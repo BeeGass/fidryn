@@ -1,13 +1,21 @@
-//! Bounded exhaustive SAT over declared finite domains.
+//! Bounded exhaustive SAT over declared finite domains, plus SMT-lite.
 //!
 //! The solver never invents a domain. Every assignment is a member of the
 //! caller-supplied completion space. Explore uses [`dpll`] conceptually to
 //! prune incompatible completions; the search remains exhaustive on that
 //! declared space.
+//!
+//! [`smt_check`] is Fidryn SMT-lite: propositional SAT and finite-domain
+//! equalities/disequalities, decided by DPLL. It is **not Z3** (no SMT-LIB,
+//! no bitvectors, no `z3-sys`).
+
+mod smt;
 
 use fidryn_core::Value;
 use std::collections::BTreeMap;
 use std::iter::FusedIterator;
+
+pub use smt::{Atom, Constraint, SmtAnswer, smt_check};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Domain {
@@ -205,13 +213,23 @@ where
 /// of `clauses`. Variables mentioned in a clause but absent from `domains`
 /// cannot take the forbidden value, so that nogood cannot fire.
 pub fn dpll(domains: &[Domain], clauses: &[Clause]) -> Vec<Assignment> {
+    let mut out = dpll_collect(domains, clauses, usize::MAX);
+    sort_assignments(&mut out);
+    out
+}
+
+/// First SAT model in DPLL search order, or `None` if unsat.
+pub(crate) fn dpll_first(domains: &[Domain], clauses: &[Clause]) -> Option<Assignment> {
+    dpll_collect(domains, clauses, 1).into_iter().next()
+}
+
+fn dpll_collect(domains: &[Domain], clauses: &[Clause], limit: usize) -> Vec<Assignment> {
     let mut remaining = BTreeMap::new();
     for domain in domains {
         remaining.insert(domain.name.clone(), domain.values.clone());
     }
     let mut out = Vec::new();
-    search_dpll(remaining, BTreeMap::new(), clauses, &mut out);
-    sort_assignments(&mut out);
+    search_dpll(remaining, BTreeMap::new(), clauses, &mut out, limit);
     out
 }
 
@@ -228,7 +246,11 @@ fn search_dpll(
     mut assigned: BTreeMap<String, Value>,
     clauses: &[Clause],
     out: &mut Vec<Assignment>,
+    limit: usize,
 ) {
+    if out.len() >= limit {
+        return;
+    }
     if !propagate(&mut remaining, &mut assigned, clauses) {
         return;
     }
@@ -244,7 +266,10 @@ fn search_dpll(
     for value in domain {
         let mut next_assigned = assigned.clone();
         next_assigned.insert(var.clone(), value);
-        search_dpll(remaining.clone(), next_assigned, clauses, out);
+        search_dpll(remaining.clone(), next_assigned, clauses, out, limit);
+        if out.len() >= limit {
+            return;
+        }
     }
 }
 

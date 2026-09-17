@@ -6,7 +6,7 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
-description = "Bounded DPLL solver over Fidryn finite completion domains"
+description = "Bounded DPLL and finite-domain SMT-lite over Fidryn completion domains (not Z3)"
 
 [dependencies]
 fidryn-core.workspace = true
