@@ -112,9 +112,12 @@ and full transaction commit are not this worklist.
 `OccupancyRecord`. Succession when `Incapacitated` is derived/determined
 or concurring evidence meets `required_concurring` (default 2). Schema
 comes from the case/module, not a `"Filing"` substring. Ranked accepted
-nominations plus a recorded interpretation (`I1`/`I2` or a nominee
-name) select the successor. Unrelated interpretation families do not
-steal that choice. No default occupant named Bryan.
+nominations are filtered by the recorded alternative's *declared*
+`Eligible` definitions, then acceptance, then rank. `I1`/`I2` are not
+nominee aliases. Families are selected by the office named in those
+definitions so two offices can declare different protocols. Unrelated
+interpretation families do not steal that choice. No default occupant
+named Bryan.
 
 **StatusOf / closed-world.** Only schema identity `OfficialFilingRecord`
 counts as filing. Substring `"Filing"` must not. Closed-world absence
@@ -122,9 +125,11 @@ requires `ClosureRecord { closed: true }` for that domain; otherwise
 `Suspended`. This is still a StatusOf evaluator, not a full status
 ledger interpreter.
 
-**RunDecision.** Declared `CoreDecision.requirements` run first, with
-temporal evidence filters. The FOIA helper is only a fallback when
-there is no usable CoreDecision and the name is the FOIA process.
+**RunDecision.** Resolve the named `CoreDecision`, check argument arity
+against binders, then evaluate declared `requirements` with temporal
+evidence filters and the declared result expression. An unknown name is
+`EngineError::Unsupported`, not a FOIA-by-name fallback. There is no
+name-based domain helper.
 
 **Convergence certificates.** `CheckedCertificate` has private fields;
 only `CheckedCertificate::verified(...)` constructs it.
