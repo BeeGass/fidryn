@@ -1,0 +1,71 @@
+module Programs.LatePayment version "0.1.0" {
+    jurisdiction Test
+    source_snapshot "2026-09-17-late-payment"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { complete_instruments }
+
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+
+    evidence_type PaymentRecord {
+        payer: NaturalPerson
+        payee: NaturalPerson
+        amount: Money<USD>
+        paid_at: Time
+    }
+
+    proposition GracePeriod(days: Int)
+    proposition StrictDeadline()
+    proposition ExtendedDeadline()
+    proposition InvoiceIssued(person: NaturalPerson)
+
+    interpretation_family DeadlineMeaning {
+        alternative Strict {
+            // Strict: 0 counted_days of grace after the invoice date.
+            defines GracePeriod(0) as established
+            defines StrictDeadline() as established
+            defines ExtendedDeadline() as not_established
+        }
+        alternative Extended {
+            // Extended: 15 counted_days of grace after the invoice date.
+            defines GracePeriod(15) as established
+            defines StrictDeadline() as not_established
+            defines ExtendedDeadline() as established
+        }
+    }
+
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        attaches when operative InvoiceIssued(Payer)
+        content USD(100.00)
+        due 0 counted_days after invoice_date
+    }
+
+    decision TimelyPayment() -> Bool {
+        record requires PaymentRecord
+        returns true
+    }
+
+    query due() -> Money<USD> {
+        goal Evaluate {
+            USD(100.00)
+        }
+    }
+
+    query paid_on_time() -> Bool ! {Observe} {
+        goal RunDecision { decision TimelyPayment }
+    }
+
+    query obligation_status() -> String {
+        goal Evaluate {
+            if performed {
+                "Performed"
+            } else {
+                "Attached"
+            }
+        }
+    }
+}

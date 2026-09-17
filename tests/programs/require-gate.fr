@@ -1,0 +1,11 @@
+module Programs.RequireGate version "0.1.0" {
+    jurisdiction Test
+    source_snapshot "2026-09-17-require-gate"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { complete_instruments }
+
+    query q() -> Int { require true; return 7 }
+    query r() -> Int { require false; return 7 }
+}

@@ -614,3 +614,67 @@ fn independent_process_responsive_record_is_not_foia() {
         other => panic!("{other:?}"),
     }
 }
+
+#[test]
+fn independent_program_late_payment_compiles() {
+    let module = compile("tests/programs/late-payment.fr");
+    assert!(module.query("due").is_some());
+    assert!(module.query("paid_on_time").is_some());
+    assert!(module.query("obligation_status").is_some());
+}
+
+#[test]
+fn independent_program_late_payment_without_record_suspends() {
+    let module = compile("tests/programs/late-payment.fr");
+    match run(&module, "paid_on_time", &CaseRecord::default()) {
+        Outcome::Suspended { requests, .. } => {
+            assert!(requests.iter().any(|r| matches!(
+                r,
+                OpenRequest::NeedEvidence { schema, .. } if schema == "PaymentRecord"
+            )));
+        }
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_late_payment_with_record_is_determinate() {
+    let module = compile("tests/programs/late-payment.fr");
+    let t = now();
+    let mut case = CaseRecord::default();
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PaymentRecord".into(),
+        value: Value::Entity("Payer".into()),
+        observed_at: t,
+    });
+    match run(&module, "paid_on_time", &case) {
+        Outcome::Determinate { value, .. } => {
+            assert_eq!(value.display_label(), "true", "{value:?}");
+        }
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_require_true_is_determinate_seven() {
+    let module = compile("tests/programs/require-gate.fr");
+    match run(&module, "q", &CaseRecord::default()) {
+        Outcome::Determinate {
+            value: Value::Int(7),
+            ..
+        } => {}
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_require_false_is_not_determinate_seven() {
+    let module = compile("tests/programs/require-gate.fr");
+    assert!(!matches!(
+        run(&module, "r", &CaseRecord::default()),
+        Outcome::Determinate {
+            value: Value::Int(7),
+            ..
+        }
+    ));
+}
