@@ -49,24 +49,39 @@ function sitePathForSlug(slug) {
 }
 
 function rewriteHref(href) {
-  if (!href || href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#") || href.startsWith("mailto:")) {
+  if (!href || href.startsWith("#") || href.startsWith("mailto:")) {
     return href;
   }
 
+  // linkify may turn bare Foo.md into http://Foo.md — map those back to docs.
+  const fakeDoc = href.match(/^https?:\/\/([^\/]+\.(?:md|ebnf|json|fr))(#.*)?$/i);
+  if (fakeDoc) {
+    return `${BLOB}/docs/${fakeDoc[1]}${fakeDoc[2] || ""}`;
+  }
+
+  if (href.startsWith("http://") || href.startsWith("https://")) {
+    return href;
+  }
+
+  // Strip anchors for lookup; reattach later
   const hashIdx = href.indexOf("#");
   const bare = hashIdx >= 0 ? href.slice(0, hashIdx) : href;
   const hash = hashIdx >= 0 ? href.slice(hashIdx) : "";
 
+  // Repo-relative paths from docs/ (../README.md, ../grammar.ebnf, etc.)
+  // Must run before basename learner match so ../README.md ≠ docs hub.
   if (bare.startsWith("../")) {
     const rel = bare.replace(/^\.\.\//, "");
     return `${BLOB}/${rel}${hash}`;
   }
 
+  // Same-directory learner guides only
   const base = path.posix.basename(bare);
   if (!bare.includes("/") && learnerByFile.has(base)) {
     return sitePathForSlug(learnerByFile.get(base).slug) + hash;
   }
 
+  // Same-dir markdown / other implementer docs
   if (bare.endsWith(".md") || bare.endsWith(".ebnf") || bare.endsWith(".json") || bare.endsWith(".fr")) {
     const cleaned = bare.replace(/^\.\//, "");
     if (cleaned.includes("/")) {
@@ -97,6 +112,7 @@ function makeMd() {
     if (hrefIdx >= 0) {
       token.attrs[hrefIdx][1] = rewriteHref(token.attrs[hrefIdx][1]);
     }
+    // External links open in new tab
     const href = hrefIdx >= 0 ? token.attrs[hrefIdx][1] : "";
     if (href.startsWith("http")) {
       token.attrSet("target", "_blank");
@@ -201,6 +217,8 @@ function firstParagraph(mdSource) {
 }
 
 function appendImplementersSection(html) {
+  // If the hub markdown already has implementers table, links were rewritten to GitHub.
+  // Also ensure a clean card list exists for hub — inject after main content if missing.
   const list = IMPLEMENTERS.map(
     (d) =>
       `  <li><a href="${BLOB}/docs/${d.file}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.label)}</a></li>`
@@ -232,6 +250,8 @@ function build() {
     }
     let source = fs.readFileSync(srcPath, "utf8");
 
+    // Hub: drop the "For implementers" markdown table; we inject a GitHub list instead
+    // so we don't duplicate and so links are consistent.
     if (page.slug === "index") {
       source = source.replace(/\n## For implementers[\s\S]*$/m, "\n");
     }
