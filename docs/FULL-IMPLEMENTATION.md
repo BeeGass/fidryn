@@ -128,7 +128,7 @@ determination that is operative in the relevant context.
 14. **Mill UI**
     - `fidryn ui [--port N] [--no-open]` on 127.0.0.1 only.
     - Check, run, explore, render. No live filing from the UI.
-    - Outcome JSON uses the mill/CLI envelope (`fidryn.outcome/v0.1`
+    - Outcome JSON uses the mill/CLI evaluation-report envelope (`fidryn.evaluation-report/v0.1` with nested `fidryn.outcome/v0.1`
       fields, camelCase, hex ids, tagged `Value`).
 
 15. **General worklist evaluator**
