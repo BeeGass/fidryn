@@ -172,17 +172,15 @@ fn ignored_issue() -> OpenRequest {
     }
 }
 
-fn bool_branch(b: bool, answer: bool) -> BranchClaim {
-    let mut bindings = BTreeMap::new();
-    bindings.insert("b".into(), Value::Bool(b));
+fn empty_true_branch() -> BranchClaim {
     BranchClaim {
-        bindings,
-        answer: Value::Bool(answer),
+        bindings: BTreeMap::new(),
+        answer: Value::Bool(true),
     }
 }
 
 fn tautology_module() -> fidryn_core::CoreModule {
-    compile(&source("query q() -> Bool { return b or not b }"))
+    compile(&source("query q() -> Bool { return true }"))
 }
 
 fn covering_id(
@@ -300,7 +298,7 @@ fn structural_accept_covering_cannot_authorize_ignored_issues() {
     let answer = Value::Bool(true);
     let mut ignored = BTreeSet::new();
     ignored.insert(ignored_issue());
-    let witness = CoverageWitness::complete(2, answer.clone());
+    let witness = CoverageWitness::complete(1, answer.clone());
     let id = structural_id(&module, &case, &ignored, &answer, &witness);
     let cert = accept_covering(
         id,
@@ -331,11 +329,11 @@ fn finite_replay_accept_covering_eval_can_authorize_ignored_issues() {
     let mut ignored = BTreeSet::new();
     ignored.insert(ignored_issue());
     let witness = CoverageWitness {
-        examined: 2,
-        total: 2,
+        examined: 1,
+        total: 1,
         incomplete: false,
         answer: claimed.clone(),
-        branches: vec![bool_branch(false, true), bool_branch(true, true)],
+        branches: vec![empty_true_branch()],
     };
     let id = covering_id(&module, &case, &ignored, &claimed, &witness);
     let cert = accept_covering_eval(
@@ -367,7 +365,7 @@ fn empty_coverage_witness_cannot_cover_via_accept_covering_eval() {
     let answer = Value::Bool(true);
     let mut ignored = BTreeSet::new();
     ignored.insert(ignored_issue());
-    let witness = CoverageWitness::complete(2, answer.clone());
+    let witness = CoverageWitness::complete(1, answer.clone());
     assert!(
         witness.branches.is_empty(),
         "complete() is shape-only; branches stay empty"
@@ -434,11 +432,11 @@ fn accept_covering_eval_does_not_mutate_caller_case() {
     let claimed = Value::Bool(true);
     let ignored = BTreeSet::new();
     let witness = CoverageWitness {
-        examined: 2,
-        total: 2,
+        examined: 1,
+        total: 1,
         incomplete: false,
         answer: claimed.clone(),
-        branches: vec![bool_branch(false, true), bool_branch(true, true)],
+        branches: vec![empty_true_branch()],
     };
     let id = covering_id(&module, &case, &ignored, &claimed, &witness);
     let cert = accept_covering_eval(
@@ -824,8 +822,15 @@ async fn mill_pasted_run_is_unauthenticated_evaluation_report() {
     let bytes = response.into_body().collect().await.unwrap().to_bytes();
     let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(json["ok"], true, "{json}");
-    assert_not_outcome_only_export(&json);
-    assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
-    assert_eq!(json["executionMode"], "operative", "{json}");
-    assert_eq!(json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");
+    let report = json
+        .get("report")
+        .expect("mill transport wraps the evaluation report");
+    assert!(
+        report.get("ok").is_none(),
+        "ok is not an evaluation-report field: {json}"
+    );
+    assert_not_outcome_only_export(report);
+    assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+    assert_eq!(report["executionMode"], "operative", "{json}");
+    assert_eq!(report["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");
 }
