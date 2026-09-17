@@ -3,13 +3,20 @@
 use fidryn_core::ir::CoreDuty;
 use fidryn_core::time::{CalendarKind, Instant};
 use fidryn_core::value::{Term, Value};
-use fidryn_core::{CaseRecord, DutyState, DutyStatus, EngineError, LedgerEvent, RunContext};
+use fidryn_core::{
+    CaseRecord, DutyState, DutyStatus, EngineError, EvidenceItem, LedgerEvent, RunContext,
+};
 use std::collections::BTreeMap;
 
 pub const DUTY_KEY_PREFIX: &str = "duty:";
+pub const DEFAULT_DUTY_INSTANCE: &str = "default";
 
 pub fn duty_fact_key(name: &str) -> String {
-    format!("{DUTY_KEY_PREFIX}{name}")
+    duty_instance_key(name, DEFAULT_DUTY_INSTANCE)
+}
+
+pub fn duty_instance_key(def: &str, instance: &str) -> String {
+    format!("{DUTY_KEY_PREFIX}{def}:{instance}")
 }
 
 pub fn status_name(status: DutyStatus) -> &'static str {
@@ -20,6 +27,7 @@ pub fn status_name(status: DutyStatus) -> &'static str {
         DutyStatus::Cured => "Cured",
         DutyStatus::Discharged => "Discharged",
         DutyStatus::Unresolved => "Unresolved",
+        DutyStatus::NotAttached => "NotAttached",
     }
 }
 
@@ -31,6 +39,11 @@ pub fn status_value(status: DutyStatus) -> Value {
 }
 
 pub fn duty_state_value(state: &DutyState) -> Value {
+    let instance = if state.instance.is_empty() {
+        DEFAULT_DUTY_INSTANCE
+    } else {
+        state.instance.as_str()
+    };
     let mut fields = BTreeMap::from([
         ("name".into(), Value::String(state.name.clone())),
         (
@@ -39,6 +52,7 @@ pub fn duty_state_value(state: &DutyState) -> Value {
         ),
         ("breached".into(), Value::Bool(state.breached)),
         ("bearer".into(), Value::String(state.bearer.clone())),
+        ("instance".into(), Value::String(instance.into())),
     ]);
     if let Some(claimant) = &state.claimant {
         fields.insert("claimant".into(), Value::String(claimant.clone()));
@@ -74,12 +88,17 @@ pub fn parse_duty_state(value: &Value, name: &str) -> Option<DutyState> {
         },
         _ => None,
     };
+    let instance = match fields.get("instance").and_then(value_as_name) {
+        Some(name) if !name.is_empty() => name,
+        _ => DEFAULT_DUTY_INSTANCE.to_owned(),
+    };
     Some(DutyState {
         name: stored_name,
         status,
         breached,
         bearer,
         claimant,
+        instance,
     })
 }
 
@@ -104,6 +123,8 @@ fn parse_status_name(name: &str) -> Option<DutyStatus> {
         Some(DutyStatus::Discharged)
     } else if name.eq_ignore_ascii_case("Unresolved") {
         Some(DutyStatus::Unresolved)
+    } else if name.eq_ignore_ascii_case("NotAttached") {
+        Some(DutyStatus::NotAttached)
     } else {
         None
     }
@@ -125,20 +146,28 @@ pub fn apply_duty_action(
     let claimant = current.and_then(|state| state.claimant.clone());
     let from = current.map(|state| state.status);
     let breached = current.map(|state| state.breached).unwrap_or(false);
+    let instance = current
+        .map(|state| state.instance.clone())
+        .filter(|name| !name.is_empty())
+        .unwrap_or_else(|| DEFAULT_DUTY_INSTANCE.to_owned());
     let next = match (from, action) {
-        (None | Some(DutyStatus::Unresolved), DutyAction::Attach) => DutyState {
-            name: name.to_owned(),
-            status: DutyStatus::Attached,
-            breached: false,
-            bearer,
-            claimant,
-        },
+        (None | Some(DutyStatus::Unresolved | DutyStatus::NotAttached), DutyAction::Attach) => {
+            DutyState {
+                name: name.to_owned(),
+                status: DutyStatus::Attached,
+                breached: false,
+                bearer,
+                claimant,
+                instance,
+            }
+        }
         (Some(DutyStatus::Attached), DutyAction::Perform) => DutyState {
             name: name.to_owned(),
             status: DutyStatus::Performed,
             breached: false,
             bearer,
             claimant,
+            instance,
         },
         (Some(DutyStatus::Attached), DutyAction::Breach) => DutyState {
             name: name.to_owned(),
@@ -146,6 +175,7 @@ pub fn apply_duty_action(
             breached: true,
             bearer,
             claimant,
+            instance,
         },
         (Some(DutyStatus::Breached), DutyAction::Perform) => DutyState {
             name: name.to_owned(),
@@ -153,6 +183,7 @@ pub fn apply_duty_action(
             breached: true,
             bearer,
             claimant,
+            instance,
         },
         (Some(DutyStatus::Breached), DutyAction::Cure) => DutyState {
             name: name.to_owned(),
@@ -160,6 +191,7 @@ pub fn apply_duty_action(
             breached: true,
             bearer,
             claimant,
+            instance,
         },
         (
             Some(DutyStatus::Performed | DutyStatus::Cured | DutyStatus::Breached),
@@ -170,6 +202,7 @@ pub fn apply_duty_action(
             breached,
             bearer,
             claimant,
+            instance,
         },
         (from, action) => {
             let from = from.map_or("unattached", status_name);
@@ -266,13 +299,13 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
 }
 
 /// `duty` / `authority` / institutional events need a covering grant.
-/// `assumption` events skip that gate.
+/// Assumption events are not operative duty performance.
 pub fn event_is_admitted(case: &CaseRecord, event: &LedgerEvent, record_time: Instant) -> bool {
     if event.record_time > record_time {
         return false;
     }
     if event.kind.eq_ignore_ascii_case("assumption") {
-        return true;
+        return false;
     }
     if is_gated_event_kind(&event.kind) {
         return event_action(&event.payload)
@@ -326,13 +359,15 @@ fn status_to_action(name: &str) -> String {
     }
 }
 
-/// Surface `duty_status(Name)` from a [`CoreDuty`] plus the case, not `duty_step`.
+/// Surface `duty_status(Name)` / `duty_status(Name, Instance)` from a [`CoreDuty`].
 pub fn surface_duty_state(
     duty: &CoreDuty,
     case: &CaseRecord,
     ctx: &RunContext,
     attaches_held: bool,
+    attaches_denied: bool,
     performed_held: bool,
+    instance: &str,
 ) -> DutyState {
     let bearer = party_name(&duty.bearer);
     let claimant = duty
@@ -340,29 +375,41 @@ pub fn surface_duty_state(
         .as_ref()
         .map(party_name)
         .filter(|s| !s.is_empty());
+    let instance = if instance.is_empty() {
+        DEFAULT_DUTY_INSTANCE.to_owned()
+    } else {
+        instance.to_owned()
+    };
     if !attaches_held {
+        let status = if attaches_denied {
+            DutyStatus::NotAttached
+        } else {
+            DutyStatus::Unresolved
+        };
         return DutyState {
             name: duty.name.clone(),
-            status: DutyStatus::Unresolved,
+            status,
             breached: false,
             bearer,
             claimant,
+            instance,
         };
     }
-    let performed = performed_held || performance_exists(&duty.name, case, ctx);
+    let performed = performed_held || performance_exists(&duty.name, &instance, case, ctx);
     let deadline_passed = deadline_has_passed(&duty.name, &duty.content, case, ctx);
     let already_breached = fact_flag(case, &format!("{}_breached", duty.name)).unwrap_or(false)
-        || stored_duty_breached(&duty.name, case);
+        || stored_duty_breached(&duty.name, &instance, case);
     if performed {
         let late = already_breached
             || deadline_passed
-            || performance_is_after_deadline(&duty.name, &duty.content, case, ctx);
+            || performance_is_after_deadline(&duty.name, &instance, &duty.content, case, ctx);
         return DutyState {
             name: duty.name.clone(),
             status: DutyStatus::Performed,
             breached: late,
             bearer,
             claimant,
+            instance,
         };
     }
     if deadline_passed {
@@ -372,6 +419,7 @@ pub fn surface_duty_state(
             breached: true,
             bearer,
             claimant,
+            instance,
         };
     }
     DutyState {
@@ -380,6 +428,7 @@ pub fn surface_duty_state(
         breached: false,
         bearer,
         claimant,
+        instance,
     }
 }
 
@@ -392,43 +441,65 @@ fn party_name(term: &Term) -> String {
     }
 }
 
-fn performance_exists(name: &str, case: &CaseRecord, ctx: &RunContext) -> bool {
+fn performance_exists(name: &str, instance: &str, case: &CaseRecord, ctx: &RunContext) -> bool {
     if fact_flag(case, &format!("{name}_performed")).unwrap_or(false)
         || fact_flag(case, "performed").unwrap_or(false)
     {
         return true;
     }
-    if stored_duty_performed(name, case) {
+    if stored_duty_performed(name, instance, case) {
         return true;
     }
     if case.evidence.iter().any(|item| {
-        item.schema.eq_ignore_ascii_case("PaymentRecord") && item.observed_at <= ctx.record_time
+        item.observed_at <= ctx.record_time && payment_matches_instance(item, name, instance)
     }) {
         return true;
     }
     case.events.iter().any(|event| {
-        event_is_admitted(case, event, ctx.record_time) && event_marks_performed(event, name)
+        event_is_admitted(case, event, ctx.record_time)
+            && event_marks_performed(event, name, instance)
     })
 }
 
-fn event_marks_performed(event: &LedgerEvent, duty_name: &str) -> bool {
-    if !(event.kind.eq_ignore_ascii_case("duty") || event.kind.eq_ignore_ascii_case("assumption")) {
+fn payment_matches_instance(item: &EvidenceItem, duty_name: &str, instance: &str) -> bool {
+    if !item.schema.eq_ignore_ascii_case("PaymentRecord") {
         return false;
     }
-    payload_marks_performed(&event.payload, duty_name)
+    match &item.value {
+        Value::String(_) | Value::Entity(_) => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+        Value::Map(fields) | Value::Ctor { fields, .. } => {
+            if duty_field_mismatch(fields, duty_name) {
+                return false;
+            }
+            match instance_from_fields(fields) {
+                Some(named) => named.eq_ignore_ascii_case(instance),
+                None => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+            }
+        }
+        _ => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+    }
 }
 
-fn payload_marks_performed(payload: &Value, duty_name: &str) -> bool {
+fn event_marks_performed(event: &LedgerEvent, duty_name: &str, instance: &str) -> bool {
+    if !event.kind.eq_ignore_ascii_case("duty") {
+        return false;
+    }
+    payload_marks_performed(&event.payload, duty_name, instance)
+}
+
+fn payload_marks_performed(payload: &Value, duty_name: &str, instance: &str) -> bool {
     match payload {
-        Value::String(name) | Value::Entity(name) => is_performed_name(name),
+        Value::String(name) | Value::Entity(name) => {
+            instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE) && is_performed_name(name)
+        }
         Value::Ctor { name, fields } => {
-            if duty_field_mismatch(fields, duty_name) {
+            if duty_field_mismatch(fields, duty_name) || instance_field_mismatch(fields, instance) {
                 return false;
             }
             is_performed_name(name) || fields.get("status").is_some_and(value_is_performed)
         }
         Value::Map(fields) => {
-            if duty_field_mismatch(fields, duty_name) {
+            if duty_field_mismatch(fields, duty_name) || instance_field_mismatch(fields, instance) {
                 return false;
             }
             fields.get("status").is_some_and(value_is_performed)
@@ -443,6 +514,32 @@ fn duty_field_mismatch(fields: &BTreeMap<String, Value>, duty_name: &str) -> boo
         .get("name")
         .or_else(|| fields.get("duty"))
         .is_some_and(|named| !value_names_duty(named, duty_name))
+}
+
+fn instance_field_mismatch(fields: &BTreeMap<String, Value>, instance: &str) -> bool {
+    match instance_from_fields(fields) {
+        Some(named) => !named.eq_ignore_ascii_case(instance),
+        None => !instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+    }
+}
+
+fn instance_from_fields(fields: &BTreeMap<String, Value>) -> Option<String> {
+    fields.get("instance").and_then(value_as_name)
+}
+
+fn duty_name_from_fields(fields: &BTreeMap<String, Value>) -> Option<String> {
+    fields
+        .get("name")
+        .or_else(|| fields.get("duty"))
+        .and_then(value_as_name)
+}
+
+fn value_as_name(value: &Value) -> Option<String> {
+    match value {
+        Value::String(name) | Value::Entity(name) => Some(name.clone()),
+        Value::Ctor { name, .. } => Some(name.clone()),
+        _ => None,
+    }
 }
 
 fn value_names_duty(value: &Value, duty_name: &str) -> bool {
@@ -466,18 +563,19 @@ fn is_performed_name(name: &str) -> bool {
     name.eq_ignore_ascii_case("Performed") || name.eq_ignore_ascii_case("perform")
 }
 
-fn stored_duty_state(name: &str, case: &CaseRecord) -> Option<DutyState> {
+fn stored_duty_state(name: &str, instance: &str, case: &CaseRecord) -> Option<DutyState> {
     case.facts
-        .get(&duty_fact_key(name))
+        .get(&duty_instance_key(name, instance))
         .and_then(|value| parse_duty_state(value, name))
 }
 
-fn stored_duty_performed(name: &str, case: &CaseRecord) -> bool {
-    stored_duty_state(name, case).is_some_and(|state| state.status == DutyStatus::Performed)
+fn stored_duty_performed(name: &str, instance: &str, case: &CaseRecord) -> bool {
+    stored_duty_state(name, instance, case)
+        .is_some_and(|state| state.status == DutyStatus::Performed)
 }
 
-fn stored_duty_breached(name: &str, case: &CaseRecord) -> bool {
-    stored_duty_state(name, case).is_some_and(|state| state.breached)
+fn stored_duty_breached(name: &str, instance: &str, case: &CaseRecord) -> bool {
+    stored_duty_state(name, instance, case).is_some_and(|state| state.breached)
 }
 
 fn deadline_has_passed(name: &str, content: &[Term], case: &CaseRecord, ctx: &RunContext) -> bool {
@@ -492,6 +590,7 @@ fn deadline_has_passed(name: &str, content: &[Term], case: &CaseRecord, ctx: &Ru
 
 fn performance_is_after_deadline(
     name: &str,
+    instance: &str,
     content: &[Term],
     case: &CaseRecord,
     ctx: &RunContext,
@@ -500,7 +599,7 @@ fn performance_is_after_deadline(
         return fact_flag(case, &format!("{name}_late")).unwrap_or(false)
             || fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false);
     };
-    match performance_instant(name, case, ctx) {
+    match performance_instant(name, instance, case, ctx) {
         Some(at) => at > deadline,
         None => ctx.record_time > deadline,
     }
@@ -577,12 +676,17 @@ fn add_counted_days(start: Instant, days: i64) -> Option<Instant> {
         .map(Instant::from_offset)
 }
 
-fn performance_instant(name: &str, case: &CaseRecord, ctx: &RunContext) -> Option<Instant> {
+fn performance_instant(
+    name: &str,
+    instance: &str,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Option<Instant> {
     let from_evidence = case
         .evidence
         .iter()
         .filter(|item| {
-            item.schema.eq_ignore_ascii_case("PaymentRecord") && item.observed_at <= ctx.record_time
+            item.observed_at <= ctx.record_time && payment_matches_instance(item, name, instance)
         })
         .map(|item| item.observed_at)
         .min();
@@ -592,7 +696,8 @@ fn performance_instant(name: &str, case: &CaseRecord, ctx: &RunContext) -> Optio
     case.events
         .iter()
         .filter(|event| {
-            event_is_admitted(case, event, ctx.record_time) && event_marks_performed(event, name)
+            event_is_admitted(case, event, ctx.record_time)
+                && event_marks_performed(event, name, instance)
         })
         .map(|event| event.record_time)
         .min()
@@ -621,10 +726,81 @@ fn fact_instant(case: &CaseRecord, key: &str) -> Option<Instant> {
     }
 }
 
+/// Clone `case` and apply assumption payloads to scenario-only facts.
+/// Never appends to `events`.
+pub fn scenario_overlay_case(case: &CaseRecord) -> CaseRecord {
+    let mut overlay = case.clone();
+    let assumptions = overlay.assumptions.clone();
+    for assumption in &assumptions {
+        apply_assumption_payload(&mut overlay, &assumption.payload);
+    }
+    let event_payloads: Vec<Value> = overlay
+        .events
+        .iter()
+        .filter(|event| event.kind.eq_ignore_ascii_case("assumption"))
+        .map(|event| event.payload.clone())
+        .collect();
+    for payload in &event_payloads {
+        apply_assumption_payload(&mut overlay, payload);
+    }
+    overlay
+}
+
+/// Merge an assumption payload into scenario facts. Does not push events.
+pub fn apply_assumption_payload(case: &mut CaseRecord, payload: &Value) {
+    match payload {
+        Value::Map(fields) => {
+            for (key, value) in fields {
+                case.facts.insert(key.clone(), value.clone());
+            }
+            overlay_performed_from_fields(case, fields, false);
+        }
+        Value::Ctor { name, fields } if is_performed_name(name) => {
+            overlay_performed_from_fields(case, fields, true);
+        }
+        Value::String(name) | Value::Entity(name) if is_performed_name(name) => {
+            case.facts.insert("performed".into(), Value::Bool(true));
+        }
+        _ => {}
+    }
+}
+
+fn overlay_performed_from_fields(
+    case: &mut CaseRecord,
+    fields: &BTreeMap<String, Value>,
+    ctor_performed: bool,
+) {
+    let performed = ctor_performed
+        || fields.get("status").is_some_and(value_is_performed)
+        || matches!(fields.get("performed"), Some(Value::Bool(true)));
+    if !performed {
+        return;
+    }
+    let instance = instance_from_fields(fields).unwrap_or_else(|| DEFAULT_DUTY_INSTANCE.to_owned());
+    if let Some(name) = duty_name_from_fields(fields) {
+        insert_performed_duty(case, &name, &instance);
+    } else {
+        case.facts.insert("performed".into(), Value::Bool(true));
+    }
+}
+
+fn insert_performed_duty(case: &mut CaseRecord, name: &str, instance: &str) {
+    let state = DutyState {
+        name: name.to_owned(),
+        status: DutyStatus::Performed,
+        breached: false,
+        bearer: String::new(),
+        claimant: None,
+        instance: instance.to_owned(),
+    };
+    case.facts
+        .insert(duty_instance_key(name, instance), duty_state_value(&state));
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::EvidenceItem;
+    use fidryn_core::{Assumption, EvidenceItem};
 
     fn attached() -> DutyState {
         DutyState {
@@ -633,6 +809,7 @@ mod tests {
             breached: false,
             bearer: String::new(),
             claimant: None,
+            instance: DEFAULT_DUTY_INSTANCE.into(),
         }
     }
 
@@ -642,6 +819,22 @@ mod tests {
         assert_eq!(got.status, DutyStatus::Attached);
         assert!(!got.breached);
         assert_eq!(got.name, "pay");
+        assert_eq!(got.instance, DEFAULT_DUTY_INSTANCE);
+    }
+
+    #[test]
+    fn attach_from_not_attached_is_attached() {
+        let current = DutyState {
+            name: "pay".into(),
+            status: DutyStatus::NotAttached,
+            breached: false,
+            bearer: String::new(),
+            claimant: None,
+            instance: "invoice_a".into(),
+        };
+        let got = apply_duty_action(Some(&current), "pay", "attach", None).unwrap();
+        assert_eq!(got.status, DutyStatus::Attached);
+        assert_eq!(got.instance, "invoice_a");
     }
 
     #[test]
@@ -652,6 +845,7 @@ mod tests {
             breached: true,
             bearer: "Alice".into(),
             claimant: None,
+            instance: DEFAULT_DUTY_INSTANCE.into(),
         };
         let got = apply_duty_action(Some(&breached), "pay", "perform", None).unwrap();
         assert_eq!(got.status, DutyStatus::Performed);
@@ -710,7 +904,7 @@ mod tests {
     }
 
     #[test]
-    fn assumption_event_is_admitted_without_grant() {
+    fn assumption_event_is_not_admitted_without_grant() {
         let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let event = LedgerEvent {
             kind: "assumption".into(),
@@ -722,6 +916,35 @@ mod tests {
             },
         };
         let case = CaseRecord::default();
-        assert!(event_is_admitted(&case, &event, t));
+        assert!(!event_is_admitted(&case, &event, t));
+    }
+
+    #[test]
+    fn scenario_overlay_keeps_assumption_ids_and_does_not_append_events() {
+        let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let payload = Value::Ctor {
+            name: "Performed".into(),
+            fields: BTreeMap::new(),
+        };
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-performed".into(),
+            payload: payload.clone(),
+        });
+        case.events.push(LedgerEvent {
+            kind: "assumption".into(),
+            valid_time: fidryn_core::Interval::always(),
+            record_time: t,
+            payload,
+        });
+        let events_before = case.events.clone();
+        let assumptions_before = case.assumptions.clone();
+        let overlay = scenario_overlay_case(&case);
+        assert_eq!(case.events, events_before);
+        assert_eq!(overlay.events, events_before);
+        assert_eq!(overlay.assumptions, assumptions_before);
+        assert_eq!(overlay.assumptions[0].id, "hyp-performed");
+        assert_eq!(overlay.facts.get("performed"), Some(&Value::Bool(true)));
+        assert!(!case.facts.contains_key("performed"));
     }
 }

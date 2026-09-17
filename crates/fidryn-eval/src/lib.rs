@@ -21,9 +21,9 @@ use fidryn_core::time::Interval;
 use fidryn_core::types::{Sort, Type};
 use fidryn_core::value::{BinOp, PropTerm, Term, Value};
 use fidryn_core::{
-    CaseRecord, EvaluationReport, EvidenceItem, Guard, HaltReason, Handler, HandlerResult, Instant,
-    JurisdictionId, ManifestArtifact, NodeId, OriginId, Outcome, QueryName, RunContext,
-    SourceWeight, TraceId,
+    Assumption, CaseRecord, EvaluationReport, EvidenceItem, ExecutionMode, Guard, HaltReason,
+    Handler, HandlerResult, Instant, JurisdictionId, ManifestArtifact, NodeId, OriginId, Outcome,
+    QueryName, RunContext, SourceWeight, TraceId,
 };
 use rust_decimal::Decimal;
 use std::collections::{BTreeMap, BTreeSet};
@@ -68,6 +68,7 @@ struct SeqFrame {
 pub struct EvalSession {
     pub outcome: Outcome<Value>,
     pub continuation: Option<Continuation>,
+    pub bindings: BTreeMap<String, Value>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -131,9 +132,35 @@ pub fn evaluate<H: Handler>(
     Ok(evaluate_session(module, query, args, state, ctx, handler, case)?.outcome)
 }
 
+/// Evaluate with `case.assumptions` as a facts overlay. Does not mutate `case.events`.
+#[allow(clippy::too_many_arguments, clippy::result_large_err)]
+pub fn evaluate_scenario<H: Handler>(
+    module: &CoreModule,
+    query: &QueryName,
+    args: &BTreeMap<String, Value>,
+    state: &LegalState,
+    ctx: &RunContext,
+    handler: &mut H,
+    case: &CaseRecord,
+) -> Result<Outcome<Value>, EngineError> {
+    let overlay = duty::scenario_overlay_case(case);
+    evaluate(module, query, args, state, ctx, handler, &overlay)
+}
+
 /// Wrap an outcome as an [`EvaluationReport`]. Coverage is unset.
 pub fn report_from(outcome: Outcome<Value>) -> EvaluationReport {
     EvaluationReport::from_outcome(outcome)
+}
+
+/// Wrap an outcome as a scenario [`EvaluationReport`].
+pub fn report_from_scenario(
+    outcome: Outcome<Value>,
+    assumptions: Vec<Assumption>,
+) -> EvaluationReport {
+    let mut report = EvaluationReport::from_outcome(outcome);
+    report.execution_mode = ExecutionMode::Scenario;
+    report.assumptions = assumptions;
+    report
 }
 
 /// Evaluate `query` and, on [`Outcome::Suspended`], capture a [`Continuation`].
@@ -314,7 +341,7 @@ fn session_from(
     let continuation = match &outcome {
         Outcome::Suspended { .. } => Some(Continuation {
             residual,
-            bindings,
+            bindings: bindings.clone(),
             derived,
             fuel,
             answered,
@@ -328,6 +355,7 @@ fn session_from(
     EvalSession {
         outcome,
         continuation,
+        bindings,
     }
 }
 
@@ -529,6 +557,9 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if is_seq(ctor) {
             return self.eval_seq(args);
         }
+        if is_transaction(ctor) {
+            return self.eval_transaction(args);
+        }
         if is_require(ctor) {
             return self.eval_require(args);
         }
@@ -577,6 +608,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             || is_not(callee)
             || is_if(callee)
             || is_seq(callee)
+            || is_transaction(callee)
             || is_require(callee)
             || is_duty_step(callee)
             || is_duty_status(callee)
@@ -753,23 +785,68 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         }
     }
 
+    fn eval_transaction(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if args.is_empty() {
+            return Err(unsupported("empty transaction"));
+        }
+        let saved = self.bindings.clone();
+        let mut last = None;
+        for step in args {
+            match self.eval_term(step) {
+                Ok(Outcome::Determinate { value, .. }) => last = Some(value),
+                Ok(outcome) => {
+                    self.bindings = saved;
+                    return Ok(outcome);
+                }
+                Err(err) => {
+                    self.bindings = saved;
+                    return Err(err);
+                }
+            }
+        }
+        match last {
+            Some(value) => Ok(determinate(value, TraceId::of(b"transaction"))),
+            None => {
+                self.bindings = saved;
+                Err(unsupported("empty transaction"))
+            }
+        }
+    }
+
     fn eval_duty_status(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
         if args.is_empty() {
             return Err(unsupported("duty_status expects a duty name"));
         }
         let name = term_literal_name(&args[0])?;
+        let instance = if args.len() >= 2 {
+            term_literal_name(&args[1])?
+        } else {
+            duty::DEFAULT_DUTY_INSTANCE.to_owned()
+        };
         let Some(duty) = find_duty(self.module, &name).cloned() else {
             return Err(unsupported(format!("unknown duty `{name}`")));
         };
         let attaches_held = self
             .derived
             .is_guard_held(&duty.attaches, self.case, self.ctx);
+        let attaches_denied = self
+            .derived
+            .is_guard_denied(&duty.attaches, self.case, self.ctx);
         let performed_held = self.derived.holds_named("performed")
             || self.derived.holds_named(&format!("{name}_performed"));
-        let state =
-            duty::surface_duty_state(&duty, self.case, self.ctx, attaches_held, performed_held);
-        self.bindings
-            .insert(duty::duty_fact_key(&name), duty::duty_state_value(&state));
+        let state = duty::surface_duty_state(
+            &duty,
+            self.case,
+            self.ctx,
+            attaches_held,
+            attaches_denied,
+            performed_held,
+            &instance,
+        );
+        self.bindings.insert(
+            duty::duty_instance_key(&name, &instance),
+            duty::duty_state_value(&state),
+        );
         Ok(determinate(
             duty::duty_state_value(&state),
             TraceId::of(b"duty_status"),
@@ -789,15 +866,26 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         } else {
             None
         };
-        let must_check = args.len() > 3 || duty::has_authority_constraint(self.case);
-        if must_check && !duty::action_is_granted(self.case, &action, self.ctx.record_time) {
+        let instance = if args.len() >= 4 {
+            term_literal_name(&args[3])?
+        } else {
+            duty::DEFAULT_DUTY_INSTANCE.to_owned()
+        };
+        if duty::has_authority_constraint(self.case)
+            && !duty::action_is_granted(self.case, &action, self.ctx.record_time)
+        {
             return Ok(authority_missing(&action));
         }
-        let key = duty::duty_fact_key(&name);
+        let key = if args.len() >= 4 {
+            duty::duty_instance_key(&name, &instance)
+        } else {
+            duty::duty_fact_key(&name)
+        };
         let current = self
             .lookup(&key)
             .and_then(|value| duty::parse_duty_state(&value, &name));
-        let next = duty::apply_duty_action(current.as_ref(), &name, &action, person)?;
+        let mut next = duty::apply_duty_action(current.as_ref(), &name, &action, person)?;
+        next.instance = instance;
         self.bindings.insert(key, duty::duty_state_value(&next));
         Ok(determinate(
             duty::status_value(next.status),
@@ -1211,6 +1299,10 @@ fn is_not(ctor: &str) -> bool {
 
 fn is_seq(ctor: &str) -> bool {
     ctor.eq_ignore_ascii_case("seq")
+}
+
+fn is_transaction(ctor: &str) -> bool {
+    ctor.eq_ignore_ascii_case("transaction")
 }
 
 fn is_require(ctor: &str) -> bool {
@@ -5168,6 +5260,18 @@ mod tests {
         }
     }
 
+    fn duty_step_instance_term(name: &str, action: &str, person: &str, instance: &str) -> Term {
+        Term::Apply {
+            ctor: "duty_step".into(),
+            args: vec![
+                Term::Ident(name.into()),
+                Term::Ident(action.into()),
+                Term::Ident(person.into()),
+                Term::Ident(instance.into()),
+            ],
+        }
+    }
+
     fn attached_duty_fact() -> Value {
         Value::Map(BTreeMap::from([
             ("status".into(), Value::String("Attached".into())),
@@ -5274,7 +5378,7 @@ mod tests {
             duty_step_term("pay", "breach"),
             duty_step_term("pay", "perform"),
             Term::Field {
-                base: Box::new(Term::Ident("duty:pay".into())),
+                base: Box::new(Term::Ident("duty:pay:default".into())),
                 name: "breached".into(),
             },
         ]);
@@ -5290,7 +5394,8 @@ mod tests {
     #[test]
     fn duty_illegal_discharge_from_attached_does_not_change_state() {
         let mut case = CaseRecord::default();
-        case.facts.insert("duty:pay".into(), attached_duty_fact());
+        case.facts
+            .insert("duty:pay:default".into(), attached_duty_fact());
         let err = run_module(
             &module_with_plan("q", QueryPlan::Evaluate(duty_step_term("pay", "discharge"))),
             "q",
@@ -5303,7 +5408,7 @@ mod tests {
             "{err:?}"
         );
         match run_plan(
-            QueryPlan::Evaluate(Term::Ident("duty:pay".into())),
+            QueryPlan::Evaluate(Term::Ident("duty:pay:default".into())),
             &case,
             &mut Refusing,
         ) {
@@ -5374,7 +5479,10 @@ mod tests {
             other => panic!("{other:?}"),
         }
         let err = run_module(
-            &module_with_plan("q", QueryPlan::Evaluate(Term::Ident("duty:pay".into()))),
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Ident("duty:pay:default".into())),
+            ),
             "q",
             &case,
             &mut Refusing,
@@ -5447,6 +5555,8 @@ mod tests {
             OpenRequest::NeedCustom { effect, .. } if effect == "require"
         )));
         assert!(report.coverage.is_none());
+        assert_eq!(report.execution_mode, ExecutionMode::Operative);
+        assert!(report.assumptions.is_empty());
     }
 
     fn seq_term(args: Vec<Term>) -> Term {
@@ -5527,6 +5637,24 @@ mod tests {
             run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate"),
         );
         assert_eq!(state.status, fidryn_core::DutyStatus::Unresolved);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn duty_status_not_attached_when_attach_guard_is_denied() {
+        let module = duty_status_module(pay_duty(invoice_issued_guard(), 30));
+        let mut case = CaseRecord::default();
+        case.determinations.push(CaseDetermination {
+            issue: "InvoiceIssued".into(),
+            protocol: "Invoice".into(),
+            established: false,
+            decider: "Tribunal".into(),
+            recorded_at: None,
+        });
+        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_eq!(state.status, fidryn_core::DutyStatus::NotAttached);
+        assert_ne!(state.status, fidryn_core::DutyStatus::Unresolved);
+        assert_ne!(state.status, fidryn_core::DutyStatus::Attached);
         assert!(!state.breached);
     }
 
@@ -5620,6 +5748,25 @@ mod tests {
     }
 
     #[test]
+    fn operative_assumptions_vec_does_not_make_duty_status_performed() {
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-performed".into(),
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let events_before = case.events.clone();
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let operative =
+            status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_ne!(operative.status, fidryn_core::DutyStatus::Performed);
+        assert_eq!(operative.status, fidryn_core::DutyStatus::Attached);
+        assert_eq!(case.events, events_before);
+    }
+
+    #[test]
     fn duty_event_performed_without_grant_does_not_make_duty_status_performed() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let mut case = CaseRecord::default();
@@ -5641,20 +5788,316 @@ mod tests {
     #[test]
     fn assumption_event_performed_makes_duty_status_performed() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let payload = Value::Ctor {
+            name: "Performed".into(),
+            fields: BTreeMap::new(),
+        };
         let mut case = CaseRecord::default();
         case.events.push(fidryn_core::LedgerEvent {
             kind: "assumption".into(),
             valid_time: Interval::always(),
             record_time: t,
-            payload: Value::Ctor {
-                name: "Performed".into(),
-                fields: BTreeMap::new(),
-            },
+            payload: payload.clone(),
         });
+        let events_before = case.events.clone();
         let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
-        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
-        assert_eq!(state.status, fidryn_core::DutyStatus::Performed);
-        assert!(!state.breached);
+        let operative =
+            status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_ne!(operative.status, fidryn_core::DutyStatus::Performed);
+        assert_eq!(operative.status, fidryn_core::DutyStatus::Attached);
+
+        let assumptions = vec![Assumption {
+            id: "hyp-performed".into(),
+            payload,
+        }];
+        case.assumptions = assumptions.clone();
+        let scenario_out = evaluate_scenario(
+            &module,
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &RunContext::new(t, t),
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_scenario");
+        let scenario = status_state(scenario_out.clone());
+        assert_eq!(scenario.status, fidryn_core::DutyStatus::Performed);
+        assert!(!scenario.breached);
+        assert_eq!(case.events, events_before);
+        let report = report_from_scenario(scenario_out, assumptions.clone());
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(report.assumptions, assumptions);
+    }
+
+    #[test]
+    fn duty_step_fourth_arg_selects_instance() {
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let case = CaseRecord::default();
+        let session = evaluate_session(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(duty_step_instance_term(
+                    "pay",
+                    "attach",
+                    "Alice",
+                    "invoice_a",
+                )),
+            ),
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        match session.outcome {
+            Outcome::Determinate { ref value, .. } => match value {
+                Value::Ctor { name, .. } => assert_eq!(name, "Attached"),
+                other => panic!("{other:?}"),
+            },
+            other => panic!("{other:?}"),
+        }
+        let named = session
+            .bindings
+            .get("duty:pay:invoice_a")
+            .expect("named instance binding");
+        let state = duty::parse_duty_state(named, "pay").expect("duty state");
+        assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+        assert_eq!(state.bearer, "Alice");
+        assert_eq!(state.instance, "invoice_a");
+        assert!(
+            !session.bindings.contains_key("duty:pay:default"),
+            "{:?}",
+            session.bindings
+        );
+        assert!(!case.facts.contains_key("duty:pay:invoice_a"));
+        assert!(!case.facts.contains_key("duty:pay:default"));
+    }
+
+    #[test]
+    fn duty_step_three_arg_is_person_on_default_instance() {
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let case = CaseRecord::default();
+        let session = evaluate_session(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Apply {
+                    ctor: "duty_step".into(),
+                    args: vec![
+                        Term::Ident("pay".into()),
+                        Term::Ident("attach".into()),
+                        Term::Ident("Alice".into()),
+                    ],
+                }),
+            ),
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        let stored = session
+            .bindings
+            .get("duty:pay:default")
+            .expect("default instance binding");
+        let state = duty::parse_duty_state(stored, "pay").expect("duty state");
+        assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+        assert_eq!(state.bearer, "Alice");
+        assert_eq!(state.instance, duty::DEFAULT_DUTY_INSTANCE);
+        assert!(!session.bindings.contains_key("duty:pay:Alice"));
+    }
+
+    #[test]
+    fn payment_for_one_duty_instance_does_not_perform_another() {
+        let invoice = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let paid = fidryn_core::Instant::parse("2026-01-05T00:00:00Z").unwrap();
+        let at = fidryn_core::Instant::parse("2026-01-05T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.evidence.push(EvidenceItem {
+            schema: "PaymentRecord".into(),
+            value: Value::Map(BTreeMap::from([(
+                "instance".into(),
+                Value::String("A".into()),
+            )])),
+            observed_at: paid,
+        });
+        let duty = pay_duty(Guard::Satisfied, 30);
+        let module_a = module_with_plan_decls(
+            "q",
+            QueryPlan::Evaluate(Term::Apply {
+                ctor: "duty_status".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("A".into())],
+            }),
+            vec![CoreDecl::Duty(duty.clone())],
+        );
+        let module_b = module_with_plan_decls(
+            "q",
+            QueryPlan::Evaluate(Term::Apply {
+                ctor: "duty_status".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("B".into())],
+            }),
+            vec![CoreDecl::Duty(duty)],
+        );
+        let state_a = status_state(run_status_at(&module_a, &case, at));
+        let state_b = status_state(run_status_at(&module_b, &case, at));
+        assert_eq!(state_a.status, fidryn_core::DutyStatus::Performed);
+        assert_ne!(state_b.status, fidryn_core::DutyStatus::Performed);
+        assert_eq!(state_b.status, fidryn_core::DutyStatus::Attached);
+    }
+
+    #[test]
+    fn transaction_illegal_discharge_does_not_keep_attach() {
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "transaction".into(),
+            args: vec![
+                duty_step_term("pay", "attach"),
+                duty_step_term("pay", "discharge"),
+            ],
+        });
+        let case = CaseRecord::default();
+        let err = run_module(&module_with_plan("q", plan), "q", &case, &mut Refusing)
+            .expect_err("illegal discharge");
+        assert!(
+            matches!(err, EngineError::InvalidInput(ref msg) if msg.contains("discharge")),
+            "{err:?}"
+        );
+        assert!(!case.facts.contains_key("duty:pay:default"));
+        let absent = run_module(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Ident("duty:pay:default".into())),
+            ),
+            "q",
+            &case,
+            &mut Refusing,
+        )
+        .expect_err("duty still absent");
+        assert!(matches!(absent, EngineError::Unsupported(_)), "{absent:?}");
+
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let session = evaluate_session(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Apply {
+                    ctor: "transaction".into(),
+                    args: vec![
+                        duty_step_term("pay", "attach"),
+                        require_term(Term::Bool(false)),
+                    ],
+                }),
+            ),
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("transaction suspends");
+        assert!(
+            matches!(session.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            session.outcome
+        );
+        let cont = session.continuation.expect("continuation");
+        assert!(
+            !cont.bindings.contains_key("duty:pay:default"),
+            "{:?}",
+            cont.bindings
+        );
+    }
+
+    #[test]
+    fn transaction_suspend_then_resume_commits_once() {
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "transaction".into(),
+            args: vec![
+                duty_step_term("pay", "attach"),
+                Term::Apply {
+                    ctor: "require_authority".into(),
+                    args: vec![Term::Ident("missing_action".into())],
+                },
+                duty_step_term("pay", "perform"),
+            ],
+        });
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let before = case.clone();
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(first.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            first.outcome
+        );
+        let cont = first.continuation.as_ref().expect("continuation");
+        assert!(
+            !cont.bindings.contains_key("duty:pay:default"),
+            "{:?}",
+            cont.bindings
+        );
+        assert!(!first.bindings.contains_key("duty:pay:default"));
+        assert_eq!(case, before);
+
+        let mut granted = case.clone();
+        granted.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![
+                Value::String("missing_action".into()),
+                Value::String("attach".into()),
+                Value::String("perform".into()),
+            ]),
+        );
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &granted,
+        )
+        .expect("resume");
+        match &second.outcome {
+            Outcome::Determinate { value, .. } => match value {
+                Value::Ctor { name, .. } => assert_eq!(name, "Performed"),
+                other => panic!("{other:?}"),
+            },
+            other => panic!("{other:?}"),
+        }
+        assert!(second.continuation.is_none());
+        let committed = second
+            .bindings
+            .get("duty:pay:default")
+            .expect("committed duty binding");
+        let duty_state = duty::parse_duty_state(committed, "pay").expect("duty state");
+        assert_eq!(duty_state.status, fidryn_core::DutyStatus::Performed);
+        assert_eq!(duty_state.instance, duty::DEFAULT_DUTY_INSTANCE);
+        assert_eq!(case, before);
+        assert!(!case.facts.contains_key("duty:pay:default"));
+        assert!(!granted.facts.contains_key("duty:pay:default"));
     }
 
     #[test]

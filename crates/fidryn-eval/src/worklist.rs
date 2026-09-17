@@ -93,6 +93,11 @@ impl DerivedWorld {
         self.guard_holds(guard, &BTreeMap::new(), case, ctx) == Hold::Yes
     }
 
+    /// Whether `guard` is established false (`Hold::No`), not merely unknown.
+    pub fn is_guard_denied(&self, guard: &Guard, case: &CaseRecord, ctx: &RunContext) -> bool {
+        self.guard_holds(guard, &BTreeMap::new(), case, ctx) == Hold::No
+    }
+
     pub fn holds_named(&self, predicate: &str) -> bool {
         self.holds(&PropTerm::new(predicate, Vec::new()))
     }
@@ -800,6 +805,7 @@ pub fn is_eval_keyword(name: &str) -> bool {
             | "or"
             | "call"
             | "seq"
+            | "transaction"
             | "require"
             | "duty_step"
             | "duty_status"
