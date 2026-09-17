@@ -28,7 +28,7 @@
   ],
   "determinations": [
     {
-      "issue": "Adjudicated",
+      "issue": "Adjudicated(DistrictCase)",
       "protocol": "JudgmentOnTheMerits",
       "established": true,
       "decider": "CourtWithJurisdiction"
