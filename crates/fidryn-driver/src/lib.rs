@@ -7,7 +7,7 @@
 //! case JSON, and bitemporal times. Memo tables are explicit [`HashMap`]s; the
 //! `salsa` crate is not used.
 
-use fidryn_check::check;
+use fidryn_check::check_with_sources;
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport, Outcome,
     QueryName, RunContext, SourceManifest, Value, canonical_json,
@@ -57,29 +57,27 @@ impl Driver {
         self.misses
     }
 
-    /// Parse, elaborate, and check `source` against `manifest`.
+    /// Parse, elaborate, and check in-memory `source` against `manifest`.
     ///
-    /// The memo key is blake3(source) together with the snapshot string and
-    /// artifact digests. Comment-only edits change the source bytes and miss.
+    /// Artifact files are not read (`source_root` is `None`). The memo key is
+    /// blake3(source) together with the snapshot string and artifact digests.
+    /// Comment-only edits change the source bytes and miss.
     pub fn check_source(
         &mut self,
         source: &str,
         manifest: &SourceManifest,
     ) -> Result<CoreModule, Vec<Diagnostic>> {
-        let key = check_key(source, manifest);
-        if let Some(cached) = self.check_cache.get(&key) {
-            self.hits += 1;
-            return cached.clone();
-        }
-        self.misses += 1;
-        let result = compile_source(source, manifest);
-        self.check_cache.insert(key, result.clone());
-        result
+        self.check_cached(source, manifest, None)
     }
 
     /// Compile a `.fr` path, loading the declared `source_manifest` or a
     /// `sources/` fallback. A declared path that is missing or malformed is a
     /// diagnostic. Modules that omit a manifest get an empty default.
+    ///
+    /// After parse/elaborate, checking uses
+    /// [`fidryn_check::check_with_sources`] with `source_root = path.parent()`
+    /// so hex import digests authenticate against artifact bytes. The memo key
+    /// is still source bytes plus manifest; a new session re-hashes files.
     pub fn check_path(
         &mut self,
         path: &Path,
@@ -91,8 +89,26 @@ impl Driver {
             )]
         })?;
         let manifest = load_manifest(path, &src)?;
-        let module = self.check_source(&src, &manifest)?;
+        let source_root = path.parent().unwrap_or(Path::new("."));
+        let module = self.check_cached(&src, &manifest, Some(source_root))?;
         Ok((module, manifest))
+    }
+
+    fn check_cached(
+        &mut self,
+        source: &str,
+        manifest: &SourceManifest,
+        source_root: Option<&Path>,
+    ) -> Result<CoreModule, Vec<Diagnostic>> {
+        let key = check_key(source, manifest);
+        if let Some(cached) = self.check_cache.get(&key) {
+            self.hits += 1;
+            return cached.clone();
+        }
+        self.misses += 1;
+        let result = compile_with_sources(source, manifest, source_root);
+        self.check_cache.insert(key, result.clone());
+        result
     }
 
     /// Compile a `.fr` path, discarding the loaded manifest.
@@ -167,13 +183,17 @@ impl Default for Driver {
     }
 }
 
-fn compile_source(source: &str, manifest: &SourceManifest) -> Result<CoreModule, Vec<Diagnostic>> {
+fn compile_with_sources(
+    source: &str,
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+) -> Result<CoreModule, Vec<Diagnostic>> {
     let parsed = parse_file(source);
     if parsed.has_errors() {
         return Err(parsed.diagnostics);
     }
     let hir = elaborate(&parsed, manifest)?;
-    check(&hir, manifest)
+    check_with_sources(&hir, manifest, source_root)
 }
 
 fn evaluate_run(
@@ -646,6 +666,66 @@ module Examples.T version "0.1.0" {
         let (second, _) = driver.check_path(&path).expect("check");
         assert_eq!(driver.hits(), 1);
         assert_eq!(first.id, second.id);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn check_path_matching_blake3_authenticates_and_tamper_is_e200() {
+        let dir = temp_module_dir("bytes");
+        let bytes = b"fidryn-source-bytes";
+        let digest = blake3::hash(bytes).to_hex().to_string();
+        fs::write(dir.join("Other.Law"), bytes).expect("write artifact");
+        let manifest = fidryn_core::SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: digest.clone(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        fs::write(
+            dir.join("sources").join("manifest.json"),
+            serde_json::to_string(&manifest).expect("manifest json"),
+        )
+        .expect("write manifest");
+        let src = format!(
+            r#"
+module Examples.ImpBytes version "0.1.0" {{
+    import Other.Law version "1" {{ digest "{digest}" }}
+    query ok() -> Bool {{
+        goal Evaluate {{ true }}
+    }}
+}}
+"#
+        );
+        let path = dir.join("m.fr");
+        fs::write(&path, &src).expect("write module");
+
+        Driver::new()
+            .check_path(&path)
+            .expect("matching blake3 hex authenticates");
+
+        let memory_err = Driver::new()
+            .check_source(&src, &manifest)
+            .expect_err("in-memory check does not read artifact bytes");
+        assert!(
+            memory_err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{memory_err:?}"
+        );
+
+        fs::write(dir.join("Other.Law"), b"tampered-bytes").expect("tamper artifact");
+        // Cache key is source bytes + manifest, not artifact bytes.
+        let err = Driver::new()
+            .check_path(&path)
+            .expect_err("tampered artifact must fail E200");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
         let _ = fs::remove_dir_all(&dir);
     }
 
