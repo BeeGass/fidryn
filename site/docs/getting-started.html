@@ -1,124 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#120f0c">
-<title>Getting started — Fidryn</title>
-<meta name="description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="author" content="Bryan Gass">
-<link rel="canonical" href="https://fidryn.onlygass.dev/docs/getting-started">
-<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/getting-started.md" title="Markdown">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Fidryn">
-<meta property="og:title" content="Getting started — Fidryn">
-<meta property="og:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-<meta property="og:url" content="https://fidryn.onlygass.dev/docs/getting-started">
-<meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Getting started — Fidryn">
-<meta name="twitter:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Getting started — Fidryn","description":"Build, check, and run a tiny Fidryn (.fr) program in about an hour.","url":"https://fidryn.onlygass.dev/docs/getting-started","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/getting-started.md"}</script>
-<link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/docs.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120f0c">
+  <title>Getting started — Fidryn</title>
+  <meta name="description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/getting-started">
+  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/getting-started.md" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="Getting started — Fidryn">
+  <meta property="og:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/getting-started">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Getting started — Fidryn">
+  <meta name="twitter:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Getting started — Fidryn","description":"Build, check, and run a tiny Fidryn (.fr) program in about an hour.","url":"https://fidryn.onlygass.dev/docs/getting-started","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/getting-started.md"}</script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
-<div class="docs-backdrop" data-docs-close hidden></div>
-<div class="docs-shell">
-<header class="docs-top">
-<a class="mark" href="/">fidryn</a>
-<div class="docs-top-actions">
-<button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-<span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-<span class="docs-menu-btn-text">Menu</span>
-</button>
-<nav class="nav" aria-label="Site">
-<a href="/docs/">Docs</a>
-<a href="/#install">Install</a>
-<a href="https://github.com/BeeGass/fidryn">GitHub</a>
-</nav>
-</div>
-</header>
-<div class="docs-layout">
-<aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-<p class="docs-sidebar-label">Guides</p>
-<nav class="docs-side-nav">
-<a href="/docs/">Overview</a>
-<a href="/docs/getting-started" class="active">Getting started</a>
-<a href="/docs/language">Language</a>
-<a href="/docs/cli">CLI</a>
-<a href="/docs/mill">Mill</a>
-<a href="/docs/cases-and-time">Cases &amp; time</a>
-<a href="/docs/outcomes">Outcomes</a>
-<a href="/docs/examples">Examples</a>
-<a href="/docs/contributing">Contributing</a>
-</nav>
-<p class="docs-sidebar-label">Also</p>
-<nav class="docs-side-nav">
-<a href="/">Home</a>
-<a href="/docs/getting-started.md">Markdown</a>
-<a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
-<a href="/llms.txt">llms.txt</a>
-</nav>
-</aside>
-<main class="docs-main prose" id="main">
+  <div class="docs-backdrop" data-docs-close hidden></div>
+  <div class="docs-shell">
+    <header class="docs-top">
+      <a class="mark" href="/">fidryn</a>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
+        <p class="docs-sidebar-label">Guides</p>
+        <nav class="docs-side-nav">
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started" class="active">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
+        </nav>
+        <p class="docs-sidebar-label">Also</p>
+        <nav class="docs-side-nav">
+          <a href="/">Home</a>
+          <a href="/docs/getting-started.md">Markdown</a>
+          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/llms.txt">llms.txt</a>
+        </nav>
+      </aside>
+
+      <main class="docs-main prose" id="main">
 <h1>Getting started with Fidryn</h1>
-<p>Clone the repository, install Rust 1.98, then check and run a tiny <code>.fr</code> program. This is a first hour, not a complete encoding of any jurisdiction.</p>
-<p>Fidryn (FID-rin) is a programming language for legal instruments. Source files use the <code>.fr</code> extension. A computation may return one determinate result only when that result is invariant across every still-admissible resolution of the unresolved issues, or when a competent authority has already made a determination that is operative in the relevant context. The interpreter never invents a completion.</p>
-<p>This repository is the v0.1 research interpreter. The modules under <code>examples/</code> and the programs under <code>tests/</code> are fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction’s law.</p>
-<p>From the repository root, every command below uses <code>cargo run -p fidryn-cli --</code> so it works before you install a <code>fidryn</code> binary. After you build, the same arguments follow <code>fidryn</code>.</p>
-<p>Full guide text (with code samples) is also published as markdown: <a href="/docs/getting-started.md">getting-started.md</a>.</p>
+<p>Clone the repository, install Rust 1.98, then check and run a tiny
+<code>.fr</code> program. This is a first hour, not a complete encoding of any
+jurisdiction.</p>
+<p>Fidryn (FID-rin) is a programming language for legal instruments.
+Source files use the <code>.fr</code> extension. A computation may return one
+determinate result only when that result is invariant across every
+still-admissible resolution of the unresolved issues, or when a
+competent authority has already made a determination that is operative
+in the relevant context. The interpreter never invents a completion.</p>
+<p>This repository is the v0.1 research interpreter. The modules under
+<code>examples/</code> and the programs under <code>tests/</code> are fixtures. They are not
+legal advice, not operative instruments, and not a complete statement
+of any jurisdiction’s law.</p>
+<p>From the repository root, every command below uses
+<code>cargo run -p fidryn-cli --</code> so it works before you install a <code>fidryn</code>
+binary. After you build, the same arguments follow <code>fidryn</code>.</p>
 <h2>Prerequisites</h2>
-<p>Install Rust 1.98. The workspace <code>rust-version</code> is 1.98. <a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml" target="_blank" rel="noopener noreferrer"><code>rust-toolchain.toml</code></a> pins the patch (<code>1.98.1</code>) and the <code>rustfmt</code> / <code>clippy</code> components.</p>
+<p>Install Rust 1.98. The workspace <code>rust-version</code> is 1.98.
+<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml" target="_blank" rel="noopener noreferrer"><code>rust-toolchain.toml</code></a> pins the patch
+(<code>1.98.1</code>) and the <code>rustfmt</code> / <code>clippy</code> components. <code>rustup</code> will pick
+that toolchain up when you enter the repository.</p>
+<p>You need a working C linker. On macOS, Command Line Tools clang is
+enough.</p>
 <h2>Build</h2>
+<p>From the repository root, compile the workspace and run the tests.
+The first pass takes a bit: it builds every crate, then runs the
+suite.</p>
 <pre><code>cargo test --workspace --offline
-cargo run -p fidryn-cli -- --help
 </code></pre>
-<h2>Check and run</h2>
+<p>Confirm the CLI:</p>
+<pre><code>cargo run -p fidryn-cli -- --help
+</code></pre>
+<p>You should see the <code>fidryn</code> subcommands, including <code>check</code> and <code>run</code>.
+<code>run</code> evaluates a query against a case record and never chooses a
+completion. See the <a href="/docs/cli">CLI</a> guide for the rest of the surface.</p>
+<h2>Check a tiny program</h2>
+<p><a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/require-gate.fr" target="_blank" rel="noopener noreferrer"><code>tests/programs/require-gate.fr</code></a>
+is a complete module with two queries. <code>q</code> requires <code>true</code> and returns
+<code>7</code>. <code>r</code> requires <code>false</code> and does not reach <code>return 7</code>.</p>
+<pre><code>module Programs.RequireGate version &quot;0.1.0&quot; {
+    jurisdiction Test
+    source_snapshot &quot;2026-09-17-require-gate&quot;
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { complete_instruments }
+
+    query q() -&gt; Int { require true; return 7 }
+    query r() -&gt; Int { require false; return 7 }
+}
+</code></pre>
+<p>Check it:</p>
 <pre><code>cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 </code></pre>
-<p>Then <code>run</code> with a case record, <code>--valid-at</code>, and <code>--known-at</code>. Details, JSON envelopes, and the suspended <code>r</code> query are in the <a href="/docs/getting-started.md">markdown mirror</a>.</p>
-<ol>
-<li><a href="/docs/language">Language</a></li>
-<li><a href="/docs/cli">CLI</a></li>
-<li><a href="/docs/outcomes">Outcomes</a></li>
-<li><a href="/docs/cases-and-time">Cases and time</a></li>
-<li><a href="/docs/examples">Examples</a></li>
-<li><a href="/docs/mill">Mill</a></li>
-</ol>
-<p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-</main>
-</div>
-<footer class="footer docs-footer">
-<span>Research fixture · Bryan Gass</span>
-<span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
-</footer>
-</div>
-<script>
-(function () {
-var body = document.body;
-var btn = document.querySelector("[data-docs-toggle]");
-var backdrop = document.querySelector(".docs-backdrop");
-if (!btn || !backdrop) return;
-backdrop.hidden = false;
-function setOpen(open) {
-body.classList.toggle("docs-nav-open", open);
-btn.setAttribute("aria-expanded", open ? "true" : "false");
-btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-body.style.overflow = open ? "hidden" : "";
+<p>Once <code>fidryn</code> is on your PATH, that is
+<code>fidryn check tests/programs/require-gate.fr</code>. Success prints <code>ok</code>
+and exits 0. Diagnostics go to stderr and the process exits 1.
+<code>check</code> parses, elaborates, and type-checks. It does not evaluate a
+query and does not need a case file.</p>
+<h2>Run a query</h2>
+<p><code>run</code> requires a case record plus both clocks. <code>--valid-at</code> is the
+instant on the legal timeline you are asking about. <code>--known-at</code> is
+the instant of the file you are willing to treat as known. Both are
+ISO 8601 / RFC 3339 (<code>Z</code> or a numeric offset). Use
+<code>2026-09-17T12:00:00Z</code> for this hour. Details of the case JSON and
+the two clocks are in <a href="/docs/cases-and-time">Cases and time</a>.</p>
+<p><code>require-gate</code> does not need facts or an interpretation. Write a
+minimal empty case that satisfies the interchange schema
+(<code>schema</code> and <code>admissibleCompletions</code> are the required properties):</p>
+<pre><code>cat &gt; /tmp/fidryn-empty-case.json &lt;&lt;'EOF'
+{&quot;schema&quot;:&quot;fidryn.case-record/v0.1&quot;,&quot;admissibleCompletions&quot;:{}}
+EOF
+</code></pre>
+<p>Run <code>q</code>. It should be determinate <code>7</code>:</p>
+<pre><code>cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
+    --query q \
+    --case /tmp/fidryn-empty-case.json \
+    --valid-at 2026-09-17T12:00:00Z \
+    --known-at 2026-09-17T12:00:00Z
+</code></pre>
+<p>The CLI prints one line of canonical JSON
+(<code>fidryn.evaluation-report/v0.1</code>). Pretty-printed, the important fields
+look like this:</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;fidryn.evaluation-report/v0.1&quot;,
+  &quot;executionMode&quot;: &quot;operative&quot;,
+  &quot;sourceTrust&quot;: &quot;unauthenticated&quot;,
+  &quot;verificationMethod&quot;: &quot;none&quot;,
+  &quot;assumptions&quot;: [],
+  &quot;coverage&quot;: null,
+  &quot;outcomeDocument&quot;: {
+    &quot;schema&quot;: &quot;fidryn.outcome/v0.1&quot;,
+    &quot;module&quot;: &quot;Programs.RequireGate@0.1.0&quot;,
+    &quot;query&quot;: &quot;q&quot;,
+    &quot;asOf&quot;: {
+      &quot;validTime&quot;: &quot;2026-09-17T12:00:00Z&quot;,
+      &quot;recordTime&quot;: &quot;2026-09-17T12:00:00Z&quot;
+    },
+    &quot;modelBoundary&quot;: {
+      &quot;outsideScope&quot;: [&quot;complete_instruments&quot;],
+      &quot;admissibleCompletions&quot;: {
+        &quot;interpretations&quot;: {},
+        &quot;evidence&quot;: {},
+        &quot;choices&quot;: {}
+      }
+    },
+    &quot;outcome&quot;: {
+      &quot;kind&quot;: &quot;determinate&quot;,
+      &quot;value&quot;: { &quot;kind&quot;: &quot;int&quot;, &quot;data&quot;: 7 }
+    }
+  }
 }
-btn.addEventListener("click", function () {
-setOpen(!body.classList.contains("docs-nav-open"));
-});
-backdrop.addEventListener("click", function () { setOpen(false); });
-document.addEventListener("keydown", function (e) {
-if (e.key === "Escape") setOpen(false);
-});
-document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-if (e.target.closest("a")) setOpen(false);
-});
-})();
-</script>
+</code></pre>
+<p>The six-kind legal result is nested under <code>outcomeDocument</code>.
+<code>modelBoundary</code> is part of that answer. The module declared
+<code>complete_instruments</code> as outside scope, so the envelope repeats that
+exclusion. An omitted interpretation cannot silently shrink the model.
+Pass <code>--scenario</code> only when you intend <code>case.assumptions</code> as an overlay;
+operative <code>run</code> (the default) does not apply them.</p>
+<p>Now run <code>r</code>:</p>
+<pre><code>cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
+    --query r \
+    --case /tmp/fidryn-empty-case.json \
+    --valid-at 2026-09-17T12:00:00Z \
+    --known-at 2026-09-17T12:00:00Z
+</code></pre>
+<p><code>require false</code> does not skip ahead to <code>return 7</code>. Nested
+<code>outcomeDocument.outcome</code> is <code>suspended</code>, with a request that the
+requirement failed:</p>
+<pre><code class="language-json">{
+  &quot;outcomeDocument&quot;: {
+    &quot;outcome&quot;: {
+      &quot;kind&quot;: &quot;suspended&quot;,
+      &quot;requests&quot;: [
+        {
+          &quot;kind&quot;: &quot;needCustom&quot;,
+          &quot;effect&quot;: &quot;require&quot;,
+          &quot;payload&quot;: &quot;requirement failed&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<p>That is the governing rule in miniature: the interpreter will not
+pretend the later <code>7</code> is the answer. How those kinds compose is in
+<a href="/docs/outcomes">Outcomes</a>.</p>
+<p><code>--query</code> is the query name as written in the module (<code>q</code>, <code>r</code>).
+<code>--arg KEY=VALUE</code> writes <code>case.facts[&quot;KEY&quot;]</code>. You do not need it here.</p>
+<h2>Check a larger fixture</h2>
+<p>The Massachusetts trust fixture is a bounded slice of a private
+instrument, not Massachusetts trust law as a whole. Check it the same
+way:</p>
+<pre><code>cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
+</code></pre>
+<p>Success is again <code>ok</code>. The module lists <code>tax</code>, <code>creditor_priority</code>,
+<code>real_property_recording</code>, and <code>complete_Massachusetts_trust_law</code> as
+<code>outside_scope</code>. Those names will appear on <code>modelBoundary</code> if you
+later <code>run</code> a query against a case under
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/" target="_blank" rel="noopener noreferrer"><code>examples/trust/cases/</code></a>.</p>
+<p>The <a href="/docs/examples">examples</a> catalog has more fixtures. They encode
+bounded high-impact slices. They do not contain the entire United
+States Code.</p>
+<h2>Next reading</h2>
+<ol>
+<li><a href="/docs/language">Language</a> — module headers, queries, rules, duties,
+and what Fidryn will not do.</li>
+<li><a href="/docs/cli">CLI</a> — <code>check</code>, <code>run</code>, <code>explore</code>, and the other
+subcommands, with the flags the binary actually accepts.</li>
+<li><a href="/docs/outcomes">Outcomes</a> — determinate, suspended, contingent, and
+the rest of the envelope.</li>
+<li><a href="/docs/cases-and-time">Cases and time</a> — case JSON, admissible
+completions, <code>--valid-at</code> / <code>--known-at</code>.</li>
+<li><a href="/docs/examples">Examples</a> — the fixture corpus under <code>examples/</code>.</li>
+<li><a href="/docs/mill">Mill</a> — localhost <code>fidryn ui</code> on <code>127.0.0.1</code> (default
+port 8751). The mill checks a module in the browser. It does not
+live-file.</li>
+</ol>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
+    </footer>
+  </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
 </body>
 </html>
