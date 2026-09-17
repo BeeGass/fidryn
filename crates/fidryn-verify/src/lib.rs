@@ -5,7 +5,7 @@ use fidryn_core::{
     CaseRecord, CoverageWitness, EngineError, EvidenceItem, Instant, LegalState, OpenRequest,
     Outcome, QueryName, RunContext, TraceId, Value, VerificationBounds,
 };
-use fidryn_eval::{evaluate, seed_initial_occupancy};
+use fidryn_eval::{evaluate, evaluate_scenario, seed_initial_occupancy};
 use fidryn_handlers::{CaseFile, ExplorationBounds, Explore, Skeptical, aggregate};
 use fidryn_solve::{Assignment, Domain, SearchBudget, SearchEvent, stream};
 use std::collections::{BTreeMap, BTreeSet};
@@ -93,6 +93,7 @@ pub struct Coverage {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[must_use]
+#[allow(clippy::large_enum_variant)]
 pub enum Determinacy {
     Convergent {
         value: Value,
@@ -406,15 +407,29 @@ fn eval_assignment(
         known_at: Some(ctx.record_time),
     };
     let state = state_from_case(&branched, ctx);
-    evaluate(
-        module,
-        query,
-        &BTreeMap::new(),
-        &state,
-        ctx,
-        &mut handler,
-        &branched,
-    )
+    // Nonempty case.assumptions must change the explored answer, not only
+    // the CLI/mill envelope. Operative `evaluate` ignores that overlay.
+    if branched.assumptions.is_empty() {
+        evaluate(
+            module,
+            query,
+            &BTreeMap::new(),
+            &state,
+            ctx,
+            &mut handler,
+            &branched,
+        )
+    } else {
+        evaluate_scenario(
+            module,
+            query,
+            &BTreeMap::new(),
+            &state,
+            ctx,
+            &mut handler,
+            &branched,
+        )
+    }
 }
 
 /// Declared finite product, streamed under [`MAX_COMPLETIONS`].
@@ -847,8 +862,8 @@ mod tests {
     use fidryn_core::types::Type;
     use fidryn_core::value::PropTerm;
     use fidryn_core::{
-        Instant, Interval, JurisdictionId, ModuleId, NodeId, NodeMeta, OriginId, SourceManifestId,
-        SourceSnapshotId, Term,
+        Assumption, Instant, Interval, JurisdictionId, ModuleId, NodeId, NodeMeta, OriginId,
+        SourceManifestId, SourceSnapshotId, Term,
     };
 
     fn node_meta(name: &str) -> NodeMeta {
@@ -1418,5 +1433,36 @@ mod tests {
             matches!(out, Outcome::Inconsistent { .. }),
             "determinate inner answer must not hide an empty completion set: {out:?}"
         );
+    }
+
+    #[test]
+    fn explore_with_assumptions_overlays_boolean_fact() {
+        let module = module_with_query("q", QueryPlan::Evaluate(Term::Ident("flag".into())));
+        let mut case = CaseRecord::default();
+        let operative = explore_query(&module, &QueryName::from("q"), &case, &ctx());
+        match &operative {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => panic!("operative explore must not treat an unbound flag as true"),
+            Outcome::Determinate { value, .. } => {
+                panic!("operative explore must not determine flag: {value:?}")
+            }
+            _ => {}
+        }
+
+        let mut facts = BTreeMap::new();
+        facts.insert("flag".into(), Value::Bool(true));
+        case.assumptions.push(Assumption {
+            id: "hyp-flag".into(),
+            payload: Value::Map(facts),
+        });
+        let scenario = explore_query(&module, &QueryName::from("q"), &case, &ctx());
+        match scenario {
+            Outcome::Determinate { value, .. } => {
+                assert_eq!(value, Value::Bool(true), "{value:?}");
+            }
+            other => panic!("scenario overlay must determine flag: {other:?}"),
+        }
     }
 }
