@@ -8,43 +8,26 @@ use fidryn_core::ir::{
 use fidryn_core::patterns::{LegalStatusPattern, TermPattern};
 use fidryn_core::time::Interval;
 use fidryn_core::types::{PrimitiveType, Sort, Type};
-use fidryn_core::value::{PropTerm, Term};
+use fidryn_core::value::{BinOp, PropTerm, Term};
 use fidryn_core::{
     ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ManifestArtifact,
     ModuleId, NodeId, OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
 };
 use fidryn_hir::{
-    HirFunction, HirModule, HirQuery, HirQueryBody, collect_source_callees, collect_term_callees,
-    flatten_term_list, last_brace_inner, parse_type_name, source_has_bare_prop_if,
-    split_qname_type_args, term_as_name, term_has_bare_prop_guard,
+    HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
+    collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
+    source_has_bare_prop_if, split_qname_type_args, term_as_name, term_has_bare_prop_guard,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
-/// How a source digest is classified.
-///
-/// `"fixture"` is a test policy, not a hash of artifact bytes. Hex digests
-/// authenticate only when they equal blake3 of those bytes.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum TrustProfile {
-    /// Synthetic or test input; not source authentication.
-    Fixture,
-    /// Expected digest equals the blake3 hash of artifact bytes.
-    ByteVerified,
-    /// An explicit trust policy named in the manifest.
-    PolicyAccepted,
-    /// No digest, or a digest presented without matching bytes.
-    Unauthenticated,
-}
+pub use fidryn_core::TrustProfile;
 
-impl TrustProfile {
-    /// Whether this profile satisfies a digest-required import.
-    pub fn permits_import(self) -> bool {
-        matches!(
-            self,
-            Self::Fixture | Self::ByteVerified | Self::PolicyAccepted
-        )
-    }
+fn permits_import(profile: TrustProfile) -> bool {
+    matches!(
+        profile,
+        TrustProfile::Fixture | TrustProfile::ByteVerified | TrustProfile::PolicyAccepted
+    )
 }
 
 /// Classify `digest` without reading artifact bytes.
@@ -60,6 +43,41 @@ pub fn digest_authenticates(digest: &str) -> TrustProfile {
 /// `"fixture"` still authenticates. A hex digest without file bytes does not.
 pub fn check(hir: &HirModule, manifest: &SourceManifest) -> Result<CoreModule, Vec<Diagnostic>> {
     check_with_sources(hir, manifest, None)
+}
+
+/// Aggregate source-integrity for `manifest` from actual artifact reads.
+///
+/// [`TrustProfile::ByteVerified`] only when every plausible hex digest was
+/// read under `source_root` and matched blake3, and at least one such hex
+/// artifact exists. `"fixture"` is [`TrustProfile::Fixture`] and is never
+/// ByteVerified. `source_root = None` never ByteVerified. A missing or
+/// unread hex artifact is [`TrustProfile::Unauthenticated`]. This profile
+/// is source-integrity only, not legal applicability or issuer authenticity.
+pub fn source_integrity(manifest: &SourceManifest, source_root: Option<&Path>) -> TrustProfile {
+    let mut any_fixture = false;
+    let mut hex_count = 0usize;
+    let mut hex_verified = 0usize;
+    for artifact in &manifest.artifacts {
+        let digest = artifact.digest.trim();
+        if digest.eq_ignore_ascii_case("fixture") {
+            any_fixture = true;
+            continue;
+        }
+        if !is_plausible_hex_digest(digest) {
+            continue;
+        }
+        hex_count += 1;
+        if authenticate_artifact(artifact, source_root) == TrustProfile::ByteVerified {
+            hex_verified += 1;
+        }
+    }
+    if any_fixture {
+        TrustProfile::Fixture
+    } else if hex_count > 0 && hex_verified == hex_count {
+        TrustProfile::ByteVerified
+    } else {
+        TrustProfile::Unauthenticated
+    }
 }
 
 /// Check `hir` against `manifest`, hashing artifact files under `source_root`.
@@ -210,18 +228,25 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
                 "a proposition was used directly as a guard; use operative/determined/assumed",
             ));
         }
-        if let Some(term) = query_result_term(q)
-            && let Some(actual) = infer_term_type(term, &hir.functions)
-        {
-            let expected = parse_type_name(&q.result_type);
-            if !types_compatible(&expected, &actual) {
-                diagnostics.push(Diagnostic::new(
-                    DiagnosticCode::E210,
-                    format!(
-                        "query `{}` returns {actual} but is declared to return {expected}",
-                        q.name
-                    ),
-                ));
+        if let Some(term) = query_result_term(q) {
+            let locals = locals_from_params(&q.params);
+            let cx = TypeCheck {
+                functions: &hir.functions,
+                propositions: &propositions,
+                locals: &locals,
+                owner: &q.name,
+            };
+            if let Some(actual) = cx.infer(term, diagnostics) {
+                let expected = parse_type_name(&q.result_type);
+                if !types_compatible(&expected, &actual) {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!(
+                            "query `{}` returns {actual} but is declared to return {expected}",
+                            q.name
+                        ),
+                    ));
+                }
             }
         }
     }
@@ -230,6 +255,29 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
             diagnostics.push(Diagnostic::new(
                 DiagnosticCode::E310,
                 "a proposition was used directly as a guard; use operative/determined/assumed",
+            ));
+        }
+        let Some(body) = &f.body else {
+            continue;
+        };
+        let locals = locals_from_params(&f.params);
+        let cx = TypeCheck {
+            functions: &hir.functions,
+            propositions: &propositions,
+            locals: &locals,
+            owner: &f.name,
+        };
+        let Some(actual) = cx.infer(body, diagnostics) else {
+            continue;
+        };
+        let expected = parse_type_name(&f.result_type);
+        if !types_compatible(&expected, &actual) {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!(
+                    "function `{}` returns {actual} but is declared to return {expected}",
+                    f.name
+                ),
             ));
         }
     }
@@ -286,31 +334,253 @@ fn query_result_term(q: &HirQuery) -> Option<&Term> {
     }
 }
 
-fn infer_term_type(term: &Term, functions: &BTreeMap<String, HirFunction>) -> Option<Type> {
-    match term {
-        Term::Bool(_) => Some(Type::bool()),
-        Term::Int(_) => Some(Type::Primitive(PrimitiveType::Int)),
-        Term::Decimal(_) => Some(Type::Primitive(PrimitiveType::Decimal)),
-        Term::String(_) => Some(Type::Primitive(PrimitiveType::String)),
-        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => {
-            if let Some(function) = functions.get(ctor) {
-                return Some(parse_type_name(&function.result_type));
+struct TypeCheck<'a> {
+    functions: &'a BTreeMap<String, HirFunction>,
+    propositions: &'a BTreeSet<String>,
+    locals: &'a BTreeMap<String, Type>,
+    owner: &'a str,
+}
+
+impl TypeCheck<'_> {
+    fn infer(&self, term: &Term, diagnostics: &mut Vec<Diagnostic>) -> Option<Type> {
+        match term {
+            Term::Bool(_) => Some(Type::bool()),
+            Term::Int(_) => Some(Type::Primitive(PrimitiveType::Int)),
+            Term::Decimal(_) => Some(Type::Primitive(PrimitiveType::Decimal)),
+            Term::String(_) => Some(Type::Primitive(PrimitiveType::String)),
+            Term::Ident(name) => self.infer_ident(name),
+            Term::Binary { op, left, right } => self.infer_binary(*op, left, right, diagnostics),
+            Term::If { cond, then, else_ } => {
+                self.check_bool_condition("if", cond, diagnostics);
+                self.join_inferred(then, else_, diagnostics)
             }
-            if is_currency_ctor(ctor) {
-                Some(Type::Primitive(PrimitiveType::Money {
-                    currency: ctor.clone(),
-                }))
-            } else {
-                None
+            Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
+                self.infer_apply(ctor, args, diagnostics)
+            }
+            _ => None,
+        }
+    }
+
+    fn infer_ident(&self, name: &str) -> Option<Type> {
+        if let Some(ty) = self.locals.get(name) {
+            return Some(ty.clone());
+        }
+        if self.propositions.contains(name) {
+            return Some(Type::prop());
+        }
+        None
+    }
+
+    fn infer_apply(
+        &self,
+        ctor: &str,
+        args: &[Term],
+        diagnostics: &mut Vec<Diagnostic>,
+    ) -> Option<Type> {
+        if ctor.eq_ignore_ascii_case("seq") {
+            return self.infer_seq(args, diagnostics);
+        }
+        if ctor.eq_ignore_ascii_case("require") {
+            if let Some(cond) = args.first() {
+                self.check_bool_condition("require", cond, diagnostics);
+            }
+            return None;
+        }
+        if ctor.eq_ignore_ascii_case("if") {
+            if let Some(cond) = args.first() {
+                self.check_bool_condition("if", cond, diagnostics);
+            }
+            return match (args.get(1), args.get(2)) {
+                (Some(then), Some(else_)) => self.join_inferred(then, else_, diagnostics),
+                (Some(then), None) => self.infer(then, diagnostics),
+                _ => None,
+            };
+        }
+        if ctor.eq_ignore_ascii_case("not") {
+            if let Some(inner) = args.first() {
+                self.check_bool_condition("not", inner, diagnostics);
+            }
+            return Some(Type::bool());
+        }
+        if is_modal_ctor(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::bool());
+        }
+        if ctor.eq_ignore_ascii_case("for_all") || ctor.eq_ignore_ascii_case("exists") {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::bool());
+        }
+        if let Some(function) = self.functions.get(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(parse_type_name(&function.result_type));
+        }
+        if is_currency_ctor(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::Primitive(PrimitiveType::Money {
+                currency: ctor.to_owned(),
+            }));
+        }
+        if self.propositions.contains(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::prop());
+        }
+        for arg in args {
+            let _ = self.infer(arg, diagnostics);
+        }
+        None
+    }
+
+    fn infer_seq(&self, args: &[Term], diagnostics: &mut Vec<Diagnostic>) -> Option<Type> {
+        let mut result = None;
+        for arg in args {
+            if is_require_term(arg) {
+                let _ = self.infer(arg, diagnostics);
+                continue;
+            }
+            result = self.infer(arg, diagnostics);
+        }
+        result
+    }
+
+    fn infer_binary(
+        &self,
+        op: BinOp,
+        left: &Term,
+        right: &Term,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) -> Option<Type> {
+        match op {
+            BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge => {
+                let _ = self.infer(left, diagnostics);
+                let _ = self.infer(right, diagnostics);
+                Some(Type::bool())
+            }
+            BinOp::And | BinOp::Or => {
+                if let Some(ty) = self.infer(left, diagnostics) {
+                    self.report_bool_operand("logical", &ty, diagnostics);
+                }
+                if let Some(ty) = self.infer(right, diagnostics) {
+                    self.report_bool_operand("logical", &ty, diagnostics);
+                }
+                Some(Type::bool())
+            }
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div => {
+                match (
+                    self.infer(left, diagnostics),
+                    self.infer(right, diagnostics),
+                ) {
+                    (Some(left_ty), Some(right_ty)) => join_types(&left_ty, &right_ty),
+                    _ => None,
+                }
             }
         }
-        _ => None,
     }
+
+    fn join_inferred(
+        &self,
+        then: &Term,
+        else_: &Term,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) -> Option<Type> {
+        let then_ty = self.infer(then, diagnostics);
+        let else_ty = match else_ {
+            Term::Wildcard => None,
+            other => self.infer(other, diagnostics),
+        };
+        match (then_ty, else_ty) {
+            (Some(left), Some(right)) => join_types(&left, &right),
+            (Some(ty), None) | (None, Some(ty)) => Some(ty),
+            (None, None) => None,
+        }
+    }
+
+    fn check_bool_condition(
+        &self,
+        construct: &str,
+        cond: &Term,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        let Some(ty) = self.infer(cond, diagnostics) else {
+            return;
+        };
+        self.report_bool_operand(construct, &ty, diagnostics);
+    }
+
+    fn report_bool_operand(&self, construct: &str, ty: &Type, diagnostics: &mut Vec<Diagnostic>) {
+        if ty.is_bool() {
+            return;
+        }
+        if ty.is_prop() {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E310,
+                "a proposition was used directly as a guard; use operative/determined/assumed",
+            ));
+            return;
+        }
+        diagnostics.push(Diagnostic::new(
+            DiagnosticCode::E210,
+            format!(
+                "{construct} in `{}` has type {ty} but must be Bool",
+                self.owner
+            ),
+        ));
+    }
+}
+
+fn locals_from_params(params: &[(String, String)]) -> BTreeMap<String, Type> {
+    params
+        .iter()
+        .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+        .collect()
+}
+
+fn is_require_term(term: &Term) -> bool {
+    match term {
+        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => {
+            ctor.eq_ignore_ascii_case("require")
+        }
+        _ => false,
+    }
+}
+
+fn is_modal_ctor(name: &str) -> bool {
+    matches!(
+        name,
+        "operative" | "determined" | "assumed" | "observed" | "necessarily"
+    )
 }
 
 fn is_currency_ctor(name: &str) -> bool {
     let len = name.len();
     (3..=4).contains(&len) && name.bytes().all(|b| b.is_ascii_uppercase())
+}
+
+fn join_types(left: &Type, right: &Type) -> Option<Type> {
+    if left == right {
+        return Some(left.clone());
+    }
+    if types_compatible(left, right) {
+        return Some(prefer_money(left, right));
+    }
+    None
+}
+
+fn prefer_money(left: &Type, right: &Type) -> Type {
+    match (left, right) {
+        (Type::Primitive(PrimitiveType::Money { .. }), _) => left.clone(),
+        (_, Type::Primitive(PrimitiveType::Money { .. })) => right.clone(),
+        _ => left.clone(),
+    }
 }
 
 fn types_compatible(expected: &Type, actual: &Type) -> bool {
@@ -612,8 +882,8 @@ fn check_imports(
             continue;
         }
         let matched = manifest.artifacts.iter().any(|artifact| {
-            artifact_matches_import(&artifact.path, &import.name)
-                && authenticate_artifact(artifact, source_root).permits_import()
+            artifact_matches_import(artifact, import)
+                && permits_import(authenticate_artifact(artifact, source_root))
         });
         if !matched {
             diagnostics.push(Diagnostic::new(
@@ -627,7 +897,20 @@ fn check_imports(
     }
 }
 
-fn artifact_matches_import(path: &str, import_name: &str) -> bool {
+fn artifact_matches_import(artifact: &ManifestArtifact, import: &HirImport) -> bool {
+    if let Some(digest) = import
+        .digest
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        && artifact.digest.trim().eq_ignore_ascii_case(digest)
+    {
+        return true;
+    }
+    path_matches_import(&artifact.path, &import.name)
+}
+
+fn path_matches_import(path: &str, import_name: &str) -> bool {
     if import_name.is_empty() {
         return false;
     }
@@ -919,11 +1202,14 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
             meta: meta(name),
         }));
     }
-    for name in hir.propositions.keys() {
+    for (name, params) in &hir.propositions {
         declarations.push(CoreDecl::Proposition(CoreProposition {
             id: NodeId::of(name.as_bytes()),
             name: name.clone(),
-            params: Vec::new(),
+            params: params
+                .iter()
+                .map(|(param, ty)| (param.clone(), parse_type_name(ty)))
+                .collect(),
             meta: meta(name),
         }));
     }
@@ -1943,6 +2229,67 @@ module Examples.ImpBytes version "0.1.0" {
     }
 
     #[test]
+    fn source_integrity_requires_checked_hex_bytes() {
+        assert_eq!(
+            source_integrity(&SourceManifest::default(), None),
+            TrustProfile::Unauthenticated
+        );
+        let fixture = artifact_manifest("Other.Law", "fixture");
+        assert_eq!(source_integrity(&fixture, None), TrustProfile::Fixture);
+        assert_ne!(source_integrity(&fixture, None), TrustProfile::ByteVerified);
+        let bytes = b"fidryn-source-bytes";
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let hex = artifact_manifest("never-created.txt", &digest);
+        let root = TempRoot::new();
+        assert_eq!(
+            source_integrity(&hex, Some(&root.0)),
+            TrustProfile::Unauthenticated
+        );
+        assert_ne!(
+            source_integrity(&hex, Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+        root.write("Other.Law", bytes);
+        let matched = artifact_manifest("Other.Law", &digest);
+        assert_eq!(
+            source_integrity(&matched, Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+        assert_eq!(
+            source_integrity(&matched, None),
+            TrustProfile::Unauthenticated
+        );
+    }
+
+    fn digest_identity_src(digest: &str) -> String {
+        format!(
+            r#"
+module Examples.ImpDigest version "0.1.0" {{
+    import Other.Law version "1" {{ digest "{digest}" }}
+    query ok() -> Bool {{
+        goal Evaluate {{ true }}
+    }}
+}}
+"#
+        )
+    }
+
+    #[test]
+    fn import_digest_identity_matches_unrelated_path() {
+        let bytes = b"fidryn-source-bytes";
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let root = TempRoot::new();
+        root.write("unrelated.txt", bytes);
+        let manifest = artifact_manifest("unrelated.txt", &digest);
+        let parsed = parse_file(&digest_identity_src(&digest));
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.imports[0].digest.as_deref(), Some(digest.as_str()));
+        assert_eq!(hir.imports[0].version.as_deref(), Some("1"));
+        check_with_sources(&hir, &manifest, Some(&root.0))
+            .expect("exact digest identity authenticates without a path heuristic");
+    }
+
+    #[test]
     fn named_verify_trivial_lowers_to_core_verify() {
         let src = r#"
 module Examples.Trivial version "0.1.0" {
@@ -2016,5 +2363,83 @@ module Programs.LatePayment version "0.1.0" {
             matches!(due, Term::Apply { ctor, args } if ctor == "due" && args.len() == 1),
             "{due:?}"
         );
+        let prop = module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::Proposition(prop) if prop.name == "InvoiceIssued" => Some(prop),
+                _ => None,
+            })
+            .expect("proposition InvoiceIssued");
+        assert_eq!(
+            prop.params,
+            vec![("person".to_owned(), Type::Sort(Sort::NaturalPerson))]
+        );
+    }
+
+    #[test]
+    fn sequencing_does_not_hide_a_wrong_result_type() {
+        let src = r#"
+module Review version "0.1.0" {
+    query q() -> Bool { require true; return 7 }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn a_declared_function_result_does_not_replace_checking_its_body() {
+        let src = r#"
+module Review version "0.1.0" {
+    fn wrong() -> Bool { 7 }
+    query q() -> Bool { return wrong() }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn require_true_return_int_matches_int_query() {
+        let src = r#"
+module Examples.ReqInt version "0.1.0" {
+    query q() -> Int { require true; return 7 }
+}
+"#;
+        check_src(src).expect("int result after require should check");
+    }
+
+    #[test]
+    fn tax_closed_form_money_decimal_still_checks() {
+        let src = r#"
+module Examples.Tax version "0.1.0" {
+    calc ordinary_income_tax_formula(amount: Money<USD>) -> Money<USD> {
+        if amount <= 11925.00 {
+            amount * 0.10
+        } else {
+            if amount <= 48475.00 {
+                11925.00 * 0.10 + (amount - 11925.00) * 0.12
+            } else {
+                if amount <= 103350.00 {
+                    11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
+                } else {
+                    17651.00 + (amount - 103350.00) * 0.24
+                }
+            }
+        }
+    }
+    query automatic tax_on(amount: Money<USD>) -> Money<USD> {
+        return ordinary_income_tax_formula(amount)
+    }
+}
+"#;
+        check_src(src).expect("tax closed form should check");
     }
 }
