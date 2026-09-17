@@ -1,24 +1,32 @@
 //! Finite coverage verification by replay.
 //!
 //! Proof generation lives in `fidryn-verify` / `fidryn-solve`; this crate
-//! only accepts or rejects a covering claim. Closed Boolean/ident queries
-//! ([`Term::Bool`], [`Term::Ident`], and `not` / `||` / `&&`) are checked
-//! by [`eval_fragment`], which does **not** call [`fidryn_eval::evaluate`].
-//! Other query plans still replay each claimed world with the trusted
-//! evaluator under [`IsolatedReplay`]. Expected completion size is the
-//! checked invocation's [`CaseRecord::admissible_completions`] product.
-//! This is not a Lean kernel; a general independent checker, Salsa, SMT,
-//! and packages remain Remaining.
+//! only accepts or rejects a covering claim. Closed value-fragment queries
+//! (literals, ident overlay, Boolean/`if`/integer ops, `seq`/`require`/
+//! `transaction`, field access) are checked by [`eval_fragment`], which
+//! does **not** call [`fidryn_eval::evaluate`]. `duty_status` and
+//! `require_authority` are the institutional fragment: [`eval_institutional`]
+//! uses [`fidryn_core::ir::CoreDuty`] plus [`fidryn_core::FrozenCaseView`] /
+//! `surface_duty_state` on the restricted overlay case, with no CaseFile
+//! handlers. Observe, UniqueOccupant, `duty_step`, handlers, and other
+//! plans still replay each claimed world with the trusted evaluator under
+//! [`IsolatedReplay`].
+//! Expected completion size is the checked invocation's
+//! [`CaseRecord::admissible_completions`] product. This is not a Lean
+//! kernel; a general independent checker, Salsa, SMT, and packages remain
+//! Remaining.
 //!
 //! Replay is isolated: [`IsolatedReplay`] wraps a cloned [`CaseFile`] and a
 //! fresh [`LegalState::new`]. It never files or publishes. This crate does
 //! not import `fidryn-adapt`.
 
 mod completion;
+mod duty;
 mod pure;
 
 pub use completion::ValidatedCompletionModel;
-pub use pure::{eval_fragment, is_boolean_fragment};
+pub use duty::{eval_institutional, is_institutional_fragment};
+pub use pure::{eval_fragment, is_boolean_fragment, is_pure_fragment};
 
 use crate::completion::{CHOICE_NS, EVIDENCE_NS, INTERPRETATION_NS};
 use fidryn_core::{
@@ -160,11 +168,12 @@ pub fn accept_covering_with_args(
 /// Accept a covering witness after checking each claimed branch.
 ///
 /// Shape completeness is not enough: [`check_branches`] must re-check the
-/// query under every admitted assignment. Closed Boolean/ident terms use
-/// [`eval_fragment`] (no handlers). Other plans replay with [`evaluate`]
-/// under [`IsolatedReplay`]. Then kernel issuance stamps a FiniteReplay
-/// certificate (`is_covering()`). The bound program identity must be the
-/// module that was replayed.
+/// query under every admitted assignment. Closed value-fragment terms use
+/// [`eval_fragment`] (no handlers). `duty_status` / `require_authority` use
+/// [`eval_institutional`] on the overlay case (no CaseFile). Other plans
+/// replay with [`evaluate`] under [`IsolatedReplay`]. Then kernel issuance
+/// stamps a FiniteReplay certificate (`is_covering()`). The bound program
+/// identity must be the module that was replayed.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering_eval(
     id: CompletionProofId,
@@ -196,8 +205,9 @@ pub fn accept_covering_eval(
 /// [`accept_covering_eval`] with query arguments bound into FiniteReplay claims.
 ///
 /// Finite coverage verification by replay: each admitted assignment is
-/// checked with [`eval_fragment`] when the query is a closed Boolean/ident
-/// term, otherwise with [`evaluate`] under [`IsolatedReplay`]. The caller's
+/// checked with [`eval_fragment`] when the query is in the closed value
+/// fragment, [`eval_institutional`] for `duty_status` / `require_authority`,
+/// otherwise with [`evaluate`] under [`IsolatedReplay`]. The caller's
 /// `case` is not mutated. Bindings are a restricted overlay of declared
 /// completion slots.
 #[allow(clippy::too_many_arguments)]
@@ -359,10 +369,11 @@ fn witness_matches_declared_space(
 
 /// Re-check each claimed world. Shape completeness is not covering.
 ///
-/// Closed Boolean/ident queries use [`eval_fragment`]. Other plans call
-/// [`evaluate`]. Rejects duplicate bindings, a determinate value other
-/// than the branch answer (fabricated evaluation), and any suspend or
-/// engine error.
+/// Closed value-fragment queries use [`eval_fragment`]. Institutional
+/// `duty_status` / `require_authority` use [`eval_institutional`]. Other
+/// plans call [`evaluate`]. Rejects duplicate bindings, a determinate
+/// value other than the branch answer (fabricated evaluation), and any
+/// suspend or engine error.
 pub fn check_branches(
     module: &CoreModule,
     query: &QueryName,
@@ -409,11 +420,13 @@ fn check_branches_with_args(
 
 /// Replay one claimed world.
 ///
-/// Boolean/ident fragment: [`eval_fragment`] over admitted slots and
-/// original facts (no handlers, duty, or adapt). Otherwise a cloned
-/// [`CaseRecord`], [`IsolatedReplay`], and [`LegalState::new()`] (never
-/// `into_state` on the caller's record) with [`evaluate`]. Replay does
-/// not import `fidryn-adapt` and does not publish institutional state.
+/// Closed value fragment: [`eval_fragment`] over admitted slots and
+/// original facts (no handlers, duty, Observe, or adapt). Institutional
+/// fragment: [`eval_institutional`] on the restricted overlay case (no
+/// CaseFile). Otherwise a cloned [`CaseRecord`], [`IsolatedReplay`], and
+/// [`LegalState::new()`] (never `into_state` on the caller's record) with
+/// [`evaluate`]. Replay does not import `fidryn-adapt` and does not publish
+/// institutional state.
 fn check_branch_evaluation(
     module: &CoreModule,
     query: &QueryName,
@@ -424,9 +437,19 @@ fn check_branch_evaluation(
     model: &ValidatedCompletionModel,
 ) -> Result<(), String> {
     let cloned = model.overlay(base, &branch.bindings, ctx)?;
-    if let Some(term) = boolean_fragment_term(module, query) {
+    if let Some(term) = pure_fragment_term(module, query) {
         let assignment = fragment_assignment(&cloned.facts, &branch.bindings);
         return match eval_fragment(term, &assignment) {
+            Ok(value) if value == branch.answer => Ok(()),
+            Ok(value) => Err(format!(
+                "fabricated evaluation: branch answer {:?} but evaluation produced {value:?}",
+                branch.answer
+            )),
+            Err(err) => Err(format!("not a covering evaluation: {err}")),
+        };
+    }
+    if let Some(term) = institutional_fragment_term(module, query) {
+        return match eval_institutional(module, term, &cloned, ctx, args) {
             Ok(value) if value == branch.answer => Ok(()),
             Ok(value) => Err(format!(
                 "fabricated evaluation: branch answer {:?} but evaluation produced {value:?}",
@@ -455,9 +478,16 @@ fn check_branch_evaluation(
     }
 }
 
-fn boolean_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) -> Option<&'a Term> {
+fn pure_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) -> Option<&'a Term> {
     match &module.query(query.as_str())?.plan {
-        QueryPlan::Evaluate(term) if is_boolean_fragment(term) => Some(term),
+        QueryPlan::Evaluate(term) if is_pure_fragment(term) => Some(term),
+        _ => None,
+    }
+}
+
+fn institutional_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) -> Option<&'a Term> {
+    match &module.query(query.as_str())?.plan {
+        QueryPlan::Evaluate(term) if is_institutional_fragment(term) => Some(term),
         _ => None,
     }
 }
@@ -489,11 +519,13 @@ fn strip_slot_name(key: &str) -> Option<&str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::ir::{CoreQuery, QueryPlan};
+    use fidryn_core::ir::{CoreDuty, CoreQuery, QueryPlan};
     use fidryn_core::{
-        BinOp, CoverageMethod, Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId,
-        PrimitiveType, SourceManifestId, Term, TraceId, Type,
+        BinOp, CoreDecl, CoverageMethod, DutyState, DutyStatus, Guard, Instant, Interval,
+        JurisdictionId, NodeId, NodeMeta, OriginId, PrimitiveType, SourceManifestId, Term, TraceId,
+        Type,
     };
+    use fidryn_eval::duty::duty_state_value;
     use fidryn_eval::evaluate;
 
     fn complete_witness(answer: Value) -> CoverageWitness {
@@ -521,6 +553,10 @@ mod tests {
     }
 
     fn module_with_plan(plan: QueryPlan) -> CoreModule {
+        module_with_plan_decls(plan, Vec::new())
+    }
+
+    fn module_with_plan_decls(plan: QueryPlan, declarations: Vec<CoreDecl>) -> CoreModule {
         CoreModule {
             id: ModuleId::of(b"test"),
             name: "Test".into(),
@@ -529,7 +565,7 @@ mod tests {
             manifest: SourceManifestId::of(b"m"),
             jurisdiction: JurisdictionId::of(b"j"),
             outside_scope: Vec::new(),
-            declarations: Vec::new(),
+            declarations,
             nominations: Vec::new(),
             queries: vec![CoreQuery {
                 id: NodeId::of(b"q"),
@@ -1344,11 +1380,55 @@ mod tests {
         assert!(err.contains("fabricated"), "{err}");
     }
 
+    fn covering_value(answer: Value) -> CoverageWitness {
+        CoverageWitness {
+            examined: 1,
+            total: 1,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: vec![BranchClaim {
+                bindings: BTreeMap::new(),
+                answer,
+            }],
+        }
+    }
+
+    fn require_term(cond: Term) -> Term {
+        Term::Apply {
+            ctor: "require".into(),
+            args: vec![cond],
+        }
+    }
+
+    fn seq_term(args: Vec<Term>) -> Term {
+        Term::Apply {
+            ctor: "seq".into(),
+            args,
+        }
+    }
+
+    fn duty_step_term() -> Term {
+        Term::Apply {
+            ctor: "duty_step".into(),
+            args: vec![Term::Ident("pay".into()), Term::Ident("attach".into())],
+        }
+    }
+
+    fn observe_term() -> Term {
+        Term::Apply {
+            ctor: "observed".into(),
+            args: vec![Term::String("Filing".into())],
+        }
+    }
+
     #[test]
     fn test_eval_fragment_is_used_when_evaluate_would_suspend_on_handlers() {
         let module = module_with_plan(QueryPlan::Evaluate(Term::Ident("judgment".into())));
         match &module.queries[0].plan {
-            QueryPlan::Evaluate(term) => assert!(is_boolean_fragment(term)),
+            QueryPlan::Evaluate(term) => {
+                assert!(is_boolean_fragment(term));
+                assert!(is_pure_fragment(term));
+            }
             other => panic!("expected Evaluate plan, got {other:?}"),
         }
         let mut case = CaseRecord::default();
@@ -1392,18 +1472,347 @@ mod tests {
     }
 
     #[test]
-    fn test_non_fragment_seq_still_replays_with_evaluate() {
-        let seq_true = Term::Apply {
-            ctor: "seq".into(),
-            args: vec![Term::Bool(true), Term::Bool(true)],
+    fn test_covering_int_add_uses_fragment() {
+        let term = Term::Binary {
+            op: BinOp::Add,
+            left: Box::new(Term::Int(1)),
+            right: Box::new(Term::Int(1)),
         };
-        assert!(!is_boolean_fragment(&seq_true));
-        let module = module_with_plan(QueryPlan::Evaluate(seq_true));
+        assert!(is_pure_fragment(&term));
+        assert!(!is_boolean_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_some());
+        let claimed = Value::Int(2);
+        let cert = covering_eval(&module, &claimed, covering_value(claimed.clone()))
+            .expect("1 + 1 covers 2 via fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        let err = covering_eval(&module, &Value::Int(3), covering_value(Value::Int(3)))
+            .expect_err("1 + 1 is not 3");
+        assert!(err.contains("fabricated"), "{err}");
+    }
+
+    #[test]
+    fn test_covering_if_true_then_three_uses_fragment() {
+        let term = Term::If {
+            cond: Box::new(Term::Bool(true)),
+            then: Box::new(Term::Int(3)),
+            else_: Box::new(Term::Int(4)),
+        };
+        assert!(is_pure_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        let claimed = Value::Int(3);
+        let cert = covering_eval(&module, &claimed, covering_value(claimed.clone()))
+            .expect("if true then 3 else 4 covers 3 via fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        let err = covering_eval(&module, &Value::Int(4), covering_value(Value::Int(4)))
+            .expect_err("taken branch is 3");
+        assert!(err.contains("fabricated"), "{err}");
+    }
+
+    #[test]
+    fn test_covering_seq_require_true_seven_uses_fragment() {
+        let term = seq_term(vec![require_term(Term::Bool(true)), Term::Int(7)]);
+        assert!(is_pure_fragment(&term));
+        assert!(!is_boolean_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_some());
+        let claimed = Value::Int(7);
+        let cert = covering_eval(&module, &claimed, covering_value(claimed.clone()))
+            .expect("seq(require true, 7) covers 7 via fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_covering_seq_require_false_cannot_claim_seven() {
+        let term = seq_term(vec![require_term(Term::Bool(false)), Term::Int(7)]);
+        assert!(is_pure_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        let err = covering_eval(&module, &Value::Int(7), covering_value(Value::Int(7)))
+            .expect_err("require false is not determinate 7");
+        assert!(
+            err.contains("requirement failed") || err.contains("covering"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_covering_field_on_assignment_map_uses_fragment() {
+        let term = Term::Field {
+            base: Box::new(Term::Ident("rec".into())),
+            name: "n".into(),
+        };
+        assert!(is_pure_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "rec".into(),
+            Value::Map(BTreeMap::from([("n".into(), Value::Int(9))])),
+        );
+        let claimed = Value::Int(9);
+        let cert = covering_eval_case(&module, &case, &claimed, covering_value(claimed.clone()))
+            .expect("field on assignment map covers via fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_covering_transaction_of_fragment_steps_uses_fragment() {
+        let term = Term::Apply {
+            ctor: "transaction".into(),
+            args: vec![require_term(Term::Bool(true)), Term::Int(5)],
+        };
+        assert!(is_pure_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        let claimed = Value::Int(5);
+        let cert = covering_eval(&module, &claimed, covering_value(claimed.clone()))
+            .expect("transaction of fragment steps covers via fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_seq_with_observe_still_replays_with_evaluate() {
+        let term = seq_term(vec![observe_term(), Term::Bool(true)]);
+        assert!(!is_pure_fragment(&term));
+        assert!(!is_boolean_fragment(&term));
+        assert!(!is_institutional_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_none());
+        assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_none());
         let claimed = Value::Bool(true);
         let witness = covering_witness(true, vec![empty_branch(true)]);
         let cert = covering_eval(&module, &claimed, witness)
-            .expect("non-fragment seq still covers via evaluate");
+            .expect("seq with Observe still covers via evaluate");
         assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
         assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_seq_with_duty_still_replays_with_evaluate() {
+        let term = seq_term(vec![duty_step_term(), Term::Bool(true)]);
+        assert!(!is_pure_fragment(&term));
+        assert!(!is_institutional_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_none());
+        assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_none());
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let cert = covering_eval(&module, &claimed, witness)
+            .expect("seq with duty_step still covers via evaluate");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_unique_occupant_plan_is_not_pure_fragment() {
+        let module = module_with_plan(QueryPlan::UniqueOccupant {
+            office: Term::Ident("Trustee".into()),
+        });
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_none());
+        assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_none());
+    }
+
+    fn duty_status_term(name: &str) -> Term {
+        Term::Apply {
+            ctor: "duty_status".into(),
+            args: vec![Term::Ident(name.into())],
+        }
+    }
+
+    fn pay_invoice_duty() -> CoreDuty {
+        CoreDuty {
+            id: NodeId::of(b"PayInvoice"),
+            name: "PayInvoice".into(),
+            bearer: Term::Ident("Payer".into()),
+            claimant: Some(Term::Ident("Payee".into())),
+            attaches: Guard::Satisfied,
+            content: vec![Term::Apply {
+                ctor: "due".into(),
+                args: vec![Term::Apply {
+                    ctor: "after".into(),
+                    args: vec![
+                        Term::Apply {
+                            ctor: "counted_days".into(),
+                            args: vec![Term::Int(30)],
+                        },
+                        Term::Ident("invoice_date".into()),
+                    ],
+                }],
+            }],
+            meta: test_meta("PayInvoice"),
+        }
+    }
+
+    fn pay_invoice_module(term: Term) -> CoreModule {
+        module_with_plan_decls(
+            QueryPlan::Evaluate(term),
+            vec![CoreDecl::Duty(pay_invoice_duty())],
+        )
+    }
+
+    fn attached_pay_invoice_case() -> CaseRecord {
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(at()));
+        case
+    }
+
+    fn attached_pay_invoice_state() -> Value {
+        duty_state_value(&DutyState {
+            name: "PayInvoice".into(),
+            status: DutyStatus::Attached,
+            breached: false,
+            bearer: "Payer".into(),
+            claimant: Some("Payee".into()),
+            instance: "default".into(),
+        })
+    }
+
+    fn performed_pay_invoice_state() -> Value {
+        duty_state_value(&DutyState {
+            name: "PayInvoice".into(),
+            status: DutyStatus::Performed,
+            breached: false,
+            bearer: "Payer".into(),
+            claimant: Some("Payee".into()),
+            instance: "default".into(),
+        })
+    }
+
+    fn ungranted_performed_event() -> fidryn_core::LedgerEvent {
+        fidryn_core::LedgerEvent {
+            kind: "duty".into(),
+            valid_time: Interval::always(),
+            record_time: at(),
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        }
+    }
+
+    #[test]
+    fn test_covering_duty_status_pay_invoice_uses_institutional_fragment() {
+        let term = duty_status_term("PayInvoice");
+        assert!(!is_pure_fragment(&term));
+        assert!(!is_boolean_fragment(&term));
+        assert!(is_institutional_fragment(&term));
+        let module = pay_invoice_module(term);
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_none());
+        assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_some());
+        let case = attached_pay_invoice_case();
+        let claimed = attached_pay_invoice_state();
+        let before = case.clone();
+        let cert = covering_eval_case(&module, &case, &claimed, covering_value(claimed.clone()))
+            .expect("duty_status(PayInvoice) covers Attached via institutional fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        assert_eq!(case, before);
+        let err = covering_eval_case(
+            &module,
+            &case,
+            &performed_pay_invoice_state(),
+            covering_value(performed_pay_invoice_state()),
+        )
+        .expect_err("attached duty is not Performed");
+        assert!(
+            err.contains("fabricated") || err.contains("covering"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_covering_duty_status_ungranted_performed_is_not_performed() {
+        let term = duty_status_term("PayInvoice");
+        assert!(is_institutional_fragment(&term));
+        let module = pay_invoice_module(term);
+        let mut case = attached_pay_invoice_case();
+        case.events.push(ungranted_performed_event());
+        let performed = performed_pay_invoice_state();
+        let err = covering_eval_case(
+            &module,
+            &case,
+            &performed,
+            covering_value(performed.clone()),
+        )
+        .expect_err("ungranted Performed event must not cover as Performed");
+        assert!(
+            err.contains("fabricated") || err.contains("covering"),
+            "{err}"
+        );
+        let attached = attached_pay_invoice_state();
+        let cert = covering_eval_case(&module, &case, &attached, covering_value(attached.clone()))
+            .expect("ungranted Performed stays Attached via institutional fragment");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        let overlay = ValidatedCompletionModel::from_case(&case)
+            .expect("model")
+            .overlay(&case, &BTreeMap::new(), &run_ctx())
+            .expect("overlay");
+        let value = eval_institutional(
+            &module,
+            &duty_status_term("PayInvoice"),
+            &overlay,
+            &run_ctx(),
+            &BTreeMap::new(),
+        )
+        .expect("institutional duty_status");
+        assert_eq!(value, attached);
+        assert_ne!(value, performed_pay_invoice_state());
+    }
+
+    #[test]
+    fn test_covering_require_authority_granted_is_unit() {
+        let term = Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("release".into())],
+        };
+        assert!(!is_pure_fragment(&term));
+        assert!(is_institutional_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_some());
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![Value::String("release".into())]),
+        );
+        let claimed = Value::Unit;
+        let cert = covering_eval_case(&module, &case, &claimed, covering_value(claimed.clone()))
+            .expect("granted require_authority covers Unit");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_covering_require_authority_without_grant_cannot_claim_determinate() {
+        let term = Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("release".into())],
+        };
+        assert!(is_institutional_fragment(&term));
+        let module = module_with_plan(QueryPlan::Evaluate(term));
+        let err = covering_eval(&module, &Value::Unit, covering_value(Value::Unit))
+            .expect_err("missing grant is not determinate covering");
+        assert!(
+            err.contains("requirement failed")
+                || err.contains("covering")
+                || err.contains("authority"),
+            "{err}"
+        );
+        let err = covering_eval(
+            &module,
+            &Value::Bool(true),
+            covering_value(Value::Bool(true)),
+        )
+        .expect_err("missing grant cannot claim true");
+        assert!(
+            err.contains("requirement failed")
+                || err.contains("covering")
+                || err.contains("fabricated"),
+            "{err}"
+        );
     }
 }
