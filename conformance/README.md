@@ -15,3 +15,15 @@ valid, `1` on validation failures, `2` on setup or read errors.
 
 Prefer `jsonschema` (`python3 -m pip install jsonschema`). Without it the
 script uses a built-in Draft 2020-12 subset checker of the same files.
+
+Outcome envelope probes (optional; not invoked from cargo tests):
+
+```sh
+python3 conformance/probe_outcome_schema.py
+```
+
+The probe checks `schemas/outcome-v0.1.json` against three malformed
+`fidryn.outcome/v0.1` documents (determinate without value / non-hex
+trace, ignored open issues without a certificate, tagged bool with a
+non-boolean). After the schema strengthening, all three should report
+`accepted_by_current_schema: false`.

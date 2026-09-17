@@ -28,6 +28,30 @@
         "admissibleCompletions": { "type": "object" }
       }
     },
+    "outcome": { "$ref": "#/$defs/outcome" }
+  },
+  "$defs": {
+    "hexId": {
+      "$comment": "16-byte hashed id as 32 hex characters (TraceId, CompletionProofId).",
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{32}$"
+    },
+    "value": {
+      "$comment": "Tagged Value {kind, data} or a JSON literal. A tagged bool must carry a boolean.",
+      "if": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": { "kind": { "const": "bool" } }
+      },
+      "then": {
+        "type": "object",
+        "required": ["kind", "data"],
+        "properties": {
+          "kind": { "const": "bool" },
+          "data": { "type": "boolean" }
+        }
+      }
+    },
     "outcome": {
       "type": "object",
       "required": ["kind", "trace"],
@@ -44,20 +68,82 @@
         },
         "trace": {
           "$comment": "Hex string TraceId.",
-          "type": "string"
+          "$ref": "#/$defs/hexId"
         },
-        "value": {
-          "$comment": "Unconstrained: tagged Value {kind, data} or a JSON literal. Entity requires the tagged form."
-        },
+        "value": { "$ref": "#/$defs/value" },
         "convergenceCertificate": {
           "$comment": "Hex string CompletionProofId when present.",
-          "type": ["string", "null"]
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-fA-F]{32}$"
         },
         "ignoredOpenIssues": { "type": "array" },
         "alternatives": { "type": "object" },
         "pivots": { "type": "array" },
-        "requests": { "type": "array" }
-      }
+        "requests": { "type": "array" },
+        "doctrines": { "type": "array" },
+        "request": { "type": "object" },
+        "reason": { "type": "string" },
+        "core": { "type": "array", "items": { "type": "string" } }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "determinate" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["value"] }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": { "const": "determinate" },
+              "ignoredOpenIssues": { "type": "array", "minItems": 1 }
+            },
+            "required": ["kind", "ignoredOpenIssues"]
+          },
+          "then": {
+            "required": ["convergenceCertificate"],
+            "properties": {
+              "convergenceCertificate": { "$ref": "#/$defs/hexId" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "contingent" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["alternatives", "pivots"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "suspended" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["requests"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "normConflict" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["doctrines"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "outsideCompetence" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["request", "reason"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "inconsistent" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["core"] }
+        }
+      ]
     }
   }
 }
