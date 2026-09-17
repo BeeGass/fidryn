@@ -1,3 +1,13 @@
+---
+title: "Examples"
+description: "Trust, tax, federal slices, and the fifty-state corpus map for Fidryn."
+url: "https://fidryn.onlygass.dev/docs/examples"
+markdown: "https://fidryn.onlygass.dev/docs/examples.md"
+author: "Bryan Gass"
+---
+
+> Canonical HTML: https://fidryn.onlygass.dev/docs/examples
+> This markdown mirror is for agents and plain-text readers.
 # Example corpus
 
 This catalog is a map of the Fidryn example tree. The modules under
@@ -603,6 +613,7 @@ fidryn check tests/programs/two-offices.fr
 fidryn check tests/programs/require-gate.fr
 fidryn check tests/programs/late-payment.fr
 fidryn check tests/programs/late-payment-extended.fr
+fidryn check tests/programs/transaction-atomic.fr
 ```
 
 | Path | Purpose |
@@ -613,6 +624,7 @@ fidryn check tests/programs/late-payment-extended.fr
 | `tests/programs/require-gate.fr` | Query `q` is `require true; return 7`. Query `r` is `require false; return 7`. False require does not run the return. |
 | `tests/programs/late-payment.fr` | `PayInvoice` duty, `TimelyPayment` decision, and `DeadlineMeaning` (strict versus 15 counted days). Queries `due`, `paid_on_time`, `obligation_status`. |
 | `tests/programs/late-payment-extended.fr` | Same duty shape with `due 15 counted_days after invoice_date` and no competing deadline family. |
+| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` returns `Bool`. Partial surface — not a general transaction engine. |
 
 ## Honesty
 
