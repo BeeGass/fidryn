@@ -19,18 +19,1171 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Examples — Fidryn">
   <meta name="twitter:description" content="Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Examples \u2014 Fidryn","description":"Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.","url":"https://fidryn.onlygass.dev/docs/examples","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/examples.md"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Examples — Fidryn","description":"Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.","url":"https://fidryn.onlygass.dev/docs/examples","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/examples.md"}</script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
   <div class="docs-shell">
-    <header class="docs-top"><a class="mark" href="/">fidryn</a></header>
-    <main class="docs-main prose">
-      <h1>Example corpus</h1>
-      <p>Full catalog: <a href="/docs/examples.md">examples.md</a>.</p>
-      <p>Research fixture — not legal advice.</p>
-    </main>
+    <header class="docs-top">
+      <a class="mark" href="/">fidryn</a>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
+        <p class="docs-sidebar-label">Guides</p>
+        <nav class="docs-side-nav">
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples" class="active">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
+        </nav>
+        <p class="docs-sidebar-label">Also</p>
+        <nav class="docs-side-nav">
+          <a href="/">Home</a>
+          <a href="/docs/examples.md">Markdown</a>
+          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/llms.txt">llms.txt</a>
+        </nav>
+      </aside>
+
+      <main class="docs-main prose" id="main">
+<h1>Example corpus</h1>
+<p>This catalog is a map of the Fidryn example tree. The modules under
+<code>examples/</code> and the independent programs under <code>tests/programs/</code> are
+research fixtures. They are not legal advice, not operative instruments,
+and not a complete statement of any jurisdiction’s law.</p>
+<p>Build the toolchain as in <a href="/docs/getting-started">getting-started</a>. Source
+syntax is in <a href="/docs/language">language</a>. Subcommands, timestamps, and
+outcome envelopes are in <a href="/docs/cli">cli</a>. Commands below assume the
+repository root as the working directory. The binary name is <code>fidryn</code>.
+From a checkout that has not installed the binary, prefix the same
+subcommands with <code>cargo run -p fidryn-cli --</code>.</p>
+<h2>How to use an example</h2>
+<p>Every module is a <code>.fr</code> file. Start by checking it. <code>check</code> authenticates
+the declared source manifest (when the module has one), elaborates, and
+type-checks. A clean module prints <code>ok</code>.</p>
+<pre><code>fidryn check examples/trust/bryan-revocable-trust.fr
+</code></pre>
+<p>If the directory contains a <code>cases/</code> folder, those files are
+<code>fidryn.case-record/v0.1</code> JSON records. <code>run</code> evaluates one named query
+against one record at a pair of ISO 8601 / RFC 3339 timestamps. <code>run</code>
+never chooses a completion. A <code>Suspended</code> outcome is an honest result,
+not a failed command.</p>
+<pre><code>fidryn run examples/us-federal/flsa/flsa.fr \
+  --query overtime_hours \
+  --case examples/us-federal/flsa/cases/forty-one-hours.json \
+  --valid-at 2026-09-17T12:00:00-04:00 \
+  --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p><code>--valid-at</code> is the legal valid time. <code>--known-at</code> is the record time.
+Evidence whose <code>observedAt</code> is after <code>--known-at</code> does not discharge a
+query. <code>--arg KEY=VALUE</code> writes <code>case.facts[&quot;KEY&quot;]</code> on top of the JSON
+(for example <code>--arg provision=ChildSupportWaiver</code>).</p>
+<p>State modules under <code>examples/states/</code> do not ship companion JSON. Case
+facts live in <code>scenario</code> blocks inside the <code>.fr</code> file. There is no JSON
+source manifest either: the <code>source { ... }</code> block already carries
+citation, artifact, and <code>digest fixture</code>. Check the module, and verify a
+declared property when you want the honesty assertions:</p>
+<pre><code>fidryn check examples/states/florida/homestead.fr
+fidryn verify examples/states/florida/homestead.fr --property HomesteadHonesty
+</code></pre>
+<p>A query that looks mechanical (deadlines, dollar caps, day counts,
+acreage) is <code>automatic</code> or <code>Evaluate</code> with an empty effect row. A query
+that needs a tribunal, agency, or open-textured standard uses <code>Determine</code>
+or <code>Observe</code> and must be allowed to <code>Suspend</code>. The fixtures do not hide
+judgment in a Boolean.</p>
+<h2>Start here</h2>
+<p>These eleven modules cover an instrument, a closed-form tax slice, an
+agency procedure, a formation filing, a family agreement, a civil-procedure
+spine, a consumer clock, a state constitutional cap, a federal wage rule,
+and two interpreter programs.</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/trust/bryan-revocable-trust.fr</code></td>
+<td>Successor trustee occupancy under the Bryan revocable-trust fixture.</td>
+<td><code>fidryn check examples/trust/bryan-revocable-trust.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/tax/federal-tax.fr</code></td>
+<td>Closed-form ordinary-income tax and FinCEN BOI after the domestic-company exemption.</td>
+<td><code>fidryn check examples/tax/federal-tax.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/foia/foia-request.fr</code></td>
+<td>FOIA request processing; a proposed Exemption 5 withholding still needs harm and segregability.</td>
+<td><code>fidryn check examples/foia/foia-request.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/massachusetts-llc/harbor-robotics.fr</code></td>
+<td>Massachusetts LLC formation; a transport receipt is not an official filing record.</td>
+<td><code>fidryn check examples/massachusetts-llc/harbor-robotics.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/prenup/ava-noah.fr</code></td>
+<td>California UPAA provision enforcement for the Ava–Noah agreement.</td>
+<td><code>fidryn check examples/prenup/ava-noah.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/procedure/civil-complaint.fr</code></td>
+<td>FRCP 3/4/12/58 complaint-to-judgment spine.</td>
+<td><code>fidryn check examples/procedure/civil-complaint.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/california/security-deposit/security-deposit.fr</code></td>
+<td>California 21-day security-deposit return clock versus bad-faith doubling.</td>
+<td><code>fidryn check examples/california/security-deposit/security-deposit.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/states/florida/homestead.fr</code></td>
+<td>Florida homestead acreage caps and forced-sale character; scenarios live in the <code>.fr</code> file.</td>
+<td><code>fidryn check examples/states/florida/homestead.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/flsa/flsa.fr</code></td>
+<td>FLSA 40-hour overtime versus the white-collar exemption.</td>
+<td><code>fidryn check examples/us-federal/flsa/flsa.fr</code></td>
+</tr>
+<tr>
+<td><code>tests/programs/require-gate.fr</code></td>
+<td><code>require true</code> returns 7; <code>require false</code> does not run the return.</td>
+<td><code>fidryn check tests/programs/require-gate.fr</code></td>
+</tr>
+<tr>
+<td><code>tests/programs/late-payment.fr</code></td>
+<td>Invoice duty, timely-payment decision, and a strict-versus-extended deadline family.</td>
+<td><code>fidryn check tests/programs/late-payment.fr</code></td>
+</tr>
+</tbody>
+</table>
+<p>Run the modules that ship JSON case records. Timestamps match each
+module’s <code>recorded_at</code> or, when evidence is later, that evidence’s
+<code>observedAt</code>.</p>
+<pre><code>fidryn run examples/trust/bryan-revocable-trust.fr \
+  --query acting_trustee \
+  --case examples/trust/cases/one-certificate.json \
+  --valid-at 2026-08-23T12:00:00Z \
+  --known-at 2026-08-23T12:00:00Z
+</code></pre>
+<p>Other trust records in the same folder are
+<code>bob-plus-open-alice.json</code>, <code>two-certificates-open-eligibility.json</code>, and
+<code>court-selects-i2.json</code>. One physician certificate without a checked
+completion is expected to suspend.</p>
+<pre><code>fidryn run examples/tax/federal-tax.fr \
+  --query tax_on \
+  --case examples/tax/cases/ordinary-income.json \
+  --valid-at 2026-08-14T00:00:00-04:00 \
+  --known-at 2026-08-14T00:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/tax/federal-tax.fr \
+  --query boi_required \
+  --case examples/tax/cases/domestic-company-after-exemption.json \
+  --valid-at 2026-09-01T00:00:00-04:00 \
+  --known-at 2026-09-01T00:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/foia/foia-request.fr \
+  --query disposition \
+  --case examples/foia/cases/proposed-exemption-5-withholding.json \
+  --valid-at 2026-08-23T12:00:00-04:00 \
+  --known-at 2026-08-23T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/massachusetts-llc/harbor-robotics.fr \
+  --query entity_status \
+  --case examples/massachusetts-llc/cases/official-filing-record.json \
+  --valid-at 2026-08-28T14:12:00-04:00 \
+  --known-at 2026-08-28T14:12:00-04:00
+</code></pre>
+<p><code>examples/massachusetts-llc/cases/transmitted-without-official-record.json</code>
+is the contrast case: transmission without an <code>OfficialFilingRecord</code>
+suspends.</p>
+<pre><code>fidryn run examples/prenup/ava-noah.fr \
+  --query provision_result \
+  --case examples/prenup/cases/divorce-record.json \
+  --valid-at 2026-08-23T12:00:00-07:00 \
+  --known-at 2026-08-23T12:00:00-07:00
+</code></pre>
+<p><code>divorce-record-without-enforceability-order.json</code> suspends on
+<code>PrenupEnforceability</code>. <code>--arg provision=ChildSupportWaiver</code> overwrites
+<code>case.facts[&quot;provision&quot;]</code> when you want a different clause without
+editing the JSON.</p>
+<pre><code>fidryn run examples/procedure/civil-complaint.fr \
+  --query judgment \
+  --case examples/procedure/cases/judgment-entered.json \
+  --valid-at 2026-10-01T16:00:00-04:00 \
+  --known-at 2026-10-01T16:00:00-04:00
+</code></pre>
+<p><code>complaint-answered-without-judgment.json</code> suspends because there is no
+judgment entry.</p>
+<pre><code>fidryn run examples/california/security-deposit/security-deposit.fr \
+  --query deadline_running \
+  --case examples/california/security-deposit/cases/day-10.json \
+  --valid-at 2026-09-17T12:00:00-07:00 \
+  --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/flsa/flsa.fr \
+  --query overtime_hours \
+  --case examples/us-federal/flsa/cases/forty-one-hours.json \
+  --valid-at 2026-09-17T12:00:00-04:00 \
+  --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>Florida homestead has no JSON case file. The scenarios <code>InsideCityHalfAcre</code>,
+<code>RuralHundredSixty</code>, and <code>TaxCreditor</code> are in
+<code>examples/states/florida/homestead.fr</code>. <code>require-gate.fr</code> and
+<code>late-payment.fr</code> also have no JSON; they are check-only programs. See
+<a href="#independent-programs">Independent programs</a>.</p>
+<h2>Federal slices</h2>
+<p>Bounded United States Code and CFR slices live under
+<code>examples/us-federal/</code>. Fidryn does not contain the United States Code.
+The catalog module at <code>examples/us-federal/catalog/usc-titles.fr</code> records
+that fact. Each slice names the dated source it encodes and lists what it
+leaves <code>outside_scope</code>.</p>
+<p>Unless a row says otherwise, these modules use the 2026-09-17 snapshot
+and this timestamp pair:</p>
+<pre><code>--valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>Check, then run:</p>
+<pre><code>fidryn check PATH
+fidryn run PATH --query QUERY --case CASE \
+  --valid-at 2026-09-17T12:00:00-04:00 \
+  --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>The original FOIA spine is <code>examples/foia/foia-request.fr</code>, not under
+<code>us-federal/</code>. It is in <a href="#start-here">Start here</a>.</p>
+<h3>Litigators, every week</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/us-federal/diversity/diversity.fr</code></td>
+<td>28 U.S.C. § 1332(a). The $75,000 amount-in-controversy floor is mechanical; complete diversity is not.</td>
+<td><code>amount_in_controversy_met</code></td>
+<td><code>examples/us-federal/diversity/cases/amount-met-diversity-open.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/removal/removal.fr</code></td>
+<td>28 U.S.C. § 1446(b). Thirty-day removal clock versus later-served-defendant doctrine.</td>
+<td><code>thirty_day_window</code></td>
+<td><code>examples/us-federal/removal/cases/inside-thirty-days.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/hearsay/hearsay.fr</code></td>
+<td>Fed. R. Evid. 801–804. Out-of-court use versus the 803(6) business-records exception.</td>
+<td><code>out_of_court</code></td>
+<td><code>examples/us-federal/hearsay/cases/out-of-court-statement.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/speedy-trial/speedy-trial.fr</code></td>
+<td>18 U.S.C. § 3161. Seventy-day clock versus ends-of-justice continuance.</td>
+<td><code>seventy_day_window</code></td>
+<td><code>examples/us-federal/speedy-trial/cases/inside-seventy-days.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/us-federal/diversity/diversity.fr --query amount_in_controversy_met --case examples/us-federal/diversity/cases/amount-met-diversity-open.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/removal/removal.fr --query thirty_day_window --case examples/us-federal/removal/cases/inside-thirty-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/hearsay/hearsay.fr --query out_of_court --case examples/us-federal/hearsay/cases/out-of-court-statement.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/speedy-trial/speedy-trial.fr --query seventy_day_window --case examples/us-federal/speedy-trial/cases/inside-seventy-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<h3>Employment counsel and workers</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/us-federal/flsa/flsa.fr</code></td>
+<td>29 U.S.C. § 207. Hours over 40 are mechanical; the white-collar exemption is a determination.</td>
+<td><code>overtime_hours</code></td>
+<td><code>examples/us-federal/flsa/cases/forty-one-hours.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/fmla/fmla.fr</code></td>
+<td>29 U.S.C. § 2611. 1,250 hours / 12 months / 50 employees versus serious health condition.</td>
+<td><code>eligibility_counts</code></td>
+<td><code>examples/us-federal/fmla/cases/hours-and-headcount.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/title-vii/title-vii.fr</code></td>
+<td>42 U.S.C. § 2000e-5. 180/300-day EEOC charge clock versus equitable tolling.</td>
+<td><code>charge_clock</code></td>
+<td><code>examples/us-federal/title-vii/cases/day-100-worksharing.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/warn/warn.fr</code></td>
+<td>29 U.S.C. § 2102. Sixty-day / 100-employee floor versus unforeseen circumstances.</td>
+<td><code>notice_timely</code></td>
+<td><code>examples/us-federal/warn/cases/sixty-day-notice.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/us-federal/flsa/flsa.fr --query overtime_hours --case examples/us-federal/flsa/cases/forty-one-hours.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/fmla/fmla.fr --query eligibility_counts --case examples/us-federal/fmla/cases/hours-and-headcount.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/title-vii/title-vii.fr --query charge_clock --case examples/us-federal/title-vii/cases/day-100-worksharing.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/warn/warn.fr --query notice_timely --case examples/us-federal/warn/cases/sixty-day-notice.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>California noncompete, final pay, and the ABC test are not under
+<code>us-federal/</code>. They are in <a href="#other-practice-slices">Other practice slices</a>.</p>
+<h3>Consumer, housing, and privacy</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/us-federal/fcra/fcra.fr</code></td>
+<td>15 U.S.C. § 1681i. Thirty-day credit reinvestigation clock.</td>
+<td><code>reinvestigation_clock</code></td>
+<td><code>examples/us-federal/fcra/cases/day-10.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/fdcpa/fdcpa.fr</code></td>
+<td>15 U.S.C. § 1692g. Thirty-day debt-validation clock.</td>
+<td><code>validation_clock</code></td>
+<td><code>examples/us-federal/fdcpa/cases/day-10.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/efta/efta.fr</code></td>
+<td>15 U.S.C. § 1693f. Sixty-day bank-error clock.</td>
+<td><code>error_clock</code></td>
+<td><code>examples/us-federal/efta/cases/day-30.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/tcpa/tcpa.fr</code></td>
+<td>47 U.S.C. § 227. Statutory-damages floor; consent and autodialer stay open-textured.</td>
+<td><code>at_least_statutory_floor</code></td>
+<td><code>examples/us-federal/tcpa/cases/statutory-floor.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/dmca/dmca.fr</code></td>
+<td>17 U.S.C. § 512. Six notice elements versus counter-notice good faith.</td>
+<td><code>notice_elements_met</code></td>
+<td><code>examples/us-federal/dmca/cases/six-elements.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/ada-service-animal/ada-service-animal.fr</code></td>
+<td>28 C.F.R. § 36.302. Two permitted questions versus task-training.</td>
+<td><code>two_questions_only</code></td>
+<td><code>examples/us-federal/ada-service-animal/cases/two-questions.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/fair-housing/fair-housing.fr</code></td>
+<td>HUD FHEO-2020-01. Extra deposit is mechanical; disability-and-nexus is not.</td>
+<td><code>extra_deposit_not_required</code></td>
+<td><code>examples/us-federal/fair-housing/cases/no-extra-deposit.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/garnishment/garnishment.fr</code></td>
+<td>15 U.S.C. § 1673. Twenty-five percent disposable-earnings cap.</td>
+<td><code>within_twenty_five_percent</code></td>
+<td><code>examples/us-federal/garnishment/cases/under-cap.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/us-federal/fcra/fcra.fr --query reinvestigation_clock --case examples/us-federal/fcra/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/fdcpa/fdcpa.fr --query validation_clock --case examples/us-federal/fdcpa/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/efta/efta.fr --query error_clock --case examples/us-federal/efta/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/tcpa/tcpa.fr --query at_least_statutory_floor --case examples/us-federal/tcpa/cases/statutory-floor.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/dmca/dmca.fr --query notice_elements_met --case examples/us-federal/dmca/cases/six-elements.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/ada-service-animal/ada-service-animal.fr --query two_questions_only --case examples/us-federal/ada-service-animal/cases/two-questions.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/fair-housing/fair-housing.fr --query extra_deposit_not_required --case examples/us-federal/fair-housing/cases/no-extra-deposit.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/garnishment/garnishment.fr --query within_twenty_five_percent --case examples/us-federal/garnishment/cases/under-cap.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<h3>Benefits, health, military, and education</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/us-federal/medicare/medicare.fr</code></td>
+<td>42 U.S.C. § 1395p. Age-65 attainment versus initial-enrollment and late-enrollment penalty.</td>
+<td><code>age_65_attained</code></td>
+<td><code>examples/us-federal/medicare/cases/turning-65.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/ssa-fra/ssa-fra.fr</code></td>
+<td>42 U.S.C. § 416(l). Full retirement age 67 for birth year 1960 versus delayed credits.</td>
+<td><code>fra_is_sixty_seven</code></td>
+<td><code>examples/us-federal/ssa-fra/cases/born-1960.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/ssi/ssi.fr</code></td>
+<td>42 U.S.C. § 1382. $2,000 resource cap versus household-of-another.</td>
+<td><code>resources_within_cap</code></td>
+<td><code>examples/us-federal/ssi/cases/under-cap.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/cobra/cobra.fr</code></td>
+<td>29 U.S.C. § 1165. Sixty-day election window versus qualifying event.</td>
+<td><code>election_open</code></td>
+<td><code>examples/us-federal/cobra/cases/day-30.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/hipaa/hipaa.fr</code></td>
+<td>45 C.F.R. § 164.524. Thirty-day records clock versus psychotherapy notes.</td>
+<td><code>access_clock_running</code></td>
+<td><code>examples/us-federal/hipaa/cases/day-10.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/scra/scra.fr</code></td>
+<td>50 U.S.C. § 3937. Six-percent interest cap during military service.</td>
+<td><code>within_six_percent</code></td>
+<td><code>examples/us-federal/scra/cases/six-percent.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/userra/userra.fr</code></td>
+<td>38 U.S.C. § 4312. Reemployment window versus escalator position.</td>
+<td><code>within_outer_window</code></td>
+<td><code>examples/us-federal/userra/cases/day-30.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/pslf/pslf.fr</code></td>
+<td>20 U.S.C. § 1087e. 120 qualifying payments versus qualifying employer.</td>
+<td><code>payment_count_met</code></td>
+<td><code>examples/us-federal/pslf/cases/one-hundred-twenty.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/us-federal/medicare/medicare.fr --query age_65_attained --case examples/us-federal/medicare/cases/turning-65.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/ssa-fra/ssa-fra.fr --query fra_is_sixty_seven --case examples/us-federal/ssa-fra/cases/born-1960.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/ssi/ssi.fr --query resources_within_cap --case examples/us-federal/ssi/cases/under-cap.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/cobra/cobra.fr --query election_open --case examples/us-federal/cobra/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/hipaa/hipaa.fr --query access_clock_running --case examples/us-federal/hipaa/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/scra/scra.fr --query within_six_percent --case examples/us-federal/scra/cases/six-percent.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/userra/userra.fr --query within_outer_window --case examples/us-federal/userra/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/pslf/pslf.fr --query payment_count_met --case examples/us-federal/pslf/cases/one-hundred-twenty.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<h3>Immigration, bankruptcy, tax, and securities</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/us-federal/naturalization/naturalization.fr</code></td>
+<td>8 U.S.C. § 1427. Five-year / three-year residency versus good moral character.</td>
+<td><code>residency_met</code></td>
+<td><code>examples/us-federal/naturalization/cases/five-years.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/unlawful-presence/unlawful-presence.fr</code></td>
+<td>8 U.S.C. § 1182(a)(9)(B). 180-day / 1-year triggers versus waiver.</td>
+<td><code>three_year_bar_triggered</code></td>
+<td><code>examples/us-federal/unlawful-presence/cases/one-hundred-eighty-days.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr</code></td>
+<td>11 U.S.C. § 362. Stay on filing versus stay relief.</td>
+<td><code>stay_in_force</code></td>
+<td><code>examples/us-federal/bankruptcy-stay/cases/day-after-filing.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/means-test/means-test.fr</code></td>
+<td>11 U.S.C. § 707(b). Median-income comparison versus special circumstances.</td>
+<td><code>above_median</code></td>
+<td><code>examples/us-federal/means-test/cases/above-median.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/eighty-three-b/eighty-three-b.fr</code></td>
+<td>26 U.S.C. § 83(b). Thirty-day election window versus substantial risk of forfeiture.</td>
+<td><code>election_window_open</code></td>
+<td><code>examples/us-federal/eighty-three-b/cases/day-10.json</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/accredited-investor/accredited-investor.fr</code></td>
+<td>17 C.F.R. § 230.501. Income and net-worth tests versus sophistication.</td>
+<td><code>individual_income_met</code></td>
+<td><code>examples/us-federal/accredited-investor/cases/income-met.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/us-federal/naturalization/naturalization.fr --query residency_met --case examples/us-federal/naturalization/cases/five-years.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/unlawful-presence/unlawful-presence.fr --query three_year_bar_triggered --case examples/us-federal/unlawful-presence/cases/one-hundred-eighty-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr --query stay_in_force --case examples/us-federal/bankruptcy-stay/cases/day-after-filing.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/means-test/means-test.fr --query above_median --case examples/us-federal/means-test/cases/above-median.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/eighty-three-b/eighty-three-b.fr --query election_window_open --case examples/us-federal/eighty-three-b/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/accredited-investor/accredited-investor.fr --query individual_income_met --case examples/us-federal/accredited-investor/cases/income-met.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>Closed-form IRC § 1 and FinCEN BOI live in <code>examples/tax/federal-tax.fr</code>,
+not under <code>us-federal/</code>. See <a href="#start-here">Start here</a>.</p>
+<h3>Catalog</h3>
+<p><code>examples/us-federal/catalog/usc-titles.fr</code> (<code>US.Federal.Code.Catalog</code>)
+does not encode titles. It records that the United States Code, the CFR,
+uncodified statutes, case law, and internal guidance remain outside this
+corpus except for the slices listed above.</p>
+<pre><code>fidryn check examples/us-federal/catalog/usc-titles.fr
+fidryn run examples/us-federal/catalog/usc-titles.fr --query encoding_is_bounded --case examples/us-federal/catalog/cases/catalog-query.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+fidryn verify examples/us-federal/catalog/usc-titles.fr --property CatalogDoesNotClaimCompleteness
+</code></pre>
+<h2>Other practice slices</h2>
+<p>These directories sit beside <code>us-federal/</code> and <code>states/</code>. They still use
+<code>fidryn.case-record/v0.1</code> JSON. Unless a command uses a Pacific or
+Central offset from the module header, use
+<code>--valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00</code>.</p>
+<h3>California</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/california/security-deposit/security-deposit.fr</code></td>
+<td>Cal. Civ. Code § 1950.5. Twenty-one-day return versus bad-faith doubling.</td>
+<td><code>deadline_running</code></td>
+<td><code>examples/california/security-deposit/cases/day-10.json</code></td>
+</tr>
+<tr>
+<td><code>examples/california/final-pay/final-pay.fr</code></td>
+<td>Cal. Lab. Code §§ 201–203. Immediate pay on discharge versus waiting-time penalty.</td>
+<td><code>pay_due_immediately</code></td>
+<td><code>examples/california/final-pay/cases/discharged.json</code></td>
+</tr>
+<tr>
+<td><code>examples/california/noncompete/noncompete.fr</code></td>
+<td>Cal. Bus. &amp; Prof. Code § 16600 versus the sale-of-business exception.</td>
+<td><code>void_as_to_noncompete</code></td>
+<td><code>examples/california/noncompete/cases/restraint-present.json</code></td>
+</tr>
+<tr>
+<td><code>examples/california/abc-test/abc-test.fr</code></td>
+<td>Cal. Lab. Code § 2775. Prong A can be Boolean; prongs B and C cannot.</td>
+<td><code>prong_a_free_from_control</code></td>
+<td><code>examples/california/abc-test/cases/prong-a-free.json</code></td>
+</tr>
+<tr>
+<td><code>examples/california/lemon/lemon.fr</code></td>
+<td>Cal. Civ. Code § 1793.22. Repair attempts versus substantial impairment.</td>
+<td><code>reasonable_repair_attempts</code></td>
+<td><code>examples/california/lemon/cases/four-attempts.json</code></td>
+</tr>
+<tr>
+<td><code>examples/california/cpra/cpra.fr</code></td>
+<td>Cal. Civ. Code § 1798.130. Forty-five-day access clock.</td>
+<td><code>response_clock_running</code></td>
+<td><code>examples/california/cpra/cases/day-20.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/california/security-deposit/security-deposit.fr --query deadline_running --case examples/california/security-deposit/cases/day-10.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/california/final-pay/final-pay.fr --query pay_due_immediately --case examples/california/final-pay/cases/discharged.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/california/noncompete/noncompete.fr --query void_as_to_noncompete --case examples/california/noncompete/cases/restraint-present.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/california/abc-test/abc-test.fr --query prong_a_free_from_control --case examples/california/abc-test/cases/prong-a-free.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/california/lemon/lemon.fr --query reasonable_repair_attempts --case examples/california/lemon/cases/four-attempts.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/california/cpra/cpra.fr --query response_clock_running --case examples/california/cpra/cases/day-20.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<p>Wage statements for California are the fifty-state module
+<code>examples/states/california/wage-statements.fr</code>, not this directory.</p>
+<h3>Delaware, Illinois, Massachusetts, New York, Texas, UCC, everyday</h3>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Query</th>
+<th>Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/delaware/dgcl-220/dgcl-220.fr</code></td>
+<td>8 Del. C. § 220. Record stockholder is mechanical; proper purpose is not.</td>
+<td><code>stockholder_of_record</code></td>
+<td><code>examples/delaware/dgcl-220/cases/record-stockholder.json</code></td>
+</tr>
+<tr>
+<td><code>examples/illinois/bipa/bipa.fr</code></td>
+<td>740 ILCS 14. Consent before biometrics versus willful damages.</td>
+<td><code>consent_before_biometric</code></td>
+<td><code>examples/illinois/bipa/cases/no-consent.json</code></td>
+</tr>
+<tr>
+<td><code>examples/massachusetts/security-deposit/security-deposit.fr</code></td>
+<td>M.G.L. c. 186 § 15B. Thirty-day itemization versus treble damages.</td>
+<td><code>itemization_deadline_running</code></td>
+<td><code>examples/massachusetts/security-deposit/cases/day-15.json</code></td>
+</tr>
+<tr>
+<td><code>examples/new-york/foil/foil.fr</code></td>
+<td>N.Y. Pub. Off. Law § 87. Five-day acknowledgment versus law-enforcement exemption.</td>
+<td><code>acknowledge_window_running</code></td>
+<td><code>examples/new-york/foil/cases/day-3.json</code></td>
+</tr>
+<tr>
+<td><code>examples/texas/homestead/homestead.fr</code></td>
+<td>Tex. Const. art. XVI § 50 and Tex. Prop. Code § 41.002. Urban acreage versus homestead character.</td>
+<td><code>urban_acreage_10_acres</code></td>
+<td><code>examples/texas/homestead/cases/urban-eight-acres.json</code></td>
+</tr>
+<tr>
+<td><code>examples/ucc/battle-of-forms/battle-of-forms.fr</code></td>
+<td>U.C.C. § 2-207. Additional terms between merchants versus material alteration.</td>
+<td><code>additional_term_between_merchants</code></td>
+<td><code>examples/ucc/battle-of-forms/cases/both-merchants.json</code></td>
+</tr>
+<tr>
+<td><code>examples/everyday/minimum-wage/minimum-wage.fr</code></td>
+<td>29 U.S.C. § 206. Federal $7.25 floor; which local ordinance applies is not a Boolean.</td>
+<td><code>federal_floor</code></td>
+<td><code>examples/everyday/minimum-wage/cases/federal-floor.json</code></td>
+</tr>
+<tr>
+<td><code>examples/everyday/final-paycheck/final-paycheck.fr</code></td>
+<td>Default next payday versus California immediate pay.</td>
+<td><code>default_next_payday</code></td>
+<td><code>examples/everyday/final-paycheck/cases/next-payday.json</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code>fidryn run examples/delaware/dgcl-220/dgcl-220.fr --query stockholder_of_record --case examples/delaware/dgcl-220/cases/record-stockholder.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/illinois/bipa/bipa.fr --query consent_before_biometric --case examples/illinois/bipa/cases/no-consent.json --valid-at 2026-09-17T12:00:00-05:00 --known-at 2026-09-17T12:00:00-05:00
+</code></pre>
+<pre><code>fidryn run examples/massachusetts/security-deposit/security-deposit.fr --query itemization_deadline_running --case examples/massachusetts/security-deposit/cases/day-15.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/new-york/foil/foil.fr --query acknowledge_window_running --case examples/new-york/foil/cases/day-3.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/texas/homestead/homestead.fr --query urban_acreage_10_acres --case examples/texas/homestead/cases/urban-eight-acres.json --valid-at 2026-09-17T12:00:00-05:00 --known-at 2026-09-17T12:00:00-05:00
+</code></pre>
+<pre><code>fidryn run examples/ucc/battle-of-forms/battle-of-forms.fr --query additional_term_between_merchants --case examples/ucc/battle-of-forms/cases/both-merchants.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/everyday/minimum-wage/minimum-wage.fr --query federal_floor --case examples/everyday/minimum-wage/cases/federal-floor.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/everyday/final-paycheck/final-paycheck.fr --query default_next_payday --case examples/everyday/final-paycheck/cases/next-payday.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>The original instrument fixtures <code>examples/trust/</code>, <code>examples/prenup/</code>,
+<code>examples/foia/</code>, <code>examples/massachusetts-llc/</code>, <code>examples/procedure/</code>,
+and <code>examples/tax/</code> are in <a href="#start-here">Start here</a>.</p>
+<h2>Fifty-state corpus</h2>
+<p><code>examples/states/</code> has one full high-impact module per U.S. state:
+homestead, final pay, security deposit, paid leave, no-fault, community
+property, and similar rules people and lawyers actually hit. Each file
+is a complete instrument (sources, entities, propositions, observations,
+rules, duties, queries, scenarios, verification). These are research
+fixtures, not legal advice, and not a complete statement of any state’s
+code.</p>
+<p>Case facts are <code>scenario</code> blocks in the <code>.fr</code> file. There is no companion
+JSON case file and no JSON source manifest. <code>source_manifest</code> is omitted
+when the module’s <code>source { ... }</code> block already carries citation,
+artifact, and <code>digest fixture</code>; the compiler loads an empty manifest in
+that case.</p>
+<p>The quality bar is <code>examples/states/florida/homestead.fr</code>
+(<code>Florida.Property.Homestead</code>, Fla. Const. art. X, § 4). Urban acreage
+0.5, rural acreage 160, and the $1,000 personal-property cap are
+<code>automatic</code>. Homestead character and excepted-creditor status stay in
+<code>Determine</code> / <code>Observe</code>. Scenarios <code>InsideCityHalfAcre</code>,
+<code>RuralHundredSixty</code>, and <code>TaxCreditor</code> sit in the same file. Fixture
+excerpts live next to each module under <code>sources/</code> and are not official
+editions.</p>
+<pre><code>fidryn check examples/states/florida/homestead.fr
+fidryn verify examples/states/florida/homestead.fr --property HomesteadHonesty
+</code></pre>
+<p>District of Columbia and the territories are outside this corpus.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>File</th>
+<th>Module</th>
+<th>Principal citation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alabama</td>
+<td><code>examples/states/alabama/final-wages.fr</code></td>
+<td><code>Alabama.Employment.FinalWages</code></td>
+<td>Ala. Code §§ 8-24-2 to 8-24-3</td>
+</tr>
+<tr>
+<td>Alaska</td>
+<td><code>examples/states/alaska/security-deposit.fr</code></td>
+<td><code>Alaska.Housing.SecurityDeposit</code></td>
+<td>AS 34.03.070</td>
+</tr>
+<tr>
+<td>Arizona</td>
+<td><code>examples/states/arizona/material-noncompliance.fr</code></td>
+<td><code>Arizona.Housing.MaterialNoncomplianceNotice</code></td>
+<td>A.R.S. § 33-1368</td>
+</tr>
+<tr>
+<td>Arkansas</td>
+<td><code>examples/states/arkansas/homestead.fr</code></td>
+<td><code>Arkansas.Property.Homestead</code></td>
+<td>Ark. Const. art. IX, §§ 3–5</td>
+</tr>
+<tr>
+<td>California</td>
+<td><code>examples/states/california/wage-statements.fr</code></td>
+<td><code>California.Employment.WageStatements</code></td>
+<td>Cal. Lab. Code § 226</td>
+</tr>
+<tr>
+<td>Colorado</td>
+<td><code>examples/states/colorado/famli.fr</code></td>
+<td><code>Colorado.Employment.FAMLI</code></td>
+<td>Colo. Rev. Stat. §§ 8-13.3-503 to 8-13.3-505</td>
+</tr>
+<tr>
+<td>Connecticut</td>
+<td><code>examples/states/connecticut/paid-sick-leave.fr</code></td>
+<td><code>Connecticut.Employment.PaidSickLeave</code></td>
+<td>Conn. Gen. Stat. §§ 31-57r, 31-57s</td>
+</tr>
+<tr>
+<td>Delaware</td>
+<td><code>examples/states/delaware/wage-payment.fr</code></td>
+<td><code>Delaware.Employment.WagePayment</code></td>
+<td>19 Del. C. §§ 1102, 1103</td>
+</tr>
+<tr>
+<td>Florida</td>
+<td><code>examples/states/florida/homestead.fr</code></td>
+<td><code>Florida.Property.Homestead</code></td>
+<td>Fla. Const. art. X, § 4</td>
+</tr>
+<tr>
+<td>Georgia</td>
+<td><code>examples/states/georgia/dispossessory.fr</code></td>
+<td><code>Georgia.Housing.Dispossessory</code></td>
+<td>O.C.G.A. § 44-7-50 et seq.</td>
+</tr>
+<tr>
+<td>Hawaii</td>
+<td><code>examples/states/hawaii/security-deposit.fr</code></td>
+<td><code>Hawaii.Housing.SecurityDeposit</code></td>
+<td>Haw. Rev. Stat. § 521-44</td>
+</tr>
+<tr>
+<td>Idaho</td>
+<td><code>examples/states/idaho/noncompete.fr</code></td>
+<td><code>Idaho.Employment.Noncompete</code></td>
+<td>Idaho Code §§ 44-2701, 44-2704</td>
+</tr>
+<tr>
+<td>Illinois</td>
+<td><code>examples/states/illinois/wage-payment.fr</code></td>
+<td><code>Illinois.Employment.WagePayment</code></td>
+<td>820 ILCS 115/3 to 115/14</td>
+</tr>
+<tr>
+<td>Indiana</td>
+<td><code>examples/states/indiana/security-deposit.fr</code></td>
+<td><code>Indiana.Housing.SecurityDeposit</code></td>
+<td>Ind. Code § 32-31-3</td>
+</tr>
+<tr>
+<td>Iowa</td>
+<td><code>examples/states/iowa/security-deposit.fr</code></td>
+<td><code>Iowa.Housing.SecurityDeposit</code></td>
+<td>Iowa Code § 562A.12</td>
+</tr>
+<tr>
+<td>Kansas</td>
+<td><code>examples/states/kansas/homestead.fr</code></td>
+<td><code>Kansas.Property.Homestead</code></td>
+<td>Kan. Const. art. 15, § 9</td>
+</tr>
+<tr>
+<td>Kentucky</td>
+<td><code>examples/states/kentucky/final-wages.fr</code></td>
+<td><code>Kentucky.Employment.FinalWages</code></td>
+<td>KRS 337.055</td>
+</tr>
+<tr>
+<td>Louisiana</td>
+<td><code>examples/states/louisiana/community-property.fr</code></td>
+<td><code>Louisiana.Family.CommunityProperty</code></td>
+<td>La. Civ. Code arts. 2338–2341</td>
+</tr>
+<tr>
+<td>Maine</td>
+<td><code>examples/states/maine/paid-family-leave.fr</code></td>
+<td><code>Maine.Employment.PaidFamilyLeave</code></td>
+<td>26 M.R.S. §§ 850-A to 850-J</td>
+</tr>
+<tr>
+<td>Maryland</td>
+<td><code>examples/states/maryland/wage-payment.fr</code></td>
+<td><code>Maryland.Employment.WagePayment</code></td>
+<td>Md. Code, Lab. &amp; Empl. §§ 3-502, 3-505, 3-507.2</td>
+</tr>
+<tr>
+<td>Massachusetts</td>
+<td><code>examples/states/massachusetts/pfml.fr</code></td>
+<td><code>Massachusetts.Employment.PFML</code></td>
+<td>M.G.L. c. 175M §§ 2–6</td>
+</tr>
+<tr>
+<td>Michigan</td>
+<td><code>examples/states/michigan/no-fault-pip.fr</code></td>
+<td><code>Michigan.Insurance.NoFaultPIP</code></td>
+<td>MCL 500.3105, 500.3107</td>
+</tr>
+<tr>
+<td>Minnesota</td>
+<td><code>examples/states/minnesota/security-deposit.fr</code></td>
+<td><code>Minnesota.Housing.SecurityDeposit</code></td>
+<td>Minn. Stat. § 504B.178</td>
+</tr>
+<tr>
+<td>Mississippi</td>
+<td><code>examples/states/mississippi/eviction.fr</code></td>
+<td><code>Mississippi.Housing.Eviction</code></td>
+<td>Miss. Code Ann. §§ 89-8-13, 89-8-19, 89-8-39</td>
+</tr>
+<tr>
+<td>Missouri</td>
+<td><code>examples/states/missouri/security-deposit.fr</code></td>
+<td><code>Missouri.Housing.SecurityDeposit</code></td>
+<td>Mo. Rev. Stat. § 535.300</td>
+</tr>
+<tr>
+<td>Montana</td>
+<td><code>examples/states/montana/wrongful-discharge.fr</code></td>
+<td><code>Montana.Employment.WrongfulDischarge</code></td>
+<td>Mont. Code Ann. §§ 39-2-903 to 39-2-912</td>
+</tr>
+<tr>
+<td>Nebraska</td>
+<td><code>examples/states/nebraska/wage-payment.fr</code></td>
+<td><code>Nebraska.Employment.WagePayment</code></td>
+<td>Neb. Rev. Stat. §§ 48-1229 to 48-1234</td>
+</tr>
+<tr>
+<td>Nevada</td>
+<td><code>examples/states/nevada/security-deposit.fr</code></td>
+<td><code>Nevada.Housing.SecurityDeposit</code></td>
+<td>NRS 118A.240, 118A.242</td>
+</tr>
+<tr>
+<td>New Hampshire</td>
+<td><code>examples/states/new-hampshire/wage-payment.fr</code></td>
+<td><code>NewHampshire.Employment.WagePayment</code></td>
+<td>N.H. Rev. Stat. Ann. §§ 275:43, 275:44</td>
+</tr>
+<tr>
+<td>New Jersey</td>
+<td><code>examples/states/new-jersey/security-deposit.fr</code></td>
+<td><code>NewJersey.Housing.SecurityDeposit</code></td>
+<td>N.J.S.A. 46:8-21.1, 46:8-21.2</td>
+</tr>
+<tr>
+<td>New Mexico</td>
+<td><code>examples/states/new-mexico/owner-resident.fr</code></td>
+<td><code>NewMexico.Housing.OwnerResident</code></td>
+<td>NMSA 1978 §§ 47-8-18, 47-8-20, 47-8-37</td>
+</tr>
+<tr>
+<td>New York</td>
+<td><code>examples/states/new-york/security-deposit-trust.fr</code></td>
+<td><code>NewYork.Housing.SecurityDepositTrust</code></td>
+<td>N.Y. Gen. Oblig. Law §§ 7-103, 7-105</td>
+</tr>
+<tr>
+<td>North Carolina</td>
+<td><code>examples/states/north-carolina/security-deposit.fr</code></td>
+<td><code>NorthCarolina.Housing.SecurityDeposit</code></td>
+<td>N.C.G.S. §§ 42-50 to 42-55</td>
+</tr>
+<tr>
+<td>North Dakota</td>
+<td><code>examples/states/north-dakota/homestead.fr</code></td>
+<td><code>NorthDakota.Property.Homestead</code></td>
+<td>N.D. Const. art. XI, § 22</td>
+</tr>
+<tr>
+<td>Ohio</td>
+<td><code>examples/states/ohio/security-deposit.fr</code></td>
+<td><code>Ohio.Housing.SecurityDeposit</code></td>
+<td>Ohio Rev. Code § 5321.16</td>
+</tr>
+<tr>
+<td>Oklahoma</td>
+<td><code>examples/states/oklahoma/wage-payment.fr</code></td>
+<td><code>Oklahoma.Employment.WagePayment</code></td>
+<td>40 O.S. §§ 165.2, 165.3</td>
+</tr>
+<tr>
+<td>Oregon</td>
+<td><code>examples/states/oregon/no-cause-notice.fr</code></td>
+<td><code>Oregon.Housing.NoCauseNotice</code></td>
+<td>ORS 90.427</td>
+</tr>
+<tr>
+<td>Pennsylvania</td>
+<td><code>examples/states/pennsylvania/security-deposit.fr</code></td>
+<td><code>Pennsylvania.Housing.SecurityDeposit</code></td>
+<td>68 P.S. §§ 250.511a–250.512</td>
+</tr>
+<tr>
+<td>Rhode Island</td>
+<td><code>examples/states/rhode-island/security-deposit.fr</code></td>
+<td><code>RhodeIsland.Housing.SecurityDeposit</code></td>
+<td>R.I. Gen. Laws §§ 34-18-19, 34-18-24</td>
+</tr>
+<tr>
+<td>South Carolina</td>
+<td><code>examples/states/south-carolina/residential-landlord.fr</code></td>
+<td><code>SouthCarolina.Housing.ResidentialLandlord</code></td>
+<td>S.C. Code Ann. §§ 27-40-410, 27-40-710</td>
+</tr>
+<tr>
+<td>South Dakota</td>
+<td><code>examples/states/south-dakota/wage-payment.fr</code></td>
+<td><code>SouthDakota.Employment.WagePayment</code></td>
+<td>S.D. Codified Laws §§ 60-11-9, 60-11-10</td>
+</tr>
+<tr>
+<td>Tennessee</td>
+<td><code>examples/states/tennessee/urlta.fr</code></td>
+<td><code>Tennessee.Housing.URLTA</code></td>
+<td>Tenn. Code Ann. § 66-28-301 et seq.</td>
+</tr>
+<tr>
+<td>Texas</td>
+<td><code>examples/states/texas/payday.fr</code></td>
+<td><code>Texas.Employment.Payday</code></td>
+<td>Tex. Lab. Code ch. 61</td>
+</tr>
+<tr>
+<td>Utah</td>
+<td><code>examples/states/utah/eviction.fr</code></td>
+<td><code>Utah.Housing.Eviction</code></td>
+<td>Utah Code §§ 78B-6-802, 78B-6-811</td>
+</tr>
+<tr>
+<td>Vermont</td>
+<td><code>examples/states/vermont/security-deposit.fr</code></td>
+<td><code>Vermont.Housing.SecurityDeposit</code></td>
+<td>9 V.S.A. §§ 4451, 4461</td>
+</tr>
+<tr>
+<td>Virginia</td>
+<td><code>examples/states/virginia/vrlta-deposit.fr</code></td>
+<td><code>Virginia.Housing.VRLTADeposit</code></td>
+<td>Va. Code § 55.1-1226</td>
+</tr>
+<tr>
+<td>Washington</td>
+<td><code>examples/states/washington/paid-sick-leave.fr</code></td>
+<td><code>Washington.Employment.PaidSickLeave</code></td>
+<td>RCW 49.46.210</td>
+</tr>
+<tr>
+<td>West Virginia</td>
+<td><code>examples/states/west-virginia/final-wages.fr</code></td>
+<td><code>WestVirginia.Employment.FinalWages</code></td>
+<td>W. Va. Code § 21-5-4</td>
+</tr>
+<tr>
+<td>Wisconsin</td>
+<td><code>examples/states/wisconsin/security-deposit.fr</code></td>
+<td><code>Wisconsin.Housing.SecurityDeposit</code></td>
+<td>Wis. Stat. § 704.28; ATCP 134.06</td>
+</tr>
+<tr>
+<td>Wyoming</td>
+<td><code>examples/states/wyoming/wage-payment.fr</code></td>
+<td><code>Wyoming.Employment.WagePayment</code></td>
+<td>Wyo. Stat. § 27-4-104</td>
+</tr>
+</tbody>
+</table>
+<p>Check any row the same way:</p>
+<pre><code>fidryn check examples/states/georgia/dispossessory.fr
+fidryn check examples/states/louisiana/community-property.fr
+fidryn check examples/states/michigan/no-fault-pip.fr
+fidryn check examples/states/montana/wrongful-discharge.fr
+fidryn check examples/states/oregon/no-cause-notice.fr
+fidryn check examples/states/texas/payday.fr
+</code></pre>
+<h2>Independent programs</h2>
+<p><code>tests/programs/</code> holds small modules that exercise the interpreter.
+They are not jurisdiction slices. They declare <code>outside_scope</code>, they
+have no <code>cases/</code> directory, and <code>fidryn run</code> cannot be aimed at them
+without a case JSON you write yourself. Check them:</p>
+<pre><code>fidryn check tests/programs/eligibility-succession.fr
+fidryn check tests/programs/named-decision.fr
+fidryn check tests/programs/two-offices.fr
+fidryn check tests/programs/require-gate.fr
+fidryn check tests/programs/late-payment.fr
+fidryn check tests/programs/late-payment-extended.fr
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tests/programs/eligibility-succession.fr</code></td>
+<td><code>UniqueOccupant</code> for <code>TrusteeOf(BRT)</code> under competing <code>SuccessorEligibility</code> interpretations. Query <code>acting_trustee</code>.</td>
+</tr>
+<tr>
+<td><code>tests/programs/named-decision.fr</code></td>
+<td><code>RunDecision</code> on <code>ProcessResponsiveRecord</code>; the observation is required. Query <code>q</code>.</td>
+</tr>
+<tr>
+<td><code>tests/programs/two-offices.fr</code></td>
+<td>Two independent offices, trustee and executor, each with its own eligibility family. Queries <code>acting_trustee</code> and <code>acting_executor</code>.</td>
+</tr>
+<tr>
+<td><code>tests/programs/require-gate.fr</code></td>
+<td>Query <code>q</code> is <code>require true; return 7</code>. Query <code>r</code> is <code>require false; return 7</code>. False require does not run the return.</td>
+</tr>
+<tr>
+<td><code>tests/programs/late-payment.fr</code></td>
+<td><code>PayInvoice</code> duty, <code>TimelyPayment</code> decision, and <code>DeadlineMeaning</code> (strict versus 15 counted days). Queries <code>due</code>, <code>paid_on_time</code>, <code>obligation_status</code>.</td>
+</tr>
+<tr>
+<td><code>tests/programs/late-payment-extended.fr</code></td>
+<td>Same duty shape with <code>due 15 counted_days after invoice_date</code> and no competing deadline family.</td>
+</tr>
+</tbody>
+</table>
+<h2>Honesty</h2>
+<p>These fixtures are not legal advice and not a complete code. Read each
+module’s <code>outside_scope</code> before treating an answer as even a research
+result.</p>
+<p><strong><code>outside_scope</code>.</strong> Every module names the topics, titles, doctrines,
+and procedures it does not encode. Outcomes carry that boundary. An
+omitted interpretation cannot silently shrink the model.</p>
+<p><strong><code>digest fixture</code>.</strong> Source blocks on the 2026-09-17 slices use
+<code>digest fixture</code>. That is a fixture trust profile, not byte-verified
+authentication of the artifact, and not an official edition. Excerpts
+under each module’s <code>sources/</code> directory end by saying they are not
+official editions.</p>
+<p><strong>Not the United States Code.</strong> The United States Code is a codification
+of statutes, not the whole of federal law. Regulations, case law,
+internal guidance, and uncodified provisions sit elsewhere. This corpus
+encodes bounded high-impact slices. <code>US.Federal.Code.Catalog</code> exists so
+the interpreter cannot honestly claim completeness.</p>
+<p><code>run</code> never chooses a completion. Open-textured queries must be allowed
+to <code>Suspend</code>. The kernel does not search.</p>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
+    </footer>
   </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
 </body>
 </html>
