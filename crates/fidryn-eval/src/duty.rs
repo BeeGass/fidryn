@@ -271,6 +271,9 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
     match value {
         Value::String(name) | Value::Entity(name) => name.eq_ignore_ascii_case(action),
         Value::Ctor { name, fields } => {
+            if grant_record_is_revoked(fields) {
+                return false;
+            }
             name.eq_ignore_ascii_case(action)
                 || (name.eq_ignore_ascii_case("AuthorityGrant")
                     && fields
@@ -280,6 +283,9 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
         }
         Value::Set(items) => items.iter().any(|item| value_grants_action(item, action)),
         Value::Map(fields) => {
+            if grant_record_is_revoked(fields) {
+                return false;
+            }
             if let Some(named) = fields.get("action") {
                 return value_grants_action(named, action);
             }
@@ -290,6 +296,10 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
         }
         _ => false,
     }
+}
+
+fn grant_record_is_revoked(fields: &BTreeMap<String, Value>) -> bool {
+    matches!(fields.get("revoked"), Some(Value::Bool(true)))
 }
 
 /// Admission keys off payload semantics and authority, not only kind strings.
@@ -1012,6 +1022,56 @@ mod tests {
         assert!(action_is_granted(&evidence_only, "perform", t));
         assert!(!action_is_granted(&evidence_only, "attach", t));
         assert!(has_authority_constraint(&evidence_only));
+    }
+
+    fn grant_map(action: &str, revoked: bool, delegate_of: Option<&str>) -> Value {
+        let mut fields = BTreeMap::from([
+            ("action".into(), Value::String(action.into())),
+            ("revoked".into(), Value::Bool(revoked)),
+        ]);
+        if let Some(grantor) = delegate_of {
+            fields.insert("delegate_of".into(), Value::String(grantor.into()));
+            fields.insert("principal".into(), Value::String("delegate".into()));
+        }
+        Value::Map(fields)
+    }
+
+    #[test]
+    fn revoked_grant_map_does_not_grant() {
+        let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![grant_map("attach", true, None)]),
+        );
+        assert!(!action_is_granted(&case, "attach", t));
+
+        let mut ctor_case = CaseRecord::default();
+        ctor_case.evidence.push(EvidenceItem {
+            schema: "AuthorityGrant".into(),
+            value: Value::Ctor {
+                name: "AuthorityGrant".into(),
+                fields: BTreeMap::from([
+                    ("action".into(), Value::String("perform".into())),
+                    ("revoked".into(), Value::Bool(true)),
+                ]),
+            },
+            observed_at: t,
+        });
+        assert!(!action_is_granted(&ctor_case, "perform", t));
+        assert!(has_authority_constraint(&ctor_case));
+    }
+
+    #[test]
+    fn unrevoked_delegated_grant_map_grants() {
+        let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![grant_map("attach", false, Some("grantor"))]),
+        );
+        assert!(action_is_granted(&case, "attach", t));
+        assert!(!action_is_granted(&case, "perform", t));
     }
 
     #[test]

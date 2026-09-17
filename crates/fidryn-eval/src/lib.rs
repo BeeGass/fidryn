@@ -1,7 +1,7 @@
 //! Deterministic worklist evaluator. No partial mutation on Open or Conflict.
 
 pub mod conflict;
-mod duty;
+pub mod duty;
 pub mod law;
 mod worklist;
 
@@ -576,6 +576,9 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
     }
 
     fn eval_apply(&mut self, ctor: &str, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if let Some(kind) = quantifier_kind(ctor) {
+            return self.eval_quantifier(kind, args);
+        }
         if let Some(op) = binop_ctor(ctor)
             && args.len() == 2
         {
@@ -611,9 +614,6 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         }
         if is_require_authority(ctor) {
             return self.eval_require_authority(args);
-        }
-        if let Some(kind) = quantifier_kind(ctor) {
-            return self.eval_quantifier(kind, args);
         }
         if ctor.eq_ignore_ascii_case("operative")
             || ctor.eq_ignore_ascii_case("determined")
@@ -1101,6 +1101,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         let previous = self.bindings.get(binder).cloned();
         let mut pending: Option<Outcome<Value>> = None;
         for element in elements {
+            // Nested `for_all`/`exists` Apply/Call in `body` read this binder via lookup.
             self.bindings.insert(binder.to_owned(), element);
             match as_determinate(self.eval_term(body)?) {
                 Ok(Value::Bool(true)) => {
@@ -2318,34 +2319,16 @@ fn eval_succession(
         .map(|n| (n.candidate.clone(), n.rank))
         .collect();
     if ranked.is_empty() {
-        let mut requests = BTreeSet::new();
-        requests.insert(OpenRequest::NeedJudgment {
-            issue: PropTerm::new("Occupies", vec![Term::Wildcard, office.clone()]),
-            protocol: "Appointment".into(),
-        });
-        return Outcome::Suspended { requests, trace };
+        return need_appointment(office, trace);
     }
-    let family = succession_family(module, case, key);
-    if let Some((family_name, alts)) = family {
-        if let Some(label) = case.interpretations.get(&family_name) {
-            let defs = defs_for_alternative(alts, label);
-            return select_from_eligibility(&ranked, defs, office, case, ctx, trace);
-        }
-        return contingent_from_alternatives(&family_name, alts, &ranked, office, case, ctx, trace);
+    let Some((family_name, alts)) = succession_family(module, case, key) else {
+        return need_appointment(office, trace);
+    };
+    if let Some(label) = case.interpretations.get(&family_name) {
+        let defs = defs_for_alternative(alts, label);
+        return select_from_eligibility(&ranked, defs, office, case, ctx, trace);
     }
-    let accepted: Vec<(String, i64)> = ranked
-        .iter()
-        .filter(|(name, _)| is_accepted(case, name, key, ctx))
-        .cloned()
-        .collect();
-    match accepted.as_slice() {
-        [] => need_accept_office(office, trace),
-        [(name, _)] => determinate(Value::Entity(name.clone()), trace),
-        many => {
-            let winner = many.iter().min_by_key(|(_, rank)| *rank).unwrap();
-            determinate(Value::Entity(winner.0.clone()), trace)
-        }
-    }
+    contingent_from_alternatives(&family_name, alts, &ranked, office, case, ctx, trace)
 }
 
 type EligibilityDef = (PropTerm, bool);
@@ -2356,33 +2339,31 @@ fn succession_family<'m>(
     case: &CaseRecord,
     office: &str,
 ) -> Option<(String, &'m InterpretationAlts)> {
-    let families: Vec<_> = module
+    let matching: Vec<_> = module
         .declarations
         .iter()
         .filter_map(|d| match d {
-            CoreDecl::InterpretationFamily(family) => Some(family),
+            CoreDecl::InterpretationFamily(family)
+                if family_defines_office(&family.alternatives, office) =>
+            {
+                Some(family)
+            }
             _ => None,
         })
         .collect();
-    let matching: Vec<_> = families
-        .iter()
-        .copied()
-        .filter(|family| family_defines_office(&family.alternatives, office))
-        .collect();
-    let pool = if matching.is_empty() {
-        families
-    } else {
-        matching
-    };
+    if matching.is_empty() {
+        return None;
+    }
     if let Some(name) = case
         .interpretations
         .keys()
-        .find(|name| pool.iter().any(|family| family.name == **name))
-        && let Some(family) = pool.iter().find(|family| family.name == *name)
+        .find(|name| matching.iter().any(|family| family.name == **name))
+        && let Some(family) = matching.iter().find(|family| family.name == *name)
     {
         return Some((family.name.clone(), family.alternatives.as_slice()));
     }
-    pool.first()
+    matching
+        .first()
         .map(|family| (family.name.clone(), family.alternatives.as_slice()))
 }
 
@@ -2592,6 +2573,15 @@ fn succession_contingent(
         pivots,
         trace,
     }
+}
+
+fn need_appointment(office: &Term, trace: TraceId) -> Outcome<Value> {
+    let mut requests = BTreeSet::new();
+    requests.insert(OpenRequest::NeedJudgment {
+        issue: PropTerm::new("Occupies", vec![Term::Wildcard, office.clone()]),
+        protocol: "Appointment".into(),
+    });
+    Outcome::Suspended { requests, trace }
 }
 
 fn need_accept_office(office: &Term, trace: TraceId) -> Outcome<Value> {
@@ -3491,6 +3481,46 @@ mod tests {
         run_module(&module_with_plan("q", plan), "q", case, handler).expect("evaluate")
     }
 
+    fn closed_int_set(xs: &[i64]) -> Term {
+        Term::Set(xs.iter().copied().map(Term::Int).collect())
+    }
+
+    fn quantifier_apply(kind: &str, binder: &str, domain: Term, body: Term) -> Term {
+        Term::Apply {
+            ctor: kind.into(),
+            args: vec![Term::Binder(binder.into()), domain, body],
+        }
+    }
+
+    fn eq_idents(left: &str, right: &str) -> Term {
+        Term::Apply {
+            ctor: "==".into(),
+            args: vec![Term::Ident(left.into()), Term::Ident(right.into())],
+        }
+    }
+
+    fn assert_determinate_bool(out: Outcome<Value>, expected: bool) {
+        match out {
+            Outcome::Determinate {
+                value: Value::Bool(value),
+                ..
+            } if value == expected => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn assert_needs_closure_record(out: Outcome<Value>) {
+        match out {
+            Outcome::Suspended { requests, .. } => {
+                assert!(requests.iter().any(|r| matches!(
+                    r,
+                    OpenRequest::NeedEvidence { schema, .. } if schema == "ClosureRecord"
+                )));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
     fn run_module(
         module: &CoreModule,
         query: &str,
@@ -4165,6 +4195,55 @@ mod tests {
     }
 
     #[test]
+    fn nested_for_all_over_closed_sets_with_true_is_true() {
+        let plan = QueryPlan::Evaluate(quantifier_apply(
+            "for_all",
+            "x",
+            closed_int_set(&[1, 2]),
+            quantifier_apply("for_all", "y", closed_int_set(&[1, 2]), Term::Bool(true)),
+        ));
+        assert_determinate_bool(run_plan(plan, &CaseRecord::default(), &mut Refusing), true);
+    }
+
+    #[test]
+    fn nested_for_all_exists_equality_witness_is_true() {
+        let plan = QueryPlan::Evaluate(quantifier_apply(
+            "for_all",
+            "x",
+            closed_int_set(&[1]),
+            quantifier_apply("exists", "y", closed_int_set(&[1, 2]), eq_idents("x", "y")),
+        ));
+        assert_determinate_bool(run_plan(plan, &CaseRecord::default(), &mut Refusing), true);
+    }
+
+    #[test]
+    fn nested_for_all_exists_equality_without_witness_is_false() {
+        let plan = QueryPlan::Evaluate(quantifier_apply(
+            "for_all",
+            "x",
+            closed_int_set(&[1]),
+            quantifier_apply("exists", "y", closed_int_set(&[2]), eq_idents("x", "y")),
+        ));
+        assert_determinate_bool(run_plan(plan, &CaseRecord::default(), &mut Refusing), false);
+    }
+
+    #[test]
+    fn nested_for_all_inner_open_ident_domain_without_closure_suspends() {
+        let plan = QueryPlan::Evaluate(quantifier_apply(
+            "for_all",
+            "x",
+            closed_int_set(&[1]),
+            quantifier_apply(
+                "for_all",
+                "y",
+                Term::Ident("People".into()),
+                Term::Bool(true),
+            ),
+        ));
+        assert_needs_closure_record(run_plan(plan, &CaseRecord::default(), &mut Refusing));
+    }
+
+    #[test]
     fn run_decision_foia_process_still_needs_harm_and_segregability() {
         let plan = QueryPlan::RunDecision {
             decision: "ProcessResponsiveRecord".into(),
@@ -4333,6 +4412,54 @@ mod tests {
         match run_succession(&module, "acting_executor", &case) {
             Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Dana"),
             other => panic!("executor: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn office_without_succession_family_does_not_rank_accepted_nominees() {
+        let office = "ClerkOf(X)";
+        let unrelated = CoreDecl::InterpretationFamily(CoreInterpretationFamily {
+            id: NodeId::of(b"ExecutorEligibility"),
+            name: "ExecutorEligibility".into(),
+            source: Term::Ident("ExecutorEligibility".into()),
+            alternatives: vec![(
+                "NextOfKin".into(),
+                vec![
+                    eligible_def("Dana", "ExecutorOf(Est)", true),
+                    eligible_def("Eve", "ExecutorOf(Est)", false),
+                ],
+            )],
+            meta: test_meta("ExecutorEligibility"),
+        });
+        let mut module = module_with_plan_decls(
+            "acting_clerk",
+            QueryPlan::UniqueOccupant {
+                office: Term::Ident(office.into()),
+            },
+            vec![unrelated],
+        );
+        module.nominations = vec![nomination("Alice", office, 1), nomination("Bob", office, 2)];
+        let case = successor_case(2, None);
+        let out = run_succession(&module, "acting_clerk", &case);
+        assert!(
+            !matches!(out, Outcome::Determinate { .. }),
+            "accepted nominees must not become a successor without a family for this office: {out:?}"
+        );
+        match out {
+            Outcome::Suspended { requests, .. } => {
+                assert!(
+                    requests.iter().any(|r| matches!(
+                        r,
+                        OpenRequest::NeedJudgment { protocol, issue, .. }
+                            if protocol == "Appointment" && issue.predicate == "Occupies"
+                    ) || matches!(
+                        r,
+                        OpenRequest::NeedInterpretation { .. }
+                    )),
+                    "{requests:?}"
+                );
+            }
+            other => panic!("{other:?}"),
         }
     }
 
@@ -5543,6 +5670,115 @@ mod tests {
         )
         .expect_err("duty fact must stay absent");
         assert!(matches!(err, EngineError::Unsupported(_)), "{err:?}");
+    }
+
+    fn authority_grant_map(action: &str, revoked: bool, delegate_of: Option<&str>) -> Value {
+        let mut fields = BTreeMap::from([
+            ("action".into(), Value::String(action.into())),
+            ("revoked".into(), Value::Bool(revoked)),
+        ]);
+        if let Some(grantor) = delegate_of {
+            fields.insert("delegate_of".into(), Value::String(grantor.into()));
+            fields.insert("principal".into(), Value::String("delegate".into()));
+        }
+        Value::Map(fields)
+    }
+
+    #[test]
+    fn revoked_grant_does_not_authorize_require_authority() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![authority_grant_map("attach", true, None)]),
+        );
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("attach".into())],
+        });
+        match run_plan(plan, &case, &mut Refusing) {
+            Outcome::Suspended { requests, .. } => {
+                assert!(requests.iter().any(|r| matches!(
+                    r,
+                    OpenRequest::NeedCustom { effect, payload }
+                        if effect == "authority" && payload == "attach"
+                )));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn revoked_grant_does_not_authorize_duty_step() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![authority_grant_map("attach", true, None)]),
+        );
+        let out = run_plan(
+            QueryPlan::Evaluate(duty_step_term("pay", "attach")),
+            &case,
+            &mut Refusing,
+        );
+        match out {
+            Outcome::Suspended { requests, .. } => {
+                assert!(requests.iter().any(|r| matches!(
+                    r,
+                    OpenRequest::NeedCustom { effect, payload }
+                        if effect == "authority" && payload == "attach"
+                )));
+            }
+            other => panic!("{other:?}"),
+        }
+        let err = run_module(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Ident("duty:pay:default".into())),
+            ),
+            "q",
+            &case,
+            &mut Refusing,
+        )
+        .expect_err("duty fact must stay absent");
+        assert!(matches!(err, EngineError::Unsupported(_)), "{err:?}");
+    }
+
+    #[test]
+    fn unrevoked_delegated_grant_authorizes_require_authority() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![authority_grant_map("attach", false, Some("grantor"))]),
+        );
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("attach".into())],
+        });
+        match run_plan(plan, &case, &mut Refusing) {
+            Outcome::Determinate {
+                value: Value::Unit, ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn unrevoked_delegated_grant_authorizes_duty_step() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![authority_grant_map("attach", false, Some("grantor"))]),
+        );
+        match run_plan(
+            QueryPlan::Evaluate(duty_step_term("pay", "attach")),
+            &case,
+            &mut Refusing,
+        ) {
+            Outcome::Determinate {
+                value: Value::Ctor { name, .. },
+                ..
+            } => assert_eq!(name, "Attached"),
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
