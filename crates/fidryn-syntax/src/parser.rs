@@ -1387,6 +1387,7 @@ impl<'a> Parser<'a> {
                     };
                     continue;
                 }
+                self.error_here("expected expression after operator");
                 break;
             }
             if min_bp <= 14
@@ -2592,6 +2593,83 @@ module Examples.FuelRow version "0.1.0" {
             }
             other => panic!("expected amount <= {decimal}, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn parses_mul_tighter_than_add() {
+        let parsed = parse_body("calc f() -> Int { 1 + 2 * 3 }");
+        match first_fn(&parsed).expr.as_ref() {
+            Some(Expr::Binary {
+                op: BinOp::Add,
+                left,
+                right,
+            }) => {
+                assert_eq!(left.as_ref(), &Expr::Int(1));
+                match right.as_ref() {
+                    Expr::Binary {
+                        op: BinOp::Mul,
+                        left,
+                        right,
+                    } => {
+                        assert_eq!(left.as_ref(), &Expr::Int(2));
+                        assert_eq!(right.as_ref(), &Expr::Int(3));
+                    }
+                    other => panic!("{other:?}"),
+                }
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parses_subtraction_left_associative() {
+        let parsed = parse_body("calc f() -> Int { 1 - 2 - 3 }");
+        match first_fn(&parsed).expr.as_ref() {
+            Some(Expr::Binary {
+                op: BinOp::Sub,
+                left,
+                right,
+            }) => {
+                match left.as_ref() {
+                    Expr::Binary {
+                        op: BinOp::Sub,
+                        left,
+                        right,
+                    } => {
+                        assert_eq!(left.as_ref(), &Expr::Int(1));
+                        assert_eq!(right.as_ref(), &Expr::Int(2));
+                    }
+                    other => panic!("{other:?}"),
+                }
+                assert_eq!(right.as_ref(), &Expr::Int(3));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn malformed_calc_body_is_error_and_later_entity_still_parses() {
+        let src = r#"
+module X version "0.1.0" {
+    calc f() -> Int { 1 + }
+    entity Bryan : NaturalPerson
+}
+"#;
+        let parsed = parse_file(src);
+        assert!(parsed.has_errors(), "malformed calc body must be an error");
+        assert!(
+            parsed
+                .diagnostics
+                .iter()
+                .any(|d| d.code == DiagnosticCode::E100),
+            "{:?}",
+            parsed.diagnostics
+        );
+        let items = &parsed.module().unwrap().items;
+        assert!(
+            items.iter().any(|item| matches!(item, Item::Entity(_))),
+            "recovery should keep the later entity: {items:?}"
+        );
     }
 
     #[test]
