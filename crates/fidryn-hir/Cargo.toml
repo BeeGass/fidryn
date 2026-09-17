@@ -13,4 +13,5 @@ fidryn-core.workspace = true
 fidryn-syntax.workspace = true
 indexmap.workspace = true
 la-arena.workspace = true
+rust_decimal.workspace = true
 thiserror.workspace = true

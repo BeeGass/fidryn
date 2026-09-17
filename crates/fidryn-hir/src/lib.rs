@@ -1,13 +1,24 @@
 //! Name resolution, import authentication, and surface-to-HIR elaboration.
 
+mod body;
+
+use fidryn_core::ir::Guard;
+use fidryn_core::value::{PropTerm, Term};
 use fidryn_core::{Diagnostic, DiagnosticCode, SourceManifest};
 use fidryn_syntax::Parse;
 use std::collections::BTreeMap;
+
+pub use body::{
+    collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
+    parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
+    term_from_decl, term_has_bare_prop_guard,
+};
 
 #[derive(Clone, Debug)]
 pub struct HirModule {
     pub name: String,
     pub version: String,
+    pub type_params: Vec<String>,
     pub jurisdiction: String,
     pub snapshot: String,
     pub manifest_path: String,
@@ -29,21 +40,38 @@ pub struct HirModule {
     pub diagnostics: Vec<Diagnostic>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirQuery {
     pub name: String,
     pub result_type: String,
     pub effects: Vec<String>,
     pub automatic: bool,
     pub has_goal: bool,
+    /// Original surface text, retained for diagnostics and debug dumps.
     pub plan: String,
+    pub params: Vec<(String, String)>,
+    pub body: HirQueryBody,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum HirQueryBody {
+    Return(Term),
+    Goal {
+        kind: String,
+        office: Option<Term>,
+        expr: Option<Term>,
+        fields: BTreeMap<String, Term>,
+    },
+    None,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirRule {
     pub name: String,
     pub kind: String,
     pub source: Option<String>,
+    pub guard: Option<Guard>,
+    pub consequences: Vec<(String, PropTerm)>,
 }
 
 #[derive(Clone, Debug)]
@@ -73,6 +101,8 @@ pub struct HirFunction {
     pub fuel: Option<u32>,
     pub result_type: String,
     pub source: String,
+    pub params: Vec<(String, String)>,
+    pub body: Option<Term>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -93,6 +123,7 @@ impl QuantifierKind {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirImport {
     pub name: String,
+    pub type_args: Vec<String>,
     pub digest_required: bool,
 }
 
@@ -114,9 +145,11 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
     let Some(module) = parse.module() else {
         return Err(parse.diagnostics.clone());
     };
+    let (name, type_params) = resolve_module_type_params(module, &parse.source);
     let mut hir = HirModule {
-        name: module.name.clone(),
+        name,
         version: module.version.clone(),
+        type_params,
         jurisdiction: String::new(),
         snapshot: manifest.snapshot.clone(),
         manifest_path: String::new(),
@@ -160,9 +193,11 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 _ => {}
             },
             fidryn_syntax::ast::Item::Import(d) => {
+                let (name, type_args) = resolve_import_type_args(d);
                 hir.imports.push(HirImport {
-                    name: d.name.clone().unwrap_or_default(),
-                    digest_required: d.source.contains("digest"),
+                    name,
+                    type_args,
+                    digest_required: body::import_requires_digest(&d.source),
                 });
             }
             fidryn_syntax::ast::Item::Source(d) => {
@@ -202,37 +237,65 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             fidryn_syntax::ast::Item::Query(d) => {
                 let name = d.name.clone().unwrap_or_default();
                 let src = &d.source;
-                let has_goal = src.contains('{')
-                    && (contains_ident(src, "goal")
-                        || contains_ident(src, "return")
-                        || contains_ident(src, "require")
-                        || contains_ident(src, "for_all")
-                        || contains_ident(src, "exists"));
-                let automatic = src.contains("automatic");
-                let effects = extract_effects(src);
+                let body = body::query_body_from_decl(d);
+                let has_goal = !matches!(body, HirQueryBody::None)
+                    || query_body_has_quantifier_or_require(src);
+                let automatic = d.automatic || body::query_is_automatic(src);
+                let effects = if d.effects.is_empty() {
+                    extract_effects(src)
+                } else {
+                    d.effects.clone()
+                };
+                let result_type = d
+                    .result_type
+                    .clone()
+                    .unwrap_or_else(|| extract_return_type(src));
+                let params = if d.params.is_empty() {
+                    body::extract_params(src)
+                } else {
+                    d.params.clone()
+                };
                 hir.quantifiers.extend(extract_quantifiers(src));
                 hir.queries.insert(
                     name.clone(),
                     HirQuery {
                         name,
-                        result_type: extract_return_type(src),
+                        result_type,
                         effects,
                         automatic,
                         has_goal,
                         plan: src.clone(),
+                        params,
+                        body,
                     },
                 );
             }
             fidryn_syntax::ast::Item::Function(d) => {
                 let name = d.name.clone().unwrap_or_default();
                 if !name.is_empty() {
+                    let (parsed_params, parsed_body) = body::parse_function_parts(&d.source);
+                    let params = if d.params.is_empty() {
+                        parsed_params
+                    } else {
+                        d.params.clone()
+                    };
                     hir.functions.insert(
                         name.clone(),
                         HirFunction {
                             is_calc: d.keyword == "calc",
-                            fuel: extract_fuel(&d.source),
-                            result_type: extract_return_type(&d.source),
+                            fuel: d.fuel.or_else(|| extract_fuel(&d.source)),
+                            result_type: d
+                                .result_type
+                                .clone()
+                                .unwrap_or_else(|| extract_return_type(&d.source)),
                             source: d.source.clone(),
+                            params,
+                            body: d
+                                .expr
+                                .as_ref()
+                                .map(body::expr_to_term)
+                                .or_else(|| term_from_decl(d))
+                                .or(parsed_body),
                             name,
                         },
                     );
@@ -255,16 +318,25 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 hir.quantifiers.extend(extract_quantifiers(&d.source));
             }
             fidryn_syntax::ast::Item::Rule(d) => {
+                let (parsed_guard, parsed_consequences) = body::parse_rule_parts(&d.source);
+                let guard = d.guard.as_ref().map(body::expr_to_guard).or(parsed_guard);
+                let consequences = if d.consequences.is_empty() {
+                    parsed_consequences
+                } else {
+                    body::consequences_from_ast(&d.consequences)
+                };
                 hir.rules.push(HirRule {
                     name: d.name.clone().unwrap_or_default(),
-                    kind: if d.source.contains(": constitutive") {
-                        "constitutive".into()
-                    } else if d.source.contains(": derive") {
-                        "derive".into()
-                    } else {
-                        "prescriptive".into()
-                    },
+                    kind: d
+                        .rule_kind
+                        .clone()
+                        .filter(|kind| {
+                            matches!(kind.as_str(), "derive" | "constitutive" | "prescriptive")
+                        })
+                        .unwrap_or_else(|| body::parse_rule_kind(&d.source)),
                     source: Some(d.source.clone()),
+                    guard,
+                    consequences,
                 });
             }
             fidryn_syntax::ast::Item::Nomination(d) => {
@@ -310,6 +382,16 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
 
 fn trim_quotes(s: &str) -> &str {
     s.trim().trim_matches('"').trim()
+}
+
+fn query_body_has_quantifier_or_require(src: &str) -> bool {
+    let inner = last_brace_inner(src).unwrap_or("");
+    !inner.is_empty()
+        && (contains_ident(inner, "require")
+            || contains_ident(inner, "for_all")
+            || contains_ident(inner, "exists")
+            || contains_ident(inner, "goal")
+            || contains_ident(inner, "return"))
 }
 
 fn extract_effects(src: &str) -> Vec<String> {
@@ -556,10 +638,201 @@ fn is_ident_boundary(src: &str, start: usize, len: usize) -> bool {
     before.is_none_or(|c| !ident_char(c)) && after.is_none_or(|c| !ident_char(c))
 }
 
+/// Split `QName` / `QName<A, B>` into the base name and angle-bracket arguments.
+pub fn split_qname_type_args(s: &str) -> (String, Vec<String>) {
+    let s = s.trim();
+    let Some(open) = s.find('<') else {
+        return (s.to_owned(), Vec::new());
+    };
+    let name = s[..open].trim().to_owned();
+    (name, parse_leading_angle_args(&s[open..]))
+}
+
+/// Parse the first `<...>` argument list in `s`, respecting nested angles.
+pub fn parse_angle_args(s: &str) -> Vec<String> {
+    let Some(open) = s.find('<') else {
+        return Vec::new();
+    };
+    parse_leading_angle_args(&s[open..])
+}
+
+/// Type parameters written on a `module Name<T>` header, used when the AST
+/// field is empty.
+pub fn type_params_from_source(source: &str) -> Vec<String> {
+    parse_module_header(source).1
+}
+
+fn resolve_module_type_params(
+    module: &fidryn_syntax::ast::Module,
+    source: &str,
+) -> (String, Vec<String>) {
+    let (base_from_name, args_from_name) = split_qname_type_args(&module.name);
+    let name = if base_from_name.is_empty() {
+        module.name.clone()
+    } else {
+        base_from_name
+    };
+    let params = if !module.type_params.is_empty() {
+        module.type_params.clone()
+    } else if !args_from_name.is_empty() {
+        args_from_name
+    } else {
+        type_params_from_source(source)
+    };
+    (name, params)
+}
+
+fn resolve_import_type_args(d: &fidryn_syntax::ast::Decl) -> (String, Vec<String>) {
+    let raw = d.name.clone().unwrap_or_default();
+    let (base, args_from_name) = split_qname_type_args(&raw);
+    let name = if base.is_empty() { raw } else { base };
+    let args = if !d.type_args.is_empty() {
+        d.type_args.clone()
+    } else if !args_from_name.is_empty() {
+        args_from_name
+    } else {
+        let mut args = type_args_from_import_text(&d.source);
+        if args.is_empty()
+            && let Some(sig) = &d.signature
+        {
+            args = parse_leading_angle_args(sig);
+        }
+        args
+    };
+    (name, args)
+}
+
+fn parse_module_header(source: &str) -> (String, Vec<String>) {
+    let mut i = 0usize;
+    skip_ws_and_comments(source, &mut i);
+    if !source[i..].starts_with("module") || !is_ident_boundary(source, i, 6) {
+        return (String::new(), Vec::new());
+    }
+    i += 6;
+    skip_ws_and_comments(source, &mut i);
+    let name_start = i;
+    while i < source.len() {
+        let Some(c) = source[i..].chars().next() else {
+            break;
+        };
+        if c.is_ascii_alphanumeric() || c == '_' || c == '.' {
+            i += c.len_utf8();
+        } else {
+            break;
+        }
+    }
+    let name = source[name_start..i].trim_matches('.').to_owned();
+    skip_ws_and_comments(source, &mut i);
+    (name, parse_leading_angle_args(&source[i..]))
+}
+
+fn type_args_from_import_text(source: &str) -> Vec<String> {
+    let s = source.trim();
+    let rest = s.strip_prefix("import").unwrap_or(s);
+    let mut i = 0usize;
+    skip_ws_and_comments(rest, &mut i);
+    while i < rest.len() {
+        let Some(c) = rest[i..].chars().next() else {
+            break;
+        };
+        if c.is_ascii_alphanumeric() || c == '_' || c == '.' {
+            i += c.len_utf8();
+        } else {
+            break;
+        }
+    }
+    parse_leading_angle_args(&rest[i..])
+}
+
+fn parse_leading_angle_args(s: &str) -> Vec<String> {
+    let s = s.trim_start();
+    if !s.starts_with('<') {
+        return Vec::new();
+    }
+    let mut depth = 0i32;
+    let mut end = None;
+    for (i, c) in s.char_indices() {
+        match c {
+            '<' => depth += 1,
+            '>' => {
+                depth -= 1;
+                if depth == 0 {
+                    end = Some(i);
+                    break;
+                }
+            }
+            _ => {}
+        }
+    }
+    let Some(end) = end else {
+        return Vec::new();
+    };
+    split_top_level_commas(&s[1..end])
+}
+
+fn split_top_level_commas(inner: &str) -> Vec<String> {
+    let mut parts = Vec::new();
+    let mut start = 0;
+    let mut depth_paren = 0i32;
+    let mut depth_angle = 0i32;
+    let mut depth_brack = 0i32;
+    let mut depth_brace = 0i32;
+    for (i, c) in inner.char_indices() {
+        match c {
+            '(' => depth_paren += 1,
+            ')' => depth_paren -= 1,
+            '<' => depth_angle += 1,
+            '>' => depth_angle -= 1,
+            '[' => depth_brack += 1,
+            ']' => depth_brack -= 1,
+            '{' => depth_brace += 1,
+            '}' => depth_brace -= 1,
+            ',' if depth_paren == 0 && depth_angle == 0 && depth_brack == 0 && depth_brace == 0 => {
+                let part = inner[start..i].trim();
+                if !part.is_empty() {
+                    parts.push(part.to_owned());
+                }
+                start = i + 1;
+            }
+            _ => {}
+        }
+    }
+    let part = inner[start..].trim();
+    if !part.is_empty() {
+        parts.push(part.to_owned());
+    }
+    parts
+}
+
+fn skip_ws_and_comments(s: &str, i: &mut usize) {
+    loop {
+        if *i >= s.len() {
+            return;
+        }
+        let rest = &s[*i..];
+        let Some(c) = rest.chars().next() else {
+            return;
+        };
+        if c.is_whitespace() {
+            *i += c.len_utf8();
+            continue;
+        }
+        if rest.starts_with("//") {
+            match rest.find('\n') {
+                Some(nl) => *i += nl + 1,
+                None => *i = s.len(),
+            }
+            continue;
+        }
+        return;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use fidryn_syntax::parse_file;
+    use std::str::FromStr;
 
     #[test]
     fn elaborates_entities() {
@@ -625,5 +898,135 @@ module Examples.Lang version "0.1.0" {
         assert!(kinds.contains(&("for_all", "p", "People")), "{kinds:?}");
         assert!(kinds.contains(&("exists", "w", "People")), "{kinds:?}");
         assert!(hir.queries["all_ok"].has_goal);
+        let countdown_params = &hir.functions["countdown"].params;
+        assert_eq!(countdown_params, &[("n".to_owned(), "Int".to_owned())]);
+        assert!(
+            matches!(
+                hir.functions["countdown"].body,
+                Some(Term::Call { ref callee, .. }) if callee == "countdown"
+            ) || matches!(
+                hir.functions["countdown"].body,
+                Some(Term::Apply { ref ctor, .. }) if ctor == "countdown"
+            ),
+            "{:?}",
+            hir.functions["countdown"].body
+        );
+    }
+
+    #[test]
+    fn elaborates_evaluate_true_as_bool_term() {
+        let src = r#"
+module Examples.EvalTrue version "0.1.0" {
+    query flag() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let q = &hir.queries["flag"];
+        assert_eq!(q.result_type, "Bool");
+        assert!(
+            matches!(
+                q.body,
+                HirQueryBody::Goal {
+                    ref kind,
+                    expr: Some(Term::Bool(true)),
+                    ..
+                } if kind == "Evaluate"
+            ),
+            "{:?}",
+            q.body
+        );
+    }
+
+    #[test]
+    fn elaborates_rule_consequences() {
+        let src = r#"
+module Examples.Rule version "0.1.0" {
+    rule R : derive { when operative P() then derive Q() }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.rules.len(), 1);
+        assert_eq!(hir.rules[0].kind, "derive");
+        assert!(!hir.rules[0].consequences.is_empty());
+        assert_eq!(hir.rules[0].consequences[0].0, "derive");
+        assert_eq!(hir.rules[0].consequences[0].1.predicate, "Q");
+    }
+
+    #[test]
+    fn elaborates_decimal_money_and_for_all() {
+        let src = r#"
+module Examples.Lower version "0.1.0" {
+    calc floor() -> Decimal { 11925.00 }
+    calc cash() -> Money<USD> { USD(11925.00) }
+    calc all_ok() -> Bool { for_all x in People: Eligible(x) }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let expected = rust_decimal::Decimal::from_str("11925.00").expect("decimal");
+        assert_eq!(hir.functions["floor"].body, Some(Term::Decimal(expected)));
+        assert_eq!(hir.functions["cash"].body, Some(Term::Decimal(expected)));
+        match &hir.functions["all_ok"].body {
+            Some(Term::Apply { ctor, args }) | Some(Term::Call { callee: ctor, args }) => {
+                assert_eq!(ctor, "for_all");
+                assert_eq!(args.len(), 3, "{args:?}");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn elaborates_module_type_params() {
+        let src = r#"
+module Id<T> version "0.1.0" {
+    entity X: T
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.name, "Id");
+        assert_eq!(hir.type_params, vec!["T".to_owned()]);
+        assert_eq!(hir.entities.get("X").map(String::as_str), Some("T"));
+        assert_eq!(
+            type_params_from_source(src),
+            vec!["T".to_owned()],
+            "header fallback must also see module Id<T>"
+        );
+    }
+
+    #[test]
+    fn elaborates_import_type_args() {
+        let src = r#"
+module Host version "0.1.0" {
+    import Id<NaturalPerson> version "0.1.0"
+    entity X: NaturalPerson
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.imports.len(), 1);
+        assert_eq!(hir.imports[0].name, "Id");
+        assert_eq!(hir.imports[0].type_args, vec!["NaturalPerson".to_owned()]);
+        assert!(hir.type_params.is_empty());
+    }
+
+    #[test]
+    fn type_params_from_source_reads_header_when_ast_empty() {
+        let src = r#"module Examples.Box<T, U> version "0.1.0" { entity X: T }"#;
+        assert_eq!(
+            type_params_from_source(src),
+            vec!["T".to_owned(), "U".to_owned()]
+        );
+        assert_eq!(
+            split_qname_type_args("Examples.Box<T, U>"),
+            (
+                "Examples.Box".to_owned(),
+                vec!["T".to_owned(), "U".to_owned()]
+            )
+        );
     }
 }
