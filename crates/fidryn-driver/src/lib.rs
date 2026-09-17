@@ -1,17 +1,17 @@
 //! Incremental compile and evaluate driver.
 //!
 //! Check is memoized by blake3 of source bytes together with the manifest
-//! snapshot and artifact digests. Evaluate is memoized by canonical module
+//! snapshot, artifact digest strings, `source_root` display path, and blake3
+//! of readable artifact bytes. Evaluate is memoized by canonical module
 //! JSON together with [`CoreModule::program_digest`] / [`CoreModule::content_fingerprint`] (executable content,
 //! not only [`fidryn_core::ModuleId`]), query name, query arguments, canonical
 //! case JSON, and bitemporal times. Memo tables are explicit [`HashMap`]s; the
 //! `salsa` crate is not used.
 
-use fidryn_check::check_with_sources;
+use fidryn_check::{check_with_sources, source_integrity};
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport, Outcome,
-    QueryName, RunContext, SourceManifest, SourceManifestId, SourceSnapshotId, TrustProfile, Value,
-    canonical_json,
+    QueryName, RunContext, SourceManifest, TrustProfile, Value, canonical_json,
 };
 use fidryn_eval::{evaluate, evaluate_scenario, report_from_scenario};
 use fidryn_handlers::CaseFile;
@@ -27,7 +27,7 @@ use std::path::{Path, PathBuf};
 pub struct Driver {
     check_cache: HashMap<CheckKey, Result<CoreModule, Vec<Diagnostic>>>,
     run_cache: HashMap<RunKey, Result<Outcome<Value>, EngineError>>,
-    source_trust: HashMap<(SourceSnapshotId, SourceManifestId), TrustProfile>,
+    source_trust: HashMap<TrustKey, TrustProfile>,
     hits: u64,
     misses: u64,
 }
@@ -37,6 +37,9 @@ struct CheckKey([u8; 32]);
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct RunKey([u8; 32]);
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+struct TrustKey([u8; 32]);
 
 impl Driver {
     /// Empty memo tables.
@@ -63,8 +66,9 @@ impl Driver {
     /// Parse, elaborate, and check in-memory `source` against `manifest`.
     ///
     /// Artifact files are not read (`source_root` is `None`). The memo key is
-    /// blake3(source) together with the snapshot string and artifact digests.
-    /// Comment-only edits change the source bytes and miss.
+    /// blake3(source) together with the snapshot string, artifact digests,
+    /// and an unread-bytes sentinel. Comment-only edits change the source
+    /// bytes and miss. Pasted source never follows artifact paths.
     pub fn check_source(
         &mut self,
         source: &str,
@@ -80,7 +84,8 @@ impl Driver {
     /// After parse/elaborate, checking uses
     /// [`fidryn_check::check_with_sources`] with `source_root = path.parent()`
     /// so hex import digests authenticate against artifact bytes. The memo key
-    /// is still source bytes plus manifest; a new session re-hashes files.
+    /// includes source_root and artifact bytes; tamper or a different root
+    /// misses.
     pub fn check_path(
         &mut self,
         path: &Path,
@@ -103,7 +108,7 @@ impl Driver {
         manifest: &SourceManifest,
         source_root: Option<&Path>,
     ) -> Result<CoreModule, Vec<Diagnostic>> {
-        let key = check_key(source, manifest);
+        let key = check_key(source, manifest, source_root);
         if let Some(cached) = self.check_cache.get(&key) {
             self.hits += 1;
             return cached.clone();
@@ -111,10 +116,8 @@ impl Driver {
         self.misses += 1;
         let result = compile_with_sources(source, manifest, source_root);
         if let Ok(module) = &result {
-            self.source_trust.insert(
-                (module.snapshot, module.manifest),
-                source_trust_from_manifest(manifest, source_root),
-            );
+            self.source_trust
+                .insert(trust_key(module), source_integrity(manifest, source_root));
         }
         self.check_cache.insert(key, result.clone());
         result
@@ -241,11 +244,11 @@ impl Driver {
     /// Trust recorded when this driver compiled `module`.
     ///
     /// In-memory compile is unauthenticated unless an artifact digest is
-    /// `"fixture"`. Path compile with a matching hex digest is byte-verified.
-    /// Unknown modules are unauthenticated.
+    /// `"fixture"`. Path compile is byte-verified only when every hex
+    /// artifact was read and matched. Unknown modules are unauthenticated.
     pub fn source_trust_of(&self, module: &CoreModule) -> TrustProfile {
         self.source_trust
-            .get(&(module.snapshot, module.manifest))
+            .get(&trust_key(module))
             .copied()
             .unwrap_or(TrustProfile::Unauthenticated)
     }
@@ -257,31 +260,24 @@ impl Default for Driver {
     }
 }
 
-fn source_trust_from_manifest(
-    manifest: &SourceManifest,
-    source_root: Option<&Path>,
-) -> TrustProfile {
-    let mut any_fixture = false;
-    let mut any_hex = false;
-    for artifact in &manifest.artifacts {
-        let digest = artifact.digest.trim();
-        if digest.eq_ignore_ascii_case("fixture") {
-            any_fixture = true;
-        } else if is_plausible_hex_digest(digest) {
-            any_hex = true;
-        }
+fn trust_key(module: &CoreModule) -> TrustKey {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(module.id.as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(module.snapshot.as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(module.manifest.as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(module.name.as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(module.version.as_bytes());
+    hasher.update(&[0xff]);
+    if let Ok(digest) = module.program_digest() {
+        hasher.update(digest.as_bytes());
+    } else if let Ok(fingerprint) = module.content_fingerprint() {
+        hasher.update(&fingerprint);
     }
-    if any_fixture {
-        TrustProfile::Fixture
-    } else if any_hex && source_root.is_some() {
-        TrustProfile::ByteVerified
-    } else {
-        TrustProfile::Unauthenticated
-    }
-}
-
-fn is_plausible_hex_digest(digest: &str) -> bool {
-    matches!(digest.len(), 32 | 64) && digest.bytes().all(|b| b.is_ascii_hexdigit())
+    TrustKey(*hasher.finalize().as_bytes())
 }
 
 fn compile_with_sources(
@@ -343,19 +339,50 @@ fn evaluate_scenario_run(
     )
 }
 
-fn check_key(source: &str, manifest: &SourceManifest) -> CheckKey {
+fn check_key(source: &str, manifest: &SourceManifest, source_root: Option<&Path>) -> CheckKey {
     let mut hasher = blake3::Hasher::new();
     hasher.update(source.as_bytes());
     hasher.update(&[0xff]);
     hasher.update(manifest.snapshot.as_bytes());
+    hasher.update(&[0xff]);
+    match source_root {
+        Some(root) => {
+            hasher.update(b"root:");
+            hasher.update(root.display().to_string().as_bytes());
+        }
+        None => {
+            hasher.update(b"noroot");
+        }
+    }
     hasher.update(&[0xff]);
     for artifact in &manifest.artifacts {
         hasher.update(artifact.digest.as_bytes());
         hasher.update(&[0xff]);
         hasher.update(artifact.path.as_bytes());
         hasher.update(&[0xff]);
+        hasher.update(&artifact_input_digest(source_root, &artifact.path));
+        hasher.update(&[0xff]);
     }
     CheckKey(*hasher.finalize().as_bytes())
+}
+
+fn artifact_input_digest(source_root: Option<&Path>, artifact_path: &str) -> [u8; 32] {
+    let Some(root) = source_root else {
+        return *blake3::hash(b"unread").as_bytes();
+    };
+    match read_artifact_bytes(root, artifact_path) {
+        Some(bytes) => *blake3::hash(&bytes).as_bytes(),
+        None => *blake3::hash(b"missing").as_bytes(),
+    }
+}
+
+fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
+    let path = Path::new(artifact_path);
+    if path.is_absolute() {
+        fs::read(path).ok()
+    } else {
+        fs::read(source_root.join(path)).ok()
+    }
 }
 
 fn run_key(
@@ -1009,7 +1036,6 @@ module Examples.ImpBytes version "0.1.0" {{
         );
 
         fs::write(dir.join("Other.Law"), b"tampered-bytes").expect("tamper artifact");
-        // Cache key is source bytes + manifest, not artifact bytes.
         let err = Driver::new()
             .check_path(&path)
             .expect_err("tampered artifact must fail E200");
@@ -1018,6 +1044,127 @@ module Examples.ImpBytes version "0.1.0" {{
             "{err:?}"
         );
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn same_driver_artifact_tamper_misses_check_cache() {
+        let dir = temp_module_dir("bytes-same-driver");
+        let bytes = b"fidryn-source-bytes";
+        let digest = blake3::hash(bytes).to_hex().to_string();
+        fs::write(dir.join("Other.Law"), bytes).expect("write artifact");
+        let manifest = fidryn_core::SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: digest.clone(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        fs::write(
+            dir.join("sources").join("manifest.json"),
+            serde_json::to_string(&manifest).expect("manifest json"),
+        )
+        .expect("write manifest");
+        let src = format!(
+            r#"
+module Examples.ImpBytes version "0.1.0" {{
+    import Other.Law version "1" {{ digest "{digest}" }}
+    query ok() -> Bool {{
+        goal Evaluate {{ true }}
+    }}
+}}
+"#
+        );
+        let path = dir.join("m.fr");
+        fs::write(&path, &src).expect("write module");
+        let mut driver = Driver::new();
+        driver
+            .check_path(&path)
+            .expect("matching blake3 hex authenticates");
+        assert_eq!(driver.misses(), 1);
+        fs::write(dir.join("Other.Law"), b"tampered-bytes").expect("tamper artifact");
+        let err = driver
+            .check_path(&path)
+            .expect_err("tampered bytes must miss the check cache");
+        assert_eq!(driver.misses(), 2);
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_hex_manifest_entry_without_checked_bytes_is_not_byte_verified() {
+        let dir = temp_module_dir("dangling-hex");
+        let source = r#"module Review version "0.1.0" {
+        source_manifest "sources/manifest.json"
+        query q() -> Bool { return true }
+    }"#;
+        let path = dir.join("main.fr");
+        fs::write(&path, source).expect("source");
+        let digest = "ab".repeat(32);
+        let manifest = serde_json::json!({
+            "schema": "fidryn.source-manifest/v0.1",
+            "snapshot": "review-snapshot",
+            "jurisdiction": "Test",
+            "artifacts": [{
+                "path": "never-created.txt",
+                "digest": digest,
+                "kind": "text",
+                "effective": "2033-01-01",
+                "weight": "explanatory"
+            }],
+        });
+        fs::write(
+            dir.join("sources").join("manifest.json"),
+            manifest.to_string(),
+        )
+        .expect("manifest");
+        let mut driver = Driver::new();
+        let (module, _) = driver
+            .check_path(&path)
+            .expect("a dangling hex artifact is not a digest-required import");
+        assert_ne!(
+            driver.source_trust_of(&module),
+            TrustProfile::ByteVerified,
+            "no bytes were available to authenticate this artifact"
+        );
+        assert_eq!(
+            driver.source_trust_of(&module),
+            TrustProfile::Unauthenticated
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn check_source_hex_manifest_without_bytes_is_not_byte_verified() {
+        let src = bool_query("true");
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: "review-snapshot".into(),
+            jurisdiction: "Test".into(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "never-created.txt".into(),
+                digest: "ab".repeat(32),
+                kind: "text".into(),
+                effective: "2033-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &manifest)
+            .expect("in-memory compile does not require unread hex artifacts");
+        assert_ne!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
+        assert_eq!(
+            driver.source_trust_of(&module),
+            TrustProfile::Unauthenticated
+        );
     }
 
     #[test]
