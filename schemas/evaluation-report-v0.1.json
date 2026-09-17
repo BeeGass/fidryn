@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fidryn.dev/schemas/evaluation-report-v0.1.json",
   "title": "fidryn.evaluation-report/v0.1",
-  "$comment": "Envelope for qualifications fidryn.outcome/v0.1 cannot carry. outcomeDocument is that compatibility projection. Mill transport ok is not a field of this schema.",
+  "$comment": "Envelope for qualifications fidryn.outcome/v0.1 cannot carry. outcomeDocument is that compatibility projection. Mill transport is {ok, report}; ok is not a field of this schema. Scenario requires assumptions (empty array allowed). Operative forbids a nonempty assumptions array. finiteReplay requires a coverage object.",
   "type": "object",
   "required": [
     "schema",
@@ -12,6 +12,41 @@
     "outcomeDocument"
   ],
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": { "executionMode": { "const": "scenario" } },
+        "required": ["executionMode"]
+      },
+      "then": {
+        "$comment": "CLI --scenario with no hypotheses still serializes assumptions: [].",
+        "required": ["assumptions"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "executionMode": { "const": "operative" } },
+        "required": ["executionMode"]
+      },
+      "then": {
+        "properties": {
+          "assumptions": { "type": "array", "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "verificationMethod": { "const": "finiteReplay" } },
+        "required": ["verificationMethod"]
+      },
+      "then": {
+        "required": ["coverage"],
+        "properties": {
+          "coverage": { "type": "object" }
+        }
+      }
+    }
+  ],
   "properties": {
     "schema": { "const": "fidryn.evaluation-report/v0.1" },
     "executionMode": {

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/mill-evaluation-response-v0.1.json",
+  "title": "fidryn.mill-evaluation-response/v0.1",
+  "$comment": "HTTP success transport for mill /api/run and /api/explore. ok is not a field of fidryn.evaluation-report/v0.1. Error bodies use a different shape ({ok: false, ...}) and are not this schema.",
+  "type": "object",
+  "required": ["ok", "report"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": { "const": true },
+    "report": { "$ref": "evaluation-report-v0.1.json" }
+  }
+}
