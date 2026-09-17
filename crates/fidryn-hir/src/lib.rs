@@ -21,6 +21,8 @@ pub struct HirModule {
     pub interpretation_families: BTreeMap<String, Vec<String>>,
     pub conflict_doctrines: Vec<HirDoctrine>,
     pub clauses: BTreeMap<String, String>,
+    pub imports: Vec<HirImport>,
+    pub sources: Vec<HirSource>,
     pub effects: BTreeMap<String, HirEffect>,
     pub functions: BTreeMap<String, HirFunction>,
     pub quantifiers: Vec<HirQuantifier>,
@@ -89,6 +91,18 @@ impl QuantifierKind {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirImport {
+    pub name: String,
+    pub digest_required: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirSource {
+    pub name: String,
+    pub artifact: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirQuantifier {
     pub kind: QuantifierKind,
     pub binder: String,
@@ -116,6 +130,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         interpretation_families: BTreeMap::new(),
         conflict_doctrines: Vec::new(),
         clauses: BTreeMap::new(),
+        imports: Vec::new(),
+        sources: Vec::new(),
         effects: BTreeMap::new(),
         functions: BTreeMap::new(),
         quantifiers: Vec::new(),
@@ -143,6 +159,23 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 }
                 _ => {}
             },
+            fidryn_syntax::ast::Item::Import(d) => {
+                hir.imports.push(HirImport {
+                    name: d.name.clone().unwrap_or_default(),
+                    digest_required: d.source.contains("digest"),
+                });
+            }
+            fidryn_syntax::ast::Item::Source(d) => {
+                let artifact = d.source.split("artifact").nth(1).and_then(|s| {
+                    let t = s.trim().trim_start_matches('"');
+                    let end = t.find('"')?;
+                    Some(t[..end].to_owned())
+                });
+                hir.sources.push(HirSource {
+                    name: d.name.clone().unwrap_or_default(),
+                    artifact,
+                });
+            }
             fidryn_syntax::ast::Item::Entity(d) => {
                 if let Some(name) = &d.name {
                     let ty = d
