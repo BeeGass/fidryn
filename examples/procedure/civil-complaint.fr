@@ -115,7 +115,7 @@ module Examples.CivilComplaint version "0.1.0" {
         goal Evaluate {
             require determined Adjudicated(case)
                 using Determine
-            return judgment_entry
+            return case_input<JudgmentEntry>("judgment_entry")
         }
     }
 
