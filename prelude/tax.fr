@@ -33,7 +33,19 @@ module Fidryn.Tax version "0.1.0" {
         year: TaxYear
     }
 
-    calc ordinary_income_tax_formula(amount: Money<USD>) -> String {
-        "IRC section 1 ordinary income brackets applied to amount"
+    calc ordinary_income_tax_formula(amount: Money<USD>) -> Money<USD> {
+        if amount <= 11925.00 {
+            amount * 0.10
+        } else {
+            if amount <= 48475.00 {
+                11925.00 * 0.10 + (amount - 11925.00) * 0.12
+            } else {
+                if amount <= 103350.00 {
+                    11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
+                } else {
+                    17651.00 + (amount - 103350.00) * 0.24
+                }
+            }
+        }
     }
 }

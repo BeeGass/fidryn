@@ -4,7 +4,7 @@
   "jurisdiction": "Fidryn",
   "artifacts": [
     {
-      "path": "prelude.fidryn",
+      "path": "prelude.fr",
       "digest": "fixture",
       "kind": "profile_module",
       "effective": "2026-08-23"
