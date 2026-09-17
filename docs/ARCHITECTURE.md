@@ -57,10 +57,10 @@ those as follows:
    dropped. It yields `Suspended`.
 6. Canonical JSON follows RFC 8785 (sorted object keys, no insignificant
    whitespace). Replay is byte-identical.
-7. v0.1 intends a lossless CST (rowan green tree). The formatter
-   round-trips modules apart from documented whitespace normalization.
-   Rowan CST is **not** this pass (matrix: No / Partial). The current
-   parser is recursive-descent over tokens with source slices.
+7. `Parse.green` is a lossless Rowan CST with trivia.
+   `syntax().text()` equals the source. Not every Pratt subexpression is
+   its own node. The formatter round-trips modules apart from documented
+   whitespace normalization.
 8. Expressions follow the essay's precedence in `grammar.ebnf`. Chained
    comparisons are rejected. Evaluate/calc/guard bodies lower to Core
    `Term`; that is not a rowan CST and not a claimed Pratt implementation.
@@ -74,6 +74,8 @@ those as follows:
 13. Node IDs are blake3 content hashes. Maps and sets use `BTreeMap` /
     `BTreeSet` so serialization is deterministic.
 14. `ignoredOpenIssues` is legal only with a `convergenceCertificate`.
+    A claims-digest certificate is not covering proof. Covering checks
+    belong in `fidryn-kernel`, not in proof search.
 15. Conflict and applicable-law oracles run. Unique ranked results resume;
     ties suspend or explore. Silent picks are forbidden.
 16. Filing adapters, tax calc modules, guarded recursion, user-defined
@@ -85,17 +87,19 @@ those as follows:
 ## Crate graph
 
 ```
-fidryn-syntax          parser, formatter (rowan CST intended, not this pass)
+fidryn-syntax          parser, formatter, Rowan CST (not every Pratt node)
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
 fidryn-check           types, effects, authority, time, strata (hir + core)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
+fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
+fidryn-driver          incremental check/run memo
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
-fidryn-solve           bounded DPLL
+fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
 fidryn-cli             fidryn binary and mill UI
 ```
 
@@ -112,7 +116,7 @@ pub struct Parse {
     pub source: String,
     pub tokens: Vec<Token>,
     pub diagnostics: Vec<fidryn_core::Diagnostic>,
-    // Intended, not this pass: pub green: rowan::GreenNode,
+    pub green: rowan::GreenNode, // lossless CST; not every Pratt node
 }
 impl Parse {
     pub fn module(&self) -> Option<ast::Module>;
@@ -122,7 +126,7 @@ pub fn format_module(source: &str) -> Result<String, fidryn_core::Diagnostic>
 pub fn lex(source: &str) -> Vec<Lexeme>
 ```
 
-`Parse` always returns a tree (today: AST plus tokens). Recovery wraps a
+`Parse` always returns a tree (typed `ast::Module` plus `green`). Recovery wraps a
 malformed declaration so later declarations still parse. Diagnostics use
 `E100` for parse errors.
 
@@ -134,9 +138,12 @@ See the crate itself. The important types are `CoreModule`, `Outcome<T>`,
 `CheckedCertificate`.
 
 `Outcome::Determinate` may include `ignored_open_issues` only when
-`convergence_certificate` is a `CheckedCertificate`. Only
-`CheckedCertificate::verified(...)` constructs that handle.
-`CompletionProofId::of(b"P11")` is never a certificate.
+`convergence_certificate` is a `CheckedCertificate`.
+`CheckedCertificate::verified(...)` is a claims-digest binder, not a
+covering proof. Ignoring open issues requires a covering certificate
+(`verified_covering` + complete `CoverageWitness`). A hash of the open
+issues is not covering. `CompletionProofId::of(b"P11")` is never a
+certificate. See [`OBLIGATIONS.md`](OBLIGATIONS.md).
 
 ### fidryn-hir
 
@@ -168,6 +175,21 @@ pub fn evaluate<H: Handler>(
 Unknown queries, exhausted fuel, and unsupported operations are
 `EngineError`, never `Outcome::Inconsistent`. `QueryPlan::Evaluate`
 runs a `Term`; `Term::Bool(true)` is the `Evaluate { true }` body.
+`seq` and `require` are Core `Term::Apply` operations. The required
+contract is `require true; return 7` → Determinate 7; false or
+unresolved `require` does not run the rest.
+
+The only missing-body arithmetic helper is the explicit builtin
+`ordinary_income_tax`. Substring `tax` is not a builtin.
+
+### fidryn-kernel
+
+Covering-check boundary, not proof generation. Search stays in
+`fidryn-verify` / `fidryn-solve`. This crate only accepts or rejects a
+covering claim (`accept_covering`, `digest_is_not_covering`). A digest
+certificate is not covering. Types `CoverageWitness` /
+`verified_covering` are the contract; they are not yet on
+`CheckedCertificate`.
 
 ### fidryn-handlers
 

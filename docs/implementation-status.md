@@ -16,10 +16,17 @@ completion. Uncertified open issues are `Suspended`, never a silent
 This table is the **evidence-backed status after the previous review-fix
 pass**. It is not a snapshot of the pre-pass tree, which still
 name-dispatched many queries. A later review (2026-09-17) is **open**;
-see [`OBLIGATIONS.md`](OBLIGATIONS.md). The 28 earlier review-kit
-regressions remain. The 16 tests in `adversarial_regressions.rs` pass
-as regressions for section-1 defects; they are not closure of
-sections 2–5.
+see [`OBLIGATIONS.md`](OBLIGATIONS.md) and
+[`WORKSTREAM-CONTRACT.md`](WORKSTREAM-CONTRACT.md). The 28 earlier
+review-kit regressions remain. The 16 tests in
+`adversarial_regressions.rs` pass as regressions for section-1 defects;
+they are not closure of the review. Certificate covering and
+artifact-byte authentication are not landed. Green tests are
+regressions.
+
+`fidryn-kernel` is the covering-check boundary: it may accept or reject
+a covering claim. It does not generate proofs. Proof search lives in
+`fidryn-verify` / `fidryn-solve`. A claims digest is not covering.
 
 Cells are `Yes` / `Partial` / `No`.
 
@@ -135,16 +142,26 @@ evidence filters and the declared result expression. An unknown name is
 name-based domain helper.
 
 **Convergence certificates.** `CheckedCertificate` has private fields;
-only `CheckedCertificate::verified(...)` constructs it.
+only `CheckedCertificate::verified(...)` constructs it today.
 `CompletionProofId::of(b"P11")` is never a certificate. Ignored open
-issues without a checked handle are `Suspended`. There is no independent
-proof checker beyond construction discipline.
+issues without a checked handle are `Suspended`. `verified` is a
+claims-digest binder, not covering proof. Ignoring open issues requires
+`verified_covering` with a complete `CoverageWitness` (`examined == total`,
+`examined > 0`, `incomplete: false`, answer equals the claim). Those
+APIs are not in `fidryn-core`. `fidryn-kernel` is the covering-check
+boundary, not a proof generator. A hash of the open issues is not
+covering.
 
 **Tax bracket arithmetic.** `examples/tax/federal-tax.fr` and
 `prelude/tax.fr` define `ordinary_income_tax_formula` as an if/else calc
 on 11925 / 48475 / 103350 and 10/12/22/24%. The fourth bracket includes
-the completed 22% slab. A Rust helper remains only for a String stub
-body. Missing money is `EngineError::InvalidInput`.
+the completed 22% slab. Missing money is `EngineError::InvalidInput`.
+The only missing-body arithmetic helper allowed by the workstream
+contract is the explicit builtin name `ordinary_income_tax`. Eval still
+selects the helper with `is_tax_function` (name/source substring `tax`
+or `ordinary_income`). That substring fallback remains until eval lands
+the exact builtin. Any other function with no body must be
+`EngineError::Unsupported`.
 
 **Conflict oracle / SelectApplicableLaw.** Unique ranked results resume;
 ties suspend or explore; list order is never a tie-break. Matching is
@@ -217,6 +234,14 @@ open-world proofs are not done.
 - `resume` is in-process, not a serialized rest-of-computation on the wire.
 - Incremental compilation is a memo table, not the `salsa` crate.
 - Determinacy search is exhaustive on **declared** finite domains, not a
-  general SMT encoding of evaluation.
+  general SMT encoding of evaluation. `fidryn-solve` materializes the
+  product; it does not yield assignments lazily under a generation cap.
 - Module parameters are type-name substitution, not a module calculus
   with exports and override points.
+- Covering proof is not landed. `fidryn-kernel` is the check boundary,
+  not proof generation.
+- Import `"fixture"` is not byte-verified artifact authentication.
+- Tax substring fallback is not the `ordinary_income_tax` builtin.
+- Duty status machine and authority grants are not interpreters.
+- Complete `require` contract (`true` → 7; `false` / unresolved do not
+  run the rest) is not closed by named tests.
