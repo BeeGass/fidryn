@@ -19,12 +19,14 @@ module Examples.FormHarborRoboticsLLC version "0.1.0" {
         authority MassachusettsGeneralCourt
         citation "M.G.L. c. 156C"
         artifact "sources/ma-c156c.txt"
+        digest fixture
     }
 
     source SecretaryInstructions {
         kind administrative_material
         authority MassachusettsSecretaryOfCommonwealth
         artifact "sources/ma-llc-filing-instructions.html"
+        digest fixture
         retrieved_at 2026-08-23T12:00:00-04:00
     }
 
