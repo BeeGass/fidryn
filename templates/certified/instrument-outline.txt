@@ -1,0 +1,9 @@
+Instrument outline
+=================
+
+Module: {{module}}
+Version: {{version}}
+Outside scope: {{outside_scope}}
+
+This text is interpolated from Core values only. Missing keys fail closed.
+It is certified for interpolation, not as a substitute for the instrument.
