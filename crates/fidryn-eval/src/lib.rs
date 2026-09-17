@@ -39,12 +39,15 @@ pub enum Residual {
 
 /// Snapshot of a suspended computation so [`resume`] can continue it.
 ///
-/// If the case identity later differs, [`resume`] recomputes derived facts
-/// and discards remembered handler answers, but keeps the seq frame stack so
-/// completed prefixes are not replayed against the residual.
+/// Same case, program, query, arguments, and clocks: [`resume`] keeps seq
+/// frames and bindings and answers the pending request. If that identity
+/// later differs, [`resume`] rebases: derived facts are recomputed, remembered
+/// handler answers and seq progress are discarded, and bindings restart from
+/// the invocation arguments so completed requirements are not reused.
 ///
 /// Seq frames record every entered `seq` in evaluation order. Nested
-/// `seq` under Binary/Call/If skips its completed prefix on resume.
+/// `seq` under Binary/Call/If skips its completed prefix on a same-identity
+/// resume. Transaction rollback restores both bindings and seq frames.
 #[derive(Clone, Debug)]
 pub struct Continuation {
     pub residual: Residual,
@@ -65,6 +68,13 @@ struct SeqFrame {
 }
 
 #[derive(Clone, Debug)]
+struct TxSavepoint {
+    bindings: BTreeMap<String, Value>,
+    seq_frames: Vec<SeqFrame>,
+    seq_cursor: usize,
+}
+
+#[derive(Clone, Debug)]
 pub struct EvalSession {
     pub outcome: Outcome<Value>,
     pub continuation: Option<Continuation>,
@@ -75,15 +85,28 @@ pub struct EvalSession {
 struct CaseIdentity {
     facts: BTreeMap<String, Value>,
     evidence: Vec<(String, Instant, Value)>,
-    events: Vec<(String, Instant, Value)>,
+    events: Vec<(String, Interval, Instant, Value)>,
     determinations: Vec<(String, String, bool, String, Option<Instant>)>,
     interpretations: BTreeMap<String, String>,
     decisions: BTreeMap<String, String>,
     closures: Vec<(String, bool)>,
+    module_name: String,
+    module_version: String,
+    program_fingerprint: Option<[u8; 32]>,
+    query: String,
+    args: BTreeMap<String, Value>,
+    valid_time: Instant,
+    record_time: Instant,
 }
 
 impl CaseIdentity {
-    fn of(case: &CaseRecord) -> Self {
+    fn of(
+        module: &CoreModule,
+        query: &QueryName,
+        args: &BTreeMap<String, Value>,
+        ctx: &RunContext,
+        case: &CaseRecord,
+    ) -> Self {
         Self {
             facts: case.facts.clone(),
             evidence: case
@@ -94,7 +117,14 @@ impl CaseIdentity {
             events: case
                 .events
                 .iter()
-                .map(|e| (e.kind.clone(), e.record_time, e.payload.clone()))
+                .map(|e| {
+                    (
+                        e.kind.clone(),
+                        e.valid_time,
+                        e.record_time,
+                        e.payload.clone(),
+                    )
+                })
                 .collect(),
             determinations: case
                 .determinations
@@ -116,6 +146,13 @@ impl CaseIdentity {
                 .iter()
                 .map(|c| (c.domain.clone(), c.closed))
                 .collect(),
+            module_name: module.name.clone(),
+            module_version: module.version.clone(),
+            program_fingerprint: module.content_fingerprint().ok(),
+            query: query.as_str().to_owned(),
+            args: args.clone(),
+            valid_time: ctx.valid_time,
+            record_time: ctx.record_time,
         }
     }
 }
@@ -197,9 +234,10 @@ pub fn evaluate_session<H: Handler>(
 
 /// Continue a suspended session after a handler can [`HandlerResult::Resume`].
 ///
-/// When `case` identity has changed since the continuation was captured,
-/// derived facts are recomputed and remembered handler answers are discarded.
-/// Seq frames and bindings are kept so a completed prefix is not replayed.
+/// Same pinned identity: keep seq frames, bindings, and remembered answers.
+/// When case, program, query, arguments, or clocks have changed, rebase the
+/// residual with empty seq progress and invocation arguments so completed
+/// requirements are evaluated against the new snapshot.
 #[allow(clippy::too_many_arguments, clippy::result_large_err)]
 pub fn resume<H: Handler>(
     session: EvalSession,
@@ -221,7 +259,8 @@ pub fn resume<H: Handler>(
         Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
         Residual::Plan(plan) => plan.clone(),
     };
-    if cont.case_identity != CaseIdentity::of(case) {
+    let identity = CaseIdentity::of(module, query, args, ctx, case);
+    if cont.case_identity != identity {
         let derived = DerivedWorld::compute(module, case, ctx, args)?;
         return eval_with_state(
             &residual,
@@ -232,11 +271,11 @@ pub fn resume<H: Handler>(
             ctx,
             handler,
             case,
-            cont.bindings,
+            args.clone(),
             derived,
             cont.fuel,
             BTreeMap::new(),
-            cont.seq_frames,
+            Vec::new(),
         );
     }
     eval_with_state(
@@ -260,7 +299,7 @@ pub fn resume<H: Handler>(
 fn eval_with_state<H: Handler>(
     plan: &QueryPlan,
     module: &CoreModule,
-    _query: &QueryName,
+    query: &QueryName,
     args: &BTreeMap<String, Value>,
     state: &LegalState,
     ctx: &RunContext,
@@ -276,6 +315,7 @@ fn eval_with_state<H: Handler>(
         inner: handler,
         answered,
     };
+    let identity = CaseIdentity::of(module, query, args, ctx, case);
     match plan {
         QueryPlan::Evaluate(term) => {
             let mut frame = EvalFrame {
@@ -305,7 +345,7 @@ fn eval_with_state<H: Handler>(
                 derived,
                 fuel,
                 handler.answered,
-                case,
+                identity,
                 seq_frames,
             ))
         }
@@ -319,7 +359,7 @@ fn eval_with_state<H: Handler>(
                 derived,
                 fuel,
                 handler.answered,
-                case,
+                identity,
                 Vec::new(),
             ))
         }
@@ -334,7 +374,7 @@ fn session_from(
     derived: DerivedWorld,
     fuel: Option<u32>,
     answered: BTreeMap<String, Value>,
-    case: &CaseRecord,
+    identity: CaseIdentity,
     seq_frames: Vec<SeqFrame>,
 ) -> EvalSession {
     let (seq_index, completed) = seq_progress(&seq_frames);
@@ -348,7 +388,7 @@ fn session_from(
             completed,
             seq_index,
             seq_frames,
-            case_identity: CaseIdentity::of(case),
+            case_identity: identity,
         }),
         _ => None,
     };
@@ -789,17 +829,17 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if args.is_empty() {
             return Err(unsupported("empty transaction"));
         }
-        let saved = self.bindings.clone();
+        let saved = self.capture_savepoint();
         let mut last = None;
         for step in args {
             match self.eval_term(step) {
                 Ok(Outcome::Determinate { value, .. }) => last = Some(value),
                 Ok(outcome) => {
-                    self.bindings = saved;
+                    self.restore_savepoint(&saved);
                     return Ok(outcome);
                 }
                 Err(err) => {
-                    self.bindings = saved;
+                    self.restore_savepoint(&saved);
                     return Err(err);
                 }
             }
@@ -807,10 +847,24 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         match last {
             Some(value) => Ok(determinate(value, TraceId::of(b"transaction"))),
             None => {
-                self.bindings = saved;
+                self.restore_savepoint(&saved);
                 Err(unsupported("empty transaction"))
             }
         }
+    }
+
+    fn capture_savepoint(&self) -> TxSavepoint {
+        TxSavepoint {
+            bindings: self.bindings.clone(),
+            seq_frames: self.seq_frames.clone(),
+            seq_cursor: self.seq_cursor,
+        }
+    }
+
+    fn restore_savepoint(&mut self, saved: &TxSavepoint) {
+        self.bindings = saved.bindings.clone();
+        self.seq_frames = saved.seq_frames.clone();
+        self.seq_cursor = saved.seq_cursor;
     }
 
     fn eval_duty_status(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
@@ -6142,7 +6196,10 @@ mod tests {
         let mut granted = case.clone();
         granted.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![Value::String("missing_action".into())]),
+            Value::Set(vec![
+                Value::String("attach".into()),
+                Value::String("missing_action".into()),
+            ]),
         );
         let second = resume(
             first,
@@ -6216,5 +6273,166 @@ mod tests {
             } => {}
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn rolled_back_nested_sequence_is_reexecuted_before_transaction_commit() {
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "transaction".into(),
+            args: vec![
+                seq_term(vec![duty_step_term("pay", "attach"), Term::Bool(true)]),
+                Term::Apply {
+                    ctor: "require_authority".into(),
+                    args: vec![Term::Ident("release".into())],
+                },
+                Term::Bool(true),
+            ],
+        });
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let session = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(session.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            session.outcome
+        );
+        assert!(!session.bindings.contains_key("duty:pay:default"));
+        let cont = session.continuation.as_ref().expect("continuation");
+        assert!(!cont.bindings.contains_key("duty:pay:default"));
+        assert_eq!(cont.seq_index, 0);
+        assert!(cont.completed.is_empty());
+
+        let mut granted = case.clone();
+        granted.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![
+                Value::String("attach".into()),
+                Value::String("release".into()),
+            ]),
+        );
+        let resumed = resume(
+            session,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &granted,
+        )
+        .expect("resume with grant");
+        assert!(
+            matches!(resumed.outcome, Outcome::Determinate { .. }),
+            "{:?}",
+            resumed.outcome
+        );
+        assert!(
+            resumed.bindings.contains_key("duty:pay:default"),
+            "a rolled-back prefix cannot be marked completed and skipped: {:?}",
+            resumed.bindings
+        );
+        let committed = resumed
+            .bindings
+            .get("duty:pay:default")
+            .expect("committed duty binding");
+        let duty_state = duty::parse_duty_state(committed, "pay").expect("duty state");
+        assert_eq!(duty_state.status, fidryn_core::DutyStatus::Attached);
+        assert!(resumed.continuation.is_none());
+    }
+
+    #[test]
+    fn rebase_cannot_reuse_a_require_that_is_now_false() {
+        let plan = QueryPlan::Evaluate(seq_term(vec![
+            require_term(Term::Ident("gate".into())),
+            Term::Apply {
+                ctor: "determined".into(),
+                args: vec![Term::Apply {
+                    ctor: "P".into(),
+                    args: vec![Term::Ident("A".into())],
+                }],
+            },
+        ]));
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let mut case = CaseRecord::default();
+        case.facts.insert("gate".into(), Value::Bool(true));
+        let session = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(session.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            session.outcome
+        );
+        let cont = session.continuation.as_ref().expect("continuation");
+        assert_eq!(cont.seq_index, 1);
+        assert_eq!(cont.completed.len(), 1);
+
+        case.facts.insert("gate".into(), Value::Bool(false));
+        case.determinations.push(CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "P".into(),
+            established: true,
+            decider: "Reviewer".into(),
+            recorded_at: Some(t),
+        });
+        let fresh = evaluate(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("fresh evaluation");
+        assert!(
+            !matches!(
+                fresh,
+                Outcome::Determinate {
+                    value: Value::Bool(true),
+                    ..
+                }
+            ),
+            "{fresh:?}"
+        );
+        let resumed = resume(
+            session,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("resume");
+        assert_eq!(
+            resumed.outcome, fresh,
+            "either reject snapshot changes or invalidate dependent completed work"
+        );
     }
 }

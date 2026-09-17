@@ -1,10 +1,10 @@
 //! Duty status machine. Illegal or unauthorized transitions commit nothing.
 
 use fidryn_core::ir::CoreDuty;
-use fidryn_core::time::{CalendarKind, Instant};
+use fidryn_core::time::{Bound, CalendarKind, Instant};
 use fidryn_core::value::{Term, Value};
 use fidryn_core::{
-    CaseRecord, DutyState, DutyStatus, EngineError, EvidenceItem, LedgerEvent, RunContext,
+    CaseRecord, DutyState, DutyStatus, EngineError, EvidenceItem, Interval, LedgerEvent, RunContext,
 };
 use std::collections::BTreeMap;
 
@@ -298,8 +298,11 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
     }
 }
 
-/// `duty` / `authority` / institutional events need a covering grant.
-/// Assumption events are not operative duty performance.
+/// Admission keys off payload semantics and authority, not only kind strings.
+///
+/// `duty` / `authority` / institutional kinds, and any Performed/Attached/…
+/// duty-transition payload, need a covering grant. Assumption events are never
+/// operative. Relabeling a Performed payload as `correction` does not admit it.
 pub fn event_is_admitted(case: &CaseRecord, event: &LedgerEvent, record_time: Instant) -> bool {
     if event.record_time > record_time {
         return false;
@@ -307,7 +310,7 @@ pub fn event_is_admitted(case: &CaseRecord, event: &LedgerEvent, record_time: In
     if event.kind.eq_ignore_ascii_case("assumption") {
         return false;
     }
-    if is_gated_event_kind(&event.kind) {
+    if is_gated_event_kind(&event.kind) || payload_is_gated_duty_transition(&event.payload) {
         return event_action(&event.payload)
             .is_some_and(|action| action_is_granted(case, &action, record_time));
     }
@@ -320,6 +323,18 @@ fn is_gated_event_kind(kind: &str) -> bool {
         || kind.eq_ignore_ascii_case("institutional")
 }
 
+fn payload_is_gated_duty_transition(payload: &Value) -> bool {
+    event_action(payload).is_some_and(|action| is_gated_duty_action(&action))
+}
+
+fn is_gated_duty_action(action: &str) -> bool {
+    action.eq_ignore_ascii_case("perform")
+        || action.eq_ignore_ascii_case("attach")
+        || action.eq_ignore_ascii_case("breach")
+        || action.eq_ignore_ascii_case("cure")
+        || action.eq_ignore_ascii_case("discharge")
+}
+
 fn event_action(payload: &Value) -> Option<String> {
     match payload {
         Value::String(name) | Value::Entity(name) => Some(status_to_action(name)),
@@ -330,7 +345,11 @@ fn event_action(payload: &Value) -> Option<String> {
         Value::Map(fields) => fields
             .get("action")
             .and_then(value_action_name)
-            .or_else(|| fields.get("status").and_then(value_action_name)),
+            .or_else(|| fields.get("status").and_then(value_action_name))
+            .or_else(|| match fields.get("performed") {
+                Some(Value::Bool(true)) => Some("perform".to_owned()),
+                _ => None,
+            }),
         _ => None,
     }
 }
@@ -395,13 +414,18 @@ pub fn surface_duty_state(
             instance,
         };
     }
-    let performed = performed_held || performance_exists(&duty.name, &instance, case, ctx);
-    let deadline_passed = deadline_has_passed(&duty.name, &duty.content, case, ctx);
-    let already_breached = fact_flag(case, &format!("{}_breached", duty.name)).unwrap_or(false)
-        || stored_duty_breached(&duty.name, &instance, case);
+    let named = is_named_instance(&instance);
+    // Named instances ignore definition-level `performed` / `<duty>_performed`
+    // shortcuts from the derived world and case facts.
+    let performed =
+        (!named && performed_held) || performance_exists(&duty.name, &instance, case, ctx);
+    let deadline_passed = deadline_has_passed(&duty.name, &instance, &duty.content, case, ctx);
+    let already_breached = stored_duty_breached(&duty.name, &instance, case)
+        || (!named && fact_flag(case, &format!("{}_breached", duty.name)).unwrap_or(false));
     if performed {
+        // Historical breach is occurrence vs deadline, not "the query is after
+        // the deadline". An on-time payment stays unbreached when asked later.
         let late = already_breached
-            || deadline_passed
             || performance_is_after_deadline(&duty.name, &instance, &duty.content, case, ctx);
         return DutyState {
             name: duty.name.clone(),
@@ -441,9 +465,25 @@ fn party_name(term: &Term) -> String {
     }
 }
 
+fn is_named_instance(instance: &str) -> bool {
+    !instance.is_empty() && !instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE)
+}
+
+/// True when a payload does not name a non-default duty instance.
+pub(crate) fn payload_applies_to_default_instance(payload: &Value) -> bool {
+    match payload {
+        Value::Map(fields) | Value::Ctor { fields, .. } => match instance_from_fields(fields) {
+            Some(named) => named.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+            None => true,
+        },
+        _ => true,
+    }
+}
+
 fn performance_exists(name: &str, instance: &str, case: &CaseRecord, ctx: &RunContext) -> bool {
-    if fact_flag(case, &format!("{name}_performed")).unwrap_or(false)
-        || fact_flag(case, "performed").unwrap_or(false)
+    if !is_named_instance(instance)
+        && (fact_flag(case, &format!("{name}_performed")).unwrap_or(false)
+            || fact_flag(case, "performed").unwrap_or(false))
     {
         return true;
     }
@@ -481,9 +521,6 @@ fn payment_matches_instance(item: &EvidenceItem, duty_name: &str, instance: &str
 }
 
 fn event_marks_performed(event: &LedgerEvent, duty_name: &str, instance: &str) -> bool {
-    if !event.kind.eq_ignore_ascii_case("duty") {
-        return false;
-    }
     payload_marks_performed(&event.payload, duty_name, instance)
 }
 
@@ -578,13 +615,24 @@ fn stored_duty_breached(name: &str, instance: &str, case: &CaseRecord) -> bool {
     stored_duty_state(name, instance, case).is_some_and(|state| state.breached)
 }
 
-fn deadline_has_passed(name: &str, content: &[Term], case: &CaseRecord, ctx: &RunContext) -> bool {
-    if fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false) {
+fn deadline_has_passed(
+    name: &str,
+    instance: &str,
+    content: &[Term],
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> bool {
+    if !is_named_instance(instance)
+        && fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false)
+    {
         return true;
     }
     match due_deadline_instant(content, case) {
-        Some(deadline) => ctx.record_time > deadline,
-        None => fact_flag(case, &format!("{name}_late")).unwrap_or(false),
+        Some(deadline) => ctx.valid_time > deadline,
+        None => {
+            !is_named_instance(instance)
+                && fact_flag(case, &format!("{name}_late")).unwrap_or(false)
+        }
     }
 }
 
@@ -596,19 +644,73 @@ fn performance_is_after_deadline(
     ctx: &RunContext,
 ) -> bool {
     let Some(deadline) = due_deadline_instant(content, case) else {
-        return fact_flag(case, &format!("{name}_late")).unwrap_or(false)
-            || fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false);
+        return !is_named_instance(instance)
+            && (fact_flag(case, &format!("{name}_late")).unwrap_or(false)
+                || fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false));
     };
     match performance_instant(name, instance, case, ctx) {
         Some(at) => at > deadline,
-        None => ctx.record_time > deadline,
+        // Unknown occurrence time does not silently establish lateness.
+        None => false,
     }
 }
 
 fn due_deadline_instant(content: &[Term], case: &CaseRecord) -> Option<Instant> {
     let days = due_counted_days(content)?;
-    let start = fact_instant(case, "invoice_date").or_else(|| fact_instant(case, "due_at"))?;
+    let start = due_anchor_instant(content, case)?;
     add_counted_days(start, days)
+}
+
+fn due_anchor_instant(content: &[Term], case: &CaseRecord) -> Option<Instant> {
+    if let Some(name) = due_after_ident(content)
+        && let Some(instant) = fact_instant(case, &name)
+    {
+        return Some(instant);
+    }
+    fact_instant(case, "invoice_date").or_else(|| fact_instant(case, "due_at"))
+}
+
+fn due_after_ident(content: &[Term]) -> Option<String> {
+    content.iter().find_map(find_after_ident)
+}
+
+fn find_after_ident(term: &Term) -> Option<String> {
+    match term {
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor.eq_ignore_ascii_case("after") =>
+        {
+            after_anchor_name(args).or_else(|| args.iter().find_map(find_after_ident))
+        }
+        Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
+            args.iter().find_map(find_after_ident)
+        }
+        Term::Binary { left, right, .. } => {
+            find_after_ident(left).or_else(|| find_after_ident(right))
+        }
+        Term::If { cond, then, else_ } => find_after_ident(cond)
+            .or_else(|| find_after_ident(then))
+            .or_else(|| find_after_ident(else_)),
+        Term::Field { base, .. } => find_after_ident(base),
+        Term::Record(fields) => fields.values().find_map(find_after_ident),
+        _ => None,
+    }
+}
+
+fn after_anchor_name(args: &[Term]) -> Option<String> {
+    if args.len() >= 2 {
+        let name = party_name(&args[1]);
+        if !name.is_empty() && !is_counted_ctor(&name) {
+            return Some(name);
+        }
+    }
+    args.iter().find_map(|arg| {
+        let name = party_name(arg);
+        if name.is_empty() || is_counted_ctor(&name) {
+            None
+        } else {
+            Some(name)
+        }
+    })
 }
 
 fn due_counted_days(content: &[Term]) -> Option<i64> {
@@ -688,7 +790,7 @@ fn performance_instant(
         .filter(|item| {
             item.observed_at <= ctx.record_time && payment_matches_instance(item, name, instance)
         })
-        .map(|item| item.observed_at)
+        .filter_map(payment_occurred_at)
         .min();
     if from_evidence.is_some() {
         return from_evidence;
@@ -699,8 +801,35 @@ fn performance_instant(
             event_is_admitted(case, event, ctx.record_time)
                 && event_marks_performed(event, name, instance)
         })
-        .map(|event| event.record_time)
+        .filter_map(event_occurred_at)
         .min()
+}
+
+/// Occurrence time for a payment. Knowledge uses `observed_at`; performance
+/// prefers payload `occurred_at` and falls back to `observed_at` when absent.
+fn payment_occurred_at(item: &EvidenceItem) -> Option<Instant> {
+    occurrence_from_value(&item.value).or(Some(item.observed_at))
+}
+
+fn event_occurred_at(event: &LedgerEvent) -> Option<Instant> {
+    occurrence_from_value(&event.payload).or_else(|| interval_start(event.valid_time))
+}
+
+fn occurrence_from_value(value: &Value) -> Option<Instant> {
+    match value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => fields
+            .get("occurred_at")
+            .or_else(|| fields.get("occurredAt"))
+            .and_then(value_as_instant),
+        _ => None,
+    }
+}
+
+fn interval_start(interval: Interval) -> Option<Instant> {
+    match interval.start {
+        Bound::Inclusive(instant) | Bound::Exclusive(instant) => Some(instant),
+        Bound::NegInf | Bound::PosInf => None,
+    }
 }
 
 fn fact_flag(case: &CaseRecord, key: &str) -> Option<bool> {
@@ -717,9 +846,13 @@ fn fact_flag(case: &CaseRecord, key: &str) -> Option<bool> {
 }
 
 fn fact_instant(case: &CaseRecord, key: &str) -> Option<Instant> {
-    match case.facts.get(key) {
-        Some(Value::Instant(instant)) => Some(*instant),
-        Some(Value::String(text)) => Instant::parse(text)
+    case.facts.get(key).and_then(value_as_instant)
+}
+
+fn value_as_instant(value: &Value) -> Option<Instant> {
+    match value {
+        Value::Instant(instant) => Some(*instant),
+        Value::String(text) => Instant::parse(text)
             .ok()
             .or_else(|| Instant::parse(&format!("{text}T00:00:00Z")).ok()),
         _ => None,
@@ -800,7 +933,8 @@ fn insert_performed_duty(case: &mut CaseRecord, name: &str, instance: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::{Assumption, EvidenceItem};
+    use fidryn_core::ids::{JurisdictionId, NodeId, OriginId};
+    use fidryn_core::{Assumption, EvidenceItem, Guard, Interval, NodeMeta};
 
     fn attached() -> DutyState {
         DutyState {
@@ -892,7 +1026,7 @@ mod tests {
         let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let event = LedgerEvent {
             kind: "duty".into(),
-            valid_time: fidryn_core::Interval::always(),
+            valid_time: Interval::always(),
             record_time: t,
             payload: Value::Ctor {
                 name: "Performed".into(),
@@ -908,7 +1042,7 @@ mod tests {
         let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let event = LedgerEvent {
             kind: "assumption".into(),
-            valid_time: fidryn_core::Interval::always(),
+            valid_time: Interval::always(),
             record_time: t,
             payload: Value::Ctor {
                 name: "Performed".into(),
@@ -917,6 +1051,291 @@ mod tests {
         };
         let case = CaseRecord::default();
         assert!(!event_is_admitted(&case, &event, t));
+    }
+
+    #[test]
+    fn correction_performed_payload_is_not_admitted_without_grant() {
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let event = LedgerEvent {
+            kind: "correction".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        };
+        let case = CaseRecord::default();
+        assert!(
+            !event_is_admitted(&case, &event, t),
+            "relabeling a performed payload as correction must not authorize it"
+        );
+    }
+
+    #[test]
+    fn assumption_kind_never_operatively_admits_even_with_grant() {
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![Value::String("perform".into())]),
+        );
+        let event = LedgerEvent {
+            kind: "assumption".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        };
+        assert!(!event_is_admitted(&case, &event, t));
+    }
+
+    fn pay_invoice_duty_after(days: i64, after: &str) -> CoreDuty {
+        CoreDuty {
+            id: NodeId::of(b"PayInvoice"),
+            name: "PayInvoice".into(),
+            bearer: Term::Ident("Payer".into()),
+            claimant: Some(Term::Ident("Payee".into())),
+            attaches: Guard::Satisfied,
+            content: vec![Term::Apply {
+                ctor: "due".into(),
+                args: vec![Term::Apply {
+                    ctor: "after".into(),
+                    args: vec![
+                        Term::Apply {
+                            ctor: "counted_days".into(),
+                            args: vec![Term::Int(days)],
+                        },
+                        Term::Ident(after.into()),
+                    ],
+                }],
+            }],
+            meta: NodeMeta {
+                span: None,
+                source: None,
+                jurisdiction: JurisdictionId::of(b"j"),
+                valid_time: Interval::always(),
+                record_time: Interval::always(),
+                origin: OriginId::Direct(NodeId::of(b"PayInvoice")),
+            },
+        }
+    }
+
+    fn instant(text: &str) -> Instant {
+        Instant::parse(text).unwrap()
+    }
+
+    #[test]
+    fn on_time_payment_remains_unbreached_after_its_deadline() {
+        let invoice = instant("2033-01-01T00:00:00Z");
+        let paid = instant("2033-01-10T00:00:00Z");
+        let later = instant("2033-02-15T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.evidence.push(EvidenceItem {
+            schema: "PaymentRecord".into(),
+            observed_at: paid,
+            value: Value::Map(BTreeMap::from([
+                ("name".into(), Value::String("PayInvoice".into())),
+                ("instance".into(), Value::String("invoice_a".into())),
+            ])),
+        });
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(later, later),
+            true,
+            false,
+            false,
+            "invoice_a",
+        );
+        assert_eq!(state.status, DutyStatus::Performed);
+        assert!(
+            !state.breached,
+            "querying later must not turn timely performance into breach"
+        );
+    }
+
+    #[test]
+    fn relabeling_a_performed_payload_as_correction_does_not_authorize_it() {
+        let t = instant("2033-01-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts.insert("invoice_date".into(), Value::Instant(t));
+        case.events.push(LedgerEvent {
+            kind: "correction".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(t, t),
+            true,
+            false,
+            true,
+            "invoice_a",
+        );
+        assert_ne!(
+            state.status,
+            DutyStatus::Performed,
+            "an ungated event label must not admit a performed payload"
+        );
+    }
+
+    #[test]
+    fn named_instance_ignores_global_performed_shortcuts() {
+        let t = instant("2033-01-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts.insert("invoice_date".into(), Value::Instant(t));
+        case.facts.insert("performed".into(), Value::Bool(true));
+        case.facts
+            .insert("PayInvoice_performed".into(), Value::Bool(true));
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let named = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(t, t),
+            true,
+            false,
+            true,
+            "invoice_a",
+        );
+        assert_ne!(named.status, DutyStatus::Performed);
+        let default = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(t, t),
+            true,
+            false,
+            true,
+            DEFAULT_DUTY_INSTANCE,
+        );
+        assert_eq!(default.status, DutyStatus::Performed);
+    }
+
+    #[test]
+    fn unpaid_deadline_uses_valid_time_not_record_time() {
+        let invoice = instant("2033-01-01T00:00:00Z");
+        let valid = instant("2033-01-15T00:00:00Z");
+        let known = instant("2033-03-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(valid, known),
+            true,
+            false,
+            false,
+            DEFAULT_DUTY_INSTANCE,
+        );
+        assert_eq!(state.status, DutyStatus::Attached);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn due_after_ident_is_the_deadline_anchor() {
+        let issued = instant("2033-02-01T00:00:00Z");
+        let invoice = instant("2033-01-01T00:00:00Z");
+        let at = instant("2033-02-15T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.facts
+            .insert("issued_on".into(), Value::Instant(issued));
+        let duty = pay_invoice_duty_after(30, "issued_on");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(at, at),
+            true,
+            false,
+            false,
+            DEFAULT_DUTY_INSTANCE,
+        );
+        assert_eq!(
+            state.status,
+            DutyStatus::Attached,
+            "deadline must follow `after issued_on`, not hardcoded invoice_date"
+        );
+    }
+
+    #[test]
+    fn occurred_at_not_observed_at_decides_lateness() {
+        let invoice = instant("2033-01-01T00:00:00Z");
+        let occurred = instant("2033-01-10T00:00:00Z");
+        let observed = instant("2033-02-20T00:00:00Z");
+        let query = instant("2033-02-20T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.evidence.push(EvidenceItem {
+            schema: "PaymentRecord".into(),
+            observed_at: observed,
+            value: Value::Map(BTreeMap::from([
+                ("name".into(), Value::String("PayInvoice".into())),
+                ("instance".into(), Value::String("invoice_a".into())),
+                ("occurred_at".into(), Value::Instant(occurred)),
+            ])),
+        });
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(query, query),
+            true,
+            false,
+            false,
+            "invoice_a",
+        );
+        assert_eq!(state.status, DutyStatus::Performed);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn missing_occurrence_time_is_not_silently_late() {
+        let invoice = instant("2033-01-01T00:00:00Z");
+        let later = instant("2033-02-15T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.facts.insert(
+            duty_instance_key("PayInvoice", DEFAULT_DUTY_INSTANCE),
+            duty_state_value(&DutyState {
+                name: "PayInvoice".into(),
+                status: DutyStatus::Performed,
+                breached: false,
+                bearer: "Payer".into(),
+                claimant: None,
+                instance: DEFAULT_DUTY_INSTANCE.into(),
+            }),
+        );
+        let duty = pay_invoice_duty_after(30, "invoice_date");
+        let state = surface_duty_state(
+            &duty,
+            &case,
+            &RunContext::new(later, later),
+            true,
+            false,
+            false,
+            DEFAULT_DUTY_INSTANCE,
+        );
+        assert_eq!(state.status, DutyStatus::Performed);
+        assert!(
+            !state.breached,
+            "unknown occurrence time must not be converted into lateness"
+        );
     }
 
     #[test]
@@ -933,7 +1352,7 @@ mod tests {
         });
         case.events.push(LedgerEvent {
             kind: "assumption".into(),
-            valid_time: fidryn_core::Interval::always(),
+            valid_time: Interval::always(),
             record_time: t,
             payload,
         });

@@ -1,8 +1,9 @@
 //! Bounded constitutive/derive worklist. The case record is never mutated.
 
+use fidryn_core::case::CaseDetermination;
 use fidryn_core::ir::{CompareOp, Consequence, CoreDecl, CoreModule, CoreRule, Guard};
 use fidryn_core::value::{PropTerm, Term, Value};
-use fidryn_core::{CaseRecord, EngineError, RunContext};
+use fidryn_core::{CaseRecord, EngineError, Instant, RunContext};
 use std::collections::{BTreeMap, BTreeSet};
 
 const WORKLIST_FUEL: u32 = 64;
@@ -112,7 +113,7 @@ impl DerivedWorld {
         let propositions = declared_propositions(module);
         seed_facts(&mut world, &case.facts, &propositions);
         seed_facts(&mut world, args, &propositions);
-        seed_determinations(&mut world, case);
+        seed_determinations(&mut world, case, ctx);
         seed_evidence(&mut world, case, ctx);
         seed_events(&mut world, case, ctx, &propositions);
         seed_core_facts(&mut world, module);
@@ -179,10 +180,11 @@ impl DerivedWorld {
             }
             Guard::CompletedAct(name) | Guard::EffectiveAct(name) => {
                 if case.facts.contains_key(name)
-                    || case
-                        .determinations
-                        .iter()
-                        .any(|d| names_eq(&d.issue, name) && d.established)
+                    || case.determinations.iter().any(|d| {
+                        determination_is_known(d, ctx.record_time)
+                            && names_eq(&d.issue, name)
+                            && d.established
+                    })
                 {
                     Hold::Yes
                 } else {
@@ -280,14 +282,26 @@ fn seed_facts(
     }
 }
 
-fn seed_determinations(world: &mut DerivedWorld, case: &CaseRecord) {
+fn seed_determinations(world: &mut DerivedWorld, case: &CaseRecord, ctx: &RunContext) {
     for det in &case.determinations {
+        if !determination_is_known(det, ctx.record_time) {
+            continue;
+        }
         let prop = parse_prop_issue(&det.issue);
         if det.established {
             world.insert_held(prop);
         } else {
             world.insert_denied(prop);
         }
+    }
+}
+
+/// Knowledge filter for determinations. Missing `recorded_at` stays visible
+/// so legacy records without a knowledge timestamp remain usable.
+fn determination_is_known(det: &CaseDetermination, known_at: Instant) -> bool {
+    match det.recorded_at {
+        None => true,
+        Some(recorded) => recorded <= known_at,
     }
 }
 
@@ -315,7 +329,9 @@ fn seed_events(
                 if !fields.is_empty() {
                     seed_facts(world, fields, propositions);
                 }
-                if name.eq_ignore_ascii_case("performed") {
+                if name.eq_ignore_ascii_case("performed")
+                    && crate::duty::payload_applies_to_default_instance(&event.payload)
+                {
                     world.insert_held(PropTerm::new("performed", Vec::new()));
                 }
             }
@@ -823,4 +839,110 @@ pub fn binder_name(term: &Term) -> Option<String> {
 
 pub fn domain_name(term: &Term) -> Option<String> {
     binder_name(term)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use fidryn_core::Interval;
+    use fidryn_core::ids::{JurisdictionId, ModuleId, SourceManifestId, SourceSnapshotId};
+    use fidryn_core::{LedgerEvent, Value};
+    use std::collections::BTreeMap;
+
+    fn instant(text: &str) -> Instant {
+        Instant::parse(text).unwrap()
+    }
+
+    fn empty_module() -> CoreModule {
+        CoreModule {
+            id: ModuleId::of(b"Review"),
+            name: "Review".into(),
+            version: "0.1.0".into(),
+            snapshot: SourceSnapshotId::of(b"s"),
+            manifest: SourceManifestId::of(b"m"),
+            jurisdiction: JurisdictionId::of(b"j"),
+            outside_scope: Vec::new(),
+            declarations: Vec::new(),
+            nominations: Vec::new(),
+            queries: Vec::new(),
+            verifications: Vec::new(),
+            assertions: Vec::new(),
+        }
+    }
+
+    fn compute(case: &CaseRecord, ctx: &RunContext) -> DerivedWorld {
+        DerivedWorld::compute(&empty_module(), case, ctx, &BTreeMap::new()).unwrap()
+    }
+
+    #[test]
+    fn future_determinations_are_not_visible_at_an_earlier_known_time() {
+        let mut case = CaseRecord::default();
+        case.determinations.push(CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "P".into(),
+            established: true,
+            decider: "Reviewer".into(),
+            recorded_at: Some(instant("2034-01-01T00:00:00Z")),
+        });
+        let ctx = RunContext::new(
+            instant("2033-01-01T00:00:00Z"),
+            instant("2033-01-01T00:00:00Z"),
+        );
+        let world = compute(&case, &ctx);
+        assert!(
+            !world.holds(&parse_prop_issue("P(A)")),
+            "future knowledge must not establish a past answer"
+        );
+        assert!(!world.holds_named("P"));
+    }
+
+    #[test]
+    fn determination_at_known_time_is_visible() {
+        let known = instant("2033-01-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.determinations.push(CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "P".into(),
+            established: true,
+            decider: "Reviewer".into(),
+            recorded_at: Some(known),
+        });
+        let world = compute(&case, &RunContext::new(known, known));
+        assert!(world.holds(&parse_prop_issue("P(A)")));
+    }
+
+    #[test]
+    fn determination_without_recorded_at_remains_visible() {
+        let known = instant("2033-01-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.determinations.push(CaseDetermination {
+            issue: "InvoiceIssued".into(),
+            protocol: "Invoice".into(),
+            established: false,
+            decider: "Tribunal".into(),
+            recorded_at: None,
+        });
+        let world = compute(&case, &RunContext::new(known, known));
+        assert!(world.denied(&parse_prop_issue("InvoiceIssued")));
+    }
+
+    #[test]
+    fn correction_performed_payload_does_not_seed_performed() {
+        let t = instant("2033-01-01T00:00:00Z");
+        let mut case = CaseRecord::default();
+        case.events.push(LedgerEvent {
+            kind: "correction".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let world = compute(&case, &RunContext::new(t, t));
+        assert!(
+            !world.holds_named("performed"),
+            "an ungated event label must not admit a performed payload"
+        );
+    }
 }
