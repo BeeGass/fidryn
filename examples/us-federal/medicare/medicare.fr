@@ -1,0 +1,64 @@
+module US.Federal.Health.MedicareEnrollment version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-medicare-enrollment"
+    source_manifest "sources/medicare.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        Part_C_plan_network
+        Part_D_formulary
+        IRMAA_factfinding
+        Medicaid_dual_eligible
+        complete_42_USC_1395
+        complete_CMS_manuals
+    }
+
+    source MedicareStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "42 U.S.C. § 1395p"
+        artifact "sources/42usc-1395p.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Beneficiary : NaturalPerson
+
+    proposition PartAEligible(person: NaturalPerson)
+    proposition InitialEnrollmentPeriodOpen(person: NaturalPerson, as_of: Time)
+    proposition LateEnrollmentPenaltyApplies(person: NaturalPerson)
+
+    calc iep_months() -> Int {
+        return 7
+    }
+
+    query automatic age_65_attained(as_of: Time, birth: Time) -> Bool {
+        return as_of >= birth + 65
+    }
+
+    query initial_enrollment_open()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed BirthRecord
+            return InitialEnrollmentPeriodOpen(Beneficiary, as_of)
+        }
+    }
+
+    query late_enrollment_penalty()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LateEnrollmentPenaltyApplies(Beneficiary)
+                using Determine
+        }
+    }
+
+    verify EnrollmentHonesty {
+        assert late_enrollment_penalty
+            is never treated automatic
+    }
+}

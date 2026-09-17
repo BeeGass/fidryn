@@ -1,0 +1,85 @@
+module US.Federal.Securities.AccreditedInvestor version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-17cfr-230-501"
+    source_manifest "sources/17cfr-230-501.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        entity_tests
+        license_holder_categories
+        knowledgeable_employee
+        primary_residence_carveout_calculation
+        reasonable_expectation_of_current_year_income
+        Rule_506b_purchaser_cap
+        complete_Regulation_D
+    }
+
+    source AccreditedInvestorRule {
+        kind regulation
+        authority SecuritiesAndExchangeCommission
+        citation "17 C.F.R. § 230.501"
+        artifact "sources/17cfr-230-501.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Investor : NaturalPerson
+    entity Issuer : LegalPerson
+
+    proposition IncomeDocumented(person: NaturalPerson)
+    proposition NetWorthDocumented(person: NaturalPerson)
+    proposition InvestorSophistication(person: NaturalPerson)
+
+    calc income_threshold() -> Money<USD> {
+        return USD(200000.00)
+    }
+
+    calc joint_income_threshold() -> Money<USD> {
+        return USD(300000.00)
+    }
+
+    calc net_worth_threshold() -> Money<USD> {
+        return USD(1000000.00)
+    }
+
+    query automatic individual_income_met(year1: Money<USD>, year2: Money<USD>) -> Bool {
+        return year1 > income_threshold() and year2 > income_threshold()
+    }
+
+    query automatic joint_income_met(year1: Money<USD>, year2: Money<USD>) -> Bool {
+        return year1 > joint_income_threshold() and year2 > joint_income_threshold()
+    }
+
+    query automatic net_worth_met(net_worth: Money<USD>) -> Bool {
+        return net_worth > net_worth_threshold()
+    }
+
+    query income_from_returns(year1: Money<USD>, year2: Money<USD>)
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed TaxReturn
+            require individual_income_met(year1, year2)
+            return true
+        }
+    }
+
+    query sophistication()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined InvestorSophistication(Investor)
+                using Determine
+        }
+    }
+
+    verify IncomeIsMechanical {
+        assert automatic individual_income_met
+            has empty effect row
+        assert sophistication
+            is never treated automatic
+    }
+}

@@ -1,0 +1,9 @@
+Final paycheck timing (fixture guide). Points at California Labor Code
+§§ 201-203 and the default next-payday rule used in many jurisdictions.
+Where no more specific state rule is selected, earned wages are due by
+the next regular payday after the employment ends. California Labor
+Code § 201 requires that wages earned and unpaid at discharge are due
+and payable immediately; waiting-time penalties under § 203 are not
+encoded here. Whether the California immediate-pay rule applies to a
+worker is not a Boolean. This is a research fixture. Not official code.
+Not legal advice.

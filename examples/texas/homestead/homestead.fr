@@ -1,0 +1,66 @@
+module Texas.Property.Homestead version "0.1.0" {
+    jurisdiction Texas
+    source_snapshot "2026-09-17-tex-homestead"
+    source_manifest "sources/tex-homestead.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        rural_acreage_100_or_200
+        home_equity_and_other_section_50_exceptions
+        proceeds_tracing
+        family_versus_single_adult
+        complete_Property_Code
+        local_ordinances
+    }
+
+    source HomesteadConstitution {
+        kind constitution
+        authority Texas
+        citation "Tex. Const. art. XVI § 50"
+        artifact "sources/tex-homestead.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source HomesteadPropertyCode {
+        kind statute
+        authority TexasLegislature
+        citation "Tex. Prop. Code § 41.002"
+        artifact "sources/tex-homestead.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Owner : NaturalPerson
+    entity Place : Asset
+
+    proposition HomesteadCharacter(place: Asset)
+    proposition UrbanHomestead(place: Asset)
+    proposition ProtectedFromForcedSale(place: Asset)
+
+    calc urban_acre_cap() -> Int {
+        return 10
+    }
+
+    query automatic urban_acreage_10_acres(acres: Int) -> Bool {
+        return acres <= urban_acre_cap()
+    }
+
+    query homestead_character()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined HomesteadCharacter(Place)
+                using Determine
+        }
+    }
+
+    verify HomesteadHonesty {
+        assert automatic urban_acreage_10_acres
+            has empty effect row
+        assert homestead_character
+            is never treated automatic
+    }
+}

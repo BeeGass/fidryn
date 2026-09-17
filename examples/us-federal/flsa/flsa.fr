@@ -1,0 +1,58 @@
+module US.Federal.Labor.FLSAOvertime version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-29usc-207"
+    source_manifest "sources/29usc-207.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        section_213_exemptions_except_as_declared
+        salary_basis_and_duties_tests
+        regular_rate_inclusions
+        highly_compensated
+        fluctuating_workweek
+        state_overtime
+        complete_29_USC_207
+    }
+
+    source FLSAOvertimeStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "29 U.S.C. § 207"
+        artifact "sources/29usc-207.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition HoursWorked(employee: NaturalPerson, hours: Int)
+    proposition OvertimeDue(employee: NaturalPerson)
+    proposition WhiteCollarExempt(employee: NaturalPerson)
+
+    calc weekly_limit() -> Int {
+        return 40
+    }
+
+    query automatic overtime_hours(hours: Int) -> Bool {
+        return hours > weekly_limit()
+    }
+
+    query white_collar_exemption()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WhiteCollarExempt(Employee)
+                using Determine
+        }
+    }
+
+    verify HoursAreMechanical {
+        assert automatic overtime_hours
+            has empty effect row
+        assert white_collar_exemption
+            is never treated automatic
+    }
+}

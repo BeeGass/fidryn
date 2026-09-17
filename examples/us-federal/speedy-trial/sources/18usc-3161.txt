@@ -1,0 +1,8 @@
+18 U.S.C. § 3161 (fixture excerpt).
+In a case in which a plea of not guilty is entered, trial of a defendant
+charged in an information or indictment shall commence within seventy days
+from the filing date of the information or indictment, or from the date the
+defendant has appeared before a judicial officer of the court in which the
+charge is pending, whichever date last occurs. Ends-of-justice continuances
+under § 3161(h)(7) are not encoded as a Boolean.
+Not an official edition.

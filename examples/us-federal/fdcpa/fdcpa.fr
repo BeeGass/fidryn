@@ -1,0 +1,56 @@
+module US.Federal.Consumer.FDCPAValidation version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-fdcpa-validation"
+    source_manifest "sources/15usc-1692g.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        validation_contents
+        overshadowing
+        cease_communication
+        bona_fide_error
+        complete_15_USC_1692
+        complete_CFPB_Regulation_F
+        state_debt_collection_laws
+    }
+
+    source FDCPAValidationStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "15 U.S.C. § 1692g"
+        artifact "sources/15usc-1692g.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Consumer : NaturalPerson
+    entity Collector : LegalPerson
+
+    proposition InitialCommunication(collector: LegalPerson)
+
+    calc validation_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic validation_clock(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + validation_window()
+    }
+
+    query initial_communication()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined InitialCommunication(Collector)
+                using Determine
+        }
+    }
+
+    verify ValidationClockHonesty {
+        assert automatic validation_clock
+            has empty effect row
+        assert initial_communication
+            is never treated automatic
+    }
+}

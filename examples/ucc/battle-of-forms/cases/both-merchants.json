@@ -1,0 +1,10 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Commercial.UCC.BattleOfForms@0.1.0",
+  "facts": {
+    "offeror_merchant": true,
+    "offeree_merchant": true,
+    "additional_term": true
+  },
+  "admissibleCompletions": {}
+}

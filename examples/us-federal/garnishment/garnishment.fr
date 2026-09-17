@@ -1,0 +1,56 @@
+module US.Federal.Garnishment.CCPA version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-ccpa-garnishment"
+    source_manifest "sources/15usc-1673.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        thirty_times_minimum_wage_alternative
+        state_more_protective_caps
+        tax_levy
+        student_loan_administrative_wage_garnishment
+        complete_15_USC_1671_to_1677
+        complete_29_CFR_870
+        bankruptcy_discharge
+    }
+
+    source CCPARestriction {
+        kind statute
+        authority UnitedStatesCongress
+        citation "15 U.S.C. § 1673"
+        artifact "sources/15usc-1673.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Garnishee : LegalPerson
+
+    proposition SupportOrderPriority(order: RecordItem)
+
+    calc percent_cap() -> Int {
+        return 25
+    }
+
+    query automatic within_twenty_five_percent(garnished: Money<USD>, cap: Money<USD>) -> Bool {
+        return garnished <= cap
+    }
+
+    query support_order_priority()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SupportOrderPriority(order)
+                using Determine
+        }
+    }
+
+    verify CapHonesty {
+        assert automatic within_twenty_five_percent
+            has empty effect row
+        assert support_order_priority
+            is never treated automatic
+    }
+}

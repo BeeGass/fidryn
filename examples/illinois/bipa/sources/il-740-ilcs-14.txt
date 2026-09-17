@@ -1,0 +1,9 @@
+740 ILCS 14, Biometric Information Privacy Act (fixture excerpt).
+No private entity may collect, capture, purchase, receive through trade,
+or otherwise obtain a person's biometric identifier or biometric
+information unless it first informs the subject in writing and receives
+a written release. A person aggrieved may pursue a private right of
+action. Liquidated damages of $1,000 for negligence or $5,000 for
+intentional or reckless violation are not a Boolean; willfulness is not
+encoded as automatic. This is a research fixture. Not official code.
+Not legal advice.

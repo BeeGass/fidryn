@@ -1,0 +1,5 @@
+HUD FHEO-2020-01 (fixture excerpt).
+A housing provider should consider a request for an assistance animal as
+a reasonable accommodation. Extra pet deposits are not required.
+Disability and the nexus to the requested animal are not Booleans.
+Not an official HUD publication.

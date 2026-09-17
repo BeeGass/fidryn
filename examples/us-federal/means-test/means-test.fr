@@ -1,0 +1,51 @@
+module US.Federal.Bankruptcy.MeansTest version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-means-test"
+    source_manifest "sources/11usc-707.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        IRS_National_and_Local_Standards
+        business_debt_exclusion
+        chapter_13_confirmation
+        complete_11_USC_707
+        complete_Official_Form_122A
+        Census_median_income_tables
+        state_exemptions
+    }
+
+    source MeansTestStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "11 U.S.C. § 707(b)"
+        artifact "sources/11usc-707.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Debtor : NaturalPerson
+
+    proposition SpecialCircumstances(debtor: NaturalPerson)
+
+    query automatic above_median(current_monthly: Money<USD>, median: Money<USD>) -> Bool {
+        return current_monthly > median
+    }
+
+    query special_circumstances()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SpecialCircumstances(Debtor)
+                using Determine
+        }
+    }
+
+    verify MedianHonesty {
+        assert automatic above_median
+            has empty effect row
+        assert special_circumstances
+            is never treated automatic
+    }
+}

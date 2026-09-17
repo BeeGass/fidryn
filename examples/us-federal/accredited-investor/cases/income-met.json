@@ -1,0 +1,10 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Securities.AccreditedInvestor@0.1.0",
+  "facts": {
+    "year1": "USD(250000.00)",
+    "year2": "USD(250000.00)",
+    "net_worth": "USD(1500000.00)"
+  },
+  "admissibleCompletions": {}
+}

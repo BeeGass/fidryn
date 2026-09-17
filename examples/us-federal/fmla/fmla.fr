@@ -1,0 +1,68 @@
+module US.Federal.Labor.FMLAEligibility version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-29usc-2611"
+    source_manifest "sources/29usc-2611.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        military_caregiver
+        qualifying_exigency
+        key_employee_restoration
+        twelve_month_method_election
+        worksite_75_mile_radius_factfinding
+        state_family_leave
+        complete_29_USC_2611
+    }
+
+    source FMLAStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "29 U.S.C. § 2611"
+        artifact "sources/29usc-2611.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition EligibleEmployee(person: NaturalPerson)
+    proposition CoveredEmployer(employer: LegalPerson)
+    proposition SeriousHealthCondition(person: NaturalPerson)
+
+    calc hours_required() -> Int {
+        return 1250
+    }
+
+    calc months_required() -> Int {
+        return 12
+    }
+
+    calc employer_size() -> Int {
+        return 50
+    }
+
+    query automatic eligibility_counts(hours: Int, months: Int, headcount: Int) -> Bool {
+        return hours >= hours_required()
+            and months >= months_required()
+            and headcount >= employer_size()
+    }
+
+    query serious_health_condition()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SeriousHealthCondition(Employee)
+                using Determine
+        }
+    }
+
+    verify CountsAreMechanical {
+        assert automatic eligibility_counts
+            has empty effect row
+        assert serious_health_condition
+            is never treated automatic
+    }
+}

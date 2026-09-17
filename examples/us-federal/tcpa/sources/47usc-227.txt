@@ -1,0 +1,4 @@
+47 U.S.C. § 227 (fixture excerpt).
+Statutory damages of $500 per violation are a floor, not a Boolean.
+Consent and whether equipment is an automatic telephone dialing system
+are not encoded as closed-form tests. Not an official FCC publication.

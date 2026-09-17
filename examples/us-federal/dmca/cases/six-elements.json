@@ -1,0 +1,8 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Copyright.DMCA512@0.1.0",
+  "facts": {
+    "count": 6
+  },
+  "admissibleCompletions": {}
+}

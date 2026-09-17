@@ -1,0 +1,7 @@
+8 Del. C. § 220 (fixture excerpt).
+Any stockholder, in person or by attorney or other agent, shall, upon
+written demand under oath stating the purpose thereof, have the right
+during the usual hours for business to inspect for any proper purpose
+the corporation's stock ledger, a list of its stockholders, and its
+other books and records. Proper purpose is not encoded as a Boolean.
+Not an official edition.

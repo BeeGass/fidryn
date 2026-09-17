@@ -1,0 +1,57 @@
+module US.Federal.Courts.Removal version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-28usc-1446"
+    source_manifest "sources/28usc-1446.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        remand_1447
+        later_served_defendant_rule_factfinding
+        fraudulent_joinder
+        snap_removal
+        one_year_diversity_limit_exceptions
+        complete_Title_28
+    }
+
+    source RemovalProcedure {
+        kind statute
+        authority UnitedStatesCongress
+        citation "28 U.S.C. § 1446(b)"
+        artifact "sources/28usc-1446.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity RemovingDefendant : LegalPerson
+    entity StateAction : Action
+
+    proposition NoticeOfRemovalFiled(action: Action, at: Time)
+    proposition ThirtyDayClockStarted(action: Action, at: Time)
+    proposition RemovalUntimely(action: Action)
+
+    calc removal_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic thirty_day_window(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + removal_window()
+    }
+
+    query last_served_defendant_restart()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LastServedDefendantRuleApplies
+                using Determine
+        }
+    }
+
+    verify ClockIsMechanical {
+        assert automatic thirty_day_window
+            has empty effect row
+        assert last_served_defendant_restart
+            is never treated automatic
+    }
+}

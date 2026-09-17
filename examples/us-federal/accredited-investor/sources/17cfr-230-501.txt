@@ -1,0 +1,9 @@
+17 C.F.R. § 230.501 (fixture excerpt).
+Accredited investor includes a natural person whose individual income
+exceeded $200,000 in each of the two most recent years, or joint income
+with that person's spouse or spousal equivalent exceeded $300,000, with
+a reasonable expectation of the same income level in the current year;
+and a natural person whose net worth exceeds $1,000,000, excluding the
+value of the primary residence. Sophistication and other categories are
+not encoded as Booleans.
+Not an official edition.

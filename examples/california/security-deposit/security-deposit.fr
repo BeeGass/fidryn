@@ -1,0 +1,62 @@
+module California.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-civ-1950.5"
+    source_manifest "sources/ca-civ-1950.5.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        just_cause_eviction
+        rent_control
+        habitability_damages
+        complete_Civil_Code
+        local_ordinances
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Civ. Code § 1950.5"
+        artifact "sources/ca-civ-1950.5.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition DepositReturned(unit: Dwelling, at: Time)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition BadFaithRetention(landlord: NaturalPerson)
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 21 counted_days
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query itemization_required() -> Bool {
+        goal Evaluate { true }
+    }
+
+    query statutory_damages()
+        -> Money<USD>
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    verify DepositHonesty {
+        assert automatic deadline_running
+            has empty effect row
+        assert statutory_damages
+            is never treated automatic
+    }
+}

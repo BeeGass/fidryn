@@ -1,0 +1,56 @@
+module US.Federal.Military.USERRA version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-userra"
+    source_manifest "sources/38usc-4312.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        five_year_cumulative_limit
+        just_cause_discharge
+        pension_credit
+        health_plan_continuation
+        complete_38_USC_4301_to_4335
+        complete_20_CFR_1002
+        state_military_leave_laws
+    }
+
+    source USERRAReemployment {
+        kind statute
+        authority UnitedStatesCongress
+        citation "38 U.S.C. § 4312"
+        artifact "sources/38usc-4312.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Servicemember : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition EscalatorPosition(person: NaturalPerson)
+
+    calc reemployment_outer_window() -> Duration<counted_days> {
+        return 90 counted_days
+    }
+
+    query automatic within_outer_window(end_of_service: Time, as_of: Time) -> Bool {
+        return as_of <= end_of_service + reemployment_outer_window()
+    }
+
+    query escalator_position()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EscalatorPosition(Servicemember)
+                using Determine
+        }
+    }
+
+    verify ReemploymentHonesty {
+        assert automatic within_outer_window
+            has empty effect row
+        assert escalator_position
+            is never treated automatic
+    }
+}

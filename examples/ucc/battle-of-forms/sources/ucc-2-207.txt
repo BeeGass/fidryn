@@ -1,0 +1,9 @@
+U.C.C. § 2-207 (fixture excerpt).
+A definite and seasonable expression of acceptance or a written
+confirmation operates as an acceptance even though it states terms
+additional to or different from those offered or agreed upon. Between
+merchants, additional terms become part of the contract unless the offer
+expressly limits acceptance to the terms of the offer, they materially
+alter it, or notification of objection has been given or is given within
+a reasonable time. Material alteration is not encoded as a Boolean.
+Not an official edition.

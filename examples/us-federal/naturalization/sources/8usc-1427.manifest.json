@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-naturalization-residency",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "8usc-1427.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

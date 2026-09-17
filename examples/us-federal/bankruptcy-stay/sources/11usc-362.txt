@@ -1,0 +1,4 @@
+11 U.S.C. § 362 (fixture excerpt).
+A petition filed under section 301, 302, or 303 operates as a stay.
+Cause for relief from the stay under § 362(d) is not a Boolean.
+Not an official bankruptcy court or OLRC publication.

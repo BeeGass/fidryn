@@ -1,0 +1,56 @@
+module US.Federal.Consumer.FCRADispute version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-fcra-dispute"
+    source_manifest "sources/15usc-1681i.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        fifteen_day_extension
+        furnishers_1681s2
+        consumer_report_adverse_action
+        security_freeze
+        complete_15_USC_1681
+        complete_CFPB_Regulation_V
+        state_credit_reporting_laws
+    }
+
+    source FCRAReinvestigation {
+        kind statute
+        authority UnitedStatesCongress
+        citation "15 U.S.C. § 1681i"
+        artifact "sources/15usc-1681i.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Consumer : NaturalPerson
+    entity CRA : LegalPerson
+
+    proposition ReasonableInvestigation(cra: LegalPerson)
+
+    calc reinvestigation_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic reinvestigation_clock(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + reinvestigation_window()
+    }
+
+    query reasonable_investigation()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ReasonableInvestigation(CRA)
+                using Determine
+        }
+    }
+
+    verify DisputeClockHonesty {
+        assert automatic reinvestigation_clock
+            has empty effect row
+        assert reasonable_investigation
+            is never treated automatic
+    }
+}

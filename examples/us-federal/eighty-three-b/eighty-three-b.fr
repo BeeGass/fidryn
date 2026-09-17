@@ -1,0 +1,57 @@
+module US.Federal.Tax.Section83b version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-irc-83b"
+    source_manifest "sources/irc-83b.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        valuation_409A
+        late_election_relief
+        payroll_withholding
+        capital_versus_ordinary
+        state_tax_conformity
+        complete_IRC_83
+    }
+
+    source Section83b {
+        kind statute
+        authority UnitedStatesCongress
+        citation "26 U.S.C. § 83(b)"
+        artifact "sources/irc-83b.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Founder : NaturalPerson
+    entity Company : LegalPerson
+
+    proposition RestrictedStockTransferred(person: NaturalPerson, at: Time)
+    proposition EightyThreeBFiled(person: NaturalPerson, at: Time)
+    proposition SubstantialRiskOfForfeiture(person: NaturalPerson)
+
+    calc election_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic election_window_open(transfer: Time, as_of: Time) -> Bool {
+        return as_of <= transfer + election_deadline()
+    }
+
+    query substantial_risk_of_forfeiture()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SubstantialRiskOfForfeiture(Founder)
+                using Determine
+        }
+    }
+
+    verify ElectionHonesty {
+        assert automatic election_window_open
+            has empty effect row
+        assert substantial_risk_of_forfeiture
+            is never treated automatic
+    }
+}

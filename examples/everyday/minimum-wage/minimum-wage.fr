@@ -1,0 +1,78 @@
+module US.Everyday.MinimumWageStack version "0.1.0" {
+    jurisdiction UnitedStates
+    source_snapshot "2026-09-17-flsa-206"
+    source_manifest "sources/29usc-206.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        overtime_207
+        tipped_credit
+        youth_opportunity_wage
+        complete_29_USC_206
+        every_city_ordinance_text
+        complete_state_wage_orders
+    }
+
+    source FLSAMinimumWage {
+        kind statute
+        authority UnitedStatesCongress
+        citation "29 U.S.C. § 206"
+        artifact "sources/29usc-206.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition CoveredEmployee(employee: NaturalPerson)
+    proposition HigherLocalOrdinanceApplies(employee: NaturalPerson)
+    proposition FederalMinimumApplies(employee: NaturalPerson)
+    proposition HigherMinimumApplies(employee: NaturalPerson)
+
+    calc federal_hourly_floor() -> Money<USD> {
+        return USD(7.25)
+    }
+
+    query automatic federal_floor() -> Money<USD> {
+        return federal_hourly_floor()
+    }
+
+    clause FederalWageFloor
+        from FLSAMinimumWage.section("206")
+    {
+        then establish FederalMinimumApplies(Employee)
+    }
+
+    clause HigherStateWage
+        from FLSAMinimumWage.section("218")
+    {
+        then establish HigherMinimumApplies(Employee)
+    }
+
+    conflict_doctrine HigherWageControls
+        from FLSAMinimumWage.section("218")
+    {
+        when HigherStateWage exceeds FederalWageFloor
+        then defeat FederalWageFloor as_to Employee
+        reason StateWageControls
+    }
+
+    query which_local_ordinance_applies()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined HigherLocalOrdinanceApplies(Employee)
+                using Determine
+        }
+    }
+
+    verify WageStackHonesty {
+        assert automatic federal_floor
+            has empty effect row
+        assert which_local_ordinance_applies
+            is never treated automatic
+    }
+}

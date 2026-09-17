@@ -1,0 +1,6 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "California.Employment.Noncompete@0.1.0",
+  "facts": {},
+  "admissibleCompletions": {}
+}

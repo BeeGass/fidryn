@@ -1,0 +1,7 @@
+29 U.S.C. § 2611 (fixture excerpt).
+An eligible employee has been employed for at least 12 months by the
+employer from whom leave is requested and for at least 1,250 hours of
+service during the previous 12-month period. A covered employer employs
+50 or more employees. Whether a condition is a serious health condition
+is not encoded as a Boolean.
+Not an official edition.

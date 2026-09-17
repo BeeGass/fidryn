@@ -1,0 +1,10 @@
+New York Public Officers Law § 87 (fixture excerpt), with the five
+business-day acknowledgment clock in § 89(3).
+Each agency shall, in accordance with its published rules, make available
+for public inspection and copying all records except those records or
+portions thereof that may be withheld under § 87(2), including records
+that if disclosed would interfere with law-enforcement investigations.
+Within five business days of receipt of a written request, the agency
+shall grant or deny access or acknowledge the request and state an
+approximate date. The law-enforcement exemption is not a Boolean. This
+is a research fixture. Not official code. Not legal advice.

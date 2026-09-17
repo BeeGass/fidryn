@@ -1,0 +1,59 @@
+module US.Federal.Immigration.NaturalizationResidency version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-naturalization-residency"
+    source_manifest "sources/8usc-1427.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        physical_presence_half_period
+        continuous_residence_breaks
+        English_and_civics
+        military_naturalization
+        complete_8_USC_1427
+        complete_8_CFR_316
+        INA_other_naturalization_paths
+    }
+
+    source NaturalizationResidency {
+        kind statute
+        authority UnitedStatesCongress
+        citation "8 U.S.C. § 1427"
+        artifact "sources/8usc-1427.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Applicant : NaturalPerson
+
+    proposition GoodMoralCharacter(person: NaturalPerson)
+
+    calc standard_residency_years() -> Int {
+        return 5
+    }
+
+    calc spouse_residency_years() -> Int {
+        return 3
+    }
+
+    query automatic residency_met(start: Time, as_of: Time, years: Int) -> Bool {
+        return as_of >= start + years
+    }
+
+    query good_moral_character()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined GoodMoralCharacter(Applicant)
+                using Determine
+        }
+    }
+
+    verify ResidencyHonesty {
+        assert automatic residency_met
+            has empty effect row
+        assert good_moral_character
+            is never treated automatic
+    }
+}

@@ -1,0 +1,69 @@
+module US.Federal.Consumer.TCPA version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-tcpa"
+    source_manifest "sources/47usc-227.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        do_not_call_registry
+        residential_versus_wireless
+        fax_rules
+        state_robocall_laws
+        complete_47_USC_227
+        complete_47_CFR_64
+        FCC_declaratory_rulings
+    }
+
+    source TCPAStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "47 U.S.C. § 227"
+        artifact "sources/47usc-227.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity CalledParty : NaturalPerson
+    entity Caller : LegalPerson
+
+    proposition ConsentListIncludes(party: NaturalPerson)
+    proposition AutodialerUsed(caller: LegalPerson)
+
+    calc statutory_damages_floor() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    query automatic at_least_statutory_floor(amount: Money<USD>) -> Bool {
+        return amount >= statutory_damages_floor()
+    }
+
+    query consent_list()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ConsentList
+            return ConsentListIncludes(CalledParty)
+        }
+    }
+
+    query autodialer()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined AutodialerUsed(Caller)
+                using Determine
+        }
+    }
+
+    verify TCPAHonesty {
+        assert automatic at_least_statutory_floor
+            has empty effect row
+        assert consent_list
+            is never treated automatic
+        assert autodialer
+            is never treated automatic
+    }
+}

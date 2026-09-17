@@ -1,0 +1,8 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Texas.Property.Homestead@0.1.0",
+  "facts": {
+    "acres": 8
+  },
+  "admissibleCompletions": {}
+}

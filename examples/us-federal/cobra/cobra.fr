@@ -1,0 +1,55 @@
+module US.Federal.Health.COBRAElection version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-cobra-election"
+    source_manifest "sources/29usc-1165.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        premium_amount
+        second_qualifying_event_extension
+        disability_extension
+        employer_size_threshold
+        state_mini_COBRA
+        complete_29_USC_1161_to_1169
+        complete_IRS_COBRA_regulations
+    }
+
+    source COBRAElectionStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "29 U.S.C. § 1165"
+        artifact "sources/29usc-1165.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity QualifiedBeneficiary : NaturalPerson
+
+    proposition QualifyingEventOccurred(person: NaturalPerson)
+
+    calc election_window() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    query automatic election_open(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + election_window()
+    }
+
+    query qualifying_event()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined QualifyingEventOccurred(QualifiedBeneficiary)
+                using Determine
+        }
+    }
+
+    verify ElectionClockHonesty {
+        assert automatic election_open
+            has empty effect row
+        assert qualifying_event
+            is never treated automatic
+    }
+}

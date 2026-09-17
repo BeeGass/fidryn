@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-title-vii-2000e5",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "42usc-2000e-5.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+module US.Federal.Bankruptcy.AutomaticStay version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-automatic-stay"
+    source_manifest "sources/11usc-362.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        stay_exceptions_362b
+        serial_filing_limitations
+        codebtor_stay
+        discharge_injunction
+        complete_11_USC_362
+        complete_Bankruptcy_Rules
+        state_collection_law
+    }
+
+    source AutomaticStayStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "11 U.S.C. § 362"
+        artifact "sources/11usc-362.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Debtor : NaturalPerson
+    entity Creditor : LegalPerson
+
+    proposition StayReliefCause(creditor: LegalPerson)
+
+    query automatic stay_in_force(filed_at: Time, as_of: Time) -> Bool {
+        return as_of >= filed_at
+    }
+
+    query stay_relief_cause()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined StayReliefCause(Creditor)
+                using Determine
+        }
+    }
+
+    verify StayHonesty {
+        assert automatic stay_in_force
+            has empty effect row
+        assert stay_relief_cause
+            is never treated automatic
+    }
+}

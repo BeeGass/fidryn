@@ -1,0 +1,93 @@
+module US.Federal.Code.Catalog version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-usc-title-catalog"
+    source_manifest "sources/usc-catalog.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        complete_United_States_Code
+        uncodified_statutes
+        complete_CFR
+        complete_federal_case_law
+        internal_agency_guidance
+        appropriations_riders
+        title_1_general_provisions_except_catalog
+        title_2_the_congress
+        title_3_the_president
+        title_4_flag_and_seal
+        title_6_domestic_security
+        title_7_agriculture
+        title_8_aliens_and_nationality_except_encoded_slices
+        title_10_armed_forces
+        title_11_bankruptcy_except_encoded_slices
+        title_12_banks
+        title_13_census
+        title_14_coast_guard
+        title_15_commerce_except_encoded_slices
+        title_16_conservation
+        title_19_customs
+        title_20_education
+        title_21_food_and_drugs
+        title_22_foreign_relations
+        title_23_highways
+        title_24_hospitals
+        title_25_indians
+        title_27_intoxicating_liquors
+        title_30_mineral_lands
+        title_31_money_and_finance
+        title_32_national_guard
+        title_33_navigation
+        title_34_crime_control
+        title_35_patents
+        title_36_patriotic_societies
+        title_37_pay_and_allowances
+        title_38_veterans_benefits
+        title_39_postal_service
+        title_40_public_buildings
+        title_41_public_contracts
+        title_43_public_lands
+        title_44_public_printing
+        title_45_railroads
+        title_46_shipping
+        title_47_telecommunications
+        title_48_territories
+        title_49_transportation
+        title_50_war_and_national_defense
+        title_51_national_and_commercial_space
+        title_52_voting_and_elections
+        title_54_national_park_service
+    }
+
+    source OLRC {
+        kind statute
+        authority UnitedStatesCongress
+        citation "United States Code, Office of the Law Revision Counsel"
+        artifact "sources/olrc-about.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    proposition EncodedSlice(name: String)
+    proposition TitleRemainsOutside(title: String)
+
+    rule CatalogHonesty : constitutive
+        from OLRC
+    {
+        when operative EncodedSlice(name)
+        then derive TitleRemainsOutside("not_the_whole_code")
+    }
+
+    query encoding_is_bounded() -> Bool {
+        goal Evaluate { true }
+    }
+
+    query complete_code_is_outside_scope() -> Bool {
+        goal Evaluate { true }
+    }
+
+    verify CatalogDoesNotClaimCompleteness {
+        assert encoding_is_bounded
+        assert complete_United_States_Code is outside_scope
+    }
+}

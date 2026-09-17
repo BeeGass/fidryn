@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-scra-interest",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "50usc-3937.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

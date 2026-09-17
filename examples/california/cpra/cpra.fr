@@ -1,0 +1,57 @@
+module California.Privacy.CPRARequest version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-civ-1798.130"
+    source_manifest "sources/ca-civ-1798.130.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        forty_five_day_extension
+        deletion_exceptions
+        service_provider_contracts
+        CCPA_pre_CPRA
+        complete_Civ_1798
+        local_ordinances
+    }
+
+    source CPRAStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Civ. Code § 1798.130"
+        artifact "sources/ca-civ-1798.130.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Consumer : NaturalPerson
+    entity Business : LegalPerson
+
+    proposition VerifiableConsumerRequest(consumer: NaturalPerson)
+    proposition IdentityVerified(consumer: NaturalPerson)
+    proposition ResponseDelivered(business: LegalPerson, at: Time)
+
+    calc response_deadline() -> Duration<calendar_days> {
+        return 45 calendar_days
+    }
+
+    query automatic response_clock_running(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + response_deadline()
+    }
+
+    query identity_verification()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined IdentityVerified(Consumer)
+                using Determine
+        }
+    }
+
+    verify CPRAHonesty {
+        assert automatic response_clock_running
+            has empty effect row
+        assert identity_verification
+            is never treated automatic
+    }
+}

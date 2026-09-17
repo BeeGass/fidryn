@@ -1,0 +1,58 @@
+module NewYork.Transparency.FOIL version "0.1.0" {
+    jurisdiction NewYork
+    source_snapshot "2026-09-17-ny-pub-off-87"
+    source_manifest "sources/ny-pub-off-87.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        intra_agency_exemption
+        trade_secret
+        commercial_enterprise
+        public_holiday_calendar
+        complete_Pub_Off_Law
+        committee_on_open_government_opinions
+    }
+
+    source FOILStatute {
+        kind statute
+        authority NewYorkLegislature
+        citation "N.Y. Pub. Off. Law § 87"
+        artifact "sources/ny-pub-off-87.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Requester : NaturalPerson
+    entity Agency : LegalPerson
+    entity Record : Asset
+
+    proposition WrittenRequestReceived(agency: LegalPerson, at: Time)
+    proposition AcknowledgmentIssued(agency: LegalPerson, at: Time)
+    proposition LawEnforcementExemption(record: Asset)
+
+    calc acknowledge_window() -> Duration<working_days> {
+        return 5 working_days
+    }
+
+    query automatic acknowledge_window_running(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + acknowledge_window()
+    }
+
+    query law_enforcement_exemption()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LawEnforcementExemption(Record)
+                using Determine
+        }
+    }
+
+    verify FOILHonesty {
+        assert automatic acknowledge_window_running
+            has empty effect row
+        assert law_enforcement_exemption
+            is never treated automatic
+    }
+}

@@ -1,0 +1,54 @@
+module US.Federal.Military.SCRAInterest version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-scra-interest"
+    source_manifest "sources/50usc-3937.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        foreclosure_protections
+        eviction_protections
+        default_judgment_protections
+        complete_50_USC_3901_to_4043
+        complete_DOJ_SCRA_guidance
+        state_military_relief_statutes
+    }
+
+    source SCRAInterestStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "50 U.S.C. § 3937"
+        artifact "sources/50usc-3937.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Servicemember : NaturalPerson
+
+    proposition MilitaryServicePeriod(person: NaturalPerson)
+
+    calc interest_cap_percent() -> Int {
+        return 6
+    }
+
+    query automatic within_six_percent(rate: Int) -> Bool {
+        return rate <= interest_cap_percent()
+    }
+
+    query military_service_period()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ServiceRecord
+            return MilitaryServicePeriod(Servicemember)
+        }
+    }
+
+    verify RateCapHonesty {
+        assert automatic within_six_percent
+            has empty effect row
+        assert military_service_period
+            is never treated automatic
+    }
+}

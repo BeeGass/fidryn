@@ -1,0 +1,53 @@
+module US.Everyday.FinalPaycheckGuide version "0.1.0" {
+    jurisdiction UnitedStates
+    source_snapshot "2026-09-17-final-paycheck-guide"
+    source_manifest "sources/final-paycheck-guide.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        commissioned_pay
+        vacation_payout
+        complete_all_fifty_states
+        seventy_two_hour_quit_notice
+        complete_Labor_Code
+    }
+
+    import California.Employment.FinalPay version "0.1.0"
+
+    source FinalPayGuide {
+        kind statute
+        authority UnitedStatesCongress
+        citation "Cal. Lab. Code §§ 201-203; default next payday"
+        artifact "sources/final-paycheck-guide.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition NextPaydayDue(employee: NaturalPerson, at: Time)
+    proposition CaliforniaDischargeRuleApplies(employee: NaturalPerson)
+
+    query automatic default_next_payday(end: Time, payday: Time, as_of: Time) -> Bool {
+        return as_of >= end and as_of <= payday
+    }
+
+    query california_immediate()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined CaliforniaDischargeRuleApplies(Employee)
+                using Determine
+        }
+    }
+
+    verify FinalPaycheckHonesty {
+        assert automatic default_next_payday
+            has empty effect row
+        assert california_immediate
+            is never treated automatic
+    }
+}

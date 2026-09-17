@@ -1,0 +1,63 @@
+module US.Federal.Labor.TitleVIIChargeDeadline version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-title-vii-2000e5"
+    source_manifest "sources/title-vii.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        merits_of_discrimination
+        McDonnell_Douglas_burden_shifting
+        continuing_violation
+        Lilly_Ledbetter
+        hostile_environment_factfinding
+        complete_Title_VII
+        state_FEPA_worksharing_map_except_180_or_300
+    }
+
+    source TitleVII {
+        kind statute
+        authority UnitedStatesCongress
+        citation "42 U.S.C. § 2000e-5"
+        artifact "sources/42usc-2000e-5.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Worker : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition DiscreteAct(at: Time)
+    proposition ChargeFiled(at: Time)
+    proposition EquitableTolling(claim: Claim)
+
+    calc days_180() -> Duration<counted_days> {
+        return 180 counted_days
+    }
+
+    calc days_300() -> Duration<counted_days> {
+        return 300 counted_days
+    }
+
+    query automatic charge_clock(start: Time, as_of: Time, worksharing: Bool) -> Bool {
+        return as_of <= start + days_180()
+            or (worksharing and as_of <= start + days_300())
+    }
+
+    query equitable_tolling()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EquitableTolling(claim)
+                using Determine
+        }
+    }
+
+    verify DeadlineHonesty {
+        assert automatic charge_clock
+            has empty effect row
+        assert equitable_tolling
+            is never treated automatic
+    }
+}

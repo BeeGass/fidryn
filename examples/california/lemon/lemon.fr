@@ -1,0 +1,62 @@
+module California.Consumer.LemonLaw version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-civ-1793.22"
+    source_manifest "sources/ca-civ-1793.22.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        used_vehicle_nuance
+        lease_vs_sale
+        death_or_sbi_two_attempt_presumption
+        federal_Magnuson_Moss
+        complete_Song_Beverly
+        nonconformity_after_warranty
+    }
+
+    source LemonStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Civ. Code § 1793.22"
+        artifact "sources/ca-civ-1793.22.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Buyer : NaturalPerson
+    entity Manufacturer : LegalPerson
+    entity Vehicle : Asset
+
+    proposition Nonconformity(vehicle: Asset)
+    proposition SubstantialImpairment(vehicle: Asset)
+    proposition ReasonableRepairAttempts(vehicle: Asset)
+
+    calc presumed_attempt_count() -> Int {
+        return 4
+    }
+
+    calc presumed_days_out() -> Int {
+        return 30
+    }
+
+    query automatic reasonable_repair_attempts(attempts: Int, days_out: Int) -> Bool {
+        return attempts >= presumed_attempt_count() or days_out >= presumed_days_out()
+    }
+
+    query substantial_impairment()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SubstantialImpairment(Vehicle)
+                using Determine
+        }
+    }
+
+    verify LemonHonesty {
+        assert automatic reasonable_repair_attempts
+            has empty effect row
+        assert substantial_impairment
+            is never treated automatic
+    }
+}

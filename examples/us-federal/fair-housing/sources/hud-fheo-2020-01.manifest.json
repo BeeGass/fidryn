@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-fheo-assistance-animal",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "hud-fheo-2020-01.txt",
+      "digest": "fixture",
+      "kind": "guidance",
+      "effective": "2026-09-17",
+      "weight": "explanatory"
+    }
+  ]
+}

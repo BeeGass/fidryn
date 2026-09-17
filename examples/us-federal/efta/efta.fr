@@ -1,0 +1,56 @@
+module US.Federal.Consumer.EFTAUnauthorized version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-efta-unauthorized"
+    source_manifest "sources/15usc-1693f.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        liability_tiers_1693g
+        provisional_credit
+        error_resolution_investigation_period
+        Regulation_E_commentary
+        complete_15_USC_1693
+        complete_12_CFR_1005
+        state_electronic_fund_laws
+    }
+
+    source EFTAErrorResolution {
+        kind statute
+        authority UnitedStatesCongress
+        citation "15 U.S.C. § 1693f"
+        artifact "sources/15usc-1693f.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Consumer : NaturalPerson
+    entity Institution : LegalPerson
+
+    proposition UnauthorizedVersusAuthorized(transfer: RecordItem)
+
+    calc error_notice_window() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    query automatic error_clock(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + error_notice_window()
+    }
+
+    query unauthorized_vs_authorized()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined UnauthorizedVersusAuthorized(transfer)
+                using Determine
+        }
+    }
+
+    verify ErrorClockHonesty {
+        assert automatic error_clock
+            has empty effect row
+        assert unauthorized_vs_authorized
+            is never treated automatic
+    }
+}

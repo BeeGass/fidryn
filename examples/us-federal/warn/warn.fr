@@ -1,0 +1,66 @@
+module US.Federal.Labor.WARN version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-29usc-2102"
+    source_manifest "sources/29usc-2102.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        faltering_company
+        natural_disaster
+        mass_layoff_numbers_tests
+        employment_loss_aggregation
+        union_notice_particulars
+        state_mini_WARN
+        complete_29_USC_2102
+    }
+
+    source WARNStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "29 U.S.C. § 2102"
+        artifact "sources/29usc-2102.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employer : LegalPerson
+    entity AffectedEmployee : NaturalPerson
+
+    proposition PlantClosing(employer: LegalPerson, at: Time)
+    proposition NoticeGiven(employer: LegalPerson, at: Time)
+    proposition UnforeseenBusinessCircumstances(employer: LegalPerson)
+
+    calc notice_period() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc covered_headcount() -> Int {
+        return 100
+    }
+
+    query automatic notice_timely(notice: Time, layoff: Time) -> Bool {
+        return layoff >= notice + notice_period()
+    }
+
+    query automatic employer_covered(headcount: Int) -> Bool {
+        return headcount >= covered_headcount()
+    }
+
+    query unforeseen_business_circumstances()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined UnforeseenBusinessCircumstances(Employer)
+                using Determine
+        }
+    }
+
+    verify NoticeIsMechanical {
+        assert automatic notice_timely
+            has empty effect row
+        assert unforeseen_business_circumstances
+            is never treated automatic
+    }
+}

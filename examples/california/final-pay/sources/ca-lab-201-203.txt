@@ -1,0 +1,7 @@
+California Labor Code §§ 201-203 (fixture excerpt).
+If an employer discharges an employee, wages earned and unpaid at the
+time of discharge are due and payable immediately. A quit is not encoded
+here as the next regular payday; section 202 uses a 72-hour rule that
+this slice leaves outside_scope. Section 203 waiting-time penalties turn
+on willful failure and are not a Boolean. This is a research fixture.
+Not official code. Not legal advice.

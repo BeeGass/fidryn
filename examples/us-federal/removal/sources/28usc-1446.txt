@@ -1,0 +1,6 @@
+28 U.S.C. § 1446(b) (fixture excerpt).
+The notice of removal shall be filed within 30 days after the receipt by
+the defendant, through service or otherwise, of a copy of the initial
+pleading. Diversity removals are also subject to a one-year outer limit
+in § 1446(c). Later-served defendant doctrine is not encoded as a Boolean.
+Not an official edition.

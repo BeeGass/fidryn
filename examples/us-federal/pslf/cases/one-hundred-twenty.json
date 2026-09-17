@@ -1,0 +1,8 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Education.PSLF@0.1.0",
+  "facts": {
+    "payments": 120
+  },
+  "admissibleCompletions": {}
+}

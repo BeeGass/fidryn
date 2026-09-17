@@ -1,0 +1,53 @@
+module Delaware.DGCL.BooksAndRecords version "0.1.0" {
+    jurisdiction Delaware
+    source_snapshot "2026-09-17-8delc-220"
+    source_manifest "sources/8delc-220.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        beneficial_owner_form_and_manner
+        books_and_records_scope
+        confidentiality_limitations
+        director_inspection_220d
+        proper_purpose_case_law
+        complete_DGCL
+    }
+
+    source BooksAndRecordsStatute {
+        kind statute
+        authority DelawareGeneralAssembly
+        citation "8 Del. C. § 220"
+        artifact "sources/8delc-220.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Stockholder : NaturalPerson
+    entity Corporation : LegalPerson
+
+    proposition StockholderOfRecord(person: NaturalPerson, corporation: LegalPerson)
+    proposition WrittenDemand(person: NaturalPerson)
+    proposition ProperPurpose(person: NaturalPerson)
+
+    query automatic stockholder_of_record(on_stock_ledger: Bool) -> Bool {
+        return on_stock_ledger
+    }
+
+    query proper_purpose()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ProperPurpose(Stockholder)
+                using Determine
+        }
+    }
+
+    verify RecordHolderIsMechanical {
+        assert automatic stockholder_of_record
+            has empty effect row
+        assert proper_purpose
+            is never treated automatic
+    }
+}

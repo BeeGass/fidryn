@@ -1,0 +1,55 @@
+module US.Federal.Benefits.SocialSecurityFRA version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-ssa-fra"
+    source_manifest "sources/42usc-416.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        early_retirement_reduction_schedule
+        earnings_test
+        windfall_elimination
+        government_pension_offset
+        survivor_and_spousal_benefits
+        complete_42_USC_416
+        complete_SSA_POMS
+    }
+
+    source RetirementAgeStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "42 U.S.C. § 416(l)"
+        artifact "sources/42usc-416.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Claimant : NaturalPerson
+
+    proposition DelayedRetirementCreditsApply(person: NaturalPerson)
+
+    calc fra_years_for_1960_or_later() -> Int {
+        return 67
+    }
+
+    query automatic fra_is_sixty_seven(birth_year: Int) -> Bool {
+        return birth_year >= 1960
+    }
+
+    query delayed_credits()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined DelayedRetirementCreditsApply(Claimant)
+                using Determine
+        }
+    }
+
+    verify FRAHonesty {
+        assert automatic fra_is_sixty_seven
+            has empty effect row
+        assert delayed_credits
+            is never treated automatic
+    }
+}

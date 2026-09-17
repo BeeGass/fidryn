@@ -1,0 +1,55 @@
+module US.Federal.Benefits.SSIResources version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-ssi-resources"
+    source_manifest "sources/42usc-1382.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        couple_resource_limit
+        in_kind_support_and_maintenance_valuation
+        deemed_resources
+        excluded_resources_catalog
+        SSI_income_counting
+        complete_42_USC_1382
+        complete_SSA_POMS_SI
+    }
+
+    source SSIResourceStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "42 U.S.C. § 1382"
+        artifact "sources/42usc-1382.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Applicant : NaturalPerson
+
+    proposition HouseholdOfAnother(person: NaturalPerson)
+
+    calc individual_resource_limit() -> Money<USD> {
+        return USD(2000.00)
+    }
+
+    query automatic resources_within_cap(resources: Money<USD>) -> Bool {
+        return resources <= individual_resource_limit()
+    }
+
+    query household_of_another()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined HouseholdOfAnother(Applicant)
+                using Determine
+        }
+    }
+
+    verify ResourceCapHonesty {
+        assert automatic resources_within_cap
+            has empty effect row
+        assert household_of_another
+            is never treated automatic
+    }
+}

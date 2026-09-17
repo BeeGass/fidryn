@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-8delc-220",
+  "jurisdiction": "Delaware",
+  "artifacts": [
+    {
+      "path": "8delc-220.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

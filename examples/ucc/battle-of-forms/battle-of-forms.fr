@@ -1,0 +1,53 @@
+module US.Commercial.UCC.BattleOfForms version "0.1.0" {
+    jurisdiction UnitedStates
+    source_snapshot "2026-09-17-ucc-2-207"
+    source_manifest "sources/ucc-2-207.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        knockout_rule
+        different_terms_versus_additional
+        conduct_2_207_3
+        rolling_contracts
+        CISG
+        complete_UCC_Article_2
+    }
+
+    source BattleOfFormsCode {
+        kind statute
+        authority UniformLawCommission
+        citation "U.C.C. § 2-207"
+        artifact "sources/ucc-2-207.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Offeror : LegalPerson
+    entity Offeree : LegalPerson
+
+    proposition DefiniteAcceptance(offeree: LegalPerson)
+    proposition AdditionalTerm(term: String)
+    proposition MaterialAlteration(term: String)
+
+    query automatic additional_term_between_merchants(offeror_merchant: Bool, offeree_merchant: Bool, additional_term: Bool) -> Bool {
+        return additional_term and offeror_merchant and offeree_merchant
+    }
+
+    query material_alteration()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined MaterialAlteration(term)
+                using Determine
+        }
+    }
+
+    verify MerchantPairIsMechanical {
+        assert automatic additional_term_between_merchants
+            has empty effect row
+        assert material_alteration
+            is never treated automatic
+    }
+}

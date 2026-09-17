@@ -1,0 +1,53 @@
+module Illinois.Privacy.BIPA version "0.1.0" {
+    jurisdiction Illinois
+    source_snapshot "2026-09-17-il-bipa"
+    source_manifest "sources/il-740-ilcs-14.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        retention_schedules
+        vendor_disclosure
+        class_action_procedure
+        complete_740_ILCS_14
+        insurance_biometric
+        local_ordinances
+    }
+
+    source BIPAStatute {
+        kind statute
+        authority IllinoisGeneralAssembly
+        citation "740 ILCS 14"
+        artifact "sources/il-740-ilcs-14.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Individual : NaturalPerson
+    entity PrivateEntity : LegalPerson
+
+    proposition WrittenRelease(individual: NaturalPerson)
+    proposition BiometricCollected(entity: LegalPerson)
+    proposition WillfulOrReckless(entity: LegalPerson)
+
+    query automatic consent_before_biometric() -> Bool {
+        return true
+    }
+
+    query private_right_of_action_damages()
+        -> Money<USD>
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulOrReckless(PrivateEntity)
+                using Determine
+        }
+    }
+
+    verify BIPAHonesty {
+        assert automatic consent_before_biometric
+            has empty effect row
+        assert private_right_of_action_damages
+            is never treated automatic
+    }
+}

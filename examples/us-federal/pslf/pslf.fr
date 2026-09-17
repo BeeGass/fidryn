@@ -1,0 +1,56 @@
+module US.Federal.Education.PSLF version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-pslf"
+    source_manifest "sources/20usc-1087e.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        TEPSLF
+        IDR_plan_eligibility
+        payment_qualifying_amount
+        consolidation_effects
+        complete_20_USC_1087e
+        complete_34_CFR_685
+        Department_of_Education_handbook
+    }
+
+    source PSLFStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "20 U.S.C. § 1087e"
+        artifact "sources/20usc-1087e.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Borrower : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition QualifyingEmployer(employer: LegalPerson)
+
+    calc required_payments() -> Int {
+        return 120
+    }
+
+    query automatic payment_count_met(payments: Int) -> Bool {
+        return payments >= required_payments()
+    }
+
+    query qualifying_employer()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined QualifyingEmployer(Employer)
+                using Determine
+        }
+    }
+
+    verify PaymentCountHonesty {
+        assert automatic payment_count_met
+            has empty effect row
+        assert qualifying_employer
+            is never treated automatic
+    }
+}

@@ -1,0 +1,4 @@
+42 U.S.C. § 1382 (fixture excerpt).
+An eligible individual may not have resources in excess of $2,000.
+Living in the household of another, in-kind support, and exclusions
+are not encoded as Booleans. Not an official SSA publication.

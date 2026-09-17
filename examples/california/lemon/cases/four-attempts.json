@@ -1,0 +1,9 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "California.Consumer.LemonLaw@0.1.0",
+  "facts": {
+    "attempts": 4,
+    "days_out": 0
+  },
+  "admissibleCompletions": {}
+}

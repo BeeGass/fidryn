@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-ssa-fra",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "42usc-416.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

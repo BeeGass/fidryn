@@ -1,0 +1,73 @@
+module US.Federal.Courts.Diversity version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-28usc-1332"
+    source_manifest "sources/28usc-1332.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        federal_question_1331
+        supplemental_1367
+        amount_in_controversy_aggregation_doctrine
+        class_action_fairness_1332d
+        alienage_nuance
+        Hertz_nerve_center_factfinding
+        complete_diversity_exceptions
+        complete_Title_28
+    }
+
+    source DiversityStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "28 U.S.C. § 1332(a)"
+        artifact "sources/28usc-1332.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Plaintiff : NaturalPerson
+    entity Defendant : NaturalPerson
+    entity Forum : FederalDistrictCourt
+
+    proposition DiverseCitizenship(a: LegalPerson, b: LegalPerson)
+    proposition AmountInControversyMet(claim: Claim)
+    proposition CompleteDiversity(parties: FiniteSet<LegalPerson>)
+    proposition SubjectMatterJurisdiction(court: FederalDistrictCourt, action: Action)
+
+    calc amount_threshold() -> Money<USD> {
+        return USD(75000.00)
+    }
+
+    query automatic amount_in_controversy_met(amount: Money<USD>) -> Bool {
+        return amount > amount_threshold()
+    }
+
+    query complete_diversity()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require determined CompleteDiversity(parties)
+                using Determine
+        }
+    }
+
+    query diversity_jurisdiction(amount: Money<USD>)
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require amount_in_controversy_met(amount)
+            require determined CompleteDiversity(parties)
+                using Determine
+            return true
+        }
+    }
+
+    verify AmountIsMechanical {
+        assert automatic amount_in_controversy_met
+            has empty effect row
+        assert complete_diversity
+            is never treated automatic
+    }
+}

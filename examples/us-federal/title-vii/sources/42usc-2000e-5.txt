@@ -1,0 +1,6 @@
+42 U.S.C. § 2000e-5 (fixture excerpt).
+A charge shall be filed within 180 days after the alleged unlawful
+employment practice occurred, or within 300 days if the practice occurred
+in a State or political subdivision with a fair employment practice agency.
+Equitable tolling is not encoded as a Boolean.
+Not an official edition.

@@ -1,0 +1,10 @@
+Fed. R. Evid. 801-804 (fixture excerpt).
+Hearsay is a statement that the declarant does not make while testifying
+at the current trial or hearing and that a party offers in evidence to
+prove the truth of the matter asserted. Rule 803(6) excepts records of a
+regularly conducted activity if the record was made at or near the time
+by someone with knowledge, kept in the course of a regularly conducted
+activity, making the record was a regular practice, and the opponent does
+not show that the source or method of preparation indicates a lack of
+trustworthiness. Those findings are not Booleans.
+Not an official edition.

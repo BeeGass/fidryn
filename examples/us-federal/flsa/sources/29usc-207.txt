@@ -1,0 +1,6 @@
+29 U.S.C. § 207 (fixture excerpt).
+No employer shall employ any employee for a workweek longer than forty
+hours unless the employee receives compensation for employment in excess
+of forty hours at a rate not less than one and one-half times the regular
+rate. White-collar exemptions and duties tests are not encoded as Booleans.
+Not an official edition.

@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-ca-civ-1950.5",
+  "jurisdiction": "California",
+  "artifacts": [
+    {
+      "path": "ca-civ-1950.5.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

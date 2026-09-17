@@ -1,0 +1,56 @@
+module US.Federal.Copyright.DMCA512 version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-dmca-512"
+    source_manifest "sources/17usc-512.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        red_flag_knowledge
+        repeat_infringer_policy
+        standard_technical_measures
+        complete_17_USC_512
+        complete_copyright_fair_use
+        complete_Copyright_Office_regulations
+        state_right_of_publicity
+    }
+
+    source DMCASafeHarbor {
+        kind statute
+        authority UnitedStatesCongress
+        citation "17 U.S.C. § 512"
+        artifact "sources/17usc-512.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity ServiceProvider : LegalPerson
+    entity Claimant : LegalPerson
+
+    proposition CounterNoticeGoodFaith(notice: RecordItem)
+
+    calc required_notice_elements() -> Int {
+        return 6
+    }
+
+    query automatic notice_elements_met(count: Int) -> Bool {
+        return count >= required_notice_elements()
+    }
+
+    query counter_notice_good_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined CounterNoticeGoodFaith(notice)
+                using Determine
+        }
+    }
+
+    verify NoticeHonesty {
+        assert automatic notice_elements_met
+            has empty effect row
+        assert counter_notice_good_faith
+            is never treated automatic
+    }
+}

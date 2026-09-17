@@ -1,0 +1,56 @@
+module US.Federal.ADA.ServiceAnimal version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-ada-service-animal"
+    source_manifest "sources/28cfr-36302.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        miniature_horses
+        Title_I_employment
+        Title_II_public_entity_nuances
+        breed_restrictions
+        complete_28_CFR_36
+        complete_ADA_Title_III
+        Fair_Housing_assistance_animals
+    }
+
+    source ADAServiceAnimalRule {
+        kind regulation
+        authority DepartmentOfJustice
+        citation "28 C.F.R. § 36.302"
+        artifact "sources/28cfr-36302.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Individual : NaturalPerson
+    entity PublicAccommodation : LegalPerson
+
+    proposition TaskTrainedNotESA(handler: NaturalPerson)
+
+    calc permitted_questions() -> Int {
+        return 2
+    }
+
+    query automatic two_questions_only(asked: Int) -> Bool {
+        return asked <= permitted_questions()
+    }
+
+    query task_trained_vs_esa()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined TaskTrainedNotESA(Individual)
+                using Determine
+        }
+    }
+
+    verify InquiryHonesty {
+        assert automatic two_questions_only
+            has empty effect row
+        assert task_trained_vs_esa
+            is never treated automatic
+    }
+}

@@ -1,0 +1,6 @@
+California Civil Code § 1798.130 (fixture excerpt).
+A business shall disclose and deliver the required information to a
+consumer within 45 calendar days of receiving a verifiable consumer
+request. The request must be a verifiable consumer request; identity
+verification is not a Boolean. A further 45-day extension is not encoded
+here. This is a research fixture. Not official code. Not legal advice.

@@ -1,0 +1,65 @@
+module US.Federal.Evidence.Hearsay version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-fre-801-804"
+    source_manifest "sources/fre-801-804.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        residual_807
+        confrontation_clause_Crawford
+        rule_801d_exclusions_factfinding
+        rule_804_unavailability
+        privileges
+        complete_FRE
+    }
+
+    source HearsayRules {
+        kind statute
+        authority UnitedStatesCongress
+        citation "Fed. R. Evid. 801-804"
+        artifact "sources/fre-801-804.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Declarant : NaturalPerson
+    entity Proponent : LegalPerson
+
+    proposition OutOfCourtStatement(text: String)
+    proposition OfferedForTruth(text: String)
+    proposition Hearsay(text: String)
+    proposition BusinessRecordsException(text: String)
+
+    query automatic out_of_court(made_while_testifying: Bool) -> Bool {
+        return not made_while_testifying
+    }
+
+    query is_hearsay()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed OutOfCourtStatement
+            require determined Hearsay(text)
+                using Determine
+        }
+    }
+
+    query business_records_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BusinessRecordsException(text)
+                using Determine
+        }
+    }
+
+    verify HearsayHonesty {
+        assert automatic out_of_court
+            has empty effect row
+        assert is_hearsay
+            is never treated automatic
+    }
+}

@@ -1,0 +1,5 @@
+Office of the Law Revision Counsel, About the United States Code.
+The Code is a consolidation and codification of the general and permanent
+laws of the United States. It is not the complete body of federal law.
+This Fidryn catalog records that fact and points at bounded encoded slices
+elsewhere in examples/us-federal/. Fixture text, not an official edition.

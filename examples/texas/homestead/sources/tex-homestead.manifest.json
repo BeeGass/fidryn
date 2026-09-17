@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-09-17-tex-homestead",
+  "jurisdiction": "Texas",
+  "artifacts": [
+    {
+      "path": "tex-homestead.txt",
+      "digest": "fixture",
+      "kind": "constitution",
+      "effective": "2026-09-17",
+      "weight": "binding"
+    }
+  ]
+}

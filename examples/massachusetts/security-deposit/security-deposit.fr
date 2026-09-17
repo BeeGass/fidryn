@@ -1,0 +1,57 @@
+module Massachusetts.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Massachusetts
+    source_snapshot "2026-09-17-ma-c186-15b"
+    source_manifest "sources/ma-c186-15b.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        last_months_rent
+        furnished_apartment_higher_cap
+        interest_on_deposit
+        complete_c186
+        local_ordinances
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority MassachusettsGeneralCourt
+        citation "M.G.L. c. 186 § 15B"
+        artifact "sources/ma-c186-15b.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition DepositViolation(landlord: NaturalPerson)
+
+    calc itemization_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic itemization_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + itemization_deadline()
+    }
+
+    query treble_damages()
+        -> Money<USD>
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined DepositViolation(Landlord)
+                using Determine
+        }
+    }
+
+    verify DepositHonesty {
+        assert automatic itemization_deadline_running
+            has empty effect row
+        assert treble_damages
+            is never treated automatic
+    }
+}

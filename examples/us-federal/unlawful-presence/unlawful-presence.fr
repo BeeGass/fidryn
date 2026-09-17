@@ -1,0 +1,65 @@
+module US.Federal.Immigration.UnlawfulPresenceBars version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-unlawful-presence-bars"
+    source_manifest "sources/8usc-1182.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        permanent_bar_1182_a_9_C
+        minor_exception
+        asylum_pending_tolling
+        complete_8_USC_1182
+        complete_9_FAM
+        USCIS_unlawful_presence_policy
+        state_side_processing
+    }
+
+    source UnlawfulPresenceStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "8 U.S.C. § 1182(a)(9)(B)"
+        artifact "sources/8usc-1182.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Noncitizen : NaturalPerson
+
+    proposition WaiverAvailable(person: NaturalPerson)
+
+    calc three_year_bar_days() -> Int {
+        return 180
+    }
+
+    calc ten_year_bar_days() -> Int {
+        return 365
+    }
+
+    query automatic three_year_bar_triggered(days_present: Int) -> Bool {
+        return days_present >= three_year_bar_days()
+    }
+
+    query automatic ten_year_bar_triggered(days_present: Int) -> Bool {
+        return days_present >= ten_year_bar_days()
+    }
+
+    query waiver()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WaiverAvailable(Noncitizen)
+                using Determine
+        }
+    }
+
+    verify BarTriggerHonesty {
+        assert automatic three_year_bar_triggered
+            has empty effect row
+        assert automatic ten_year_bar_triggered
+            has empty effect row
+        assert waiver
+            is never treated automatic
+    }
+}

@@ -1,0 +1,7 @@
+California Civil Code § 1793.22 (fixture excerpt).
+A reasonable number of repair attempts is presumed if the same
+nonconformity has been subject to repair four or more times, or the
+vehicle is out of service by reason of repair of nonconformities for a
+cumulative total of more than 30 calendar days. Substantial impairment
+of use, value, or safety is not a Boolean. This is a research fixture.
+Not official code. Not legal advice.

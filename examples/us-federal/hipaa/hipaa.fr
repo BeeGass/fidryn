@@ -1,0 +1,56 @@
+module US.Federal.Health.HIPAAAccess version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-hipaa-access"
+    source_manifest "sources/45cfr-164524.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        thirty_day_extension
+        unreviewable_grounds_for_denial
+        fees_for_copies
+        business_associate_agreements
+        complete_Privacy_Rule
+        complete_Security_Rule
+        complete_45_CFR_164
+    }
+
+    source HIPAAAccessRule {
+        kind regulation
+        authority DepartmentOfHealthAndHumanServices
+        citation "45 C.F.R. § 164.524"
+        artifact "sources/45cfr-164524.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Individual : NaturalPerson
+    entity CoveredEntity : LegalPerson
+
+    proposition PsychotherapyNotesException(record: RecordItem)
+
+    calc access_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    query automatic access_clock_running(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + access_window()
+    }
+
+    query psychotherapy_notes()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PsychotherapyNotesException(record)
+                using Determine
+        }
+    }
+
+    verify AccessClockHonesty {
+        assert automatic access_clock_running
+            has empty effect row
+        assert psychotherapy_notes
+            is never treated automatic
+    }
+}

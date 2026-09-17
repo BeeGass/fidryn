@@ -1,0 +1,55 @@
+module California.Employment.Noncompete version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-bpc-16600"
+    source_manifest "sources/ca-bpc-16600.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        AB_1076_notice
+        SB_699_out_of_state
+        garden_leave
+        customer_nonsolicit_nuance
+        partnership_dissolution_16602
+        complete_Bus_Prof_Code
+        local_ordinances
+    }
+
+    source NoncompeteStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Bus. & Prof. Code § 16600"
+        artifact "sources/ca-bpc-16600.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Worker : NaturalPerson
+    entity Employer : LegalPerson
+    entity Restraint : Asset
+
+    proposition NoncompeteCovenant(worker: NaturalPerson)
+    proposition SaleOfBusinessException(worker: NaturalPerson)
+    proposition VoidAsToNoncompete(worker: NaturalPerson)
+
+    query automatic void_as_to_noncompete() -> Bool {
+        return true
+    }
+
+    query sale_of_business_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SaleOfBusinessException(Worker)
+                using Determine
+        }
+    }
+
+    verify NoncompeteHonesty {
+        assert automatic void_as_to_noncompete
+            has empty effect row
+        assert sale_of_business_exception
+            is never treated automatic
+    }
+}

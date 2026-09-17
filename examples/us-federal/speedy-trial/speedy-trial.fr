@@ -1,0 +1,58 @@
+module US.Federal.Criminal.SpeedyTrial version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-18usc-3161"
+    source_manifest "sources/18usc-3161.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        thirty_day_minimum_to_trial
+        dismissal_with_or_without_prejudice
+        all_excludable_delay_categories
+        sixth_amendment_Barker_balancing
+        interstate_agreement_on_detainers
+        complete_18_USC_3161
+    }
+
+    source SpeedyTrialStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "18 U.S.C. § 3161"
+        artifact "sources/18usc-3161.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Accused : NaturalPerson
+    entity Prosecution : LegalPerson
+    entity CriminalCase : Action
+
+    proposition ClockStarted(action: Action, at: Time)
+    proposition TrialCommenced(action: Action, at: Time)
+    proposition EndsOfJusticeContinuance(action: Action)
+
+    calc trial_clock() -> Duration<counted_days> {
+        return 70 counted_days
+    }
+
+    query automatic seventy_day_window(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + trial_clock()
+    }
+
+    query ends_of_justice_continuance()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EndsOfJusticeContinuance(CriminalCase)
+                using Determine
+        }
+    }
+
+    verify ClockIsMechanical {
+        assert automatic seventy_day_window
+            has empty effect row
+        assert ends_of_justice_continuance
+            is never treated automatic
+    }
+}

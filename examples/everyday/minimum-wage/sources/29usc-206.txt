@@ -1,0 +1,11 @@
+Fair Labor Standards Act, 29 U.S.C. § 206, with the savings clause in
+29 U.S.C. § 218 (fixture excerpt).
+Every employer shall pay to each of his employees who in any workweek
+is engaged in commerce or in the production of goods for commerce, or
+is employed in an enterprise engaged in commerce or in the production
+of goods for commerce, wages at the federal floor of $7.25 an hour.
+No provision of this chapter excuses noncompliance with any Federal or
+State law or municipal ordinance establishing a minimum wage higher
+than the federal floor; the higher wage controls as to the employee.
+Which local ordinance applies is not a Boolean. This is a research
+fixture. Not official code. Not legal advice.

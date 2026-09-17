@@ -1,0 +1,8 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Military.SCRAInterest@0.1.0",
+  "facts": {
+    "rate": 6
+  },
+  "admissibleCompletions": {}
+}

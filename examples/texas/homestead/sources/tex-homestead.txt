@@ -1,0 +1,8 @@
+Texas Constitution article XVI § 50 and Texas Property Code § 41.002
+(fixture excerpt).
+The homestead of a family or of a single adult person is protected from
+forced sale except for debts enumerated in article XVI § 50. If used for
+the purposes of an urban home, the homestead consists of not more than
+10 acres of land, which may be in one or more lots, together with any
+improvements thereon. Whether a place has homestead character is not a
+Boolean. This is a research fixture. Not official code. Not legal advice.

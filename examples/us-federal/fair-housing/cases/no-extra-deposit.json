@@ -1,0 +1,8 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Housing.AssistanceAnimal@0.1.0",
+  "facts": {
+    "charged": "USD(0.00)"
+  },
+  "admissibleCompletions": {}
+}

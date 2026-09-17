@@ -1,0 +1,66 @@
+module California.Employment.ABCTest version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-lab-2775"
+    source_manifest "sources/ca-lab-2775.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        Borello_residual
+        ABC_exceptions_2776_through_2785
+        joint_employment
+        unemployment_insurance_alignment
+        complete_Labor_Code
+        local_ordinances
+    }
+
+    source ABCStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Lab. Code § 2775"
+        artifact "sources/ca-lab-2775.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Worker : NaturalPerson
+    entity HiringEntity : LegalPerson
+
+    proposition FreeFromControl(worker: NaturalPerson)
+    proposition OutsideUsualCourse(worker: NaturalPerson)
+    proposition IndependentlyEstablishedTrade(worker: NaturalPerson)
+    proposition IndependentContractor(worker: NaturalPerson)
+
+    query automatic prong_a_free_from_control(free: Bool) -> Bool {
+        return free
+    }
+
+    query prong_b_outside_usual_course()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined OutsideUsualCourse(Worker)
+                using Determine
+        }
+    }
+
+    query prong_c_independent_trade()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined IndependentlyEstablishedTrade(Worker)
+                using Determine
+        }
+    }
+
+    verify ABCHonesty {
+        assert automatic prong_a_free_from_control
+            has empty effect row
+        assert prong_b_outside_usual_course
+            is never treated automatic
+        assert prong_c_independent_trade
+            is never treated automatic
+    }
+}

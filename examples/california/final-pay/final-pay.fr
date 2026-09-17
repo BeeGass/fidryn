@@ -1,0 +1,58 @@
+module California.Employment.FinalPay version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-lab-201-203"
+    source_manifest "sources/ca-lab-201-203.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        seventy_two_hour_quit_notice
+        commissioned_employee_special_rules
+        vacation_payout_factfinding
+        complete_Labor_Code
+        local_ordinances
+    }
+
+    source FinalPayStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Lab. Code §§ 201-203"
+        artifact "sources/ca-lab-201-203.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    proposition Discharged(employee: NaturalPerson)
+    proposition WaitingTimePenalty(employer: LegalPerson)
+    proposition WillfulFailureToPay(employer: LegalPerson)
+
+    query automatic pay_due_immediately(discharged: Bool) -> Bool {
+        return discharged
+    }
+
+    query automatic next_payday_if_not_discharged(discharged: Bool) -> Bool {
+        return not discharged
+    }
+
+    query waiting_time_penalty()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulFailureToPay(Employer)
+                using Determine
+        }
+    }
+
+    verify FinalPayHonesty {
+        assert automatic pay_due_immediately
+            has empty effect row
+        assert automatic next_payday_if_not_discharged
+            has empty effect row
+        assert waiting_time_penalty
+            is never treated automatic
+    }
+}

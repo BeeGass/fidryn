@@ -1,0 +1,69 @@
+module US.Federal.Housing.AssistanceAnimal version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-09-17-fheo-assistance-animal"
+    source_manifest "sources/hud-fheo-2020-01.manifest.json"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        ADA_service_animal_in_common_areas
+        direct_threat
+        fundamental_alteration
+        complete_Fair_Housing_Act
+        complete_24_CFR_100
+        state_assistance_animal_statutes
+        local_breed_ordinances
+    }
+
+    source HUDAssistanceAnimalGuidance {
+        kind guidance
+        authority DepartmentOfHousingAndUrbanDevelopment
+        citation "HUD FHEO-2020-01"
+        artifact "sources/hud-fheo-2020-01.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Resident : NaturalPerson
+    entity HousingProvider : LegalPerson
+
+    proposition ReasonableAccommodationRequested(resident: NaturalPerson)
+    proposition DisabilityAndNexus(resident: NaturalPerson)
+
+    calc extra_deposit() -> Money<USD> {
+        return USD(0.00)
+    }
+
+    query automatic extra_deposit_not_required(charged: Money<USD>) -> Bool {
+        return charged <= extra_deposit()
+    }
+
+    query request_received()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed AccommodationRequest
+            return ReasonableAccommodationRequested(Resident)
+        }
+    }
+
+    query disability_and_nexus()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined DisabilityAndNexus(Resident)
+                using Determine
+        }
+    }
+
+    verify AssistanceAnimalHonesty {
+        assert automatic extra_deposit_not_required
+            has empty effect row
+        assert request_received
+            is never treated automatic
+        assert disability_and_nexus
+            is never treated automatic
+    }
+}
