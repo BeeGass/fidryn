@@ -39,11 +39,12 @@ module US.Federal.Health.MedicareEnrollment version "0.1.0" {
 
     query initial_enrollment_open()
         -> Bool
-        ! {Observe}
+        ! {Observe, Determine}
     {
         goal Evaluate {
             require observed BirthRecord
-            return InitialEnrollmentPeriodOpen(Beneficiary, as_of)
+            require determined InitialEnrollmentPeriodOpen(Beneficiary, as_of)
+                using Determine
         }
     }
 

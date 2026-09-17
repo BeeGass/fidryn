@@ -37,11 +37,12 @@ module US.Federal.Military.SCRAInterest version "0.1.0" {
 
     query military_service_period()
         -> Bool
-        ! {Observe}
+        ! {Observe, Determine}
     {
         goal Evaluate {
             require observed ServiceRecord
-            return MilitaryServicePeriod(Servicemember)
+            require determined MilitaryServicePeriod(Servicemember)
+                using Determine
         }
     }
 

@@ -29,6 +29,7 @@ module US.Federal.Courts.Removal version "0.1.0" {
     proposition NoticeOfRemovalFiled(action: Action, at: Time)
     proposition ThirtyDayClockStarted(action: Action, at: Time)
     proposition RemovalUntimely(action: Action)
+    proposition LastServedDefendantRuleApplies
 
     calc removal_window() -> Duration<counted_days> {
         return 30 counted_days
