@@ -1,0 +1,43 @@
+# Fidryn
+
+> Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.
+
+This file follows the llms.txt convention: a curated map of public pages, with clean markdown mirrors for agents.
+Human-facing HTML is unchanged; prefer `text/markdown` URLs below when you need the full text.
+
+Site: https://fidryn.onlygass.dev
+Full corpus: https://fidryn.onlygass.dev/llms-full.txt
+Source: https://github.com/BeeGass/fidryn
+
+## Primary pages
+
+- [Home](https://fidryn.onlygass.dev/): Overview — programming language for legal instruments
+  - Markdown: https://fidryn.onlygass.dev/index.md
+- [Docs hub](https://fidryn.onlygass.dev/docs/): Learner documentation index
+  - Markdown: https://fidryn.onlygass.dev/docs/index.md
+
+## Learner guides
+
+- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md): Build, check, and run a tiny Fidryn (.fr) program in about an hour.
+  - HTML: https://fidryn.onlygass.dev/docs/getting-started
+- [Language](https://fidryn.onlygass.dev/docs/language.md): Fidryn language map: modules, queries, rules, duties, and what the language will not do.
+  - HTML: https://fidryn.onlygass.dev/docs/language
+- [CLI](https://fidryn.onlygass.dev/docs/cli.md): Every fidryn CLI subcommand and flag the reference binary accepts.
+  - HTML: https://fidryn.onlygass.dev/docs/cli
+- [Mill](https://fidryn.onlygass.dev/docs/mill.md): Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.
+  - HTML: https://fidryn.onlygass.dev/docs/mill
+- [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md): Case records, admissible completions, valid-at and known-at in Fidryn.
+  - HTML: https://fidryn.onlygass.dev/docs/cases-and-time
+- [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md): Determinate, Suspended, Contingent, and the rest of the Fidryn outcome envelope.
+  - HTML: https://fidryn.onlygass.dev/docs/outcomes
+- [Examples](https://fidryn.onlygass.dev/docs/examples.md): Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.
+  - HTML: https://fidryn.onlygass.dev/docs/examples
+- [Contributing](https://fidryn.onlygass.dev/docs/contributing.md): Toolchain, tests, and how to work on the Fidryn reference interpreter.
+  - HTML: https://fidryn.onlygass.dev/docs/contributing
+
+## Notes for agents
+
+- Research fixture — not legal advice.
+- Per-page markdown mirrors use the `.md` suffix and `Content-Type: text/markdown`.
+- HTML pages advertise the mirror via `rel=alternate` / `type=text/markdown`.
+- The local mill (`fidryn ui`) binds loopback only and is not exposed on this site.
