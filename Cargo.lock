@@ -361,6 +361,7 @@ dependencies = [
  "fidryn-adapt",
  "fidryn-check",
  "fidryn-core",
+ "fidryn-driver",
  "fidryn-eval",
  "fidryn-handlers",
  "fidryn-hir",
@@ -394,16 +395,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "fidryn-driver"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "fidryn-check",
+ "fidryn-core",
+ "fidryn-eval",
+ "fidryn-handlers",
+ "fidryn-hir",
+ "fidryn-syntax",
+ "serde_json",
+]
+
+[[package]]
 name = "fidryn-eval"
 version = "0.1.0"
 dependencies = [
- "fidryn-check",
  "fidryn-core",
- "fidryn-hir",
- "fidryn-syntax",
  "indexmap",
  "rust_decimal",
- "thiserror",
  "time",
 ]
 
@@ -425,6 +436,7 @@ dependencies = [
  "fidryn-syntax",
  "indexmap",
  "la-arena",
+ "rust_decimal",
  "thiserror",
 ]
 
@@ -432,6 +444,7 @@ dependencies = [
 name = "fidryn-render"
 version = "0.1.0"
 dependencies = [
+ "blake3",
  "fidryn-core",
  "thiserror",
 ]
