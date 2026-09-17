@@ -760,6 +760,8 @@ pub fn is_eval_keyword(name: &str) -> bool {
             | "call"
             | "seq"
             | "require"
+            | "duty_step"
+            | "require_authority"
     ) || name.eq_ignore_ascii_case("for_all")
         || name.eq_ignore_ascii_case("exists")
 }

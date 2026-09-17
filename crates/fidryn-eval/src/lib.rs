@@ -1,6 +1,7 @@
 //! Deterministic worklist evaluator. No partial mutation on Open or Conflict.
 
 pub mod conflict;
+mod duty;
 pub mod law;
 mod worklist;
 
@@ -20,8 +21,9 @@ use fidryn_core::time::Interval;
 use fidryn_core::types::{Sort, Type};
 use fidryn_core::value::{BinOp, PropTerm, Term, Value};
 use fidryn_core::{
-    CaseRecord, EvidenceItem, Guard, HaltReason, Handler, HandlerResult, Instant, JurisdictionId,
-    ManifestArtifact, NodeId, OriginId, Outcome, QueryName, RunContext, SourceWeight, TraceId,
+    CaseRecord, EvaluationReport, EvidenceItem, Guard, HaltReason, Handler, HandlerResult, Instant,
+    JurisdictionId, ManifestArtifact, NodeId, OriginId, Outcome, QueryName, RunContext,
+    SourceWeight, TraceId,
 };
 use rust_decimal::Decimal;
 use std::collections::{BTreeMap, BTreeSet};
@@ -41,6 +43,10 @@ pub enum Residual {
 /// decisions, closures) later differs, [`resume`] recomputes via
 /// [`evaluate_session`] rather than replaying this residual against stale
 /// derived facts.
+///
+/// When the residual is `seq`, [`completed`] holds determinate prefix
+/// values so resume skips those positions. Nested `seq` inside a non-seq
+/// residual still relies on [`RememberingHandler`].
 #[derive(Clone, Debug)]
 pub struct Continuation {
     pub residual: Residual,
@@ -48,6 +54,8 @@ pub struct Continuation {
     pub derived: DerivedWorld,
     pub fuel: Option<u32>,
     pub answered: BTreeMap<String, Value>,
+    pub completed: Vec<Value>,
+    pub seq_index: usize,
     case_identity: CaseIdentity,
 }
 
@@ -61,7 +69,8 @@ pub struct EvalSession {
 struct CaseIdentity {
     facts: BTreeMap<String, Value>,
     evidence: Vec<(String, Instant, Value)>,
-    determinations: Vec<(String, String, bool, String)>,
+    events: Vec<(String, Instant, Value)>,
+    determinations: Vec<(String, String, bool, String, Option<Instant>)>,
     interpretations: BTreeMap<String, String>,
     decisions: BTreeMap<String, String>,
     closures: Vec<(String, bool)>,
@@ -76,6 +85,11 @@ impl CaseIdentity {
                 .iter()
                 .map(|e| (e.schema.clone(), e.observed_at, e.value.clone()))
                 .collect(),
+            events: case
+                .events
+                .iter()
+                .map(|e| (e.kind.clone(), e.record_time, e.payload.clone()))
+                .collect(),
             determinations: case
                 .determinations
                 .iter()
@@ -85,6 +99,7 @@ impl CaseIdentity {
                         d.protocol.clone(),
                         d.established,
                         d.decider.clone(),
+                        d.recorded_at,
                     )
                 })
                 .collect(),
@@ -109,6 +124,11 @@ pub fn evaluate<H: Handler>(
     case: &CaseRecord,
 ) -> Result<Outcome<Value>, EngineError> {
     Ok(evaluate_session(module, query, args, state, ctx, handler, case)?.outcome)
+}
+
+/// Wrap an outcome as an [`EvaluationReport`]. Coverage is unset.
+pub fn report_from(outcome: Outcome<Value>) -> EvaluationReport {
+    EvaluationReport::from_outcome(outcome)
 }
 
 /// Evaluate `query` and, on [`Outcome::Suspended`], capture a [`Continuation`].
@@ -139,6 +159,8 @@ pub fn evaluate_session<H: Handler>(
         derived,
         None,
         BTreeMap::new(),
+        0,
+        Vec::new(),
     )
 }
 
@@ -179,6 +201,8 @@ pub fn resume<H: Handler>(
             derived,
             cont.fuel,
             BTreeMap::new(),
+            0,
+            Vec::new(),
         );
     }
     let residual = match &cont.residual {
@@ -198,6 +222,8 @@ pub fn resume<H: Handler>(
         cont.derived,
         cont.fuel,
         cont.answered,
+        cont.seq_index,
+        cont.completed,
     )
 }
 
@@ -215,6 +241,8 @@ fn eval_with_state<H: Handler>(
     derived: DerivedWorld,
     fuel: Option<u32>,
     answered: BTreeMap<String, Value>,
+    seq_index: usize,
+    completed: Vec<Value>,
 ) -> Result<EvalSession, EngineError> {
     let mut handler = RememberingHandler {
         inner: handler,
@@ -222,6 +250,7 @@ fn eval_with_state<H: Handler>(
     };
     match plan {
         QueryPlan::Evaluate(term) => {
+            let seq_resume = term_is_seq(term);
             let mut frame = EvalFrame {
                 module,
                 args,
@@ -231,16 +260,29 @@ fn eval_with_state<H: Handler>(
                 case,
                 derived,
                 fuel,
+                seq_index: if seq_resume { seq_index } else { 0 },
+                completed: if seq_resume { completed } else { Vec::new() },
+                seq_is_residual: seq_resume,
             };
             let outcome = frame.eval_term(term)?;
+            let EvalFrame {
+                bindings,
+                derived,
+                fuel,
+                seq_index,
+                completed,
+                ..
+            } = frame;
             Ok(session_from(
                 outcome,
                 Residual::Term(term.clone()),
-                frame.bindings,
-                frame.derived,
-                frame.fuel,
+                bindings,
+                derived,
+                fuel,
                 handler.answered,
                 case,
+                seq_index,
+                completed,
             ))
         }
         other => {
@@ -254,11 +296,14 @@ fn eval_with_state<H: Handler>(
                 fuel,
                 handler.answered,
                 case,
+                0,
+                Vec::new(),
             ))
         }
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn session_from(
     outcome: Outcome<Value>,
     residual: Residual,
@@ -267,6 +312,8 @@ fn session_from(
     fuel: Option<u32>,
     answered: BTreeMap<String, Value>,
     case: &CaseRecord,
+    seq_index: usize,
+    completed: Vec<Value>,
 ) -> EvalSession {
     let continuation = match &outcome {
         Outcome::Suspended { .. } => Some(Continuation {
@@ -275,6 +322,8 @@ fn session_from(
             derived,
             fuel,
             answered,
+            completed,
+            seq_index,
             case_identity: CaseIdentity::of(case),
         }),
         _ => None,
@@ -385,6 +434,9 @@ struct EvalFrame<'a, H: Handler> {
     case: &'a CaseRecord,
     derived: DerivedWorld,
     fuel: Option<u32>,
+    seq_index: usize,
+    completed: Vec<Value>,
+    seq_is_residual: bool,
 }
 
 impl<'a, H: Handler> EvalFrame<'a, H> {
@@ -484,6 +536,12 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if is_require(ctor) {
             return self.eval_require(args);
         }
+        if is_duty_step(ctor) {
+            return self.eval_duty_step(args);
+        }
+        if is_require_authority(ctor) {
+            return self.eval_require_authority(args);
+        }
         if let Some(kind) = quantifier_kind(ctor) {
             return self.eval_quantifier(kind, args);
         }
@@ -521,6 +579,8 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             || is_if(callee)
             || is_seq(callee)
             || is_require(callee)
+            || is_duty_step(callee)
+            || is_require_authority(callee)
             || binop_ctor(callee).is_some()
         {
             return self.eval_apply(callee, args);
@@ -580,13 +640,14 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             case: self.case,
             derived: self.derived.clone(),
             fuel: budget.map(|n| n.saturating_sub(1)),
+            seq_index: 0,
+            completed: Vec::new(),
+            seq_is_residual: false,
         };
-        if let Some(body) = function_body(function)
-            && is_executable_body(body)
-        {
+        if let Some(body) = &function.body {
             return nested.eval_term(body);
         }
-        if is_tax_stub(function) {
+        if function.name == "ordinary_income_tax" {
             return nested.eval_tax();
         }
         Err(unsupported(format!(
@@ -649,16 +710,86 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if args.is_empty() {
             return Err(unsupported("empty seq"));
         }
-        let mut last = None;
-        for arg in args {
+        let is_residual = self.seq_is_residual;
+        self.seq_is_residual = false;
+        let start = if is_residual {
+            self.seq_index.max(self.completed.len())
+        } else {
+            0
+        };
+        if start > args.len() {
+            return Err(unsupported("seq resume index past arguments"));
+        }
+        let mut last = if start > 0 {
+            self.completed.get(start - 1).cloned()
+        } else {
+            None
+        };
+        for (index, arg) in args.iter().enumerate().skip(start) {
             match as_determinate(self.eval_term(arg)?) {
-                Ok(v) => last = Some(v),
-                Err(outcome) => return Ok(outcome),
+                Ok(v) => {
+                    last = Some(v.clone());
+                    if is_residual {
+                        if self.completed.len() > index {
+                            self.completed[index] = v;
+                        } else {
+                            self.completed.push(v);
+                        }
+                        self.seq_index = index + 1;
+                    }
+                }
+                Err(outcome) => {
+                    if is_residual {
+                        self.seq_index = index;
+                    }
+                    return Ok(outcome);
+                }
             }
         }
         match last {
             Some(value) => Ok(determinate(value, TraceId::of(b"seq"))),
             None => Err(unsupported("empty seq")),
+        }
+    }
+
+    fn eval_duty_step(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if args.len() < 2 {
+            return Err(EngineError::InvalidInput(
+                "duty_step expects [name, action]".into(),
+            ));
+        }
+        let name = term_literal_name(&args[0])?;
+        let action = term_literal_name(&args[1])?;
+        let person = if args.len() >= 3 {
+            Some(term_literal_name(&args[2])?)
+        } else {
+            None
+        };
+        let must_check = args.len() > 3 || duty::has_authority_constraint(self.case);
+        if must_check && !duty::action_is_granted(self.case, &action, self.ctx.record_time) {
+            return Ok(authority_missing(&action));
+        }
+        let key = duty::duty_fact_key(&name);
+        let current = self
+            .lookup(&key)
+            .and_then(|value| duty::parse_duty_state(&value, &name));
+        let next = duty::apply_duty_action(current.as_ref(), &name, &action, person)?;
+        self.bindings.insert(key, duty::duty_state_value(&next));
+        Ok(determinate(
+            duty::status_value(next.status),
+            TraceId::of(b"duty"),
+        ))
+    }
+
+    fn eval_require_authority(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if args.is_empty() {
+            return Err(unsupported("require_authority expects an action"));
+        }
+        let action = term_literal_name(&args[0])?;
+        if duty::action_is_granted(self.case, &action, self.ctx.record_time) {
+            Ok(determinate(Value::Unit, TraceId::of(b"authority")))
+        } else {
+            Ok(authority_missing(&action))
         }
     }
 
@@ -1002,30 +1133,6 @@ fn as_determinate(out: Outcome<Value>) -> Result<Value, Outcome<Value>> {
     }
 }
 
-fn function_body(function: &CoreFunction) -> Option<&Term> {
-    function.body.as_ref()
-}
-
-fn is_executable_body(term: &Term) -> bool {
-    !matches!(term, Term::Wildcard | Term::Binder(_))
-}
-
-fn is_tax_function(function: &CoreFunction) -> bool {
-    let name = function.name.to_ascii_lowercase();
-    function.is_calc
-        && (name.contains("tax")
-            || name.contains("ordinary_income")
-            || function
-                .meta
-                .source
-                .as_deref()
-                .is_some_and(|s| s.contains("ordinary_income") || s.contains("tax")))
-}
-
-fn is_tax_stub(function: &CoreFunction) -> bool {
-    is_tax_function(function) && function.body.is_none()
-}
-
 fn find_function<'m>(module: &'m CoreModule, name: &str) -> Option<&'m CoreFunction> {
     module.declarations.iter().find_map(|d| match d {
         CoreDecl::Function(f) if f.name == name => Some(f),
@@ -1070,6 +1177,33 @@ fn is_require(ctor: &str) -> bool {
     ctor.eq_ignore_ascii_case("require")
 }
 
+fn is_duty_step(ctor: &str) -> bool {
+    ctor.eq_ignore_ascii_case("duty_step")
+}
+
+fn is_require_authority(ctor: &str) -> bool {
+    ctor.eq_ignore_ascii_case("require_authority")
+}
+
+fn term_is_seq(term: &Term) -> bool {
+    match term {
+        Term::Apply { ctor, .. } => is_seq(ctor),
+        Term::Call { callee, .. } => is_seq(callee),
+        _ => false,
+    }
+}
+
+fn term_literal_name(term: &Term) -> Result<String, EngineError> {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => Ok(name.clone()),
+        Term::Apply { ctor, args } if args.is_empty() => Ok(ctor.clone()),
+        Term::Call { callee, args } if args.is_empty() => Ok(callee.clone()),
+        other => Err(EngineError::InvalidInput(format!(
+            "expected name, got `{other:?}`"
+        ))),
+    }
+}
+
 fn require_failed() -> Outcome<Value> {
     let mut requests = BTreeSet::new();
     requests.insert(OpenRequest::NeedCustom {
@@ -1079,6 +1213,18 @@ fn require_failed() -> Outcome<Value> {
     Outcome::Suspended {
         requests,
         trace: TraceId::of(b"require"),
+    }
+}
+
+fn authority_missing(action: &str) -> Outcome<Value> {
+    let mut requests = BTreeSet::new();
+    requests.insert(OpenRequest::NeedCustom {
+        effect: "authority".into(),
+        payload: action.to_owned(),
+    });
+    Outcome::Suspended {
+        requests,
+        trace: TraceId::of(b"authority"),
     }
 }
 
@@ -3358,7 +3504,7 @@ mod tests {
     #[test]
     fn evaluate_tax_on_is_closed_form() {
         let plan = QueryPlan::Evaluate(Term::Apply {
-            ctor: "ordinary_income_tax_formula".into(),
+            ctor: "ordinary_income_tax".into(),
             args: vec![Term::Ident("amount".into())],
         });
         let mut case = CaseRecord::default();
@@ -3367,7 +3513,7 @@ mod tests {
             "q",
             plan,
             vec![CoreDecl::Function(tax_function(
-                "ordinary_income_tax_formula",
+                "ordinary_income_tax",
                 None,
             ))],
         );
@@ -3384,14 +3530,14 @@ mod tests {
     #[test]
     fn ordinary_income_tax_is_monotonic_across_the_fourth_bracket() {
         let plan = QueryPlan::Evaluate(Term::Apply {
-            ctor: "ordinary_income_tax_formula".into(),
+            ctor: "ordinary_income_tax".into(),
             args: vec![Term::Ident("amount".into())],
         });
         let module = module_with_plan_decls(
             "q",
             plan,
             vec![CoreDecl::Function(tax_function(
-                "ordinary_income_tax_formula",
+                "ordinary_income_tax",
                 None,
             ))],
         );
@@ -3415,14 +3561,14 @@ mod tests {
     #[test]
     fn missing_money_is_invalid_input() {
         let plan = QueryPlan::Evaluate(Term::Apply {
-            ctor: "ordinary_income_tax_formula".into(),
+            ctor: "ordinary_income_tax".into(),
             args: vec![],
         });
         let module = module_with_plan_decls(
             "q",
             plan,
             vec![CoreDecl::Function(tax_function(
-                "ordinary_income_tax_formula",
+                "ordinary_income_tax",
                 None,
             ))],
         );
@@ -3434,12 +3580,12 @@ mod tests {
 
     #[test]
     fn fuel_exhaustion_is_engine_error() {
-        let plan = QueryPlan::Evaluate(Term::Ident("ordinary_income_tax_formula".into()));
+        let plan = QueryPlan::Evaluate(Term::Ident("ordinary_income_tax".into()));
         let module = module_with_plan_decls(
             "q",
             plan,
             vec![CoreDecl::Function(tax_function(
-                "ordinary_income_tax_formula",
+                "ordinary_income_tax",
                 Some(0),
             ))],
         );
@@ -3608,6 +3754,7 @@ mod tests {
                 protocol: "FormationCompliance".into(),
                 established: true,
                 decider: "CompetentFormationAuthority".into(),
+                recorded_at: None,
             });
         let out = run_plan(plan, &case, &mut Refusing);
         assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
@@ -3741,6 +3888,7 @@ mod tests {
             protocol: "P".into(),
             established: true,
             decider: "test".into(),
+            recorded_at: None,
         });
         match run_module(&module, "q", &case, &mut Refusing).expect("evaluate") {
             Outcome::Determinate {
@@ -4161,6 +4309,7 @@ mod tests {
             protocol: "JudgmentOnTheMerits".into(),
             established: true,
             decider: "Court".into(),
+            recorded_at: None,
         });
         let second = resume(
             first,
@@ -4916,12 +5065,12 @@ mod tests {
                     ctor: "require".into(),
                     args: vec![Term::Bool(true)],
                 },
-                Term::Int(42),
+                Term::Int(7),
             ],
         });
         match run_plan(plan, &CaseRecord::default(), &mut Refusing) {
             Outcome::Determinate {
-                value: Value::Int(42),
+                value: Value::Int(7),
                 ..
             } => {}
             other => panic!("{other:?}"),
@@ -4937,7 +5086,7 @@ mod tests {
                     ctor: "require".into(),
                     args: vec![Term::Bool(false)],
                 },
-                Term::Int(42),
+                Term::Int(7),
             ],
         });
         let out = run_plan(plan, &CaseRecord::default(), &mut Refusing);
@@ -4945,7 +5094,7 @@ mod tests {
             !matches!(
                 out,
                 Outcome::Determinate {
-                    value: Value::Int(42),
+                    value: Value::Int(7),
                     ..
                 }
             ),
@@ -4960,5 +5109,307 @@ mod tests {
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    fn seq_terms(args: Vec<Term>) -> QueryPlan {
+        QueryPlan::Evaluate(Term::Apply {
+            ctor: "seq".into(),
+            args,
+        })
+    }
+
+    fn require_term(cond: Term) -> Term {
+        Term::Apply {
+            ctor: "require".into(),
+            args: vec![cond],
+        }
+    }
+
+    fn duty_step_term(name: &str, action: &str) -> Term {
+        Term::Apply {
+            ctor: "duty_step".into(),
+            args: vec![Term::Ident(name.into()), Term::Ident(action.into())],
+        }
+    }
+
+    fn attached_duty_fact() -> Value {
+        Value::Map(BTreeMap::from([
+            ("status".into(), Value::String("Attached".into())),
+            ("breached".into(), Value::Bool(false)),
+            ("bearer".into(), Value::Unit),
+        ]))
+    }
+
+    #[test]
+    fn seq_require_unbound_ident_does_not_return_later_value() {
+        let plan = seq_terms(vec![
+            require_term(Term::Ident("missing".into())),
+            Term::Int(7),
+        ]);
+        let err = run_module(
+            &module_with_plan("q", plan),
+            "q",
+            &CaseRecord::default(),
+            &mut Refusing,
+        )
+        .expect_err("unbound require condition");
+        assert!(
+            matches!(err, EngineError::Unsupported(ref msg) if msg.contains("missing")),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn seq_require_suspending_ident_does_not_return_later_value() {
+        let plan = seq_terms(vec![
+            require_term(Term::Ident("EligibleForOpenTexturedCredit".into())),
+            Term::Int(7),
+        ]);
+        let out = run_plan(plan, &CaseRecord::default(), &mut Refusing);
+        assert!(
+            !matches!(
+                out,
+                Outcome::Determinate {
+                    value: Value::Int(7),
+                    ..
+                }
+            ),
+            "{out:?}"
+        );
+        assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
+    }
+
+    #[test]
+    fn tax_on_without_body_is_unsupported() {
+        let plan = QueryPlan::Evaluate(Term::Call {
+            callee: "tax_on".into(),
+            args: vec![Term::Int(10_000)],
+        });
+        let err = run_module(
+            &module_with_plan_decls(
+                "q",
+                plan,
+                vec![CoreDecl::Function(tax_function("tax_on", None))],
+            ),
+            "q",
+            &CaseRecord::default(),
+            &mut Refusing,
+        )
+        .expect_err("tax_on is not a builtin");
+        assert!(
+            matches!(
+                err,
+                EngineError::Unsupported(ref msg)
+                    if msg == "function `tax_on` has no executable body"
+            ),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn ordinary_income_tax_without_body_still_computes() {
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "ordinary_income_tax".into(),
+            args: vec![Term::Ident("amount".into())],
+        });
+        let mut case = CaseRecord::default();
+        case.facts.insert("amount".into(), Value::Int(10_000));
+        let module = module_with_plan_decls(
+            "q",
+            plan,
+            vec![CoreDecl::Function(tax_function(
+                "ordinary_income_tax",
+                None,
+            ))],
+        );
+        match run_module(&module, "q", &case, &mut Refusing).expect("evaluate") {
+            Outcome::Determinate {
+                value: Value::Decimal(d),
+                ..
+            } => assert!(d > Decimal::ZERO),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn duty_late_perform_retains_breached() {
+        let plan = seq_terms(vec![
+            duty_step_term("pay", "attach"),
+            duty_step_term("pay", "breach"),
+            duty_step_term("pay", "perform"),
+            Term::Field {
+                base: Box::new(Term::Ident("duty:pay".into())),
+                name: "breached".into(),
+            },
+        ]);
+        match run_plan(plan, &CaseRecord::default(), &mut Refusing) {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn duty_illegal_discharge_from_attached_does_not_change_state() {
+        let mut case = CaseRecord::default();
+        case.facts.insert("duty:pay".into(), attached_duty_fact());
+        let err = run_module(
+            &module_with_plan("q", QueryPlan::Evaluate(duty_step_term("pay", "discharge"))),
+            "q",
+            &case,
+            &mut Refusing,
+        )
+        .expect_err("illegal discharge");
+        assert!(
+            matches!(err, EngineError::InvalidInput(ref msg) if msg.contains("discharge")),
+            "{err:?}"
+        );
+        match run_plan(
+            QueryPlan::Evaluate(Term::Ident("duty:pay".into())),
+            &case,
+            &mut Refusing,
+        ) {
+            Outcome::Determinate { value, .. } => {
+                let state = duty::parse_duty_state(&value, "pay").expect("duty fact");
+                assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+                assert!(!state.breached);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn require_authority_with_grant_is_unit() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![Value::String("attach".into())]),
+        );
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("attach".into())],
+        });
+        match run_plan(plan, &case, &mut Refusing) {
+            Outcome::Determinate {
+                value: Value::Unit, ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn require_authority_without_grant_suspends() {
+        let plan = QueryPlan::Evaluate(Term::Apply {
+            ctor: "require_authority".into(),
+            args: vec![Term::Ident("attach".into())],
+        });
+        match run_plan(plan, &CaseRecord::default(), &mut Refusing) {
+            Outcome::Suspended { requests, .. } => {
+                assert!(requests.iter().any(|r| matches!(
+                    r,
+                    OpenRequest::NeedCustom { effect, payload }
+                        if effect == "authority" && payload == "attach"
+                )));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn unauthorized_duty_step_does_not_change_duty_facts() {
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("authority_grants".into(), Value::Set(Vec::new()));
+        let out = run_plan(
+            QueryPlan::Evaluate(duty_step_term("pay", "attach")),
+            &case,
+            &mut Refusing,
+        );
+        match out {
+            Outcome::Suspended { requests, .. } => {
+                assert!(requests.iter().any(|r| matches!(
+                    r,
+                    OpenRequest::NeedCustom { effect, payload }
+                        if effect == "authority" && payload == "attach"
+                )));
+            }
+            other => panic!("{other:?}"),
+        }
+        let err = run_module(
+            &module_with_plan("q", QueryPlan::Evaluate(Term::Ident("duty:pay".into()))),
+            "q",
+            &case,
+            &mut Refusing,
+        )
+        .expect_err("duty fact must stay absent");
+        assert!(matches!(err, EngineError::Unsupported(_)), "{err:?}");
+    }
+
+    #[test]
+    fn seq_resume_skips_completed_duty_attach() {
+        let plan = seq_terms(vec![
+            duty_step_term("pay", "attach"),
+            Term::Ident("judgment".into()),
+        ]);
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(first.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            first.outcome
+        );
+        let cont = first.continuation.as_ref().expect("continuation");
+        assert_eq!(cont.seq_index, 1);
+        assert_eq!(cont.completed.len(), 1);
+        assert_eq!(cont.completed[0].display_label(), "Attached");
+        let mut handler = Scripted::resume_only(&["other"]);
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut handler,
+            &case,
+        )
+        .expect("resume");
+        assert!(
+            matches!(second.outcome, Outcome::Determinate { .. }),
+            "{:?}",
+            second.outcome
+        );
+    }
+
+    #[test]
+    fn report_from_wraps_suspended_require() {
+        let out = run_plan(
+            QueryPlan::Evaluate(require_term(Term::Bool(false))),
+            &CaseRecord::default(),
+            &mut Refusing,
+        );
+        let report = report_from(out);
+        assert!(matches!(report.outcome, Outcome::Suspended { .. }));
+        assert!(report.unresolved.iter().any(|r| matches!(
+            r,
+            OpenRequest::NeedCustom { effect, .. } if effect == "require"
+        )));
+        assert!(report.coverage.is_none());
     }
 }
