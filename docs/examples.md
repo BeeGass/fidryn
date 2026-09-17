@@ -1,1 +1,3 @@
-@file:///workspace/agent-tools/FULL-docs-examples.md
+# Example corpus
+
+PLACEHOLDER_WILL_REPLACE
