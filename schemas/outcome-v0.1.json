@@ -42,9 +42,17 @@
             "inconsistent"
           ]
         },
-        "trace": { "type": "string" },
-        "value": true,
-        "convergenceCertificate": { "type": ["string", "null"] },
+        "trace": {
+          "$comment": "Hex string TraceId.",
+          "type": "string"
+        },
+        "value": {
+          "$comment": "Unconstrained: tagged Value {kind, data} or a JSON literal. Entity requires the tagged form."
+        },
+        "convergenceCertificate": {
+          "$comment": "Hex string CompletionProofId when present.",
+          "type": ["string", "null"]
+        },
         "ignoredOpenIssues": { "type": "array" },
         "alternatives": { "type": "object" },
         "pivots": { "type": "array" },

@@ -19,7 +19,12 @@
           "path": { "type": "string" },
           "digest": { "type": "string" },
           "kind": { "type": "string" },
-          "effective": { "type": "string" }
+          "effective": { "type": "string" },
+          "weight": {
+            "$comment": "Optional. Compiler default is explanatory.",
+            "type": "string",
+            "enum": ["binding", "controlling", "persuasive", "explanatory"]
+          }
         }
       }
     }
