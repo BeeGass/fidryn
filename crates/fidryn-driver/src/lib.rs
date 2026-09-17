@@ -1,13 +1,14 @@
 //! Incremental compile and evaluate driver.
 //!
 //! Check and run are salsa tracked functions over interned input structs:
-//! source bytes, manifest snapshot, artifact observations, `source_root`
-//! display path, query, arguments, case, bitemporal times, and execution
-//! mode. A [`VerifiedSourceBundle`] is stored with the compiled module;
-//! trust is that bundle's summary, not a reconstruction from digest-looking
-//! strings. Fuel exhaustion is not retained as a stable memo. Pasted mill
-//! source uses `source_root = None` and never follows artifact paths or
-//! `packages/`.
+//! source bytes, manifest snapshot, artifact observations (including nested
+//! `packages/` module and lock bytes), `source_root` display path, query,
+//! arguments, case, bitemporal times, and execution mode. Compile uses those
+//! interned bytes, not a reread of the live tree after the key is hashed.
+//! A [`VerifiedSourceBundle`] is stored with the compiled module; trust is
+//! that bundle's summary, not a reconstruction from digest-looking strings.
+//! Fuel exhaustion is not retained as a stable memo. Pasted mill source uses
+//! `source_root = None` and never follows artifact paths or `packages/`.
 
 use fidryn_check::check_with_sources;
 use fidryn_core::{
@@ -25,9 +26,15 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::ErrorKind;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+/// Nested package walk when building the salsa check key. Matches the
+/// checker depth cap; mill / `check_source` never increment this.
+const NESTED_PACKAGE_INPUT_DEPTH: usize = 8;
+static PINNED_ROOT_SEQ: AtomicU64 = AtomicU64::new(0);
 
 /// Interned run-key payload hashed by canonical JSON, compared structurally.
 #[derive(Clone, PartialEq, Eq)]
@@ -144,14 +151,23 @@ fn compile_checked<'db>(db: &'db dyn DriverJar, input: CheckInput<'db>) -> Check
             bundle: None,
         };
     }
-    let root_buf = input.source_root(db).map(PathBuf::from);
-    // Unread observations are mill / check_source: never follow a filesystem root.
+    // Unread observations and a missing interned root are mill / check_source:
+    // never follow a filesystem root. Path compile uses the interned artifact
+    // bytes, not a reread of the live tree after the salsa key is hashed.
     let unread = artifacts
         .iter()
         .any(|(_, _, obs)| matches!(obs, ArtifactObservation::Unread));
-    let source_root = if unread { None } else { root_buf.as_deref() };
-    let result = compile_with_sources(source, &manifest, source_root);
-    let bundle = result.is_ok().then(|| pin_bundle(&manifest, source_root));
+    let result = if unread || input.source_root(db).is_none() {
+        compile_with_sources(source, &manifest, None)
+    } else {
+        match materialize_pinned_root(&artifacts) {
+            Ok(pinned) => compile_with_sources(source, &manifest, Some(pinned.path())),
+            Err(diagnostics) => Err(diagnostics),
+        }
+    };
+    let bundle = result
+        .is_ok()
+        .then(|| pin_bundle_from_observations(&manifest, &artifacts, unread));
     CheckMemo { result, bundle }
 }
 
@@ -255,8 +271,9 @@ impl Driver {
     /// so hex import digests authenticate against artifact bytes. Imports such
     /// as `Std.Core` may be satisfied by `source_root/packages/<name>` when
     /// the package lock digest matches the module bytes. The interned check
-    /// input includes source_root and artifact bytes; tamper or a different
-    /// root misses.
+    /// input includes source_root, artifact bytes, and nested `packages/`
+    /// module/lock bytes; tamper or a different root misses. Compile uses
+    /// those interned bytes rather than rereading the live tree.
     pub fn check_path(
         &mut self,
         path: &Path,
@@ -293,7 +310,10 @@ impl Driver {
         let snapshot = manifest.snapshot.clone();
         let source_owned = source.to_owned();
         let root_display = source_root.map(|path| path.display().to_string());
-        let artifacts = artifact_observations(manifest, source_root);
+        let mut artifacts = artifact_observations(manifest, source_root);
+        if let Some(root) = source_root {
+            collect_nested_package_inputs(root, source, &mut artifacts);
+        }
         let memo = self.with_memo(|db| {
             let input = CheckInput::new(
                 db,
@@ -490,12 +510,109 @@ impl Default for Driver {
     }
 }
 
-fn pin_bundle(manifest: &SourceManifest, source_root: Option<&Path>) -> VerifiedSourceBundle {
-    match source_root {
-        None => VerifiedSourceBundle::from_manifest(manifest),
-        Some(root) => {
-            VerifiedSourceBundle::from_observed(manifest, |path| read_artifact_bytes(root, path))
+fn pin_bundle_from_observations(
+    manifest: &SourceManifest,
+    artifacts: &[(String, String, ArtifactObservation)],
+    unread: bool,
+) -> VerifiedSourceBundle {
+    if unread {
+        return VerifiedSourceBundle::from_manifest(manifest);
+    }
+    VerifiedSourceBundle::from_observed(manifest, |path| {
+        artifacts.iter().find_map(|(observed_path, _, obs)| {
+            if observed_path != path {
+                return None;
+            }
+            match obs {
+                ArtifactObservation::Bytes(bytes) => Some(bytes.clone()),
+                ArtifactObservation::Unread | ArtifactObservation::Missing => None,
+            }
+        })
+    })
+}
+
+/// Temporary tree of interned artifact bytes. Drop removes the directory.
+struct PinnedRoot {
+    dir: PathBuf,
+}
+
+impl PinnedRoot {
+    fn path(&self) -> &Path {
+        &self.dir
+    }
+}
+
+impl Drop for PinnedRoot {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.dir);
+    }
+}
+
+/// Write interned bytes to a private directory so check reads the salsa
+/// snapshot, not the live `source_root`.
+fn materialize_pinned_root(
+    artifacts: &[(String, String, ArtifactObservation)],
+) -> Result<PinnedRoot, Vec<Diagnostic>> {
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let dir = std::env::temp_dir().join(format!(
+        "fidryn-pin-{}-{}-{}",
+        std::process::id(),
+        nanos,
+        PINNED_ROOT_SEQ.fetch_add(1, Ordering::Relaxed)
+    ));
+    fs::create_dir_all(&dir).map_err(|err| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E100,
+            format!("cannot create pinned artifact snapshot: {err}"),
+        )]
+    })?;
+    let pinned = PinnedRoot { dir };
+    for (path, _, observation) in artifacts {
+        let ArtifactObservation::Bytes(bytes) = observation else {
+            continue;
+        };
+        let Some(rel) = safe_rel_artifact_path(path) else {
+            continue;
+        };
+        let dest = pinned.dir.join(rel);
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|err| {
+                vec![Diagnostic::new(
+                    DiagnosticCode::E100,
+                    format!("cannot create pinned artifact directory: {err}"),
+                )]
+            })?;
         }
+        fs::write(&dest, bytes).map_err(|err| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E100,
+                format!("cannot write pinned artifact `{path}`: {err}"),
+            )]
+        })?;
+    }
+    Ok(pinned)
+}
+
+fn safe_rel_artifact_path(path: &str) -> Option<PathBuf> {
+    let raw = Path::new(path);
+    if raw.is_absolute() {
+        return None;
+    }
+    let mut out = PathBuf::new();
+    for component in raw.components() {
+        match component {
+            Component::Normal(part) => out.push(part),
+            Component::CurDir => {}
+            Component::Prefix(_) | Component::RootDir | Component::ParentDir => return None,
+        }
+    }
+    if out.as_os_str().is_empty() {
+        None
+    } else {
+        Some(out)
     }
 }
 
@@ -607,6 +724,96 @@ fn artifact_observations(
             (artifact.path.clone(), artifact.digest.clone(), observation)
         })
         .collect()
+}
+
+/// Add nested `packages/<name>` module and lock bytes to the salsa check
+/// input. Direct imports are already on the manifest; this walks their
+/// nested imports so a B+lock edit with A+root unchanged is part of the key.
+fn collect_nested_package_inputs(
+    source_root: &Path,
+    src: &str,
+    artifacts: &mut Vec<(String, String, ArtifactObservation)>,
+) {
+    let mut pending: Vec<(String, usize)> = imported_package_names(src)
+        .into_iter()
+        .map(|name| (name, 1))
+        .collect();
+    let mut seen = BTreeSet::new();
+    while let Some((name, depth)) = pending.pop() {
+        if !is_safe_package_name(&name) || !seen.insert(name.clone()) {
+            continue;
+        }
+        if depth > NESTED_PACKAGE_INPUT_DEPTH {
+            continue;
+        }
+        observe_package_inputs(source_root, &name, depth, artifacts, &mut pending);
+    }
+    artifacts.sort_by(|left, right| left.0.cmp(&right.0));
+}
+
+fn observe_package_inputs(
+    source_root: &Path,
+    name: &str,
+    depth: usize,
+    artifacts: &mut Vec<(String, String, ArtifactObservation)>,
+    pending: &mut Vec<(String, usize)>,
+) {
+    let dir = packages_root(source_root).join(name);
+    let lock_rel = format!("packages/{name}/manifest.json");
+    let lock_obs = match fs::read(dir.join("manifest.json")) {
+        Ok(bytes) => ArtifactObservation::Bytes(bytes),
+        Err(_) => ArtifactObservation::Missing,
+    };
+    let lock = match &lock_obs {
+        ArtifactObservation::Bytes(bytes) => serde_json::from_slice::<PackageLock>(bytes).ok(),
+        ArtifactObservation::Unread | ArtifactObservation::Missing => None,
+    };
+    let lock_digest = match &lock_obs {
+        ArtifactObservation::Bytes(bytes) => blake3::hash(bytes).to_hex().to_string(),
+        ArtifactObservation::Unread | ArtifactObservation::Missing => String::new(),
+    };
+    push_artifact_observation(artifacts, lock_rel, lock_digest, lock_obs);
+
+    let Some(module_path) = unique_package_module(&dir) else {
+        return;
+    };
+    let Some(file_name) = module_path.file_name().and_then(|n| n.to_str()) else {
+        return;
+    };
+    let rel = format!("packages/{name}/{file_name}");
+    let module_obs = match fs::read(&module_path) {
+        Ok(bytes) => ArtifactObservation::Bytes(bytes),
+        Err(_) => ArtifactObservation::Missing,
+    };
+    let module_digest = match &module_obs {
+        ArtifactObservation::Bytes(bytes) => lock
+            .as_ref()
+            .map(|item| item.digest.clone())
+            .filter(|digest| !digest.is_empty())
+            .unwrap_or_else(|| blake3::hash(bytes).to_hex().to_string()),
+        ArtifactObservation::Unread | ArtifactObservation::Missing => String::new(),
+    };
+    if let ArtifactObservation::Bytes(bytes) = &module_obs
+        && let Ok(text) = std::str::from_utf8(bytes)
+        && depth < NESTED_PACKAGE_INPUT_DEPTH
+    {
+        for nested in imported_package_names(text) {
+            pending.push((nested, depth + 1));
+        }
+    }
+    push_artifact_observation(artifacts, rel, module_digest, module_obs);
+}
+
+fn push_artifact_observation(
+    artifacts: &mut Vec<(String, String, ArtifactObservation)>,
+    path: String,
+    digest: String,
+    observation: ArtifactObservation,
+) {
+    if artifacts.iter().any(|(existing, _, _)| existing == &path) {
+        return;
+    }
+    artifacts.push((path, digest, observation));
 }
 
 fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
@@ -934,7 +1141,10 @@ fn parse_manifest_json(text: &str, path: &Path) -> Result<SourceManifest, Vec<Di
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::{Assumption, ExecutionMode, Instant, QueryPlan, Term, TrustProfile};
+    use fidryn_core::{
+        Assumption, CoreDecl, ExecutionMode, Instant, PACKAGE_LOCK_SCHEMA, QueryPlan, Term,
+        TrustProfile,
+    };
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn bool_query(literal: &str) -> String {
@@ -1881,18 +2091,29 @@ module Examples.UseStd version "0.1.0" {
         copy_workspace_packages(&dir);
         let src = std_core_call_src();
         let mut driver = Driver::new();
-        let module = driver
-            .check_source(src, &SourceManifest::default())
-            .expect("digest-free import without a bundle is not path compile");
-        assert_ne!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
-        assert_eq!(
-            driver.source_trust_of(&module),
-            TrustProfile::Unauthenticated
-        );
-        assert!(
-            !has_core_function(&module, "always_true"),
-            "check_source must not mill packages/ from cwd: {module:?}"
-        );
+        match driver.check_source(src, &SourceManifest::default()) {
+            Ok(module) => {
+                assert_ne!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
+                assert_eq!(
+                    driver.source_trust_of(&module),
+                    TrustProfile::Unauthenticated
+                );
+                assert!(
+                    !has_core_function(&module, "always_true"),
+                    "check_source must not mill packages/ from cwd: {module:?}"
+                );
+            }
+            Err(diagnostics) => {
+                assert!(
+                    diagnostics.iter().any(|d| d.code == DiagnosticCode::E210),
+                    "unlinked always_true is E210, not a packages/ mill: {diagnostics:?}"
+                );
+                assert!(
+                    !diagnostics.iter().any(|d| d.message.contains("packages/")),
+                    "check_source must not walk packages/: {diagnostics:?}"
+                );
+            }
+        }
 
         let bytes = fs::read(dir.join("packages").join("std").join("core.fr")).expect("bytes");
         let digest = blake3::hash(&bytes).to_hex().to_string();
@@ -1949,5 +2170,112 @@ module Examples.UseStd version "0.1.0" {
             assert_eq!(lock.digest, blake3::hash(&bytes).to_hex().to_string());
             assert_eq!(lock.schema, fidryn_core::PACKAGE_LOCK_SCHEMA);
         }
+    }
+
+    fn write_locked_package(root: &Path, name: &str, file: &str, src: &str) {
+        let dir = root.join("packages").join(name);
+        fs::create_dir_all(&dir).expect("package dir");
+        fs::write(dir.join(file), src.as_bytes()).expect("package module");
+        let lock = PackageLock {
+            schema: PACKAGE_LOCK_SCHEMA.into(),
+            name: name.into(),
+            version: "0.1.0".into(),
+            digest: blake3::hash(src.as_bytes()).to_hex().to_string(),
+        };
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_string(&lock).expect("lock json"),
+        )
+        .expect("package lock");
+    }
+
+    fn nested_flag_importer() -> &'static str {
+        r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    query q() -> Bool { return flag() }
+}
+"#
+    }
+
+    fn nested_std_reexport() -> &'static str {
+        r#"
+module Std.Core version "0.1.0" {
+    import Logic.True version "0.1.0"
+}
+"#
+    }
+
+    fn nested_logic_flag(literal: &str) -> String {
+        format!(
+            r#"
+module Logic.True version "0.1.0" {{
+    fn flag() -> Bool {{ {literal} }}
+}}
+"#
+        )
+    }
+
+    fn function_body<'a>(module: &'a CoreModule, name: &str) -> Option<&'a Term> {
+        module.declarations.iter().find_map(|decl| match decl {
+            CoreDecl::Function(function) if function.name == name => function.body.as_ref(),
+            _ => None,
+        })
+    }
+
+    fn outcome_codes(diagnostics: &[Diagnostic]) -> Vec<DiagnosticCode> {
+        let mut codes: Vec<DiagnosticCode> = diagnostics.iter().map(|d| d.code).collect();
+        codes.sort_by_key(|code| format!("{code:?}"));
+        codes
+    }
+
+    #[test]
+    fn nested_package_edit_agrees_on_warm_and_fresh_driver() {
+        let dir = temp_module_dir("nested-pin");
+        write_locked_package(&dir, "logic", "true.fr", &nested_logic_flag("true"));
+        write_locked_package(&dir, "std", "core.fr", nested_std_reexport());
+        let path = dir.join("m.fr");
+        fs::write(&path, nested_flag_importer()).expect("write importer");
+
+        let mut warm = Driver::new();
+        let (first, _) = warm.check_path(&path).expect("initial nested link");
+        assert_eq!(function_body(&first, "flag"), Some(&Term::Bool(true)));
+        let misses_after_first = warm.misses();
+
+        write_locked_package(&dir, "logic", "true.fr", &nested_logic_flag("false"));
+
+        let warm_after = warm.check_path(&path);
+        let fresh = Driver::new().check_path(&path);
+        match (&warm_after, &fresh) {
+            (Ok((warm_module, _)), Ok((fresh_module, _))) => {
+                assert_eq!(
+                    function_body(warm_module, "flag"),
+                    function_body(fresh_module, "flag"),
+                    "warm and fresh must agree on nested B"
+                );
+                assert_eq!(
+                    function_body(warm_module, "flag"),
+                    Some(&Term::Bool(false)),
+                    "both drivers must see the edited nested package"
+                );
+                assert_eq!(
+                    warm_module.content_fingerprint().expect("warm fp"),
+                    fresh_module.content_fingerprint().expect("fresh fp")
+                );
+            }
+            (Err(warm_err), Err(fresh_err)) => {
+                assert_eq!(
+                    outcome_codes(warm_err),
+                    outcome_codes(fresh_err),
+                    "warm and fresh must agree on nested B failure: {warm_err:?} vs {fresh_err:?}"
+                );
+            }
+            other => panic!("warm vs fresh disagreed after nested B+lock edit: {other:?}"),
+        }
+        assert!(
+            warm.misses() > misses_after_first,
+            "nested B+lock is part of the salsa key so the warm driver must miss"
+        );
+        let _ = fs::remove_dir_all(&dir);
     }
 }
