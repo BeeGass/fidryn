@@ -1,21 +1,39 @@
 //! CaseFile, Scenario, Explore, and Skeptical handlers.
 
+use fidryn_core::case::CaseDetermination;
+use fidryn_core::ir::CoreConflictDoctrine;
 use fidryn_core::outcome::OpenRequest;
+use fidryn_core::patterns::{PropPattern, TermPattern};
 use fidryn_core::{
-    CaseRecord, HaltReason, Handler, HandlerResult, Outcome, SuspensionReason, Value,
+    CaseRecord, EvidenceItem, HaltReason, Handler, HandlerResult, Instant, Outcome, PropTerm,
+    SuspensionReason, Term, TraceId, Value,
 };
 use fidryn_eval::resolve_conflict;
 use std::collections::{BTreeMap, BTreeSet};
 
+#[derive(Default)]
 pub struct CaseFile {
     pub record: CaseRecord,
+    /// Extra temporal filter for observe. `None` does not filter by time.
+    pub known_at: Option<Instant>,
+}
+
+impl CaseFile {
+    pub fn new(record: CaseRecord) -> Self {
+        Self {
+            record,
+            known_at: None,
+        }
+    }
 }
 
 impl Handler for CaseFile {
     fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
-            OpenRequest::NeedEvidence { schema, .. } => {
-                if let Some(item) = self.record.evidence.iter().find(|e| e.schema == *schema) {
+            OpenRequest::NeedEvidence { schema, issue } => {
+                if let Some(item) =
+                    select_evidence(&self.record.evidence, schema, issue, self.known_at)
+                {
                     HandlerResult::Resume {
                         value: item.value.clone(),
                         trace_fragment: format!("observe:{schema}"),
@@ -36,34 +54,24 @@ impl Handler for CaseFile {
 
     fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
-            OpenRequest::NeedJudgment { protocol, .. } => {
-                if let Some(d) = self
-                    .record
-                    .determinations
-                    .iter()
-                    .find(|d| d.protocol == *protocol)
-                {
-                    if d.established {
-                        HandlerResult::Resume {
-                            value: Value::Bool(true),
-                            trace_fragment: format!("determine:{protocol}"),
+            OpenRequest::NeedJudgment { protocol, issue } => {
+                match matching_determination(&self.record.determinations, protocol, issue) {
+                    Some(d) if d.established => HandlerResult::Resume {
+                        value: Value::Bool(true),
+                        trace_fragment: format!("determine:{protocol}"),
+                    },
+                    Some(_) => HandlerResult::Resume {
+                        value: Value::Bool(false),
+                        trace_fragment: format!("determine-rejected:{protocol}"),
+                    },
+                    None => {
+                        let mut requests = BTreeSet::new();
+                        requests.insert(request.clone());
+                        HandlerResult::Suspend {
+                            requests,
+                            reason: SuspensionReason::MissingDetermination,
+                            trace_fragment: format!("need-judgment:{protocol}"),
                         }
-                    } else {
-                        HandlerResult::Halt {
-                            reason: HaltReason::OutsideCompetence {
-                                request: request.clone(),
-                                reason: "determination present but not established".into(),
-                            },
-                            trace_fragment: format!("invalid-determination:{protocol}"),
-                        }
-                    }
-                } else {
-                    let mut requests = BTreeSet::new();
-                    requests.insert(request.clone());
-                    HandlerResult::Suspend {
-                        requests,
-                        reason: SuspensionReason::MissingDetermination,
-                        trace_fragment: format!("need-judgment:{protocol}"),
                     }
                 }
             }
@@ -211,6 +219,218 @@ impl CaseFile {
     }
 }
 
+fn select_evidence<'a>(
+    evidence: &'a [EvidenceItem],
+    schema: &str,
+    issue: &PropPattern,
+    known_at: Option<Instant>,
+) -> Option<&'a EvidenceItem> {
+    let matching: Vec<&EvidenceItem> = evidence
+        .iter()
+        .filter(|item| {
+            item.schema == schema
+                && observed_by_known_at(item.observed_at, known_at)
+                && evidence_fits_issue(&item.value, issue)
+        })
+        .collect();
+    let subjects = pattern_subjects(issue);
+    matching
+        .iter()
+        .copied()
+        .find(|item| {
+            subjects
+                .iter()
+                .any(|subject| value_mentions_subject(&item.value, subject))
+        })
+        .or_else(|| matching.first().copied())
+}
+
+fn observed_by_known_at(observed_at: Instant, known_at: Option<Instant>) -> bool {
+    match known_at {
+        None => true,
+        Some(known) => observed_at <= known,
+    }
+}
+
+fn evidence_fits_issue(value: &Value, issue: &PropPattern) -> bool {
+    let subjects = pattern_subjects(issue);
+    if subjects.is_empty() {
+        return true;
+    }
+    if subjects
+        .iter()
+        .any(|subject| value_mentions_subject(value, subject))
+    {
+        return true;
+    }
+    named_subjects_in_value(value).is_empty()
+}
+
+fn pattern_subjects(issue: &PropPattern) -> Vec<String> {
+    match issue {
+        PropPattern::Ground(prop) => prop.arguments.iter().filter_map(term_subject).collect(),
+        PropPattern::Match { arguments, .. } => arguments
+            .iter()
+            .filter_map(|pattern| match pattern {
+                TermPattern::Exact(term) => term_subject(term),
+                TermPattern::Bind(_) | TermPattern::Wildcard => None,
+            })
+            .collect(),
+    }
+}
+
+fn term_subject(term: &Term) -> Option<String> {
+    match term {
+        Term::Ident(name) | Term::String(name) => Some(name.clone()),
+        Term::Apply { ctor, args } if args.is_empty() => Some(ctor.clone()),
+        _ => None,
+    }
+}
+
+fn value_mentions_subject(value: &Value, subject: &str) -> bool {
+    match value {
+        Value::Entity(name) | Value::String(name) => name == subject,
+        Value::Prop(prop) => {
+            prop.predicate == subject
+                || prop
+                    .arguments
+                    .iter()
+                    .any(|term| term_mentions_subject(term, subject))
+        }
+        Value::Ctor { name, fields } => {
+            name == subject || fields.values().any(|v| value_mentions_subject(v, subject))
+        }
+        Value::Map(fields) => fields.values().any(|v| value_mentions_subject(v, subject)),
+        Value::Set(items) => items.iter().any(|v| value_mentions_subject(v, subject)),
+        Value::Option(Some(inner)) => value_mentions_subject(inner, subject),
+        Value::ClauseRef { arguments, .. } => {
+            arguments.iter().any(|v| value_mentions_subject(v, subject))
+        }
+        _ => false,
+    }
+}
+
+fn term_mentions_subject(term: &Term, subject: &str) -> bool {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name == subject,
+        Term::Apply { ctor, args } => {
+            ctor == subject || args.iter().any(|term| term_mentions_subject(term, subject))
+        }
+        Term::Set(items) => items
+            .iter()
+            .any(|term| term_mentions_subject(term, subject)),
+        Term::Record(fields) => fields
+            .values()
+            .any(|term| term_mentions_subject(term, subject)),
+        _ => false,
+    }
+}
+
+fn named_subjects_in_value(value: &Value) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    collect_named_subjects(value, false, &mut names);
+    names
+}
+
+fn collect_named_subjects(value: &Value, in_subject_field: bool, names: &mut BTreeSet<String>) {
+    match value {
+        Value::Entity(name) => {
+            names.insert(name.clone());
+        }
+        Value::String(name) if in_subject_field => {
+            names.insert(name.clone());
+        }
+        Value::Prop(prop) => {
+            for term in &prop.arguments {
+                if let Some(subject) = term_subject(term) {
+                    names.insert(subject);
+                }
+            }
+        }
+        Value::Ctor { fields, .. } | Value::Map(fields) => {
+            for (key, nested) in fields {
+                collect_named_subjects(nested, is_subject_key(key), names);
+            }
+        }
+        Value::Set(items) => {
+            for nested in items {
+                collect_named_subjects(nested, in_subject_field, names);
+            }
+        }
+        Value::Option(Some(inner)) => collect_named_subjects(inner, in_subject_field, names),
+        Value::ClauseRef { arguments, .. } => {
+            for nested in arguments {
+                collect_named_subjects(nested, in_subject_field, names);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn is_subject_key(key: &str) -> bool {
+    matches!(
+        key,
+        "subject"
+            | "person"
+            | "entity"
+            | "party"
+            | "occupant"
+            | "who"
+            | "candidate"
+            | "holder"
+            | "trustee"
+            | "of"
+            | "name"
+    )
+}
+
+fn matching_determination<'a>(
+    determinations: &'a [CaseDetermination],
+    protocol: &str,
+    issue: &PropTerm,
+) -> Option<&'a CaseDetermination> {
+    determinations.iter().find(|determination| {
+        determination.protocol == protocol && judgment_issue_matches(&determination.issue, issue)
+    })
+}
+
+fn judgment_issue_matches(recorded: &str, issue: &PropTerm) -> bool {
+    compact_issue(recorded) == compact_issue(&format_prop_term(issue))
+}
+
+fn format_prop_term(issue: &PropTerm) -> String {
+    if issue.arguments.is_empty() {
+        return issue.predicate.clone();
+    }
+    let args = issue
+        .arguments
+        .iter()
+        .map(format_term)
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!("{}({args})", issue.predicate)
+}
+
+fn format_term(term: &Term) -> String {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name.clone(),
+        Term::Bool(value) => value.to_string(),
+        Term::Int(value) => value.to_string(),
+        Term::Decimal(value) => value.to_string(),
+        Term::Apply { ctor, args } if args.is_empty() => ctor.clone(),
+        Term::Apply { ctor, args } => {
+            let nested = args.iter().map(format_term).collect::<Vec<_>>().join(", ");
+            format!("{ctor}({nested})")
+        }
+        Term::Wildcard => "_".into(),
+        other => format!("{other:?}"),
+    }
+}
+
+fn compact_issue(label: &str) -> String {
+    label.chars().filter(|c| !c.is_whitespace()).collect()
+}
+
 fn recorded_conflict(
     record: &CaseRecord,
     graph: &[String],
@@ -331,17 +551,14 @@ impl Handler for Explore {
     fn handle_interpret(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
             OpenRequest::NeedInterpretation { family, .. } => {
-                if let Some(alt) = self.branch.get(family) {
-                    HandlerResult::Resume {
-                        value: Value::String(alt.clone()),
-                        trace_fragment: format!("explore:{family}:{alt}"),
-                    }
-                } else if self
+                if let Some(alt) = self.branch.get(family).cloned() {
+                    return self.resume_recorded_interpretation(request, family, alt);
+                }
+                if self
                     .bounds
                     .interpretations
                     .get(family)
-                    .map(|v| v.is_empty())
-                    .unwrap_or(true)
+                    .is_none_or(Vec::is_empty)
                 {
                     let mut requests = BTreeSet::new();
                     requests.insert(request.clone());
@@ -430,6 +647,44 @@ impl Handler for Explore {
 }
 
 impl Explore {
+    /// Bind `additions` only for families that are not already recorded.
+    /// Ordinary interpret must not replace a recorded selection.
+    pub fn fill_unset(&mut self, additions: &BTreeMap<String, String>) {
+        for (family, alt) in additions {
+            self.branch
+                .entry(family.clone())
+                .or_insert_with(|| alt.clone());
+        }
+    }
+
+    fn resume_recorded_interpretation(
+        &self,
+        request: &OpenRequest,
+        family: &str,
+        alt: String,
+    ) -> HandlerResult {
+        let admitted = self
+            .bounds
+            .interpretations
+            .get(family)
+            .map(|options| options.iter().any(|option| option == &alt))
+            .unwrap_or(true);
+        if admitted {
+            HandlerResult::Resume {
+                value: Value::String(alt.clone()),
+                trace_fragment: format!("explore:{family}:{alt}"),
+            }
+        } else {
+            HandlerResult::Halt {
+                reason: HaltReason::OutsideCompetence {
+                    request: request.clone(),
+                    reason: "recorded interpretation is not in the admissible set".into(),
+                },
+                trace_fragment: format!("inadmissible:{family}"),
+            }
+        }
+    }
+
     fn branch_or_open(&self, request: &OpenRequest) -> HandlerResult {
         let mut requests = BTreeSet::new();
         requests.insert(request.clone());
@@ -467,71 +722,269 @@ impl Handler for Skeptical {
 }
 
 /// Conservative aggregation of explored branch outcomes.
+///
+/// Determinate answers are compared with full [`Value`] equality. Nested
+/// contingents are flattened. Unresolved requests are unioned rather than
+/// dropped. Suspended / conflict / competence beat a lone determinate;
+/// a nested contingent or unequal values beat determinate.
 pub fn aggregate(branches: Vec<Outcome<Value>>) -> Outcome<Value> {
     if branches.is_empty() {
         return Outcome::Inconsistent {
             core: vec!["empty completion set".into()],
-            trace: fidryn_core::TraceId::of(b"empty"),
+            trace: TraceId::of(b"empty"),
         };
     }
-    if branches
-        .iter()
-        .all(|b| matches!(b, Outcome::Inconsistent { .. }))
-    {
-        return branches.into_iter().next().unwrap();
+    if branches.iter().all(is_inconsistent) {
+        return merge_inconsistent(branches);
     }
-    if let Some(out) = branches
-        .iter()
-        .find(|b| matches!(b, Outcome::OutsideCompetence { .. }))
-    {
-        return out.clone();
-    }
-    if let Some(out) = branches
-        .iter()
-        .find(|b| matches!(b, Outcome::Suspended { .. }))
-    {
-        return out.clone();
-    }
-    if let Some(out) = branches
-        .iter()
-        .find(|b| matches!(b, Outcome::NormConflict { .. }))
-    {
-        return out.clone();
-    }
-    let values: Vec<_> = branches
-        .iter()
-        .filter_map(|b| match b {
-            Outcome::Determinate { value, .. } => Some(value.display_label()),
-            _ => None,
-        })
+
+    let live: Vec<Outcome<Value>> = branches
+        .into_iter()
+        .filter(|branch| !is_inconsistent(branch))
         .collect();
-    if values.is_empty() {
-        return branches.into_iter().next().unwrap();
-    }
-    let first = values[0].clone();
-    if values.iter().all(|v| *v == first) {
-        return branches
+    if live.len() <= 1 {
+        return live
             .into_iter()
-            .find(|b| matches!(b, Outcome::Determinate { .. }))
-            .unwrap();
+            .next()
+            .unwrap_or_else(|| Outcome::Inconsistent {
+                core: vec!["empty completion set".into()],
+                trace: TraceId::of(b"empty"),
+            });
     }
+
     let mut alternatives = BTreeMap::new();
-    for (i, b) in branches.iter().enumerate() {
-        if let Outcome::Determinate { value, .. } = b {
-            alternatives.insert(format!("B{i}"), value.clone());
+    let mut pivots = BTreeSet::new();
+    let mut requests = BTreeSet::new();
+    let mut first_determinate = None;
+    let mut competence = Vec::new();
+    let mut conflicts = Vec::new();
+    let mut has_contingent = false;
+    let mut has_suspended = false;
+
+    for (index, branch) in live.into_iter().enumerate() {
+        match branch {
+            Outcome::Determinate {
+                value,
+                trace,
+                convergence_certificate,
+                ignored_open_issues,
+            } => {
+                insert_alternative(&mut alternatives, format!("B{index}"), value.clone());
+                if first_determinate.is_none() {
+                    first_determinate = Some(Outcome::Determinate {
+                        value,
+                        trace,
+                        convergence_certificate,
+                        ignored_open_issues,
+                    });
+                }
+            }
+            Outcome::Contingent {
+                alternatives: nested,
+                pivots: nested_pivots,
+                ..
+            } => {
+                has_contingent = true;
+                pivots.extend(nested_pivots);
+                for (key, value) in nested {
+                    insert_alternative(&mut alternatives, key, value);
+                }
+            }
+            Outcome::Suspended {
+                requests: nested, ..
+            } => {
+                has_suspended = true;
+                requests.extend(nested);
+            }
+            Outcome::OutsideCompetence {
+                request,
+                reason,
+                trace,
+            } => {
+                requests.insert(request.clone());
+                competence.push(Outcome::OutsideCompetence {
+                    request,
+                    reason,
+                    trace,
+                });
+            }
+            Outcome::NormConflict { doctrines, trace } => {
+                requests.insert(conflict_request(&doctrines));
+                conflicts.push(Outcome::NormConflict { doctrines, trace });
+            }
+            Outcome::Inconsistent { .. } => {}
         }
     }
-    Outcome::Contingent {
-        alternatives,
-        pivots: BTreeSet::new(),
-        trace: fidryn_core::TraceId::of(b"aggregate"),
+
+    let divergent = unique_values(&alternatives).len() > 1;
+    let combined_trace = TraceId::of(b"aggregate");
+
+    if has_contingent || divergent {
+        pivots.extend(requests);
+        return Outcome::Contingent {
+            alternatives,
+            pivots,
+            trace: combined_trace,
+        };
     }
+    if has_suspended {
+        return Outcome::Suspended {
+            requests,
+            trace: combined_trace,
+        };
+    }
+    if !conflicts.is_empty() {
+        return merge_conflicts(conflicts);
+    }
+    if competence.len() == 1 {
+        return competence.remove(0);
+    }
+    if !competence.is_empty() {
+        return Outcome::Suspended {
+            requests,
+            trace: combined_trace,
+        };
+    }
+    if let Some(determinate) = first_determinate {
+        return determinate;
+    }
+    Outcome::Inconsistent {
+        core: vec!["empty completion set".into()],
+        trace: combined_trace,
+    }
+}
+
+fn is_inconsistent(outcome: &Outcome<Value>) -> bool {
+    matches!(outcome, Outcome::Inconsistent { .. })
+}
+
+fn merge_inconsistent(branches: Vec<Outcome<Value>>) -> Outcome<Value> {
+    let mut core = Vec::new();
+    let mut trace = TraceId::of(b"aggregate");
+    for (index, branch) in branches.into_iter().enumerate() {
+        if let Outcome::Inconsistent {
+            core: lines,
+            trace: branch_trace,
+        } = branch
+        {
+            if index == 0 {
+                trace = branch_trace;
+            }
+            for line in lines {
+                if !core.contains(&line) {
+                    core.push(line);
+                }
+            }
+        }
+    }
+    Outcome::Inconsistent { core, trace }
+}
+
+fn merge_conflicts(mut conflicts: Vec<Outcome<Value>>) -> Outcome<Value> {
+    if conflicts.len() == 1 {
+        return conflicts.remove(0);
+    }
+    let mut doctrines: Vec<CoreConflictDoctrine> = Vec::new();
+    let mut trace = TraceId::of(b"aggregate");
+    for (index, conflict) in conflicts.into_iter().enumerate() {
+        if let Outcome::NormConflict {
+            doctrines: nested,
+            trace: branch_trace,
+        } = conflict
+        {
+            if index == 0 {
+                trace = branch_trace;
+            }
+            for doctrine in nested {
+                if doctrines
+                    .iter()
+                    .all(|seen| seen.id != doctrine.id && seen.name != doctrine.name)
+                {
+                    doctrines.push(doctrine);
+                }
+            }
+        }
+    }
+    Outcome::NormConflict { doctrines, trace }
+}
+
+fn conflict_request(doctrines: &[CoreConflictDoctrine]) -> OpenRequest {
+    OpenRequest::NeedConflict {
+        graph: Vec::new(),
+        doctrines: doctrines
+            .iter()
+            .map(|doctrine| doctrine.name.clone())
+            .collect(),
+    }
+}
+
+fn insert_alternative(alternatives: &mut BTreeMap<String, Value>, key: String, value: Value) {
+    match alternatives.get(&key) {
+        None => {
+            alternatives.insert(key, value);
+        }
+        Some(existing) if existing == &value => {}
+        Some(_) => {
+            let mut n = 0u32;
+            loop {
+                let candidate = format!("{key}#{n}");
+                match alternatives.get(&candidate) {
+                    None => {
+                        alternatives.insert(candidate, value);
+                        return;
+                    }
+                    Some(existing) if existing == &value => return,
+                    Some(_) => n += 1,
+                }
+            }
+        }
+    }
+}
+
+fn unique_values(alternatives: &BTreeMap<String, Value>) -> Vec<&Value> {
+    let mut unique = Vec::new();
+    for value in alternatives.values() {
+        if !unique.contains(&value) {
+            unique.push(value);
+        }
+    }
+    unique
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::TraceId;
+
+    fn award(amount: i64) -> Value {
+        Value::Ctor {
+            name: "Award".into(),
+            fields: BTreeMap::from([("amount".into(), Value::Int(amount))]),
+        }
+    }
+
+    fn determinate(value: Value) -> Outcome<Value> {
+        Outcome::Determinate {
+            value,
+            trace: TraceId::of(b"t"),
+            convergence_certificate: None,
+            ignored_open_issues: BTreeSet::new(),
+        }
+    }
+
+    fn instant(text: &str) -> Instant {
+        Instant::parse(text).unwrap()
+    }
+
+    fn eligible(person: &str) -> PropTerm {
+        PropTerm::new("Eligible", vec![Term::Ident(person.into())])
+    }
+
+    fn need_eligible(person: &str) -> OpenRequest {
+        OpenRequest::NeedJudgment {
+            issue: eligible(person),
+            protocol: "Eligibility".into(),
+        }
+    }
 
     #[test]
     fn empty_completions_are_inconsistent() {
@@ -541,12 +994,7 @@ mod tests {
 
     #[test]
     fn uncertified_open_prevents_determinate() {
-        let det = Outcome::Determinate {
-            value: Value::Entity("Bob".into()),
-            trace: TraceId::of(b"t"),
-            convergence_certificate: None,
-            ignored_open_issues: BTreeSet::new(),
-        };
+        let det = determinate(Value::Entity("Bob".into()));
         let sus = Outcome::Suspended {
             requests: BTreeSet::new(),
             trace: TraceId::of(b"t2"),
@@ -556,12 +1004,62 @@ mod tests {
     }
 
     #[test]
+    fn same_constructor_different_fields_are_contingent() {
+        let out = aggregate(vec![determinate(award(100)), determinate(award(200))]);
+        match out {
+            Outcome::Contingent { alternatives, .. } => {
+                let values: Vec<&Value> = alternatives.values().collect();
+                assert!(values.contains(&&award(100)), "{alternatives:?}");
+                assert!(values.contains(&&award(200)), "{alternatives:?}");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn nested_contingent_is_not_discarded() {
+        let mut nested = BTreeMap::new();
+        nested.insert("I1".into(), award(100));
+        nested.insert("I2".into(), award(200));
+        let contingent = Outcome::Contingent {
+            alternatives: nested,
+            pivots: BTreeSet::new(),
+            trace: TraceId::of(b"c"),
+        };
+        let out = aggregate(vec![determinate(award(100)), contingent]);
+        match out {
+            Outcome::Contingent { alternatives, .. } => {
+                let values: Vec<&Value> = alternatives.values().collect();
+                assert!(values.contains(&&award(100)), "{alternatives:?}");
+                assert!(values.contains(&&award(200)), "{alternatives:?}");
+            }
+            other => panic!("nested contingent discarded: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn all_inconsistent_stays_inconsistent() {
+        let a = Outcome::Inconsistent {
+            core: vec!["a".into()],
+            trace: TraceId::of(b"a"),
+        };
+        let b = Outcome::Inconsistent {
+            core: vec!["b".into()],
+            trace: TraceId::of(b"b"),
+        };
+        assert!(matches!(
+            aggregate(vec![a, b]),
+            Outcome::Inconsistent { .. }
+        ));
+    }
+
+    #[test]
     fn casefile_resumes_recorded_conflict_id() {
         let mut record = CaseRecord::default();
         record
             .decisions
             .insert("conflict:LexSpecialis".into(), "LexSpecialis".into());
-        let mut h = CaseFile { record };
+        let mut h = CaseFile::new(record);
         let out = h.handle(&OpenRequest::NeedConflict {
             graph: vec!["Follow:LexSpecialis".into(), "Follow:LexPosterior".into()],
             doctrines: vec!["LexSpecialis".into(), "LexPosterior".into()],
@@ -576,14 +1074,146 @@ mod tests {
 
     #[test]
     fn casefile_does_not_pick_the_first_of_two_doctrines() {
-        let mut h = CaseFile {
-            record: CaseRecord::default(),
-        };
+        let mut h = CaseFile::new(CaseRecord::default());
         let out = h.handle(&OpenRequest::NeedConflict {
             graph: vec!["Follow:A".into(), "Follow:B".into()],
             doctrines: vec!["A".into(), "B".into()],
         });
         assert!(matches!(out, HandlerResult::Suspend { .. }));
+    }
+
+    #[test]
+    fn determination_for_alice_does_not_resume_bob() {
+        let mut record = CaseRecord::default();
+        record.determinations.push(CaseDetermination {
+            issue: "Eligible(Alice)".into(),
+            protocol: "Eligibility".into(),
+            established: true,
+            decider: "Court".into(),
+        });
+        let mut h = CaseFile::new(record);
+        match h.handle_determine(&need_eligible("Bob")) {
+            HandlerResult::Suspend { .. } => {}
+            other => panic!("Alice determination resumed Bob: {other:?}"),
+        }
+        match h.handle_determine(&need_eligible("Alice")) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Bool(true)),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn negative_determination_is_not_outside_competence() {
+        let mut record = CaseRecord::default();
+        record.determinations.push(CaseDetermination {
+            issue: "Eligible(Alice)".into(),
+            protocol: "Eligibility".into(),
+            established: false,
+            decider: "Court".into(),
+        });
+        let mut h = CaseFile::new(record);
+        match h.handle_determine(&need_eligible("Alice")) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Bool(false)),
+            HandlerResult::Halt { reason, .. } => {
+                panic!("established:false halted as {reason:?}")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn observe_matches_schema_subject_and_known_at() {
+        let early = instant("2033-01-01T00:00:00Z");
+        let late = instant("2034-01-01T00:00:00Z");
+        let mut record = CaseRecord::default();
+        record.evidence.push(EvidenceItem {
+            schema: "PhysicianCertificate".into(),
+            value: Value::Entity("Bob".into()),
+            observed_at: early,
+        });
+        record.evidence.push(EvidenceItem {
+            schema: "PhysicianCertificate".into(),
+            value: Value::Entity("Alice".into()),
+            observed_at: late,
+        });
+        let issue = PropPattern::Ground(eligible("Alice"));
+        let req = OpenRequest::NeedEvidence {
+            issue,
+            schema: "PhysicianCertificate".into(),
+        };
+
+        let mut by_schema = CaseFile::new(record.clone());
+        match by_schema.handle_observe(&req) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Entity("Alice".into())),
+            other => panic!("subject mismatch used first schema hit: {other:?}"),
+        }
+
+        let mut too_early = CaseFile {
+            record: record.clone(),
+            known_at: Some(early),
+        };
+        assert!(
+            matches!(
+                too_early.handle_observe(&req),
+                HandlerResult::Suspend { .. }
+            ),
+            "future Alice record must not resume at an earlier known_at"
+        );
+
+        let mut known = CaseFile {
+            record,
+            known_at: Some(late),
+        };
+        match known.handle_observe(&req) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Entity("Alice".into())),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn explore_fill_unset_does_not_replace_recorded() {
+        let mut bounds = ExplorationBounds::default();
+        bounds.interpretations.insert(
+            "SuccessorEligibility".into(),
+            vec!["I1".into(), "I2".into()],
+        );
+        bounds
+            .interpretations
+            .insert("Other".into(), vec!["X".into(), "Y".into()]);
+        let mut explore = Explore {
+            bounds,
+            branch: BTreeMap::from([("SuccessorEligibility".into(), "I1".into())]),
+        };
+        let mut additions = BTreeMap::new();
+        additions.insert("SuccessorEligibility".into(), "I2".into());
+        additions.insert("Other".into(), "X".into());
+        explore.fill_unset(&additions);
+        assert_eq!(
+            explore
+                .branch
+                .get("SuccessorEligibility")
+                .map(String::as_str),
+            Some("I1")
+        );
+        assert_eq!(explore.branch.get("Other").map(String::as_str), Some("X"));
+
+        let req = OpenRequest::NeedInterpretation {
+            source: "Instrument.clause(\"4.4\")".into(),
+            family: "SuccessorEligibility".into(),
+        };
+        match explore.handle_interpret(&req) {
+            HandlerResult::Resume { value, .. } => {
+                assert_eq!(value, Value::String("I1".into()));
+            }
+            other => panic!("{other:?}"),
+        }
+        assert_eq!(
+            explore
+                .branch
+                .get("SuccessorEligibility")
+                .map(String::as_str),
+            Some("I1")
+        );
     }
 
     #[test]
