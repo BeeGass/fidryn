@@ -29,14 +29,16 @@ That places `fidryn` on your Cargo bin path. Workspace `rust-version` is
 
 Success is exit 0. Failures are exit 1. Compiler diagnostics, engine
 errors, adapter errors, and usage problems go to stderr. Successful
-payloads (formatted source, the word `ok`, outcome JSON, rendered text,
+payloads (formatted source, the word `ok`, evaluation-report JSON, rendered text,
 diff JSON, filing receipts) go to stdout.
 
 A legal `Outcome` is not a process failure. `run` and `explore` print a
-`fidryn.outcome/v0.1` document and exit 0 even when the outcome kind is
-`suspended`, `contingent`, `normConflict`, `outsideCompetence`, or
-`inconsistent`. Unknown queries, invalid timestamps, missing files, and
-check errors are engine or compiler failures and exit 1.
+`fidryn.evaluation-report/v0.1` document (with nested
+`outcomeDocument` of schema `fidryn.outcome/v0.1`) and exit 0 even when
+the nested outcome kind is `suspended`, `contingent`, `normConflict`,
+`outsideCompetence`, or `inconsistent`. Unknown queries, invalid
+timestamps, missing files, and check errors are engine or compiler
+failures and exit 1.
 
 ## Source checking and trust
 
@@ -128,11 +130,16 @@ evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]
 | `--valid-at TIME` | yes | ISO 8601 / RFC 3339 instant |
 | `--known-at TIME` | yes | ISO 8601 / RFC 3339 instant |
 | `--arg KEY=VALUE` | no, repeatable | sets `case.facts[KEY]` to the string `VALUE` |
+| `--scenario` | no | flag; evaluate with `case.assumptions` as a scenario overlay (`executionMode: scenario`) |
 
 `--valid-at` is valid time. `--known-at` is record time. Both accept a
 `Z` suffix or a numeric offset (`+00:00`, `-04:00`). Example spellings:
 `2033-01-01T00:00:00Z` and `2033-01-01T00:00:00+00:00`. `--arg provision=ChildSupportWaiver`
 writes `case.facts["provision"]`. A binding without `=` is an error.
+Without `--scenario`, evaluation is operative: `case.assumptions` are
+not applied as an overlay. With `--scenario`, the report keeps
+`executionMode: scenario` and serializes `assumptions` (an empty array
+when the case has none).
 
 **Example**
 
@@ -155,10 +162,12 @@ fidryn run examples/prenup/ava-noah.fr \
   --arg provision=ChildSupportWaiver
 ```
 
-**Success.** Canonical JSON for schema `fidryn.outcome/v0.1` on stdout:
-`schema`, `module`, `sourceSnapshot`, `query`, `asOf` (`validTime`,
-`recordTime`), `modelBoundary`, and `outcome` (`kind`, `trace`, and
-kind-specific fields). Exit 0.
+**Success.** Canonical JSON for schema `fidryn.evaluation-report/v0.1`
+on stdout: `schema`, `executionMode` (`operative` or `scenario`),
+`sourceTrust`, `verificationMethod`, `assumptions`, optional `coverage`,
+and `outcomeDocument`. Nested `outcomeDocument` is the
+`fidryn.outcome/v0.1` projection (`module`, `sourceSnapshot`, `query`,
+`asOf`, `modelBoundary`, `outcome`). Exit 0. See [Outcomes](outcomes.md).
 
 **Failure.** Exit 1, stderr only. Check diagnostics; `cannot read PATH`;
 `invalid case record: ...`;
@@ -210,7 +219,10 @@ fidryn explore examples/trust/bryan-revocable-trust.fr \
 Omit `--bounds` when the case record is already admissible, as
 `examples/trust/cases/one-certificate.json` is.
 
-**Success.** The same `fidryn.outcome/v0.1` envelope as `run`, on stdout.
+**Success.** The same `fidryn.evaluation-report/v0.1` envelope as `run`,
+on stdout. If `case.assumptions` is nonempty, explore labels the report
+`executionMode: scenario` (there is no separate `--scenario` flag on
+`explore`).
 
 **Failure.** Exit 1. Same compile, case, and timestamp failures as `run`;
 `cannot read` / `invalid bounds JSON` for `--bounds`; or
@@ -229,8 +241,9 @@ Render a trace as text, JSON, or Graphviz DOT.
 | `--format FORMAT` | no | `text` (default), `json`, or `dot` |
 
 If `TRACE_ID` is an existing file, or `TRACE_ID.json` exists, that JSON
-is loaded. An outcome document from a prior `run` / `explore` is wrapped
-as a small DAG. If no such file exists, the argument is hashed as a
+is loaded. An evaluation-report or outcome document from a prior `run` /
+`explore` is wrapped as a small DAG (nested `outcomeDocument` is used
+when present). If no such file exists, the argument is hashed as a
 `TraceId` and the node list is empty. JSON always includes a `nodes`
 array; emptiness means no persisted DAG was loaded, not an omitted field.
 Unknown `--format` values are treated as `text`.
