@@ -440,9 +440,12 @@ impl CoreModule {
             .map(crate::ids::ProgramDigest::from_bytes)
     }
 
-    /// Blake3 of canonical JSON over name, version, queries, and declarations.
+    /// Blake3 of canonical JSON over name, version, queries, declarations,
+    /// and nominations.
     ///
     /// Distinct from [`Self::id`], which is name-based via [`ModuleId::of`].
+    /// Covering claims bind both identities; this digest is not a substitute
+    /// for [`ModuleId`].
     pub fn content_fingerprint(&self) -> Result<[u8; 32], String> {
         #[derive(Serialize)]
         struct Fingerprint<'a> {
@@ -450,12 +453,14 @@ impl CoreModule {
             version: &'a str,
             queries: &'a [CoreQuery],
             declarations: &'a [CoreDecl],
+            nominations: &'a [CoreNomination],
         }
         let bytes = crate::canonical_to_vec(&Fingerprint {
             name: &self.name,
             version: &self.version,
             queries: &self.queries,
             declarations: &self.declarations,
+            nominations: &self.nominations,
         })
         .map_err(|e| e.to_string())?;
         Ok(*blake3::hash(&bytes).as_bytes())
@@ -523,7 +528,19 @@ mod tests {
             a.content_fingerprint().unwrap(),
             with_decl.content_fingerprint().unwrap()
         );
+        let mut with_nomination = empty_module("Trust", "0.1.0");
+        with_nomination.nominations.push(CoreNomination {
+            candidate: "Alice".into(),
+            office: "Trustee".into(),
+            rank: 1,
+        });
+        assert_ne!(
+            a.content_fingerprint().unwrap(),
+            with_nomination.content_fingerprint().unwrap(),
+            "nominations are part of program content identity"
+        );
         assert_eq!(a.id, empty_module("Trust", "0.2.0").id);
+        assert_eq!(a.id, with_nomination.id);
         assert_eq!(
             a.program_digest().unwrap().as_bytes(),
             &a.content_fingerprint().unwrap()

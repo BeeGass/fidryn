@@ -42,8 +42,8 @@ pub use ir::{
 };
 pub use outcome::{
     BoundClaims, BranchClaim, CheckedCertificate, CoverageMethod, CoverageWitness,
-    EvaluationReport, ExecutionMode, OpenRequest, Outcome, ReplayVerifiedCoverage,
-    StructurallyCheckedCoverage, TrustProfile,
+    EvaluationReport, ExecutionMode, OpenRequest, Outcome, ReplayIssuance, ReplayVerifiedCoverage,
+    StructurallyCheckedCoverage, TrustProfile, canonical_branch_root,
 };
 pub use patterns::{
     ContextPattern, LegalEffectPattern, LegalStatusPattern, LegalSubjectPattern, PositionPattern,
