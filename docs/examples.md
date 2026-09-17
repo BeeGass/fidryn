@@ -1,1 +1,1 @@
-PLACEHOLDER
+@file:///workspace/agent-tools/FULL-docs-examples.md
