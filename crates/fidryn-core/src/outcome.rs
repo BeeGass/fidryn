@@ -187,13 +187,18 @@ pub enum OpenRequest {
 /// FiniteReplay. Ignoring open issues requires a kernel-issued
 /// FiniteReplay certificate. Empty [`CoverageWitness::complete`] is not
 /// FiniteReplay. A raw [`CompletionProofId`] is not a certificate.
+/// Public [`Self::issue_finite_replay`] is not a covering factory:
+/// it always returns `Err`. `#[doc(hidden)]` is not access control.
+/// Kernel replay stamps via `stamp_finite_replay` (feature `kernel-issue`).
 ///
 /// ```compile_fail
-/// use fidryn_core::{CheckedCertificate, CompletionProofId};
+/// use fidryn_core::{CheckedCertificate, CompletionProofId, CoverageMethod};
 /// let id = CompletionProofId::of(b"P11");
 /// let _ = CheckedCertificate {
 ///     id,
 ///     claims_digest: [0u8; 16],
+///     method: CoverageMethod::FiniteReplay,
+///     replay: None,
 /// };
 /// ```
 #[derive(Clone, PartialEq, Eq)]
@@ -833,8 +838,8 @@ impl CheckedCertificate {
     /// Public FiniteReplay constructor. Always refuses covering issuance.
     ///
     /// Shape and digest are still checked so callers get precise errors.
-    /// A matching digest is not covering authority; only
-    /// [`Self::issue_finite_replay`] (kernel) stamps FiniteReplay.
+    /// A matching digest is not covering authority; only kernel
+    /// `stamp_finite_replay` (feature `kernel-issue`) stamps FiniteReplay.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_covering(
         id: CompletionProofId,
@@ -907,17 +912,90 @@ impl CheckedCertificate {
         )
     }
 
-    /// Kernel issuance of a sealed FiniteReplay certificate.
+    /// Public FiniteReplay mint. Always refuses covering issuance.
     ///
-    /// Not a public covering factory. Callers must have replayed the
-    /// bound program. Hashed claims include answer, ignored set, query,
-    /// times, args, execution mode, branch root, ModuleId, snapshot, and
-    /// program content fingerprint.
+    /// `#[doc(hidden)]` is not access control. Shape and digest are still
+    /// checked so callers get precise errors. A matching digest is not
+    /// covering: this factory always returns `Err`. Kernel replay stamps
+    /// via `stamp_finite_replay` (feature `kernel-issue` only).
+    ///
+    /// ```
+    /// # use fidryn_core::*;
+    /// # use std::collections::{BTreeMap, BTreeSet};
+    /// let program = ModuleId::of(b"m");
+    /// let snapshot = SourceSnapshotId::of(b"s");
+    /// let case = CaseRecord::default();
+    /// let query = QueryName::from("q");
+    /// let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+    /// let ignored = BTreeSet::new();
+    /// let args = BTreeMap::new();
+    /// let answer = Value::Bool(true);
+    /// let witness = CoverageWitness {
+    ///     examined: 1,
+    ///     total: 1,
+    ///     incomplete: false,
+    ///     answer: answer.clone(),
+    ///     branches: vec![BranchClaim {
+    ///         bindings: BTreeMap::new(),
+    ///         answer: answer.clone(),
+    ///     }],
+    /// };
+    /// let fingerprint = [0u8; 32];
+    /// let id = CheckedCertificate::covering_claims_id_with_identity(
+    ///     program, snapshot, fingerprint, &case, &query, t, t,
+    ///     &ignored, &answer, &witness, &args, ExecutionMode::Operative,
+    /// ).unwrap();
+    /// let result = CheckedCertificate::issue_finite_replay(
+    ///     id,
+    ///     ReplayIssuance {
+    ///         program,
+    ///         snapshot,
+    ///         fingerprint,
+    ///         case: &case,
+    ///         query: &query,
+    ///         valid: t,
+    ///         known: t,
+    ///         constraints: &ignored,
+    ///         answer: &answer,
+    ///         witness: &witness,
+    ///         args: &args,
+    ///         execution_mode: ExecutionMode::Operative,
+    ///     },
+    /// );
+    /// assert!(!result.is_ok_and(|certificate| certificate.is_covering()));
+    /// ```
     #[doc(hidden)]
     pub fn issue_finite_replay(
         id: CompletionProofId,
         issuance: ReplayIssuance<'_>,
     ) -> Result<Self, String> {
+        Self::prepare_finite_replay(id, issuance)?;
+        Err(
+            "FiniteReplay covering certificates are issued only by fidryn_kernel::accept_covering_eval"
+                .into(),
+        )
+    }
+
+    /// Kernel FiniteReplay stamp after actual replay.
+    ///
+    /// Exists only with feature `kernel-issue`. `fidryn-kernel` is the
+    /// in-tree crate that enables it. Public [`Self::issue_finite_replay`]
+    /// never stamps, including when this feature is unified into a larger
+    /// test graph.
+    #[cfg(feature = "kernel-issue")]
+    #[doc(hidden)]
+    pub fn stamp_finite_replay(
+        id: CompletionProofId,
+        issuance: ReplayIssuance<'_>,
+    ) -> Result<Self, String> {
+        let (id, payload, issuance) = Self::prepare_finite_replay(id, issuance)?;
+        Self::seal_finite_replay(id, payload, issuance)
+    }
+
+    fn prepare_finite_replay<'a>(
+        id: CompletionProofId,
+        issuance: ReplayIssuance<'a>,
+    ) -> Result<(CompletionProofId, Vec<u8>, ReplayIssuance<'a>), String> {
         Self::require_replay_witness(issuance.witness, issuance.answer)?;
         let (payload, expected) = Self::bind_covering(
             issuance.program,
@@ -941,6 +1019,15 @@ impl CheckedCertificate {
                 expected.hex()
             ));
         }
+        Ok((id, payload, issuance))
+    }
+
+    #[cfg(any(feature = "kernel-issue", test))]
+    fn seal_finite_replay(
+        id: CompletionProofId,
+        payload: Vec<u8>,
+        issuance: ReplayIssuance<'_>,
+    ) -> Result<Self, String> {
         let branch_root = canonical_branch_root(&issuance.witness.branches)?;
         Ok(Self {
             id,
@@ -1285,7 +1372,9 @@ mod tests {
             ExecutionMode::Operative,
         )
         .unwrap();
-        CheckedCertificate::issue_finite_replay(
+        // Outcome tests need a covering certificate. Public mint is sealed
+        // without kernel-issue; this helper stamps via the private sealer.
+        let (id, payload, issuance) = CheckedCertificate::prepare_finite_replay(
             id,
             ReplayIssuance {
                 program,
@@ -1302,7 +1391,61 @@ mod tests {
                 execution_mode: ExecutionMode::Operative,
             },
         )
-        .unwrap()
+        .unwrap();
+        CheckedCertificate::seal_finite_replay(id, payload, issuance).unwrap()
+    }
+
+    #[test]
+    fn public_issue_finite_replay_cannot_stamp_covering() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let ignored = BTreeSet::new();
+        let args = BTreeMap::new();
+        let answer = Value::Bool(true);
+        let witness = replay_witness(answer.clone());
+        let fingerprint = [7u8; 32];
+        let id = CheckedCertificate::covering_claims_id_with_identity(
+            program,
+            snapshot,
+            fingerprint,
+            &case,
+            &query,
+            t,
+            t,
+            &ignored,
+            &answer,
+            &witness,
+            &args,
+            ExecutionMode::Operative,
+        )
+        .unwrap();
+        let result = CheckedCertificate::issue_finite_replay(
+            id,
+            ReplayIssuance {
+                program,
+                snapshot,
+                fingerprint,
+                case: &case,
+                query: &query,
+                valid: t,
+                known: t,
+                constraints: &ignored,
+                answer: &answer,
+                witness: &witness,
+                args: &args,
+                execution_mode: ExecutionMode::Operative,
+            },
+        );
+        assert!(
+            !result
+                .as_ref()
+                .is_ok_and(|certificate| certificate.is_covering()),
+            "default public fidryn-core cannot produce is_covering()"
+        );
+        assert!(result.is_err());
     }
 
     #[test]

@@ -8,6 +8,12 @@ repository.workspace = true
 rust-version.workspace = true
 description = "Canonical Fidryn Core IR, legal state, outcomes, and diagnostics"
 
+[features]
+default = []
+# Trusted FiniteReplay stamp. Default public consumers cannot produce
+# is_covering(); only fidryn-kernel should enable this.
+kernel-issue = []
+
 [dependencies]
 blake3.workspace = true
 indexmap.workspace = true
