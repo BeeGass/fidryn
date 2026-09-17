@@ -1,0 +1,20 @@
+[package]
+name = "fidryn-eval"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn reference worklist evaluator"
+
+[dependencies]
+fidryn-core.workspace = true
+indexmap.workspace = true
+thiserror.workspace = true
+time.workspace = true
+
+[dev-dependencies]
+fidryn-check.workspace = true
+fidryn-hir.workspace = true
+fidryn-syntax.workspace = true
