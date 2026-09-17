@@ -83,7 +83,10 @@ fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-trace           DAG, canonical JSON, source maps (core)
-fidryn-cli             fidryn binary
+fidryn-render          constrained templates
+fidryn-adapt           filing adapters
+fidryn-solve           bounded DPLL
+fidryn-cli             fidryn binary and mill UI
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
