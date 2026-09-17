@@ -274,28 +274,29 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
             if grant_record_is_revoked(fields) {
                 return false;
             }
-            name.eq_ignore_ascii_case(action)
-                || (name.eq_ignore_ascii_case("AuthorityGrant")
-                    && fields
-                        .get("action")
-                        .is_some_and(|v| value_grants_action(v, action)))
-                || fields.values().any(|v| value_grants_action(v, action))
+            name.eq_ignore_ascii_case(action) || fields_grant_action(fields, action)
         }
         Value::Set(items) => items.iter().any(|item| value_grants_action(item, action)),
         Value::Map(fields) => {
             if grant_record_is_revoked(fields) {
                 return false;
             }
-            if let Some(named) = fields.get("action") {
-                return value_grants_action(named, action);
-            }
-            fields.iter().any(|(key, val)| match val {
-                Value::Bool(true) => key.eq_ignore_ascii_case(action),
-                _ => key.eq_ignore_ascii_case(action) || value_grants_action(val, action),
-            })
+            fields_grant_action(fields, action)
         }
         _ => false,
     }
+}
+
+/// A key grants only as `Bool(true)` or a nested true grant. `Bool(false)` never grants.
+fn fields_grant_action(fields: &BTreeMap<String, Value>, action: &str) -> bool {
+    if let Some(named) = fields.get("action") {
+        return value_grants_action(named, action);
+    }
+    fields.iter().any(|(key, val)| match val {
+        Value::Bool(true) => key.eq_ignore_ascii_case(action),
+        Value::Bool(false) => false,
+        _ => value_grants_action(val, action),
+    })
 }
 
 fn grant_record_is_revoked(fields: &BTreeMap<String, Value>) -> bool {
@@ -1060,6 +1061,26 @@ mod tests {
         });
         assert!(!action_is_granted(&ctor_case, "perform", t));
         assert!(has_authority_constraint(&ctor_case));
+    }
+
+    #[test]
+    fn false_permission_entry_does_not_grant_authority() {
+        let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Map(BTreeMap::from([("perform".into(), Value::Bool(false))])),
+        );
+        assert!(
+            !action_is_granted(&case, "perform", t),
+            "{{\"perform\": false}} is a denial, not a grant"
+        );
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Map(BTreeMap::from([("perform".into(), Value::Bool(true))])),
+        );
+        assert!(action_is_granted(&case, "perform", t));
+        assert!(!action_is_granted(&case, "attach", t));
     }
 
     #[test]
