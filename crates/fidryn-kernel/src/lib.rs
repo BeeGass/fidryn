@@ -1,24 +1,30 @@
 //! Finite coverage verification by replay.
 //!
 //! Proof generation lives in `fidryn-verify` / `fidryn-solve`; this crate
-//! only accepts or rejects a covering claim. [`accept_covering_eval`]
-//! re-evaluates each claimed world with [`fidryn_eval::evaluate`] (trusted
-//! evaluator, not an independent Lean kernel). Expected completion size is
-//! the checked invocation's [`CaseRecord::admissible_completions`] product.
-//! Independent proof checking, Salsa, SMT, and packages remain Remaining.
+//! only accepts or rejects a covering claim. Closed Boolean/ident queries
+//! ([`Term::Bool`], [`Term::Ident`], and `not` / `||` / `&&`) are checked
+//! by [`eval_fragment`], which does **not** call [`fidryn_eval::evaluate`].
+//! Other query plans still replay each claimed world with the trusted
+//! evaluator under [`IsolatedReplay`]. Expected completion size is the
+//! checked invocation's [`CaseRecord::admissible_completions`] product.
+//! This is not a Lean kernel; a general independent checker, Salsa, SMT,
+//! and packages remain Remaining.
 //!
 //! Replay is isolated: [`IsolatedReplay`] wraps a cloned [`CaseFile`] and a
 //! fresh [`LegalState::new`]. It never files or publishes. This crate does
 //! not import `fidryn-adapt`.
 
 mod completion;
+mod pure;
 
 pub use completion::ValidatedCompletionModel;
+pub use pure::{eval_fragment, is_boolean_fragment};
 
+use crate::completion::{CHOICE_NS, EVIDENCE_NS, INTERPRETATION_NS};
 use fidryn_core::{
     BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
     ExecutionMode, Handler, HandlerResult, LegalState, ModuleId, OpenRequest, Outcome, QueryName,
-    ReplayIssuance, RunContext, SourceSnapshotId, SuspensionReason, Value,
+    QueryPlan, ReplayIssuance, RunContext, SourceSnapshotId, SuspensionReason, Term, Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -151,12 +157,14 @@ pub fn accept_covering_with_args(
     )
 }
 
-/// Accept a covering witness after evaluating each claimed branch.
+/// Accept a covering witness after checking each claimed branch.
 ///
-/// Shape completeness is not enough: [`check_branches`] must re-evaluate the
-/// query under every admitted assignment. Then kernel issuance stamps a
-/// FiniteReplay certificate (`is_covering()`). The bound program identity
-/// must be the module that was replayed.
+/// Shape completeness is not enough: [`check_branches`] must re-check the
+/// query under every admitted assignment. Closed Boolean/ident terms use
+/// [`eval_fragment`] (no handlers). Other plans replay with [`evaluate`]
+/// under [`IsolatedReplay`]. Then kernel issuance stamps a FiniteReplay
+/// certificate (`is_covering()`). The bound program identity must be the
+/// module that was replayed.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering_eval(
     id: CompletionProofId,
@@ -188,7 +196,8 @@ pub fn accept_covering_eval(
 /// [`accept_covering_eval`] with query arguments bound into FiniteReplay claims.
 ///
 /// Finite coverage verification by replay: each admitted assignment is
-/// re-evaluated with [`evaluate`] under [`IsolatedReplay`]. The caller's
+/// checked with [`eval_fragment`] when the query is a closed Boolean/ident
+/// term, otherwise with [`evaluate`] under [`IsolatedReplay`]. The caller's
 /// `case` is not mutated. Bindings are a restricted overlay of declared
 /// completion slots.
 #[allow(clippy::too_many_arguments)]
@@ -348,10 +357,12 @@ fn witness_matches_declared_space(
     Ok(())
 }
 
-/// Re-evaluate each claimed world. Shape completeness is not covering.
+/// Re-check each claimed world. Shape completeness is not covering.
 ///
-/// Rejects duplicate bindings, a determinate value other than the branch
-/// answer (fabricated evaluation), and any suspend or engine error.
+/// Closed Boolean/ident queries use [`eval_fragment`]. Other plans call
+/// [`evaluate`]. Rejects duplicate bindings, a determinate value other
+/// than the branch answer (fabricated evaluation), and any suspend or
+/// engine error.
 pub fn check_branches(
     module: &CoreModule,
     query: &QueryName,
@@ -396,12 +407,13 @@ fn check_branches_with_args(
     Ok(())
 }
 
-/// Replay one claimed world against `evaluate`.
+/// Replay one claimed world.
 ///
-/// Finite coverage verification by replay. Isolation: a cloned
+/// Boolean/ident fragment: [`eval_fragment`] over admitted slots and
+/// original facts (no handlers, duty, or adapt). Otherwise a cloned
 /// [`CaseRecord`], [`IsolatedReplay`], and [`LegalState::new()`] (never
-/// `into_state` on the caller's record). Replay does not import
-/// `fidryn-adapt` and does not publish institutional state.
+/// `into_state` on the caller's record) with [`evaluate`]. Replay does
+/// not import `fidryn-adapt` and does not publish institutional state.
 fn check_branch_evaluation(
     module: &CoreModule,
     query: &QueryName,
@@ -412,6 +424,17 @@ fn check_branch_evaluation(
     model: &ValidatedCompletionModel,
 ) -> Result<(), String> {
     let cloned = model.overlay(base, &branch.bindings, ctx)?;
+    if let Some(term) = boolean_fragment_term(module, query) {
+        let assignment = fragment_assignment(&cloned.facts, &branch.bindings);
+        return match eval_fragment(term, &assignment) {
+            Ok(value) if value == branch.answer => Ok(()),
+            Ok(value) => Err(format!(
+                "fabricated evaluation: branch answer {:?} but evaluation produced {value:?}",
+                branch.answer
+            )),
+            Err(err) => Err(format!("not a covering evaluation: {err}")),
+        };
+    }
     let mut handler = IsolatedReplay::new(cloned.clone());
     let state = LegalState::new();
     match evaluate(module, query, args, &state, ctx, &mut handler, &cloned) {
@@ -432,14 +455,46 @@ fn check_branch_evaluation(
     }
 }
 
+fn boolean_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) -> Option<&'a Term> {
+    match &module.query(query.as_str())?.plan {
+        QueryPlan::Evaluate(term) if is_boolean_fragment(term) => Some(term),
+        _ => None,
+    }
+}
+
+/// Admitted-slot overlay onto original facts. Bindings never overwrite a
+/// fixed fact; undeclared keys are rejected before this map is built.
+fn fragment_assignment(
+    facts: &BTreeMap<String, Value>,
+    bindings: &BTreeMap<String, Value>,
+) -> BTreeMap<String, Value> {
+    let mut env = facts.clone();
+    for (key, value) in bindings {
+        env.entry(key.clone()).or_insert(value.clone());
+        if let Some(name) = strip_slot_name(key)
+            && !name.is_empty()
+        {
+            env.entry(name.to_owned()).or_insert(value.clone());
+        }
+    }
+    env
+}
+
+fn strip_slot_name(key: &str) -> Option<&str> {
+    key.strip_prefix(INTERPRETATION_NS)
+        .or_else(|| key.strip_prefix(CHOICE_NS))
+        .or_else(|| key.strip_prefix(EVIDENCE_NS))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use fidryn_core::ir::{CoreQuery, QueryPlan};
     use fidryn_core::{
-        CoverageMethod, Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId,
+        BinOp, CoverageMethod, Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId,
         PrimitiveType, SourceManifestId, Term, TraceId, Type,
     };
+    use fidryn_eval::evaluate;
 
     fn complete_witness(answer: Value) -> CoverageWitness {
         CoverageWitness::complete(3, answer)
@@ -1217,5 +1272,138 @@ mod tests {
             err.contains("fabricated") || err.contains("covering"),
             "{err}"
         );
+    }
+
+    fn or_not_b() -> Term {
+        Term::Binary {
+            op: BinOp::Or,
+            left: Box::new(Term::Ident("b".into())),
+            right: Box::new(Term::Apply {
+                ctor: "not".into(),
+                args: vec![Term::Ident("b".into())],
+            }),
+        }
+    }
+
+    fn declared_b_case() -> CaseRecord {
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .interpretations
+            .insert("b".into(), vec!["true".into(), "false".into()]);
+        case
+    }
+
+    fn b_worlds(answer: bool) -> Vec<BranchClaim> {
+        ["true", "false"]
+            .into_iter()
+            .map(|label| BranchClaim {
+                bindings: BTreeMap::from([("i:b".into(), Value::String(label.into()))]),
+                answer: Value::Bool(answer),
+            })
+            .collect()
+    }
+
+    #[test]
+    fn test_accept_covering_eval_with_or_not_tautology_uses_fragment() {
+        let module = module_with_plan(QueryPlan::Evaluate(or_not_b()));
+        match &module.queries[0].plan {
+            QueryPlan::Evaluate(term) => assert!(is_boolean_fragment(term)),
+            other => panic!("expected Evaluate plan, got {other:?}"),
+        }
+        let case = declared_b_case();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(true, b_worlds(true));
+        let cert = covering_eval_case(&module, &case, &claimed, witness)
+            .expect("b || !b covers both declared interpretations");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_fragment_rejects_fabricated_false_world_claiming_true() {
+        let module = constant_false_module();
+        match &module.queries[0].plan {
+            QueryPlan::Evaluate(term) => assert!(is_boolean_fragment(term)),
+            other => panic!("expected Evaluate plan, got {other:?}"),
+        }
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let err = covering_eval(&module, &claimed, witness)
+            .expect_err("fragment checker must reject false → true");
+        assert!(err.contains("fabricated"), "{err}");
+    }
+
+    #[test]
+    fn test_fragment_rejects_fabricated_false_for_or_not_tautology() {
+        let module = module_with_plan(QueryPlan::Evaluate(or_not_b()));
+        let case = declared_b_case();
+        let claimed = Value::Bool(false);
+        let witness = covering_witness(false, b_worlds(false));
+        let err = covering_eval_case(&module, &case, &claimed, witness)
+            .expect_err("b || !b is not false");
+        assert!(err.contains("fabricated"), "{err}");
+    }
+
+    #[test]
+    fn test_eval_fragment_is_used_when_evaluate_would_suspend_on_handlers() {
+        let module = module_with_plan(QueryPlan::Evaluate(Term::Ident("judgment".into())));
+        match &module.queries[0].plan {
+            QueryPlan::Evaluate(term) => assert!(is_boolean_fragment(term)),
+            other => panic!("expected Evaluate plan, got {other:?}"),
+        }
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .choices
+            .insert("judgment".into(), vec!["true".into()]);
+        let bindings = BTreeMap::from([("c:judgment".into(), Value::String("true".into()))]);
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(
+            true,
+            vec![BranchClaim {
+                bindings: bindings.clone(),
+                answer: claimed.clone(),
+            }],
+        );
+
+        let model = ValidatedCompletionModel::from_case(&case).expect("completion model");
+        let overlaid = model
+            .overlay(&case, &bindings, &run_ctx())
+            .expect("admitted overlay");
+        let mut handler = IsolatedReplay::new(overlaid.clone());
+        let eval_result = evaluate(
+            &module,
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &run_ctx(),
+            &mut handler,
+            &overlaid,
+        )
+        .expect("evaluate runs");
+        assert!(
+            matches!(eval_result, Outcome::Suspended { .. }),
+            "evaluate must suspend on NeedJudgment without a determination, got {eval_result:?}"
+        );
+
+        let cert = covering_eval_case(&module, &case, &claimed, witness)
+            .expect("fragment checker decides Ident from admitted bindings");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_non_fragment_seq_still_replays_with_evaluate() {
+        let seq_true = Term::Apply {
+            ctor: "seq".into(),
+            args: vec![Term::Bool(true), Term::Bool(true)],
+        };
+        assert!(!is_boolean_fragment(&seq_true));
+        let module = module_with_plan(QueryPlan::Evaluate(seq_true));
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let cert = covering_eval(&module, &claimed, witness)
+            .expect("non-fragment seq still covers via evaluate");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
     }
 }
