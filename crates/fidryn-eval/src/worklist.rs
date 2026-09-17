@@ -51,20 +51,21 @@ impl DerivedWorld {
         }
         let candidates = ground_candidates(module, case, args);
         for _ in 0..WORKLIST_FUEL {
-            let before = world.held.len();
+            let before_held = world.held.clone();
+            let before_denied = world.denied.clone();
             for rule in &rules {
                 if !rule_in_force(rule, ctx) {
                     continue;
                 }
                 let binders = rule_binders(rule, module);
-                for subst in substitutions(&binders, &candidates) {
+                for subst in substitutions(&binders, &candidates)? {
                     if world.guard_holds(&rule.guard, &subst, case, ctx) != Hold::Yes {
                         continue;
                     }
                     world.apply_consequences(rule, &subst);
                 }
             }
-            if world.held.len() == before {
+            if world.held == before_held && world.denied == before_denied {
                 return Ok(world);
             }
         }
@@ -462,32 +463,53 @@ fn ground_candidates(
     terms.into_iter().collect()
 }
 
-fn substitutions(binders: &[String], candidates: &[Term]) -> Vec<BTreeMap<String, Term>> {
+fn substitutions(
+    binders: &[String],
+    candidates: &[Term],
+) -> Result<Vec<BTreeMap<String, Term>>, EngineError> {
     if binders.is_empty() {
-        return vec![BTreeMap::new()];
+        return Ok(vec![BTreeMap::new()]);
+    }
+    if candidates.is_empty() {
+        return Ok(Vec::new());
     }
     let mut acc = vec![BTreeMap::new()];
-    for binder in binders {
-        if candidates.is_empty() {
-            break;
-        }
+    for (index, binder) in binders.iter().enumerate() {
+        let last_binder = index + 1 == binders.len();
         let mut next = Vec::new();
-        for env in &acc {
+        let mut truncated = false;
+        'expand: for env in &acc {
             for candidate in candidates {
                 if next.len() >= MAX_SUBSTITUTIONS {
-                    return next;
+                    truncated = true;
+                    break 'expand;
                 }
                 let mut env = env.clone();
                 env.insert(binder.clone(), candidate.clone());
                 next.push(env);
             }
         }
+        if truncated && !last_binder {
+            return Err(EngineError::Unsupported(format!(
+                "substitution cap {MAX_SUBSTITUTIONS} reached with binders remaining"
+            )));
+        }
         if next.is_empty() {
-            break;
+            return Ok(Vec::new());
         }
         acc = next;
+        if truncated {
+            break;
+        }
     }
-    acc
+    let total = binders.len();
+    acc.retain(|subst| subst.len() == total && binders.iter().all(|b| subst.contains_key(b)));
+    if acc.is_empty() && !binders.is_empty() {
+        return Err(EngineError::Unsupported(
+            "substitution cap dropped binders before they were bound".into(),
+        ));
+    }
+    Ok(acc)
 }
 
 fn subst_prop(prop: &PropTerm, subst: &BTreeMap<String, Term>) -> PropTerm {
@@ -736,6 +758,8 @@ pub fn is_eval_keyword(name: &str) -> bool {
             | "and"
             | "or"
             | "call"
+            | "seq"
+            | "require"
     ) || name.eq_ignore_ascii_case("for_all")
         || name.eq_ignore_ascii_case("exists")
 }
