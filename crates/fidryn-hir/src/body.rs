@@ -60,7 +60,18 @@ pub fn term_from_decl(d: &Decl) -> Option<Term> {
 
 pub fn query_body_from_decl(d: &Decl) -> HirQueryBody {
     if let Some(goal) = &d.goal {
-        return goal_ast_to_body(goal);
+        let mut body = goal_ast_to_body(goal);
+        if let Some(expr) = &d.expr
+            && let HirQueryBody::Goal {
+                kind,
+                expr: goal_expr,
+                ..
+            } = &mut body
+            && kind == "Evaluate"
+        {
+            *goal_expr = Some(concat_seq(expr_to_term(expr), goal_expr.take()));
+        }
+        return body;
     }
     if let Some(expr) = &d.expr {
         return HirQueryBody::Return(expr_to_term(expr));
@@ -94,19 +105,16 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             then: Box::new(expr_to_term(then)),
             else_: Box::new(else_.as_deref().map(expr_to_term).unwrap_or(Term::Wildcard)),
         },
-        Expr::Money {
-            amount,
-            currency: _,
-        } => decimal_term(amount),
+        Expr::Money { amount, currency } => Term::Apply {
+            ctor: currency.clone(),
+            args: vec![decimal_term(amount)],
+        },
         Expr::Duration { n, unit } => Term::Apply {
             ctor: unit.clone(),
             args: vec![Term::Int(*n)],
         },
-        Expr::Block(items) => match items.as_slice() {
-            [] => Term::Wildcard,
-            [only] => expr_to_term(only),
-            _ => items.last().map(expr_to_term).unwrap_or(Term::Wildcard),
-        },
+        Expr::Require(inner) => require_term(expr_to_term(inner)),
+        Expr::Block(items) => seq_term(items.iter().map(expr_to_term).collect()),
     }
 }
 
@@ -183,10 +191,12 @@ fn map_binop(op: SynBinOp) -> BinOp {
 pub fn parse_query_body(src: &str) -> HirQueryBody {
     let inner = last_brace_inner(src).unwrap_or(src);
     let mut p = SliceParser::new(inner);
+    let mut items = Vec::new();
+    let mut goal = None;
     while !p.is_eof() {
         if p.eat_ident("return") {
             if let Some(term) = p.parse_expr() {
-                return HirQueryBody::Return(term);
+                items.push(term);
             }
             continue;
         }
@@ -199,28 +209,57 @@ pub fn parse_query_body(src: &str) -> HirQueryBody {
             if p.eat_kind(TokenKind::LBrace) {
                 if kind == "Evaluate" {
                     let expr = parse_contents_until_rbrace(&mut p);
-                    return HirQueryBody::Goal {
+                    goal = Some(HirQueryBody::Goal {
                         kind,
                         office: None,
                         expr,
                         fields: BTreeMap::new(),
-                    };
+                    });
+                } else {
+                    let fields = parse_goal_fields(&mut p);
+                    let office = fields.get("office").cloned();
+                    let expr = fields.get("expr").cloned();
+                    goal = Some(HirQueryBody::Goal {
+                        kind,
+                        office,
+                        expr,
+                        fields,
+                    });
                 }
-                let fields = parse_goal_fields(&mut p);
-                let office = fields.get("office").cloned();
-                let expr = fields.get("expr").cloned();
-                return HirQueryBody::Goal {
-                    kind,
-                    office,
-                    expr,
-                    fields,
-                };
             }
             continue;
         }
-        p.bump();
+        match p.parse_expr() {
+            Some(term) => items.push(term),
+            None => {
+                p.bump();
+            }
+        }
     }
-    HirQueryBody::None
+    if let Some(HirQueryBody::Goal {
+        kind,
+        office,
+        expr,
+        fields,
+    }) = goal
+    {
+        let expr = if kind == "Evaluate" && !items.is_empty() {
+            Some(concat_seq(seq_term(items), expr))
+        } else {
+            expr
+        };
+        return HirQueryBody::Goal {
+            kind,
+            office,
+            expr,
+            fields,
+        };
+    }
+    if items.is_empty() {
+        HirQueryBody::None
+    } else {
+        HirQueryBody::Return(seq_term(items))
+    }
 }
 
 pub fn parse_function_parts(src: &str) -> (Vec<(String, String)>, Option<Term>) {
@@ -574,19 +613,60 @@ fn parse_contents_until_rbrace(p: &mut SliceParser<'_>) -> Option<Term> {
 }
 
 fn parse_contents_until_end(p: &mut SliceParser<'_>) -> Option<Term> {
-    let mut last = None;
+    let mut items = Vec::new();
     while !p.is_eof() && !p.at_kind(TokenKind::RBrace) {
         if p.eat_kind(TokenKind::Semicolon) {
             continue;
         }
+        if p.eat_ident("return") {
+            if let Some(term) = p.parse_expr() {
+                items.push(term);
+            }
+            continue;
+        }
         match p.parse_expr() {
-            Some(term) => last = Some(term),
+            Some(term) => items.push(term),
             None => {
                 p.bump();
             }
         }
     }
-    last
+    if items.is_empty() {
+        None
+    } else {
+        Some(seq_term(items))
+    }
+}
+
+fn seq_term(args: Vec<Term>) -> Term {
+    match args.len() {
+        0 => Term::Wildcard,
+        1 => args.into_iter().next().unwrap_or(Term::Wildcard),
+        _ => Term::Apply {
+            ctor: "seq".into(),
+            args,
+        },
+    }
+}
+
+fn require_term(inner: Term) -> Term {
+    Term::Apply {
+        ctor: "require".into(),
+        args: vec![inner],
+    }
+}
+
+fn concat_seq(head: Term, tail: Option<Term>) -> Term {
+    let mut args = match head {
+        Term::Apply { ctor, args } if ctor == "seq" => args,
+        other => vec![other],
+    };
+    match tail {
+        Some(Term::Apply { ctor, args: more }) if ctor == "seq" => args.extend(more),
+        Some(other) => args.push(other),
+        None => {}
+    }
+    seq_term(args)
 }
 
 fn parse_goal_fields(p: &mut SliceParser<'_>) -> BTreeMap<String, Term> {
@@ -829,6 +909,8 @@ fn is_operator(name: &str) -> bool {
             | "."
             | "=>"
             | "call"
+            | "seq"
+            | "require"
     ) || is_modal(name)
 }
 
@@ -1042,7 +1124,43 @@ impl<'a> SliceParser<'a> {
         if self.at_ident("if") {
             return self.parse_if();
         }
+        if self.eat_ident("require") {
+            let inner = self.parse_expr()?;
+            if self.eat_ident("using") && self.at_kind(TokenKind::Ident) {
+                self.bump();
+            }
+            return Some(require_term(inner));
+        }
+        if self.at_ident("for_all") || self.at_ident("exists") {
+            return self.parse_quantifier();
+        }
         self.parse_postfix()
+    }
+
+    fn parse_quantifier(&mut self) -> Option<Term> {
+        let kind = self.bump_text();
+        if !self.at_kind(TokenKind::Ident) {
+            return Some(Term::Ident(kind));
+        }
+        let binder = self.bump_text();
+        if !self.eat_ident("in") {
+            return Some(Term::Apply {
+                ctor: kind,
+                args: vec![Term::Ident(binder)],
+            });
+        }
+        let domain = self.parse_expr()?;
+        let body = if self.eat_kind(TokenKind::Colon) {
+            self.parse_expr()?
+        } else if self.at_kind(TokenKind::LBrace) {
+            self.parse_block()?
+        } else {
+            Term::Wildcard
+        };
+        Some(Term::Apply {
+            ctor: kind,
+            args: vec![Term::Ident(binder), domain, body],
+        })
     }
 
     fn parse_if(&mut self) -> Option<Term> {
@@ -1420,19 +1538,99 @@ mod tests {
     }
 
     #[test]
-    fn money_expr_lowers_to_decimal_not_currency_apply() {
-        let term = expr_to_term(&Expr::Money {
+    fn money_expr_lowers_to_currency_apply() {
+        let expected = Decimal::from_str("11925.00").expect("decimal");
+        let usd = expr_to_term(&Expr::Money {
             currency: "USD".into(),
             amount: "11925.00".into(),
         });
+        let eur = expr_to_term(&Expr::Money {
+            currency: "EUR".into(),
+            amount: "11925.00".into(),
+        });
         assert_eq!(
-            term,
-            Term::Decimal(Decimal::from_str("11925.00").expect("decimal"))
+            usd,
+            Term::Apply {
+                ctor: "USD".into(),
+                args: vec![Term::Decimal(expected)],
+            }
         );
-        assert!(
-            !matches!(term, Term::Apply { .. } | Term::Call { .. }),
-            "{term:?}"
+        assert_eq!(
+            eur,
+            Term::Apply {
+                ctor: "EUR".into(),
+                args: vec![Term::Decimal(expected)],
+            }
         );
+        assert_ne!(usd, eur);
+    }
+
+    #[test]
+    fn block_of_two_exprs_lowers_to_seq() {
+        let term = expr_to_term(&Expr::Block(vec![Expr::Bool(false), Expr::Bool(true)]));
+        match term {
+            Term::Apply { ctor, args } if ctor == "seq" => {
+                assert_eq!(args, vec![Term::Bool(false), Term::Bool(true)]);
+            }
+            other => panic!("{other:?}"),
+        }
+        assert_eq!(
+            expr_to_term(&Expr::Block(vec![Expr::Bool(true)])),
+            Term::Bool(true)
+        );
+    }
+
+    #[test]
+    fn require_false_return_true_slice_is_seq_not_bool_true() {
+        let body = parse_query_body("query q() -> Bool { require false; return true }");
+        match body {
+            HirQueryBody::Return(term) => {
+                assert_ne!(term, Term::Bool(true), "{term:?}");
+                match term {
+                    Term::Apply { ctor, args } if ctor == "seq" && args.len() == 2 => {
+                        assert_eq!(
+                            args[0],
+                            Term::Apply {
+                                ctor: "require".into(),
+                                args: vec![Term::Bool(false)],
+                            }
+                        );
+                        assert_eq!(args[1], Term::Bool(true));
+                    }
+                    other => panic!("{other:?}"),
+                }
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn evaluate_require_false_return_true_slice_keeps_both() {
+        let body =
+            parse_query_body("query q() -> Bool { goal Evaluate { require false; return true } }");
+        match body {
+            HirQueryBody::Goal {
+                ref kind,
+                expr: Some(term),
+                ..
+            } if kind == "Evaluate" => {
+                assert_ne!(term, Term::Bool(true), "{term:?}");
+                match term {
+                    Term::Apply { ctor, args } if ctor == "seq" && args.len() == 2 => {
+                        assert_eq!(
+                            args[0],
+                            Term::Apply {
+                                ctor: "require".into(),
+                                args: vec![Term::Bool(false)],
+                            }
+                        );
+                        assert_eq!(args[1], Term::Bool(true));
+                    }
+                    other => panic!("{other:?}"),
+                }
+            }
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]

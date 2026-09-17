@@ -38,6 +38,7 @@ pub struct HirModule {
     pub effects: BTreeMap<String, HirEffect>,
     pub functions: BTreeMap<String, HirFunction>,
     pub quantifiers: Vec<HirQuantifier>,
+    pub verifications: Vec<HirVerification>,
     pub diagnostics: Vec<Diagnostic>,
 }
 
@@ -152,6 +153,20 @@ pub struct HirQuantifier {
     pub formula: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirVerification {
+    pub name: String,
+    pub formula: String,
+    pub bounds: Option<HirVerificationBounds>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirVerificationBounds {
+    pub persons: u32,
+    pub events: u32,
+    pub time_points: u32,
+}
+
 pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, Vec<Diagnostic>> {
     let Some(module) = parse.module() else {
         return Err(parse.diagnostics.clone());
@@ -180,6 +195,7 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         effects: BTreeMap::new(),
         functions: BTreeMap::new(),
         quantifiers: Vec::new(),
+        verifications: Vec::new(),
         diagnostics: parse.diagnostics.clone(),
     };
     for item in &module.items {
@@ -328,6 +344,9 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Verify(d) => {
                 hir.quantifiers.extend(extract_quantifiers(&d.source));
+                if let Some(verification) = verification_from_decl(d) {
+                    hir.verifications.push(verification);
+                }
             }
             fidryn_syntax::ast::Item::Rule(d) => {
                 let (parsed_guard, parsed_consequences) = body::parse_rule_parts(&d.source);
@@ -577,6 +596,104 @@ fn extract_effect_result(src: &str) -> String {
                 .to_owned()
         })
         .unwrap_or_default()
+}
+
+fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerification> {
+    if d.keyword != "verify" {
+        return None;
+    }
+    let name = d.name.as_ref().filter(|n| !n.is_empty())?.clone();
+    Some(HirVerification {
+        formula: verify_formula(d),
+        bounds: verify_bounds(d),
+        name,
+    })
+}
+
+fn verify_formula(d: &fidryn_syntax::ast::Decl) -> String {
+    if let Some(text) = d.fields.get("assert") {
+        let trimmed = text.trim().trim_end_matches(';').trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_owned();
+        }
+    }
+    if let Some(text) = extract_assert_clause(&d.source) {
+        return text;
+    }
+    match &d.expr {
+        Some(fidryn_syntax::ast::Expr::Bool(true)) => "true".into(),
+        Some(fidryn_syntax::ast::Expr::Bool(false)) => "false".into(),
+        _ => last_brace_inner(&d.source).unwrap_or("").trim().to_owned(),
+    }
+}
+
+fn verify_bounds(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificationBounds> {
+    let text = d
+        .fields
+        .get("bounds")
+        .cloned()
+        .or_else(|| extract_bounds_clause(&d.source))?;
+    Some(HirVerificationBounds {
+        persons: labeled_u32(&text, "persons").unwrap_or(0),
+        events: labeled_u32(&text, "events").unwrap_or(0),
+        time_points: labeled_u32(&text, "time_points").unwrap_or(0),
+    })
+}
+
+fn extract_assert_clause(src: &str) -> Option<String> {
+    let i = find_ident(src, "assert")?;
+    Some(take_clause_to_end(&src[i..]))
+}
+
+fn extract_bounds_clause(src: &str) -> Option<String> {
+    let i = find_ident(src, "bounds")?;
+    let rest = src[i..].trim_start();
+    if rest.len() < 6 {
+        return None;
+    }
+    let after = rest[6..].trim_start();
+    if after.starts_with('{') {
+        let inner = brace_inner(after)?;
+        Some(format!("bounds {{{inner}}}"))
+    } else {
+        Some(take_clause_to_end(&src[i..]))
+    }
+}
+
+fn take_clause_to_end(s: &str) -> String {
+    let mut depth_paren = 0i32;
+    let mut depth_brack = 0i32;
+    let mut depth_brace = 0i32;
+    for (i, c) in s.char_indices() {
+        match c {
+            '(' => depth_paren += 1,
+            ')' => depth_paren -= 1,
+            '[' => depth_brack += 1,
+            ']' => depth_brack -= 1,
+            '{' => depth_brace += 1,
+            '}' => {
+                if depth_paren == 0 && depth_brack == 0 && depth_brace == 0 {
+                    return s[..i].trim().trim_end_matches(';').trim().to_owned();
+                }
+                depth_brace -= 1;
+            }
+            ';' if depth_paren == 0 && depth_brack == 0 && depth_brace == 0 => {
+                return s[..i].trim().to_owned();
+            }
+            _ => {}
+        }
+    }
+    s.trim().trim_end_matches(';').trim().to_owned()
+}
+
+fn labeled_u32(src: &str, label: &str) -> Option<u32> {
+    let i = find_ident(src, label)?;
+    let rest = src[i + label.len()..]
+        .trim_start()
+        .trim_start_matches(':')
+        .trim_start();
+    let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
+    digits.parse().ok()
 }
 
 fn extract_quantifiers(src: &str) -> Vec<HirQuantifier> {
@@ -1110,7 +1227,13 @@ module Examples.Lower version "0.1.0" {
         let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
         let expected = rust_decimal::Decimal::from_str("11925.00").expect("decimal");
         assert_eq!(hir.functions["floor"].body, Some(Term::Decimal(expected)));
-        assert_eq!(hir.functions["cash"].body, Some(Term::Decimal(expected)));
+        assert_eq!(
+            hir.functions["cash"].body,
+            Some(Term::Apply {
+                ctor: "USD".into(),
+                args: vec![Term::Decimal(expected)],
+            })
+        );
         match &hir.functions["all_ok"].body {
             Some(Term::Apply { ctor, args }) | Some(Term::Call { callee: ctor, args }) => {
                 assert_eq!(ctor, "for_all");
@@ -1169,5 +1292,111 @@ module Host version "0.1.0" {
                 vec!["T".to_owned(), "U".to_owned()]
             )
         );
+    }
+
+    fn require_seq_is_not_bool_true(term: &Term) {
+        assert_ne!(term, &Term::Bool(true), "{term:?}");
+        match term {
+            Term::Apply { ctor, args } if ctor == "seq" && args.len() == 2 => {
+                assert_eq!(
+                    args[0],
+                    Term::Apply {
+                        ctor: "require".into(),
+                        args: vec![Term::Bool(false)],
+                    }
+                );
+                assert_eq!(args[1], Term::Bool(true));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn require_false_return_true_is_not_just_bool_true() {
+        let src = r#"
+module Examples.Req version "0.1.0" {
+    query q() -> Bool { require false; return true }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        match &hir.queries["q"].body {
+            HirQueryBody::Return(term) => require_seq_is_not_bool_true(term),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn evaluate_require_false_return_true_is_not_just_bool_true() {
+        let src = r#"
+module Examples.ReqEval version "0.1.0" {
+    query q() -> Bool { goal Evaluate { require false; return true } }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        match &hir.queries["q"].body {
+            HirQueryBody::Goal {
+                kind,
+                expr: Some(term),
+                ..
+            } if kind == "Evaluate" => require_seq_is_not_bool_true(term),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn elaborates_verify_trivial_assert_true() {
+        let src = r#"
+module Examples.Trivial version "0.1.0" {
+    verify Trivial { assert true }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.verifications.len(), 1, "{:?}", hir.verifications);
+        let v = &hir.verifications[0];
+        assert_eq!(v.name, "Trivial");
+        assert!(
+            v.formula.contains("true"),
+            "formula should contain true: {:?}",
+            v.formula
+        );
+        assert!(
+            v.formula == "assert true" || v.formula == "true",
+            "formula should be a true literal: {:?}",
+            v.formula
+        );
+        assert!(v.bounds.is_none(), "{:?}", v.bounds);
+    }
+
+    #[test]
+    fn money_usd_and_eur_differ() {
+        let src = r#"
+module Examples.Fx version "0.1.0" {
+    calc usd() -> Money<USD> { USD(1.00) }
+    calc eur() -> Money<EUR> { EUR(1.00) }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let expected = rust_decimal::Decimal::from_str("1.00").expect("decimal");
+        let usd = hir.functions["usd"].body.as_ref().expect("usd");
+        let eur = hir.functions["eur"].body.as_ref().expect("eur");
+        assert_eq!(
+            usd,
+            &Term::Apply {
+                ctor: "USD".into(),
+                args: vec![Term::Decimal(expected)],
+            }
+        );
+        assert_eq!(
+            eur,
+            &Term::Apply {
+                ctor: "EUR".into(),
+                args: vec![Term::Decimal(expected)],
+            }
+        );
+        assert_ne!(usd, eur);
     }
 }
