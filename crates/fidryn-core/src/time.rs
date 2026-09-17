@@ -1,9 +1,10 @@
 //! Bitemporal clocks: valid time is not record time.
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 use thiserror::Error;
 use time::OffsetDateTime;
+use time::UtcOffset;
 use time::format_description::well_known::Rfc3339;
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
@@ -16,19 +17,22 @@ pub enum TimeError {
     InvertedInterval,
 }
 
-/// An instant on the legal timeline. Stored as RFC3339 UTC.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct Instant(#[serde(with = "time::serde::rfc3339")] OffsetDateTime);
+/// An instant on the legal timeline. Stored and serialized as RFC3339 UTC (`Z`).
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Instant(OffsetDateTime);
+
+fn as_utc(dt: OffsetDateTime) -> OffsetDateTime {
+    dt.to_offset(UtcOffset::UTC)
+}
 
 impl Instant {
     pub fn from_offset(dt: OffsetDateTime) -> Self {
-        Self(dt)
+        Self(as_utc(dt))
     }
 
     pub fn parse(text: &str) -> Result<Self, TimeError> {
         OffsetDateTime::parse(text, &Rfc3339)
-            .map(Self)
+            .map(Self::from_offset)
             .map_err(|_| TimeError::InvalidRfc3339(text.to_owned()))
     }
 
@@ -38,6 +42,19 @@ impl Instant {
 
     pub fn to_rfc3339(self) -> String {
         self.0.format(&Rfc3339).expect("OffsetDateTime formats")
+    }
+}
+
+impl Serialize for Instant {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.to_rfc3339())
+    }
+}
+
+impl<'de> Deserialize<'de> for Instant {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let text = String::deserialize(deserializer)?;
+        Instant::parse(&text).map_err(serde::de::Error::custom)
     }
 }
 
@@ -180,5 +197,20 @@ mod tests {
             kind: CalendarKind::WorkingDays,
         };
         assert_ne!(a, b);
+    }
+
+    #[test]
+    fn equal_instants_have_one_canonical_wire_form() {
+        let utc = Instant::parse("2020-01-01T00:00:00Z").unwrap();
+        let offset = Instant::parse("2020-01-01T01:00:00+01:00").unwrap();
+        let plus_zero = Instant::parse("2020-01-01T00:00:00+00:00").unwrap();
+        assert_eq!(utc, offset);
+        assert_eq!(utc, plus_zero);
+        let expected = "\"2020-01-01T00:00:00Z\"";
+        assert_eq!(serde_json::to_string(&utc).unwrap(), expected);
+        assert_eq!(serde_json::to_string(&offset).unwrap(), expected);
+        assert_eq!(serde_json::to_string(&plus_zero).unwrap(), expected);
+        assert_eq!(utc.to_rfc3339(), "2020-01-01T00:00:00Z");
+        assert_eq!(offset.to_rfc3339(), "2020-01-01T00:00:00Z");
     }
 }

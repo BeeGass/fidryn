@@ -5,8 +5,7 @@ use std::fmt;
 
 macro_rules! hashed_id {
     ($name:ident, $tag:literal) => {
-        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-        #[serde(transparent)]
+        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $name([u8; 16]);
 
         impl $name {
@@ -31,6 +30,23 @@ macro_rules! hashed_id {
 
             pub fn hex(&self) -> String {
                 hex_encode(&self.0)
+            }
+
+            pub fn from_hex(text: &str) -> Result<Self, String> {
+                hex_decode(text).map(Self)
+            }
+        }
+
+        impl Serialize for $name {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                serializer.serialize_str(&self.hex())
+            }
+        }
+
+        impl<'de> Deserialize<'de> for $name {
+            fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+                let text = String::deserialize(deserializer)?;
+                Self::from_hex(&text).map_err(serde::de::Error::custom)
             }
         }
 
@@ -91,6 +107,29 @@ pub fn hex_encode(bytes: &[u8]) -> String {
     out
 }
 
+pub fn hex_decode(text: &str) -> Result<[u8; 16], String> {
+    if text.len() != 32 {
+        return Err(format!("expected 32 hex characters, got {}", text.len()));
+    }
+    let bytes = text.as_bytes();
+    let mut out = [0u8; 16];
+    for i in 0..16 {
+        let hi = hex_nibble(bytes[i * 2])?;
+        let lo = hex_nibble(bytes[i * 2 + 1])?;
+        out[i] = (hi << 4) | lo;
+    }
+    Ok(out)
+}
+
+fn hex_nibble(b: u8) -> Result<u8, String> {
+    match b {
+        b'0'..=b'9' => Ok(b - b'0'),
+        b'a'..=b'f' => Ok(b - b'a' + 10),
+        b'A'..=b'F' => Ok(b - b'A' + 10),
+        _ => Err("invalid hex character".into()),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -107,5 +146,29 @@ mod tests {
     #[test]
     fn distinct_tags_do_not_collide() {
         assert_ne!(NodeId::of(b"x").hex(), RuleId::of(b"x").hex());
+    }
+
+    #[test]
+    fn trace_id_serializes_as_hex_string() {
+        let id = TraceId::of(b"t");
+        let json = serde_json::to_value(id).unwrap();
+        assert!(json.is_string(), "{json}");
+        assert_eq!(json.as_str().unwrap(), id.hex());
+        assert_eq!(json.as_str().unwrap().len(), 32);
+        let back: TraceId = serde_json::from_value(json).unwrap();
+        assert_eq!(back, id);
+        assert!(!serde_json::to_value(id).unwrap().is_array());
+    }
+
+    #[test]
+    fn hashed_ids_used_in_outcome_json_are_hex_strings() {
+        for json in [
+            serde_json::to_value(NodeId::of(b"n")).unwrap(),
+            serde_json::to_value(CompletionProofId::of(b"p")).unwrap(),
+            serde_json::to_value(TraceId::of(b"t")).unwrap(),
+        ] {
+            assert!(json.is_string(), "{json}");
+            assert_eq!(json.as_str().unwrap().len(), 32);
+        }
     }
 }

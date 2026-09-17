@@ -127,6 +127,8 @@ pub struct CoreFunction {
     pub is_calc: bool,
     #[serde(default)]
     pub fuel: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<Term>,
     pub meta: NodeMeta,
 }
 

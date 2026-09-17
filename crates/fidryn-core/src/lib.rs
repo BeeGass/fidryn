@@ -6,6 +6,7 @@ pub mod canonical;
 pub mod case;
 pub mod diagnostics;
 pub mod effects;
+pub mod engine;
 pub mod ids;
 pub mod ir;
 pub mod outcome;
@@ -25,6 +26,7 @@ pub use diagnostics::{Diagnostic, DiagnosticCode, Severity, Span};
 pub use effects::{
     EffectName, HaltReason, Handler, HandlerResult, OpenOperation, SuspensionReason,
 };
+pub use engine::EngineError;
 pub use ids::{
     ClauseId, CompletionProofId, EffectId, JurisdictionId, ModuleId, NodeId, OriginId, QueryName,
     RuleId, SourceManifestId, SourceSnapshotId, TraceId,
@@ -36,7 +38,7 @@ pub use ir::{
     DeclaredDecisionResult, Guard, NodeMeta, QueryPlan, RuleKind, SelectionResult,
     VerificationBounds,
 };
-pub use outcome::{OpenRequest, Outcome};
+pub use outcome::{CheckedCertificate, OpenRequest, Outcome};
 pub use patterns::{
     ContextPattern, LegalEffectPattern, LegalStatusPattern, LegalSubjectPattern, PositionPattern,
     PropPattern, TermPattern,
@@ -50,7 +52,7 @@ pub use time::{
     Bound, CalendarKind, FidrynDuration, Instant, Interval, RunContext, TemporalLens, TimeError,
 };
 pub use types::{PrimitiveType, Sort, Type, is_subtype};
-pub use value::{PropTerm, Term, Value};
+pub use value::{BinOp, PropTerm, Term, Value};
 
 /// Compile-time reminder: a proposition is not a Boolean.
 pub const PROP_IS_NOT_BOOL: &str = "Prop has no implicit conversion to Bool";

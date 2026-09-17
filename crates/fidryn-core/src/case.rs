@@ -11,7 +11,7 @@ use std::collections::BTreeMap;
 pub struct CaseRecord {
     pub schema: String,
     pub module: Option<String>,
-    #[serde(default)]
+    #[serde(default, with = "crate::value::case_value_map")]
     pub facts: BTreeMap<String, Value>,
     #[serde(default)]
     pub evidence: Vec<EvidenceItem>,
@@ -49,6 +49,7 @@ impl Default for CaseRecord {
 #[serde(rename_all = "camelCase")]
 pub struct EvidenceItem {
     pub schema: String,
+    #[serde(with = "crate::value::case_value")]
     pub value: Value,
     pub observed_at: Instant,
 }
@@ -154,5 +155,39 @@ impl Default for SourceManifest {
             jurisdiction: String::new(),
             artifacts: Vec::new(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::value::Value;
+
+    #[test]
+    fn case_facts_accept_bare_literals_and_tagged_entity() {
+        let json = serde_json::json!({
+            "schema": "fidryn.case-record/v0.1",
+            "facts": {
+                "acting_trustee": "Bryan",
+                "open_alice_branch": true,
+                "year": 2026,
+                "who": {"kind": "entity", "data": "Alice"}
+            },
+            "evidence": [{
+                "schema": "PhysicianCertificate",
+                "value": "certificate-1",
+                "observedAt": "2026-08-23T12:00:00Z"
+            }],
+            "admissibleCompletions": {}
+        });
+        let case: CaseRecord = serde_json::from_value(json).unwrap();
+        assert_eq!(case.facts["acting_trustee"], Value::String("Bryan".into()));
+        assert_eq!(case.facts["open_alice_branch"], Value::Bool(true));
+        assert_eq!(case.facts["year"], Value::Int(2026));
+        assert_eq!(case.facts["who"], Value::Entity("Alice".into()));
+        assert_eq!(
+            case.evidence[0].value,
+            Value::String("certificate-1".into())
+        );
     }
 }
