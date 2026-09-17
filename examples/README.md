@@ -66,7 +66,7 @@ use `fidryn.case-record/v0.1` JSON for CLI case-record interchange.
 
 ## Module index
 
-All of these `fidryn check` clean. Each has fixture sources and at least one case record.
+All of these `fidryn check` clean. Each has fixture sources. Modules with a sibling `cases/` directory ship JSON case records; the fifty state modules use in-file `scenario` blocks instead (no sibling `cases/`).
 
 ### Courts and evidence (lawyers)
 
@@ -150,3 +150,9 @@ file names are in `states/README.md`. Examples:
 
 - `US.Federal.Code.Catalog` — records that the United States Code is not fully encoded
 
+## Independent programs
+
+Small interpreter fixtures live under `tests/programs/` (including
+`require-gate.fr`, `late-payment.fr`, and `transaction-atomic.fr`). They are
+not jurisdiction slices. Path-level `check` / `run` commands are in
+[docs/examples.md](../docs/examples.md).
