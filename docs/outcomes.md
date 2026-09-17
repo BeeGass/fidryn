@@ -12,13 +12,14 @@ cannot fit that schema live on the evaluation-report envelope
 they are not extra keys on the outcome object (`additionalProperties`
 is false).
 
-See [CLI](../README.md#cli), the [language grammar](../grammar.ebnf), and
+See [CLI](cli.md), the [language grammar](../grammar.ebnf), and
 [Cases and time](cases-and-time.md).
 
 ## Envelope
 
-The six-kind result inside a successful run is this object. The
-evaluation-report envelope, when emitted, wraps it as `outcomeDocument`.
+CLI `run` / `explore` and mill `/api/run` / `/api/explore` emit
+`fidryn.evaluation-report/v0.1`. The six-kind legal result is nested as
+`outcomeDocument`. That nested object is:
 
 | Field | Meaning |
 | --- | --- |
@@ -53,7 +54,7 @@ above; that schema is unchanged.
 | `executionMode` | `operative` or `scenario`. Operative `evaluate` does not apply `case.assumptions`. |
 | `assumptions` | Overlay hypotheses copied onto a scenario report. Empty for operative runs. |
 | `sourceTrust` | How the compiled source was authenticated. In-memory / mill pasted compile is `unauthenticated`. A path compile may be `fixture` or `byteVerified`. `fixture` is not byte-verified. |
-| `verificationMethod` | `none` (claims digest), `structural` (shape only), or `finiteReplay` (each branch re-evaluated). Only `finiteReplay` is covering. |
+| `verificationMethod` | `none` (no covering verification; a claims-digest binding is not covering), `structural` (shape only), or `finiteReplay` (each declared branch re-evaluated). Only `finiteReplay` is covering. |
 | `coverage` | Optional `CoverageWitness`. Shape completeness is not covering meaning. |
 | `outcomeDocument` | The `fidryn.outcome/v0.1` object from the previous section. |
 
@@ -342,7 +343,11 @@ user record must use `{ "kind": "record", "data": { ... } }`; see
 
 ## Reading a result
 
-1. Confirm `schema` is `fidryn.outcome/v0.1`.
+1. Confirm the CLI/mill report `schema` is
+   `fidryn.evaluation-report/v0.1`, then open nested `outcomeDocument`
+   (`schema` `fidryn.outcome/v0.1`). Read `executionMode`,
+   `sourceTrust`, and `assumptions` on the report before treating the
+   answer as operative.
 2. Read `modelBoundary` and `asOf` before `outcome.kind`.
 3. Branch on `kind`. Only `determinate` has `value` as *the* answer.
 4. If `kind` is `determinate` and `ignoredOpenIssues` is nonempty, demand
