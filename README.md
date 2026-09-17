@@ -80,7 +80,7 @@ The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 ```
 fidryn fmt PATH
 fidryn check PATH
-fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE]
+fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario]
 fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] --valid-at TIME --known-at TIME
 fidryn explain TRACE_ID --format text|json|dot
 fidryn verify PATH --property NAME
@@ -91,9 +91,12 @@ fidryn ui [--port N] [--no-open]
 ```
 
 `--arg provision=...` writes `case.facts["provision"]`. Times are ISO 8601
-/ RFC 3339. `explore` searches only the declared finite completion space.
-`file` is dry-run unless both `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`
-are set; a transport receipt is not a `Filed` fact.
+/ RFC 3339. `run` / `explore` print `fidryn.evaluation-report/v0.1` (nested
+`outcomeDocument` is `fidryn.outcome/v0.1`). `--scenario` applies
+`case.assumptions` as an overlay; default `run` is operative. `explore`
+searches only the declared finite completion space. `file` is dry-run
+unless both `--live` and `FIDRYN_ALLOW_LIVE_FILING=1` are set; a transport
+receipt is not a `Filed` fact.
 
 ## Examples
 
@@ -132,4 +135,3 @@ actually implemented: [docs/implementation-status.md](docs/implementation-status
 ## Website
 
 Public landing: [fidryn.onlygass.dev](https://fidryn.onlygass.dev) (static files in `site/`).
-
