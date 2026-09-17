@@ -207,7 +207,11 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
 /// `sources/` fallback. A declared path that is missing or malformed is a
 /// diagnostic. Modules that omit a manifest get an empty default.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
-    fidryn_driver::Driver::new().check_path(path)
+    thread_local! {
+        static DRIVER: std::cell::RefCell<fidryn_driver::Driver> =
+            std::cell::RefCell::new(fidryn_driver::Driver::new());
+    }
+    DRIVER.with(|driver| driver.borrow_mut().check_path(path))
 }
 
 fn emit_diagnostics(diagnostics: &[Diagnostic]) {
