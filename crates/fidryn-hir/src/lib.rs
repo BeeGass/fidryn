@@ -28,6 +28,7 @@ pub struct HirModule {
     pub offices: BTreeMap<String, String>,
     pub queries: BTreeMap<String, HirQuery>,
     pub rules: Vec<HirRule>,
+    pub duties: Vec<HirDuty>,
     pub nominations: Vec<HirNomination>,
     pub interpretation_families: BTreeMap<String, InterpretationAlts>,
     pub decisions: Vec<HirDecision>,
@@ -74,6 +75,16 @@ pub struct HirRule {
     pub source: Option<String>,
     pub guard: Option<Guard>,
     pub consequences: Vec<(String, PropTerm)>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirDuty {
+    pub name: String,
+    pub bearer: String,
+    pub claimant: Option<String>,
+    pub attaches: Option<Guard>,
+    pub content: Vec<Term>,
+    pub due: Option<Term>,
 }
 
 pub type EligibilityDef = (PropTerm, bool);
@@ -185,6 +196,7 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         offices: BTreeMap::new(),
         queries: BTreeMap::new(),
         rules: Vec::new(),
+        duties: Vec::new(),
         nominations: Vec::new(),
         interpretation_families: BTreeMap::new(),
         decisions: Vec::new(),
@@ -369,6 +381,20 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     guard,
                     consequences,
                 });
+            }
+            fidryn_syntax::ast::Item::Duty(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                if !name.is_empty() {
+                    let parts = body::parse_duty_parts(&d.source);
+                    hir.duties.push(HirDuty {
+                        name,
+                        bearer: parts.bearer,
+                        claimant: parts.claimant,
+                        attaches: parts.attaches,
+                        content: parts.content,
+                        due: parts.due,
+                    });
+                }
             }
             fidryn_syntax::ast::Item::Nomination(d) => {
                 let rank = extract_rank(&d.source);
@@ -1398,5 +1424,59 @@ module Examples.Fx version "0.1.0" {
             }
         );
         assert_ne!(usd, eur);
+    }
+
+    #[test]
+    fn elaborates_late_payment_style_duty() {
+        let src = r#"
+module Programs.LatePayment version "0.1.0" {
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+    proposition InvoiceIssued(person: NaturalPerson)
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        attaches when operative InvoiceIssued(Payer)
+        content USD(100.00)
+        due 0 counted_days after invoice_date
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.duties.len(), 1, "{:?}", hir.duties);
+        let duty = &hir.duties[0];
+        assert_eq!(duty.name, "PayInvoice");
+        assert_eq!(duty.bearer, "Payer");
+        assert_eq!(duty.claimant.as_deref(), Some("Payee"));
+        assert!(
+            matches!(
+                &duty.attaches,
+                Some(Guard::Operative(prop, _)) if prop.predicate == "InvoiceIssued"
+            ),
+            "{:?}",
+            duty.attaches
+        );
+        assert_eq!(
+            duty.content,
+            vec![Term::Apply {
+                ctor: "USD".into(),
+                args: vec![Term::Decimal(
+                    rust_decimal::Decimal::from_str("100.00").expect("decimal")
+                )],
+            }]
+        );
+        match &duty.due {
+            Some(Term::Apply { ctor, args }) if ctor == "after" && args.len() == 2 => {
+                match &args[0] {
+                    Term::Apply { ctor, args: unit } if ctor == "counted_days" => {
+                        assert_eq!(unit.as_slice(), &[Term::Int(0)]);
+                    }
+                    other => panic!("{other:?}"),
+                }
+                assert_eq!(args[1], Term::Ident("invoice_date".into()));
+            }
+            other => panic!("{other:?}"),
+        }
     }
 }

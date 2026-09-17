@@ -296,6 +296,77 @@ pub fn parse_rule_parts(src: &str) -> (Option<Guard>, Vec<(String, PropTerm)>) {
     (guard, consequences)
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DutyParts {
+    pub bearer: String,
+    pub claimant: Option<String>,
+    pub attaches: Option<Guard>,
+    pub content: Vec<Term>,
+    pub due: Option<Term>,
+}
+
+pub fn parse_duty_parts(src: &str) -> DutyParts {
+    let inner = last_brace_inner(src).unwrap_or(src);
+    let mut p = SliceParser::new(inner);
+    let mut bearer = String::new();
+    let mut claimant = None;
+    let mut attaches = None;
+    let mut content = Vec::new();
+    let mut due = None;
+    while !p.is_eof() {
+        if p.eat_ident("bearer") {
+            if p.at_kind(TokenKind::Ident) {
+                bearer = p.bump_text();
+            }
+            continue;
+        }
+        if p.eat_ident("claimant") {
+            if p.at_kind(TokenKind::Ident) {
+                claimant = Some(p.bump_text());
+            }
+            continue;
+        }
+        if p.eat_ident("attaches") {
+            let _ = p.eat_ident("when");
+            if let Some(term) = p.parse_expr() {
+                attaches = Some(term_to_guard(&term));
+            }
+            continue;
+        }
+        if p.eat_ident("content") {
+            if let Some(term) = p.parse_expr() {
+                content.push(term);
+            }
+            continue;
+        }
+        if p.eat_ident("due") {
+            due = parse_due_expr(&mut p);
+            continue;
+        }
+        p.bump();
+    }
+    DutyParts {
+        bearer,
+        claimant,
+        attaches,
+        content,
+        due,
+    }
+}
+
+fn parse_due_expr(p: &mut SliceParser<'_>) -> Option<Term> {
+    let term = p.parse_expr()?;
+    if p.eat_ident("after") {
+        let event = p.parse_expr()?;
+        Some(Term::Apply {
+            ctor: "after".into(),
+            args: vec![term, event],
+        })
+    } else {
+        Some(term)
+    }
+}
+
 pub fn parse_rule_kind(src: &str) -> String {
     let mut p = SliceParser::new(src);
     while !p.is_eof() {
@@ -1251,7 +1322,15 @@ impl<'a> SliceParser<'a> {
             }
             TokenKind::Int => {
                 let text = self.bump_text();
-                text.parse().ok().map(Term::Int)
+                let n = text.parse().ok().map(Term::Int)?;
+                if self.at_kind(TokenKind::DurationUnit) {
+                    let unit = self.bump_text();
+                    return Some(Term::Apply {
+                        ctor: unit,
+                        args: vec![n],
+                    });
+                }
+                Some(n)
             }
             TokenKind::Decimal => Some(decimal_term(&self.bump_text())),
             TokenKind::Date | TokenKind::DateTime => Some(Term::Ident(self.bump_text())),
@@ -1424,6 +1503,54 @@ mod tests {
     fn parse_expr_true() {
         assert_eq!(parse_expr_src("true"), Some(Term::Bool(true)));
         assert_eq!(parse_expr_src("false"), Some(Term::Bool(false)));
+    }
+
+    #[test]
+    fn parse_expr_counted_days_duration() {
+        assert_eq!(
+            parse_expr_src("0 counted_days"),
+            Some(Term::Apply {
+                ctor: "counted_days".into(),
+                args: vec![Term::Int(0)],
+            })
+        );
+        assert_eq!(parse_expr_src("15"), Some(Term::Int(15)));
+        assert_eq!(
+            parse_expr_src("GracePeriod"),
+            Some(Term::Ident("GracePeriod".into()))
+        );
+    }
+
+    #[test]
+    fn parse_duty_late_payment_fields() {
+        let src = r#"
+duty PayInvoice {
+    bearer Payer
+    claimant Payee
+    attaches when operative InvoiceIssued(Payer)
+    content USD(100.00)
+    due 0 counted_days after invoice_date
+}
+"#;
+        let parts = parse_duty_parts(src);
+        assert_eq!(parts.bearer, "Payer");
+        assert_eq!(parts.claimant.as_deref(), Some("Payee"));
+        assert!(
+            matches!(
+                &parts.attaches,
+                Some(Guard::Operative(prop, _)) if prop.predicate == "InvoiceIssued"
+            ),
+            "{:?}",
+            parts.attaches
+        );
+        assert_eq!(parts.content.len(), 1, "{:?}", parts.content);
+        match parts.due {
+            Some(Term::Apply { ref ctor, ref args }) if ctor == "after" => {
+                assert_eq!(args.len(), 2, "{args:?}");
+            }
+            Some(Term::Apply { ref ctor, .. }) if ctor == "counted_days" => {}
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
