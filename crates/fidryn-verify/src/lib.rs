@@ -79,25 +79,31 @@ impl fmt::Display for PropertyVerdict {
     }
 }
 
-/// Two-phase determinacy over declared `admissible_completions` only.
+/// How much of the declared completion space was examined.
 ///
-/// Evaluate one admissible assignment to `v`, then search for another
-/// assignment whose determinate value is `≠ v`. Agreement is
-/// [`Determinacy::Convergent`]; two values are
-/// [`Determinacy::Counterexample`]. Engine errors and incomplete coverage
-/// are [`Determinacy::Unknown`], never convergent. An explicit empty
-/// declared domain is not convergent.
+/// `incomplete` is true when some admissible region was truncated, left
+/// unresolved, or lies outside the enumerated dimensions. Agreement among
+/// examined worlds is then [`Determinacy::Unknown`], not convergent.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Coverage {
+    pub examined: usize,
+    pub total: usize,
+    pub incomplete: bool,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[must_use]
 pub enum Determinacy {
     Convergent {
         value: Value,
+        coverage: Coverage,
     },
     Counterexample {
         left: String,
         right: String,
         va: Value,
         vb: Value,
+        coverage: Coverage,
     },
     Unknown {
         reason: String,
@@ -111,14 +117,21 @@ pub enum Determinacy {
 impl fmt::Display for Determinacy {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Convergent { value } => {
-                write!(f, "convergent {}", value.display_label())
+            Self::Convergent { value, coverage } => {
+                write!(
+                    f,
+                    "convergent {} (examined {}/{})",
+                    value.display_label(),
+                    coverage.examined,
+                    coverage.total
+                )
             }
             Self::Counterexample {
                 left,
                 right,
                 va,
                 vb,
+                coverage: _,
             } => write!(
                 f,
                 "counterexample {left}={} vs {right}={}",
@@ -162,7 +175,7 @@ pub fn explore_query(
 ) -> Outcome<Value> {
     if let Ok(determinacy) = check_determinacy(module, query, case, ctx) {
         match determinacy {
-            Determinacy::Convergent { value } => return determinate_explored(value),
+            Determinacy::Convergent { value, .. } => return determinate_explored(value),
             Determinacy::Suspended { requests } => {
                 return Outcome::Suspended {
                     requests,
@@ -212,12 +225,17 @@ pub fn check_determinacy(
         return Ok(Determinacy::Other(empty_completion_set()));
     }
 
-    let mut scan = DetScan::default();
+    let domains = completion_domains(case);
+    let mut scan = DetScan {
+        total: assignments.len(),
+        incomplete,
+        ..DetScan::default()
+    };
     for assignment in &assignments {
         let label = assignment_identity(assignment);
         match eval_assignment(module, query, case, ctx, assignment) {
             Ok(outcome) => {
-                if let Some(counterexample) = scan.absorb(&label, outcome) {
+                if let Some(counterexample) = scan.absorb(&label, outcome, &domains) {
                     return Ok(counterexample);
                 }
             }
@@ -226,7 +244,7 @@ pub fn check_determinacy(
             }
         }
     }
-    Ok(scan.finish(incomplete))
+    Ok(scan.finish())
 }
 
 pub fn skeptical(
@@ -325,11 +343,33 @@ pub fn verify_property(module: &CoreModule, name: &str) -> PropertyVerdict {
         };
     }
 
+    let formula = property.formula.trim().trim_end_matches(';').trim();
+    if formula_is_true_literal(formula) {
+        return PropertyVerdict::Proved {
+            name: property.name.clone(),
+            bounds: property.bounds.clone(),
+        };
+    }
+    if formula_is_false_literal(formula) {
+        return PropertyVerdict::Counterexample {
+            name: property.name.clone(),
+            detail: "formula evaluates to false".into(),
+        };
+    }
+
     PropertyVerdict::Unknown {
         name: property.name.clone(),
         reason: "bounded check did not obtain a covering proof of the declared formula".into(),
         bounds: property.bounds.clone(),
     }
+}
+
+fn formula_is_true_literal(formula: &str) -> bool {
+    formula == "true" || formula == "assert true"
+}
+
+fn formula_is_false_literal(formula: &str) -> bool {
+    formula == "false" || formula == "assert false"
 }
 
 fn eval_assignment(
@@ -378,6 +418,10 @@ struct DetScan {
     suspended: BTreeSet<OpenRequest>,
     saw_suspended: bool,
     other: Option<Outcome<Value>>,
+    examined: usize,
+    total: usize,
+    incomplete: bool,
+    unresolved_outside: bool,
 }
 
 impl DetScan {
@@ -387,17 +431,35 @@ impl DetScan {
                 self.witness = Some((label, value));
                 None
             }
-            Some((left, va)) if va != &value => Some(Determinacy::Counterexample {
-                left: left.clone(),
-                right: label,
-                va: va.clone(),
-                vb: value,
-            }),
+            Some((left, va)) if va != &value => {
+                let coverage = self.coverage();
+                Some(Determinacy::Counterexample {
+                    left: left.clone(),
+                    right: label,
+                    va: va.clone(),
+                    vb: value,
+                    coverage,
+                })
+            }
             Some(_) => None,
         }
     }
 
-    fn absorb(&mut self, label: &str, outcome: Outcome<Value>) -> Option<Determinacy> {
+    fn coverage(&self) -> Coverage {
+        Coverage {
+            examined: self.examined,
+            total: self.total,
+            incomplete: self.incomplete || self.unresolved_outside,
+        }
+    }
+
+    fn absorb(
+        &mut self,
+        label: &str,
+        outcome: Outcome<Value>,
+        domains: &[Domain],
+    ) -> Option<Determinacy> {
+        self.examined += 1;
         match outcome {
             Outcome::Determinate { value, .. } => self.record(label.to_owned(), value),
             Outcome::Contingent { alternatives, .. } => {
@@ -415,6 +477,9 @@ impl DetScan {
             }
             Outcome::Suspended { requests, .. } => {
                 self.saw_suspended = true;
+                if requests.iter().any(|req| !request_in_domains(req, domains)) {
+                    self.unresolved_outside = true;
+                }
                 self.suspended.extend(requests);
                 None
             }
@@ -427,12 +492,20 @@ impl DetScan {
         }
     }
 
-    fn finish(self, incomplete: bool) -> Determinacy {
+    fn finish(self) -> Determinacy {
+        let coverage = self.coverage();
         if let Some((_, value)) = self.witness {
-            if incomplete || self.engine.is_some() || self.saw_suspended || self.other.is_some() {
+            if self.incomplete
+                || self.engine.is_some()
+                || self.saw_suspended
+                || self.other.is_some()
+                || self.unresolved_outside
+            {
                 return Determinacy::Unknown {
                     reason: self.engine.unwrap_or_else(|| {
-                        if incomplete {
+                        if self.unresolved_outside {
+                            "unresolved request outside declared completion dimensions".into()
+                        } else if self.incomplete {
                             "incomplete completion search".into()
                         } else {
                             "admissible assignments are not uniformly determinate".into()
@@ -440,12 +513,12 @@ impl DetScan {
                     }),
                 };
             }
-            return Determinacy::Convergent { value };
+            return Determinacy::Convergent { value, coverage };
         }
         if let Some(reason) = self.engine {
             return Determinacy::Unknown { reason };
         }
-        if incomplete {
+        if self.incomplete {
             return Determinacy::Unknown {
                 reason: "incomplete completion search".into(),
             };
@@ -462,6 +535,18 @@ impl DetScan {
             reason: "no admissible determinate assignment".into(),
         }
     }
+}
+
+fn request_in_domains(request: &OpenRequest, domains: &[Domain]) -> bool {
+    let key = match request {
+        OpenRequest::NeedEvidence { schema, .. } => format!("{EVIDENCE_NS}{schema}"),
+        OpenRequest::NeedInterpretation { family, .. } => {
+            format!("{INTERPRETATION_NS}{family}")
+        }
+        OpenRequest::NeedChoice { protocol, .. } => format!("{CHOICE_NS}{protocol}"),
+        _ => return false,
+    };
+    domains.iter().any(|domain| domain.name == key)
 }
 
 fn determinate_explored(value: Value) -> Outcome<Value> {
@@ -712,8 +797,11 @@ fn contains_ident(src: &str, ident: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::ir::{CoreNomination, CoreQuery, CoreVerify, QueryPlan};
+    use fidryn_core::ir::{
+        CoreDecl, CoreInterpretationFamily, CoreNomination, CoreQuery, CoreVerify, QueryPlan,
+    };
     use fidryn_core::types::Type;
+    use fidryn_core::value::PropTerm;
     use fidryn_core::{
         Instant, Interval, JurisdictionId, ModuleId, NodeId, NodeMeta, OriginId, SourceManifestId,
         SourceSnapshotId, Term,
@@ -767,13 +855,49 @@ mod tests {
         }
     }
 
+    fn eligible_def(person: &str, office: &str, established: bool) -> (PropTerm, bool) {
+        (
+            PropTerm::new(
+                "Eligible",
+                vec![Term::Ident(person.into()), Term::Ident(office.into())],
+            ),
+            established,
+        )
+    }
+
     fn trust_module() -> CoreModule {
-        module_with_query(
+        let office = "TrusteeOf(BRT)";
+        let mut module = module_with_query(
             "acting_trustee",
             QueryPlan::UniqueOccupant {
-                office: Term::Ident("TrusteeOf(BRT)".into()),
+                office: Term::Ident(office.into()),
             },
-        )
+        );
+        module
+            .declarations
+            .push(CoreDecl::InterpretationFamily(CoreInterpretationFamily {
+                id: NodeId::of(b"SuccessorEligibility"),
+                name: "SuccessorEligibility".into(),
+                source: Term::Ident("SuccessorEligibility".into()),
+                alternatives: vec![
+                    (
+                        "I1".into(),
+                        vec![
+                            eligible_def("Alice", office, true),
+                            eligible_def("Bob", office, true),
+                        ],
+                    ),
+                    (
+                        "I2".into(),
+                        vec![
+                            eligible_def("Alice", office, false),
+                            eligible_def("Bob", office, true),
+                        ],
+                    ),
+                ],
+                meta: node_meta("SuccessorEligibility"),
+            }));
+        module
     }
 
     fn bool_module() -> CoreModule {
@@ -899,7 +1023,7 @@ mod tests {
                 assert!(labels.contains(&"Bob".to_owned()), "{labels:?}");
                 assert_ne!(va, vb);
             }
-            Determinacy::Convergent { value } => {
+            Determinacy::Convergent { value, .. } => {
                 panic!("two SuccessorEligibility interpretations must not be Convergent: {value:?}")
             }
             other => panic!("{other:?}"),
@@ -913,7 +1037,7 @@ mod tests {
         let det = check_determinacy(&module, &QueryName::from("acting_trustee"), &case, &ctx())
             .expect("determinacy");
         match det {
-            Determinacy::Convergent { value } => {
+            Determinacy::Convergent { value, .. } => {
                 assert_eq!(value.display_label(), "Bob");
             }
             other => panic!("recorded I2 with OccupancyRecord must be Convergent Bob: {other:?}"),
@@ -1096,6 +1220,50 @@ mod tests {
             }
             PropertyVerdict::InvalidProperty { diagnostics } => {
                 panic!("declared TrusteeContinuity must be recognized: {diagnostics}")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_proves_true_literal() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "AlwaysOk",
+            "assert true",
+            VerificationBounds {
+                persons: 1,
+                events: 1,
+                time_points: 1,
+            },
+        );
+        match verify_property(&module, "AlwaysOk") {
+            PropertyVerdict::Proved { name, bounds } => {
+                assert_eq!(name, "AlwaysOk");
+                assert_eq!(bounds.persons, 1);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_counterexample_for_false_literal() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "NeverOk",
+            "assert false",
+            VerificationBounds {
+                persons: 1,
+                events: 1,
+                time_points: 1,
+            },
+        );
+        match verify_property(&module, "NeverOk") {
+            PropertyVerdict::Counterexample { name, detail } => {
+                assert_eq!(name, "NeverOk");
+                assert!(detail.contains("false"), "{detail}");
             }
             other => panic!("{other:?}"),
         }

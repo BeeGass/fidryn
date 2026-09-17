@@ -163,7 +163,7 @@ fn two_interpretations_are_contingent() {
             assert!(labels.contains(&"Bob".to_owned()), "{labels:?}");
             assert_ne!(va, vb);
         }
-        Determinacy::Convergent { value } => {
+        Determinacy::Convergent { value, .. } => {
             panic!("two SuccessorEligibility interpretations must not be Convergent: {value:?}")
         }
         other => panic!("{other:?}"),
@@ -202,7 +202,7 @@ fn court_selects_i2_determinate_bob() {
     )
     .expect("determinacy");
     match det {
-        Determinacy::Convergent { value } => {
+        Determinacy::Convergent { value, .. } => {
             assert_eq!(value.display_label(), "Bob");
         }
         other => panic!("recorded I2 with OccupancyRecord must be Convergent Bob: {other:?}"),
