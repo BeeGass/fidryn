@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/outcome-v0.1.json",
+  "title": "fidryn.outcome/v0.1",
+  "type": "object",
+  "required": ["schema", "module", "sourceSnapshot", "query", "asOf", "modelBoundary", "outcome"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.outcome/v0.1" },
+    "module": { "type": "string" },
+    "sourceSnapshot": { "type": "string" },
+    "query": { "type": "string" },
+    "asOf": {
+      "type": "object",
+      "required": ["validTime", "recordTime"],
+      "additionalProperties": false,
+      "properties": {
+        "validTime": { "type": "string", "format": "date-time" },
+        "recordTime": { "type": "string", "format": "date-time" }
+      }
+    },
+    "modelBoundary": {
+      "type": "object",
+      "required": ["outsideScope", "admissibleCompletions"],
+      "additionalProperties": false,
+      "properties": {
+        "outsideScope": { "type": "array", "items": { "type": "string" } },
+        "admissibleCompletions": { "type": "object" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["kind", "trace"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "determinate",
+            "contingent",
+            "suspended",
+            "normConflict",
+            "outsideCompetence",
+            "inconsistent"
+          ]
+        },
+        "trace": { "type": "string" },
+        "value": true,
+        "convergenceCertificate": { "type": ["string", "null"] },
+        "ignoredOpenIssues": { "type": "array" },
+        "alternatives": { "type": "object" },
+        "pivots": { "type": "array" },
+        "requests": { "type": "array" }
+      }
+    }
+  }
+}

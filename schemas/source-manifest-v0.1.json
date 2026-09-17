@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/source-manifest-v0.1.json",
+  "title": "fidryn.source-manifest/v0.1",
+  "type": "object",
+  "required": ["schema", "snapshot", "jurisdiction", "artifacts"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.source-manifest/v0.1" },
+    "snapshot": { "type": "string" },
+    "jurisdiction": { "type": "string" },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "digest", "kind", "effective"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string" },
+          "digest": { "type": "string" },
+          "kind": { "type": "string" },
+          "effective": { "type": "string" }
+        }
+      }
+    }
+  }
+}

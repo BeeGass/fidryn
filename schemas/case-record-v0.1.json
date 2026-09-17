@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/case-record-v0.1.json",
+  "title": "fidryn.case-record/v0.1",
+  "type": "object",
+  "required": ["schema", "admissibleCompletions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.case-record/v0.1" },
+    "module": { "type": "string" },
+    "facts": { "type": "object" },
+    "evidence": { "type": "array" },
+    "determinations": { "type": "array" },
+    "interpretations": { "type": "object" },
+    "decisions": { "type": "object" },
+    "closures": { "type": "array" },
+    "outsideScope": { "type": "array", "items": { "type": "string" } },
+    "admissibleCompletions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "interpretations": { "type": "object" },
+        "evidence": { "type": "object" },
+        "choices": { "type": "object" }
+      }
+    }
+  }
+}
