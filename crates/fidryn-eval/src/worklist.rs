@@ -1,9 +1,8 @@
 //! Bounded constitutive/derive worklist. The case record is never mutated.
 
-use fidryn_core::case::CaseDetermination;
 use fidryn_core::ir::{CompareOp, Consequence, CoreDecl, CoreModule, CoreRule, Guard};
 use fidryn_core::value::{PropTerm, Term, Value};
-use fidryn_core::{CaseRecord, EngineError, Instant, RunContext};
+use fidryn_core::{CaseRecord, EngineError, FrozenCaseView, RunContext};
 use std::collections::{BTreeMap, BTreeSet};
 
 const WORKLIST_FUEL: u32 = 64;
@@ -111,13 +110,14 @@ impl DerivedWorld {
     ) -> Self {
         let mut world = Self::default();
         let propositions = declared_propositions(module);
+        let view = FrozenCaseView::from_context(case, ctx);
         seed_facts(&mut world, &case.facts, &propositions);
         seed_facts(&mut world, args, &propositions);
-        seed_determinations(&mut world, case, ctx);
-        seed_evidence(&mut world, case, ctx);
-        seed_events(&mut world, case, ctx, &propositions);
+        seed_determinations(&mut world, &view);
+        seed_evidence(&mut world, &view);
+        seed_events(&mut world, &view, &propositions);
         seed_core_facts(&mut world, module);
-        seed_observations(&mut world, module, case, ctx);
+        seed_observations(&mut world, module, &view);
         world
     }
 
@@ -150,10 +150,9 @@ impl DerivedWorld {
             }
             Guard::Observed { schema, .. } => {
                 if self.observed(schema)
-                    || case
-                        .evidence
-                        .iter()
-                        .any(|e| names_eq(&e.schema, schema) && e.observed_at <= ctx.record_time)
+                    || FrozenCaseView::from_context(case, ctx)
+                        .evidence()
+                        .any(|e| names_eq(&e.schema, schema))
                 {
                     Hold::Yes
                 } else {
@@ -180,11 +179,9 @@ impl DerivedWorld {
             }
             Guard::CompletedAct(name) | Guard::EffectiveAct(name) => {
                 if case.facts.contains_key(name)
-                    || case.determinations.iter().any(|d| {
-                        determination_is_known(d, ctx.record_time)
-                            && names_eq(&d.issue, name)
-                            && d.established
-                    })
+                    || FrozenCaseView::from_context(case, ctx)
+                        .determinations()
+                        .any(|d| names_eq(&d.issue, name) && d.established)
                 {
                     Hold::Yes
                 } else {
@@ -282,11 +279,8 @@ fn seed_facts(
     }
 }
 
-fn seed_determinations(world: &mut DerivedWorld, case: &CaseRecord, ctx: &RunContext) {
-    for det in &case.determinations {
-        if !determination_is_known(det, ctx.record_time) {
-            continue;
-        }
+fn seed_determinations(world: &mut DerivedWorld, view: &FrozenCaseView<'_>) {
+    for det in view.determinations() {
         let prop = parse_prop_issue(&det.issue);
         if det.established {
             world.insert_held(prop);
@@ -296,31 +290,21 @@ fn seed_determinations(world: &mut DerivedWorld, case: &CaseRecord, ctx: &RunCon
     }
 }
 
-/// Knowledge filter for determinations. Missing `recorded_at` stays visible
-/// so legacy records without a knowledge timestamp remain usable.
-fn determination_is_known(det: &CaseDetermination, known_at: Instant) -> bool {
-    match det.recorded_at {
-        None => true,
-        Some(recorded) => recorded <= known_at,
-    }
-}
-
-fn seed_evidence(world: &mut DerivedWorld, case: &CaseRecord, ctx: &RunContext) {
-    for item in &case.evidence {
-        if item.observed_at <= ctx.record_time {
-            world.observed.insert(item.schema.clone());
-        }
+fn seed_evidence(world: &mut DerivedWorld, view: &FrozenCaseView<'_>) {
+    for item in view.evidence() {
+        world.observed.insert(item.schema.clone());
     }
 }
 
 fn seed_events(
     world: &mut DerivedWorld,
-    case: &CaseRecord,
-    ctx: &RunContext,
+    view: &FrozenCaseView<'_>,
     propositions: &BTreeSet<String>,
 ) {
-    for event in &case.events {
-        if !crate::duty::event_is_admitted(case, event, ctx.record_time) {
+    let case = view.case();
+    let known_at = view.known_at();
+    for event in view.events() {
+        if !crate::duty::event_is_admitted(case, event, known_at) {
             continue;
         }
         match &event.payload {
@@ -357,21 +341,13 @@ fn seed_core_facts(world: &mut DerivedWorld, module: &CoreModule) {
     }
 }
 
-fn seed_observations(
-    world: &mut DerivedWorld,
-    module: &CoreModule,
-    case: &CaseRecord,
-    ctx: &RunContext,
-) {
+fn seed_observations(world: &mut DerivedWorld, module: &CoreModule, view: &FrozenCaseView<'_>) {
     for decl in &module.declarations {
         let CoreDecl::Observation(obs) = decl else {
             continue;
         };
-        let seen = world.observed(&obs.name)
-            || case
-                .evidence
-                .iter()
-                .any(|e| names_eq(&e.schema, &obs.name) && e.observed_at <= ctx.record_time);
+        let seen =
+            world.observed(&obs.name) || view.evidence().any(|e| names_eq(&e.schema, &obs.name));
         if !seen {
             continue;
         }
@@ -845,8 +821,9 @@ pub fn domain_name(term: &Term) -> Option<String> {
 mod tests {
     use super::*;
     use fidryn_core::Interval;
+    use fidryn_core::case::CaseDetermination;
     use fidryn_core::ids::{JurisdictionId, ModuleId, SourceManifestId, SourceSnapshotId};
-    use fidryn_core::{LedgerEvent, Value};
+    use fidryn_core::{Instant, LedgerEvent, Value};
     use std::collections::BTreeMap;
 
     fn instant(text: &str) -> Instant {

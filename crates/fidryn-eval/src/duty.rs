@@ -4,7 +4,8 @@ use fidryn_core::ir::CoreDuty;
 use fidryn_core::time::{Bound, CalendarKind, Instant};
 use fidryn_core::value::{Term, Value};
 use fidryn_core::{
-    CaseRecord, DutyState, DutyStatus, EngineError, EvidenceItem, Interval, LedgerEvent, RunContext,
+    CaseRecord, DutyState, DutyStatus, EngineError, EvidenceItem, FrozenCaseView, Interval,
+    LedgerEvent, RunContext,
 };
 use std::collections::BTreeMap;
 
@@ -261,16 +262,9 @@ pub fn has_authority_constraint(case: &CaseRecord) -> bool {
 }
 
 pub fn action_is_granted(case: &CaseRecord, action: &str, record_time: Instant) -> bool {
-    if let Some(grants) = case.facts.get("authority_grants")
-        && value_grants_action(grants, action)
-    {
-        return true;
-    }
-    case.evidence.iter().any(|item| {
-        item.schema.eq_ignore_ascii_case("AuthorityGrant")
-            && item.observed_at <= record_time
-            && value_grants_action(&item.value, action)
-    })
+    FrozenCaseView::new(case, record_time, record_time)
+        .grants()
+        .any(|value| value_grants_action(value, action))
 }
 
 fn value_grants_action(value: &Value, action: &str) -> bool {
@@ -304,7 +298,7 @@ fn value_grants_action(value: &Value, action: &str) -> bool {
 /// duty-transition payload, need a covering grant. Assumption events are never
 /// operative. Relabeling a Performed payload as `correction` does not admit it.
 pub fn event_is_admitted(case: &CaseRecord, event: &LedgerEvent, record_time: Instant) -> bool {
-    if event.record_time > record_time {
+    if !FrozenCaseView::event_is_known_at(event, record_time) {
         return false;
     }
     if event.kind.eq_ignore_ascii_case("assumption") {
@@ -490,12 +484,14 @@ fn performance_exists(name: &str, instance: &str, case: &CaseRecord, ctx: &RunCo
     if stored_duty_performed(name, instance, case) {
         return true;
     }
-    if case.evidence.iter().any(|item| {
-        item.observed_at <= ctx.record_time && payment_matches_instance(item, name, instance)
-    }) {
+    let view = FrozenCaseView::from_context(case, ctx);
+    if view
+        .evidence()
+        .any(|item| payment_matches_instance(item, name, instance))
+    {
         return true;
     }
-    case.events.iter().any(|event| {
+    view.events().any(|event| {
         event_is_admitted(case, event, ctx.record_time)
             && event_marks_performed(event, name, instance)
     })
@@ -784,19 +780,16 @@ fn performance_instant(
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Option<Instant> {
-    let from_evidence = case
-        .evidence
-        .iter()
-        .filter(|item| {
-            item.observed_at <= ctx.record_time && payment_matches_instance(item, name, instance)
-        })
+    let view = FrozenCaseView::from_context(case, ctx);
+    let from_evidence = view
+        .evidence()
+        .filter(|item| payment_matches_instance(item, name, instance))
         .filter_map(payment_occurred_at)
         .min();
     if from_evidence.is_some() {
         return from_evidence;
     }
-    case.events
-        .iter()
+    view.events()
         .filter(|event| {
             event_is_admitted(case, event, ctx.record_time)
                 && event_marks_performed(event, name, instance)

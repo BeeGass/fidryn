@@ -6007,6 +6007,45 @@ mod tests {
         assert_eq!(state_b.status, fidryn_core::DutyStatus::Attached);
     }
 
+    fn compile_program(rel: &str) -> CoreModule {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join(rel);
+        let src = std::fs::read_to_string(&path).expect("program source");
+        let parsed = fidryn_syntax::parse_file(&src);
+        assert!(!parsed.has_errors(), "{rel}: {:?}", parsed.diagnostics);
+        let hir = fidryn_hir::elaborate(&parsed, &fidryn_core::SourceManifest::default())
+            .unwrap_or_else(|d| panic!("{rel}: {d:?}"));
+        fidryn_check::check(&hir, &fidryn_core::SourceManifest::default())
+            .unwrap_or_else(|d| panic!("{rel}: {d:?}"))
+    }
+
+    #[test]
+    fn independent_transaction_atomic_does_not_keep_attach() {
+        let module = compile_program("tests/programs/transaction-atomic.fr");
+        let case = CaseRecord::default();
+        let before = case.clone();
+        let err = run_module(&module, "q", &case, &mut Refusing)
+            .expect_err("illegal discharge must not commit");
+        assert!(
+            matches!(err, EngineError::InvalidInput(ref msg) if msg.contains("discharge")),
+            "{err:?}"
+        );
+        assert_eq!(case, before, "failed transaction must not mutate case");
+        assert!(!case.facts.contains_key("duty:pay:default"));
+        let absent = run_module(
+            &module_with_plan(
+                "q",
+                QueryPlan::Evaluate(Term::Ident("duty:pay:default".into())),
+            ),
+            "q",
+            &case,
+            &mut Refusing,
+        )
+        .expect_err("duty still absent");
+        assert!(matches!(absent, EngineError::Unsupported(_)), "{absent:?}");
+    }
+
     #[test]
     fn transaction_illegal_discharge_does_not_keep_attach() {
         let plan = QueryPlan::Evaluate(Term::Apply {

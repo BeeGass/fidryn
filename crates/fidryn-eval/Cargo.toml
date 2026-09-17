@@ -13,3 +13,8 @@ fidryn-core.workspace = true
 indexmap.workspace = true
 rust_decimal.workspace = true
 time.workspace = true
+
+[dev-dependencies]
+fidryn-check.workspace = true
+fidryn-hir.workspace = true
+fidryn-syntax.workspace = true
