@@ -41,7 +41,8 @@ pub use ir::{
     VerificationBounds,
 };
 pub use outcome::{
-    CheckedCertificate, CoverageWitness, EvaluationReport, OpenRequest, Outcome, TrustProfile,
+    BranchClaim, CheckedCertificate, CoverageWitness, EvaluationReport, OpenRequest, Outcome,
+    TrustProfile,
 };
 pub use patterns::{
     ContextPattern, LegalEffectPattern, LegalStatusPattern, LegalSubjectPattern, PositionPattern,

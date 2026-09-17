@@ -12,11 +12,20 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
+/// One claimed world: bindings for a case clone and the query answer there.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BranchClaim {
+    pub bindings: BTreeMap<String, Value>,
+    pub answer: Value,
+}
+
 /// Exhaustive-search witness for a covering certificate.
 ///
 /// A hash of open issues is not covering. Completeness requires a nonempty
 /// examined space (`examined == total && examined > 0`) that was not cut
-/// short (`incomplete == false`).
+/// short (`incomplete == false`). [`Self::is_complete`] does not inspect
+/// `branches`; the kernel checks their meaning.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoverageWitness {
@@ -24,9 +33,22 @@ pub struct CoverageWitness {
     pub total: usize,
     pub incomplete: bool,
     pub answer: Value,
+    #[serde(default)]
+    pub branches: Vec<BranchClaim>,
 }
 
 impl CoverageWitness {
+    /// Complete shape with empty `branches`. Kernel still checks meaning.
+    pub fn complete(examined: usize, answer: Value) -> Self {
+        Self {
+            examined,
+            total: examined,
+            incomplete: false,
+            answer,
+            branches: Vec::new(),
+        }
+    }
+
     pub fn is_complete(&self) -> bool {
         !self.incomplete && self.examined == self.total && self.examined > 0
     }
@@ -537,12 +559,7 @@ mod tests {
     }
 
     fn complete_witness(answer: Value) -> CoverageWitness {
-        CoverageWitness {
-            examined: 1,
-            total: 1,
-            incomplete: false,
-            answer,
-        }
+        CoverageWitness::complete(1, answer)
     }
 
     #[test]
@@ -614,6 +631,7 @@ mod tests {
             total: 0,
             incomplete: false,
             answer: answer.clone(),
+            branches: Vec::new(),
         };
         let err = CheckedCertificate::verified_covering(
             CompletionProofId::of(b"x"),
@@ -690,6 +708,7 @@ mod tests {
             total: 0,
             incomplete: false,
             answer: Value::Unit,
+            branches: Vec::new(),
         };
         assert!(!empty.is_complete());
         let cut_short = CoverageWitness {
@@ -697,9 +716,36 @@ mod tests {
             total: 2,
             incomplete: true,
             answer: Value::Unit,
+            branches: Vec::new(),
         };
         assert!(!cut_short.is_complete());
         assert!(complete_witness(Value::Unit).is_complete());
+    }
+
+    #[test]
+    fn coverage_witness_deserializes_without_branches() {
+        let json = serde_json::json!({
+            "examined": 1,
+            "total": 1,
+            "incomplete": false,
+            "answer": {"kind": "unit"}
+        });
+        let witness: CoverageWitness = serde_json::from_value(json).unwrap();
+        assert!(witness.branches.is_empty());
+        assert!(witness.is_complete());
+        assert_eq!(witness.answer, Value::Unit);
+    }
+
+    #[test]
+    fn coverage_witness_is_complete_ignores_branches() {
+        let mut witness = CoverageWitness::complete(1, Value::Unit);
+        assert!(witness.branches.is_empty());
+        assert!(witness.is_complete());
+        witness.branches.push(BranchClaim {
+            bindings: BTreeMap::new(),
+            answer: Value::Unit,
+        });
+        assert!(witness.is_complete());
     }
 
     #[test]

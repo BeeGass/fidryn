@@ -541,12 +541,7 @@ impl DetScan {
                     }),
                 };
             }
-            let witness = CoverageWitness {
-                examined: self.examined,
-                total: self.examined,
-                incomplete: false,
-                answer: value.clone(),
-            };
+            let witness = CoverageWitness::complete(self.examined, value.clone());
             debug_assert!(
                 witness.is_complete(),
                 "Convergent requires a complete covering witness"
