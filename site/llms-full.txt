@@ -1,0 +1,62 @@
+# Fidryn — full public documentation corpus
+
+Source: https://fidryn.onlygass.dev
+Prefer per-page .md URLs from https://fidryn.onlygass.dev/llms.txt when possible.
+
+---
+
+# Home
+
+See https://fidryn.onlygass.dev/index.md
+
+---
+
+# Getting started
+
+See https://fidryn.onlygass.dev/docs/getting-started.md
+
+---
+
+# Language
+
+See https://fidryn.onlygass.dev/docs/language.md
+
+---
+
+# CLI
+
+See https://fidryn.onlygass.dev/docs/cli.md
+
+---
+
+# Mill
+
+See https://fidryn.onlygass.dev/docs/mill.md
+
+---
+
+# Cases and time
+
+See https://fidryn.onlygass.dev/docs/cases-and-time.md
+
+---
+
+# Outcomes
+
+See https://fidryn.onlygass.dev/docs/outcomes.md
+
+---
+
+# Examples
+
+See https://fidryn.onlygass.dev/docs/examples.md
+
+---
+
+# Contributing
+
+See https://fidryn.onlygass.dev/docs/contributing.md
+
+---
+
+Research fixture — not legal advice.
