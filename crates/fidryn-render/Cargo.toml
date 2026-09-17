@@ -9,5 +9,6 @@ rust-version.workspace = true
 description = "Constrained template and controlled-English rendering"
 
 [dependencies]
+blake3.workspace = true
 fidryn-core.workspace = true
 thiserror.workspace = true

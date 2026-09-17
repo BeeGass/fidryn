@@ -1,4 +1,8 @@
 //! Constrained templates. Missing keys fail closed.
+//!
+//! Interpolation is not semantic certification. A path segment named
+//! `certified` does not approve a template. Approval is an explicit
+//! digest plus `CertifiedTemplate::approved`.
 
 use fidryn_core::{CoreModule, Value};
 use std::collections::BTreeMap;
@@ -10,8 +14,28 @@ pub enum RenderError {
     MissingKey(String),
     #[error("template `{0}` is not certified for semantics-preserving claims")]
     Uncertified(String),
+    #[error("template digest mismatch")]
+    DigestMismatch,
 }
 
+/// Explicit approval record. A directory named `certified` is not this.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CertifiedTemplate<'a> {
+    pub name: &'a str,
+    pub source: &'a str,
+    pub digest_hex: &'a str,
+    pub approved: bool,
+}
+
+pub fn template_digest(source: &str) -> String {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"fidryn-template");
+    hasher.update(&[0xff]);
+    hasher.update(source.as_bytes());
+    hasher.finalize().to_hex().to_string()
+}
+
+/// Interpolate only. The result is not a certified legal claim.
 pub fn render(template: &str, vars: &BTreeMap<String, String>) -> Result<String, RenderError> {
     let mut out = String::new();
     let mut rest = template;
@@ -79,7 +103,23 @@ fn split_each_body(src: &str) -> Option<(&str, &str)> {
     None
 }
 
+/// Interpolate only if the digest matches and `approved` is set.
+/// Path names such as `templates/certified/` do not satisfy this.
+pub fn render_certified(
+    spec: CertifiedTemplate<'_>,
+    vars: &BTreeMap<String, String>,
+) -> Result<String, RenderError> {
+    if !spec.approved {
+        return Err(RenderError::Uncertified(spec.name.to_owned()));
+    }
+    if template_digest(spec.source) != spec.digest_hex {
+        return Err(RenderError::DigestMismatch);
+    }
+    render(spec.source, vars)
+}
+
 /// Interpolate Core module fields. Missing keys fail closed.
+/// Not certified unless [`render_certified`] is used.
 pub fn render_module(template: &str, module: &CoreModule) -> Result<String, RenderError> {
     render(template, &module_vars(module))
 }
@@ -167,5 +207,40 @@ mod tests {
             render("{{#each outside_scope}}{{item}}", &vars),
             Err(RenderError::MissingKey(k)) if k == "/each"
         ));
+    }
+
+    #[test]
+    fn path_named_certified_is_not_approval() {
+        let mut vars = BTreeMap::new();
+        vars.insert("module".into(), "Examples.T".into());
+        let source = "Module: {{module}}";
+        let spec = CertifiedTemplate {
+            name: "templates/certified/instrument-outline.txt",
+            source,
+            digest_hex: "deadbeef",
+            approved: false,
+        };
+        assert!(matches!(
+            render_certified(spec, &vars),
+            Err(RenderError::Uncertified(_))
+        ));
+        let spec = CertifiedTemplate {
+            name: "templates/certified/instrument-outline.txt",
+            source,
+            digest_hex: "deadbeef",
+            approved: true,
+        };
+        assert!(matches!(
+            render_certified(spec, &vars),
+            Err(RenderError::DigestMismatch)
+        ));
+        let digest = template_digest(source);
+        let spec = CertifiedTemplate {
+            name: "instrument-outline",
+            source,
+            digest_hex: digest.as_str(),
+            approved: true,
+        };
+        assert_eq!(render_certified(spec, &vars).unwrap(), "Module: Examples.T");
     }
 }
