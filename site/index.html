@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120f0c">
+  <title>Fidryn — a language for legal instruments</title>
+  <meta name="description" content="Fidryn is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="mark" href="/">fidryn</a>
+      <nav class="nav">
+        <a href="#install">Install</a>
+        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <h1>Law that cannot hide inside a Boolean.</h1>
+      <p class="lede">Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority, discretion, or ambiguity inside a Boolean.</p>
+      <div class="privacy"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</div>
+      <div class="actions">
+        <a class="btn btn-primary" href="#install">Install</a>
+        <a class="btn btn-ghost" href="https://github.com/BeeGass/fidryn">View on GitHub</a>
+      </div>
+    </main>
+
+    <section>
+      <h2>What it does</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>No false determinacy</h3>
+          <p>A determinate result only when it is invariant across every still-admissible resolution — or a competent authority has already determined it.</p>
+        </article>
+        <article class="card">
+          <h3>Open branches stay suspended</h3>
+          <p><code>run</code> never chooses a completion. Empty completion sets are not vacuous determinate answers. Open branches without a covering certificate stay <code>Suspended</code>.</p>
+        </article>
+        <article class="card">
+          <h3>Model boundary carried</h3>
+          <p>Every outcome carries the declared <code>modelBoundary</code> so omitted interpretations cannot silently shrink the model.</p>
+        </article>
+        <article class="card">
+          <h3>Local mill</h3>
+          <p><code>fidryn ui</code> binds loopback only (default <code>127.0.0.1:8751</code>). This public site does not expose live filing.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install</h2>
+      <pre><code>cargo install --git https://github.com/BeeGass/fidryn --locked</code></pre>
+      <p class="note">Requires Rust 1.98+. Source files use the <code>.fr</code> extension. For a local checkout, <code>cargo install --path crates/fidryn-cli</code> works too. The GitHub repo must be public (or you need access) for <code>--git</code> install.</p>
+      <pre style="margin-top:16px"><code>fidryn check examples/trust/bryan-revocable-trust.fr
+fidryn ui --no-open</code></pre>
+      <p class="note">Mill binds loopback only (default <code>http://127.0.0.1:8751</code>). It checks modules in the browser — it does not live-file.</p>
+    </section>
+
+    <footer class="footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+    </footer>
+  </div>
+</body>
+</html>
