@@ -5,362 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#120f0c">
   <title>Cases and time — Fidryn</title>
-  <meta name="description" content="This guide explains how to supply a case record to Fidryn. Fidryn is a research interpreter for legal instruments. It is not legal advice, not an operative filing system, and not a statement of any ju">
+  <meta name="description" content="How Fidryn models cases, temporal scope, and time-bounded norms.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/cases-and-time">
+  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/cases-and-time.md" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="Cases and time — Fidryn">
+  <meta property="og:description" content="How Fidryn models cases, temporal scope, and time-bounded norms.">
+  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/cases-and-time">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Cases and time — Fidryn">
+  <meta name="twitter:description" content="How Fidryn models cases, temporal scope, and time-bounded norms.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Cases and time \u2014 Fidryn","description":"How Fidryn models cases, temporal scope, and time-bounded norms.","url":"https://fidryn.onlygass.dev/docs/cases-and-time","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/cases-and-time.md"}</script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
   <div class="docs-shell">
     <header class="docs-top">
       <a class="mark" href="/">fidryn</a>
-      <nav class="nav">
-        <a href="/docs/">Docs</a>
-        <a href="/#install">Install</a>
-        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-      </nav>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
     </header>
-
     <div class="docs-layout">
-      <aside class="docs-sidebar" aria-label="Documentation">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
-        <a href="/docs/">Overview</a>
-        <a href="/docs/getting-started">Getting started</a>
-        <a href="/docs/language">Language</a>
-        <a href="/docs/cli">CLI</a>
-        <a href="/docs/mill">Mill</a>
-        <a href="/docs/cases-and-time" class="active">Cases &amp; time</a>
-        <a href="/docs/outcomes">Outcomes</a>
-        <a href="/docs/examples">Examples</a>
-        <a href="/docs/contributing">Contributing</a>
+          <a href="/docs/">Overview</a>
+          <a href="/docs/getting-started">Getting started</a>
+          <a href="/docs/language">Language</a>
+          <a href="/docs/cli">CLI</a>
+          <a href="/docs/mill">Mill</a>
+          <a href="/docs/cases-and-time" class="active">Cases &amp; time</a>
+          <a href="/docs/outcomes">Outcomes</a>
+          <a href="/docs/examples">Examples</a>
+          <a href="/docs/contributing">Contributing</a>
         </nav>
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
           <a href="/">Home</a>
-          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/docs/cases-and-time.md">Markdown</a>
+          <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
-
-      <main class="docs-main prose">
-<h1>Cases and time</h1>
-<p>This guide explains how to supply a case record to Fidryn. Fidryn is a
-research interpreter for legal instruments. It is not legal advice, not an
-operative filing system, and not a statement of any jurisdiction’s law.
-The JSON you write is a fixture for evaluation, not a court record.</p>
-<p>A case is a <code>fidryn.case-record/v0.1</code> document. The interchange schema is
-<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/case-record-v0.1.json</code></a>. Wire
-names are camelCase except where a nested type keeps its Rust field names
-(determinations use <code>recorded_at</code>).</p>
-<p>Required properties are <code>schema</code> and <code>admissibleCompletions</code>. Everything
-else may be omitted and defaults to empty. The published schema lists
-<code>schema</code>, <code>module</code>, <code>facts</code>, <code>evidence</code>, <code>determinations</code>,
-<code>interpretations</code>, <code>decisions</code>, <code>closures</code>, <code>outsideScope</code>, and
-<code>admissibleCompletions</code>. The interpreter also reads an <code>events</code> array
-when it is present.</p>
-<h2>Supplying a case</h2>
-<p>Pass a JSON file to <code>fidryn run</code> or <code>fidryn explore</code>:</p>
-<pre><code>fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
-    --valid-at TIME --known-at TIME
-</code></pre>
-<p><code>TIME</code> is ISO 8601 / RFC 3339 with a <code>Z</code> suffix or a numeric offset
-(<code>2033-01-01T00:00:00Z</code>, <code>2033-01-01T00:00:00+00:00</code>). Equal instants
-canonicalize to UTC. <code>run</code> never chooses a missing completion. <code>--arg KEY=VALUE</code> writes <code>case.facts[&quot;KEY&quot;]</code>. <code>explore --bounds</code> merges extra
-declared domains into <code>admissibleCompletions</code>.</p>
-<p>See <a href="https://github.com/BeeGass/fidryn/blob/main/README.md#cli" target="_blank" rel="noopener noreferrer">CLI</a>, the <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer">language grammar</a>, and
-<a href="/docs/outcomes">Outcomes</a>.</p>
-<h2>Record shape</h2>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>schema</code></td>
-<td>Must be the string <code>fidryn.case-record/v0.1</code>.</td>
-</tr>
-<tr>
-<td><code>module</code></td>
-<td>Optional module identity (<code>Name@version</code>). The outcome envelope uses the compiled module, not this string, as <code>sourceSnapshot</code>.</td>
-</tr>
-<tr>
-<td><code>facts</code></td>
-<td>Named values already treated as given. Bare JSON booleans, integers, and strings are accepted.</td>
-</tr>
-<tr>
-<td><code>evidence</code></td>
-<td>Observed records. Each item has <code>schema</code>, <code>value</code>, and <code>observedAt</code>.</td>
-</tr>
-<tr>
-<td><code>determinations</code></td>
-<td>Competent judgments already on file. Nested fields are <code>issue</code>, <code>protocol</code>, <code>established</code>, <code>decider</code>, and optional <code>recorded_at</code>.</td>
-</tr>
-<tr>
-<td><code>interpretations</code></td>
-<td>Selected alternative per interpretation family (<code>&quot;SuccessorEligibility&quot;: &quot;I2&quot;</code>).</td>
-</tr>
-<tr>
-<td><code>decisions</code></td>
-<td>Selected option per choice protocol.</td>
-</tr>
-<tr>
-<td><code>closures</code></td>
-<td>Closed-world flags (<code>domain</code>, <code>closed</code>). Absence is not a determinate negative unless the domain is closed.</td>
-</tr>
-<tr>
-<td><code>admissibleCompletions</code></td>
-<td>The declared finite model. This is the model boundary, not a hint.</td>
-</tr>
-<tr>
-<td><code>outsideScope</code></td>
-<td>Named exclusions. The outcome envelope unions these with the module’s <code>outside_scope</code>.</td>
-</tr>
-<tr>
-<td><code>events</code></td>
-<td>Optional ledger rows (<code>kind</code>, <code>validTime</code>, <code>recordTime</code>, <code>payload</code>).</td>
-</tr>
-</tbody>
-</table>
-<p><code>admissibleCompletions</code> has three maps:</p>
-<pre><code class="language-json">&quot;admissibleCompletions&quot;: {
-  &quot;interpretations&quot;: {
-    &quot;SuccessorEligibility&quot;: [&quot;I1&quot;, &quot;I2&quot;]
-  },
-  &quot;evidence&quot;: {
-    &quot;SecondConcurringCertificate&quot;: {
-      &quot;responses&quot;: [&quot;absent&quot;, &quot;present_prospective&quot;],
-      &quot;effectOnValidTime&quot;: &quot;unchanged_if_after_query_valid_time&quot;
-    }
-  },
-  &quot;choices&quot;: {
-    &quot;DistributionProtocol&quot;: [&quot;hold&quot;, &quot;distribute&quot;]
-  }
-}
-</code></pre>
-<p><code>interpretations</code> maps a family name to the alternatives the instrument
-still admits. <code>evidence</code> maps a schema name to a finite response list
-and an optional <code>effectOnValidTime</code>. <code>choices</code> maps a protocol name to
-the options a decision-maker may still pick.</p>
-<p>That object is the model. An omitted family is not silently filled in
-later. An empty declared list for a named family is not a vacuous
-determinate world: explore treats it as an empty completion set
-(<code>inconsistent</code>), even if <code>interpretations</code> already records a selection.
-A recorded alternative that is not in the declared list is outside
-competence, not a new world.</p>
-<h2>Valid time and record time</h2>
-<p>Fidryn is bitemporal. Every evaluation has two clocks.</p>
-<p><code>--valid-at</code> is valid time: the instant on the legal timeline you are
-asking about (when occupancy, a deadline, or a status is supposed to
-hold). <code>--known-at</code> is record time: the instant of the file you are
-willing to treat as known. Occupancy and similar ledgers must contain
-the valid instant and must have been recorded no later than record time.</p>
-<p>These clocks are independent. You can ask what the office was on
-2026-08-23 using only records known on that day, or you can ask the same
-valid-time question using a later known-at that includes subsequent
-filings.</p>
-<p>The outcome envelope repeats the pair as <code>asOf.validTime</code> and
-<code>asOf.recordTime</code>.</p>
-<h2>Evidence after known-at does not count</h2>
-<p>Each evidence item carries <code>observedAt</code>. Observe matches schema, the
-issue’s subject when the value designates one, and <code>observedAt &lt;= --known-at</code>. A certificate dated after known-at is invisible to that
-query. It does not become a determinate negative; the query still
-suspends if the remaining known record is incomplete.</p>
-<p>The same cutoff applies to duty and institutional events: <code>recordTime</code>
-after known-at is not admitted.</p>
-<p>Determinations match <strong>protocol and issue</strong>. <code>established: false</code> is a
-negative determination from a competent authority, not
-<code>outsideCompetence</code>. A determination for Alice does not discharge a
-judgment about Bob.</p>
-<h2>Completions are the model boundary</h2>
-<p><code>run</code> evaluates the case you gave. If an interpretation, choice, or
-judgment is required and missing, the outcome is <code>suspended</code> with a
-<code>needInterpretation</code>, <code>needChoice</code>, or <code>needJudgment</code> request. <code>run</code>
-does not pick I1 because it is listed first.</p>
-<p><code>explore</code> searches the <strong>declared</strong> completions. Recorded selections
-constrain that search: a case that already records
-<code>SuccessorEligibility: I2</code> is not re-opened onto I1. Declared evidence
-responses such as <code>absent</code> versus <code>present_prospective</code> are hypothetical
-worlds for explore, not facts invented by <code>run</code>.</p>
-<p>Three different empty-looking objects are not the same:</p>
-<ul>
-<li><code>&quot;admissibleCompletions&quot;: {}</code> declares no open families. A query that
-does not need an interpretation can still be determinate.</li>
-<li><code>&quot;interpretations&quot;: {}</code> on the case means no alternative has been
-selected yet. If the query needs one, <code>run</code> suspends.</li>
-<li><code>&quot;admissibleCompletions&quot;: { &quot;interpretations&quot;: { &quot;Family&quot;: [] } }</code>
-declares a family whose admissible set is empty. That is not a
-determinate answer by vacuity. Explore reports <code>inconsistent</code> with
-core <code>empty completion set</code>. A recorded selection cannot reopen that
-empty domain.</li>
-</ul>
-<p>Interpretations you record must be members of the declared domain for
-that family. <code>I2</code> is lawful only when <code>I2</code> appears in
-<code>admissibleCompletions.interpretations.SuccessorEligibility</code>. An
-off-list selection is <code>outsideCompetence</code> (<code>recorded interpretation is not in the admissible set</code> / <code>inadmissible interpretation</code>). The same
-rule applies to <code>decisions</code> versus <code>choices</code>.</p>
-<h2>Money and structured values</h2>
-<p>Case JSON accepts bare literals for booleans, integers, and strings.
-Decimals and other runtime values must be tagged so they do not alias
-those literals.</p>
-<pre><code class="language-json">{ &quot;kind&quot;: &quot;decimal&quot;, &quot;data&quot;: &quot;1.25&quot; }
-</code></pre>
-<p>is money-as-decimal. The bare string <code>&quot;1.25&quot;</code> is a string. A JSON
-number that is not an integer may decode as decimal, but do not rely on
-that for amounts you care about: write the tagged form.</p>
-<pre><code class="language-json">{ &quot;kind&quot;: &quot;bool&quot;, &quot;data&quot;: false }
-</code></pre>
-<p>is the boolean false.</p>
-<pre><code class="language-json">{ &quot;kind&quot;: &quot;record&quot;, &quot;data&quot;: { &quot;kind&quot;: &quot;bool&quot;, &quot;data&quot;: false } }
-</code></pre>
-<p>is a user record whose fields happen to be named <code>kind</code> and <code>data</code>.
-Without the <code>record</code> wrapper, <code>{&quot;kind&quot;:&quot;bool&quot;,&quot;data&quot;:false}</code> is always
-boolean, so you cannot store a complaint-shaped object that uses those
-field names as a tagged bool. Unknown <code>kind</code> tags (for example
-<code>{&quot;kind&quot;:&quot;Complaint&quot;,&quot;id&quot;:&quot;1&quot;}</code>) decode as a map, not as a bool.</p>
-<p>Other tagged forms you may need:</p>
-<pre><code class="language-json">{ &quot;kind&quot;: &quot;entity&quot;, &quot;data&quot;: &quot;Alice&quot; }
-{ &quot;kind&quot;: &quot;instant&quot;, &quot;data&quot;: &quot;2026-08-23T12:00:00Z&quot; }
-{ &quot;kind&quot;: &quot;prop&quot;, &quot;data&quot;: { &quot;predicate&quot;: &quot;Incapacitated&quot;, &quot;arguments&quot;: [] } }
-</code></pre>
-<p>A bare <code>&quot;Alice&quot;</code> is a string, not an entity. A proposition is never a
-boolean; see <a href="/docs/outcomes">Outcomes</a>.</p>
-<h2>Authority grants and duty events</h2>
-<p>Institutional events do not commit performance just because they appear
-in JSON. Events with <code>kind</code> <code>duty</code>, <code>authority</code>, or <code>institutional</code> are
-admitted only when an <code>AuthorityGrant</code> covers the action at
-<code>recordTime</code>. Assumptions are explicit: <code>kind</code> <code>assumption</code> skips that
-gate.</p>
-<p>Grants may be evidence:</p>
-<pre><code class="language-json">{
-  &quot;schema&quot;: &quot;AuthorityGrant&quot;,
-  &quot;value&quot;: { &quot;action&quot;: &quot;perform&quot; },
-  &quot;observedAt&quot;: &quot;2026-01-01T00:00:00Z&quot;
-}
-</code></pre>
-<p>or a fact named <code>authority_grants</code>. A <code>duty</code> event whose payload is
-<code>Performed</code> / <code>action: &quot;perform&quot;</code> without a covering grant is dropped
-from the duty machine. It does not turn <code>duty_status</code> into Performed.</p>
-<p><code>kind</code> <code>evidence</code> rows are copied onto the record ledger at
-<code>recordTime</code>. Other documented kinds include <code>correction</code> and
-<code>retraction</code>. Events are append-only in the interpreter; they do not
-rewrite earlier rows.</p>
-<p>A typical duty event:</p>
-<pre><code class="language-json">{
-  &quot;kind&quot;: &quot;duty&quot;,
-  &quot;validTime&quot;: { &quot;start&quot;: &quot;NegInf&quot;, &quot;end&quot;: &quot;PosInf&quot; },
-  &quot;recordTime&quot;: &quot;2026-01-01T00:00:00Z&quot;,
-  &quot;payload&quot;: {
-    &quot;kind&quot;: &quot;ctor&quot;,
-    &quot;data&quot;: { &quot;name&quot;: &quot;Performed&quot;, &quot;fields&quot;: {} }
-  }
-}
-</code></pre>
-<p><code>validTime</code> is an interval (<code>start</code> / <code>end</code> are <code>NegInf</code>, <code>PosInf</code>,
-<code>Inclusive</code> of an instant, or <code>Exclusive</code> of an instant). <code>recordTime</code>
-is a single RFC 3339 instant.</p>
-<h2>Annotated example: court selects I2</h2>
-<p>The fixture
-<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/court-selects-i2.json" target="_blank" rel="noopener noreferrer"><code>examples/trust/cases/court-selects-i2.json</code></a>
-is a complete case for <code>Examples.BryanRevocableTrust</code>. The module
-declares interpretation family <code>SuccessorEligibility</code> with alternatives
-I1 (Alice and Bob both eligible) and I2 (only Bob eligible). Two
-physician certificates and an occupancy record are on file. A court (or
-other controlling selector) has already chosen I2.</p>
-<pre><code class="language-json">{
-  &quot;schema&quot;: &quot;fidryn.case-record/v0.1&quot;,
-  &quot;module&quot;: &quot;Examples.BryanRevocableTrust@0.1.0&quot;,
-  &quot;facts&quot;: {
-    &quot;alice_accepted&quot;: true,
-    &quot;bob_accepted&quot;: true
-  },
-  &quot;evidence&quot;: [
-    {
-      &quot;schema&quot;: &quot;OccupancyRecord&quot;,
-      &quot;value&quot;: &quot;Bryan&quot;,
-      &quot;observedAt&quot;: &quot;2026-08-23T12:00:00Z&quot;
-    },
-    {
-      &quot;schema&quot;: &quot;PhysicianCertificate&quot;,
-      &quot;value&quot;: &quot;certificate-1&quot;,
-      &quot;observedAt&quot;: &quot;2026-08-23T12:00:00Z&quot;
-    },
-    {
-      &quot;schema&quot;: &quot;PhysicianCertificate&quot;,
-      &quot;value&quot;: &quot;certificate-2&quot;,
-      &quot;observedAt&quot;: &quot;2026-08-23T12:00:00Z&quot;
-    }
-  ],
-  &quot;interpretations&quot;: {
-    &quot;SuccessorEligibility&quot;: &quot;I2&quot;
-  },
-  &quot;admissibleCompletions&quot;: {
-    &quot;interpretations&quot;: {
-      &quot;SuccessorEligibility&quot;: [&quot;I1&quot;, &quot;I2&quot;]
-    }
-  }
-}
-</code></pre>
-<p>What each part is doing:</p>
-<ul>
-<li><code>schema</code> identifies the interchange format. Reject anything else.</li>
-<li><code>module</code> names the fixture this record is meant to accompany. Compile
-<code>examples/trust/bryan-revocable-trust.fr</code>; do not treat this string as
-a source-snapshot digest.</li>
-<li><code>facts.alice_accepted</code> and <code>facts.bob_accepted</code> record that both
-nominees have accepted office. They are booleans, not propositions.</li>
-<li><code>OccupancyRecord</code> with value <code>Bryan</code> is who occupies <code>TrusteeOf(BRT)</code>
-at the observation instant. Unique-occupant queries need this (or an
-equivalent ledger row). Two occupants for one office are
-<code>inconsistent</code>.</li>
-<li>Two <code>PhysicianCertificate</code> rows, both observed at
-<code>2026-08-23T12:00:00Z</code>, are the concurring record the instrument’s
-incapacity judgment expects. If <code>--known-at</code> is earlier than that
-instant, neither certificate counts.</li>
-<li><code>interpretations.SuccessorEligibility</code> is <code>I2</code>, which is a member of
-the declared domain <code>[&quot;I1&quot;, &quot;I2&quot;]</code>. That selection is already on the
-case, so <code>run</code> does not suspend for <code>needInterpretation</code>, and
-<code>explore</code> does not also try I1.</li>
-<li><code>admissibleCompletions</code> is nonempty. The still-admissible worlds are
-exactly those two named alternatives, of which one has been chosen.
-Contrast
-<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/two-certificates-open-eligibility.json" target="_blank" rel="noopener noreferrer"><code>two-certificates-open-eligibility.json</code></a>,
-which has the same certificates and domain but no recorded
-interpretation: <code>run</code> stays suspended, <code>explore</code> is contingent between
-Alice and Bob.</li>
-</ul>
-<p>Against <code>acting_trustee</code> with <code>--valid-at</code> / <code>--known-at</code> at or after
-the observation times, both <code>run</code> and <code>explore</code> answer Bob. That
-agreement is not a general guarantee; see <a href="/docs/outcomes">Outcomes</a>.</p>
-<h2>Checklist</h2>
-<ol>
-<li>Set <code>&quot;schema&quot;: &quot;fidryn.case-record/v0.1&quot;</code>.</li>
-<li>Declare every still-open family, evidence schema, and choice protocol
-under <code>admissibleCompletions</code>. Leave a family off the object only if
-it is not part of this model.</li>
-<li>Put recorded interpretations and decisions in those declared lists.</li>
-<li>Timestamp evidence with <code>observedAt</code> and choose <code>--known-at</code> so that
-later records do not leak into an earlier file.</li>
-<li>Tag decimals. Do not store amounts as bare strings.</li>
-<li>Wrap user objects that need fields named <code>kind</code> and <code>data</code> as
-<code>{ &quot;kind&quot;: &quot;record&quot;, &quot;data&quot;: { ... } }</code>.</li>
-<li>Do not expect a <code>duty</code> event to perform an obligation unless an
-<code>AuthorityGrant</code> covers the action, or the event is an explicit
-<code>assumption</code>.</li>
-<li>Treat <code>outsideScope</code> as part of the answer. The envelope will repeat
-it on <code>modelBoundary</code>.</li>
-</ol>
-
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      <main class="docs-main prose" id="main">
+        <h1>Cases and time</h1>
+<p>Case records, <code>valid-at</code>, <code>known-at</code>, and how evidence ages out of a query.</p>
+<p>Full guide: <a href="/docs/cases-and-time.md">cases-and-time.md</a>.</p>
+<p>Research fixture — not legal advice.</p>
       </main>
     </div>
-
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
       <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
     </footer>
   </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () { setOpen(!body.classList.contains("docs-nav-open")); });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) { if (e.target.closest("a")) setOpen(false); });
+  })();
+  </script>
 </body>
 </html>
