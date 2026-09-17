@@ -40,19 +40,20 @@
         </nav>
       </div>
     </header>
+
     <div class="docs-layout">
       <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
-          <a href="/docs/">Overview</a>
-          <a href="/docs/getting-started">Getting started</a>
-          <a href="/docs/language" class="active">Language</a>
-          <a href="/docs/cli">CLI</a>
-          <a href="/docs/mill">Mill</a>
-          <a href="/docs/cases-and-time">Cases &amp; time</a>
-          <a href="/docs/outcomes">Outcomes</a>
-          <a href="/docs/examples">Examples</a>
-          <a href="/docs/contributing">Contributing</a>
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language" class="active">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
         </nav>
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
@@ -62,22 +63,333 @@
           <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
+
       <main class="docs-main prose" id="main">
-        <h1>The Fidryn language</h1>
-        <p>Map of constructs in <code>.fr</code> files. Full guide: <a href="/docs/language.md">language.md</a>.</p>
-        <p>Fidryn is a language for legal instruments: precise where law is mechanical, explicit where judgment enters. This repo is the v0.1 research interpreter.</p>
-        <h2>Topics</h2>
-        <ul>
-          <li>Module headers, sources, digests</li>
-          <li>Entities, propositions, offices</li>
-          <li>Queries, goals, effects</li>
-          <li>Automatic vs judgment</li>
-          <li>Rules, interpretation families, nominations, duties</li>
-          <li>What the language will not do</li>
-        </ul>
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice.</p>
+<h1>The Fidryn language</h1>
+<p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
+open the fixtures and check them. For build, <code>check</code>, and the first
+<code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
+<p>Fidryn (FID-rin) is a language for legal instruments: precise where
+law is mechanical, explicit where judgment enters. This repository is
+the v0.1 research interpreter. Example modules are fixtures. They are
+not legal advice, not operative instruments, and not a complete
+statement of any jurisdiction’s law.</p>
+<p>The grammar is closed: unknown body fields are parse errors. Copy from
+an existing <code>.fr</code> file when you are unsure a spelling parses. The
+reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>.</p>
+<h2>Module header</h2>
+<p>Every file is one module. The header names the instrument, the dated
+slice it encodes, and what it refuses to claim.</p>
+<pre><code>module Programs.LatePayment version &quot;0.1.0&quot; {
+    jurisdiction Test
+    source_snapshot &quot;2026-09-17-late-payment&quot;
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { complete_instruments }
+
+    // queries, duties, and interpretation families follow
+}
+</code></pre>
+<p><code>jurisdiction</code> is a name, not a choice of engine. <code>source_snapshot</code> is
+the dated slice this file encodes. <code>effective_at</code> is a date.
+<code>recorded_at</code> is a date-time (<code>Z</code> or a numeric offset).
+<code>outside_scope</code> is a set of named exclusions; those names reappear on
+the outcome’s <code>modelBoundary</code>.</p>
+<p>The trust fixture also declares a source manifest, resolved relative
+to the module file:</p>
+<pre><code>source_manifest &quot;sources/ma-trust-fixture.manifest.json&quot;
+</code></pre>
+<p>A declared path that is missing or malformed is a diagnostic. Modules
+that omit a manifest get an empty default. CLI <code>check</code> / <code>run</code> of a
+path can byte-authenticate artifacts against files next to the module.
+Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
+<h2>Sources and digests</h2>
+<p>A <code>source { }</code> block names an artifact the module is encoding.</p>
+<pre><code>source FinalPayStatute {
+    kind statute
+    authority CaliforniaLegislature
+    citation &quot;Cal. Lab. Code §§ 201-203&quot;
+    artifact &quot;sources/ca-lab-201-203.txt&quot;
+    digest fixture
+    effective [2026-09-17, +inf)
+}
+</code></pre>
+<p><code>digest fixture</code> is a fixture profile, not a hash of the file. It is
+not byte-verified authentication. A 32- or 64-digit hex digest is
+blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
+first 16 bytes). <code>check</code> of a <code>.fr</code> path hashes the file at <code>artifact</code>
+relative to the module directory. A missing file or a mismatch is
+unauthenticated; digest-required imports fail with E200. Hex without
+readable bytes is not a fixture profile. The source-manifest JSON uses
+the same <code>&quot;digest&quot;: &quot;fixture&quot;</code> versus hex distinction.</p>
+<h2>Entities, propositions, and offices</h2>
+<p>Name the parties and the propositions you will later test. A
+proposition is not a Boolean.</p>
+<pre><code>entity Payer : NaturalPerson
+entity Payee : NaturalPerson
+
+proposition InvoiceIssued(person: NaturalPerson)
+proposition Eligible(person: LegalPerson, office: Office)
+</code></pre>
+<p>An <code>office</code> is a position someone can occupy. From
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/bryan-revocable-trust.fr" target="_blank" rel="noopener noreferrer"><code>examples/trust/bryan-revocable-trust.fr</code></a>:</p>
+<pre><code>office TrusteeOf(trust: Trust) occupied_by LegalPerson {
+    cardinality 0..1
+    acquired_by Effective(AcceptOffice)
+    suspended_by OperativeIncapacity
+    lost_by {Death, EffectiveResignation, EffectiveRemoval}
+    competence {AdministerTrust, DecideTrustDistributions}
+}
+</code></pre>
+<p><code>Occupies(Bryan, TrusteeOf(BRT))</code> is a proposition about that office,
+not a <code>Bool</code>.</p>
+<h2>Queries, goals, and effects</h2>
+<p>A query is the thing you <code>run</code>. The body is <code>return</code> / <code>require</code>
+statements or an explicit <code>goal</code>. Fixtures use <code>Evaluate</code>,
+<code>UniqueOccupant</code>, <code>RunDecision</code>, and <code>StatusOf</code>.</p>
+<pre><code>query due() -&gt; Money&lt;USD&gt; {
+    goal Evaluate { USD(100.00) }
+}
+
+query acting_trustee() -&gt; LegalPerson ! {Observe, Determine, Interpret} {
+    goal UniqueOccupant { office TrusteeOf(BRT) }
+}
+
+query paid_on_time() -&gt; Bool ! {Observe} {
+    goal RunDecision { decision TimelyPayment }
+}
+
+query entity_status() -&gt; EntityStatus ! {Observe, Determine} {
+    goal StatusOf {
+        status FormedLLC(HarborRobotics)
+        when_present FormedLLC(HarborRobotics)
+        when_closed_absent NotFormedLLC(HarborRobotics)
+    }
+}
+</code></pre>
+<p><code>Evaluate</code> computes a term. <code>UniqueOccupant</code> asks who occupies an
+office. <code>RunDecision</code> runs a named <code>decision</code> against the case.
+<code>StatusOf</code> reports a legal status when present, or the closed-absent
+form when the domain is closed
+(<a href="https://github.com/BeeGass/fidryn/blob/main/examples/massachusetts-llc/harbor-robotics.fr" target="_blank" rel="noopener noreferrer"><code>harbor-robotics.fr</code></a>).</p>
+<p>The effect row <code>! {Observe, Determine, Interpret}</code> is permission, not
+a promise that the engine will invent evidence. If the case does not
+supply what the effect needs, the outcome is <code>suspended</code>. <code>run</code> never
+fills that request. See <a href="/docs/outcomes">Outcomes</a> and
+<a href="/docs/cases-and-time">Cases and time</a>.</p>
+<h2>Automatic versus judgment</h2>
+<p>Mark a query <code>automatic</code> only when the answer is mechanical and the
+effect row is empty.</p>
+<pre><code>query automatic pay_due_immediately(discharged: Bool) -&gt; Bool {
+    return discharged
+}
+
+query waiting_time_penalty() -&gt; Bool ! {Determine} {
+    goal Evaluate {
+        require determined WillfulFailureToPay(Employer)
+            using Determine
+    }
+}
+</code></pre>
+<p>An automatic query that reaches <code>Determine</code>, <code>Observe</code>, or <code>Interpret</code>
+is E420. Willful failure is a judgment, not a Bool you compute in the
+module. The waiting-time query is allowed to suspend.</p>
+<p>A <code>judgment</code> declaration names who decides a proposition, what record
+it needs, and what happens on established / rejected / otherwise. The
+trust fixture’s incapacity judgment requires two distinct physician
+certificates and otherwise suspends <code>NeedJudgment</code>. The language will
+not collapse “the physicians have not spoken” into <code>false</code>.</p>
+<h2>Require, return, and sequential evaluation</h2>
+<p>Statements in a block run left to right. Several statements lower to
+a <code>seq</code>; the last value is the result. <code>require</code> is a gate: <code>true</code>
+continues, <code>false</code> suspends and does not return the later value.</p>
+<pre><code>query q() -&gt; Int { require true; return 7 }
+query r() -&gt; Int { require false; return 7 }
+</code></pre>
+<p><code>q</code> is determinate <code>7</code>. <code>r</code> is <code>suspended</code> (<code>needCustom</code> /
+<code>requirement failed</code>). That is why <a href="/docs/getting-started">Getting started</a>
+runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</code> resumes by skipping
+the completed prefix, so a later term does not re-run an earlier
+attach.</p>
+<p><code>require determined P using Determine</code> requests a competent
+determination instead of treating <code>P</code> as a Bool.</p>
+<h2>Calc, conditionals, money, and durations</h2>
+<p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
+<pre><code>calc return_deadline() -&gt; Duration&lt;counted_days&gt; {
+    return 21 counted_days
+}
+
+calc federal_hourly_floor() -&gt; Money&lt;USD&gt; {
+    return USD(7.25)
+}
+
+query automatic deadline_running(end: Time, as_of: Time) -&gt; Bool {
+    return as_of &lt;= end + return_deadline()
+}
+</code></pre>
+<p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
+calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
+<code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> is not
+<code>21 days</code>.</p>
+<p><code>if</code> / <code>else</code> is Boolean control flow. The condition must be a <code>Bool</code>,
+not a proposition. <a href="https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr" target="_blank" rel="noopener noreferrer"><code>prelude/tax.fr</code></a> uses it on
+amounts:</p>
+<pre><code>if amount &lt;= 11925.00 {
+    amount * 0.10
+} else {
+    if amount &lt;= 48475.00 {
+        11925.00 * 0.10 + (amount - 11925.00) * 0.12
+    } else {
+        if amount &lt;= 103350.00 {
+            11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
+        } else {
+            17651.00 + (amount - 103350.00) * 0.24
+        }
+    }
+}
+</code></pre>
+<p>This is a rejected guard (E310):</p>
+<pre><code>query bad() -&gt; LegalPerson {
+    goal Evaluate { if Incapacitated(Bryan) { Bryan } }
+}
+</code></pre>
+<p>Use <code>when operative P</code> on a rule, or <code>require determined P using Determine</code> in a query. <code>Prop</code> has no conversion to <code>Bool</code>.</p>
+<h2>Rules</h2>
+<p>A <code>rule</code> fires when a guard holds, then derives or establishes a
+proposition. The kind is <code>derive</code>, <code>constitutive</code>, or <code>prescriptive</code>.</p>
+<pre><code>rule InitialTrustee : constitutive
+    from Instrument.clause(&quot;1.2&quot;)
+{
+    when operative TrustInstrumentExecuted(BRT) in TrustCreation(BRT)
+    then establish Occupies(Bryan, TrusteeOf(BRT))
+}
+</code></pre>
+<p><code>when operative P</code> tests legal status. <code>when determined P</code> tests a
+competent determination already on the case. <code>then derive</code> and
+<code>then establish</code> are the usual consequences. Guards must use
+<code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a bare
+proposition. The successor rule in the trust fixture also
+<code>select unique candidate from nominations_for(...)</code> with
+<code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
+<h2>Interpretation families</h2>
+<p>When the instrument still admits more than one reading, declare the
+family and what each alternative establishes.</p>
+<pre><code>interpretation_family DeadlineMeaning {
+    alternative Strict {
+        defines GracePeriod(0) as established
+        defines StrictDeadline() as established
+        defines ExtendedDeadline() as not_established
+    }
+    alternative Extended {
+        defines GracePeriod(15) as established
+        defines StrictDeadline() as not_established
+        defines ExtendedDeadline() as established
+    }
+}
+</code></pre>
+<p>Each <code>defines P as established</code> or <code>defines P as not_established</code> is
+a claim in that world. The case lists still-admissible alternatives
+under <code>admissibleCompletions.interpretations</code>. <code>run</code> does not pick
+<code>Strict</code> because it is written first. If the query needs a reading
+and the case has not selected one, the outcome is <code>suspended</code>
+(<code>needInterpretation</code>).</p>
+<p>The trust fixture binds a family to a clause and names a selector
+(<code>explicit_instrument_definition or controlling_interpretation or request Interpret</code>). That is how a court selection on the case becomes
+operative. It is not a default vote.</p>
+<h2>Nominations</h2>
+<p>A nomination is a ranked candidate for an office.</p>
+<pre><code>nomination Alice for TrusteeOf(BRT) rank 1
+    from Instrument.clause(&quot;4.4.a&quot;)
+
+nomination Bob for TrusteeOf(BRT) rank 2
+    from Instrument.clause(&quot;4.4.b&quot;)
+</code></pre>
+<p>Rank <code>1</code> is higher than rank <code>2</code>. Duplicate ranks for the same office
+are E410. Rank is not occupancy: <code>UniqueOccupant</code> still needs an
+occupancy record, eligibility, and any required acceptance. Open
+eligibility stays <code>suspended</code>, or becomes <code>contingent</code> under
+<a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
+the first name on the list.</p>
+<h2>Duties</h2>
+<p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
+From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr" target="_blank" rel="noopener noreferrer"><code>tests/programs/late-payment.fr</code></a>:</p>
+<pre><code>duty PayInvoice {
+    bearer Payer
+    claimant Payee
+    attaches when operative InvoiceIssued(Payer)
+    content USD(100.00)
+    due 0 counted_days after invoice_date
+}
+
+query obligation_status() -&gt; String {
+    goal Evaluate { duty_status(PayInvoice) }
+}
+</code></pre>
+<p><code>duty_status(Name)</code> looks up that duty declaration plus the case. It
+does not invent performance. Status is one of <code>Unresolved</code>,
+<code>Attached</code>, <code>Performed</code>, <code>Breached</code>, <code>Cured</code>, <code>Discharged</code>. A late
+perform can remain <code>Performed</code> with <code>breached: true</code>. Changing
+<code>due 0 counted_days</code> to <code>due 15 counted_days</code> changes when the same
+case becomes <code>Breached</code>; see <code>late-payment-extended.fr</code>.</p>
+<p>Declaring a duty does not attach it. Attachment waits on the <code>when</code>
+guard. A <code>kind: duty</code> event on the case does not commit performance
+unless an authority grant covers the action, or the event is an
+explicit <code>assumption</code>. That gate is in
+<a href="/docs/cases-and-time">Cases and time</a>.</p>
+<h2>Scenarios (in-module)</h2>
+<p>A <code>scenario</code> block names overlay hypotheses for fixtures that do not
+ship companion JSON case files (for example under <code>examples/states/</code>).
+It is not a silent default for <code>run</code>.</p>
+<pre><code>scenario InsideCityHalfAcre {
+    assume OccupiesAsResidence(Owner, Home)
+    assume InsideMunicipality(Home)
+    assume within_urban_acreage(0.5)
+    at 2026-09-17T12:00:00-04:00
+}
+</code></pre>
+<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>. Case JSON
+can carry analogous overlay rows as <code>assumptions</code> (<code>id</code>, <code>payload</code>);
+CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
+<code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
+See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
+<h2>Verify</h2>
+<p>A <code>verify</code> block is a named property. v0.1 discharges Boolean
+literals:</p>
+<pre><code>verify Trivial {
+    assert true
+}
+</code></pre>
+<p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Other
+formulas parse, but the bounded verifier does not currently obtain a
+covering proof of them:</p>
+<pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME
+</code></pre>
+<p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
+modules often write honesty properties in English-shaped <code>assert</code>
+lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
+Treat those as documentation the checker records as a verify item, not
+as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
+whether or not a <code>verify</code> block repeats it.</p>
+<h2>What the language will not do</h2>
+<p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
+<code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,
+<code>assumed</code>, or <code>necessarily</code>, or request <code>Determine</code>.</p>
+<p>Fidryn will not invent a completion. <code>run</code> evaluates the case you
+supplied. Missing interpretation, evidence, or choice yields
+<code>suspended</code>. An empty admissible set is <code>inconsistent</code> or
+<code>suspended</code>, never a vacuous determinate answer. <code>explore</code> searches
+only the finite domains you declared.</p>
+<p>Fidryn will not treat <code>Prop</code> as <code>Bool</code>. <code>defines Eligible(Alice, TrusteeOf(BRT)) as not_established</code> is not <code>false</code>. It is a reading of
+a proposition in one named alternative.</p>
+<p>Those three refusals are the language. The <a href="/docs/cli">CLI</a> will not
+choose a completion either. The <a href="/docs/examples">examples</a> show the
+refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-file.</p>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
       </main>
     </div>
+
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
       <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
@@ -96,10 +408,16 @@
       btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
       body.style.overflow = open ? "hidden" : "";
     }
-    btn.addEventListener("click", function () { setOpen(!body.classList.contains("docs-nav-open")); });
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
     backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
   })();
   </script>
 </body>
