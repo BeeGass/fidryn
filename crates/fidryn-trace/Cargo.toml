@@ -1,0 +1,18 @@
+[package]
+name = "fidryn-trace"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn proof-relevant traces and canonical JSON"
+
+[dependencies]
+fidryn-core.workspace = true
+indexmap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+time.workspace = true
+blake3.workspace = true
