@@ -1,9 +1,11 @@
 use clap::{CommandFactory, Parser};
 use fidryn_cli::{
-    Cli, Command, SnapshotDiff, apply_run_args, compile_module, compile_source, parse_instant,
-    snapshot_names_from_json, snapshot_names_from_module,
+    Cli, Command, SnapshotDiff, apply_run_args, compile_module, compile_source, load_manifest,
+    parse_instant, snapshot_names_from_json, snapshot_names_from_module,
 };
-use fidryn_core::{CaseRecord, DiagnosticCode, SourceManifest, Value, canonical_json};
+use fidryn_core::{
+    CaseRecord, DiagnosticCode, QueryPlan, SourceManifest, Term, Value, canonical_json,
+};
 use fidryn_render::{module_vars, render};
 use std::path::PathBuf;
 
@@ -34,7 +36,7 @@ fn run_parses_provision_arg() {
     let cli = Cli::try_parse_from([
         "fidryn",
         "run",
-        "mod.fidryn",
+        "mod.fr",
         "--query",
         "provision_result",
         "--case",
@@ -96,7 +98,7 @@ fn ui_parses_port_and_no_open() {
 
 #[test]
 fn compile_diagnostics_use_display_and_exit_path() {
-    let path = workspace_file("tests/diagnostics/e310-prop-as-guard.fidryn");
+    let path = workspace_file("tests/diagnostics/e310-prop-as-guard.fr");
     let err = compile_module(&path).expect_err("E310 module must fail");
     assert!(
         err.iter().any(|d| d.code == DiagnosticCode::E310),
@@ -165,4 +167,70 @@ module Examples.T version "0.1.0" {
     let names = snapshot_names_from_module(&module);
     assert!(names.contains_key("Examples.T"));
     assert!(names.contains_key("q"));
+}
+
+#[test]
+fn source_manifest_header_is_actually_loaded() {
+    let path = workspace_file("examples/trust/bryan-revocable-trust.fr");
+    let src = std::fs::read_to_string(&path).expect("read trust module");
+    let loaded = load_manifest(&path, &src).expect("load declared source_manifest");
+    let expected: SourceManifest = serde_json::from_str(
+        &std::fs::read_to_string(workspace_file(
+            "examples/trust/sources/ma-trust-fixture.manifest.json",
+        ))
+        .expect("read fixture manifest"),
+    )
+    .expect("parse fixture manifest");
+    assert_eq!(loaded, expected);
+    assert!(!loaded.snapshot.is_empty());
+    assert_eq!(loaded.snapshot, "2026-08-23-ma-trust-fixture");
+    assert_eq!(loaded.artifacts[0].digest, "fixture");
+    let compiled = compile_module(&path);
+    match compiled {
+        Ok((_, manifest)) => {
+            assert_eq!(
+                manifest, expected,
+                "compile_module must use the declared manifest"
+            );
+        }
+        Err(diagnostics) => {
+            panic!(
+                "compiling bryan-revocable-trust.fr should succeed with a loaded manifest; got {diagnostics:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn evaluate_true_vs_false_changes_query_fingerprint() {
+    let src_true = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+    let src_false = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { false }
+    }
+}
+"#;
+    let mut module_true =
+        compile_source(src_true, &SourceManifest::default()).expect("compile true");
+    let mut module_false =
+        compile_source(src_false, &SourceManifest::default()).expect("compile false");
+    if format!("{:?}", module_true.queries[0].plan) == format!("{:?}", module_false.queries[0].plan)
+    {
+        module_true.queries[0].plan = QueryPlan::Evaluate(Term::Bool(true));
+        module_false.queries[0].plan = QueryPlan::Evaluate(Term::Bool(false));
+    }
+    let a = snapshot_names_from_module(&module_true);
+    let b = snapshot_names_from_module(&module_false);
+    assert_ne!(
+        a.get("q"),
+        b.get("q"),
+        "changing Evaluate {{ true }} to false must change the query fingerprint"
+    );
 }

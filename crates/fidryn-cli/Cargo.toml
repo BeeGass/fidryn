@@ -27,6 +27,7 @@ anyhow.workspace = true
 clap.workspace = true
 fidryn-check.workspace = true
 fidryn-core.workspace = true
+fidryn-driver.workspace = true
 fidryn-eval.workspace = true
 fidryn-handlers.workspace = true
 fidryn-hir.workspace = true

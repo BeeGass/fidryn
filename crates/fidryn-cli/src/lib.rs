@@ -6,19 +6,22 @@ use clap::{Parser, Subcommand};
 use fidryn_adapt::{DryRun, FilingAdapter, MassachusettsCorporations};
 use fidryn_check::check;
 use fidryn_core::{
-    AdmissibleCompletions, CaseRecord, CoreModule, Diagnostic, DiagnosticCode, Instant, QueryName,
-    RunContext, SourceManifest, TimeError, TraceId, Value, canonical_json,
+    AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode, Instant,
+    Outcome, QueryName, RunContext, SourceManifest, TimeError, TraceId, Value, canonical_json,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_render::{module_vars, render};
+use fidryn_syntax::ast::{HeaderKind, Item};
 use fidryn_syntax::{format_module, parse_file};
 use fidryn_trace::{explain, explain_value, render_outcome};
 use fidryn_verify::{explore_query, verify_property};
 use serde::Serialize;
 use std::collections::BTreeMap;
+use std::fmt;
 use std::fs;
+use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -200,17 +203,11 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
     check(&hir, manifest)
 }
 
-/// Compile a `.fidryn` path, loading `sources/manifest.json` when present.
+/// Compile a `.fr` path, loading the declared `source_manifest` or a
+/// `sources/` fallback. A declared path that is missing or malformed is a
+/// diagnostic. Modules that omit a manifest get an empty default.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
-    let src = fs::read_to_string(path).map_err(|e| {
-        vec![Diagnostic::new(
-            DiagnosticCode::E100,
-            format!("cannot read {}: {e}", path.display()),
-        )]
-    })?;
-    let manifest = load_manifest(path);
-    let module = compile_source(&src, &manifest)?;
-    Ok((module, manifest))
+    fidryn_driver::Driver::new().check_path(path)
 }
 
 fn emit_diagnostics(diagnostics: &[Diagnostic]) {
@@ -226,17 +223,213 @@ fn compile_or_exit(path: &Path) -> Result<(CoreModule, SourceManifest), ExitCode
     })
 }
 
-fn load_manifest(module_path: &Path) -> SourceManifest {
-    let candidate = module_path
-        .parent()
-        .unwrap_or(Path::new("."))
-        .join("sources")
-        .join("manifest.json");
-    if let Ok(text) = fs::read_to_string(candidate) {
-        serde_json::from_str(&text).unwrap_or_default()
-    } else {
-        SourceManifest::default()
+/// Engine failure from `evaluate` / `explore_query` when those APIs return
+/// `Result<Outcome, EngineError>`. Unknown queries and invalid input are
+/// never rewritten as `Outcome::Inconsistent` here.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct EngineFailure {
+    pub kind: String,
+    pub message: String,
+}
+
+impl fmt::Display for EngineFailure {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {}", self.kind, self.message)
     }
+}
+
+impl EngineFailure {
+    fn from_err<E: fmt::Display + fmt::Debug>(err: E) -> Self {
+        let debug = format!("{err:?}");
+        Self {
+            kind: engine_error_kind(&debug).to_owned(),
+            message: err.to_string(),
+        }
+    }
+
+    pub(crate) fn is_internal(&self) -> bool {
+        self.kind == "Internal"
+    }
+}
+
+fn engine_error_kind(debug: &str) -> &'static str {
+    const KINDS: &[&str] = &[
+        "UnknownQuery",
+        "Unsupported",
+        "FuelExhausted",
+        "InvalidInput",
+        "Internal",
+    ];
+    KINDS
+        .iter()
+        .copied()
+        .find(|kind| debug.contains(kind))
+        .unwrap_or("Internal")
+}
+
+/// Accept both `Outcome` and `Result<Outcome, EngineError>` (core or eval).
+pub(crate) trait IntoEvalOutcome {
+    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure>;
+}
+
+impl IntoEvalOutcome for Outcome<Value> {
+    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure> {
+        Ok(self)
+    }
+}
+
+impl<E: fmt::Display + fmt::Debug> IntoEvalOutcome for Result<Outcome<Value>, E> {
+    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure> {
+        self.map_err(EngineFailure::from_err)
+    }
+}
+
+/// Load the source manifest for `module_path`.
+///
+/// Resolution:
+/// 1. `source_manifest "..."` on the module, relative to the module directory
+/// 2. else `sources/manifest.json` next to the module
+/// 3. else the unique `*.manifest.json` in `sources/` (trust fixture layout)
+///
+/// A **declared** path that is missing or malformed is a diagnostic, not
+/// [`SourceManifest::default`]. `"digest": "fixture"` is a fixture profile
+/// label, not an authenticated hash.
+pub fn load_manifest(module_path: &Path, src: &str) -> Result<SourceManifest, Vec<Diagnostic>> {
+    let dir = module_path.parent().unwrap_or(Path::new("."));
+    if let Some(declared) = declared_manifest_path(src) {
+        if declared.is_empty() {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E540,
+                "declared source_manifest path is empty",
+            )]);
+        }
+        let path = resolve_manifest_path(dir, &declared);
+        return read_manifest(&path, true);
+    }
+
+    let default_path = dir.join("sources").join("manifest.json");
+    if default_path.is_file() {
+        return read_manifest(&default_path, false);
+    }
+
+    let sources_dir = dir.join("sources");
+    if let Some(unique) = unique_glob_manifest(&sources_dir) {
+        return read_manifest(&unique, false);
+    }
+
+    Ok(SourceManifest::default())
+}
+
+fn resolve_manifest_path(module_dir: &Path, declared: &str) -> PathBuf {
+    let path = Path::new(declared);
+    if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        module_dir.join(path)
+    }
+}
+
+fn declared_manifest_path(src: &str) -> Option<String> {
+    let parsed = parse_file(src);
+    if let Some(module) = parsed.module() {
+        for item in &module.items {
+            if let Item::Header(header) = item
+                && header.kind == HeaderKind::SourceManifest
+            {
+                let path = unquote_manifest_path(&header.value);
+                if !path.is_empty() {
+                    return Some(path);
+                }
+            }
+        }
+    }
+    scan_source_manifest_header(src)
+}
+
+fn scan_source_manifest_header(src: &str) -> Option<String> {
+    for line in src.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("//") {
+            continue;
+        }
+        let Some(rest) = trimmed.strip_prefix("source_manifest") else {
+            continue;
+        };
+        let path = unquote_manifest_path(rest);
+        if !path.is_empty() {
+            return Some(path);
+        }
+    }
+    None
+}
+
+fn unquote_manifest_path(raw: &str) -> String {
+    let raw = raw.trim().trim_end_matches(';').trim();
+    if let Some(inner) = raw.strip_prefix('"') {
+        return inner
+            .split_once('"')
+            .map(|(s, _)| s)
+            .unwrap_or(inner)
+            .trim()
+            .to_owned();
+    }
+    if let Some(inner) = raw.strip_prefix('\'') {
+        return inner
+            .split_once('\'')
+            .map(|(s, _)| s)
+            .unwrap_or(inner)
+            .trim()
+            .to_owned();
+    }
+    raw.split_whitespace().next().unwrap_or("").to_owned()
+}
+
+fn unique_glob_manifest(sources_dir: &Path) -> Option<PathBuf> {
+    if !sources_dir.is_dir() {
+        return None;
+    }
+    let mut found = Vec::new();
+    let entries = fs::read_dir(sources_dir).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let name = path.file_name()?.to_str()?;
+        if name.ends_with(".manifest.json") {
+            found.push(path);
+        }
+    }
+    if found.len() == 1 { found.pop() } else { None }
+}
+
+fn read_manifest(path: &Path, declared: bool) -> Result<SourceManifest, Vec<Diagnostic>> {
+    match fs::read_to_string(path) {
+        Ok(text) => parse_manifest_json(&text, path),
+        Err(err) if err.kind() == ErrorKind::NotFound => {
+            if declared {
+                Err(vec![Diagnostic::new(
+                    DiagnosticCode::E540,
+                    format!("declared source_manifest `{}` is missing", path.display()),
+                )])
+            } else {
+                Ok(SourceManifest::default())
+            }
+        }
+        Err(err) => Err(vec![Diagnostic::new(
+            DiagnosticCode::E540,
+            format!("cannot read source_manifest {}: {err}", path.display()),
+        )]),
+    }
+}
+
+fn parse_manifest_json(text: &str, path: &Path) -> Result<SourceManifest, Vec<Diagnostic>> {
+    serde_json::from_str::<SourceManifest>(text).map_err(|err| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E100,
+            format!("malformed source_manifest {}: {err}", path.display()),
+        )]
+    })
 }
 
 fn load_case(path: &Path) -> Result<CaseRecord, ExitCode> {
@@ -315,8 +508,9 @@ fn cmd_run(
     let state = case.into_state();
     let mut handler = CaseFile {
         record: case.clone(),
+        known_at: Some(known),
     };
-    let outcome = evaluate(
+    let outcome = match evaluate(
         &module,
         &QueryName::from(query),
         &Default::default(),
@@ -324,7 +518,15 @@ fn cmd_run(
         &ctx,
         &mut handler,
         &case,
-    );
+    )
+    .into_eval_outcome()
+    {
+        Ok(outcome) => outcome,
+        Err(err) => {
+            eprintln!("{err}");
+            return ExitCode::from(1);
+        }
+    };
     println!(
         "{}",
         render_outcome(
@@ -400,7 +602,14 @@ fn cmd_explore(
         return ExitCode::from(1);
     };
     let ctx = RunContext::new(valid, known);
-    let outcome = explore_query(&module, &QueryName::from(query), &case, &ctx);
+    let outcome =
+        match explore_query(&module, &QueryName::from(query), &case, &ctx).into_eval_outcome() {
+            Ok(outcome) => outcome,
+            Err(err) => {
+                eprintln!("{err}");
+                return ExitCode::from(1);
+            }
+        };
     println!(
         "{}",
         render_outcome(
@@ -419,15 +628,13 @@ fn cmd_verify(path: &Path, property: &str) -> ExitCode {
     let Ok((module, _)) = compile_or_exit(path) else {
         return ExitCode::from(1);
     };
-    match verify_property(&module, property) {
-        Ok(()) => {
-            println!("verified {property}");
-            ExitCode::SUCCESS
-        }
-        Err(e) => {
-            eprintln!("{e}");
-            ExitCode::from(1)
-        }
+    let verdict = verify_property(&module, property);
+    if verdict.is_proved() {
+        println!("{verdict}");
+        ExitCode::SUCCESS
+    } else {
+        eprintln!("{verdict}");
+        ExitCode::from(1)
     }
 }
 
@@ -607,16 +814,34 @@ impl SnapshotDiff {
     }
 }
 
-/// Names and fingerprints from a compiled module (module name plus queries).
+/// Names and fingerprints from a compiled module (module name, queries, rules).
+///
+/// Query fingerprints serialize the whole [`fidryn_core::CoreQuery`], including
+/// `plan` / body. Rule fingerprints serialize [`CoreDecl::Rule`] so a
+/// body-only rule change affects the module snapshot.
 pub fn snapshot_names_from_module(module: &CoreModule) -> BTreeMap<String, String> {
     let mut names = BTreeMap::new();
+    let rules: Vec<&fidryn_core::CoreRule> = module
+        .declarations
+        .iter()
+        .filter_map(|decl| match decl {
+            CoreDecl::Rule(rule) => Some(rule),
+            _ => None,
+        })
+        .collect();
     let module_fp = canonical_json(&serde_json::json!({
         "name": module.name,
         "version": module.version,
         "outside_scope": module.outside_scope,
+        "rules": rules,
     }))
     .expect("canonical json");
     names.insert(module.name.clone(), module_fp);
+    for rule in &rules {
+        names
+            .entry(rule.name.clone())
+            .or_insert_with(|| canonical_json(rule).expect("canonical json"));
+    }
     for query in &module.queries {
         names.insert(
             query.name.clone(),
@@ -724,7 +949,7 @@ fn merge_json_snapshot(
 fn is_fidryn_source(path: &Path) -> bool {
     path.extension()
         .and_then(|e| e.to_str())
-        .is_some_and(|e| e.eq_ignore_ascii_case("fidryn"))
+        .is_some_and(|e| e.eq_ignore_ascii_case("fr"))
 }
 
 fn load_snapshot(path: &Path, query: &str) -> Result<BTreeMap<String, String>, ExitCode> {
@@ -746,7 +971,29 @@ fn load_snapshot(path: &Path, query: &str) -> Result<BTreeMap<String, String>, E
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fidryn_core::{CoreRule, Guard, NodeId, QueryPlan, RuleKind, Term};
     use serde_json::json;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn workspace_file(rel: &str) -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join(rel)
+    }
+
+    fn temp_module_dir(tag: &str) -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!(
+            "fidryn-cli-manifest-{}-{}-{tag}",
+            std::process::id(),
+            nanos
+        ));
+        fs::create_dir_all(dir.join("sources")).expect("temp sources");
+        dir
+    }
 
     #[test]
     fn snapshot_diff_reports_added_removed_changed() {
@@ -808,6 +1055,203 @@ module Examples.T version "0.1.0" {
         let names = snapshot_names_from_module(&module);
         assert!(names.contains_key("Examples.T"));
         assert!(names.contains_key("q"));
+    }
+
+    #[test]
+    fn evaluate_true_vs_false_changes_query_fingerprint() {
+        let src_true = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let src_false = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { false }
+    }
+}
+"#;
+        let mut module_true =
+            compile_source(src_true, &SourceManifest::default()).expect("compile true");
+        let mut module_false =
+            compile_source(src_false, &SourceManifest::default()).expect("compile false");
+        if format!("{:?}", module_true.queries[0].plan)
+            == format!("{:?}", module_false.queries[0].plan)
+        {
+            module_true.queries[0].plan = QueryPlan::Evaluate(Term::Bool(true));
+            module_false.queries[0].plan = QueryPlan::Evaluate(Term::Bool(false));
+        }
+        let a = snapshot_names_from_module(&module_true);
+        let b = snapshot_names_from_module(&module_false);
+        assert_ne!(
+            a.get("q"),
+            b.get("q"),
+            "query fingerprint must include the Evaluate plan/body"
+        );
+    }
+
+    #[test]
+    fn rule_body_change_changes_module_snapshot() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let mut module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let meta = module.queries[0].meta.clone();
+        module.declarations.push(CoreDecl::Rule(CoreRule {
+            id: NodeId::of(b"R"),
+            name: "R".into(),
+            kind: RuleKind::Derive,
+            binders: Vec::new(),
+            selection: None,
+            guard: Guard::Satisfied,
+            consequences: Vec::new(),
+            fallback: None,
+            meta: meta.clone(),
+        }));
+        let before = snapshot_names_from_module(&module);
+        if let Some(CoreDecl::Rule(rule)) = module.declarations.last_mut() {
+            rule.guard = Guard::Not(Box::new(Guard::Satisfied));
+        }
+        let after = snapshot_names_from_module(&module);
+        assert_ne!(
+            before.get("Examples.T"),
+            after.get("Examples.T"),
+            "module snapshot must include rule bodies"
+        );
+        assert_ne!(before.get("R"), after.get("R"));
+    }
+
+    #[test]
+    fn load_manifest_trust_header_matches_file() {
+        let path = workspace_file("examples/trust/bryan-revocable-trust.fr");
+        let src = fs::read_to_string(&path).expect("read trust");
+        let loaded = load_manifest(&path, &src).expect("load declared manifest");
+        let expected: SourceManifest = serde_json::from_str(
+            &fs::read_to_string(workspace_file(
+                "examples/trust/sources/ma-trust-fixture.manifest.json",
+            ))
+            .expect("read fixture manifest"),
+        )
+        .expect("parse fixture manifest");
+        assert_eq!(loaded, expected);
+        assert_eq!(loaded.snapshot, "2026-08-23-ma-trust-fixture");
+        assert_eq!(loaded.artifacts[0].digest, "fixture");
+    }
+
+    #[test]
+    fn load_manifest_undeclared_states_corpus_is_empty_default() {
+        let path = workspace_file("examples/states/alabama/final-wages.fr");
+        let src = fs::read_to_string(&path).expect("read alabama");
+        let loaded = load_manifest(&path, &src).expect("empty default");
+        assert!(loaded.snapshot.is_empty(), "{loaded:?}");
+        assert!(loaded.artifacts.is_empty(), "{loaded:?}");
+    }
+
+    #[test]
+    fn load_manifest_declared_missing_is_diagnostic() {
+        let dir = temp_module_dir("missing");
+        let src = r#"
+module Examples.T version "0.1.0" {
+    source_manifest "sources/missing.manifest.json"
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let path = dir.join("mod.fr");
+        fs::write(&path, src).unwrap();
+        let err = load_manifest(&path, src).expect_err("declared missing");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E540),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn load_manifest_declared_malformed_is_diagnostic() {
+        let dir = temp_module_dir("malformed");
+        let src = r#"
+module Examples.T version "0.1.0" {
+    source_manifest "sources/broken.manifest.json"
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let path = dir.join("mod.fr");
+        fs::write(&path, src).unwrap();
+        fs::write(dir.join("sources/broken.manifest.json"), "{").unwrap();
+        let err = load_manifest(&path, src).expect_err("declared malformed");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E100),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn load_manifest_unique_glob_when_undeclared() {
+        let dir = temp_module_dir("glob");
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let path = dir.join("mod.fr");
+        fs::write(&path, src).unwrap();
+        fs::write(
+            dir.join("sources/ma-trust-fixture.manifest.json"),
+            r#"{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "glob-snap",
+  "jurisdiction": "X",
+  "artifacts": []
+}"#,
+        )
+        .unwrap();
+        let loaded = load_manifest(&path, src).expect("unique glob");
+        assert_eq!(loaded.snapshot, "glob-snap");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn load_manifest_declared_does_not_silent_default() {
+        let dir = temp_module_dir("no-default");
+        let src = r#"
+module Examples.T version "0.1.0" {
+    source_manifest "sources/declared.manifest.json"
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let path = dir.join("mod.fr");
+        fs::write(&path, src).unwrap();
+        fs::write(
+            dir.join("sources/manifest.json"),
+            r#"{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "should-not-load",
+  "jurisdiction": "X",
+  "artifacts": []
+}"#,
+        )
+        .unwrap();
+        let err = load_manifest(&path, src).expect_err("declared wins over default");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E540),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]

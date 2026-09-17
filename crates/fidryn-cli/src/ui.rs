@@ -1,15 +1,18 @@
 //! Local mill: localhost-only web UI. Never live-files.
 
-use crate::{compile_source, merge_bounds_json, parse_instant};
+use crate::{EngineFailure, IntoEvalOutcome, compile_source, merge_bounds_json, parse_instant};
 use axum::Router;
 use axum::extract::Json;
 use axum::http::{StatusCode, header};
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, post};
-use fidryn_core::{CaseRecord, Diagnostic, QueryName, RunContext, SourceManifest};
+use fidryn_core::{
+    CaseRecord, CoreModule, Diagnostic, Instant, QueryName, RunContext, SourceManifest, Value,
+};
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
 use fidryn_render::{module_vars, render};
+use fidryn_trace::render_outcome;
 use fidryn_verify::explore_query;
 use serde::{Deserialize, Serialize};
 use std::io::ErrorKind;
@@ -118,16 +121,7 @@ struct EvalRequest {
     known_at: String,
 }
 
-#[derive(Debug, Serialize)]
-struct OutcomeResponse {
-    ok: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    outcome: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    error: Option<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    diagnostics: Vec<Diagnostic>,
-}
+type JsonResponse = (StatusCode, Json<serde_json::Value>);
 
 #[derive(Debug, Deserialize)]
 struct RenderRequest {
@@ -152,73 +146,117 @@ fn parse_case(value: serde_json::Value) -> Result<CaseRecord, String> {
     }
 }
 
-fn outcome_err(
+fn mill_err(
+    status: StatusCode,
     error: impl Into<String>,
     diagnostics: Vec<Diagnostic>,
-) -> (StatusCode, Json<OutcomeResponse>) {
+) -> JsonResponse {
     (
-        StatusCode::OK,
-        Json(OutcomeResponse {
-            ok: false,
-            outcome: None,
-            error: Some(error.into()),
-            diagnostics,
-        }),
+        status,
+        Json(serde_json::json!({
+            "ok": false,
+            "error": error.into(),
+            "diagnostics": diagnostics,
+        })),
     )
 }
 
-fn outcome_ok(
-    outcome: &fidryn_core::Outcome<fidryn_core::Value>,
-) -> (StatusCode, Json<OutcomeResponse>) {
-    match serde_json::to_value(outcome) {
-        Ok(value) => (
-            StatusCode::OK,
-            Json(OutcomeResponse {
-                ok: true,
-                outcome: Some(value),
-                error: None,
-                diagnostics: Vec::new(),
-            }),
+fn mill_engine_err(err: &EngineFailure) -> JsonResponse {
+    let status = if err.is_internal() {
+        StatusCode::INTERNAL_SERVER_ERROR
+    } else {
+        StatusCode::BAD_REQUEST
+    };
+    (
+        status,
+        Json(serde_json::json!({
+            "kind": "engineError",
+            "error": err.kind,
+            "message": err.message,
+            "ok": false,
+        })),
+    )
+}
+
+/// Same document as `fidryn_trace::render_outcome` (schema, module,
+/// sourceSnapshot, query, asOf, modelBoundary, outcome). `ok` is mill-only.
+fn mill_outcome_doc(
+    module: &CoreModule,
+    query: &QueryName,
+    valid: Instant,
+    known: Instant,
+    case: &CaseRecord,
+    outcome: &fidryn_core::Outcome<Value>,
+) -> JsonResponse {
+    let text = render_outcome(module, query, valid, known, case, outcome);
+    match serde_json::from_str::<serde_json::Value>(&text) {
+        Ok(mut value) => {
+            if let Some(obj) = value.as_object_mut() {
+                obj.insert("ok".into(), serde_json::Value::Bool(true));
+            }
+            (StatusCode::OK, Json(value))
+        }
+        Err(err) => mill_err(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            err.to_string(),
+            Vec::new(),
         ),
-        Err(err) => outcome_err(err.to_string(), Vec::new()),
     }
 }
 
-fn eval_request(req: EvalRequest, explore_mode: bool) -> (StatusCode, Json<OutcomeResponse>) {
+fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
     let module = match compile_source(&req.source, &SourceManifest::default()) {
         Ok(module) => module,
-        Err(diagnostics) => return outcome_err("check failed", diagnostics),
+        Err(diagnostics) => {
+            return mill_err(StatusCode::BAD_REQUEST, "check failed", diagnostics);
+        }
     };
     let mut case = match parse_case(req.case) {
         Ok(case) => case,
-        Err(err) => return outcome_err(err, Vec::new()),
+        Err(err) => return mill_err(StatusCode::BAD_REQUEST, err, Vec::new()),
     };
     if explore_mode
         && let Some(bounds) = req.bounds
         && !bounds.is_null()
         && let Err(err) = merge_bounds_json(&mut case, &bounds)
     {
-        return outcome_err(err, Vec::new());
+        return mill_err(StatusCode::BAD_REQUEST, err, Vec::new());
     }
     let valid = match parse_instant(&req.valid_at) {
         Ok(instant) => instant,
-        Err(err) => return outcome_err(format!("validAt: {err}"), Vec::new()),
+        Err(err) => {
+            return mill_err(
+                StatusCode::BAD_REQUEST,
+                format!("validAt: {err}"),
+                Vec::new(),
+            );
+        }
     };
     let known = match parse_instant(&req.known_at) {
         Ok(instant) => instant,
-        Err(err) => return outcome_err(format!("knownAt: {err}"), Vec::new()),
+        Err(err) => {
+            return mill_err(
+                StatusCode::BAD_REQUEST,
+                format!("knownAt: {err}"),
+                Vec::new(),
+            );
+        }
     };
     let ctx = RunContext::new(valid, known);
     let query = QueryName::from(req.query.as_str());
     let outcome = if explore_mode {
-        explore_query(&module, &query, &case, &ctx)
+        match explore_query(&module, &query, &case, &ctx).into_eval_outcome() {
+            Ok(outcome) => outcome,
+            Err(err) => return mill_engine_err(&err),
+        }
     } else {
         // Occupancy and completions come only from the case record.
         let state = case.into_state();
         let mut handler = CaseFile {
             record: case.clone(),
+            known_at: Some(known),
         };
-        evaluate(
+        match evaluate(
             &module,
             &query,
             &Default::default(),
@@ -227,15 +265,20 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> (StatusCode, Json<Outco
             &mut handler,
             &case,
         )
+        .into_eval_outcome()
+        {
+            Ok(outcome) => outcome,
+            Err(err) => return mill_engine_err(&err),
+        }
     };
-    outcome_ok(&outcome)
+    mill_outcome_doc(&module, &query, valid, known, &case, &outcome)
 }
 
-async fn run(Json(req): Json<EvalRequest>) -> (StatusCode, Json<OutcomeResponse>) {
+async fn run(Json(req): Json<EvalRequest>) -> JsonResponse {
     eval_request(req, false)
 }
 
-async fn explore(Json(req): Json<EvalRequest>) -> (StatusCode, Json<OutcomeResponse>) {
+async fn explore(Json(req): Json<EvalRequest>) -> JsonResponse {
     eval_request(req, true)
 }
 
@@ -409,13 +452,41 @@ module Examples.T version "0.1.0" {
         })
     }
 
+    fn assert_outcome_document(json: &serde_json::Value, query: &str) {
+        assert_eq!(json["ok"], true, "{json}");
+        assert_eq!(json["schema"], "fidryn.outcome/v0.1", "{json}");
+        assert!(json["module"].is_string(), "{json}");
+        assert!(json["sourceSnapshot"].is_string(), "{json}");
+        assert_eq!(json["query"], query, "{json}");
+        assert!(json["asOf"]["validTime"].is_string(), "{json}");
+        assert!(json["asOf"]["recordTime"].is_string(), "{json}");
+        assert!(json["modelBoundary"].is_object(), "{json}");
+        assert!(json["modelBoundary"]["outsideScope"].is_array(), "{json}");
+        assert!(
+            json["modelBoundary"]["admissibleCompletions"].is_object(),
+            "{json}"
+        );
+        assert!(json["outcome"].is_object(), "{json}");
+        assert!(json["outcome"]["kind"].is_string(), "{json}");
+        assert!(json["outcome"]["trace"].is_string(), "{json}");
+    }
+
     #[tokio::test]
     async fn run_evaluates_a_query() {
         let (status, json) = post_json("/api/run", eval_body()).await;
         assert_eq!(status, StatusCode::OK);
-        assert_eq!(json["ok"], true, "{json}");
-        assert!(json["outcome"].is_object(), "{json}");
-        assert!(json["outcome"]["kind"].is_string(), "{json}");
+        assert_outcome_document(&json, "q");
+    }
+
+    #[tokio::test]
+    async fn run_unknown_query_is_engine_error_not_inconsistent() {
+        let mut body = eval_body();
+        body["query"] = serde_json::json!("no_such_query");
+        let (status, json) = post_json("/api/run", body).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "{json}");
+        assert_eq!(json["kind"], "engineError", "{json}");
+        assert_eq!(json["error"], "UnknownQuery", "{json}");
+        assert_ne!(json["outcome"]["kind"], "inconsistent", "{json}");
     }
 
     #[tokio::test]
@@ -428,9 +499,7 @@ module Examples.T version "0.1.0" {
         });
         let (status, json) = post_json("/api/explore", body).await;
         assert_eq!(status, StatusCode::OK);
-        assert_eq!(json["ok"], true, "{json}");
-        assert!(json["outcome"].is_object(), "{json}");
-        assert!(json["outcome"]["kind"].is_string(), "{json}");
+        assert_outcome_document(&json, "q");
     }
 
     #[tokio::test]
