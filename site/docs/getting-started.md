@@ -121,36 +121,48 @@ cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --known-at 2026-09-17T12:00:00Z
 ```
 
-The CLI prints one line of canonical JSON (`fidryn.outcome/v0.1`).
-Pretty-printed, the important fields look like this:
+The CLI prints one line of canonical JSON
+(`fidryn.evaluation-report/v0.1`). Pretty-printed, the important fields
+look like this:
 
 ```json
 {
-  "schema": "fidryn.outcome/v0.1",
-  "module": "Programs.RequireGate@0.1.0",
-  "query": "q",
-  "asOf": {
-    "validTime": "2026-09-17T12:00:00Z",
-    "recordTime": "2026-09-17T12:00:00Z"
-  },
-  "modelBoundary": {
-    "outsideScope": ["complete_instruments"],
-    "admissibleCompletions": {
-      "interpretations": {},
-      "evidence": {},
-      "choices": {}
+  "schema": "fidryn.evaluation-report/v0.1",
+  "executionMode": "operative",
+  "sourceTrust": "unauthenticated",
+  "verificationMethod": "none",
+  "assumptions": [],
+  "coverage": null,
+  "outcomeDocument": {
+    "schema": "fidryn.outcome/v0.1",
+    "module": "Programs.RequireGate@0.1.0",
+    "query": "q",
+    "asOf": {
+      "validTime": "2026-09-17T12:00:00Z",
+      "recordTime": "2026-09-17T12:00:00Z"
+    },
+    "modelBoundary": {
+      "outsideScope": ["complete_instruments"],
+      "admissibleCompletions": {
+        "interpretations": {},
+        "evidence": {},
+        "choices": {}
+      }
+    },
+    "outcome": {
+      "kind": "determinate",
+      "value": { "kind": "int", "data": 7 }
     }
-  },
-  "outcome": {
-    "kind": "determinate",
-    "value": { "kind": "int", "data": 7 }
   }
 }
 ```
 
-`modelBoundary` is part of the answer. The module declared
+The six-kind legal result is nested under `outcomeDocument`.
+`modelBoundary` is part of that answer. The module declared
 `complete_instruments` as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
+Pass `--scenario` only when you intend `case.assumptions` as an overlay;
+operative `run` (the default) does not apply them.
 
 Now run `r`:
 
@@ -162,20 +174,23 @@ cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --known-at 2026-09-17T12:00:00Z
 ```
 
-`require false` does not skip ahead to `return 7`. The outcome is
-`suspended`, with a request that the requirement failed:
+`require false` does not skip ahead to `return 7`. Nested
+`outcomeDocument.outcome` is `suspended`, with a request that the
+requirement failed:
 
 ```json
 {
-  "outcome": {
-    "kind": "suspended",
-    "requests": [
-      {
-        "kind": "needCustom",
-        "effect": "require",
-        "payload": "requirement failed"
-      }
-    ]
+  "outcomeDocument": {
+    "outcome": {
+      "kind": "suspended",
+      "requests": [
+        {
+          "kind": "needCustom",
+          "effect": "require",
+          "payload": "requirement failed"
+        }
+      ]
+    }
   }
 }
 ```
