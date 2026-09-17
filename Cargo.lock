@@ -366,6 +366,7 @@ dependencies = [
  "fidryn-eval",
  "fidryn-handlers",
  "fidryn-hir",
+ "fidryn-kernel",
  "fidryn-render",
  "fidryn-solve",
  "fidryn-syntax",
