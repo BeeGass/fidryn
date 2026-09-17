@@ -1,9 +1,10 @@
 //! Incremental compile and evaluate driver.
 //!
 //! Check is memoized by blake3 of source bytes together with the manifest
-//! snapshot and artifact digests. Evaluate is memoized by program id, query
-//! name, canonical case JSON, and bitemporal times. Memo tables are explicit
-//! [`HashMap`]s; the `salsa` crate is not used.
+//! snapshot and artifact digests. Evaluate is memoized by canonical module
+//! JSON (executable content, not only [`fidryn_core::ModuleId`]), query name,
+//! query arguments, canonical case JSON, and bitemporal times. Memo tables
+//! are explicit [`HashMap`]s; the `salsa` crate is not used.
 
 use fidryn_check::check;
 use fidryn_core::{
@@ -99,7 +100,8 @@ impl Driver {
     }
 
     /// Evaluate `query` against `case`. Hits return a clone of the stored
-    /// outcome. The memo key includes query arguments.
+    /// outcome. The memo key includes executable module content and query
+    /// arguments. Fuel exhaustion is not stored.
     pub fn run(
         &mut self,
         module: &CoreModule,
@@ -192,10 +194,12 @@ fn run_key(
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<RunKey, EngineError> {
+    let module_json =
+        canonical_json(module).map_err(|err| EngineError::Internal(err.to_string()))?;
     let case_json = canonical_json(case).map_err(|err| EngineError::Internal(err.to_string()))?;
     let args_json = canonical_json(args).map_err(|err| EngineError::Internal(err.to_string()))?;
     let mut hasher = blake3::Hasher::new();
-    hasher.update(module.id.hex().as_bytes());
+    hasher.update(module_json.as_bytes());
     hasher.update(&[0xff]);
     hasher.update(query.as_bytes());
     hasher.update(&[0xff]);
@@ -454,6 +458,47 @@ module Examples.T version "0.1.0" {{
                 ..
             } => {}
             other => panic!("expected determinate true, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn module_body_edit_invalidates_execution_cache() {
+        let yes_src = r#"
+module Regression version "0.1.0" {
+    query q() -> Bool {
+        return true
+    }
+}
+"#;
+        let no_src = r#"
+module Regression version "0.1.0" {
+    query q() -> Bool {
+        return false
+    }
+}
+"#;
+        let mut driver = Driver::new();
+        let manifest = SourceManifest::default();
+        let yes = driver.check_source(yes_src, &manifest).expect("true");
+        let no = driver.check_source(no_src, &manifest).expect("false");
+        let case = CaseRecord::default();
+        let first = driver.run(&yes, "q", &case, &ctx()).expect("run true");
+        let misses = driver.misses();
+        let second = driver.run(&no, "q", &case, &ctx()).expect("run false");
+        assert_eq!(driver.misses(), misses + 1, "body edit must miss run cache");
+        match first {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("expected determinate true, got {other:?}"),
+        }
+        match second {
+            Outcome::Determinate {
+                value: Value::Bool(false),
+                ..
+            } => {}
+            other => panic!("expected determinate false, got {other:?}"),
         }
     }
 
