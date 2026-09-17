@@ -7,6 +7,7 @@
 
 use fidryn_core::Value;
 use std::collections::BTreeMap;
+use std::iter::FusedIterator;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Domain {
@@ -19,6 +20,143 @@ pub struct Assignment {
     pub bindings: BTreeMap<String, Value>,
 }
 
+/// Cap on assignments emitted by [`stream`]. Hitting it is incomplete
+/// coverage, not a determinate product.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SearchBudget {
+    pub max_assignments: usize,
+}
+
+/// One step of a budgeted cartesian product. Terminal events are last.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SearchEvent {
+    Assignment(Assignment),
+    Exhausted,
+    BudgetExceeded { emitted: usize },
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum StreamPhase {
+    Next,
+    Exhausted,
+    Done,
+}
+
+/// Odometer over `domains`. Assignments are built one at a time; the
+/// full cartesian product is never materialized.
+#[derive(Debug)]
+pub struct StreamSearch<'a> {
+    domains: &'a [Domain],
+    indices: Vec<usize>,
+    budget: usize,
+    emitted: usize,
+    built: usize,
+    phase: StreamPhase,
+}
+
+/// Stream the cartesian product of `domains` until exhaustion or budget.
+#[must_use]
+pub fn stream(domains: &[Domain], budget: SearchBudget) -> StreamSearch<'_> {
+    StreamSearch::new(domains, budget)
+}
+
+impl<'a> StreamSearch<'a> {
+    fn new(domains: &'a [Domain], budget: SearchBudget) -> Self {
+        let empty_product = domains.iter().any(|domain| domain.values.is_empty());
+        Self {
+            domains,
+            indices: vec![0; domains.len()],
+            budget: budget.max_assignments,
+            emitted: 0,
+            built: 0,
+            phase: if empty_product {
+                StreamPhase::Exhausted
+            } else {
+                StreamPhase::Next
+            },
+        }
+    }
+
+    /// Assignments yielded so far. Never the full product size once the
+    /// budget has cut generation.
+    #[must_use]
+    pub fn emitted(&self) -> usize {
+        self.emitted
+    }
+
+    /// Assignment values constructed. Equal to [`Self::emitted`] because a
+    /// binding map is allocated only when an assignment is yielded.
+    #[must_use]
+    pub fn built(&self) -> usize {
+        self.built
+    }
+
+    fn current_assignment(&self) -> Assignment {
+        let mut bindings = BTreeMap::new();
+        for (domain, &index) in self.domains.iter().zip(&self.indices) {
+            bindings.insert(domain.name.clone(), domain.values[index].clone());
+        }
+        Assignment { bindings }
+    }
+
+    /// Advance the odometer. False when the last assignment was current.
+    fn advance(&mut self) -> bool {
+        if self.indices.is_empty() {
+            return false;
+        }
+        for i in (0..self.indices.len()).rev() {
+            self.indices[i] += 1;
+            if self.indices[i] < self.domains[i].values.len() {
+                return true;
+            }
+            self.indices[i] = 0;
+        }
+        false
+    }
+}
+
+impl Iterator for StreamSearch<'_> {
+    type Item = SearchEvent;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.phase {
+            StreamPhase::Done => None,
+            StreamPhase::Exhausted => {
+                self.phase = StreamPhase::Done;
+                Some(SearchEvent::Exhausted)
+            }
+            StreamPhase::Next if self.emitted >= self.budget => {
+                self.phase = StreamPhase::Done;
+                Some(SearchEvent::BudgetExceeded {
+                    emitted: self.emitted,
+                })
+            }
+            StreamPhase::Next => {
+                let assignment = self.current_assignment();
+                self.built += 1;
+                self.emitted += 1;
+                self.phase = if self.advance() {
+                    StreamPhase::Next
+                } else {
+                    StreamPhase::Exhausted
+                };
+                Some(SearchEvent::Assignment(assignment))
+            }
+        }
+    }
+}
+
+impl FusedIterator for StreamSearch<'_> {}
+
+fn collect_assignments(domains: &[Domain], budget: SearchBudget) -> Vec<Assignment> {
+    stream(domains, budget)
+        .filter_map(|event| match event {
+            SearchEvent::Assignment(assignment) => Some(assignment),
+            SearchEvent::Exhausted | SearchEvent::BudgetExceeded { .. } => None,
+        })
+        .collect()
+}
+
 /// A nogood: the conjunction of these `(variable, value)` pairs must not
 /// all hold.
 ///
@@ -28,28 +166,17 @@ pub struct Assignment {
 /// so it forbids every assignment.
 pub type Clause = Vec<(String, Value)>;
 
-/// Cartesian product of finite domains, in domain-name order.
+/// Cartesian product of finite domains, in slice order.
+///
+/// Collects [`stream`] with an unbounded budget so existing callers keep
+/// an exhaustive `Vec`. Prefer [`stream`] when the product may be large.
 pub fn enumerate(domains: &[Domain]) -> Vec<Assignment> {
-    if domains.is_empty() {
-        return vec![Assignment {
-            bindings: BTreeMap::new(),
-        }];
-    }
-    let mut acc = vec![Assignment {
-        bindings: BTreeMap::new(),
-    }];
-    for domain in domains {
-        let mut next = Vec::new();
-        for prefix in &acc {
-            for value in &domain.values {
-                let mut bindings = prefix.bindings.clone();
-                bindings.insert(domain.name.clone(), value.clone());
-                next.push(Assignment { bindings });
-            }
-        }
-        acc = next;
-    }
-    acc
+    collect_assignments(
+        domains,
+        SearchBudget {
+            max_assignments: usize::MAX,
+        },
+    )
 }
 
 /// DPLL-style search: unit-prefer bindings that satisfy `ok`.
@@ -57,7 +184,19 @@ pub fn search<F>(domains: &[Domain], mut ok: F) -> Vec<Assignment>
 where
     F: FnMut(&Assignment) -> bool,
 {
-    enumerate(domains).into_iter().filter(|a| ok(a)).collect()
+    stream(
+        domains,
+        SearchBudget {
+            max_assignments: usize::MAX,
+        },
+    )
+    .filter_map(|event| match event {
+        SearchEvent::Assignment(assignment) if ok(&assignment) => Some(assignment),
+        SearchEvent::Assignment(_)
+        | SearchEvent::Exhausted
+        | SearchEvent::BudgetExceeded { .. } => None,
+    })
+    .collect()
 }
 
 /// Bounded DPLL over caller-supplied finite domains and nogood clauses.
@@ -210,16 +349,78 @@ mod tests {
             .all(|(var, value)| assignment.bindings.get(var) == Some(value))
     }
 
-    #[test]
-    fn product_is_exhaustive() {
-        let domains = vec![
+    fn two_by_two() -> Vec<Domain> {
+        vec![
             domain(
                 "I",
                 vec![Value::String("I1".into()), Value::String("I2".into())],
             ),
             domain("C", vec![Value::Bool(true), Value::Bool(false)]),
-        ];
-        assert_eq!(enumerate(&domains).len(), 4);
+        ]
+    }
+
+    #[test]
+    fn product_is_exhaustive() {
+        assert_eq!(enumerate(&two_by_two()).len(), 4);
+    }
+
+    #[test]
+    fn stream_budget_one_on_two_by_two_exceeds_without_full_product() {
+        let domains = two_by_two();
+        let mut search = stream(&domains, SearchBudget { max_assignments: 1 });
+        let first = search.next();
+        assert!(
+            matches!(first, Some(SearchEvent::Assignment(_))),
+            "{first:?}"
+        );
+        match search.next() {
+            Some(SearchEvent::BudgetExceeded { emitted }) => {
+                assert!(emitted <= 1, "emitted={emitted}");
+            }
+            other => panic!("{other:?}"),
+        }
+        assert!(search.next().is_none());
+        assert!(search.emitted() <= 1, "emitted={}", search.emitted());
+        assert!(
+            search.built() <= 1,
+            "constructed {} assignments; full 2x2 product is 4",
+            search.built()
+        );
+    }
+
+    #[test]
+    fn stream_exhausts_two_by_two_within_budget() {
+        let domains = two_by_two();
+        let events: Vec<_> = stream(&domains, SearchBudget { max_assignments: 4 }).collect();
+        let assignments = events
+            .iter()
+            .filter(|event| matches!(event, SearchEvent::Assignment(_)))
+            .count();
+        assert_eq!(assignments, 4);
+        assert!(matches!(events.last(), Some(SearchEvent::Exhausted)));
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, SearchEvent::BudgetExceeded { .. }))
+        );
+    }
+
+    #[test]
+    fn stream_empty_domain_is_exhausted_without_assignments() {
+        let domains = vec![domain("I", Vec::new())];
+        let events: Vec<_> = stream(&domains, SearchBudget { max_assignments: 8 }).collect();
+        assert_eq!(events, vec![SearchEvent::Exhausted]);
+    }
+
+    #[test]
+    fn stream_no_domains_is_one_empty_assignment() {
+        let events: Vec<_> = stream(&[], SearchBudget { max_assignments: 8 }).collect();
+        match events.as_slice() {
+            [SearchEvent::Assignment(assignment), SearchEvent::Exhausted] => {
+                assert!(assignment.bindings.is_empty());
+            }
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
