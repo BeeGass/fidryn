@@ -1077,15 +1077,13 @@ module Examples.T version "0.1.0" {
     }
 }
 "#;
-        let mut module_true =
+        let module_true =
             compile_source(src_true, &SourceManifest::default()).expect("compile true");
-        let mut module_false =
+        let module_false =
             compile_source(src_false, &SourceManifest::default()).expect("compile false");
-        if format!("{:?}", module_true.queries[0].plan)
-            == format!("{:?}", module_false.queries[0].plan)
-        {
-            module_true.queries[0].plan = QueryPlan::Evaluate(Term::Bool(true));
-            module_false.queries[0].plan = QueryPlan::Evaluate(Term::Bool(false));
+        match (&module_true.queries[0].plan, &module_false.queries[0].plan) {
+            (QueryPlan::Evaluate(Term::Bool(true)), QueryPlan::Evaluate(Term::Bool(false))) => {}
+            other => panic!("compilation must preserve Evaluate true vs false, got {other:?}"),
         }
         let a = snapshot_names_from_module(&module_true);
         let b = snapshot_names_from_module(&module_false);

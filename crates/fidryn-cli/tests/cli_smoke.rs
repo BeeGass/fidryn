@@ -3,9 +3,7 @@ use fidryn_cli::{
     Cli, Command, SnapshotDiff, apply_run_args, compile_module, compile_source, load_manifest,
     parse_instant, snapshot_names_from_json, snapshot_names_from_module,
 };
-use fidryn_core::{
-    CaseRecord, DiagnosticCode, QueryPlan, SourceManifest, Term, Value, canonical_json,
-};
+use fidryn_core::{CaseRecord, DiagnosticCode, SourceManifest, Value, canonical_json};
 use fidryn_render::{module_vars, render};
 use std::path::PathBuf;
 
@@ -217,15 +215,14 @@ module Examples.T version "0.1.0" {
     }
 }
 "#;
-    let mut module_true =
-        compile_source(src_true, &SourceManifest::default()).expect("compile true");
-    let mut module_false =
+    let module_true = compile_source(src_true, &SourceManifest::default()).expect("compile true");
+    let module_false =
         compile_source(src_false, &SourceManifest::default()).expect("compile false");
-    if format!("{:?}", module_true.queries[0].plan) == format!("{:?}", module_false.queries[0].plan)
-    {
-        module_true.queries[0].plan = QueryPlan::Evaluate(Term::Bool(true));
-        module_false.queries[0].plan = QueryPlan::Evaluate(Term::Bool(false));
-    }
+    assert_ne!(
+        format!("{:?}", module_true.queries[0].plan),
+        format!("{:?}", module_false.queries[0].plan),
+        "Evaluate {{ true }} and Evaluate {{ false }} must lower to distinct plans"
+    );
     let a = snapshot_names_from_module(&module_true);
     let b = snapshot_names_from_module(&module_false);
     assert_ne!(
