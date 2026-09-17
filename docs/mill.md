@@ -106,6 +106,13 @@ or a wrapper with `admissibleCompletions` / `admissible_completions`.
 completion space on the case, on `bounds`, or both; otherwise the
 outcome is an empty completion set.
 
+A nonempty `case.assumptions` array puts mill `/api/run` and
+`/api/explore` into scenario mode (`executionMode: scenario` on the
+report). There is no separate mill `--scenario` flag; the overlay is
+inferred from the case. An empty or omitted `assumptions` list is
+operative. CLI path `run` still requires explicit `--scenario` to apply
+the same overlay.
+
 `validAt` and `knownAt` accept a `Z` suffix or a numeric offset, the same
 as CLI `--valid-at` and `--known-at`.
 
