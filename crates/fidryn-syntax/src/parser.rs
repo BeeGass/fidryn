@@ -718,7 +718,7 @@ impl<'a> Parser<'a> {
             }
             "query" => Some(self.wrap_item(|p| Item::Query(p.parse_query_decl()))),
             "scenario" => Some(self.wrap_item(|p| Item::Scenario(p.parse_decl("scenario")))),
-            "verify" => Some(self.wrap_item(|p| Item::Verify(p.parse_decl("verify")))),
+            "verify" => Some(self.wrap_item(|p| Item::Verify(p.parse_verify_decl()))),
             _ => {
                 self.error(t, &format!("unknown declaration `{kw}`"));
                 None
@@ -1010,34 +1010,7 @@ impl<'a> Parser<'a> {
             result_type = Some(self.parse_type_string());
         }
         let effects = self.parse_effect_row_opt();
-        let mut expr = None;
-        let mut goal = None;
-        if self.peek().kind == TokenKind::LBrace {
-            self.bump();
-            while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-                if self.eat_ident("goal") {
-                    goal = Some(self.parse_goal());
-                } else if self.eat_ident("return") {
-                    expr = self.parse_expr();
-                    self.eat_semi();
-                } else if self.eat_ident("require") {
-                    self.parse_require_tail();
-                } else if self.at_ident("for_all") || self.at_ident("exists") {
-                    let _ = self.parse_expr();
-                    self.eat_semi();
-                } else if let Some(e) = self.parse_expr() {
-                    if expr.is_none() {
-                        expr = Some(e);
-                    }
-                    self.eat_semi();
-                } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-                    self.skip_balanced_until_end();
-                }
-            }
-            self.expect_kind(TokenKind::RBrace, "expected `}`");
-        } else {
-            self.skip_balanced_until_end();
-        }
+        let (expr, goal) = self.parse_query_block();
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
             Span {
@@ -1059,12 +1032,66 @@ impl<'a> Parser<'a> {
         decl
     }
 
-    fn parse_require_tail(&mut self) {
-        let _ = self.parse_expr();
+    fn parse_query_block(&mut self) -> (Option<Expr>, Option<GoalAst>) {
+        if self.peek().kind != TokenKind::LBrace {
+            self.skip_balanced_until_end();
+            return (None, None);
+        }
+        self.bump();
+        let mut stmts = Vec::new();
+        let mut goal = None;
+        while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if self.eat_ident("goal") {
+                let parsed = self.parse_goal();
+                if goal.is_none() {
+                    goal = Some(parsed);
+                }
+            } else if let Some(e) = self.parse_eval_stmt() {
+                stmts.push(e);
+            } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                self.skip_balanced_until_end();
+            }
+        }
+        self.expect_kind(TokenKind::RBrace, "expected `}`");
+        let expr = if let Some(g) = goal.as_mut() {
+            if g.kind == "Evaluate" && !stmts.is_empty() {
+                g.expr = seq_exprs(extend_expr(stmts, g.expr.take()));
+                None
+            } else {
+                seq_exprs(stmts)
+            }
+        } else {
+            seq_exprs(stmts)
+        };
+        (expr, goal)
+    }
+
+    fn parse_eval_stmt(&mut self) -> Option<Expr> {
+        if self.eat_ident("return") {
+            let expr = self.parse_expr();
+            self.eat_semi();
+            return expr;
+        }
+        if self.eat_ident("require") {
+            return self.parse_require_tail();
+        }
+        if self.at_ident("for_all") || self.at_ident("exists") {
+            let expr = self.parse_expr();
+            self.eat_semi();
+            return expr;
+        }
+        let expr = self.parse_expr()?;
+        self.eat_semi();
+        Some(expr)
+    }
+
+    fn parse_require_tail(&mut self) -> Option<Expr> {
+        let expr = self.parse_expr();
         if self.eat_ident("using") && self.at_name() {
             let _ = self.parse_ident_name();
         }
         self.eat_semi();
+        expr.map(|inner| Expr::Require(Box::new(inner)))
     }
 
     fn parse_goal(&mut self) -> GoalAst {
@@ -1085,25 +1112,16 @@ impl<'a> Parser<'a> {
         }
         if goal.kind == "Evaluate" {
             self.bump();
+            let mut stmts = Vec::new();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-                if self.eat_ident("return") {
-                    goal.expr = self.parse_expr();
-                    self.eat_semi();
-                } else if self.eat_ident("require") {
-                    self.parse_require_tail();
-                } else if self.at_ident("for_all") || self.at_ident("exists") {
-                    let _ = self.parse_expr();
-                    self.eat_semi();
-                } else if let Some(e) = self.parse_expr() {
-                    if goal.expr.is_none() {
-                        goal.expr = Some(e);
-                    }
-                    self.eat_semi();
+                if let Some(e) = self.parse_eval_stmt() {
+                    stmts.push(e);
                 } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
                     self.skip_balanced_until_end();
                 }
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
+            goal.expr = seq_exprs(stmts);
         } else {
             self.bump();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
@@ -1135,6 +1153,107 @@ impl<'a> Parser<'a> {
             self.expect_kind(TokenKind::RBrace, "expected `}`");
         }
         goal
+    }
+
+    fn parse_verify_decl(&mut self) -> Decl {
+        self.start_node(SyntaxKind::DECL);
+        let start = self.bump();
+        let name = if self.at_name() || self.peek().kind == TokenKind::Error {
+            Some(self.parse_ident_name())
+        } else {
+            self.error_here("expected verification name");
+            None
+        };
+        let sig_start = self.peek().start;
+        let mut fields = BTreeMap::new();
+        let mut expr = None;
+        if self.peek().kind == TokenKind::LBrace {
+            self.bump();
+            while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                if self.at_ident("assert") {
+                    let clause_start = self.peek().start;
+                    self.bump();
+                    if let Some(e) = self.parse_expr()
+                        && expr.is_none()
+                    {
+                        expr = Some(e);
+                    }
+                    if !self.at_verify_field()
+                        && !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof)
+                    {
+                        self.skip_balanced_until_end();
+                    }
+                    self.eat_semi();
+                    let text = self
+                        .src_slice(clause_start, self.last_end(clause_start))
+                        .trim()
+                        .trim_end_matches(';')
+                        .trim()
+                        .to_owned();
+                    if !text.is_empty() && !fields.contains_key("assert") {
+                        fields.insert("assert".to_owned(), text);
+                    }
+                } else if self.at_ident("bounds") {
+                    let clause_start = self.peek().start;
+                    self.bump();
+                    if self.peek().kind == TokenKind::LBrace {
+                        let _ = self.parse_braced_expr();
+                    } else {
+                        self.skip_balanced_until_end();
+                    }
+                    self.eat_semi();
+                    let text = self
+                        .src_slice(clause_start, self.last_end(clause_start))
+                        .trim()
+                        .trim_end_matches(';')
+                        .trim()
+                        .to_owned();
+                    if !text.is_empty() {
+                        fields.insert("bounds".to_owned(), text);
+                    }
+                } else if self.at_ident("for_all") || self.at_ident("exists") {
+                    let _ = self.parse_expr();
+                    self.eat_semi();
+                } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                    self.skip_balanced_until_end();
+                }
+            }
+            self.expect_kind(TokenKind::RBrace, "expected `}`");
+        } else {
+            self.skip_balanced_until_end();
+        }
+        let end = self.last_end(start.end);
+        let mut decl = Decl::new(
+            Span {
+                start: start.start,
+                end,
+            },
+            "verify",
+            name,
+            Some(self.src_slice(sig_start, end).trim().to_owned()),
+            self.src_slice(start.start, end),
+        );
+        decl.expr = expr;
+        decl.fields = fields;
+        self.finish_node();
+        decl
+    }
+
+    fn at_verify_field(&mut self) -> bool {
+        let t = self.peek();
+        t.kind == TokenKind::Ident
+            && matches!(
+                self.text(t),
+                "interpretations"
+                    | "judgments"
+                    | "choices"
+                    | "bounds"
+                    | "assuming"
+                    | "assert"
+                    | "for_all"
+                    | "exists"
+                    | "for"
+            )
     }
 
     fn parse_function_decl(&mut self, keyword: &str) -> Decl {
@@ -2044,6 +2163,23 @@ fn trim_quotes(s: &str) -> &str {
         .unwrap_or(s)
 }
 
+fn seq_exprs(stmts: Vec<Expr>) -> Option<Expr> {
+    match stmts.len() {
+        0 => None,
+        1 => stmts.into_iter().next(),
+        _ => Some(Expr::Block(stmts)),
+    }
+}
+
+fn extend_expr(mut stmts: Vec<Expr>, extra: Option<Expr>) -> Vec<Expr> {
+    match extra {
+        Some(Expr::Block(mut more)) => stmts.append(&mut more),
+        Some(e) => stmts.push(e),
+        None => {}
+    }
+    stmts
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2338,6 +2474,78 @@ module Examples.FuelRow version "0.1.0" {
         assert_eq!(tg.expr.as_ref(), Some(&Expr::Bool(true)));
         assert_eq!(fg.expr.as_ref(), Some(&Expr::Bool(false)));
         assert_ne!(tg.expr, fg.expr);
+    }
+
+    fn expect_require_then(expr: &Expr, required: Expr, then: Expr) {
+        match expr {
+            Expr::Block(items) if items.len() == 2 => {
+                match &items[0] {
+                    Expr::Require(inner) => assert_eq!(inner.as_ref(), &required),
+                    other => panic!("{other:?}"),
+                }
+                assert_eq!(items[1], then);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn require_false_return_true_is_not_just_true() {
+        let parsed = parse_body("query q() -> Bool { require false; return true }");
+        let q = first_query(&parsed);
+        let expr = q.expr.as_ref().expect("query expr");
+        expect_require_then(expr, Expr::Bool(false), Expr::Bool(true));
+        assert_ne!(expr, &Expr::Bool(true));
+        assert!(q.goal.is_none());
+    }
+
+    #[test]
+    fn evaluate_require_false_return_true_keeps_both() {
+        let parsed =
+            parse_body("query q() -> Bool { goal Evaluate { require false; return true } }");
+        let q = first_query(&parsed);
+        let goal = q.goal.as_ref().expect("evaluate goal");
+        assert_eq!(goal.kind, "Evaluate");
+        let expr = goal.expr.as_ref().expect("goal expr");
+        expect_require_then(expr, Expr::Bool(false), Expr::Bool(true));
+        assert_ne!(expr, &Expr::Bool(true));
+    }
+
+    #[test]
+    fn query_quantifiers_are_kept_with_return() {
+        let parsed =
+            parse_body("query q() -> Bool { for_all x in People: Eligible(x); return true }");
+        let q = first_query(&parsed);
+        match q.expr.as_ref() {
+            Some(Expr::Block(items)) if items.len() == 2 => {
+                match &items[0] {
+                    Expr::Apply { callee, args } => {
+                        assert_eq!(callee.as_ref(), &Expr::Ident("for_all".to_owned()));
+                        assert_eq!(args.len(), 3, "{args:?}");
+                    }
+                    other => panic!("{other:?}"),
+                }
+                assert_eq!(items[1], Expr::Bool(true));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parses_verify_trivial_assert_true() {
+        let parsed = parse_body("verify Trivial { assert true }");
+        match &parsed.module().unwrap().items[0] {
+            Item::Verify(d) => {
+                assert_eq!(d.keyword, "verify");
+                assert_eq!(d.name.as_deref(), Some("Trivial"));
+                assert_eq!(d.expr.as_ref(), Some(&Expr::Bool(true)));
+                assert_eq!(
+                    d.fields.get("assert").map(String::as_str),
+                    Some("assert true")
+                );
+            }
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]

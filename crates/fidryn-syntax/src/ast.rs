@@ -115,6 +115,7 @@ pub enum Expr {
         n: i64,
         unit: String,
     },
+    Require(Box<Expr>),
     Block(Vec<Expr>),
 }
 
