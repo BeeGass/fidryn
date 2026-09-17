@@ -1,22 +1,96 @@
-//! Trusted checks for covering evaluation. Proof generation lives in
-//! `fidryn-verify` / `fidryn-solve`; this crate only accepts or rejects
-//! a covering claim.
+//! Finite coverage verification by replay.
+//!
+//! Proof generation lives in `fidryn-verify` / `fidryn-solve`; this crate
+//! only accepts or rejects a covering claim. [`accept_covering_eval`]
+//! re-evaluates each claimed world with [`fidryn_eval::evaluate`] (trusted
+//! evaluator, not an independent Lean kernel). Expected completion size is
+//! the checked invocation's [`CaseRecord::admissible_completions`] product.
+//! Independent proof checking, Salsa, SMT, and packages remain Remaining.
+//!
+//! Replay is isolated: [`IsolatedReplay`] wraps a cloned [`CaseFile`] and a
+//! fresh [`LegalState::new`]. It never files or publishes. This crate does
+//! not import `fidryn-adapt`.
 
 use fidryn_core::{
     BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
-    LegalState, ModuleId, OpenRequest, Outcome, QueryName, RunContext, SourceSnapshotId, Value,
+    Handler, HandlerResult, LegalState, ModuleId, OpenRequest, Outcome, QueryName, RunContext,
+    SourceSnapshotId, SuspensionReason, Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
 use std::collections::{BTreeMap, BTreeSet};
 
-/// Accept a covering witness by shape and bind a certificate to the claimed
-/// answer.
+/// Isolated replay handler: recorded case responses only.
+///
+/// Wraps a cloned [`CaseFile`]. Never files, never publishes, and never
+/// treats NeedCustom `"file"` / `"publish"` as [`HandlerResult::Resume`].
+/// The caller's [`CaseRecord`] is not mutated; construct from a clone.
+pub struct IsolatedReplay {
+    inner: CaseFile,
+}
+
+impl IsolatedReplay {
+    pub fn new(case: CaseRecord) -> Self {
+        Self {
+            inner: CaseFile::new(case),
+        }
+    }
+
+    fn refuse_live(request: &OpenRequest) -> HandlerResult {
+        let mut requests = BTreeSet::new();
+        requests.insert(request.clone());
+        let fragment = match request {
+            OpenRequest::NeedCustom { effect, .. } => {
+                format!("isolated-replay:{effect}")
+            }
+            _ => "isolated-replay".into(),
+        };
+        HandlerResult::Suspend {
+            requests,
+            reason: SuspensionReason::OpenBranch,
+            trace_fragment: fragment,
+        }
+    }
+}
+
+impl Handler for IsolatedReplay {
+    fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_observe(request)
+    }
+
+    fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_determine(request)
+    }
+
+    fn handle_choose(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_choose(request)
+    }
+
+    fn handle_interpret(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_interpret(request)
+    }
+
+    fn handle_law(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_law(request)
+    }
+
+    fn handle_conflict(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.inner.handle_conflict(request)
+    }
+
+    fn handle_custom(&mut self, request: &OpenRequest) -> HandlerResult {
+        Self::refuse_live(request)
+    }
+}
+
+/// Accept a covering witness by shape and bind a structural certificate.
 ///
 /// Completeness here is `examined == total`, `examined > 0`,
-/// `incomplete == false`, and a matching answer. This does **not** evaluate
-/// branch meaning. Use [`accept_covering_eval`] when a module and query are
-/// available. A claims digest is not covering proof.
+/// `incomplete == false`, a matching answer, and (when the case declares a
+/// nonempty completion product) `total` and `branches.len()` equal to that
+/// product. This does **not** evaluate branch meaning. The result is not
+/// covering (`!is_covering()`). Use [`accept_covering_eval`] when a module
+/// and query are available. A claims digest is not covering proof.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering(
     id: CompletionProofId,
@@ -29,8 +103,36 @@ pub fn accept_covering(
     answer: &Value,
     witness: CoverageWitness,
 ) -> Result<CheckedCertificate, String> {
-    witness_is_admissible(&witness, answer)?;
-    CheckedCertificate::verified_covering(
+    accept_covering_with_args(
+        id,
+        program,
+        snapshot,
+        case,
+        query,
+        ctx,
+        constraints,
+        answer,
+        witness,
+        &BTreeMap::new(),
+    )
+}
+
+/// [`accept_covering`] with query arguments bound into Structural claims.
+#[allow(clippy::too_many_arguments)]
+pub fn accept_covering_with_args(
+    id: CompletionProofId,
+    program: ModuleId,
+    snapshot: SourceSnapshotId,
+    case: &CaseRecord,
+    query: &QueryName,
+    ctx: &RunContext,
+    constraints: &BTreeSet<OpenRequest>,
+    answer: &Value,
+    witness: CoverageWitness,
+    args: &BTreeMap<String, Value>,
+) -> Result<CheckedCertificate, String> {
+    admit_witness_shape(case, &witness, answer)?;
+    CheckedCertificate::verified_structural_with_args(
         id,
         program,
         snapshot,
@@ -41,6 +143,7 @@ pub fn accept_covering(
         constraints,
         answer,
         witness,
+        args,
     )
 }
 
@@ -48,7 +151,7 @@ pub fn accept_covering(
 ///
 /// Shape completeness is not enough: [`check_branches`] must re-evaluate the
 /// query under every binding. Then [`CheckedCertificate::verified_covering`]
-/// binds the certificate.
+/// binds a FiniteReplay certificate (`is_covering()`).
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering_eval(
     id: CompletionProofId,
@@ -62,8 +165,42 @@ pub fn accept_covering_eval(
     answer: &Value,
     witness: CoverageWitness,
 ) -> Result<CheckedCertificate, String> {
-    check_branches(module, query, case, ctx, &witness, answer)?;
-    CheckedCertificate::verified_covering(
+    accept_covering_eval_with_args(
+        id,
+        program,
+        snapshot,
+        case,
+        query,
+        module,
+        ctx,
+        constraints,
+        answer,
+        witness,
+        &BTreeMap::new(),
+    )
+}
+
+/// [`accept_covering_eval`] with query arguments bound into FiniteReplay claims.
+///
+/// Finite coverage verification by replay: each branch is re-evaluated
+/// with [`evaluate`] under [`IsolatedReplay`]. The caller's `case` is not
+/// mutated.
+#[allow(clippy::too_many_arguments)]
+pub fn accept_covering_eval_with_args(
+    id: CompletionProofId,
+    program: ModuleId,
+    snapshot: SourceSnapshotId,
+    case: &CaseRecord,
+    query: &QueryName,
+    module: &CoreModule,
+    ctx: &RunContext,
+    constraints: &BTreeSet<OpenRequest>,
+    answer: &Value,
+    witness: CoverageWitness,
+    args: &BTreeMap<String, Value>,
+) -> Result<CheckedCertificate, String> {
+    check_branches_with_args(module, query, case, ctx, &witness, answer, args)?;
+    CheckedCertificate::verified_covering_with_args(
         id,
         program,
         snapshot,
@@ -74,6 +211,7 @@ pub fn accept_covering_eval(
         constraints,
         answer,
         witness,
+        args,
     )
 }
 
@@ -105,6 +243,64 @@ pub fn witness_is_admissible(witness: &CoverageWitness, answer: &Value) -> Resul
     Ok(())
 }
 
+fn admit_witness_shape(
+    case: &CaseRecord,
+    witness: &CoverageWitness,
+    answer: &Value,
+) -> Result<(), String> {
+    witness_is_admissible(witness, answer)?;
+    witness_matches_declared_space(case, witness)
+}
+
+/// Cartesian size of declared interpretation, choice, and evidence domains.
+///
+/// `None` when no domains are listed: that is not an extra constraint.
+/// An empty listed domain contributes size 0.
+fn declared_completion_product(case: &CaseRecord) -> Result<Option<usize>, String> {
+    let completions = &case.admissible_completions;
+    let mut sizes: Vec<usize> = Vec::new();
+    sizes.extend(completions.interpretations.values().map(Vec::len));
+    sizes.extend(completions.choices.values().map(Vec::len));
+    sizes.extend(
+        completions
+            .evidence
+            .values()
+            .map(|domain| domain.responses.len()),
+    );
+    if sizes.is_empty() {
+        return Ok(None);
+    }
+    let product = sizes
+        .into_iter()
+        .try_fold(1usize, |acc, size| acc.checked_mul(size))
+        .ok_or_else(|| "declared admissible completion product overflows usize".to_string())?;
+    Ok(Some(product))
+}
+
+/// Do not trust a claimed total larger than the declared model.
+fn witness_matches_declared_space(
+    case: &CaseRecord,
+    witness: &CoverageWitness,
+) -> Result<(), String> {
+    let Some(expected) = declared_completion_product(case)? else {
+        return Ok(());
+    };
+    if witness.total > expected {
+        return Err(format!(
+            "coverage witness total {} exceeds declared completion product {expected}",
+            witness.total
+        ));
+    }
+    if expected > 0 && (witness.total != expected || witness.branches.len() != expected) {
+        return Err(format!(
+            "coverage witness total {} / branches {} does not match declared completion product {expected}",
+            witness.total,
+            witness.branches.len()
+        ));
+    }
+    Ok(())
+}
+
 /// Re-evaluate each claimed world. Shape completeness is not covering.
 ///
 /// Rejects duplicate bindings, a determinate value other than the branch
@@ -117,7 +313,20 @@ pub fn check_branches(
     witness: &CoverageWitness,
     claimed: &Value,
 ) -> Result<(), String> {
-    witness_is_admissible(witness, claimed)?;
+    check_branches_with_args(module, query, base, ctx, witness, claimed, &BTreeMap::new())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn check_branches_with_args(
+    module: &CoreModule,
+    query: &QueryName,
+    base: &CaseRecord,
+    ctx: &RunContext,
+    witness: &CoverageWitness,
+    claimed: &Value,
+    args: &BTreeMap<String, Value>,
+) -> Result<(), String> {
+    admit_witness_shape(base, witness, claimed)?;
     if witness.branches.is_empty() {
         return Err("coverage witness has no branches".into());
     }
@@ -136,7 +345,7 @@ pub fn check_branches(
         if branch.answer != *claimed || branch.answer != witness.answer {
             return Err("coverage witness branch answer does not match claimed answer".into());
         }
-        check_branch_evaluation(module, query, base, ctx, branch)?;
+        check_branch_evaluation(module, query, base, ctx, branch, args)?;
     }
     Ok(())
 }
@@ -149,18 +358,24 @@ fn has_duplicate_worlds(branches: &[BranchClaim]) -> bool {
     })
 }
 
+/// Replay one claimed world against `evaluate`.
+///
+/// Finite coverage verification by replay. Isolation: a cloned
+/// [`CaseRecord`], [`IsolatedReplay`], and [`LegalState::new()`] (never
+/// `into_state` on the caller's record). Replay does not import
+/// `fidryn-adapt` and does not publish institutional state.
 fn check_branch_evaluation(
     module: &CoreModule,
     query: &QueryName,
     base: &CaseRecord,
     ctx: &RunContext,
     branch: &BranchClaim,
+    args: &BTreeMap<String, Value>,
 ) -> Result<(), String> {
-    let case = apply_branch_bindings(base, &branch.bindings);
-    let mut handler = CaseFile::new(case.clone());
-    let args = BTreeMap::new();
+    let cloned = apply_branch_bindings(base, &branch.bindings);
+    let mut handler = IsolatedReplay::new(cloned.clone());
     let state = LegalState::new();
-    match evaluate(module, query, &args, &state, ctx, &mut handler, &case) {
+    match evaluate(module, query, args, &state, ctx, &mut handler, &cloned) {
         Ok(Outcome::Determinate { value, .. }) => {
             if value != branch.answer {
                 return Err(format!(
@@ -210,8 +425,8 @@ mod tests {
     use super::*;
     use fidryn_core::ir::{CoreQuery, QueryPlan};
     use fidryn_core::{
-        Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId, PrimitiveType,
-        SourceManifestId, Term, Type,
+        CoverageMethod, Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId,
+        PrimitiveType, SourceManifestId, Term, TraceId, Type,
     };
 
     fn complete_witness(answer: Value) -> CoverageWitness {
@@ -333,19 +548,69 @@ mod tests {
         .expect("verified digest")
     }
 
+    fn ignored_issue() -> OpenRequest {
+        OpenRequest::NeedChoice {
+            protocol: "p".into(),
+            options: vec!["a".into(), "b".into()],
+        }
+    }
+
+    fn covering_shape(
+        case: &CaseRecord,
+        answer: &Value,
+        witness: CoverageWitness,
+    ) -> Result<CheckedCertificate, String> {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let query = QueryName::from("q");
+        let ctx = run_ctx();
+        let constraints = BTreeSet::new();
+        let id = CheckedCertificate::structural_claims_id(
+            program,
+            snapshot,
+            case,
+            &query,
+            ctx.valid_time,
+            ctx.record_time,
+            &constraints,
+            answer,
+            &witness,
+        )
+        .expect("structural claims id");
+        accept_covering(
+            id,
+            program,
+            snapshot,
+            case,
+            &query,
+            &ctx,
+            &constraints,
+            answer,
+            witness,
+        )
+    }
+
     fn covering_eval(
         module: &CoreModule,
         answer: &Value,
         witness: CoverageWitness,
     ) -> Result<CheckedCertificate, String> {
+        covering_eval_case(module, &CaseRecord::default(), answer, witness)
+    }
+
+    fn covering_eval_case(
+        module: &CoreModule,
+        case: &CaseRecord,
+        answer: &Value,
+        witness: CoverageWitness,
+    ) -> Result<CheckedCertificate, String> {
         let query = QueryName::from("q");
-        let case = CaseRecord::default();
         let ctx = run_ctx();
         let constraints = BTreeSet::new();
         let id = CheckedCertificate::covering_claims_id(
             module.id,
             module.snapshot,
-            &case,
+            case,
             &query,
             ctx.valid_time,
             ctx.record_time,
@@ -358,7 +623,7 @@ mod tests {
             id,
             module.id,
             module.snapshot,
-            &case,
+            case,
             &query,
             module,
             &ctx,
@@ -436,42 +701,28 @@ mod tests {
     }
 
     #[test]
-    fn test_accept_covering_with_complete_witness_returns_covering_certificate() {
-        let program = ModuleId::of(b"m");
-        let snapshot = SourceSnapshotId::of(b"s");
+    fn test_accept_covering_with_complete_witness_is_not_covering() {
         let case = CaseRecord::default();
-        let query = QueryName::from("q");
-        let t = at();
-        let ctx = RunContext::new(t, t);
-        let constraints = BTreeSet::new();
         let answer = Value::Int(7);
         let witness = complete_witness(answer.clone());
-        let id = CheckedCertificate::covering_claims_id(
-            program,
-            snapshot,
-            &case,
-            &query,
-            ctx.valid_time,
-            ctx.record_time,
-            &constraints,
-            &answer,
-            &witness,
-        )
-        .expect("covering claims id");
-        let cert = accept_covering(
-            id,
-            program,
-            snapshot,
-            &case,
-            &query,
-            &ctx,
-            &constraints,
-            &answer,
-            witness,
-        )
-        .expect("accept covering");
-        assert!(cert.is_covering());
-        assert!(!reject_digest_as_covering(&cert));
+        let cert = covering_shape(&case, &answer, witness).expect("accept covering");
+        assert_eq!(cert.method(), CoverageMethod::Structural);
+        assert!(!cert.is_covering());
+        assert!(reject_digest_as_covering(&cert));
+    }
+
+    #[test]
+    fn test_accept_covering_with_ignored_issues_cannot_build_determinate() {
+        let case = CaseRecord::default();
+        let answer = Value::Int(7);
+        let witness = complete_witness(answer.clone());
+        let cert = covering_shape(&case, &answer, witness).expect("accept covering");
+        assert!(!cert.is_covering());
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        let err = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored)
+            .expect_err("structural is not covering");
+        assert!(err.contains("covering"), "{err}");
     }
 
     #[test]
@@ -567,8 +818,38 @@ mod tests {
             vec![bool_branch(false, true), bool_branch(true, true)],
         );
         let cert = covering_eval(&module, &claimed, witness).expect("tautology covers");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
         assert!(cert.is_covering());
         assert!(!reject_digest_as_covering(&cert));
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        Outcome::determinate(claimed, TraceId::of(b"t"), Some(cert), ignored)
+            .expect("finite replay may ignore open issues");
+    }
+
+    #[test]
+    fn test_accept_covering_with_two_choice_domain_and_total_one_returns_err() {
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .choices
+            .insert("protocol".into(), vec!["a".into(), "b".into()]);
+        let answer = Value::Bool(true);
+        let witness = CoverageWitness {
+            examined: 1,
+            total: 1,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: vec![BranchClaim {
+                bindings: BTreeMap::new(),
+                answer: answer.clone(),
+            }],
+        };
+        let err = covering_shape(&case, &answer, witness)
+            .expect_err("declared two-choice space is not size 1");
+        assert!(
+            err.contains("declared") || err.contains("product") || err.contains("total"),
+            "{err}"
+        );
     }
 
     #[test]
@@ -577,5 +858,84 @@ mod tests {
         let cert = claims_digest_certificate(&answer);
         assert!(reject_digest_as_covering(&cert));
         assert!(!cert.is_covering());
+    }
+
+    #[test]
+    fn test_accept_covering_eval_does_not_mutate_original_case_record() {
+        let module = tautology_module();
+        let mut case = CaseRecord::default();
+        case.facts.insert("keep".into(), Value::Int(1));
+        case.events.push(fidryn_core::LedgerEvent {
+            kind: "evidence".into(),
+            valid_time: fidryn_core::Interval::always(),
+            record_time: at(),
+            payload: Value::Bool(true),
+        });
+        let before = case.clone();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(
+            true,
+            vec![bool_branch(false, true), bool_branch(true, true)],
+        );
+        covering_eval_case(&module, &case, &claimed, witness).expect("tautology covers");
+        assert_eq!(case, before);
+    }
+
+    #[test]
+    fn test_kernel_crate_has_no_fidryn_adapt_dependency() {
+        let manifest = include_str!("../Cargo.toml");
+        assert!(
+            !manifest.contains("fidryn-adapt"),
+            "fidryn-kernel must not depend on fidryn-adapt:\n{manifest}"
+        );
+    }
+
+    #[test]
+    fn test_isolated_replay_does_not_resume_file_or_publish() {
+        let mut handler = IsolatedReplay::new(CaseRecord::default());
+        for effect in ["file", "publish"] {
+            let request = OpenRequest::NeedCustom {
+                effect: effect.into(),
+                payload: "{}".into(),
+            };
+            match handler.handle(&request) {
+                HandlerResult::Resume { .. } => {
+                    panic!("isolated replay must not resume NeedCustom {effect}")
+                }
+                HandlerResult::Suspend { .. } | HandlerResult::Halt { .. } => {}
+            }
+        }
+    }
+
+    #[test]
+    fn test_structural_accept_covering_cannot_authorize_ignored_issues() {
+        let case = CaseRecord::default();
+        let answer = Value::Int(7);
+        let witness = complete_witness(answer.clone());
+        let cert = covering_shape(&case, &answer, witness).expect("accept covering");
+        assert_eq!(cert.method(), CoverageMethod::Structural);
+        assert!(!cert.is_covering());
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        let err = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored)
+            .expect_err("structural is not covering");
+        assert!(err.contains("covering"), "{err}");
+    }
+
+    #[test]
+    fn test_accept_covering_eval_can_authorize_ignored_issues() {
+        let module = tautology_module();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(
+            true,
+            vec![bool_branch(false, true), bool_branch(true, true)],
+        );
+        let cert = covering_eval(&module, &claimed, witness).expect("tautology covers");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        Outcome::determinate(claimed, TraceId::of(b"t"), Some(cert), ignored)
+            .expect("finite replay may ignore open issues");
     }
 }
