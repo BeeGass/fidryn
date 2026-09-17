@@ -14,6 +14,29 @@ The grammar is closed: unknown body fields are parse errors. Copy from
 an existing `.fr` file when you are unsure a spelling parses. The
 reference is [`grammar.ebnf`](../grammar.ebnf).
 
+
+## Surface inventory (status-qualified)
+
+The grammar ([`grammar.ebnf`](../grammar.ebnf)) is broader than this map.
+Use the table as a honesty check; open a fixture for the full field list.
+v0.1 support is **parsed / checked / executed** only where noted — see
+[implementation-status](implementation-status.md).
+
+| Construct | Fixture example | Status note |
+| --- | --- | --- |
+| `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed/checked; hex digests authenticate under CLI `check_path` |
+| `record_type` / `evidence_type` | FOIA / trust fixtures | Parsed/checked; used as named evidence schemas |
+| `observation` | LLC / state homestead modules | Parsed/checked; Observe matches schema + known-at |
+| `scenario` | all 50 `examples/states/` modules | In-module overlay fixtures; not JSON cases; not silent `run` defaults |
+| `Evaluate` / `UniqueOccupant` / `RunDecision` / `StatusOf` | trust, late-payment, LLC | Executed query plans |
+| `EvaluateClause` | `examples/prenup/ava-noah.fr` | Executed clause-plan queries |
+| `power` / `legal_act` / `clause` | trust, FOIA, prenup | Parsed/checked; specialized paths, not a general act engine |
+| `conflict_doctrine` | prenup, minimum-wage | Parsed; conflict outcomes/requests when staged effects disagree |
+| `transaction` | `tests/programs/transaction-atomic.fr` | Partial; not a full commit engine |
+| `for_all` / `exists` | status + grammar | Finite declared domains only; open domains suspend; no open-world proofs |
+| `fn` | grammar / status | Limited/partial; no current example declaration |
+| Module type parameters | status | Type-name substitution only; no cross-file value-parameter calculus |
+
 ## Module header
 
 Every file is one module. The header names the instrument, the dated
@@ -74,6 +97,25 @@ unauthenticated; digest-required imports fail with E200. Hex without
 readable bytes is not a fixture profile. The source-manifest JSON uses
 the same `"digest": "fixture"` versus hex distinction.
 
+
+## Imports
+
+Modules may import another module by name and version. Digests and aliases
+match the source-trust story above.
+
+```
+import MA.TrustLaw.Fixture version "2026-08-23"
+import Agency.FOIARegulations version "fixture-2026-08-23" {
+    digest fixture
+    alias FOIARegs
+}
+```
+
+CLI `check` / `run` of a path can byte-authenticate hex digests against
+artifacts under the module directory. `"digest": "fixture"` (or
+`digest fixture` in source) is a trust profile, not byte verification.
+Mill paste does not load manifests or artifact files.
+
 ## Entities, propositions, and offices
 
 Name the parties and the propositions you will later test. A
@@ -102,6 +144,37 @@ office TrusteeOf(trust: Trust) occupied_by LegalPerson {
 
 `Occupies(Bryan, TrusteeOf(BRT))` is a proposition about that office,
 not a `Bool`.
+
+
+## Record and evidence types
+
+Name structured payloads the case and Observe paths will carry.
+
+```
+record_type FOIARequest {
+    // fields as in examples/foia/foia-request.fr
+}
+
+evidence_type PhysicianCertificate {
+    // fields as in examples/trust/bryan-revocable-trust.fr
+}
+```
+
+These declarations are part of the closed grammar. Copy field shapes from
+an existing fixture rather than inventing spellings.
+
+## Observations
+
+An `observation` names an evidence-shaped fact the evaluator may Observe.
+
+```
+observation OfficialFilingObservation(record: OfficialFilingRecord)
+observation EndOfTenancy(record: TenancyRecord)
+```
+
+Observe still requires a matching case evidence row with `observedAt` at
+or before `--known-at`. Declaring an observation does not invent the
+record.
 
 ## Queries, goals, and effects
 
@@ -136,6 +209,15 @@ office. `RunDecision` runs a named `decision` against the case.
 `StatusOf` reports a legal status when present, or the closed-absent
 form when the domain is closed
 ([`harbor-robotics.fr`](../examples/massachusetts-llc/harbor-robotics.fr)).
+
+`EvaluateClause` is an additional query plan used by some instruments
+(for example [`examples/prenup/ava-noah.fr`](../examples/prenup/ava-noah.fr)):
+
+```
+query provision_result() -> ... ! {Observe, Determine, Interpret} {
+    goal EvaluateClause { /* clause plan */ }
+}
+```
 
 The effect row `! {Observe, Determine, Interpret}` is permission, not
 a promise that the engine will invent evidence. If the case does not
@@ -248,7 +330,10 @@ Determine` in a query. `Prop` has no conversion to `Bool`.
 ## Rules
 
 A `rule` fires when a guard holds, then derives or establishes a
-proposition. The kind is `derive`, `constitutive`, or `prescriptive`.
+proposition. The current staged worklist is **bounded and specialized**
+([implementation-status](implementation-status.md)); this is not a
+general rule engine, and prescriptive duties / full transaction commit
+are not that worklist. The kind is `derive`, `constitutive`, or `prescriptive`.
 
 ```
 rule InitialTrustee : constitutive
@@ -318,6 +403,24 @@ eligibility stays `suspended`, or becomes `contingent` under
 [CLI](cli.md) `explore` with declared bounds. It does not collapse to
 the first name on the list.
 
+
+## Powers, legal acts, clauses, and conflict doctrines
+
+These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
+They are **status-qualified**: parsed and checked, with specialized
+evaluation paths — not a general operational law engine. See
+[implementation-status](implementation-status.md).
+
+```
+power SettlorAmendmentPower { ... }
+legal_act AcceptOffice(candidate: LegalPerson, office: Office) { ... }
+conflict_doctrine ChildSupportCannotBeAdverselyAffected ...
+```
+
+When staged effects disagree and no unique doctrine applies, the outcome
+kind is `normConflict` (or a `needConflict` request). List order is never
+a silent tie-break.
+
 ## Duties
 
 A `duty` names bearer, claimant, attachment, content, and due time.
@@ -337,8 +440,10 @@ query obligation_status() -> String {
 }
 ```
 
-`duty_status(Name)` looks up that duty declaration plus the case. It
-does not invent performance. Status is one of `Unresolved`,
+`duty_status(Name)` looks up that duty declaration plus the case on the
+**implemented specialized duty path** (see late-payment fixtures and
+[implementation-status](implementation-status.md)). It does not invent
+performance and is not a general legal-duty / transaction engine. Status is one of `Unresolved`,
 `Attached`, `Performed`, `Breached`, `Cured`, `Discharged`. A late
 perform can remain `Performed` with `breached: true`. Changing
 `due 0 counted_days` to `due 15 counted_days` changes when the same
@@ -349,6 +454,40 @@ guard. A `kind: duty` event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit `assumption`. That gate is in
 [Cases and time](cases-and-time.md).
+
+
+## Transactions and quantifiers
+
+`transaction { ... }` blocks exist in the grammar and are exercised by
+`tests/programs/transaction-atomic.fr`. Support is **partial** — not a
+full atomic commit engine for arbitrary legal acts.
+
+`for_all` / `exists` quantify over **finite declared domains** (and
+closures where required). Open domains suspend. Nested / open-world
+theorem proving is not implemented. Prefer reading
+[implementation-status](implementation-status.md) before treating a
+quantified `verify` as a proved theorem.
+
+## Scenarios (in-module)
+
+A `scenario` block names overlay hypotheses for fixtures that do not
+ship companion JSON case files (for example under `examples/states/`).
+It is not a silent default for `run`.
+
+```
+scenario InsideCityHalfAcre {
+    assume OccupiesAsResidence(Owner, Home)
+    assume InsideMunicipality(Home)
+    assume within_urban_acreage(0.5)
+    at 2026-09-17T12:00:00-04:00
+}
+```
+
+Grammar: `ScenarioDecl` in [`grammar.ebnf`](../grammar.ebnf). Case JSON
+can carry analogous overlay rows as `assumptions` (`id`, `payload`);
+CLI `run --scenario` applies them, and the mill treats a nonempty
+`assumptions` list as scenario mode. Default operative `run` does not.
+See [Cases and time](cases-and-time.md) and [CLI](cli.md).
 
 ## Verify
 
