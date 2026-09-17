@@ -1,0 +1,14 @@
+[package]
+name = "fidryn-syntax"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn lexer, lossless CST, parser, and formatter"
+
+[dependencies]
+rowan.workspace = true
+thiserror.workspace = true
+fidryn-core.workspace = true

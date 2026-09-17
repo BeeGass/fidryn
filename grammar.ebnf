@@ -1,0 +1,338 @@
+(* Fidryn v0.1 closed grammar. Unknown body fields are parse errors. *)
+
+File            ::= Module EOF
+
+Module          ::= "module" QName "version" String "{" ModuleItem* "}"
+
+ModuleItem      ::= HeaderDecl
+                  | SourceDecl
+                  | ImportDecl
+                  | EntityDecl
+                  | TypeDecl
+                  | RecordTypeDecl
+                  | OfficeDecl
+                  | PropositionDecl
+                  | ObservationDecl
+                  | NominationDecl
+                  | FunctionDecl
+                  | EffectDecl
+                  | QuantifierDecl
+                  | RuleDecl
+                  | PowerDecl
+                  | DutyDecl
+                  | JudgmentDecl
+                  | DecisionDecl
+                  | LegalActDecl
+                  | ClauseDecl
+                  | InterpretationDecl
+                  | ConflictDoctrineDecl
+                  | QueryDecl
+                  | ScenarioDecl
+                  | VerifyDecl
+
+(* ----- headers ----- *)
+
+HeaderDecl      ::= "jurisdiction" QName End
+                  | "source_snapshot" String End
+                  | "source_manifest" String End
+                  | "effective_at" Date End
+                  | "recorded_at" DateTime End
+                  | "outside_scope" "{" IdentList "}"
+
+IdentList       ::= Ident (","? Ident)*
+
+(* ----- sources and imports ----- *)
+
+SourceDecl      ::= "source" Ident "{" SourceField* "}"
+SourceField     ::= "kind" Ident End
+                  | "authority" AuthorityExpr End
+                  | "citation" String End
+                  | "artifact" String End
+                  | "digest" Expr End
+                  | "effective" IntervalExpr End
+                  | "retrieved_at" DateTime End
+                  | "provision_intervals" "from" String End
+                  | "amendment" Expr End
+
+ImportDecl      ::= "import" QName "version" Value
+                    ("{" ImportField* "}")? End
+ImportField     ::= "digest" Expr End
+                  | "alias" Ident End
+
+AuthorityExpr   ::= Expr ("as" Expr)?
+                  | "{" ExprList "}"
+
+(* ----- entities, types, records, offices ----- *)
+
+EntityDecl      ::= "entity" Ident ":" Type End
+
+TypeDecl        ::= "type" Ident TypeParameters? "=" TypeBody End
+TypeParameters  ::= "<" Ident ("," Ident)* ">"
+TypeBody        ::= Type
+                  | VariantType
+VariantType     ::= Variant ("|" Variant)+
+Variant         ::= Ident ("{" FieldDecl* "}")?
+
+RecordTypeDecl  ::= ("record_type" | "evidence_type") Ident
+                    "{" FieldDecl* "}"
+FieldDecl       ::= Ident ":" Type End
+
+OfficeDecl      ::= "office" Signature "occupied_by" Type
+                    "{" OfficeField* "}"
+OfficeField     ::= "cardinality" Cardinality End
+                  | "acquired_by" Expr End
+                  | "suspended_by" Expr End
+                  | "lost_by" SetExpr End
+                  | "competence" SetExpr End
+Cardinality     ::= Int ".." (Int | "*")
+
+PropositionDecl ::= "proposition" Signature End
+
+ObservationDecl ::= "observation" Signature
+                    "establishes" Expr SourceRef? "{" ObservationField* "}"
+ObservationField::= "authenticate" Expr End
+                  | "require" Expr End
+                  | "valid_time" IntervalExpr End
+                  | "record_time" IntervalExpr End
+
+NominationDecl  ::= "nomination" Expr "for" Expr "rank" Int SourceRef? End
+
+FunctionDecl    ::= ("fn" | "calc") Signature "->" Type EffectRow? FuelClause? Block
+FuelClause      ::= "fuel" "=" Int
+FuelStmt        ::= "fuel" "=" Int End
+
+EffectDecl      ::= "effect" Ident "{" EffectField* "}"
+EffectField     ::= "request" "(" ParameterList? ")" "->" Type End
+
+QuantifierDecl  ::= QuantifierField
+QuantifierField ::= ("for_all" | "exists") Ident "in" Expr (":" Expr End | Block)
+QuantifierExpr  ::= ("for_all" | "exists") Ident "in" Expr ":" Expr
+
+(* ----- powers, duties, acts, clauses ----- *)
+
+PowerDecl       ::= "power" Ident Signature? SourceRef? "{" PowerField* "}"
+PowerField      ::= "holder" Expr End
+                  | "subject" Expr End
+                  | "effect" Expr End
+                  | "active_while" Expr End
+                  | "exercise_by" Expr End
+                  | "source" Expr End
+                  | "to" "constitute" Expr Block
+
+DutyDecl        ::= "duty" Ident Signature? SourceRef? "{" DutyField* "}"
+DutyField       ::= "bearer" Expr End
+                  | "claimant" Expr End
+                  | "attaches" "when" Expr End
+                  | "content" (Expr | Block) End?
+                  | "due" Expr End
+                  | "exclude_from_count" SetExpr End
+                  | "discharge_by" Expr End
+                  | "violation_when" Expr End
+                  | "source" Expr End
+
+ClauseDecl      ::= "clause" Ident Signature? SourceRef? "{" ClauseField* "}"
+ClauseField     ::= "when" Expr End
+                  | "then" ConsequenceStmt
+                  | "purport_to" ConsequenceStmt
+                  | "purports_to" ConsequenceStmt
+                  | "enforcement" "requires" Expr End
+                  | "subject_to" Expr End
+                  | "source" Expr End
+
+LegalActDecl    ::= "legal_act" Signature "{" ActField* "}"
+ActField        ::= "performer" Expr End
+                  | "performers" SetExpr End
+                  | "recipient" Expr End
+                  | "exercises" Expr End
+                  | "validity" "requires" Expr ("using" Ident)? End
+                  | "active_while" Expr End
+                  | "effect" ConsequenceStmt
+                  | "physical_effect" Expr End
+                  | "does_not_establish" Expr End
+                  | "defects" Block
+                  | "source" Expr End
+
+(* ----- rules ----- *)
+
+RuleDecl        ::= "rule" Ident ("(" ParameterList? ")")?
+                    ":" RuleKind SourceRef? "{" RuleStatement* "}"
+RuleKind        ::= "derive" | "constitutive" | "prescriptive"
+RuleStatement   ::= "when" Expr End
+                  | "then" ConsequenceStmt
+                  | "otherwise" ConsequenceStmt
+                  | "require" Expr End
+                  | "select" Selection
+                  | "source" Expr End
+Selection       ::= "unique"? Ident "from" Expr
+                    ("where" Expr)?
+                    ("order_by" OrderKey ("," OrderKey)*)? End
+OrderKey        ::= Ident ("ascending" | "descending")?
+
+ConsequenceStmt ::= ConsequenceOp Expr ("as_to" Expr)? End
+ConsequenceOp   ::= "establish" | "terminate" | "suspend"
+                  | "constitute" | "create" | "derive" | "activate"
+                  | "defeat" | "make"
+
+(* ----- judgments and decisions ----- *)
+
+JudgmentDecl    ::= "judgment" Signature "decides" Expr SourceRef?
+                    "{" JudgmentField* "}"
+JudgmentField   ::= "authority" Expr End
+                  | "primary_authority" Expr End
+                  | "record" "requires" RecordBind End
+                  | "record" "may_include" Expr End
+                  | "where" Expr End
+                  | "establish" "when" Expr End
+                  | "reject" "when" Expr End
+                  | "otherwise" Expr End
+                  | "on" Ident Block
+                  | "review" ReviewClause End
+                  | "burden_of_persuasion" Block
+                  | "court_finding" Expr End
+                  | "court" Expr End
+                  | "standard" Expr End
+                  | "decision_rule" Block
+                  | "constitutive_effect" Block
+                  | "duration" Expr End
+                  | "source" Expr End
+RecordBind      ::= Ident ":" Type
+
+DecisionDecl    ::= "decision" Signature ("->" Type)? "{" DecisionField* "}"
+DecisionField   ::= "authority" Expr End
+                  | "options" Expr End
+                  | "must_consider" SetExpr End
+                  | "must_not_consider" SetExpr End
+                  | "record" "requires" Expr End
+                  | "standard" Expr End
+                  | "output" Expr End
+                  | "returns" Expr ("when" Expr)? End
+                  | "review" ReviewClause End
+                  | "for" "each" Ident "in" Expr ":" DecisionField*
+                  | "when" Expr ":" DecisionField*
+                  | "require" Expr End
+                  | "source" Expr End
+                  | "choice_space" Expr End
+                  | "competent_when" Expr End
+ReviewClause    ::= "by" Expr ("under" Expr)?
+
+(* ----- interpretation and conflict ----- *)
+
+InterpretationDecl ::= "interpretation_family" Ident "for" Expr
+                       "{" InterpretationField* "}"
+InterpretationField::= "alternative" Ident Block
+                  | "admissibility" Expr End
+                  | "selector" Expr End
+                  | "defines" Expr "as" Expr End
+
+ConflictDoctrineDecl ::= "conflict_doctrine" Ident SourceRef?
+                         "{" ConflictField* "}"
+ConflictField   ::= "when" Expr End
+                  | "then" "defeat" Expr ("as_to" Expr)? End
+                  | "reason" Ident End
+
+(* ----- queries, scenarios, verify ----- *)
+
+QueryDecl       ::= "query" "automatic"? Signature "->" Type EffectRow?
+                    "{" QueryBody "}"
+QueryBody       ::= QueryStatement*
+QueryStatement  ::= "goal" QueryPlan Block
+                  | "require" Expr ("using" Ident)? End
+                  | "return" Expr End
+                  | QuantifierField
+EffectRow       ::= "!" "{" Ident ("," Ident)* "}"
+
+QueryPlan       ::= "UniqueOccupant"
+                  | "EvaluateClause"
+                  | "RunDecision"
+                  | "StatusOf"
+                  | "Evaluate"
+
+ScenarioDecl    ::= "scenario" Ident "{" ScenarioField* "}"
+ScenarioField   ::= "assume" Expr End
+                  | "at" DateTime End
+
+VerifyDecl      ::= "verify" Ident "{" VerifyField* "}"
+VerifyField     ::= "interpretations" Expr End
+                  | "judgments" Expr End
+                  | "choices" Expr End
+                  | "bounds" RecordExpr End
+                  | "assuming" Expr End
+                  | "assert" Expr End
+                  | QuantifierField
+                  | "for" "every" Expr ":" Expr End
+
+(* ----- shared ----- *)
+
+Signature       ::= Ident "(" ParameterList? ")"
+ParameterList   ::= Parameter ("," Parameter)*
+Parameter       ::= Ident ":" Type
+SourceRef       ::= "from" Expr
+Block           ::= "{" Statement* "}"
+Statement       ::= Expr End | DeclStatement | FuelStmt
+DeclStatement   ::= ModuleItem
+
+Type            ::= QName TypeArgs?
+                  | "FiniteSet" "<" Type ">"
+                  | "NonEmptySet" "<" Type ">"
+                  | "Option" "<" Type ">"
+                  | "Map" "<" Type "," Type ">"
+                  | "Duration" "<" Ident ">"
+                  | "Money" "<" Ident ">"
+                  | "Interval" "<" Type ">"
+TypeArgs        ::= "<" Type ("," Type)* ">"
+
+Expr            ::= Implication
+Implication     ::= Or ("=>" Or)*
+Or              ::= And ("or" And)*
+And             ::= Compare ("and" Compare)*
+Compare         ::= Add (CompareOp Add)?
+CompareOp       ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+Add             ::= Mul (("+" | "-") Mul)*
+Mul             ::= Unary (("*" | "/") Unary)*
+Unary           ::= "not" Unary | Postfix
+Postfix         ::= Primary (CallSuffix | MemberSuffix)*
+CallSuffix      ::= "(" ArgList? ")"
+MemberSuffix    ::= "." Ident
+Primary         ::= literal
+                  | QName
+                  | SetExpr
+                  | RecordExpr
+                  | IntervalExpr
+                  | "(" Expr ")"
+                  | MoneyLiteral
+                  | QuantifierExpr
+ArgList         ::= Arg ("," Arg)*
+Arg             ::= (Ident "=")? Expr
+                  | "..." Expr
+
+SetExpr         ::= "{" ExprList? "}"
+ExprList        ::= Expr ("," Expr)*
+RecordExpr      ::= "{" FieldAssign ("," FieldAssign)* ","? "}"
+FieldAssign     ::= Ident (":" | "=") Expr
+IntervalExpr    ::= "[" Expr "," Expr ("]" | ")")
+MoneyLiteral    ::= Ident "(" Decimal ")"   (* currency constructor, e.g. USD(500.00) *)
+
+QName           ::= Ident ("." Ident)*
+Ident           ::= [A-Za-z_] [A-Za-z0-9_]*
+String          ::= JSON-string
+Int             ::= "-"? [0-9]+
+Decimal         ::= "-"? [0-9]+ "." [0-9]+
+Date            ::= [0-9]{4} "-" [0-9]{2} "-" [0-9]{2}
+DateTime        ::= Date "T" TimeOfDay Offset?
+TimeOfDay       ::= [0-9]{2} ":" [0-9]{2} ":" [0-9]{2}
+Offset          ::= ("+" | "-") [0-9]{2} ":" [0-9]{2} | "Z"
+DurationLit     ::= Int DurationUnit
+DurationUnit    ::= "days" | "working_days" | "counted_days"
+                  | "calendar_days" | "hours" | "minutes" | "seconds"
+Infinity        ::= "+inf" | "-inf"
+End             ::= inserted-newline | ";"
+
+(* Automatic semicolon insertion: insert End at newline when delimiter
+   depth is zero, the previous token can end a statement, and the next
+   token is not a continuation: and, or, where, then, else, ".", ",". *)
+
+(* Reserved words: module, version, fn, calc, type, query, rule, when,
+   then, otherwise, and, or, not, in, from, for, return, returns.
+   All other declaration introducers are contextual keywords. *)
+
+(* "_" is legal only inside checked Prop / status / effect patterns. *)
