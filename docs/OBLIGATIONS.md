@@ -31,7 +31,7 @@ byte-verified.
 | Digest / program identity | Landed | `module_body_edit_invalidates_execution_cache`; `declared_empty_completion_domain_cannot_be_reopened_by_recorded_selection` | Run key hashes canonical CoreModule JSON. `ModuleId` is still name-derived. |
 | Artifact-byte authentication | Landed | `matching_blake3_hex_authenticates_required_import`; `mismatched_blake3_hex_is_e200`; `hex_digest_without_bytes_is_e200`; `fixture_digest_authenticates_required_import` | `"fixture"` is `TrustProfile::Fixture`, never `ByteVerified`. Hex without a readable file is E200. |
 | Verify pipeline (named literals) | Landed | `declared_true_property_survives_the_entire_compiler_pipeline` | Named `verify Trivial { assert true }` lowers. Only exact `true`/`false` literals are decided. |
-| Certificate covering | Landed | `test_check_branches_with_fabricated_false_world_returns_err`; `test_check_branches_with_duplicate_false_worlds_claiming_total_two_returns_err`; `test_accept_covering_eval_with_tautology_worlds_returns_covering_certificate`; digest-only `reject_digest_as_covering` | Shape-only `accept_covering` does not re-eval. `accept_covering_eval` checks each branch against `evaluate`. Kernel does not generate proofs. |
+| Certificate covering | Implemented (this suite) | kernel fabricated-witness / duplicate-world / tautology tests; `structural_accept_covering_cannot_authorize_ignored_issues`; `finite_replay_accept_covering_eval_can_authorize_ignored_issues`; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Shape-only `accept_covering` is Structural (`!is_covering()`). FiniteReplay is `accept_covering_eval`. Kernel still calls `evaluate`; an independent kernel without evaluate is Remaining. |
 | String / arity | Landed | `ordinary_string_returning_function_executes`; `function_arity_is_not_filled_from_caller_bindings` | Callee env starts empty; arity mismatch is `InvalidInput`. |
 
 Outcome schema `fidryn.outcome/v0.1` (`schemas/outcome-v0.1.json`) now
@@ -71,7 +71,7 @@ and not Determinate false unless a later declared result says so.
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| `seq` / `require` Core eval | Landed | `independent_program_require_true_is_determinate_seven`; `independent_program_require_false_is_not_determinate_seven`; `nested_seq_under_add_skips_completed_attach_on_resume` | Rule-body `require` is not stored. RememberingHandler still used for reusable observations. |
+| `seq` / `require` Core eval | Implemented | `independent_program_require_true_is_determinate_seven`; `independent_program_require_false_is_not_determinate_seven`; `nested_seq_under_add_skips_completed_attach_on_resume` | Nested seq is implemented in eval. This suite does not reimplement it. Rule-body `require` is not stored. RememberingHandler still used for reusable observations. |
 | Tax builtin | Landed | eval: missing-body helper is only `ordinary_income_tax`; other missing bodies are `Unsupported` | Closed-form `.fr` calc still used when a body exists. |
 | Records vs tagged values | Landed | `{"kind":"bool","data":false}` is Bool; `{"kind":"record","data":{…}}` is Map | Untagged objects still become `Value::Map`. RFC 8785 is not claimed. |
 
@@ -80,15 +80,15 @@ and not Determinate false unless a later declared result says so.
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
 | Duty status machine | Landed | eval `duty_step` tests: late perform keeps `breached`; illegal discharge commits nothing | History is in bindings/`duty:{name}`, not a full event ledger query API. |
-| Surface duty integration | Landed | `duty_status(PayInvoice)` from `.fr`; Unresolved / Attached / Breached / late Performed+breached; 15-day due stays Attached when 0-day is Breached | Not a full DutyInstance ledger API. Multi-step declared transactions are not a language construct. |
+| Surface duty integration | Implemented (this suite) | `duty_status(PayInvoice)` from `.fr`; `operative_duty_performed_event_without_grant_is_not_performed`; `scenario_assumption_can_report_performed_without_mutating_events`; `scenario_render_report_includes_execution_mode_and_assumptions`; `two_duty_instances_isolation`; `transaction_rollback`; `transaction_suspend_does_not_commit_prefix`; `attach_guard_unknown_is_unresolved_established_false_is_not_attached` | Source-driven due is implemented. Scenario overlay is `evaluate_scenario`, not operative `evaluate`. Surface transaction syntax is Remaining. |
 | Authority grants | Landed | `AuthorityGrant` + `covers`; eval `require_authority` suspends without a grant | Occupancy is still a separate UniqueOccupant path. No full delegation/revocation language. |
 
 ### 4. Reasoning / proofs
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| Covering certificates | Landed | fabricated `false→true` rejected; duplicate-world omission rejected; `b \|\| !b` covering accepted | Shape-only `accept_covering` still does not re-run evaluate. Digest is not covering. |
-| Streaming search | Landed | `stream_budget_one_on_two_by_two_exceeds_without_full_product`; `budget_exhaustion_is_unknown_not_convergent`; `counterexample_returns_before_remaining_space` | `enumerate` still collects a stream with a huge budget for existing tests. No SMT backend. |
+| Covering certificates | Implemented (this suite) | fabricated `false→true` rejected; duplicate-world omission rejected; `b \|\| !b` FiniteReplay accepted; Structural cannot `Outcome::determinate` with ignored issues; `empty_coverage_witness_cannot_cover_via_accept_covering_eval` | Digest is not covering. Kernel still depends on `evaluate`. Independent kernel without `evaluate` is Remaining. |
+| Streaming search | Landed | `stream_budget_one_on_two_by_two_exceeds_without_full_product`; `budget_exhaustion_is_unknown_not_convergent`; `counterexample_returns_before_remaining_space` | `enumerate` still collects a stream with a huge budget for existing tests. SMT is Remaining. |
 | Finite quantifiers | Partial | `for_all_over_closed_positive_set_is_true`; `for_all_open_ident_domain_without_closure_suspends` | Nested quantifiers and open-world proofs are not done. Quantifiers as a general language (not only `Term::Apply` over a closed `Value::Set`) remain incomplete. |
 
 A trusted evaluator may establish covering by exhaustive finite search.
@@ -100,11 +100,14 @@ The 2026-09-17 review is still **open**.
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| `fidryn-kernel` crate split | Landed | 12 kernel tests including fabricated-witness rejection | Not a proof generator. `accept_covering` is shape-only; `accept_covering_eval` checks meaning. |
-| `fidryn-driver` crate split | Landed | `run_report`; `check_path_matching_blake3_authenticates_and_tamper_is_e200` | Mill pasted source still uses `check` without files. Outcome JSON does not carry extra report fields (`additionalProperties: false`). |
-| CLI `check_path` byte-auth | Landed | `Driver::check_path` → `check_with_sources(..., parent_dir)`; tamper is E200 | In-memory `check_source` is not byte-verified. |
+| `fidryn-kernel` crate split | Implemented (this suite) | fabricated-witness rejection; Structural vs FiniteReplay determinate gate; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Not a proof generator. Independent kernel without `evaluate` is Remaining. |
+| `fidryn-driver` crate split | Landed | `run_report`; `check_path_matching_blake3_authenticates_and_tamper_is_e200`; `render_report_schema_is_evaluation_report_v0_1`; `scenario_report_is_not_outcome_only_export` | Mill pasted source still uses `check` without files. Report envelope is `fidryn.evaluation-report/v0.1`; outcome JSON stays a projection (`additionalProperties: false`). Mill must not gain filesystem from paste. |
+| CLI `check_path` byte-auth | Implemented (this suite) | `Driver::check_path` → `check_with_sources(..., parent_dir)`; tamper is E200; `render_report_schema_is_evaluation_report_v0_1`; `mill_pasted_run_is_unauthenticated_evaluation_report` | In-memory `compile_source` / mill paste is not byte-verified (`sourceTrust: unauthenticated`). Mill must not gain filesystem from paste. |
 | Cross-feature programs | Landed | `late-payment.fr` / `late-payment-extended.fr` / `require-gate.fr` duty_status lifecycle | Not closed through mill explore vs run as one envelope. |
 | Packages | Remaining | none | No package language, lock, or authenticated package digest. |
+| Salsa | Remaining | none | Driver memo is blake3 / canonical JSON, not the salsa crate. |
+| SMT | Remaining | none | Search is fidryn-solve enumerate/DPLL. No Z3. |
+| Independent kernel without `evaluate` | Remaining | none | `accept_covering_eval` / `check_branches` call `fidryn_eval::evaluate`. |
 
 Trust profiles `Fixture`, `ByteVerified`, `PolicyAccepted`, and
 `Unauthenticated` exist on `TrustProfile`. Evaluation reports carry a
@@ -126,5 +129,13 @@ profile; fixture execution must not be presented as byte-verified.
 | Evidence and authority scoping | Observe schema+subject+time; designated subject fields | `evidence_does_not_match_subject_by_incidental_issuer_field`; existing Observe tests | Wrong-authority matrix is still Partial. Grant calculus is Remaining (§3). |
 | Source authentication | check imports | `import_not_satisfied_by_unrelated_digest`; `digest_abc_does_not_authenticate_required_import` | `"fixture"` is a test policy. Tampered bytes after load are not a live rehash of every import file. See §1 artifact-byte authentication. |
 
+The four crate-level items **fabricated-witness**, **source-duty**, **nested seq**,
+and **CLI byte-auth** are implemented. This suite does not reimplement them.
+Remaining after that gate: independent kernel without `evaluate`, packages,
+Salsa, SMT, surface transaction syntax, mill must not gain filesystem from
+paste. The 2026-09-17 review stays **open**. Green tests are regressions,
+not language closure.
+
 Commands: `cargo test --workspace --offline` and `cargo clippy --workspace -- -D warnings`.
 `cargo test -p fidryn-cli --test adversarial_regressions` is the 16-test kit.
+`cargo test -p fidryn-cli --test integration_suite --offline` is the integration gate.
