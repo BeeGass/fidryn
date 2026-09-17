@@ -10,9 +10,10 @@
 use fidryn_check::check_with_sources;
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport, Outcome,
-    QueryName, RunContext, SourceManifest, Value, canonical_json,
+    QueryName, RunContext, SourceManifest, SourceManifestId, SourceSnapshotId, TrustProfile, Value,
+    canonical_json,
 };
-use fidryn_eval::evaluate;
+use fidryn_eval::{evaluate, evaluate_scenario, report_from_scenario};
 use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_syntax::ast::{HeaderKind, Item};
@@ -26,6 +27,7 @@ use std::path::{Path, PathBuf};
 pub struct Driver {
     check_cache: HashMap<CheckKey, Result<CoreModule, Vec<Diagnostic>>>,
     run_cache: HashMap<RunKey, Result<Outcome<Value>, EngineError>>,
+    source_trust: HashMap<(SourceSnapshotId, SourceManifestId), TrustProfile>,
     hits: u64,
     misses: u64,
 }
@@ -42,6 +44,7 @@ impl Driver {
         Self {
             check_cache: HashMap::new(),
             run_cache: HashMap::new(),
+            source_trust: HashMap::new(),
             hits: 0,
             misses: 0,
         }
@@ -107,6 +110,12 @@ impl Driver {
         }
         self.misses += 1;
         let result = compile_with_sources(source, manifest, source_root);
+        if let Ok(module) = &result {
+            self.source_trust.insert(
+                (module.snapshot, module.manifest),
+                source_trust_from_manifest(manifest, source_root),
+            );
+        }
         self.check_cache.insert(key, result.clone());
         result
     }
@@ -152,8 +161,12 @@ impl Driver {
 
     /// Evaluate `query` and wrap the outcome as [`EvaluationReport`].
     ///
-    /// Memoization is the same as [`Self::run`]; the report is derived from
-    /// the cached outcome.
+    /// [`Self::run`] stays operative (assumptions ignored for committed
+    /// status; the run cache stores those outcomes). Nonempty
+    /// `case.assumptions` selects [`fidryn_eval::evaluate_scenario`] and
+    /// `ExecutionMode::Scenario` so a case file cannot silently render as
+    /// an unconditional operative result. The caller's `case.events` is
+    /// not mutated.
     pub fn run_report(
         &mut self,
         module: &CoreModule,
@@ -172,8 +185,69 @@ impl Driver {
         ctx: &RunContext,
         args: &BTreeMap<String, Value>,
     ) -> Result<EvaluationReport<Value>, EngineError> {
-        self.run_with_args(module, query, case, ctx, args)
-            .map(EvaluationReport::from_outcome)
+        self.finish_run_report(module, query, case, ctx, args, false)
+    }
+
+    /// Like [`Self::run_report`], always as a scenario overlay.
+    ///
+    /// Used by CLI `--scenario`. Nonempty `case.assumptions` already take
+    /// this path from [`Self::run_report`].
+    pub fn run_report_scenario(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.run_report_scenario_with_args(module, query, case, ctx, &BTreeMap::new())
+    }
+
+    pub fn run_report_scenario_with_args(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.finish_run_report(module, query, case, ctx, args, true)
+    }
+
+    fn finish_run_report(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+        scenario: bool,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        let scenario = scenario || !case.assumptions.is_empty();
+        if scenario {
+            let outcome = evaluate_scenario_run(module, query, args, case, ctx)?;
+            let mut report = report_from_scenario(outcome, case.assumptions.clone());
+            report.trust = self.source_trust_of(module);
+            Ok(report)
+        } else {
+            self.run_with_args(module, query, case, ctx, args)
+                .map(|outcome| {
+                    let mut report = EvaluationReport::from_outcome(outcome);
+                    report.trust = self.source_trust_of(module);
+                    report
+                })
+        }
+    }
+
+    /// Trust recorded when this driver compiled `module`.
+    ///
+    /// In-memory compile is unauthenticated unless an artifact digest is
+    /// `"fixture"`. Path compile with a matching hex digest is byte-verified.
+    /// Unknown modules are unauthenticated.
+    pub fn source_trust_of(&self, module: &CoreModule) -> TrustProfile {
+        self.source_trust
+            .get(&(module.snapshot, module.manifest))
+            .copied()
+            .unwrap_or(TrustProfile::Unauthenticated)
     }
 }
 
@@ -181,6 +255,33 @@ impl Default for Driver {
     fn default() -> Self {
         Self::new()
     }
+}
+
+fn source_trust_from_manifest(
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+) -> TrustProfile {
+    let mut any_fixture = false;
+    let mut any_hex = false;
+    for artifact in &manifest.artifacts {
+        let digest = artifact.digest.trim();
+        if digest.eq_ignore_ascii_case("fixture") {
+            any_fixture = true;
+        } else if is_plausible_hex_digest(digest) {
+            any_hex = true;
+        }
+    }
+    if any_fixture {
+        TrustProfile::Fixture
+    } else if any_hex && source_root.is_some() {
+        TrustProfile::ByteVerified
+    } else {
+        TrustProfile::Unauthenticated
+    }
+}
+
+fn is_plausible_hex_digest(digest: &str) -> bool {
+    matches!(digest.len(), 32 | 64) && digest.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
 fn compile_with_sources(
@@ -209,6 +310,29 @@ fn evaluate_run(
         known_at: Some(ctx.record_time),
     };
     evaluate(
+        module,
+        &QueryName::from(query),
+        args,
+        &state,
+        ctx,
+        &mut handler,
+        case,
+    )
+}
+
+fn evaluate_scenario_run(
+    module: &CoreModule,
+    query: &str,
+    args: &BTreeMap<String, Value>,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Result<Outcome<Value>, EngineError> {
+    let state = case.into_state();
+    let mut handler = CaseFile {
+        record: case.clone(),
+        known_at: Some(ctx.record_time),
+    };
+    evaluate_scenario(
         module,
         &QueryName::from(query),
         args,
@@ -416,7 +540,7 @@ fn parse_manifest_json(text: &str, path: &Path) -> Result<SourceManifest, Vec<Di
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::{Instant, QueryPlan, Term};
+    use fidryn_core::{Assumption, ExecutionMode, Instant, QueryPlan, Term, TrustProfile};
     use std::time::{SystemTime, UNIX_EPOCH};
 
     fn bool_query(literal: &str) -> String {
@@ -618,6 +742,9 @@ module Regression version "0.1.0" {
             .run_report(&module, "q", &case, &ctx())
             .expect("report");
         assert_eq!(report.outcome, outcome);
+        assert_eq!(report.trust, TrustProfile::Unauthenticated);
+        assert_eq!(report.execution_mode, ExecutionMode::Operative);
+        assert!(report.assumptions.is_empty());
         match report.outcome {
             Outcome::Determinate {
                 value: Value::Bool(true),
@@ -625,6 +752,170 @@ module Regression version "0.1.0" {
             } => {}
             other => panic!("expected determinate true, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn run_stays_operative_when_case_has_assumptions() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-1".into(),
+            payload: Value::Bool(true),
+        });
+        let events_before = case.events.clone();
+        let outcome = driver.run(&module, "q", &case, &ctx()).expect("run");
+        assert_eq!(case.events, events_before);
+        match outcome {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("operative run must stay determinate true, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn run_report_with_assumptions_is_scenario_and_preserves_events() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-1".into(),
+            payload: Value::Bool(true),
+        });
+        let events_before = case.events.clone();
+        let report = driver
+            .run_report(&module, "q", &case, &ctx())
+            .expect("report");
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(report.assumptions, case.assumptions);
+        assert_eq!(report.trust, TrustProfile::Unauthenticated);
+        assert_eq!(case.events, events_before);
+        match report.outcome {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("expected determinate true, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn run_report_scenario_flag_is_scenario_with_empty_assumptions() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let case = CaseRecord::default();
+        let report = driver
+            .run_report_scenario(&module, "q", &case, &ctx())
+            .expect("report");
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        assert!(report.assumptions.is_empty());
+        assert_eq!(report.trust, TrustProfile::Unauthenticated);
+    }
+
+    #[test]
+    fn check_source_trust_remains_unauthenticated() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        assert_eq!(
+            driver.source_trust_of(&module),
+            TrustProfile::Unauthenticated
+        );
+    }
+
+    #[test]
+    fn run_report_fixture_digest_is_fixture_trust() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    import Other.Law version "1" { digest "fixture" }
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: "fixture".into(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let mut driver = Driver::new();
+        let module = driver.check_source(src, &manifest).expect("compile");
+        let report = driver
+            .run_report(&module, "q", &CaseRecord::default(), &ctx())
+            .expect("report");
+        assert_eq!(report.trust, TrustProfile::Fixture);
+        assert_eq!(driver.source_trust_of(&module), TrustProfile::Fixture);
+    }
+
+    #[test]
+    fn run_report_path_hex_digest_is_byte_verified() {
+        let dir = temp_module_dir("report-bytes");
+        let bytes = b"fidryn-source-bytes";
+        let digest = blake3::hash(bytes).to_hex().to_string();
+        fs::write(dir.join("Other.Law"), bytes).expect("write artifact");
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: digest.clone(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        fs::write(
+            dir.join("sources").join("manifest.json"),
+            serde_json::to_string(&manifest).expect("manifest json"),
+        )
+        .expect("write manifest");
+        let src = format!(
+            r#"
+module Examples.ImpBytes version "0.1.0" {{
+    import Other.Law version "1" {{ digest "{digest}" }}
+    query ok() -> Bool {{
+        goal Evaluate {{ true }}
+    }}
+}}
+"#
+        );
+        let path = dir.join("m.fr");
+        fs::write(&path, &src).expect("write module");
+        let mut driver = Driver::new();
+        let (module, _) = driver.check_path(&path).expect("check");
+        let report = driver
+            .run_report(&module, "ok", &CaseRecord::default(), &ctx())
+            .expect("report");
+        assert_eq!(report.trust, TrustProfile::ByteVerified);
+        let memory = Driver::new()
+            .check_source(&src, &manifest)
+            .expect_err("in-memory hex is not byte-verified");
+        assert!(
+            memory.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{memory:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
