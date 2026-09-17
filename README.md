@@ -1,56 +1,87 @@
 # Fidryn
 
-Fidryn (FID-rin) is a programming language for legal instruments: precise
-where law is mechanical, explicit where judgment enters, and incapable of
-hiding authority, discretion, or ambiguity inside a Boolean.
+Fidryn (pronounced **FID-rin**) is a programming language for legal
+instruments: precise where law is mechanical, explicit where judgment
+enters, and incapable of hiding authority, discretion, or ambiguity
+inside a Boolean.
 
-This repository is the v0.1 reference interpreter. It is a research fixture,
-not legal advice, not an operative instrument, and not a complete statement
-of any jurisdiction's law. The modules under `examples/` and the records
-under `tests/` are fixtures for the interpreter. They are not legal advice.
+This repository is the v0.1 **reference interpreter**. It is a research
+fixture, not legal advice, not an operative instrument, and not a
+complete statement of any jurisdiction's law. Modules under `examples/`
+and programs under `tests/` exist to exercise the interpreter.
 
 Source files use the `.fr` extension.
 
-## Governing rule: no false determinacy
+**Documentation:** [docs/README.md](docs/README.md) — start with
+[Getting started](docs/getting-started.md).
 
-A legal computation may return one determinate result only when that result
+## No false determinacy
+
+A computation may return one determinate result only when that result
 is invariant across every still-admissible resolution of the unresolved
-issues, or when a competent authority has already made a determination that
-is operative in the relevant context.
+issues, or when a competent authority has already made a determination
+that is operative in the relevant context.
 
-`Determinate` additionally requires a nonempty exhaustive completion set.
-An empty set is `Inconsistent` or `Suspended`, never a vacuous determinate
-answer. Open branches without a checked convergence certificate yield
-`Suspended`. `run` never chooses a completion. Every outcome carries the
-declared `modelBoundary` so omitted interpretations cannot silently shrink
-the model.
+`run` never chooses a completion. An empty completion set is not a
+vacuous determinate answer. Open branches without a covering certificate
+stay `Suspended`. Every outcome carries the declared `modelBoundary`.
 
-## Build
+## Quick start
 
-Rust 1.98 (workspace `rust-version` is 1.98; `rust-toolchain.toml` pins the
-patch). Edition 2024. On this Mac, `.cargo/config.toml` points at Command
-Line Tools clang because the Xcode license is unsigned.
+Rust 1.98 (`rust-toolchain.toml` pins the patch). From the repository
+root:
 
 ```
-cargo test
-cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
+cargo test --workspace --offline
+cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 ```
 
-Example modules live under `examples/` (see `examples/README.md`). They encode
-bounded high-impact slices of federal, state, and everyday law. They do
-not contain the entire United States Code.
+Install the binary:
 
-## CLI
+```
+cargo install --path crates/fidryn-cli
+fidryn check examples/trust/bryan-revocable-trust.fr
+```
 
-The binary name is `fidryn`.
+Run a query against a case record (RFC 3339 times are required):
+
+```
+fidryn run examples/tax/federal-tax.fr \
+  --query tax_on \
+  --case examples/tax/cases/ordinary-income.json \
+  --valid-at 2034-03-01T09:00:00Z \
+  --known-at 2034-03-01T09:00:00Z
+```
+
+Local mill (loopback only, default port 8751):
+
+```
+fidryn ui --no-open
+```
+
+Then open `http://127.0.0.1:8751`. See [the mill guide](docs/mill.md).
+
+## What to read next
+
+| If you want to… | Read |
+| --- | --- |
+| Check and run a first module | [Getting started](docs/getting-started.md) |
+| Write `.fr` | [Language](docs/language.md) |
+| Use every subcommand | [CLI](docs/cli.md) |
+| Supply facts and evidence | [Cases and time](docs/cases-and-time.md) |
+| Interpret `Determinate` vs `Suspended` | [Outcomes](docs/outcomes.md) |
+| Browse fixtures | [Examples](docs/examples.md) |
+| Change the interpreter | [Contributing](docs/contributing.md) |
+
+## CLI at a glance
+
+The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 
 ```
 fidryn fmt PATH
 fidryn check PATH
-fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
-    [--arg KEY=VALUE]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json
-    --valid-at TIME --known-at TIME
+fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] --valid-at TIME --known-at TIME
 fidryn explain TRACE_ID --format text|json|dot
 fidryn verify PATH --property NAME
 fidryn diff OLD_SNAPSHOT NEW_SNAPSHOT --query NAME
@@ -59,53 +90,41 @@ fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint
 fidryn ui [--port N] [--no-open]
 ```
 
-`run` never chooses a completion. `--arg provision=...` sets
-`case.facts["provision"]`. `--valid-at` and `--known-at` are ISO 8601 /
-RFC 3339 timestamps (`2033-01-01T00:00:00Z` or a numeric offset such as
-`+00:00`). `explore` requires explicit finite bounds.
+`--arg provision=...` writes `case.facts["provision"]`. Times are ISO 8601
+/ RFC 3339. `explore` searches only the declared finite completion space.
+`file` is dry-run unless both `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`
+are set; a transport receipt is not a `Filed` fact.
 
-`render` interpolates Core fields (`{{module}}`, `{{version}}`,
-`{{outside_scope}}`) into a template. Missing keys fail closed (exit 1).
-Templates under `templates/certified/` are the only ones treated as
-certified interpolations; they still cannot invent legal content.
+## Examples
 
-`diff` compiles `.fr` snapshots or reads JSON outcomes and prints
-canonical JSON `{added, removed, changed}` of query and module names.
+Bounded high-impact slices, not the United States Code:
 
-`explain` loads `TRACE_ID.json` when that file exists; otherwise it
-prints the hashed `TraceId` as text, JSON, or DOT. JSON always includes
-a `nodes` array. The array is empty only when no persisted DAG was
-loaded.
+- Trust successor occupancy: `examples/trust/bryan-revocable-trust.fr`
+- Federal ordinary-income tax: `examples/tax/federal-tax.fr`
+- Fifty-state corpus: `examples/states/` (quality bar: Florida homestead)
+- Independent programs: `tests/programs/` (require-gate, late-payment)
 
-## Mill
+Catalog: [docs/examples.md](docs/examples.md) and
+[examples/README.md](examples/README.md).
 
-`fidryn ui [--port N] [--no-open]` binds a mill on **127.0.0.1 only**
-(default port 8751). It serves `web/index.html` and exposes
-`GET /api/health` and `POST /api/check`. Check a module in the browser.
-Run, explore, and render remain CLI commands.
+## Crates
 
-The mill does not live-file. There is no filing route. This build does
-not link an opener crate; `--no-open` skips any browser launch.
+| Crate | Role |
+| --- | --- |
+| `fidryn-syntax` | Lexer, parser, Rowan CST, formatter |
+| `fidryn-hir` | Names, imports, elaboration |
+| `fidryn-check` | Types, effects, import authentication |
+| `fidryn-core` | IR, values, outcomes, legal state |
+| `fidryn-eval` | Worklist evaluator |
+| `fidryn-handlers` | CaseFile, Explore, Skeptical |
+| `fidryn-verify` | Determinacy search |
+| `fidryn-kernel` | Covering-certificate checks |
+| `fidryn-solve` | Streamed finite-domain search |
+| `fidryn-driver` | Compile and run session |
+| `fidryn-trace` | Outcome JSON and traces |
+| `fidryn-render` | Constrained templates |
+| `fidryn-adapt` | Filing adapters |
+| `fidryn-cli` | `fidryn` binary and mill |
 
-`fidryn file` dry-runs by default. Live HTTP requires both `--live` and
-`FIDRYN_ALLOW_LIVE_FILING=1`. A successful transport receipt is not a
-`Filed` legal fact.
-
-## Crate layout
-
-```
-fidryn-syntax          lossless CST, parser, formatter
-fidryn-core            IR, types, Outcome, LegalState, diagnostics
-fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
-fidryn-eval            worklist evaluator (core)
-fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
-fidryn-verify          bounded explorer and invariants (eval + handlers)
-fidryn-trace           DAG, canonical JSON, source maps (core)
-fidryn-render          constrained templates (missing keys fail closed)
-fidryn-adapt           capability-gated filing adapters
-fidryn-solve           bounded DPLL over declared finite domains
-fidryn-cli             fidryn binary and localhost mill
-```
-
-See `docs/ARCHITECTURE.md` and `grammar.ebnf`.
+Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is
+actually implemented: [docs/implementation-status.md](docs/implementation-status.md).

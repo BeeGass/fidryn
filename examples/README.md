@@ -1,5 +1,8 @@
 # Fidryn example corpus
 
+A browseable catalog with copy-paste `check` / `run` commands is
+[docs/examples.md](../docs/examples.md).
+
 These modules are research fixtures. They are not legal advice, not a
 complete statement of any jurisdiction's law, and not operative
 instruments. Every module names the dated source slice it encodes and
