@@ -14,15 +14,20 @@ Required properties are `schema` and `admissibleCompletions`. Everything
 else may be omitted and defaults to empty. The published schema lists
 `schema`, `module`, `facts`, `evidence`, `determinations`,
 `interpretations`, `decisions`, `closures`, `outsideScope`, and
-`admissibleCompletions`. The interpreter also reads an `events` array
-when it is present.
+`admissibleCompletions`. The interpreter also reads `events` and
+`assumptions` when present; those fields are not yet in
+[`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json)
+(`additionalProperties` is false there). Treat that published schema lag
+as an evidence gap in
+[implementation-status](implementation-status.md), not as CLI behavior.
 
 ## Supplying a case
 
 Pass a JSON file to `fidryn run` or `fidryn explore`:
 
 ```
-fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
+fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME \
+    [--arg KEY=VALUE] [--scenario]
 fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
     --valid-at TIME --known-at TIME
 ```
@@ -30,11 +35,34 @@ fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
 `TIME` is ISO 8601 / RFC 3339 with a `Z` suffix or a numeric offset
 (`2033-01-01T00:00:00Z`, `2033-01-01T00:00:00+00:00`). Equal instants
 canonicalize to UTC. `run` never chooses a missing completion. `--arg
-KEY=VALUE` writes `case.facts["KEY"]`. `explore --bounds` merges extra
-declared domains into `admissibleCompletions`.
+KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
+`case.assumptions` as an overlay. `explore --bounds` merges extra
+declared domains into `admissibleCompletions`. Successful `run` /
+`explore` stdout is `fidryn.evaluation-report/v0.1`.
 
-See [CLI](../README.md#cli), the [language grammar](../grammar.ebnf), and
+See [CLI](cli.md), the [language grammar](../grammar.ebnf), and
 [Outcomes](outcomes.md).
+
+## Assumptions and scenario evaluation
+
+`Assumption` rows are `{ "id": "...", "payload": ... }`. They are overlay
+hypotheses, not operative ledger events.
+
+- CLI `run` without `--scenario` is **operative**: `case.assumptions` are
+  ignored for evaluation.
+- CLI `run --scenario` applies those rows as a scenario overlay and labels
+  the report `executionMode: scenario` (assumptions are serialized on the
+  evaluation-report envelope).
+- Mill `/api/run` and `/api/explore` have no `--scenario` flag; a nonempty
+  `assumptions` array selects the scenario path automatically.
+
+The published interchange schema
+[`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json) does
+not yet list `events` or `assumptions` (`additionalProperties` is false).
+The interpreter still reads both when present. Treat that as schema lag /
+an implementation extension documented in
+[implementation-status](implementation-status.md), not as proof that the
+fields are invalid at runtime.
 
 ## Record shape
 
@@ -51,6 +79,7 @@ See [CLI](../README.md#cli), the [language grammar](../grammar.ebnf), and
 | `admissibleCompletions` | The declared finite model. This is the model boundary, not a hint. |
 | `outsideScope` | Named exclusions. The outcome envelope unions these with the module's `outside_scope`. |
 | `events` | Optional ledger rows (`kind`, `validTime`, `recordTime`, `payload`). |
+| `assumptions` | Optional overlay hypotheses (`id`, `payload`). Not operative case state. CLI `run --scenario` applies them; mill `/api/run` and `/api/explore` treat a nonempty list as scenario mode. Default `run` without `--scenario` leaves them unused. |
 
 `admissibleCompletions` has three maps:
 
