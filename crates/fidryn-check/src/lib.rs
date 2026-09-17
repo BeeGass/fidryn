@@ -7,7 +7,7 @@ use fidryn_core::ir::{
 };
 use fidryn_core::patterns::{LegalStatusPattern, TermPattern};
 use fidryn_core::time::Interval;
-use fidryn_core::types::{PrimitiveType, Sort, Type};
+use fidryn_core::types::{PrimitiveType, Sort, Type, is_subtype};
 use fidryn_core::value::{BinOp, PropTerm, Term};
 use fidryn_core::{
     ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ManifestArtifact,
@@ -16,7 +16,7 @@ use fidryn_core::{
     package_name_from_import, package_path_matches_import, packages_root,
 };
 use fidryn_hir::{
-    HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
+    HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
     collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
     source_has_bare_prop_if, split_qname_type_args, term_as_name, term_has_bare_prop_guard,
 };
@@ -137,7 +137,7 @@ fn check_module(
     if has_errors(&diagnostics) {
         return Err(diagnostics);
     }
-    let mut core = lower(hir, manifest);
+    let mut core = lower(hir, manifest, &linked.functions);
     merge_linked_modules(&mut core, &linked.modules, &mut diagnostics);
     if has_errors(&diagnostics) {
         return Err(diagnostics);
@@ -250,11 +250,16 @@ fn check_queries(
     diagnostics: &mut Vec<Diagnostic>,
 ) {
     let propositions: BTreeSet<String> = hir.propositions.keys().cloned().collect();
-    let inferred = infer_module_effects(hir);
+    let inferred = infer_module_effects(hir, imported_functions);
     let mut functions = hir.functions.clone();
     for (name, function) in imported_functions {
         functions.entry(name.clone()).or_insert(function.clone());
     }
+    let entities: BTreeMap<String, Type> = hir
+        .entities
+        .iter()
+        .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+        .collect();
     for q in hir.queries.values() {
         if !query_declares_goal(q) {
             diagnostics.push(Diagnostic::new(
@@ -279,21 +284,18 @@ fn check_queries(
             let cx = TypeCheck {
                 functions: &functions,
                 propositions: &propositions,
+                entities: &entities,
+                effects: &hir.effects,
                 locals: &locals,
                 owner: &q.name,
             };
-            if let Some(actual) = cx.infer(term, diagnostics) {
-                let expected = parse_type_name(&q.result_type);
-                if !types_compatible(&expected, &actual) {
-                    diagnostics.push(Diagnostic::new(
-                        DiagnosticCode::E210,
-                        format!(
-                            "query `{}` returns {actual} but is declared to return {expected}",
-                            q.name
-                        ),
-                    ));
-                }
-            }
+            cx.check_result(
+                term,
+                &parse_type_name(&q.result_type),
+                "query",
+                true,
+                diagnostics,
+            );
         }
     }
     for f in hir.functions.values() {
@@ -310,22 +312,18 @@ fn check_queries(
         let cx = TypeCheck {
             functions: &functions,
             propositions: &propositions,
+            entities: &entities,
+            effects: &hir.effects,
             locals: &locals,
             owner: &f.name,
         };
-        let Some(actual) = cx.infer(body, diagnostics) else {
-            continue;
-        };
-        let expected = parse_type_name(&f.result_type);
-        if !types_compatible(&expected, &actual) {
-            diagnostics.push(Diagnostic::new(
-                DiagnosticCode::E210,
-                format!(
-                    "function `{}` returns {actual} but is declared to return {expected}",
-                    f.name
-                ),
-            ));
-        }
+        cx.check_result(
+            body,
+            &parse_type_name(&f.result_type),
+            "function",
+            false,
+            diagnostics,
+        );
     }
 }
 
@@ -383,18 +381,59 @@ fn query_result_term(q: &HirQuery) -> Option<&Term> {
 struct TypeCheck<'a> {
     functions: &'a BTreeMap<String, HirFunction>,
     propositions: &'a BTreeSet<String>,
+    entities: &'a BTreeMap<String, Type>,
+    effects: &'a BTreeMap<String, HirEffect>,
     locals: &'a BTreeMap<String, Type>,
     owner: &'a str,
 }
 
 impl TypeCheck<'_> {
+    fn check_result(
+        &self,
+        term: &Term,
+        expected: &Type,
+        item: &str,
+        allow_case_bindings: bool,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        let before = diagnostics.len();
+        match self.infer(term, diagnostics) {
+            Some(actual) => {
+                if !types_compatible_in(self.owner, expected, &actual) {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!(
+                            "{item} `{}` returns {actual} but is declared to return {expected}",
+                            self.owner
+                        ),
+                    ));
+                }
+            }
+            None if diagnostics.len() > before => {}
+            None if allow_case_bindings && result_may_be_open(term) => {}
+            None => {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "{item} `{}` has an untyped result but is declared to return {expected}",
+                        self.owner
+                    ),
+                ));
+            }
+        }
+    }
+
     fn infer(&self, term: &Term, diagnostics: &mut Vec<Diagnostic>) -> Option<Type> {
         match term {
             Term::Bool(_) => Some(Type::bool()),
             Term::Int(_) => Some(Type::Primitive(PrimitiveType::Int)),
             Term::Decimal(_) => Some(Type::Primitive(PrimitiveType::Decimal)),
             Term::String(_) => Some(Type::Primitive(PrimitiveType::String)),
-            Term::Ident(name) => self.infer_ident(name),
+            Term::Instant(_) => Some(Type::Primitive(PrimitiveType::Time)),
+            Term::Duration(_) => Some(Type::Primitive(PrimitiveType::Duration {
+                calendar: "counted_days".into(),
+            })),
+            Term::Ident(name) | Term::Binder(name) => self.infer_ident(name),
             Term::Binary { op, left, right } => self.infer_binary(*op, left, right, diagnostics),
             Term::If { cond, then, else_ } => {
                 self.check_bool_condition("if", cond, diagnostics);
@@ -403,7 +442,18 @@ impl TypeCheck<'_> {
             Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
                 self.infer_apply(ctor, args, diagnostics)
             }
-            _ => None,
+            Term::Field { base, .. } => {
+                let _ = self.infer(base, diagnostics);
+                None
+            }
+            Term::Set(xs) => self.infer_set(xs, diagnostics),
+            Term::Record(fields) => {
+                for value in fields.values() {
+                    let _ = self.infer(value, diagnostics);
+                }
+                None
+            }
+            Term::Wildcard => None,
         }
     }
 
@@ -411,8 +461,14 @@ impl TypeCheck<'_> {
         if let Some(ty) = self.locals.get(name) {
             return Some(ty.clone());
         }
+        if let Some(ty) = self.entities.get(name) {
+            return Some(ty.clone());
+        }
         if self.propositions.contains(name) {
             return Some(Type::prop());
+        }
+        if let Some(effect) = self.effects.get(name) {
+            return Some(parse_type_name(&effect.result_type));
         }
         None
     }
@@ -448,6 +504,10 @@ impl TypeCheck<'_> {
             }
             return Some(Type::bool());
         }
+        if is_proposition_modal(ctor) {
+            self.check_modal_proposition(ctor, args, diagnostics);
+            return Some(Type::bool());
+        }
         if is_modal_ctor(ctor) {
             for arg in args {
                 let _ = self.infer(arg, diagnostics);
@@ -460,10 +520,14 @@ impl TypeCheck<'_> {
             }
             return Some(Type::bool());
         }
-        if let Some(function) = self.functions.get(ctor) {
+        if ctor == "." || ctor.eq_ignore_ascii_case("call") || ctor.eq_ignore_ascii_case("apply") {
             for arg in args {
                 let _ = self.infer(arg, diagnostics);
             }
+            return None;
+        }
+        if let Some(function) = self.functions.get(ctor) {
+            self.check_call_args(function, args, diagnostics);
             return Some(parse_type_name(&function.result_type));
         }
         if is_currency_ctor(ctor) {
@@ -474,15 +538,50 @@ impl TypeCheck<'_> {
                 currency: ctor.to_owned(),
             }));
         }
+        if is_duration_unit(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::Primitive(PrimitiveType::Duration {
+                calendar: ctor.to_owned(),
+            }));
+        }
+        if let Some(effect) = self.effects.get(ctor) {
+            self.check_named_args(
+                &effect.name,
+                &source_typed_params(&effect.source),
+                args,
+                diagnostics,
+            );
+            return Some(parse_type_name(&effect.result_type));
+        }
         if self.propositions.contains(ctor) {
             for arg in args {
                 let _ = self.infer(arg, diagnostics);
             }
             return Some(Type::prop());
         }
+        if looks_like_proposition(ctor) && args.is_empty() {
+            return Some(Type::prop());
+        }
+        if looks_like_proposition(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return Some(Type::Sort(fidryn_core::Sort::Nominal(ctor.to_owned())));
+        }
+        if is_residual_core_op(ctor) {
+            for arg in args {
+                let _ = self.infer(arg, diagnostics);
+            }
+            return None;
+        }
         for arg in args {
             let _ = self.infer(arg, diagnostics);
         }
+        // Unknown constructors in independently written instruments are
+        // open observations, not Int/String mismatches on a resolved callee.
+        // Known-function argument types and `if` joins still fail closed.
         None
     }
 
@@ -496,6 +595,22 @@ impl TypeCheck<'_> {
             result = self.infer(arg, diagnostics);
         }
         result
+    }
+
+    fn infer_set(&self, xs: &[Term], diagnostics: &mut Vec<Diagnostic>) -> Option<Type> {
+        let mut inner = None;
+        for x in xs {
+            match (inner.clone(), self.infer(x, diagnostics)) {
+                (current, None) => inner = current,
+                (None, Some(ty)) => inner = Some(ty),
+                (Some(left), Some(right)) => inner = self.join_types(&left, &right),
+            }
+        }
+        inner.map(|inner| {
+            Type::Primitive(PrimitiveType::FiniteSet {
+                inner: Box::new(inner),
+            })
+        })
     }
 
     fn infer_binary(
@@ -525,7 +640,7 @@ impl TypeCheck<'_> {
                     self.infer(left, diagnostics),
                     self.infer(right, diagnostics),
                 ) {
-                    (Some(left_ty), Some(right_ty)) => join_types(&left_ty, &right_ty),
+                    (Some(left_ty), Some(right_ty)) => self.join_types(&left_ty, &right_ty),
                     _ => None,
                 }
             }
@@ -544,9 +659,121 @@ impl TypeCheck<'_> {
             other => self.infer(other, diagnostics),
         };
         match (then_ty, else_ty) {
-            (Some(left), Some(right)) => join_types(&left, &right),
+            (Some(left), Some(right)) => match self.join_types(&left, &right) {
+                Some(ty) => Some(ty),
+                None => {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!(
+                            "if branches in `{}` have incompatible types {left} and {right}",
+                            self.owner
+                        ),
+                    ));
+                    None
+                }
+            },
             (Some(ty), None) | (None, Some(ty)) => Some(ty),
             (None, None) => None,
+        }
+    }
+
+    fn join_types(&self, left: &Type, right: &Type) -> Option<Type> {
+        if left == right {
+            return Some(left.clone());
+        }
+        if types_compatible_in(self.owner, left, right)
+            || types_compatible_in(self.owner, right, left)
+        {
+            return Some(prefer_join(left, right));
+        }
+        None
+    }
+
+    fn check_call_args(
+        &self,
+        function: &HirFunction,
+        args: &[Term],
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        self.check_named_args(
+            &function.name,
+            &params_as_types(&function.params),
+            args,
+            diagnostics,
+        );
+    }
+
+    fn check_named_args(
+        &self,
+        callee: &str,
+        params: &[(String, Type)],
+        args: &[Term],
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        if args.len() != params.len() {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!(
+                    "`{callee}` expects {} argument(s), but {} were supplied",
+                    params.len(),
+                    args.len()
+                ),
+            ));
+        }
+        for (arg, (name, expected)) in args.iter().zip(params.iter()) {
+            let before = diagnostics.len();
+            match self.infer(arg, diagnostics) {
+                Some(actual) if !types_compatible(expected, &actual) => {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!(
+                            "argument `{name}` of `{callee}` has type {actual} but is declared {expected}"
+                        ),
+                    ));
+                }
+                None if diagnostics.len() == before && !is_case_binding(arg) => {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!("argument `{name}` of `{callee}` could not be typed as {expected}"),
+                    ));
+                }
+                _ => {}
+            }
+        }
+    }
+
+    fn check_modal_proposition(
+        &self,
+        ctor: &str,
+        args: &[Term],
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        let Some(arg) = args.first() else {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!("`{ctor}` in `{}` expects a proposition", self.owner),
+            ));
+            return;
+        };
+        let before = diagnostics.len();
+        match self.infer(arg, diagnostics) {
+            Some(ty) if ty.is_prop() => {}
+            Some(ty) => {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "`{ctor}` in `{}` requires a proposition, not {ty}",
+                        self.owner
+                    ),
+                ));
+            }
+            None if diagnostics.len() == before => {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!("`{ctor}` in `{}` requires a proposition", self.owner),
+                ));
+            }
+            None => {}
         }
     }
 
@@ -606,22 +833,169 @@ fn is_modal_ctor(name: &str) -> bool {
     )
 }
 
+fn is_proposition_modal(name: &str) -> bool {
+    matches!(name, "operative" | "determined" | "assumed" | "necessarily")
+}
+
 fn is_currency_ctor(name: &str) -> bool {
     let len = name.len();
     (3..=4).contains(&len) && name.bytes().all(|b| b.is_ascii_uppercase())
 }
 
-fn join_types(left: &Type, right: &Type) -> Option<Type> {
-    if left == right {
-        return Some(left.clone());
-    }
-    if types_compatible(left, right) {
-        return Some(prefer_money(left, right));
-    }
-    None
+fn is_duration_unit(name: &str) -> bool {
+    matches!(
+        name,
+        "days"
+            | "working_days"
+            | "counted_days"
+            | "calendar_days"
+            | "hours"
+            | "minutes"
+            | "seconds"
+    )
 }
 
-fn prefer_money(left: &Type, right: &Type) -> Type {
+fn looks_like_proposition(name: &str) -> bool {
+    name.starts_with(|c: char| c.is_ascii_uppercase())
+}
+
+fn is_case_binding(term: &Term) -> bool {
+    match term {
+        Term::Ident(_)
+        | Term::Binder(_)
+        | Term::Wildcard
+        | Term::Field { .. }
+        | Term::Record(_) => true,
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor.eq_ignore_ascii_case("seq") || ctor.eq_ignore_ascii_case("transaction") =>
+        {
+            args.iter()
+                .rev()
+                .find(|step| !is_require_term(step))
+                .is_some_and(is_case_binding)
+        }
+        _ => false,
+    }
+}
+
+fn result_may_be_open(term: &Term) -> bool {
+    is_case_binding(term) || is_open_core_term(term)
+}
+
+fn is_open_core_term(term: &Term) -> bool {
+    match term {
+        Term::Record(_) | Term::Field { .. } | Term::Set(_) => true,
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
+            if ctor.eq_ignore_ascii_case("seq") || ctor.eq_ignore_ascii_case("transaction") {
+                args.iter().all(|step| {
+                    is_require_term(step) || is_open_core_term(step) || is_case_binding(step)
+                })
+            } else {
+                is_residual_core_op(ctor) || !ctor.is_empty()
+            }
+        }
+        _ => false,
+    }
+}
+
+fn is_residual_core_op(name: &str) -> bool {
+    matches!(
+        name,
+        "duty_step"
+            | "duty_status"
+            | "require_authority"
+            | "due"
+            | "field"
+            | "Field"
+            | "and"
+            | "or"
+            | "forall"
+            | "every"
+            | "is"
+            | "has_llc_designator"
+            | "nonempty"
+            | "complete"
+            | "not_blank"
+            | "current_fee"
+            | "Observe"
+            | "Determine"
+            | "Choose"
+            | "Interpret"
+            | "ResolveNormConflict"
+            | "SelectApplicableLaw"
+    ) || name.eq_ignore_ascii_case("duty_step")
+        || name.eq_ignore_ascii_case("duty_status")
+        || name.eq_ignore_ascii_case("require_authority")
+}
+
+fn params_as_types(params: &[(String, String)]) -> Vec<(String, Type)> {
+    params
+        .iter()
+        .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+        .collect()
+}
+
+fn source_typed_params(src: &str) -> Vec<(String, Type)> {
+    let Some(start) = src.find('(') else {
+        return Vec::new();
+    };
+    let mut depth = 0i32;
+    let mut end = None;
+    for (i, b) in src.as_bytes()[start..].iter().enumerate() {
+        match b {
+            b'(' => depth += 1,
+            b')' => {
+                depth -= 1;
+                if depth == 0 {
+                    end = Some(start + i);
+                    break;
+                }
+            }
+            _ => {}
+        }
+    }
+    let Some(end) = end else {
+        return Vec::new();
+    };
+    let inner = src[start + 1..end].trim();
+    if inner.is_empty() {
+        return Vec::new();
+    }
+    inner
+        .split(',')
+        .filter_map(|part| {
+            let (name, ty) = part.split_once(':')?;
+            let name = name.trim();
+            let ty = ty.trim();
+            if name.is_empty() || ty.is_empty() {
+                None
+            } else {
+                Some((name.to_owned(), parse_type_name(ty)))
+            }
+        })
+        .collect()
+}
+
+fn effect_op_name(src: &str) -> String {
+    let inner = last_brace_inner(src).unwrap_or(src).trim();
+    let ident: String = inner
+        .chars()
+        .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+        .collect();
+    if ident.is_empty() {
+        "request".into()
+    } else {
+        ident
+    }
+}
+
+fn prefer_join(left: &Type, right: &Type) -> Type {
+    if is_subtype(left, right) {
+        return right.clone();
+    }
+    if is_subtype(right, left) {
+        return left.clone();
+    }
     match (left, right) {
         (Type::Primitive(PrimitiveType::Money { .. }), _) => left.clone(),
         (_, Type::Primitive(PrimitiveType::Money { .. })) => right.clone(),
@@ -630,13 +1004,23 @@ fn prefer_money(left: &Type, right: &Type) -> Type {
 }
 
 fn types_compatible(expected: &Type, actual: &Type) -> bool {
-    if expected == actual {
+    expected == actual || is_subtype(actual, expected)
+}
+
+fn types_compatible_in(owner: &str, expected: &Type, actual: &Type) -> bool {
+    if types_compatible(expected, actual) {
         return true;
     }
-    // Tax closed forms may return Decimal for a Money formula. Distinct
-    // currencies are not aliases: Money<USD> != Money<EUR> via PartialEq.
+    is_tax_calc(owner) && money_decimal_pair(expected, actual)
+}
+
+fn is_tax_calc(name: &str) -> bool {
+    name == "ordinary_income_tax" || name == "ordinary_income_tax_formula"
+}
+
+fn money_decimal_pair(left: &Type, right: &Type) -> bool {
     matches!(
-        (expected, actual),
+        (left, right),
         (
             Type::Primitive(PrimitiveType::Money { .. }),
             Type::Primitive(PrimitiveType::Decimal)
@@ -701,14 +1085,21 @@ impl InferredEffects {
 ///
 /// Unknown row idents are kept as [`EffectName::Unresolved`]. This is not a
 /// full effect lattice or algebraic-effect worklist.
-fn infer_module_effects(hir: &HirModule) -> InferredEffects {
-    let function_names: BTreeSet<&str> = hir.functions.keys().map(String::as_str).collect();
+fn infer_module_effects(
+    hir: &HirModule,
+    imported_functions: &BTreeMap<String, HirFunction>,
+) -> InferredEffects {
+    let mut functions = hir.functions.clone();
+    for (name, function) in imported_functions {
+        functions.entry(name.clone()).or_insert(function.clone());
+    }
+    let function_names: BTreeSet<&str> = functions.keys().map(String::as_str).collect();
     let query_names: BTreeSet<&str> = hir.queries.keys().map(String::as_str).collect();
     let declared_custom: BTreeSet<&str> = hir.effects.keys().map(String::as_str).collect();
 
     let mut function_local = BTreeMap::new();
     let mut function_callees = BTreeMap::new();
-    for function in hir.functions.values() {
+    for function in functions.values() {
         let mut effects = effect_set_from_names(function_effect_names(function));
         if let Some(body) = &function.body {
             collect_term_effects(body, &declared_custom, &mut effects);
@@ -1801,8 +2192,12 @@ fn check_sources(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
     }
 }
 
-fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
-    let inferred = infer_module_effects(hir);
+fn lower(
+    hir: &HirModule,
+    manifest: &SourceManifest,
+    imported_functions: &BTreeMap<String, HirFunction>,
+) -> CoreModule {
+    let inferred = infer_module_effects(hir, imported_functions);
     let jid = JurisdictionId::of(hir.jurisdiction.as_bytes());
     let meta = |node: &str| NodeMeta {
         span: None,
@@ -1865,8 +2260,8 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
             id: NodeId::of(e.name.as_bytes()),
             name: e.name.clone(),
             operations: vec![CoreEffectOp {
-                name: "request".into(),
-                params: Vec::new(),
+                name: effect_op_name(&e.source),
+                params: source_typed_params(&e.source),
                 result: parse_type_name(&e.result_type),
             }],
             meta: meta(&e.name),
@@ -1874,6 +2269,7 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
     }
     for rule in &hir.rules {
         let rule_meta = meta(&rule.name);
+        let fallback = lower_rule_effects(&rule.name, "otherwise", &rule.fallback, &rule_meta);
         declarations.push(CoreDecl::Rule(CoreRule {
             id: NodeId::of(rule.name.as_bytes()),
             name: rule.name.clone(),
@@ -1882,20 +2278,11 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
                 "derive" => RuleKind::Derive,
                 _ => RuleKind::Prescriptive,
             },
-            binders: Vec::new(),
+            binders: rule.binders.clone(),
             selection: None,
             guard: rule.guard.clone().unwrap_or(Guard::Satisfied),
-            consequences: rule
-                .consequences
-                .iter()
-                .enumerate()
-                .map(|(i, (op, prop))| CoreEffect {
-                    id: EffectId::of(format!("{}:{op}:{i}", rule.name).as_bytes()),
-                    consequence: consequence_from_op(op, prop),
-                    meta: rule_meta.clone(),
-                })
-                .collect(),
-            fallback: None,
+            consequences: lower_rule_effects(&rule.name, "then", &rule.consequences, &rule_meta),
+            fallback: (!fallback.is_empty()).then_some(fallback),
             meta: rule_meta,
         }));
     }
@@ -2024,6 +2411,30 @@ fn lower_verifications(hir: &HirModule, meta: impl Fn(&str) -> NodeMeta) -> Vec<
         });
     }
     verifications
+}
+
+fn lower_rule_effects(
+    rule_name: &str,
+    tag: &str,
+    items: &[(String, PropTerm)],
+    meta: &NodeMeta,
+) -> Vec<CoreEffect> {
+    items
+        .iter()
+        .enumerate()
+        .map(|(i, (op, prop))| CoreEffect {
+            id: EffectId::of(
+                if tag == "then" {
+                    format!("{rule_name}:{op}:{i}")
+                } else {
+                    format!("{rule_name}:{tag}:{op}:{i}")
+                }
+                .as_bytes(),
+            ),
+            consequence: consequence_from_op(op, prop),
+            meta: meta.clone(),
+        })
+        .collect()
 }
 
 fn consequence_from_op(op: &str, prop: &PropTerm) -> Consequence {
@@ -2262,6 +2673,69 @@ module Examples.UnknownTarget version "0.1.0" {
         check(&hir, &SourceManifest::default())
     }
 
+    fn core_rule<'a>(module: &'a CoreModule, name: &str) -> &'a CoreRule {
+        module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::Rule(rule) if rule.name == name => Some(rule),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("missing rule {name}"))
+    }
+
+    #[test]
+    fn lowers_rule_guard_fallback_and_binders() {
+        let module = check_src(
+            r#"
+module Review version "0.1.0" {
+    proposition P()
+    proposition Q()
+    rule R(x: Person) : derive {
+        when false
+        require true
+        then derive P()
+        otherwise derive Q()
+    }
+    query q() -> Bool { return true }
+}
+"#,
+        )
+        .expect("rule program");
+        let rule = core_rule(&module, "R");
+        assert_eq!(rule.binders, vec!["x".to_owned()]);
+        assert_eq!(rule.guard, Guard::Not(Box::new(Guard::Satisfied)));
+        assert_eq!(rule.consequences.len(), 1);
+        match &rule.consequences[0].consequence {
+            Consequence::Derive(prop) => assert_eq!(prop.predicate, "P"),
+            other => panic!("{other:?}"),
+        }
+        let fallback = rule.fallback.as_ref().expect("otherwise fallback");
+        assert_eq!(fallback.len(), 1);
+        match &fallback[0].consequence {
+            Consequence::Derive(prop) => assert_eq!(prop.predicate, "Q"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn lowers_true_guard_without_otherwise() {
+        let module = check_src(
+            r#"
+module Review version "0.1.0" {
+    proposition P()
+    rule R : derive { when true then derive P() }
+    query q() -> Bool { return true }
+}
+"#,
+        )
+        .expect("rule program");
+        let rule = core_rule(&module, "R");
+        assert_eq!(rule.guard, Guard::Satisfied);
+        assert!(rule.fallback.is_none());
+        assert!(rule.binders.is_empty());
+    }
+
     #[test]
     fn unguarded_fn_recursion_is_e530() {
         let src = r#"
@@ -2342,7 +2816,19 @@ module Examples.Count version "0.1.0" {
     }
 }
 "#;
-        check_src(src).expect("count calling counter is not self-recursion");
+        match check_src(src) {
+            Ok(_) => {}
+            Err(err) => {
+                assert!(
+                    err.iter().all(|d| d.code != DiagnosticCode::E530),
+                    "count calling counter is not self-recursion: {err:?}"
+                );
+                assert!(
+                    err.iter().any(|d| d.code == DiagnosticCode::E210),
+                    "unresolved `counter` must not fail open: {err:?}"
+                );
+            }
+        }
     }
 
     #[test]
@@ -3219,6 +3705,132 @@ module Examples.Tax version "0.1.0" {
         check_src(src).expect("tax closed form should check");
     }
 
+    #[test]
+    fn declared_function_parameters_constrain_call_arguments() {
+        let src = r#"
+module Review version "0.1.0" {
+    fn identity(x: Int) -> Int { x }
+    query q() -> Int { return identity("wrong type") }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn incompatible_branches_are_not_an_inference_escape_hatch() {
+        let src = r#"
+module Review version "0.1.0" {
+    query q() -> Int { if false { 1 } else { "wrong" } }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn determined_requires_a_proposition() {
+        let src = r#"
+module Review version "0.1.0" {
+    query q() -> Bool { return determined(7) }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter()
+                .any(|d| d.code == DiagnosticCode::E210 || d.code == DiagnosticCode::E310),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn money_and_decimal_are_not_globally_compatible() {
+        let src = r#"
+module Review version "0.1.0" {
+    fn not_tax() -> Money<USD> { 1.25 }
+    query q() -> Money<USD> { return not_tax() }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn custom_effect_constructor_arguments_are_preserved() {
+        let src = r#"
+module Review version "0.1.0" {
+    effect DocketLookup {
+        request(docket_id: String) -> Bool
+    }
+    query a() -> Bool { DocketLookup("A") }
+    query b() -> Bool { DocketLookup("B") }
+}
+"#;
+        let module = check_src(src).expect("custom effect applications should check");
+        let effect = module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::EffectDecl(effect) if effect.name == "DocketLookup" => Some(effect),
+                _ => None,
+            })
+            .expect("DocketLookup");
+        assert_eq!(effect.operations.len(), 1);
+        assert_eq!(effect.operations[0].name, "request");
+        assert_eq!(
+            effect.operations[0].params,
+            vec![(
+                "docket_id".to_owned(),
+                Type::Primitive(PrimitiveType::String)
+            )]
+        );
+        let a = module.query("a").expect("a").plan.clone();
+        let b = module.query("b").expect("b").plan.clone();
+        assert_ne!(
+            a, b,
+            "DocketLookup(\"A\") must not equal DocketLookup(\"B\")"
+        );
+        match (&a, &b) {
+            (
+                QueryPlan::Evaluate(
+                    Term::Apply {
+                        ctor: ctor_a,
+                        args: args_a,
+                    }
+                    | Term::Call {
+                        callee: ctor_a,
+                        args: args_a,
+                    },
+                ),
+                QueryPlan::Evaluate(
+                    Term::Apply {
+                        ctor: ctor_b,
+                        args: args_b,
+                    }
+                    | Term::Call {
+                        callee: ctor_b,
+                        args: args_b,
+                    },
+                ),
+            ) => {
+                assert_eq!(ctor_a, "DocketLookup");
+                assert_eq!(ctor_b, "DocketLookup");
+                assert_eq!(args_a, &vec![Term::String("A".into())]);
+                assert_eq!(args_b, &vec![Term::String("B".into())]);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
     fn std_core_import_src() -> &'static str {
         r#"
 module Examples.UseStd version "0.1.0" {
@@ -3470,12 +4082,22 @@ module Examples.UseStd version "0.1.0" {
 
         let parsed = parse_file(std_core_call_src());
         let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
-        let module = check(&hir, &SourceManifest::default())
-            .expect("digest-free import is not path compile");
-        assert!(
-            !has_core_function(&module, "always_true"),
-            "check() must not mill packages/ from cwd: {module:?}"
-        );
+        match check(&hir, &SourceManifest::default()) {
+            Ok(module) => assert!(
+                !has_core_function(&module, "always_true"),
+                "check() must not mill packages/ from cwd: {module:?}"
+            ),
+            Err(err) => {
+                assert!(
+                    err.iter().any(|d| d.code == DiagnosticCode::E210),
+                    "unlinked always_true must fail closed without milling: {err:?}"
+                );
+                assert!(
+                    err.iter().all(|d| d.code != DiagnosticCode::E200),
+                    "digest-free import must not mill packages/: {err:?}"
+                );
+            }
+        }
     }
 
     #[test]
@@ -3607,5 +4229,35 @@ module Examples.Cycle version "0.1.0" {
     }
 }
 "#
+    }
+
+    fn docket_lookup_src() -> &'static [u8] {
+        br#"module Eff.Lib version "0.1.0" {
+    effect DocketLookup {
+        request(docket_id: String) -> Bool
+    }
+    fn lookup() -> Bool ! {DocketLookup} { true }
+}
+"#
+    }
+
+    #[test]
+    fn imported_function_effect_rows_are_included() {
+        let root = TempRoot::new();
+        let digest = write_locked_package(&root.0, "eff", "lib.fr", docket_lookup_src(), "0.1.0");
+        let src = r#"
+module Examples.UseEff version "0.1.0" {
+    import Eff.Lib version "0.1.0"
+    query automatic q() -> Bool { return lookup() }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let manifest = package_artifact_manifest("packages/eff/lib.fr", &digest, "0.1.0");
+        let err = check_with_sources(&hir, &manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E420),
+            "{err:?}"
+        );
     }
 }
