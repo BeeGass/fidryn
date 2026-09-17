@@ -25,8 +25,11 @@ statement of any jurisdiction's law.
 | [Examples](examples.md) | Trust, tax, federal slices, fifty states |
 
 The closed grammar is [`grammar.ebnf`](../grammar.ebnf). Wire formats
-are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json)
-and [`schemas/outcome-v0.1.json`](../schemas/outcome-v0.1.json).
+are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
+[`schemas/outcome-v0.1.json`](../schemas/outcome-v0.1.json), and
+[`schemas/evaluation-report-v0.1.json`](../schemas/evaluation-report-v0.1.json)
+(CLI `run` / `explore` and mill eval responses nest the outcome as
+`outcomeDocument`).
 
 ## For implementers
 
