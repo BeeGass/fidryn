@@ -9,8 +9,6 @@ use fidryn_core::{
     AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode, Instant,
     Outcome, QueryName, RunContext, SourceManifest, TimeError, TraceId, Value, canonical_json,
 };
-use fidryn_eval::evaluate;
-use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_render::{module_vars, render};
 use fidryn_syntax::ast::{HeaderKind, Item};
@@ -18,12 +16,17 @@ use fidryn_syntax::{format_module, parse_file};
 use fidryn_trace::{explain, explain_value, render_outcome};
 use fidryn_verify::{explore_query, verify_property};
 use serde::Serialize;
+use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::fmt;
 use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+
+thread_local! {
+    static DRIVER: RefCell<fidryn_driver::Driver> = RefCell::new(fidryn_driver::Driver::new());
+}
 
 #[derive(Parser, Debug)]
 #[command(name = "fidryn", version, about = "Fidryn reference interpreter")]
@@ -207,10 +210,6 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
 /// `sources/` fallback. A declared path that is missing or malformed is a
 /// diagnostic. Modules that omit a manifest get an empty default.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
-    thread_local! {
-        static DRIVER: std::cell::RefCell<fidryn_driver::Driver> =
-            std::cell::RefCell::new(fidryn_driver::Driver::new());
-    }
     DRIVER.with(|driver| driver.borrow_mut().check_path(path))
 }
 
@@ -508,29 +507,15 @@ fn cmd_run(
         return ExitCode::from(1);
     };
     let ctx = RunContext::new(valid, known);
-    // Occupancy and completions come only from the case record.
-    let state = case.into_state();
-    let mut handler = CaseFile {
-        record: case.clone(),
-        known_at: Some(known),
-    };
-    let outcome = match evaluate(
-        &module,
-        &QueryName::from(query),
-        &Default::default(),
-        &state,
-        &ctx,
-        &mut handler,
-        &case,
-    )
-    .into_eval_outcome()
-    {
-        Ok(outcome) => outcome,
-        Err(err) => {
-            eprintln!("{err}");
-            return ExitCode::from(1);
-        }
-    };
+    let report =
+        match DRIVER.with(|driver| driver.borrow_mut().run_report(&module, query, &case, &ctx)) {
+            Ok(report) => report,
+            Err(err) => {
+                eprintln!("{}", EngineFailure::from_err(err));
+                return ExitCode::from(1);
+            }
+        };
+    let outcome = report.outcome;
     println!(
         "{}",
         render_outcome(

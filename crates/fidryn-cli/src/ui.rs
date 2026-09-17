@@ -9,8 +9,7 @@ use axum::routing::{get, post};
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, Instant, QueryName, RunContext, SourceManifest, Value,
 };
-use fidryn_eval::evaluate;
-use fidryn_handlers::CaseFile;
+use fidryn_driver::Driver;
 use fidryn_render::{module_vars, render};
 use fidryn_trace::render_outcome;
 use fidryn_verify::explore_query;
@@ -250,22 +249,10 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
             Err(err) => return mill_engine_err(&err),
         }
     } else {
-        // Occupancy and completions come only from the case record.
-        let state = case.into_state();
-        let mut handler = CaseFile {
-            record: case.clone(),
-            known_at: Some(known),
-        };
-        match evaluate(
-            &module,
-            &query,
-            &Default::default(),
-            &state,
-            &ctx,
-            &mut handler,
-            &case,
-        )
-        .into_eval_outcome()
+        match Driver::new()
+            .run_report(&module, query.as_str(), &case, &ctx)
+            .map(|report| report.outcome)
+            .into_eval_outcome()
         {
             Ok(outcome) => outcome,
             Err(err) => return mill_engine_err(&err),
