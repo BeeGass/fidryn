@@ -13,7 +13,7 @@ is not covering. A `fixture` digest is not byte-verified.
 ## 1. Immediate defects (regressions, not closure)
 
 Section-1 items are recorded as
-`crates/fidryn-cli/tests/adversarial_regressions.rs`. Those 16 tests
+`tests/integration/adversarial_regressions.rs`. Those 16 tests
 pass. That is a regression suite, not a proof of soundness. Covering
 certificates and artifact-byte authentication now have named tests.
 A claims digest is still not covering. A `fixture` digest is still not
@@ -137,14 +137,16 @@ gain filesystem from paste. The 2026-09-17 review stays **open**. Green
 tests are regressions, not language closure.
 
 Commands: `cargo test --workspace --offline` and `cargo clippy --workspace -- -D warnings`.
-`cargo test -p fidryn-cli --test adversarial_regressions` is the 16-test kit.
-`cargo test -p fidryn-cli --test integration_suite --offline` is the integration gate.
-`cargo test -p fidryn-cli --test boundary_review_20260917 --offline` is the 2026-09-17 11:35 boundary-review gate.
+`cargo test -p fidryn-integration-tests --offline` is the cross-crate integration crate.
+`cargo test -p fidryn-integration-tests --offline adversarial_regressions` is the 16-test kit.
+`cargo test -p fidryn-integration-tests --offline integration_suite` is the integration gate.
+`cargo test -p fidryn-integration-tests --offline boundary_review_20260917` is the 2026-09-17 11:35 boundary-review gate.
+`cargo test -p fidryn-integration-tests --offline review_regressions` is the 2026-09-17 14:45 review gate.
 
 ## 2026-09-17 11:35 boundary review
 
 The review stays **open**. Green tests are regressions, not closure.
-This gate is `crates/fidryn-cli/tests/boundary_review_20260917.rs`
+This gate is `tests/integration/boundary_review_20260917.rs`
 (thirteen tests). Schema probes live at
 `conformance/schema_boundary_probes.py`.
 
@@ -163,3 +165,29 @@ This gate is `crates/fidryn-cli/tests/boundary_review_20260917.rs`
 | `sequencing_does_not_hide_a_wrong_result_type` | A surrounding sequence does not conceal a wrong result type. |
 | `a_declared_function_result_does_not_replace_checking_its_body` | Function bodies must satisfy their declared results. |
 | `a_hex_manifest_entry_without_checked_bytes_is_not_byte_verified` | ByteVerified requires checked bytes, not a plausible hex label. |
+
+## 2026-09-17 14:45 review
+
+The review stays **open**. Green tests are regressions, not closure.
+This gate is [`tests/integration/review_regressions.rs`](../tests/integration/review_regressions.rs)
+(ten semantic tests). Command:
+`cargo test -p fidryn-integration-tests --offline review_regressions`.
+Do not weaken assertions.
+
+`CheckedCertificate::issue_finite_replay` is still public on core. The
+same file asserts a fabricated answer cannot mint covering. If that
+factory is removed, convert the probe to a rustdoc `compile_fail`; do
+not re-expose minting.
+
+| Test | Contract |
+| --- | --- |
+| `false_rule_guard_does_not_establish_a_proposition` | A false rule guard does not derive its then-consequence. |
+| `otherwise_is_not_an_additional_then_consequence` | `otherwise` is not an extra `then`. |
+| `declared_function_parameters_constrain_call_arguments` | Call arguments must match declared parameter types. |
+| `incompatible_branches_are_not_an_inference_escape_hatch` | If-branches of incompatible types are a compile error. |
+| `resuming_a_nested_sequence_without_new_evidence_stays_suspended` | Nested seq resume without evidence stays Suspended. |
+| `a_rebase_runs_the_new_query_not_the_old_residual` | Rebase evaluates the new program, not the old residual. |
+| `false_permission_entry_does_not_grant_authority` | `action: false` is not a grant. |
+| `replay_uses_the_same_argument_precedence_as_execution` | Replay cannot certify the case fact when args win. |
+| `replay_does_not_admit_a_future_determination` | Knowledge time binds replay as well as execution. |
+| `function_body_changes_are_not_invisible_to_source_diff` | A function-body edit is visible to source diff. |

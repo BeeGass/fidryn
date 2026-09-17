@@ -48,7 +48,7 @@ Cells are `Yes` / `Partial` / `No`.
 - **Traceable** — a proof-relevant DAG records the step with parent
   edges, not only a content-hashed `TraceId`.
 - **Conformance tests** — shared tests under `conformance/` and/or
-  `crates/fidryn-cli/tests/semantic_regressions.rs` (crate unit tests
+  `tests/integration/semantic_regressions.rs` (crate unit tests
   alone are `Partial`).
 - **This pass** — `In progress` if a crate-owned agent is changing the
   row under the review-fix contract; `Not this pass` if the language

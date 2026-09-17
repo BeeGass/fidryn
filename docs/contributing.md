@@ -76,7 +76,7 @@ Tests live next to the crates they exercise (`#[cfg(test)]` in `src`,
 and `crates/<name>/tests/` when a crate has an integration kit).
 
 The adversarial review kit is
-[`crates/fidryn-cli/tests/adversarial_regressions.rs`](../crates/fidryn-cli/tests/adversarial_regressions.rs).
+[`tests/integration/adversarial_regressions.rs`](../tests/integration/adversarial_regressions.rs).
 Those tests are regressions, not closure of the language.
 
 Independent programs live under [`tests/programs/`](../tests/programs/).

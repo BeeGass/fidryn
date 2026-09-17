@@ -116,7 +116,7 @@ fidryn check tests/diagnostics/e310-prop-as-guard.fr
 Evaluate one query against one case record at a pair of bitemporal
 instants. `run` never chooses a completion. It does not search
 `admissibleCompletions`, pick an interpretation, or fill in missing
-evidence. `--arg` only writes string facts onto the case.
+evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]`).
 
 **Arguments**
 
@@ -132,7 +132,7 @@ evidence. `--arg` only writes string facts onto the case.
 `--valid-at` is valid time. `--known-at` is record time. Both accept a
 `Z` suffix or a numeric offset (`+00:00`, `-04:00`). Example spellings:
 `2033-01-01T00:00:00Z` and `2033-01-01T00:00:00+00:00`. `--arg provision=ChildSupportWaiver`
-writes `case.facts["provision"]`. Bindings without an `=` are ignored.
+writes `case.facts["provision"]`. A binding without `=` is an error.
 
 **Example**
 
