@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fidryn mill</title>
+  <style>
+    :root {
+      --ink: #14110e;
+      --ink-2: #1d1914;
+      --paper: #f3e6cf;
+      --paper-2: #e7d5b4;
+      --rule: #c9b48a;
+      --rust: #c44b24;
+      --brass: #c4a056;
+      --mist: #9a8d7a;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --serif: Palatino, "Palatino Linotype", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      min-height: 100dvh;
+      background:
+        radial-gradient(800px 380px at 0% -10%, #3a2a1c 0%, transparent 55%),
+        var(--ink);
+      color: var(--paper);
+      font-family: var(--serif);
+    }
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      display: grid;
+      gap: 16px;
+    }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .word {
+      font-size: 28px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .word small {
+      display: block;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--brass);
+    }
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brass);
+      border: 1px solid color-mix(in srgb, var(--brass) 55%, transparent);
+      padding: 8px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .deck { margin: 0; color: var(--mist); max-width: 42rem; line-height: 1.45; }
+    .warn {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #f0b4a8;
+      border: 1px solid #5a342c;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #1a1210;
+    }
+    label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 280px;
+      background: var(--ink-2);
+      color: var(--paper);
+      border: 1px solid #3d342a;
+      border-radius: 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 12px;
+      resize: vertical;
+    }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    button {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid var(--brass);
+      background: var(--ink-2);
+      color: var(--paper);
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button.primary { background: var(--rust); border-color: var(--rust); }
+    button:hover { filter: brightness(1.08); }
+    pre {
+      margin: 0;
+      min-height: 8rem;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0 27px,
+          color-mix(in srgb, var(--rule) 35%, transparent) 28px
+        ),
+        var(--paper);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .ok { color: #3d6b3a; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1 class="word">fidryn mill<small>localhost 127.0.0.1</small></h1>
+      <div class="badge" id="health">health: ...</div>
+    </header>
+    <p class="deck">
+      Check a Fidryn module on this machine. Run, explore, and render remain
+      CLI commands. This mill never files.
+    </p>
+    <p class="warn">Live filing is not available from the UI.</p>
+    <div>
+      <label for="source">Module source</label>
+      <textarea id="source" spellcheck="false">module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+</textarea>
+    </div>
+    <div class="tools">
+      <button class="primary" id="check" type="button">Check</button>
+    </div>
+    <div>
+      <label>Diagnostics</label>
+      <pre id="out">Ready.</pre>
+    </div>
+  </div>
+  <script>
+    const out = document.getElementById("out");
+    const health = document.getElementById("health");
+    fetch("/api/health").then(function (r) { return r.text(); }).then(function (t) {
+      health.textContent = "health: " + t.trim() + " (localhost)";
+    }).catch(function () {
+      health.textContent = "health: unreachable";
+    });
+    document.getElementById("check").addEventListener("click", function () {
+      out.textContent = "Checking...";
+      fetch("/api/check", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ source: document.getElementById("source").value })
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (data.ok) {
+          out.className = "ok";
+          out.textContent = "ok";
+          return;
+        }
+        out.className = "";
+        var lines = (data.diagnostics || []).map(function (d) {
+          return (d.code || "") + " " + (d.message || JSON.stringify(d));
+        });
+        out.textContent = lines.join("\n") || "check failed";
+      }).catch(function (err) {
+        out.className = "";
+        out.textContent = String(err);
+      });
+    });
+  </script>
+</body>
+</html>
