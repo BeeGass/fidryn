@@ -22,9 +22,11 @@ pub struct HirModule {
     pub jurisdiction: String,
     pub snapshot: String,
     pub manifest_path: String,
+    pub effective_at: String,
+    pub recorded_at: String,
     pub outside_scope: Vec<String>,
     pub entities: BTreeMap<String, String>,
-    pub propositions: BTreeMap<String, Vec<String>>,
+    pub propositions: BTreeMap<String, Vec<(String, String)>>,
     pub offices: BTreeMap<String, String>,
     pub queries: BTreeMap<String, HirQuery>,
     pub rules: Vec<HirRule>,
@@ -40,7 +42,17 @@ pub struct HirModule {
     pub functions: BTreeMap<String, HirFunction>,
     pub quantifiers: Vec<HirQuantifier>,
     pub verifications: Vec<HirVerification>,
+    /// Parsed surface constructs that are not yet executable Core.
+    pub retained: Vec<HirRetainedDecl>,
     pub diagnostics: Vec<Diagnostic>,
+}
+
+/// A parsed declaration kept for conservation rather than silently dropped.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirRetainedDecl {
+    pub kind: String,
+    pub name: String,
+    pub source: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -148,6 +160,10 @@ pub struct HirImport {
     pub name: String,
     pub type_args: Vec<String>,
     pub digest_required: bool,
+    /// Expected artifact digest from `digest "..."` on the import, if present.
+    pub digest: Option<String>,
+    /// Requested import version from `version "..."`, if present.
+    pub version: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -190,6 +206,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         jurisdiction: String::new(),
         snapshot: manifest.snapshot.clone(),
         manifest_path: String::new(),
+        effective_at: String::new(),
+        recorded_at: String::new(),
         outside_scope: Vec::new(),
         entities: BTreeMap::new(),
         propositions: BTreeMap::new(),
@@ -208,6 +226,7 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         functions: BTreeMap::new(),
         quantifiers: Vec::new(),
         verifications: Vec::new(),
+        retained: Vec::new(),
         diagnostics: parse.diagnostics.clone(),
     };
     for item in &module.items {
@@ -230,7 +249,12 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         .map(str::to_owned)
                         .collect();
                 }
-                _ => {}
+                fidryn_syntax::ast::HeaderKind::EffectiveAt => {
+                    hir.effective_at = h.value.clone();
+                }
+                fidryn_syntax::ast::HeaderKind::RecordedAt => {
+                    hir.recorded_at = h.value.clone();
+                }
             },
             fidryn_syntax::ast::Item::Import(d) => {
                 let (name, type_args) = resolve_import_type_args(d);
@@ -238,6 +262,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     name,
                     type_args,
                     digest_required: body::import_requires_digest(&d.source),
+                    digest: body::import_digest(&d.source),
+                    version: body::import_version(&d.source),
                 });
             }
             fidryn_syntax::ast::Item::Source(d) => {
@@ -265,7 +291,7 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Proposition(d) => {
                 if let Some(name) = &d.name {
-                    hir.propositions.insert(name.clone(), Vec::new());
+                    hir.propositions.insert(name.clone(), decl_params(d));
                 }
             }
             fidryn_syntax::ast::Item::Office(d) => {
@@ -427,7 +453,19 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     hir.clauses.insert(name.clone(), d.source.clone());
                 }
             }
-            _ => {}
+            fidryn_syntax::ast::Item::Type(d)
+            | fidryn_syntax::ast::Item::RecordType(d)
+            | fidryn_syntax::ast::Item::Observation(d)
+            | fidryn_syntax::ast::Item::Power(d)
+            | fidryn_syntax::ast::Item::Judgment(d)
+            | fidryn_syntax::ast::Item::LegalAct(d)
+            | fidryn_syntax::ast::Item::Scenario(d) => {
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name: d.name.clone().unwrap_or_default(),
+                    source: d.source.clone(),
+                });
+            }
         }
     }
     if hir.diagnostics.iter().any(|d| {
@@ -446,6 +484,14 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
 
 fn trim_quotes(s: &str) -> &str {
     s.trim().trim_matches('"').trim()
+}
+
+fn decl_params(d: &fidryn_syntax::ast::Decl) -> Vec<(String, String)> {
+    if d.params.is_empty() {
+        body::extract_params(&d.source)
+    } else {
+        d.params.clone()
+    }
 }
 
 fn query_body_has_quantifier_or_require(src: &str) -> bool {
@@ -1301,7 +1347,27 @@ module Host version "0.1.0" {
         assert_eq!(hir.imports.len(), 1);
         assert_eq!(hir.imports[0].name, "Id");
         assert_eq!(hir.imports[0].type_args, vec!["NaturalPerson".to_owned()]);
+        assert_eq!(hir.imports[0].version.as_deref(), Some("0.1.0"));
+        assert_eq!(hir.imports[0].digest, None);
+        assert!(!hir.imports[0].digest_required);
         assert!(hir.type_params.is_empty());
+    }
+
+    #[test]
+    fn elaborates_import_digest_and_version() {
+        let src = r#"
+module Host version "0.1.0" {
+    import Other.Law version "1" { digest "fixture" }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.imports.len(), 1);
+        assert_eq!(hir.imports[0].name, "Other.Law");
+        assert_eq!(hir.imports[0].version.as_deref(), Some("1"));
+        assert_eq!(hir.imports[0].digest.as_deref(), Some("fixture"));
+        assert!(hir.imports[0].digest_required);
+        assert!(hir.imports[0].type_args.is_empty());
     }
 
     #[test]
@@ -1444,6 +1510,10 @@ module Programs.LatePayment version "0.1.0" {
 "#;
         let parsed = parse_file(src);
         let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(
+            hir.propositions.get("InvoiceIssued").map(Vec::as_slice),
+            Some([("person".to_owned(), "NaturalPerson".to_owned())].as_slice())
+        );
         assert_eq!(hir.duties.len(), 1, "{:?}", hir.duties);
         let duty = &hir.duties[0];
         assert_eq!(duty.name, "PayInvoice");
@@ -1478,5 +1548,61 @@ module Programs.LatePayment version "0.1.0" {
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn retains_parsed_surface_constructs() {
+        let src = r#"
+module Examples.Retain version "0.1.0" {
+    effective_at 2026-01-01
+    recorded_at 2026-01-01T00:00:00Z
+    type TaxYear = Int
+    record_type TaxableIncome { amount: Money<USD> }
+    observation Filing(record: TaxableIncome)
+    power Amend { holder Settlor }
+    judgment Capacity(person: NaturalPerson)
+    legal_act Sign(doc: TaxableIncome)
+    scenario HappyPath { assume true }
+    proposition Issued(person: NaturalPerson)
+    query q() -> Bool { return true }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.effective_at, "2026-01-01");
+        assert_eq!(hir.recorded_at, "2026-01-01T00:00:00Z");
+        assert_eq!(
+            hir.propositions.get("Issued").map(Vec::as_slice),
+            Some([("person".to_owned(), "NaturalPerson".to_owned())].as_slice())
+        );
+        let kinds: Vec<&str> = hir.retained.iter().map(|d| d.kind.as_str()).collect();
+        for kind in [
+            "type",
+            "record_type",
+            "observation",
+            "power",
+            "judgment",
+            "legal_act",
+            "scenario",
+        ] {
+            assert!(
+                kinds.contains(&kind),
+                "expected retained `{kind}`, got {kinds:?}"
+            );
+        }
+        assert!(
+            hir.retained
+                .iter()
+                .any(|d| d.kind == "type" && d.name == "TaxYear"),
+            "{:?}",
+            hir.retained
+        );
+        assert!(
+            hir.retained
+                .iter()
+                .any(|d| d.kind == "scenario" && d.name == "HappyPath"),
+            "{:?}",
+            hir.retained
+        );
     }
 }

@@ -642,12 +642,61 @@ pub fn query_is_automatic(src: &str) -> bool {
 }
 
 pub fn import_requires_digest(src: &str) -> bool {
+    ident_present(src, "digest")
+}
+
+/// Value of `digest "..."` on an import, if present.
+pub fn import_digest(src: &str) -> Option<String> {
+    field_after_ident(src, "digest")
+}
+
+/// Value of `version "..."` on an import, if present.
+pub fn import_version(src: &str) -> Option<String> {
+    field_after_ident(src, "version")
+}
+
+fn ident_present(src: &str, name: &str) -> bool {
     let p = SliceParser::new(src);
     p.tokens.iter().any(|t| {
         t.kind == TokenKind::Ident
-            && p.text(*t) == "digest"
-            && ident_boundary(src, t.start as usize, 6)
+            && p.text(*t) == name
+            && ident_boundary(src, t.start as usize, name.len())
     })
+}
+
+fn field_after_ident(src: &str, name: &str) -> Option<String> {
+    let p = SliceParser::new(src);
+    for i in 0..p.tokens.len() {
+        let token = p.tokens[i];
+        if token.kind != TokenKind::Ident || p.text(token) != name {
+            continue;
+        }
+        if !ident_boundary(src, token.start as usize, name.len()) {
+            continue;
+        }
+        let next = p.tokens.get(i + 1)?;
+        match next.kind {
+            TokenKind::String => return Some(unquote_token(p.text(*next))),
+            TokenKind::Ident | TokenKind::Int | TokenKind::Decimal => {
+                return Some(p.text(*next).to_owned());
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+fn unquote_token(text: &str) -> String {
+    let text = text.trim();
+    let bytes = text.as_bytes();
+    if bytes.len() >= 2 {
+        let start = bytes[0];
+        let end = bytes[bytes.len() - 1];
+        if (start == b'"' && end == b'"') || (start == b'\'' && end == b'\'') {
+            return text[1..text.len() - 1].to_owned();
+        }
+    }
+    text.to_owned()
 }
 
 fn source_slices(d: &Decl) -> Vec<&str> {
