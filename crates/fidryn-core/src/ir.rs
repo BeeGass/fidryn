@@ -16,6 +16,8 @@ use std::collections::BTreeSet;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CoreModule {
+    /// Assigned by the checker from the module name (`ModuleId::of`). Not a
+    /// content hash; see [`Self::content_fingerprint`].
     pub id: ModuleId,
     pub name: String,
     pub version: String,
@@ -430,5 +432,91 @@ pub struct NodeMeta {
 impl CoreModule {
     pub fn query(&self, name: &str) -> Option<&CoreQuery> {
         self.queries.iter().find(|q| q.name == name)
+    }
+
+    /// Blake3 of canonical JSON over name, version, queries, and declarations.
+    ///
+    /// Distinct from [`Self::id`], which is name-based via [`ModuleId::of`].
+    pub fn content_fingerprint(&self) -> Result<[u8; 32], String> {
+        #[derive(Serialize)]
+        struct Fingerprint<'a> {
+            name: &'a str,
+            version: &'a str,
+            queries: &'a [CoreQuery],
+            declarations: &'a [CoreDecl],
+        }
+        let bytes = crate::canonical_to_vec(&Fingerprint {
+            name: &self.name,
+            version: &self.version,
+            queries: &self.queries,
+            declarations: &self.declarations,
+        })
+        .map_err(|e| e.to_string())?;
+        Ok(*blake3::hash(&bytes).as_bytes())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ids::{OriginId, SourceManifestId};
+
+    fn empty_module(name: &str, version: &str) -> CoreModule {
+        CoreModule {
+            id: ModuleId::of(name.as_bytes()),
+            name: name.into(),
+            version: version.into(),
+            snapshot: SourceSnapshotId::of(b"s"),
+            manifest: SourceManifestId::of(b"m"),
+            jurisdiction: JurisdictionId::of(b"j"),
+            outside_scope: Vec::new(),
+            declarations: Vec::new(),
+            nominations: Vec::new(),
+            queries: Vec::new(),
+            verifications: Vec::new(),
+            assertions: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn content_fingerprint_hashes_name_version_queries_declarations() {
+        let a = empty_module("Trust", "0.1.0");
+        let b = empty_module("Trust", "0.1.0");
+        assert_eq!(
+            a.content_fingerprint().unwrap(),
+            b.content_fingerprint().unwrap()
+        );
+        assert_ne!(
+            a.content_fingerprint().unwrap(),
+            empty_module("Other", "0.1.0")
+                .content_fingerprint()
+                .unwrap()
+        );
+        assert_ne!(
+            a.content_fingerprint().unwrap(),
+            empty_module("Trust", "0.2.0")
+                .content_fingerprint()
+                .unwrap()
+        );
+
+        let mut with_decl = empty_module("Trust", "0.1.0");
+        with_decl.declarations.push(CoreDecl::Fact(CoreFact {
+            id: NodeId::of(b"f"),
+            relation: "Holds".into(),
+            arguments: Vec::new(),
+            meta: NodeMeta {
+                span: None,
+                source: None,
+                jurisdiction: JurisdictionId::of(b"j"),
+                valid_time: Interval::always(),
+                record_time: Interval::always(),
+                origin: OriginId::Direct(NodeId::of(b"f")),
+            },
+        }));
+        assert_ne!(
+            a.content_fingerprint().unwrap(),
+            with_decl.content_fingerprint().unwrap()
+        );
+        assert_eq!(a.id, empty_module("Trust", "0.2.0").id);
     }
 }

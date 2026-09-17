@@ -126,7 +126,31 @@ impl Value {
     }
 }
 
-/// Case JSON: bare literals for primitives, tagged objects for Entity and the rest.
+/// Serde tags for [`Value`] (`tag = "kind"`, `rename_all = "camelCase"`).
+/// Records whose `kind` is not one of these decode as [`Value::Map`].
+fn is_runtime_value_kind_tag(tag: &str) -> bool {
+    matches!(
+        tag,
+        "bool"
+            | "clauseRef"
+            | "ctor"
+            | "decimal"
+            | "duration"
+            | "entity"
+            | "int"
+            | "instant"
+            | "map"
+            | "option"
+            | "prop"
+            | "set"
+            | "string"
+            | "unit"
+    )
+}
+
+/// Case JSON: bare literals for bool/int/string/unit; tagged objects for
+/// runtime Values. Decimal is tagged so it does not alias String. A bare
+/// JSON string is always String; a bare JSON number may be Int or Decimal.
 pub(crate) fn value_from_case_json(raw: serde_json::Value) -> Result<Value, String> {
     match raw {
         serde_json::Value::Null => Ok(Value::Unit),
@@ -141,8 +165,12 @@ pub(crate) fn value_from_case_json(raw: serde_json::Value) -> Result<Value, Stri
             Ok(Value::Set(values))
         }
         serde_json::Value::Object(map) => {
+            let tagged = map
+                .get("kind")
+                .and_then(serde_json::Value::as_str)
+                .is_some_and(is_runtime_value_kind_tag);
             let obj = serde_json::Value::Object(map);
-            if obj.get("kind").is_some() {
+            if tagged {
                 serde_json::from_value(obj).map_err(|e| e.to_string())
             } else {
                 map_from_case_json(obj)
@@ -185,8 +213,9 @@ pub(crate) mod case_value {
             Value::Bool(b) => serializer.serialize_bool(*b),
             Value::Int(i) => serializer.serialize_i64(*i),
             Value::String(s) => serializer.serialize_str(s),
-            Value::Decimal(d) => serializer.serialize_str(&d.to_string()),
             Value::Unit => serializer.serialize_unit(),
+            // Decimal and structured values stay tagged so types survive
+            // canonical case JSON (Decimal must not alias String).
             other => other.serialize(serializer),
         }
     }
@@ -237,6 +266,8 @@ pub(crate) mod case_value_map {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canonical_json;
+    use crate::case::CaseRecord;
 
     #[test]
     fn prop_term_is_not_bool() {
@@ -272,6 +303,77 @@ mod tests {
         assert_eq!(
             value_from_case_json(tagged).unwrap(),
             Value::Entity("Alice".into())
+        );
+    }
+
+    #[test]
+    fn case_record_decimal_fact_round_trips() {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "x".into(),
+            Value::Decimal(Decimal::from_str("1.25").unwrap()),
+        );
+        let json = serde_json::to_value(&case).unwrap();
+        assert_eq!(json["facts"]["x"]["kind"], "decimal");
+        assert_eq!(json["facts"]["x"]["data"], "1.25");
+        let back: CaseRecord = serde_json::from_value(json).unwrap();
+        assert_eq!(back, case);
+        assert_eq!(
+            back.facts.get("x"),
+            Some(&Value::Decimal(Decimal::from_str("1.25").unwrap()))
+        );
+    }
+
+    #[test]
+    fn decimal_case_canonical_json_is_not_string_case() {
+        let mut decimal_case = CaseRecord::default();
+        decimal_case.facts.insert(
+            "x".into(),
+            Value::Decimal(Decimal::from_str("1.25").unwrap()),
+        );
+        let mut string_case = CaseRecord::default();
+        string_case
+            .facts
+            .insert("x".into(), Value::String("1.25".into()));
+        let decimal_json = canonical_json(&decimal_case).unwrap();
+        let string_json = canonical_json(&string_case).unwrap();
+        assert_ne!(decimal_json, string_json);
+        assert!(
+            decimal_json.contains("\"kind\":\"decimal\""),
+            "{decimal_json}"
+        );
+        assert!(
+            !string_json.contains("\"kind\":\"decimal\""),
+            "{string_json}"
+        );
+    }
+
+    #[test]
+    fn unknown_kind_object_decodes_as_map() {
+        let raw = serde_json::json!({"kind": "Complaint", "id": "1"});
+        match value_from_case_json(raw).unwrap() {
+            Value::Map(map) => {
+                assert_eq!(map.get("kind"), Some(&Value::String("Complaint".into())));
+                assert_eq!(map.get("id"), Some(&Value::String("1".into())));
+            }
+            other => panic!("expected Map, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn tagged_decimal_decodes_as_decimal_not_string() {
+        let tagged = serde_json::json!({"kind": "decimal", "data": "1.25"});
+        assert_eq!(
+            value_from_case_json(tagged).unwrap(),
+            Value::Decimal(Decimal::from_str("1.25").unwrap())
+        );
+        assert_eq!(
+            value_from_case_json(serde_json::json!("1.25")).unwrap(),
+            Value::String("1.25".into())
+        );
+        assert_eq!(
+            value_from_case_json(serde_json::json!(1.25)).unwrap(),
+            Value::Decimal(Decimal::from_str("1.25").unwrap())
         );
     }
 }

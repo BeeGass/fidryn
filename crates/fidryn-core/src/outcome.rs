@@ -45,9 +45,11 @@ pub enum OpenRequest {
     },
 }
 
-/// A convergence certificate that has been checked against its claims.
+/// A convergence certificate bound to a claims digest.
 ///
-/// The only constructor is [`CheckedCertificate::verified`]. A raw
+/// [`verified`](Self::verified) is a claims-digest binder, not a covering
+/// proof checker. Matching claims do not discharge open constraints. The
+/// only constructor is [`CheckedCertificate::verified`]. A raw
 /// [`CompletionProofId`] is not a certificate.
 ///
 /// ```compile_fail
@@ -134,6 +136,11 @@ impl CheckedCertificate {
 
     /// Bind an untrusted proof id to checked claims. The id must be the
     /// content hash of those claims.
+    ///
+    /// This is a claims-digest binder, not a covering proof checker. Open
+    /// `constraints` are hashed into the digest (the path used when
+    /// constructing a certificate that names ignored issues) so they cannot
+    /// be swapped silently; they are not discharged by a kernel proof.
     #[allow(clippy::too_many_arguments)]
     pub fn verified(
         id: CompletionProofId,
