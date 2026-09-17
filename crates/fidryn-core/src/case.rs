@@ -6,6 +6,14 @@ use crate::value::Value;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+/// Overlay hypothesis; not operative case state.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Assumption {
+    pub id: String,
+    #[serde(with = "crate::value::case_value")]
+    pub payload: Value,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CaseRecord {
@@ -28,6 +36,8 @@ pub struct CaseRecord {
     pub admissible_completions: AdmissibleCompletions,
     #[serde(default)]
     pub outside_scope: Vec<String>,
+    #[serde(default)]
+    pub assumptions: Vec<Assumption>,
 }
 
 impl Default for CaseRecord {
@@ -44,6 +54,7 @@ impl Default for CaseRecord {
             closures: Vec::new(),
             admissible_completions: AdmissibleCompletions::default(),
             outside_scope: Vec::new(),
+            assumptions: Vec::new(),
         }
     }
 }
@@ -233,6 +244,35 @@ mod tests {
         let det: CaseDetermination = serde_json::from_value(json).unwrap();
         assert_eq!(det.issue, "Incapacitated");
         assert!(det.recorded_at.is_none());
+    }
+
+    #[test]
+    fn assumptions_default_empty_on_deserialize() {
+        let json = serde_json::json!({
+            "schema": "fidryn.case-record/v0.1",
+            "admissibleCompletions": {}
+        });
+        let case: CaseRecord = serde_json::from_value(json).unwrap();
+        assert!(case.assumptions.is_empty());
+        assert!(CaseRecord::default().assumptions.is_empty());
+    }
+
+    #[test]
+    fn assumptions_round_trip_id_and_payload() {
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "a1".into(),
+            payload: Value::String("performed".into()),
+        });
+        let v = serde_json::to_value(&case).unwrap();
+        assert_eq!(v["assumptions"][0]["id"], "a1");
+        assert_eq!(v["assumptions"][0]["payload"], "performed");
+        let back: CaseRecord = serde_json::from_value(v).unwrap();
+        assert_eq!(back.assumptions[0].id, "a1");
+        assert_eq!(
+            back.assumptions[0].payload,
+            Value::String("performed".into())
+        );
     }
 
     #[test]

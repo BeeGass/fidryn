@@ -1,6 +1,6 @@
 //! Honest evaluator results. Determinate is never a guess.
 
-use crate::case::CaseRecord;
+use crate::case::{Assumption, CaseRecord};
 use crate::effects::OpenOperation;
 use crate::ids::{CompletionProofId, ModuleId, QueryName, SourceSnapshotId, TraceId};
 use crate::ir::CoreConflictDoctrine;
@@ -25,7 +25,9 @@ pub struct BranchClaim {
 /// A hash of open issues is not covering. Completeness requires a nonempty
 /// examined space (`examined == total && examined > 0`) that was not cut
 /// short (`incomplete == false`). [`Self::is_complete`] does not inspect
-/// `branches`; the kernel checks their meaning.
+/// `branches`. [`CheckedCertificate::verified_covering`] requires one unique
+/// world per `total` with matching answers. FiniteReplay meaning is checked
+/// by kernel replay, not by this shape.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoverageWitness {
@@ -38,7 +40,9 @@ pub struct CoverageWitness {
 }
 
 impl CoverageWitness {
-    /// Complete shape with empty `branches`. Kernel still checks meaning.
+    /// Complete shape with empty `branches`.
+    ///
+    /// Shape-only: [`CheckedCertificate::verified_structural`], not FiniteReplay.
     pub fn complete(examined: usize, answer: Value) -> Self {
         Self {
             examined,
@@ -68,6 +72,30 @@ pub enum TrustProfile {
     Unauthenticated,
 }
 
+/// How a certificate's coverage claim was established.
+///
+/// `None` is a claims digest ([`BoundClaims`]). `Structural` is shape-only
+/// ([`StructurallyCheckedCoverage`]). `FiniteReplay` is finite coverage
+/// verification by replay ([`ReplayVerifiedCoverage`]). Only FiniteReplay
+/// is covering. This is not independent Lean / SMT proof checking.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum CoverageMethod {
+    #[default]
+    None,
+    Structural,
+    FiniteReplay,
+}
+
+/// Whether evaluation committed operative state or applied a scenario overlay.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ExecutionMode {
+    #[default]
+    Operative,
+    Scenario,
+}
+
 /// Evaluator result plus unresolved issues, coverage, and trust.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -77,12 +105,19 @@ pub struct EvaluationReport<T = Value> {
     pub coverage: Option<CoverageWitness>,
     pub trust: TrustProfile,
     pub provenance_root: TraceId,
+    #[serde(default)]
+    pub execution_mode: ExecutionMode,
+    #[serde(default)]
+    pub assumptions: Vec<Assumption>,
+    #[serde(default)]
+    pub verification_method: CoverageMethod,
 }
 
 impl<T> EvaluationReport<T> {
     /// Wrap an outcome. Coverage is unset; trust is unauthenticated.
     ///
     /// Unresolved issues are the suspended requests or contingent pivots.
+    /// Mode is operative; assumptions and verification method are empty/none.
     pub fn from_outcome(outcome: Outcome<T>) -> Self {
         let unresolved = match &outcome {
             Outcome::Suspended { requests, .. } => requests.clone(),
@@ -96,6 +131,9 @@ impl<T> EvaluationReport<T> {
             coverage: None,
             trust: TrustProfile::Unauthenticated,
             provenance_root,
+            execution_mode: ExecutionMode::Operative,
+            assumptions: Vec::new(),
+            verification_method: CoverageMethod::None,
         }
     }
 }
@@ -135,11 +173,17 @@ pub enum OpenRequest {
 
 /// A convergence certificate bound to a claims digest, optionally covering.
 ///
+/// Strength is type-distinct: [`BoundClaims`] (`None`),
+/// [`StructurallyCheckedCoverage`] (`Structural`),
+/// [`ReplayVerifiedCoverage`] (`FiniteReplay`).
 /// [`verified`](Self::verified) is a claims-digest binder, not a covering
 /// proof checker. Matching claims do not discharge open constraints.
-/// Ignoring open issues requires [`verified_covering`](Self::verified_covering)
-/// with a complete [`CoverageWitness`]. A raw [`CompletionProofId`] is not
-/// a certificate.
+/// [`verified_structural`](Self::verified_structural) binds a
+/// shape-complete witness and is not covering. Ignoring open issues
+/// requires [`verified_covering`](Self::verified_covering) with unique
+/// nonempty `branches` (`examined == total == branches.len()`). Empty
+/// [`CoverageWitness::complete`] is not FiniteReplay. A raw
+/// [`CompletionProofId`] is not a certificate.
 ///
 /// ```compile_fail
 /// use fidryn_core::{CheckedCertificate, CompletionProofId};
@@ -153,7 +197,7 @@ pub enum OpenRequest {
 pub struct CheckedCertificate {
     id: CompletionProofId,
     claims_digest: [u8; 16],
-    covering: bool,
+    method: CoverageMethod,
 }
 
 #[derive(Serialize)]
@@ -166,6 +210,8 @@ struct CertificateClaims<'a> {
     known: Instant,
     constraints: &'a BTreeSet<OpenRequest>,
     answer: &'a Value,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    args: &'a BTreeMap<String, Value>,
 }
 
 #[derive(Serialize)]
@@ -179,9 +225,134 @@ struct CoveringClaims<'a> {
     witness_answer: &'a Value,
 }
 
+/// Claims-digest evidence. [`CoverageMethod::None`]. Not covering.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct BoundClaims {
+    certificate: CheckedCertificate,
+}
+
+impl BoundClaims {
+    pub fn certificate(self) -> CheckedCertificate {
+        self.certificate
+    }
+}
+
+impl TryFrom<CheckedCertificate> for BoundClaims {
+    type Error = String;
+
+    fn try_from(certificate: CheckedCertificate) -> Result<Self, Self::Error> {
+        if certificate.method() != CoverageMethod::None {
+            return Err("BoundClaims requires CoverageMethod::None".into());
+        }
+        Ok(Self { certificate })
+    }
+}
+
+impl From<BoundClaims> for CheckedCertificate {
+    fn from(bound: BoundClaims) -> Self {
+        bound.certificate
+    }
+}
+
+/// Shape-complete coverage evidence. [`CoverageMethod::Structural`]. Not covering.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct StructurallyCheckedCoverage {
+    certificate: CheckedCertificate,
+}
+
+impl StructurallyCheckedCoverage {
+    pub fn certificate(self) -> CheckedCertificate {
+        self.certificate
+    }
+}
+
+impl TryFrom<CheckedCertificate> for StructurallyCheckedCoverage {
+    type Error = String;
+
+    fn try_from(certificate: CheckedCertificate) -> Result<Self, Self::Error> {
+        if certificate.method() != CoverageMethod::Structural {
+            return Err("StructurallyCheckedCoverage requires CoverageMethod::Structural".into());
+        }
+        Ok(Self { certificate })
+    }
+}
+
+impl From<StructurallyCheckedCoverage> for CheckedCertificate {
+    fn from(coverage: StructurallyCheckedCoverage) -> Self {
+        coverage.certificate
+    }
+}
+
+/// Finite-replay coverage evidence. [`CoverageMethod::FiniteReplay`]. Covering.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ReplayVerifiedCoverage {
+    certificate: CheckedCertificate,
+}
+
+impl ReplayVerifiedCoverage {
+    pub fn certificate(self) -> CheckedCertificate {
+        self.certificate
+    }
+}
+
+impl TryFrom<CheckedCertificate> for ReplayVerifiedCoverage {
+    type Error = String;
+
+    fn try_from(certificate: CheckedCertificate) -> Result<Self, Self::Error> {
+        if !certificate.is_covering() {
+            return Err(
+                "ReplayVerifiedCoverage requires CoverageMethod::FiniteReplay (is_covering)".into(),
+            );
+        }
+        Ok(Self { certificate })
+    }
+}
+
+impl From<ReplayVerifiedCoverage> for CheckedCertificate {
+    fn from(coverage: ReplayVerifiedCoverage) -> Self {
+        coverage.certificate
+    }
+}
+
+fn reject_raw_certificate_id<'de, D, T>(deserializer: D, ctor: &'static str) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let _ = Option::<serde_json::Value>::deserialize(deserializer)?;
+    Err(D::Error::custom(format!(
+        "convergence certificates cannot be rebuilt from a raw id; use {ctor}"
+    )))
+}
+
+impl<'de> Deserialize<'de> for BoundClaims {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        reject_raw_certificate_id(deserializer, "CheckedCertificate::verified")
+    }
+}
+
+impl<'de> Deserialize<'de> for StructurallyCheckedCoverage {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        reject_raw_certificate_id(deserializer, "CheckedCertificate::verified_structural")
+    }
+}
+
+impl<'de> Deserialize<'de> for ReplayVerifiedCoverage {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        reject_raw_certificate_id(deserializer, "CheckedCertificate::verified_covering")
+    }
+}
+
 impl CheckedCertificate {
     fn claims_payload(claims: &CertificateClaims<'_>) -> Result<Vec<u8>, String> {
         crate::canonical_to_vec(claims).map_err(|e| e.to_string())
+    }
+
+    fn covering_tag(method: CoverageMethod) -> Result<&'static str, String> {
+        match method {
+            CoverageMethod::Structural => Ok("structural"),
+            CoverageMethod::FiniteReplay => Ok("finiteReplay"),
+            CoverageMethod::None => Err("claims digest is not a covering method".into()),
+        }
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -194,6 +365,7 @@ impl CheckedCertificate {
         known: Instant,
         constraints: &BTreeSet<OpenRequest>,
         answer: &Value,
+        args: &BTreeMap<String, Value>,
     ) -> Result<(Vec<u8>, CompletionProofId), String> {
         let claims = CertificateClaims {
             program,
@@ -204,6 +376,7 @@ impl CheckedCertificate {
             known,
             constraints,
             answer,
+            args,
         };
         let payload = Self::claims_payload(&claims)?;
         let id = CompletionProofId::of(&payload);
@@ -222,6 +395,32 @@ impl CheckedCertificate {
         constraints: &BTreeSet<OpenRequest>,
         answer: &Value,
     ) -> Result<CompletionProofId, String> {
+        Self::claims_id_with_args(
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`claims_id`] with query arguments bound into the digest.
+    #[allow(clippy::too_many_arguments)]
+    pub fn claims_id_with_args(
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<CompletionProofId, String> {
         let (_payload, id) = Self::bind_claims(
             program,
             snapshot,
@@ -231,6 +430,7 @@ impl CheckedCertificate {
             known,
             constraints,
             answer,
+            args,
         )?;
         Ok(id)
     }
@@ -238,10 +438,12 @@ impl CheckedCertificate {
     /// Bind an untrusted proof id to checked claims. The id must be the
     /// content hash of those claims.
     ///
-    /// This is a claims-digest binder, not a covering proof checker. Open
-    /// `constraints` are hashed into the digest (the path used when
-    /// constructing a certificate that names ignored issues) so they cannot
-    /// be swapped silently; they are not discharged by a kernel proof.
+    /// This is a claims-digest binder ([`BoundClaims`]), not a covering
+    /// proof checker. Open `constraints` are hashed into the digest (the
+    /// path used when constructing a certificate that names ignored issues)
+    /// so they cannot be swapped silently; they are not discharged by a
+    /// kernel proof. Assumptions live on [`CaseRecord`] and are hashed with
+    /// the case. Query arguments default to empty; see [`verified_with_args`].
     #[allow(clippy::too_many_arguments)]
     pub fn verified(
         id: CompletionProofId,
@@ -254,6 +456,34 @@ impl CheckedCertificate {
         constraints: &BTreeSet<OpenRequest>,
         answer: &Value,
     ) -> Result<Self, String> {
+        Self::verified_with_args(
+            id,
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`verified`] with query arguments bound into the claims digest.
+    #[allow(clippy::too_many_arguments)]
+    pub fn verified_with_args(
+        id: CompletionProofId,
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<Self, String> {
         let (payload, expected) = Self::bind_claims(
             program,
             snapshot,
@@ -263,6 +493,7 @@ impl CheckedCertificate {
             known,
             constraints,
             answer,
+            args,
         )?;
         if expected != id {
             return Err(format!(
@@ -271,13 +502,10 @@ impl CheckedCertificate {
                 expected.hex()
             ));
         }
-        let hash = blake3::hash(&payload);
-        let mut claims_digest = [0u8; 16];
-        claims_digest.copy_from_slice(&hash.as_bytes()[..16]);
         Ok(Self {
             id,
-            claims_digest,
-            covering: false,
+            claims_digest: Self::digest_from_payload(&payload),
+            method: CoverageMethod::None,
         })
     }
 
@@ -292,6 +520,8 @@ impl CheckedCertificate {
         constraints: &BTreeSet<OpenRequest>,
         answer: &Value,
         witness: &CoverageWitness,
+        method: CoverageMethod,
+        args: &BTreeMap<String, Value>,
     ) -> Result<(Vec<u8>, CompletionProofId), String> {
         let claims = CoveringClaims {
             claims: CertificateClaims {
@@ -303,8 +533,9 @@ impl CheckedCertificate {
                 known,
                 constraints,
                 answer,
+                args,
             },
-            tag: "covering",
+            tag: Self::covering_tag(method)?,
             examined: witness.examined,
             total: witness.total,
             incomplete: witness.incomplete,
@@ -315,7 +546,9 @@ impl CheckedCertificate {
         Ok((payload, id))
     }
 
-    /// Content hash of covering claims. Pass this as `id` to [`verified_covering`].
+    /// Content hash of FiniteReplay covering claims. Pass this as `id` to
+    /// [`verified_covering`]. For Structural evidence use
+    /// [`structural_claims_id`].
     #[allow(clippy::too_many_arguments)]
     pub fn covering_claims_id(
         program: ModuleId,
@@ -328,6 +561,34 @@ impl CheckedCertificate {
         answer: &Value,
         witness: &CoverageWitness,
     ) -> Result<CompletionProofId, String> {
+        Self::covering_claims_id_with_args(
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            witness,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`covering_claims_id`] with query arguments bound into the digest.
+    #[allow(clippy::too_many_arguments)]
+    pub fn covering_claims_id_with_args(
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: &CoverageWitness,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<CompletionProofId, String> {
         let (_payload, id) = Self::bind_covering(
             program,
             snapshot,
@@ -338,12 +599,148 @@ impl CheckedCertificate {
             constraints,
             answer,
             witness,
+            CoverageMethod::FiniteReplay,
+            args,
         )?;
         Ok(id)
     }
 
-    /// Bind an untrusted proof id to checked claims plus a complete covering
-    /// witness. A claims digest is not covering.
+    /// Content hash of Structural covering claims. Pass this as `id` to
+    /// [`verified_structural`]. Distinct from [`covering_claims_id`].
+    #[allow(clippy::too_many_arguments)]
+    pub fn structural_claims_id(
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: &CoverageWitness,
+    ) -> Result<CompletionProofId, String> {
+        Self::structural_claims_id_with_args(
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            witness,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`structural_claims_id`] with query arguments bound into the digest.
+    #[allow(clippy::too_many_arguments)]
+    pub fn structural_claims_id_with_args(
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: &CoverageWitness,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<CompletionProofId, String> {
+        let (_payload, id) = Self::bind_covering(
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            witness,
+            CoverageMethod::Structural,
+            args,
+        )?;
+        Ok(id)
+    }
+
+    /// Bind an untrusted proof id to checked claims plus a shape-complete
+    /// witness. Completeness is `is_complete` and a matching answer. This
+    /// is not covering: [`is_covering`] is false.
+    #[allow(clippy::too_many_arguments)]
+    pub fn verified_structural(
+        id: CompletionProofId,
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: CoverageWitness,
+    ) -> Result<Self, String> {
+        Self::verified_structural_with_args(
+            id,
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            witness,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`verified_structural`] with query arguments bound into the claims.
+    #[allow(clippy::too_many_arguments)]
+    pub fn verified_structural_with_args(
+        id: CompletionProofId,
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: CoverageWitness,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<Self, String> {
+        Self::require_complete_witness(&witness, answer)?;
+        let (payload, expected) = Self::bind_covering(
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            &witness,
+            CoverageMethod::Structural,
+            args,
+        )?;
+        if expected != id {
+            return Err(format!(
+                "completion proof id {} does not match covering claims {}",
+                id.hex(),
+                expected.hex()
+            ));
+        }
+        Ok(Self {
+            id,
+            claims_digest: Self::digest_from_payload(&payload),
+            method: CoverageMethod::Structural,
+        })
+    }
+
+    /// Bind an untrusted proof id to checked claims plus a FiniteReplay
+    /// witness. Empty `branches` (including [`CoverageWitness::complete`])
+    /// is not covering. Method is FiniteReplay only after unique worlds
+    /// with matching answers are present. A claims digest is not covering.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_covering(
         id: CompletionProofId,
@@ -357,12 +754,37 @@ impl CheckedCertificate {
         answer: &Value,
         witness: CoverageWitness,
     ) -> Result<Self, String> {
-        if !witness.is_complete() {
-            return Err("coverage witness is incomplete".into());
-        }
-        if witness.answer != *answer {
-            return Err("coverage witness answer does not match claimed answer".into());
-        }
+        Self::verified_covering_with_args(
+            id,
+            program,
+            snapshot,
+            case,
+            query,
+            valid,
+            known,
+            constraints,
+            answer,
+            witness,
+            &BTreeMap::new(),
+        )
+    }
+
+    /// [`verified_covering`] with query arguments bound into the claims.
+    #[allow(clippy::too_many_arguments)]
+    pub fn verified_covering_with_args(
+        id: CompletionProofId,
+        program: ModuleId,
+        snapshot: SourceSnapshotId,
+        case: &CaseRecord,
+        query: &QueryName,
+        valid: Instant,
+        known: Instant,
+        constraints: &BTreeSet<OpenRequest>,
+        answer: &Value,
+        witness: CoverageWitness,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<Self, String> {
+        Self::require_replay_witness(&witness, answer)?;
         let (payload, expected) = Self::bind_covering(
             program,
             snapshot,
@@ -373,6 +795,8 @@ impl CheckedCertificate {
             constraints,
             answer,
             &witness,
+            CoverageMethod::FiniteReplay,
+            args,
         )?;
         if expected != id {
             return Err(format!(
@@ -381,14 +805,54 @@ impl CheckedCertificate {
                 expected.hex()
             ));
         }
-        let hash = blake3::hash(&payload);
-        let mut claims_digest = [0u8; 16];
-        claims_digest.copy_from_slice(&hash.as_bytes()[..16]);
         Ok(Self {
             id,
-            claims_digest,
-            covering: true,
+            claims_digest: Self::digest_from_payload(&payload),
+            method: CoverageMethod::FiniteReplay,
         })
+    }
+
+    fn require_complete_witness(witness: &CoverageWitness, answer: &Value) -> Result<(), String> {
+        if !witness.is_complete() {
+            return Err("coverage witness is incomplete".into());
+        }
+        if witness.answer != *answer {
+            return Err("coverage witness answer does not match claimed answer".into());
+        }
+        Ok(())
+    }
+
+    fn require_replay_witness(witness: &CoverageWitness, answer: &Value) -> Result<(), String> {
+        Self::require_complete_witness(witness, answer)?;
+        if witness.branches.is_empty() {
+            return Err("coverage witness has no branches".into());
+        }
+        if witness.branches.len() != witness.total || witness.branches.len() != witness.examined {
+            return Err(format!(
+                "coverage witness branches length {} does not match examined {} / total {}",
+                witness.branches.len(),
+                witness.examined,
+                witness.total
+            ));
+        }
+        if has_duplicate_bindings(&witness.branches) {
+            return Err("duplicate worlds in coverage witness".into());
+        }
+        if witness
+            .branches
+            .iter()
+            .any(|branch| branch.answer != *answer || branch.answer != witness.answer)
+        {
+            return Err("coverage witness branch answer does not match claimed answer".into());
+        }
+        Ok(())
+    }
+
+    fn digest_from_payload(payload: &[u8]) -> [u8; 16] {
+        let hash = blake3::hash(payload);
+        let mut claims_digest = [0u8; 16];
+        claims_digest.copy_from_slice(&hash.as_bytes()[..16]);
+        claims_digest
     }
 
     pub fn id(self) -> CompletionProofId {
@@ -399,16 +863,30 @@ impl CheckedCertificate {
         self.claims_digest
     }
 
-    pub fn is_covering(self) -> bool {
-        self.covering
+    pub fn method(self) -> CoverageMethod {
+        self.method
     }
+
+    /// True only for [`CoverageMethod::FiniteReplay`].
+    pub fn is_covering(self) -> bool {
+        matches!(self.method, CoverageMethod::FiniteReplay)
+    }
+}
+
+fn has_duplicate_bindings(branches: &[BranchClaim]) -> bool {
+    branches.iter().enumerate().any(|(index, branch)| {
+        branches[..index]
+            .iter()
+            .any(|prior| prior.bindings == branch.bindings)
+    })
 }
 
 impl fmt::Debug for CheckedCertificate {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("CheckedCertificate")
             .field("id", &self.id)
-            .field("covering", &self.covering)
+            .field("method", &self.method)
+            .field("covering", &self.is_covering())
             .finish_non_exhaustive()
     }
 }
@@ -562,6 +1040,19 @@ mod tests {
         CoverageWitness::complete(1, answer)
     }
 
+    fn replay_witness(answer: Value) -> CoverageWitness {
+        CoverageWitness {
+            examined: 1,
+            total: 1,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: vec![BranchClaim {
+                bindings: BTreeMap::new(),
+                answer,
+            }],
+        }
+    }
+
     #[test]
     fn determinate_fields_are_camel_case() {
         let program = ModuleId::of(b"m");
@@ -572,7 +1063,7 @@ mod tests {
         let mut ignored = BTreeSet::new();
         ignored.insert(sample_request());
         let answer = Value::Bool(true);
-        let witness = complete_witness(answer.clone());
+        let witness = replay_witness(answer.clone());
         let id = CheckedCertificate::covering_claims_id(
             program, snapshot, &case, &query, t, t, &ignored, &answer, &witness,
         )
@@ -595,6 +1086,56 @@ mod tests {
     }
 
     #[test]
+    fn verified_structural_is_not_covering_for_ignored_issues() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let mut ignored = BTreeSet::new();
+        ignored.insert(sample_request());
+        let answer = Value::Bool(true);
+        let witness = complete_witness(answer.clone());
+        let id = CheckedCertificate::structural_claims_id(
+            program, snapshot, &case, &query, t, t, &ignored, &answer, &witness,
+        )
+        .unwrap();
+        let cert = CheckedCertificate::verified_structural(
+            id, program, snapshot, &case, &query, t, t, &ignored, &answer, witness,
+        )
+        .unwrap();
+        assert_eq!(cert.method(), CoverageMethod::Structural);
+        assert!(!cert.is_covering());
+        let err = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored).unwrap_err();
+        assert!(err.contains("covering"), "{err}");
+    }
+
+    #[test]
+    fn verified_covering_with_ignored_issues_is_determinate() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let mut ignored = BTreeSet::new();
+        ignored.insert(sample_request());
+        let answer = Value::Bool(true);
+        let witness = replay_witness(answer.clone());
+        let id = CheckedCertificate::covering_claims_id(
+            program, snapshot, &case, &query, t, t, &ignored, &answer, &witness,
+        )
+        .unwrap();
+        let cert = CheckedCertificate::verified_covering(
+            id, program, snapshot, &case, &query, t, t, &ignored, &answer, witness,
+        )
+        .unwrap();
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        let out = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored).unwrap();
+        assert!(out.is_determinate());
+    }
+
+    #[test]
     fn verified_digest_is_not_covering_for_ignored_issues() {
         let program = ModuleId::of(b"m");
         let snapshot = SourceSnapshotId::of(b"s");
@@ -612,6 +1153,7 @@ mod tests {
             id, program, snapshot, &case, &query, t, t, &ignored, &answer,
         )
         .unwrap();
+        assert_eq!(cert.method(), CoverageMethod::None);
         assert!(!cert.is_covering());
         let err = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored).unwrap_err();
         assert!(err.contains("covering"), "{err}");
@@ -650,6 +1192,102 @@ mod tests {
 
         let mismatched = complete_witness(Value::Bool(false));
         let err = CheckedCertificate::verified_covering(
+            CompletionProofId::of(b"x"),
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            mismatched,
+        )
+        .unwrap_err();
+        assert!(err.contains("answer"), "{err}");
+
+        let duplicates = CoverageWitness {
+            examined: 2,
+            total: 2,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: vec![
+                BranchClaim {
+                    bindings: BTreeMap::new(),
+                    answer: answer.clone(),
+                },
+                BranchClaim {
+                    bindings: BTreeMap::new(),
+                    answer: answer.clone(),
+                },
+            ],
+        };
+        let err = CheckedCertificate::verified_covering(
+            CompletionProofId::of(b"x"),
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            duplicates,
+        )
+        .unwrap_err();
+        assert!(err.contains("duplicate"), "{err}");
+
+        let short = CoverageWitness {
+            examined: 2,
+            total: 2,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: vec![BranchClaim {
+                bindings: BTreeMap::new(),
+                answer: answer.clone(),
+            }],
+        };
+        let err = CheckedCertificate::verified_covering(
+            CompletionProofId::of(b"x"),
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            short,
+        )
+        .unwrap_err();
+        assert!(
+            err.contains("branches") || err.contains("length") || err.contains("total"),
+            "{err}"
+        );
+
+        let incomplete = CoverageWitness {
+            examined: 0,
+            total: 0,
+            incomplete: false,
+            answer: answer.clone(),
+            branches: Vec::new(),
+        };
+        let err = CheckedCertificate::verified_structural(
+            CompletionProofId::of(b"x"),
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            incomplete,
+        )
+        .unwrap_err();
+        assert!(err.contains("incomplete"), "{err}");
+        let mismatched = complete_witness(Value::Bool(false));
+        let err = CheckedCertificate::verified_structural(
             CompletionProofId::of(b"x"),
             program,
             snapshot,
@@ -761,6 +1399,28 @@ mod tests {
         assert!(report.coverage.is_none());
         assert_eq!(report.trust, TrustProfile::Unauthenticated);
         assert_eq!(report.provenance_root, TraceId::of(b"t"));
+        assert_eq!(report.execution_mode, ExecutionMode::Operative);
+        assert!(report.assumptions.is_empty());
+        assert_eq!(report.verification_method, CoverageMethod::None);
+    }
+
+    #[test]
+    fn evaluation_report_deserializes_without_new_envelope_fields() {
+        let json = serde_json::json!({
+            "outcome": {
+                "kind": "suspended",
+                "requests": [],
+                "trace": TraceId::of(b"t").hex()
+            },
+            "unresolved": [],
+            "coverage": null,
+            "trust": "unauthenticated",
+            "provenanceRoot": TraceId::of(b"t").hex()
+        });
+        let report: EvaluationReport<Value> = serde_json::from_value(json).unwrap();
+        assert_eq!(report.execution_mode, ExecutionMode::Operative);
+        assert!(report.assumptions.is_empty());
+        assert_eq!(report.verification_method, CoverageMethod::None);
     }
 
     #[test]
@@ -774,6 +1434,29 @@ mod tests {
             "unauthenticated"
         );
         assert_eq!(TrustProfile::default(), TrustProfile::Unauthenticated);
+    }
+
+    #[test]
+    fn coverage_method_and_execution_mode_serialize_camel_case() {
+        assert_eq!(serde_json::to_value(CoverageMethod::None).unwrap(), "none");
+        assert_eq!(
+            serde_json::to_value(CoverageMethod::Structural).unwrap(),
+            "structural"
+        );
+        assert_eq!(
+            serde_json::to_value(CoverageMethod::FiniteReplay).unwrap(),
+            "finiteReplay"
+        );
+        assert_eq!(
+            serde_json::to_value(ExecutionMode::Operative).unwrap(),
+            "operative"
+        );
+        assert_eq!(
+            serde_json::to_value(ExecutionMode::Scenario).unwrap(),
+            "scenario"
+        );
+        assert_eq!(CoverageMethod::default(), CoverageMethod::None);
+        assert_eq!(ExecutionMode::default(), ExecutionMode::Operative);
     }
 
     #[test]
@@ -851,5 +1534,308 @@ mod tests {
             err.to_string().contains("CheckedCertificate::verified"),
             "{err}"
         );
+        let raw = serde_json::json!(CompletionProofId::of(b"P11").hex());
+        let bound = serde_json::from_value::<BoundClaims>(raw.clone()).unwrap_err();
+        assert!(
+            bound.to_string().contains("CheckedCertificate::verified"),
+            "{bound}"
+        );
+        let structural =
+            serde_json::from_value::<StructurallyCheckedCoverage>(raw.clone()).unwrap_err();
+        assert!(
+            structural
+                .to_string()
+                .contains("CheckedCertificate::verified_structural"),
+            "{structural}"
+        );
+        let replay = serde_json::from_value::<ReplayVerifiedCoverage>(raw).unwrap_err();
+        assert!(
+            replay
+                .to_string()
+                .contains("CheckedCertificate::verified_covering"),
+            "{replay}"
+        );
+    }
+
+    #[test]
+    fn verified_covering_with_empty_branches_is_err() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let constraints = BTreeSet::new();
+        let answer = Value::Bool(true);
+        let witness = complete_witness(answer.clone());
+        assert!(witness.branches.is_empty());
+        let id = CheckedCertificate::covering_claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &witness,
+        )
+        .unwrap();
+        let err = CheckedCertificate::verified_covering(
+            id,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            witness,
+        )
+        .unwrap_err();
+        assert!(
+            err.contains("branch") || err.contains("empty") || err.contains("no branches"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn structural_and_finite_replay_covering_claims_ids_differ() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let constraints = BTreeSet::new();
+        let answer = Value::Bool(true);
+        let witness = replay_witness(answer.clone());
+        let structural = CheckedCertificate::structural_claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &witness,
+        )
+        .unwrap();
+        let replay = CheckedCertificate::covering_claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &witness,
+        )
+        .unwrap();
+        assert_ne!(structural, replay);
+        let err = CheckedCertificate::verified_covering(
+            structural,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            witness.clone(),
+        )
+        .unwrap_err();
+        assert!(err.contains("does not match"), "{err}");
+        let err = CheckedCertificate::verified_structural(
+            replay,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            witness,
+        )
+        .unwrap_err();
+        assert!(err.contains("does not match"), "{err}");
+    }
+
+    #[test]
+    fn replay_verified_coverage_try_from_rejects_structural_and_none() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let constraints = BTreeSet::new();
+        let answer = Value::Bool(true);
+        let structural_witness = complete_witness(answer.clone());
+        let structural_id = CheckedCertificate::structural_claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &structural_witness,
+        )
+        .unwrap();
+        let structural = CheckedCertificate::verified_structural(
+            structural_id,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            structural_witness,
+        )
+        .unwrap();
+        assert!(!structural.is_covering());
+        ReplayVerifiedCoverage::try_from(structural).expect_err("structural is not covering");
+        BoundClaims::try_from(structural).expect_err("structural is not BoundClaims");
+        StructurallyCheckedCoverage::try_from(structural).expect("structural wraps");
+
+        let none_id = CheckedCertificate::claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+        )
+        .unwrap();
+        let none = CheckedCertificate::verified(
+            none_id,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+        )
+        .unwrap();
+        ReplayVerifiedCoverage::try_from(none).expect_err("digest is not covering");
+        BoundClaims::try_from(none).expect("digest wraps BoundClaims");
+        StructurallyCheckedCoverage::try_from(none).expect_err("digest is not structural");
+
+        let replay_w = replay_witness(answer.clone());
+        let replay_id = CheckedCertificate::covering_claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &replay_w,
+        )
+        .unwrap();
+        let covering = CheckedCertificate::verified_covering(
+            replay_id,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            replay_w,
+        )
+        .unwrap();
+        let wrapped = ReplayVerifiedCoverage::try_from(covering).expect("finite replay wraps");
+        assert!(wrapped.certificate().is_covering());
+        BoundClaims::try_from(covering).expect_err("finite replay is not BoundClaims");
+        StructurallyCheckedCoverage::try_from(covering)
+            .expect_err("finite replay is not structural");
+    }
+
+    #[test]
+    fn outcome_determinate_rejects_structural_for_ignored_issues() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let mut ignored = BTreeSet::new();
+        ignored.insert(sample_request());
+        let answer = Value::Bool(true);
+        let witness = complete_witness(answer.clone());
+        let id = CheckedCertificate::structural_claims_id(
+            program, snapshot, &case, &query, t, t, &ignored, &answer, &witness,
+        )
+        .unwrap();
+        let cert = CheckedCertificate::verified_structural(
+            id, program, snapshot, &case, &query, t, t, &ignored, &answer, witness,
+        )
+        .unwrap();
+        let err = Outcome::determinate(answer, TraceId::of(b"t"), Some(cert), ignored).unwrap_err();
+        assert!(err.contains("covering"), "{err}");
+    }
+
+    #[test]
+    fn query_args_are_bound_into_claims() {
+        let program = ModuleId::of(b"m");
+        let snapshot = SourceSnapshotId::of(b"s");
+        let case = CaseRecord::default();
+        let query = QueryName::from("q");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let constraints = BTreeSet::new();
+        let answer = Value::Unit;
+        let empty = CheckedCertificate::claims_id(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+        )
+        .unwrap();
+        let mut args = BTreeMap::new();
+        args.insert("x".into(), Value::Int(1));
+        let with_args = CheckedCertificate::claims_id_with_args(
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &args,
+        )
+        .unwrap();
+        assert_ne!(empty, with_args);
+        let cert = CheckedCertificate::verified_with_args(
+            with_args,
+            program,
+            snapshot,
+            &case,
+            &query,
+            t,
+            t,
+            &constraints,
+            &answer,
+            &args,
+        )
+        .unwrap();
+        assert_eq!(cert.method(), CoverageMethod::None);
+        BoundClaims::try_from(cert).expect("args-bound digest is BoundClaims");
     }
 }

@@ -20,8 +20,8 @@ pub mod value;
 
 pub use canonical::{canonical_json, canonical_to_vec};
 pub use case::{
-    AdmissibleCompletions, CaseRecord, ClosureRecord, CompletionDomain, EvidenceItem, LedgerEvent,
-    ManifestArtifact, ModelBoundary, SourceManifest, SourceWeight,
+    AdmissibleCompletions, Assumption, CaseRecord, ClosureRecord, CompletionDomain, EvidenceItem,
+    LedgerEvent, ManifestArtifact, ModelBoundary, SourceManifest, SourceWeight,
 };
 pub use diagnostics::{Diagnostic, DiagnosticCode, Severity, Span};
 pub use duty::{DutyState, DutyStatus};
@@ -41,8 +41,9 @@ pub use ir::{
     VerificationBounds,
 };
 pub use outcome::{
-    BranchClaim, CheckedCertificate, CoverageWitness, EvaluationReport, OpenRequest, Outcome,
-    TrustProfile,
+    BoundClaims, BranchClaim, CheckedCertificate, CoverageMethod, CoverageWitness,
+    EvaluationReport, ExecutionMode, OpenRequest, Outcome, ReplayVerifiedCoverage,
+    StructurallyCheckedCoverage, TrustProfile,
 };
 pub use patterns::{
     ContextPattern, LegalEffectPattern, LegalStatusPattern, LegalSubjectPattern, PositionPattern,
