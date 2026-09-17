@@ -1,0 +1,4 @@
+FinCEN beneficial ownership information final rule (research fixture, not the C.F.R.).
+Effective 2026-08-14. U.S. companies are exempt from BOI reporting.
+Reporting company means a foreign entity registered to do business in a U.S. State or Tribal jurisdiction, unless otherwise exempt.
+U.S. persons are not reported as beneficial owners or company applicants.

@@ -1,0 +1,3 @@
+26 U.S.C. section 1 (research fixture, not the Internal Revenue Code).
+Ordinary income tax is a closed-form function of taxable income and filing status.
+This module names that formula. It does not run a tax engine.

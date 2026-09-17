@@ -1,0 +1,56 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.CivilComplaint@0.1.0",
+  "facts": {
+    "case": "DistrictCase",
+    "complaint": "ComplaintPleading",
+    "answer": "AnswerPleading",
+    "judgment_entry": "judgment-1",
+    "commenced": true,
+    "answered": true
+  },
+  "evidence": [
+    {
+      "schema": "Pleading",
+      "value": "complaint-1",
+      "observedAt": "2026-08-24T09:00:00-04:00"
+    },
+    {
+      "schema": "Pleading",
+      "value": "answer-1",
+      "observedAt": "2026-09-10T09:00:00-04:00"
+    },
+    {
+      "schema": "JudgmentEntry",
+      "value": "judgment-1",
+      "observedAt": "2026-10-01T16:00:00-04:00"
+    }
+  ],
+  "determinations": [
+    {
+      "issue": "Adjudicated",
+      "protocol": "JudgmentOnTheMerits",
+      "established": true,
+      "decider": "CourtWithJurisdiction"
+    }
+  ],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [
+    { "domain": "judgment_entries", "closed": true }
+  ],
+  "outsideScope": [
+    "discovery",
+    "jury_practice",
+    "class_actions",
+    "complete_FRCP",
+    "appellate_procedure",
+    "state_procedure",
+    "evidence_code"
+  ],
+  "admissibleCompletions": {
+    "interpretations": {},
+    "evidence": {},
+    "choices": {}
+  }
+}

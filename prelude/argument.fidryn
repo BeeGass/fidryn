@@ -1,0 +1,22 @@
+module Fidryn.Argument version "0.1.0" {
+    jurisdiction Fidryn
+    source_snapshot "2026-08-23-prelude"
+    source_manifest "prelude.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00Z
+
+    outside_scope {
+        complete_conflict_oracle
+        all_case_law_not_expressly_imported
+    }
+
+    proposition Citation(decision: SourceRef, holding: Prop)
+    proposition Holding(decision: SourceRef, proposition: Prop)
+    proposition Distinguishes(
+        later: SourceRef,
+        earlier: SourceRef,
+        proposition: Prop
+    )
+    proposition Overrules(later: SourceRef, earlier: SourceRef)
+    proposition Follows(later: SourceRef, earlier: SourceRef)
+}

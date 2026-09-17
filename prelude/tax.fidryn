@@ -1,0 +1,39 @@
+module Fidryn.Tax version "0.1.0" {
+    jurisdiction Fidryn
+    source_snapshot "2026-08-14-prelude-tax"
+    source_manifest "prelude.manifest.json"
+    effective_at 2026-08-14
+    recorded_at 2026-08-14T00:00:00Z
+
+    outside_scope {
+        tax_engines
+        live_government_filing
+        complete_IRC
+        state_tax
+        international_tax
+    }
+
+    type TaxYear = Int
+    type FilingStatus =
+        Single
+      | MarriedFilingJointly
+      | MarriedFilingSeparately
+      | HeadOfHousehold
+    type ReportingCompanyKind = DomesticEntity | ForeignEntityRegisteredInUS
+    type BOIStatus = BOIRequired | ExemptFromBOI
+
+    record_type TaxableIncome {
+        amount: Money<USD>
+        year: TaxYear
+        status: FilingStatus
+    }
+
+    record_type BeneficialOwnershipReport {
+        company: LegalPerson
+        year: TaxYear
+    }
+
+    calc ordinary_income_tax_formula(amount: Money<USD>) -> String {
+        "IRC section 1 ordinary income brackets applied to amount"
+    }
+}

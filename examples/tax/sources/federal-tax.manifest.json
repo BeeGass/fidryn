@@ -1,0 +1,21 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-08-14-fincen-boi",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "fincen-boi-final-rule.txt",
+      "digest": "fixture",
+      "kind": "regulation",
+      "effective": "2026-08-14",
+      "weight": "binding"
+    },
+    {
+      "path": "irc-1-ordinary-income.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-01-01",
+      "weight": "binding"
+    }
+  ]
+}

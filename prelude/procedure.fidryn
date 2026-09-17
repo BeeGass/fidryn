@@ -1,0 +1,71 @@
+module Fidryn.Procedure version "0.1.0" {
+    jurisdiction Fidryn
+    source_snapshot "2026-08-23-prelude"
+    source_manifest "prelude.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00Z
+
+    outside_scope {
+        complete_FRCP
+        appellate_procedure
+        evidence_code
+        live_government_filing
+        jury_practice
+    }
+
+    record_type Proceeding {
+        caption: String
+        forum: Authority
+        docket: String
+    }
+
+    type PleadingKind = Complaint | Answer | Reply | Motion
+    record_type Pleading {
+        kind: PleadingKind
+        proceeding: Proceeding
+        filer: LegalPerson
+        text: String
+        filed_at: Time
+    }
+
+    type Burden = Production | Persuasion
+    record_type AllocatedBurden {
+        issue: Prop
+        bearer: LegalPerson
+        kind: Burden
+    }
+
+    type NoticeKind = ProcessNotice | HearingNotice | JudgmentNotice
+    record_type Notice {
+        kind: NoticeKind
+        recipient: LegalPerson
+        content: String
+        given_at: Time
+    }
+
+    record_type JudgmentEntry {
+        proceeding: Proceeding
+        court: Authority
+        entered_at: Time
+        disposition: String
+        finality: Finality
+    }
+
+    record_type Appeal {
+        from_judgment: JudgmentEntry
+        appellant: LegalPerson
+        noticed_at: Time
+    }
+
+    type Stay = Stayed | NotStayed
+    type Remand = Remanded | NotRemanded
+    type Finality = Interlocutory | Final
+
+    proposition Commenced(proceeding: Proceeding)
+    proposition Served(pleading: Pleading, recipient: LegalPerson)
+    proposition Answered(proceeding: Proceeding)
+    proposition Adjudicated(proceeding: Proceeding)
+    proposition AppealTaken(proceeding: Proceeding)
+    proposition Stayed(proceeding: Proceeding)
+    proposition Remanded(proceeding: Proceeding)
+}

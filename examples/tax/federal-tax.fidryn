@@ -1,0 +1,96 @@
+module US.Federal.Tax.ClosedForms version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-08-14-fincen-boi"
+    source_manifest "sources/federal-tax.manifest.json"
+    effective_at 2026-08-14
+    recorded_at 2026-08-14T00:00:00-04:00
+
+    outside_scope {
+        tax_engines
+        live_government_filing
+        complete_IRC
+        state_tax
+        international_tax
+        partnership_allocations
+        open_textured_credits_except_as_declared
+    }
+
+    import Fidryn.Tax version "0.1.0"
+
+    source IRCSection1 {
+        kind statute
+        authority UnitedStatesCongress
+        citation "26 U.S.C. § 1"
+        artifact "sources/irc-1-ordinary-income.txt"
+        digest fixture
+        effective [2026-01-01, +inf)
+    }
+
+    source FinCENBOIFinalRule {
+        kind regulation
+        authority FinCEN
+        citation "31 C.F.R. 1010.380 (final rule effective 2026-08-14)"
+        artifact "sources/fincen-boi-final-rule.txt"
+        digest fixture
+        effective [2026-08-14, +inf)
+        retrieved_at 2026-08-14T00:00:00-04:00
+    }
+
+    entity AcmeLLC : LegalPerson
+    entity Taxpayer : NaturalPerson
+
+    proposition DomesticCompany(entity: LegalPerson)
+    proposition ExemptFromBOI(entity: LegalPerson)
+    proposition BOIRequired(entity: LegalPerson)
+    proposition EligibleForOpenTexturedCredit(person: NaturalPerson)
+
+    observation DomesticFormationRecord(record: BeneficialOwnershipReport)
+    establishes DomesticCompany(record.company)
+        from FinCENBOIFinalRule.section("domestic-entity")
+    {
+        require record.company == AcmeLLC
+    }
+
+    rule DomesticCompaniesExemptFromBOI(company: LegalPerson) : constitutive
+        from FinCENBOIFinalRule.section("reporting-company")
+    {
+        when operative DomesticCompany(company)
+        then establish ExemptFromBOI(company)
+            valid_time [2026-08-14, +inf)
+            record_time [2026-08-14T00:00:00-04:00, +inf)
+    }
+
+    query automatic tax_on(amount: Money<USD>) -> Money<USD> {
+        return ordinary_income_tax_formula(amount)
+    }
+
+    query boi_required() -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            not operative ExemptFromBOI(AcmeLLC)
+        }
+    }
+
+    query earned_income_credit(amount: Money<USD>) -> Money<USD>
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EligibleForOpenTexturedCredit(Taxpayer)
+                using Determine
+            return open_textured_credit_amount(amount)
+        }
+    }
+
+    verify ClosedFormHonesty {
+        assert automatic tax_on
+            has empty effect row
+
+        assert earned_income_credit
+            is never treated automatic
+
+        assert operative DomesticCompany(AcmeLLC)
+            implies operative ExemptFromBOI(AcmeLLC)
+                after 2026-08-14
+    }
+}

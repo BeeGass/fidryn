@@ -1,0 +1,131 @@
+module Examples.CivilComplaint version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-08-23-frcp-fixture"
+    source_manifest "sources/frcp.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00-04:00
+
+    outside_scope {
+        discovery
+        jury_practice
+        class_actions
+        complete_FRCP
+        appellate_procedure
+        state_procedure
+        evidence_code
+    }
+
+    import Fidryn.Procedure version "0.1.0"
+
+    source FRCP {
+        kind court_rule
+        authority UnitedStatesSupremeCourt
+        citation "Fed. R. Civ. P."
+        artifact "sources/frcp.txt"
+        digest fixture
+        effective [2026-08-23, +inf)
+    }
+
+    source ComplaintInstrument {
+        kind pleading
+        authority Plaintiff
+        artifact "sources/complaint.txt"
+    }
+
+    entity Plaintiff : NaturalPerson
+    entity Defendant : NaturalPerson
+    entity Forum : Authority
+    entity DistrictCase : Proceeding
+    entity ComplaintPleading : Pleading
+    entity AnswerPleading : Pleading
+
+    office ClerkOf(court: Authority) occupied_by LegalPerson {
+        cardinality 1..1
+        competence {
+            AcceptPleading
+            EnterJudgment
+        }
+    }
+
+    proposition Commenced(proceeding: Proceeding)
+    proposition Served(pleading: Pleading, recipient: LegalPerson)
+    proposition Answered(proceeding: Proceeding)
+    proposition Adjudicated(proceeding: Proceeding)
+
+    legal_act FileComplaint(complaint: Pleading) {
+        performer Plaintiff
+        recipient occupant ClerkOf(Forum)
+        effect establish Commenced(DistrictCase)
+        source FRCP.rule("3")
+    }
+
+    legal_act ServeComplaint(complaint: Pleading, recipient: LegalPerson) {
+        performer Plaintiff
+        recipient recipient
+        validity requires operative Commenced(DistrictCase)
+        effect establish Served(complaint, recipient)
+        source FRCP.rule("4")
+    }
+
+    legal_act FileAnswer(answer: Pleading) {
+        performer Defendant
+        recipient occupant ClerkOf(Forum)
+        validity requires operative Served(ComplaintPleading, Defendant)
+        effect establish Answered(DistrictCase)
+        source FRCP.rule("12")
+    }
+
+    duty AnswerComplaint {
+        bearer Defendant
+        claimant Plaintiff
+        attaches when operative Served(ComplaintPleading, Defendant)
+        due 21 days after service_date(ComplaintPleading)
+        content FileAnswer(AnswerPleading)
+        source FRCP.rule("12(a)(1)(A)")
+    }
+
+    observation JudgmentEntryObservation(entry: JudgmentEntry)
+    establishes Adjudicated(entry.proceeding)
+        from FRCP.rule("58")
+    {
+        authenticate entry.court == Forum
+        require entry.proceeding == DistrictCase
+    }
+
+    judgment JudgmentOnTheMerits(case: Proceeding)
+    decides Adjudicated(case)
+        from FRCP.rule("58")
+    {
+        authority CourtWithJurisdiction(case)
+        record requires JudgmentEntry
+        establish when observed JudgmentEntryObservation(entry)
+          and entry.proceeding == case
+        otherwise suspend NeedJudgment {
+            issue: Adjudicated(case)
+            protocol: JudgmentOnTheMerits
+        }
+        review by CourtOfAppeals under ApplicableAppellateStandard
+    }
+
+    query judgment(case: Proceeding)
+        -> JudgmentEntry
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require determined Adjudicated(case)
+                using Determine
+            return case_input<JudgmentEntry>("judgment_entry")
+        }
+    }
+
+    verify PleadingIntegrity {
+        assert Effective(FileComplaint)
+            does_not_imply Adjudicated(DistrictCase)
+
+        assert Effective(FileAnswer)
+            does_not_imply Adjudicated(DistrictCase)
+
+        assert no JudgmentEntry
+            without determined Adjudicated(DistrictCase)
+    }
+}

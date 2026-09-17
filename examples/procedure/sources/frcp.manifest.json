@@ -1,0 +1,21 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-08-23-frcp-fixture",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "frcp.txt",
+      "digest": "fixture",
+      "kind": "court_rule",
+      "effective": "2026-08-23",
+      "weight": "binding"
+    },
+    {
+      "path": "complaint.txt",
+      "digest": "fixture",
+      "kind": "pleading",
+      "effective": "2026-08-23",
+      "weight": "explanatory"
+    }
+  ]
+}

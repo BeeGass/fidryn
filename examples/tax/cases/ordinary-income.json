@@ -1,0 +1,28 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.Tax.ClosedForms@0.1.0",
+  "facts": {
+    "amount": "USD(50000.00)",
+    "year": 2026,
+    "status": "Single"
+  },
+  "evidence": [],
+  "determinations": [],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [],
+  "outsideScope": [
+    "tax_engines",
+    "live_government_filing",
+    "complete_IRC",
+    "state_tax",
+    "international_tax",
+    "partnership_allocations",
+    "open_textured_credits_except_as_declared"
+  ],
+  "admissibleCompletions": {
+    "interpretations": {},
+    "evidence": {},
+    "choices": {}
+  }
+}
