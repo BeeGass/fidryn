@@ -50,8 +50,8 @@ pub fn instantiate(module: &CoreModule, args: &[Type]) -> Result<CoreModule, Vec
         return Err(vec![arity_mismatch(&base_name, params.len(), args.len())]);
     }
     let mut out = module.clone();
-    out.name = base_name;
     if params.is_empty() {
+        out.name = base_name;
         return Ok(out);
     }
     for decl in &mut out.declarations {
@@ -60,7 +60,23 @@ pub fn instantiate(module: &CoreModule, args: &[Type]) -> Result<CoreModule, Vec
     for query in &mut out.queries {
         subst_query(query, &params, args);
     }
+    out.name = instantiated_module_name(&base_name, args);
+    out.id = ModuleId::of(out.name.as_bytes());
     Ok(out)
+}
+
+fn instantiated_module_name(base: &str, args: &[Type]) -> String {
+    if args.is_empty() {
+        base.to_owned()
+    } else {
+        format!(
+            "{base}<{}>",
+            args.iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
 }
 
 /// Replace `Type::Sort(Sort::Nominal(param))` (and nested occurrences) with the
@@ -711,6 +727,40 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
             meta: rule_meta,
         }));
     }
+    for (name, alts) in &hir.interpretation_families {
+        declarations.push(CoreDecl::InterpretationFamily(
+            fidryn_core::ir::CoreInterpretationFamily {
+                id: NodeId::of(name.as_bytes()),
+                name: name.clone(),
+                source: Term::Ident(name.clone()),
+                alternatives: alts.clone(),
+                meta: meta(name),
+            },
+        ));
+    }
+    for decision in &hir.decisions {
+        declarations.push(CoreDecl::Decision(fidryn_core::ir::CoreDecision {
+            id: NodeId::of(decision.name.as_bytes()),
+            name: decision.name.clone(),
+            binders: Vec::new(),
+            requirements: decision
+                .requirements
+                .iter()
+                .map(|schema| Guard::Observed {
+                    schema: schema.clone(),
+                    binder: schema.clone(),
+                })
+                .collect(),
+            option_space: Term::Wildcard,
+            declared_result: decision.result.as_ref().map(|expression| {
+                fidryn_core::ir::DecisionReturn {
+                    result_type: Type::Sort(Sort::Nominal("Decision".into())),
+                    expression: expression.clone(),
+                }
+            }),
+            meta: meta(&decision.name),
+        }));
+    }
     let queries = hir
         .queries
         .values()
@@ -1240,6 +1290,43 @@ module Id<T> version "0.1.0" {
             ),
             Type::Sort(Sort::NaturalPerson)
         );
+        assert_eq!(inst.name, "Id<NaturalPerson>");
+    }
+
+    #[test]
+    fn instantiate_substitutes_nested_option() {
+        let src = r#"
+module Box<T> version "0.1.0" {
+    entity X: Option<T>
+}
+"#;
+        let core = check_src(src).expect("generic module type-checks");
+        let inst = instantiate(&core, &[Type::Sort(Sort::NaturalPerson)]).expect("instantiate");
+        assert_eq!(
+            entity_ty(&inst, "X"),
+            Some(&Type::Primitive(PrimitiveType::Option {
+                inner: Box::new(Type::Sort(Sort::NaturalPerson)),
+            }))
+        );
+    }
+
+    #[test]
+    fn instantiate_twice_isolates_nominal_identity() {
+        let src = r#"
+module Id<T> version "0.1.0" {
+    entity X: T
+}
+"#;
+        let core = check_src(src).expect("generic module type-checks");
+        let a = instantiate(&core, &[Type::Sort(Sort::NaturalPerson)]).expect("a");
+        let b = instantiate(&core, &[Type::Sort(Sort::LegalPerson)]).expect("b");
+        let a_again = instantiate(&core, &[Type::Sort(Sort::NaturalPerson)]).expect("a again");
+        assert_ne!(a.id, b.id);
+        assert_ne!(a.name, b.name);
+        assert_eq!(a.id, a_again.id);
+        assert_eq!(a.name, a_again.name);
+        assert_eq!(entity_ty(&a, "X"), Some(&Type::Sort(Sort::NaturalPerson)));
+        assert_eq!(entity_ty(&b, "X"), Some(&Type::Sort(Sort::LegalPerson)));
     }
 
     #[test]
