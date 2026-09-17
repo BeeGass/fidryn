@@ -49,10 +49,12 @@ indexmap = { version = "2.11.4", features = ["serde"] }
 la-arena = "0.3.1"
 rowan = "0.16.1"
 rust_decimal = { version = "1.39.0", features = ["serde"] }
+ryu-js = "1.0.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
 thiserror = "2.0.17"
 time = { version = "0.3.44", features = ["formatting", "macros", "parsing", "serde"] }
+salsa = "0.28.2"
 
 [profile.release]
 lto = "thin"
