@@ -4,7 +4,7 @@ use crate::{
     EngineFailure, compile_source, explore_report, merge_bounds_json, parse_instant, render_report,
 };
 use axum::Router;
-use axum::extract::Json;
+use axum::extract::{Json, State};
 use axum::http::{StatusCode, header};
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, post};
@@ -17,9 +17,42 @@ use fidryn_render::{module_vars, render};
 use serde::{Deserialize, Serialize};
 use std::io::ErrorKind;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::sync::Arc;
+use tokio::sync::Semaphore;
 
 const INDEX: &str = include_str!("../../../web/index.html");
 const DEFAULT_PORT: u16 = 8751;
+/// Concurrent check / run / explore / render workers. Extra requests wait
+/// on the semaphore; they do not occupy extra blocking threads.
+const MILL_CPU_SLOTS: usize = 4;
+
+#[derive(Clone)]
+struct MillState {
+    cpu_slots: Arc<Semaphore>,
+}
+
+fn mill_state() -> MillState {
+    MillState {
+        cpu_slots: Arc::new(Semaphore::new(MILL_CPU_SLOTS)),
+    }
+}
+
+/// Run compile/eval off the async worker. At most [`MILL_CPU_SLOTS`] CPU
+/// tasks run at once.
+async fn mill_cpu<T, F>(state: &MillState, work: F) -> Result<T, String>
+where
+    T: Send + 'static,
+    F: FnOnce() -> T + Send + 'static,
+{
+    let _permit = state
+        .cpu_slots
+        .acquire()
+        .await
+        .map_err(|err| format!("mill cpu slots closed: {err}"))?;
+    tokio::task::spawn_blocking(work)
+        .await
+        .map_err(|err| format!("mill worker: {err}"))
+}
 
 /// Axum router used by `fidryn ui` and the HTTP tests.
 pub fn router() -> Router {
@@ -30,6 +63,7 @@ pub fn router() -> Router {
         .route("/api/run", post(run))
         .route("/api/explore", post(explore))
         .route("/api/render", post(render_api))
+        .with_state(mill_state())
 }
 
 /// Bind `127.0.0.1` and serve the mill. Never listens on other interfaces.
@@ -100,20 +134,30 @@ fn mill_compile(source: &str) -> Result<CoreModule, Vec<Diagnostic>> {
     compile_source(source, &SourceManifest::default())
 }
 
-async fn check(Json(req): Json<CheckRequest>) -> (StatusCode, Json<CheckResponse>) {
-    match mill_compile(&req.source) {
-        Ok(_) => (
-            StatusCode::OK,
-            Json(CheckResponse {
-                ok: true,
-                diagnostics: Vec::new(),
-            }),
-        ),
-        Err(diagnostics) => (
-            StatusCode::OK,
+fn mill_check(source: String) -> CheckResponse {
+    match mill_compile(&source) {
+        Ok(_) => CheckResponse {
+            ok: true,
+            diagnostics: Vec::new(),
+        },
+        Err(diagnostics) => CheckResponse {
+            ok: false,
+            diagnostics,
+        },
+    }
+}
+
+async fn check(
+    State(state): State<MillState>,
+    Json(req): Json<CheckRequest>,
+) -> (StatusCode, Json<CheckResponse>) {
+    match mill_cpu(&state, move || mill_check(req.source)).await {
+        Ok(body) => (StatusCode::OK, Json(body)),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
             Json(CheckResponse {
                 ok: false,
-                diagnostics,
+                diagnostics: Vec::new(),
             }),
         ),
     }
@@ -284,15 +328,21 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
     mill_report_doc(&module, &query, valid, known, &case, &report)
 }
 
-async fn run(Json(req): Json<EvalRequest>) -> JsonResponse {
-    eval_request(req, false)
+async fn run(State(state): State<MillState>, Json(req): Json<EvalRequest>) -> JsonResponse {
+    match mill_cpu(&state, move || eval_request(req, false)).await {
+        Ok(response) => response,
+        Err(err) => mill_err(StatusCode::INTERNAL_SERVER_ERROR, err, Vec::new()),
+    }
 }
 
-async fn explore(Json(req): Json<EvalRequest>) -> JsonResponse {
-    eval_request(req, true)
+async fn explore(State(state): State<MillState>, Json(req): Json<EvalRequest>) -> JsonResponse {
+    match mill_cpu(&state, move || eval_request(req, true)).await {
+        Ok(response) => response,
+        Err(err) => mill_err(StatusCode::INTERNAL_SERVER_ERROR, err, Vec::new()),
+    }
 }
 
-async fn render_api(Json(req): Json<RenderRequest>) -> (StatusCode, Json<RenderResponse>) {
+fn mill_render(req: RenderRequest) -> (StatusCode, Json<RenderResponse>) {
     let module = match mill_compile(&req.source) {
         Ok(module) => module,
         Err(diagnostics) => {
@@ -331,11 +381,29 @@ async fn render_api(Json(req): Json<RenderRequest>) -> (StatusCode, Json<RenderR
     }
 }
 
+async fn render_api(
+    State(state): State<MillState>,
+    Json(req): Json<RenderRequest>,
+) -> (StatusCode, Json<RenderResponse>) {
+    match mill_cpu(&state, move || mill_render(req)).await {
+        Ok(response) => response,
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(RenderResponse {
+                ok: false,
+                text: None,
+                error: Some(err),
+            }),
+        ),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use axum::body::Body;
     use axum::http::{Request, StatusCode};
+    use fidryn_core::EngineError;
     use http_body_util::BodyExt;
     use std::io::{Read, Write};
     use tower::ServiceExt;
@@ -712,6 +780,42 @@ module Examples.T version "0.1.0" {
         assert_eq!(json["kind"], "engineError", "{json}");
         assert_eq!(json["error"], "UnknownQuery", "{json}");
         assert_ne!(json["outcome"]["kind"], "inconsistent", "{json}");
+    }
+
+    #[tokio::test]
+    async fn mill_unknown_query_named_internal_is_still_400() {
+        let mut body = eval_body();
+        body["query"] = serde_json::json!("Internal");
+        let (status, json) = post_json("/api/run", body).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "{json}");
+        assert_eq!(json["kind"], "engineError", "{json}");
+        assert_eq!(json["error"], "UnknownQuery", "{json}");
+        assert_ne!(json["error"], "Internal", "{json}");
+    }
+
+    #[test]
+    fn mill_engine_http_status_follows_variant_not_message() {
+        let unknown = EngineFailure::from_err(EngineError::UnknownQuery("Internal".into()));
+        let (status, Json(body)) = mill_engine_err(&unknown);
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert_eq!(body["error"], "UnknownQuery");
+        assert_eq!(body["kind"], "engineError");
+
+        let internal = EngineFailure::from_err(EngineError::Internal("UnknownQuery".into()));
+        let (status, Json(body)) = mill_engine_err(&internal);
+        assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(body["error"], "Internal");
+        assert_eq!(body["kind"], "engineError");
+
+        for err in [
+            EngineError::Unsupported("x".into()),
+            EngineError::FuelExhausted { remaining: 0 },
+            EngineError::InvalidInput("x".into()),
+        ] {
+            let fail = EngineFailure::from_err(err);
+            let (status, _) = mill_engine_err(&fail);
+            assert_eq!(status, StatusCode::BAD_REQUEST, "{}", fail.kind);
+        }
     }
 
     #[tokio::test]

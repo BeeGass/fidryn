@@ -414,7 +414,10 @@ dependencies = [
 name = "fidryn-eval"
 version = "0.1.0"
 dependencies = [
+ "fidryn-check",
  "fidryn-core",
+ "fidryn-hir",
+ "fidryn-syntax",
  "indexmap",
  "rust_decimal",
  "time",

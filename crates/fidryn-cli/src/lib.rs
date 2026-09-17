@@ -7,8 +7,8 @@ use fidryn_adapt::{DryRun, FilingAdapter, MassachusettsCorporations};
 use fidryn_check::check;
 use fidryn_core::{
     AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode,
-    EvaluationReport, ExecutionMode, Instant, Outcome, QueryName, RunContext, SourceManifest,
-    TimeError, TraceId, Value, canonical_json,
+    EngineError, EvaluationReport, ExecutionMode, Instant, Outcome, QueryName, RunContext,
+    SourceManifest, TimeError, TraceId, Value, canonical_json,
 };
 use fidryn_hir::elaborate;
 use fidryn_render::{module_vars, render};
@@ -235,9 +235,13 @@ fn compile_or_exit(path: &Path) -> Result<(CoreModule, SourceManifest), ExitCode
 /// Engine failure from `evaluate` / `explore_query` when those APIs return
 /// `Result<Outcome, EngineError>`. Unknown queries and invalid input are
 /// never rewritten as `Outcome::Inconsistent` here.
+///
+/// `kind` is the `EngineError` variant name. HTTP status is derived from
+/// the variant (`Internal` -> 500, every other variant -> 400), not from
+/// `Display` / `Debug` text.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct EngineFailure {
-    pub kind: String,
+    pub kind: &'static str,
     pub message: String,
 }
 
@@ -248,12 +252,8 @@ impl fmt::Display for EngineFailure {
 }
 
 impl EngineFailure {
-    pub(crate) fn from_err<E: fmt::Display + fmt::Debug>(err: E) -> Self {
-        let debug = format!("{err:?}");
-        Self {
-            kind: engine_error_kind(&debug).to_owned(),
-            message: err.to_string(),
-        }
+    pub(crate) fn from_err(err: EngineError) -> Self {
+        Self::from(err)
     }
 
     pub(crate) fn is_internal(&self) -> bool {
@@ -261,19 +261,20 @@ impl EngineFailure {
     }
 }
 
-fn engine_error_kind(debug: &str) -> &'static str {
-    const KINDS: &[&str] = &[
-        "UnknownQuery",
-        "Unsupported",
-        "FuelExhausted",
-        "InvalidInput",
-        "Internal",
-    ];
-    KINDS
-        .iter()
-        .copied()
-        .find(|kind| debug.contains(kind))
-        .unwrap_or("Internal")
+impl From<EngineError> for EngineFailure {
+    fn from(err: EngineError) -> Self {
+        let kind = match &err {
+            EngineError::UnknownQuery(_) => "UnknownQuery",
+            EngineError::Unsupported(_) => "Unsupported",
+            EngineError::FuelExhausted { .. } => "FuelExhausted",
+            EngineError::InvalidInput(_) => "InvalidInput",
+            EngineError::Internal(_) => "Internal",
+        };
+        Self {
+            kind,
+            message: err.to_string(),
+        }
+    }
 }
 
 /// Accept both `Outcome` and `Result<Outcome, EngineError>` (core or eval).
@@ -287,7 +288,7 @@ impl IntoEvalOutcome for Outcome<Value> {
     }
 }
 
-impl<E: fmt::Display + fmt::Debug> IntoEvalOutcome for Result<Outcome<Value>, E> {
+impl IntoEvalOutcome for Result<Outcome<Value>, EngineError> {
     fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure> {
         self.map_err(EngineFailure::from_err)
     }
@@ -1771,5 +1772,38 @@ module Examples.T version "0.1.0" {
             case.admissible_completions.interpretations.get("Other"),
             Some(&vec!["X".to_string()])
         );
+    }
+
+    #[test]
+    fn engine_failure_kinds_match_engine_error_variants() {
+        let cases = [
+            (EngineError::UnknownQuery("q".into()), "UnknownQuery", false),
+            (EngineError::Unsupported("op".into()), "Unsupported", false),
+            (
+                EngineError::FuelExhausted { remaining: 0 },
+                "FuelExhausted",
+                false,
+            ),
+            (EngineError::InvalidInput("x".into()), "InvalidInput", false),
+            (EngineError::Internal("boom".into()), "Internal", true),
+        ];
+        for (err, kind, internal) in cases {
+            let fail = EngineFailure::from_err(err.clone());
+            assert_eq!(fail.kind, kind, "{err:?}");
+            assert_eq!(fail.is_internal(), internal, "{err:?}");
+            assert_eq!(fail.message, err.to_string());
+            assert_eq!(format!("{fail}"), format!("{kind}: {}", err));
+        }
+    }
+
+    #[test]
+    fn engine_failure_kind_is_not_parsed_from_message() {
+        let unknown = EngineFailure::from_err(EngineError::UnknownQuery("Internal".into()));
+        assert_eq!(unknown.kind, "UnknownQuery");
+        assert!(!unknown.is_internal());
+
+        let internal = EngineFailure::from_err(EngineError::Internal("UnknownQuery".into()));
+        assert_eq!(internal.kind, "Internal");
+        assert!(internal.is_internal());
     }
 }
