@@ -1,46 +1,99 @@
 //! Applicable-law oracle. Rank by source weight, then later-in-time.
 
-use fidryn_core::{ManifestArtifact, SourceWeight};
-use std::cmp::Reverse;
+use fidryn_core::{Instant, ManifestArtifact};
 
 /// Rank candidates: Binding > Controlling > Persuasive > Explanatory, then
-/// lexicographic `effective` as a later-in-time fallback.
+/// later-in-time using parsed dates. Unparseable or equal times stay tied.
 ///
 /// A unique winner is `Ok`. Same-rank ties return the tied set; list order is
-/// never a tie-break. Dates are compared as strings, not parsed calendars.
+/// never a tie-break.
 pub fn select_applicable_law(
     candidates: &[ManifestArtifact],
 ) -> Result<ManifestArtifact, Vec<ManifestArtifact>> {
     if candidates.is_empty() {
         return Err(Vec::new());
     }
-    let best = candidates
+    if candidates.len() == 1 {
+        return Ok(candidates[0].clone());
+    }
+    let best_weight = candidates
         .iter()
-        .map(rank_key)
-        .max()
+        .map(|c| c.weight)
+        .min()
         .expect("non-empty candidates");
     let mut tied: Vec<ManifestArtifact> = candidates
         .iter()
-        .filter(|c| rank_key(c) == best)
+        .filter(|c| c.weight == best_weight)
         .cloned()
         .collect();
-    match tied.len() {
-        1 => Ok(tied.pop().expect("len == 1")),
+    if tied.len() == 1 {
+        return Ok(tied.pop().expect("len == 1"));
+    }
+
+    let parsed: Vec<Option<Instant>> = tied.iter().map(|c| parse_effective(&c.effective)).collect();
+    if parsed.iter().all(Option::is_some) {
+        let best_time = parsed.iter().copied().flatten().max();
+        let mut winners: Vec<ManifestArtifact> = tied
+            .into_iter()
+            .zip(parsed)
+            .filter(|(_, t)| *t == best_time)
+            .map(|(a, _)| a)
+            .collect();
+        return unique_or_tied(&mut winners);
+    }
+
+    sort_tied(&mut tied);
+    Err(tied)
+}
+
+fn unique_or_tied(
+    winners: &mut Vec<ManifestArtifact>,
+) -> Result<ManifestArtifact, Vec<ManifestArtifact>> {
+    match winners.len() {
+        1 => Ok(winners.pop().expect("len == 1")),
         _ => {
-            tied.sort_by(|a, b| a.path.cmp(&b.path).then(a.digest.cmp(&b.digest)));
-            Err(tied)
+            sort_tied(winners);
+            Err(std::mem::take(winners))
         }
     }
 }
 
-fn rank_key(artifact: &ManifestArtifact) -> (Reverse<SourceWeight>, &str) {
-    (Reverse(artifact.weight), artifact.effective.as_str())
+fn sort_tied(tied: &mut [ManifestArtifact]) {
+    tied.sort_by(|a, b| a.path.cmp(&b.path).then(a.digest.cmp(&b.digest)));
+}
+
+fn parse_effective(text: &str) -> Option<Instant> {
+    let text = text.trim();
+    if text.is_empty() {
+        return None;
+    }
+    if let Ok(instant) = Instant::parse(text) {
+        return Some(instant);
+    }
+    if !text.contains('T')
+        && let Ok(instant) = Instant::parse(&format!("{text}T00:00:00Z"))
+    {
+        return Some(instant);
+    }
+    let normalized = normalize_iso_date(text)?;
+    Instant::parse(&format!("{normalized}T00:00:00Z")).ok()
+}
+
+fn normalize_iso_date(text: &str) -> Option<String> {
+    let mut parts = text.split('-');
+    let year: i32 = parts.next()?.parse().ok()?;
+    let month: u8 = parts.next()?.parse().ok()?;
+    let day: u8 = parts.next()?.parse().ok()?;
+    if parts.next().is_some() || !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    Some(format!("{year:04}-{month:02}-{day:02}"))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::{OpenRequest, Outcome, TraceId};
+    use fidryn_core::{OpenRequest, Outcome, SourceWeight, TraceId};
     use std::collections::BTreeSet;
 
     fn artifact(path: &str, effective: &str, weight: SourceWeight) -> ManifestArtifact {
@@ -130,10 +183,34 @@ mod tests {
     }
 
     #[test]
-    fn lexicographic_effective_is_not_a_parsed_calendar() {
+    fn unpadded_and_padded_same_date_stay_tied() {
         let a = artifact("a.txt", "2024-1-1", SourceWeight::Controlling);
         let b = artifact("b.txt", "2024-01-01", SourceWeight::Controlling);
-        assert_eq!(select_applicable_law(&[b, a]).unwrap().path, "a.txt");
+        let tied = select_applicable_law(&[b, a]).unwrap_err();
+        assert_eq!(tied.len(), 2);
+        assert_eq!(tied[0].path, "a.txt");
+        assert_eq!(tied[1].path, "b.txt");
+    }
+
+    #[test]
+    fn parsed_later_date_beats_lexicographically_larger_earlier_date() {
+        let jan = artifact("jan.txt", "2024-1-15", SourceWeight::Controlling);
+        let feb = artifact("feb.txt", "2024-02-01", SourceWeight::Controlling);
+        assert_eq!(
+            select_applicable_law(&[jan.clone(), feb.clone()])
+                .unwrap()
+                .path,
+            "feb.txt"
+        );
+        assert_eq!(select_applicable_law(&[feb, jan]).unwrap().path, "feb.txt");
+    }
+
+    #[test]
+    fn unparseable_effective_dates_stay_tied() {
+        let a = artifact("a.txt", "session-law", SourceWeight::Persuasive);
+        let b = artifact("b.txt", "slip-op", SourceWeight::Persuasive);
+        let tied = select_applicable_law(&[b, a]).unwrap_err();
+        assert_eq!(tied.len(), 2);
     }
 
     #[test]
