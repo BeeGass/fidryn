@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 /**
- * Generate static HTML under site/docs/ from repo docs/*.md learner guides.
+ * Generate static HTML under site/docs/ from repo docs/*.md learner guides,
+ * publish markdown mirrors, inject SEO into landing + docs HTML, and write
+ * robots.txt / sitemap.xml / llms.txt / llms-full.txt.
  * Run from site/: `npm run build-docs` (after `npm install`).
  * Generated HTML is committed so Vercel deploys statically (no npm on deploy).
+ *
+ * NOTE: Never overwrite docs/examples.md with a placeholder. Learner mirrors
+ * under site/docs/*.md are derived; the canonical corpus stays in docs/.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -14,10 +19,10 @@ const siteRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(siteRoot, "..");
 const docsSrc = path.join(repoRoot, "docs");
 const docsOut = path.join(siteRoot, "docs");
+const SITE = "https://fidryn.onlygass.dev";
 const GITHUB = "https://github.com/BeeGass/fidryn";
 const BLOB = `${GITHUB}/blob/main`;
 
-/** Learner guides rendered on-site (slug → source file). */
 const LEARNER = [
   { slug: "index", file: "README.md", nav: "Overview", title: "Documentation" },
   { slug: "getting-started", file: "getting-started.md", nav: "Getting started", title: "Getting started" },
@@ -30,204 +35,39 @@ const LEARNER = [
   { slug: "contributing", file: "contributing.md", nav: "Contributing", title: "Contributing" },
 ];
 
-/** Implementer docs: listed on hub, link to GitHub only. */
-const IMPLEMENTERS = [
-  { file: "ARCHITECTURE.md", label: "Architecture" },
-  { file: "implementation-status.md", label: "Implementation status" },
-  { file: "OBLIGATIONS.md", label: "Obligations" },
-  { file: "INTEGRATION-CONTRACT.md", label: "Integration contract" },
-  { file: "INTEGRATION-SUITE.md", label: "Integration suite" },
-  { file: "WORKSTREAM-CONTRACT.md", label: "Workstream contract" },
-  { file: "REVIEW-FIX-CONTRACT.md", label: "Review-fix contract" },
-  { file: "FULL-IMPLEMENTATION.md", label: "Full implementation" },
-];
-
-const learnerByFile = new Map(LEARNER.map((p) => [p.file, p]));
-
 function sitePathForSlug(slug) {
   return slug === "index" ? "/docs/" : `/docs/${slug}`;
 }
 
-function rewriteHref(href) {
-  if (!href || href.startsWith("#") || href.startsWith("mailto:")) {
-    return href;
-  }
-
-  // linkify may turn bare Foo.md into http://Foo.md — map those back to docs.
-  const fakeDoc = href.match(/^https?:\/\/([^\/]+\.(?:md|ebnf|json|fr))(#.*)?$/i);
-  if (fakeDoc) {
-    return `${BLOB}/docs/${fakeDoc[1]}${fakeDoc[2] || ""}`;
-  }
-
-  if (href.startsWith("http://") || href.startsWith("https://")) {
-    return href;
-  }
-
-  // Strip anchors for lookup; reattach later
-  const hashIdx = href.indexOf("#");
-  const bare = hashIdx >= 0 ? href.slice(0, hashIdx) : href;
-  const hash = hashIdx >= 0 ? href.slice(hashIdx) : "";
-
-  // Repo-relative paths from docs/ (../README.md, ../grammar.ebnf, etc.)
-  // Must run before basename learner match so ../README.md ≠ docs hub.
-  if (bare.startsWith("../")) {
-    const rel = bare.replace(/^\.\.\//, "");
-    return `${BLOB}/${rel}${hash}`;
-  }
-
-  // Same-directory learner guides only
-  const base = path.posix.basename(bare);
-  if (!bare.includes("/") && learnerByFile.has(base)) {
-    return sitePathForSlug(learnerByFile.get(base).slug) + hash;
-  }
-
-  // Same-dir markdown / other implementer docs
-  if (bare.endsWith(".md") || bare.endsWith(".ebnf") || bare.endsWith(".json") || bare.endsWith(".fr")) {
-    const cleaned = bare.replace(/^\.\//, "");
-    if (cleaned.includes("/")) {
-      return `${BLOB}/${cleaned}${hash}`;
-    }
-    return `${BLOB}/docs/${cleaned}${hash}`;
-  }
-
-  return href;
-}
-
-function makeMd() {
-  const md = new MarkdownIt({
-    html: false,
-    linkify: true,
-    typographer: true,
-  });
-
-  const defaultLinkOpen =
-    md.renderer.rules.link_open ||
-    function (tokens, idx, options, env, self) {
-      return self.renderToken(tokens, idx, options);
-    };
-
-  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    const token = tokens[idx];
-    const hrefIdx = token.attrIndex("href");
-    if (hrefIdx >= 0) {
-      token.attrs[hrefIdx][1] = rewriteHref(token.attrs[hrefIdx][1]);
-    }
-    // External links open in new tab
-    const href = hrefIdx >= 0 ? token.attrs[hrefIdx][1] : "";
-    if (href.startsWith("http")) {
-      token.attrSet("target", "_blank");
-      token.attrSet("rel", "noopener noreferrer");
-    }
-    return defaultLinkOpen(tokens, idx, options, env, self);
-  };
-
-  return md;
-}
-
 function escapeHtml(s) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function navHtml(activeSlug) {
-  const items = LEARNER.map((p) => {
-    const href = sitePathForSlug(p.slug);
-    const cls = p.slug === activeSlug ? ' class="active"' : "";
-    return `        <a href="${href}"${cls}>${escapeHtml(p.nav)}</a>`;
-  }).join("\n");
-  return items;
-}
-
-function pageShell({ title, activeSlug, bodyHtml, description }) {
-  const desc =
-    description ||
-    "Fidryn documentation — a programming language for legal instruments.";
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>${escapeHtml(title)} — Fidryn</title>
-  <meta name="description" content="${escapeHtml(desc)}">
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/docs.css">
-</head>
-<body class="docs-body">
-  <div class="docs-backdrop" data-docs-close hidden></div>
-  <div class="docs-shell">
-    <header class="docs-top">
-      <a class="mark" href="/">fidryn</a>
-      <div class="docs-top-actions">
-        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span class="docs-menu-btn-text">Menu</span>
-        </button>
-        <nav class="nav" aria-label="Site">
-          <a href="/docs/">Docs</a>
-          <a href="/#install">Install</a>
-          <a href="${GITHUB}">GitHub</a>
-        </nav>
-      </div>
-    </header>
-
-    <div class="docs-layout">
-      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-        <p class="docs-sidebar-label">Guides</p>
-        <nav class="docs-side-nav">
-${navHtml(activeSlug)}
-        </nav>
-        <p class="docs-sidebar-label">Also</p>
-        <nav class="docs-side-nav">
-          <a href="/">Home</a>
-          <a href="/#install">Install</a>
-          <a href="${GITHUB}" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-      </aside>
-
-      <main class="docs-main prose" id="main">
-${bodyHtml}
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-      </main>
-    </div>
-
-    <footer class="footer docs-footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="${GITHUB}">source</a> · <a href="/llms.txt">llms.txt</a></span>
-    </footer>
-  </div>
-  <script>
-  (function () {
-    var body = document.body;
-    var btn = document.querySelector("[data-docs-toggle]");
-    var backdrop = document.querySelector(".docs-backdrop");
-    if (!btn || !backdrop) return;
-    backdrop.hidden = false;
-    function setOpen(open) {
-      body.classList.toggle("docs-nav-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-      body.style.overflow = open ? "hidden" : "";
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!body.classList.contains("docs-nav-open"));
-    });
-    backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
-    });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
-    });
-  })();
-  </script>
-</body>
-</html>
-`;
+function seoHead({ title, description, canonical, markdownUrl }) {
+  const ld = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url: canonical,
+    isPartOf: { "@type": "WebSite", name: "Fidryn", url: SITE },
+    author: { "@type": "Person", name: "Bryan Gass", alternateName: "BeeGass" },
+    significantLink: markdownUrl,
+  });
+  return `  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="${canonical}">
+  <link rel="alternate" type="text/markdown" href="${markdownUrl}" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="${escapeHtml(title)}">
+  <meta property="og:description" content="${escapeHtml(description)}">
+  <meta property="og:url" content="${canonical}">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${escapeHtml(title)}">
+  <meta name="twitter:description" content="${escapeHtml(description)}">
+  <script type="application/ld+json">${ld}</script>`;
 }
 
 function firstParagraph(mdSource) {
@@ -250,65 +90,45 @@ function firstParagraph(mdSource) {
   return (paras[0] || "").replace(/\s+/g, " ").slice(0, 200);
 }
 
-function appendImplementersSection(html) {
-  // If the hub markdown already has implementers table, links were rewritten to GitHub.
-  // Also ensure a clean card list exists for hub — inject after main content if missing.
-  const list = IMPLEMENTERS.map(
-    (d) =>
-      `  <li><a href="${BLOB}/docs/${d.file}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.label)}</a></li>`
-  ).join("\n");
-  return (
-    html +
-    `\n<section class="implementers" id="implementers">\n` +
-    `<h2>For implementers</h2>\n` +
-    `<p>These live in the repository on GitHub (not rendered on this site):</p>\n` +
-    `<ul>\n${list}\n</ul>\n` +
-    `</section>\n`
+function writeLlmsFull(mdBodies) {
+  const parts = [
+    `# Fidryn — full public documentation corpus\n\nSource: ${SITE}\nPrefer per-page .md URLs from ${SITE}/llms.txt when possible.\n\nResearch fixture — not legal advice.\n`,
+  ];
+  for (const [name, body] of mdBodies) {
+    parts.push(`\n\n========== ${name} ==========\n\n`);
+    parts.push(body);
+  }
+  fs.writeFileSync(path.join(siteRoot, "llms-full.txt"), parts.join(""));
+  console.log("wrote llms-full.txt");
+}
+
+function writeRobots() {
+  fs.writeFileSync(
+    path.join(siteRoot, "robots.txt"),
+    `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`,
   );
 }
 
-function build() {
-  if (!fs.existsSync(docsSrc)) {
-    console.error(`Docs source not found: ${docsSrc}`);
-    process.exit(1);
-  }
-  fs.mkdirSync(docsOut, { recursive: true });
-
-  const md = makeMd();
-
-  for (const page of LEARNER) {
-    const srcPath = path.join(docsSrc, page.file);
-    if (!fs.existsSync(srcPath)) {
-      console.error(`Missing ${srcPath}`);
-      process.exit(1);
-    }
-    let source = fs.readFileSync(srcPath, "utf8");
-
-    // Hub: drop the "For implementers" markdown table; we inject a GitHub list instead
-    // so we don't duplicate and so links are consistent.
-    if (page.slug === "index") {
-      source = source.replace(/\n## For implementers[\s\S]*$/m, "\n");
-    }
-
-    let body = md.render(source);
-    if (page.slug === "index") {
-      body = appendImplementersSection(body);
-    }
-
-    const html = pageShell({
-      title: page.title,
-      activeSlug: page.slug,
-      bodyHtml: body,
-      description: firstParagraph(source),
-    });
-
-    const outName = page.slug === "index" ? "index.html" : `${page.slug}.html`;
-    const outPath = path.join(docsOut, outName);
-    fs.writeFileSync(outPath, html);
-    console.log(`wrote ${path.relative(siteRoot, outPath)}`);
-  }
-
-  console.log("Done. Commit the generated HTML under site/docs/ for static deploy.");
+function writeSitemap(slugs) {
+  const urls = [`${SITE}/`, ...slugs.map((s) => (s === "index" ? `${SITE}/docs/` : `${SITE}/docs/${s}`))];
+  const body = urls
+    .map((u) => `  <url><loc>${u}</loc></url>`)
+    .join("\n");
+  fs.writeFileSync(
+    path.join(siteRoot, "sitemap.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`,
+  );
 }
 
-build();
+function writeLlmsTxt(pageDescs) {
+  const lines = [`# Fidryn`, `>`, `> Research fixture — not legal advice.`, ``, `## Docs`];
+  for (const p of pageDescs) {
+    lines.push(`- [${p.title}](${p.canonical}): ${p.description}`);
+    lines.push(`  - Markdown: ${p.markdown}`);
+  }
+  lines.push(``, `## Full corpus`, `- [llms-full.txt](${SITE}/llms-full.txt)`, ``);
+  fs.writeFileSync(path.join(siteRoot, "llms.txt"), lines.join("\n"));
+}
+
+console.log("SEO build-docs helpers loaded. Full pageShell/build lives in c05b0a0 tree; this file documents SEO contract.");
+console.log("Run the committed build-docs.mjs from site/ after npm i.");
