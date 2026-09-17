@@ -1,16 +1,13 @@
 //! Incremental compile and evaluate driver.
 //!
-//! Check is memoized by blake3 of source bytes together with the manifest
-//! snapshot, artifact digest strings, `source_root` display path, and blake3
-//! of readable artifact bytes. A [`VerifiedSourceBundle`] is stored with the
-//! compiled module; trust is that bundle's summary, not a reconstruction
-//! from digest-looking strings. Evaluate is memoized by canonical module
-//! JSON together with [`CoreModule::program_digest`] / [`CoreModule::content_fingerprint`] (executable content,
-//! not only [`fidryn_core::ModuleId`]), query name, query arguments, canonical
-//! case JSON, bitemporal times, and [`ExecutionRequest`] identity (mode and
-//! optional budget). Memo tables are explicit [`HashMap`]s; the `salsa` crate
-//! is not used. Pasted mill source uses `source_root = None` and never
-//! follows artifact paths or `packages/`.
+//! Check and run are salsa tracked functions over interned input structs:
+//! source bytes, manifest snapshot, artifact observations, `source_root`
+//! display path, query, arguments, case, bitemporal times, and execution
+//! mode. A [`VerifiedSourceBundle`] is stored with the compiled module;
+//! trust is that bundle's summary, not a reconstruction from digest-looking
+//! strings. Fuel exhaustion is not retained as a stable memo. Pasted mill
+//! source uses `source_root = None` and never follows artifact paths or
+//! `packages/`.
 
 use fidryn_check::check_with_sources;
 use fidryn_core::{
@@ -26,37 +23,202 @@ use fidryn_syntax::ast::{HeaderKind, Item};
 use fidryn_syntax::parse_file;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs;
+use std::hash::{Hash, Hasher};
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+/// Interned run-key payload hashed by canonical JSON, compared structurally.
+#[derive(Clone, PartialEq, Eq)]
+struct CanonicalKey<T>(T);
+
+macro_rules! hash_canonical {
+    ($t:ty) => {
+        impl Hash for CanonicalKey<$t> {
+            fn hash<H: Hasher>(&self, state: &mut H) {
+                match canonical_json(&self.0) {
+                    Ok(json) => json.hash(state),
+                    Err(_) => 0u8.hash(state),
+                }
+            }
+        }
+    };
+}
+
+hash_canonical!(CoreModule);
+hash_canonical!(BTreeMap<String, Value>);
+hash_canonical!(CaseRecord);
+
+#[salsa::db]
+trait DriverJar: salsa::Database {}
+
+#[salsa::db]
+#[derive(Clone)]
+struct DriverDb {
+    storage: salsa::Storage<Self>,
+}
+
+#[salsa::db]
+impl salsa::Database for DriverDb {}
+
+#[salsa::db]
+impl DriverJar for DriverDb {}
+
+/// Observed artifact bytes interned as part of the check key.
+///
+/// `Unread` is mill / `check_source` (`source_root = None`) and must not
+/// follow filesystem paths. `Missing` is a path compile whose file was absent.
+#[derive(Clone, PartialEq, Eq, Hash)]
+enum ArtifactObservation {
+    Unread,
+    Missing,
+    Bytes(Vec<u8>),
+}
+
+#[salsa::interned]
+struct CheckInput<'db> {
+    #[returns(deref)]
+    source: String,
+    #[returns(deref)]
+    snapshot: String,
+    #[returns(as_deref)]
+    source_root: Option<String>,
+    #[returns(clone)]
+    artifacts: Vec<(String, String, ArtifactObservation)>,
+    #[returns(deref)]
+    manifest_json: String,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct CheckMemo {
+    result: Result<CoreModule, Vec<Diagnostic>>,
+    bundle: Option<VerifiedSourceBundle>,
+}
+
+#[salsa::interned]
+struct RunInput<'db> {
+    #[returns(clone)]
+    module: CanonicalKey<CoreModule>,
+    #[returns(deref)]
+    query: String,
+    #[returns(clone)]
+    args: CanonicalKey<BTreeMap<String, Value>>,
+    #[returns(clone)]
+    case: CanonicalKey<CaseRecord>,
+    #[returns(deref)]
+    valid_time: String,
+    #[returns(deref)]
+    record_time: String,
+    #[returns(deref)]
+    request_identity: String,
+    #[returns(copy)]
+    scenario: bool,
+    #[returns(copy)]
+    fuel_attempt: u64,
+}
+
+#[salsa::tracked(returns(clone))]
+fn compile_checked<'db>(db: &'db dyn DriverJar, input: CheckInput<'db>) -> CheckMemo {
+    let source = input.source(db);
+    let artifacts = input.artifacts(db);
+    let snapshot = input.snapshot(db);
+    let manifest = match serde_json::from_str::<SourceManifest>(input.manifest_json(db)) {
+        Ok(manifest) => manifest,
+        Err(err) => {
+            return CheckMemo {
+                result: Err(vec![Diagnostic::new(
+                    DiagnosticCode::E100,
+                    format!("cannot decode source_manifest: {err}"),
+                )]),
+                bundle: None,
+            };
+        }
+    };
+    if snapshot != manifest.snapshot {
+        return CheckMemo {
+            result: Err(vec![Diagnostic::new(
+                DiagnosticCode::E100,
+                "interned snapshot does not match source_manifest",
+            )]),
+            bundle: None,
+        };
+    }
+    let root_buf = input.source_root(db).map(PathBuf::from);
+    // Unread observations are mill / check_source: never follow a filesystem root.
+    let unread = artifacts
+        .iter()
+        .any(|(_, _, obs)| matches!(obs, ArtifactObservation::Unread));
+    let source_root = if unread { None } else { root_buf.as_deref() };
+    let result = compile_with_sources(source, &manifest, source_root);
+    let bundle = result.is_ok().then(|| pin_bundle(&manifest, source_root));
+    CheckMemo { result, bundle }
+}
+
+#[salsa::tracked(returns(clone))]
+fn evaluate_query<'db>(
+    db: &'db dyn DriverJar,
+    input: RunInput<'db>,
+) -> Result<Outcome<Value>, EngineError> {
+    let module = input.module(db).0;
+    let args = input.args(db).0;
+    let case = input.case(db).0;
+    let valid_time = fidryn_core::Instant::parse(input.valid_time(db))
+        .map_err(|err| EngineError::Internal(err.to_string()))?;
+    let record_time = fidryn_core::Instant::parse(input.record_time(db))
+        .map_err(|err| EngineError::Internal(err.to_string()))?;
+    let ctx = RunContext::new(valid_time, record_time);
+    let _fuel_attempt = input.fuel_attempt(db);
+    if input.scenario(db) {
+        evaluate_scenario_run(&module, input.query(db), &args, &case, &ctx)
+    } else {
+        evaluate_run(&module, input.query(db), &args, &case, &ctx)
+    }
+}
 
 /// Incremental parse/check/evaluate session.
 pub struct Driver {
-    check_cache: HashMap<CheckKey, Result<CoreModule, Vec<Diagnostic>>>,
-    run_cache: HashMap<RunKey, Result<Outcome<Value>, EngineError>>,
+    db: DriverDb,
+    executes: Arc<AtomicU64>,
     source_bundles: HashMap<TrustKey, VerifiedSourceBundle>,
+    fuel_attempts: HashMap<[u8; 32], u64>,
     hits: u64,
     misses: u64,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct CheckKey([u8; 32]);
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct RunKey([u8; 32]);
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct TrustKey([u8; 32]);
 
 impl Driver {
-    /// Empty memo tables.
+    /// Empty salsa database and memo counters.
     pub fn new() -> Self {
+        let executes = Arc::new(AtomicU64::new(0));
+        let event_executes = Arc::clone(&executes);
         Self {
-            check_cache: HashMap::new(),
-            run_cache: HashMap::new(),
+            db: DriverDb {
+                storage: salsa::Storage::new(Some(Box::new(move |event| {
+                    if matches!(event.kind, salsa::EventKind::WillExecute { .. }) {
+                        event_executes.fetch_add(1, Ordering::Relaxed);
+                    }
+                }))),
+            },
+            executes,
             source_bundles: HashMap::new(),
+            fuel_attempts: HashMap::new(),
             hits: 0,
             misses: 0,
         }
+    }
+
+    fn with_memo<R>(&mut self, op: impl FnOnce(&DriverDb) -> R) -> R {
+        let before = self.executes.load(Ordering::Relaxed);
+        let result = op(&self.db);
+        if self.executes.load(Ordering::Relaxed) > before {
+            self.misses += 1;
+        } else {
+            self.hits += 1;
+        }
+        result
     }
 
     /// Combined check and run cache hits.
@@ -71,11 +233,11 @@ impl Driver {
 
     /// Parse, elaborate, and check in-memory `source` against `manifest`.
     ///
-    /// Artifact files are not read (`source_root` is `None`). The memo key is
-    /// blake3(source) together with the snapshot string, artifact digests,
-    /// and an unread-bytes sentinel. Comment-only edits change the source
-    /// bytes and miss. Pasted source never follows artifact paths or
-    /// `packages/` on the filesystem.
+    /// Artifact files are not read (`source_root` is `None`). The salsa
+    /// interned check input is source bytes, the manifest snapshot, unread
+    /// artifact sentinels, and no `source_root`. Comment-only edits change
+    /// the source bytes and miss. Pasted source never follows artifact
+    /// paths or `packages/` on the filesystem.
     pub fn check_source(
         &mut self,
         source: &str,
@@ -92,9 +254,9 @@ impl Driver {
     /// [`fidryn_check::check_with_sources`] with `source_root = path.parent()`
     /// so hex import digests authenticate against artifact bytes. Imports such
     /// as `Std.Core` may be satisfied by `source_root/packages/<name>` when
-    /// the package lock digest matches the module bytes. The memo key
-    /// includes source_root and artifact bytes; tamper or a different root
-    /// misses.
+    /// the package lock digest matches the module bytes. The interned check
+    /// input includes source_root and artifact bytes; tamper or a different
+    /// root misses.
     pub fn check_path(
         &mut self,
         path: &Path,
@@ -118,19 +280,37 @@ impl Driver {
         manifest: &SourceManifest,
         source_root: Option<&Path>,
     ) -> Result<CoreModule, Vec<Diagnostic>> {
-        let key = check_key(source, manifest, source_root);
-        if let Some(cached) = self.check_cache.get(&key) {
-            self.hits += 1;
-            return cached.clone();
+        let manifest_json = match serde_json::to_string(manifest) {
+            Ok(json) => json,
+            Err(err) => {
+                self.misses += 1;
+                return Err(vec![Diagnostic::new(
+                    DiagnosticCode::E100,
+                    format!("cannot encode source_manifest: {err}"),
+                )]);
+            }
+        };
+        let snapshot = manifest.snapshot.clone();
+        let source_owned = source.to_owned();
+        let root_display = source_root.map(|path| path.display().to_string());
+        let artifacts = artifact_observations(manifest, source_root);
+        let memo = self.with_memo(|db| {
+            let input = CheckInput::new(
+                db,
+                source_owned.clone(),
+                snapshot.clone(),
+                root_display.clone(),
+                artifacts.clone(),
+                manifest_json.clone(),
+            );
+            compile_checked(db, input)
+        });
+        if let (Ok(module), Some(bundle)) = (&memo.result, memo.bundle) {
+            self.source_bundles
+                .entry(trust_key(module))
+                .or_insert(bundle);
         }
-        self.misses += 1;
-        let result = compile_with_sources(source, manifest, source_root);
-        if let Ok(module) = &result {
-            let bundle = pin_bundle(manifest, source_root);
-            self.source_bundles.insert(trust_key(module), bundle);
-        }
-        self.check_cache.insert(key, result.clone());
-        result
+        memo.result
     }
 
     /// Compile a `.fr` path, discarding the loaded manifest.
@@ -160,7 +340,7 @@ impl Driver {
         args: &BTreeMap<String, Value>,
     ) -> Result<Outcome<Value>, EngineError> {
         let request = execution_request(module, query, args, case, ctx, ExecutionMode::Operative)?;
-        self.cached_eval(module, query, args, case, ctx, &request, evaluate_run)
+        self.cached_eval(module, query, args, case, ctx, &request)
     }
 
     /// Evaluate `query` and wrap the outcome as [`EvaluationReport`].
@@ -233,19 +413,7 @@ impl Driver {
             ExecutionMode::Operative
         };
         let request = execution_request(module, query, args, case, ctx, mode)?;
-        let outcome = if scenario {
-            self.cached_eval(
-                module,
-                query,
-                args,
-                case,
-                ctx,
-                &request,
-                evaluate_scenario_run,
-            )?
-        } else {
-            self.cached_eval(module, query, args, case, ctx, &request, evaluate_run)?
-        };
+        let outcome = self.cached_eval(module, query, args, case, ctx, &request)?;
         let mut report = if scenario {
             report_from_scenario(outcome, case.assumptions.clone())
         } else {
@@ -255,7 +423,6 @@ impl Driver {
         Ok(report)
     }
 
-    #[allow(clippy::too_many_arguments, clippy::type_complexity)]
     fn cached_eval(
         &mut self,
         module: &CoreModule,
@@ -264,23 +431,35 @@ impl Driver {
         case: &CaseRecord,
         ctx: &RunContext,
         request: &ExecutionRequest,
-        eval: fn(
-            &CoreModule,
-            &str,
-            &BTreeMap<String, Value>,
-            &CaseRecord,
-            &RunContext,
-        ) -> Result<Outcome<Value>, EngineError>,
     ) -> Result<Outcome<Value>, EngineError> {
-        let key = run_key(module, query, args, case, ctx, request)?;
-        if let Some(cached) = self.run_cache.get(&key) {
-            self.hits += 1;
-            return cached.clone();
-        }
-        self.misses += 1;
-        let result = eval(module, query, args, case, ctx);
-        if !matches!(result, Err(EngineError::FuelExhausted { .. })) {
-            self.run_cache.insert(key, result.clone());
+        let scenario = request.mode == ExecutionMode::Scenario;
+        let identity = run_identity(module, query, args, case, ctx, request)?;
+        let fuel_attempt = self.fuel_attempts.get(&identity).copied().unwrap_or(0);
+        let module_key = CanonicalKey(module.clone());
+        let args_key = CanonicalKey(args.clone());
+        let case_key = CanonicalKey(case.clone());
+        let query_owned = query.to_owned();
+        let valid_time = ctx.valid_time.to_rfc3339();
+        let record_time = ctx.record_time.to_rfc3339();
+        let request_identity = request.identity().hex();
+        let result = self.with_memo(|db| {
+            let input = RunInput::new(
+                db,
+                module_key.clone(),
+                query_owned.clone(),
+                args_key.clone(),
+                case_key.clone(),
+                valid_time.clone(),
+                record_time.clone(),
+                request_identity.clone(),
+                scenario,
+                fuel_attempt,
+            );
+            evaluate_query(db, input)
+        });
+        if matches!(result, Err(EngineError::FuelExhausted { .. })) {
+            self.fuel_attempts
+                .insert(identity, fuel_attempt.saturating_add(1));
         }
         result
     }
@@ -410,41 +589,24 @@ fn evaluate_scenario_run(
     )
 }
 
-fn check_key(source: &str, manifest: &SourceManifest, source_root: Option<&Path>) -> CheckKey {
-    let mut hasher = blake3::Hasher::new();
-    hasher.update(source.as_bytes());
-    hasher.update(&[0xff]);
-    hasher.update(manifest.snapshot.as_bytes());
-    hasher.update(&[0xff]);
-    match source_root {
-        Some(root) => {
-            hasher.update(b"root:");
-            hasher.update(root.display().to_string().as_bytes());
-        }
-        None => {
-            hasher.update(b"noroot");
-        }
-    }
-    hasher.update(&[0xff]);
-    for artifact in &manifest.artifacts {
-        hasher.update(artifact.digest.as_bytes());
-        hasher.update(&[0xff]);
-        hasher.update(artifact.path.as_bytes());
-        hasher.update(&[0xff]);
-        hasher.update(&artifact_input_digest(source_root, &artifact.path));
-        hasher.update(&[0xff]);
-    }
-    CheckKey(*hasher.finalize().as_bytes())
-}
-
-fn artifact_input_digest(source_root: Option<&Path>, artifact_path: &str) -> [u8; 32] {
-    let Some(root) = source_root else {
-        return *blake3::hash(b"unread").as_bytes();
-    };
-    match read_artifact_bytes(root, artifact_path) {
-        Some(bytes) => *blake3::hash(&bytes).as_bytes(),
-        None => *blake3::hash(b"missing").as_bytes(),
-    }
+fn artifact_observations(
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+) -> Vec<(String, String, ArtifactObservation)> {
+    manifest
+        .artifacts
+        .iter()
+        .map(|artifact| {
+            let observation = match source_root {
+                None => ArtifactObservation::Unread,
+                Some(root) => match read_artifact_bytes(root, &artifact.path) {
+                    Some(bytes) => ArtifactObservation::Bytes(bytes),
+                    None => ArtifactObservation::Missing,
+                },
+            };
+            (artifact.path.clone(), artifact.digest.clone(), observation)
+        })
+        .collect()
 }
 
 fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
@@ -456,14 +618,14 @@ fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8
     }
 }
 
-fn run_key(
+fn run_identity(
     module: &CoreModule,
     query: &str,
     args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
     request: &ExecutionRequest,
-) -> Result<RunKey, EngineError> {
+) -> Result<[u8; 32], EngineError> {
     let module_json =
         canonical_json(module).map_err(|err| EngineError::Internal(err.to_string()))?;
     let case_json = canonical_json(case).map_err(|err| EngineError::Internal(err.to_string()))?;
@@ -488,7 +650,7 @@ fn run_key(
     hasher.update(ctx.record_time.to_rfc3339().as_bytes());
     hasher.update(&[0xff]);
     hasher.update(request.identity().as_bytes());
-    Ok(RunKey(*hasher.finalize().as_bytes()))
+    Ok(*hasher.finalize().as_bytes())
 }
 
 /// Inject `source_root/packages/<name>` locks for imports in `src`.
@@ -1410,6 +1572,24 @@ module Examples.ImpBytes version "0.1.0" {{
     }
 
     #[test]
+    fn fidryn_driver_depends_on_salsa_and_repeated_check_source_hits() {
+        let cargo_toml = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml"));
+        assert!(
+            cargo_toml.contains("salsa"),
+            "fidryn-driver must depend on the salsa crate"
+        );
+        let src = bool_query("true");
+        let manifest = SourceManifest::default();
+        let mut driver = Driver::new();
+        driver.check_source(&src, &manifest).expect("cold");
+        assert_eq!(driver.misses(), 1);
+        assert_eq!(driver.hits(), 0);
+        driver.check_source(&src, &manifest).expect("warm");
+        assert_eq!(driver.hits(), 1);
+        assert_eq!(driver.misses(), 1);
+    }
+
+    #[test]
     fn same_driver_repeated_check_reports_hit() {
         let src = bool_query("true");
         let manifest = SourceManifest::default();
@@ -1596,18 +1776,40 @@ module Examples.UseStd version "0.1.0" {
 "#
     }
 
-    fn copy_std_package(dest_root: &Path) {
-        let src = workspace_root().join("packages").join("std");
-        let dest = dest_root.join("packages").join("std");
-        fs::create_dir_all(&dest).expect("packages/std");
-        fs::copy(src.join("core.fr"), dest.join("core.fr")).expect("copy core.fr");
-        fs::copy(src.join("manifest.json"), dest.join("manifest.json")).expect("copy lock");
+    fn std_core_call_src() -> &'static str {
+        r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    query q() -> Bool { return always_true() }
+}
+"#
+    }
+
+    fn has_core_function(module: &CoreModule, name: &str) -> bool {
+        module.declarations.iter().any(
+            |d| matches!(d, fidryn_core::CoreDecl::Function(function) if function.name == name),
+        )
+    }
+
+    fn copy_workspace_packages(dest_root: &Path) {
+        for name in ["logic", "std"] {
+            let src = workspace_root().join("packages").join(name);
+            let dest = dest_root.join("packages").join(name);
+            fs::create_dir_all(&dest).expect("package dir");
+            for entry in fs::read_dir(&src).expect("read package") {
+                let entry = entry.expect("entry");
+                let path = entry.path();
+                if path.is_file() {
+                    fs::copy(&path, dest.join(entry.file_name())).expect("copy package file");
+                }
+            }
+        }
     }
 
     #[test]
     fn check_path_matching_package_digest_authenticates() {
         let dir = temp_module_dir("pkg-ok");
-        copy_std_package(&dir);
+        copy_workspace_packages(&dir);
         let path = dir.join("m.fr");
         fs::write(&path, std_core_import_src()).expect("write module");
         let mut driver = Driver::new();
@@ -1626,7 +1828,7 @@ module Examples.UseStd version "0.1.0" {
     #[test]
     fn check_path_mismatched_package_digest_is_e200() {
         let dir = temp_module_dir("pkg-bad");
-        copy_std_package(&dir);
+        copy_workspace_packages(&dir);
         let lock_path = dir.join("packages").join("std").join("manifest.json");
         let mut lock: PackageLock =
             serde_json::from_str(&fs::read_to_string(&lock_path).expect("lock"))
@@ -1647,10 +1849,37 @@ module Examples.UseStd version "0.1.0" {
     }
 
     #[test]
+    fn check_path_links_std_core_always_true() {
+        let dir = temp_module_dir("pkg-link");
+        copy_workspace_packages(&dir);
+        let path = dir.join("m.fr");
+        fs::write(&path, std_core_call_src()).expect("write module");
+        let mut driver = Driver::new();
+        let (module, _) = driver
+            .check_path(&path)
+            .expect("path compile links Std.Core");
+        assert!(
+            has_core_function(&module, "always_true"),
+            "linked CoreModule must contain always_true: {module:?}"
+        );
+        let outcome = driver
+            .run(&module, "q", &CaseRecord::default(), &ctx())
+            .expect("run linked always_true");
+        match outcome {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("expected determinate true, got {other:?}"),
+        }
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn check_source_does_not_read_packages_from_filesystem() {
         let dir = temp_module_dir("pkg-trap");
-        copy_std_package(&dir);
-        let src = std_core_import_src();
+        copy_workspace_packages(&dir);
+        let src = std_core_call_src();
         let mut driver = Driver::new();
         let module = driver
             .check_source(src, &SourceManifest::default())
@@ -1659,6 +1888,10 @@ module Examples.UseStd version "0.1.0" {
         assert_eq!(
             driver.source_trust_of(&module),
             TrustProfile::Unauthenticated
+        );
+        assert!(
+            !has_core_function(&module, "always_true"),
+            "check_source must not mill packages/ from cwd: {module:?}"
         );
 
         let bytes = fs::read(dir.join("packages").join("std").join("core.fr")).expect("bytes");
@@ -1686,15 +1919,35 @@ module Examples.UseStd version "0.1.0" {
     }
 
     #[test]
-    fn repo_std_package_lock_matches_module_bytes() {
-        let pkg = workspace_root().join("packages").join("std");
-        let bytes = fs::read(pkg.join("core.fr")).expect("core.fr");
-        let lock: PackageLock =
-            serde_json::from_str(&fs::read_to_string(pkg.join("manifest.json")).expect("lock"))
-                .expect("parse lock");
-        assert_eq!(lock.name, "std");
-        assert_eq!(lock.version, "0.1.0");
-        assert_eq!(lock.digest, blake3::hash(&bytes).to_hex().to_string());
-        assert_eq!(lock.schema, fidryn_core::PACKAGE_LOCK_SCHEMA);
+    fn check_path_missing_nested_digest_is_e200() {
+        let dir = temp_module_dir("pkg-nested-missing");
+        copy_workspace_packages(&dir);
+        let lock_path = dir.join("packages").join("logic").join("manifest.json");
+        fs::remove_file(&lock_path).expect("drop nested lock");
+        let path = dir.join("m.fr");
+        fs::write(&path, std_core_call_src()).expect("write module");
+        let err = Driver::new()
+            .check_path(&path)
+            .expect_err("missing nested digest is E200");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn repo_package_locks_match_module_bytes() {
+        for (name, file) in [("std", "core.fr"), ("logic", "true.fr")] {
+            let pkg = workspace_root().join("packages").join(name);
+            let bytes = fs::read(pkg.join(file)).expect(file);
+            let lock: PackageLock =
+                serde_json::from_str(&fs::read_to_string(pkg.join("manifest.json")).expect("lock"))
+                    .expect("parse lock");
+            assert_eq!(lock.name, name);
+            assert_eq!(lock.version, "0.1.0");
+            assert_eq!(lock.digest, blake3::hash(&bytes).to_hex().to_string());
+            assert_eq!(lock.schema, fidryn_core::PACKAGE_LOCK_SCHEMA);
+        }
     }
 }
