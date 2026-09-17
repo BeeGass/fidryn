@@ -9,6 +9,8 @@ not legal advice, not an operative instrument, and not a complete statement
 of any jurisdiction's law. The modules under `examples/` and the records
 under `tests/` are fixtures for the interpreter. They are not legal advice.
 
+Source files use the `.fr` extension.
+
 ## Governing rule: no false determinacy
 
 A legal computation may return one determinate result only when that result
@@ -31,8 +33,12 @@ Line Tools clang because the Xcode license is unsigned.
 
 ```
 cargo test
-cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fidryn
+cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
 ```
+
+Example modules live under `examples/` (see `examples/README.md`). They encode
+bounded high-impact slices of federal, state, and everyday law. They do
+not contain the entire United States Code.
 
 ## CLI
 
@@ -63,7 +69,7 @@ RFC 3339 timestamps (`2033-01-01T00:00:00Z` or a numeric offset such as
 Templates under `templates/certified/` are the only ones treated as
 certified interpolations; they still cannot invent legal content.
 
-`diff` compiles `.fidryn` snapshots or reads JSON outcomes and prints
+`diff` compiles `.fr` snapshots or reads JSON outcomes and prints
 canonical JSON `{added, removed, changed}` of query and module names.
 
 `explain` loads `TRACE_ID.json` when that file exists; otherwise it

@@ -1,12 +1,18 @@
 # Fidryn v0.1 architecture
 
 Fidryn is a reference interpreter for legal instruments. It is a compiler
-plus a partial evaluator: parse a `.fidryn` module, authenticate a source
+plus a partial evaluator: parse a `.fr` module, authenticate a source
 manifest, elaborate to Core IR, then evaluate a query under a handler.
 The semantics do not depend on Rust. Rust is the implementation language.
 
 This document is the frozen crate contract. When prose in the originating
 essay, an example, and Core disagree, Core plus the acceptance tests win.
+A `.fr` file is not an executable spec. Evidence of what the pipeline
+actually does is [`implementation-status.md`](implementation-status.md).
+
+A computation is determinate only when every still-admissible resolution
+agrees, or a competent authority has already made a determination that
+is operative in the relevant context.
 
 ## How a language is built
 
@@ -16,7 +22,7 @@ trees, not a single interpreter of source text:
 ```
 bytes
   -> lexer (tokens + trivia)
-  -> parser (lossless CST)
+  -> parser (AST this pass; lossless rowan CST intended)
   -> AST (typed, trivia dropped)
   -> name resolution / imports
   -> elaboration (surface shorthands -> Core)
@@ -51,10 +57,13 @@ those as follows:
    dropped. It yields `Suspended`.
 6. Canonical JSON follows RFC 8785 (sorted object keys, no insignificant
    whitespace). Replay is byte-identical.
-7. The CST is lossless (rowan green tree). The formatter round-trips
-   modules apart from documented whitespace normalization.
-8. Expressions use a Pratt parser with the essay's precedence. Chained
-   comparisons are rejected.
+7. v0.1 intends a lossless CST (rowan green tree). The formatter
+   round-trips modules apart from documented whitespace normalization.
+   Rowan CST is **not** this pass (matrix: No / Partial). The current
+   parser is recursive-descent over tokens with source slices.
+8. Expressions follow the essay's precedence in `grammar.ebnf`. Chained
+   comparisons are rejected. Evaluate/calc/guard bodies lower to Core
+   `Term`; that is not a rowan CST and not a claimed Pratt implementation.
 9. `LegalState` is an immutable value. Transitions allocate a new state.
 10. `Prop` has no conversion to `bool`. Guards must use `operative`,
     `assumed`, `determined`, or `necessarily`.
@@ -69,13 +78,14 @@ those as follows:
     ties suspend or explore. Silent picks are forbidden.
 16. Filing adapters, tax calc modules, guarded recursion, user-defined
     effects, quantification, court procedure, case-law graphs, constrained
-    render, a bounded solver, and a localhost mill UI are in-tree. Live
-    filing still requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
+    render, a bounded solver, and a localhost mill UI are in-tree. In-tree
+    is not executed. See the capability matrix. Live filing still requires
+    `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
 
 ## Crate graph
 
 ```
-fidryn-syntax          lossless CST, parser, formatter
+fidryn-syntax          parser, formatter (rowan CST intended, not this pass)
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
 fidryn-check           types, effects, authority, time, strata (hir + core)
@@ -99,11 +109,12 @@ Do not put parser logic in `core`.
 ```rust
 pub fn parse_file(source: &str) -> Parse
 pub struct Parse {
-    pub green: rowan::GreenNode,
+    pub source: String,
+    pub tokens: Vec<Token>,
     pub diagnostics: Vec<fidryn_core::Diagnostic>,
+    // Intended, not this pass: pub green: rowan::GreenNode,
 }
 impl Parse {
-    pub fn syntax(&self) -> SyntaxNode;
     pub fn module(&self) -> Option<ast::Module>;
     pub fn has_errors(&self) -> bool;
 }
@@ -111,17 +122,21 @@ pub fn format_module(source: &str) -> Result<String, fidryn_core::Diagnostic>
 pub fn lex(source: &str) -> Vec<Lexeme>
 ```
 
-`Parse` always returns a tree. Recovery wraps a malformed declaration so
-later declarations still parse. Diagnostics use `E100` for parse errors.
+`Parse` always returns a tree (today: AST plus tokens). Recovery wraps a
+malformed declaration so later declarations still parse. Diagnostics use
+`E100` for parse errors.
 
 ### fidryn-core
 
 See the crate itself. The important types are `CoreModule`, `Outcome<T>`,
 `LegalState`, `Guard`, `OpenRequest`, `HandlerResult<T>`, `RunContext`,
-`CaseRecord`, `SourceManifest`, `Diagnostic`.
+`CaseRecord`, `SourceManifest`, `Diagnostic`, `EngineError`,
+`CheckedCertificate`.
 
 `Outcome::Determinate` may include `ignored_open_issues` only when
-`convergence_certificate` is `Some`. The constructors enforce this.
+`convergence_certificate` is a `CheckedCertificate`. Only
+`CheckedCertificate::verified(...)` constructs that handle.
+`CompletionProofId::of(b"P11")` is never a certificate.
 
 ### fidryn-hir
 
@@ -147,8 +162,12 @@ pub fn evaluate<H: Handler>(
     state: &LegalState,
     ctx: &RunContext,
     handler: &mut H,
-) -> Outcome<Value>
+) -> Result<Outcome<Value>, EngineError>
 ```
+
+Unknown queries, exhausted fuel, and unsupported operations are
+`EngineError`, never `Outcome::Inconsistent`. `QueryPlan::Evaluate`
+runs a `Term`; `Term::Bool(true)` is the `Evaluate { true }` body.
 
 ### fidryn-handlers
 
@@ -159,13 +178,17 @@ pub struct Explore { pub bounds: ExplorationBounds }
 pub struct Skeptical { pub inner: Explore }
 ```
 
-Aggregation precedence (conservative, first match wins):
+Aggregation compares full `Value` with `PartialEq`, never `display_label()`.
+A determinate branch plus a contingent branch is not determinate. Preserve
+nested alternatives and unresolved requests.
+
+Conservative precedence (first match wins):
 
 1. every branch unsatisfiable -> `Inconsistent`
 2. uncertified `OutsideCompetence` -> `OutsideCompetence`
 3. uncertified open request -> `Suspended`
 4. unresolved conflict -> `NormConflict`
-5. divergent total answers -> `Contingent`
+5. divergent total answers, or mixed determinate/contingent -> `Contingent`
 6. convergent nonempty answers (open branches certified) -> `Determinate`
 
 ### fidryn-cli
@@ -209,7 +232,8 @@ parse
   -> Outcome<T>
 ```
 
-A guard that is `Open` or `Conflict` stages no partial mutation.
+A guard that is `Open` or `Conflict` stages no partial mutation. Name-dispatch
+on a query name is not evaluation of Core.
 
 ## Diagnostic codes
 
