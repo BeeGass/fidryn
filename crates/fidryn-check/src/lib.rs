@@ -1,9 +1,9 @@
 //! Type, effect, authority, time, and stratification checking.
 
 use fidryn_core::ir::{
-    ClauseSelector, Consequence, CoreDecl, CoreEffect, CoreEffectDecl, CoreEffectOp, CoreEntity,
-    CoreFunction, CoreModule, CoreOffice, CoreProposition, CoreQuery, CoreRule, CoreVerify, Guard,
-    NodeMeta, QueryPlan, RuleKind, VerificationBounds,
+    ClauseSelector, Consequence, CoreDecl, CoreDuty, CoreEffect, CoreEffectDecl, CoreEffectOp,
+    CoreEntity, CoreFunction, CoreModule, CoreOffice, CoreProposition, CoreQuery, CoreRule,
+    CoreVerify, Guard, NodeMeta, QueryPlan, RuleKind, VerificationBounds,
 };
 use fidryn_core::patterns::{LegalStatusPattern, TermPattern};
 use fidryn_core::time::Interval;
@@ -994,6 +994,24 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
             meta: rule_meta,
         }));
     }
+    for duty in &hir.duties {
+        let mut content = duty.content.clone();
+        if let Some(due) = &duty.due {
+            content.push(Term::Apply {
+                ctor: "due".into(),
+                args: vec![due.clone()],
+            });
+        }
+        declarations.push(CoreDecl::Duty(CoreDuty {
+            id: NodeId::of(duty.name.as_bytes()),
+            name: duty.name.clone(),
+            bearer: Term::Ident(duty.bearer.clone()),
+            claimant: duty.claimant.clone().map(Term::Ident),
+            attaches: duty.attaches.clone().unwrap_or(Guard::Satisfied),
+            content,
+            meta: meta(&duty.name),
+        }));
+    }
     for (name, alts) in &hir.interpretation_families {
         declarations.push(CoreDecl::InterpretationFamily(
             fidryn_core::ir::CoreInterpretationFamily {
@@ -1944,6 +1962,59 @@ module Examples.Trivial version "0.1.0" {
             verify.formula == "assert true" || verify.formula == "true",
             "{:?}",
             verify.formula
+        );
+    }
+
+    #[test]
+    fn late_payment_style_duty_lowers_to_core_duty() {
+        let src = r#"
+module Programs.LatePayment version "0.1.0" {
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+    proposition InvoiceIssued(person: NaturalPerson)
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        attaches when operative InvoiceIssued(Payer)
+        content USD(100.00)
+        due 0 counted_days after invoice_date
+    }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = check_src(src).expect("declared duty should check");
+        let duty = module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::Duty(duty) if duty.name == "PayInvoice" => Some(duty),
+                _ => None,
+            })
+            .expect("CoreDuty PayInvoice");
+        assert_eq!(duty.bearer, Term::Ident("Payer".into()));
+        assert_eq!(duty.claimant, Some(Term::Ident("Payee".into())));
+        assert!(
+            matches!(
+                &duty.attaches,
+                Guard::Operative(prop, _) if prop.predicate == "InvoiceIssued"
+            ),
+            "{:?}",
+            duty.attaches
+        );
+        assert!(
+            duty.content.iter().any(|term| matches!(
+                term,
+                Term::Apply { ctor, .. } if ctor == "USD"
+            )),
+            "{:?}",
+            duty.content
+        );
+        let due = duty.content.last().expect("due content");
+        assert!(
+            matches!(due, Term::Apply { ctor, args } if ctor == "due" && args.len() == 1),
+            "{due:?}"
         );
     }
 }
