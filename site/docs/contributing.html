@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120f0c">
+  <title>Contributing — Fidryn</title>
+  <meta name="description" content="This file is for people building the v0.1 reference interpreter. It is not a language tutorial and not legal advice. Product usage lives in the [README](../README.md) and the [documentation hub](READM">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/docs.css">
+</head>
+<body class="docs-body">
+  <div class="docs-shell">
+    <header class="docs-top">
+      <a class="mark" href="/">fidryn</a>
+      <nav class="nav">
+        <a href="/docs/">Docs</a>
+        <a href="/#install">Install</a>
+        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+      </nav>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="docs-sidebar" aria-label="Documentation">
+        <p class="docs-sidebar-label">Guides</p>
+        <nav class="docs-side-nav">
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples">Examples</a>
+        <a href="/docs/contributing" class="active">Contributing</a>
+        </nav>
+        <p class="docs-sidebar-label">Also</p>
+        <nav class="docs-side-nav">
+          <a href="/">Home</a>
+          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+        </nav>
+      </aside>
+
+      <main class="docs-main prose">
+<h1>Contributing to Fidryn</h1>
+<p>This file is for people building the v0.1 reference interpreter. It is
+not a language tutorial and not legal advice. Product usage lives in
+the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> and the <a href="/docs/">documentation hub</a>.</p>
+<p>Fidryn (FID-rin) is a research fixture. Modules under <code>examples/</code> and
+records under <code>tests/</code> exercise the interpreter. They are not operative
+instruments and not a complete statement of any jurisdiction’s law.</p>
+<h2>Toolchain</h2>
+<p>Rust 1.98, edition 2024. Workspace <code>package.rust-version</code> is 1.98.
+<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml" target="_blank" rel="noopener noreferrer"><code>rust-toolchain.toml</code></a> pins the 1.98.1
+channel and the <code>rustfmt</code> and <code>clippy</code> components.</p>
+<p>If <code>cargo</code> or <code>git</code> pick the wrong tools on this Mac, a working PATH is
+<code>/opt/homebrew/bin:$HOME/.cargo/bin:/usr/bin:/bin</code>, with
+<code>DEVELOPER_DIR=/Library/Developer/CommandLineTools</code>.
+<a href="https://github.com/BeeGass/fidryn/blob/main/.cargo/config.toml" target="_blank" rel="noopener noreferrer"><code>.cargo/config.toml</code></a> already points the linker
+at Command Line Tools clang because the Xcode license is unsigned.</p>
+<h2>Checks</h2>
+<p>From the repository root:</p>
+<pre><code>cargo fmt
+cargo clippy --workspace -- -D warnings
+cargo test --workspace --offline
+</code></pre>
+<p>Do not weaken no-false-determinacy to make a test pass.</p>
+<h2>Pipeline</h2>
+<p>Land a change in the crate that owns that stage:</p>
+<pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli
+</code></pre>
+<p><code>fidryn-kernel</code> sits beside verify: it accepts or rejects covering
+claims and does not search. <code>fidryn-trace</code>, <code>fidryn-solve</code>,
+<code>fidryn-adapt</code>, and <code>fidryn-render</code> support the pipeline; they are not
+extra stages.</p>
+<p>Do not add reverse dependencies. Do not put evaluator logic in
+<code>syntax</code>. Do not put parser logic in <code>core</code>. <code>fidryn-driver</code> must not
+depend on <code>fidryn-cli</code>.</p>
+<h2>Crates</h2>
+<p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml" target="_blank" rel="noopener noreferrer"><code>Cargo.toml</code></a>.</p>
+<pre><code>fidryn-syntax          lossless CST, parser, formatter
+fidryn-core            IR, types, Outcome, LegalState, diagnostics
+fidryn-hir             names, imports, elaboration  (syntax + core)
+fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-eval            worklist evaluator (core)
+fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
+fidryn-verify          bounded explorer and invariants (eval + handlers)
+fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
+fidryn-driver          incremental check/run memo
+fidryn-trace           DAG, canonical JSON, source maps (core)
+fidryn-render          constrained templates (missing keys fail closed)
+fidryn-adapt           capability-gated filing adapters
+fidryn-solve           bounded DPLL over declared finite domains
+fidryn-cli             fidryn binary and localhost mill
+</code></pre>
+<p>Mill HTTP routes are documented in <a href="/docs/mill">mill.md</a>, not in
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">ARCHITECTURE.md</a>.</p>
+<h2>Not legal advice</h2>
+<p>This interpreter, its tests, and its example modules are not legal
+advice.</p>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+    </footer>
+  </div>
+</body>
+</html>
