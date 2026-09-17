@@ -11,17 +11,25 @@ use fidryn_core::types::{PrimitiveType, Sort, Type};
 use fidryn_core::value::{BinOp, PropTerm, Term};
 use fidryn_core::{
     ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ManifestArtifact,
-    ModuleId, NodeId, OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
-    artifact_path_is_package, package_dir_from_artifact_path, package_name_from_import,
-    package_path_matches_import,
+    ModuleId, NodeId, OriginId, PackageLock, SourceManifest, SourceManifestId, SourceSnapshotId,
+    artifact_path_is_package, is_safe_package_name, package_dir_from_artifact_path,
+    package_name_from_import, package_path_matches_import, packages_root,
 };
 use fidryn_hir::{
     HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
     collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
     source_has_bare_prop_if, split_qname_type_args, term_as_name, term_has_bare_prop_guard,
 };
+use fidryn_syntax::ast::Item;
+use fidryn_syntax::parse_file;
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::fs;
+use std::io::ErrorKind;
+use std::path::{Path, PathBuf};
+
+/// Nested package linking on path compile. Mill / `check_source` never
+/// increment this: `source_root = None` does not walk `packages/`.
+const PACKAGE_LINK_DEPTH_CAP: usize = 8;
 
 pub use fidryn_core::TrustProfile;
 
@@ -87,31 +95,64 @@ pub fn source_integrity(manifest: &SourceManifest, source_root: Option<&Path>) -
 /// Hex digests of length 32 or 64 authenticate when they match blake3 of the
 /// file at `artifact.path` relative to `source_root` (64 hex: full digest; 32
 /// hex: first 16 bytes). A missing file or mismatch is E200 for
-/// digest-required imports. `source_root = None` never byte-verifies.
+/// digest-required imports. `source_root = None` never byte-verifies and
+/// never reads `packages/` from the working directory.
+///
+/// When `source_root` is set and a package artifact authenticates, those
+/// already-hashed bytes are parsed and checked. Nested `import`s in a
+/// package are resolved against `source_root/packages` (depth cap 8;
+/// a cycle or missing nested digest is E200) and unique declarations are
+/// merged into the importer. `source_root = None` never walks `packages/`.
+/// Unique names are kept as-is; collisions are E200.
 pub fn check_with_sources(
     hir: &HirModule,
     manifest: &SourceManifest,
     source_root: Option<&Path>,
 ) -> Result<CoreModule, Vec<Diagnostic>> {
+    let mut seen = BTreeSet::new();
+    Ok(check_module(hir, manifest, source_root, true, &mut seen, 0)?.0)
+}
+
+fn check_module(
+    hir: &HirModule,
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+    link_imports: bool,
+    seen: &mut BTreeSet<String>,
+    depth: usize,
+) -> Result<(CoreModule, LinkedImports), Vec<Diagnostic>> {
     let mut diagnostics = hir.diagnostics.clone();
     check_nominations(hir, &mut diagnostics);
-    check_queries(hir, &mut diagnostics);
+    check_imports(hir, manifest, source_root, &mut diagnostics);
+    let linked = if link_imports {
+        link_authenticated_packages(hir, manifest, source_root, seen, depth, &mut diagnostics)
+    } else {
+        LinkedImports::default()
+    };
+    check_queries(hir, &linked.functions, &mut diagnostics);
     check_doctrines(hir, &mut diagnostics);
     check_recursion(hir, &mut diagnostics);
-    check_imports(hir, manifest, source_root, &mut diagnostics);
     check_sources(hir, &mut diagnostics);
     check_instantiation_arity(hir, &mut diagnostics);
-    if diagnostics
-        .iter()
-        .any(|d| d.code.severity() == fidryn_core::Severity::Error)
-    {
+    if has_errors(&diagnostics) {
         return Err(diagnostics);
     }
-    let core = lower(hir, manifest);
-    match instantiation_args(hir) {
-        Some(args) => instantiate(&core, &args),
-        None => Ok(core),
+    let mut core = lower(hir, manifest);
+    merge_linked_modules(&mut core, &linked.modules, &mut diagnostics);
+    if has_errors(&diagnostics) {
+        return Err(diagnostics);
     }
+    let core = match instantiation_args(hir) {
+        Some(args) => instantiate(&core, &args)?,
+        None => core,
+    };
+    Ok((core, linked))
+}
+
+fn has_errors(diagnostics: &[Diagnostic]) -> bool {
+    diagnostics
+        .iter()
+        .any(|d| d.code.severity() == fidryn_core::Severity::Error)
 }
 
 /// Instantiate a parameterized `CoreModule` by substituting `args` for its
@@ -203,9 +244,17 @@ fn check_nominations(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
     }
 }
 
-fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
+fn check_queries(
+    hir: &HirModule,
+    imported_functions: &BTreeMap<String, HirFunction>,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
     let propositions: BTreeSet<String> = hir.propositions.keys().cloned().collect();
     let inferred = infer_module_effects(hir);
+    let mut functions = hir.functions.clone();
+    for (name, function) in imported_functions {
+        functions.entry(name.clone()).or_insert(function.clone());
+    }
     for q in hir.queries.values() {
         if !query_declares_goal(q) {
             diagnostics.push(Diagnostic::new(
@@ -228,7 +277,7 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
         if let Some(term) = query_result_term(q) {
             let locals = locals_from_params(&q.params);
             let cx = TypeCheck {
-                functions: &hir.functions,
+                functions: &functions,
                 propositions: &propositions,
                 locals: &locals,
                 owner: &q.name,
@@ -259,7 +308,7 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
         };
         let locals = locals_from_params(&f.params);
         let cx = TypeCheck {
-            functions: &hir.functions,
+            functions: &functions,
             propositions: &propositions,
             locals: &locals,
             owner: &f.name,
@@ -1185,6 +1234,387 @@ fn encode_hex(bytes: &[u8]) -> String {
 
 fn is_plausible_hex_digest(digest: &str) -> bool {
     matches!(digest.len(), 32 | 64) && digest.bytes().all(|b| b.is_ascii_hexdigit())
+}
+
+#[derive(Default)]
+struct LinkedImports {
+    functions: BTreeMap<String, HirFunction>,
+    modules: Vec<CoreModule>,
+}
+
+/// Parse and check authenticated package bytes on path compile.
+///
+/// Nested package imports are injected from `source_root/packages` and
+/// linked with a depth/cycle guard. `source_root = None` (mill /
+/// `check_source`) never enters here with a root, so it does not read
+/// `packages/`.
+fn link_authenticated_packages(
+    hir: &HirModule,
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+    seen: &mut BTreeSet<String>,
+    depth: usize,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> LinkedImports {
+    let mut linked = LinkedImports::default();
+    let Some(root) = source_root else {
+        return linked;
+    };
+    let mut finished = BTreeSet::new();
+    for import in &hir.imports {
+        let Some(artifact) = authenticated_package_artifact(import, manifest, Some(root)) else {
+            continue;
+        };
+        if !finished.insert(artifact.path.clone()) {
+            continue;
+        }
+        if !seen.insert(artifact.path.clone()) {
+            diagnostics.push(package_cycle(import, &artifact.path));
+            continue;
+        }
+        let compiled = (|| {
+            if depth >= PACKAGE_LINK_DEPTH_CAP {
+                return Err(vec![package_depth(import)]);
+            }
+            let Some(bytes) = read_artifact_bytes(root, &artifact.path) else {
+                return Ok(None);
+            };
+            if !permits_import(authenticate_digest(artifact.digest.trim(), Some(&bytes))) {
+                return Ok(None);
+            }
+            compile_package_bytes(&bytes, Some(root), import, seen, depth + 1).map(Some)
+        })();
+        seen.remove(&artifact.path);
+        match compiled {
+            Ok(Some((_pkg_hir, pkg_core, nested))) => {
+                merge_exported_functions(hir, nested, &mut linked);
+                linked.modules.push(pkg_core);
+            }
+            Ok(None) => {}
+            Err(err) => diagnostics.extend(err),
+        }
+    }
+    linked
+}
+
+fn authenticated_package_artifact<'a>(
+    import: &HirImport,
+    manifest: &'a SourceManifest,
+    source_root: Option<&Path>,
+) -> Option<&'a ManifestArtifact> {
+    let package_name = package_name_from_import(&import.name);
+    manifest.artifacts.iter().find(|artifact| {
+        artifact_path_is_package(&artifact.path)
+            && package_dir_from_artifact_path(&artifact.path).as_deref()
+                == Some(package_name.as_str())
+            && package_artifact_satisfies(artifact, import)
+            && permits_import(authenticate_artifact(artifact, source_root))
+    })
+}
+
+fn compile_package_bytes(
+    bytes: &[u8],
+    source_root: Option<&Path>,
+    import: &HirImport,
+    seen: &mut BTreeSet<String>,
+    depth: usize,
+) -> Result<(HirModule, CoreModule, LinkedImports), Vec<Diagnostic>> {
+    if depth > PACKAGE_LINK_DEPTH_CAP {
+        return Err(vec![package_depth(import)]);
+    }
+    let source = std::str::from_utf8(bytes).map_err(|_| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E100,
+            format!("imported package `{}` is not utf-8", import.name),
+        )]
+    })?;
+    let parsed = parse_file(source);
+    if parsed.has_errors() {
+        return Err(parsed.diagnostics);
+    }
+    let mut pkg_manifest = SourceManifest::default();
+    if let Some(root) = source_root {
+        inject_package_artifacts(&mut pkg_manifest, root, source)?;
+    }
+    let pkg_hir = fidryn_hir::elaborate(&parsed, &pkg_manifest)?;
+    let (pkg_core, nested) = check_module(
+        &pkg_hir,
+        &pkg_manifest,
+        source_root,
+        source_root.is_some(),
+        seen,
+        depth,
+    )?;
+    let exported = export_package_functions(&pkg_hir, nested);
+    Ok((pkg_hir, pkg_core, exported))
+}
+
+fn package_cycle(import: &HirImport, path: &str) -> Diagnostic {
+    Diagnostic::new(
+        DiagnosticCode::E200,
+        format!("import `{}` forms a package cycle at `{path}`", import.name),
+    )
+}
+
+fn package_depth(import: &HirImport) -> Diagnostic {
+    Diagnostic::new(
+        DiagnosticCode::E200,
+        format!(
+            "import `{}` exceeds nested package depth {PACKAGE_LINK_DEPTH_CAP}",
+            import.name
+        ),
+    )
+}
+
+/// Inject `source_root/packages/<name>` locks for imports in `src`.
+///
+/// Only path compile of an already-authenticated package calls this.
+/// Missing nested lock/digest is E200. Mill / `check_source` never
+/// pass a `source_root` into package compile.
+fn inject_package_artifacts(
+    manifest: &mut SourceManifest,
+    source_root: &Path,
+    src: &str,
+) -> Result<(), Vec<Diagnostic>> {
+    let packages_dir = packages_root(source_root);
+    if !packages_dir.is_dir() {
+        return Ok(());
+    }
+    let wanted = imported_package_names(src);
+    if wanted.is_empty() {
+        return Ok(());
+    }
+    let mut errors = Vec::new();
+    for name in wanted {
+        match load_nested_package_artifact(source_root, &name) {
+            Ok(Some(artifact)) => {
+                if !manifest
+                    .artifacts
+                    .iter()
+                    .any(|existing| existing.path == artifact.path)
+                {
+                    manifest.artifacts.push(artifact);
+                }
+            }
+            Ok(None) => errors.push(Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("imported package `{name}` is missing a nested digest"),
+            )),
+            Err(ds) => errors.extend(ds),
+        }
+    }
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
+}
+
+fn imported_package_names(src: &str) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    let parsed = parse_file(src);
+    let Some(module) = parsed.module() else {
+        return names;
+    };
+    for item in &module.items {
+        if let Item::Import(decl) = item {
+            let raw = decl.name.as_deref().unwrap_or("");
+            let name = package_name_from_import(raw);
+            if is_safe_package_name(&name) {
+                names.insert(name);
+            }
+        }
+    }
+    names
+}
+
+fn load_nested_package_artifact(
+    source_root: &Path,
+    name: &str,
+) -> Result<Option<ManifestArtifact>, Vec<Diagnostic>> {
+    if !is_safe_package_name(name) {
+        return Ok(None);
+    }
+    let dir = packages_root(source_root).join(name);
+    if !dir.is_dir() {
+        return Ok(None);
+    }
+    let lock_path = dir.join("manifest.json");
+    let text = match fs::read_to_string(&lock_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == ErrorKind::NotFound => {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("imported package `{name}` is missing a nested digest"),
+            )]);
+        }
+        Err(err) => {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("cannot read nested package `{name}` lock: {err}"),
+            )]);
+        }
+    };
+    let lock: PackageLock = serde_json::from_str(&text).map_err(|err| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!(
+                "malformed nested package lock {}: {err}",
+                lock_path.display()
+            ),
+        )]
+    })?;
+    if lock.digest.trim().is_empty() {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!("imported package `{name}` is missing a nested digest"),
+        )]);
+    }
+    if !lock.name.is_empty() && !lock.name.eq_ignore_ascii_case(name) {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!(
+                "package directory `{name}` does not match lock name `{}`",
+                lock.name
+            ),
+        )]);
+    }
+    let Some(module_path) = unique_package_module(&dir) else {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!("package `{name}` does not contain a unique .fr module"),
+        )]);
+    };
+    let file_name = module_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("package `{name}` module path is not utf-8"),
+            )]
+        })?;
+    let rel = format!("packages/{name}/{file_name}");
+    Ok(Some(lock.module_artifact(rel)))
+}
+
+fn unique_package_module(dir: &Path) -> Option<PathBuf> {
+    let mut found = Vec::new();
+    let entries = fs::read_dir(dir).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() && path.extension().and_then(|e| e.to_str()) == Some("fr") {
+            found.push(path);
+        }
+    }
+    if found.len() == 1 { found.pop() } else { None }
+}
+
+fn export_package_functions(pkg: &HirModule, nested: LinkedImports) -> LinkedImports {
+    let mut exported = nested;
+    for (name, function) in &pkg.functions {
+        exported
+            .functions
+            .entry(name.clone())
+            .or_insert(function.clone());
+    }
+    for (name, query) in &pkg.queries {
+        exported
+            .functions
+            .entry(name.clone())
+            .or_insert(hir_function_from_query(query));
+    }
+    exported
+}
+
+fn merge_exported_functions(
+    importer: &HirModule,
+    nested: LinkedImports,
+    linked: &mut LinkedImports,
+) {
+    for (name, function) in nested.functions {
+        if importer.functions.contains_key(&name) || linked.functions.contains_key(&name) {
+            continue;
+        }
+        linked.functions.insert(name, function);
+    }
+}
+
+fn hir_function_from_query(query: &HirQuery) -> HirFunction {
+    HirFunction {
+        name: query.name.clone(),
+        is_calc: false,
+        fuel: None,
+        result_type: query.result_type.clone(),
+        source: query.plan.clone(),
+        params: query.params.clone(),
+        body: query_result_term(query).cloned(),
+    }
+}
+
+fn merge_linked_modules(
+    into: &mut CoreModule,
+    packages: &[CoreModule],
+    diagnostics: &mut Vec<Diagnostic>,
+) {
+    let mut decl_names: BTreeSet<String> = into
+        .declarations
+        .iter()
+        .filter_map(core_decl_name)
+        .map(str::to_owned)
+        .collect();
+    let mut query_names: BTreeSet<String> = into.queries.iter().map(|q| q.name.clone()).collect();
+    for package in packages {
+        for decl in &package.declarations {
+            let Some(name) = core_decl_name(decl) else {
+                into.declarations.push(decl.clone());
+                continue;
+            };
+            if !decl_names.insert(name.to_owned()) {
+                diagnostics.push(imported_name_collision(name, &package.name));
+                continue;
+            }
+            into.declarations.push(decl.clone());
+        }
+        for query in &package.queries {
+            if !query_names.insert(query.name.clone()) {
+                diagnostics.push(imported_name_collision(&query.name, &package.name));
+                continue;
+            }
+            into.queries.push(query.clone());
+        }
+    }
+}
+
+fn core_decl_name(decl: &CoreDecl) -> Option<&str> {
+    match decl {
+        CoreDecl::Source(d) => Some(d.name.as_str()),
+        CoreDecl::Entity(d) => Some(d.name.as_str()),
+        CoreDecl::RecordType(d) => Some(d.name.as_str()),
+        CoreDecl::Office(d) => Some(d.name.as_str()),
+        CoreDecl::Proposition(d) => Some(d.name.as_str()),
+        CoreDecl::Observation(d) => Some(d.name.as_str()),
+        CoreDecl::Fact(d) => Some(d.relation.as_str()),
+        CoreDecl::Function(d) => Some(d.name.as_str()),
+        CoreDecl::EffectDecl(d) => Some(d.name.as_str()),
+        CoreDecl::Rule(d) => Some(d.name.as_str()),
+        CoreDecl::Position(_) => None,
+        CoreDecl::Power(d) => Some(d.name.as_str()),
+        CoreDecl::Duty(d) => Some(d.name.as_str()),
+        CoreDecl::Judgment(d) => Some(d.name.as_str()),
+        CoreDecl::Decision(d) => Some(d.name.as_str()),
+        CoreDecl::LegalAct(d) => Some(d.name.as_str()),
+        CoreDecl::InterpretationFamily(d) => Some(d.name.as_str()),
+        CoreDecl::ConflictDoctrine(d) => Some(d.name.as_str()),
+        CoreDecl::Clause(d) => Some(d.name.as_str()),
+    }
+}
+
+fn imported_name_collision(name: &str, from: &str) -> Diagnostic {
+    Diagnostic::new(
+        DiagnosticCode::E200,
+        format!("imported `{name}` from `{from}` collides with an existing declaration"),
+    )
 }
 
 fn check_instantiation_arity(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
@@ -2800,6 +3230,98 @@ module Examples.UseStd version "0.1.0" {
 "#
     }
 
+    fn std_core_call_src() -> &'static str {
+        r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    query q() -> Bool { return always_true() }
+}
+"#
+    }
+
+    fn workspace_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
+    }
+
+    fn std_core_package_bytes() -> Vec<u8> {
+        fs::read(
+            workspace_root()
+                .join("packages")
+                .join("std")
+                .join("core.fr"),
+        )
+        .expect("core.fr")
+    }
+
+    fn install_workspace_packages(root: &Path) {
+        for name in ["logic", "std"] {
+            let src = workspace_root().join("packages").join(name);
+            let dest = root.join("packages").join(name);
+            fs::create_dir_all(&dest).expect("package dir");
+            for entry in fs::read_dir(&src).expect("read package") {
+                let entry = entry.expect("entry");
+                let path = entry.path();
+                if path.is_file() {
+                    fs::copy(&path, dest.join(entry.file_name())).expect("copy package file");
+                }
+            }
+        }
+    }
+
+    fn write_locked_package(
+        root: &Path,
+        name: &str,
+        file: &str,
+        source: &[u8],
+        version: &str,
+    ) -> String {
+        let dir = root.join("packages").join(name);
+        fs::create_dir_all(&dir).expect("package dir");
+        fs::write(dir.join(file), source).expect("write module");
+        let digest = encode_hex(blake3::hash(source).as_bytes());
+        let lock = serde_json::json!({
+            "schema": "fidryn.package-lock/v0.1",
+            "name": name,
+            "version": version,
+            "digest": digest,
+        });
+        fs::write(dir.join("manifest.json"), lock.to_string()).expect("lock");
+        digest
+    }
+
+    fn logic_true_src() -> &'static [u8] {
+        br#"module Logic.True version "0.1.0" {
+    fn always_true() -> Bool { true }
+}
+"#
+    }
+
+    fn std_core_reexport_src() -> &'static [u8] {
+        br#"module Std.Core version "0.1.0" {
+    import Logic.True version "0.1.0"
+    query always_true() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#
+    }
+
+    fn has_core_function(module: &CoreModule, name: &str) -> bool {
+        module
+            .declarations
+            .iter()
+            .any(|d| matches!(d, CoreDecl::Function(function) if function.name == name))
+    }
+
+    fn check_std_core_call(
+        manifest: &SourceManifest,
+        source_root: Option<&Path>,
+    ) -> Result<CoreModule, Vec<Diagnostic>> {
+        let parsed = parse_file(std_core_call_src());
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        check_with_sources(&hir, manifest, source_root)
+    }
+
     fn package_artifact_manifest(path: &str, digest: &str, version: &str) -> SourceManifest {
         SourceManifest {
             schema: "fidryn.source-manifest/v0.1".into(),
@@ -2896,5 +3418,194 @@ module Examples.UseStd version "0.1.0" {
             source_integrity(&manifest, None),
             TrustProfile::Unauthenticated
         );
+    }
+
+    #[test]
+    fn matching_package_links_always_true_so_query_type_checks() {
+        let bytes = std_core_package_bytes();
+        let digest = encode_hex(blake3::hash(&bytes).as_bytes());
+        let root = TempRoot::new();
+        install_workspace_packages(&root.0);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let module =
+            check_std_core_call(&manifest, Some(&root.0)).expect("path compile links always_true");
+        assert!(
+            has_core_function(&module, "always_true"),
+            "linked CoreModule must contain always_true: {module:?}"
+        );
+        let q = module.query("q").unwrap_or_else(|| {
+            panic!(
+                "missing query q; queries={:?}",
+                module.queries.iter().map(|q| &q.name).collect::<Vec<_>>()
+            )
+        });
+        assert_eq!(q.result_type, Type::bool());
+    }
+
+    #[test]
+    fn mismatched_package_digest_does_not_link_always_true() {
+        let bytes = std_core_package_bytes();
+        let wrong = encode_hex(blake3::hash(b"tampered-package-bytes").as_bytes());
+        let root = TempRoot::new();
+        fs::create_dir_all(root.0.join("packages").join("std")).expect("packages/std");
+        root.write("packages/std/core.fr", &bytes);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &wrong, "0.1.0");
+        let err = check_std_core_call(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn in_memory_compile_does_not_load_packages_from_cwd() {
+        let bytes = std_core_package_bytes();
+        let digest = encode_hex(blake3::hash(&bytes).as_bytes());
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let err = check_std_core_call(&manifest, None).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+
+        let parsed = parse_file(std_core_call_src());
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let module = check(&hir, &SourceManifest::default())
+            .expect("digest-free import is not path compile");
+        assert!(
+            !has_core_function(&module, "always_true"),
+            "check() must not mill packages/ from cwd: {module:?}"
+        );
+    }
+
+    #[test]
+    fn imported_always_true_collides_with_importer_function() {
+        let src = r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    fn always_true() -> Bool { false }
+    query q() -> Bool { return always_true() }
+}
+"#;
+        let bytes = std_core_package_bytes();
+        let digest = encode_hex(blake3::hash(&bytes).as_bytes());
+        let root = TempRoot::new();
+        install_workspace_packages(&root.0);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let err = check_with_sources(&hir, &manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn nested_package_authenticates_and_links() {
+        let root = TempRoot::new();
+        write_locked_package(&root.0, "logic", "true.fr", logic_true_src(), "0.1.0");
+        let std_digest =
+            write_locked_package(&root.0, "std", "core.fr", std_core_reexport_src(), "0.1.0");
+        let manifest = package_artifact_manifest("packages/std/core.fr", &std_digest, "0.1.0");
+        let module = check_std_core_call(&manifest, Some(&root.0))
+            .expect("nested Logic.True authenticates and links always_true");
+        assert!(
+            has_core_function(&module, "always_true"),
+            "nested always_true must be merged into the importer: {module:?}"
+        );
+        assert_eq!(
+            source_integrity(&manifest, Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+    }
+
+    #[test]
+    fn nested_package_cycle_is_e200() {
+        let ping = br#"module Ping.Mod version "0.1.0" {
+    import Pong.Mod version "0.1.0"
+    fn ping() -> Bool { true }
+}
+"#;
+        let pong = br#"module Pong.Mod version "0.1.0" {
+    import Ping.Mod version "0.1.0"
+    fn pong() -> Bool { true }
+}
+"#;
+        let root = TempRoot::new();
+        let ping_digest = write_locked_package(&root.0, "ping", "mod.fr", ping, "0.1.0");
+        write_locked_package(&root.0, "pong", "mod.fr", pong, "0.1.0");
+        let src = r#"
+module Examples.Cycle version "0.1.0" {
+    import Ping.Mod version "0.1.0"
+    query q() -> Bool { return true }
+}
+"#;
+        let manifest = package_artifact_manifest("packages/ping/mod.fr", &ping_digest, "0.1.0");
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let err = check_with_sources(&hir, &manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn missing_nested_digest_is_e200() {
+        let root = TempRoot::new();
+        let logic_dir = root.0.join("packages").join("logic");
+        fs::create_dir_all(&logic_dir).expect("packages/logic");
+        fs::write(logic_dir.join("true.fr"), logic_true_src()).expect("true.fr");
+        let std_digest =
+            write_locked_package(&root.0, "std", "core.fr", std_core_reexport_src(), "0.1.0");
+        let manifest = package_artifact_manifest("packages/std/core.fr", &std_digest, "0.1.0");
+        let err = check_std_core_call(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn nested_package_wrong_digest_is_e200() {
+        let root = TempRoot::new();
+        write_locked_package(&root.0, "logic", "true.fr", logic_true_src(), "0.1.0");
+        let lock_path = root.0.join("packages").join("logic").join("manifest.json");
+        let mut lock: fidryn_core::PackageLock =
+            serde_json::from_str(&fs::read_to_string(&lock_path).expect("lock")).expect("parse");
+        lock.digest = encode_hex(blake3::hash(b"tampered-nested-bytes").as_bytes());
+        fs::write(&lock_path, serde_json::to_string(&lock).expect("lock json"))
+            .expect("write lock");
+        let std_digest =
+            write_locked_package(&root.0, "std", "core.fr", std_core_reexport_src(), "0.1.0");
+        let manifest = package_artifact_manifest("packages/std/core.fr", &std_digest, "0.1.0");
+        let err = check_std_core_call(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn check_source_does_not_read_nested_packages() {
+        let parsed = parse_file(std_core_reexport_src_str());
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let module = check(&hir, &SourceManifest::default())
+            .expect("in-memory package source must not mill packages/");
+        assert!(
+            !has_core_function(&module, "always_true"),
+            "check() must not read nested packages/: {module:?}"
+        );
+    }
+
+    fn std_core_reexport_src_str() -> &'static str {
+        r#"module Std.Core version "0.1.0" {
+    import Logic.True version "0.1.0"
+    query always_true() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#
     }
 }

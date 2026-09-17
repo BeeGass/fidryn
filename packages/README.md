@@ -12,8 +12,8 @@
 | Compile | `Driver::check_path` may hash files next to the `.fr` | `Driver::check_path` may resolve `source_root/packages` |
 | Mill paste | Empty default manifest, `source_root = None` | Never follows `packages/` on the server |
 
-A path-compiled program may `import Std.Core` (package directory `std`) when `packages/std/manifest.json` names a digest that matches `packages/std/*.fr`. A mismatch is diagnostic `E200`.
+A path-compiled program may `import Std.Core` (package directory `std`) when `packages/std/manifest.json` names a digest that matches `packages/std/*.fr`. A mismatch is diagnostic `E200`. `Std.Core` may itself `import Logic.True` (`packages/logic/true.fr`); path compile authenticates that nested lock and merges unique declarations (depth cap 8). A cycle or missing nested digest is `E200`.
 
-`Driver::check_source` and mill pasted source do not read `packages/`. In-memory compile without a bundle of observed bytes is not `ByteVerified`; a package hex artifact without bytes is unresolved (`E200`).
+`Driver::check_source` and mill pasted source do not read `packages/`. In-memory compile without a bundle of observed bytes is not `ByteVerified`; a package hex artifact without bytes is unresolved (`E200`). Nested package linking is path compile only.
 
-This tree is not a package store. There is no network fetch, no lockfile syntax in `.fr` beyond the package manifest digest, and no linking of package declarations into the importer.
+This tree is not a package store. There is no network fetch and no lockfile syntax in `.fr` beyond the package manifest digest. Path compile that authenticates a package artifact may merge that module's declarations into the importer; in-memory compile still does not read `packages/`.

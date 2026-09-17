@@ -169,6 +169,10 @@ mod tests {
             "Std.Core"
         ));
         assert!(package_path_matches_import(
+            "packages/logic/true.fr",
+            "Logic.True"
+        ));
+        assert!(package_path_matches_import(
             "packages\\std\\core.fr",
             "Std.Core"
         ));

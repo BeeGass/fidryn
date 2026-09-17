@@ -1,4 +1,5 @@
 module Std.Core version "0.1.0" {
+    import Logic.True version "0.1.0"
     query always_true() -> Bool {
         goal Evaluate { true }
     }

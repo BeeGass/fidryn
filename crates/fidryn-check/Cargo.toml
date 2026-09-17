@@ -12,8 +12,7 @@ description = "Fidryn type, effect, authority, time, and stratification checking
 blake3.workspace = true
 fidryn-core.workspace = true
 fidryn-hir.workspace = true
-indexmap.workspace = true
-thiserror.workspace = true
-
-[dev-dependencies]
 fidryn-syntax.workspace = true
+indexmap.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
