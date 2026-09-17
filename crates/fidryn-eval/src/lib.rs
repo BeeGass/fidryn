@@ -11,8 +11,8 @@ pub use worklist::DerivedWorld;
 use worklist::{binder_name, domain_name, parse_prop_issue, term_as_proposition};
 
 use fidryn_core::ir::{
-    CompareOp, CoreConflictDoctrine, CoreDecision, CoreDecl, CoreFunction, CoreModule, NodeMeta,
-    QueryPlan,
+    CompareOp, CoreConflictDoctrine, CoreDecision, CoreDecl, CoreDuty, CoreFunction, CoreModule,
+    NodeMeta, QueryPlan,
 };
 use fidryn_core::outcome::OpenRequest;
 use fidryn_core::patterns::{LegalStatusPattern, PropPattern};
@@ -39,14 +39,12 @@ pub enum Residual {
 
 /// Snapshot of a suspended computation so [`resume`] can continue it.
 ///
-/// If the case identity (facts, evidence, determinations, interpretations,
-/// decisions, closures) later differs, [`resume`] recomputes via
-/// [`evaluate_session`] rather than replaying this residual against stale
-/// derived facts.
+/// If the case identity later differs, [`resume`] recomputes derived facts
+/// and discards remembered handler answers, but keeps the seq frame stack so
+/// completed prefixes are not replayed against the residual.
 ///
-/// When the residual is `seq`, [`completed`] holds determinate prefix
-/// values so resume skips those positions. Nested `seq` inside a non-seq
-/// residual still relies on [`RememberingHandler`].
+/// Seq frames record every entered `seq` in evaluation order. Nested
+/// `seq` under Binary/Call/If skips its completed prefix on resume.
 #[derive(Clone, Debug)]
 pub struct Continuation {
     pub residual: Residual,
@@ -56,7 +54,14 @@ pub struct Continuation {
     pub answered: BTreeMap<String, Value>,
     pub completed: Vec<Value>,
     pub seq_index: usize,
+    seq_frames: Vec<SeqFrame>,
     case_identity: CaseIdentity,
+}
+
+#[derive(Clone, Debug, Default)]
+struct SeqFrame {
+    index: usize,
+    completed: Vec<Value>,
 }
 
 #[derive(Clone, Debug)]
@@ -159,7 +164,6 @@ pub fn evaluate_session<H: Handler>(
         derived,
         None,
         BTreeMap::new(),
-        0,
         Vec::new(),
     )
 }
@@ -167,8 +171,8 @@ pub fn evaluate_session<H: Handler>(
 /// Continue a suspended session after a handler can [`HandlerResult::Resume`].
 ///
 /// When `case` identity has changed since the continuation was captured,
-/// this recomputes from [`evaluate_session`] and discards remembered handler
-/// answers from the previous snapshot.
+/// derived facts are recomputed and remembered handler answers are discarded.
+/// Seq frames and bindings are kept so a completed prefix is not replayed.
 #[allow(clippy::too_many_arguments, clippy::result_large_err)]
 pub fn resume<H: Handler>(
     session: EvalSession,
@@ -183,13 +187,17 @@ pub fn resume<H: Handler>(
     let Some(cont) = session.continuation else {
         return evaluate_session(module, query, args, state, ctx, handler, case);
     };
+    if module.query(query.as_str()).is_none() {
+        return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
+    }
+    let residual = match &cont.residual {
+        Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
+        Residual::Plan(plan) => plan.clone(),
+    };
     if cont.case_identity != CaseIdentity::of(case) {
-        let Some(q) = module.query(query.as_str()) else {
-            return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
-        };
         let derived = DerivedWorld::compute(module, case, ctx, args)?;
         return eval_with_state(
-            &q.plan,
+            &residual,
             module,
             query,
             args,
@@ -197,18 +205,13 @@ pub fn resume<H: Handler>(
             ctx,
             handler,
             case,
-            args.clone(),
+            cont.bindings,
             derived,
             cont.fuel,
             BTreeMap::new(),
-            0,
-            Vec::new(),
+            cont.seq_frames,
         );
     }
-    let residual = match &cont.residual {
-        Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
-        Residual::Plan(plan) => plan.clone(),
-    };
     eval_with_state(
         &residual,
         module,
@@ -222,8 +225,7 @@ pub fn resume<H: Handler>(
         cont.derived,
         cont.fuel,
         cont.answered,
-        cont.seq_index,
-        cont.completed,
+        cont.seq_frames,
     )
 }
 
@@ -241,8 +243,7 @@ fn eval_with_state<H: Handler>(
     derived: DerivedWorld,
     fuel: Option<u32>,
     answered: BTreeMap<String, Value>,
-    seq_index: usize,
-    completed: Vec<Value>,
+    seq_frames: Vec<SeqFrame>,
 ) -> Result<EvalSession, EngineError> {
     let mut handler = RememberingHandler {
         inner: handler,
@@ -250,7 +251,6 @@ fn eval_with_state<H: Handler>(
     };
     match plan {
         QueryPlan::Evaluate(term) => {
-            let seq_resume = term_is_seq(term);
             let mut frame = EvalFrame {
                 module,
                 args,
@@ -260,17 +260,15 @@ fn eval_with_state<H: Handler>(
                 case,
                 derived,
                 fuel,
-                seq_index: if seq_resume { seq_index } else { 0 },
-                completed: if seq_resume { completed } else { Vec::new() },
-                seq_is_residual: seq_resume,
+                seq_frames,
+                seq_cursor: 0,
             };
             let outcome = frame.eval_term(term)?;
             let EvalFrame {
                 bindings,
                 derived,
                 fuel,
-                seq_index,
-                completed,
+                seq_frames,
                 ..
             } = frame;
             Ok(session_from(
@@ -281,8 +279,7 @@ fn eval_with_state<H: Handler>(
                 fuel,
                 handler.answered,
                 case,
-                seq_index,
-                completed,
+                seq_frames,
             ))
         }
         other => {
@@ -296,7 +293,6 @@ fn eval_with_state<H: Handler>(
                 fuel,
                 handler.answered,
                 case,
-                0,
                 Vec::new(),
             ))
         }
@@ -312,9 +308,9 @@ fn session_from(
     fuel: Option<u32>,
     answered: BTreeMap<String, Value>,
     case: &CaseRecord,
-    seq_index: usize,
-    completed: Vec<Value>,
+    seq_frames: Vec<SeqFrame>,
 ) -> EvalSession {
+    let (seq_index, completed) = seq_progress(&seq_frames);
     let continuation = match &outcome {
         Outcome::Suspended { .. } => Some(Continuation {
             residual,
@@ -324,6 +320,7 @@ fn session_from(
             answered,
             completed,
             seq_index,
+            seq_frames,
             case_identity: CaseIdentity::of(case),
         }),
         _ => None,
@@ -434,9 +431,8 @@ struct EvalFrame<'a, H: Handler> {
     case: &'a CaseRecord,
     derived: DerivedWorld,
     fuel: Option<u32>,
-    seq_index: usize,
-    completed: Vec<Value>,
-    seq_is_residual: bool,
+    seq_frames: Vec<SeqFrame>,
+    seq_cursor: usize,
 }
 
 impl<'a, H: Handler> EvalFrame<'a, H> {
@@ -539,6 +535,9 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if is_duty_step(ctor) {
             return self.eval_duty_step(args);
         }
+        if is_duty_status(ctor) {
+            return self.eval_duty_status(args);
+        }
         if is_require_authority(ctor) {
             return self.eval_require_authority(args);
         }
@@ -580,6 +579,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             || is_seq(callee)
             || is_require(callee)
             || is_duty_step(callee)
+            || is_duty_status(callee)
             || is_require_authority(callee)
             || binop_ctor(callee).is_some()
         {
@@ -640,20 +640,22 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             case: self.case,
             derived: self.derived.clone(),
             fuel: budget.map(|n| n.saturating_sub(1)),
-            seq_index: 0,
-            completed: Vec::new(),
-            seq_is_residual: false,
+            seq_frames: std::mem::take(&mut self.seq_frames),
+            seq_cursor: self.seq_cursor,
         };
-        if let Some(body) = &function.body {
-            return nested.eval_term(body);
-        }
-        if function.name == "ordinary_income_tax" {
-            return nested.eval_tax();
-        }
-        Err(unsupported(format!(
-            "function `{}` has no executable body",
-            function.name
-        )))
+        let result = if let Some(body) = &function.body {
+            nested.eval_term(body)
+        } else if function.name == "ordinary_income_tax" {
+            nested.eval_tax()
+        } else {
+            Err(unsupported(format!(
+                "function `{}` has no executable body",
+                function.name
+            )))
+        };
+        self.seq_frames = nested.seq_frames;
+        self.seq_cursor = nested.seq_cursor;
+        result
     }
 
     fn eval_tax(&mut self) -> Result<Outcome<Value>, EngineError> {
@@ -710,18 +712,20 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if args.is_empty() {
             return Err(unsupported("empty seq"));
         }
-        let is_residual = self.seq_is_residual;
-        self.seq_is_residual = false;
-        let start = if is_residual {
-            self.seq_index.max(self.completed.len())
-        } else {
-            0
+        let frame_i = self.seq_cursor;
+        self.seq_cursor += 1;
+        if self.seq_frames.len() <= frame_i {
+            self.seq_frames.push(SeqFrame::default());
+        }
+        let start = {
+            let frame = &self.seq_frames[frame_i];
+            frame.index.max(frame.completed.len())
         };
         if start > args.len() {
             return Err(unsupported("seq resume index past arguments"));
         }
         let mut last = if start > 0 {
-            self.completed.get(start - 1).cloned()
+            self.seq_frames[frame_i].completed.get(start - 1).cloned()
         } else {
             None
         };
@@ -729,19 +733,16 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             match as_determinate(self.eval_term(arg)?) {
                 Ok(v) => {
                     last = Some(v.clone());
-                    if is_residual {
-                        if self.completed.len() > index {
-                            self.completed[index] = v;
-                        } else {
-                            self.completed.push(v);
-                        }
-                        self.seq_index = index + 1;
+                    let frame = &mut self.seq_frames[frame_i];
+                    if frame.completed.len() > index {
+                        frame.completed[index] = v;
+                    } else {
+                        frame.completed.push(v);
                     }
+                    frame.index = index + 1;
                 }
                 Err(outcome) => {
-                    if is_residual {
-                        self.seq_index = index;
-                    }
+                    self.seq_frames[frame_i].index = index;
                     return Ok(outcome);
                 }
             }
@@ -750,6 +751,29 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             Some(value) => Ok(determinate(value, TraceId::of(b"seq"))),
             None => Err(unsupported("empty seq")),
         }
+    }
+
+    fn eval_duty_status(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if args.is_empty() {
+            return Err(unsupported("duty_status expects a duty name"));
+        }
+        let name = term_literal_name(&args[0])?;
+        let Some(duty) = find_duty(self.module, &name).cloned() else {
+            return Err(unsupported(format!("unknown duty `{name}`")));
+        };
+        let attaches_held = self
+            .derived
+            .is_guard_held(&duty.attaches, self.case, self.ctx);
+        let performed_held = self.derived.holds_named("performed")
+            || self.derived.holds_named(&format!("{name}_performed"));
+        let state =
+            duty::surface_duty_state(&duty, self.case, self.ctx, attaches_held, performed_held);
+        self.bindings
+            .insert(duty::duty_fact_key(&name), duty::duty_state_value(&state));
+        Ok(determinate(
+            duty::duty_state_value(&state),
+            TraceId::of(b"duty_status"),
+        ))
     }
 
     fn eval_duty_step(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
@@ -1140,6 +1164,22 @@ fn find_function<'m>(module: &'m CoreModule, name: &str) -> Option<&'m CoreFunct
     })
 }
 
+fn find_duty<'m>(module: &'m CoreModule, name: &str) -> Option<&'m CoreDuty> {
+    module.declarations.iter().find_map(|d| match d {
+        CoreDecl::Duty(duty) if duty.name == name || duty.name.eq_ignore_ascii_case(name) => {
+            Some(duty)
+        }
+        _ => None,
+    })
+}
+
+fn seq_progress(frames: &[SeqFrame]) -> (usize, Vec<Value>) {
+    match frames.first() {
+        Some(frame) => (frame.index, frame.completed.clone()),
+        None => (0, Vec::new()),
+    }
+}
+
 fn find_effect_name(module: &CoreModule, name: &str) -> Option<String> {
     module.declarations.iter().find_map(|d| match d {
         CoreDecl::EffectDecl(e) if e.name == name => Some(e.name.clone()),
@@ -1181,16 +1221,12 @@ fn is_duty_step(ctor: &str) -> bool {
     ctor.eq_ignore_ascii_case("duty_step")
 }
 
-fn is_require_authority(ctor: &str) -> bool {
-    ctor.eq_ignore_ascii_case("require_authority")
+fn is_duty_status(ctor: &str) -> bool {
+    ctor.eq_ignore_ascii_case("duty_status")
 }
 
-fn term_is_seq(term: &Term) -> bool {
-    match term {
-        Term::Apply { ctor, .. } => is_seq(ctor),
-        Term::Call { callee, .. } => is_seq(callee),
-        _ => false,
-    }
+fn is_require_authority(ctor: &str) -> bool {
+    ctor.eq_ignore_ascii_case("require_authority")
 }
 
 fn term_literal_name(term: &Term) -> Result<String, EngineError> {
@@ -2922,7 +2958,7 @@ mod tests {
     use fidryn_core::case::CaseDetermination;
     use fidryn_core::effects::HandlerResult;
     use fidryn_core::ir::{
-        Consequence, CoreDecision, CoreEffect, CoreEntity, CoreInterpretationFamily,
+        Consequence, CoreDecision, CoreDuty, CoreEffect, CoreEntity, CoreInterpretationFamily,
         CoreNomination, CoreProposition, CoreQuery, CoreRule, DecisionReturn,
         DeclaredDecisionResult, RuleKind,
     };
@@ -5411,5 +5447,331 @@ mod tests {
             OpenRequest::NeedCustom { effect, .. } if effect == "require"
         )));
         assert!(report.coverage.is_none());
+    }
+
+    fn seq_term(args: Vec<Term>) -> Term {
+        Term::Apply {
+            ctor: "seq".into(),
+            args,
+        }
+    }
+
+    fn duty_status_term(name: &str) -> Term {
+        Term::Apply {
+            ctor: "duty_status".into(),
+            args: vec![Term::Ident(name.into())],
+        }
+    }
+
+    fn due_apply(days: i64) -> Term {
+        Term::Apply {
+            ctor: "due".into(),
+            args: vec![Term::Int(days), Term::Ident("counted_days".into())],
+        }
+    }
+
+    fn pay_duty(attaches: Guard, due_days: i64) -> CoreDuty {
+        CoreDuty {
+            id: NodeId::of(b"pay"),
+            name: "pay".into(),
+            bearer: Term::Ident("Payer".into()),
+            claimant: Some(Term::Ident("Payee".into())),
+            attaches,
+            content: vec![due_apply(due_days)],
+            meta: test_meta("pay"),
+        }
+    }
+
+    fn duty_status_module(duty: CoreDuty) -> CoreModule {
+        module_with_plan_decls(
+            "q",
+            QueryPlan::Evaluate(duty_status_term("pay")),
+            vec![CoreDecl::Duty(duty)],
+        )
+    }
+
+    fn run_status_at(
+        module: &CoreModule,
+        case: &CaseRecord,
+        at: fidryn_core::Instant,
+    ) -> Outcome<Value> {
+        evaluate(
+            module,
+            &QueryName::from("q"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &RunContext::new(at, at),
+            &mut Refusing,
+            case,
+        )
+        .expect("evaluate")
+    }
+
+    fn status_state(out: Outcome<Value>) -> fidryn_core::DutyState {
+        match out {
+            Outcome::Determinate { value, .. } => {
+                duty::parse_duty_state(&value, "pay").expect("duty state")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn invoice_issued_guard() -> Guard {
+        Guard::Operative(PropTerm::new("InvoiceIssued", Vec::new()), String::new())
+    }
+
+    #[test]
+    fn duty_status_unresolved_when_attach_guard_does_not_hold() {
+        let module = duty_status_module(pay_duty(invoice_issued_guard(), 30));
+        let state = status_state(
+            run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate"),
+        );
+        assert_eq!(state.status, fidryn_core::DutyStatus::Unresolved);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn duty_status_attached_when_guard_holds_and_deadline_open() {
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let invoice = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        let at = fidryn_core::Instant::parse("2026-01-15T00:00:00Z").unwrap();
+        let state = status_state(run_status_at(&module, &case, at));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn changing_due_apply_changes_duty_status_without_rust_edits() {
+        let invoice = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let at = fidryn_core::Instant::parse("2026-01-15T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        let early = duty_status_module(pay_duty(Guard::Satisfied, 0));
+        let later = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let early_state = status_state(run_status_at(&early, &case, at));
+        let later_state = status_state(run_status_at(&later, &case, at));
+        assert_eq!(early_state.status, fidryn_core::DutyStatus::Breached);
+        assert!(early_state.breached);
+        assert_eq!(later_state.status, fidryn_core::DutyStatus::Attached);
+        assert!(!later_state.breached);
+    }
+
+    #[test]
+    fn duty_status_performed_from_payment_record_keeps_late_breach() {
+        let invoice = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let paid = fidryn_core::Instant::parse("2026-01-20T00:00:00Z").unwrap();
+        let at = fidryn_core::Instant::parse("2026-01-20T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.evidence.push(EvidenceItem {
+            schema: "PaymentRecord".into(),
+            value: Value::Entity("Payer".into()),
+            observed_at: paid,
+        });
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 0));
+        let state = status_state(run_status_at(&module, &case, at));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Performed);
+        assert!(state.breached);
+    }
+
+    #[test]
+    fn duty_status_performed_on_time_is_not_breached() {
+        let invoice = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let at = fidryn_core::Instant::parse("2026-01-05T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts
+            .insert("invoice_date".into(), Value::Instant(invoice));
+        case.facts.insert("pay_performed".into(), Value::Bool(true));
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let state = status_state(run_status_at(&module, &case, at));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Performed);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn duty_status_honors_named_late_fact_without_invoice_date() {
+        let mut case = CaseRecord::default();
+        case.facts.insert("pay_late".into(), Value::Bool(true));
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 10));
+        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Breached);
+        assert!(state.breached);
+    }
+
+    #[test]
+    fn duty_status_call_form_matches_apply() {
+        let module = module_with_plan_decls(
+            "q",
+            QueryPlan::Evaluate(Term::Call {
+                callee: "duty_status".into(),
+                args: vec![Term::Ident("pay".into())],
+            }),
+            vec![CoreDecl::Duty(pay_duty(Guard::Satisfied, 30))],
+        );
+        let state = status_state(
+            run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate"),
+        );
+        assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+    }
+
+    #[test]
+    fn duty_event_performed_without_grant_does_not_make_duty_status_performed() {
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.events.push(fidryn_core::LedgerEvent {
+            kind: "duty".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
+        assert_ne!(state.status, fidryn_core::DutyStatus::Performed);
+    }
+
+    #[test]
+    fn assumption_event_performed_makes_duty_status_performed() {
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.events.push(fidryn_core::LedgerEvent {
+            kind: "assumption".into(),
+            valid_time: Interval::always(),
+            record_time: t,
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
+        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
+        assert_eq!(state.status, fidryn_core::DutyStatus::Performed);
+        assert!(!state.breached);
+    }
+
+    #[test]
+    fn nested_seq_under_add_skips_completed_attach_on_resume() {
+        let plan = QueryPlan::Evaluate(Term::Binary {
+            op: BinOp::Add,
+            left: Box::new(Term::Int(10)),
+            right: Box::new(seq_term(vec![
+                duty_step_term("pay", "attach"),
+                Term::Apply {
+                    ctor: "require_authority".into(),
+                    args: vec![Term::Ident("missing_action".into())],
+                },
+                Term::Int(2),
+            ])),
+        });
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(first.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            first.outcome
+        );
+        let cont = first.continuation.as_ref().expect("continuation");
+        assert_eq!(cont.seq_index, 1);
+        assert_eq!(cont.completed.len(), 1);
+        assert_eq!(cont.completed[0].display_label(), "Attached");
+        let mut granted = case.clone();
+        granted.facts.insert(
+            "authority_grants".into(),
+            Value::Set(vec![Value::String("missing_action".into())]),
+        );
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &granted,
+        )
+        .expect("resume");
+        match second.outcome {
+            Outcome::Determinate {
+                value: Value::Int(12),
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+        assert!(second.continuation.is_none());
+    }
+
+    #[test]
+    fn nested_seq_under_add_does_not_double_attach_on_same_case_resume() {
+        let plan = QueryPlan::Evaluate(Term::Binary {
+            op: BinOp::Add,
+            left: Box::new(Term::Int(10)),
+            right: Box::new(seq_term(vec![
+                duty_step_term("pay", "attach"),
+                Term::Ident("judgment".into()),
+                Term::Int(2),
+            ])),
+        });
+        let module = module_with_plan("q", plan);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(
+            matches!(first.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            first.outcome
+        );
+        let mut handler = Scripted::resume_only(&["other"]);
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut handler,
+            &case,
+        )
+        .expect("resume");
+        match second.outcome {
+            Outcome::Determinate {
+                value: Value::Int(12),
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
     }
 }

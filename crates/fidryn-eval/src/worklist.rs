@@ -88,6 +88,15 @@ impl DerivedWorld {
         self.observed.iter().any(|s| names_eq(s, schema))
     }
 
+    /// Whether `guard` holds under the empty substitution, as in worklist firing.
+    pub fn is_guard_held(&self, guard: &Guard, case: &CaseRecord, ctx: &RunContext) -> bool {
+        self.guard_holds(guard, &BTreeMap::new(), case, ctx) == Hold::Yes
+    }
+
+    pub fn holds_named(&self, predicate: &str) -> bool {
+        self.holds(&PropTerm::new(predicate, Vec::new()))
+    }
+
     fn seed(
         module: &CoreModule,
         case: &CaseRecord,
@@ -100,6 +109,7 @@ impl DerivedWorld {
         seed_facts(&mut world, args, &propositions);
         seed_determinations(&mut world, case);
         seed_evidence(&mut world, case, ctx);
+        seed_events(&mut world, case, ctx, &propositions);
         seed_core_facts(&mut world, module);
         seed_observations(&mut world, module, case, ctx);
         world
@@ -280,6 +290,37 @@ fn seed_evidence(world: &mut DerivedWorld, case: &CaseRecord, ctx: &RunContext) 
     for item in &case.evidence {
         if item.observed_at <= ctx.record_time {
             world.observed.insert(item.schema.clone());
+        }
+    }
+}
+
+fn seed_events(
+    world: &mut DerivedWorld,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    propositions: &BTreeSet<String>,
+) {
+    for event in &case.events {
+        if !crate::duty::event_is_admitted(case, event, ctx.record_time) {
+            continue;
+        }
+        match &event.payload {
+            Value::Map(fields) => seed_facts(world, fields, propositions),
+            Value::Ctor { name, fields } => {
+                if !fields.is_empty() {
+                    seed_facts(world, fields, propositions);
+                }
+                if name.eq_ignore_ascii_case("performed") {
+                    world.insert_held(PropTerm::new("performed", Vec::new()));
+                }
+            }
+            Value::String(name) | Value::Entity(name) if name.eq_ignore_ascii_case("performed") => {
+                world.insert_held(PropTerm::new("performed", Vec::new()));
+            }
+            Value::Bool(true) => {
+                world.insert_held(PropTerm::new(event.kind.clone(), Vec::new()));
+            }
+            _ => {}
         }
     }
 }
@@ -761,6 +802,7 @@ pub fn is_eval_keyword(name: &str) -> bool {
             | "seq"
             | "require"
             | "duty_step"
+            | "duty_status"
             | "require_authority"
     ) || name.eq_ignore_ascii_case("for_all")
         || name.eq_ignore_ascii_case("exists")
