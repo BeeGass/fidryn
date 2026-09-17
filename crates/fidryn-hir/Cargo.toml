@@ -1,0 +1,16 @@
+[package]
+name = "fidryn-hir"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn name resolution, imports, and surface elaboration"
+
+[dependencies]
+fidryn-core.workspace = true
+fidryn-syntax.workspace = true
+indexmap.workspace = true
+la-arena.workspace = true
+thiserror.workspace = true
