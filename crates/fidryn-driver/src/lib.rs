@@ -99,8 +99,7 @@ impl Driver {
     }
 
     /// Evaluate `query` against `case`. Hits return a clone of the stored
-    /// outcome. The memo key is module id hex, query name, canonical case
-    /// JSON, and valid/known times.
+    /// outcome. The memo key includes query arguments.
     pub fn run(
         &mut self,
         module: &CoreModule,
@@ -108,14 +107,27 @@ impl Driver {
         case: &CaseRecord,
         ctx: &RunContext,
     ) -> Result<Outcome<Value>, EngineError> {
-        let key = run_key(module, query, case, ctx)?;
+        self.run_with_args(module, query, case, ctx, &BTreeMap::new())
+    }
+
+    pub fn run_with_args(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<Outcome<Value>, EngineError> {
+        let key = run_key(module, query, args, case, ctx)?;
         if let Some(cached) = self.run_cache.get(&key) {
             self.hits += 1;
             return cached.clone();
         }
         self.misses += 1;
-        let result = evaluate_run(module, query, case, ctx);
-        self.run_cache.insert(key, result.clone());
+        let result = evaluate_run(module, query, args, case, ctx);
+        if !matches!(result, Err(EngineError::FuelExhausted { .. })) {
+            self.run_cache.insert(key, result.clone());
+        }
         result
     }
 }
@@ -138,6 +150,7 @@ fn compile_source(source: &str, manifest: &SourceManifest) -> Result<CoreModule,
 fn evaluate_run(
     module: &CoreModule,
     query: &str,
+    args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<Outcome<Value>, EngineError> {
@@ -149,7 +162,7 @@ fn evaluate_run(
     evaluate(
         module,
         &QueryName::from(query),
-        &BTreeMap::new(),
+        args,
         &state,
         ctx,
         &mut handler,
@@ -175,14 +188,18 @@ fn check_key(source: &str, manifest: &SourceManifest) -> CheckKey {
 fn run_key(
     module: &CoreModule,
     query: &str,
+    args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<RunKey, EngineError> {
     let case_json = canonical_json(case).map_err(|err| EngineError::Internal(err.to_string()))?;
+    let args_json = canonical_json(args).map_err(|err| EngineError::Internal(err.to_string()))?;
     let mut hasher = blake3::Hasher::new();
     hasher.update(module.id.hex().as_bytes());
     hasher.update(&[0xff]);
     hasher.update(query.as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(args_json.as_bytes());
     hasher.update(&[0xff]);
     hasher.update(case_json.as_bytes());
     hasher.update(&[0xff]);
@@ -441,6 +458,34 @@ module Examples.T version "0.1.0" {{
     }
 
     #[test]
+    fn different_query_arguments_miss_the_run_cache() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    calc echo(x: Int) -> Int { x }
+    query q(x: Int) -> Int { return echo(x) }
+}
+"#;
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(src, &SourceManifest::default())
+            .expect("compile");
+        let case = CaseRecord::default();
+        let mut a = BTreeMap::new();
+        a.insert("x".into(), Value::Int(1));
+        let mut b = BTreeMap::new();
+        b.insert("x".into(), Value::Int(2));
+        let first = driver
+            .run_with_args(&module, "q", &case, &ctx(), &a)
+            .expect("run a");
+        let misses = driver.misses();
+        let second = driver
+            .run_with_args(&module, "q", &case, &ctx(), &b)
+            .expect("run b");
+        assert_eq!(driver.misses(), misses + 1, "argument B must miss");
+        assert_ne!(first, second);
+    }
+
+    #[test]
     fn check_path_identical_bytes_is_hit() {
         let dir = temp_module_dir("path");
         let path = dir.join("m.fr");
@@ -465,5 +510,46 @@ module Examples.T version "0.1.0" {{
         driver.check_source(&commented, &manifest).expect("compile");
         assert_eq!(driver.misses(), 2);
         assert_eq!(driver.hits(), 0);
+    }
+
+    #[test]
+    fn changed_import_digest_misses_check_cache() {
+        let src = bool_query("true");
+        let artifact = |digest: &str| fidryn_core::ManifestArtifact {
+            path: "Other.Law".into(),
+            digest: digest.into(),
+            kind: "fixture".into(),
+            effective: String::new(),
+            weight: fidryn_core::SourceWeight::Explanatory,
+        };
+        let mut first = SourceManifest::default();
+        first.artifacts.push(artifact("aaa"));
+        let mut second = SourceManifest::default();
+        second.artifacts.push(artifact("bbb"));
+        let mut driver = Driver::new();
+        driver.check_source(&src, &first).expect("compile a");
+        assert_eq!(driver.misses(), 1);
+        driver.check_source(&src, &second).expect("compile b");
+        assert_eq!(driver.misses(), 2);
+        assert_eq!(driver.hits(), 0);
+        driver.check_source(&src, &first).expect("compile a again");
+        assert_eq!(driver.hits(), 1);
+    }
+
+    #[test]
+    fn same_driver_repeated_check_reports_hit() {
+        let src = bool_query("true");
+        let manifest = SourceManifest::default();
+        let mut driver = Driver::new();
+        driver.check_source(&src, &manifest).expect("cold");
+        assert_eq!(driver.misses(), 1);
+        assert_eq!(driver.hits(), 0);
+        driver.check_source(&src, &manifest).expect("repeat");
+        assert_eq!(driver.misses(), 1);
+        assert_eq!(driver.hits(), 1);
+        let edited = bool_query("false");
+        driver.check_source(&edited, &manifest).expect("edit");
+        assert_eq!(driver.misses(), 2);
+        assert_eq!(driver.hits(), 1);
     }
 }
