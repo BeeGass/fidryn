@@ -111,5 +111,330 @@ result.</p>
 <p>Unknown queries, exhausted fuel, and unsupported operations are engine
 failures (exit 1). They are never rewritten as <code>inconsistent</code>.</p>
 <h2>Evaluation report envelope</h2>
-<p>PLACEHOLDER_WILL_FAIL_SIZE_CHECK</p>
-</main></div></div></body></html>
+<p>Qualifications that the outcome schema cannot carry live on
+<code>fidryn.evaluation-report/v0.1</code>. <code>fidryn_trace::render_report</code> emits
+that object. <code>outcomeDocument</code> is the <code>fidryn.outcome/v0.1</code> projection
+above; that schema is unchanged.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema</code></td>
+<td><code>fidryn.evaluation-report/v0.1</code>.</td>
+</tr>
+<tr>
+<td><code>executionMode</code></td>
+<td><code>operative</code> or <code>scenario</code>. Operative <code>evaluate</code> does not apply <code>case.assumptions</code>.</td>
+</tr>
+<tr>
+<td><code>assumptions</code></td>
+<td>Overlay hypotheses copied onto a scenario report. Empty for operative runs.</td>
+</tr>
+<tr>
+<td><code>sourceTrust</code></td>
+<td>How the compiled source was authenticated. In-memory / mill pasted compile is <code>unauthenticated</code>. A path compile may be <code>fixture</code> or <code>byteVerified</code>. <code>fixture</code> is not byte-verified.</td>
+</tr>
+<tr>
+<td><code>verificationMethod</code></td>
+<td><code>none</code> (claims digest), <code>structural</code> (shape only), or <code>finiteReplay</code> (each branch re-evaluated). Only <code>finiteReplay</code> is covering.</td>
+</tr>
+<tr>
+<td><code>coverage</code></td>
+<td>Optional <code>CoverageWitness</code>. Shape completeness is not covering meaning.</td>
+</tr>
+<tr>
+<td><code>outcomeDocument</code></td>
+<td>The <code>fidryn.outcome/v0.1</code> object from the previous section.</td>
+</tr>
+</tbody>
+</table>
+<p>Do not drop trust or coverage to keep an old outcome printer happy.
+If a qualification cannot fit <code>fidryn.outcome/v0.1</code>, it belongs here.
+A scenario report keeps <code>executionMode: scenario</code> and a nonempty
+<code>assumptions</code> array on this envelope; it must not be reduced to an
+outcome-only <code>fidryn.outcome/v0.1</code> export.</p>
+<h2>Outcome kinds</h2>
+<p><code>outcome</code> is tagged by <code>kind</code>. Every kind includes <code>trace</code>, a 32-character
+hex <code>TraceId</code>. <code>fidryn explain TRACE_ID</code> loads <code>TRACE_ID.json</code> when that
+file exists; otherwise it prints the hashed id. JSON traces always
+include a <code>nodes</code> array.</p>
+<p>Values inside an outcome are tagged runtime values
+(<code>{&quot;kind&quot;:&quot;bool&quot;,&quot;data&quot;:true}</code>, <code>{&quot;kind&quot;:&quot;entity&quot;,&quot;data&quot;:&quot;Bob&quot;}</code>,
+<code>{&quot;kind&quot;:&quot;unit&quot;}</code>). They are not the looser case-JSON literals. A
+proposition is <code>{&quot;kind&quot;:&quot;prop&quot;,...}</code>; it is not a boolean.</p>
+<h3>Determinate</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;determinate&quot;,
+  &quot;value&quot;: { &quot;kind&quot;: &quot;entity&quot;, &quot;data&quot;: &quot;Bob&quot; },
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;,
+  &quot;convergenceCertificate&quot;: null,
+  &quot;ignoredOpenIssues&quot;: []
+}
+</code></pre>
+<p><strong>When.</strong> The query has one answer that does not depend on any still-open
+admissible completion, or a competent authority has already determined
+the issue in this context. <code>Determinate</code> additionally requires a
+<strong>nonempty</strong> exhaustive completion set. An empty declared domain is
+<code>inconsistent</code> or <code>suspended</code>, never a vacuous <code>determinate</code>.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>value</code> (required). The answer. Compared with full value equality, not
+with display labels. <code>Bob</code> the entity is not <code>&quot;Bob&quot;</code> the string.</li>
+<li><code>trace</code>. Provenance id for this evaluation.</li>
+<li><code>convergenceCertificate</code>. Optional 32-hex completion-proof id. Present
+when a covering certificate was bound. A raw id cannot be deserialized
+back into a live certificate; the kernel has to verify it.</li>
+<li><code>ignoredOpenIssues</code>. Open requests that were set aside. Nonempty only
+together with a <strong>covering</strong> certificate. A claims-digest binder is
+not enough; the constructor refuses <code>determinate</code> with ignored issues
+and a non-covering certificate.</li>
+</ul>
+<p><strong>What it is not.</strong> Listing one alternative first is not determination.
+Hashing the open issues is not covering. Shape-complete <code>examined == total</code> with empty or fabricated <code>branches</code> is not covering.</p>
+<h3>Contingent</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;contingent&quot;,
+  &quot;alternatives&quot;: {
+    &quot;i:SuccessorEligibility=I1&quot;: { &quot;kind&quot;: &quot;entity&quot;, &quot;data&quot;: &quot;Alice&quot; },
+    &quot;i:SuccessorEligibility=I2&quot;: { &quot;kind&quot;: &quot;entity&quot;, &quot;data&quot;: &quot;Bob&quot; }
+  },
+  &quot;pivots&quot;: [],
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;
+}
+</code></pre>
+<p><strong>When.</strong> At least two still-admissible total answers disagree, or a
+determinate branch is mixed with a nested contingent. Explore of the
+trust fixture with two certificates and <strong>no</strong> recorded interpretation
+is the usual example: I1 yields Alice, I2 yields Bob.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>alternatives</code> (required). Map from assignment identity (the full
+binding, not a list index) to the answer in that world.</li>
+<li><code>pivots</code> (required). Open requests that split the worlds
+(<code>needInterpretation</code>, <code>needChoice</code>, <code>needEvidence</code>, and so on).</li>
+<li><code>trace</code>.</li>
+</ul>
+<p>Aggregation compares full <code>Value</code>s. Two worlds that print the same label
+but differ in kind stay contingent. A determinate world plus a
+contingent world is contingent, not determinate.</p>
+<h3>Suspended</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;suspended&quot;,
+  &quot;requests&quot;: [
+    {
+      &quot;kind&quot;: &quot;needInterpretation&quot;,
+      &quot;source&quot;: &quot;Instrument.clause(\&quot;4.4\&quot;)&quot;,
+      &quot;family&quot;: &quot;SuccessorEligibility&quot;
+    }
+  ],
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;
+}
+</code></pre>
+<p><strong>When.</strong> The evaluator needs a legal operation that the case does not
+discharge, and there is no covering certificate that would let those
+open branches be ignored. <code>run</code> never invents the missing completion.
+Open branches without a covering certificate stay <code>suspended</code>.</p>
+<p>Typical causes: missing evidence whose <code>observedAt</code> is at or before
+known-at; a judgment with no matching determination; a choice with no
+recorded decision; an interpretation family with no recorded
+alternative; a unique-occupant query with no occupancy; a closed-world
+status asked without a closure record; an incomplete explore that ran
+out of budget.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>requests</code> (required). The outstanding <code>OpenRequest</code> set.</li>
+<li><code>trace</code>.</li>
+</ul>
+<p>Request kinds you will see:</p>
+<table>
+<thead>
+<tr>
+<th><code>kind</code></th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>needEvidence</code></td>
+<td><code>issue</code> plus <code>schema</code>. Observe matches that schema and known-at.</td>
+</tr>
+<tr>
+<td><code>needJudgment</code></td>
+<td><code>issue</code> (a proposition term) plus <code>protocol</code>. Determine matches protocol and issue.</td>
+</tr>
+<tr>
+<td><code>needChoice</code></td>
+<td><code>protocol</code> plus <code>options</code>.</td>
+</tr>
+<tr>
+<td><code>needInterpretation</code></td>
+<td><code>source</code> plus <code>family</code>.</td>
+</tr>
+<tr>
+<td><code>needApplicableLaw</code></td>
+<td><code>issue</code> plus <code>candidates</code>. A unique candidate may resume; a tie suspends.</td>
+</tr>
+<tr>
+<td><code>needConflict</code></td>
+<td><code>graph</code> plus <code>doctrines</code>. A unique applicable doctrine may resume; list order is never a tie-break.</td>
+</tr>
+<tr>
+<td><code>needCustom</code></td>
+<td><code>effect</code> plus <code>payload</code> (for example an incomplete explore).</td>
+</tr>
+</tbody>
+</table>
+<h3>NormConflict</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;normConflict&quot;,
+  &quot;doctrines&quot;: [ { &quot;name&quot;: &quot;LaterInTime&quot; } ],
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;
+}
+</code></pre>
+<p><strong>When.</strong> Staged effects disagree and the conflict oracle cannot pick
+exactly one applicable doctrine. Zero applicable doctrines, or two or
+more incompatible ones, stay unresolved. Silent preference for the
+first name in a list is forbidden.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>doctrines</code> (required). The conflict doctrines involved (<code>name</code>,
+<code>guard</code>, <code>defeats</code>, <code>as_to</code>, <code>reason</code>, and identity metadata).</li>
+<li><code>trace</code>.</li>
+</ul>
+<p>If a unique doctrine applies, evaluation resumes instead of returning
+this kind. Recorded resolutions on the case, when present, also resume.</p>
+<h3>OutsideCompetence</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;outsideCompetence&quot;,
+  &quot;request&quot;: {
+    &quot;kind&quot;: &quot;needInterpretation&quot;,
+    &quot;source&quot;: &quot;Instrument.clause(\&quot;4.4\&quot;)&quot;,
+    &quot;family&quot;: &quot;SuccessorEligibility&quot;
+  },
+  &quot;reason&quot;: &quot;recorded interpretation is not in the admissible set&quot;,
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;
+}
+</code></pre>
+<p><strong>When.</strong> The case asks the interpreter to do something outside the
+declared model or the module’s competence. A recorded interpretation or
+choice that is not in <code>admissibleCompletions</code> is the usual case. An
+explored doctrine or source outside the candidate set is another.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>request</code> (required). The operation that could not be discharged.</li>
+<li><code>reason</code> (required). Why it is outside competence, not merely open.</li>
+<li><code>trace</code>.</li>
+</ul>
+<p><code>established: false</code> from a competent protocol is a negative
+determination, not this kind.</p>
+<h3>Inconsistent</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;inconsistent&quot;,
+  &quot;core&quot;: [&quot;empty completion set&quot;],
+  &quot;trace&quot;: &quot;0123456789abcdef0123456789abcdef&quot;
+}
+</code></pre>
+<p><strong>When.</strong> The admitted model cannot be satisfied. Examples: a named
+interpretation family whose declared list is empty; every explored
+branch unsatisfiable; two established occupants of an office that must
+be unique.</p>
+<p><strong>Fields.</strong></p>
+<ul>
+<li><code>core</code> (required). Human-readable inconsistency lines. Explore of an
+empty declared domain uses <code>empty completion set</code>.</li>
+<li><code>trace</code>.</li>
+</ul>
+<p>Engine errors are not this kind. <code>unknown query q</code> exits without an
+outcome document.</p>
+<h2>Rules to internalize</h2>
+<h3>Determinate needs nonempty exhaustive agreement or a competent determination</h3>
+<p>A legal computation may return one determinate result only when that
+result is invariant across every still-admissible resolution, or when a
+competent authority has already made a determination that is operative
+in the relevant context. The completion set those worlds are drawn from
+must be nonempty and exhaustive. Vacuity (<code>Family: []</code>) is not
+agreement. <code>run</code> does not choose a completion to manufacture agreement.</p>
+<h3>Open branches without a covering certificate stay Suspended</h3>
+<p>An open <code>needInterpretation</code>, <code>needEvidence</code>, or similar request is not
+dropped because the rest of the query looks settled. Ignoring open
+issues on a <code>determinate</code> result requires <code>ignoredOpenIssues</code> <strong>and</strong> a
+covering <code>convergenceCertificate</code>. Without that pair, the outcome is
+<code>suspended</code>.</p>
+<h3>A claims digest is not covering proof</h3>
+<p><code>CheckedCertificate::verified</code> binds a proof id to a hash of program,
+snapshot, case, query, clocks, constraints, and answer. Matching that
+digest does not discharge open constraints and does not set
+<code>covering: true</code>.</p>
+<p>Covering requires <code>verified_covering</code> plus a complete
+<code>CoverageWitness</code>: <code>incomplete == false</code>, <code>examined == total</code>,
+<code>examined &gt; 0</code>, matching answer, and a <code>branches</code> list whose meaning
+checks. Shape completeness is not enough.
+<code>fidryn-kernel::accept_covering_eval</code> re-evaluates each
+<code>CoverageWitness.branches</code> entry (<code>BranchClaim { bindings, answer }</code>)
+against the claimed program and query. It rejects fabricated
+evaluations, duplicate worlds, incomplete or mismatched counts, and
+digest-only certificates. The kernel does not search and does not
+invent worlds. <code>accept_covering</code> (shape only) is not that check.</p>
+<h3>explore versus run</h3>
+<p><code>run</code> evaluates the given case with a <code>CaseFile</code> handler. Missing
+completions suspend. It never fills I1 or I2 for you.</p>
+<p><code>explore</code> searches the declared <code>admissibleCompletions</code> (and any
+<code>--bounds</code> merge). Recorded interpretations and decisions constrain the
+search; they are not overwritten. Divergent total answers become
+<code>contingent</code>. Convergent nonempty answers can become <code>determinate</code>. An
+empty named domain becomes <code>inconsistent</code>.</p>
+<p>The two commands need not return the same category. With two
+certificates and an open <code>SuccessorEligibility</code> domain,
+<code>run ... --query acting_trustee</code> suspends (<code>needInterpretation</code>) while
+<code>explore</code> is <code>contingent</code> between Alice and Bob. With
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/court-selects-i2.json" target="_blank" rel="noopener noreferrer"><code>court-selects-i2.json</code></a>,
+both answer Bob, because I2 is already on the case and inside the
+declared domain. Treat agreement as a fact about that record, not as a
+reason to skip reading <code>kind</code>.</p>
+<h3>modelBoundary is on the envelope</h3>
+<p>Do not read <code>outcome.value</code> and ignore <code>modelBoundary</code>.
+<code>outsideScope</code> is the union of module and case exclusions; a case that
+lists only <code>tax</code> does not erase the module’s <code>creditor_priority</code>.
+<code>admissibleCompletions</code> on the envelope is the space the result is
+relative to. If you omitted a family, the result is silent about that
+family; it is not a proof that the family does not matter.</p>
+<h3>Prop is not Bool</h3>
+<p><code>Prop</code> is a first-class sort. There is no conversion from a proposition
+term to <code>bool</code>. <code>Incapacitated(Bryan, Administer(BRT))</code> is not <code>true</code>.
+Guards use <code>operative</code>, <code>assumed</code>, <code>determined</code>, or <code>necessarily</code>. A
+tagged <code>{ &quot;kind&quot;: &quot;bool&quot;, &quot;data&quot;: false }</code> is boolean; a tagged
+<code>{ &quot;kind&quot;: &quot;prop&quot;, &quot;data&quot;: { &quot;predicate&quot;: &quot;Incapacitated&quot;, &quot;arguments&quot;: [] } }</code>
+is not. Case JSON that needs both field names <code>kind</code> and <code>data</code> for a
+user record must use <code>{ &quot;kind&quot;: &quot;record&quot;, &quot;data&quot;: { ... } }</code>; see
+<a href="/docs/cases-and-time">Cases and time</a>.</p>
+<h2>Reading a result</h2>
+<ol>
+<li>Confirm <code>schema</code> is <code>fidryn.outcome/v0.1</code>.</li>
+<li>Read <code>modelBoundary</code> and <code>asOf</code> before <code>outcome.kind</code>.</li>
+<li>Branch on <code>kind</code>. Only <code>determinate</code> has <code>value</code> as <em>the</em> answer.</li>
+<li>If <code>kind</code> is <code>determinate</code> and <code>ignoredOpenIssues</code> is nonempty, demand
+a covering certificate, not a hex string you minted yourself.</li>
+<li>If <code>kind</code> is <code>suspended</code> or <code>contingent</code>, the work is in <code>requests</code> /
+<code>pivots</code> and <code>alternatives</code>, not in guessing a default.</li>
+<li>Do not promote a <code>run</code> suspension into the <code>explore</code> contingent
+answer, or the reverse, without a new evaluation.</li>
+</ol>
+<p>The modules under <code>examples/</code> and the records under <code>tests/</code> are
+fixtures for this interpreter. They are not legal advice.</p>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+    </footer>
+  </div>
+</body>
+</html>
