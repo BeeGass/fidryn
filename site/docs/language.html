@@ -5,23 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#120f0c">
   <title>Language — Fidryn</title>
-  <meta name="description" content="Read this as a map of the constructs you will see in `.fr` files, then open the fixtures and check them. For build, `check`, and the first `run`, start with [Getting started](getting-started.md).">
+  <meta name="description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/language">
+  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/language.md" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="Language — Fidryn">
+  <meta property="og:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/language">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Language — Fidryn">
+  <meta name="twitter:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Language — Fidryn","description":"Fidryn language map: modules, queries, rules, duties, and what the language will not do.","url":"https://fidryn.onlygass.dev/docs/language","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/language.md"}</script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
   <div class="docs-shell">
     <header class="docs-top">
       <a class="mark" href="/">fidryn</a>
-      <nav class="nav">
-        <a href="/docs/">Docs</a>
-        <a href="/#install">Install</a>
-        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-      </nav>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
     </header>
 
     <div class="docs-layout">
-      <aside class="docs-sidebar" aria-label="Documentation">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
         <a href="/docs/">Overview</a>
@@ -37,11 +58,13 @@
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
           <a href="/">Home</a>
+          <a href="/docs/language.md">Markdown</a>
           <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
 
-      <main class="docs-main prose">
+      <main class="docs-main prose" id="main">
 <h1>The Fidryn language</h1>
 <p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
 open the fixtures and check them. For build, <code>check</code>, and the first
@@ -314,6 +337,22 @@ guard. A <code>kind: duty</code> event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit <code>assumption</code>. That gate is in
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
+<h2>Scenarios (in-module)</h2>
+<p>A <code>scenario</code> block names overlay hypotheses for fixtures that do not
+ship companion JSON case files (for example under <code>examples/states/</code>).
+It is not a silent default for <code>run</code>.</p>
+<pre><code>scenario InsideCityHalfAcre {
+    assume OccupiesAsResidence(Owner, Home)
+    assume InsideMunicipality(Home)
+    assume within_urban_acreage(0.5)
+    at 2026-09-17T12:00:00-04:00
+}
+</code></pre>
+<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>. Case JSON
+can carry analogous overlay rows as <code>assumptions</code> (<code>id</code>, <code>payload</code>);
+CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
+<code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
+See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2>Verify</h2>
 <p>A <code>verify</code> block is a named property. v0.1 discharges Boolean
 literals:</p>
@@ -353,8 +392,33 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
 
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
     </footer>
   </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
 </body>
 </html>
