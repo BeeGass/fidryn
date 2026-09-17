@@ -74,8 +74,7 @@ claims and does not search. <code>fidryn-trace</code>, <code>fidryn-solve</code>
 <code>fidryn-adapt</code>, and <code>fidryn-render</code> support the pipeline; they are not
 extra stages.</p>
 <p>Do not add reverse dependencies. Do not put evaluator logic in
-<code>syntax</code>. Do not put parser logic in
-<code>core</code>. <code>fidryn-driver</code> must not
+<code>syntax</code>. Do not put parser logic in <code>core</code>. <code>fidryn-driver</code> must not
 depend on <code>fidryn-cli</code>.</p>
 <h2>Crates</h2>
 <p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml" target="_blank" rel="noopener noreferrer"><code>Cargo.toml</code></a>.</p>
@@ -94,6 +93,7 @@ fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-cli             fidryn binary and localhost mill
 </code></pre>
+<h2>Tests</h2>
 <p>Tests live next to the crates they exercise (<code>#[cfg(test)]</code> in <code>src</code>,
 and <code>crates/&lt;name&gt;/tests/</code> when a crate has an integration kit).</p>
 <p>The adversarial review kit is
