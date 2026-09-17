@@ -16,6 +16,7 @@ module Examples.BryanRevocableTrust version "0.1.0" {
         kind private_instrument
         authority Bryan as SettlorOf(BRT)
         artifact "sources/bryan-revocable-trust.txt"
+        digest fixture
         effective [execution_time, +inf)
     }
 
