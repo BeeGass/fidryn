@@ -14,9 +14,9 @@ use fidryn_core::{
     OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
 };
 use fidryn_hir::{
-    HirModule, HirQuery, HirQueryBody, collect_source_callees, collect_term_callees,
-    flatten_term_list, parse_type_name, source_has_bare_prop_if, split_qname_type_args,
-    term_as_name, term_has_bare_prop_guard,
+    HirFunction, HirModule, HirQuery, HirQueryBody, collect_source_callees, collect_term_callees,
+    flatten_term_list, last_brace_inner, parse_type_name, source_has_bare_prop_if,
+    split_qname_type_args, term_as_name, term_has_bare_prop_guard,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -133,18 +133,24 @@ fn check_nominations(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 
 fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
     let propositions: BTreeSet<String> = hir.propositions.keys().cloned().collect();
+    let function_names: BTreeSet<&str> = hir.functions.keys().map(String::as_str).collect();
     for q in hir.queries.values() {
-        if !q.has_goal {
+        if !query_declares_goal(q) {
             diagnostics.push(Diagnostic::new(
                 DiagnosticCode::E430,
                 format!("query `{}` is missing a body or explicit goal", q.name),
             ));
         }
-        if q.automatic && !q.effects.is_empty() {
-            diagnostics.push(Diagnostic::new(
-                DiagnosticCode::E420,
-                format!("automatic query `{}` must have an empty effect row", q.name),
-            ));
+        if q.automatic {
+            let mut effects = effect_set_from_names(&q.effects);
+            let callees = collect_query_callees(q, &function_names);
+            effects.extend(reachable_callee_effects(&callees, &hir.functions));
+            if !effects.is_empty() {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E420,
+                    format!("automatic query `{}` must have an empty effect row", q.name),
+                ));
+            }
         }
         if query_has_bare_prop_guard(q, &propositions) {
             diagnostics.push(Diagnostic::new(
@@ -152,8 +158,8 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
                 "a proposition was used directly as a guard; use operative/determined/assumed",
             ));
         }
-        if let HirQueryBody::Return(term) = &q.body
-            && let Some(actual) = literal_term_type(term)
+        if let Some(term) = query_result_term(q)
+            && let Some(actual) = infer_term_type(term, &hir.functions)
         {
             let expected = parse_type_name(&q.result_type);
             if !types_compatible(&expected, &actual) {
@@ -173,6 +179,24 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
                 DiagnosticCode::E310,
                 "a proposition was used directly as a guard; use operative/determined/assumed",
             ));
+        }
+    }
+}
+
+fn query_declares_goal(q: &HirQuery) -> bool {
+    if !q.has_goal {
+        return false;
+    }
+    match &q.body {
+        HirQueryBody::None => false,
+        HirQueryBody::Goal {
+            kind,
+            expr,
+            office,
+            fields,
+        } => !kind.is_empty() || expr.is_some() || office.is_some() || !fields.is_empty(),
+        HirQueryBody::Return(_) => {
+            last_brace_inner(&q.plan).is_some_and(|inner| !inner.trim().is_empty())
         }
     }
 }
@@ -202,20 +226,47 @@ fn query_has_bare_prop_guard(q: &HirQuery, propositions: &BTreeSet<String>) -> b
     }
 }
 
-fn literal_term_type(term: &Term) -> Option<Type> {
+fn query_result_term(q: &HirQuery) -> Option<&Term> {
+    match &q.body {
+        HirQueryBody::Return(term) => Some(term),
+        HirQueryBody::Goal { kind, expr, .. } if kind == "Evaluate" => expr.as_ref(),
+        _ => None,
+    }
+}
+
+fn infer_term_type(term: &Term, functions: &BTreeMap<String, HirFunction>) -> Option<Type> {
     match term {
         Term::Bool(_) => Some(Type::bool()),
         Term::Int(_) => Some(Type::Primitive(PrimitiveType::Int)),
         Term::Decimal(_) => Some(Type::Primitive(PrimitiveType::Decimal)),
         Term::String(_) => Some(Type::Primitive(PrimitiveType::String)),
+        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => {
+            if let Some(function) = functions.get(ctor) {
+                return Some(parse_type_name(&function.result_type));
+            }
+            if is_currency_ctor(ctor) {
+                Some(Type::Primitive(PrimitiveType::Money {
+                    currency: ctor.clone(),
+                }))
+            } else {
+                None
+            }
+        }
         _ => None,
     }
+}
+
+fn is_currency_ctor(name: &str) -> bool {
+    let len = name.len();
+    (3..=4).contains(&len) && name.bytes().all(|b| b.is_ascii_uppercase())
 }
 
 fn types_compatible(expected: &Type, actual: &Type) -> bool {
     if expected == actual {
         return true;
     }
+    // Tax closed forms may return Decimal for a Money formula. Distinct
+    // currencies are not aliases: Money<USD> != Money<EUR> via PartialEq.
     matches!(
         (expected, actual),
         (
@@ -228,16 +279,115 @@ fn types_compatible(expected: &Type, actual: &Type) -> bool {
     )
 }
 
-fn function_has_bare_prop_guard(
-    f: &fidryn_hir::HirFunction,
-    propositions: &BTreeSet<String>,
-) -> bool {
+fn function_has_bare_prop_guard(f: &HirFunction, propositions: &BTreeSet<String>) -> bool {
     if source_has_bare_prop_if(&f.source, propositions) {
         return true;
     }
     f.body
         .as_ref()
         .is_some_and(|term| term_has_bare_prop_guard(term, propositions))
+}
+
+fn collect_query_callees(q: &HirQuery, functions: &BTreeSet<&str>) -> BTreeSet<String> {
+    let mut callees = BTreeSet::new();
+    match &q.body {
+        HirQueryBody::Return(term) => collect_term_callees(term, functions, &mut callees),
+        HirQueryBody::Goal {
+            expr,
+            office,
+            fields,
+            ..
+        } => {
+            if let Some(term) = expr {
+                collect_term_callees(term, functions, &mut callees);
+            }
+            if let Some(term) = office {
+                collect_term_callees(term, functions, &mut callees);
+            }
+            for term in fields.values() {
+                collect_term_callees(term, functions, &mut callees);
+            }
+        }
+        HirQueryBody::None => {}
+    }
+    callees.extend(collect_source_callees(&q.plan, functions));
+    callees
+}
+
+fn reachable_callee_effects(
+    start: &BTreeSet<String>,
+    functions: &BTreeMap<String, HirFunction>,
+) -> BTreeSet<EffectName> {
+    let names: BTreeSet<&str> = functions.keys().map(String::as_str).collect();
+    let mut stack: Vec<String> = start.iter().cloned().collect();
+    let mut seen = BTreeSet::new();
+    let mut effects = BTreeSet::new();
+    while let Some(name) = stack.pop() {
+        if !seen.insert(name.clone()) {
+            continue;
+        }
+        let Some(function) = functions.get(&name) else {
+            continue;
+        };
+        effects.extend(function_effect_set(function));
+        let mut callees = BTreeSet::new();
+        if let Some(body) = &function.body {
+            collect_term_callees(body, &names, &mut callees);
+        }
+        callees.extend(collect_source_callees(&function.source, &names));
+        stack.extend(callees);
+    }
+    effects
+}
+
+fn parse_effect_name(name: &str) -> Option<EffectName> {
+    match name {
+        "Observe" => Some(EffectName::Observe),
+        "Determine" => Some(EffectName::Determine),
+        "Choose" => Some(EffectName::Choose),
+        "Interpret" => Some(EffectName::Interpret),
+        "ResolveNormConflict" => Some(EffectName::ResolveNormConflict),
+        "SelectApplicableLaw" => Some(EffectName::SelectApplicableLaw),
+        _ => None,
+    }
+}
+
+fn effect_set_from_names<I>(names: I) -> BTreeSet<EffectName>
+where
+    I: IntoIterator,
+    I::Item: AsRef<str>,
+{
+    names
+        .into_iter()
+        .filter_map(|name| parse_effect_name(name.as_ref()))
+        .collect()
+}
+
+fn extract_effect_names(src: &str) -> Vec<String> {
+    let mut search = src;
+    while let Some(bang) = search.find('!') {
+        let after = search[bang + 1..].trim_start();
+        if let Some(inner) = after.strip_prefix('{')
+            && let Some(close) = inner.find('}')
+        {
+            return inner[..close]
+                .split(',')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(str::to_owned)
+                .collect();
+        }
+        search = &search[bang + 1..];
+    }
+    Vec::new()
+}
+
+fn function_effect_names(function: &HirFunction) -> Vec<String> {
+    extract_effect_names(&function.source)
+}
+
+fn function_effect_set(function: &HirFunction) -> BTreeSet<EffectName> {
+    effect_set_from_names(function_effect_names(function))
 }
 
 fn check_recursion(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
@@ -446,7 +596,15 @@ fn normalize_import_key(s: &str) -> String {
 }
 
 fn digest_authenticates(digest: &str) -> bool {
-    !digest.is_empty() || digest == "fixture"
+    let digest = digest.trim();
+    if digest.eq_ignore_ascii_case("fixture") {
+        return true;
+    }
+    is_plausible_hex_digest(digest)
+}
+
+fn is_plausible_hex_digest(digest: &str) -> bool {
+    matches!(digest.len(), 32 | 64) && digest.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
 fn check_instantiation_arity(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
@@ -681,7 +839,7 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
                 .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
                 .collect(),
             result: parse_type_name(&f.result_type),
-            effects: BTreeSet::new(),
+            effects: function_effect_set(f),
             is_calc: f.is_calc,
             fuel: f.fuel,
             body: f.body.clone(),
@@ -766,31 +924,7 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
         .values()
         .map(|q| lower_query(q, hir, jid))
         .collect();
-    let verifications = hir
-        .quantifiers
-        .iter()
-        .enumerate()
-        .map(|(i, q)| {
-            let name = format!("{}:{}:{i}", q.kind.as_str(), q.binder);
-            CoreVerify {
-                id: NodeId::of(name.as_bytes()),
-                name,
-                bounds: VerificationBounds {
-                    persons: 0,
-                    events: 0,
-                    time_points: 0,
-                },
-                formula: format!(
-                    "{} {} in {}: {}",
-                    q.kind.as_str(),
-                    q.binder,
-                    q.domain,
-                    q.formula
-                ),
-                meta: meta(&q.binder),
-            }
-        })
-        .collect();
+    let verifications = lower_verifications(hir, meta);
     CoreModule {
         id: ModuleId::of(hir.name.as_bytes()),
         name: encode_module_name(&hir.name, &hir.type_params),
@@ -815,6 +949,51 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
     }
 }
 
+fn lower_verifications(hir: &HirModule, meta: impl Fn(&str) -> NodeMeta) -> Vec<CoreVerify> {
+    let mut verifications = Vec::new();
+    for item in &hir.verifications {
+        verifications.push(CoreVerify {
+            id: NodeId::of(item.name.as_bytes()),
+            name: item.name.clone(),
+            bounds: item.bounds.as_ref().map_or(
+                VerificationBounds {
+                    persons: 0,
+                    events: 0,
+                    time_points: 0,
+                },
+                |bounds| VerificationBounds {
+                    persons: bounds.persons,
+                    events: bounds.events,
+                    time_points: bounds.time_points,
+                },
+            ),
+            formula: item.formula.clone(),
+            meta: meta(&item.name),
+        });
+    }
+    for (i, q) in hir.quantifiers.iter().enumerate() {
+        let name = format!("{}:{}:{i}", q.kind.as_str(), q.binder);
+        verifications.push(CoreVerify {
+            id: NodeId::of(name.as_bytes()),
+            name,
+            bounds: VerificationBounds {
+                persons: 0,
+                events: 0,
+                time_points: 0,
+            },
+            formula: format!(
+                "{} {} in {}: {}",
+                q.kind.as_str(),
+                q.binder,
+                q.domain,
+                q.formula
+            ),
+            meta: meta(&q.binder),
+        });
+    }
+    verifications
+}
+
 fn consequence_from_op(op: &str, prop: &PropTerm) -> Consequence {
     match op {
         "establish" | "constitute" => Consequence::Establish(prop.clone()),
@@ -825,24 +1004,7 @@ fn consequence_from_op(op: &str, prop: &PropTerm) -> Consequence {
 }
 
 fn lower_query(q: &HirQuery, hir: &HirModule, jid: JurisdictionId) -> CoreQuery {
-    let mut effects = BTreeSet::new();
-    for e in &q.effects {
-        match e.as_str() {
-            "Observe" => {
-                effects.insert(EffectName::Observe);
-            }
-            "Determine" => {
-                effects.insert(EffectName::Determine);
-            }
-            "Choose" => {
-                effects.insert(EffectName::Choose);
-            }
-            "Interpret" => {
-                effects.insert(EffectName::Interpret);
-            }
-            _ => {}
-        }
-    }
+    let effects = effect_set_from_names(&q.effects);
     CoreQuery {
         id: NodeId::of(q.name.as_bytes()),
         name: q.name.clone(),
@@ -1388,5 +1550,153 @@ module Examples.EvalTrue version "0.1.0" {
         let q = module.query("flag").expect("flag query");
         assert_eq!(q.result_type, Type::bool());
         assert_eq!(q.plan, QueryPlan::Evaluate(Term::Bool(true)));
+    }
+
+    #[test]
+    fn automatic_query_calling_determine_function_is_e420() {
+        let src = r#"
+module Examples.AutoDet version "0.1.0" {
+    proposition P(x: LegalPerson)
+    entity A : LegalPerson
+    fn f() -> Bool ! {Determine} { determined(P(A)) }
+    query automatic q() -> Bool { return f() }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E420),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn evaluate_int_as_bool_query_is_e210() {
+        let src = r#"
+module Examples.EvalInt version "0.1.0" {
+    query q() -> Bool { goal Evaluate { 7 } }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn digest_abc_does_not_authenticate_required_import() {
+        let src = r#"
+module Examples.ImpAbc version "0.1.0" {
+    import Other.Law version "1" { digest "abc" }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: "abc".into(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let err = check(&hir, &manifest).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn fixture_digest_authenticates_required_import() {
+        let src = r#"
+module Examples.ImpFixture version "0.1.0" {
+    import Other.Law version "1" { digest "fixture" }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: "FIXTURE".into(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        check(&hir, &manifest).expect("fixture digest authenticates");
+    }
+
+    #[test]
+    fn determine_effect_row_is_preserved_on_core_function() {
+        let src = r#"
+module Examples.FnEff version "0.1.0" {
+    proposition P(x: LegalPerson)
+    entity A : LegalPerson
+    fn f() -> Bool ! {Determine} { determined(P(A)) }
+    query q() -> Bool ! {Determine} {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = check_src(src).expect("declared Determine should check");
+        let function = module.declarations.iter().find_map(|d| match d {
+            CoreDecl::Function(function) if function.name == "f" => Some(function),
+            _ => None,
+        });
+        let function = function.expect("function f");
+        assert!(
+            function.effects.contains(&EffectName::Determine),
+            "{:?}",
+            function.effects
+        );
+    }
+
+    #[test]
+    fn digest_authenticates_fixture_and_plausible_hex() {
+        assert!(digest_authenticates("fixture"));
+        assert!(digest_authenticates("Fixture"));
+        assert!(digest_authenticates(&"ab".repeat(16)));
+        assert!(digest_authenticates(&"ab".repeat(32)));
+        assert!(!digest_authenticates("abc"));
+        assert!(!digest_authenticates("deadbeef"));
+        assert!(!digest_authenticates(""));
+    }
+
+    #[test]
+    fn named_verify_trivial_lowers_to_core_verify() {
+        let src = r#"
+module Examples.Trivial version "0.1.0" {
+    verify Trivial { assert true }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = check_src(src).expect("named verify should check");
+        let verify = module
+            .verifications
+            .iter()
+            .find(|v| v.name == "Trivial")
+            .expect("CoreVerify Trivial");
+        assert!(
+            verify.formula == "assert true" || verify.formula == "true",
+            "{:?}",
+            verify.formula
+        );
     }
 }
