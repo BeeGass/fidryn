@@ -157,18 +157,25 @@ function pageShell({ title, activeSlug, bodyHtml, description }) {
   <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
   <div class="docs-shell">
     <header class="docs-top">
       <a class="mark" href="/">fidryn</a>
-      <nav class="nav">
-        <a href="/docs/">Docs</a>
-        <a href="/#install">Install</a>
-        <a href="${GITHUB}">GitHub</a>
-      </nav>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="${GITHUB}">GitHub</a>
+        </nav>
+      </div>
     </header>
 
     <div class="docs-layout">
-      <aside class="docs-sidebar" aria-label="Documentation">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
 ${navHtml(activeSlug)}
@@ -176,11 +183,13 @@ ${navHtml(activeSlug)}
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
           <a href="/">Home</a>
-          <a href="${GITHUB}" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/#install">Install</a>
+          <a href="${GITHUB}" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
 
-      <main class="docs-main prose">
+      <main class="docs-main prose" id="main">
 ${bodyHtml}
         <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
       </main>
@@ -188,9 +197,34 @@ ${bodyHtml}
 
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="${GITHUB}">source</a></span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="${GITHUB}">source</a> · <a href="/llms.txt">llms.txt</a></span>
     </footer>
   </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
 </body>
 </html>
 `;
