@@ -1,1 +1,1 @@
-LOAD_FROM_FILE_FAILED_USE_SHELL
+SEE_FILE_/tmp/RESTORE-docs-examples.md
