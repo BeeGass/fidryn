@@ -609,8 +609,14 @@ fn completion_domains(case: &CaseRecord) -> Vec<Domain> {
 }
 
 fn recorded_or_declared(recorded: Option<&String>, declared: &[String]) -> Vec<Value> {
+    if declared.is_empty() {
+        return Vec::new();
+    }
     if let Some(value) = recorded {
-        return vec![Value::String(value.clone())];
+        if declared.iter().any(|item| item == value) {
+            return vec![Value::String(value.clone())];
+        }
+        return Vec::new();
     }
     declared.iter().cloned().map(Value::String).collect()
 }
@@ -1061,6 +1067,22 @@ mod tests {
             Determinacy::Other(Outcome::Inconsistent { .. }) | Determinacy::Unknown { .. } => {}
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn recorded_selection_cannot_reopen_empty_declared_domain() {
+        let module = bool_module();
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .interpretations
+            .insert("I".into(), Vec::new());
+        case.interpretations.insert("I".into(), "outside".into());
+        let det =
+            check_determinacy(&module, &QueryName::from("q"), &case, &ctx()).expect("determinacy");
+        assert!(
+            !matches!(det, Determinacy::Convergent { .. }),
+            "an invalid recorded value is not an admissible world: {det:?}"
+        );
     }
 
     #[test]
