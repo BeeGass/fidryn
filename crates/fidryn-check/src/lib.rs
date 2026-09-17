@@ -12,6 +12,8 @@ use fidryn_core::value::{BinOp, PropTerm, Term};
 use fidryn_core::{
     ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ManifestArtifact,
     ModuleId, NodeId, OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
+    artifact_path_is_package, package_dir_from_artifact_path, package_name_from_import,
+    package_path_matches_import,
 };
 use fidryn_hir::{
     HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
@@ -203,7 +205,7 @@ fn check_nominations(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 
 fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
     let propositions: BTreeSet<String> = hir.propositions.keys().cloned().collect();
-    let function_names: BTreeSet<&str> = hir.functions.keys().map(String::as_str).collect();
+    let inferred = infer_module_effects(hir);
     for q in hir.queries.values() {
         if !query_declares_goal(q) {
             diagnostics.push(Diagnostic::new(
@@ -211,16 +213,11 @@ fn check_queries(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
                 format!("query `{}` is missing a body or explicit goal", q.name),
             ));
         }
-        if q.automatic {
-            let mut effects = effect_set_from_names(&q.effects);
-            let callees = collect_query_callees(q, &function_names);
-            effects.extend(reachable_callee_effects(&callees, &hir.functions));
-            if !effects.is_empty() {
-                diagnostics.push(Diagnostic::new(
-                    DiagnosticCode::E420,
-                    format!("automatic query `{}` must have an empty effect row", q.name),
-                ));
-            }
+        if q.automatic && !inferred.query(&q.name).is_empty() {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E420,
+                format!("automatic query `{}` must have an empty effect row", q.name),
+            ));
         }
         if query_has_bare_prop_guard(q, &propositions) {
             diagnostics.push(Diagnostic::new(
@@ -377,7 +374,7 @@ impl TypeCheck<'_> {
         args: &[Term],
         diagnostics: &mut Vec<Diagnostic>,
     ) -> Option<Type> {
-        if ctor.eq_ignore_ascii_case("seq") {
+        if ctor.eq_ignore_ascii_case("seq") || ctor.eq_ignore_ascii_case("transaction") {
             return self.infer_seq(args, diagnostics);
         }
         if ctor.eq_ignore_ascii_case("require") {
@@ -610,10 +607,10 @@ fn function_has_bare_prop_guard(f: &HirFunction, propositions: &BTreeSet<String>
         .is_some_and(|term| term_has_bare_prop_guard(term, propositions))
 }
 
-fn collect_query_callees(q: &HirQuery, functions: &BTreeSet<&str>) -> BTreeSet<String> {
+fn collect_query_callees(q: &HirQuery, names: &BTreeSet<&str>) -> BTreeSet<String> {
     let mut callees = BTreeSet::new();
     match &q.body {
-        HirQueryBody::Return(term) => collect_term_callees(term, functions, &mut callees),
+        HirQueryBody::Return(term) => collect_term_callees(term, names, &mut callees),
         HirQueryBody::Goal {
             expr,
             office,
@@ -621,55 +618,197 @@ fn collect_query_callees(q: &HirQuery, functions: &BTreeSet<&str>) -> BTreeSet<S
             ..
         } => {
             if let Some(term) = expr {
-                collect_term_callees(term, functions, &mut callees);
+                collect_term_callees(term, names, &mut callees);
             }
             if let Some(term) = office {
-                collect_term_callees(term, functions, &mut callees);
+                collect_term_callees(term, names, &mut callees);
             }
             for term in fields.values() {
-                collect_term_callees(term, functions, &mut callees);
+                collect_term_callees(term, names, &mut callees);
             }
         }
         HirQueryBody::None => {}
     }
-    callees.extend(collect_source_callees(&q.plan, functions));
+    callees.extend(collect_source_callees(&q.plan, names));
     callees
 }
 
-fn reachable_callee_effects(
-    start: &BTreeSet<String>,
-    functions: &BTreeMap<String, HirFunction>,
-) -> BTreeSet<EffectName> {
-    let names: BTreeSet<&str> = functions.keys().map(String::as_str).collect();
-    let mut stack: Vec<String> = start.iter().cloned().collect();
-    let mut seen = BTreeSet::new();
-    let mut effects = BTreeSet::new();
-    while let Some(name) = stack.pop() {
-        if !seen.insert(name.clone()) {
-            continue;
-        }
-        let Some(function) = functions.get(&name) else {
-            continue;
-        };
-        effects.extend(function_effect_set(function));
-        let mut callees = BTreeSet::new();
-        if let Some(body) = &function.body {
-            collect_term_callees(body, &names, &mut callees);
-        }
-        callees.extend(collect_source_callees(&function.source, &names));
-        stack.extend(callees);
-    }
-    effects
+struct InferredEffects {
+    functions: BTreeMap<String, BTreeSet<EffectName>>,
+    queries: BTreeMap<String, BTreeSet<EffectName>>,
 }
 
-fn parse_effect_name(name: &str) -> Option<EffectName> {
-    match name {
+impl InferredEffects {
+    fn function(&self, name: &str) -> BTreeSet<EffectName> {
+        self.functions.get(name).cloned().unwrap_or_default()
+    }
+
+    fn query(&self, name: &str) -> BTreeSet<EffectName> {
+        self.queries.get(name).cloned().unwrap_or_default()
+    }
+}
+
+/// Recursively infer effect rows from declarations, recognized Applies, and callees.
+///
+/// Unknown row idents are kept as [`EffectName::Unresolved`]. This is not a
+/// full effect lattice or algebraic-effect worklist.
+fn infer_module_effects(hir: &HirModule) -> InferredEffects {
+    let function_names: BTreeSet<&str> = hir.functions.keys().map(String::as_str).collect();
+    let query_names: BTreeSet<&str> = hir.queries.keys().map(String::as_str).collect();
+    let declared_custom: BTreeSet<&str> = hir.effects.keys().map(String::as_str).collect();
+
+    let mut function_local = BTreeMap::new();
+    let mut function_callees = BTreeMap::new();
+    for function in hir.functions.values() {
+        let mut effects = effect_set_from_names(function_effect_names(function));
+        if let Some(body) = &function.body {
+            collect_term_effects(body, &declared_custom, &mut effects);
+        }
+        let mut callees = BTreeSet::new();
+        if let Some(body) = &function.body {
+            collect_term_callees(body, &function_names, &mut callees);
+        }
+        callees.extend(collect_source_callees(&function.source, &function_names));
+        function_local.insert(function.name.clone(), effects);
+        function_callees.insert(function.name.clone(), callees);
+    }
+    let functions = close_effect_sets(&function_local, &function_callees);
+
+    let mut query_local = BTreeMap::new();
+    let mut query_callees = BTreeMap::new();
+    for query in hir.queries.values() {
+        let mut effects = effect_set_from_names(&query.effects);
+        collect_query_term_effects(query, &declared_custom, &mut effects);
+        for callee in collect_query_callees(query, &function_names) {
+            if let Some(callee_effects) = functions.get(&callee) {
+                effects.extend(callee_effects.iter().cloned());
+            }
+        }
+        query_local.insert(query.name.clone(), effects);
+        query_callees.insert(
+            query.name.clone(),
+            collect_query_callees(query, &query_names),
+        );
+    }
+    let queries = close_effect_sets(&query_local, &query_callees);
+    InferredEffects { functions, queries }
+}
+
+fn close_effect_sets(
+    local: &BTreeMap<String, BTreeSet<EffectName>>,
+    callees: &BTreeMap<String, BTreeSet<String>>,
+) -> BTreeMap<String, BTreeSet<EffectName>> {
+    let mut inferred = local.clone();
+    for name in callees.keys() {
+        inferred.entry(name.clone()).or_default();
+    }
+    let names: Vec<String> = inferred.keys().cloned().collect();
+    let mut changed = true;
+    while changed {
+        changed = false;
+        for name in &names {
+            let extra: BTreeSet<EffectName> = callees
+                .get(name)
+                .into_iter()
+                .flatten()
+                .filter_map(|callee| inferred.get(callee))
+                .flatten()
+                .cloned()
+                .collect();
+            if let Some(set) = inferred.get_mut(name) {
+                let before = set.len();
+                set.extend(extra);
+                changed |= set.len() != before;
+            }
+        }
+    }
+    inferred
+}
+
+fn collect_query_term_effects(
+    query: &HirQuery,
+    declared_custom: &BTreeSet<&str>,
+    out: &mut BTreeSet<EffectName>,
+) {
+    match &query.body {
+        HirQueryBody::Return(term) => collect_term_effects(term, declared_custom, out),
+        HirQueryBody::Goal {
+            expr,
+            office,
+            fields,
+            ..
+        } => {
+            if let Some(term) = expr {
+                collect_term_effects(term, declared_custom, out);
+            }
+            if let Some(term) = office {
+                collect_term_effects(term, declared_custom, out);
+            }
+            for term in fields.values() {
+                collect_term_effects(term, declared_custom, out);
+            }
+        }
+        HirQueryBody::None => {}
+    }
+}
+
+fn collect_term_effects(
+    term: &Term,
+    declared_custom: &BTreeSet<&str>,
+    out: &mut BTreeSet<EffectName>,
+) {
+    match term {
+        Term::Call { callee, args } => {
+            if let Some(effect) = effect_from_apply(callee, declared_custom) {
+                out.insert(effect);
+            }
+            for arg in args {
+                collect_term_effects(arg, declared_custom, out);
+            }
+        }
+        Term::Apply { ctor, args } => {
+            if let Some(effect) = effect_from_apply(ctor, declared_custom) {
+                out.insert(effect);
+            }
+            for arg in args {
+                collect_term_effects(arg, declared_custom, out);
+            }
+        }
+        Term::Binary { left, right, .. } => {
+            collect_term_effects(left, declared_custom, out);
+            collect_term_effects(right, declared_custom, out);
+        }
+        Term::If { cond, then, else_ } => {
+            collect_term_effects(cond, declared_custom, out);
+            collect_term_effects(then, declared_custom, out);
+            collect_term_effects(else_, declared_custom, out);
+        }
+        Term::Field { base, .. } => collect_term_effects(base, declared_custom, out),
+        Term::Set(xs) => {
+            for x in xs {
+                collect_term_effects(x, declared_custom, out);
+            }
+        }
+        Term::Record(fields) => {
+            for x in fields.values() {
+                collect_term_effects(x, declared_custom, out);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn effect_from_apply(ctor: &str, declared_custom: &BTreeSet<&str>) -> Option<EffectName> {
+    match ctor {
+        "determined" | "operative" => Some(EffectName::Determine),
+        "observed" => Some(EffectName::Observe),
         "Observe" => Some(EffectName::Observe),
         "Determine" => Some(EffectName::Determine),
         "Choose" => Some(EffectName::Choose),
         "Interpret" => Some(EffectName::Interpret),
         "ResolveNormConflict" => Some(EffectName::ResolveNormConflict),
         "SelectApplicableLaw" => Some(EffectName::SelectApplicableLaw),
+        other if declared_custom.contains(other) => Some(EffectName::Unresolved(other.to_owned())),
         _ => None,
     }
 }
@@ -681,7 +820,9 @@ where
 {
     names
         .into_iter()
-        .filter_map(|name| parse_effect_name(name.as_ref()))
+        .map(|name| name.as_ref().trim().to_owned())
+        .filter(|name| !name.is_empty())
+        .map(|name| EffectName::from_ident(&name))
         .collect()
 }
 
@@ -706,10 +847,6 @@ fn extract_effect_names(src: &str) -> Vec<String> {
 
 fn function_effect_names(function: &HirFunction) -> Vec<String> {
     extract_effect_names(&function.source)
-}
-
-fn function_effect_set(function: &HirFunction) -> BTreeSet<EffectName> {
-    effect_set_from_names(function_effect_names(function))
 }
 
 fn check_recursion(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
@@ -878,6 +1015,26 @@ fn check_imports(
     diagnostics: &mut Vec<Diagnostic>,
 ) {
     for import in &hir.imports {
+        let package_name = package_name_from_import(&import.name);
+        let package_artifacts: Vec<&ManifestArtifact> = manifest
+            .artifacts
+            .iter()
+            .filter(|artifact| {
+                artifact_path_is_package(&artifact.path)
+                    && package_dir_from_artifact_path(&artifact.path).as_deref()
+                        == Some(package_name.as_str())
+            })
+            .collect();
+        if !package_artifacts.is_empty() {
+            let matched = package_artifacts.iter().any(|artifact| {
+                package_artifact_satisfies(artifact, import)
+                    && permits_import(authenticate_artifact(artifact, source_root))
+            });
+            if !matched {
+                diagnostics.push(unresolved_import(import));
+            }
+            continue;
+        }
         if !import.digest_required {
             continue;
         }
@@ -886,18 +1043,49 @@ fn check_imports(
                 && permits_import(authenticate_artifact(artifact, source_root))
         });
         if !matched {
-            diagnostics.push(Diagnostic::new(
-                DiagnosticCode::E200,
-                format!(
-                    "import `{}` requires a digest in the authenticated source manifest",
-                    import.name
-                ),
-            ));
+            diagnostics.push(unresolved_import(import));
         }
     }
 }
 
+fn unresolved_import(import: &HirImport) -> Diagnostic {
+    Diagnostic::new(
+        DiagnosticCode::E200,
+        format!(
+            "import `{}` requires a digest in the authenticated source manifest",
+            import.name
+        ),
+    )
+}
+
+fn package_artifact_satisfies(artifact: &ManifestArtifact, import: &HirImport) -> bool {
+    if let Some(ver) = import
+        .version
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        let locked = artifact.effective.trim();
+        if !locked.is_empty() && locked != ver {
+            return false;
+        }
+    }
+    if let Some(digest) = import
+        .digest
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        && !artifact.digest.trim().eq_ignore_ascii_case(digest)
+    {
+        return false;
+    }
+    package_path_matches_import(&artifact.path, &import.name)
+}
+
 fn artifact_matches_import(artifact: &ManifestArtifact, import: &HirImport) -> bool {
+    if artifact_path_is_package(&artifact.path) {
+        return package_artifact_satisfies(artifact, import);
+    }
     if let Some(digest) = import
         .digest
         .as_deref()
@@ -1184,6 +1372,7 @@ fn check_sources(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 }
 
 fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
+    let inferred = infer_module_effects(hir);
     let jid = JurisdictionId::of(hir.jurisdiction.as_bytes());
     let meta = |node: &str| NodeMeta {
         span: None,
@@ -1234,7 +1423,7 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
                 .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
                 .collect(),
             result: parse_type_name(&f.result_type),
-            effects: function_effect_set(f),
+            effects: inferred.function(&f.name),
             is_calc: f.is_calc,
             fuel: f.fuel,
             body: f.body.clone(),
@@ -1335,7 +1524,7 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
     let queries = hir
         .queries
         .values()
-        .map(|q| lower_query(q, hir, jid))
+        .map(|q| lower_query(q, hir, jid, inferred.query(&q.name)))
         .collect();
     let verifications = lower_verifications(hir, meta);
     CoreModule {
@@ -1416,8 +1605,12 @@ fn consequence_from_op(op: &str, prop: &PropTerm) -> Consequence {
     }
 }
 
-fn lower_query(q: &HirQuery, hir: &HirModule, jid: JurisdictionId) -> CoreQuery {
-    let effects = effect_set_from_names(&q.effects);
+fn lower_query(
+    q: &HirQuery,
+    hir: &HirModule,
+    jid: JurisdictionId,
+    effects: BTreeSet<EffectName>,
+) -> CoreQuery {
     CoreQuery {
         id: NodeId::of(q.name.as_bytes()),
         name: q.name.clone(),
@@ -2083,6 +2276,95 @@ module Examples.FnEff version "0.1.0" {
     }
 
     #[test]
+    fn automatic_query_calling_custom_effect_function_is_e420() {
+        let src = r#"
+module Examples.AutoCustom version "0.1.0" {
+    effect DocketLookup {
+        request(docket_id: String) -> Bool
+    }
+    fn lookup() -> Bool ! {DocketLookup} { true }
+    query automatic q() -> Bool { return lookup() }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E420),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn custom_effect_names_are_kept_on_core_function_and_query() {
+        let src = r#"
+module Examples.CustomEff version "0.1.0" {
+    effect DocketLookup {
+        request(docket_id: String) -> Bool
+    }
+    fn lookup() -> Bool ! {DocketLookup} { true }
+    query declared() -> Bool ! {DocketLookup} {
+        goal Evaluate { true }
+    }
+    query inferred() -> Bool {
+        goal Evaluate { lookup() }
+    }
+}
+"#;
+        let module = check_src(src).expect("non-automatic custom effects should check");
+        let function = core_function(&module, "lookup");
+        assert!(
+            function
+                .effects
+                .contains(&EffectName::from_ident("DocketLookup")),
+            "{:?}",
+            function.effects
+        );
+        let declared = module.query("declared").expect("declared query");
+        assert!(
+            declared
+                .effects
+                .contains(&EffectName::from_ident("DocketLookup")),
+            "{:?}",
+            declared.effects
+        );
+        let inferred = module.query("inferred").expect("inferred query");
+        assert!(
+            inferred
+                .effects
+                .contains(&EffectName::from_ident("DocketLookup")),
+            "{:?}",
+            inferred.effects
+        );
+    }
+
+    #[test]
+    fn automatic_query_with_inferred_determine_apply_is_e420() {
+        let src = r#"
+module Examples.AutoDetBody version "0.1.0" {
+    proposition P(x: LegalPerson)
+    entity A : LegalPerson
+    fn f() -> Bool { determined(P(A)) }
+    query automatic q() -> Bool { return f() }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E420),
+            "{err:?}"
+        );
+    }
+
+    fn core_function<'a>(module: &'a CoreModule, name: &str) -> &'a CoreFunction {
+        module
+            .declarations
+            .iter()
+            .find_map(|d| match d {
+                CoreDecl::Function(function) if function.name == name => Some(function),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("function `{name}`"))
+    }
+
+    #[test]
     fn digest_authenticates_fixture_not_hex() {
         assert_eq!(digest_authenticates("fixture"), TrustProfile::Fixture);
         assert_eq!(digest_authenticates("Fixture"), TrustProfile::Fixture);
@@ -2392,6 +2674,70 @@ module Review version "0.1.0" {
     }
 
     #[test]
+    fn transaction_last_step_type_is_query_result() {
+        let src = r#"
+module Examples.TxInt version "0.1.0" {
+    query q() -> Int {
+        transaction {
+            require true;
+            7
+        }
+    }
+}
+"#;
+        let module = check_src(src).expect("transaction last step Int should check");
+        let q = module.query("q").expect("q");
+        match &q.plan {
+            QueryPlan::Evaluate(Term::Apply { ctor, args }) if ctor == "transaction" => {
+                assert_eq!(args.len(), 2, "{args:?}");
+                assert_eq!(args[1], Term::Int(7));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn transaction_does_not_hide_a_wrong_result_type() {
+        let src = r#"
+module Review version "0.1.0" {
+    query q() -> Bool {
+        transaction {
+            require true;
+            7
+        }
+    }
+}
+"#;
+        let err = check_src(src).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E210),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn transaction_atomic_program_keeps_both_steps() {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("tests/programs/transaction-atomic.fr");
+        let src = std::fs::read_to_string(&path).expect("transaction-atomic.fr");
+        let module = check_src(&src).expect("transaction-atomic.fr should check");
+        let q = module.query("q").expect("q");
+        match &q.plan {
+            QueryPlan::Evaluate(Term::Apply { ctor, args }) if ctor == "transaction" => {
+                assert_eq!(args.len(), 2, "{args:?}");
+                assert!(
+                    !args
+                        .iter()
+                        .any(|arg| matches!(arg, Term::Apply { ctor, .. } if ctor == "seq")),
+                    "{args:?}"
+                );
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
     fn a_declared_function_result_does_not_replace_checking_its_body() {
         let src = r#"
 module Review version "0.1.0" {
@@ -2441,5 +2787,114 @@ module Examples.Tax version "0.1.0" {
 }
 "#;
         check_src(src).expect("tax closed form should check");
+    }
+
+    fn std_core_import_src() -> &'static str {
+        r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#
+    }
+
+    fn package_artifact_manifest(path: &str, digest: &str, version: &str) -> SourceManifest {
+        SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![ManifestArtifact {
+                path: path.into(),
+                digest: digest.into(),
+                kind: "package_module".into(),
+                effective: version.into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        }
+    }
+
+    fn check_std_core_import(
+        manifest: &SourceManifest,
+        source_root: Option<&Path>,
+    ) -> Result<CoreModule, Vec<Diagnostic>> {
+        let parsed = parse_file(std_core_import_src());
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        check_with_sources(&hir, manifest, source_root)
+    }
+
+    #[test]
+    fn matching_package_digest_authenticates_std_core_import() {
+        let bytes = br#"module Std.Core version "0.1.0" {
+    query always_true() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let root = TempRoot::new();
+        fs::create_dir_all(root.0.join("packages").join("std")).expect("packages/std");
+        root.write("packages/std/core.fr", bytes);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        check_std_core_import(&manifest, Some(&root.0))
+            .expect("matching package digest authenticates");
+        assert_eq!(
+            source_integrity(&manifest, Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+        assert_eq!(
+            authenticate_artifact(&manifest.artifacts[0], Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+    }
+
+    #[test]
+    fn mismatched_package_digest_is_e200() {
+        let bytes = br#"module Std.Core version "0.1.0" {
+    query always_true() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let wrong = encode_hex(blake3::hash(b"tampered-package-bytes").as_bytes());
+        let root = TempRoot::new();
+        fs::create_dir_all(root.0.join("packages").join("std")).expect("packages/std");
+        root.write("packages/std/core.fr", bytes);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &wrong, "0.1.0");
+        let err = check_std_core_import(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        assert_eq!(
+            authenticate_artifact(&manifest.artifacts[0], Some(&root.0)),
+            TrustProfile::Unauthenticated
+        );
+    }
+
+    #[test]
+    fn package_hex_without_source_root_is_e200() {
+        let bytes = br#"module Std.Core version "0.1.0" {
+    query always_true() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let err = check_std_core_import(&manifest, None).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        assert_ne!(
+            source_integrity(&manifest, None),
+            TrustProfile::ByteVerified
+        );
+        assert_eq!(
+            source_integrity(&manifest, None),
+            TrustProfile::Unauthenticated
+        );
     }
 }
