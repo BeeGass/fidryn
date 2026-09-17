@@ -30,6 +30,7 @@ module Examples.CivilComplaint version "0.1.0" {
         kind pleading
         authority Plaintiff
         artifact "sources/complaint.txt"
+        digest fixture
     }
 
     entity Plaintiff : NaturalPerson
@@ -114,7 +115,7 @@ module Examples.CivilComplaint version "0.1.0" {
         goal Evaluate {
             require determined Adjudicated(case)
                 using Determine
-            return case_input<JudgmentEntry>("judgment_entry")
+            return judgment_entry
         }
     }
 
