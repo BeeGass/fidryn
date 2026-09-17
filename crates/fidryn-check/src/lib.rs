@@ -21,6 +21,8 @@ pub fn check(hir: &HirModule, manifest: &SourceManifest) -> Result<CoreModule, V
     check_queries(hir, &mut diagnostics);
     check_doctrines(hir, &mut diagnostics);
     check_recursion(hir, &mut diagnostics);
+    check_imports(hir, manifest, &mut diagnostics);
+    check_sources(hir, &mut diagnostics);
     if diagnostics
         .iter()
         .any(|d| d.code.severity() == fidryn_core::Severity::Error)
@@ -202,6 +204,51 @@ fn expand_conflict_clause_ids(source: &str, clauses: &BTreeMap<String, String>) 
     found
 }
 
+fn check_imports(hir: &HirModule, manifest: &SourceManifest, diagnostics: &mut Vec<Diagnostic>) {
+    if manifest.snapshot.is_empty() {
+        return;
+    }
+    for import in &hir.imports {
+        if !import.digest_required {
+            continue;
+        }
+        let known = manifest.artifacts.iter().any(|a| {
+            import.name.is_empty() || a.path.contains(&import.name) || !a.digest.is_empty()
+        });
+        if !known {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E200,
+                format!(
+                    "import `{}` requires a digest in the authenticated source manifest",
+                    import.name
+                ),
+            ));
+        }
+    }
+}
+
+fn check_sources(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
+    for source in &hir.sources {
+        if source.artifact.is_none() {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E540,
+                format!("source `{}` is missing a legal artifact", source.name),
+            ));
+        }
+    }
+    for q in &hir.quantifiers {
+        if q.domain.chars().any(|c| c.is_ascii_uppercase()) {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::W610,
+                format!(
+                    "quantifier over `{}` is an open universe unless a closure record is supplied",
+                    q.domain
+                ),
+            ));
+        }
+    }
+}
+
 fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
     let jid = JurisdictionId::of(hir.jurisdiction.as_bytes());
     let meta = |node: &str| NodeMeta {
@@ -322,10 +369,28 @@ fn lower(hir: &HirModule, manifest: &SourceManifest) -> CoreModule {
         jurisdiction: jid,
         outside_scope: hir.outside_scope.clone(),
         declarations,
+        nominations: hir
+            .nominations
+            .iter()
+            .map(|n| fidryn_core::CoreNomination {
+                candidate: n.candidate.clone(),
+                office: n.office.clone(),
+                rank: n.rank,
+            })
+            .collect(),
         queries,
         verifications,
         assertions: Vec::new(),
     }
+}
+
+fn extract_plan_field(plan: &str, key: &str) -> Option<String> {
+    let needle = format!("{key} ");
+    let i = plan.find(&needle)?;
+    let rest = plan[i + needle.len()..].trim_start();
+    let end = rest.find(['\n', '}', '{']).unwrap_or(rest.len());
+    let value = rest[..end].trim().trim_end_matches(',').to_owned();
+    if value.is_empty() { None } else { Some(value) }
 }
 
 fn lower_query(q: &HirQuery, jid: JurisdictionId) -> CoreQuery {
@@ -348,13 +413,14 @@ fn lower_query(q: &HirQuery, jid: JurisdictionId) -> CoreQuery {
         }
     }
     let plan = if q.plan.contains("UniqueOccupant") {
+        let office = extract_plan_field(&q.plan, "office").unwrap_or_else(|| "TrusteeOf".into());
         QueryPlan::UniqueOccupant {
-            office: Term::Ident("TrusteeOf".into()),
+            office: Term::Ident(office),
         }
     } else if q.plan.contains("EvaluateClause") {
         QueryPlan::EvaluateClause {
             clause: ClauseSelector::Bound {
-                binder: "provision".into(),
+                binder: extract_plan_field(&q.plan, "clause").unwrap_or_else(|| "provision".into()),
                 module: ModuleId::of(b"clause"),
             },
             context: "case".into(),
@@ -362,22 +428,33 @@ fn lower_query(q: &HirQuery, jid: JurisdictionId) -> CoreQuery {
         }
     } else if q.plan.contains("RunDecision") {
         QueryPlan::RunDecision {
-            decision: "ProcessResponsiveRecord".into(),
+            decision: extract_plan_field(&q.plan, "decision")
+                .unwrap_or_else(|| "ProcessResponsiveRecord".into()),
             arguments: Vec::new(),
             result: fidryn_core::ir::DeclaredDecisionResult {
                 expected_type: Type::Sort(Sort::Nominal("FOIADisposition".into())),
             },
         }
     } else if q.plan.contains("StatusOf") {
+        let ctor = extract_plan_field(&q.plan, "status")
+            .or_else(|| extract_plan_field(&q.plan, "when_present"))
+            .unwrap_or_else(|| "FormedLLC".into());
+        let present = ctor
+            .split('(')
+            .next()
+            .unwrap_or("FormedLLC")
+            .trim()
+            .to_owned();
+        let absent = extract_plan_field(&q.plan, "when_closed_absent")
+            .and_then(|s| s.split('(').next().map(str::trim).map(str::to_owned))
+            .unwrap_or_else(|| format!("Not{present}"));
         QueryPlan::StatusOf {
             status: fidryn_core::LegalStatusPattern::InstitutionalStatus {
-                constructor: "FormedLLC".into(),
-                arguments: vec![fidryn_core::TermPattern::Exact(Term::Ident(
-                    "HarborRobotics".into(),
-                ))],
+                constructor: present.clone(),
+                arguments: Vec::new(),
             },
-            when_present: Term::unit_ctor("FormedLLC"),
-            when_closed_absent: Term::unit_ctor("NotFormedLLC"),
+            when_present: Term::unit_ctor(present),
+            when_closed_absent: Term::unit_ctor(absent),
         }
     } else {
         QueryPlan::Evaluate(Term::Ident(q.name.clone()))
