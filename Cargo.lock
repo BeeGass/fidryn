@@ -402,6 +402,7 @@ dependencies = [
  "fidryn-hir",
  "fidryn-syntax",
  "indexmap",
+ "rust_decimal",
  "thiserror",
  "time",
 ]
@@ -475,6 +476,7 @@ dependencies = [
  "fidryn-eval",
  "fidryn-handlers",
  "fidryn-hir",
+ "fidryn-solve",
  "fidryn-syntax",
  "indexmap",
  "serde_json",
