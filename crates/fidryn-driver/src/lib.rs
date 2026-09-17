@@ -2,14 +2,15 @@
 //!
 //! Check is memoized by blake3 of source bytes together with the manifest
 //! snapshot and artifact digests. Evaluate is memoized by canonical module
-//! JSON (executable content, not only [`fidryn_core::ModuleId`]), query name,
-//! query arguments, canonical case JSON, and bitemporal times. Memo tables
-//! are explicit [`HashMap`]s; the `salsa` crate is not used.
+//! JSON together with [`CoreModule::program_digest`] / [`CoreModule::content_fingerprint`] (executable content,
+//! not only [`fidryn_core::ModuleId`]), query name, query arguments, canonical
+//! case JSON, and bitemporal times. Memo tables are explicit [`HashMap`]s; the
+//! `salsa` crate is not used.
 
 use fidryn_check::check;
 use fidryn_core::{
-    CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, Outcome, QueryName,
-    RunContext, SourceManifest, Value, canonical_json,
+    CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport, Outcome,
+    QueryName, RunContext, SourceManifest, Value, canonical_json,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -132,6 +133,32 @@ impl Driver {
         }
         result
     }
+
+    /// Evaluate `query` and wrap the outcome as [`EvaluationReport`].
+    ///
+    /// Memoization is the same as [`Self::run`]; the report is derived from
+    /// the cached outcome.
+    pub fn run_report(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.run_report_with_args(module, query, case, ctx, &BTreeMap::new())
+    }
+
+    pub fn run_report_with_args(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.run_with_args(module, query, case, ctx, args)
+            .map(EvaluationReport::from_outcome)
+    }
 }
 
 impl Default for Driver {
@@ -200,6 +227,12 @@ fn run_key(
     let args_json = canonical_json(args).map_err(|err| EngineError::Internal(err.to_string()))?;
     let mut hasher = blake3::Hasher::new();
     hasher.update(module_json.as_bytes());
+    hasher.update(&[0xff]);
+    if let Ok(digest) = module.program_digest() {
+        hasher.update(digest.as_bytes());
+    } else if let Ok(fingerprint) = module.content_fingerprint() {
+        hasher.update(&fingerprint);
+    }
     hasher.update(&[0xff]);
     hasher.update(query.as_bytes());
     hasher.update(&[0xff]);
@@ -499,6 +532,78 @@ module Regression version "0.1.0" {
                 ..
             } => {}
             other => panic!("expected determinate false, got {other:?}"),
+        }
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn function_body_edit_invalidates_execution_cache() {
+        let one_src = r#"
+module Regression version "0.1.0" {
+    calc answer() -> Int { return 1 }
+    query q() -> Int { return answer() }
+}
+"#;
+        let two_src = r#"
+module Regression version "0.1.0" {
+    calc answer() -> Int { return 2 }
+    query q() -> Int { return answer() }
+}
+"#;
+        let mut driver = Driver::new();
+        let manifest = SourceManifest::default();
+        let one = driver.check_source(one_src, &manifest).expect("one");
+        let two = driver.check_source(two_src, &manifest).expect("two");
+        assert_ne!(
+            one.content_fingerprint().expect("fp one"),
+            two.content_fingerprint().expect("fp two"),
+            "function body must change the content fingerprint"
+        );
+        let case = CaseRecord::default();
+        let first = driver.run(&one, "q", &case, &ctx()).expect("run 1");
+        let misses = driver.misses();
+        let second = driver.run(&two, "q", &case, &ctx()).expect("run 2");
+        assert_eq!(
+            driver.misses(),
+            misses + 1,
+            "function body edit must miss run cache"
+        );
+        match first {
+            Outcome::Determinate {
+                value: Value::Int(1),
+                ..
+            } => {}
+            other => panic!("expected determinate 1, got {other:?}"),
+        }
+        match second {
+            Outcome::Determinate {
+                value: Value::Int(2),
+                ..
+            } => {}
+            other => panic!("expected determinate 2, got {other:?}"),
+        }
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn run_report_matches_cached_run_outcome() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let case = CaseRecord::default();
+        let outcome = driver.run(&module, "q", &case, &ctx()).expect("run");
+        let report = driver
+            .run_report(&module, "q", &case, &ctx())
+            .expect("report");
+        assert_eq!(report.outcome, outcome);
+        match report.outcome {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("expected determinate true, got {other:?}"),
         }
     }
 
