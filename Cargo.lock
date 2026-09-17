@@ -344,6 +344,7 @@ dependencies = [
 name = "fidryn-check"
 version = "0.1.0"
 dependencies = [
+ "blake3",
  "fidryn-core",
  "fidryn-hir",
  "fidryn-syntax",
@@ -438,6 +439,13 @@ dependencies = [
  "la-arena",
  "rust_decimal",
  "thiserror",
+]
+
+[[package]]
+name = "fidryn-kernel"
+version = "0.1.0"
+dependencies = [
+ "fidryn-core",
 ]
 
 [[package]]

@@ -9,6 +9,7 @@ members = [
     "crates/fidryn-handlers",
     "crates/fidryn-driver",
     "crates/fidryn-verify",
+    "crates/fidryn-kernel",
     "crates/fidryn-trace",
     "crates/fidryn-cli",
     "crates/fidryn-solve",
@@ -33,6 +34,7 @@ fidryn-eval = { path = "crates/fidryn-eval" }
 fidryn-handlers = { path = "crates/fidryn-handlers" }
 fidryn-driver = { path = "crates/fidryn-driver" }
 fidryn-verify = { path = "crates/fidryn-verify" }
+fidryn-kernel = { path = "crates/fidryn-kernel" }
 fidryn-trace = { path = "crates/fidryn-trace" }
 fidryn-solve = { path = "crates/fidryn-solve" }
 fidryn-adapt = { path = "crates/fidryn-adapt" }

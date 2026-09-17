@@ -1,0 +1,12 @@
+[package]
+name = "fidryn-kernel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn covering-proof checks for convergence certificates"
+
+[dependencies]
+fidryn-core.workspace = true
