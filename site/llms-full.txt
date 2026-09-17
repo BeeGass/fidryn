@@ -3,60 +3,42 @@
 Source: https://fidryn.onlygass.dev
 Prefer per-page .md URLs from https://fidryn.onlygass.dev/llms.txt when possible.
 
----
-
-# Home
-
-See https://fidryn.onlygass.dev/index.md
-
----
-
-# Getting started
-
-See https://fidryn.onlygass.dev/docs/getting-started.md
-
----
-
-# Language
-
-See https://fidryn.onlygass.dev/docs/language.md
-
----
-
-# CLI
-
-See https://fidryn.onlygass.dev/docs/cli.md
-
----
-
-# Mill
-
-See https://fidryn.onlygass.dev/docs/mill.md
-
----
-
-# Cases and time
-
-See https://fidryn.onlygass.dev/docs/cases-and-time.md
-
----
-
-# Outcomes
-
-See https://fidryn.onlygass.dev/docs/outcomes.md
-
----
-
-# Examples
-
-See https://fidryn.onlygass.dev/docs/examples.md
-
----
-
-# Contributing
-
-See https://fidryn.onlygass.dev/docs/contributing.md
-
----
-
 Research fixture — not legal advice.
+
+---
+
+## Guide index
+
+| Guide | HTML | Markdown |
+| --- | --- | --- |
+| Home | https://fidryn.onlygass.dev/ | https://fidryn.onlygass.dev/index.md |
+| Getting started | https://fidryn.onlygass.dev/docs/getting-started | https://fidryn.onlygass.dev/docs/getting-started.md |
+| Language | https://fidryn.onlygass.dev/docs/language | https://fidryn.onlygass.dev/docs/language.md |
+| CLI | https://fidryn.onlygass.dev/docs/cli | https://fidryn.onlygass.dev/docs/cli.md |
+| Mill | https://fidryn.onlygass.dev/docs/mill | https://fidryn.onlygass.dev/docs/mill.md |
+| Cases and time | https://fidryn.onlygass.dev/docs/cases-and-time | https://fidryn.onlygass.dev/docs/cases-and-time.md |
+| Outcomes | https://fidryn.onlygass.dev/docs/outcomes | https://fidryn.onlygass.dev/docs/outcomes.md |
+| Examples | https://fidryn.onlygass.dev/docs/examples | https://fidryn.onlygass.dev/docs/examples.md |
+| Contributing | https://fidryn.onlygass.dev/docs/contributing | https://fidryn.onlygass.dev/docs/contributing.md |
+
+## CLI summary
+
+Binary `fidryn`. Subcommands: `fmt`, `check`, `run`, `explore`, `explain`, `verify`, `diff`, `render`, `file`, `ui`.
+`--valid-at` / `--known-at` are RFC 3339. `run` never invents completions.
+
+## Outcomes summary
+
+Six kinds: determinate, contingent, suspended, normConflict, outsideCompetence, inconsistent.
+Read `modelBoundary` before treating determinate as the answer.
+
+## Examples summary
+
+Fixtures under `examples/`. Start: `fidryn check examples/trust/bryan-revocable-trust.fr`.
+Full catalog: docs/examples.md (do not replace with stubs).
+
+## Mill / robots / sitemap
+
+- Mill: https://fidryn.onlygass.dev/docs/mill
+- robots: https://fidryn.onlygass.dev/robots.txt
+- sitemap: https://fidryn.onlygass.dev/sitemap.xml
+- llms.txt: https://fidryn.onlygass.dev/llms.txt
