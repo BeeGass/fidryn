@@ -7,7 +7,9 @@ use fidryn_core::{
 };
 use fidryn_eval::{evaluate, evaluate_scenario, seed_initial_occupancy};
 use fidryn_handlers::{CaseFile, ExplorationBounds, Explore, Skeptical, aggregate};
-use fidryn_solve::{Assignment, Domain, SearchBudget, SearchEvent, stream};
+use fidryn_solve::{
+    Assignment, Constraint, Domain, SearchBudget, SearchEvent, SmtAnswer, smt_check, stream,
+};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
@@ -340,6 +342,10 @@ pub fn skeptical(
 /// Query names are not properties. `TrusteeContinuity` is not special: it
 /// must appear in `module.verifications`. A universal with empty bounds is
 /// [`PropertyVerdict::Unknown`], not proved.
+///
+/// Quantified `true` / `false` (and finite-domain `x = v` / `x ≠ v`) over
+/// nonempty `People` bounds are decided by Fidryn SMT-lite, not Z3.
+/// `assert always occupied(...)` stays Unknown.
 pub fn verify_property(module: &CoreModule, name: &str) -> PropertyVerdict {
     let Some(property) = module.verifications.iter().find(|item| item.name == name) else {
         let diagnostics = if module.queries.iter().any(|query| query.name == name) {
@@ -378,6 +384,9 @@ pub fn verify_property(module: &CoreModule, name: &str) -> PropertyVerdict {
             detail: "formula evaluates to false".into(),
         };
     }
+    if let Some(verdict) = verify_quantified_lite(&property.name, formula, &property.bounds) {
+        return verdict;
+    }
 
     PropertyVerdict::Unknown {
         name: property.name.clone(),
@@ -392,6 +401,260 @@ fn formula_is_true_literal(formula: &str) -> bool {
 
 fn formula_is_false_literal(formula: &str) -> bool {
     formula == "false" || formula == "assert false"
+}
+
+/// SMT-lite decision for a single `for_all` / `exists` over a finite bound
+/// sort (`People`, `Events`, `TimePoints`) whose body is `true`, `false`,
+/// or a finite-domain equality/disequality.
+///
+/// `assert always occupied(...)` and other uninterpreted bodies stay
+/// [`None`] so [`verify_property`] reports Unknown. Empty person bounds on
+/// a universal remain W620, never a vacuous proof.
+fn verify_quantified_lite(
+    name: &str,
+    formula: &str,
+    bounds: &VerificationBounds,
+) -> Option<PropertyVerdict> {
+    let quantified = parse_quantified_lite(formula)?;
+    let domain = finite_sort_domain(&quantified.binder, &quantified.domain, bounds)?;
+    if domain.values.is_empty() {
+        let reason = match quantified.kind {
+            QuantKind::ForAll => "W620 BoundedVerification: quantifier has empty bounds".to_owned(),
+            QuantKind::Exists => {
+                "bounded check cannot witness an existential over empty bounds".to_owned()
+            }
+        };
+        return Some(PropertyVerdict::Unknown {
+            name: name.to_owned(),
+            reason,
+            bounds: bounds.clone(),
+        });
+    }
+
+    let negate = matches!(quantified.kind, QuantKind::ForAll);
+    let constraints = lite_body_constraints(&quantified.body, negate);
+    match smt_check(std::slice::from_ref(&domain), &constraints) {
+        SmtAnswer::Sat(assignment) => match quantified.kind {
+            QuantKind::ForAll => Some(PropertyVerdict::Counterexample {
+                name: name.to_owned(),
+                detail: format!(
+                    "formula is false under {}",
+                    assignment_identity(&assignment)
+                ),
+            }),
+            QuantKind::Exists => Some(PropertyVerdict::Proved {
+                name: name.to_owned(),
+                bounds: bounds.clone(),
+            }),
+        },
+        SmtAnswer::Unsat => match quantified.kind {
+            QuantKind::ForAll => Some(PropertyVerdict::Proved {
+                name: name.to_owned(),
+                bounds: bounds.clone(),
+            }),
+            QuantKind::Exists => Some(PropertyVerdict::Counterexample {
+                name: name.to_owned(),
+                detail: "no finite witness".into(),
+            }),
+        },
+        SmtAnswer::Unknown { reason } => Some(PropertyVerdict::Unknown {
+            name: name.to_owned(),
+            reason,
+            bounds: bounds.clone(),
+        }),
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum QuantKind {
+    ForAll,
+    Exists,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum LiteBody {
+    Bool(bool),
+    Eq(String, Value),
+    Ne(String, Value),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LiteQuantifier {
+    kind: QuantKind,
+    binder: String,
+    domain: String,
+    body: LiteBody,
+}
+
+fn parse_quantified_lite(formula: &str) -> Option<LiteQuantifier> {
+    let rest = strip_leading_assert(formula);
+    // Temporal `always` is not this fragment. TrusteeContinuity stays Unknown.
+    if ident_prefix(rest, "always").is_some() {
+        return None;
+    }
+    let (kind, rest) = if let Some(rest) = ident_prefix(rest, "for_all") {
+        (QuantKind::ForAll, rest)
+    } else {
+        let rest = ident_prefix(rest, "exists")?;
+        (QuantKind::Exists, rest)
+    };
+    let (binder, rest) = take_ident(rest.trim_start())?;
+    let rest = ident_prefix(rest.trim_start(), "in")?;
+    let (domain, rest) = take_ident(rest.trim_start())?;
+    let rest = rest.trim_start().strip_prefix(':')?;
+    let body_src = rest.trim().trim_end_matches(';').trim();
+    if body_src.is_empty() {
+        return None;
+    }
+    let body = parse_lite_body(body_src)?;
+    Some(LiteQuantifier {
+        kind,
+        binder,
+        domain,
+        body,
+    })
+}
+
+fn strip_leading_assert(formula: &str) -> &str {
+    let trimmed = formula.trim();
+    ident_prefix(trimmed, "assert").unwrap_or(trimmed)
+}
+
+fn ident_prefix<'a>(src: &'a str, ident: &str) -> Option<&'a str> {
+    if src.starts_with(ident) && ident_boundary(src, ident.len()) {
+        Some(src[ident.len()..].trim_start())
+    } else {
+        None
+    }
+}
+
+fn ident_boundary(src: &str, end: usize) -> bool {
+    match src[end..].chars().next() {
+        None => true,
+        Some(c) => !c.is_ascii_alphanumeric() && c != '_',
+    }
+}
+
+fn take_ident(src: &str) -> Option<(String, &str)> {
+    let mut chars = src.char_indices();
+    let (_, first) = chars.next()?;
+    if !(first.is_ascii_alphabetic() || first == '_') {
+        return None;
+    }
+    let mut end = first.len_utf8();
+    for (i, c) in chars {
+        if c.is_ascii_alphanumeric() || c == '_' {
+            end = i + c.len_utf8();
+        } else {
+            break;
+        }
+    }
+    Some((src[..end].to_owned(), &src[end..]))
+}
+
+fn parse_lite_body(src: &str) -> Option<LiteBody> {
+    match src {
+        "true" => return Some(LiteBody::Bool(true)),
+        "false" => return Some(LiteBody::Bool(false)),
+        _ => {}
+    }
+    if let Some((left, right)) = split_once_op(src, "!=").or_else(|| split_once_op(src, "≠")) {
+        return Some(LiteBody::Ne(
+            parse_lite_var(left)?,
+            parse_lite_value(right)?,
+        ));
+    }
+    if let Some((left, right)) = split_once_op(src, "=") {
+        return Some(LiteBody::Eq(
+            parse_lite_var(left)?,
+            parse_lite_value(right)?,
+        ));
+    }
+    None
+}
+
+fn split_once_op<'a>(src: &'a str, op: &str) -> Option<(&'a str, &'a str)> {
+    let i = src.find(op)?;
+    Some((&src[..i], &src[i + op.len()..]))
+}
+
+fn parse_lite_var(src: &str) -> Option<String> {
+    let src = src.trim();
+    let (ident, rest) = take_ident(src)?;
+    if rest.trim().is_empty() {
+        Some(ident)
+    } else {
+        None
+    }
+}
+
+fn is_lite_entity_token(src: &str) -> bool {
+    let mut chars = src.chars();
+    let Some(first) = chars.next() else {
+        return false;
+    };
+    if !(first.is_ascii_alphabetic() || first == '_') {
+        return false;
+    }
+    chars.all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+}
+
+fn parse_lite_value(src: &str) -> Option<Value> {
+    let src = src.trim();
+    match src {
+        "true" => Some(Value::Bool(true)),
+        "false" => Some(Value::Bool(false)),
+        _ => {
+            if let Ok(n) = src.parse::<i64>() {
+                return Some(Value::Int(n));
+            }
+            if src.len() >= 2 {
+                let bytes = src.as_bytes();
+                if (bytes[0] == b'"' && *bytes.last()? == b'"')
+                    || (bytes[0] == b'\'' && *bytes.last()? == b'\'')
+                {
+                    return Some(Value::String(src[1..src.len() - 1].to_owned()));
+                }
+            }
+            if is_lite_entity_token(src) {
+                Some(Value::Entity(src.to_owned()))
+            } else {
+                None
+            }
+        }
+    }
+}
+
+fn lite_body_constraints(body: &LiteBody, negate: bool) -> Vec<Constraint> {
+    match (body, negate) {
+        (LiteBody::Bool(true), false) | (LiteBody::Bool(false), true) => Vec::new(),
+        (LiteBody::Bool(true), true) | (LiteBody::Bool(false), false) => {
+            vec![Constraint::nogood(Vec::new())]
+        }
+        (LiteBody::Eq(var, value), false) | (LiteBody::Ne(var, value), true) => {
+            vec![Constraint::eq(var.clone(), value.clone())]
+        }
+        (LiteBody::Eq(var, value), true) | (LiteBody::Ne(var, value), false) => {
+            vec![Constraint::ne(var.clone(), value.clone())]
+        }
+    }
+}
+
+fn finite_sort_domain(binder: &str, sort: &str, bounds: &VerificationBounds) -> Option<Domain> {
+    let (n, prefix) = match sort {
+        "People" | "people" | "Person" | "persons" => (bounds.persons, "person"),
+        "Events" | "events" | "Event" => (bounds.events, "event"),
+        "Time" | "Times" | "TimePoint" | "TimePoints" | "time_points" => {
+            (bounds.time_points, "time")
+        }
+        _ => return None,
+    };
+    Some(Domain {
+        name: binder.to_owned(),
+        values: (0..n)
+            .map(|i| Value::Entity(format!("{prefix}-{i}")))
+            .collect(),
+    })
 }
 
 fn eval_assignment(
@@ -1404,6 +1667,170 @@ mod tests {
             PropertyVerdict::Counterexample { name, detail } => {
                 assert_eq!(name, "NeverOk");
                 assert!(detail.contains("false"), "{detail}");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn people_bounds(persons: u32) -> VerificationBounds {
+        VerificationBounds {
+            persons,
+            events: 1,
+            time_points: 1,
+        }
+    }
+
+    #[test]
+    fn verify_property_proves_forall_true_over_people() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "AllTrue",
+            "for_all x in People: true",
+            people_bounds(3),
+        );
+        match verify_property(&module, "AllTrue") {
+            PropertyVerdict::Proved { name, bounds } => {
+                assert_eq!(name, "AllTrue");
+                assert_eq!(bounds.persons, 3);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_counterexample_forall_false_over_people() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "AllFalse",
+            "for_all x in People: false",
+            people_bounds(3),
+        );
+        match verify_property(&module, "AllFalse") {
+            PropertyVerdict::Counterexample { name, detail } => {
+                assert_eq!(name, "AllFalse");
+                assert!(
+                    detail.contains("person-") || detail.contains('x'),
+                    "{detail}"
+                );
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_proves_exists_true_over_people() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "Someone",
+            "exists x in People: true",
+            people_bounds(2),
+        );
+        match verify_property(&module, "Someone") {
+            PropertyVerdict::Proved { name, bounds } => {
+                assert_eq!(name, "Someone");
+                assert_eq!(bounds.persons, 2);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_exists_false_over_people_is_counterexample() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "Nobody",
+            "exists x in People: false",
+            people_bounds(2),
+        );
+        match verify_property(&module, "Nobody") {
+            PropertyVerdict::Counterexample { name, .. } => {
+                assert_eq!(name, "Nobody");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_forall_true_empty_people_is_w620() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "Vacuous",
+            "for_all x in People: true",
+            VerificationBounds {
+                persons: 0,
+                events: 0,
+                time_points: 0,
+            },
+        );
+        match verify_property(&module, "Vacuous") {
+            PropertyVerdict::Unknown { reason, .. } => {
+                assert!(reason.contains("W620"), "{reason}");
+                assert!(reason.contains("empty bounds"), "{reason}");
+            }
+            other => panic!("empty universal true must not be proved: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_forall_true_empty_people_sort_is_w620() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "VacuousPeople",
+            "for_all x in People: true",
+            VerificationBounds {
+                persons: 0,
+                events: 4,
+                time_points: 4,
+            },
+        );
+        match verify_property(&module, "VacuousPeople") {
+            PropertyVerdict::Unknown { reason, .. } => {
+                assert!(reason.contains("W620"), "{reason}");
+                assert!(reason.contains("empty bounds"), "{reason}");
+            }
+            other => panic!("empty People sort must not be a vacuous proof: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_forall_eligible_stays_unknown() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "ClosedWorld",
+            "for_all x in People: Eligible(x)",
+            people_bounds(4),
+        );
+        match verify_property(&module, "ClosedWorld") {
+            PropertyVerdict::Unknown { name, .. } => {
+                assert_eq!(name, "ClosedWorld");
+            }
+            PropertyVerdict::Proved { .. } => {
+                panic!("Eligible is outside SMT-lite; must not auto-prove")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn verify_property_exists_equality_witness_over_people() {
+        let mut module = bool_module();
+        push_property(
+            &mut module,
+            "NamedPerson",
+            "exists x in People: x = person-0",
+            people_bounds(3),
+        );
+        match verify_property(&module, "NamedPerson") {
+            PropertyVerdict::Proved { name, bounds } => {
+                assert_eq!(name, "NamedPerson");
+                assert_eq!(bounds.persons, 3);
             }
             other => panic!("{other:?}"),
         }
