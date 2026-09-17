@@ -19,6 +19,7 @@ module Examples.AvaNoahPrenup version "0.1.0" {
         authority CaliforniaLegislature
         citation "Cal. Fam. Code §§ 1610-1617"
         artifact "sources/ca-family-1610-1617.txt"
+        digest fixture
         retrieved_at 2026-08-23T12:00:00-07:00
         provision_intervals from "sources/ca-family-1610-1617.manifest.json"
     }
@@ -27,6 +28,7 @@ module Examples.AvaNoahPrenup version "0.1.0" {
         kind private_instrument
         authority {Ava, Noah}
         artifact "sources/ava-noah-prenup.txt"
+        digest fixture
     }
 
     entity Ava : NaturalPerson
