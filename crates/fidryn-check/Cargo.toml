@@ -1,0 +1,18 @@
+[package]
+name = "fidryn-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn type, effect, authority, time, and stratification checking"
+
+[dependencies]
+fidryn-core.workspace = true
+fidryn-hir.workspace = true
+indexmap.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+fidryn-syntax.workspace = true
