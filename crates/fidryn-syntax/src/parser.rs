@@ -1639,6 +1639,10 @@ impl<'a> Parser<'a> {
                 let e = self.parse_quantifier_expr();
                 Some(self.parse_postfix(e))
             }
+            TokenKind::Ident if self.text(t) == "transaction" => {
+                let e = self.parse_transaction_expr();
+                Some(self.parse_postfix(e))
+            }
             TokenKind::Ident if Self::is_prefix_word(self.text(t)) => {
                 let name = self.text(t).to_owned();
                 self.bump();
@@ -1790,6 +1794,12 @@ impl<'a> Parser<'a> {
             };
         }
         if self.peek().kind == TokenKind::LBrace {
+            if name == "transaction" {
+                return Expr::Apply {
+                    callee: Box::new(Expr::Ident(name)),
+                    args: self.parse_transaction_block(),
+                };
+            }
             let block = self.parse_braced_expr();
             return Expr::Apply {
                 callee: Box::new(Expr::Ident(name)),
@@ -1797,6 +1807,85 @@ impl<'a> Parser<'a> {
             };
         }
         Expr::Ident(name)
+    }
+
+    fn parse_transaction_expr(&mut self) -> Expr {
+        self.bump();
+        if self.peek().kind == TokenKind::LBrace {
+            Expr::Apply {
+                callee: Box::new(Expr::Ident("transaction".to_owned())),
+                args: self.parse_transaction_block(),
+            }
+        } else {
+            Expr::Ident("transaction".to_owned())
+        }
+    }
+
+    fn parse_transaction_block(&mut self) -> Vec<Expr> {
+        self.bump();
+        let mut stmts = Vec::new();
+        while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if matches!(self.peek().kind, TokenKind::Comma | TokenKind::Semicolon) {
+                self.bump();
+                continue;
+            }
+            if let Some(e) = self.parse_eval_stmt() {
+                stmts.push(e);
+            } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                self.error_here("expected transaction step");
+                self.skip_one_transaction_step();
+            }
+        }
+        self.expect_kind(TokenKind::RBrace, "expected `}`");
+        stmts
+    }
+
+    fn skip_one_transaction_step(&mut self) {
+        let mut depth_brace = 0u32;
+        let mut depth_paren = 0u32;
+        let mut depth_brack = 0u32;
+        loop {
+            let t = self.peek();
+            match t.kind {
+                TokenKind::Eof => return,
+                TokenKind::LBrace => {
+                    depth_brace += 1;
+                    self.bump();
+                }
+                TokenKind::RBrace => {
+                    if depth_brace == 0 && depth_paren == 0 && depth_brack == 0 {
+                        return;
+                    }
+                    depth_brace = depth_brace.saturating_sub(1);
+                    self.bump();
+                }
+                TokenKind::LParen => {
+                    depth_paren += 1;
+                    self.bump();
+                }
+                TokenKind::RParen => {
+                    depth_paren = depth_paren.saturating_sub(1);
+                    self.bump();
+                }
+                TokenKind::LBracket => {
+                    depth_brack += 1;
+                    self.bump();
+                }
+                TokenKind::RBracket => {
+                    depth_brack = depth_brack.saturating_sub(1);
+                    self.bump();
+                }
+                TokenKind::Semicolon | TokenKind::Comma
+                    if depth_brace == 0 && depth_paren == 0 && depth_brack == 0 =>
+                {
+                    self.bump();
+                    return;
+                }
+                _ => {
+                    self.bump();
+                }
+            }
+        }
     }
 
     fn parse_int_or_duration(&mut self) -> Expr {
@@ -2509,6 +2598,131 @@ module Examples.FuelRow version "0.1.0" {
         let expr = goal.expr.as_ref().expect("goal expr");
         expect_require_then(expr, Expr::Bool(false), Expr::Bool(true));
         assert_ne!(expr, &Expr::Bool(true));
+    }
+
+    fn expect_transaction_steps(expr: &Expr) -> &[Expr] {
+        match expr {
+            Expr::Apply { callee, args } => {
+                assert_eq!(callee.as_ref(), &Expr::Ident("transaction".to_owned()));
+                args
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn expect_duty_step(expr: &Expr, name: &str, action: &str) {
+        match expr {
+            Expr::Call { callee, args } => {
+                assert_eq!(callee, "duty_step");
+                assert_eq!(
+                    args,
+                    &vec![Expr::Ident(name.to_owned()), Expr::Ident(action.to_owned())]
+                );
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parses_transaction_block_keeps_both_steps() {
+        let parsed = parse_body(
+            r#"
+    query q() -> Bool {
+        transaction {
+            duty_step(pay, attach);
+            duty_step(pay, discharge)
+        }
+    }
+"#,
+        );
+        let expr = first_query(&parsed).expr.as_ref().expect("query expr");
+        let steps = expect_transaction_steps(expr);
+        assert_eq!(steps.len(), 2, "{steps:?}");
+        expect_duty_step(&steps[0], "pay", "attach");
+        expect_duty_step(&steps[1], "pay", "discharge");
+        assert!(!matches!(expr, Expr::Block(_)), "{expr:?}");
+        assert!(!matches!(expr, Expr::Call { .. }), "{expr:?}");
+    }
+
+    #[test]
+    fn parses_transaction_call_form() {
+        let parsed = parse_body(
+            r#"
+    query q() -> Bool {
+        transaction(duty_step(pay, attach), duty_step(pay, discharge))
+    }
+"#,
+        );
+        match first_query(&parsed).expr.as_ref() {
+            Some(Expr::Call { callee, args }) => {
+                assert_eq!(callee, "transaction");
+                assert_eq!(args.len(), 2, "{args:?}");
+                expect_duty_step(&args[0], "pay", "attach");
+                expect_duty_step(&args[1], "pay", "discharge");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parses_single_step_transaction_block_without_unwrapping() {
+        let parsed = parse_body(
+            r#"
+    query q() -> Bool {
+        transaction {
+            duty_step(pay, attach)
+        }
+    }
+"#,
+        );
+        let expr = first_query(&parsed).expr.as_ref().expect("query expr");
+        let steps = expect_transaction_steps(expr);
+        assert_eq!(steps.len(), 1, "{steps:?}");
+        expect_duty_step(&steps[0], "pay", "attach");
+    }
+
+    #[test]
+    fn parses_transaction_block_inside_evaluate_goal() {
+        let parsed = parse_body(
+            r#"
+    query q() -> Bool {
+        goal Evaluate {
+            transaction {
+                duty_step(pay, attach);
+                duty_step(pay, perform)
+            }
+        }
+    }
+"#,
+        );
+        let goal = first_query(&parsed).goal.as_ref().expect("evaluate goal");
+        assert_eq!(goal.kind, "Evaluate");
+        let steps = expect_transaction_steps(goal.expr.as_ref().expect("goal expr"));
+        assert_eq!(steps.len(), 2, "{steps:?}");
+        expect_duty_step(&steps[0], "pay", "attach");
+        expect_duty_step(&steps[1], "pay", "perform");
+    }
+
+    #[test]
+    fn parses_require_inside_transaction_block() {
+        let parsed = parse_body(
+            r#"
+    query q() -> Int {
+        transaction {
+            require true;
+            return 7
+        }
+    }
+"#,
+        );
+        let steps =
+            expect_transaction_steps(first_query(&parsed).expr.as_ref().expect("query expr"));
+        assert_eq!(steps.len(), 2, "{steps:?}");
+        match &steps[0] {
+            Expr::Require(inner) => assert_eq!(inner.as_ref(), &Expr::Bool(true)),
+            other => panic!("{other:?}"),
+        }
+        assert_eq!(steps[1], Expr::Int(7));
     }
 
     #[test]

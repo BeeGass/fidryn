@@ -238,7 +238,10 @@ QueryBody       ::= QueryStatement*
 QueryStatement  ::= "goal" QueryPlan Block
                   | "require" Expr ("using" Ident)? End
                   | "return" Expr End
+                  | TransactionExpr End?
                   | QuantifierField
+TransactionExpr ::= "transaction" Block
+                  | "transaction" "(" ArgList? ")"
 EffectRow       ::= "!" "{" Ident ("," Ident)* "}"
 
 QueryPlan       ::= "UniqueOccupant"
@@ -301,6 +304,7 @@ Primary         ::= literal
                   | "(" Expr ")"
                   | MoneyLiteral
                   | QuantifierExpr
+                  | TransactionExpr
 ArgList         ::= Arg ("," Arg)*
 Arg             ::= (Ident "=")? Expr
                   | "..." Expr
@@ -333,6 +337,9 @@ End             ::= inserted-newline | ";"
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.
-   All other declaration introducers are contextual keywords. *)
+   All other declaration introducers are contextual keywords.
+   `transaction` is contextual in expressions: `transaction { … }` is a
+   block of steps; `transaction(...)` remains a call. Both lower to
+   Apply("transaction", steps). *)
 
 (* "_" is legal only inside checked Prop / status / effect patterns. *)
