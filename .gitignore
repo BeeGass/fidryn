@@ -1,0 +1,6 @@
+/target
+**/*.rs.bk
+.DS_Store
+/Cargo.lock
+# Keep lockfile for the CLI binary reproducibility.
+!/Cargo.lock

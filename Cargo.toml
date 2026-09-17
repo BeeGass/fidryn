@@ -1,0 +1,56 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fidryn-syntax",
+    "crates/fidryn-hir",
+    "crates/fidryn-core",
+    "crates/fidryn-check",
+    "crates/fidryn-eval",
+    "crates/fidryn-handlers",
+    "crates/fidryn-verify",
+    "crates/fidryn-trace",
+    "crates/fidryn-cli",
+    "crates/fidryn-solve",
+    "crates/fidryn-adapt",
+    "crates/fidryn-render",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Bryan Gass"]
+repository = "https://github.com/BeeGass/fidryn"
+rust-version = "1.98"
+
+[workspace.dependencies]
+fidryn-syntax = { path = "crates/fidryn-syntax" }
+fidryn-hir = { path = "crates/fidryn-hir" }
+fidryn-core = { path = "crates/fidryn-core" }
+fidryn-check = { path = "crates/fidryn-check" }
+fidryn-eval = { path = "crates/fidryn-eval" }
+fidryn-handlers = { path = "crates/fidryn-handlers" }
+fidryn-verify = { path = "crates/fidryn-verify" }
+fidryn-trace = { path = "crates/fidryn-trace" }
+fidryn-solve = { path = "crates/fidryn-solve" }
+fidryn-adapt = { path = "crates/fidryn-adapt" }
+fidryn-render = { path = "crates/fidryn-render" }
+anyhow = "1.0.100"
+axum = { version = "0.8.9", features = ["json"] }
+tokio = { version = "1.47.1", features = ["rt-multi-thread", "macros", "net", "signal"] }
+tower = { version = "0.5.2", features = ["util"] }
+blake3 = "1.8.2"
+clap = { version = "4.5.48", features = ["derive"] }
+indexmap = { version = "2.11.4", features = ["serde"] }
+la-arena = "0.3.1"
+rowan = "0.16.1"
+rust_decimal = { version = "1.39.0", features = ["serde"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.145", features = ["preserve_order"] }
+thiserror = "2.0.17"
+time = { version = "0.3.44", features = ["formatting", "macros", "parsing", "serde"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
