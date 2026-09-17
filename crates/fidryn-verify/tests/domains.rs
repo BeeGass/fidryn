@@ -439,3 +439,178 @@ fn judgment_with_entry_is_determinate() {
         other => panic!("{other:?}"),
     }
 }
+
+#[test]
+fn independent_program_both_eligible_picks_rank_one() {
+    let module = compile("tests/programs/eligibility-succession.fr");
+    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
+    let mut case = CaseRecord::default();
+    case.facts
+        .insert("alice_accepted".into(), Value::Bool(true));
+    case.facts.insert("bob_accepted".into(), Value::Bool(true));
+    case.facts
+        .insert("carol_accepted".into(), Value::Bool(true));
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "OccupancyRecord".into(),
+        value: Value::String("Pat".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c1".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c2".into()),
+        observed_at: t,
+    });
+    case.admissible_completions.interpretations.insert(
+        "SuccessorEligibility".into(),
+        vec!["Both".into(), "BobAndCarol".into()],
+    );
+    case.interpretations
+        .insert("SuccessorEligibility".into(), "Both".into());
+    match run(&module, "acting_trustee", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Alice"),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_bob_and_carol_does_not_appoint_alice() {
+    let module = compile("tests/programs/eligibility-succession.fr");
+    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
+    let mut case = CaseRecord::default();
+    case.facts
+        .insert("alice_accepted".into(), Value::Bool(true));
+    case.facts.insert("bob_accepted".into(), Value::Bool(true));
+    case.facts
+        .insert("carol_accepted".into(), Value::Bool(true));
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "OccupancyRecord".into(),
+        value: Value::String("Pat".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c1".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c2".into()),
+        observed_at: t,
+    });
+    case.admissible_completions.interpretations.insert(
+        "SuccessorEligibility".into(),
+        vec!["Both".into(), "BobAndCarol".into()],
+    );
+    case.interpretations
+        .insert("SuccessorEligibility".into(), "BobAndCarol".into());
+    match run(&module, "acting_trustee", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_carol_only_selects_carol() {
+    let module = compile("tests/programs/eligibility-succession.fr");
+    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
+    let mut case = CaseRecord::default();
+    case.facts
+        .insert("alice_accepted".into(), Value::Bool(true));
+    case.facts.insert("bob_accepted".into(), Value::Bool(true));
+    case.facts
+        .insert("carol_accepted".into(), Value::Bool(true));
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "OccupancyRecord".into(),
+        value: Value::String("Pat".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c1".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c2".into()),
+        observed_at: t,
+    });
+    case.admissible_completions.interpretations.insert(
+        "SuccessorEligibility".into(),
+        vec!["Both".into(), "BobAndCarol".into(), "CarolOnly".into()],
+    );
+    case.interpretations
+        .insert("SuccessorEligibility".into(), "CarolOnly".into());
+    match run(&module, "acting_trustee", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Carol"),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn independent_program_two_offices_follow_their_own_protocols() {
+    let module = compile("tests/programs/two-offices.fr");
+    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
+    let mut case = CaseRecord::default();
+    case.facts
+        .insert("alice_accepted".into(), Value::Bool(true));
+    case.facts.insert("bob_accepted".into(), Value::Bool(true));
+    case.facts.insert("dana_accepted".into(), Value::Bool(true));
+    case.facts.insert("eve_accepted".into(), Value::Bool(true));
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "OccupancyRecord".into(),
+        value: Value::String("Pat".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c1".into()),
+        observed_at: t,
+    });
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PhysicianCertificate".into(),
+        value: Value::String("c2".into()),
+        observed_at: t,
+    });
+    case.admissible_completions
+        .interpretations
+        .insert("TrusteeEligibility".into(), vec!["HighRank".into()]);
+    case.admissible_completions
+        .interpretations
+        .insert("ExecutorEligibility".into(), vec!["NextOfKin".into()]);
+    case.interpretations
+        .insert("TrusteeEligibility".into(), "HighRank".into());
+    case.interpretations
+        .insert("ExecutorEligibility".into(), "NextOfKin".into());
+    match run(&module, "acting_trustee", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Alice"),
+        other => panic!("trustee: {other:?}"),
+    }
+    match run(&module, "acting_executor", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Dana"),
+        other => panic!("executor: {other:?}"),
+    }
+}
+
+#[test]
+fn independent_process_responsive_record_is_not_foia() {
+    let module = compile("tests/programs/named-decision.fr");
+    match run(&module, "q", &CaseRecord::default()) {
+        Outcome::Suspended { requests, .. } => {
+            assert!(requests.iter().any(|r| matches!(
+                r,
+                OpenRequest::NeedEvidence { schema, .. } if schema == "SiteInspection"
+            )));
+            assert!(!requests.iter().any(|r| matches!(
+                r,
+                OpenRequest::NeedEvidence { schema, .. }
+                    if schema == "HarmAnalysis" || schema == "SegregabilityAnalysis"
+            )));
+        }
+        other => panic!("{other:?}"),
+    }
+}

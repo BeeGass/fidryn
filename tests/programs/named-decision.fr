@@ -1,0 +1,17 @@
+module Programs.NamedDecision version "0.1.0" {
+    jurisdiction Test
+    source_snapshot "2026-09-17-decision"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { foia }
+
+    decision ProcessResponsiveRecord() -> Bool {
+        record requires SiteInspection
+        returns approved
+    }
+
+    query q() -> Bool ! {Observe} {
+        goal RunDecision { decision ProcessResponsiveRecord }
+    }
+}

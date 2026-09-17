@@ -1,0 +1,41 @@
+module Programs.EligibilitySuccession version "0.1.0" {
+    jurisdiction Test
+    source_snapshot "2026-09-17-eligibility"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00Z
+
+    outside_scope { complete_trust_instrument }
+
+    entity Alice : NaturalPerson
+    entity Bob : NaturalPerson
+    entity Carol : NaturalPerson
+    entity Pat : NaturalPerson
+
+    proposition Eligible(person: NaturalPerson, office: Office)
+
+    interpretation_family SuccessorEligibility {
+        alternative Both {
+            defines Eligible(Alice, TrusteeOf(BRT)) as established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+            defines Eligible(Carol, TrusteeOf(BRT)) as not_established
+        }
+        alternative BobAndCarol {
+            defines Eligible(Alice, TrusteeOf(BRT)) as not_established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+            defines Eligible(Carol, TrusteeOf(BRT)) as established
+        }
+        alternative CarolOnly {
+            defines Eligible(Alice, TrusteeOf(BRT)) as not_established
+            defines Eligible(Bob, TrusteeOf(BRT)) as not_established
+            defines Eligible(Carol, TrusteeOf(BRT)) as established
+        }
+    }
+
+    nomination Alice for TrusteeOf(BRT) rank 1
+    nomination Bob for TrusteeOf(BRT) rank 2
+    nomination Carol for TrusteeOf(BRT) rank 3
+
+    query acting_trustee() -> LegalPerson ! {Observe, Determine, Interpret} {
+        goal UniqueOccupant { office TrusteeOf(BRT) }
+    }
+}
