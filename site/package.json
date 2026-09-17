@@ -1,0 +1,11 @@
+{
+  "name": "fidryn-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build-docs": "node scripts/build-docs.mjs"
+  },
+  "devDependencies": {
+    "markdown-it": "^14.1.0"
+  }
+}

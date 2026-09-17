@@ -184,3 +184,38 @@ pre {
   gap: 12px 20px;
   justify-content: space-between;
 }
+
+/* Landing extras */
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.pronounce {
+  font-weight: 500;
+  font-size: 0.55em;
+  color: var(--mist);
+  letter-spacing: 0.02em;
+}
+.section-lede {
+  max-width: 42rem;
+  margin: 0 0 18px;
+  color: var(--paper-2);
+}
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.card-link:hover {
+  border-color: color-mix(in srgb, var(--brass) 55%, transparent);
+  background: color-mix(in srgb, var(--ink-2) 92%, transparent);
+  color: inherit;
+}
+.card-link h3 { color: var(--paper); }
+.card-link:hover h3 { color: var(--brass); }
+.follow-pre { margin-top: 16px; }
+.learn-grid { margin-top: 4px; }

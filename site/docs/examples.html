@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120f0c">
+  <title>Examples — Fidryn</title>
+  <meta name="description" content="This catalog is a map of the Fidryn example tree. The modules under `examples/` and the independent programs under `tests/programs/` are research fixtures. They are not legal advice, not operative ins">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/docs.css">
+</head>
+<body class="docs-body">
+  <div class="docs-shell">
+    <header class="docs-top">
+      <a class="mark" href="/">fidryn</a>
+      <nav class="nav">
+        <a href="/docs/">Docs</a>
+        <a href="/#install">Install</a>
+        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+      </nav>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="docs-sidebar" aria-label="Documentation">
+        <p class="docs-sidebar-label">Guides</p>
+        <nav class="docs-side-nav">
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples" class="active">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
+        </nav>
+        <p class="docs-sidebar-label">Also</p>
+        <nav class="docs-side-nav">
+          <a href="/">Home</a>
+          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+        </nav>
+      </aside>
+
+      <main class="docs-main prose">
+<h1>Example corpus</h1>
+<p>This catalog is a map of the Fidryn example tree. The modules under
+<code>examples/</code> and the independent programs under <code>tests/programs/</code> are
+research fixtures. They are not legal advice, not operative instruments,
+and not a complete statement of any jurisdiction’s law.</p>
+<p>Build the toolchain as in <a href="/docs/getting-started">getting-started</a>. Source
+syntax is in <a href="/docs/language">language</a>. Subcommands, timestamps, and
+outcome envelopes are in <a href="/docs/cli">cli</a>. Commands below assume the
+repository root as the working directory. The binary name is <code>fidryn</code>.
+From a checkout that has not installed the binary, prefix the same
+subcommands with <code>cargo run -p fidryn-cli --</code>.</p>
+<h2>How to use an example</h2>
+<p>Every module is a <code>.fr</code> file. Start by checking it. <code>check</code> authenticates
+the declared source manifest (when the module has one), elaborates, and
+type-checks. A clean module prints <code>ok</code>.</p>
+<pre><code>fidryn check examples/trust/bryan-revocable-trust.fr
+</code></pre>
+<p>If the directory contains a <code>cases/</code> folder, those files are
+<code>fidryn.case-record/v0.1</code> JSON records. <code>run</code> evaluates one named query
+against one record at a pair of ISO 8601 / RFC 3339 timestamps. <code>run</code>
+never chooses a completion. A <code>Suspended</code> outcome is an honest result,
+not a failed command.</p>
+<pre><code>fidryn run examples/us-federal/flsa/flsa.fr \
+  --query overtime_hours \
+  --case examples/us-federal/flsa/cases/forty-one-hours.json \
+  --valid-at 2026-09-17T12:00:00-04:00 \
+  --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p><code>--valid-at</code> is the legal valid time. <code>--known-at</code> is the record time.
+Evidence whose <code>observedAt</code> is after <code>--known-at</code> does not discharge a
+query. <code>--arg KEY=VALUE</code> writes <code>case.facts[&quot;KEY&quot;]</code> on top of the JSON
+(for example <code>--arg provision=ChildSupportWaiver</code>).</p>
+<p>State modules under <code>examples/states/</code> do not ship companion JSON. Case
+facts live in <code>scenario</code> blocks inside the <code>.fr</code> file. There is no JSON
+source manifest either: the <code>source { ... }</code> block already carries
+citation, artifact, and <code>digest fixture</code>. Check the module, and verify a
+declared property when you want the honesty assertions:</p>
+<pre><code>fidryn check examples/states/florida/homestead.fr
+fidryn verify examples/states/florida/homestead.fr --property HomesteadHonesty
+</code></pre>
+<p>A query that looks mechanical (deadlines, dollar caps, day counts,
+acreage) is <code>automatic</code> or <code>Evaluate</code> with an empty effect row. A query
+that needs a tribunal, agency, or open-textured standard uses <code>Determine</code>
+or <code>Observe</code> and must be allowed to <code>Suspend</code>. The fixtures do not hide
+judgment in a Boolean.</p>
+<h2>Start here</h2>
+<p>These eleven modules cover an instrument, a closed-form tax slice, an
+agency procedure, a formation filing, a family agreement, a civil-procedure
+spine, a consumer clock, a state constitutional cap, a federal wage rule,
+and two interpreter programs.</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>examples/trust/bryan-revocable-trust.fr</code></td>
+<td>Successor trustee occupancy under the Bryan revocable-trust fixture.</td>
+<td><code>fidryn check examples/trust/bryan-revocable-trust.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/tax/federal-tax.fr</code></td>
+<td>Closed-form ordinary-income tax and FinCEN BOI after the domestic-company exemption.</td>
+<td><code>fidryn check examples/tax/federal-tax.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/foia/foia-request.fr</code></td>
+<td>FOIA request processing; a proposed Exemption 5 withholding still needs harm and segregability.</td>
+<td><code>fidryn check examples/foia/foia-request.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/massachusetts-llc/harbor-robotics.fr</code></td>
+<td>Massachusetts LLC formation; a transport receipt is not an official filing record.</td>
+<td><code>fidryn check examples/massachusetts-llc/harbor-robotics.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/prenup/ava-noah.fr</code></td>
+<td>California UPAA provision enforcement for the Ava–Noah agreement.</td>
+<td><code>fidryn check examples/prenup/ava-noah.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/procedure/civil-complaint.fr</code></td>
+<td>FRCP 3/4/12/58 complaint-to-judgment spine.</td>
+<td><code>fidryn check examples/procedure/civil-complaint.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/california/security-deposit/security-deposit.fr</code></td>
+<td>California 21-day security-deposit return clock versus bad-faith doubling.</td>
+<td><code>fidryn check examples/california/security-deposit/security-deposit.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/states/florida/homestead.fr</code></td>
+<td>Florida homestead acreage caps and forced-sale character; scenarios live in the <code>.fr</code> file.</td>
+<td><code>fidryn check examples/states/florida/homestead.fr</code></td>
+</tr>
+<tr>
+<td><code>examples/us-federal/flsa/flsa.fr</code></td>
+<td>FLSA 40-hour overtime versus the white-collar exemption.</td>
+<td><code>fidryn check examples/us-federal/flsa/flsa.fr</code></td>
+</tr>
+<tr>
+<td><code>tests/programs/require-gate.fr</code></td>
+<td><code>require true</code> returns 7; <code>require false</code> does not run the return.</td>
+<td><code>fidryn check tests/programs/require-gate.fr</code></td>
+</tr>
+<tr>
+<td><code>tests/programs/late-payment.fr</code></td>
+<td>Invoice duty, timely-payment decision, and a strict-versus-extended deadline family.</td>
+<td><code>fidryn check tests/programs/late-payment.fr</code></td>
+</tr>
+</tbody>
+</table>
+<p>Run the modules that ship JSON case records. Timestamps match each
+module’s <code>recorded_at</code> or, when evidence is later, that evidence’s
+<code>observedAt</code>.</p>
+<pre><code>fidryn run examples/trust/bryan-revocable-trust.fr \
+  --query acting_trustee \
+  --case examples/trust/cases/one-certificate.json \
+  --valid-at 2026-08-23T12:00:00Z \
+  --known-at 2026-08-23T12:00:00Z
+</code></pre>
+<p>Other trust records in the same folder are
+<code>bob-plus-open-alice.json</code>, <code>two-certificates-open-eligibility.json</code>, and
+<code>court-selects-i2.json</code>. One physician certificate without a checked
+completion is expected to suspend.</p>
+<pre><code>fidryn run examples/tax/federal-tax.fr \
+  --query tax_on \
+  --case examples/tax/cases/ordinary-income.json \
+  --valid-at 2026-08-14T00:00:00-04:00 \
+  --known-at 2026-08-14T00:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/tax/federal-tax.fr \
+  --query boi_required \
+  --case examples/tax/cases/domestic-company-after-exemption.json \
+  --valid-at 2026-09-01T00:00:00-04:00 \
+  --known-at 2026-09-01T00:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/foia/foia-request.fr \
+  --query disposition \
+  --case examples/foia/cases/proposed-exemption-5-withholding.json \
+  --valid-at 2026-08-23T12:00:00-04:00 \
+  --known-at 2026-08-23T12:00:00-04:00
+</code></pre>
+<pre><code>fidryn run examples/massachusetts-llc/harbor-robotics.fr \
+  --query entity_status \
+  --case examples/massachusetts-llc/cases/official-filing-record.json \
+  --valid-at 2026-08-28T14:12:00-04:00 \
+  --known-at 2026-08-28T14:12:00-04:00
+</code></pre>
+<p><code>examples/massachusetts-llc/cases/transmitted-without-official-record.json</code>
+is the contrast case: transmission without an <code>OfficialFilingRecord</code>
+suspends.</p>
+<pre><code>fidryn run examples/prenup/ava-noah.fr \
+  --query provision_result \
+  --case examples/prenup/cases/divorce-record.json \
+  --valid-at 2026-08-23T12:00:00-07:00 \
+  --known-at 2026-08-23T12:00:00-07:00
+</code></pre>
+<p><code>divorce-record-without-enforceability-order.json</code> suspends on
+<code>PrenupEnforceability</code>. <code>--arg provision=ChildSupportWaiver</code> overwrites
+<code>case.facts[&quot;provision&quot;]</code> when you want a different clause without
+editing the JSON.</p>
+<pre><code>fidryn run examples/procedure/civil-complaint.fr \
+  --query judgment \
+  --case examples/procedure/cases/judgment-entered.json \
+  --valid-at 2026-10-01T16:00:00-04:00 \
+  --known-at 2026-10-01T16:00:00-04:00
+</code></pre>
+<p><code>complaint-answered-without-judgment.json</code> suspends because there is no
+judgment entry.</p>
+<pre><code>fidryn run examples/california/security-deposit/security-deposit.fr \
+  --query deadline_running \
+  --case examples/california/security-deposit/cases/day-10.json \
+  --valid-at 2026-09-17T12:00:00-07:00 \
+  --known-at 2026-09-17T12:00:00-07:00
+</code></pre>
+<pre><code>fidryn run examples/us-federal/flsa/flsa.fr \
+  --query overtime_hours \
+  --case examples/us-federal/flsa/cases/forty-one-hours.json \
+  --valid-at 2026-09-17T12:00:00-04:00 \
+  --known-at 2026-09-17T12:00:00-04:00
+</code></pre>
+<p>Florida homestead has no JSON case file. The scenarios <code>InsideCityHalfAcre</code>,
+<code>RuralHundredSixty</code>, and <code>TaxCreditor</code> are in
+<code>examples/states/florida/homestead.fr</code>. <code>require-gate.fr</code> and
+<code>late-payment.fr</code> also have no JSON; they are check-only programs. See
+<a href="#independent-programs">Independent programs</a>.</p>
+<h2>Honesty</h2>
+<p>These fixtures are not legal advice and not a complete code. Read each
+module’s <code>outside_scope</code> before treating an answer as even a research
+result.</p>
+<p><strong><code>outside_scope</code>.</strong> Every module names the topics, titles, doctrines,
+and procedures it does not encode. Outcomes carry that boundary. An
+omitted interpretation cannot silently shrink the model.</p>
+<p><strong><code>digest fixture</code>.</strong> Source blocks on the 2026-09-17 slices use
+<code>digest fixture</code>. That is a fixture trust profile, not byte-verified
+authentication of the artifact, and not an official edition. Excerpts
+under each module’s <code>sources/</code> directory end by saying they are not
+official editions.</p>
+<p><strong>Not the United States Code.</strong> The United States Code is a codification
+of statutes, not the whole of federal law. Regulations, case law,
+internal guidance, and uncodified provisions sit elsewhere. This corpus
+encodes bounded high-impact slices. <code>US.Federal.Code.Catalog</code> exists so
+the interpreter cannot honestly claim completeness.</p>
+<p><code>run</code> never chooses a completion. Open-textured queries must be allowed
+to <code>Suspend</code>. The kernel does not search.</p>
+<h2>Full catalog on GitHub</h2>
+<p>Federal slices, practice slices, the fifty-state corpus map, and independent
+programs are listed in the full
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/examples.md" target="_blank" rel="noopener noreferrer">examples.md</a>
+on GitHub. This page keeps the how-to-use and start-here paths.</p>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+    </footer>
+  </div>
+</body>
+</html>
