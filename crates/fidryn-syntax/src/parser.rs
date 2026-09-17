@@ -1387,45 +1387,47 @@ impl<'a> Parser<'a> {
                 self.error_here("expected rule kind");
             }
         }
+        let mut source_basis = None;
         if self.eat_ident("from") {
-            let _ = self.parse_expr();
+            source_basis = self.parse_expr();
         }
         let mut guard = None;
         let mut consequences = Vec::new();
+        let mut fallback = Vec::new();
+        let mut require = None;
         if self.peek().kind == TokenKind::LBrace {
             self.bump();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
                 if self.eat_ident("when") {
                     if let Some(e) = self.parse_expr() {
-                        guard = Some(match guard.take() {
-                            Some(prev) => Expr::Binary {
-                                op: BinOp::And,
-                                left: Box::new(prev),
-                                right: Box::new(e),
-                            },
-                            None => e,
-                        });
+                        guard = Some(and_opt_expr(guard.take(), e));
                     }
                     self.eat_semi();
-                } else if self.eat_ident("then") || self.eat_ident("otherwise") {
-                    if self.at_consequence_op() {
-                        let verb = self.parse_ident_name();
-                        let expr = self.parse_expr().unwrap_or(Expr::Ident(String::new()));
-                        if self.eat_ident("as_to") {
-                            let _ = self.parse_expr();
-                        }
-                        consequences.push(ConsequenceAst { verb, expr });
-                        self.eat_semi();
-                        if !self.at_rule_stmt()
-                            && !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof)
-                        {
-                            self.skip_balanced_until_end();
-                        }
+                } else if self.eat_ident("then") {
+                    if let Some(item) = self.parse_rule_consequence() {
+                        consequences.push(item);
+                        self.finish_rule_stmt();
+                    } else {
+                        self.skip_balanced_until_end();
+                    }
+                } else if self.eat_ident("otherwise") {
+                    if let Some(item) = self.parse_rule_consequence() {
+                        fallback.push(item);
+                        self.finish_rule_stmt();
                     } else {
                         self.skip_balanced_until_end();
                     }
                 } else if self.eat_ident("require") {
-                    let _ = self.parse_expr();
+                    if let Some(e) = self.parse_expr() {
+                        require = Some(and_opt_expr(require.take(), e));
+                    }
+                    self.eat_semi();
+                } else if self.eat_ident("source") {
+                    if let Some(e) = self.parse_expr()
+                        && source_basis.is_none()
+                    {
+                        source_basis = Some(e);
+                    }
                     self.eat_semi();
                 } else {
                     self.skip_balanced_until_end();
@@ -1450,8 +1452,30 @@ impl<'a> Parser<'a> {
         decl.rule_kind = rule_kind;
         decl.guard = guard;
         decl.consequences = consequences;
+        decl.fallback = fallback;
+        decl.require = require;
+        decl.source_basis = source_basis;
         self.finish_node();
         decl
+    }
+
+    fn parse_rule_consequence(&mut self) -> Option<ConsequenceAst> {
+        if !self.at_consequence_op() {
+            return None;
+        }
+        let verb = self.parse_ident_name();
+        let expr = self.parse_expr().unwrap_or(Expr::Ident(String::new()));
+        if self.eat_ident("as_to") {
+            let _ = self.parse_expr();
+        }
+        self.eat_semi();
+        Some(ConsequenceAst { verb, expr })
+    }
+
+    fn finish_rule_stmt(&mut self) {
+        if !self.at_rule_stmt() && !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            self.skip_balanced_until_end();
+        }
     }
 
     fn at_consequence_op(&mut self) -> bool {
@@ -2207,6 +2231,17 @@ impl<'a> Parser<'a> {
     }
 }
 
+fn and_opt_expr(prev: Option<Expr>, next: Expr) -> Expr {
+    match prev {
+        Some(prev) => Expr::Binary {
+            op: BinOp::And,
+            left: Box::new(prev),
+            right: Box::new(next),
+        },
+        None => next,
+    }
+}
+
 fn is_declaration_keyword(word: &str) -> bool {
     matches!(
         word,
@@ -2927,6 +2962,55 @@ module Examples.FuelRow version "0.1.0" {
                 args: vec![],
             }
         );
+    }
+
+    #[test]
+    fn parses_otherwise_as_fallback_not_then() {
+        let parsed =
+            parse_body("rule R : derive { when true then derive P() otherwise derive Q() }");
+        let d = match &parsed.module().unwrap().items[0] {
+            Item::Rule(d) => d,
+            other => panic!("{other:?}"),
+        };
+        assert_eq!(d.guard.as_ref(), Some(&Expr::Bool(true)));
+        assert_eq!(d.consequences.len(), 1);
+        assert_eq!(d.consequences[0].verb, "derive");
+        assert_eq!(
+            d.consequences[0].expr,
+            Expr::Call {
+                callee: "P".to_owned(),
+                args: vec![],
+            }
+        );
+        assert_eq!(d.fallback.len(), 1, "otherwise must not append to then");
+        assert_eq!(d.fallback[0].verb, "derive");
+        assert_eq!(
+            d.fallback[0].expr,
+            Expr::Call {
+                callee: "Q".to_owned(),
+                args: vec![],
+            }
+        );
+    }
+
+    #[test]
+    fn parses_rule_require_and_from() {
+        let parsed = parse_body(
+            r#"rule R(x: Person) : derive from Instrument.clause("1") { when true require false then derive P() }"#,
+        );
+        let d = match &parsed.module().unwrap().items[0] {
+            Item::Rule(d) => d,
+            other => panic!("{other:?}"),
+        };
+        assert_eq!(d.params, vec![("x".to_owned(), "Person".to_owned())]);
+        assert_eq!(d.require.as_ref(), Some(&Expr::Bool(false)));
+        assert!(
+            d.source_basis.is_some(),
+            "from source_basis must not be dropped: {:?}",
+            d.source_basis
+        );
+        assert_eq!(d.consequences.len(), 1);
+        assert!(d.fallback.is_empty());
     }
 
     #[test]

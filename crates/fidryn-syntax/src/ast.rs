@@ -74,6 +74,9 @@ pub struct Decl {
     pub rule_kind: Option<String>,
     pub guard: Option<Expr>,
     pub consequences: Vec<ConsequenceAst>,
+    pub fallback: Vec<ConsequenceAst>,
+    pub require: Option<Expr>,
+    pub source_basis: Option<Expr>,
     pub fields: BTreeMap<String, String>,
     pub type_args: Vec<String>,
 }
@@ -172,6 +175,9 @@ impl Decl {
             rule_kind: None,
             guard: None,
             consequences: Vec::new(),
+            fallback: Vec::new(),
+            require: None,
+            source_basis: None,
             fields: BTreeMap::new(),
             type_args: Vec::new(),
         }
