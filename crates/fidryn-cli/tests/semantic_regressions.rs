@@ -280,6 +280,7 @@ fn determination_for_one_subject_does_not_discharge_another_subject() {
         protocol: "EligibilityDecision".into(),
         established: true,
         decider: "Court".into(),
+        recorded_at: None,
     });
     let mut handler = CaseFile::new(record);
     let request = OpenRequest::NeedJudgment {
@@ -323,6 +324,7 @@ fn transport_receipt_does_not_count_as_official_filing_record() {
         protocol: "FormationCompliance".into(),
         established: true,
         decider: "AuthorizedReviewer".into(),
+        recorded_at: None,
     });
     let out = run(&module, "entity_status", &case);
     assert!(

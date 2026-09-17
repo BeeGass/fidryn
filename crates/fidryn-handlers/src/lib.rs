@@ -1178,6 +1178,7 @@ mod tests {
             protocol: "Eligibility".into(),
             established: true,
             decider: "Court".into(),
+            recorded_at: None,
         });
         let mut h = CaseFile::new(record);
         match h.handle_determine(&need_eligible("Bob")) {
@@ -1198,6 +1199,7 @@ mod tests {
             protocol: "Eligibility".into(),
             established: false,
             decider: "Court".into(),
+            recorded_at: None,
         });
         let mut h = CaseFile::new(record);
         match h.handle_determine(&need_eligible("Alice")) {

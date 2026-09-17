@@ -75,6 +75,53 @@ hashed_id!(SourceSnapshotId, "snapshot");
 hashed_id!(SourceManifestId, "manifest");
 hashed_id!(JurisdictionId, "jurisdiction");
 
+/// Blake3 digest of a program's content fingerprint (32 bytes).
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ProgramDigest([u8; 32]);
+
+impl ProgramDigest {
+    pub fn from_bytes(bytes: [u8; 32]) -> Self {
+        Self(bytes)
+    }
+
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
+
+    pub fn hex(&self) -> String {
+        hex_encode(&self.0)
+    }
+
+    pub fn from_hex(text: &str) -> Result<Self, String> {
+        hex_decode_array(text).map(Self)
+    }
+}
+
+impl Serialize for ProgramDigest {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.hex())
+    }
+}
+
+impl<'de> Deserialize<'de> for ProgramDigest {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let text = String::deserialize(deserializer)?;
+        Self::from_hex(&text).map_err(serde::de::Error::custom)
+    }
+}
+
+impl fmt::Debug for ProgramDigest {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "ProgramDigest({})", self.hex())
+    }
+}
+
+impl fmt::Display for ProgramDigest {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.hex())
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct QueryName(pub String);
 
@@ -108,12 +155,20 @@ pub fn hex_encode(bytes: &[u8]) -> String {
 }
 
 pub fn hex_decode(text: &str) -> Result<[u8; 16], String> {
-    if text.len() != 32 {
-        return Err(format!("expected 32 hex characters, got {}", text.len()));
+    hex_decode_array(text)
+}
+
+fn hex_decode_array<const N: usize>(text: &str) -> Result<[u8; N], String> {
+    if text.len() != N * 2 {
+        return Err(format!(
+            "expected {} hex characters, got {}",
+            N * 2,
+            text.len()
+        ));
     }
     let bytes = text.as_bytes();
-    let mut out = [0u8; 16];
-    for i in 0..16 {
+    let mut out = [0u8; N];
+    for i in 0..N {
         let hi = hex_nibble(bytes[i * 2])?;
         let lo = hex_nibble(bytes[i * 2 + 1])?;
         out[i] = (hi << 4) | lo;
@@ -170,5 +225,16 @@ mod tests {
             assert!(json.is_string(), "{json}");
             assert_eq!(json.as_str().unwrap().len(), 32);
         }
+    }
+
+    #[test]
+    fn program_digest_is_64_hex_chars() {
+        let digest = ProgramDigest::from_bytes([0xab; 32]);
+        assert_eq!(digest.hex().len(), 64);
+        assert_eq!(digest.hex(), "ab".repeat(32));
+        let json = serde_json::to_value(digest).unwrap();
+        assert_eq!(json.as_str().unwrap().len(), 64);
+        let back: ProgramDigest = serde_json::from_value(json).unwrap();
+        assert_eq!(back, digest);
     }
 }

@@ -434,6 +434,12 @@ impl CoreModule {
         self.queries.iter().find(|q| q.name == name)
     }
 
+    /// [`crate::ids::ProgramDigest`] wrapping [`Self::content_fingerprint`].
+    pub fn program_digest(&self) -> Result<crate::ids::ProgramDigest, String> {
+        self.content_fingerprint()
+            .map(crate::ids::ProgramDigest::from_bytes)
+    }
+
     /// Blake3 of canonical JSON over name, version, queries, and declarations.
     ///
     /// Distinct from [`Self::id`], which is name-based via [`ModuleId::of`].
@@ -518,5 +524,9 @@ mod tests {
             with_decl.content_fingerprint().unwrap()
         );
         assert_eq!(a.id, empty_module("Trust", "0.2.0").id);
+        assert_eq!(
+            a.program_digest().unwrap().as_bytes(),
+            &a.content_fingerprint().unwrap()
+        );
     }
 }

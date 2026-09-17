@@ -127,7 +127,8 @@ impl Value {
 }
 
 /// Serde tags for [`Value`] (`tag = "kind"`, `rename_all = "camelCase"`).
-/// Records whose `kind` is not one of these decode as [`Value::Map`].
+/// `kind: record` wraps an object as [`Value::Map`]. Other unknown `kind`
+/// values decode as [`Value::Map`] of the whole object.
 fn is_runtime_value_kind_tag(tag: &str) -> bool {
     matches!(
         tag,
@@ -142,6 +143,7 @@ fn is_runtime_value_kind_tag(tag: &str) -> bool {
             | "map"
             | "option"
             | "prop"
+            | "record"
             | "set"
             | "string"
             | "unit"
@@ -165,10 +167,15 @@ pub(crate) fn value_from_case_json(raw: serde_json::Value) -> Result<Value, Stri
             Ok(Value::Set(values))
         }
         serde_json::Value::Object(map) => {
-            let tagged = map
-                .get("kind")
-                .and_then(serde_json::Value::as_str)
-                .is_some_and(is_runtime_value_kind_tag);
+            let kind = map.get("kind").and_then(serde_json::Value::as_str);
+            if kind == Some("record") {
+                let data = map
+                    .get("data")
+                    .cloned()
+                    .ok_or_else(|| "record value requires data object".to_string())?;
+                return map_from_case_json(data);
+            }
+            let tagged = kind.is_some_and(is_runtime_value_kind_tag);
             let obj = serde_json::Value::Object(map);
             if tagged {
                 serde_json::from_value(obj).map_err(|e| e.to_string())
@@ -345,6 +352,23 @@ mod tests {
         assert!(
             !string_json.contains("\"kind\":\"decimal\""),
             "{string_json}"
+        );
+    }
+
+    #[test]
+    fn record_kind_decodes_as_map_bool_kind_stays_bool() {
+        let record = serde_json::json!({"kind": "record", "data": {"kind": "bool", "data": false}});
+        match value_from_case_json(record).unwrap() {
+            Value::Map(map) => {
+                assert_eq!(map.get("kind"), Some(&Value::String("bool".into())));
+                assert_eq!(map.get("data"), Some(&Value::Bool(false)));
+            }
+            other => panic!("expected Map, got {other:?}"),
+        }
+        let tagged_bool = serde_json::json!({"kind": "bool", "data": false});
+        assert_eq!(
+            value_from_case_json(tagged_bool).unwrap(),
+            Value::Bool(false)
         );
     }
 

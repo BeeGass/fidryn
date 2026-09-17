@@ -5,6 +5,7 @@
 pub mod canonical;
 pub mod case;
 pub mod diagnostics;
+pub mod duty;
 pub mod effects;
 pub mod engine;
 pub mod ids;
@@ -19,17 +20,18 @@ pub mod value;
 
 pub use canonical::{canonical_json, canonical_to_vec};
 pub use case::{
-    AdmissibleCompletions, CaseRecord, ClosureRecord, CompletionDomain, EvidenceItem,
+    AdmissibleCompletions, CaseRecord, ClosureRecord, CompletionDomain, EvidenceItem, LedgerEvent,
     ManifestArtifact, ModelBoundary, SourceManifest, SourceWeight,
 };
 pub use diagnostics::{Diagnostic, DiagnosticCode, Severity, Span};
+pub use duty::{DutyState, DutyStatus};
 pub use effects::{
     EffectName, HaltReason, Handler, HandlerResult, OpenOperation, SuspensionReason,
 };
 pub use engine::EngineError;
 pub use ids::{
-    ClauseId, CompletionProofId, EffectId, JurisdictionId, ModuleId, NodeId, OriginId, QueryName,
-    RuleId, SourceManifestId, SourceSnapshotId, TraceId,
+    ClauseId, CompletionProofId, EffectId, JurisdictionId, ModuleId, NodeId, OriginId,
+    ProgramDigest, QueryName, RuleId, SourceManifestId, SourceSnapshotId, TraceId,
 };
 pub use ir::{
     ClauseSelector, Consequence, CoreAssertion, CoreConflictDoctrine, CoreDecision, CoreDecl,
@@ -38,15 +40,18 @@ pub use ir::{
     DeclaredDecisionResult, Guard, NodeMeta, QueryPlan, RuleKind, SelectionResult,
     VerificationBounds,
 };
-pub use outcome::{CheckedCertificate, OpenRequest, Outcome};
+pub use outcome::{
+    CheckedCertificate, CoverageWitness, EvaluationReport, OpenRequest, Outcome, TrustProfile,
+};
 pub use patterns::{
     ContextPattern, LegalEffectPattern, LegalStatusPattern, LegalSubjectPattern, PositionPattern,
     PropPattern, TermPattern,
 };
 pub use positions::{Position, PositionKind};
 pub use state::{
-    AuthorityLedger, DecisionLedger, InterpretationLedger, LegalState, LegalStatusLedger,
-    Occupancy, PositionLedger, RecordLedger, SourceLedger, StatusMode, WorldLedger,
+    AuthorityGrant, AuthorityLedger, DecisionLedger, InterpretationLedger, LegalState,
+    LegalStatusLedger, Occupancy, PositionLedger, RecordLedger, SourceLedger, StatusMode,
+    WorldLedger,
 };
 pub use time::{
     Bound, CalendarKind, FidrynDuration, Instant, Interval, RunContext, TemporalLens, TimeError,

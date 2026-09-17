@@ -1,7 +1,7 @@
 //! Case records declare their admissible completion space.
 
 use crate::state::LegalState;
-use crate::time::Instant;
+use crate::time::{Instant, Interval};
 use crate::value::Value;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -15,6 +15,8 @@ pub struct CaseRecord {
     pub facts: BTreeMap<String, Value>,
     #[serde(default)]
     pub evidence: Vec<EvidenceItem>,
+    #[serde(default)]
+    pub events: Vec<LedgerEvent>,
     #[serde(default)]
     pub determinations: Vec<CaseDetermination>,
     #[serde(default)]
@@ -35,6 +37,7 @@ impl Default for CaseRecord {
             module: None,
             facts: BTreeMap::new(),
             evidence: Vec::new(),
+            events: Vec::new(),
             determinations: Vec::new(),
             interpretations: BTreeMap::new(),
             decisions: BTreeMap::new(),
@@ -55,11 +58,24 @@ pub struct EvidenceItem {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LedgerEvent {
+    /// `"evidence"` | `"duty"` | `"authority"` | `"correction"` | `"retraction"`
+    pub kind: String,
+    pub valid_time: Interval,
+    pub record_time: Instant,
+    #[serde(with = "crate::value::case_value")]
+    pub payload: Value,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CaseDetermination {
     pub issue: String,
     pub protocol: String,
     pub established: bool,
     pub decider: String,
+    #[serde(default)]
+    pub recorded_at: Option<Instant>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -112,7 +128,21 @@ impl CaseRecord {
                 observed_at: item.observed_at,
             });
         }
+        for event in &self.events {
+            if event.kind == "evidence" {
+                state.record.items.push(crate::state::RecordEntry {
+                    schema: event.kind.clone(),
+                    value: event.payload.clone(),
+                    observed_at: event.record_time,
+                });
+            }
+        }
         state
+    }
+
+    /// Append without rewriting earlier events.
+    pub fn append_event(&mut self, event: LedgerEvent) {
+        self.events.push(event);
     }
 }
 
@@ -161,6 +191,7 @@ impl Default for SourceManifest {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::time::{Instant, Interval};
     use crate::value::Value;
 
     #[test]
@@ -189,5 +220,53 @@ mod tests {
             case.evidence[0].value,
             Value::String("certificate-1".into())
         );
+    }
+
+    #[test]
+    fn determination_without_recorded_at_deserializes() {
+        let json = serde_json::json!({
+            "issue": "Incapacitated",
+            "protocol": "PhysicianCertificate",
+            "established": true,
+            "decider": "court"
+        });
+        let det: CaseDetermination = serde_json::from_value(json).unwrap();
+        assert_eq!(det.issue, "Incapacitated");
+        assert!(det.recorded_at.is_none());
+    }
+
+    #[test]
+    fn into_state_projects_evidence_and_evidence_events() {
+        let observed = Instant::parse("2026-08-23T12:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.evidence.push(EvidenceItem {
+            schema: "PhysicianCertificate".into(),
+            value: Value::String("certificate-1".into()),
+            observed_at: observed,
+        });
+        let first = LedgerEvent {
+            kind: "evidence".into(),
+            valid_time: Interval::always(),
+            record_time: observed,
+            payload: Value::String("event-1".into()),
+        };
+        let second = LedgerEvent {
+            kind: "duty".into(),
+            valid_time: Interval::always(),
+            record_time: observed,
+            payload: Value::String("duty-1".into()),
+        };
+        case.append_event(first.clone());
+        case.append_event(second.clone());
+        assert_eq!(case.events[0], first);
+        let state = case.into_state();
+        assert_eq!(state.record.items.len(), 2);
+        assert_eq!(state.record.items[0].schema, "PhysicianCertificate");
+        assert_eq!(
+            state.record.items[0].value,
+            Value::String("certificate-1".into())
+        );
+        assert_eq!(state.record.items[1].schema, "evidence");
+        assert_eq!(state.record.items[1].value, Value::String("event-1".into()));
     }
 }

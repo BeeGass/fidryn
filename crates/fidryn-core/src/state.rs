@@ -79,6 +79,24 @@ pub struct PositionLedger {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AuthorityLedger {
     pub occupancy: Vec<Occupancy>,
+    #[serde(default)]
+    pub grants: Vec<AuthorityGrant>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorityGrant {
+    pub action: String,
+    pub scope: String,
+    pub context: String,
+    pub valid_time: Interval,
+    pub source: String,
+}
+
+impl AuthorityGrant {
+    pub fn covers(&self, action: &str, at: Instant) -> bool {
+        self.action == action && self.valid_time.contains(at)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -138,4 +156,26 @@ pub struct InterpretationLedger {
 pub struct SourceLedger {
     pub snapshot: String,
     pub artifacts: BTreeMap<String, String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::time::Instant;
+
+    #[test]
+    fn grant_covers_matching_action_inside_interval() {
+        let start = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let end = Instant::parse("2034-01-01T00:00:00Z").unwrap();
+        let grant = AuthorityGrant {
+            action: "Administer".into(),
+            scope: "trust".into(),
+            context: "office".into(),
+            valid_time: Interval::from_instants(start, Some(end)).unwrap(),
+            source: "instrument".into(),
+        };
+        assert!(grant.covers("Administer", start));
+        assert!(!grant.covers("Distribute", start));
+        assert!(!grant.covers("Administer", end));
+    }
 }
