@@ -51,7 +51,7 @@ fn run_parses_provision_arg() {
         Command::Run { args, .. } => {
             assert_eq!(args, vec!["provision=ChildSupportWaiver"]);
             let mut case = CaseRecord::default();
-            apply_run_args(&mut case, &args);
+            apply_run_args(&mut case, &args).expect("arg");
             assert_eq!(
                 case.facts.get("provision"),
                 Some(&Value::String("ChildSupportWaiver".into()))
@@ -230,4 +230,35 @@ module Examples.T version "0.1.0" {
         b.get("q"),
         "changing Evaluate {{ true }} to false must change the query fingerprint"
     );
+}
+
+#[test]
+fn function_body_true_vs_false_changes_snapshot() {
+    let src_true = r#"
+module Examples.T version "0.1.0" {
+    fn f() -> Bool { true }
+    query q() -> Bool { return f() }
+}
+"#;
+    let src_false = r#"
+module Examples.T version "0.1.0" {
+    fn f() -> Bool { false }
+    query q() -> Bool { return f() }
+}
+"#;
+    let module_true = compile_source(src_true, &SourceManifest::default()).expect("compile true");
+    let module_false =
+        compile_source(src_false, &SourceManifest::default()).expect("compile false");
+    let a = snapshot_names_from_module(&module_true);
+    let b = snapshot_names_from_module(&module_false);
+    assert_ne!(a, b, "f(){{true}} vs f(){{false}} must differ");
+    assert_ne!(a.get("f"), b.get("f"));
+}
+
+#[test]
+fn apply_run_args_rejects_binding_without_equals() {
+    let mut case = CaseRecord::default();
+    let err = apply_run_args(&mut case, &["orphan".into()]).expect_err("missing =");
+    assert!(err.contains("KEY=VALUE"), "{err}");
+    assert!(case.facts.is_empty());
 }

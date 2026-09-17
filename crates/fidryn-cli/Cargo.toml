@@ -18,12 +18,8 @@ name = "fidryn"
 path = "src/main.rs"
 
 [dev-dependencies]
-fidryn-eval.workspace = true
-fidryn-handlers.workspace = true
-fidryn-kernel.workspace = true
 http-body-util = "0.1.3"
-pretty_assertions = "1.4.1"
-tower = { workspace = true }
+tower.workspace = true
 
 [dependencies]
 anyhow.workspace = true

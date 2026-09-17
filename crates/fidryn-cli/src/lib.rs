@@ -58,7 +58,7 @@ pub enum Command {
         /// ISO 8601 / RFC 3339 record time (`Z` or a numeric offset)
         #[arg(long = "known-at")]
         known_at: String,
-        /// Set a case fact (`provision=...` writes `case.facts["provision"]`).
+        /// Write a case fact (`KEY=VALUE` sets `case.facts[KEY]`). Missing `=` is an error.
         #[arg(long = "arg", value_name = "KEY=VALUE")]
         args: Vec<String>,
         /// Evaluate with case assumptions as a scenario overlay.
@@ -191,15 +191,22 @@ pub fn parse_instant(text: &str) -> Result<Instant, TimeError> {
     }
 }
 
-/// Apply `--arg key=value` bindings to case facts. `provision=...` sets
+/// Apply `--arg KEY=VALUE` bindings to case facts. `provision=...` sets
 /// `case.facts["provision"]`. This does not select an interpretation or
-/// otherwise choose a completion.
-pub fn apply_run_args(case: &mut CaseRecord, args: &[String]) {
+/// otherwise choose a completion. A binding without `=` is an error.
+pub fn apply_run_args(case: &mut CaseRecord, args: &[String]) -> Result<(), String> {
     for a in args {
-        if let Some((k, v)) = a.split_once('=') {
-            case.facts.insert(k.to_owned(), Value::String(v.to_owned()));
+        let Some((k, v)) = a.split_once('=') else {
+            return Err(format!(
+                "--arg `{a}` must be KEY=VALUE (writes case.facts[KEY])"
+            ));
+        };
+        if k.is_empty() {
+            return Err("--arg KEY=VALUE requires a nonempty KEY".into());
         }
+        case.facts.insert(k.to_owned(), Value::String(v.to_owned()));
     }
+    Ok(())
 }
 
 /// Parse, elaborate, and check a module from source text.
@@ -536,7 +543,10 @@ fn cmd_run(
     let Ok(mut case) = load_case(case_path) else {
         return ExitCode::from(1);
     };
-    apply_run_args(&mut case, args);
+    if let Err(err) = apply_run_args(&mut case, args) {
+        eprintln!("{err}");
+        return ExitCode::from(1);
+    }
     let Ok(valid) = instant_or_exit("--valid-at", valid_at) else {
         return ExitCode::from(1);
     };
@@ -864,33 +874,56 @@ impl SnapshotDiff {
     }
 }
 
-/// Names and fingerprints from a compiled module (module name, queries, rules).
+/// Names and fingerprints from a compiled module.
 ///
+/// The module fingerprint includes rules, functions, duties, and nominations.
 /// Query fingerprints serialize the whole [`fidryn_core::CoreQuery`], including
-/// `plan` / body. Rule fingerprints serialize [`CoreDecl::Rule`] so a
-/// body-only rule change affects the module snapshot.
+/// `plan` / body. A function-body-only change (`f(){true}` vs `f(){false}`
+/// with the same `return f()` query) must change the snapshot.
 pub fn snapshot_names_from_module(module: &CoreModule) -> BTreeMap<String, String> {
     let mut names = BTreeMap::new();
-    let rules: Vec<&fidryn_core::CoreRule> = module
-        .declarations
-        .iter()
-        .filter_map(|decl| match decl {
-            CoreDecl::Rule(rule) => Some(rule),
-            _ => None,
-        })
-        .collect();
+    let mut functions = Vec::new();
+    let mut duties = Vec::new();
+    let mut rules = Vec::new();
+    for decl in &module.declarations {
+        match decl {
+            CoreDecl::Function(function) => functions.push(function),
+            CoreDecl::Duty(duty) => duties.push(duty),
+            CoreDecl::Rule(rule) => rules.push(rule),
+            _ => {}
+        }
+    }
     let module_fp = canonical_json(&serde_json::json!({
         "name": module.name,
         "version": module.version,
         "outside_scope": module.outside_scope,
         "rules": rules,
+        "functions": functions,
+        "duties": duties,
+        "nominations": module.nominations,
     }))
     .expect("canonical json");
     names.insert(module.name.clone(), module_fp);
+    for function in &functions {
+        names
+            .entry(function.name.clone())
+            .or_insert_with(|| canonical_json(function).expect("canonical json"));
+    }
+    for duty in &duties {
+        names
+            .entry(duty.name.clone())
+            .or_insert_with(|| canonical_json(duty).expect("canonical json"));
+    }
     for rule in &rules {
         names
             .entry(rule.name.clone())
             .or_insert_with(|| canonical_json(rule).expect("canonical json"));
+    }
+    for nomination in &module.nominations {
+        let key = format!("nomination:{}:{}", nomination.office, nomination.candidate);
+        names
+            .entry(key)
+            .or_insert_with(|| canonical_json(nomination).expect("canonical json"));
     }
     for query in &module.queries {
         names.insert(
@@ -1121,7 +1154,8 @@ fn load_diff_input(path: &Path, query: &str) -> Result<DiffInput, ExitCode> {
 mod tests {
     use super::*;
     use fidryn_core::{
-        Assumption, CoreRule, ExecutionMode, Guard, NodeId, QueryPlan, RuleKind, Term,
+        Assumption, CoreNomination, CoreRule, ExecutionMode, Guard, NodeId, QueryPlan, RuleKind,
+        Term,
     };
     use serde_json::json;
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -1613,6 +1647,101 @@ module Examples.T version "0.1.0" {
             "module snapshot must include rule bodies"
         );
         assert_ne!(before.get("R"), after.get("R"));
+    }
+
+    #[test]
+    fn function_body_change_changes_snapshot_with_same_query() {
+        let src_true = r#"
+module Examples.T version "0.1.0" {
+    fn f() -> Bool { true }
+    query q() -> Bool { return f() }
+}
+"#;
+        let src_false = r#"
+module Examples.T version "0.1.0" {
+    fn f() -> Bool { false }
+    query q() -> Bool { return f() }
+}
+"#;
+        let module_true =
+            compile_source(src_true, &SourceManifest::default()).expect("compile true");
+        let module_false =
+            compile_source(src_false, &SourceManifest::default()).expect("compile false");
+        let a = snapshot_names_from_module(&module_true);
+        let b = snapshot_names_from_module(&module_false);
+        assert_ne!(
+            a, b,
+            "f(){{true}} vs f(){{false}} with the same return f() query must differ"
+        );
+        assert_ne!(
+            a.get("f"),
+            b.get("f"),
+            "function fingerprint must include the body"
+        );
+        assert_ne!(
+            a.get("Examples.T"),
+            b.get("Examples.T"),
+            "module snapshot must include function bodies"
+        );
+    }
+
+    #[test]
+    fn duty_and_nomination_changes_change_module_snapshot() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        content USD(100.00)
+    }
+    query q() -> Bool { goal Evaluate { true } }
+}
+"#;
+        let mut module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let before = snapshot_names_from_module(&module);
+        assert!(before.contains_key("PayInvoice"), "{before:?}");
+        if let Some(CoreDecl::Duty(duty)) = module
+            .declarations
+            .iter_mut()
+            .find(|decl| matches!(decl, CoreDecl::Duty(_)))
+        {
+            duty.content.clear();
+        }
+        let after_duty = snapshot_names_from_module(&module);
+        assert_ne!(
+            before.get("PayInvoice"),
+            after_duty.get("PayInvoice"),
+            "duty fingerprint must include content"
+        );
+        assert_ne!(before.get("Examples.T"), after_duty.get("Examples.T"));
+        module.nominations.push(CoreNomination {
+            candidate: "Alice".into(),
+            office: "Trustee".into(),
+            rank: 1,
+        });
+        let after_nom = snapshot_names_from_module(&module);
+        assert_ne!(
+            after_duty.get("Examples.T"),
+            after_nom.get("Examples.T"),
+            "module snapshot must include nominations"
+        );
+        assert!(after_nom.contains_key("nomination:Trustee:Alice"));
+    }
+
+    #[test]
+    fn apply_run_args_writes_facts_and_rejects_missing_equals() {
+        let mut case = CaseRecord::default();
+        apply_run_args(&mut case, &["provision=ChildSupportWaiver".into()]).expect("arg");
+        assert_eq!(
+            case.facts.get("provision"),
+            Some(&Value::String("ChildSupportWaiver".into()))
+        );
+        let err = apply_run_args(&mut case, &["not-a-binding".into()]).expect_err("missing =");
+        assert!(err.contains("KEY=VALUE"), "{err}");
+        let err = apply_run_args(&mut case, &["=value".into()]).expect_err("empty key");
+        assert!(err.contains("nonempty KEY"), "{err}");
     }
 
     #[test]

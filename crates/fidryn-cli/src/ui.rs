@@ -38,20 +38,25 @@ fn mill_state() -> MillState {
 }
 
 /// Run compile/eval off the async worker. At most [`MILL_CPU_SLOTS`] CPU
-/// tasks run at once.
+/// tasks run at once. The owned semaphore permit is held inside the
+/// blocking task so a cancelled request does not release the slot early.
 async fn mill_cpu<T, F>(state: &MillState, work: F) -> Result<T, String>
 where
     T: Send + 'static,
     F: FnOnce() -> T + Send + 'static,
 {
-    let _permit = state
+    let permit = state
         .cpu_slots
-        .acquire()
+        .clone()
+        .acquire_owned()
         .await
         .map_err(|err| format!("mill cpu slots closed: {err}"))?;
-    tokio::task::spawn_blocking(work)
-        .await
-        .map_err(|err| format!("mill worker: {err}"))
+    tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        work()
+    })
+    .await
+    .map_err(|err| format!("mill worker: {err}"))
 }
 
 /// Axum router used by `fidryn ui` and the HTTP tests.
@@ -697,9 +702,10 @@ module Examples.T version "0.1.0" {
         let mut operative_body = eval_body();
         operative_body["source"] = serde_json::json!(flag_src());
         let (op_status, op_json) = post_json("/api/explore", operative_body).await;
-        assert_eq!(op_status, StatusCode::OK, "{op_json}");
-        assert_outcome_document(&op_json, "q");
-        assert_ne!(outcome_bool(&op_json), Some(true), "{op_json}");
+        assert_eq!(op_status, StatusCode::BAD_REQUEST, "{op_json}");
+        assert_eq!(op_json["kind"], "engineError", "{op_json}");
+        assert_eq!(op_json["ok"], false, "{op_json}");
+        assert_ne!(op_json["outcome"]["kind"], "determinate", "{op_json}");
 
         let mut scenario_body = eval_body();
         scenario_body["source"] = serde_json::json!(flag_src());
@@ -780,6 +786,19 @@ module Examples.T version "0.1.0" {
         assert_eq!(json["kind"], "engineError", "{json}");
         assert_eq!(json["error"], "UnknownQuery", "{json}");
         assert_ne!(json["outcome"]["kind"], "inconsistent", "{json}");
+    }
+
+    #[tokio::test]
+    async fn explore_unknown_query_is_engine_error_not_incomplete() {
+        let mut body = eval_body();
+        body["query"] = serde_json::json!("no_such_query");
+        let (status, json) = post_json("/api/explore", body).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "{json}");
+        assert_eq!(json["kind"], "engineError", "{json}");
+        assert_eq!(json["error"], "UnknownQuery", "{json}");
+        assert_ne!(json["outcome"]["kind"], "inconsistent", "{json}");
+        assert_ne!(json["outcome"]["kind"], "suspended", "{json}");
+        assert_eq!(json["ok"], false, "{json}");
     }
 
     #[tokio::test]
