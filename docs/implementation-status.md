@@ -27,8 +27,10 @@ does not generate proofs. Branch evaluation (`check_branches` /
 `accept_covering_eval`) is **in progress** until named kernel or
 domains tests exist. A claims digest is not covering. Artifact-byte
 authentication is landed in `fidryn-check` with an explicit
-`source_root`; CLI `Driver::check_path` does not yet pass
-`check_with_sources(..., Some(parent_dir))`.
+`source_root`. CLI `Driver::check_path` passes the module parent directory
+into `check_cached` / `check_with_sources` so hex import digests are
+byte-authenticated against artifact files next to the module. Mill /
+`check_source` still uses `source_root = None` (unauthenticated paste).
 
 `fidryn-kernel` is the covering-check boundary. Proof search lives in
 `fidryn-verify` / `fidryn-solve`. A `fixture` digest is
@@ -189,11 +191,13 @@ values stay disjoint (`Value::Prop` ≠ `Value::Bool`).
 `binding | controlling | persuasive | explanatory`. The JSON checker
 validates document shape. It does not authenticate artifacts.
 
-**Mill outcome envelope.** Mill stays on `127.0.0.1`. `/api/run` and
-`/api/explore` must serialize outcomes with camelCase fields, hex
-trace/certificate ids, and internally tagged `Value`. The HTTP wrapper
-`{ok, outcome, error}` is transport. The legal document is
-`fidryn.outcome/v0.1` (CLI `render_outcome`), including `modelBoundary`.
+**Mill / CLI evaluation-report envelope.** Mill stays on `127.0.0.1`.
+`/api/run` and `/api/explore` return `{ok: true, report: <evaluation-report>}`
+(or an error wrapper). CLI `run` / `explore` print the same report via
+`render_report`: top-level `fidryn.evaluation-report/v0.1` with nested
+`outcomeDocument` of schema `fidryn.outcome/v0.1` (camelCase fields, hex
+trace/certificate ids, internally tagged `Value`, including
+`modelBoundary`).
 
 **Filing adapter states.** `DryRun` / `Submitted` / `Rejected`. Live HTTP
 requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`. A transport receipt
@@ -250,8 +254,8 @@ open-world proofs are not done.
   not proof generation. `check_branches` re-evaluates claimed worlds;
   named tests for that path are not landed. A digest is not covering.
 - Import `"fixture"` is `TrustProfile::Fixture`, never byte-verified.
-  CLI `check_path` does not pass the parent directory into
-  `check_with_sources`.
+  CLI `check_path` does pass the module parent as `source_root` into
+  `check_with_sources` for hex digests; mill paste does not.
 - Surface duty: `duty PayInvoice` lowers to `CoreDuty`; query
   `obligation_status` is `duty_status(PayInvoice)` in
   `tests/programs/late-payment.fr` and `late-payment-extended.fr`
