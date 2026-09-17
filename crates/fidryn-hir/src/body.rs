@@ -1309,6 +1309,45 @@ mod tests {
     }
 
     #[test]
+    fn parse_expr_mul_tighter_than_add() {
+        match parse_expr_src("1 + 2 * 3") {
+            Some(Term::Apply { ctor, args }) if ctor == "+" => {
+                assert_eq!(args[0], Term::Int(1));
+                match &args[1] {
+                    Term::Apply { ctor, args } if ctor == "*" => {
+                        assert_eq!(args[0], Term::Int(2));
+                        assert_eq!(args[1], Term::Int(3));
+                    }
+                    other => panic!("{other:?}"),
+                }
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parse_expr_subtraction_is_left_associative() {
+        match parse_expr_src("1 - 2 - 3") {
+            Some(Term::Apply { ctor, args }) if ctor == "-" => {
+                match &args[0] {
+                    Term::Apply { ctor, args: inner } if ctor == "-" => {
+                        assert_eq!(inner[0], Term::Int(1));
+                        assert_eq!(inner[1], Term::Int(2));
+                    }
+                    other => panic!("{other:?}"),
+                }
+                assert_eq!(args[1], Term::Int(3));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn parse_expr_malformed_add_is_none() {
+        assert_eq!(parse_expr_src("1 +"), None);
+    }
+
+    #[test]
     fn parse_evaluate_true() {
         let body = parse_query_body("query q() -> Bool { goal Evaluate { true } }");
         assert!(

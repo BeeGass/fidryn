@@ -29,7 +29,8 @@ pub struct HirModule {
     pub queries: BTreeMap<String, HirQuery>,
     pub rules: Vec<HirRule>,
     pub nominations: Vec<HirNomination>,
-    pub interpretation_families: BTreeMap<String, Vec<String>>,
+    pub interpretation_families: BTreeMap<String, InterpretationAlts>,
+    pub decisions: Vec<HirDecision>,
     pub conflict_doctrines: Vec<HirDoctrine>,
     pub clauses: BTreeMap<String, String>,
     pub imports: Vec<HirImport>,
@@ -74,11 +75,21 @@ pub struct HirRule {
     pub consequences: Vec<(String, PropTerm)>,
 }
 
+pub type EligibilityDef = (PropTerm, bool);
+pub type InterpretationAlts = Vec<(String, Vec<EligibilityDef>)>;
+
 #[derive(Clone, Debug)]
 pub struct HirNomination {
     pub candidate: String,
     pub office: String,
     pub rank: i64,
+}
+
+#[derive(Clone, Debug)]
+pub struct HirDecision {
+    pub name: String,
+    pub requirements: Vec<String>,
+    pub result: Option<Term>,
 }
 
 #[derive(Clone, Debug)]
@@ -161,6 +172,7 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         rules: Vec::new(),
         nominations: Vec::new(),
         interpretation_families: BTreeMap::new(),
+        decisions: Vec::new(),
         conflict_doctrines: Vec::new(),
         clauses: BTreeMap::new(),
         imports: Vec::new(),
@@ -349,8 +361,15 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Interpretation(d) => {
                 let name = d.name.clone().unwrap_or_default();
-                let alts = extract_alternatives(&d.source);
+                let alts = extract_alternative_defs(&d.source);
                 hir.interpretation_families.insert(name, alts);
+            }
+            fidryn_syntax::ast::Item::Decision(d) => {
+                hir.decisions.push(HirDecision {
+                    name: d.name.clone().unwrap_or_default(),
+                    requirements: extract_record_requires(&d.source),
+                    result: extract_returns(&d.source),
+                });
             }
             fidryn_syntax::ast::Item::ConflictDoctrine(d) => {
                 hir.conflict_doctrines.push(HirDoctrine {
@@ -447,17 +466,82 @@ fn extract_office(src: &str) -> String {
         .unwrap_or_default()
 }
 
+#[allow(dead_code)]
 fn extract_alternatives(src: &str) -> Vec<String> {
+    extract_alternative_defs(src)
+        .into_iter()
+        .map(|(name, _)| name)
+        .collect()
+}
+
+fn extract_alternative_defs(src: &str) -> InterpretationAlts {
     let mut out = Vec::new();
-    for part in src.split("alternative ") {
-        if part == src {
+    for (i, part) in src.split("alternative ").enumerate() {
+        if i == 0 {
             continue;
         }
-        if let Some(name) = part.split_whitespace().next() {
-            out.push(name.to_owned());
+        let name = part
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .trim_matches('{')
+            .to_owned();
+        if name.is_empty() {
+            continue;
+        }
+        let mut defs = Vec::new();
+        let mut rest = part;
+        while let Some(idx) = rest.find("defines ") {
+            rest = &rest[idx + "defines ".len()..];
+            let stmt_end = rest.find("defines ").unwrap_or(rest.len());
+            let stmt = &rest[..stmt_end];
+            if let Some(end) = stmt.find(" as not_established") {
+                let expr = stmt[..end].trim();
+                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
+                {
+                    defs.push((prop, false));
+                }
+            } else if let Some(end) = stmt.find(" as established") {
+                let expr = stmt[..end].trim();
+                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
+                {
+                    defs.push((prop, true));
+                }
+            }
+            rest = &rest[stmt_end..];
+        }
+        out.push((name, defs));
+    }
+    out
+}
+
+fn extract_record_requires(src: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = src;
+    while let Some(idx) = rest.find("record requires ") {
+        rest = &rest[idx + "record requires ".len()..];
+        let name: String = rest
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+            .collect();
+        if !name.is_empty() && !out.contains(&name) {
+            out.push(name);
         }
     }
     out
+}
+
+fn extract_returns(src: &str) -> Option<Term> {
+    let rest = src.split("returns ").nth(1)?.trim();
+    let token: String = rest
+        .chars()
+        .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+        .collect();
+    if token.is_empty() {
+        None
+    } else {
+        Some(Term::Ident(token))
+    }
 }
 
 fn extract_fuel(src: &str) -> Option<u32> {
@@ -954,6 +1038,63 @@ module Examples.Rule version "0.1.0" {
         assert!(!hir.rules[0].consequences.is_empty());
         assert_eq!(hir.rules[0].consequences[0].0, "derive");
         assert_eq!(hir.rules[0].consequences[0].1.predicate, "Q");
+    }
+
+    #[test]
+    fn elaborates_interpretation_defines_not_just_labels() {
+        let src = r#"
+module Examples.Interp version "0.1.0" {
+    interpretation_family SuccessorEligibility {
+        alternative Both {
+            defines Eligible(Alice, TrusteeOf(BRT)) as established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+            defines Eligible(Carol, TrusteeOf(BRT)) as not_established
+        }
+        alternative BobOnly {
+            defines Eligible(Alice, TrusteeOf(BRT)) as not_established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+        }
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let alts = &hir.interpretation_families["SuccessorEligibility"];
+        assert_eq!(alts.len(), 2, "{alts:?}");
+        assert_eq!(alts[0].0, "Both");
+        assert_eq!(alts[0].1.len(), 3, "{:?}", alts[0].1);
+        assert!(
+            alts[0].1.iter().any(|(prop, established)| *established
+                && prop
+                    .arguments
+                    .iter()
+                    .any(|a| matches!(a, Term::Ident(n) if n == "Alice"))),
+            "{:?}",
+            alts[0].1
+        );
+        assert!(
+            alts[0].1.iter().any(|(prop, established)| !established
+                && prop
+                    .arguments
+                    .iter()
+                    .any(|a| matches!(a, Term::Ident(n) if n == "Carol"))),
+            "{:?}",
+            alts[0].1
+        );
+        assert_eq!(alts[1].0, "BobOnly");
+        assert!(
+            alts[1]
+                .1
+                .iter()
+                .any(|(prop, established)| prop.predicate == "Eligible"
+                    && !established
+                    && prop
+                        .arguments
+                        .iter()
+                        .any(|a| matches!(a, Term::Ident(n) if n == "Alice"))),
+            "{:?}",
+            alts[1].1
+        );
     }
 
     #[test]
