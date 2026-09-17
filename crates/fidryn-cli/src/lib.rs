@@ -6,14 +6,16 @@ use clap::{Parser, Subcommand};
 use fidryn_adapt::{DryRun, FilingAdapter, MassachusettsCorporations};
 use fidryn_check::check;
 use fidryn_core::{
-    AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode, Instant,
-    Outcome, QueryName, RunContext, SourceManifest, TimeError, TraceId, Value, canonical_json,
+    AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode,
+    EvaluationReport, ExecutionMode, Instant, Outcome, QueryName, RunContext, SourceManifest,
+    TimeError, TraceId, Value, canonical_json,
 };
 use fidryn_hir::elaborate;
 use fidryn_render::{module_vars, render};
 use fidryn_syntax::ast::{HeaderKind, Item};
 use fidryn_syntax::{format_module, parse_file};
-use fidryn_trace::{explain, explain_value, render_outcome};
+pub(crate) use fidryn_trace::render_report;
+use fidryn_trace::{explain, explain_value};
 use fidryn_verify::{explore_query, verify_property};
 use serde::Serialize;
 use std::cell::RefCell;
@@ -59,6 +61,9 @@ pub enum Command {
         /// Set a case fact (`provision=...` writes `case.facts["provision"]`).
         #[arg(long = "arg", value_name = "KEY=VALUE")]
         args: Vec<String>,
+        /// Evaluate with case assumptions as a scenario overlay.
+        #[arg(long)]
+        scenario: bool,
     },
     /// Explore a query under explicit finite bounds.
     Explore {
@@ -131,7 +136,8 @@ pub fn run(cli: Cli) -> ExitCode {
             valid_at,
             known_at,
             args,
-        } => cmd_run(&path, &query, &case, &valid_at, &known_at, &args),
+            scenario,
+        } => cmd_run(&path, &query, &case, &valid_at, &known_at, &args, scenario),
         Command::Explore {
             path,
             query,
@@ -242,7 +248,7 @@ impl fmt::Display for EngineFailure {
 }
 
 impl EngineFailure {
-    fn from_err<E: fmt::Display + fmt::Debug>(err: E) -> Self {
+    pub(crate) fn from_err<E: fmt::Display + fmt::Debug>(err: E) -> Self {
         let debug = format!("{err:?}");
         Self {
             kind: engine_error_kind(&debug).to_owned(),
@@ -485,6 +491,17 @@ fn cmd_check(path: &Path) -> ExitCode {
     }
 }
 
+/// Copy nonempty `case.assumptions` onto the evaluation-report envelope.
+///
+/// Explore keeps the verify-stream outcome and the same report schema as
+/// `run`. Nonempty assumptions are `executionMode: scenario`.
+pub(crate) fn apply_scenario_envelope(report: &mut EvaluationReport, case: &CaseRecord) {
+    if !case.assumptions.is_empty() {
+        report.execution_mode = ExecutionMode::Scenario;
+        report.assumptions = case.assumptions.clone();
+    }
+}
+
 fn cmd_run(
     path: &Path,
     query: &str,
@@ -492,6 +509,7 @@ fn cmd_run(
     valid_at: &str,
     known_at: &str,
     args: &[String],
+    scenario: bool,
 ) -> ExitCode {
     let Ok((module, _)) = compile_or_exit(path) else {
         return ExitCode::from(1);
@@ -507,24 +525,29 @@ fn cmd_run(
         return ExitCode::from(1);
     };
     let ctx = RunContext::new(valid, known);
-    let report =
-        match DRIVER.with(|driver| driver.borrow_mut().run_report(&module, query, &case, &ctx)) {
-            Ok(report) => report,
-            Err(err) => {
-                eprintln!("{}", EngineFailure::from_err(err));
-                return ExitCode::from(1);
-            }
-        };
-    let outcome = report.outcome;
+    let report = match DRIVER.with(|driver| {
+        let mut driver = driver.borrow_mut();
+        if scenario {
+            driver.run_report_scenario(&module, query, &case, &ctx)
+        } else {
+            driver.run_report(&module, query, &case, &ctx)
+        }
+    }) {
+        Ok(report) => report,
+        Err(err) => {
+            eprintln!("{}", EngineFailure::from_err(err));
+            return ExitCode::from(1);
+        }
+    };
     println!(
         "{}",
-        render_outcome(
+        render_report(
             &module,
             &QueryName::from(query),
             valid,
             known,
             &case,
-            &outcome
+            &report
         )
     );
     ExitCode::SUCCESS
@@ -599,15 +622,18 @@ fn cmd_explore(
                 return ExitCode::from(1);
             }
         };
+    let mut report = EvaluationReport::from_outcome(outcome);
+    apply_scenario_envelope(&mut report, &case);
+    report.trust = DRIVER.with(|driver| driver.borrow().source_trust_of(&module));
     println!(
         "{}",
-        render_outcome(
+        render_report(
             &module,
             &QueryName::from(query),
             valid,
             known,
             &case,
-            &outcome
+            &report
         )
     );
     ExitCode::SUCCESS
@@ -875,6 +901,10 @@ fn merge_json_snapshot(
         );
         return;
     };
+    if let Some(nested) = obj.get("outcomeDocument") {
+        merge_json_snapshot(names, nested, query);
+        return;
+    }
     if let Some(module) = obj.get("module").and_then(|m| m.as_str()) {
         let module_fp = canonical_json(&serde_json::json!({
             "module": module,
@@ -960,7 +990,9 @@ fn load_snapshot(path: &Path, query: &str) -> Result<BTreeMap<String, String>, E
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::{CoreRule, Guard, NodeId, QueryPlan, RuleKind, Term};
+    use fidryn_core::{
+        Assumption, CoreRule, ExecutionMode, Guard, NodeId, QueryPlan, RuleKind, Term,
+    };
     use serde_json::json;
     use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -1029,6 +1061,187 @@ mod tests {
         assert!(diff.changed.contains(&"acting_trustee".to_string()));
         assert!(diff.added.is_empty());
         assert!(diff.removed.is_empty());
+    }
+
+    #[test]
+    fn snapshot_from_evaluation_report_json_uses_outcome_document() {
+        let v = json!({
+            "schema": "fidryn.evaluation-report/v0.1",
+            "executionMode": "operative",
+            "sourceTrust": "unauthenticated",
+            "outcomeDocument": {
+                "schema": "fidryn.outcome/v0.1",
+                "module": "Examples.T@0.1.0",
+                "query": "acting_trustee",
+                "outcome": {"kind": "determinate", "trace": "aa"}
+            }
+        });
+        let names = snapshot_names_from_json(&v, "acting_trustee");
+        assert!(names.contains_key("Examples.T@0.1.0"));
+        assert!(names.contains_key("acting_trustee"));
+        let other = json!({
+            "schema": "fidryn.evaluation-report/v0.1",
+            "outcomeDocument": {
+                "schema": "fidryn.outcome/v0.1",
+                "module": "Examples.T@0.1.0",
+                "query": "acting_trustee",
+                "outcome": {"kind": "suspended", "trace": "bb"}
+            }
+        });
+        let diff = SnapshotDiff::from_maps(
+            &snapshot_names_from_json(&v, "acting_trustee"),
+            &snapshot_names_from_json(&other, "acting_trustee"),
+        );
+        assert!(diff.changed.contains(&"acting_trustee".to_string()));
+    }
+
+    #[test]
+    fn render_report_uses_evaluation_report_schema() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let case = CaseRecord::default();
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let report = DRIVER
+            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .expect("report");
+        let text = render_report(&module, &QueryName::from("q"), t, t, &case, &report);
+        let json: serde_json::Value = serde_json::from_str(&text).expect("report json");
+        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(
+            json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
+            "{json}"
+        );
+        assert_eq!(json["executionMode"], "operative", "{json}");
+        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        assert_eq!(json["verificationMethod"], "none", "{json}");
+        assert!(json["assumptions"].as_array().unwrap().is_empty(), "{json}");
+        assert!(json["coverage"].is_null(), "{json}");
+        assert_eq!(json["outcomeDocument"]["query"], "q", "{json}");
+        assert!(
+            json["outcomeDocument"]["outcome"]["kind"].is_string(),
+            "{json}"
+        );
+        assert!(!text.contains(' '));
+    }
+
+    #[test]
+    fn run_parses_scenario_flag() {
+        let with_flag = Cli::try_parse_from([
+            "fidryn",
+            "run",
+            "mod.fr",
+            "--query",
+            "q",
+            "--case",
+            "case.json",
+            "--valid-at",
+            "2033-01-01T00:00:00Z",
+            "--known-at",
+            "2033-01-01T00:00:00Z",
+            "--scenario",
+        ])
+        .expect("parse --scenario");
+        match with_flag.command {
+            Command::Run { scenario, .. } => assert!(scenario),
+            other => panic!("expected run, got {other:?}"),
+        }
+        let without = Cli::try_parse_from([
+            "fidryn",
+            "run",
+            "mod.fr",
+            "--query",
+            "q",
+            "--case",
+            "case.json",
+            "--valid-at",
+            "2033-01-01T00:00:00Z",
+            "--known-at",
+            "2033-01-01T00:00:00Z",
+        ])
+        .expect("parse run");
+        match without.command {
+            Command::Run { scenario, .. } => assert!(!scenario),
+            other => panic!("expected run, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn run_report_with_assumptions_renders_scenario_envelope() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-1".into(),
+            payload: Value::Bool(true),
+        });
+        let events_before = case.events.clone();
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let report = DRIVER
+            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .expect("report");
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(report.assumptions, case.assumptions);
+        assert_eq!(case.events, events_before);
+        let text = render_report(&module, &QueryName::from("q"), t, t, &case, &report);
+        let json: serde_json::Value = serde_json::from_str(&text).expect("report json");
+        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(
+            json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
+            "{json}"
+        );
+        assert_eq!(json["executionMode"], "scenario", "{json}");
+        assert_eq!(json["assumptions"][0]["id"], "hyp-1", "{json}");
+        assert_eq!(json["assumptions"][0]["payload"], true, "{json}");
+    }
+
+    #[test]
+    fn explore_report_copies_case_assumptions() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let mut case = CaseRecord::default();
+        case.assumptions.push(Assumption {
+            id: "hyp-explore".into(),
+            payload: Value::Bool(true),
+        });
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let outcome = explore_query(&module, &QueryName::from("q"), &case, &ctx)
+            .into_eval_outcome()
+            .expect("explore");
+        let mut report = EvaluationReport::from_outcome(outcome);
+        apply_scenario_envelope(&mut report, &case);
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(report.assumptions.len(), 1);
+        assert_eq!(report.assumptions[0].id, "hyp-explore");
+        let text = render_report(&module, &QueryName::from("q"), t, t, &case, &report);
+        let json: serde_json::Value = serde_json::from_str(&text).expect("report json");
+        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(json["executionMode"], "scenario", "{json}");
+        assert_eq!(json["assumptions"][0]["id"], "hyp-explore", "{json}");
+        assert_eq!(
+            json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
+            "{json}"
+        );
     }
 
     #[test]

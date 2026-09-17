@@ -1,17 +1,20 @@
 //! Local mill: localhost-only web UI. Never live-files.
 
-use crate::{EngineFailure, IntoEvalOutcome, compile_source, merge_bounds_json, parse_instant};
+use crate::{
+    EngineFailure, IntoEvalOutcome, apply_scenario_envelope, compile_source, merge_bounds_json,
+    parse_instant, render_report,
+};
 use axum::Router;
 use axum::extract::Json;
 use axum::http::{StatusCode, header};
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, post};
 use fidryn_core::{
-    CaseRecord, CoreModule, Diagnostic, Instant, QueryName, RunContext, SourceManifest, Value,
+    CaseRecord, CoreModule, Diagnostic, EvaluationReport, Instant, QueryName, RunContext,
+    SourceManifest, TrustProfile,
 };
 use fidryn_driver::Driver;
 use fidryn_render::{module_vars, render};
-use fidryn_trace::render_outcome;
 use fidryn_verify::explore_query;
 use serde::{Deserialize, Serialize};
 use std::io::ErrorKind;
@@ -88,8 +91,19 @@ struct CheckResponse {
     diagnostics: Vec<Diagnostic>,
 }
 
+/// Compile pasted mill source in memory only.
+///
+/// The paste is a standalone in-memory program: no external artifacts are
+/// claimed as verified. `source_root` is not set. Missing hex artifacts are
+/// E200 only on path compile (`Driver::check_path`), not by reading server
+/// paths from pasted source. Never call `check_path` or `fs::read` of
+/// artifact paths from the paste.
+fn mill_compile(source: &str) -> Result<CoreModule, Vec<Diagnostic>> {
+    compile_source(source, &SourceManifest::default())
+}
+
 async fn check(Json(req): Json<CheckRequest>) -> (StatusCode, Json<CheckResponse>) {
-    match compile_source(&req.source, &SourceManifest::default()) {
+    match mill_compile(&req.source) {
         Ok(_) => (
             StatusCode::OK,
             Json(CheckResponse {
@@ -141,6 +155,17 @@ fn parse_case(value: serde_json::Value) -> Result<CaseRecord, String> {
     match value {
         serde_json::Value::Null => Ok(CaseRecord::default()),
         serde_json::Value::Object(map) if map.is_empty() => Ok(CaseRecord::default()),
+        serde_json::Value::Object(map) => {
+            let mut base = serde_json::to_value(CaseRecord::default())
+                .map_err(|e| format!("invalid case: {e}"))?;
+            let Some(obj) = base.as_object_mut() else {
+                return Err("invalid case: default record is not an object".into());
+            };
+            for (k, v) in map {
+                obj.insert(k, v);
+            }
+            serde_json::from_value(base).map_err(|e| format!("invalid case: {e}"))
+        }
         other => serde_json::from_value(other).map_err(|e| format!("invalid case: {e}")),
     }
 }
@@ -177,17 +202,19 @@ fn mill_engine_err(err: &EngineFailure) -> JsonResponse {
     )
 }
 
-/// Same document as `fidryn_trace::render_outcome` (schema, module,
-/// sourceSnapshot, query, asOf, modelBoundary, outcome). `ok` is mill-only.
-fn mill_outcome_doc(
+/// Same document as CLI `render_report` (`fidryn.evaluation-report/v0.1`).
+/// `ok` is mill-only transport metadata on the response object, not a
+/// field of the report schema. Pasted compile is
+/// `sourceTrust: unauthenticated` and is never `byteVerified`.
+fn mill_report_doc(
     module: &CoreModule,
     query: &QueryName,
     valid: Instant,
     known: Instant,
     case: &CaseRecord,
-    outcome: &fidryn_core::Outcome<Value>,
+    report: &EvaluationReport,
 ) -> JsonResponse {
-    let text = render_outcome(module, query, valid, known, case, outcome);
+    let text = render_report(module, query, valid, known, case, report);
     match serde_json::from_str::<serde_json::Value>(&text) {
         Ok(mut value) => {
             if let Some(obj) = value.as_object_mut() {
@@ -204,7 +231,7 @@ fn mill_outcome_doc(
 }
 
 fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
-    let module = match compile_source(&req.source, &SourceManifest::default()) {
+    let module = match mill_compile(&req.source) {
         Ok(module) => module,
         Err(diagnostics) => {
             return mill_err(StatusCode::BAD_REQUEST, "check failed", diagnostics);
@@ -243,22 +270,20 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
     };
     let ctx = RunContext::new(valid, known);
     let query = QueryName::from(req.query.as_str());
-    let outcome = if explore_mode {
+    let mut report = if explore_mode {
         match explore_query(&module, &query, &case, &ctx).into_eval_outcome() {
-            Ok(outcome) => outcome,
+            Ok(outcome) => EvaluationReport::from_outcome(outcome),
             Err(err) => return mill_engine_err(&err),
         }
     } else {
-        match Driver::new()
-            .run_report(&module, query.as_str(), &case, &ctx)
-            .map(|report| report.outcome)
-            .into_eval_outcome()
-        {
-            Ok(outcome) => outcome,
-            Err(err) => return mill_engine_err(&err),
+        match Driver::new().run_report(&module, query.as_str(), &case, &ctx) {
+            Ok(report) => report,
+            Err(err) => return mill_engine_err(&EngineFailure::from_err(err)),
         }
     };
-    mill_outcome_doc(&module, &query, valid, known, &case, &outcome)
+    apply_scenario_envelope(&mut report, &case);
+    report.trust = TrustProfile::Unauthenticated;
+    mill_report_doc(&module, &query, valid, known, &case, &report)
 }
 
 async fn run(Json(req): Json<EvalRequest>) -> JsonResponse {
@@ -270,7 +295,7 @@ async fn explore(Json(req): Json<EvalRequest>) -> JsonResponse {
 }
 
 async fn render_api(Json(req): Json<RenderRequest>) -> (StatusCode, Json<RenderResponse>) {
-    let module = match compile_source(&req.source, &SourceManifest::default()) {
+    let module = match mill_compile(&req.source) {
         Ok(module) => module,
         Err(diagnostics) => {
             let error = diagnostics
@@ -439,23 +464,34 @@ module Examples.T version "0.1.0" {
         })
     }
 
-    fn assert_outcome_document(json: &serde_json::Value, query: &str) {
+    fn assert_report_envelope(json: &serde_json::Value, query: &str, mode: &str) {
         assert_eq!(json["ok"], true, "{json}");
-        assert_eq!(json["schema"], "fidryn.outcome/v0.1", "{json}");
-        assert!(json["module"].is_string(), "{json}");
-        assert!(json["sourceSnapshot"].is_string(), "{json}");
-        assert_eq!(json["query"], query, "{json}");
-        assert!(json["asOf"]["validTime"].is_string(), "{json}");
-        assert!(json["asOf"]["recordTime"].is_string(), "{json}");
-        assert!(json["modelBoundary"].is_object(), "{json}");
-        assert!(json["modelBoundary"]["outsideScope"].is_array(), "{json}");
+        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(json["executionMode"], mode, "{json}");
+        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
+        assert!(json["assumptions"].is_array(), "{json}");
+        assert!(json["verificationMethod"].is_string(), "{json}");
+        let doc = &json["outcomeDocument"];
+        assert_eq!(doc["schema"], "fidryn.outcome/v0.1", "{json}");
+        assert!(doc["module"].is_string(), "{json}");
+        assert!(doc["sourceSnapshot"].is_string(), "{json}");
+        assert_eq!(doc["query"], query, "{json}");
+        assert!(doc["asOf"]["validTime"].is_string(), "{json}");
+        assert!(doc["asOf"]["recordTime"].is_string(), "{json}");
+        assert!(doc["modelBoundary"].is_object(), "{json}");
+        assert!(doc["modelBoundary"]["outsideScope"].is_array(), "{json}");
         assert!(
-            json["modelBoundary"]["admissibleCompletions"].is_object(),
+            doc["modelBoundary"]["admissibleCompletions"].is_object(),
             "{json}"
         );
-        assert!(json["outcome"].is_object(), "{json}");
-        assert!(json["outcome"]["kind"].is_string(), "{json}");
-        assert!(json["outcome"]["trace"].is_string(), "{json}");
+        assert!(doc["outcome"].is_object(), "{json}");
+        assert!(doc["outcome"]["kind"].is_string(), "{json}");
+        assert!(doc["outcome"]["trace"].is_string(), "{json}");
+    }
+
+    fn assert_outcome_document(json: &serde_json::Value, query: &str) {
+        assert_report_envelope(json, query, "operative");
     }
 
     #[tokio::test]
@@ -463,6 +499,63 @@ module Examples.T version "0.1.0" {
         let (status, json) = post_json("/api/run", eval_body()).await;
         assert_eq!(status, StatusCode::OK);
         assert_outcome_document(&json, "q");
+    }
+
+    #[tokio::test]
+    async fn pasted_run_with_assumptions_is_scenario() {
+        let mut body = eval_body();
+        body["case"] = serde_json::json!({
+            "assumptions": [{"id": "hyp-1", "payload": true}]
+        });
+        let (status, json) = post_json("/api/run", body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_report_envelope(&json, "q", "scenario");
+        assert_eq!(json["assumptions"][0]["id"], "hyp-1", "{json}");
+        assert_eq!(json["assumptions"][0]["payload"], true, "{json}");
+        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
+        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(
+            json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
+            "{json}"
+        );
+    }
+
+    #[tokio::test]
+    async fn pasted_explore_with_assumptions_is_scenario() {
+        let mut body = eval_body();
+        body["case"] = serde_json::json!({
+            "assumptions": [{"id": "hyp-explore", "payload": true}]
+        });
+        let (status, json) = post_json("/api/explore", body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_report_envelope(&json, "q", "scenario");
+        assert_eq!(json["assumptions"][0]["id"], "hyp-explore", "{json}");
+        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+    }
+
+    #[tokio::test]
+    async fn pasted_compile_is_not_byte_verified() {
+        let (status, json) = post_json("/api/run", eval_body()).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
+        let hex_src = r#"
+module Examples.T version "0.1.0" {
+    source_manifest "/etc/passwd"
+    import Other.Law version "1" { digest "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+    query q() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let mut body = eval_body();
+        body["source"] = serde_json::json!(hex_src);
+        let (status, json) = post_json("/api/run", body).await;
+        assert_ne!(json["sourceTrust"], "byteVerified", "{status} {json}");
+        if json["ok"] == true {
+            assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        }
     }
 
     #[tokio::test]
