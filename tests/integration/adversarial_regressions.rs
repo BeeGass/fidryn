@@ -1,7 +1,5 @@
 //! Proposed regressions for the 2026-09-17 08:25 source export.
-//! NOT compiled or executed in the review environment (Rust unavailable).
-//! Copy into crates/fidryn-cli/tests/adversarial_regressions.rs.
-//! These assert intended contracts and are expected to expose current defects.
+//! These assert intended contracts. Green tests are regressions, not closure.
 //! No helper repairs compiled Core or weakens assertions on failure.
 
 use fidryn_cli::compile_source;

@@ -15,6 +15,9 @@ members = [
     "crates/fidryn-solve",
     "crates/fidryn-adapt",
     "crates/fidryn-render",
+    "tests",
+    "benches",
+    "xtask",
 ]
 
 [workspace.package]
@@ -39,6 +42,7 @@ fidryn-trace = { path = "crates/fidryn-trace" }
 fidryn-solve = { path = "crates/fidryn-solve" }
 fidryn-adapt = { path = "crates/fidryn-adapt" }
 fidryn-render = { path = "crates/fidryn-render" }
+fidryn-cli = { path = "crates/fidryn-cli" }
 anyhow = "1.0.100"
 axum = { version = "0.8.9", features = ["json"] }
 tokio = { version = "1.47.1", features = ["rt-multi-thread", "macros", "net", "signal", "sync"] }

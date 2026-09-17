@@ -28,3 +28,6 @@ rustflags = [
     "-C",
     "link-arg=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
 ]
+
+[alias]
+xtask = "run --package xtask --"

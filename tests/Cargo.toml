@@ -1,0 +1,35 @@
+[package]
+name = "fidryn-integration-tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Cross-crate Fidryn integration tests"
+publish = false
+autolib = false
+autobins = false
+autoexamples = false
+autobenches = false
+autotests = false
+
+[[test]]
+name = "integration"
+path = "integration/main.rs"
+
+[dev-dependencies]
+axum.workspace = true
+fidryn-cli.workspace = true
+fidryn-core.workspace = true
+fidryn-driver.workspace = true
+fidryn-eval.workspace = true
+fidryn-handlers.workspace = true
+fidryn-kernel.workspace = true
+fidryn-syntax.workspace = true
+fidryn-trace.workspace = true
+fidryn-verify.workspace = true
+http-body-util = "0.1.3"
+serde_json.workspace = true
+tokio.workspace = true
+tower.workspace = true

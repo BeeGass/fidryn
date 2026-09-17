@@ -1,0 +1,27 @@
+[package]
+name = "fidryn-integration-benches"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Cross-crate Fidryn integration benches"
+publish = false
+autolib = false
+autobins = false
+autoexamples = false
+autobenches = false
+autotests = false
+
+[[bench]]
+name = "pipeline"
+path = "integration/pipeline.rs"
+harness = false
+
+[dev-dependencies]
+criterion = "0.8"
+fidryn-cli.workspace = true
+fidryn-core.workspace = true
+fidryn-eval.workspace = true
+fidryn-handlers.workspace = true
