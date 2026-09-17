@@ -1,12 +1,14 @@
 //! Surface AST. Trivia is retained on [`crate::Parse`] tokens; this tree keeps spans.
 
 use fidryn_core::Span;
+use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Module {
     pub span: Span,
     pub name: String,
     pub version: String,
+    pub type_params: Vec<String>,
     pub items: Vec<Item>,
 }
 
@@ -62,6 +64,117 @@ pub struct Decl {
     pub name: Option<String>,
     pub signature: Option<String>,
     pub source: String,
+    pub automatic: bool,
+    pub result_type: Option<String>,
+    pub params: Vec<(String, String)>,
+    pub effects: Vec<String>,
+    pub fuel: Option<u32>,
+    pub expr: Option<Expr>,
+    pub goal: Option<GoalAst>,
+    pub rule_kind: Option<String>,
+    pub guard: Option<Expr>,
+    pub consequences: Vec<ConsequenceAst>,
+    pub fields: BTreeMap<String, String>,
+    pub type_args: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Expr {
+    Bool(bool),
+    Int(i64),
+    Decimal(String),
+    String(String),
+    Ident(String),
+    Apply {
+        callee: Box<Expr>,
+        args: Vec<Expr>,
+    },
+    Binary {
+        op: BinOp,
+        left: Box<Expr>,
+        right: Box<Expr>,
+    },
+    Field {
+        base: Box<Expr>,
+        name: String,
+    },
+    Call {
+        callee: String,
+        args: Vec<Expr>,
+    },
+    If {
+        cond: Box<Expr>,
+        then: Box<Expr>,
+        else_: Option<Box<Expr>>,
+    },
+    Money {
+        currency: String,
+        amount: String,
+    },
+    Duration {
+        n: i64,
+        unit: String,
+    },
+    Block(Vec<Expr>),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BinOp {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    And,
+    Or,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GoalAst {
+    pub kind: String,
+    pub expr: Option<Expr>,
+    pub fields: BTreeMap<String, Expr>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ConsequenceAst {
+    pub verb: String,
+    pub expr: Expr,
+}
+
+impl Decl {
+    pub fn new(
+        span: Span,
+        keyword: impl Into<String>,
+        name: Option<String>,
+        signature: Option<String>,
+        source: String,
+    ) -> Self {
+        Self {
+            span,
+            keyword: keyword.into(),
+            name,
+            signature,
+            source,
+            automatic: false,
+            result_type: None,
+            params: Vec::new(),
+            effects: Vec::new(),
+            fuel: None,
+            expr: None,
+            goal: None,
+            rule_kind: None,
+            guard: None,
+            consequences: Vec::new(),
+            fields: BTreeMap::new(),
+            type_args: Vec::new(),
+        }
+    }
 }
 
 impl Item {

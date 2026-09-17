@@ -2,7 +2,7 @@
 
 File            ::= Module EOF
 
-Module          ::= "module" QName "version" String "{" ModuleItem* "}"
+Module          ::= "module" QName TypeParameters? "version" String "{" ModuleItem* "}"
 
 ModuleItem      ::= HeaderDecl
                   | SourceDecl
@@ -54,7 +54,7 @@ SourceField     ::= "kind" Ident End
                   | "provision_intervals" "from" String End
                   | "amendment" Expr End
 
-ImportDecl      ::= "import" QName "version" Value
+ImportDecl      ::= "import" QName TypeArgs? "version" Value
                     ("{" ImportField* "}")? End
 ImportField     ::= "digest" Expr End
                   | "alias" Ident End

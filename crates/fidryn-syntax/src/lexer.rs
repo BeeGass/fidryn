@@ -253,13 +253,39 @@ impl Iterator for Lexer<'_> {
                 };
                 self.emit(kind, start)
             }
-            _ => self.emit(TokenKind::Error, start),
+            _ => self.lex_error(start),
         };
         Some(tok)
     }
 }
 
 impl Lexer<'_> {
+    fn lex_error(&mut self, start: usize) -> Token {
+        // `bump` advanced one byte; rewind and consume a whole UTF-8 scalar
+        // (and any following non-ASCII ident-like scalars) so token slices
+        // stay on char boundaries.
+        self.pos = start;
+        let rest = &self.src[start..];
+        let Some(ch) = rest.chars().next() else {
+            self.pos = start;
+            return self.emit(TokenKind::Error, start);
+        };
+        self.pos += ch.len_utf8();
+        if ch.is_alphabetic() || ch == '_' {
+            while let Some(c) = self.src[self.pos..].chars().next() {
+                if c.is_ascii() {
+                    break;
+                }
+                if c.is_alphanumeric() || c == '_' {
+                    self.pos += c.len_utf8();
+                } else {
+                    break;
+                }
+            }
+        }
+        self.emit(TokenKind::Error, start)
+    }
+
     fn lex_number(&mut self, start: usize) -> Token {
         while matches!(self.peek(), Some(b'0'..=b'9')) {
             self.bump();
@@ -449,6 +475,32 @@ mod tests {
         );
         assert_eq!(kinds("// line"), vec![TokenKind::Comment]);
         assert_eq!(kinds("/// docs"), vec![TokenKind::DocComment]);
+    }
+
+    #[test]
+    fn non_ascii_error_tokens_are_char_aligned() {
+        for src in ["λ", "Café", "query λx() {}", "日本語"] {
+            let tokens = lex(src);
+            let mut pos = 0u32;
+            for t in &tokens {
+                if t.kind == TokenKind::Eof {
+                    assert_eq!(t.start as usize, src.len(), "{src}");
+                    continue;
+                }
+                assert_eq!(t.start, pos, "{src} gap at {}", t.start);
+                assert!(
+                    src.is_char_boundary(t.start as usize) && src.is_char_boundary(t.end as usize),
+                    "{src} token {:?} not on char boundary",
+                    t.kind
+                );
+                let _ = &src[t.start as usize..t.end as usize];
+                pos = t.end;
+            }
+            assert!(
+                tokens.iter().any(|t| t.kind == TokenKind::Error),
+                "{src} expected an Error token"
+            );
+        }
     }
 
     #[test]
