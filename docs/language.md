@@ -350,6 +350,27 @@ unless an authority grant covers the action, or the event is an
 explicit `assumption`. That gate is in
 [Cases and time](cases-and-time.md).
 
+## Scenarios (in-module)
+
+A `scenario` block names overlay hypotheses for fixtures that do not
+ship companion JSON case files (for example under `examples/states/`).
+It is not a silent default for `run`.
+
+```
+scenario InsideCityHalfAcre {
+    assume OccupiesAsResidence(Owner, Home)
+    assume InsideMunicipality(Home)
+    assume within_urban_acreage(0.5)
+    at 2026-09-17T12:00:00-04:00
+}
+```
+
+Grammar: `ScenarioDecl` in [`grammar.ebnf`](../grammar.ebnf). Case JSON
+can carry analogous overlay rows as `assumptions` (`id`, `payload`);
+CLI `run --scenario` applies them, and the mill treats a nonempty
+`assumptions` list as scenario mode. Default operative `run` does not.
+See [Cases and time](cases-and-time.md) and [CLI](cli.md).
+
 ## Verify
 
 A `verify` block is a named property. v0.1 discharges Boolean
