@@ -55,7 +55,12 @@ impl Handler for CaseFile {
     fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
             OpenRequest::NeedJudgment { protocol, issue } => {
-                match matching_determination(&self.record.determinations, protocol, issue) {
+                match matching_determination(
+                    &self.record.determinations,
+                    protocol,
+                    issue,
+                    self.known_at,
+                ) {
                     Some(d) if d.established => HandlerResult::Resume {
                         value: Value::Bool(true),
                         trace_fragment: format!("determine:{protocol}"),
@@ -458,10 +463,23 @@ fn matching_determination<'a>(
     determinations: &'a [CaseDetermination],
     protocol: &str,
     issue: &PropTerm,
+    known_at: Option<Instant>,
 ) -> Option<&'a CaseDetermination> {
     determinations.iter().find(|determination| {
-        determination.protocol == protocol && judgment_issue_matches(&determination.issue, issue)
+        determination.protocol == protocol
+            && judgment_issue_matches(&determination.issue, issue)
+            && determination_is_known(determination.recorded_at, known_at)
     })
+}
+
+/// Missing `recorded_at` stays visible (legacy records). `known_at = None`
+/// does not apply a knowledge filter, matching observe.
+fn determination_is_known(recorded_at: Option<Instant>, known_at: Option<Instant>) -> bool {
+    match (recorded_at, known_at) {
+        (_, None) => true,
+        (None, Some(_)) => true,
+        (Some(recorded), Some(known)) => recorded <= known,
+    }
 }
 
 fn judgment_issue_matches(recorded: &str, issue: &PropTerm) -> bool {
@@ -1168,6 +1186,55 @@ mod tests {
             doctrines: vec!["A".into(), "B".into()],
         });
         assert!(matches!(out, HandlerResult::Suspend { .. }));
+    }
+
+    #[test]
+    fn future_determinations_are_not_visible_at_an_earlier_known_time() {
+        let mut record = CaseRecord::default();
+        record.determinations.push(CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "P".into(),
+            established: true,
+            decider: "Reviewer".into(),
+            recorded_at: Some(instant("2034-01-01T00:00:00Z")),
+        });
+        let mut h = CaseFile {
+            record,
+            known_at: Some(instant("2033-01-01T00:00:00Z")),
+        };
+        let req = OpenRequest::NeedJudgment {
+            issue: PropTerm::new("P", vec![Term::Ident("A".into())]),
+            protocol: "P".into(),
+        };
+        assert!(
+            matches!(h.handle_determine(&req), HandlerResult::Suspend { .. }),
+            "future knowledge must not establish a past answer"
+        );
+    }
+
+    #[test]
+    fn determination_at_known_time_still_resumes() {
+        let known = instant("2033-01-01T00:00:00Z");
+        let mut record = CaseRecord::default();
+        record.determinations.push(CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "P".into(),
+            established: true,
+            decider: "Reviewer".into(),
+            recorded_at: Some(known),
+        });
+        let mut h = CaseFile {
+            record,
+            known_at: Some(known),
+        };
+        let req = OpenRequest::NeedJudgment {
+            issue: PropTerm::new("P", vec![Term::Ident("A".into())]),
+            protocol: "P".into(),
+        };
+        match h.handle_determine(&req) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Bool(true)),
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]
