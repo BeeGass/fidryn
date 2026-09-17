@@ -23,15 +23,15 @@ module US.Federal.FOIA.RequestProcessing version "0.1.0" {
         authority UnitedStatesCongress
         citation "5 U.S.C. § 552"
         artifact "sources/usc-5-552.txt"
-        digest required_in source_manifest
-        effective according_to source_manifest
+        digest fixture
+        effective [2026-08-23, +inf)
     }
 
     import Agency.FOIARegulations version "fixture-2026-08-23" {
-        digest required_in source_manifest
+        digest fixture
     }
     import US.Federal.Cases.FOIA version "fixture-2026-08-23" {
-        digest required_in source_manifest
+        digest fixture
     }
     import US.Federal.Calendars version "2026"
 
