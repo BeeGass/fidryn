@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fidryn.onlygass.dev/sitemap.xml
+
+# LLM / agent maps
+# https://fidryn.onlygass.dev/llms.txt
+# https://fidryn.onlygass.dev/llms-full.txt
