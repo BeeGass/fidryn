@@ -2,8 +2,14 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Federal.Tax.Section83b@0.1.0",
   "facts": {
-    "transfer": "2026-09-01T00:00:00Z",
-    "as_of": "2026-09-11T00:00:00Z"
+    "transfer": {
+      "kind": "instant",
+      "data": "2026-09-01T00:00:00Z"
+    },
+    "as_of": {
+      "kind": "instant",
+      "data": "2026-09-11T00:00:00Z"
+    }
   },
   "admissibleCompletions": {}
 }
