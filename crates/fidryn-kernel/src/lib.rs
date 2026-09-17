@@ -16,8 +16,9 @@
 //! kernel; a general independent checker, Salsa, SMT, and packages remain
 //! Remaining.
 //!
-//! Replay is isolated: [`IsolatedReplay`] wraps a cloned [`CaseFile`] and a
-//! fresh [`LegalState::new`]. It never files or publishes. This crate does
+//! Replay is isolated: [`IsolatedReplay`] wraps a cloned [`CaseFile`] with
+//! `known_at = record_time` and a fresh [`LegalState::new`]. It never files
+//! or publishes. Query args overlay facts on the pure path. This crate does
 //! not import `fidryn-adapt`.
 
 mod completion;
@@ -31,8 +32,9 @@ pub use pure::{eval_fragment, is_boolean_fragment, is_pure_fragment};
 use crate::completion::{CHOICE_NS, EVIDENCE_NS, INTERPRETATION_NS};
 use fidryn_core::{
     BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
-    ExecutionMode, Handler, HandlerResult, LegalState, ModuleId, OpenRequest, Outcome, QueryName,
-    QueryPlan, ReplayIssuance, RunContext, SourceSnapshotId, SuspensionReason, Term, Value,
+    ExecutionMode, Handler, HandlerResult, Instant, LegalState, ModuleId, OpenRequest, Outcome,
+    QueryName, QueryPlan, ReplayIssuance, RunContext, SourceSnapshotId, SuspensionReason, Term,
+    Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -40,17 +42,21 @@ use std::collections::{BTreeMap, BTreeSet};
 
 /// Isolated replay handler: recorded case responses only.
 ///
-/// Wraps a cloned [`CaseFile`]. Never files, never publishes, and never
-/// treats NeedCustom `"file"` / `"publish"` as [`HandlerResult::Resume`].
-/// The caller's [`CaseRecord`] is not mutated; construct from a clone.
+/// Wraps a cloned [`CaseFile`] with `known_at` set to the invocation
+/// record time. Never files, never publishes, and never treats NeedCustom
+/// `"file"` / `"publish"` as [`HandlerResult::Resume`]. The caller's
+/// [`CaseRecord`] is not mutated; construct from a clone.
 pub struct IsolatedReplay {
     inner: CaseFile,
 }
 
 impl IsolatedReplay {
-    pub fn new(case: CaseRecord) -> Self {
+    pub fn new(case: CaseRecord, known_at: Instant) -> Self {
         Self {
-            inner: CaseFile::new(case),
+            inner: CaseFile {
+                record: case,
+                known_at: Some(known_at),
+            },
         }
     }
 
@@ -262,7 +268,7 @@ pub fn accept_covering_eval_with_args(
             sealed_id.hex()
         ));
     }
-    CheckedCertificate::issue_finite_replay(
+    CheckedCertificate::stamp_finite_replay(
         sealed_id,
         ReplayIssuance {
             program,
@@ -423,10 +429,11 @@ fn check_branches_with_args(
 /// Closed value fragment: [`eval_fragment`] over admitted slots and
 /// original facts (no handlers, duty, Observe, or adapt). Institutional
 /// fragment: [`eval_institutional`] on the restricted overlay case (no
-/// CaseFile). Otherwise a cloned [`CaseRecord`], [`IsolatedReplay`], and
-/// [`LegalState::new()`] (never `into_state` on the caller's record) with
-/// [`evaluate`]. Replay does not import `fidryn-adapt` and does not publish
-/// institutional state.
+/// CaseFile). Otherwise a cloned [`CaseRecord`], [`IsolatedReplay`] at
+/// `ctx.record_time`, and [`LegalState::new()`] (never `into_state` on the
+/// caller's record) with [`evaluate`]. Replay does not import `fidryn-adapt`
+/// and does not publish institutional state. Query args overlay facts on
+/// the pure path with the same precedence as evaluate.
 fn check_branch_evaluation(
     module: &CoreModule,
     query: &QueryName,
@@ -438,7 +445,7 @@ fn check_branch_evaluation(
 ) -> Result<(), String> {
     let cloned = model.overlay(base, &branch.bindings, ctx)?;
     if let Some(term) = pure_fragment_term(module, query) {
-        let assignment = fragment_assignment(&cloned.facts, &branch.bindings);
+        let assignment = fragment_assignment(&cloned.facts, &branch.bindings, args);
         return match eval_fragment(term, &assignment) {
             Ok(value) if value == branch.answer => Ok(()),
             Ok(value) => Err(format!(
@@ -458,7 +465,7 @@ fn check_branch_evaluation(
             Err(err) => Err(format!("not a covering evaluation: {err}")),
         };
     }
-    let mut handler = IsolatedReplay::new(cloned.clone());
+    let mut handler = IsolatedReplay::new(cloned.clone(), ctx.record_time);
     let state = LegalState::new();
     match evaluate(module, query, args, &state, ctx, &mut handler, &cloned) {
         Ok(Outcome::Determinate { value, .. }) => {
@@ -492,11 +499,15 @@ fn institutional_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) ->
     }
 }
 
-/// Admitted-slot overlay onto original facts. Bindings never overwrite a
-/// fixed fact; undeclared keys are rejected before this map is built.
+/// Admitted-slot overlay onto original facts, then query args.
+///
+/// Bindings never overwrite a fixed fact; undeclared keys are rejected
+/// before this map is built. Query args take precedence over case facts,
+/// matching evaluate lookup (`bindings` then `args` then `facts`).
 fn fragment_assignment(
     facts: &BTreeMap<String, Value>,
     bindings: &BTreeMap<String, Value>,
+    args: &BTreeMap<String, Value>,
 ) -> BTreeMap<String, Value> {
     let mut env = facts.clone();
     for (key, value) in bindings {
@@ -506,6 +517,9 @@ fn fragment_assignment(
         {
             env.entry(name.to_owned()).or_insert(value.clone());
         }
+    }
+    for (key, value) in args {
+        env.insert(key.clone(), value.clone());
     }
     env
 }
@@ -519,11 +533,12 @@ fn strip_slot_name(key: &str) -> Option<&str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::ir::{CoreDuty, CoreQuery, QueryPlan};
+    use fidryn_core::case::CaseDetermination;
+    use fidryn_core::ir::{CoreDuty, CoreEntity, CoreProposition, CoreQuery, QueryPlan};
     use fidryn_core::{
         BinOp, CoreDecl, CoverageMethod, DutyState, DutyStatus, Guard, Instant, Interval,
-        JurisdictionId, NodeId, NodeMeta, OriginId, PrimitiveType, SourceManifestId, Term, TraceId,
-        Type,
+        JurisdictionId, NodeId, NodeMeta, OriginId, PrimitiveType, Sort, SourceManifestId, Term,
+        TraceId, Type,
     };
     use fidryn_eval::duty::duty_state_value;
     use fidryn_eval::evaluate;
@@ -719,6 +734,17 @@ mod tests {
         witness: CoverageWitness,
         constraints: &BTreeSet<OpenRequest>,
     ) -> Result<CheckedCertificate, String> {
+        covering_eval_case_with_args(module, case, answer, witness, constraints, &BTreeMap::new())
+    }
+
+    fn covering_eval_case_with_args(
+        module: &CoreModule,
+        case: &CaseRecord,
+        answer: &Value,
+        witness: CoverageWitness,
+        constraints: &BTreeSet<OpenRequest>,
+        args: &BTreeMap<String, Value>,
+    ) -> Result<CheckedCertificate, String> {
         let query = QueryName::from("q");
         let ctx = run_ctx();
         let fingerprint = module.content_fingerprint().expect("fingerprint");
@@ -733,11 +759,11 @@ mod tests {
             constraints,
             answer,
             &witness,
-            &BTreeMap::new(),
+            args,
             ExecutionMode::Operative,
         )
         .expect("covering claims id");
-        accept_covering_eval(
+        accept_covering_eval_with_args(
             id,
             module.id,
             module.snapshot,
@@ -748,6 +774,7 @@ mod tests {
             constraints,
             answer,
             witness,
+            args,
         )
     }
 
@@ -1011,7 +1038,7 @@ mod tests {
 
     #[test]
     fn test_isolated_replay_does_not_resume_file_or_publish() {
-        let mut handler = IsolatedReplay::new(CaseRecord::default());
+        let mut handler = IsolatedReplay::new(CaseRecord::default(), at());
         for effect in ["file", "publish"] {
             let request = OpenRequest::NeedCustom {
                 effect: effect.into(),
@@ -1449,7 +1476,7 @@ mod tests {
         let overlaid = model
             .overlay(&case, &bindings, &run_ctx())
             .expect("admitted overlay");
-        let mut handler = IsolatedReplay::new(overlaid.clone());
+        let mut handler = IsolatedReplay::new(overlaid.clone(), run_ctx().record_time);
         let eval_result = evaluate(
             &module,
             &QueryName::from("q"),
@@ -1814,5 +1841,106 @@ mod tests {
                 || err.contains("fabricated"),
             "{err}"
         );
+    }
+
+    fn ident_query_module() -> CoreModule {
+        let mut module = module_with_plan(QueryPlan::Evaluate(Term::Ident("x".into())));
+        module.queries[0].binders = vec![("x".into(), Type::Primitive(PrimitiveType::Bool))];
+        module
+    }
+
+    fn determined_pa_module() -> CoreModule {
+        module_with_plan_decls(
+            QueryPlan::Evaluate(Term::Apply {
+                ctor: "determined".into(),
+                args: vec![Term::Apply {
+                    ctor: "P".into(),
+                    args: vec![Term::Ident("A".into())],
+                }],
+            }),
+            vec![
+                CoreDecl::Entity(CoreEntity {
+                    id: NodeId::of(b"A"),
+                    name: "A".into(),
+                    ty: Type::Sort(Sort::NaturalPerson),
+                    meta: test_meta("A"),
+                }),
+                CoreDecl::Proposition(CoreProposition {
+                    id: NodeId::of(b"P"),
+                    name: "P".into(),
+                    params: vec![("x".into(), Type::Sort(Sort::NaturalPerson))],
+                    meta: test_meta("P"),
+                }),
+            ],
+        )
+    }
+
+    fn pa_determination(recorded_at: Instant) -> CaseDetermination {
+        CaseDetermination {
+            issue: "P(A)".into(),
+            protocol: "determined".into(),
+            established: true,
+            decider: "fixture".into(),
+            recorded_at: Some(recorded_at),
+        }
+    }
+
+    #[test]
+    fn test_replay_uses_the_same_argument_precedence_as_execution() {
+        let module = ident_query_module();
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_some());
+        let mut case = CaseRecord::default();
+        case.facts.insert("x".into(), Value::Bool(false));
+        let args = BTreeMap::from([("x".into(), Value::Bool(true))]);
+        let claimed = Value::Bool(false);
+        let witness = covering_value(claimed.clone());
+        let err = covering_eval_case_with_args(
+            &module,
+            &case,
+            &claimed,
+            witness,
+            &BTreeSet::new(),
+            &args,
+        )
+        .expect_err("query args override conflicting facts; claiming false is not covering");
+        assert!(
+            err.contains("fabricated") || err.contains("covering"),
+            "{err}"
+        );
+        let claimed = Value::Bool(true);
+        let cert = covering_eval_case_with_args(
+            &module,
+            &case,
+            &claimed,
+            covering_value(claimed.clone()),
+            &BTreeSet::new(),
+            &args,
+        )
+        .expect("return x with args x=true covers true");
+        assert!(cert.is_covering());
+    }
+
+    #[test]
+    fn test_replay_does_not_admit_a_future_determination() {
+        let module = determined_pa_module();
+        assert!(pure_fragment_term(&module, &QueryName::from("q")).is_none());
+        let ctx = run_ctx();
+        let mut future = CaseRecord::default();
+        future.determinations.push(pa_determination(
+            Instant::parse("2034-01-01T00:00:00Z").unwrap(),
+        ));
+        let claimed = Value::Bool(true);
+        let err = covering_eval_case(&module, &future, &claimed, covering_value(claimed.clone()))
+            .expect_err("a determination after record_time is not covering");
+        assert!(
+            err.contains("covering") || err.contains("suspended") || err.contains("fabricated"),
+            "{err}"
+        );
+
+        let mut known = CaseRecord::default();
+        known.determinations.push(pa_determination(ctx.record_time));
+        let cert = covering_eval_case(&module, &known, &claimed, covering_value(claimed.clone()))
+            .expect("a determination at record_time covers true");
+        assert!(cert.is_covering());
     }
 }
