@@ -1,8 +1,7 @@
 //! Local mill: localhost-only web UI. Never live-files.
 
 use crate::{
-    EngineFailure, IntoEvalOutcome, apply_scenario_envelope, compile_source, merge_bounds_json,
-    parse_instant, render_report,
+    EngineFailure, compile_source, explore_report, merge_bounds_json, parse_instant, render_report,
 };
 use axum::Router;
 use axum::extract::Json;
@@ -15,7 +14,6 @@ use fidryn_core::{
 };
 use fidryn_driver::Driver;
 use fidryn_render::{module_vars, render};
-use fidryn_verify::explore_query;
 use serde::{Deserialize, Serialize};
 use std::io::ErrorKind;
 use std::net::{Ipv4Addr, SocketAddr};
@@ -202,10 +200,10 @@ fn mill_engine_err(err: &EngineFailure) -> JsonResponse {
     )
 }
 
-/// Same document as CLI `render_report` (`fidryn.evaluation-report/v0.1`).
-/// `ok` is mill-only transport metadata on the response object, not a
-/// field of the report schema. Pasted compile is
-/// `sourceTrust: unauthenticated` and is never `byteVerified`.
+/// Mill success transport: `{ "ok": true, "report": <evaluation-report> }`.
+///
+/// `ok` is not a field of `fidryn.evaluation-report/v0.1`. Pasted compile
+/// is `sourceTrust: unauthenticated` and is never `byteVerified`.
 fn mill_report_doc(
     module: &CoreModule,
     query: &QueryName,
@@ -216,12 +214,13 @@ fn mill_report_doc(
 ) -> JsonResponse {
     let text = render_report(module, query, valid, known, case, report);
     match serde_json::from_str::<serde_json::Value>(&text) {
-        Ok(mut value) => {
-            if let Some(obj) = value.as_object_mut() {
-                obj.insert("ok".into(), serde_json::Value::Bool(true));
-            }
-            (StatusCode::OK, Json(value))
-        }
+        Ok(report_json) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": true,
+                "report": report_json,
+            })),
+        ),
         Err(err) => mill_err(
             StatusCode::INTERNAL_SERVER_ERROR,
             err.to_string(),
@@ -271,8 +270,8 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
     let ctx = RunContext::new(valid, known);
     let query = QueryName::from(req.query.as_str());
     let mut report = if explore_mode {
-        match explore_query(&module, &query, &case, &ctx).into_eval_outcome() {
-            Ok(outcome) => EvaluationReport::from_outcome(outcome),
+        match explore_report(&module, &query, &case, &ctx) {
+            Ok(report) => report,
             Err(err) => return mill_engine_err(&err),
         }
     } else {
@@ -281,7 +280,6 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
             Err(err) => return mill_engine_err(&EngineFailure::from_err(err)),
         }
     };
-    apply_scenario_envelope(&mut report, &case);
     report.trust = TrustProfile::Unauthenticated;
     mill_report_doc(&module, &query, valid, known, &case, &report)
 }
@@ -464,15 +462,29 @@ module Examples.T version "0.1.0" {
         })
     }
 
+    fn mill_report(json: &serde_json::Value) -> &serde_json::Value {
+        json.get("report")
+            .unwrap_or_else(|| panic!("mill transport must wrap report: {json}"))
+    }
+
     fn assert_report_envelope(json: &serde_json::Value, query: &str, mode: &str) {
         assert_eq!(json["ok"], true, "{json}");
-        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
-        assert_eq!(json["executionMode"], mode, "{json}");
-        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
-        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
-        assert!(json["assumptions"].is_array(), "{json}");
-        assert!(json["verificationMethod"].is_string(), "{json}");
-        let doc = &json["outcomeDocument"];
+        assert!(
+            json.get("schema").is_none(),
+            "ok is transport, not an evaluation-report field: {json}"
+        );
+        let report = mill_report(json);
+        assert!(
+            report.get("ok").is_none(),
+            "report schema forbids mill ok: {report}"
+        );
+        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(report["executionMode"], mode, "{json}");
+        assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(report["sourceTrust"], "byteVerified", "{json}");
+        assert!(report["assumptions"].is_array(), "{json}");
+        assert!(report["verificationMethod"].is_string(), "{json}");
+        let doc = &report["outcomeDocument"];
         assert_eq!(doc["schema"], "fidryn.outcome/v0.1", "{json}");
         assert!(doc["module"].is_string(), "{json}");
         assert!(doc["sourceSnapshot"].is_string(), "{json}");
@@ -510,13 +522,14 @@ module Examples.T version "0.1.0" {
         let (status, json) = post_json("/api/run", body).await;
         assert_eq!(status, StatusCode::OK, "{json}");
         assert_report_envelope(&json, "q", "scenario");
-        assert_eq!(json["assumptions"][0]["id"], "hyp-1", "{json}");
-        assert_eq!(json["assumptions"][0]["payload"], true, "{json}");
-        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
-        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
-        assert_eq!(json["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        let report = mill_report(&json);
+        assert_eq!(report["assumptions"][0]["id"], "hyp-1", "{json}");
+        assert_eq!(report["assumptions"][0]["payload"], true, "{json}");
+        assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(report["sourceTrust"], "byteVerified", "{json}");
+        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.1", "{json}");
         assert_eq!(
-            json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
+            report["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
             "{json}"
         );
     }
@@ -530,16 +543,145 @@ module Examples.T version "0.1.0" {
         let (status, json) = post_json("/api/explore", body).await;
         assert_eq!(status, StatusCode::OK, "{json}");
         assert_report_envelope(&json, "q", "scenario");
-        assert_eq!(json["assumptions"][0]["id"], "hyp-explore", "{json}");
-        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+        let report = mill_report(&json);
+        assert_eq!(report["assumptions"][0]["id"], "hyp-explore", "{json}");
+        assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+    }
+
+    fn flag_src() -> &'static str {
+        r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { flag }
+    }
+}
+"#
+    }
+
+    fn duty_src() -> &'static str {
+        r#"
+module Examples.T version "0.1.0" {
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+    proposition InvoiceIssued(person: NaturalPerson)
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        attaches when operative InvoiceIssued(Payer)
+        content USD(100.00)
+        due 30 counted_days after invoice_date
+    }
+    query q() -> String {
+        goal Evaluate { duty_status(PayInvoice) }
+    }
+}
+"#
+    }
+
+    fn attached_duty_case(assumptions: serde_json::Value) -> serde_json::Value {
+        serde_json::json!({
+            "facts": {
+                "invoice_date": {"kind": "instant", "data": "2033-01-01T00:00:00Z"}
+            },
+            "determinations": [{
+                "issue": "InvoiceIssued(Payer)",
+                "protocol": "InvoiceIssued",
+                "established": true,
+                "decider": "test",
+                "recorded_at": "2033-01-01T00:00:00Z"
+            }],
+            "assumptions": assumptions
+        })
+    }
+
+    fn outcome_bool(json: &serde_json::Value) -> Option<bool> {
+        mill_report(json)["outcomeDocument"]["outcome"]["value"]["data"].as_bool()
+    }
+
+    fn outcome_duty_status(json: &serde_json::Value) -> String {
+        mill_report(json)["outcomeDocument"]["outcome"]["value"]["data"]["status"]["data"]
+            .as_str()
+            .unwrap_or("")
+            .to_owned()
+    }
+
+    #[tokio::test]
+    async fn pasted_run_assumption_overlay_changes_boolean_fact() {
+        let mut operative_body = eval_body();
+        operative_body["source"] = serde_json::json!(flag_src());
+        let (op_status, op_json) = post_json("/api/run", operative_body).await;
+        assert_eq!(op_status, StatusCode::BAD_REQUEST, "{op_json}");
+        assert_eq!(op_json["ok"], false, "{op_json}");
+
+        let mut scenario_body = eval_body();
+        scenario_body["source"] = serde_json::json!(flag_src());
+        scenario_body["case"] = serde_json::json!({
+            "assumptions": [{"id": "hyp-flag", "payload": {"flag": true}}]
+        });
+        let (status, json) = post_json("/api/run", scenario_body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_report_envelope(&json, "q", "scenario");
+        assert_eq!(outcome_bool(&json), Some(true), "{json}");
+    }
+
+    #[tokio::test]
+    async fn pasted_explore_assumption_overlay_changes_boolean_fact() {
+        let mut operative_body = eval_body();
+        operative_body["source"] = serde_json::json!(flag_src());
+        let (op_status, op_json) = post_json("/api/explore", operative_body).await;
+        assert_eq!(op_status, StatusCode::OK, "{op_json}");
+        assert_outcome_document(&op_json, "q");
+        assert_ne!(outcome_bool(&op_json), Some(true), "{op_json}");
+
+        let mut scenario_body = eval_body();
+        scenario_body["source"] = serde_json::json!(flag_src());
+        scenario_body["case"] = serde_json::json!({
+            "assumptions": [{"id": "hyp-flag", "payload": {"flag": true}}]
+        });
+        let (status, json) = post_json("/api/explore", scenario_body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_report_envelope(&json, "q", "scenario");
+        assert_eq!(outcome_bool(&json), Some(true), "{json}");
+    }
+
+    #[tokio::test]
+    async fn pasted_run_assumption_overlay_changes_duty_status() {
+        let mut operative_body = eval_body();
+        operative_body["source"] = serde_json::json!(duty_src());
+        operative_body["case"] = attached_duty_case(serde_json::json!([]));
+        let (op_status, op_json) = post_json("/api/run", operative_body).await;
+        assert_eq!(op_status, StatusCode::OK, "{op_json}");
+        assert_outcome_document(&op_json, "q");
+        let operative_status = outcome_duty_status(&op_json);
+        assert!(
+            !operative_status.eq_ignore_ascii_case("Performed"),
+            "{op_json}"
+        );
+
+        let mut scenario_body = eval_body();
+        scenario_body["source"] = serde_json::json!(duty_src());
+        scenario_body["case"] = attached_duty_case(serde_json::json!([{
+            "id": "hyp-performed",
+            "payload": {"kind": "ctor", "data": {"name": "Performed", "fields": {}}}
+        }]));
+        let (status, json) = post_json("/api/run", scenario_body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_report_envelope(&json, "q", "scenario");
+        let scenario_status = outcome_duty_status(&json);
+        assert_ne!(
+            operative_status, scenario_status,
+            "assumption overlay must change duty_status: {op_json} vs {json}"
+        );
+        assert!(scenario_status.eq_ignore_ascii_case("Performed"), "{json}");
     }
 
     #[tokio::test]
     async fn pasted_compile_is_not_byte_verified() {
         let (status, json) = post_json("/api/run", eval_body()).await;
         assert_eq!(status, StatusCode::OK, "{json}");
-        assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
-        assert_ne!(json["sourceTrust"], "byteVerified", "{json}");
+        let report = mill_report(&json);
+        assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+        assert_ne!(report["sourceTrust"], "byteVerified", "{json}");
         let hex_src = r#"
 module Examples.T version "0.1.0" {
     source_manifest "/etc/passwd"
@@ -552,9 +694,12 @@ module Examples.T version "0.1.0" {
         let mut body = eval_body();
         body["source"] = serde_json::json!(hex_src);
         let (status, json) = post_json("/api/run", body).await;
-        assert_ne!(json["sourceTrust"], "byteVerified", "{status} {json}");
         if json["ok"] == true {
-            assert_eq!(json["sourceTrust"], "unauthenticated", "{json}");
+            let report = mill_report(&json);
+            assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
+            assert_ne!(report["sourceTrust"], "byteVerified", "{status} {json}");
+        } else {
+            assert_ne!(json["sourceTrust"], "byteVerified", "{status} {json}");
         }
     }
 

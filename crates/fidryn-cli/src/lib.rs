@@ -15,7 +15,7 @@ use fidryn_render::{module_vars, render};
 use fidryn_syntax::ast::{HeaderKind, Item};
 use fidryn_syntax::{format_module, parse_file};
 pub(crate) use fidryn_trace::render_report;
-use fidryn_trace::{explain, explain_value};
+use fidryn_trace::{REPORT_QUALIFICATION_FIELDS, explain, explain_value};
 use fidryn_verify::{explore_query, verify_property};
 use serde::Serialize;
 use std::cell::RefCell;
@@ -493,13 +493,31 @@ fn cmd_check(path: &Path) -> ExitCode {
 
 /// Copy nonempty `case.assumptions` onto the evaluation-report envelope.
 ///
-/// Explore keeps the verify-stream outcome and the same report schema as
-/// `run`. Nonempty assumptions are `executionMode: scenario`.
+/// Explore evaluates under the scenario overlay when assumptions are
+/// nonempty; this only labels the report. Nonempty assumptions are
+/// `executionMode: scenario`.
 pub(crate) fn apply_scenario_envelope(report: &mut EvaluationReport, case: &CaseRecord) {
     if !case.assumptions.is_empty() {
         report.execution_mode = ExecutionMode::Scenario;
         report.assumptions = case.assumptions.clone();
     }
+}
+
+/// Explore `query` and wrap it as an evaluation report.
+///
+/// Assignment evaluation uses `evaluate_scenario` when `case.assumptions`
+/// is nonempty, so the overlay can change the answer. The envelope is
+/// then labeled scenario.
+pub(crate) fn explore_report(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Result<EvaluationReport, EngineFailure> {
+    let outcome = explore_query(module, query, case, ctx).into_eval_outcome()?;
+    let mut report = EvaluationReport::from_outcome(outcome);
+    apply_scenario_envelope(&mut report, case);
+    Ok(report)
 }
 
 fn cmd_run(
@@ -614,16 +632,13 @@ fn cmd_explore(
         return ExitCode::from(1);
     };
     let ctx = RunContext::new(valid, known);
-    let outcome =
-        match explore_query(&module, &QueryName::from(query), &case, &ctx).into_eval_outcome() {
-            Ok(outcome) => outcome,
-            Err(err) => {
-                eprintln!("{err}");
-                return ExitCode::from(1);
-            }
-        };
-    let mut report = EvaluationReport::from_outcome(outcome);
-    apply_scenario_envelope(&mut report, &case);
+    let mut report = match explore_report(&module, &QueryName::from(query), &case, &ctx) {
+        Ok(report) => report,
+        Err(err) => {
+            eprintln!("{err}");
+            return ExitCode::from(1);
+        }
+    };
     report.trust = DRIVER.with(|driver| driver.borrow().source_trust_of(&module));
     println!(
         "{}",
@@ -757,13 +772,16 @@ fn load_explain_source(trace_id: &str) -> Result<ExplainSource, String> {
 }
 
 fn cmd_diff(old_snapshot: &Path, new_snapshot: &Path, query: &str) -> ExitCode {
-    let Ok(old) = load_snapshot(old_snapshot, query) else {
+    let Ok(old) = load_diff_input(old_snapshot, query) else {
         return ExitCode::from(1);
     };
-    let Ok(new) = load_snapshot(new_snapshot, query) else {
+    let Ok(new) = load_diff_input(new_snapshot, query) else {
         return ExitCode::from(1);
     };
-    let diff = SnapshotDiff::from_maps(&old, &new);
+    let diff = NamedSnapshotDiff {
+        result: SnapshotDiff::from_maps(&old.result, &new.result),
+        assurance: SnapshotDiff::from_maps(&old.assurance, &new.assurance),
+    };
     match canonical_json(&diff) {
         Ok(text) => {
             println!("{text}");
@@ -793,12 +811,28 @@ fn cmd_ui(port: Option<u16>, no_open: bool) -> ExitCode {
     }
 }
 
-/// Canonical `{added, removed, changed}` of query and module names.
+/// Canonical `{added, removed, changed}` of named fingerprints.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SnapshotDiff {
     pub added: Vec<String>,
     pub removed: Vec<String>,
     pub changed: Vec<String>,
+}
+
+/// Named report comparison: semantic result vs assurance/provenance.
+///
+/// `result` is the outcomeDocument (or compiled module/query bodies).
+/// `assurance` is executionMode, sourceTrust, assumptions, and
+/// verificationMethod. Changing only qualifications must not be silent.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct NamedSnapshotDiff {
+    pub result: SnapshotDiff,
+    pub assurance: SnapshotDiff,
+}
+
+struct DiffInput {
+    result: BTreeMap<String, String>,
+    assurance: BTreeMap<String, String>,
 }
 
 impl SnapshotDiff {
@@ -867,10 +901,21 @@ pub fn snapshot_names_from_module(module: &CoreModule) -> BTreeMap<String, Strin
 }
 
 /// Names and fingerprints from an outcome JSON (or a serialized module).
+///
+/// This is the semantic **result** map: mill `{ok, report}` unwraps to the
+/// report, and `outcomeDocument` is compared without envelope
+/// qualifications. Use [`assurance_snapshot_names`] / [`assurance_diff`]
+/// for mode, trust, assumptions, and verificationMethod.
 pub fn snapshot_names_from_json(
     value: &serde_json::Value,
     query: &str,
 ) -> BTreeMap<String, String> {
+    result_snapshot_names(value, query)
+}
+
+/// Semantic-result fingerprints (outcome / compiled query bodies).
+pub fn result_snapshot_names(value: &serde_json::Value, query: &str) -> BTreeMap<String, String> {
+    let value = unwrap_mill_report(value);
     let mut names = BTreeMap::new();
     match value {
         serde_json::Value::Array(items) => {
@@ -889,6 +934,78 @@ pub fn snapshot_names_from_json(
     names
 }
 
+/// Assurance/provenance fingerprints from an evaluation-report envelope.
+///
+/// Keys are [`REPORT_QUALIFICATION_FIELDS`]. Outcome-only JSON yields an
+/// empty map. Mill transport unwraps `report` first.
+pub fn assurance_snapshot_names(value: &serde_json::Value) -> BTreeMap<String, String> {
+    let value = unwrap_mill_report(value);
+    let mut names = BTreeMap::new();
+    let Some(obj) = value.as_object() else {
+        return names;
+    };
+    if !is_evaluation_report_object(obj) {
+        return names;
+    }
+    for key in REPORT_QUALIFICATION_FIELDS {
+        if let Some(field) = obj.get(*key) {
+            names.insert(
+                (*key).to_owned(),
+                canonical_json(field).unwrap_or_else(|_| field.to_string()),
+            );
+        }
+    }
+    names
+}
+
+/// Semantic-result diff of two snapshots (outcomeDocument / module bodies).
+pub fn result_diff(old: &serde_json::Value, new: &serde_json::Value, query: &str) -> SnapshotDiff {
+    SnapshotDiff::from_maps(
+        &result_snapshot_names(old, query),
+        &result_snapshot_names(new, query),
+    )
+}
+
+/// Assurance/provenance diff (mode, trust, assumptions, verificationMethod).
+pub fn assurance_diff(old: &serde_json::Value, new: &serde_json::Value) -> SnapshotDiff {
+    SnapshotDiff::from_maps(
+        &assurance_snapshot_names(old),
+        &assurance_snapshot_names(new),
+    )
+}
+
+/// Combined named operations used by `fidryn diff`.
+pub fn named_diff(
+    old: &serde_json::Value,
+    new: &serde_json::Value,
+    query: &str,
+) -> NamedSnapshotDiff {
+    NamedSnapshotDiff {
+        result: result_diff(old, new, query),
+        assurance: assurance_diff(old, new),
+    }
+}
+
+fn unwrap_mill_report(value: &serde_json::Value) -> &serde_json::Value {
+    match value.as_object() {
+        Some(obj) => match obj.get("report") {
+            Some(report) if is_evaluation_report_value(report) => report,
+            _ => value,
+        },
+        None => value,
+    }
+}
+
+fn is_evaluation_report_value(value: &serde_json::Value) -> bool {
+    value.as_object().is_some_and(is_evaluation_report_object)
+}
+
+fn is_evaluation_report_object(obj: &serde_json::Map<String, serde_json::Value>) -> bool {
+    obj.get("schema").and_then(|s| s.as_str()) == Some("fidryn.evaluation-report/v0.1")
+        || obj.contains_key("outcomeDocument")
+        || obj.contains_key("executionMode")
+}
+
 fn merge_json_snapshot(
     names: &mut BTreeMap<String, String>,
     value: &serde_json::Value,
@@ -901,6 +1018,12 @@ fn merge_json_snapshot(
         );
         return;
     };
+    if let Some(report) = obj.get("report")
+        && is_evaluation_report_value(report)
+    {
+        merge_json_snapshot(names, report, query);
+        return;
+    }
     if let Some(nested) = obj.get("outcomeDocument") {
         merge_json_snapshot(names, nested, query);
         return;
@@ -971,10 +1094,13 @@ fn is_fidryn_source(path: &Path) -> bool {
         .is_some_and(|e| e.eq_ignore_ascii_case("fr"))
 }
 
-fn load_snapshot(path: &Path, query: &str) -> Result<BTreeMap<String, String>, ExitCode> {
+fn load_diff_input(path: &Path, query: &str) -> Result<DiffInput, ExitCode> {
     if is_fidryn_source(path) {
         let (module, _) = compile_or_exit(path)?;
-        return Ok(snapshot_names_from_module(&module));
+        return Ok(DiffInput {
+            result: snapshot_names_from_module(&module),
+            assurance: BTreeMap::new(),
+        });
     }
     let text = fs::read_to_string(path).map_err(|e| {
         eprintln!("cannot read {}: {e}", path.display());
@@ -984,7 +1110,10 @@ fn load_snapshot(path: &Path, query: &str) -> Result<BTreeMap<String, String>, E
         eprintln!("invalid snapshot JSON {}: {e}", path.display());
         ExitCode::from(1)
     })?;
-    Ok(snapshot_names_from_json(&value, query))
+    Ok(DiffInput {
+        result: result_snapshot_names(&value, query),
+        assurance: assurance_snapshot_names(&value),
+    })
 }
 
 #[cfg(test)]
@@ -1225,11 +1354,7 @@ module Examples.T version "0.1.0" {
         });
         let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
         let ctx = RunContext::new(t, t);
-        let outcome = explore_query(&module, &QueryName::from("q"), &case, &ctx)
-            .into_eval_outcome()
-            .expect("explore");
-        let mut report = EvaluationReport::from_outcome(outcome);
-        apply_scenario_envelope(&mut report, &case);
+        let report = explore_report(&module, &QueryName::from("q"), &case, &ctx).expect("explore");
         assert_eq!(report.execution_mode, ExecutionMode::Scenario);
         assert_eq!(report.assumptions.len(), 1);
         assert_eq!(report.assumptions[0].id, "hyp-explore");
@@ -1241,6 +1366,168 @@ module Examples.T version "0.1.0" {
         assert_eq!(
             json["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
             "{json}"
+        );
+    }
+
+    #[test]
+    fn run_report_assumption_overlay_changes_boolean_fact() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    query q() -> Bool {
+        goal Evaluate { flag }
+    }
+}
+"#;
+        let module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let mut case = CaseRecord::default();
+        let mut facts = BTreeMap::new();
+        facts.insert("flag".into(), Value::Bool(true));
+        case.assumptions.push(Assumption {
+            id: "hyp-flag".into(),
+            payload: Value::Map(facts),
+        });
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let operative = DRIVER.with(|driver| driver.borrow_mut().run(&module, "q", &case, &ctx));
+        assert!(
+            operative.is_err(),
+            "operative evaluate must ignore the flag overlay: {operative:?}"
+        );
+        let report = DRIVER
+            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .expect("run_report scenario");
+        assert_eq!(report.execution_mode, ExecutionMode::Scenario);
+        match &report.outcome {
+            Outcome::Determinate { value, .. } => {
+                assert_eq!(value, &Value::Bool(true), "{value:?}");
+            }
+            other => panic!("scenario overlay must determine flag: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn run_report_assumption_overlay_changes_duty_status() {
+        let src = r#"
+module Examples.T version "0.1.0" {
+    entity Payer : NaturalPerson
+    entity Payee : NaturalPerson
+    proposition InvoiceIssued(person: NaturalPerson)
+    duty PayInvoice {
+        bearer Payer
+        claimant Payee
+        attaches when operative InvoiceIssued(Payer)
+        content USD(100.00)
+        due 30 counted_days after invoice_date
+    }
+    query q() -> String {
+        goal Evaluate { duty_status(PayInvoice) }
+    }
+}
+"#;
+        let module = compile_source(src, &SourceManifest::default()).expect("compile");
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let mut case = CaseRecord::default();
+        case.facts.insert("invoice_date".into(), Value::Instant(t));
+        case.determinations
+            .push(fidryn_core::case::CaseDetermination {
+                issue: "InvoiceIssued(Payer)".into(),
+                protocol: "InvoiceIssued".into(),
+                established: true,
+                decider: "test".into(),
+                recorded_at: Some(t),
+            });
+        case.assumptions.push(Assumption {
+            id: "hyp-performed".into(),
+            payload: Value::Ctor {
+                name: "Performed".into(),
+                fields: BTreeMap::new(),
+            },
+        });
+        let ctx = RunContext::new(t, t);
+        let operative = DRIVER
+            .with(|driver| driver.borrow_mut().run(&module, "q", &case, &ctx))
+            .expect("operative");
+        let scenario = DRIVER
+            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .expect("run_report scenario");
+        assert_eq!(scenario.execution_mode, ExecutionMode::Scenario);
+        let operative_status = duty_status_label(&operative);
+        let scenario_status = duty_status_label(&scenario.outcome);
+        assert_ne!(
+            operative_status, scenario_status,
+            "assumption overlay must change duty_status: operative={operative_status} scenario={scenario_status}"
+        );
+        assert!(
+            !operative_status.eq_ignore_ascii_case("Performed"),
+            "{operative_status}"
+        );
+        assert!(
+            scenario_status.eq_ignore_ascii_case("Performed"),
+            "{scenario_status}"
+        );
+    }
+
+    fn duty_status_label(outcome: &Outcome<Value>) -> String {
+        match outcome {
+            Outcome::Determinate { value, .. } => match value {
+                Value::Map(fields) | Value::Ctor { fields, .. } => match fields.get("status") {
+                    Some(Value::String(s) | Value::Entity(s)) => s.clone(),
+                    Some(Value::Ctor { name, .. }) => name.clone(),
+                    _ => value.display_label(),
+                },
+                other => other.display_label(),
+            },
+            other => format!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn result_diff_ignores_qualifications_assurance_diff_does_not() {
+        let outcome = json!({
+            "schema": "fidryn.outcome/v0.1",
+            "module": "Examples.T@0.1.0",
+            "query": "acting_trustee",
+            "outcome": {"kind": "determinate", "trace": "aa"}
+        });
+        let operative = json!({
+            "schema": "fidryn.evaluation-report/v0.1",
+            "executionMode": "operative",
+            "sourceTrust": "unauthenticated",
+            "verificationMethod": "none",
+            "assumptions": [],
+            "outcomeDocument": outcome
+        });
+        let mut scenario = operative.clone();
+        scenario["executionMode"] = json!("scenario");
+        scenario["assumptions"] = json!([{"id": "hyp-1", "payload": true}]);
+        scenario["sourceTrust"] = json!("fixture");
+        let result = result_diff(&operative, &scenario, "acting_trustee");
+        assert!(
+            result.changed.is_empty() && result.added.is_empty() && result.removed.is_empty(),
+            "same outcomeDocument must be result-equal: {result:?}"
+        );
+        let assurance = assurance_diff(&operative, &scenario);
+        assert!(
+            assurance.changed.contains(&"executionMode".to_string()),
+            "{assurance:?}"
+        );
+        assert!(
+            assurance.changed.contains(&"assumptions".to_string()),
+            "{assurance:?}"
+        );
+        assert!(
+            assurance.changed.contains(&"sourceTrust".to_string()),
+            "{assurance:?}"
+        );
+        let mill = json!({ "ok": true, "report": scenario });
+        let mill_diff = named_diff(&operative, &mill, "acting_trustee");
+        assert!(mill_diff.result.changed.is_empty(), "{mill_diff:?}");
+        assert!(
+            mill_diff
+                .assurance
+                .changed
+                .contains(&"assumptions".to_string()),
+            "{mill_diff:?}"
         );
     }
 
