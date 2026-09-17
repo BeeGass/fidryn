@@ -13,10 +13,13 @@ that is operative in the relevant context. `run` never chooses a
 completion. Uncertified open issues are `Suspended`, never a silent
 `Determinate`.
 
-This table is the **evidence-backed status after the review-fix pass**.
-It is not a snapshot of the pre-pass tree, which still name-dispatched
-many queries. `cargo test --workspace` and `clippy -D warnings` are
-green, including the 28 review-kit regressions.
+This table is the **evidence-backed status after the previous review-fix
+pass**. It is not a snapshot of the pre-pass tree, which still
+name-dispatched many queries. A later review (2026-09-17) is **open**;
+see [`OBLIGATIONS.md`](OBLIGATIONS.md). The 28 earlier review-kit
+regressions remain. The 16 tests in `adversarial_regressions.rs` pass
+as regressions for section-1 defects; they are not closure of
+sections 2–5.
 
 Cells are `Yes` / `Partial` / `No`.
 
