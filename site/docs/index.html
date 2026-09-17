@@ -40,19 +40,20 @@
         </nav>
       </div>
     </header>
+
     <div class="docs-layout">
       <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
-          <a href="/docs/" class="active">Overview</a>
-          <a href="/docs/getting-started">Getting started</a>
-          <a href="/docs/language">Language</a>
-          <a href="/docs/cli">CLI</a>
-          <a href="/docs/mill">Mill</a>
-          <a href="/docs/cases-and-time">Cases &amp; time</a>
-          <a href="/docs/outcomes">Outcomes</a>
-          <a href="/docs/examples">Examples</a>
-          <a href="/docs/contributing">Contributing</a>
+        <a href="/docs/" class="active">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
         </nav>
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
@@ -62,22 +63,84 @@
           <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
+
       <main class="docs-main prose" id="main">
-        <h1>Fidryn documentation</h1>
-        <p>Learner guides for Fidryn — a programming language for legal instruments. Research fixture; not legal advice.</p>
-        <ul>
-          <li><a href="/docs/getting-started">Getting started</a></li>
-          <li><a href="/docs/language">Language</a></li>
-          <li><a href="/docs/cli">CLI</a></li>
-          <li><a href="/docs/mill">Mill</a></li>
-          <li><a href="/docs/cases-and-time">Cases and time</a></li>
-          <li><a href="/docs/outcomes">Outcomes</a></li>
-          <li><a href="/docs/examples">Examples</a></li>
-          <li><a href="/docs/contributing">Contributing</a></li>
-        </ul>
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice.</p>
+<h1>Fidryn documentation</h1>
+<p>Fidryn (pronounced FID-rin) is a programming language for legal
+instruments: precise where law is mechanical, explicit where judgment
+enters, and incapable of hiding authority, discretion, or ambiguity
+inside a Boolean.</p>
+<p>This directory is the human documentation for the v0.1 reference
+interpreter. Start at the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md" target="_blank" rel="noopener noreferrer">product README</a> to clone and
+build, then read <a href="/docs/getting-started">Getting started</a>. The modules,
+records, and examples in this repository are research fixtures. They
+are not legal advice, not operative instruments, and not a complete
+statement of any jurisdiction’s law.</p>
+<h2>For users</h2>
+<table>
+<thead>
+<tr>
+<th>Guide</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/docs/getting-started">Getting started</a></td>
+<td>First hour: build, <code>check</code>, <code>run</code></td>
+</tr>
+<tr>
+<td><a href="/docs/language">Language</a></td>
+<td><code>.fr</code> modules, queries, rules, duties, verify</td>
+</tr>
+<tr>
+<td><a href="/docs/cli">CLI</a></td>
+<td>Every <code>fidryn</code> subcommand and flag</td>
+</tr>
+<tr>
+<td><a href="/docs/mill">Mill</a></td>
+<td>Localhost UI on 127.0.0.1</td>
+</tr>
+<tr>
+<td><a href="/docs/cases-and-time">Cases and time</a></td>
+<td>Case records, valid time, known-at</td>
+</tr>
+<tr>
+<td><a href="/docs/outcomes">Outcomes</a></td>
+<td>Determinate, Suspended, Contingent, and the rest</td>
+</tr>
+<tr>
+<td><a href="/docs/examples">Examples</a></td>
+<td>Trust, tax, federal slices, fifty states</td>
+</tr>
+</tbody>
+</table>
+<p>The closed grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>. Wire formats
+are <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/case-record-v0.1.json</code></a>,
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/outcome-v0.1.json</code></a>, and
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/evaluation-report-v0.1.json</code></a>
+(CLI <code>run</code> / <code>explore</code> and mill eval responses nest the outcome as
+<code>outcomeDocument</code>).</p>
+
+<section class="implementers" id="implementers">
+<h2>For implementers</h2>
+<p>These live in the repository on GitHub (not rendered on this site):</p>
+<ul>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">Architecture</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md" target="_blank" rel="noopener noreferrer">Implementation status</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md" target="_blank" rel="noopener noreferrer">Obligations</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md" target="_blank" rel="noopener noreferrer">Integration contract</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-SUITE.md" target="_blank" rel="noopener noreferrer">Integration suite</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md" target="_blank" rel="noopener noreferrer">Workstream contract</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md" target="_blank" rel="noopener noreferrer">Review-fix contract</a></li>
+  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md" target="_blank" rel="noopener noreferrer">Full implementation</a></li>
+</ul>
+</section>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
       </main>
     </div>
+
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
       <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
@@ -96,10 +159,16 @@
       btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
       body.style.overflow = open ? "hidden" : "";
     }
-    btn.addEventListener("click", function () { setOpen(!body.classList.contains("docs-nav-open")); });
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
     backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
   })();
   </script>
 </body>
