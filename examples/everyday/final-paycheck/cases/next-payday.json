@@ -2,9 +2,18 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Everyday.FinalPaycheckGuide@0.1.0",
   "facts": {
-    "end": "2026-09-01T00:00:00-04:00",
-    "payday": "2026-09-15T00:00:00-04:00",
-    "as_of": "2026-09-10T00:00:00-04:00"
+    "end": {
+      "kind": "instant",
+      "data": "2026-09-01T00:00:00-04:00"
+    },
+    "payday": {
+      "kind": "instant",
+      "data": "2026-09-15T00:00:00-04:00"
+    },
+    "as_of": {
+      "kind": "instant",
+      "data": "2026-09-10T00:00:00-04:00"
+    }
   },
   "admissibleCompletions": {}
 }
