@@ -2,12 +2,12 @@
 
 use fidryn_core::ir::CoreModule;
 use fidryn_core::{
-    CaseRecord, EngineError, EvidenceItem, Instant, LegalState, OpenRequest, Outcome, QueryName,
-    RunContext, TraceId, Value, VerificationBounds,
+    CaseRecord, CoverageWitness, EngineError, EvidenceItem, Instant, LegalState, OpenRequest,
+    Outcome, QueryName, RunContext, TraceId, Value, VerificationBounds,
 };
 use fidryn_eval::{evaluate, seed_initial_occupancy};
 use fidryn_handlers::{CaseFile, ExplorationBounds, Explore, Skeptical, aggregate};
-use fidryn_solve::{Assignment, Domain, enumerate};
+use fidryn_solve::{Assignment, Domain, SearchBudget, SearchEvent, stream};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
@@ -210,7 +210,9 @@ pub fn explore_query(
 
 /// Two-phase search: one admissible `v`, then a witness of `≠ v`.
 ///
-/// Domains are exactly `case.admissible_completions`. Engine errors are
+/// Domains are exactly `case.admissible_completions`. Completions are
+/// streamed under [`MAX_COMPLETIONS`]; the full product is never built
+/// and then truncated. Engine errors and budget exhaustion are
 /// [`Determinacy::Unknown`], never [`Determinacy::Convergent`].
 pub fn check_determinacy(
     module: &CoreModule,
@@ -218,30 +220,49 @@ pub fn check_determinacy(
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<Determinacy, EngineError> {
-    let Some((assignments, incomplete)) = declared_assignments(case) else {
-        return Ok(Determinacy::Other(empty_completion_set()));
-    };
-    if assignments.is_empty() {
+    check_determinacy_with_budget(
+        module,
+        query,
+        case,
+        ctx,
+        SearchBudget {
+            max_assignments: MAX_COMPLETIONS,
+        },
+    )
+}
+
+fn check_determinacy_with_budget(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    budget: SearchBudget,
+) -> Result<Determinacy, EngineError> {
+    let domains = completion_domains(case);
+    if domains.iter().any(|domain| domain.values.is_empty()) {
         return Ok(Determinacy::Other(empty_completion_set()));
     }
 
-    let domains = completion_domains(case);
-    let mut scan = DetScan {
-        total: assignments.len(),
-        incomplete,
-        ..DetScan::default()
-    };
-    for assignment in &assignments {
-        let label = assignment_identity(assignment);
-        match eval_assignment(module, query, case, ctx, assignment) {
-            Ok(outcome) => {
-                if let Some(counterexample) = scan.absorb(&label, outcome, &domains) {
-                    return Ok(counterexample);
+    let mut scan = DetScan::default();
+    for event in stream(&domains, budget) {
+        match event {
+            SearchEvent::Assignment(assignment) => {
+                let label = assignment_identity(&assignment);
+                match eval_assignment(module, query, case, ctx, &assignment) {
+                    Ok(outcome) => {
+                        if let Some(counterexample) = scan.absorb(&label, outcome, &domains) {
+                            return Ok(counterexample);
+                        }
+                    }
+                    Err(err) => {
+                        scan.engine.get_or_insert_with(|| err.to_string());
+                    }
                 }
             }
-            Err(err) => {
-                scan.engine.get_or_insert_with(|| err.to_string());
+            SearchEvent::BudgetExceeded { .. } => {
+                scan.incomplete = true;
             }
+            SearchEvent::Exhausted => {}
         }
     }
     Ok(scan.finish())
@@ -396,17 +417,26 @@ fn eval_assignment(
     )
 }
 
-/// Declared finite product. `None` when a domain is explicitly empty.
+/// Declared finite product, streamed under [`MAX_COMPLETIONS`].
+/// `None` when a domain is explicitly empty.
 fn declared_assignments(case: &CaseRecord) -> Option<(Vec<Assignment>, bool)> {
     let domains = completion_domains(case);
     if domains.iter().any(|domain| domain.values.is_empty()) {
         return None;
     }
-    let mut assignments = enumerate(&domains);
+    let mut assignments = Vec::new();
     let mut incomplete = false;
-    if assignments.len() > MAX_COMPLETIONS {
-        assignments.truncate(MAX_COMPLETIONS);
-        incomplete = true;
+    for event in stream(
+        &domains,
+        SearchBudget {
+            max_assignments: MAX_COMPLETIONS,
+        },
+    ) {
+        match event {
+            SearchEvent::Assignment(assignment) => assignments.push(assignment),
+            SearchEvent::BudgetExceeded { .. } => incomplete = true,
+            SearchEvent::Exhausted => {}
+        }
     }
     Some((assignments, incomplete))
 }
@@ -419,7 +449,6 @@ struct DetScan {
     saw_suspended: bool,
     other: Option<Outcome<Value>>,
     examined: usize,
-    total: usize,
     incomplete: bool,
     unresolved_outside: bool,
 }
@@ -448,7 +477,7 @@ impl DetScan {
     fn coverage(&self) -> Coverage {
         Coverage {
             examined: self.examined,
-            total: self.total,
+            total: self.examined,
             incomplete: self.incomplete || self.unresolved_outside,
         }
     }
@@ -493,7 +522,6 @@ impl DetScan {
     }
 
     fn finish(self) -> Determinacy {
-        let coverage = self.coverage();
         if let Some((_, value)) = self.witness {
             if self.incomplete
                 || self.engine.is_some()
@@ -513,6 +541,21 @@ impl DetScan {
                     }),
                 };
             }
+            let witness = CoverageWitness {
+                examined: self.examined,
+                total: self.examined,
+                incomplete: false,
+                answer: value.clone(),
+            };
+            debug_assert!(
+                witness.is_complete(),
+                "Convergent requires a complete covering witness"
+            );
+            let coverage = Coverage {
+                examined: witness.examined,
+                total: witness.total,
+                incomplete: witness.incomplete,
+            };
             return Determinacy::Convergent { value, coverage };
         }
         if let Some(reason) = self.engine {
@@ -1037,16 +1080,77 @@ mod tests {
     }
 
     #[test]
+    fn counterexample_returns_before_remaining_space() {
+        let module = trust_module();
+        let mut case = two_cert_case();
+        case.admissible_completions
+            .interpretations
+            .insert("Padding".into(), (0..32).map(|i| format!("p{i}")).collect());
+        let det = check_determinacy(&module, &QueryName::from("acting_trustee"), &case, &ctx())
+            .expect("determinacy");
+        match det {
+            Determinacy::Counterexample {
+                va, vb, coverage, ..
+            } => {
+                let labels = [va.display_label(), vb.display_label()];
+                assert!(labels.contains(&"Alice".to_owned()), "{labels:?}");
+                assert!(labels.contains(&"Bob".to_owned()), "{labels:?}");
+                assert_ne!(va, vb);
+                assert!(
+                    coverage.examined <= 2,
+                    "disagreeing answers must not wait for the padded product: {coverage:?}"
+                );
+            }
+            Determinacy::Convergent { value, .. } => {
+                panic!("padded SuccessorEligibility product must not be Convergent: {value:?}")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
     fn recorded_i2_with_occupancy_is_convergent_bob() {
         let module = trust_module();
         let case = court_i2_occupancy_case();
         let det = check_determinacy(&module, &QueryName::from("acting_trustee"), &case, &ctx())
             .expect("determinacy");
         match det {
-            Determinacy::Convergent { value, .. } => {
+            Determinacy::Convergent { value, coverage } => {
                 assert_eq!(value.display_label(), "Bob");
+                assert!(!coverage.incomplete);
+                assert_eq!(coverage.total, coverage.examined);
+                assert!(coverage.examined > 0);
             }
             other => panic!("recorded I2 with OccupancyRecord must be Convergent Bob: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn budget_exhaustion_is_unknown_not_convergent() {
+        let module = bool_module();
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .interpretations
+            .insert("A".into(), vec!["a1".into(), "a2".into()]);
+        case.admissible_completions
+            .interpretations
+            .insert("B".into(), vec!["b1".into(), "b2".into()]);
+        let det = super::check_determinacy_with_budget(
+            &module,
+            &QueryName::from("q"),
+            &case,
+            &ctx(),
+            SearchBudget { max_assignments: 1 },
+        )
+        .expect("determinacy");
+        match det {
+            Determinacy::Unknown { reason } => {
+                assert!(reason.contains("incomplete"), "{reason}");
+            }
+            Determinacy::Convergent { value, coverage } => {
+                panic!("budget exhaustion must not be Convergent: {value:?} {coverage:?}")
+            }
+            other => panic!("{other:?}"),
         }
     }
 
@@ -1064,8 +1168,8 @@ mod tests {
             "empty admissible product must not be Convergent: {det:?}"
         );
         match det {
-            Determinacy::Other(Outcome::Inconsistent { .. }) | Determinacy::Unknown { .. } => {}
-            other => panic!("{other:?}"),
+            Determinacy::Other(Outcome::Inconsistent { .. }) => {}
+            other => panic!("empty domain must be Other(Inconsistent), got {other:?}"),
         }
     }
 
@@ -1083,6 +1187,10 @@ mod tests {
             !matches!(det, Determinacy::Convergent { .. }),
             "an invalid recorded value is not an admissible world: {det:?}"
         );
+        match det {
+            Determinacy::Other(Outcome::Inconsistent { .. }) => {}
+            other => panic!("recorded empty domain must stay Other(Inconsistent): {other:?}"),
+        }
     }
 
     #[test]
