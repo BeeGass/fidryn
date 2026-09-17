@@ -143,7 +143,8 @@ fn two_interpretations_are_contingent() {
     let case = with_incumbent(load_case("two-certificates-open-eligibility.json"));
     let t = at();
     let ctx = RunContext::new(t, t);
-    let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx);
+    let out =
+        explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx).expect("explore");
     match out {
         Outcome::Contingent { alternatives, .. } => {
             let labels: BTreeSet<String> =
@@ -181,7 +182,8 @@ fn court_selects_i2_determinate_bob() {
         other => panic!("{other:?}"),
     }
     let ctx = RunContext::new(t, t);
-    let explored = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx);
+    let explored =
+        explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx).expect("explore");
     match explored {
         Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
         other => panic!("recorded I2 must constrain explore: {other:?}"),
@@ -233,6 +235,7 @@ fn skeptical_preserves_suspended_open_branch() {
         &QueryName::from("acting_trustee"),
         &case,
         &RunContext::new(t, t),
-    );
+    )
+    .expect("skeptical");
     assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
 }

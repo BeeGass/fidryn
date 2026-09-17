@@ -150,65 +150,47 @@ impl fmt::Display for Determinacy {
     }
 }
 
-/// Map `evaluate`'s `Outcome` or `Result<Outcome, E>` into a world outcome.
-/// Engine errors are not legal inconsistency.
-trait IntoWorldOutcome {
-    fn into_world_outcome(self) -> Result<Outcome<Value>, String>;
-}
-
-#[allow(dead_code)]
-impl IntoWorldOutcome for Outcome<Value> {
-    fn into_world_outcome(self) -> Result<Outcome<Value>, String> {
-        Ok(self)
-    }
-}
-
-#[allow(dead_code)]
-impl<E: fmt::Display> IntoWorldOutcome for Result<Outcome<Value>, E> {
-    fn into_world_outcome(self) -> Result<Outcome<Value>, String> {
-        self.map_err(|err| err.to_string())
-    }
-}
-
+/// Explore `query` under declared finite completions.
+///
+/// Unknown queries and other [`EngineError`] values are returned as errors.
+/// They are not rewritten as `incomplete`, `Suspended`, or another legal
+/// outcome.
 pub fn explore_query(
     module: &CoreModule,
     query: &QueryName,
     case: &CaseRecord,
     ctx: &RunContext,
-) -> Outcome<Value> {
+) -> Result<Outcome<Value>, EngineError> {
+    if module.query(query.as_str()).is_none() {
+        return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
+    }
     if let Ok(determinacy) = check_determinacy(module, query, case, ctx) {
         match determinacy {
-            Determinacy::Convergent { value, .. } => return determinate_explored(value),
+            Determinacy::Convergent { value, .. } => return Ok(determinate_explored(value)),
             Determinacy::Suspended { requests } => {
-                return Outcome::Suspended {
+                return Ok(Outcome::Suspended {
                     requests,
                     trace: TraceId::of(b"explore"),
-                };
+                });
             }
-            Determinacy::Other(outcome) => return outcome,
+            Determinacy::Other(outcome) => return Ok(outcome),
             Determinacy::Counterexample { .. } | Determinacy::Unknown { .. } => {}
         }
     }
 
-    let Some((assignments, mut incomplete)) = declared_assignments(case) else {
-        return empty_completion_set();
+    let Some((assignments, incomplete)) = declared_assignments(case) else {
+        return Ok(empty_completion_set());
     };
     if assignments.is_empty() {
-        return empty_completion_set();
+        return Ok(empty_completion_set());
     }
 
     let mut labeled_branches: Vec<(String, Outcome<Value>)> = Vec::new();
     for assignment in &assignments {
-        match eval_assignment(module, query, case, ctx, assignment) {
-            Ok(out) => {
-                labeled_branches.push((assignment_identity(assignment), out));
-            }
-            Err(_) => {
-                incomplete = true;
-            }
-        }
+        let out = eval_assignment(module, query, case, ctx, assignment)?;
+        labeled_branches.push((assignment_identity(assignment), out));
     }
-    finalize_exploration(labeled_branches, incomplete)
+    Ok(finalize_exploration(labeled_branches, incomplete))
 }
 
 /// Two-phase search: one admissible `v`, then a witness of `≠ v`.
@@ -276,7 +258,7 @@ pub fn skeptical(
     query: &QueryName,
     case: &CaseRecord,
     ctx: &RunContext,
-) -> Outcome<Value> {
+) -> Result<Outcome<Value>, EngineError> {
     let bounds = ExplorationBounds {
         interpretations: case.admissible_completions.interpretations.clone(),
         evidence: case
@@ -301,37 +283,33 @@ pub fn skeptical(
         ctx,
         &mut handler,
         case,
-    )
-    .into_world_outcome()
-    {
+    ) {
         Ok(out) => out,
-        Err(_) => {
-            return explore_query(module, query, case, ctx);
-        }
+        Err(_) => return explore_query(module, query, case, ctx),
     };
 
     let Outcome::Determinate {
         value: inner_value, ..
     } = &inner
     else {
-        return inner;
+        return Ok(inner);
     };
 
-    let explored = explore_query(module, query, case, ctx);
+    let explored = explore_query(module, query, case, ctx)?;
     match explored {
         Outcome::Contingent { .. }
         | Outcome::Suspended { .. }
         | Outcome::NormConflict { .. }
         | Outcome::Inconsistent { .. }
-        | Outcome::OutsideCompetence { .. } => explored,
+        | Outcome::OutsideCompetence { .. } => Ok(explored),
         Outcome::Determinate {
             value: ref explored_value,
             ..
         } => {
             if inner_value == explored_value {
-                inner
+                Ok(inner)
             } else {
-                explored
+                Ok(explored)
             }
         }
     }
@@ -1320,7 +1298,8 @@ mod tests {
     fn two_interpretations_are_contingent() {
         let module = trust_module();
         let case = two_cert_case();
-        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx());
+        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx())
+            .expect("explore");
         match out {
             Outcome::Contingent { alternatives, .. } => {
                 assert_eq!(alternatives.len(), 2);
@@ -1487,10 +1466,30 @@ mod tests {
     }
 
     #[test]
+    fn explore_unknown_query_is_engine_error_not_incomplete() {
+        let module = bool_module();
+        let case = CaseRecord::default();
+        let err = explore_query(&module, &QueryName::from("missing"), &case, &ctx())
+            .expect_err("unknown query is not a legal outcome");
+        match err {
+            EngineError::UnknownQuery(name) => assert_eq!(name, "missing"),
+            other => panic!("expected UnknownQuery, got {other:?}"),
+        }
+        let mut empty_domain = CaseRecord::default();
+        empty_domain
+            .admissible_completions
+            .interpretations
+            .insert("ClosedFamily".into(), Vec::new());
+        let err = explore_query(&module, &QueryName::from("missing"), &empty_domain, &ctx())
+            .expect_err("unknown query is not an empty completion set");
+        assert!(matches!(err, EngineError::UnknownQuery(_)));
+    }
+
+    #[test]
     fn empty_families_are_one_empty_assignment() {
         let module = bool_module();
         let case = CaseRecord::default();
-        let out = explore_query(&module, &QueryName::from("q"), &case, &ctx());
+        let out = explore_query(&module, &QueryName::from("q"), &case, &ctx()).expect("explore");
         match out {
             Outcome::Determinate { value, .. } => assert_eq!(value, Value::Bool(true)),
             other => panic!("empty families should evaluate once, got {other:?}"),
@@ -1504,7 +1503,7 @@ mod tests {
         case.admissible_completions
             .interpretations
             .insert("SuccessorEligibility".into(), Vec::new());
-        let out = explore_query(&module, &QueryName::from("q"), &case, &ctx());
+        let out = explore_query(&module, &QueryName::from("q"), &case, &ctx()).expect("explore");
         match out {
             Outcome::Inconsistent { core, .. } => {
                 assert!(
@@ -1523,7 +1522,8 @@ mod tests {
         let mut case = two_cert_case();
         case.interpretations
             .insert("SuccessorEligibility".into(), "I2".into());
-        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx());
+        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx())
+            .expect("explore");
         match out {
             Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
             other => panic!("{other:?}"),
@@ -1537,7 +1537,8 @@ mod tests {
         case.admissible_completions
             .interpretations
             .insert("ExtraFamily".into(), vec!["P".into(), "Q".into()]);
-        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx());
+        let out = explore_query(&module, &QueryName::from("acting_trustee"), &case, &ctx())
+            .expect("explore");
         match out {
             Outcome::Contingent { alternatives, .. } => {
                 assert_eq!(alternatives.len(), 4, "{alternatives:?}");
@@ -1844,7 +1845,8 @@ mod tests {
             "SuccessorEligibility".into(),
             vec!["I1".into(), "I2".into()],
         );
-        let out = skeptical(&module, &QueryName::from("acting_trustee"), &case, &ctx());
+        let out = skeptical(&module, &QueryName::from("acting_trustee"), &case, &ctx())
+            .expect("skeptical");
         assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
     }
 
@@ -1855,7 +1857,7 @@ mod tests {
         case.admissible_completions
             .interpretations
             .insert("ClosedFamily".into(), Vec::new());
-        let out = skeptical(&module, &QueryName::from("q"), &case, &ctx());
+        let out = skeptical(&module, &QueryName::from("q"), &case, &ctx()).expect("skeptical");
         assert!(
             matches!(out, Outcome::Inconsistent { .. }),
             "determinate inner answer must not hide an empty completion set: {out:?}"
@@ -1867,15 +1869,17 @@ mod tests {
         let module = module_with_query("q", QueryPlan::Evaluate(Term::Ident("flag".into())));
         let mut case = CaseRecord::default();
         let operative = explore_query(&module, &QueryName::from("q"), &case, &ctx());
-        match &operative {
-            Outcome::Determinate {
-                value: Value::Bool(true),
-                ..
-            } => panic!("operative explore must not treat an unbound flag as true"),
-            Outcome::Determinate { value, .. } => {
+        match operative {
+            Err(EngineError::Unsupported(message)) => {
+                assert!(
+                    message.contains("flag"),
+                    "unbound flag must surface as engine error: {message}"
+                );
+            }
+            Ok(Outcome::Determinate { value, .. }) => {
                 panic!("operative explore must not determine flag: {value:?}")
             }
-            _ => {}
+            other => panic!("unbound flag must not be a fake legal outcome: {other:?}"),
         }
 
         let mut facts = BTreeMap::new();
@@ -1884,7 +1888,8 @@ mod tests {
             id: "hyp-flag".into(),
             payload: Value::Map(facts),
         });
-        let scenario = explore_query(&module, &QueryName::from("q"), &case, &ctx());
+        let scenario =
+            explore_query(&module, &QueryName::from("q"), &case, &ctx()).expect("explore");
         match scenario {
             Outcome::Determinate { value, .. } => {
                 assert_eq!(value, Value::Bool(true), "{value:?}");
