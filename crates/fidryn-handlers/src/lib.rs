@@ -5,8 +5,8 @@ use fidryn_core::ir::CoreConflictDoctrine;
 use fidryn_core::outcome::OpenRequest;
 use fidryn_core::patterns::{PropPattern, TermPattern};
 use fidryn_core::{
-    CaseRecord, EvidenceItem, HaltReason, Handler, HandlerResult, Instant, Outcome, PropTerm,
-    SuspensionReason, Term, TraceId, Value,
+    CaseRecord, EvidenceItem, FrozenCaseView, HaltReason, Handler, HandlerResult, Instant, Outcome,
+    PropTerm, SuspensionReason, Term, TraceId, Value,
 };
 use fidryn_eval::resolve_conflict;
 use std::collections::{BTreeMap, BTreeSet};
@@ -31,11 +31,9 @@ impl Handler for CaseFile {
     fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
             OpenRequest::NeedEvidence { schema, issue } => {
-                if let Some(item) =
-                    select_evidence(&self.record.evidence, schema, issue, self.known_at)
-                {
+                if let Some(value) = self.visible_evidence_value(schema, issue) {
                     HandlerResult::Resume {
-                        value: item.value.clone(),
+                        value,
                         trace_fragment: format!("observe:{schema}"),
                     }
                 } else {
@@ -55,12 +53,7 @@ impl Handler for CaseFile {
     fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
             OpenRequest::NeedJudgment { protocol, issue } => {
-                match matching_determination(
-                    &self.record.determinations,
-                    protocol,
-                    issue,
-                    self.known_at,
-                ) {
+                match self.visible_determination(protocol, issue) {
                     Some(d) if d.established => HandlerResult::Resume {
                         value: Value::Bool(true),
                         trace_fragment: format!("determine:{protocol}"),
@@ -222,26 +215,31 @@ impl CaseFile {
             trace_fragment: "refuse".into(),
         }
     }
+
+    fn visible_evidence_value(&self, schema: &str, issue: &PropPattern) -> Option<Value> {
+        select_evidence(&self.record, schema, issue, self.known_at).map(|item| item.value.clone())
+    }
+
+    fn visible_determination(
+        &self,
+        protocol: &str,
+        issue: &PropTerm,
+    ) -> Option<&CaseDetermination> {
+        matching_determination(&self.record, protocol, issue, self.known_at)
+    }
 }
 
 fn select_evidence<'a>(
-    evidence: &'a [EvidenceItem],
+    record: &'a CaseRecord,
     schema: &str,
     issue: &PropPattern,
     known_at: Option<Instant>,
 ) -> Option<&'a EvidenceItem> {
-    evidence.iter().find(|item| {
+    record.evidence.iter().find(|item| {
         item.schema == schema
-            && observed_by_known_at(item.observed_at, known_at)
+            && FrozenCaseView::evidence_is_known(item.observed_at, known_at)
             && evidence_fits_issue(&item.value, issue)
     })
-}
-
-fn observed_by_known_at(observed_at: Instant, known_at: Option<Instant>) -> bool {
-    match known_at {
-        None => true,
-        Some(known) => observed_at <= known,
-    }
 }
 
 fn evidence_fits_issue(value: &Value, issue: &PropPattern) -> bool {
@@ -460,26 +458,16 @@ fn term_mentions_subject(term: &Term, subject: &str) -> bool {
 }
 
 fn matching_determination<'a>(
-    determinations: &'a [CaseDetermination],
+    record: &'a CaseRecord,
     protocol: &str,
     issue: &PropTerm,
     known_at: Option<Instant>,
 ) -> Option<&'a CaseDetermination> {
-    determinations.iter().find(|determination| {
+    record.determinations.iter().find(|determination| {
         determination.protocol == protocol
             && judgment_issue_matches(&determination.issue, issue)
-            && determination_is_known(determination.recorded_at, known_at)
+            && FrozenCaseView::determination_is_known(determination.recorded_at, known_at)
     })
-}
-
-/// Missing `recorded_at` stays visible (legacy records). `known_at = None`
-/// does not apply a knowledge filter, matching observe.
-fn determination_is_known(recorded_at: Option<Instant>, known_at: Option<Instant>) -> bool {
-    match (recorded_at, known_at) {
-        (_, None) => true,
-        (None, Some(_)) => true,
-        (Some(recorded), Some(known)) => recorded <= known,
-    }
 }
 
 fn judgment_issue_matches(recorded: &str, issue: &PropTerm) -> bool {
