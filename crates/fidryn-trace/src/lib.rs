@@ -1,11 +1,18 @@
 //! Proof-relevant traces and canonical outcome JSON.
 //!
-//! [`OutcomeDocument`] is the single envelope for CLI `run`/`explore` and
-//! the mill HTTP API. Field names match `schemas/outcome-v0.1.json`.
+//! [`EvaluationReportDocument`] is the report envelope
+//! (`schemas/evaluation-report-v0.1.json`). [`OutcomeDocument`] is the
+//! nested `fidryn.outcome/v0.1` compatibility projection
+//! (`schemas/outcome-v0.1.json`): `report.outcome` only. Qualifications
+//! the outcome schema cannot express (`executionMode`, `assumptions`,
+//! `sourceTrust`, `verificationMethod`, `coverage`) stay on the envelope.
+//! [`reject_lossy_export`] errors when a standalone outcome projection
+//! would drop them.
 
 use fidryn_core::{
-    AdmissibleCompletions, CaseRecord, CoreModule, Instant, ModelBoundary, Outcome, QueryName,
-    TraceId, Value, canonical_json,
+    AdmissibleCompletions, Assumption, CaseRecord, CoreModule, CoverageMethod, CoverageWitness,
+    EvaluationReport, ExecutionMode, Instant, ModelBoundary, Outcome, QueryName, TraceId,
+    TrustProfile, Value, canonical_json,
 };
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
@@ -58,7 +65,13 @@ pub enum TraceKind {
     SolverLemma,
 }
 
-/// Build the schema-matching outcome envelope.
+/// Compatibility projection of an [`Outcome`] onto `fidryn.outcome/v0.1`.
+///
+/// This is `report.outcome` only. It does not carry `executionMode`,
+/// `assumptions`, `sourceTrust`, `verificationMethod`, or `coverage`.
+/// Nested as `outcomeDocument` inside [`report_document`], those fields
+/// stay on the envelope, so that path is not lossy. A standalone export
+/// of this object drops them: call [`reject_lossy_export`] first.
 ///
 /// `sourceSnapshot` is the module snapshot identity, not the case's module
 /// name. `modelBoundary.outsideScope` is the stable unique union of module
@@ -86,6 +99,9 @@ pub fn outcome_document(
     }
 }
 
+/// Canonical JSON for the [`outcome_document`] compatibility projection.
+///
+/// Prefer [`render_report`] when the value is an [`EvaluationReport`].
 pub fn render_outcome(
     module: &CoreModule,
     query: &QueryName,
@@ -98,6 +114,126 @@ pub fn render_outcome(
         module, query, valid, known, case, outcome,
     ))
     .expect("canonical json")
+}
+
+/// Error if projecting `report` onto `fidryn.outcome/v0.1` would drop
+/// qualifications that schema cannot express.
+///
+/// A standalone outcome document has no `executionMode`, `assumptions`,
+/// `sourceTrust`, `verificationMethod`, or `coverage`. Nested projection
+/// inside [`render_report`] is not this check: the envelope carries those
+/// fields. `sourceTrust` other than `unauthenticated` is a qualification
+/// (`fixture` is not byte-verified; covering lives on the envelope).
+#[must_use = "dropping qualifications must be checked by the caller"]
+pub fn reject_lossy_export<T>(report: &EvaluationReport<T>) -> Result<(), String> {
+    let mut dropped = Vec::new();
+    if report.execution_mode != ExecutionMode::Operative {
+        dropped.push("executionMode=scenario");
+    }
+    if !report.assumptions.is_empty() {
+        dropped.push("assumptions");
+    }
+    match report.verification_method {
+        CoverageMethod::None => {}
+        CoverageMethod::Structural => dropped.push("verificationMethod=structural"),
+        CoverageMethod::FiniteReplay => dropped.push("verificationMethod=finiteReplay"),
+    }
+    if report.coverage.is_some() {
+        dropped.push("coverage");
+    }
+    if report.trust != TrustProfile::Unauthenticated {
+        dropped.push("sourceTrust");
+    }
+    if dropped.is_empty() {
+        Ok(())
+    } else {
+        Err(format!(
+            "cannot project evaluation report onto fidryn.outcome/v0.1: would drop {}",
+            dropped.join(", ")
+        ))
+    }
+}
+
+/// Standalone `fidryn.outcome/v0.1` export of `report.outcome`.
+///
+/// Succeeds only when [`reject_lossy_export`] is `Ok`. Qualified reports
+/// must use [`render_report`]; this path does not drop envelope fields.
+pub fn render_outcome_lossy(
+    module: &CoreModule,
+    query: &QueryName,
+    valid: Instant,
+    known: Instant,
+    case: &CaseRecord,
+    report: &EvaluationReport,
+) -> Result<String, String> {
+    reject_lossy_export(report)?;
+    Ok(render_outcome(
+        module,
+        query,
+        valid,
+        known,
+        case,
+        &report.outcome,
+    ))
+}
+
+/// Canonical evaluation-report envelope (`fidryn.evaluation-report/v0.1`).
+///
+/// Qualifications the nested [`OutcomeDocument`] cannot express live here.
+/// Mill transport `ok` is not a field of this document.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EvaluationReportDocument {
+    pub schema: String,
+    pub execution_mode: ExecutionMode,
+    pub source_trust: TrustProfile,
+    pub verification_method: CoverageMethod,
+    #[serde(default)]
+    pub assumptions: Vec<Assumption>,
+    #[serde(default)]
+    pub coverage: Option<CoverageWitness>,
+    pub outcome_document: OutcomeDocument,
+}
+
+/// Wrap [`outcome_document`] as `outcomeDocument` plus report fields.
+///
+/// Field names match `schemas/evaluation-report-v0.1.json`. Unset report
+/// qualifications serialize as operative, unauthenticated, none, and an
+/// empty assumptions array. Nested [`outcome_document`] is the outcome
+/// projection only; this envelope keeps the rest, so nothing is dropped.
+pub fn report_document(
+    module: &CoreModule,
+    query: &QueryName,
+    valid: Instant,
+    known: Instant,
+    case: &CaseRecord,
+    report: &EvaluationReport,
+) -> EvaluationReportDocument {
+    EvaluationReportDocument {
+        schema: "fidryn.evaluation-report/v0.1".into(),
+        execution_mode: report.execution_mode,
+        source_trust: report.trust,
+        verification_method: report.verification_method,
+        assumptions: report.assumptions.clone(),
+        coverage: report.coverage.clone(),
+        outcome_document: outcome_document(module, query, valid, known, case, &report.outcome),
+    }
+}
+
+/// Canonical JSON for [`report_document`].
+///
+/// This is not a lossy outcome projection: envelope fields are serialized
+/// beside `outcomeDocument`.
+pub fn render_report(
+    module: &CoreModule,
+    query: &QueryName,
+    valid: Instant,
+    known: Instant,
+    case: &CaseRecord,
+    report: &EvaluationReport,
+) -> String {
+    canonical_json(&report_document(module, query, valid, known, case, report))
+        .expect("canonical json")
 }
 
 /// Proof-relevant DAG for `explain`.
@@ -349,7 +485,10 @@ fn sanitize_dot_id(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::TraceId;
+    use fidryn_core::{
+        Assumption, CoverageMethod, CoverageWitness, EvaluationReport, ExecutionMode, TraceId,
+        TrustProfile,
+    };
     use std::collections::BTreeSet;
 
     fn sample_module() -> CoreModule {
@@ -387,6 +526,26 @@ mod tests {
             t,
             case,
             &sample_outcome(),
+        )
+    }
+
+    fn sample_report() -> EvaluationReport {
+        EvaluationReport::from_outcome(sample_outcome())
+    }
+
+    fn render_sample_report(
+        module: &CoreModule,
+        case: &CaseRecord,
+        report: &EvaluationReport,
+    ) -> String {
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        render_report(
+            module,
+            &QueryName::from("acting_trustee"),
+            t,
+            t,
+            case,
+            report,
         )
     }
 
@@ -591,5 +750,196 @@ mod tests {
         assert!(dot.contains("n0 -> n1"), "{dot}");
         let text = explain_value(&value, "text");
         assert!(text.contains("parents=n0"), "{text}");
+    }
+
+    #[test]
+    fn report_json_schema_is_evaluation_report_v0_1() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let json = render_sample_report(&module, &case, &sample_report());
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["schema"], "fidryn.evaluation-report/v0.1");
+        assert_eq!(doc["executionMode"], "operative");
+        assert_eq!(doc["sourceTrust"], "unauthenticated");
+        assert_eq!(doc["verificationMethod"], "none");
+        assert_eq!(doc["assumptions"], serde_json::json!([]));
+        assert!(doc["coverage"].is_null(), "{json}");
+        assert!(!json.contains('\n'));
+        assert!(!json.contains(' '));
+        let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.schema, "fidryn.evaluation-report/v0.1");
+        assert_eq!(parsed.execution_mode, ExecutionMode::Operative);
+        assert_eq!(parsed.source_trust, TrustProfile::Unauthenticated);
+        assert_eq!(parsed.verification_method, CoverageMethod::None);
+        assert!(parsed.assumptions.is_empty());
+        assert!(parsed.coverage.is_none());
+    }
+
+    #[test]
+    fn report_nests_outcome_document_schema() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let json = render_sample_report(&module, &case, &sample_report());
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");
+        let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.outcome_document.schema, "fidryn.outcome/v0.1");
+        let projected = render_sample(&module, &case);
+        let projected_doc: OutcomeDocument = serde_json::from_str(&projected).unwrap();
+        assert_eq!(parsed.outcome_document.schema, projected_doc.schema);
+        assert_eq!(parsed.outcome_document.module, projected_doc.module);
+        assert_eq!(parsed.outcome_document.query, projected_doc.query);
+        assert_eq!(parsed.outcome_document.outcome, projected_doc.outcome);
+    }
+
+    #[test]
+    fn scenario_mode_serializes_assumptions() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let mut report = sample_report();
+        report.execution_mode = ExecutionMode::Scenario;
+        report.assumptions = vec![Assumption {
+            id: "duty.performed".into(),
+            payload: Value::Bool(true),
+        }];
+        let json = render_sample_report(&module, &case, &report);
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["schema"], "fidryn.evaluation-report/v0.1");
+        assert_eq!(doc["executionMode"], "scenario");
+        assert_eq!(doc["assumptions"][0]["id"], "duty.performed");
+        assert_eq!(doc["assumptions"][0]["payload"], true);
+        assert_eq!(doc["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");
+        let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(parsed.assumptions.len(), 1);
+        assert_eq!(parsed.assumptions[0].id, "duty.performed");
+        assert_eq!(parsed.assumptions[0].payload, Value::Bool(true));
+    }
+
+    #[test]
+    fn render_report_keeps_qualifications_outcome_schema_cannot_express() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let mut report = sample_report();
+        report.execution_mode = ExecutionMode::Scenario;
+        report.trust = TrustProfile::Fixture;
+        report.verification_method = CoverageMethod::FiniteReplay;
+        report.assumptions = vec![Assumption {
+            id: "duty.performed".into(),
+            payload: Value::Bool(true),
+        }];
+        report.coverage = Some(CoverageWitness::complete(1, Value::Entity("Bryan".into())));
+        let json = render_sample_report(&module, &case, &report);
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["schema"], "fidryn.evaluation-report/v0.1");
+        assert_eq!(doc["executionMode"], "scenario");
+        assert_eq!(doc["sourceTrust"], "fixture");
+        assert_eq!(doc["verificationMethod"], "finiteReplay");
+        assert_eq!(doc["assumptions"][0]["id"], "duty.performed");
+        assert_eq!(doc["coverage"]["examined"], 1);
+        assert_eq!(doc["coverage"]["incomplete"], false);
+        assert_eq!(doc["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");
+        assert!(
+            doc.get("ok").is_none(),
+            "mill transport ok is not an evaluation-report field: {json}"
+        );
+        let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.execution_mode, ExecutionMode::Scenario);
+        assert_eq!(parsed.source_trust, TrustProfile::Fixture);
+        assert_eq!(parsed.verification_method, CoverageMethod::FiniteReplay);
+        assert_eq!(parsed.assumptions[0].id, "duty.performed");
+        assert!(parsed.coverage.is_some());
+        assert_eq!(parsed.outcome_document.schema, "fidryn.outcome/v0.1");
+    }
+
+    #[test]
+    fn reject_lossy_export_allows_plain_operative_unauthenticated_report() {
+        let report = sample_report();
+        assert_eq!(report.execution_mode, ExecutionMode::Operative);
+        assert_eq!(report.trust, TrustProfile::Unauthenticated);
+        assert_eq!(report.verification_method, CoverageMethod::None);
+        assert!(report.assumptions.is_empty());
+        assert!(report.coverage.is_none());
+        assert_eq!(reject_lossy_export(&report), Ok(()));
+    }
+
+    #[test]
+    fn reject_lossy_export_rejects_scenario_assumptions_and_finite_replay() {
+        let mut scenario = sample_report();
+        scenario.execution_mode = ExecutionMode::Scenario;
+        scenario.assumptions = vec![Assumption {
+            id: "duty.performed".into(),
+            payload: Value::Bool(true),
+        }];
+        let err = reject_lossy_export(&scenario).unwrap_err();
+        assert!(err.contains("executionMode"), "{err}");
+        assert!(err.contains("assumptions"), "{err}");
+
+        let mut replay = sample_report();
+        replay.verification_method = CoverageMethod::FiniteReplay;
+        let err = reject_lossy_export(&replay).unwrap_err();
+        assert!(err.contains("verificationMethod"), "{err}");
+        assert!(err.contains("finiteReplay"), "{err}");
+    }
+
+    #[test]
+    fn reject_lossy_export_rejects_trust_coverage_and_structural_verification() {
+        let mut fixture = sample_report();
+        fixture.trust = TrustProfile::Fixture;
+        let err = reject_lossy_export(&fixture).unwrap_err();
+        assert!(err.contains("sourceTrust"), "{err}");
+
+        let mut verified = sample_report();
+        verified.trust = TrustProfile::ByteVerified;
+        let err = reject_lossy_export(&verified).unwrap_err();
+        assert!(err.contains("sourceTrust"), "{err}");
+
+        let mut structural = sample_report();
+        structural.verification_method = CoverageMethod::Structural;
+        let err = reject_lossy_export(&structural).unwrap_err();
+        assert!(err.contains("verificationMethod"), "{err}");
+        assert!(err.contains("structural"), "{err}");
+
+        let mut covered = sample_report();
+        covered.coverage = Some(CoverageWitness::complete(1, Value::Unit));
+        let err = reject_lossy_export(&covered).unwrap_err();
+        assert!(err.contains("coverage"), "{err}");
+    }
+
+    #[test]
+    fn render_outcome_lossy_matches_outcome_projection_when_unqualified() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let report = sample_report();
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let query = QueryName::from("acting_trustee");
+        let projected = render_outcome(&module, &query, t, t, &case, &report.outcome);
+        let gated = render_outcome_lossy(&module, &query, t, t, &case, &report)
+            .expect("unqualified report");
+        assert_eq!(projected, gated);
+        let nested = render_sample_report(&module, &case, &report);
+        let doc: serde_json::Value = serde_json::from_str(&nested).unwrap();
+        let projected_val: serde_json::Value = serde_json::from_str(&projected).unwrap();
+        assert_eq!(doc["outcomeDocument"], projected_val);
+    }
+
+    #[test]
+    fn render_outcome_lossy_refuses_qualified_reports() {
+        let module = sample_module();
+        let case = CaseRecord::default();
+        let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let query = QueryName::from("acting_trustee");
+        let mut report = sample_report();
+        report.execution_mode = ExecutionMode::Scenario;
+        report.assumptions = vec![Assumption {
+            id: "duty.performed".into(),
+            payload: Value::Bool(true),
+        }];
+        let err = render_outcome_lossy(&module, &query, t, t, &case, &report).unwrap_err();
+        assert!(err.contains("executionMode"), "{err}");
+        assert!(err.contains("assumptions"), "{err}");
+        let json = render_sample_report(&module, &case, &report);
+        let doc: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc.assumptions[0].id, "duty.performed");
     }
 }

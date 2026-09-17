@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/evaluation-report-v0.1.json",
+  "title": "fidryn.evaluation-report/v0.1",
+  "$comment": "Envelope for qualifications fidryn.outcome/v0.1 cannot carry. outcomeDocument is that compatibility projection. Mill transport ok is not a field of this schema.",
+  "type": "object",
+  "required": [
+    "schema",
+    "executionMode",
+    "sourceTrust",
+    "verificationMethod",
+    "outcomeDocument"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.evaluation-report/v0.1" },
+    "executionMode": {
+      "type": "string",
+      "enum": ["operative", "scenario"]
+    },
+    "sourceTrust": {
+      "type": "string",
+      "enum": ["fixture", "byteVerified", "policyAccepted", "unauthenticated"]
+    },
+    "verificationMethod": {
+      "type": "string",
+      "enum": ["none", "structural", "finiteReplay"]
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "payload"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "payload": true
+        }
+      }
+    },
+    "coverage": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "examined": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "incomplete": { "type": "boolean" },
+        "answer": true,
+        "branches": { "type": "array" }
+      }
+    },
+    "outcomeDocument": {
+      "$comment": "fidryn.outcome/v0.1 projection of report.outcome. Do not put envelope qualifications on this object.",
+      "$ref": "outcome-v0.1.json",
+      "type": "object",
+      "required": [
+        "schema",
+        "module",
+        "sourceSnapshot",
+        "query",
+        "asOf",
+        "modelBoundary",
+        "outcome"
+      ],
+      "properties": {
+        "schema": { "const": "fidryn.outcome/v0.1" },
+        "module": { "type": "string" },
+        "sourceSnapshot": { "type": "string" },
+        "query": { "type": "string" },
+        "asOf": { "type": "object" },
+        "modelBoundary": { "type": "object" },
+        "outcome": { "type": "object" }
+      }
+    }
+  }
+}
