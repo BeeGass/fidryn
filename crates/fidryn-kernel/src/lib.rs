@@ -11,10 +11,14 @@
 //! fresh [`LegalState::new`]. It never files or publishes. This crate does
 //! not import `fidryn-adapt`.
 
+mod completion;
+
+pub use completion::ValidatedCompletionModel;
+
 use fidryn_core::{
     BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
-    Handler, HandlerResult, LegalState, ModuleId, OpenRequest, Outcome, QueryName, RunContext,
-    SourceSnapshotId, SuspensionReason, Value,
+    ExecutionMode, Handler, HandlerResult, LegalState, ModuleId, OpenRequest, Outcome, QueryName,
+    ReplayIssuance, RunContext, SourceSnapshotId, SuspensionReason, Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -150,8 +154,9 @@ pub fn accept_covering_with_args(
 /// Accept a covering witness after evaluating each claimed branch.
 ///
 /// Shape completeness is not enough: [`check_branches`] must re-evaluate the
-/// query under every binding. Then [`CheckedCertificate::verified_covering`]
-/// binds a FiniteReplay certificate (`is_covering()`).
+/// query under every admitted assignment. Then kernel issuance stamps a
+/// FiniteReplay certificate (`is_covering()`). The bound program identity
+/// must be the module that was replayed.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering_eval(
     id: CompletionProofId,
@@ -182,9 +187,10 @@ pub fn accept_covering_eval(
 
 /// [`accept_covering_eval`] with query arguments bound into FiniteReplay claims.
 ///
-/// Finite coverage verification by replay: each branch is re-evaluated
-/// with [`evaluate`] under [`IsolatedReplay`]. The caller's `case` is not
-/// mutated.
+/// Finite coverage verification by replay: each admitted assignment is
+/// re-evaluated with [`evaluate`] under [`IsolatedReplay`]. The caller's
+/// `case` is not mutated. Bindings are a restricted overlay of declared
+/// completion slots.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering_eval_with_args(
     id: CompletionProofId,
@@ -199,9 +205,26 @@ pub fn accept_covering_eval_with_args(
     witness: CoverageWitness,
     args: &BTreeMap<String, Value>,
 ) -> Result<CheckedCertificate, String> {
+    if program != module.id || snapshot != module.snapshot {
+        return Err("the replayed program and bound program must agree".into());
+    }
+    let fingerprint = module.content_fingerprint()?;
     check_branches_with_args(module, query, case, ctx, &witness, answer, args)?;
-    CheckedCertificate::verified_covering_with_args(
-        id,
+    let sealed_id = CheckedCertificate::covering_claims_id_with_identity(
+        program,
+        snapshot,
+        fingerprint,
+        case,
+        query,
+        ctx.valid_time,
+        ctx.record_time,
+        constraints,
+        answer,
+        &witness,
+        args,
+        ExecutionMode::Operative,
+    )?;
+    let legacy_id = CheckedCertificate::covering_claims_id_with_args(
         program,
         snapshot,
         case,
@@ -210,8 +233,32 @@ pub fn accept_covering_eval_with_args(
         ctx.record_time,
         constraints,
         answer,
-        witness,
+        &witness,
         args,
+    )?;
+    if id != sealed_id && id != legacy_id {
+        return Err(format!(
+            "completion proof id {} does not match covering claims {}",
+            id.hex(),
+            sealed_id.hex()
+        ));
+    }
+    CheckedCertificate::issue_finite_replay(
+        sealed_id,
+        ReplayIssuance {
+            program,
+            snapshot,
+            fingerprint,
+            case,
+            query,
+            valid: ctx.valid_time,
+            known: ctx.record_time,
+            constraints,
+            answer,
+            witness: &witness,
+            args,
+            execution_mode: ExecutionMode::Operative,
+        },
     )
 }
 
@@ -338,24 +385,15 @@ fn check_branches_with_args(
             witness.total
         ));
     }
-    if has_duplicate_worlds(&witness.branches) {
-        return Err("duplicate worlds in coverage witness".into());
-    }
+    let model = ValidatedCompletionModel::from_case(base)?;
+    let _admitted = model.admit_witness(witness)?;
     for branch in &witness.branches {
         if branch.answer != *claimed || branch.answer != witness.answer {
             return Err("coverage witness branch answer does not match claimed answer".into());
         }
-        check_branch_evaluation(module, query, base, ctx, branch, args)?;
+        check_branch_evaluation(module, query, base, ctx, branch, args, &model)?;
     }
     Ok(())
-}
-
-fn has_duplicate_worlds(branches: &[BranchClaim]) -> bool {
-    branches.iter().enumerate().any(|(index, branch)| {
-        branches[..index]
-            .iter()
-            .any(|prior| prior.bindings == branch.bindings)
-    })
 }
 
 /// Replay one claimed world against `evaluate`.
@@ -371,8 +409,9 @@ fn check_branch_evaluation(
     ctx: &RunContext,
     branch: &BranchClaim,
     args: &BTreeMap<String, Value>,
+    model: &ValidatedCompletionModel,
 ) -> Result<(), String> {
-    let cloned = apply_branch_bindings(base, &branch.bindings);
+    let cloned = model.overlay(base, &branch.bindings, ctx)?;
     let mut handler = IsolatedReplay::new(cloned.clone());
     let state = LegalState::new();
     match evaluate(module, query, args, &state, ctx, &mut handler, &cloned) {
@@ -390,33 +429,6 @@ fn check_branch_evaluation(
         }
         Ok(other) => Err(format!("not a covering evaluation: {other:?}")),
         Err(err) => Err(format!("not a covering evaluation: {err}")),
-    }
-}
-
-fn apply_branch_bindings(base: &CaseRecord, bindings: &BTreeMap<String, Value>) -> CaseRecord {
-    let mut case = base.clone();
-    for (key, value) in bindings {
-        case.facts.insert(key.clone(), value.clone());
-        if let Some(family) = key.strip_prefix("i:")
-            && !family.is_empty()
-        {
-            case.interpretations
-                .insert(family.to_owned(), binding_label(value));
-        }
-        if let Some(protocol) = key.strip_prefix("c:")
-            && !protocol.is_empty()
-        {
-            case.decisions
-                .insert(protocol.to_owned(), binding_label(value));
-        }
-    }
-    case
-}
-
-fn binding_label(value: &Value) -> String {
-    match value {
-        Value::String(s) | Value::Entity(s) => s.clone(),
-        other => other.display_label(),
     }
 }
 
@@ -479,21 +491,23 @@ mod tests {
         }
     }
 
-    fn return_b_module() -> CoreModule {
-        module_with_plan(QueryPlan::Evaluate(Term::Ident("b".into())))
+    fn constant_true_module() -> CoreModule {
+        module_with_plan(QueryPlan::Evaluate(Term::Bool(true)))
+    }
+
+    fn constant_false_module() -> CoreModule {
+        module_with_plan(QueryPlan::Evaluate(Term::Bool(false)))
     }
 
     fn tautology_module() -> CoreModule {
-        module_with_plan(QueryPlan::Evaluate(Term::Apply {
-            ctor: "||".into(),
-            args: vec![
-                Term::Ident("b".into()),
-                Term::Apply {
-                    ctor: "not".into(),
-                    args: vec![Term::Ident("b".into())],
-                },
-            ],
-        }))
+        constant_true_module()
+    }
+
+    fn empty_branch(answer: bool) -> BranchClaim {
+        BranchClaim {
+            bindings: BTreeMap::new(),
+            answer: Value::Bool(answer),
+        }
     }
 
     fn bool_branch(b: bool, answer: bool) -> BranchClaim {
@@ -604,19 +618,32 @@ mod tests {
         answer: &Value,
         witness: CoverageWitness,
     ) -> Result<CheckedCertificate, String> {
+        covering_eval_case_ignored(module, case, answer, witness, &BTreeSet::new())
+    }
+
+    fn covering_eval_case_ignored(
+        module: &CoreModule,
+        case: &CaseRecord,
+        answer: &Value,
+        witness: CoverageWitness,
+        constraints: &BTreeSet<OpenRequest>,
+    ) -> Result<CheckedCertificate, String> {
         let query = QueryName::from("q");
         let ctx = run_ctx();
-        let constraints = BTreeSet::new();
-        let id = CheckedCertificate::covering_claims_id(
+        let fingerprint = module.content_fingerprint().expect("fingerprint");
+        let id = CheckedCertificate::covering_claims_id_with_identity(
             module.id,
             module.snapshot,
+            fingerprint,
             case,
             &query,
             ctx.valid_time,
             ctx.record_time,
-            &constraints,
+            constraints,
             answer,
             &witness,
+            &BTreeMap::new(),
+            ExecutionMode::Operative,
         )
         .expect("covering claims id");
         accept_covering_eval(
@@ -627,7 +654,7 @@ mod tests {
             &query,
             module,
             &ctx,
-            &constraints,
+            constraints,
             answer,
             witness,
         )
@@ -767,12 +794,9 @@ mod tests {
 
     #[test]
     fn test_check_branches_with_fabricated_false_world_returns_err() {
-        let module = return_b_module();
+        let module = constant_false_module();
         let claimed = Value::Bool(true);
-        let witness = covering_witness(
-            true,
-            vec![bool_branch(false, true), bool_branch(true, true)],
-        );
+        let witness = covering_witness(true, vec![empty_branch(true)]);
         let err = check_branches(
             &module,
             &QueryName::from("q"),
@@ -789,12 +813,9 @@ mod tests {
 
     #[test]
     fn test_check_branches_with_duplicate_false_worlds_claiming_total_two_returns_err() {
-        let module = return_b_module();
+        let module = constant_false_module();
         let claimed = Value::Bool(false);
-        let witness = covering_witness(
-            false,
-            vec![bool_branch(false, false), bool_branch(false, false)],
-        );
+        let witness = covering_witness(false, vec![empty_branch(false), empty_branch(false)]);
         let err = check_branches(
             &module,
             &QueryName::from("q"),
@@ -804,25 +825,35 @@ mod tests {
             &claimed,
         )
         .expect_err("duplicate worlds");
-        assert!(err.contains("duplicate"), "{err}");
+        assert!(
+            err.contains("duplicate") || err.contains("product") || err.contains("undeclared"),
+            "{err}"
+        );
         let err = covering_eval(&module, &claimed, witness).expect_err("not covering");
-        assert!(err.contains("duplicate"), "{err}");
+        assert!(
+            err.contains("duplicate") || err.contains("product") || err.contains("undeclared"),
+            "{err}"
+        );
     }
 
     #[test]
     fn test_accept_covering_eval_with_tautology_worlds_returns_covering_certificate() {
         let module = tautology_module();
         let claimed = Value::Bool(true);
-        let witness = covering_witness(
-            true,
-            vec![bool_branch(false, true), bool_branch(true, true)],
-        );
-        let cert = covering_eval(&module, &claimed, witness).expect("tautology covers");
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        let cert = covering_eval_case_ignored(
+            &module,
+            &CaseRecord::default(),
+            &claimed,
+            witness,
+            &ignored,
+        )
+        .expect("tautology covers");
         assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
         assert!(cert.is_covering());
         assert!(!reject_digest_as_covering(&cert));
-        let mut ignored = BTreeSet::new();
-        ignored.insert(ignored_issue());
         Outcome::determinate(claimed, TraceId::of(b"t"), Some(cert), ignored)
             .expect("finite replay may ignore open issues");
     }
@@ -873,10 +904,7 @@ mod tests {
         });
         let before = case.clone();
         let claimed = Value::Bool(true);
-        let witness = covering_witness(
-            true,
-            vec![bool_branch(false, true), bool_branch(true, true)],
-        );
+        let witness = covering_witness(true, vec![empty_branch(true)]);
         covering_eval_case(&module, &case, &claimed, witness).expect("tautology covers");
         assert_eq!(case, before);
     }
@@ -926,16 +954,268 @@ mod tests {
     fn test_accept_covering_eval_can_authorize_ignored_issues() {
         let module = tautology_module();
         let claimed = Value::Bool(true);
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let mut ignored = BTreeSet::new();
+        ignored.insert(ignored_issue());
+        let cert = covering_eval_case_ignored(
+            &module,
+            &CaseRecord::default(),
+            &claimed,
+            witness,
+            &ignored,
+        )
+        .expect("tautology covers");
+        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
+        assert!(cert.is_covering());
+        Outcome::determinate(claimed, TraceId::of(b"t"), Some(cert), ignored)
+            .expect("finite replay may ignore open issues");
+    }
+
+    #[test]
+    fn test_caller_supplied_answers_cannot_mint_finite_replay_without_replay() {
+        let module = tautology_module();
+        let case = CaseRecord::default();
+        let ctx = run_ctx();
+        let ignored = BTreeSet::new();
+        let fabricated = covering_witness(true, vec![empty_branch(true)]);
+        let id = CheckedCertificate::covering_claims_id(
+            module.id,
+            module.snapshot,
+            &case,
+            &QueryName::from("q"),
+            ctx.valid_time,
+            ctx.record_time,
+            &ignored,
+            &Value::Bool(true),
+            &fabricated,
+        )
+        .expect("claim digest");
+        let result = CheckedCertificate::verified_covering(
+            id,
+            module.id,
+            module.snapshot,
+            &case,
+            &QueryName::from("q"),
+            ctx.valid_time,
+            ctx.record_time,
+            &ignored,
+            &Value::Bool(true),
+            fabricated,
+        );
+        assert!(
+            !result.is_ok_and(|certificate| certificate.is_covering()),
+            "shape-only public construction must not produce replay authority"
+        );
+    }
+
+    #[test]
+    fn test_replay_cannot_overwrite_a_fixed_case_fact() {
+        let module = module_with_plan(QueryPlan::Evaluate(Term::Ident("fixed".into())));
+        let mut case = CaseRecord::default();
+        case.facts.insert("fixed".into(), Value::Bool(false));
+        case.admissible_completions
+            .interpretations
+            .insert("I".into(), vec!["A".into(), "B".into()]);
+        let branches = ["A", "B"]
+            .into_iter()
+            .map(|alternative| {
+                let mut bindings = BTreeMap::new();
+                bindings.insert("i:I".into(), Value::String(alternative.into()));
+                bindings.insert("fixed".into(), Value::Bool(true));
+                BranchClaim {
+                    bindings,
+                    answer: Value::Bool(true),
+                }
+            })
+            .collect();
+        let fabricated = covering_witness(true, branches);
+        let err = covering_eval_case(&module, &case, &Value::Bool(true), fabricated)
+            .expect_err("completion bindings may resolve declared slots, not rewrite fixed facts");
+        assert!(
+            err.contains("undeclared") || err.contains("fixed") || err.contains("fabricated"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_matching_branch_count_does_not_replace_domain_membership() {
+        let module = tautology_module();
+        let mut case = CaseRecord::default();
+        case.admissible_completions
+            .interpretations
+            .insert("I".into(), vec!["A".into(), "B".into()]);
+        let fabricated = covering_witness(
+            true,
+            vec![
+                BranchClaim {
+                    bindings: BTreeMap::from([("noise".into(), Value::Int(0))]),
+                    answer: Value::Bool(true),
+                },
+                BranchClaim {
+                    bindings: BTreeMap::from([("noise".into(), Value::Int(1))]),
+                    answer: Value::Bool(true),
+                },
+            ],
+        );
+        let err = covering_eval_case(&module, &case, &Value::Bool(true), fabricated)
+            .expect_err("exact admitted assignment coverage is required");
+        assert!(
+            err.contains("undeclared") || err.contains("missing") || err.contains("membership"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_replay_rejects_a_different_program_identity() {
+        let module = tautology_module();
+        let case = CaseRecord::default();
+        let ignored = BTreeSet::new();
+        let actual = covering_witness(true, vec![empty_branch(true)]);
+        let wrong_program = ModuleId::of(b"different-program");
+        let ctx = run_ctx();
+        let id = CheckedCertificate::covering_claims_id(
+            wrong_program,
+            module.snapshot,
+            &case,
+            &QueryName::from("q"),
+            ctx.valid_time,
+            ctx.record_time,
+            &ignored,
+            &Value::Bool(true),
+            &actual,
+        )
+        .expect("claim digest");
+        let err = accept_covering_eval(
+            id,
+            wrong_program,
+            module.snapshot,
+            &case,
+            &QueryName::from("q"),
+            &module,
+            &ctx,
+            &ignored,
+            &Value::Bool(true),
+            actual,
+        )
+        .expect_err("the replayed program and bound program must agree");
+        assert!(err.contains("program") || err.contains("agree"), "{err}");
+    }
+
+    #[test]
+    fn test_a_real_certificate_for_true_cannot_certify_false() {
+        let module = tautology_module();
+        let case = CaseRecord::default();
+        let ignored = BTreeSet::from([OpenRequest::NeedInterpretation {
+            source: "Review".into(),
+            family: "Unneeded".into(),
+        }]);
+        let actual = covering_witness(true, vec![empty_branch(true)]);
+        let certificate =
+            covering_eval_case_ignored(&module, &case, &Value::Bool(true), actual, &ignored)
+                .expect("a valid certificate for a constant true query");
+        let err = Outcome::determinate(
+            Value::Bool(false),
+            TraceId::of(b"review"),
+            Some(certificate),
+            ignored,
+        )
+        .expect_err("certificate consumption must check the certified answer");
+        assert!(err.contains("answer"), "{err}");
+    }
+
+    #[test]
+    fn test_replay_rejects_same_module_id_with_different_fingerprint() {
+        let module = tautology_module();
+        let mut other = tautology_module();
+        other.nominations.push(fidryn_core::ir::CoreNomination {
+            candidate: "Alice".into(),
+            office: "Trustee".into(),
+            rank: 1,
+        });
+        assert_eq!(module.id, other.id);
+        assert_ne!(
+            module.content_fingerprint().unwrap(),
+            other.content_fingerprint().unwrap()
+        );
+        let case = CaseRecord::default();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(true, vec![empty_branch(true)]);
+        let ctx = run_ctx();
+        let query = QueryName::from("q");
+        let constraints = BTreeSet::new();
+        let id = CheckedCertificate::covering_claims_id_with_identity(
+            module.id,
+            module.snapshot,
+            module.content_fingerprint().unwrap(),
+            &case,
+            &query,
+            ctx.valid_time,
+            ctx.record_time,
+            &constraints,
+            &claimed,
+            &witness,
+            &BTreeMap::new(),
+            ExecutionMode::Operative,
+        )
+        .expect("id for original fingerprint");
+        let err = accept_covering_eval(
+            id,
+            other.id,
+            other.snapshot,
+            &case,
+            &query,
+            &other,
+            &ctx,
+            &constraints,
+            &claimed,
+            witness,
+        )
+        .expect_err("fingerprint must match the replayed module");
+        assert!(
+            err.contains("does not match")
+                || err.contains("fingerprint")
+                || err.contains("program"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_undeclared_fact_bindings_are_not_completion_worlds() {
+        let module = tautology_module();
+        let claimed = Value::Bool(true);
         let witness = covering_witness(
             true,
             vec![bool_branch(false, true), bool_branch(true, true)],
         );
-        let cert = covering_eval(&module, &claimed, witness).expect("tautology covers");
-        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
-        assert!(cert.is_covering());
-        let mut ignored = BTreeSet::new();
-        ignored.insert(ignored_issue());
-        Outcome::determinate(claimed, TraceId::of(b"t"), Some(cert), ignored)
-            .expect("finite replay may ignore open issues");
+        let err = covering_eval(&module, &claimed, witness)
+            .expect_err("undeclared fact keys are not admitted assignments");
+        assert!(
+            err.contains("undeclared") || err.contains("product"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn test_admitted_slots_without_fact_overwrite_cannot_claim_true_for_fixed_false() {
+        let module = module_with_plan(QueryPlan::Evaluate(Term::Ident("fixed".into())));
+        let mut case = CaseRecord::default();
+        case.facts.insert("fixed".into(), Value::Bool(false));
+        case.admissible_completions
+            .interpretations
+            .insert("I".into(), vec!["A".into(), "B".into()]);
+        let branches = ["A", "B"]
+            .into_iter()
+            .map(|alternative| BranchClaim {
+                bindings: BTreeMap::from([("i:I".into(), Value::String(alternative.into()))]),
+                answer: Value::Bool(true),
+            })
+            .collect();
+        let witness = covering_witness(true, branches);
+        let err = covering_eval_case(&module, &case, &Value::Bool(true), witness)
+            .expect_err("fixed fact stays false");
+        assert!(
+            err.contains("fabricated") || err.contains("covering"),
+            "{err}"
+        );
     }
 }
