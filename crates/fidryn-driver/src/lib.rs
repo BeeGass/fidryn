@@ -2,23 +2,29 @@
 //!
 //! Check is memoized by blake3 of source bytes together with the manifest
 //! snapshot, artifact digest strings, `source_root` display path, and blake3
-//! of readable artifact bytes. Evaluate is memoized by canonical module
+//! of readable artifact bytes. A [`VerifiedSourceBundle`] is stored with the
+//! compiled module; trust is that bundle's summary, not a reconstruction
+//! from digest-looking strings. Evaluate is memoized by canonical module
 //! JSON together with [`CoreModule::program_digest`] / [`CoreModule::content_fingerprint`] (executable content,
 //! not only [`fidryn_core::ModuleId`]), query name, query arguments, canonical
-//! case JSON, and bitemporal times. Memo tables are explicit [`HashMap`]s; the
-//! `salsa` crate is not used.
+//! case JSON, bitemporal times, and [`ExecutionRequest`] identity (mode and
+//! optional budget). Memo tables are explicit [`HashMap`]s; the `salsa` crate
+//! is not used. Pasted mill source uses `source_root = None` and never
+//! follows artifact paths or `packages/`.
 
-use fidryn_check::{check_with_sources, source_integrity};
+use fidryn_check::check_with_sources;
 use fidryn_core::{
-    CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport, Outcome,
-    QueryName, RunContext, SourceManifest, TrustProfile, Value, canonical_json,
+    CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport,
+    ExecutionMode, ExecutionRequest, Outcome, PackageLock, QueryName, RunContext, SourceManifest,
+    TrustProfile, Value, VerifiedSourceBundle, canonical_json, is_safe_package_name,
+    package_name_from_import, packages_root,
 };
 use fidryn_eval::{evaluate, evaluate_scenario, report_from_scenario};
 use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_syntax::ast::{HeaderKind, Item};
 use fidryn_syntax::parse_file;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
@@ -27,7 +33,7 @@ use std::path::{Path, PathBuf};
 pub struct Driver {
     check_cache: HashMap<CheckKey, Result<CoreModule, Vec<Diagnostic>>>,
     run_cache: HashMap<RunKey, Result<Outcome<Value>, EngineError>>,
-    source_trust: HashMap<TrustKey, TrustProfile>,
+    source_bundles: HashMap<TrustKey, VerifiedSourceBundle>,
     hits: u64,
     misses: u64,
 }
@@ -47,7 +53,7 @@ impl Driver {
         Self {
             check_cache: HashMap::new(),
             run_cache: HashMap::new(),
-            source_trust: HashMap::new(),
+            source_bundles: HashMap::new(),
             hits: 0,
             misses: 0,
         }
@@ -68,7 +74,8 @@ impl Driver {
     /// Artifact files are not read (`source_root` is `None`). The memo key is
     /// blake3(source) together with the snapshot string, artifact digests,
     /// and an unread-bytes sentinel. Comment-only edits change the source
-    /// bytes and miss. Pasted source never follows artifact paths.
+    /// bytes and miss. Pasted source never follows artifact paths or
+    /// `packages/` on the filesystem.
     pub fn check_source(
         &mut self,
         source: &str,
@@ -83,7 +90,9 @@ impl Driver {
     ///
     /// After parse/elaborate, checking uses
     /// [`fidryn_check::check_with_sources`] with `source_root = path.parent()`
-    /// so hex import digests authenticate against artifact bytes. The memo key
+    /// so hex import digests authenticate against artifact bytes. Imports such
+    /// as `Std.Core` may be satisfied by `source_root/packages/<name>` when
+    /// the package lock digest matches the module bytes. The memo key
     /// includes source_root and artifact bytes; tamper or a different root
     /// misses.
     pub fn check_path(
@@ -96,8 +105,9 @@ impl Driver {
                 format!("cannot read {}: {e}", path.display()),
             )]
         })?;
-        let manifest = load_manifest(path, &src)?;
+        let mut manifest = load_manifest(path, &src)?;
         let source_root = path.parent().unwrap_or(Path::new("."));
+        extend_manifest_with_packages(&mut manifest, source_root, &src)?;
         let module = self.check_cached(&src, &manifest, Some(source_root))?;
         Ok((module, manifest))
     }
@@ -116,8 +126,8 @@ impl Driver {
         self.misses += 1;
         let result = compile_with_sources(source, manifest, source_root);
         if let Ok(module) = &result {
-            self.source_trust
-                .insert(trust_key(module), source_integrity(manifest, source_root));
+            let bundle = pin_bundle(manifest, source_root);
+            self.source_bundles.insert(trust_key(module), bundle);
         }
         self.check_cache.insert(key, result.clone());
         result
@@ -149,17 +159,8 @@ impl Driver {
         ctx: &RunContext,
         args: &BTreeMap<String, Value>,
     ) -> Result<Outcome<Value>, EngineError> {
-        let key = run_key(module, query, args, case, ctx)?;
-        if let Some(cached) = self.run_cache.get(&key) {
-            self.hits += 1;
-            return cached.clone();
-        }
-        self.misses += 1;
-        let result = evaluate_run(module, query, args, case, ctx);
-        if !matches!(result, Err(EngineError::FuelExhausted { .. })) {
-            self.run_cache.insert(key, result.clone());
-        }
-        result
+        let request = execution_request(module, query, args, case, ctx, ExecutionMode::Operative)?;
+        self.cached_eval(module, query, args, case, ctx, &request, evaluate_run)
     }
 
     /// Evaluate `query` and wrap the outcome as [`EvaluationReport`].
@@ -226,30 +227,80 @@ impl Driver {
         scenario: bool,
     ) -> Result<EvaluationReport<Value>, EngineError> {
         let scenario = scenario || !case.assumptions.is_empty();
-        if scenario {
-            let outcome = evaluate_scenario_run(module, query, args, case, ctx)?;
-            let mut report = report_from_scenario(outcome, case.assumptions.clone());
-            report.trust = self.source_trust_of(module);
-            Ok(report)
+        let mode = if scenario {
+            ExecutionMode::Scenario
         } else {
-            self.run_with_args(module, query, case, ctx, args)
-                .map(|outcome| {
-                    let mut report = EvaluationReport::from_outcome(outcome);
-                    report.trust = self.source_trust_of(module);
-                    report
-                })
+            ExecutionMode::Operative
+        };
+        let request = execution_request(module, query, args, case, ctx, mode)?;
+        let outcome = if scenario {
+            self.cached_eval(
+                module,
+                query,
+                args,
+                case,
+                ctx,
+                &request,
+                evaluate_scenario_run,
+            )?
+        } else {
+            self.cached_eval(module, query, args, case, ctx, &request, evaluate_run)?
+        };
+        let mut report = if scenario {
+            report_from_scenario(outcome, case.assumptions.clone())
+        } else {
+            EvaluationReport::from_outcome(outcome)
+        };
+        report.trust = self.source_trust_of(module);
+        Ok(report)
+    }
+
+    #[allow(clippy::too_many_arguments, clippy::type_complexity)]
+    fn cached_eval(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        args: &BTreeMap<String, Value>,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        request: &ExecutionRequest,
+        eval: fn(
+            &CoreModule,
+            &str,
+            &BTreeMap<String, Value>,
+            &CaseRecord,
+            &RunContext,
+        ) -> Result<Outcome<Value>, EngineError>,
+    ) -> Result<Outcome<Value>, EngineError> {
+        let key = run_key(module, query, args, case, ctx, request)?;
+        if let Some(cached) = self.run_cache.get(&key) {
+            self.hits += 1;
+            return cached.clone();
         }
+        self.misses += 1;
+        let result = eval(module, query, args, case, ctx);
+        if !matches!(result, Err(EngineError::FuelExhausted { .. })) {
+            self.run_cache.insert(key, result.clone());
+        }
+        result
+    }
+
+    /// Bundle recorded when this driver compiled `module`.
+    pub fn source_bundle_of(&self, module: &CoreModule) -> Option<&VerifiedSourceBundle> {
+        self.source_bundles.get(&trust_key(module))
     }
 
     /// Trust recorded when this driver compiled `module`.
     ///
-    /// In-memory compile is unauthenticated unless an artifact digest is
-    /// `"fixture"`. Path compile is byte-verified only when every hex
-    /// artifact was read and matched. Unknown modules are unauthenticated.
+    /// Prefers the stored [`VerifiedSourceBundle`] summary over reconstructing
+    /// trust from digest-looking strings. In-memory compile is unauthenticated
+    /// unless an artifact digest is `"fixture"`. Path compile is byte-verified
+    /// only when every hex artifact (including injected package modules) was
+    /// read and matched. Unknown modules are unauthenticated. `check_source`
+    /// never reads `packages/`.
     pub fn source_trust_of(&self, module: &CoreModule) -> TrustProfile {
-        self.source_trust
-            .get(&trust_key(module))
-            .copied()
+        self.source_bundle_of(module)
+            .map(VerifiedSourceBundle::trust_summary)
             .unwrap_or(TrustProfile::Unauthenticated)
     }
 }
@@ -258,6 +309,26 @@ impl Default for Driver {
     fn default() -> Self {
         Self::new()
     }
+}
+
+fn pin_bundle(manifest: &SourceManifest, source_root: Option<&Path>) -> VerifiedSourceBundle {
+    match source_root {
+        None => VerifiedSourceBundle::from_manifest(manifest),
+        Some(root) => {
+            VerifiedSourceBundle::from_observed(manifest, |path| read_artifact_bytes(root, path))
+        }
+    }
+}
+
+fn execution_request(
+    module: &CoreModule,
+    query: &str,
+    args: &BTreeMap<String, Value>,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    mode: ExecutionMode,
+) -> Result<ExecutionRequest, EngineError> {
+    ExecutionRequest::from_eval(module, query, args, case, ctx, mode).map_err(EngineError::Internal)
 }
 
 fn trust_key(module: &CoreModule) -> TrustKey {
@@ -391,6 +462,7 @@ fn run_key(
     args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
+    request: &ExecutionRequest,
 ) -> Result<RunKey, EngineError> {
     let module_json =
         canonical_json(module).map_err(|err| EngineError::Internal(err.to_string()))?;
@@ -414,7 +486,140 @@ fn run_key(
     hasher.update(ctx.valid_time.to_rfc3339().as_bytes());
     hasher.update(&[0xff]);
     hasher.update(ctx.record_time.to_rfc3339().as_bytes());
+    hasher.update(&[0xff]);
+    hasher.update(request.identity().as_bytes());
     Ok(RunKey(*hasher.finalize().as_bytes()))
+}
+
+/// Inject `source_root/packages/<name>` locks for imports in `src`.
+///
+/// Only [`Driver::check_path`] calls this. [`Driver::check_source`] must not:
+/// mill paste has no `source_root` and must not follow server `packages/`.
+fn extend_manifest_with_packages(
+    manifest: &mut SourceManifest,
+    source_root: &Path,
+    src: &str,
+) -> Result<(), Vec<Diagnostic>> {
+    let packages_dir = packages_root(source_root);
+    if !packages_dir.is_dir() {
+        return Ok(());
+    }
+    let wanted = imported_package_names(src);
+    if wanted.is_empty() {
+        return Ok(());
+    }
+    let mut errors = Vec::new();
+    for name in wanted {
+        match load_package_artifact(source_root, &name) {
+            Ok(Some(artifact)) => {
+                if !manifest
+                    .artifacts
+                    .iter()
+                    .any(|existing| existing.path == artifact.path)
+                {
+                    manifest.artifacts.push(artifact);
+                }
+            }
+            Ok(None) => {}
+            Err(ds) => errors.extend(ds),
+        }
+    }
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
+}
+
+fn imported_package_names(src: &str) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    let parsed = parse_file(src);
+    let Some(module) = parsed.module() else {
+        return names;
+    };
+    for item in &module.items {
+        if let Item::Import(decl) = item {
+            let raw = decl.name.as_deref().unwrap_or("");
+            let name = package_name_from_import(raw);
+            if is_safe_package_name(&name) {
+                names.insert(name);
+            }
+        }
+    }
+    names
+}
+
+fn load_package_artifact(
+    source_root: &Path,
+    name: &str,
+) -> Result<Option<fidryn_core::ManifestArtifact>, Vec<Diagnostic>> {
+    if !is_safe_package_name(name) {
+        return Ok(None);
+    }
+    let dir = packages_root(source_root).join(name);
+    if !dir.is_dir() {
+        return Ok(None);
+    }
+    let lock_path = dir.join("manifest.json");
+    let text = match fs::read_to_string(&lock_path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == ErrorKind::NotFound => {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E540,
+                format!("package `{name}` is missing packages/{name}/manifest.json"),
+            )]);
+        }
+        Err(err) => {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E540,
+                format!("cannot read package `{name}` lock: {err}"),
+            )]);
+        }
+    };
+    let lock: PackageLock = serde_json::from_str(&text).map_err(|err| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E100,
+            format!("malformed package lock {}: {err}", lock_path.display()),
+        )]
+    })?;
+    if !lock.name.is_empty() && !lock.name.eq_ignore_ascii_case(name) {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!(
+                "package directory `{name}` does not match lock name `{}`",
+                lock.name
+            ),
+        )]);
+    }
+    let Some(module_path) = unique_package_module(&dir) else {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!("package `{name}` does not contain a unique .fr module"),
+        )]);
+    };
+    let file_name = module_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("package `{name}` module path is not utf-8"),
+            )]
+        })?;
+    let rel = format!("packages/{name}/{file_name}");
+    Ok(Some(lock.module_artifact(rel)))
+}
+
+fn unique_package_module(dir: &Path) -> Option<PathBuf> {
+    let mut found = Vec::new();
+    let entries = fs::read_dir(dir).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() && path.extension().and_then(|e| e.to_str()) == Some("fr") {
+            found.push(path);
+        }
+    }
+    if found.len() == 1 { found.pop() } else { None }
 }
 
 /// Load the source manifest for `module_path`.
@@ -1219,5 +1424,277 @@ module Examples.ImpBytes version "0.1.0" {{
         driver.check_source(&edited, &manifest).expect("edit");
         assert_eq!(driver.misses(), 2);
         assert_eq!(driver.hits(), 1);
+    }
+
+    #[test]
+    fn check_source_does_not_follow_artifact_paths() {
+        let dir = temp_module_dir("mill-no-path");
+        let bytes = b"secret-bytes-must-not-be-read";
+        let digest = blake3::hash(bytes).to_hex().to_string();
+        let artifact_path = dir.join("secret.txt");
+        fs::write(&artifact_path, bytes).expect("write secret");
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: "mill".into(),
+            jurisdiction: "Test".into(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: artifact_path.to_string_lossy().into_owned(),
+                digest,
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&bool_query("true"), &manifest)
+            .expect("in-memory compile does not require unread hex");
+        assert_eq!(
+            driver.source_trust_of(&module),
+            TrustProfile::Unauthenticated
+        );
+        let bundle = driver.source_bundle_of(&module).expect("bundle");
+        assert!(!bundle.artifacts[0].ok);
+        assert!(bundle.artifacts[0].observed_digest.is_none());
+        assert_ne!(bundle.trust_summary(), TrustProfile::ByteVerified);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn check_path_bundle_identity_is_byte_verified_when_hex_matches() {
+        let dir = temp_module_dir("bundle-bytes");
+        let bytes = b"fidryn-source-bytes";
+        let digest = blake3::hash(bytes).to_hex().to_string();
+        fs::write(dir.join("Other.Law"), bytes).expect("write artifact");
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "Other.Law".into(),
+                digest: digest.clone(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        fs::write(
+            dir.join("sources").join("manifest.json"),
+            serde_json::to_string(&manifest).expect("manifest json"),
+        )
+        .expect("write manifest");
+        let src = format!(
+            r#"
+module Examples.ImpBytes version "0.1.0" {{
+    import Other.Law version "1" {{ digest "{digest}" }}
+    query ok() -> Bool {{
+        goal Evaluate {{ true }}
+    }}
+}}
+"#
+        );
+        let path = dir.join("m.fr");
+        fs::write(&path, &src).expect("write module");
+        let mut driver = Driver::new();
+        let (module, _) = driver.check_path(&path).expect("check");
+        let bundle = driver.source_bundle_of(&module).expect("bundle");
+        assert!(bundle.artifacts[0].ok);
+        assert_eq!(
+            bundle.artifacts[0].observed_digest.as_deref(),
+            Some(digest.as_str())
+        );
+        assert_eq!(bundle.trust_summary(), TrustProfile::ByteVerified);
+        assert_eq!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn dangling_hex_bundle_is_unauthenticated() {
+        let src = bool_query("true");
+        let manifest = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: "review-snapshot".into(),
+            jurisdiction: "Test".into(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "never-created.txt".into(),
+                digest: "ab".repeat(32),
+                kind: "text".into(),
+                effective: "2033-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let mut driver = Driver::new();
+        let module = driver.check_source(&src, &manifest).expect("compile");
+        let bundle = driver.source_bundle_of(&module).expect("bundle");
+        assert!(!bundle.artifacts[0].ok);
+        assert_eq!(bundle.trust_summary(), TrustProfile::Unauthenticated);
+        assert_eq!(driver.source_trust_of(&module), bundle.trust_summary());
+    }
+
+    #[test]
+    fn run_report_warm_and_cold_agree() {
+        let src = bool_query("true");
+        let case = CaseRecord::default();
+        let mut cold = Driver::new();
+        let module = cold
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let cold_report = cold.run_report(&module, "q", &case, &ctx()).expect("cold");
+        let mut warm = Driver::new();
+        let warm_module = warm
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let first = warm
+            .run_report(&warm_module, "q", &case, &ctx())
+            .expect("warm miss");
+        let hits = warm.hits();
+        let second = warm
+            .run_report(&warm_module, "q", &case, &ctx())
+            .expect("warm hit");
+        assert_eq!(warm.hits(), hits + 1);
+        assert_eq!(cold_report.outcome, first.outcome);
+        assert_eq!(first, second);
+        assert_eq!(first.execution_mode, ExecutionMode::Operative);
+    }
+
+    #[test]
+    fn scenario_request_misses_operative_run_cache() {
+        let src = bool_query("true");
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(&src, &SourceManifest::default())
+            .expect("compile");
+        let case = CaseRecord::default();
+        driver.run(&module, "q", &case, &ctx()).expect("operative");
+        let misses = driver.misses();
+        driver
+            .run_report_scenario(&module, "q", &case, &ctx())
+            .expect("scenario");
+        assert_eq!(
+            driver.misses(),
+            misses + 1,
+            "scenario ExecutionRequest identity must miss the operative slot"
+        );
+        driver
+            .run_report_scenario(&module, "q", &case, &ctx())
+            .expect("scenario hit");
+        assert_eq!(driver.misses(), misses + 1);
+    }
+
+    fn workspace_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
+    }
+
+    fn std_core_import_src() -> &'static str {
+        r#"
+module Examples.UseStd version "0.1.0" {
+    import Std.Core version "0.1.0"
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#
+    }
+
+    fn copy_std_package(dest_root: &Path) {
+        let src = workspace_root().join("packages").join("std");
+        let dest = dest_root.join("packages").join("std");
+        fs::create_dir_all(&dest).expect("packages/std");
+        fs::copy(src.join("core.fr"), dest.join("core.fr")).expect("copy core.fr");
+        fs::copy(src.join("manifest.json"), dest.join("manifest.json")).expect("copy lock");
+    }
+
+    #[test]
+    fn check_path_matching_package_digest_authenticates() {
+        let dir = temp_module_dir("pkg-ok");
+        copy_std_package(&dir);
+        let path = dir.join("m.fr");
+        fs::write(&path, std_core_import_src()).expect("write module");
+        let mut driver = Driver::new();
+        let (module, manifest) = driver.check_path(&path).expect("matching package digest");
+        assert!(
+            manifest
+                .artifacts
+                .iter()
+                .any(|a| a.path == "packages/std/core.fr"),
+            "{manifest:?}"
+        );
+        assert_eq!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn check_path_mismatched_package_digest_is_e200() {
+        let dir = temp_module_dir("pkg-bad");
+        copy_std_package(&dir);
+        let lock_path = dir.join("packages").join("std").join("manifest.json");
+        let mut lock: PackageLock =
+            serde_json::from_str(&fs::read_to_string(&lock_path).expect("lock"))
+                .expect("parse lock");
+        lock.digest = blake3::hash(b"tampered-package-bytes").to_hex().to_string();
+        fs::write(&lock_path, serde_json::to_string(&lock).expect("lock json"))
+            .expect("write lock");
+        let path = dir.join("m.fr");
+        fs::write(&path, std_core_import_src()).expect("write module");
+        let err = Driver::new()
+            .check_path(&path)
+            .expect_err("mismatched package digest is E200");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn check_source_does_not_read_packages_from_filesystem() {
+        let dir = temp_module_dir("pkg-trap");
+        copy_std_package(&dir);
+        let src = std_core_import_src();
+        let mut driver = Driver::new();
+        let module = driver
+            .check_source(src, &SourceManifest::default())
+            .expect("digest-free import without a bundle is not path compile");
+        assert_ne!(driver.source_trust_of(&module), TrustProfile::ByteVerified);
+        assert_eq!(
+            driver.source_trust_of(&module),
+            TrustProfile::Unauthenticated
+        );
+
+        let bytes = fs::read(dir.join("packages").join("std").join("core.fr")).expect("bytes");
+        let digest = blake3::hash(&bytes).to_hex().to_string();
+        let bundle = SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "packages/std/core.fr".into(),
+                digest,
+                kind: "package_module".into(),
+                effective: "0.1.0".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        };
+        let err = Driver::new()
+            .check_source(src, &bundle)
+            .expect_err("in-memory compile without observed bytes is unresolved");
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn repo_std_package_lock_matches_module_bytes() {
+        let pkg = workspace_root().join("packages").join("std");
+        let bytes = fs::read(pkg.join("core.fr")).expect("core.fr");
+        let lock: PackageLock =
+            serde_json::from_str(&fs::read_to_string(pkg.join("manifest.json")).expect("lock"))
+                .expect("parse lock");
+        assert_eq!(lock.name, "std");
+        assert_eq!(lock.version, "0.1.0");
+        assert_eq!(lock.digest, blake3::hash(&bytes).to_hex().to_string());
+        assert_eq!(lock.schema, fidryn_core::PACKAGE_LOCK_SCHEMA);
     }
 }
