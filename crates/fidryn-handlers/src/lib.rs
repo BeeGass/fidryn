@@ -225,24 +225,11 @@ fn select_evidence<'a>(
     issue: &PropPattern,
     known_at: Option<Instant>,
 ) -> Option<&'a EvidenceItem> {
-    let matching: Vec<&EvidenceItem> = evidence
-        .iter()
-        .filter(|item| {
-            item.schema == schema
-                && observed_by_known_at(item.observed_at, known_at)
-                && evidence_fits_issue(&item.value, issue)
-        })
-        .collect();
-    let subjects = pattern_subjects(issue);
-    matching
-        .iter()
-        .copied()
-        .find(|item| {
-            subjects
-                .iter()
-                .any(|subject| value_mentions_subject(&item.value, subject))
-        })
-        .or_else(|| matching.first().copied())
+    evidence.iter().find(|item| {
+        item.schema == schema
+            && observed_by_known_at(item.observed_at, known_at)
+            && evidence_fits_issue(&item.value, issue)
+    })
 }
 
 fn observed_by_known_at(observed_at: Instant, known_at: Option<Instant>) -> bool {
@@ -257,13 +244,150 @@ fn evidence_fits_issue(value: &Value, issue: &PropPattern) -> bool {
     if subjects.is_empty() {
         return true;
     }
-    if subjects
+    subjects
         .iter()
-        .any(|subject| value_mentions_subject(value, subject))
-    {
-        return true;
+        .any(|subject| evidence_matches_subject(value, subject, issue))
+}
+
+fn evidence_matches_subject(value: &Value, subject: &str, issue: &PropPattern) -> bool {
+    match value {
+        Value::String(name) | Value::Entity(name) => names_eq(name, subject),
+        Value::Option(Some(inner)) => evidence_matches_subject(inner, subject, issue),
+        Value::Set(items) => items
+            .iter()
+            .any(|item| evidence_matches_subject(item, subject, issue)),
+        Value::Map(_) | Value::Ctor { .. } => designated_subject_matches(value, subject, issue),
+        _ => false,
     }
-    named_subjects_in_value(value).is_empty()
+}
+
+fn designated_subject_matches(value: &Value, subject: &str, issue: &PropPattern) -> bool {
+    let mut names = BTreeSet::new();
+    let mut saw_subject_field = false;
+    collect_designated_subject_names(value, issue, &mut names, &mut saw_subject_field);
+    saw_subject_field && !names.is_empty() && names.iter().all(|name| names_eq(name, subject))
+}
+
+fn collect_designated_subject_names(
+    value: &Value,
+    issue: &PropPattern,
+    names: &mut BTreeSet<String>,
+    saw_subject_field: &mut bool,
+) {
+    match value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => {
+            for (key, nested) in fields {
+                if is_designated_subject_key(key, issue) {
+                    *saw_subject_field = true;
+                    collect_person_names(nested, names);
+                } else {
+                    collect_designated_subject_names(nested, issue, names, saw_subject_field);
+                }
+            }
+        }
+        Value::Set(items) => {
+            for nested in items {
+                collect_designated_subject_names(nested, issue, names, saw_subject_field);
+            }
+        }
+        Value::Option(Some(inner)) => {
+            collect_designated_subject_names(inner, issue, names, saw_subject_field);
+        }
+        _ => {}
+    }
+}
+
+fn collect_person_names(value: &Value, names: &mut BTreeSet<String>) {
+    match value {
+        Value::String(name) | Value::Entity(name) => {
+            names.insert(name.clone());
+        }
+        Value::Option(Some(inner)) => collect_person_names(inner, names),
+        Value::Set(items) => {
+            for nested in items {
+                collect_person_names(nested, names);
+            }
+        }
+        Value::Map(fields) | Value::Ctor { fields, .. } => {
+            for (key, nested) in fields {
+                if DESIGNATED_SUBJECT_FIELDS
+                    .iter()
+                    .any(|field| field.eq_ignore_ascii_case(key))
+                {
+                    collect_person_names(nested, names);
+                }
+            }
+        }
+        _ => {}
+    }
+}
+
+/// Person slots on evidence maps. Role fields count only when the issue is
+/// about that role (`Issuer(A)` may read `issuer`; `Certified(A)` must not).
+const DESIGNATED_SUBJECT_FIELDS: &[&str] =
+    &["subject", "person", "candidate", "occupant", "holder"];
+const ROLE_SUBJECT_FIELDS: &[&str] = &["issuer", "signer", "author", "decider"];
+
+fn is_designated_subject_key(key: &str, issue: &PropPattern) -> bool {
+    designated_keys_for_issue(issue)
+        .iter()
+        .any(|field| field.eq_ignore_ascii_case(key))
+}
+
+fn designated_keys_for_issue(issue: &PropPattern) -> Vec<&'static str> {
+    let roles: Vec<&'static str> = ROLE_SUBJECT_FIELDS
+        .iter()
+        .copied()
+        .filter(|role| issue_is_about_role(issue, role))
+        .collect();
+    if roles.is_empty() {
+        DESIGNATED_SUBJECT_FIELDS.to_vec()
+    } else {
+        roles
+    }
+}
+
+fn issue_is_about_role(issue: &PropPattern, role: &str) -> bool {
+    ident_tokens(issue_predicate(issue))
+        .iter()
+        .any(|token| token_matches_role(token, role))
+}
+
+fn issue_predicate(issue: &PropPattern) -> &str {
+    match issue {
+        PropPattern::Ground(prop) => prop.predicate.as_str(),
+        PropPattern::Match { predicate, .. } => predicate.as_str(),
+    }
+}
+
+fn token_matches_role(token: &str, role: &str) -> bool {
+    token.eq_ignore_ascii_case(role)
+        || (role.eq_ignore_ascii_case("issuer") && token.eq_ignore_ascii_case("issued"))
+}
+
+fn ident_tokens(name: &str) -> Vec<String> {
+    let mut tokens = Vec::new();
+    let mut current = String::new();
+    for c in name.chars() {
+        if c == '_' || c == '-' {
+            if !current.is_empty() {
+                tokens.push(std::mem::take(&mut current).to_ascii_lowercase());
+            }
+            continue;
+        }
+        if c.is_ascii_uppercase() && !current.is_empty() {
+            tokens.push(std::mem::take(&mut current).to_ascii_lowercase());
+        }
+        current.push(c);
+    }
+    if !current.is_empty() {
+        tokens.push(current.to_ascii_lowercase());
+    }
+    tokens
+}
+
+fn names_eq(left: &str, right: &str) -> bool {
+    left.eq_ignore_ascii_case(right)
 }
 
 fn pattern_subjects(issue: &PropPattern) -> Vec<String> {
@@ -287,18 +411,21 @@ fn term_subject(term: &Term) -> Option<String> {
     }
 }
 
+/// Nested mention helper for tests. Observe matching does not use this:
+/// an `issuer` field naming A is not evidence that A is the subject.
+#[cfg(test)]
 fn value_mentions_subject(value: &Value, subject: &str) -> bool {
     match value {
-        Value::Entity(name) | Value::String(name) => name == subject,
+        Value::Entity(name) | Value::String(name) => names_eq(name, subject),
         Value::Prop(prop) => {
-            prop.predicate == subject
+            names_eq(&prop.predicate, subject)
                 || prop
                     .arguments
                     .iter()
                     .any(|term| term_mentions_subject(term, subject))
         }
         Value::Ctor { name, fields } => {
-            name == subject || fields.values().any(|v| value_mentions_subject(v, subject))
+            names_eq(name, subject) || fields.values().any(|v| value_mentions_subject(v, subject))
         }
         Value::Map(fields) => fields.values().any(|v| value_mentions_subject(v, subject)),
         Value::Set(items) => items.iter().any(|v| value_mentions_subject(v, subject)),
@@ -310,11 +437,12 @@ fn value_mentions_subject(value: &Value, subject: &str) -> bool {
     }
 }
 
+#[cfg(test)]
 fn term_mentions_subject(term: &Term, subject: &str) -> bool {
     match term {
-        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name == subject,
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => names_eq(name, subject),
         Term::Apply { ctor, args } => {
-            ctor == subject || args.iter().any(|term| term_mentions_subject(term, subject))
+            names_eq(ctor, subject) || args.iter().any(|term| term_mentions_subject(term, subject))
         }
         Term::Set(items) => items
             .iter()
@@ -324,64 +452,6 @@ fn term_mentions_subject(term: &Term, subject: &str) -> bool {
             .any(|term| term_mentions_subject(term, subject)),
         _ => false,
     }
-}
-
-fn named_subjects_in_value(value: &Value) -> BTreeSet<String> {
-    let mut names = BTreeSet::new();
-    collect_named_subjects(value, false, &mut names);
-    names
-}
-
-fn collect_named_subjects(value: &Value, in_subject_field: bool, names: &mut BTreeSet<String>) {
-    match value {
-        Value::Entity(name) => {
-            names.insert(name.clone());
-        }
-        Value::String(name) if in_subject_field => {
-            names.insert(name.clone());
-        }
-        Value::Prop(prop) => {
-            for term in &prop.arguments {
-                if let Some(subject) = term_subject(term) {
-                    names.insert(subject);
-                }
-            }
-        }
-        Value::Ctor { fields, .. } | Value::Map(fields) => {
-            for (key, nested) in fields {
-                collect_named_subjects(nested, is_subject_key(key), names);
-            }
-        }
-        Value::Set(items) => {
-            for nested in items {
-                collect_named_subjects(nested, in_subject_field, names);
-            }
-        }
-        Value::Option(Some(inner)) => collect_named_subjects(inner, in_subject_field, names),
-        Value::ClauseRef { arguments, .. } => {
-            for nested in arguments {
-                collect_named_subjects(nested, in_subject_field, names);
-            }
-        }
-        _ => {}
-    }
-}
-
-fn is_subject_key(key: &str) -> bool {
-    matches!(
-        key,
-        "subject"
-            | "person"
-            | "entity"
-            | "party"
-            | "occupant"
-            | "who"
-            | "candidate"
-            | "holder"
-            | "trustee"
-            | "of"
-            | "name"
-    )
 }
 
 fn matching_determination<'a>(
@@ -986,6 +1056,24 @@ mod tests {
         }
     }
 
+    fn certified(person: &str) -> PropPattern {
+        PropPattern::Ground(PropTerm::new("Certified", vec![Term::Ident(person.into())]))
+    }
+
+    fn need_certified(person: &str) -> OpenRequest {
+        OpenRequest::NeedEvidence {
+            issue: certified(person),
+            schema: "Certificate".into(),
+        }
+    }
+
+    fn certificate_map(subject: &str, issuer: &str) -> Value {
+        Value::Map(BTreeMap::from([
+            ("subject".into(), Value::String(subject.into())),
+            ("issuer".into(), Value::String(issuer.into())),
+        ]))
+    }
+
     #[test]
     fn empty_completions_are_inconsistent() {
         let out = aggregate(vec![]);
@@ -1168,6 +1256,61 @@ mod tests {
             HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Entity("Alice".into())),
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn certificate_subject_b_issuer_a_does_not_resume_certified_a() {
+        let cert = certificate_map("B", "A");
+        assert!(
+            value_mentions_subject(&cert, "A"),
+            "issuer A is a nested mention; observe must not use that predicate"
+        );
+        assert!(!evidence_fits_issue(&cert, &certified("A")));
+        assert!(evidence_fits_issue(&cert, &certified("B")));
+
+        let mut record = CaseRecord::default();
+        record.evidence.push(EvidenceItem {
+            schema: "Certificate".into(),
+            value: cert.clone(),
+            observed_at: instant("2033-01-01T00:00:00Z"),
+        });
+        let mut h = CaseFile::new(record);
+
+        match h.handle_observe(&need_certified("A")) {
+            HandlerResult::Suspend { .. } => {}
+            other => panic!("issuer A must not resume Certified(A): {other:?}"),
+        }
+        match h.handle_observe(&need_certified("B")) {
+            HandlerResult::Resume { value, .. } => assert_eq!(value, cert),
+            other => panic!("subject B should resume Certified(B): {other:?}"),
+        }
+    }
+
+    #[test]
+    fn evidence_without_designated_subject_field_does_not_resume() {
+        let mut record = CaseRecord::default();
+        record.evidence.push(EvidenceItem {
+            schema: "Certificate".into(),
+            value: Value::Map(BTreeMap::from([
+                ("issuer".into(), Value::String("A".into())),
+                ("signer".into(), Value::String("A".into())),
+            ])),
+            observed_at: instant("2033-01-01T00:00:00Z"),
+        });
+        let mut h = CaseFile::new(record);
+        match h.handle_observe(&need_certified("A")) {
+            HandlerResult::Suspend { .. } => {}
+            other => panic!("missing subject field must stay unresolved: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn issuer_issue_reads_issuer_field_not_certificate_subject() {
+        let cert = certificate_map("B", "A");
+        let about_a = PropPattern::Ground(PropTerm::new("Issuer", vec![Term::Ident("A".into())]));
+        let about_b = PropPattern::Ground(PropTerm::new("Issuer", vec![Term::Ident("B".into())]));
+        assert!(evidence_fits_issue(&cert, &about_a));
+        assert!(!evidence_fits_issue(&cert, &about_b));
     }
 
     #[test]
