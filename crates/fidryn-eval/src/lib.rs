@@ -47,6 +47,7 @@ pub struct Continuation {
     pub bindings: BTreeMap<String, Value>,
     pub derived: DerivedWorld,
     pub fuel: Option<u32>,
+    pub answered: BTreeMap<String, Value>,
     case_identity: CaseIdentity,
 }
 
@@ -137,6 +138,7 @@ pub fn evaluate_session<H: Handler>(
         args.clone(),
         derived,
         None,
+        BTreeMap::new(),
     )
 }
 
@@ -159,7 +161,24 @@ pub fn resume<H: Handler>(
         return evaluate_session(module, query, args, state, ctx, handler, case);
     };
     if cont.case_identity != CaseIdentity::of(case) {
-        return evaluate_session(module, query, args, state, ctx, handler, case);
+        let Some(q) = module.query(query.as_str()) else {
+            return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
+        };
+        let derived = DerivedWorld::compute(module, case, ctx, args)?;
+        return eval_with_state(
+            &q.plan,
+            module,
+            query,
+            args,
+            state,
+            ctx,
+            handler,
+            case,
+            args.clone(),
+            derived,
+            cont.fuel,
+            cont.answered,
+        );
     }
     let residual = match &cont.residual {
         Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
@@ -177,6 +196,7 @@ pub fn resume<H: Handler>(
         cont.bindings,
         cont.derived,
         cont.fuel,
+        cont.answered,
     )
 }
 
@@ -193,7 +213,12 @@ fn eval_with_state<H: Handler>(
     bindings: BTreeMap<String, Value>,
     derived: DerivedWorld,
     fuel: Option<u32>,
+    answered: BTreeMap<String, Value>,
 ) -> Result<EvalSession, EngineError> {
+    let mut handler = RememberingHandler {
+        inner: handler,
+        answered,
+    };
     match plan {
         QueryPlan::Evaluate(term) => {
             let mut frame = EvalFrame {
@@ -201,7 +226,7 @@ fn eval_with_state<H: Handler>(
                 args,
                 bindings,
                 ctx,
-                handler,
+                handler: &mut handler,
                 case,
                 derived,
                 fuel,
@@ -213,17 +238,20 @@ fn eval_with_state<H: Handler>(
                 frame.bindings,
                 frame.derived,
                 frame.fuel,
+                handler.answered,
                 case,
             ))
         }
         other => {
-            let outcome = eval_specialized_plan(other, module, state, ctx, handler, case, &derived);
+            let outcome =
+                eval_specialized_plan(other, module, state, ctx, &mut handler, case, &derived)?;
             Ok(session_from(
                 outcome,
                 Residual::Plan(other.clone()),
                 bindings,
                 derived,
                 fuel,
+                handler.answered,
                 case,
             ))
         }
@@ -236,6 +264,7 @@ fn session_from(
     bindings: BTreeMap<String, Value>,
     derived: DerivedWorld,
     fuel: Option<u32>,
+    answered: BTreeMap<String, Value>,
     case: &CaseRecord,
 ) -> EvalSession {
     let continuation = match &outcome {
@@ -244,6 +273,7 @@ fn session_from(
             bindings,
             derived,
             fuel,
+            answered,
             case_identity: CaseIdentity::of(case),
         }),
         _ => None,
@@ -251,6 +281,70 @@ fn session_from(
     EvalSession {
         outcome,
         continuation,
+    }
+}
+
+struct RememberingHandler<'a, H> {
+    inner: &'a mut H,
+    answered: BTreeMap<String, Value>,
+}
+
+fn request_key(request: &OpenRequest) -> String {
+    match request {
+        OpenRequest::NeedEvidence { schema, .. } => format!("evidence:{schema}"),
+        OpenRequest::NeedJudgment { protocol, issue } => {
+            format!("judgment:{protocol}:{}", issue.predicate)
+        }
+        OpenRequest::NeedChoice { protocol, .. } => format!("choice:{protocol}"),
+        OpenRequest::NeedInterpretation { family, .. } => format!("interpret:{family}"),
+        OpenRequest::NeedApplicableLaw { issue, .. } => format!("law:{issue}"),
+        OpenRequest::NeedConflict { .. } => "conflict".into(),
+        OpenRequest::NeedCustom { effect, .. } => format!("custom:{effect}"),
+    }
+}
+
+impl<H: Handler> Handler for RememberingHandler<'_, H> {
+    fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_observe(req))
+    }
+    fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_determine(req))
+    }
+    fn handle_choose(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_choose(req))
+    }
+    fn handle_interpret(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_interpret(req))
+    }
+    fn handle_conflict(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_conflict(req))
+    }
+    fn handle_law(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_law(req))
+    }
+    fn handle_custom(&mut self, request: &OpenRequest) -> HandlerResult {
+        self.remembered_or(request, |this, req| this.inner.handle_custom(req))
+    }
+}
+
+impl<H: Handler> RememberingHandler<'_, H> {
+    fn remembered_or(
+        &mut self,
+        request: &OpenRequest,
+        call: impl FnOnce(&mut Self, &OpenRequest) -> HandlerResult,
+    ) -> HandlerResult {
+        let key = request_key(request);
+        if let Some(value) = self.answered.get(&key) {
+            return HandlerResult::Resume {
+                value: value.clone(),
+                trace_fragment: format!("resume-answered:{key}"),
+            };
+        }
+        let result = call(self, request);
+        if let HandlerResult::Resume { value, .. } = &result {
+            self.answered.insert(key, value.clone());
+        }
+        result
     }
 }
 
@@ -262,24 +356,32 @@ fn eval_specialized_plan<H: Handler>(
     handler: &mut H,
     case: &CaseRecord,
     derived: &DerivedWorld,
-) -> Outcome<Value> {
+) -> Result<Outcome<Value>, EngineError> {
     match plan {
-        QueryPlan::UniqueOccupant { office } => {
-            eval_unique_occupant(module, office, state, ctx, handler, case, derived)
-        }
+        QueryPlan::UniqueOccupant { office } => Ok(eval_unique_occupant(
+            module, office, state, ctx, handler, case, derived,
+        )),
         QueryPlan::StatusOf {
             status,
             when_present,
             when_closed_absent,
-        } => eval_status_of(status, when_present, when_closed_absent, case, ctx),
-        QueryPlan::EvaluateClause { clause, .. } => eval_clause(module, clause, case, handler),
-        QueryPlan::RunDecision { decision, .. } => {
-            eval_run_decision(module, decision, case, handler, ctx, derived)
-        }
-        QueryPlan::Evaluate(_) => Outcome::Suspended {
+        } => Ok(eval_status_of(
+            status,
+            when_present,
+            when_closed_absent,
+            case,
+            ctx,
+        )),
+        QueryPlan::EvaluateClause { clause, .. } => Ok(eval_clause(module, clause, case, handler)),
+        QueryPlan::RunDecision {
+            decision,
+            arguments,
+            ..
+        } => eval_run_decision(module, decision, arguments, case, handler, ctx, derived),
+        QueryPlan::Evaluate(_) => Ok(Outcome::Suspended {
             requests: BTreeSet::new(),
             trace: TraceId::of(b"eval"),
-        },
+        }),
     }
 }
 
@@ -1848,26 +1950,173 @@ fn eval_succession(
         });
         return Outcome::Suspended { requests, trace };
     }
+    let family = succession_family(module, case, key);
+    if let Some((family_name, alts)) = family {
+        if let Some(label) = case.interpretations.get(&family_name) {
+            let defs = defs_for_alternative(alts, label);
+            return select_from_eligibility(&ranked, defs, office, case, ctx, trace);
+        }
+        return contingent_from_alternatives(&family_name, alts, &ranked, office, case, ctx, trace);
+    }
     let accepted: Vec<(String, i64)> = ranked
         .iter()
         .filter(|(name, _)| is_accepted(case, name, ctx))
         .cloned()
         .collect();
-    if let Some(label) = recorded_succession_interpretation(case, &ranked)
-        && let Some(name) = nominee_for_interpretation(&label, &ranked)
+    match accepted.as_slice() {
+        [] => need_accept_office(office, trace),
+        [(name, _)] => determinate(Value::Entity(name.clone()), trace),
+        many => {
+            let winner = many.iter().min_by_key(|(_, rank)| *rank).unwrap();
+            determinate(Value::Entity(winner.0.clone()), trace)
+        }
+    }
+}
+
+type EligibilityDef = (PropTerm, bool);
+type InterpretationAlts = [(String, Vec<EligibilityDef>)];
+
+fn succession_family<'m>(
+    module: &'m CoreModule,
+    case: &CaseRecord,
+    office: &str,
+) -> Option<(String, &'m InterpretationAlts)> {
+    let families: Vec<_> = module
+        .declarations
+        .iter()
+        .filter_map(|d| match d {
+            CoreDecl::InterpretationFamily(family) => Some(family),
+            _ => None,
+        })
+        .collect();
+    let matching: Vec<_> = families
+        .iter()
+        .copied()
+        .filter(|family| family_defines_office(&family.alternatives, office))
+        .collect();
+    let pool = if matching.is_empty() {
+        families
+    } else {
+        matching
+    };
+    if let Some(name) = case
+        .interpretations
+        .keys()
+        .find(|name| pool.iter().any(|family| family.name == **name))
+        && let Some(family) = pool.iter().find(|family| family.name == *name)
     {
-        if is_accepted(case, &name, ctx) {
-            return determinate(Value::Entity(name), trace);
+        return Some((family.name.clone(), family.alternatives.as_slice()));
+    }
+    pool.first()
+        .map(|family| (family.name.clone(), family.alternatives.as_slice()))
+}
+
+fn family_defines_office(alts: &InterpretationAlts, office: &str) -> bool {
+    alts.iter().any(|(_, defs)| {
+        defs.iter().any(|(prop, _)| {
+            prop.predicate == "Eligible" && argument_names_office(prop.arguments.get(1), office)
+        })
+    })
+}
+
+fn defs_for_alternative<'a>(alts: &'a InterpretationAlts, label: &str) -> &'a [EligibilityDef] {
+    alts.iter()
+        .find(|(name, _)| name == label)
+        .map(|(_, defs)| defs.as_slice())
+        .unwrap_or(&[])
+}
+
+fn select_from_eligibility(
+    ranked: &[(String, i64)],
+    defs: &[EligibilityDef],
+    office: &Term,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    trace: TraceId,
+) -> Outcome<Value> {
+    let office_key = office_key(office);
+    let eligible: Vec<(String, i64)> = ranked
+        .iter()
+        .filter(|(name, _)| is_defined_eligible(defs, name, &office_key))
+        .cloned()
+        .collect();
+    let accepted: Vec<(String, i64)> = eligible
+        .iter()
+        .filter(|(name, _)| is_accepted(case, name, ctx))
+        .cloned()
+        .collect();
+    if accepted.is_empty() {
+        if eligible.is_empty() {
+            let mut requests = BTreeSet::new();
+            requests.insert(OpenRequest::NeedJudgment {
+                issue: PropTerm::new("Eligible", vec![Term::Wildcard, office.clone()]),
+                protocol: "Eligibility".into(),
+            });
+            return Outcome::Suspended { requests, trace };
         }
         return need_accept_office(office, trace);
     }
-    if accepted.len() >= 2 {
-        return contingent_succession(case, &ranked, &accepted, trace);
+    let winner = accepted.iter().min_by_key(|(_, rank)| *rank).unwrap();
+    determinate(Value::Entity(winner.0.clone()), trace)
+}
+
+fn is_defined_eligible(defs: &[EligibilityDef], person: &str, office: &str) -> bool {
+    defs.iter().any(|(prop, established)| {
+        *established
+            && prop.predicate == "Eligible"
+            && argument_names_person(prop.arguments.first(), person)
+            && argument_names_office(prop.arguments.get(1), office)
+    })
+}
+
+fn argument_names_person(term: Option<&Term>, person: &str) -> bool {
+    match term {
+        Some(Term::Ident(name) | Term::String(name)) => name.eq_ignore_ascii_case(person),
+        _ => false,
     }
-    if let Some((name, _)) = accepted.first() {
-        return determinate(Value::Entity(name.clone()), trace);
+}
+
+fn argument_names_office(term: Option<&Term>, office: &str) -> bool {
+    match term {
+        Some(t) => office_matches(&office_key(t), office),
+        None => false,
     }
-    need_accept_office(office, trace)
+}
+
+fn contingent_from_alternatives(
+    family: &str,
+    alts: &InterpretationAlts,
+    ranked: &[(String, i64)],
+    office: &Term,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    trace: TraceId,
+) -> Outcome<Value> {
+    let mut alternatives = BTreeMap::new();
+    for (label, defs) in alts {
+        if let Outcome::Determinate { value, .. } =
+            select_from_eligibility(ranked, defs, office, case, ctx, trace)
+        {
+            alternatives.insert(label.clone(), value);
+        }
+    }
+    if alternatives.is_empty() {
+        return need_accept_office(office, trace);
+    }
+    let values: Vec<_> = alternatives.values().cloned().collect();
+    if values.windows(2).all(|w| w[0] == w[1]) {
+        return determinate(values[0].clone(), trace);
+    }
+    let mut pivots = BTreeSet::new();
+    pivots.insert(OpenRequest::NeedInterpretation {
+        source: family.to_owned(),
+        family: family.to_owned(),
+    });
+    Outcome::Contingent {
+        alternatives,
+        pivots,
+        trace,
+    }
 }
 
 fn need_accept_office(office: &Term, trace: TraceId) -> Outcome<Value> {
@@ -1903,86 +2152,6 @@ fn value_names_person(value: &Value, name: &str) -> bool {
                 .any(|s| s.eq_ignore_ascii_case(name))
         }),
         _ => false,
-    }
-}
-
-fn recorded_succession_interpretation(
-    case: &CaseRecord,
-    ranked: &[(String, i64)],
-) -> Option<String> {
-    case.interpretations.iter().find_map(|(family, value)| {
-        if !case
-            .admissible_completions
-            .interpretations
-            .contains_key(family)
-        {
-            return None;
-        }
-        nominee_for_interpretation(value, ranked).map(|_| value.clone())
-    })
-}
-
-fn nominee_for_interpretation(label: &str, ranked: &[(String, i64)]) -> Option<String> {
-    if let Some((name, _)) = ranked
-        .iter()
-        .find(|(name, _)| name.eq_ignore_ascii_case(label))
-    {
-        return Some(name.clone());
-    }
-    nominee_index(label).and_then(|idx| ranked.get(idx).map(|(name, _)| name.clone()))
-}
-
-fn nominee_index(label: &str) -> Option<usize> {
-    let text = label.trim();
-    let rest = text
-        .strip_prefix('I')
-        .or_else(|| text.strip_prefix('i'))
-        .unwrap_or(text);
-    let n: usize = rest.parse().ok()?;
-    n.checked_sub(1)
-}
-
-fn contingent_succession(
-    case: &CaseRecord,
-    ranked: &[(String, i64)],
-    accepted: &[(String, i64)],
-    trace: TraceId,
-) -> Outcome<Value> {
-    let mut alternatives = BTreeMap::new();
-    let mut pivots = BTreeSet::new();
-    let families = &case.admissible_completions.interpretations;
-    if families.is_empty() {
-        for (i, (name, _)) in accepted.iter().enumerate() {
-            alternatives.insert(format!("I{}", i + 1), Value::Entity(name.clone()));
-        }
-        pivots.insert(OpenRequest::NeedInterpretation {
-            source: String::new(),
-            family: "succession".into(),
-        });
-    } else {
-        for (family, alts) in families {
-            for alt in alts {
-                if let Some(name) = nominee_for_interpretation(alt, ranked)
-                    && accepted.iter().any(|(n, _)| n == &name)
-                {
-                    alternatives.insert(alt.clone(), Value::Entity(name));
-                }
-            }
-            pivots.insert(OpenRequest::NeedInterpretation {
-                source: family.clone(),
-                family: family.clone(),
-            });
-        }
-        if alternatives.is_empty() {
-            for (i, (name, _)) in accepted.iter().enumerate() {
-                alternatives.insert(format!("I{}", i + 1), Value::Entity(name.clone()));
-            }
-        }
-    }
-    Outcome::Contingent {
-        alternatives,
-        pivots,
-        trace,
     }
 }
 
@@ -2147,65 +2316,68 @@ fn eval_clause<H: Handler>(
     }
 }
 
-fn is_foia_process(name: &str) -> bool {
-    let n = name.trim();
-    n.eq_ignore_ascii_case("ProcessResponsiveRecord")
-        || n.eq_ignore_ascii_case("IssueFOIADetermination")
-}
-
 fn eval_run_decision<H: Handler>(
     module: &CoreModule,
     decision: &str,
+    arguments: &[Term],
     case: &CaseRecord,
     handler: &mut H,
     ctx: &RunContext,
     derived: &DerivedWorld,
-) -> Outcome<Value> {
-    let trace = TraceId::of(decision.as_bytes());
-    if let Some(decl) = find_decision(module, decision)
-        && !decl.requirements.is_empty()
-    {
-        let mut open = BTreeSet::new();
-        for req in &decl.requirements {
-            if let Some(halt) =
-                gather_unmet_requirement(req, case, ctx, derived, handler, &mut open)
-            {
-                return halt;
-            }
-        }
-        if !open.is_empty() {
-            return Outcome::Suspended {
-                requests: open,
-                trace,
-            };
-        }
-        if let Some(ret) = &decl.declared_result
-            && let Some(value) = term_as_value_literal(&ret.expression)
-        {
-            return determinate(value, trace);
-        }
-        if let Some(recorded) = case.decisions.get(decision) {
-            return determinate(Value::String(recorded.clone()), trace);
-        }
-        let mut requests = BTreeSet::new();
-        requests.insert(OpenRequest::NeedJudgment {
-            issue: PropTerm::new(decision, vec![]),
-            protocol: decision.to_owned(),
-        });
-        return Outcome::Suspended { requests, trace };
+) -> Result<Outcome<Value>, EngineError> {
+    let Some(decl) = find_decision(module, decision) else {
+        return Err(unsupported(format!("unknown decision `{decision}`")));
+    };
+    if !decl.binders.is_empty() && decl.binders.len() != arguments.len() {
+        return Err(EngineError::InvalidInput(format!(
+            "decision `{decision}` expects {} argument(s), got {}",
+            decl.binders.len(),
+            arguments.len()
+        )));
     }
-    if is_foia_process(decision) {
-        return eval_foia(case, handler, ctx);
+    let trace = TraceId::of(decision.as_bytes());
+    let mut open = BTreeSet::new();
+    for req in &decl.requirements {
+        if let Some(halt) = gather_unmet_requirement(req, case, ctx, derived, handler, &mut open) {
+            return Ok(halt);
+        }
+    }
+    if !open.is_empty() {
+        return Ok(Outcome::Suspended {
+            requests: open,
+            trace,
+        });
+    }
+    if let Some(ret) = &decl.declared_result
+        && let Some(value) = decision_result_value(&ret.expression, case)
+    {
+        return Ok(determinate(value, trace));
     }
     if let Some(recorded) = case.decisions.get(decision) {
-        return determinate(Value::String(recorded.clone()), trace);
+        return Ok(determinate(Value::String(recorded.clone()), trace));
     }
     let mut requests = BTreeSet::new();
     requests.insert(OpenRequest::NeedJudgment {
         issue: PropTerm::new(decision, vec![]),
         protocol: decision.to_owned(),
     });
-    Outcome::Suspended { requests, trace }
+    Ok(Outcome::Suspended { requests, trace })
+}
+
+fn decision_result_value(term: &Term, case: &CaseRecord) -> Option<Value> {
+    if let Some(value) = term_as_value_literal(term) {
+        match &value {
+            Value::String(name) => case
+                .facts
+                .get(name)
+                .cloned()
+                .or_else(|| case.facts.get("proposed_disposition").cloned())
+                .or(Some(value)),
+            other => Some(other.clone()),
+        }
+    } else {
+        None
+    }
 }
 
 fn gather_unmet_requirement<H: Handler>(
@@ -2359,48 +2531,6 @@ fn term_as_value_literal(term: &Term) -> Option<Value> {
     }
 }
 
-fn eval_foia<H: Handler>(case: &CaseRecord, handler: &mut H, ctx: &RunContext) -> Outcome<Value> {
-    let trace = TraceId::of(b"foia-disposition");
-    let known = ctx.record_time;
-    let has_harm = case
-        .evidence
-        .iter()
-        .any(|e| e.schema == "HarmAnalysis" && e.observed_at <= known);
-    let has_seg = case
-        .evidence
-        .iter()
-        .any(|e| e.schema == "SegregabilityAnalysis" && e.observed_at <= known);
-    let mut requests = BTreeSet::new();
-    if !has_harm {
-        let req = OpenRequest::NeedEvidence {
-            issue: PropPattern::Ground(PropTerm::new("ForeseeableHarm", vec![])),
-            schema: "HarmAnalysis".into(),
-        };
-        if !matches!(handler.handle(&req), HandlerResult::Resume { .. }) {
-            requests.insert(req);
-        }
-    }
-    if !has_seg {
-        let req = OpenRequest::NeedEvidence {
-            issue: PropPattern::Ground(PropTerm::new("SegregabilityEstablished", vec![])),
-            schema: "SegregabilityAnalysis".into(),
-        };
-        if !matches!(handler.handle(&req), HandlerResult::Resume { .. }) {
-            requests.insert(req);
-        }
-    }
-    if !requests.is_empty() {
-        return Outcome::Suspended { requests, trace };
-    }
-    determinate(
-        case.facts
-            .get("proposed_disposition")
-            .cloned()
-            .unwrap_or(Value::String("released".into())),
-        trace,
-    )
-}
-
 fn occupancy_from_records(case: &CaseRecord, office: &str, ctx: &RunContext) -> Vec<Occupancy> {
     case.evidence
         .iter()
@@ -2468,8 +2598,8 @@ mod tests {
     use fidryn_core::case::CaseDetermination;
     use fidryn_core::effects::HandlerResult;
     use fidryn_core::ir::{
-        Consequence, CoreEffect, CoreNomination, CoreProposition, CoreQuery, CoreRule,
-        DecisionReturn, DeclaredDecisionResult, RuleKind,
+        Consequence, CoreDecision, CoreEffect, CoreInterpretationFamily, CoreNomination,
+        CoreProposition, CoreQuery, CoreRule, DecisionReturn, DeclaredDecisionResult, RuleKind,
     };
     use fidryn_core::{
         EffectId, ModuleId, PrimitiveType, Sort, SourceManifestId, SourceSnapshotId, Type,
@@ -2504,26 +2634,255 @@ mod tests {
         }
     }
 
+    struct Scripted {
+        resume: BTreeSet<String>,
+        halt: BTreeSet<String>,
+        counts: BTreeMap<String, usize>,
+    }
+
+    impl Scripted {
+        fn resume_only(schemas: &[&str]) -> Self {
+            Self {
+                resume: schemas.iter().map(|s| (*s).to_owned()).collect(),
+                halt: BTreeSet::new(),
+                counts: BTreeMap::new(),
+            }
+        }
+
+        fn halt_on(schema: &str) -> Self {
+            Self {
+                resume: BTreeSet::new(),
+                halt: BTreeSet::from([schema.to_owned()]),
+                counts: BTreeMap::new(),
+            }
+        }
+
+        fn count(&self, schema: &str) -> usize {
+            self.counts.get(schema).copied().unwrap_or(0)
+        }
+
+        fn bump(&mut self, schema: &str) {
+            *self.counts.entry(schema.to_owned()).or_insert(0) += 1;
+        }
+    }
+
+    impl Handler for Scripted {
+        fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
+            let schema = match request {
+                OpenRequest::NeedEvidence { schema, .. } => schema.clone(),
+                _ => "other".into(),
+            };
+            self.bump(&schema);
+            if self.halt.contains(&schema) {
+                return HandlerResult::Halt {
+                    reason: HaltReason::OutsideCompetence {
+                        request: request.clone(),
+                        reason: "invalid response".into(),
+                    },
+                    trace_fragment: "halt".into(),
+                };
+            }
+            if self.resume.contains(&schema) {
+                return HandlerResult::Resume {
+                    value: Value::Bool(true),
+                    trace_fragment: format!("resume:{schema}"),
+                };
+            }
+            let mut requests = BTreeSet::new();
+            requests.insert(request.clone());
+            HandlerResult::Suspend {
+                requests,
+                reason: fidryn_core::SuspensionReason::MissingRecord,
+                trace_fragment: "missing".into(),
+            }
+        }
+        fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+        fn handle_choose(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+        fn handle_interpret(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+    }
+
+    fn eligible_def(person: &str, office: &str, established: bool) -> (PropTerm, bool) {
+        (
+            PropTerm::new(
+                "Eligible",
+                vec![Term::Ident(person.into()), Term::Ident(office.into())],
+            ),
+            established,
+        )
+    }
+
     fn module_with_occupant() -> CoreModule {
-        let mut module = module_with_plan(
+        let office = "TrusteeOf(BRT)";
+        let family = CoreDecl::InterpretationFamily(CoreInterpretationFamily {
+            id: NodeId::of(b"SuccessorEligibility"),
+            name: "SuccessorEligibility".into(),
+            source: Term::Ident("SuccessorEligibility".into()),
+            alternatives: vec![
+                (
+                    "I1".into(),
+                    vec![
+                        eligible_def("Alice", office, true),
+                        eligible_def("Bob", office, true),
+                    ],
+                ),
+                (
+                    "I2".into(),
+                    vec![
+                        eligible_def("Alice", office, false),
+                        eligible_def("Bob", office, true),
+                    ],
+                ),
+                (
+                    "BobOnly".into(),
+                    vec![
+                        eligible_def("Alice", office, false),
+                        eligible_def("Bob", office, true),
+                    ],
+                ),
+            ],
+            meta: test_meta("SuccessorEligibility"),
+        });
+        let mut module = module_with_plan_decls(
             "acting_trustee",
             QueryPlan::UniqueOccupant {
-                office: Term::Ident("TrusteeOf(BRT)".into()),
+                office: Term::Ident(office.into()),
             },
+            vec![family],
         );
         module.nominations = vec![
             CoreNomination {
                 candidate: "Alice".into(),
-                office: "TrusteeOf(BRT)".into(),
+                office: office.into(),
                 rank: 1,
             },
             CoreNomination {
                 candidate: "Bob".into(),
-                office: "TrusteeOf(BRT)".into(),
+                office: office.into(),
                 rank: 2,
             },
         ];
         module
+    }
+
+    fn family_mut(module: &mut CoreModule) -> &mut CoreInterpretationFamily {
+        module
+            .declarations
+            .iter_mut()
+            .find_map(|decl| match decl {
+                CoreDecl::InterpretationFamily(family) => Some(family),
+                _ => None,
+            })
+            .expect("family")
+    }
+
+    fn rename_family_labels(module: &mut CoreModule, pairs: &[(&str, &str)]) {
+        let family = family_mut(module);
+        for (from, to) in pairs {
+            for (label, _) in &mut family.alternatives {
+                if label == from {
+                    *label = (*to).to_owned();
+                }
+            }
+        }
+    }
+
+    fn set_family_defs(module: &mut CoreModule, label: &str, defs: Vec<(PropTerm, bool)>) {
+        let family = family_mut(module);
+        if let Some((_, slot)) = family
+            .alternatives
+            .iter_mut()
+            .find(|(name, _)| name == label)
+        {
+            *slot = defs;
+        }
+    }
+
+    fn nomination(candidate: &str, office: &str, rank: i64) -> CoreNomination {
+        CoreNomination {
+            candidate: candidate.into(),
+            office: office.into(),
+            rank,
+        }
+    }
+
+    fn module_with_two_offices() -> CoreModule {
+        let trustee = "TrusteeOf(BRT)";
+        let executor = "ExecutorOf(Est)";
+        let trustee_family = CoreDecl::InterpretationFamily(CoreInterpretationFamily {
+            id: NodeId::of(b"TrusteeEligibility"),
+            name: "TrusteeEligibility".into(),
+            source: Term::Ident("TrusteeEligibility".into()),
+            alternatives: vec![(
+                "HighRank".into(),
+                vec![
+                    eligible_def("Alice", trustee, true),
+                    eligible_def("Bob", trustee, false),
+                ],
+            )],
+            meta: test_meta("TrusteeEligibility"),
+        });
+        let executor_family = CoreDecl::InterpretationFamily(CoreInterpretationFamily {
+            id: NodeId::of(b"ExecutorEligibility"),
+            name: "ExecutorEligibility".into(),
+            source: Term::Ident("ExecutorEligibility".into()),
+            alternatives: vec![(
+                "NextOfKin".into(),
+                vec![
+                    eligible_def("Dana", executor, true),
+                    eligible_def("Eve", executor, false),
+                ],
+            )],
+            meta: test_meta("ExecutorEligibility"),
+        });
+        let mut module = module_with_plan_decls(
+            "acting_trustee",
+            QueryPlan::UniqueOccupant {
+                office: Term::Ident(trustee.into()),
+            },
+            vec![trustee_family, executor_family],
+        );
+        module.queries.push(CoreQuery {
+            id: NodeId::of(b"acting_executor"),
+            name: "acting_executor".into(),
+            binders: Vec::new(),
+            result_type: Type::Sort(Sort::LegalPerson),
+            effects: BTreeSet::new(),
+            automatic: false,
+            plan: QueryPlan::UniqueOccupant {
+                office: Term::Ident(executor.into()),
+            },
+            meta: test_meta("acting_executor"),
+        });
+        module.nominations = vec![
+            nomination("Alice", trustee, 1),
+            nomination("Bob", trustee, 2),
+            nomination("Dana", executor, 1),
+            nomination("Eve", executor, 2),
+        ];
+        module
+    }
+
+    fn two_office_case() -> CaseRecord {
+        let mut case = successor_case(2, None);
+        case.facts.insert("dana_accepted".into(), Value::Bool(true));
+        case.facts.insert("eve_accepted".into(), Value::Bool(true));
+        case.admissible_completions
+            .interpretations
+            .insert("TrusteeEligibility".into(), vec!["HighRank".into()]);
+        case.admissible_completions
+            .interpretations
+            .insert("ExecutorEligibility".into(), vec!["NextOfKin".into()]);
+        case.interpretations
+            .insert("TrusteeEligibility".into(), "HighRank".into());
+        case.interpretations
+            .insert("ExecutorEligibility".into(), "NextOfKin".into());
+        case
     }
 
     fn successor_case(certs: usize, interpretation: Option<&str>) -> CaseRecord {
@@ -2641,6 +3000,20 @@ mod tests {
             handler,
             case,
         )
+    }
+
+    fn run_succession(module: &CoreModule, query: &str, case: &CaseRecord) -> Outcome<Value> {
+        let t = fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        evaluate(
+            module,
+            &QueryName::from(query),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &RunContext::new(t, t),
+            &mut Refusing,
+            case,
+        )
+        .expect("evaluate")
     }
 
     fn artifact_term(path: &str, effective: &str, weight: &str) -> Term {
@@ -3070,22 +3443,17 @@ mod tests {
                 expected_type: Type::Sort(Sort::Nominal("Distribution".into())),
             },
         };
-        let out = run_plan(plan, &CaseRecord::default(), &mut Refusing);
-        match out {
-            Outcome::Suspended { requests, .. } => {
-                assert!(
-                    requests
-                        .iter()
-                        .any(|r| matches!(r, OpenRequest::NeedJudgment { .. }))
-                );
-                assert!(!requests.iter().any(|r| matches!(
-                    r,
-                    OpenRequest::NeedEvidence { schema, .. }
-                        if schema == "HarmAnalysis" || schema == "SegregabilityAnalysis"
-                )));
-            }
-            other => panic!("{other:?}"),
-        }
+        let err = run_module(
+            &module_with_plan("q", plan),
+            "q",
+            &CaseRecord::default(),
+            &mut Refusing,
+        )
+        .expect_err("unknown decision is an implementation error");
+        assert!(
+            matches!(err, EngineError::Unsupported(ref msg) if msg.contains("TrusteeDistributionDecision")),
+            "{err:?}"
+        );
     }
 
     fn proposition(name: &str) -> CoreDecl {
@@ -3245,7 +3613,30 @@ mod tests {
                 expected_type: Type::Sort(Sort::Nominal("FOIADisposition".into())),
             },
         };
-        let out = run_plan(plan, &CaseRecord::default(), &mut Refusing);
+        let decision = CoreDecision {
+            id: NodeId::of(b"ProcessResponsiveRecord"),
+            name: "ProcessResponsiveRecord".into(),
+            binders: Vec::new(),
+            requirements: vec![
+                Guard::Observed {
+                    schema: "HarmAnalysis".into(),
+                    binder: "h".into(),
+                },
+                Guard::Observed {
+                    schema: "SegregabilityAnalysis".into(),
+                    binder: "s".into(),
+                },
+            ],
+            option_space: Term::Wildcard,
+            declared_result: Some(DecisionReturn {
+                result_type: Type::Sort(Sort::Nominal("FOIADisposition".into())),
+                expression: Term::Ident("proposed".into()),
+            }),
+            meta: test_meta("ProcessResponsiveRecord"),
+        };
+        let module = module_with_plan_decls("q", plan, vec![CoreDecl::Decision(decision)]);
+        let out =
+            run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate");
         match out {
             Outcome::Suspended { requests, .. } => {
                 let schemas: Vec<_> = requests
@@ -3259,6 +3650,160 @@ mod tests {
                 assert!(schemas.contains(&"SegregabilityAnalysis"), "{schemas:?}");
             }
             other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn i1_with_both_accepted_selects_highest_rank_not_the_label() {
+        let module = module_with_occupant();
+        let case = successor_case(2, Some("I1"));
+        let t = fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let out = evaluate(
+            &module,
+            &QueryName::from("acting_trustee"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &RunContext::new(t, t),
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate");
+        match out {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Alice"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn i1_with_only_bob_accepted_selects_bob() {
+        let module = module_with_occupant();
+        let mut case = successor_case(2, Some("I1"));
+        case.facts
+            .insert("alice_accepted".into(), Value::Bool(false));
+        let t = fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let out = evaluate(
+            &module,
+            &QueryName::from("acting_trustee"),
+            &BTreeMap::new(),
+            &LegalState::new(),
+            &RunContext::new(t, t),
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate");
+        match out {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn renamed_alternatives_keep_eligibility_results() {
+        let mut module = module_with_occupant();
+        rename_family_labels(&mut module, &[("I1", "Alpha"), ("I2", "Beta")]);
+        let mut case = successor_case(2, Some("Alpha"));
+        case.admissible_completions.interpretations.insert(
+            "SuccessorEligibility".into(),
+            vec!["Alpha".into(), "Beta".into()],
+        );
+        match run_succession(&module, "acting_trustee", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Alice"),
+            other => panic!("{other:?}"),
+        }
+        case.interpretations
+            .insert("SuccessorEligibility".into(), "Beta".into());
+        match run_succession(&module, "acting_trustee", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn changing_i1_definitions_without_renaming_changes_the_result() {
+        let mut module = module_with_occupant();
+        set_family_defs(
+            &mut module,
+            "I1",
+            vec![
+                eligible_def("Alice", "TrusteeOf(BRT)", false),
+                eligible_def("Bob", "TrusteeOf(BRT)", true),
+            ],
+        );
+        let case = successor_case(2, Some("I1"));
+        match run_succession(&module, "acting_trustee", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn third_nominee_can_win_from_declared_eligibility() {
+        let mut module = module_with_occupant();
+        module.nominations.push(CoreNomination {
+            candidate: "Carol".into(),
+            office: "TrusteeOf(BRT)".into(),
+            rank: 3,
+        });
+        set_family_defs(
+            &mut module,
+            "I1",
+            vec![
+                eligible_def("Alice", "TrusteeOf(BRT)", false),
+                eligible_def("Bob", "TrusteeOf(BRT)", false),
+                eligible_def("Carol", "TrusteeOf(BRT)", true),
+            ],
+        );
+        let mut case = successor_case(2, Some("I1"));
+        case.facts
+            .insert("carol_accepted".into(), Value::Bool(true));
+        match run_succession(&module, "acting_trustee", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Carol"),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn two_offices_follow_distinct_succession_families() {
+        let module = module_with_two_offices();
+        let case = two_office_case();
+        match run_succession(&module, "acting_trustee", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Alice"),
+            other => panic!("trustee: {other:?}"),
+        }
+        match run_succession(&module, "acting_executor", &case) {
+            Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Dana"),
+            other => panic!("executor: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn process_responsive_record_executes_its_declared_body() {
+        let plan = QueryPlan::RunDecision {
+            decision: "ProcessResponsiveRecord".into(),
+            arguments: Vec::new(),
+            result: DeclaredDecisionResult {
+                expected_type: Type::bool(),
+            },
+        };
+        let decision = CoreDecision {
+            id: NodeId::of(b"ProcessResponsiveRecord"),
+            name: "ProcessResponsiveRecord".into(),
+            binders: Vec::new(),
+            requirements: Vec::new(),
+            option_space: Term::Wildcard,
+            declared_result: Some(DecisionReturn {
+                result_type: Type::bool(),
+                expression: Term::Bool(true),
+            }),
+            meta: test_meta("ProcessResponsiveRecord"),
+        };
+        let module = module_with_plan_decls("q", plan, vec![CoreDecl::Decision(decision)]);
+        match run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate") {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("name must not activate FOIA: {other:?}"),
         }
     }
 
@@ -3286,7 +3831,7 @@ mod tests {
     #[test]
     fn recorded_nominee_name_selects_that_successor() {
         let module = module_with_occupant();
-        let case = successor_case(2, Some("Bob"));
+        let case = successor_case(2, Some("BobOnly"));
         let t = fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap();
         let out = evaluate(
             &module,
@@ -3470,5 +4015,184 @@ mod tests {
         });
         let late = run_module(&module, "q", &future, &mut Refusing).expect("evaluate");
         assert!(matches!(late, Outcome::Suspended { .. }), "{late:?}");
+    }
+
+    #[test]
+    fn run_decision_rejects_argument_arity_mismatch() {
+        let plan = QueryPlan::RunDecision {
+            decision: "IssuePermit".into(),
+            arguments: Vec::new(),
+            result: DeclaredDecisionResult {
+                expected_type: Type::bool(),
+            },
+        };
+        let decision = CoreDecision {
+            id: NodeId::of(b"IssuePermit"),
+            name: "IssuePermit".into(),
+            binders: vec![("site".into(), Type::bool())],
+            requirements: Vec::new(),
+            option_space: Term::Wildcard,
+            declared_result: Some(DecisionReturn {
+                result_type: Type::bool(),
+                expression: Term::Bool(true),
+            }),
+            meta: test_meta("IssuePermit"),
+        };
+        let err = run_module(
+            &module_with_plan_decls("q", plan, vec![CoreDecl::Decision(decision)]),
+            "q",
+            &CaseRecord::default(),
+            &mut Refusing,
+        )
+        .expect_err("arity");
+        assert!(
+            matches!(err, EngineError::InvalidInput(ref msg) if msg.contains("IssuePermit")),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn resume_does_not_replay_answered_observe() {
+        let plan = QueryPlan::RunDecision {
+            decision: "TwoStep".into(),
+            arguments: Vec::new(),
+            result: DeclaredDecisionResult {
+                expected_type: Type::bool(),
+            },
+        };
+        let decision = CoreDecision {
+            id: NodeId::of(b"TwoStep"),
+            name: "TwoStep".into(),
+            binders: Vec::new(),
+            requirements: vec![
+                Guard::Observed {
+                    schema: "FirstRecord".into(),
+                    binder: "a".into(),
+                },
+                Guard::Observed {
+                    schema: "SecondRecord".into(),
+                    binder: "b".into(),
+                },
+            ],
+            option_space: Term::Wildcard,
+            declared_result: Some(DecisionReturn {
+                result_type: Type::bool(),
+                expression: Term::Bool(true),
+            }),
+            meta: test_meta("TwoStep"),
+        };
+        let module = module_with_plan_decls("q", plan, vec![CoreDecl::Decision(decision)]);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let mut first_handler = Scripted::resume_only(&["FirstRecord"]);
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut first_handler,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert_eq!(first_handler.count("FirstRecord"), 1);
+        assert_eq!(first_handler.count("SecondRecord"), 1);
+        assert!(
+            matches!(first.outcome, Outcome::Suspended { .. }),
+            "{:?}",
+            first.outcome
+        );
+
+        let mut second_handler = Scripted::resume_only(&["FirstRecord", "SecondRecord"]);
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut second_handler,
+            &case,
+        )
+        .expect("resume");
+        assert_eq!(
+            second_handler.count("FirstRecord"),
+            0,
+            "answered FirstRecord must not run again"
+        );
+        assert_eq!(second_handler.count("SecondRecord"), 1);
+        match second.outcome {
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            } => {}
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn resume_invalid_response_stays_suspended_or_halts() {
+        let plan = QueryPlan::RunDecision {
+            decision: "TwoStep".into(),
+            arguments: Vec::new(),
+            result: DeclaredDecisionResult {
+                expected_type: Type::bool(),
+            },
+        };
+        let decision = CoreDecision {
+            id: NodeId::of(b"TwoStep"),
+            name: "TwoStep".into(),
+            binders: Vec::new(),
+            requirements: vec![Guard::Observed {
+                schema: "FirstRecord".into(),
+                binder: "a".into(),
+            }],
+            option_space: Term::Wildcard,
+            declared_result: Some(DecisionReturn {
+                result_type: Type::bool(),
+                expression: Term::Bool(true),
+            }),
+            meta: test_meta("TwoStep"),
+        };
+        let module = module_with_plan_decls("q", plan, vec![CoreDecl::Decision(decision)]);
+        let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
+        let ctx = RunContext::new(t, t);
+        let args = BTreeMap::new();
+        let state = LegalState::new();
+        let case = CaseRecord::default();
+        let first = evaluate_session(
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut Refusing,
+            &case,
+        )
+        .expect("evaluate_session");
+        assert!(matches!(first.outcome, Outcome::Suspended { .. }));
+        let mut halting = Scripted::halt_on("FirstRecord");
+        let second = resume(
+            first,
+            &module,
+            &QueryName::from("q"),
+            &args,
+            &state,
+            &ctx,
+            &mut halting,
+            &case,
+        )
+        .expect("resume");
+        assert!(
+            matches!(
+                second.outcome,
+                Outcome::OutsideCompetence { .. } | Outcome::Suspended { .. }
+            ),
+            "{:?}",
+            second.outcome
+        );
     }
 }
