@@ -1,12 +1,13 @@
 //! v0.1 domain and diagnostic acceptance tests.
 
 use fidryn_check::check;
-use fidryn_core::ir::{CoreDecl, CoreFunction, QueryPlan};
+use fidryn_core::case::CaseDetermination;
+use fidryn_core::ir::{CoreDecl, CoreDuty, CoreFunction, QueryPlan};
 use fidryn_core::types::PrimitiveType;
 use fidryn_core::{
-    CaseRecord, DiagnosticCode, Interval, JurisdictionId, ManifestArtifact, NodeId, NodeMeta,
-    OpenRequest, OriginId, Outcome, QueryName, RunContext, SourceManifest, SourceWeight, Term,
-    Type, Value,
+    CaseRecord, DiagnosticCode, EngineError, Interval, JurisdictionId, ManifestArtifact, NodeId,
+    NodeMeta, OpenRequest, OriginId, Outcome, QueryName, RunContext, SourceManifest, SourceWeight,
+    Term, Type, Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -229,7 +230,15 @@ impl<E: std::fmt::Display> IntoWorldOutcome for Result<Outcome, E> {
 }
 
 fn run(module: &fidryn_core::CoreModule, query: &str, case: &CaseRecord) -> Outcome {
-    let t = now();
+    try_run_at(module, query, case, now()).into_world_outcome()
+}
+
+fn try_run_at(
+    module: &fidryn_core::CoreModule,
+    query: &str,
+    case: &CaseRecord,
+    t: fidryn_core::Instant,
+) -> Result<Outcome, EngineError> {
     let state = case.into_state();
     let mut handler = CaseFile {
         record: case.clone(),
@@ -244,7 +253,137 @@ fn run(module: &fidryn_core::CoreModule, query: &str, case: &CaseRecord) -> Outc
         &mut handler,
         case,
     )
-    .into_world_outcome()
+}
+
+fn invoice_instant() -> fidryn_core::Instant {
+    fidryn_core::Instant::parse("2034-03-01T00:00:00Z").unwrap()
+}
+
+fn mid_window() -> fidryn_core::Instant {
+    // 7 counted days after invoice_date: past a 0-day due, before a 15-day due.
+    fidryn_core::Instant::parse("2034-03-08T09:00:00Z").unwrap()
+}
+
+fn pay_invoice_duty(module: &fidryn_core::CoreModule) -> &CoreDuty {
+    module
+        .declarations
+        .iter()
+        .find_map(|decl| match decl {
+            CoreDecl::Duty(duty) if duty.name == "PayInvoice" => Some(duty),
+            _ => None,
+        })
+        .expect("CoreDuty PayInvoice")
+}
+
+fn obligation_evaluates_duty_status(module: &fidryn_core::CoreModule) {
+    let query = module
+        .query("obligation_status")
+        .expect("obligation_status");
+    match &query.plan {
+        QueryPlan::Evaluate(Term::Apply { ctor, args }) => {
+            assert_eq!(ctor, "duty_status", "{ctor}");
+            assert_eq!(args.as_slice(), &[Term::Ident("PayInvoice".into())]);
+        }
+        QueryPlan::Evaluate(Term::Call { callee, args }) => {
+            assert_eq!(callee, "duty_status", "{callee}");
+            assert_eq!(args.as_slice(), &[Term::Ident("PayInvoice".into())]);
+        }
+        other => panic!("obligation_status must be duty_status(PayInvoice), got {other:?}"),
+    }
+}
+
+fn due_counted_days(duty: &CoreDuty) -> i64 {
+    for term in &duty.content {
+        if let Term::Apply { ctor, args } = term
+            && ctor == "due"
+        {
+            return counted_days_in(args.first().expect("due argument"));
+        }
+    }
+    panic!("PayInvoice has no due term in content: {:?}", duty.content);
+}
+
+fn counted_days_in(term: &Term) -> i64 {
+    match term {
+        Term::Apply { ctor, args } if ctor == "counted_days" => match args.first() {
+            Some(Term::Int(n)) => *n,
+            other => panic!("{other:?}"),
+        },
+        Term::Apply { ctor, args } if ctor == "after" || ctor == "due" => {
+            counted_days_in(args.first().expect("duration"))
+        }
+        other => panic!("expected counted_days due, got {other:?}"),
+    }
+}
+
+fn duty_status_label(value: &Value) -> String {
+    match value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => {
+            if let Some(status) = fields.get("status") {
+                return status.display_label();
+            }
+            if let Value::Ctor { name, .. } = value
+                && name != "duty_status"
+            {
+                return name.clone();
+            }
+            value.display_label()
+        }
+        _ => value.display_label(),
+    }
+}
+
+fn duty_breached_flag(value: &Value) -> Option<bool> {
+    match value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => match fields.get("breached") {
+            Some(Value::Bool(flag)) => Some(*flag),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+fn with_invoice_issued(mut case: CaseRecord, at: fidryn_core::Instant) -> CaseRecord {
+    case.facts
+        .insert("invoice_date".into(), Value::Instant(invoice_instant()));
+    case.determinations.push(CaseDetermination {
+        issue: "InvoiceIssued(Payer)".into(),
+        protocol: "InvoiceIssued".into(),
+        established: true,
+        decider: "test".into(),
+        recorded_at: Some(at),
+    });
+    case
+}
+
+fn with_payment(mut case: CaseRecord, paid_at: fidryn_core::Instant) -> CaseRecord {
+    case.evidence.push(fidryn_core::EvidenceItem {
+        schema: "PaymentRecord".into(),
+        value: Value::Entity("Payer".into()),
+        observed_at: paid_at,
+    });
+    case
+}
+
+fn assert_obligation_status(
+    module: &fidryn_core::CoreModule,
+    case: &CaseRecord,
+    t: fidryn_core::Instant,
+    expected: &str,
+) -> Value {
+    match try_run_at(module, "obligation_status", case, t) {
+        Ok(Outcome::Determinate { value, .. }) => {
+            assert_eq!(
+                duty_status_label(&value),
+                expected,
+                "obligation_status at {t}: {value:?}"
+            );
+            value
+        }
+        other => panic!(
+            "expected determinate {expected} from duty_status(PayInvoice) at {t}, got {other:?}"
+        ),
+    }
 }
 
 fn check_file(rel: &str) -> Vec<fidryn_core::Diagnostic> {
@@ -621,6 +760,19 @@ fn independent_program_late_payment_compiles() {
     assert!(module.query("due").is_some());
     assert!(module.query("paid_on_time").is_some());
     assert!(module.query("obligation_status").is_some());
+    obligation_evaluates_duty_status(&module);
+    let duty = pay_invoice_duty(&module);
+    assert_eq!(duty.bearer, Term::Ident("Payer".into()));
+    assert_eq!(duty.claimant, Some(Term::Ident("Payee".into())));
+    assert!(
+        matches!(
+            &duty.attaches,
+            fidryn_core::Guard::Operative(prop, _) if prop.predicate == "InvoiceIssued"
+        ),
+        "{:?}",
+        duty.attaches
+    );
+    assert_eq!(due_counted_days(duty), 0);
 }
 
 #[test]
@@ -653,6 +805,66 @@ fn independent_program_late_payment_with_record_is_determinate() {
         }
         other => panic!("{other:?}"),
     }
+}
+
+#[test]
+fn independent_program_late_payment_without_attach_is_unresolved() {
+    // Attach guard is `operative InvoiceIssued(Payer)`. No determination and
+    // no payment: Unresolved, not Attached merely because the duty exists.
+    let module = compile("tests/programs/late-payment.fr");
+    let t = invoice_instant();
+    let mut case = CaseRecord::default();
+    case.facts.insert("invoice_date".into(), Value::Instant(t));
+    assert_obligation_status(&module, &case, t, "Unresolved");
+}
+
+#[test]
+fn independent_program_late_payment_attached_when_not_late() {
+    // Guard holds, no PaymentRecord, valid_time equals invoice_date (0-day
+    // due has not elapsed): Attached.
+    let module = compile("tests/programs/late-payment.fr");
+    let t = invoice_instant();
+    let case = with_invoice_issued(CaseRecord::default(), t);
+    assert_obligation_status(&module, &case, t, "Attached");
+}
+
+#[test]
+fn independent_program_late_payment_breached_when_late_unpaid() {
+    // Guard holds, no payment, valid_time is 7 days after a 0-day due: Breached.
+    let module = compile("tests/programs/late-payment.fr");
+    let issued = invoice_instant();
+    let late = mid_window();
+    let case = with_invoice_issued(CaseRecord::default(), issued);
+    assert_obligation_status(&module, &case, late, "Breached");
+}
+
+#[test]
+fn independent_program_late_payment_late_perform_is_performed_and_breached() {
+    // PaymentRecord after the 0-day due: display Performed; breached stays true
+    // when the value exposes that field.
+    let module = compile("tests/programs/late-payment.fr");
+    let issued = invoice_instant();
+    let late = mid_window();
+    let case = with_payment(with_invoice_issued(CaseRecord::default(), issued), late);
+    let value = assert_obligation_status(&module, &case, late, "Performed");
+    if let Some(breached) = duty_breached_flag(&value) {
+        assert!(breached, "late perform keeps breached: {value:?}");
+    }
+}
+
+#[test]
+fn independent_program_late_payment_extended_due_stays_attached() {
+    // Same case times: 0-day due is Breached; 15-day due is still Attached.
+    let zero = compile("tests/programs/late-payment.fr");
+    let extended = compile("tests/programs/late-payment-extended.fr");
+    obligation_evaluates_duty_status(&extended);
+    assert_eq!(due_counted_days(pay_invoice_duty(&zero)), 0);
+    assert_eq!(due_counted_days(pay_invoice_duty(&extended)), 15);
+    let issued = invoice_instant();
+    let late = mid_window();
+    let case = with_invoice_issued(CaseRecord::default(), issued);
+    assert_obligation_status(&zero, &case, late, "Breached");
+    assert_obligation_status(&extended, &case, late, "Attached");
 }
 
 #[test]
