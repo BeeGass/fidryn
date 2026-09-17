@@ -1,0 +1,22 @@
+[package]
+name = "fidryn-verify"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn bounded temporal and completion-space verification"
+
+[dependencies]
+fidryn-core.workspace = true
+fidryn-eval.workspace = true
+fidryn-handlers.workspace = true
+indexmap.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+fidryn-check.workspace = true
+fidryn-hir.workspace = true
+fidryn-syntax.workspace = true
+serde_json.workspace = true
