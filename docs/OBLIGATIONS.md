@@ -31,7 +31,7 @@ byte-verified.
 | Digest / program identity | Landed | `module_body_edit_invalidates_execution_cache`; `declared_empty_completion_domain_cannot_be_reopened_by_recorded_selection` | Run key hashes canonical CoreModule JSON. `ModuleId` is still name-derived. |
 | Artifact-byte authentication | Landed | `matching_blake3_hex_authenticates_required_import`; `mismatched_blake3_hex_is_e200`; `hex_digest_without_bytes_is_e200`; `fixture_digest_authenticates_required_import` | `"fixture"` is `TrustProfile::Fixture`, never `ByteVerified`. Hex without a readable file is E200. |
 | Verify pipeline (named literals) | Landed | `declared_true_property_survives_the_entire_compiler_pipeline` | Named `verify Trivial { assert true }` lowers. Only exact `true`/`false` literals are decided. |
-| Certificate covering | Landed | kernel `test_accept_covering_with_complete_witness_returns_covering_certificate`; `test_reject_digest_as_covering_with_claims_digest_returns_true`; core `Outcome::determinate` rejects digest-only certs with ignored issues | `verified` remains a claims digest (`is_covering() == false`). Ignoring issues requires `verified_covering` plus a complete `CoverageWitness`. Kernel does not generate proofs. |
+| Certificate covering | Landed | `test_check_branches_with_fabricated_false_world_returns_err`; `test_check_branches_with_duplicate_false_worlds_claiming_total_two_returns_err`; `test_accept_covering_eval_with_tautology_worlds_returns_covering_certificate`; digest-only `reject_digest_as_covering` | Shape-only `accept_covering` does not re-eval. `accept_covering_eval` checks each branch against `evaluate`. Kernel does not generate proofs. |
 | String / arity | Landed | `ordinary_string_returning_function_executes`; `function_arity_is_not_filled_from_caller_bindings` | Callee env starts empty; arity mismatch is `InvalidInput`. |
 
 Outcome schema `fidryn.outcome/v0.1` (`schemas/outcome-v0.1.json`) now
@@ -71,7 +71,7 @@ and not Determinate false unless a later declared result says so.
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| `seq` / `require` Core eval | Landed | `independent_program_require_true_is_determinate_seven`; `independent_program_require_false_is_not_determinate_seven`; eval seq/require unit tests | Rule-body `require` is not stored. Nested seq inside a non-seq residual still uses RememberingHandler. |
+| `seq` / `require` Core eval | Landed | `independent_program_require_true_is_determinate_seven`; `independent_program_require_false_is_not_determinate_seven`; `nested_seq_under_add_skips_completed_attach_on_resume` | Rule-body `require` is not stored. RememberingHandler still used for reusable observations. |
 | Tax builtin | Landed | eval: missing-body helper is only `ordinary_income_tax`; other missing bodies are `Unsupported` | Closed-form `.fr` calc still used when a body exists. |
 | Records vs tagged values | Landed | `{"kind":"bool","data":false}` is Bool; `{"kind":"record","data":{…}}` is Map | Untagged objects still become `Value::Map`. RFC 8785 is not claimed. |
 
@@ -79,29 +79,31 @@ and not Determinate false unless a later declared result says so.
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| Duty status machine | Landed | eval `duty_step` tests: late perform keeps `breached`; illegal discharge commits nothing | Surface `duty` declarations are not yet the eval state machine. History is in bindings/`duty:{name}`, not a full event ledger query API. |
+| Duty status machine | Landed | eval `duty_step` tests: late perform keeps `breached`; illegal discharge commits nothing | History is in bindings/`duty:{name}`, not a full event ledger query API. |
+| Surface duty integration | Landed | `duty_status(PayInvoice)` from `.fr`; Unresolved / Attached / Breached / late Performed+breached; 15-day due stays Attached when 0-day is Breached | Not a full DutyInstance ledger API. Multi-step declared transactions are not a language construct. |
 | Authority grants | Landed | `AuthorityGrant` + `covers`; eval `require_authority` suspends without a grant | Occupancy is still a separate UniqueOccupant path. No full delegation/revocation language. |
 
 ### 4. Reasoning / proofs
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| Covering certificates | Landed | `fidryn-kernel` `accept_covering`; `reject_digest_as_covering`; `Outcome::determinate` requires `is_covering()` when issues are ignored | Kernel does not re-run the evaluator. A complete witness is supplied by the caller. Digest is not covering. |
+| Covering certificates | Landed | fabricated `false→true` rejected; duplicate-world omission rejected; `b \|\| !b` covering accepted | Shape-only `accept_covering` still does not re-run evaluate. Digest is not covering. |
 | Streaming search | Landed | `stream_budget_one_on_two_by_two_exceeds_without_full_product`; `budget_exhaustion_is_unknown_not_convergent`; `counterexample_returns_before_remaining_space` | `enumerate` still collects a stream with a huge budget for existing tests. No SMT backend. |
 | Finite quantifiers | Partial | `for_all_over_closed_positive_set_is_true`; `for_all_open_ident_domain_without_closure_suspends` | Nested quantifiers and open-world proofs are not done. Quantifiers as a general language (not only `Term::Apply` over a closed `Value::Set`) remain incomplete. |
 
 A trusted evaluator may establish covering by exhaustive finite search.
-`fidryn-kernel` only accepts or rejects a covering claim.
-`fidryn-verify` / `fidryn-solve` generate search; they do not make a
-digest covering.
+`fidryn-kernel` checks supplied branch derivations against `evaluate`;
+it does not search. Shape-only `accept_covering` is not that check.
+The 2026-09-17 review is still **open**.
 
 ### 5. Application / packages
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| `fidryn-kernel` crate split | Landed | 8 kernel tests; covering vs digest | Not a proof generator. Does not re-execute the program. |
-| `fidryn-driver` crate split | Landed | `run_report`; `function_body_edit_invalidates_execution_cache`; `program_digest` in run key | Handler/profile are not separate key fields. No declaration-level invalidation. |
-| Cross-feature programs | Landed | `tests/programs/late-payment.fr`; `tests/programs/require-gate.fr` | Late-payment does not yet run duty breach history through CLI/server/explore together. |
+| `fidryn-kernel` crate split | Landed | 12 kernel tests including fabricated-witness rejection | Not a proof generator. `accept_covering` is shape-only; `accept_covering_eval` checks meaning. |
+| `fidryn-driver` crate split | Landed | `run_report`; `check_path_matching_blake3_authenticates_and_tamper_is_e200` | Mill pasted source still uses `check` without files. Outcome JSON does not carry extra report fields (`additionalProperties: false`). |
+| CLI `check_path` byte-auth | Landed | `Driver::check_path` → `check_with_sources(..., parent_dir)`; tamper is E200 | In-memory `check_source` is not byte-verified. |
+| Cross-feature programs | Landed | `late-payment.fr` / `late-payment-extended.fr` / `require-gate.fr` duty_status lifecycle | Not closed through mill explore vs run as one envelope. |
 | Packages | Remaining | none | No package language, lock, or authenticated package digest. |
 
 Trust profiles `Fixture`, `ByteVerified`, `PolicyAccepted`, and

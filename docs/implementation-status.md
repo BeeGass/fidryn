@@ -20,13 +20,19 @@ see [`OBLIGATIONS.md`](OBLIGATIONS.md) and
 [`WORKSTREAM-CONTRACT.md`](WORKSTREAM-CONTRACT.md). The 28 earlier
 review-kit regressions remain. The 16 tests in
 `adversarial_regressions.rs` pass as regressions for section-1 defects;
-they are not closure of the review. Certificate covering and
-artifact-byte authentication are not landed. Green tests are
-regressions.
+they are not closure of the review. Green tests are regressions.
 
-`fidryn-kernel` is the covering-check boundary: it may accept or reject
-a covering claim. It does not generate proofs. Proof search lives in
-`fidryn-verify` / `fidryn-solve`. A claims digest is not covering.
+Covering: `fidryn-kernel` may accept or reject a covering claim. It
+does not generate proofs. Branch evaluation (`check_branches` /
+`accept_covering_eval`) is **in progress** until named kernel or
+domains tests exist. A claims digest is not covering. Artifact-byte
+authentication is landed in `fidryn-check` with an explicit
+`source_root`; CLI `Driver::check_path` does not yet pass
+`check_with_sources(..., Some(parent_dir))`.
+
+`fidryn-kernel` is the covering-check boundary. Proof search lives in
+`fidryn-verify` / `fidryn-solve`. A `fixture` digest is
+`TrustProfile::Fixture`, never `ByteVerified`.
 
 Cells are `Yes` / `Partial` / `No`.
 
@@ -232,16 +238,24 @@ open-world proofs are not done.
 
 - Pratt still sits beside the Rowan tree; not every expr is a CST node.
 - `resume` is in-process, not a serialized rest-of-computation on the wire.
+- Nested seq under Binary/Call/If is not a continuation frame stack;
+  resume of a non-seq residual still uses `RememberingHandler`.
 - Incremental compilation is a memo table, not the `salsa` crate.
 - Determinacy search is exhaustive on **declared** finite domains, not a
   general SMT encoding of evaluation. `fidryn-solve` materializes the
   product; it does not yield assignments lazily under a generation cap.
 - Module parameters are type-name substitution, not a module calculus
   with exports and override points.
-- Covering proof is not landed. `fidryn-kernel` is the check boundary,
-  not proof generation.
-- Import `"fixture"` is not byte-verified artifact authentication.
-- Tax substring fallback is not the `ordinary_income_tax` builtin.
-- Duty status machine and authority grants are not interpreters.
-- Complete `require` contract (`true` → 7; `false` / unresolved do not
-  run the rest) is not closed by named tests.
+- Covering proof is not closed. `fidryn-kernel` is the check boundary,
+  not proof generation. `check_branches` re-evaluates claimed worlds;
+  named tests for that path are not landed. A digest is not covering.
+- Import `"fixture"` is `TrustProfile::Fixture`, never byte-verified.
+  CLI `check_path` does not pass the parent directory into
+  `check_with_sources`.
+- Surface duty: `duty PayInvoice` lowers to `CoreDuty`; query
+  `obligation_status` is `duty_status(PayInvoice)` in
+  `tests/programs/late-payment.fr` and `late-payment-extended.fr`
+  (named domains tests). Eval of declaration+due may still fail until
+  that path lands. `duty_step` in source is not the surface language.
+- `require true; return 7` and `require false; return 7` have named
+  tests. An independent unresolved-require program is not added.
