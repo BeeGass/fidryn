@@ -1437,6 +1437,88 @@ module Examples.ReqEval version "0.1.0" {
         }
     }
 
+    fn expect_transaction_args(term: &Term) -> &[Term] {
+        match term {
+            Term::Apply { ctor, args } if ctor == "transaction" => args,
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn query_result_term(body: &HirQueryBody) -> &Term {
+        match body {
+            HirQueryBody::Return(term) => term,
+            HirQueryBody::Goal {
+                expr: Some(term), ..
+            } => term,
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn elaborates_transaction_block_as_apply_steps() {
+        let src = r#"
+module Examples.Tx version "0.1.0" {
+    query q() -> Bool {
+        transaction {
+            duty_step(pay, attach);
+            duty_step(pay, discharge)
+        }
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let args = expect_transaction_args(query_result_term(&hir.queries["q"].body));
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(
+            args[0],
+            Term::Call {
+                callee: "duty_step".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("attach".into())],
+            }
+        );
+        assert_eq!(
+            args[1],
+            Term::Call {
+                callee: "duty_step".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("discharge".into())],
+            }
+        );
+        assert!(
+            !args
+                .iter()
+                .any(|arg| matches!(arg, Term::Apply { ctor, .. } if ctor == "seq"))
+        );
+    }
+
+    #[test]
+    fn elaborates_transaction_atomic_program() {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join("tests/programs/transaction-atomic.fr");
+        let src = std::fs::read_to_string(&path).expect("transaction-atomic.fr");
+        let parsed = parse_file(&src);
+        assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let args = expect_transaction_args(query_result_term(&hir.queries["q"].body));
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(
+            args[0],
+            Term::Call {
+                callee: "duty_step".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("attach".into())],
+            }
+        );
+        assert_eq!(
+            args[1],
+            Term::Call {
+                callee: "duty_step".into(),
+                args: vec![Term::Ident("pay".into()), Term::Ident("discharge".into())],
+            }
+        );
+    }
+
     #[test]
     fn elaborates_verify_trivial_assert_true() {
         let src = r#"

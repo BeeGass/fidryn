@@ -96,6 +96,9 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             base: Box::new(expr_to_term(base)),
             name: name.clone(),
         },
+        Expr::Call { callee, args } if callee.eq_ignore_ascii_case("transaction") => {
+            transaction_term(flatten_transaction_expr_args(args))
+        }
         Expr::Call { callee, args } => Term::Call {
             callee: callee.clone(),
             args: args.iter().map(expr_to_term).collect(),
@@ -153,16 +156,27 @@ fn decimal_term(text: &str) -> Term {
 }
 
 fn apply_expr_to_term(callee: &Expr, args: &[Expr]) -> Term {
-    let mapped: Vec<Term> = args.iter().map(expr_to_term).collect();
     match expr_to_term(callee) {
-        Term::Ident(ctor) => Term::Apply { ctor, args: mapped },
-        Term::Call { callee, args: prev } if prev.is_empty() => Term::Apply {
-            ctor: callee,
-            args: mapped,
+        Term::Ident(ctor) if ctor.eq_ignore_ascii_case("transaction") => {
+            transaction_term(flatten_transaction_expr_args(args))
+        }
+        Term::Ident(ctor) => Term::Apply {
+            ctor,
+            args: args.iter().map(expr_to_term).collect(),
         },
+        Term::Call { callee, args: prev } if prev.is_empty() => {
+            if callee.eq_ignore_ascii_case("transaction") {
+                transaction_term(flatten_transaction_expr_args(args))
+            } else {
+                Term::Apply {
+                    ctor: callee,
+                    args: args.iter().map(expr_to_term).collect(),
+                }
+            }
+        }
         other => {
             let mut call_args = vec![other];
-            call_args.extend(mapped);
+            call_args.extend(args.iter().map(expr_to_term));
             Term::Apply {
                 ctor: "apply".into(),
                 args: call_args,
@@ -769,6 +783,24 @@ fn seq_term(args: Vec<Term>) -> Term {
     }
 }
 
+fn transaction_term(args: Vec<Term>) -> Term {
+    Term::Apply {
+        ctor: "transaction".into(),
+        args,
+    }
+}
+
+fn flatten_transaction_expr_args(args: &[Expr]) -> Vec<Term> {
+    let mut out = Vec::new();
+    for arg in args {
+        match arg {
+            Expr::Block(items) => out.extend(items.iter().map(expr_to_term)),
+            other => out.push(expr_to_term(other)),
+        }
+    }
+    out
+}
+
 fn require_term(inner: Term) -> Term {
     Term::Apply {
         ctor: "require".into(),
@@ -1031,6 +1063,7 @@ fn is_operator(name: &str) -> bool {
             | "call"
             | "seq"
             | "require"
+            | "transaction"
     ) || is_modal(name)
 }
 
@@ -1251,10 +1284,42 @@ impl<'a> SliceParser<'a> {
             }
             return Some(require_term(inner));
         }
+        if self.at_ident("transaction")
+            && self.peek_at(1).map(|t| t.kind) == Some(TokenKind::LBrace)
+        {
+            return self.parse_transaction_block_term();
+        }
         if self.at_ident("for_all") || self.at_ident("exists") {
             return self.parse_quantifier();
         }
         self.parse_postfix()
+    }
+
+    fn parse_transaction_block_term(&mut self) -> Option<Term> {
+        self.eat_ident("transaction");
+        if !self.eat_kind(TokenKind::LBrace) {
+            return Some(Term::Ident("transaction".into()));
+        }
+        let mut items = Vec::new();
+        while !self.is_eof() && !self.at_kind(TokenKind::RBrace) {
+            if self.eat_kind(TokenKind::Semicolon) || self.eat_kind(TokenKind::Comma) {
+                continue;
+            }
+            if self.eat_ident("return") {
+                if let Some(term) = self.parse_expr() {
+                    items.push(term);
+                }
+                continue;
+            }
+            match self.parse_expr() {
+                Some(term) => items.push(term),
+                None => {
+                    self.bump();
+                }
+            }
+        }
+        let _ = self.eat_kind(TokenKind::RBrace);
+        Some(transaction_term(items))
     }
 
     fn parse_quantifier(&mut self) -> Option<Term> {
@@ -1847,6 +1912,123 @@ duty PayInvoice {
             Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
                 assert_eq!(ctor, "exists");
                 assert_eq!(args.len(), 3, "{args:?}");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    fn duty_step_expr(name: &str, action: &str) -> Expr {
+        Expr::Call {
+            callee: "duty_step".into(),
+            args: vec![Expr::Ident(name.into()), Expr::Ident(action.into())],
+        }
+    }
+
+    fn duty_step_call(name: &str, action: &str) -> Term {
+        Term::Call {
+            callee: "duty_step".into(),
+            args: vec![Term::Ident(name.into()), Term::Ident(action.into())],
+        }
+    }
+
+    fn duty_step_apply(name: &str, action: &str) -> Term {
+        Term::Apply {
+            ctor: "duty_step".into(),
+            args: vec![Term::Ident(name.into()), Term::Ident(action.into())],
+        }
+    }
+
+    fn expect_transaction_args(term: &Term) -> &[Term] {
+        match term {
+            Term::Apply { ctor, args } if ctor == "transaction" => args,
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn transaction_block_lowers_to_apply_not_seq() {
+        let expr = Expr::Apply {
+            callee: Box::new(Expr::Ident("transaction".into())),
+            args: vec![
+                duty_step_expr("pay", "attach"),
+                duty_step_expr("pay", "discharge"),
+            ],
+        };
+        let term = expr_to_term(&expr);
+        let args = expect_transaction_args(&term);
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(args[0], duty_step_call("pay", "attach"));
+        assert_eq!(args[1], duty_step_call("pay", "discharge"));
+        assert!(!args.iter().any(|arg| matches!(
+            arg,
+            Term::Apply { ctor, .. } if ctor == "seq"
+        )));
+    }
+
+    #[test]
+    fn transaction_block_wrapped_as_one_block_arg_is_flattened() {
+        let expr = Expr::Apply {
+            callee: Box::new(Expr::Ident("transaction".into())),
+            args: vec![Expr::Block(vec![
+                duty_step_expr("pay", "attach"),
+                duty_step_expr("pay", "discharge"),
+            ])],
+        };
+        let term = expr_to_term(&expr);
+        let args = expect_transaction_args(&term);
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(args[0], duty_step_call("pay", "attach"));
+        assert_eq!(args[1], duty_step_call("pay", "discharge"));
+    }
+
+    #[test]
+    fn single_step_transaction_is_not_unwrapped() {
+        let expr = Expr::Apply {
+            callee: Box::new(Expr::Ident("transaction".into())),
+            args: vec![duty_step_expr("pay", "attach")],
+        };
+        let term = expr_to_term(&expr);
+        let args = expect_transaction_args(&term);
+        assert_eq!(args, &[duty_step_call("pay", "attach")]);
+        assert_ne!(term, duty_step_call("pay", "attach"));
+    }
+
+    #[test]
+    fn transaction_call_lowers_to_apply() {
+        let expr = Expr::Call {
+            callee: "transaction".into(),
+            args: vec![
+                duty_step_expr("pay", "attach"),
+                duty_step_expr("pay", "discharge"),
+            ],
+        };
+        let term = expr_to_term(&expr);
+        let args = expect_transaction_args(&term);
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(args[0], duty_step_call("pay", "attach"));
+        assert_eq!(args[1], duty_step_call("pay", "discharge"));
+    }
+
+    #[test]
+    fn parse_expr_src_transaction_block_keeps_both_steps() {
+        let term =
+            parse_expr_src("transaction { duty_step(pay, attach); duty_step(pay, discharge) }")
+                .expect("transaction block");
+        let args = expect_transaction_args(&term);
+        assert_eq!(args.len(), 2, "{args:?}");
+        assert_eq!(args[0], duty_step_apply("pay", "attach"));
+        assert_eq!(args[1], duty_step_apply("pay", "discharge"));
+    }
+
+    #[test]
+    fn parse_query_body_transaction_block_is_not_seq() {
+        let body = parse_query_body(
+            "query q() -> Bool { transaction { duty_step(pay, attach); duty_step(pay, discharge) } }",
+        );
+        match body {
+            HirQueryBody::Return(term) => {
+                let args = expect_transaction_args(&term);
+                assert_eq!(args.len(), 2, "{args:?}");
             }
             other => panic!("{other:?}"),
         }
