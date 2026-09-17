@@ -12,6 +12,7 @@ description = "Fidryn bounded temporal and completion-space verification"
 fidryn-core.workspace = true
 fidryn-eval.workspace = true
 fidryn-handlers.workspace = true
+fidryn-solve.workspace = true
 indexmap.workspace = true
 thiserror.workspace = true
 

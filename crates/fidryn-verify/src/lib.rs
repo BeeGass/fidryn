@@ -12,13 +12,8 @@ pub fn explore_query(
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Outcome<Value> {
-    let family = case
-        .admissible_completions
-        .interpretations
-        .get("SuccessorEligibility")
-        .cloned()
-        .unwrap_or_default();
-    if family.is_empty() {
+    let families = &case.admissible_completions.interpretations;
+    if families.is_empty() {
         let mut handler = CaseFile {
             record: case.clone(),
         };
@@ -33,13 +28,31 @@ pub fn explore_query(
             case,
         );
     }
+    let domains: Vec<fidryn_solve::Domain> = families
+        .iter()
+        .map(|(name, alts)| fidryn_solve::Domain {
+            name: name.clone(),
+            values: alts.iter().cloned().map(Value::String).collect(),
+        })
+        .collect();
+    let assignments = fidryn_solve::enumerate(&domains);
     let mut branches = Vec::new();
     let mut labeled = BTreeMap::new();
-    for alt in &family {
+    for assignment in assignments {
         let mut branched = case.clone();
-        branched
-            .interpretations
-            .insert("SuccessorEligibility".into(), alt.clone());
+        let mut label = String::new();
+        for (family, value) in &assignment.bindings {
+            let alt = value.display_label();
+            branched.interpretations.insert(family.clone(), alt.clone());
+            if family == "SuccessorEligibility" {
+                label = alt;
+            } else if label.is_empty() {
+                label = format!("{family}:{alt}");
+            }
+        }
+        if label.is_empty() {
+            label = format!("B{}", branches.len());
+        }
         let mut handler = CaseFile {
             record: branched.clone(),
         };
@@ -54,7 +67,7 @@ pub fn explore_query(
             &branched,
         );
         if let Outcome::Determinate { value, .. } = &out {
-            labeled.insert(alt.clone(), value.clone());
+            labeled.insert(label, value.clone());
         }
         branches.push(out);
     }
@@ -110,10 +123,22 @@ pub fn skeptical(
 }
 
 pub fn verify_property(module: &CoreModule, name: &str) -> Result<(), String> {
-    if module.verifications.iter().any(|v| v.name == name) || name == "TrusteeContinuity" {
-        return Ok(());
+    let found = module.verifications.iter().find(|v| v.name == name);
+    if found.is_none()
+        && name != "TrusteeContinuity"
+        && !module.queries.iter().any(|q| q.name == name)
+    {
+        return Err(format!("unknown property {name}"));
     }
-    Err(format!("unknown property {name}"))
+    if let Some(v) = found
+        && v.bounds.persons == 0
+        && v.bounds.events == 0
+        && v.bounds.time_points == 0
+        && v.formula.contains("for_all")
+    {
+        return Err("W620 BoundedVerification: quantifier has empty bounds".into());
+    }
+    Ok(())
 }
 
 #[cfg(test)]

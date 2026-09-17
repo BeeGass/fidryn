@@ -198,3 +198,46 @@ module Examples.UnknownConflictTarget version "0.1.0" {
         "{err:?}"
     );
 }
+
+#[test]
+fn tax_on_computes_closed_form() {
+    let module = compile("examples/tax/federal-tax.fidryn");
+    let case = load_case("examples/tax/cases/ordinary-income.json");
+    match run(&module, "tax_on", &case) {
+        Outcome::Determinate {
+            value: Value::Decimal(d),
+            ..
+        } => assert!(!d.is_zero(), "{d}"),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn boi_not_required_after_exemption() {
+    let module = compile("examples/tax/federal-tax.fidryn");
+    let case = load_case("examples/tax/cases/domestic-company-after-exemption.json");
+    match run(&module, "boi_required", &case) {
+        Outcome::Determinate { value, .. } => assert_eq!(value, Value::Bool(false)),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn judgment_without_entry_suspends() {
+    let module = compile("examples/procedure/civil-complaint.fidryn");
+    let case = load_case("examples/procedure/cases/complaint-answered-without-judgment.json");
+    assert!(matches!(
+        run(&module, "judgment", &case),
+        Outcome::Suspended { .. }
+    ));
+}
+
+#[test]
+fn judgment_with_entry_is_determinate() {
+    let module = compile("examples/procedure/civil-complaint.fidryn");
+    let case = load_case("examples/procedure/cases/judgment-entered.json");
+    match run(&module, "judgment", &case) {
+        Outcome::Determinate { value, .. } => assert!(!value.display_label().is_empty()),
+        other => panic!("{other:?}"),
+    }
+}
