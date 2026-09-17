@@ -7,7 +7,9 @@
 //! the outcome schema cannot express (`executionMode`, `assumptions`,
 //! `sourceTrust`, `verificationMethod`, `coverage`) stay on the envelope.
 //! [`reject_lossy_export`] errors when a standalone outcome projection
-//! would drop them.
+//! would drop them. Mill HTTP success is `{ "ok": true, "report": ... }`;
+//! `ok` is not a field of this envelope. Result vs assurance/provenance
+//! diffs of those qualifications live in the CLI.
 
 use fidryn_core::{
     AdmissibleCompletions, Assumption, CaseRecord, CoreModule, CoverageMethod, CoverageWitness,
@@ -176,6 +178,17 @@ pub fn render_outcome_lossy(
         &report.outcome,
     ))
 }
+
+/// Envelope fields that `fidryn.outcome/v0.1` cannot carry.
+///
+/// CLI `assurance_diff` fingerprints these. Mill transport `ok` is not one
+/// of them.
+pub const REPORT_QUALIFICATION_FIELDS: &[&str] = &[
+    "executionMode",
+    "sourceTrust",
+    "assumptions",
+    "verificationMethod",
+];
 
 /// Canonical evaluation-report envelope (`fidryn.evaluation-report/v0.1`).
 ///
@@ -842,6 +855,15 @@ mod tests {
         assert!(
             doc.get("ok").is_none(),
             "mill transport ok is not an evaluation-report field: {json}"
+        );
+        assert_eq!(
+            REPORT_QUALIFICATION_FIELDS,
+            [
+                "executionMode",
+                "sourceTrust",
+                "assumptions",
+                "verificationMethod",
+            ]
         );
         let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed.execution_mode, ExecutionMode::Scenario);
