@@ -1,0 +1,216 @@
+module California.Employment.WageStatements version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-09-17-ca-lab-226"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        PAGA_civil_penalties_and_cure
+        paid_sick_leave_item_Labor_Code_246
+        farm_labor_contractor_secured_entity_line
+        temporary_services_assignment_line
+        hours_worked_exemption_factfinding_226_j
+        residential_household_carveout_226_d
+        governmental_entity_carveout_226_i
+        deemed_injury_promptly_and_easily_test
+        actual_damages_greater_than_statutory
+        attorney_fees_and_injunctive_relief
+        misdemeanor_226_6
+        complete_Labor_Code
+        local_ordinances
+    }
+
+    source WageStatementStatute {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Lab. Code § 226"
+        artifact "sources/ca-lab-226.txt"
+        digest fixture
+        effective [2023-10-13, +inf)
+    }
+
+    source WageStatementCivilPenalty {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Lab. Code § 226.3"
+        artifact "sources/ca-lab-226-3.txt"
+        digest fixture
+        effective [1993-01-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Statement : RecordItem
+
+    record_type ItemizedWageStatement {
+        employee: NaturalPerson
+        employer: LegalPerson
+        items_shown: Int
+        furnished_at: Time
+    }
+
+    proposition EmployedBy(employee: NaturalPerson, employer: LegalPerson)
+    proposition StatementRequired(employer: LegalPerson, employee: NaturalPerson)
+    proposition StatementFurnished(employee: NaturalPerson, employer: LegalPerson)
+    proposition KnowingAndIntentionalFailure(employer: LegalPerson)
+    proposition IsolatedClericalMistake(employer: LegalPerson)
+    proposition EmployeeInjured(employee: NaturalPerson)
+    proposition StatutoryPenaltyAvailable(employee: NaturalPerson)
+    proposition ExemptFromHoursWorkedItem(employee: NaturalPerson)
+
+    observation StatementRecord(record: ItemizedWageStatement)
+        establishes StatementFurnished(record.employee, record.employer)
+        from WageStatementStatute
+    {
+        require record.employee == Employee
+    }
+
+    calc required_item_count() -> Int {
+        return 9
+    }
+
+    calc initial_pay_period_penalty() -> Money<USD> {
+        return USD(50.00)
+    }
+
+    calc subsequent_pay_period_penalty() -> Money<USD> {
+        return USD(100.00)
+    }
+
+    calc aggregate_penalty_cap() -> Money<USD> {
+        return USD(4000.00)
+    }
+
+    calc inspection_deadline() -> Duration<calendar_days> {
+        return 21 calendar_days
+    }
+
+    calc inspection_failure_penalty() -> Money<USD> {
+        return USD(750.00)
+    }
+
+    calc record_retention_years() -> Int {
+        return 3
+    }
+
+    calc civil_citation_initial() -> Money<USD> {
+        return USD(250.00)
+    }
+
+    calc civil_citation_subsequent() -> Money<USD> {
+        return USD(1000.00)
+    }
+
+    rule ItemizedStatementRequired : prescriptive
+        from WageStatementStatute
+    {
+        when operative EmployedBy(Employee, Employer)
+        then establish StatementRequired(Employer, Employee)
+    }
+
+    rule StatutoryDamagesTrack : constitutive
+        from WageStatementStatute
+    {
+        when operative KnowingAndIntentionalFailure(Employer)
+        then derive StatutoryPenaltyAvailable(Employee)
+    }
+
+    duty FurnishAccurateItemizedStatement {
+        bearer Employer
+        claimant Employee
+        attaches when operative StatementRequired(Employer, Employee)
+        content furnish_accurate_itemized_statement_with_nine_items
+        source WageStatementStatute
+    }
+
+    legal_act FurnishWageStatement(record: ItemizedWageStatement) {
+        performer Employer
+        recipient Employee
+        effect establish StatementFurnished(record.employee, record.employer)
+        source WageStatementStatute
+    }
+
+    query automatic items_complete(shown: Int) -> Bool {
+        return shown >= required_item_count()
+    }
+
+    query automatic first_period_penalty_amount(amount: Money<USD>) -> Bool {
+        return amount == initial_pay_period_penalty()
+    }
+
+    query automatic subsequent_period_penalty_amount(amount: Money<USD>) -> Bool {
+        return amount == subsequent_pay_period_penalty()
+    }
+
+    query automatic penalty_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= aggregate_penalty_cap()
+    }
+
+    query automatic inspection_timely(request: Time, production: Time) -> Bool {
+        return production <= request + inspection_deadline()
+    }
+
+    query automatic retention_years_met(years: Int) -> Bool {
+        return years >= record_retention_years()
+    }
+
+    query knowing_and_intentional()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined KnowingAndIntentionalFailure(Employer)
+                using Determine
+        }
+    }
+
+    query statutory_injury()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EmployeeInjured(Employee)
+                using Determine
+        }
+    }
+
+    scenario CompleteNineItems {
+        assume EmployedBy(Employee, Employer)
+        assume items_complete(9)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario MissingHourlyRates {
+        assume EmployedBy(Employee, Employer)
+        assume items_complete(8)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario FirstPeriodFifty {
+        assume first_period_penalty_amount(USD(50.00))
+        assume penalty_within_cap(USD(50.00))
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario SubsequentCapped {
+        assume KnowingAndIntentionalFailure(Employer)
+        assume subsequent_period_penalty_amount(USD(100.00))
+        assume penalty_within_cap(USD(4000.00))
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    verify WageStatementHonesty {
+        assert automatic items_complete
+            has empty effect row
+        assert automatic first_period_penalty_amount
+            has empty effect row
+        assert automatic subsequent_period_penalty_amount
+            has empty effect row
+        assert automatic penalty_within_cap
+            has empty effect row
+        assert knowing_and_intentional
+            is never treated automatic
+        assert statutory_injury
+            is never treated automatic
+    }
+}

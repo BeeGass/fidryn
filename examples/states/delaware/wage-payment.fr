@@ -1,0 +1,201 @@
+module Delaware.Employment.WagePayment version "0.1.0" {
+    jurisdiction Delaware
+    source_snapshot "2026-09-17-19-del-c-1102"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        independent_contractor_exclusion
+        federal_and_delaware_public_employees
+        wage_theft_section_1102A
+        authorized_withholding_under_1107
+        undisputed_portion_under_1104
+        benefits_and_wage_supplements_under_1109
+        deceased_employee_three_hundred_dollar_payover
+        payroll_disruption_labor_dispute_or_catastrophe
+        sunday_and_legal_holiday_identification
+        civil_penalty_range_under_1112
+        complete_19_Del_C_chapter_11
+    }
+
+    source RegularPaydayStatute {
+        kind statute
+        authority DelawareGeneralAssembly
+        citation "19 Del. C. § 1102"
+        artifact "sources/19-del-c-1102.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source SeparationPayStatute {
+        kind statute
+        authority DelawareGeneralAssembly
+        citation "19 Del. C. § 1103"
+        artifact "sources/19-del-c-1103.txt"
+        digest fixture
+        effective [2022-10-07, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity DepartmentOfLabor : LegalEntity
+
+    record_type PayPeriodRecord {
+        person: NaturalPerson
+        period_close: Time
+    }
+
+    proposition WorkPerformed(person: NaturalPerson)
+    proposition WagesDue(person: NaturalPerson)
+    proposition Separated(person: NaturalPerson)
+    proposition FinalWagesDue(person: NaturalPerson)
+    proposition BonaFideDispute(employer: LegalPerson)
+    proposition PaydayDesignatedInAdvance(employer: LegalPerson)
+    proposition PaydayOnNonworkDay(employer: LegalPerson)
+    proposition OvertimeInPeriod(person: NaturalPerson)
+
+    observation PayPeriodClosed(record: PayPeriodRecord)
+        establishes WagesDue(record.person)
+        from RegularPaydayStatute
+    {
+        require record.person == Employee
+    }
+
+    calc minimum_paydays_per_month() -> Int {
+        return 1
+    }
+
+    calc pay_period_close_deadline() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc overtime_deferral_day_cap() -> Int {
+        return 16
+    }
+
+    calc separation_floor() -> Duration<working_days> {
+        return 3 working_days
+    }
+
+    calc liquidated_percent_per_day() -> Int {
+        return 10
+    }
+
+    calc liquidated_day_cap() -> Int {
+        return 10
+    }
+
+    rule WagesBecomeDue : constitutive
+        from RegularPaydayStatute
+    {
+        when operative WorkPerformed(Employee)
+        then derive WagesDue(Employee)
+    }
+
+    rule SeparationPay : constitutive
+        from SeparationPayStatute
+    {
+        when operative Separated(Employee)
+        then derive FinalWagesDue(Employee)
+    }
+
+    duty PayOnRegularPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative WagesDue(Employee)
+        content pay_wages_on_designated_payday
+        source RegularPaydayStatute
+    }
+
+    duty PayOnSeparation {
+        bearer Employer
+        claimant Employee
+        attaches when operative FinalWagesDue(Employee)
+        content pay_final_wages_on_later_deadline
+        source SeparationPayStatute
+    }
+
+    legal_act SeparateFromPayroll() {
+        performer Employer
+        recipient Employee
+        effect establish Separated(Employee)
+        source SeparationPayStatute
+    }
+
+    query automatic monthly_payday_satisfied(paydays: Int) -> Bool {
+        return paydays >= minimum_paydays_per_month()
+    }
+
+    query automatic wages_paid_within_seven(period_close: Time, paid_at: Time) -> Bool {
+        return paid_at <= period_close + pay_period_close_deadline()
+    }
+
+    query automatic overtime_deferral_period_ok(period_days: Int) -> Bool {
+        return period_days <= overtime_deferral_day_cap()
+    }
+
+    query automatic separation_floor_elapsed(last_day: Time, as_of: Time) -> Bool {
+        return as_of >= last_day + separation_floor()
+    }
+
+    query automatic next_payday_is_later_deadline(next_payday: Time, last_day: Time) -> Bool {
+        return next_payday >= last_day + separation_floor()
+    }
+
+    query automatic liquidated_at_unpaid_cap(countable_days: Int) -> Bool {
+        return countable_days >= liquidated_day_cap()
+    }
+
+    query automatic liquidated_percent_is_ten(percent: Int) -> Bool {
+        return percent == liquidated_percent_per_day()
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDispute(Employer)
+                using Determine
+        }
+    }
+
+    scenario PaydayWithinSevenDays {
+        assume WorkPerformed(Employee)
+        assume PaydayDesignatedInAdvance(Employer)
+        assume monthly_payday_satisfied(1)
+        assume wages_paid_within_seven(2026-09-10T12:00:00-04:00, 2026-09-17T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SeparationThreeBusinessDays {
+        assume Separated(Employee)
+        assume separation_floor_elapsed(2026-09-14T12:00:00-04:00, 2026-09-17T12:00:00-04:00)
+        assume next_payday_is_later_deadline(2026-09-25T12:00:00-04:00, 2026-09-14T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario OvertimeDeferralSixteenDays {
+        assume OvertimeInPeriod(Employee)
+        assume overtime_deferral_period_ok(16)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LiquidatedTenDayCap {
+        assume FinalWagesDue(Employee)
+        assume liquidated_percent_is_ten(10)
+        assume liquidated_at_unpaid_cap(10)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic monthly_payday_satisfied
+            has empty effect row
+        assert automatic wages_paid_within_seven
+            has empty effect row
+        assert automatic separation_floor_elapsed
+            has empty effect row
+        assert bona_fide_dispute
+            is never treated automatic
+    }
+}

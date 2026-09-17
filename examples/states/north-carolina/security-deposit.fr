@@ -1,0 +1,240 @@
+module NorthCarolina.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction NorthCarolina
+    source_snapshot "2026-09-17-nc-gs-42-50"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        pet_fee_reasonableness
+        out_of_state_trust_account_bond_adequacy
+        single_room_exclusion
+        business_of_renting_characterization
+        summary_ejectment_procedure
+        constructive_eviction_and_42_45_early_termination
+        water_sewer_electric_utility_liens
+        wear_and_tear_versus_damage
+        complete_Chapter_42
+        local_ordinances
+        not_legal_advice
+    }
+
+    source HoldingStatute {
+        kind statute
+        authority NorthCarolinaGeneralAssembly
+        citation "N.C.G.S. § 42-50"
+        artifact "sources/nc-gs-42-50.txt"
+        digest fixture
+        effective [2017-07-01, +inf)
+    }
+
+    source CapReturnRemedies {
+        kind statute
+        authority NorthCarolinaGeneralAssembly
+        citation "N.C.G.S. §§ 42-51, 42-52, 42-55"
+        artifact "sources/nc-gs-42-51-55.txt"
+        digest fixture
+        effective [2012-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    proposition SecurityDepositReceived(unit: Dwelling)
+    proposition HeldInTrustOrBonded(unit: Dwelling)
+    proposition BankOrBondNoticeGiven(unit: Dwelling)
+    proposition WeekToWeekTenancy(unit: Dwelling)
+    proposition MonthToMonthTenancy(unit: Dwelling)
+    proposition LongerThanMonthToMonth(unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition PossessionDelivered(unit: Dwelling, at: Time)
+    proposition InterimAccountingMailed(unit: Dwelling)
+    proposition WillfulNoncompliance(landlord: NaturalPerson)
+    proposition RetentionRightVoided(landlord: NaturalPerson)
+
+    observation BankOrBondNoticeRecord(record: HoldingNotice)
+        establishes BankOrBondNoticeGiven(record.unit)
+        from HoldingStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act ReceiveResidentialDeposit() {
+        performer Tenant
+        recipient Landlord
+        effect establish SecurityDepositReceived(Unit)
+        source HoldingStatute
+    }
+
+    calc week_to_week_cap_weeks() -> Int {
+        return 2
+    }
+
+    calc month_to_month_cap_months() -> Decimal {
+        return 1.5
+    }
+
+    calc longer_term_cap_months() -> Decimal {
+        return 2.0
+    }
+
+    calc bank_notice_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc itemization_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc final_accounting_deadline() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc unknown_address_hold_months() -> Int {
+        return 6
+    }
+
+    rule TrustOrBondHolding : constitutive
+        from HoldingStatute
+    {
+        when operative SecurityDepositReceived(Unit)
+        then derive HeldInTrustOrBonded(Unit)
+    }
+
+    rule WillfulHoldingFailureVoidsRetention : constitutive
+        from CapReturnRemedies
+    {
+        when operative WillfulNoncompliance(Landlord)
+        then derive RetentionRightVoided(Landlord)
+    }
+
+    duty KeepTrustOrBond {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative SecurityDepositReceived(Unit)
+        content deposit_in_qualifying_trust_account_or_furnish_bond
+        source HoldingStatute
+    }
+
+    duty NotifyBankOrInsurer {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative SecurityDepositReceived(Unit)
+        content name_and_address_of_bank_or_name_of_insurer
+        source HoldingStatute
+    }
+
+    duty ItemizeAndRefund {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit, 2026-09-17T12:00:00-04:00)
+        content mail_itemization_and_balance_or_interim_then_final
+        source CapReturnRemedies
+    }
+
+    query automatic within_week_to_week_cap(weeks_of_rent: Int) -> Bool {
+        return weeks_of_rent <= week_to_week_cap_weeks()
+    }
+
+    query automatic within_month_to_month_cap(months_of_rent: Decimal) -> Bool {
+        return months_of_rent <= month_to_month_cap_months()
+    }
+
+    query automatic within_longer_term_cap(months_of_rent: Decimal) -> Bool {
+        return months_of_rent <= longer_term_cap_months()
+    }
+
+    query automatic bank_notice_running(lease_start: Time, as_of: Time) -> Bool {
+        return as_of <= lease_start + bank_notice_deadline()
+    }
+
+    query automatic itemization_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + itemization_deadline()
+    }
+
+    query automatic final_accounting_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + final_accounting_deadline()
+    }
+
+    query automatic unknown_address_hold_met(months_held: Int) -> Bool {
+        return months_held >= unknown_address_hold_months()
+    }
+
+    query holding_notice()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed BankOrBondNoticeRecord
+        }
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulNoncompliance(Landlord)
+                using Determine
+        }
+    }
+
+    scenario MonthToMonthOneAndHalf {
+        assume MonthToMonthTenancy(Unit)
+        assume SecurityDepositReceived(Unit)
+        assume within_month_to_month_cap(1.5)
+        assume bank_notice_running(2026-09-17T12:00:00-04:00, 2026-10-16T12:00:00-04:00)
+        at 2026-10-16T12:00:00-04:00
+    }
+
+    scenario YearLeaseTwoMonths {
+        assume LongerThanMonthToMonth(Unit)
+        assume SecurityDepositReceived(Unit)
+        assume within_longer_term_cap(2.0)
+        assume HeldInTrustOrBonded(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WeekToWeekTwoWeeks {
+        assume WeekToWeekTenancy(Unit)
+        assume within_week_to_week_cap(2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario TimelyItemization {
+        assume TenancyEnded(Unit, 2026-09-17T12:00:00-04:00)
+        assume PossessionDelivered(Unit, 2026-09-17T12:00:00-04:00)
+        assume itemization_deadline_running(2026-09-17T12:00:00-04:00, 2026-10-16T12:00:00-04:00)
+        at 2026-10-16T12:00:00-04:00
+    }
+
+    scenario InterimThenFinal {
+        assume TenancyEnded(Unit, 2026-09-17T12:00:00-04:00)
+        assume InterimAccountingMailed(Unit)
+        assume final_accounting_deadline_running(2026-09-17T12:00:00-04:00, 2026-11-15T12:00:00-04:00)
+        at 2026-11-15T12:00:00-04:00
+    }
+
+    scenario WillfulTrustAccountFailure {
+        assume SecurityDepositReceived(Unit)
+        assume WillfulNoncompliance(Landlord)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_week_to_week_cap
+            has empty effect row
+        assert automatic within_month_to_month_cap
+            has empty effect row
+        assert automatic within_longer_term_cap
+            has empty effect row
+        assert automatic itemization_deadline_running
+            has empty effect row
+        assert automatic final_accounting_deadline_running
+            has empty effect row
+        assert holding_notice
+            is never treated automatic
+        assert bad_faith
+            is never treated automatic
+    }
+}

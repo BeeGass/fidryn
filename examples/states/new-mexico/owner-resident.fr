@@ -1,0 +1,248 @@
+module NewMexico.Housing.OwnerResident version "0.1.0" {
+    jurisdiction NewMexico
+    source_snapshot "2026-09-17-nmsa-47-8"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        three_day_nonpayment_notice_47_8_33
+        seven_day_habitability_cure_47_8_27_1
+        rent_abatement_47_8_27_2
+        last_months_prepaid_rent
+        passbook_interest_rate_lookup
+        local_housing_codes
+        complete_UORRA
+    }
+
+    source DepositStatute {
+        kind statute
+        authority NewMexicoLegislature
+        citation "NMSA 1978 § 47-8-18"
+        artifact "sources/nmsa-47-8-18.txt"
+        digest fixture
+        effective [1989-06-16, +inf)
+    }
+
+    source OwnerObligations {
+        kind statute
+        authority NewMexicoLegislature
+        citation "NMSA 1978 § 47-8-20"
+        artifact "sources/nmsa-47-8-20.txt"
+        digest fixture
+        effective [1999-06-18, +inf)
+    }
+
+    source TerminationNotice {
+        kind statute
+        authority NewMexicoLegislature
+        citation "NMSA 1978 § 47-8-37"
+        artifact "sources/nmsa-47-8-37.txt"
+        digest fixture
+        effective [1975-07-01, +inf)
+    }
+
+    entity Resident : NaturalPerson
+    entity Owner : LegalPerson
+    entity Unit : Asset
+
+    record_type ItemizationRecord {
+        resident: NaturalPerson
+        unit: Asset
+        mailed_at: Time
+    }
+
+    proposition TenancyEnded(unit: Asset)
+    proposition ResidentDeparted(unit: Asset)
+    proposition OccupiesUnit(resident: NaturalPerson, unit: Asset)
+    proposition ItemizedStatementProvided(unit: Asset)
+    proposition DepositBalanceReturned(unit: Asset)
+    proposition ShortTermRental(unit: Asset)
+    proposition AnnualRental(unit: Asset)
+    proposition ItemizationDeadlineMissed(owner: LegalPerson)
+    proposition DepositWithholdForfeited(owner: LegalPerson)
+    proposition WeekToWeekResidency(unit: Asset)
+    proposition MonthToMonthResidency(unit: Asset)
+    proposition WrittenNoticeGiven(unit: Asset)
+    proposition HabitablePremises(unit: Asset)
+    proposition BadFaithRetention(owner: LegalPerson)
+    proposition WillfulHoldover(resident: NaturalPerson)
+    proposition ReasonableAnnualDeposit(owner: LegalPerson)
+
+    observation ItemizationMailing(record: ItemizationRecord)
+        establishes ItemizedStatementProvided(record.unit)
+        from DepositStatute
+    {
+        require record.resident == Resident
+    }
+
+    calc itemization_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc short_term_deposit_months() -> Decimal {
+        return 1.0
+    }
+
+    calc bad_faith_civil_penalty() -> Money<USD> {
+        return USD(250.00)
+    }
+
+    calc week_to_week_notice() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc month_to_month_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    rule ForfeitOnMissedItemization : constitutive
+        from DepositStatute
+    {
+        when operative ItemizationDeadlineMissed(Owner)
+        then derive DepositWithholdForfeited(Owner)
+    }
+
+    duty ReturnDepositWithItemization {
+        bearer Owner
+        claimant Resident
+        attaches when operative TenancyEnded(Unit)
+        content itemized_list_and_balance_within_thirty_days
+        source DepositStatute
+    }
+
+    duty KeepPremisesHabitable {
+        bearer Owner
+        claimant Resident
+        attaches when operative OccupiesUnit(Resident, Unit)
+        content comply_with_owner_obligations_47_8_20
+        source OwnerObligations
+    }
+
+    legal_act MailItemization(unit: Asset) {
+        performer Owner
+        recipient Resident
+        effect establish ItemizedStatementProvided(unit)
+        source DepositStatute
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + itemization_deadline()
+    }
+
+    query automatic within_itemization_days(days_after: Int) -> Bool {
+        return days_after <= 30
+    }
+
+    query automatic past_itemization_days(days_after: Int) -> Bool {
+        return days_after > 30
+    }
+
+    query automatic short_term_within_cap(deposit_in_months: Decimal) -> Bool {
+        return deposit_in_months <= short_term_deposit_months()
+    }
+
+    query automatic penalty_equals_statute(amount: Money<USD>) -> Bool {
+        return amount == bad_faith_civil_penalty()
+    }
+
+    query automatic week_to_week_notice_timely(days_before: Int) -> Bool {
+        return days_before >= 7
+    }
+
+    query automatic month_to_month_notice_timely(days_before: Int) -> Bool {
+        return days_before >= 30
+    }
+
+    query itemization_mailed()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ItemizationMailing
+        }
+    }
+
+    query habitability()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined HabitablePremises(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Owner)
+                using Determine
+        }
+    }
+
+    query annual_deposit_reasonableness()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ReasonableAnnualDeposit(Owner)
+                using Determine
+        }
+    }
+
+    scenario ShortTermCapReturnedOnDayThirty {
+        assume ShortTermRental(Unit)
+        assume TenancyEnded(Unit)
+        assume short_term_within_cap(1.0)
+        assume within_itemization_days(30)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario MissedItemizationForfeit {
+        assume TenancyEnded(Unit)
+        assume ItemizationDeadlineMissed(Owner)
+        assume past_itemization_days(31)
+        assume penalty_equals_statute(USD(250.00))
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario MonthToMonthThirtyDayNotice {
+        assume MonthToMonthResidency(Unit)
+        assume month_to_month_notice_timely(30)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario WeekToWeekSevenDayNotice {
+        assume WeekToWeekResidency(Unit)
+        assume week_to_week_notice_timely(7)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario OccupancyHabitabilityOpen {
+        assume OccupiesUnit(Resident, Unit)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify OwnerResidentHonesty {
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic within_itemization_days
+            has empty effect row
+        assert automatic past_itemization_days
+            has empty effect row
+        assert automatic short_term_within_cap
+            has empty effect row
+        assert automatic month_to_month_notice_timely
+            has empty effect row
+        assert itemization_mailed
+            is never treated automatic
+        assert habitability
+            is never treated automatic
+        assert bad_faith_retention
+            is never treated automatic
+        assert annual_deposit_reasonableness
+            is never treated automatic
+    }
+}

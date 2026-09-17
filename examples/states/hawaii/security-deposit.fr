@@ -1,0 +1,250 @@
+module Hawaii.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Hawaii
+    source_snapshot "2026-09-17-hrs-521-44"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-10:00
+
+    outside_scope {
+        last_month_rent_conversion_forty_five_day_notice
+        successor_landlord_accounting_adequacy
+        small_claims_no_attorney_representation
+        assistance_animal_reasonable_accommodation_merits
+        ordinary_wear_and_tear_factfinding
+        permitted_deduction_categories_521_44_a
+        interest_not_required
+        complete_Chapter_521
+        local_ordinances
+        chapter_633_small_claims_procedure
+    }
+
+    source DepositStatute {
+        kind statute
+        authority HawaiiLegislature
+        citation "Haw. Rev. Stat. § 521-44"
+        artifact "sources/hrs-521-44.txt"
+        digest fixture
+        effective [2015-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type TerminationRecord {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        ended_at: Time
+    }
+
+    record_type ItemizedNotice {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        delivered_at: Time
+    }
+
+    proposition OccupiesUnit(tenant: NaturalPerson, unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling)
+    proposition DepositCollected(unit: Dwelling)
+    proposition PetAnimalResides(unit: Dwelling)
+    proposition AssistanceAnimalAccommodation(unit: Dwelling)
+    proposition ItemizedNoticeFurnished(unit: Dwelling)
+    proposition DepositBalanceReturned(unit: Dwelling)
+    proposition RetentionForfeited(landlord: LegalPerson)
+    proposition WrongfulRetention(landlord: LegalPerson)
+    proposition WilfulRetention(landlord: LegalPerson)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition WrongfullyQuit(tenant: NaturalPerson, unit: Dwelling)
+    proposition ForwardingAddressSupplied(tenant: NaturalPerson)
+
+    observation TenancyTermination(record: TerminationRecord)
+        establishes TenancyEnded(record.unit)
+        from DepositStatute
+    {
+        require record.tenant == Tenant
+        require record.landlord == Landlord
+    }
+
+    observation ItemizedReturnNotice(record: ItemizedNotice)
+        establishes ItemizedNoticeFurnished(record.unit)
+        from DepositStatute
+    {
+        require record.tenant == Tenant
+        require record.landlord == Landlord
+    }
+
+    legal_act FurnishItemizedNotice(notice: ItemizedNotice) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedNoticeFurnished(notice.unit)
+        source DepositStatute
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc wrongful_quit_absence() -> Duration<counted_days> {
+        return 20 counted_days
+    }
+
+    calc successor_notice_period() -> Duration<counted_days> {
+        return 20 counted_days
+    }
+
+    calc recovery_action_limit() -> Duration<counted_days> {
+        return 365 counted_days
+    }
+
+    calc treble_multiplier() -> Int {
+        return 3
+    }
+
+    rule MissedNoticeForfeitsRetention : constitutive
+        from DepositStatute
+    {
+        when operative TenancyEnded(Unit)
+          and operative RetentionForfeited(Landlord)
+        then derive WrongfulRetention(Landlord)
+    }
+
+    rule WilfulIsBadFaith : constitutive
+        from DepositStatute
+    {
+        when operative WrongfulRetention(Landlord)
+          and operative WilfulRetention(Landlord)
+        then derive BadFaithRetention(Landlord)
+    }
+
+    duty ReturnAndItemize {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit)
+        content return_balance_or_itemized_notice_within_fourteen_days
+        source DepositStatute
+    }
+
+    query automatic within_base_cap(deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return deposit <= monthly_rent
+    }
+
+    query automatic within_pet_cap(pet_deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return pet_deposit <= monthly_rent
+    }
+
+    query automatic return_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic return_deadline_missed(end: Time, as_of: Time) -> Bool {
+        return as_of > end + return_deadline()
+    }
+
+    query automatic wrongful_quit_absence_met(absent_from: Time, as_of: Time) -> Bool {
+        return as_of >= absent_from + wrongful_quit_absence()
+    }
+
+    query automatic successor_notice_running(transfer: Time, as_of: Time) -> Bool {
+        return as_of <= transfer + successor_notice_period()
+    }
+
+    query automatic recovery_action_open(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + recovery_action_limit()
+    }
+
+    query automatic treble_of(withheld_units: Int) -> Int {
+        return withheld_units * treble_multiplier()
+    }
+
+    query itemized_notice()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ItemizedReturnNotice
+        }
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    query wrongful_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WrongfulRetention(Landlord)
+                using Determine
+        }
+    }
+
+    scenario OneMonthBaseCap {
+        assume OccupiesUnit(Tenant, Unit)
+        assume within_base_cap(USD(2000.00), USD(2000.00))
+        at 2026-09-17T12:00:00-10:00
+    }
+
+    scenario PetDepositWithinCap {
+        assume OccupiesUnit(Tenant, Unit)
+        assume PetAnimalResides(Unit)
+        assume within_base_cap(USD(1800.00), USD(1800.00))
+        assume within_pet_cap(USD(1800.00), USD(1800.00))
+        at 2026-09-17T12:00:00-10:00
+    }
+
+    scenario ReturnOnDayFourteen {
+        assume TenancyEnded(Unit)
+        assume ForwardingAddressSupplied(Tenant)
+        assume return_deadline_running(2026-09-03T12:00:00-10:00, 2026-09-17T12:00:00-10:00)
+        at 2026-09-17T12:00:00-10:00
+    }
+
+    scenario MissedDeadlineForfeitsRetention {
+        assume TenancyEnded(Unit)
+        assume return_deadline_missed(2026-08-01T12:00:00-10:00, 2026-09-17T12:00:00-10:00)
+        assume RetentionForfeited(Landlord)
+        at 2026-09-17T12:00:00-10:00
+    }
+
+    scenario TrebleRequiresWilful {
+        assume TenancyEnded(Unit)
+        assume WrongfulRetention(Landlord)
+        assume WilfulRetention(Landlord)
+        assume BadFaithRetention(Landlord)
+        assume treble_of(1) == 3
+        at 2026-09-17T12:00:00-10:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_base_cap
+            has empty effect row
+        assert automatic within_pet_cap
+            has empty effect row
+        assert automatic return_deadline_running
+            has empty effect row
+        assert automatic return_deadline_missed
+            has empty effect row
+        assert automatic wrongful_quit_absence_met
+            has empty effect row
+        assert automatic successor_notice_running
+            has empty effect row
+        assert automatic recovery_action_open
+            has empty effect row
+        assert automatic treble_of
+            has empty effect row
+        assert itemized_notice
+            is never treated automatic
+        assert bad_faith
+            is never treated automatic
+        assert wrongful_retention
+            is never treated automatic
+    }
+}

@@ -1,0 +1,250 @@
+module Oregon.Housing.NoCauseNotice version "0.1.0" {
+    jurisdiction Oregon
+    source_snapshot "2026-09-17-ors-90-427"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        tenant_cause_notices_under_90_392_to_90_445
+        manufactured_dwelling_park_tenancies
+        spaces_subject_to_90_429
+        portland_and_local_relocation_ordinances
+        three_strikes_fixed_term_nonrenewal
+        retaliatory_eviction
+        FED_possession_procedure
+        tenant_early_exit_after_qualifying_reason_notice
+        rider_v_carranza_termination_date_cutoff
+        complete_ORS_chapter_90
+    }
+
+    source TerminationStatute {
+        kind statute
+        authority OregonLegislativeAssembly
+        citation "ORS 90.427"
+        artifact "sources/ors-90-427.txt"
+        digest fixture
+        effective [2025-09-26, +inf)
+    }
+
+    entity Landlord : LegalPerson
+    entity Tenant : NaturalPerson
+    entity Unit : Dwelling
+
+    record_type OccupancyStart {
+        tenant: NaturalPerson
+        unit: Dwelling
+        began: Time
+    }
+
+    record_type TerminationNoticeRecord {
+        landlord: LegalPerson
+        tenant: NaturalPerson
+        unit: Dwelling
+        given_at: Time
+        designated_end: Time
+    }
+
+    proposition ResidesIn(person: NaturalPerson, unit: Dwelling)
+    proposition MonthToMonthTenancy(unit: Dwelling)
+    proposition FirstYearOfOccupancy(unit: Dwelling)
+    proposition AfterFirstYear(unit: Dwelling)
+    proposition JustCauseRequired(unit: Dwelling)
+    proposition QualifyingLandlordReason(landlord: LegalPerson, unit: Dwelling)
+    proposition DemolitionOrConversion(unit: Dwelling)
+    proposition UnsafeRepairsOrRenovations(unit: Dwelling)
+    proposition LandlordOrFamilyOccupancy(unit: Dwelling)
+    proposition SaleToOwnerOccupant(unit: Dwelling)
+    proposition LandlordOccupiedOneOrTwoUnit(unit: Dwelling)
+    proposition WrittenNoticeGiven(unit: Dwelling)
+
+    observation OccupancyStartRecord(record: OccupancyStart)
+        establishes ResidesIn(record.tenant, record.unit)
+        from TerminationStatute
+    {
+        require record.tenant == Tenant
+        require record.unit == Unit
+    }
+
+    legal_act ServeTerminationNotice(notice: TerminationNoticeRecord) {
+        performer notice.landlord
+        recipient notice.tenant
+        effect establish WrittenNoticeGiven(notice.unit)
+        source TerminationStatute
+    }
+
+    calc week_to_week_notice() -> Duration<counted_days> {
+        return 10 counted_days
+    }
+
+    calc first_year_no_cause_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc qualifying_landlord_reason_notice() -> Duration<counted_days> {
+        return 90 counted_days
+    }
+
+    calc sale_to_occupant_short_notice() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc small_property_no_cause_notice() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc small_landlord_unit_cap() -> Int {
+        return 4
+    }
+
+    calc small_property_unit_cap() -> Int {
+        return 2
+    }
+
+    calc penalty_months() -> Int {
+        return 3
+    }
+
+    rule AfterFirstYearJustCause : constitutive
+        from TerminationStatute
+    {
+        when operative AfterFirstYear(Unit)
+        then derive JustCauseRequired(Unit)
+    }
+
+    rule QualifyingReasonFromGrounds : constitutive
+        from TerminationStatute
+    {
+        when operative DemolitionOrConversion(Unit)
+          or operative UnsafeRepairsOrRenovations(Unit)
+          or operative LandlordOrFamilyOccupancy(Unit)
+          or operative SaleToOwnerOccupant(Unit)
+        then derive QualifyingLandlordReason(Landlord, Unit)
+    }
+
+    power FirstYearNoCauseTermination {
+        holder Landlord
+        subject Unit
+        effect WrittenNoticeGiven(unit: Dwelling)
+        active_while operative FirstYearOfOccupancy(Unit)
+        source TerminationStatute
+    }
+
+    duty PayRelocationAssistance {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative QualifyingLandlordReason(Landlord, Unit)
+        content pay_one_months_periodic_rent_at_notice_delivery
+        source TerminationStatute
+    }
+
+    query automatic first_year_notice_timely(notice: Time, end: Time) -> Bool {
+        return end >= notice + first_year_no_cause_notice()
+    }
+
+    query automatic qualifying_reason_notice_timely(notice: Time, end: Time) -> Bool {
+        return end >= notice + qualifying_landlord_reason_notice()
+    }
+
+    query automatic sale_short_notice_timely(notice: Time, end: Time) -> Bool {
+        return end >= notice + sale_to_occupant_short_notice()
+    }
+
+    query automatic first_year_notice_sufficient(days: Int) -> Bool {
+        return days >= 30
+    }
+
+    query automatic qualifying_reason_notice_sufficient(days: Int) -> Bool {
+        return days >= 90
+    }
+
+    query automatic sale_short_notice_sufficient(days: Int) -> Bool {
+        return days >= 60
+    }
+
+    query automatic small_property_no_cause_sufficient(days: Int) -> Bool {
+        return days >= 60
+    }
+
+    query automatic four_or_fewer_units(units: Int) -> Bool {
+        return units <= small_landlord_unit_cap()
+    }
+
+    query automatic relocation_covers_one_month(paid: Money<USD>, rent: Money<USD>) -> Bool {
+        return paid == rent
+    }
+
+    query first_year_occupancy()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed OccupancyStartRecord
+            require determined FirstYearOfOccupancy(Unit)
+                using Observe
+        }
+    }
+
+    query qualifying_landlord_reason()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined QualifyingLandlordReason(Landlord, Unit)
+                using Determine
+        }
+    }
+
+    scenario FirstYearThirty {
+        assume MonthToMonthTenancy(Unit)
+        assume FirstYearOfOccupancy(Unit)
+        assume first_year_notice_sufficient(30)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario AfterYearNinetyQLR {
+        assume MonthToMonthTenancy(Unit)
+        assume AfterFirstYear(Unit)
+        assume qualifying_reason_notice_sufficient(90)
+        assume relocation_covers_one_month(USD(1500.00), USD(1500.00))
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario SaleSixtyWithExtraMonth {
+        assume AfterFirstYear(Unit)
+        assume SaleToOwnerOccupant(Unit)
+        assume four_or_fewer_units(4)
+        assume sale_short_notice_sufficient(60)
+        assume relocation_covers_one_month(USD(1500.00), USD(1500.00))
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario SmallPropertySixtyNoCause {
+        assume AfterFirstYear(Unit)
+        assume LandlordOccupiedOneOrTwoUnit(Unit)
+        assume small_property_no_cause_sufficient(60)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    verify NoticeHonesty {
+        assert automatic first_year_notice_timely
+            has empty effect row
+        assert automatic qualifying_reason_notice_timely
+            has empty effect row
+        assert automatic sale_short_notice_timely
+            has empty effect row
+        assert automatic first_year_notice_sufficient
+            has empty effect row
+        assert automatic qualifying_reason_notice_sufficient
+            has empty effect row
+        assert automatic sale_short_notice_sufficient
+            has empty effect row
+        assert automatic four_or_fewer_units
+            has empty effect row
+        assert automatic relocation_covers_one_month
+            has empty effect row
+        assert qualifying_landlord_reason
+            is never treated automatic
+        assert first_year_occupancy
+            is never treated automatic
+    }
+}

@@ -1,0 +1,201 @@
+module NorthDakota.Property.Homestead version "0.1.0" {
+    jurisdiction NorthDakota
+    source_snapshot "2026-09-17-nd-const-art-xi-22"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        property_tax_homestead_credit_57_02_08_1
+        bankruptcy_opt_out_and_federal_exemptions
+        probate_homestead_estate_chapter_30_16
+        mobile_home_in_lieu_28_22_02_10
+        optional_declaration_of_homestead
+        mental_illness_conveyance_47_18_22
+        leap_day_in_proceeds_year
+        complete_North_Dakota_Constitution
+        complete_Chapter_47_18
+    }
+
+    source HomesteadConstitution {
+        kind constitution
+        authority PeopleOfNorthDakota
+        citation "N.D. Const. art. XI, § 22"
+        artifact "sources/nd-const-art-xi-22.txt"
+        digest fixture
+        effective [1889-10-01, +inf)
+    }
+
+    source HomesteadChapter {
+        kind statute
+        authority NorthDakotaLegislativeAssembly
+        citation "N.D.C.C. § 47-18-01 et seq."
+        artifact "sources/ndcc-47-18.txt"
+        digest fixture
+        effective [2023-08-01, +inf)
+    }
+
+    entity Owner : NaturalPerson
+    entity Spouse : NaturalPerson
+    entity Creditor : LegalPerson
+    entity Home : RealProperty
+
+    record_type ResidenceRecord {
+        person: NaturalPerson
+        property: RealProperty
+    }
+
+    proposition OccupiesAsResidence(person: NaturalPerson, property: RealProperty)
+    proposition ContiguousTracts(property: RealProperty)
+    proposition HomesteadCharacter(property: RealProperty, owner: NaturalPerson)
+    proposition ForcedSaleProtected(property: RealProperty)
+    proposition ExceptedCreditor(creditor: LegalPerson)
+    proposition MechanicsOrLaborersLien(creditor: LegalPerson, property: RealProperty)
+    proposition PurchaseMoneyDebt(creditor: LegalPerson, property: RealProperty)
+    proposition TaxesAccrued(property: RealProperty)
+    proposition JointMortgage(creditor: LegalPerson, property: RealProperty)
+
+    observation OccupancyRecord(record: ResidenceRecord)
+        establishes OccupiesAsResidence(record.person, record.property)
+        from HomesteadChapter
+    {
+        require record.person == Owner
+    }
+
+    calc homestead_value_cap() -> Money<USD> {
+        return USD(150000.00)
+    }
+
+    calc waiver_notice_acre_floor() -> Decimal {
+        return 40.0
+    }
+
+    calc proceeds_protection() -> Duration<counted_days> {
+        return 365 counted_days
+    }
+
+    calc appraisal_hearing_notice() -> Duration<counted_days> {
+        return 10 counted_days
+    }
+
+    calc appraisers_report_deadline() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    rule OccupancyConstitutesHomestead : constitutive
+        from HomesteadChapter
+    {
+        when operative OccupiesAsResidence(Owner, Home)
+        then derive HomesteadCharacter(Home, Owner)
+    }
+
+    rule ForcedSaleProtection : constitutive
+        from HomesteadChapter
+    {
+        when operative HomesteadCharacter(Home, Owner)
+        then establish ForcedSaleProtected(Home)
+    }
+
+    duty RespectHomestead {
+        bearer Creditor
+        claimant Owner
+        attaches when operative ForcedSaleProtected(Home)
+        content refrain_from_forced_sale_except_enumerated_exceptions
+        source HomesteadChapter
+    }
+
+    query automatic within_value_cap(equity: Money<USD>) -> Bool {
+        return equity <= homestead_value_cap()
+    }
+
+    query automatic no_statutory_acreage_cap(acres: Decimal) -> Bool {
+        return acres >= 0.0
+    }
+
+    query automatic waiver_notice_acreage_applies(acres: Decimal) -> Bool {
+        return acres >= waiver_notice_acre_floor()
+    }
+
+    query automatic waiver_notice_acreage_exempt(acres: Decimal) -> Bool {
+        return acres < waiver_notice_acre_floor()
+    }
+
+    query automatic proceeds_year_running(conveyance: Time, as_of: Time) -> Bool {
+        return as_of <= conveyance + proceeds_protection()
+    }
+
+    query automatic appraisal_notice_timely(served: Time, hearing: Time) -> Bool {
+        return hearing >= served + appraisal_hearing_notice()
+    }
+
+    query automatic appraisers_report_timely(appointed: Time, filed: Time) -> Bool {
+        return filed <= appointed + appraisers_report_deadline()
+    }
+
+    query homestead_character()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed OccupancyRecord
+            require determined HomesteadCharacter(Home, Owner)
+                using Determine
+        }
+    }
+
+    query execution_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ExceptedCreditor(Creditor)
+                using Determine
+        }
+    }
+
+    scenario EquityAtCap {
+        assume OccupiesAsResidence(Owner, Home)
+        assume within_value_cap(USD(150000.00))
+        assume no_statutory_acreage_cap(160.0)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario EquityOverCap {
+        assume OccupiesAsResidence(Owner, Home)
+        assume HomesteadCharacter(Home, Owner)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario FortyAcreMortgageNotice {
+        assume HomesteadCharacter(Home, Owner)
+        assume waiver_notice_acreage_applies(40.0)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario SubFortyAcreMortgage {
+        assume HomesteadCharacter(Home, Owner)
+        assume waiver_notice_acreage_exempt(10.0)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario TaxOrPurchaseMoney {
+        assume HomesteadCharacter(Home, Owner)
+        assume TaxesAccrued(Home)
+        assume PurchaseMoneyDebt(Creditor, Home)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify HomesteadHonesty {
+        assert automatic within_value_cap
+            has empty effect row
+        assert automatic no_statutory_acreage_cap
+            has empty effect row
+        assert automatic waiver_notice_acreage_applies
+            has empty effect row
+        assert automatic waiver_notice_acreage_exempt
+            has empty effect row
+        assert homestead_character
+            is never treated automatic
+        assert execution_exception
+            is never treated automatic
+    }
+}

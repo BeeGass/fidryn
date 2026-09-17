@@ -1,0 +1,239 @@
+module Mississippi.Housing.Eviction version "0.1.0" {
+    jurisdiction Mississippi
+    source_snapshot "2026-09-17-miss-code-89-8"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        commercial_chapter_7_removal
+        manufactured_home_disposition
+        self_help_lockout_torts
+        retaliatory_conduct_under_89_8_17
+        justice_court_summons_and_adjournment
+        complete_Title_89
+        local_ordinances
+        SCRA_military_protections
+    }
+
+    source ResidentialBreachNotice {
+        kind statute
+        authority MississippiLegislature
+        citation "Miss. Code Ann. § 89-8-13"
+        artifact "sources/miss-code-89-8-13.txt"
+        digest fixture
+        effective [2022-07-01, +inf)
+    }
+
+    source PeriodicTenancyNotice {
+        kind statute
+        authority MississippiLegislature
+        citation "Miss. Code Ann. § 89-8-19"
+        artifact "sources/miss-code-89-8-19.txt"
+        digest fixture
+        effective [1991-07-01, +inf)
+    }
+
+    source PossessionAfterJudgment {
+        kind statute
+        authority MississippiLegislature
+        citation "Miss. Code Ann. § 89-8-39"
+        artifact "sources/miss-code-89-8-39.txt"
+        digest fixture
+        effective [2022-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+    entity JusticeCourt : Authority
+
+    record_type NoticeRecord {
+        tenant: NaturalPerson
+        unit: Dwelling
+        served_at: Time
+    }
+
+    proposition NonpaymentOfRent(tenant: NaturalPerson, unit: Dwelling)
+    proposition MaterialNoncompliance(tenant: NaturalPerson, unit: Dwelling)
+    proposition BreachRemedied(tenant: NaturalPerson, unit: Dwelling)
+    proposition RepeatNoncomplianceWithinSixMonths(tenant: NaturalPerson, unit: Dwelling)
+    proposition NoticeServed(tenant: NaturalPerson, unit: Dwelling)
+    proposition RentalAgreementTerminated(unit: Dwelling)
+    proposition MonthToMonthTenancy(unit: Dwelling)
+    proposition WeekToWeekTenancy(unit: Dwelling)
+    proposition SubstantialHealthOrSafetyViolation(unit: Dwelling)
+    proposition EntitledToPossession(landlord: NaturalPerson, unit: Dwelling)
+    proposition JudgmentOfPossession(unit: Dwelling)
+
+    observation WrittenNoticeRecord(record: NoticeRecord)
+        establishes NoticeServed(record.tenant, record.unit)
+        from ResidentialBreachNotice
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act ServePayOrQuit(record: NoticeRecord) {
+        performer Landlord
+        recipient Tenant
+        effect establish NoticeServed(Tenant, Unit)
+        source ResidentialBreachNotice
+    }
+
+    calc pay_or_quit_period() -> Duration<counted_days> {
+        return 3 counted_days
+    }
+
+    calc material_breach_cure_period() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc repeat_breach_notice_period() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc week_to_week_notice_period() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc month_to_month_notice_period() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc repeat_noncompliance_window_months() -> Int {
+        return 6
+    }
+
+    calc judgment_vacate_period() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc property_access_after_warrant() -> Duration<hours> {
+        return 72 hours
+    }
+
+    rule NonpaymentNoticeGround : constitutive
+        from ResidentialBreachNotice
+    {
+        when operative NonpaymentOfRent(Tenant, Unit)
+        then derive NoticeServed(Tenant, Unit)
+    }
+
+    rule CurePreventsTermination : constitutive
+        from ResidentialBreachNotice
+    {
+        when operative BreachRemedied(Tenant, Unit)
+        then defeat RentalAgreementTerminated(Unit)
+    }
+
+    duty PayOrQuitAfterNotice {
+        bearer Tenant
+        claimant Landlord
+        attaches when operative NonpaymentOfRent(Tenant, Unit)
+        content pay_rent_or_surrender_possession
+        source ResidentialBreachNotice
+    }
+
+    duty VacateAfterPossessionJudgment {
+        bearer Tenant
+        claimant Landlord
+        attaches when operative JudgmentOfPossession(Unit)
+        content vacate_within_court_ordered_move_out_date
+        source PossessionAfterJudgment
+    }
+
+    query automatic pay_or_quit_still_open(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + pay_or_quit_period()
+    }
+
+    query automatic material_breach_cure_still_open(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + material_breach_cure_period()
+    }
+
+    query automatic week_to_week_notice_complete(notice: Time, termination: Time) -> Bool {
+        return termination >= notice + week_to_week_notice_period()
+    }
+
+    query automatic month_to_month_notice_complete(notice: Time, termination: Time) -> Bool {
+        return termination >= notice + month_to_month_notice_period()
+    }
+
+    query automatic vacate_window_after_judgment(judgment: Time, as_of: Time) -> Bool {
+        return as_of <= judgment + judgment_vacate_period()
+    }
+
+    query automatic property_access_still_open(warrant_executed: Time, as_of: Time) -> Bool {
+        return as_of <= warrant_executed + property_access_after_warrant()
+    }
+
+    query automatic within_repeat_window_months(months_apart: Int) -> Bool {
+        return months_apart <= repeat_noncompliance_window_months()
+    }
+
+    query possession()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined EntitledToPossession(Landlord, Unit)
+                using Determine
+        }
+    }
+
+    query adequate_cure()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require determined BreachRemedied(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    scenario PayOrQuitThreeDays {
+        assume NonpaymentOfRent(Tenant, Unit)
+        assume NoticeServed(Tenant, Unit)
+        assume pay_or_quit_still_open(2026-09-01T12:00:00-05:00, 2026-09-04T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario MaterialBreachFourteenDays {
+        assume MaterialNoncompliance(Tenant, Unit)
+        assume NoticeServed(Tenant, Unit)
+        assume material_breach_cure_still_open(2026-09-01T12:00:00-05:00, 2026-09-15T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario MonthToMonthThirtyDays {
+        assume MonthToMonthTenancy(Unit)
+        assume month_to_month_notice_complete(2026-08-01T12:00:00-05:00, 2026-08-31T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario PossessionAfterHearing {
+        assume NoticeServed(Tenant, Unit)
+        assume JudgmentOfPossession(Unit)
+        assume vacate_window_after_judgment(2026-09-10T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify EvictionHonesty {
+        assert automatic pay_or_quit_still_open
+            has empty effect row
+        assert automatic material_breach_cure_still_open
+            has empty effect row
+        assert automatic week_to_week_notice_complete
+            has empty effect row
+        assert automatic month_to_month_notice_complete
+            has empty effect row
+        assert automatic vacate_window_after_judgment
+            has empty effect row
+        assert automatic property_access_still_open
+            has empty effect row
+        assert automatic within_repeat_window_months
+            has empty effect row
+        assert possession
+            is never treated automatic
+        assert adequate_cure
+            is never treated automatic
+    }
+}

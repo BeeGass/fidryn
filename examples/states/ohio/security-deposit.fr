@@ -1,0 +1,221 @@
+module Ohio.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Ohio
+    source_snapshot "2026-09-17-orc-5321.16"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        no_statutory_deposit_amount_cap
+        ordinary_wear_and_tear
+        proration_of_annual_interest_at_move_out
+        attorney_fee_reasonableness
+        small_claims_procedure
+        complete_Chapter_5321
+        local_ordinances
+        smith_v_padgett_no_bad_faith_element
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority OhioGeneralAssembly
+        citation "Ohio Rev. Code § 5321.16"
+        artifact "sources/orc-5321.16.txt"
+        digest fixture
+        effective [1974-11-04, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type TenancyRecord {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        monthly_rent: Money<USD>
+        deposit: Money<USD>
+    }
+
+    record_type ItemizedNotice {
+        landlord: LegalPerson
+        tenant: NaturalPerson
+        delivered_at: Time
+    }
+
+    proposition TenancyEnded(unit: Dwelling)
+    proposition PossessionDelivered(unit: Dwelling)
+    proposition ForwardingAddressProvided(tenant: NaturalPerson)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition LawfulDeduction(landlord: LegalPerson)
+    proposition WrongfullyWithheld(landlord: LegalPerson)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition PastDueRent(unit: Dwelling)
+    proposition TenantNoncompliance(unit: Dwelling)
+    proposition OccupiedSixMonths(unit: Dwelling)
+
+    observation EndOfTenancy(record: TenancyRecord)
+        establishes TenancyEnded(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc fifty_dollar_floor() -> Money<USD> {
+        return USD(50.00)
+    }
+
+    calc interest_percent() -> Int {
+        return 5
+    }
+
+    calc occupancy_months_for_interest() -> Int {
+        return 6
+    }
+
+    duty ReturnDepositAndItemization {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit)
+        content deliver_itemized_notice_and_amount_due
+        source SecurityDepositStatute
+    }
+
+    duty PayAnnualInterestOnExcess {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative OccupiedSixMonths(Unit)
+        content compute_and_pay_five_percent_on_excess_annually
+        source SecurityDepositStatute
+    }
+
+    legal_act ProvideForwardingAddress() {
+        performer Tenant
+        recipient Landlord
+        effect establish ForwardingAddressProvided(Tenant)
+        source SecurityDepositStatute
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic occupancy_meets_interest(months: Int) -> Bool {
+        return months >= occupancy_months_for_interest()
+    }
+
+    query automatic occupancy_below_interest(months: Int) -> Bool {
+        return months < occupancy_months_for_interest()
+    }
+
+    query automatic rent_sets_threshold(monthly_rent: Money<USD>) -> Bool {
+        return monthly_rent >= fifty_dollar_floor()
+    }
+
+    query automatic fifty_sets_threshold(monthly_rent: Money<USD>) -> Bool {
+        return monthly_rent < fifty_dollar_floor()
+    }
+
+    query automatic excess_over_rent(deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return deposit > monthly_rent
+            and monthly_rent >= fifty_dollar_floor()
+    }
+
+    query automatic excess_over_fifty(deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return deposit > fifty_dollar_floor()
+            and monthly_rent < fifty_dollar_floor()
+    }
+
+    query automatic statutory_additional_damages(wrongfully_withheld: Money<USD>) -> Money<USD> {
+        return wrongfully_withheld
+    }
+
+    query automatic interest_rate_is_five_percent() -> Bool {
+        return interest_percent() == 5
+    }
+
+    query wrongful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WrongfullyWithheld(Landlord)
+                using Determine
+        }
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    query lawful_deduction()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LawfulDeduction(Landlord)
+                using Determine
+        }
+    }
+
+    scenario TimelyReturnWithItemization {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        assume ForwardingAddressProvided(Tenant)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario InterestOnExcess {
+        assume OccupiedSixMonths(Unit)
+        assume occupancy_meets_interest(12)
+        assume rent_sets_threshold(USD(1200.00))
+        assume excess_over_rent(USD(1500.00), USD(1200.00))
+        assume interest_rate_is_five_percent()
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ShortStayNoInterest {
+        assume occupancy_below_interest(5)
+        assume excess_over_rent(USD(1500.00), USD(1200.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FiftyDollarFloorWhenRentIsSmall {
+        assume occupancy_meets_interest(8)
+        assume fifty_sets_threshold(USD(40.00))
+        assume excess_over_fifty(USD(200.00), USD(40.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario MissingForwardingAddress {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic occupancy_meets_interest
+            has empty effect row
+        assert automatic occupancy_below_interest
+            has empty effect row
+        assert automatic excess_over_rent
+            has empty effect row
+        assert bad_faith
+            is never treated automatic
+        assert wrongful_withholding
+            is never treated automatic
+        assert lawful_deduction
+            is never treated automatic
+    }
+}

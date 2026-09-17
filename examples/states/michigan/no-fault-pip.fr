@@ -1,0 +1,242 @@
+module Michigan.Insurance.NoFaultPIP version "0.1.0" {
+    jurisdiction Michigan
+    source_snapshot "2026-09-17-mcl-500-3105"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        parked_vehicle_exceptions
+        assigned_claims_plan
+        medical_fee_schedules
+        attendant_care_hourly_limits
+        medicare_opt_out_and_qhc_exclusions
+        medicaid_and_household_eligibility_for_50000_option
+        reasonably_necessary_and_reasonable_charge
+        arising_out_of_motor_vehicle_as_such_factfinding
+        tort_liability_threshold
+        insurer_priority
+        multi_policy_aggregate_highest_limit
+        later_indexed_work_loss_maxima
+        overdue_benefits_and_penalty_interest
+        complete_Chapter_31
+    }
+
+    source PIPLiability {
+        kind statute
+        authority MichiganLegislature
+        citation "MCL 500.3105"
+        artifact "sources/mcl-500-3105.txt"
+        digest fixture
+        effective [1973-03-30, +inf)
+    }
+
+    source PIPBenefitsAndLimits {
+        kind statute
+        authority MichiganLegislature
+        citation "MCL 500.3107 and 500.3107c"
+        artifact "sources/mcl-500-3107.txt"
+        digest fixture
+        effective [2020-07-02, +inf)
+    }
+
+    entity InjuredPerson : NaturalPerson
+    entity NamedInsured : NaturalPerson
+    entity Insurer : LegalPerson
+    entity Vehicle : Asset
+
+    record_type InjuryClaimRecord {
+        person: NaturalPerson
+        vehicle: Asset
+        claimed: Money<USD>
+    }
+
+    proposition AccidentalBodilyInjury(person: NaturalPerson, vehicle: Asset)
+    proposition ClaimPresented(person: NaturalPerson, vehicle: Asset)
+    proposition IncurredForAccidentalBodilyInjury(person: NaturalPerson)
+    proposition BenefitsDueWithoutRegardToFault(person: NaturalPerson)
+    proposition CoverageLimitSelected(insured: NaturalPerson, limit: Money<USD>)
+    proposition ReasonablyNecessary(person: NaturalPerson)
+
+    observation InjuryClaimFiled(record: InjuryClaimRecord)
+        establishes ClaimPresented(record.person, record.vehicle)
+        from PIPLiability
+    {
+        require record.person == InjuredPerson
+    }
+
+    calc pip_medical_limit_medicaid() -> Money<USD> {
+        return USD(50000.00)
+    }
+
+    calc pip_medical_limit_250000() -> Money<USD> {
+        return USD(250000.00)
+    }
+
+    calc pip_medical_limit_500000() -> Money<USD> {
+        return USD(500000.00)
+    }
+
+    calc funeral_minimum() -> Money<USD> {
+        return USD(1750.00)
+    }
+
+    calc funeral_maximum() -> Money<USD> {
+        return USD(5000.00)
+    }
+
+    calc replacement_services_daily_cap() -> Money<USD> {
+        return USD(20.00)
+    }
+
+    calc work_loss_monthly_maximum() -> Money<USD> {
+        return USD(7201.00)
+    }
+
+    calc work_loss_payable_fraction() -> Decimal {
+        return 0.85
+    }
+
+    calc work_loss_years() -> Int {
+        return 3
+    }
+
+    rule NoFaultLiability : constitutive
+        from PIPLiability
+    {
+        when operative AccidentalBodilyInjury(InjuredPerson, Vehicle)
+        then establish BenefitsDueWithoutRegardToFault(InjuredPerson)
+    }
+
+    duty PayPIPBenefits {
+        bearer Insurer
+        claimant InjuredPerson
+        attaches when operative BenefitsDueWithoutRegardToFault(InjuredPerson)
+        content pay_personal_protection_benefits_as_loss_accrues
+        source PIPLiability
+    }
+
+    legal_act SelectPIPMedicalLimit(limit: Money<USD>) {
+        performer NamedInsured
+        recipient Insurer
+        effect establish CoverageLimitSelected(NamedInsured, limit)
+        source PIPBenefitsAndLimits
+    }
+
+    query automatic within_medicaid_medical_cap(allowable: Money<USD>) -> Bool {
+        return allowable <= pip_medical_limit_medicaid()
+    }
+
+    query automatic within_250000_medical_cap(allowable: Money<USD>) -> Bool {
+        return allowable <= pip_medical_limit_250000()
+    }
+
+    query automatic within_500000_medical_cap(allowable: Money<USD>) -> Bool {
+        return allowable <= pip_medical_limit_500000()
+    }
+
+    query automatic is_named_medicaid_limit(limit: Money<USD>) -> Bool {
+        return limit == pip_medical_limit_medicaid()
+    }
+
+    query automatic is_named_250000_limit(limit: Money<USD>) -> Bool {
+        return limit == pip_medical_limit_250000()
+    }
+
+    query automatic is_named_500000_limit(limit: Money<USD>) -> Bool {
+        return limit == pip_medical_limit_500000()
+    }
+
+    query automatic work_loss_period_within_cap(benefits_plus_earnings: Money<USD>) -> Bool {
+        return benefits_plus_earnings <= work_loss_monthly_maximum()
+    }
+
+    query automatic replacement_services_within_daily_cap(amount: Money<USD>) -> Bool {
+        return amount <= replacement_services_daily_cap()
+    }
+
+    query automatic funeral_policy_amount_within_band(amount: Money<USD>) -> Bool {
+        return amount >= funeral_minimum() and amount <= funeral_maximum()
+    }
+
+    query automatic default_work_loss_fraction(fraction: Decimal) -> Bool {
+        return fraction == work_loss_payable_fraction()
+    }
+
+    query automatic within_work_loss_years(elapsed_years: Int) -> Bool {
+        return elapsed_years < work_loss_years()
+    }
+
+    query incurred_for_accidental_bodily_injury()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed InjuryClaimFiled
+            require determined IncurredForAccidentalBodilyInjury(InjuredPerson)
+                using Determine
+        }
+    }
+
+    scenario MedicaidFiftyThousand {
+        assume CoverageLimitSelected(NamedInsured, USD(50000.00))
+        assume is_named_medicaid_limit(USD(50000.00))
+        assume within_medicaid_medical_cap(USD(50000.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario TwoFiftyThousandMedical {
+        assume CoverageLimitSelected(NamedInsured, USD(250000.00))
+        assume is_named_250000_limit(USD(250000.00))
+        assume within_250000_medical_cap(USD(250000.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FiveHundredThousandMedical {
+        assume CoverageLimitSelected(NamedInsured, USD(500000.00))
+        assume is_named_500000_limit(USD(500000.00))
+        assume within_500000_medical_cap(USD(500000.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WorkLossAtMonthlyCap {
+        assume AccidentalBodilyInjury(InjuredPerson, Vehicle)
+        assume work_loss_period_within_cap(USD(7201.00))
+        assume default_work_loss_fraction(0.85)
+        assume within_work_loss_years(2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ReplacementAndFuneralCaps {
+        assume AccidentalBodilyInjury(InjuredPerson, Vehicle)
+        assume replacement_services_within_daily_cap(USD(20.00))
+        assume funeral_policy_amount_within_band(USD(5000.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify PIPHonesty {
+        assert automatic within_medicaid_medical_cap
+            has empty effect row
+        assert automatic within_250000_medical_cap
+            has empty effect row
+        assert automatic within_500000_medical_cap
+            has empty effect row
+        assert automatic is_named_medicaid_limit
+            has empty effect row
+        assert automatic is_named_250000_limit
+            has empty effect row
+        assert automatic is_named_500000_limit
+            has empty effect row
+        assert automatic work_loss_period_within_cap
+            has empty effect row
+        assert automatic replacement_services_within_daily_cap
+            has empty effect row
+        assert automatic funeral_policy_amount_within_band
+            has empty effect row
+        assert automatic default_work_loss_fraction
+            has empty effect row
+        assert automatic within_work_loss_years
+            has empty effect row
+        assert incurred_for_accidental_bodily_injury
+            is never treated automatic
+    }
+}

@@ -1,0 +1,204 @@
+module Kansas.Property.Homestead version "0.1.0" {
+    jurisdiction Kansas
+    source_snapshot "2026-09-17-kan-const-art-15-9"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        homestead_property_tax_refund
+        bankruptcy_forty_month_residency
+        annexation_continuation_under_12_524a
+        probate_homestead_allowance
+        designation_procedure_under_60_2302
+        personal_property_exemptions_under_60_2304
+        incapacitated_spouse_mineral_lease
+        complete_Kansas_Constitution
+        complete_KSA_60_2301
+        this_module_is_not_legal_advice
+    }
+
+    source HomesteadConstitution {
+        kind constitution
+        authority PeopleOfKansas
+        citation "Kan. Const. art. 15, § 9"
+        artifact "sources/kan-const-art-15-9.txt"
+        digest fixture
+        effective [1944-11-07, +inf)
+    }
+
+    source HomesteadStatute {
+        kind statute
+        authority KansasLegislature
+        citation "K.S.A. 60-2301"
+        artifact "sources/ksa-60-2301.txt"
+        digest fixture
+        effective [2011-06-02, +inf)
+    }
+
+    entity Owner : NaturalPerson
+    entity FamilyMember : NaturalPerson
+    entity Spouse : NaturalPerson
+    entity Creditor : LegalPerson
+    entity Home : RealProperty
+    entity IncorporatedPlace : LegalEntity
+
+    record_type ResidenceRecord {
+        person: NaturalPerson
+        property: RealProperty
+    }
+
+    proposition OccupiesAsResidence(person: NaturalPerson, property: RealProperty)
+    proposition FamilyOccupiesAsResidence(person: NaturalPerson, property: RealProperty)
+    proposition InsideIncorporatedPlace(property: RealProperty)
+    proposition FarmingLand(property: RealProperty)
+    proposition ManufacturedOrMobileHome(property: RealProperty)
+    proposition HomesteadCharacter(property: RealProperty, owner: NaturalPerson)
+    proposition ForcedSaleProtected(property: RealProperty)
+    proposition ExceptedCreditor(creditor: LegalPerson)
+    proposition TaxesDue(property: RealProperty)
+    proposition PurchaseMoneyObligation(creditor: LegalPerson, property: RealProperty)
+    proposition ImprovementObligation(creditor: LegalPerson, property: RealProperty)
+    proposition ConsensualSpousalLien(creditor: LegalPerson, property: RealProperty)
+    proposition AbandonedHomestead(property: RealProperty, owner: NaturalPerson)
+
+    observation OccupancyRecord(record: ResidenceRecord)
+        establishes OccupiesAsResidence(record.person, record.property)
+        from HomesteadConstitution
+    {
+        require record.person == Owner
+    }
+
+    calc urban_acreage_cap() -> Decimal {
+        return 1.0
+    }
+
+    calc rural_acreage_cap() -> Decimal {
+        return 160.0
+    }
+
+    calc dollar_value_ceiling_absent() -> Bool {
+        return true
+    }
+
+    rule OccupancyConstitutes : constitutive
+        from HomesteadConstitution
+    {
+        when operative OccupiesAsResidence(Owner, Home)
+        then derive HomesteadCharacter(Home, Owner)
+    }
+
+    rule FamilyOccupancyConstitutes : constitutive
+        from HomesteadStatute
+    {
+        when operative FamilyOccupiesAsResidence(FamilyMember, Home)
+        then derive HomesteadCharacter(Home, Owner)
+    }
+
+    rule ForcedSaleProtection : constitutive
+        from HomesteadConstitution
+    {
+        when operative HomesteadCharacter(Home, Owner)
+        then establish ForcedSaleProtected(Home)
+    }
+
+    duty RespectHomestead {
+        bearer Creditor
+        claimant Owner
+        attaches when operative ForcedSaleProtected(Home)
+        content refrain_from_forced_sale_except_enumerated_exceptions
+        source HomesteadConstitution
+    }
+
+    query automatic within_urban_acreage(acres: Decimal) -> Bool {
+        return acres <= urban_acreage_cap()
+    }
+
+    query automatic within_rural_acreage(acres: Decimal) -> Bool {
+        return acres <= rural_acreage_cap()
+    }
+
+    query automatic value_not_dollar_capped(equity: Money<USD>) -> Bool {
+        return dollar_value_ceiling_absent() and equity >= USD(0.00)
+    }
+
+    query homestead_character()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed OccupancyRecord
+            require determined HomesteadCharacter(Home, Owner)
+                using Determine
+        }
+    }
+
+    query forced_sale_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ExceptedCreditor(Creditor)
+                using Determine
+        }
+    }
+
+    query abandonment()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined AbandonedHomestead(Home, Owner)
+                using Determine
+        }
+    }
+
+    scenario InsideCityOneAcre {
+        assume OccupiesAsResidence(Owner, Home)
+        assume InsideIncorporatedPlace(Home)
+        assume within_urban_acreage(1.0)
+        assume value_not_dollar_capped(USD(1500000.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario RuralHundredSixty {
+        assume OccupiesAsResidence(Owner, Home)
+        assume FarmingLand(Home)
+        assume within_rural_acreage(160.0)
+        assume value_not_dollar_capped(USD(450000.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario FamilyOccupiesWithoutOwner {
+        assume FamilyOccupiesAsResidence(FamilyMember, Home)
+        assume InsideIncorporatedPlace(Home)
+        assume within_urban_acreage(0.75)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario TaxCreditor {
+        assume HomesteadCharacter(Home, Owner)
+        assume TaxesDue(Home)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario PurchaseMoney {
+        assume HomesteadCharacter(Home, Owner)
+        assume PurchaseMoneyObligation(Creditor, Home)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify HomesteadHonesty {
+        assert automatic within_urban_acreage
+            has empty effect row
+        assert automatic within_rural_acreage
+            has empty effect row
+        assert automatic value_not_dollar_capped
+            has empty effect row
+        assert homestead_character
+            is never treated automatic
+        assert forced_sale_exception
+            is never treated automatic
+        assert abandonment
+            is never treated automatic
+    }
+}

@@ -1,0 +1,22 @@
+New Mexico Statutes Annotated 1978, § 47-8-37 (fixture excerpt).
+Uniform Owner-Resident Relations Act. 2025 N.M. Stat. § 47-8-37.
+Enacted Laws 1975, ch. 38, § 37. Effective July 1, 1975.
+
+A. The owner or the resident may terminate a week-to-week residency by
+a written notice given to the other at least seven days prior to the
+termination date specified in the notice.
+
+B. The owner or the resident may terminate a month-to-month residency
+by a written notice given to the other at least thirty days prior to
+the periodic rental date specified in the notice.
+
+C. If the resident remains in possession without the owner's consent
+after expiration of the term of the rental agreement or its
+termination, the owner may bring an action for possession and if the
+resident's holdover is willful and not in good faith the owner, in
+addition, may recover the damages sustained by him and reasonable
+attorney's fees.
+
+Willful holdover is a determination, not a Boolean.
+
+Not an official edition.

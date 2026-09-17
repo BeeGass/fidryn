@@ -1,0 +1,220 @@
+module Nevada.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Nevada
+    source_snapshot "2026-09-17-nrs-118a-242"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        NRS_118A_244_transfer_on_sale
+        NRS_118B_manufactured_home_parks
+        habitability_and_repair_duties
+        eviction_and_summary_process
+        Clark_County_and_city_ordinances
+        option_to_purchase_deposits
+        surety_premium_as_non_deposit
+        interest_on_deposit
+        complete_Chapter_118A
+    }
+
+    source SecurityDepositDefinition {
+        kind statute
+        authority NevadaLegislature
+        citation "NRS 118A.240"
+        artifact "sources/nrs-118a-240.txt"
+        digest fixture
+        effective [2021-01-01, +inf)
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority NevadaLegislature
+        citation "NRS 118A.242"
+        artifact "sources/nrs-118a-242.txt"
+        digest fixture
+        effective [2021-01-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+    entity JusticeCourt : LegalEntity
+
+    record_type TenancyEndRecord {
+        unit: Dwelling
+        tenant: NaturalPerson
+        ended_at: Time
+    }
+
+    record_type DepositAccounting {
+        unit: Dwelling
+        remainder: Money<USD>
+        provided_at: Time
+    }
+
+    proposition ResidentialTenancy(unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling)
+    proposition DepositCapped(unit: Dwelling)
+    proposition DepositReturned(unit: Dwelling)
+    proposition ItemizedAccountingProvided(unit: Dwelling)
+    proposition RemainderUnreturnedAfterDeadline(unit: Dwelling)
+    proposition EntireDepositLiability(landlord: LegalPerson)
+    proposition UnpaidRentDefault(unit: Dwelling)
+    proposition TenantCausedDamageBeyondNormalWear(unit: Dwelling)
+    proposition ReasonableCleaningCost(unit: Dwelling)
+    proposition DeductionReasonablyNecessary(unit: Dwelling)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition WaiverProvision(unit: Dwelling)
+    proposition ReasonableNonrefundableCleaningCharge(unit: Dwelling)
+
+    observation TerminationRecord(record: TenancyEndRecord)
+        establishes TenancyEnded(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+        require record.unit == Unit
+    }
+
+    observation AccountingRecord(record: DepositAccounting)
+        establishes ItemizedAccountingProvided(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.unit == Unit
+    }
+
+    calc months_periodic_rent_cap() -> Decimal {
+        return 3.0
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc surety_dispute_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc additional_damages_cap_multiplier() -> Decimal {
+        return 1.0
+    }
+
+    rule CombinedSecurityCap : constitutive
+        from SecurityDepositStatute
+    {
+        when operative ResidentialTenancy(Unit)
+        then derive DepositCapped(Unit)
+    }
+
+    rule LateReturnEntireDeposit : constitutive
+        from SecurityDepositStatute
+    {
+        when operative RemainderUnreturnedAfterDeadline(Unit)
+        then derive EntireDepositLiability(Landlord)
+    }
+
+    duty ReturnRemainderAndAccounting {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit)
+        due 30 counted_days after termination
+        content itemized_written_accounting_and_return_of_remainder
+        source SecurityDepositStatute
+    }
+
+    legal_act ReturnRemainder(at: Time) {
+        performer Landlord
+        recipient Tenant
+        effect establish DepositReturned(Unit)
+        source SecurityDepositStatute
+    }
+
+    legal_act ProvideItemizedAccounting(at: Time) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedAccountingProvided(Unit)
+        source SecurityDepositStatute
+    }
+
+    judgment AdditionalDamagesAward()
+        decides BadFaithRetention(Landlord)
+        from SecurityDepositStatute
+    {
+        authority JusticeCourt
+        standard GoodFaithCourseOfConductAndHarm
+    }
+
+    query automatic within_three_month_cap(months: Decimal) -> Bool {
+        return months <= months_periodic_rent_cap()
+    }
+
+    query automatic return_window_open(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic surety_dispute_open(received: Time, as_of: Time) -> Bool {
+        return as_of <= received + surety_dispute_window()
+    }
+
+    query automatic additional_damages_within_cap(multiplier: Decimal) -> Bool {
+        return multiplier <= additional_damages_cap_multiplier()
+    }
+
+    query additional_damages()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    query reasonable_deduction()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed TerminationRecord
+            require determined DeductionReasonablyNecessary(Unit)
+                using Determine
+        }
+    }
+
+    scenario ThreeMonthCapReturnedOnDayThirty {
+        assume ResidentialTenancy(Unit)
+        assume TenancyEnded(Unit)
+        assume within_three_month_cap(3.0)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario LastMonthRentPushesOverCap {
+        assume ResidentialTenancy(Unit)
+        assume within_three_month_cap(3.0)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario LateReturnWithoutAccounting {
+        assume TenancyEnded(Unit)
+        assume RemainderUnreturnedAfterDeadline(Unit)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario WearVersusDamageDispute {
+        assume TenancyEnded(Unit)
+        assume ItemizedAccountingProvided(Unit)
+        assume TenantCausedDamageBeyondNormalWear(Unit)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_three_month_cap
+            has empty effect row
+        assert automatic return_window_open
+            has empty effect row
+        assert automatic surety_dispute_open
+            has empty effect row
+        assert additional_damages
+            is never treated automatic
+        assert reasonable_deduction
+            is never treated automatic
+    }
+}

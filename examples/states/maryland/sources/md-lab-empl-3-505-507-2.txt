@@ -1,0 +1,46 @@
+Maryland Code, Labor and Employment §§ 3-505 and 3-507.2
+(fixture excerpt). Wage Payment and Collection.
+
+§ 3-505. Payment on termination of employment; accrued leave.
+
+(a) Except as provided in subsection (b) of this section, each
+employer shall pay an employee or the authorized representative of
+an employee all wages due for work that the employee performed
+before the termination of employment, on or before the day on which
+the employee would have been paid the wages if the employment had
+not been terminated.
+
+(b) An employer is not required to pay accrued leave to an
+employee if:
+    (1) the employer has a written policy that limits the
+    compensation of accrued leave to employees;
+    (2) the employer notified the employee of the employer's
+    leave benefits in accordance with § 3-504(a)(1) of this subtitle;
+    and
+    (3) the employee is not entitled to payment for accrued leave
+    at termination under the terms of the employer's written policy.
+
+§ 3-507.2. Recovery of unpaid wages.
+
+(a) Notwithstanding any remedy available under § 3-507 of this
+subtitle, if an employer fails to pay an employee in accordance
+with § 3-502 or § 3-505 of this subtitle, after 2 weeks have
+elapsed from the date on which the employer is required to have
+paid the wages, the employee may bring an action against the
+employer to recover the unpaid wages.
+
+(b) If, in an action under subsection (a) of this section, a
+court finds that an employer withheld the wage of an employee in
+violation of this subtitle and not as a result of a bona fide
+dispute, the court may award the employee an amount not exceeding
+3 times the wage, and reasonable counsel fees and other costs.
+
+(c) Construction-services general-contractor joint and several
+liability for a subcontractor violation is outside this module's
+encoded slice.
+
+Whether a withholding is "as a result of a bona fide dispute" is
+a determination, not a Boolean. Treble damages are a ceiling, not
+an automatic award.
+
+Fixture text for Fidryn research. Not an official edition.

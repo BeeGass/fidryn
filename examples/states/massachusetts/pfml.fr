@@ -1,0 +1,248 @@
+module Massachusetts.Employment.PFML version "0.1.0" {
+    jurisdiction Massachusetts
+    source_snapshot "2026-09-17-mgl-c175m"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        private_plan_substitution
+        self_employed_election
+        intermittent_and_reduced_schedule_proration
+        qualifying_exigency_factfinding
+        covered_servicemember_caregiver_interaction
+        pregnancy_waiting_period_waiver
+        contribution_shift_effective_2027
+        federal_FMLA_concurrency_details
+        weekly_benefit_offset_for_other_wage_replacement
+        complete_c175M
+        complete_458_CMR_2_00
+    }
+
+    source LeaveRequirements {
+        kind statute
+        authority MassachusettsGeneralCourt
+        citation "M.G.L. c. 175M §§ 2-3"
+        artifact "sources/mgl-c175m-2.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source Contributions {
+        kind statute
+        authority MassachusettsGeneralCourt
+        citation "M.G.L. c. 175M § 6"
+        artifact "sources/mgl-c175m-6.txt"
+        digest fixture
+        effective [2026-01-01, 2027-01-01)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Department : LegalPerson
+
+    record_type LeaveClaim {
+        claimant: NaturalPerson
+        filed_at: Time
+    }
+
+    proposition CoveredEmployer(employer: LegalPerson)
+    proposition ClaimSubmitted(person: NaturalPerson)
+    proposition LeaveTaken(person: NaturalPerson)
+    proposition SeriousHealthCondition(person: NaturalPerson)
+    proposition MedicalLeaveEligible(person: NaturalPerson)
+    proposition BondingWithChild(person: NaturalPerson)
+
+    observation ClaimRecord(record: LeaveClaim)
+        establishes ClaimSubmitted(record.claimant)
+        from LeaveRequirements
+    {
+        require record.claimant == Employee
+    }
+
+    calc family_week_cap() -> Int {
+        return 12
+    }
+
+    calc medical_week_cap() -> Int {
+        return 20
+    }
+
+    calc servicemember_family_week_cap() -> Int {
+        return 26
+    }
+
+    calc aggregate_week_cap() -> Int {
+        return 26
+    }
+
+    calc waiting_period() -> Duration<calendar_days> {
+        return 7 calendar_days
+    }
+
+    calc small_employer_headcount_ceiling() -> Int {
+        return 25
+    }
+
+    calc large_employer_contribution_percent() -> Decimal {
+        return 0.88
+    }
+
+    calc small_employer_contribution_percent() -> Decimal {
+        return 0.46
+    }
+
+    calc medical_leave_percent() -> Decimal {
+        return 0.70
+    }
+
+    calc family_leave_percent() -> Decimal {
+        return 0.18
+    }
+
+    calc employee_medical_withholding_percent() -> Decimal {
+        return 0.28
+    }
+
+    calc employer_medical_share_percent() -> Decimal {
+        return 0.42
+    }
+
+    calc employee_total_withholding_percent() -> Decimal {
+        return 0.46
+    }
+
+    calc maximum_weekly_benefit() -> Money<USD> {
+        return USD(1230.39)
+    }
+
+    calc state_average_weekly_wage() -> Money<USD> {
+        return USD(1922.48)
+    }
+
+    calc social_security_wage_base() -> Money<USD> {
+        return USD(184500.00)
+    }
+
+    rule MedicalLeaveFromSeriousHealthCondition : constitutive
+        from LeaveRequirements
+    {
+        when operative SeriousHealthCondition(Employee)
+        then derive MedicalLeaveEligible(Employee)
+    }
+
+    duty RemitContributions {
+        bearer Employer
+        claimant Department
+        attaches when operative CoveredEmployer(Employer)
+        content remit_family_and_medical_leave_contributions
+        source Contributions
+    }
+
+    duty RestorePosition {
+        bearer Employer
+        claimant Employee
+        attaches when operative LeaveTaken(Employee)
+        content restore_to_previous_or_equivalent_position
+        source LeaveRequirements
+    }
+
+    query automatic family_weeks_within_cap(weeks: Int) -> Bool {
+        return weeks <= family_week_cap()
+    }
+
+    query automatic medical_weeks_within_cap(weeks: Int) -> Bool {
+        return weeks <= medical_week_cap()
+    }
+
+    query automatic servicemember_family_weeks_within_cap(weeks: Int) -> Bool {
+        return weeks <= servicemember_family_week_cap()
+    }
+
+    query automatic aggregate_weeks_within_cap(weeks: Int) -> Bool {
+        return weeks <= aggregate_week_cap()
+    }
+
+    query automatic is_small_employer(headcount: Int) -> Bool {
+        return headcount < small_employer_headcount_ceiling()
+    }
+
+    query automatic large_employer_rate_applies(headcount: Int) -> Bool {
+        return headcount >= small_employer_headcount_ceiling()
+    }
+
+    query automatic large_employer_contribution_matches(percent: Decimal) -> Bool {
+        return percent == large_employer_contribution_percent()
+    }
+
+    query automatic small_employer_contribution_matches(percent: Decimal) -> Bool {
+        return percent == small_employer_contribution_percent()
+    }
+
+    query automatic employee_withholding_within_cap(percent: Decimal) -> Bool {
+        return percent <= employee_total_withholding_percent()
+    }
+
+    query automatic weekly_benefit_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= maximum_weekly_benefit()
+    }
+
+    query automatic waiting_period_running(start: Time, as_of: Time) -> Bool {
+        return as_of < start + waiting_period()
+    }
+
+    query serious_health_condition()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SeriousHealthCondition(Employee)
+                using Determine
+        }
+    }
+
+    scenario FamilyLeaveTwelveWeeks {
+        assume CoveredEmployer(Employer)
+        assume BondingWithChild(Employee)
+        assume family_weeks_within_cap(12)
+        assume aggregate_weeks_within_cap(12)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario MedicalLeaveTwentyWeeks {
+        assume CoveredEmployer(Employer)
+        assume medical_weeks_within_cap(20)
+        assume aggregate_weeks_within_cap(20)
+        assume weekly_benefit_within_cap(USD(1230.39))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LargeEmployerContribution {
+        assume CoveredEmployer(Employer)
+        assume large_employer_rate_applies(25)
+        assume large_employer_contribution_matches(0.88)
+        assume employee_withholding_within_cap(0.46)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SmallEmployerContribution {
+        assume CoveredEmployer(Employer)
+        assume is_small_employer(24)
+        assume small_employer_contribution_matches(0.46)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify PFMLHonesty {
+        assert automatic family_weeks_within_cap
+            has empty effect row
+        assert automatic medical_weeks_within_cap
+            has empty effect row
+        assert automatic aggregate_weeks_within_cap
+            has empty effect row
+        assert automatic large_employer_contribution_matches
+            has empty effect row
+        assert automatic weekly_benefit_within_cap
+            has empty effect row
+        assert serious_health_condition
+            is never treated automatic
+    }
+}

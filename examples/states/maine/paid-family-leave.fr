@@ -1,0 +1,222 @@
+module Maine.Employment.PaidFamilyLeave version "0.1.0" {
+    jurisdiction Maine
+    source_snapshot "2026-09-17-26-mrs-850"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        pregnancy_medical_then_family_stacking
+        intermittent_leave_increments
+        private_plan_substitution
+        self_employed_election
+        tribal_government_opt_in
+        contribution_rates
+        fmla_concurrency
+        benefit_offsets
+        complete_26_MRS_850
+        complete_program_rules
+    }
+
+    source ProgramStatute {
+        kind statute
+        authority MaineLegislature
+        citation "26 M.R.S. §§ 850-A to 850-B"
+        artifact "sources/26-mrs-850-a-b.txt"
+        digest fixture
+        effective [2026-05-01, +inf)
+    }
+
+    source BenefitStatute {
+        kind statute
+        authority MaineLegislature
+        citation "26 M.R.S. §§ 850-C, 850-J"
+        artifact "sources/26-mrs-850-c-j.txt"
+        digest fixture
+        effective [2026-05-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Administrator : LegalPerson
+    entity FamilyMember : NaturalPerson
+
+    record_type WageRecord {
+        person: NaturalPerson
+        base_period_wages: Money<USD>
+    }
+
+    proposition CoveredIndividual(person: NaturalPerson)
+    proposition EarnedBasePeriodWages(person: NaturalPerson)
+    proposition QualifyingEvent(person: NaturalPerson)
+    proposition SeriousHealthCondition(person: NaturalPerson)
+    proposition FamilyLeave(person: NaturalPerson)
+    proposition MedicalLeave(person: NaturalPerson)
+    proposition SafeLeave(person: NaturalPerson)
+    proposition LeaveTaken(person: NaturalPerson)
+    proposition EmployedOneHundredTwentyDays(person: NaturalPerson)
+    proposition JobProtected(person: NaturalPerson)
+    proposition ApplicationFiled(person: NaturalPerson)
+
+    observation WageHistory(record: WageRecord)
+        establishes EarnedBasePeriodWages(record.person)
+        from ProgramStatute
+    {
+        require record.person == Employee
+    }
+
+    legal_act ApplyForBenefits() {
+        performer Employee
+        recipient Administrator
+        effect establish ApplicationFiled(Employee)
+        source ProgramStatute
+    }
+
+    calc max_weeks() -> Int {
+        return 12
+    }
+
+    calc earnings_multiplier() -> Int {
+        return 6
+    }
+
+    calc state_average_weekly_wage() -> Money<USD> {
+        return USD(1249.12)
+    }
+
+    calc earnings_threshold() -> Money<USD> {
+        return USD(7494.72)
+    }
+
+    calc max_weekly_benefit() -> Money<USD> {
+        return USD(1249.12)
+    }
+
+    calc lower_band_rate() -> Decimal {
+        return 0.90
+    }
+
+    calc upper_band_rate() -> Decimal {
+        return 0.66
+    }
+
+    calc saww_band_fraction() -> Decimal {
+        return 0.50
+    }
+
+    calc medical_waiting_period() -> Duration<calendar_days> {
+        return 7 calendar_days
+    }
+
+    calc job_protection_days() -> Int {
+        return 120
+    }
+
+    rule RestorationRight : constitutive
+        from BenefitStatute
+    {
+        when operative EmployedOneHundredTwentyDays(Employee)
+            and operative LeaveTaken(Employee)
+        then establish JobProtected(Employee)
+    }
+
+    duty RestorePosition {
+        bearer Employer
+        claimant Employee
+        attaches when operative JobProtected(Employee)
+        content restore_to_same_or_equivalent_position
+        source BenefitStatute
+    }
+
+    query automatic within_week_cap(weeks: Int) -> Bool {
+        return weeks <= max_weeks()
+    }
+
+    query automatic family_and_medical_within_aggregate(
+        family_weeks: Int,
+        medical_weeks: Int
+    ) -> Bool {
+        return family_weeks + medical_weeks <= max_weeks()
+    }
+
+    query automatic meets_earnings_threshold(base_period_wages: Money<USD>) -> Bool {
+        return base_period_wages >= earnings_threshold()
+    }
+
+    query automatic medical_waiting_elapsed(start: Time, as_of: Time) -> Bool {
+        return as_of >= start + medical_waiting_period()
+    }
+
+    query automatic job_protection_days_met(days: Int) -> Bool {
+        return days >= job_protection_days()
+    }
+
+    query automatic weekly_benefit_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= max_weekly_benefit()
+    }
+
+    query qualifying_event()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined QualifyingEvent(Employee)
+                using Determine
+        }
+    }
+
+    query serious_health_condition()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SeriousHealthCondition(Employee)
+                using Determine
+        }
+    }
+
+    scenario TwelveWeeksAtCap {
+        assume CoveredIndividual(Employee)
+        assume within_week_cap(12)
+        assume family_and_medical_within_aggregate(6, 6)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario EarningsAtThreshold {
+        assume meets_earnings_threshold(USD(7494.72))
+        assume weekly_benefit_within_cap(USD(1249.12))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario BondingLeave {
+        assume CoveredIndividual(Employee)
+        assume FamilyLeave(Employee)
+        assume within_week_cap(12)
+        assume job_protection_days_met(120)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario MedicalWaitingComplete {
+        assume MedicalLeave(Employee)
+        assume CoveredIndividual(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify LeaveHonesty {
+        assert automatic within_week_cap
+            has empty effect row
+        assert automatic family_and_medical_within_aggregate
+            has empty effect row
+        assert automatic meets_earnings_threshold
+            has empty effect row
+        assert automatic medical_waiting_elapsed
+            has empty effect row
+        assert automatic job_protection_days_met
+            has empty effect row
+        assert automatic weekly_benefit_within_cap
+            has empty effect row
+        assert qualifying_event
+            is never treated automatic
+        assert serious_health_condition
+            is never treated automatic
+    }
+}

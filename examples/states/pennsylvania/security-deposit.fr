@@ -1,0 +1,240 @@
+module Pennsylvania.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Pennsylvania
+    source_snapshot "2026-09-17-68-ps-250-511a-512"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        commercial_leaseholds
+        bond_in_lieu_of_escrow_511c
+        philadelphia_and_local_deposit_ordinances
+        pet_and_cleaning_fee_labeling
+        normal_wear_versus_tenant_damage
+        escrow_from_day_one_versus_after_two_years
+        magisterial_district_court_procedure
+        complete_Landlord_and_Tenant_Act
+    }
+
+    source EscrowLimits {
+        kind statute
+        authority PennsylvaniaGeneralAssembly
+        citation "68 P.S. §§ 250.511a–250.511b"
+        artifact "sources/68-ps-250-511a.txt"
+        digest fixture
+        effective [1972-12-29, +inf)
+    }
+
+    source ReturnOfEscrow {
+        kind statute
+        authority PennsylvaniaGeneralAssembly
+        citation "68 P.S. § 250.512"
+        artifact "sources/68-ps-250-512.txt"
+        digest fixture
+        effective [1968-05-03, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type DamageListRecord {
+        unit: Dwelling
+        provided_at: Time
+    }
+
+    record_type ForwardingAddressNotice {
+        tenant: NaturalPerson
+        given_at: Time
+    }
+
+    proposition ResidentialTenancy(unit: Dwelling)
+    proposition FirstYearOfLease(unit: Dwelling)
+    proposition SubsequentYearOfLease(unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition ForwardingAddressProvided(tenant: NaturalPerson)
+    proposition ActualDamagesCausedByTenant(unit: Dwelling)
+    proposition UnpaidRentOrOtherLeaseBreach(tenant: NaturalPerson)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition TwoMonthEscrowCap(unit: Dwelling)
+    proposition OneMonthEscrowCap(unit: Dwelling)
+    proposition WrittenListRequired(unit: Dwelling)
+
+    observation DamageListDelivery(record: DamageListRecord)
+        establishes ItemizedStatementProvided(record.unit)
+        from ReturnOfEscrow
+    {
+        require record.unit == Unit
+    }
+
+    observation ForwardingAddressRecord(notice: ForwardingAddressNotice)
+        establishes ForwardingAddressProvided(notice.tenant)
+        from ReturnOfEscrow
+    {
+        require notice.tenant == Tenant
+    }
+
+    duty ReturnEscrowDifference {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative WrittenListRequired(Unit)
+        content return_escrow_plus_unpaid_interest_less_actual_damages_with_written_list
+        source ReturnOfEscrow
+    }
+
+    rule YearOneCap : constitutive
+        from EscrowLimits
+    {
+        when operative FirstYearOfLease(Unit)
+        then derive TwoMonthEscrowCap(Unit)
+    }
+
+    rule YearTwoAndAfterCap : constitutive
+        from EscrowLimits
+    {
+        when operative SubsequentYearOfLease(Unit)
+        then derive OneMonthEscrowCap(Unit)
+    }
+
+    rule ListOnTermination : constitutive
+        from ReturnOfEscrow
+    {
+        when operative TenancyEnded(Unit, end)
+        then derive WrittenListRequired(Unit)
+    }
+
+    calc first_year_month_cap() -> Int {
+        return 2
+    }
+
+    calc subsequent_year_month_cap() -> Int {
+        return 1
+    }
+
+    calc five_year_freeze() -> Int {
+        return 5
+    }
+
+    calc escrow_threshold() -> Money<USD> {
+        return USD(100.00)
+    }
+
+    calc interest_after_years() -> Int {
+        return 2
+    }
+
+    calc admin_fee_percent_per_annum() -> Int {
+        return 1
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc double_damages_multiplier() -> Int {
+        return 2
+    }
+
+    query automatic within_first_year_month_cap(months_deposited: Int) -> Bool {
+        return months_deposited <= first_year_month_cap()
+    }
+
+    query automatic within_subsequent_year_month_cap(months_deposited: Int) -> Bool {
+        return months_deposited <= subsequent_year_month_cap()
+    }
+
+    query automatic five_year_possession_freeze(years_in_possession: Int) -> Bool {
+        return years_in_possession >= five_year_freeze()
+    }
+
+    query automatic escrow_over_threshold(deposit: Money<USD>) -> Bool {
+        return deposit > escrow_threshold()
+    }
+
+    query automatic interest_section_applies(years_held: Int) -> Bool {
+        return years_held > interest_after_years()
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query forwarding_address_on_file()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ForwardingAddressRecord
+        }
+    }
+
+    query actual_damages()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ActualDamagesCausedByTenant(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    scenario FirstYearTwoMonths {
+        assume ResidentialTenancy(Unit)
+        assume FirstYearOfLease(Unit)
+        assume within_first_year_month_cap(2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SecondYearOneMonth {
+        assume ResidentialTenancy(Unit)
+        assume SubsequentYearOfLease(Unit)
+        assume within_subsequent_year_month_cap(1)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FiveYearFreezeAndEscrow {
+        assume ResidentialTenancy(Unit)
+        assume five_year_possession_freeze(5)
+        assume escrow_over_threshold(USD(1500.00))
+        assume interest_section_applies(3)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LateWithoutList {
+        assume ResidentialTenancy(Unit)
+        assume TenancyEnded(Unit, end)
+        assume BadFaithRetention(Landlord)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_first_year_month_cap
+            has empty effect row
+        assert automatic within_subsequent_year_month_cap
+            has empty effect row
+        assert automatic five_year_possession_freeze
+            has empty effect row
+        assert automatic escrow_over_threshold
+            has empty effect row
+        assert automatic interest_section_applies
+            has empty effect row
+        assert automatic deadline_running
+            has empty effect row
+        assert forwarding_address_on_file
+            is never treated automatic
+        assert actual_damages
+            is never treated automatic
+        assert bad_faith_retention
+            is never treated automatic
+    }
+}

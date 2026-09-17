@@ -1,0 +1,226 @@
+module Alabama.Employment.FinalWages version "0.1.0" {
+    jurisdiction Alabama
+    source_snapshot "2026-09-17-ala-code-8-24-2-29cfr-778.106"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        no_general_alabama_payday_statute
+        vacation_and_pto_payout
+        unclaimed_wages_ala_code_35_12_72
+        child_labor
+        workers_compensation
+        independent_contractor_classification
+        overtime_regular_rate_computation
+        complete_FLSA
+        complete_Title_25
+        local_ordinances
+        attorney_fee_reasonableness
+        home_solicitation_sales
+    }
+
+    source CommissionStatute {
+        kind statute
+        authority AlabamaLegislature
+        citation "Ala. Code §§ 8-24-2 to 8-24-3"
+        artifact "sources/ala-code-8-24-2.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source PaydayRegulation {
+        kind regulation
+        authority UnitedStatesDepartmentOfLabor
+        citation "29 C.F.R. § 778.106; 29 U.S.C. § 260"
+        artifact "sources/29cfr-778.106.txt"
+        digest fixture
+        effective [1968-01-26, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity SalesRepresentative : NaturalPerson
+    entity Principal : LegalPerson
+
+    record_type WagePayment {
+        employee: NaturalPerson
+        amount: Money<USD>
+        paid_at: Time
+    }
+
+    record_type CommissionAccount {
+        representative: NaturalPerson
+        unpaid: Money<USD>
+        terminated_at: Time
+    }
+
+    proposition EmploymentEnded(person: NaturalPerson)
+    proposition Discharged(person: NaturalPerson)
+    proposition Resigned(person: NaturalPerson)
+    proposition WagesEarned(person: NaturalPerson, amount: Money<USD>)
+    proposition FinalWagesPaid(person: NaturalPerson, at: Time)
+    proposition CommissionsDueAtTermination(person: NaturalPerson)
+    proposition SalesRepresentativeStatus(person: NaturalPerson)
+    proposition GoodFaithContest(employer: LegalPerson)
+    proposition ReasonableGrounds(employer: LegalPerson)
+    proposition WaitingTimePenalty(employer: LegalPerson)
+
+    observation PayrollRecord(record: WagePayment)
+        establishes WagesEarned(record.employee, record.amount)
+        from PaydayRegulation
+    {
+        require record.employee == Employee
+    }
+
+    calc commission_pay_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc commission_treble_factor() -> Int {
+        return 3
+    }
+
+    calc alabama_waiting_time_days() -> Int {
+        return 0
+    }
+
+    rule NextPaydayDuty : prescriptive
+        from PaydayRegulation
+    {
+        when operative EmploymentEnded(Employee)
+        then create Duty(
+            bearer = Employer,
+            claimant = Employee,
+            content = pay_earned_wages_on_next_regular_payday
+        )
+    }
+
+    rule CommissionThirtyDayClock : prescriptive
+        from CommissionStatute
+    {
+        when operative CommissionsDueAtTermination(SalesRepresentative)
+        then create Duty(
+            bearer = Principal,
+            claimant = SalesRepresentative,
+            content = pay_commissions_within_thirty_counted_days
+        )
+    }
+
+    duty PayOnNextRegularPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative EmploymentEnded(Employee)
+        content pay_all_earned_wages_on_the_regular_payday
+        source PaydayRegulation
+    }
+
+    duty PayCommissionsWithinThirtyDays {
+        bearer Principal
+        claimant SalesRepresentative
+        attaches when operative CommissionsDueAtTermination(SalesRepresentative)
+        due 30 counted_days after termination
+        content pay_commissions_due_at_termination
+        source CommissionStatute
+    }
+
+    legal_act PayFinalWages(payment: WagePayment) {
+        performer Employer
+        recipient payment.employee
+        effect establish FinalWagesPaid(payment.employee, payment.paid_at)
+        source PaydayRegulation
+    }
+
+    judgment GoodFaithWageContest(employer: LegalPerson)
+        decides GoodFaithContest(employer)
+        from PaydayRegulation
+    {
+        authority court
+        standard good_faith_and_reasonable_grounds
+        establish when employer_shows_good_faith_and_reasonable_grounds
+        source PaydayRegulation
+    }
+
+    query automatic next_payday_still_open(payday: Time, as_of: Time) -> Bool {
+        return as_of <= payday
+    }
+
+    query automatic payday_has_passed(payday: Time, as_of: Time) -> Bool {
+        return as_of > payday
+    }
+
+    query automatic commission_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + commission_pay_window()
+    }
+
+    query automatic commission_deadline_passed(end: Time, as_of: Time) -> Bool {
+        return as_of > end + commission_pay_window()
+    }
+
+    query automatic treble_commissions(unpaid: Money<USD>) -> Money<USD> {
+        return unpaid + unpaid + unpaid
+    }
+
+    query automatic no_alabama_waiting_time_days() -> Int {
+        return alabama_waiting_time_days()
+    }
+
+    query automatic same_clock_for_quit_and_discharge(quit: Bool, discharged: Bool) -> Bool {
+        return quit or discharged
+    }
+
+    query good_faith_contest()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined GoodFaithContest(Employer)
+                using Determine
+            require determined ReasonableGrounds(Employer)
+                using Determine
+        }
+    }
+
+    query sales_representative_status()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined SalesRepresentativeStatus(SalesRepresentative)
+                using Determine
+        }
+    }
+
+    scenario NextPaydayOnTime {
+        assume EmploymentEnded(Employee)
+        assume WagesEarned(Employee, USD(1200.00))
+        assume next_payday_still_open
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario CommissionDayThirty {
+        assume CommissionsDueAtTermination(SalesRepresentative)
+        assume SalesRepresentativeStatus(SalesRepresentative)
+        assume commission_deadline_running
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario GoodFaithAmountDispute {
+        assume EmploymentEnded(Employee)
+        assume payday_has_passed
+        assume GoodFaithContest(Employer)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify FinalWagesHonesty {
+        assert automatic next_payday_still_open
+            has empty effect row
+        assert automatic commission_deadline_running
+            has empty effect row
+        assert automatic treble_commissions
+            has empty effect row
+        assert good_faith_contest
+            is never treated automatic
+        assert sales_representative_status
+            is never treated automatic
+    }
+}

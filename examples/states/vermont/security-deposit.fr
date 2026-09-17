@@ -1,0 +1,227 @@
+module Vermont.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Vermont
+    source_snapshot "2026-09-17-9vsa-4461"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        municipal_ordinance_overlays
+        burlington_one_month_cap_and_interest
+        proposed_two_month_statewide_cap
+        abandonment_procedure_under_4462
+        seasonal_forfeiture_fourteen_versus_sixty
+        attorney_fee_reasonableness
+        successor_landlord_transfer_disputes
+        interest_on_deposit
+        complete_chapter_137
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority VermontGeneralAssembly
+        citation "9 V.S.A. § 4461"
+        artifact "sources/9-vsa-4461.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source ResidentialDefinitions {
+        kind statute
+        authority VermontGeneralAssembly
+        citation "9 V.S.A. § 4451"
+        artifact "sources/9-vsa-4451.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    record_type VacateNotice {
+        tenant: NaturalPerson
+        unit: Dwelling
+        vacated_at: Time
+    }
+
+    record_type ItemizedStatement {
+        unit: Dwelling
+        tenant: NaturalPerson
+        withheld: Money<USD>
+        issued_at: Time
+    }
+
+    proposition TenancyEnded(unit: Dwelling)
+    proposition TenantGaveVacateNotice(unit: Dwelling)
+    proposition SeasonalNonPrimaryResidence(unit: Dwelling)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition MissedReturnDeadline(landlord: NaturalPerson, unit: Dwelling)
+    proposition ForfeitedWithholdingRight(landlord: NaturalPerson, unit: Dwelling)
+    proposition WillfulFailure(landlord: NaturalPerson)
+    proposition DoubleDamagesLiability(landlord: NaturalPerson)
+    proposition BeyondNormalWearAndTear(unit: Dwelling)
+
+    observation VacateNoticeRecord(record: VacateNotice)
+        establishes TenantGaveVacateNotice(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    observation ItemizationRecord(record: ItemizedStatement)
+        establishes ItemizedStatementProvided(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    calc ordinary_return_days() -> Int {
+        return 14
+    }
+
+    calc seasonal_return_days() -> Int {
+        return 60
+    }
+
+    calc mailing_receipt_presumption_days() -> Int {
+        return 3
+    }
+
+    calc willful_multiplier() -> Int {
+        return 2
+    }
+
+    calc ordinary_return_deadline() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc seasonal_return_deadline() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    rule ForfeitWithholding : constitutive
+        from SecurityDepositStatute
+    {
+        when operative MissedReturnDeadline(Landlord, Unit)
+        then derive ForfeitedWithholdingRight(Landlord, Unit)
+    }
+
+    rule WillfulDoubleLiability : constitutive
+        from SecurityDepositStatute
+    {
+        when operative WillfulFailure(Landlord)
+        then derive DoubleDamagesLiability(Landlord)
+    }
+
+    duty ReturnDepositWithItemization {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit)
+        content return_deposit_and_written_itemization
+        source SecurityDepositStatute
+    }
+
+    legal_act DeliverItemizedReturn(statement: ItemizedStatement) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedStatementProvided(statement.unit)
+        source SecurityDepositStatute
+    }
+
+    query automatic within_ordinary_return(elapsed_days: Int) -> Bool {
+        return elapsed_days <= ordinary_return_days()
+    }
+
+    query automatic within_seasonal_return(elapsed_days: Int) -> Bool {
+        return elapsed_days <= seasonal_return_days()
+    }
+
+    query automatic missed_ordinary_return(elapsed_days: Int) -> Bool {
+        return elapsed_days > ordinary_return_days()
+    }
+
+    query automatic ordinary_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + ordinary_return_deadline()
+    }
+
+    query automatic double_damages_factor() -> Int {
+        return willful_multiplier()
+    }
+
+    query return_and_itemization()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ItemizationRecord
+            require observed VacateNoticeRecord
+        }
+    }
+
+    query lawful_damage_deduction()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BeyondNormalWearAndTear(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulFailure(Landlord)
+                using Determine
+        }
+    }
+
+    scenario OnTimeOrdinaryFourteen {
+        assume TenancyEnded(Unit)
+        assume TenantGaveVacateNotice(Unit)
+        assume within_ordinary_return(14)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SeasonalSixty {
+        assume TenancyEnded(Unit)
+        assume SeasonalNonPrimaryResidence(Unit)
+        assume within_seasonal_return(60)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario MissedOrdinaryFifteen {
+        assume TenancyEnded(Unit)
+        assume TenantGaveVacateNotice(Unit)
+        assume missed_ordinary_return(15)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WillfulWithholding {
+        assume TenancyEnded(Unit)
+        assume MissedReturnDeadline(Landlord, Unit)
+        assume WillfulFailure(Landlord)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_ordinary_return
+            has empty effect row
+        assert automatic within_seasonal_return
+            has empty effect row
+        assert automatic missed_ordinary_return
+            has empty effect row
+        assert automatic ordinary_deadline_running
+            has empty effect row
+        assert automatic double_damages_factor
+            has empty effect row
+        assert return_and_itemization
+            is never treated automatic
+        assert lawful_damage_deduction
+            is never treated automatic
+        assert bad_faith
+            is never treated automatic
+    }
+}

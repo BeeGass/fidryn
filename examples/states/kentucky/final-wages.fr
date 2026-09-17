@@ -1,0 +1,213 @@
+module Kentucky.Employment.FinalWages version "0.1.0" {
+    jurisdiction Kentucky
+    source_snapshot "2026-09-17-krs-337-055"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        vesting_of_vacation_under_employer_policy
+        complete_KRS_337_010_wages_definition
+        semimonthly_pay_construction_under_337_020
+        civil_penalty_schedule_under_337_990
+        forced_labor_treble_damages
+        FLSA_overlap
+        local_ordinances
+        complete_KRS_Chapter_337
+        this_module_is_not_legal_advice
+    }
+
+    source FinalWagesStatute {
+        kind statute
+        authority KentuckyGeneralAssembly
+        citation "KRS 337.055"
+        artifact "sources/krs-337-055.txt"
+        digest fixture
+        effective [1974-01-01, +inf)
+    }
+
+    source WageLiabilityStatute {
+        kind statute
+        authority KentuckyGeneralAssembly
+        citation "KRS 337.385"
+        artifact "sources/krs-337-385.txt"
+        digest fixture
+        effective [2024-07-15, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    proposition Separated(employee: NaturalPerson, employer: LegalPerson)
+    proposition Discharged(employee: NaturalPerson)
+    proposition VoluntaryLeaving(employee: NaturalPerson)
+    proposition WagesEarned(employee: NaturalPerson)
+    proposition VestedVacationPay(employee: NaturalPerson)
+    proposition PaidInFull(employer: LegalPerson, employee: NaturalPerson, at: Time)
+    proposition AbsentAtFixedPayment(employee: NaturalPerson)
+    proposition DemandMade(employee: NaturalPerson, at: Time)
+    proposition GoodFaithDispute(employer: LegalPerson)
+    proposition ReasonableGrounds(employer: LegalPerson)
+    proposition LiquidatedDamagesAwardable(employer: LegalPerson)
+
+    observation SeparationNotice(record: SeparationRecord)
+        establishes Separated(record.employee, record.employer)
+        from FinalWagesStatute
+    {
+        require record.employee == Employee
+        require record.employer == Employer
+    }
+
+    legal_act DischargeEmployee {
+        performer Employer
+        recipient Employee
+        effect establish Discharged(Employee)
+        source FinalWagesStatute
+    }
+
+    legal_act EmployeeQuits {
+        performer Employee
+        recipient Employer
+        effect establish VoluntaryLeaving(Employee)
+        source FinalWagesStatute
+    }
+
+    calc fourteen_days() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc default_liquidated_multiplier() -> Int {
+        return 1
+    }
+
+    rule LeaveOrDischargeSameClock : constitutive
+        from FinalWagesStatute
+    {
+        when operative Discharged(Employee)
+        then derive Separated(Employee, Employer)
+    }
+
+    rule QuitSeparates : constitutive
+        from FinalWagesStatute
+    {
+        when operative VoluntaryLeaving(Employee)
+        then derive Separated(Employee, Employer)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative Separated(Employee, Employer)
+        content pay_in_full_all_wages_or_salary_earned
+        source FinalWagesStatute
+    }
+
+    query automatic statutory_floor_elapsed(separated: Time, as_of: Time) -> Bool {
+        return as_of >= separated + fourteen_days()
+    }
+
+    query automatic next_pay_period_elapsed(next_pay: Time, as_of: Time) -> Bool {
+        return as_of >= next_pay
+    }
+
+    query automatic later_deadline_reached(separated: Time, next_pay: Time, as_of: Time) -> Bool {
+        return as_of >= separated + fourteen_days() and as_of >= next_pay
+    }
+
+    query automatic paid_by_later_deadline(paid: Time, separated: Time, next_pay: Time) -> Bool {
+        return paid <= separated + fourteen_days() or paid <= next_pay
+    }
+
+    query automatic demand_window_elapsed(demand: Time, as_of: Time) -> Bool {
+        return as_of >= demand + fourteen_days()
+    }
+
+    query automatic default_liquidated_equals_unpaid(unpaid: Money<USD>, liquidated: Money<USD>) -> Bool {
+        return liquidated == unpaid and default_liquidated_multiplier() == 1
+    }
+
+    query good_faith_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined GoodFaithDispute(Employer)
+                using Determine
+            require determined ReasonableGrounds(Employer)
+                using Determine
+        }
+    }
+
+    query liquidated_damages()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LiquidatedDamagesAwardable(Employer)
+                using Determine
+        }
+    }
+
+    scenario PaydayAfterFourteen {
+        assume Separated(Employee, Employer)
+        assume Discharged(Employee)
+        assume paid_by_later_deadline(
+            2026-10-08T12:00:00-04:00,
+            2026-09-17T12:00:00-04:00,
+            2026-10-08T12:00:00-04:00
+        )
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FourteenAfterPayday {
+        assume Separated(Employee, Employer)
+        assume VoluntaryLeaving(Employee)
+        assume paid_by_later_deadline(
+            2026-10-01T12:00:00-04:00,
+            2026-09-17T12:00:00-04:00,
+            2026-09-22T12:00:00-04:00
+        )
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario AbsentEmployeeDemand {
+        assume Separated(Employee, Employer)
+        assume AbsentAtFixedPayment(Employee)
+        assume DemandMade(Employee, 2026-10-02T12:00:00-04:00)
+        assume demand_window_elapsed(
+            2026-10-02T12:00:00-04:00,
+            2026-10-16T12:00:00-04:00
+        )
+        at 2026-10-02T12:00:00-04:00
+    }
+
+    scenario GoodFaithWithholding {
+        assume Separated(Employee, Employer)
+        assume WagesEarned(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify FinalWagesHonesty {
+        assert automatic statutory_floor_elapsed
+            has empty effect row
+        assert automatic next_pay_period_elapsed
+            has empty effect row
+        assert automatic later_deadline_reached
+            has empty effect row
+        assert automatic paid_by_later_deadline
+            has empty effect row
+        assert automatic demand_window_elapsed
+            has empty effect row
+        assert automatic default_liquidated_equals_unpaid
+            has empty effect row
+        assert good_faith_dispute
+            is never treated automatic
+        assert liquidated_damages
+            is never treated automatic
+    }
+}

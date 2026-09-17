@@ -1,0 +1,43 @@
+Connecticut General Statutes § 31-57r (fixture excerpt).
+Paid sick leave definitions, as amended by P.A. 24-8, effective January 1, 2025.
+
+As used in this section and sections 31-57s to 31-57w, inclusive:
+
+(2) "Employee" means an individual engaged in service to an employer in
+the business of the employer. "Employee" does not include (A) an individual
+who is a member of a construction-related tradesperson employee
+organization that is a party to a multiemployer health plan in which more
+than one employer is required to contribute to such plan and such plan is
+maintained pursuant to one or more collective bargaining agreements between
+a construction-related tradesperson employee organization or organizations
+and employers, or (B) a seasonal employee;
+
+(3) "Employer" means any person, firm, business, educational institution,
+nonprofit agency, corporation, limited liability company or other entity
+that (A) on and after January 1, 2025, employs twenty-five or more
+individuals in the state, (B) on and after January 1, 2026, employs eleven
+or more individuals in the state, and (C) on and after January 1, 2027,
+employs one or more individuals in the state which shall be determined
+based on such person's, firm's, business', educational institution's,
+nonprofit agency's, corporation's, limited liability company's or other
+entity's payroll for the week containing January first, annually.
+"Employer" does not include (i) an employer that participates in a
+multiemployer health plan in which more than one employer is required to
+contribute to such plan and such plan is maintained pursuant to one or more
+collective bargaining agreements between a construction-related tradesperson
+employee organization or organizations and employers, or (ii) a
+self-employed individual;
+
+(4) "Family member" means a spouse, sibling, child, grandparent,
+grandchild or parent of an employee or an individual related to the
+employee by blood or affinity whose close association the employee shows
+to be equivalent to those family relationships;
+
+(11) "Seasonal employee" means an employee who works one hundred twenty
+days or less in any year;
+
+(15) "Year" means any three-hundred-sixty-five-day period used by an
+employer to calculate employee benefits.
+
+Whether a person is a covered employee remains a determination, not a
+Boolean. Not an official edition.

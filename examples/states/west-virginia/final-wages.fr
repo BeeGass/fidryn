@@ -1,0 +1,247 @@
+module WestVirginia.Employment.FinalWages version "0.1.0" {
+    jurisdiction WestVirginia
+    source_snapshot "2026-09-17-w-va-code-21-5-4"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        repealed_seventy_two_hour_discharge_deadline
+        attorney_fees_and_class_actions
+        labor_dispute_work_suspension
+        property_escrow_and_uniform_age_rules
+        independent_contractor_and_railroad_pay
+        regular_payday_frequency_under_21_5_3
+        bankruptcy_cutoff_of_liquidated_damages
+        west_virginia_legal_holiday_calendar_under_2_2_1
+        complete_Wage_Payment_and_Collection_Act
+        local_ordinances
+    }
+
+    source FinalWagesStatute {
+        kind statute
+        authority WestVirginiaLegislature
+        citation "W. Va. Code § 21-5-4"
+        artifact "sources/w-va-code-21-5-4.txt"
+        digest fixture
+        effective [2022-06-09, +inf)
+    }
+
+    source SafeHarborStatute {
+        kind statute
+        authority WestVirginiaLegislature
+        citation "W. Va. Code § 21-5-4a"
+        artifact "sources/w-va-code-21-5-4a.txt"
+        digest fixture
+        effective [2020-06-04, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    record_type WrittenDemandRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        sent_at: Time
+    }
+
+    proposition Discharged(employee: NaturalPerson, employer: LegalPerson)
+    proposition QuitOrResigned(employee: NaturalPerson, employer: LegalPerson)
+    proposition LaidOff(employee: NaturalPerson, employer: LegalPerson)
+    proposition SeparatedFromPayroll(employee: NaturalPerson, employer: LegalPerson)
+    proposition NextRegularPaydayDue(employee: NaturalPerson, employer: LegalPerson)
+    proposition WagesUnpaidWhenDue(employer: LegalPerson, employee: NaturalPerson)
+    proposition FringeAgreementControlsTiming(employee: NaturalPerson, employer: LegalPerson)
+    proposition LiquidatedDamagesAvailable(employer: LegalPerson, employee: NaturalPerson)
+    proposition WrittenDemandMade(employee: NaturalPerson, employer: LegalPerson)
+    proposition PropertyWithholdingAuthorized(employer: LegalPerson, employee: NaturalPerson)
+    proposition PropertyReturnAgreementSigned(employee: NaturalPerson, employer: LegalPerson)
+
+    observation SeparationPayrollRecord(record: SeparationRecord)
+        establishes SeparatedFromPayroll(record.employee, record.employer)
+        from FinalWagesStatute
+    {
+        require record.employee == Employee
+    }
+
+    calc liquidated_damages_multiplier() -> Int {
+        return 2
+    }
+
+    calc employer_property_value_floor() -> Money<USD> {
+        return USD(100.00)
+    }
+
+    calc safe_harbor_correction_window() -> Duration<calendar_days> {
+        return 7 calendar_days
+    }
+
+    calc property_return_demand_cap() -> Duration<working_days> {
+        return 10 working_days
+    }
+
+    rule SeparationUsesNextPayday : constitutive
+        from FinalWagesStatute
+    {
+        when operative SeparatedFromPayroll(Employee, Employer)
+        then derive NextRegularPaydayDue(Employee, Employer)
+    }
+
+    rule DischargeIsSeparation : constitutive
+        from FinalWagesStatute
+    {
+        when operative Discharged(Employee, Employer)
+        then derive SeparatedFromPayroll(Employee, Employer)
+    }
+
+    rule QuitIsSeparation : constitutive
+        from FinalWagesStatute
+    {
+        when operative QuitOrResigned(Employee, Employer)
+        then derive SeparatedFromPayroll(Employee, Employer)
+    }
+
+    rule LayoffIsSeparation : constitutive
+        from FinalWagesStatute
+    {
+        when operative LaidOff(Employee, Employer)
+        then derive SeparatedFromPayroll(Employee, Employer)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative NextRegularPaydayDue(Employee, Employer)
+        content pay_wages_due_on_or_before_next_regular_payday
+        source FinalWagesStatute
+    }
+
+    legal_act MakeWrittenDemand(demand: WrittenDemandRecord) {
+        performer demand.employee
+        recipient Employer
+        effect establish WrittenDemandMade(demand.employee, demand.employer)
+        source SafeHarborStatute
+    }
+
+    query automatic paid_on_or_before_next_payday(paid: Time, payday: Time) -> Bool {
+        return paid <= payday
+    }
+
+    query automatic liquidated_damages_multiplier_is_two(n: Int) -> Bool {
+        return n == liquidated_damages_multiplier()
+    }
+
+    query automatic property_exceeds_withholding_floor(value: Money<USD>) -> Bool {
+        return value > employer_property_value_floor()
+    }
+
+    query automatic within_safe_harbor_window(received: Time, as_of: Time) -> Bool {
+        return as_of <= received + safe_harbor_correction_window()
+    }
+
+    query automatic within_property_return_demand(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + property_return_demand_cap()
+    }
+
+    query wages_unpaid_when_due()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WagesUnpaidWhenDue(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query liquidated_damages_available()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LiquidatedDamagesAvailable(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query fringe_agreement_controls_timing()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined FringeAgreementControlsTiming(Employee, Employer)
+                using Determine
+        }
+    }
+
+    query property_withholding_authorized()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PropertyWithholdingAuthorized(Employer, Employee)
+                using Determine
+        }
+    }
+
+    scenario DischargePaidOnPayday {
+        assume Discharged(Employee, Employer)
+        assume paid_on_or_before_next_payday(
+            2026-09-18T12:00:00-04:00,
+            2026-09-18T12:00:00-04:00
+        )
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario QuitSameDeadline {
+        assume QuitOrResigned(Employee, Employer)
+        assume NextRegularPaydayDue(Employee, Employer)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LatePayTwoTimes {
+        assume WagesUnpaidWhenDue(Employer, Employee)
+        assume liquidated_damages_multiplier_is_two(2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LaptopOverHundred {
+        assume PropertyReturnAgreementSigned(Employee, Employer)
+        assume property_exceeds_withholding_floor(USD(250.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SafeHarborSevenDays {
+        assume WrittenDemandMade(Employee, Employer)
+        assume within_safe_harbor_window(
+            2026-09-01T12:00:00-04:00,
+            2026-09-08T12:00:00-04:00
+        )
+        at 2026-09-08T12:00:00-04:00
+    }
+
+    verify FinalWagesHonesty {
+        assert automatic paid_on_or_before_next_payday
+            has empty effect row
+        assert automatic liquidated_damages_multiplier_is_two
+            has empty effect row
+        assert automatic property_exceeds_withholding_floor
+            has empty effect row
+        assert automatic within_safe_harbor_window
+            has empty effect row
+        assert automatic within_property_return_demand
+            has empty effect row
+        assert wages_unpaid_when_due
+            is never treated automatic
+        assert liquidated_damages_available
+            is never treated automatic
+        assert fringe_agreement_controls_timing
+            is never treated automatic
+        assert property_withholding_authorized
+            is never treated automatic
+    }
+}

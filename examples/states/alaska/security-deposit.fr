@@ -1,0 +1,244 @@
+module Alaska.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Alaska
+    source_snapshot "2026-09-17-as-34.03.070"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-08:00
+
+    outside_scope {
+        trust_account_commingling_remedies
+        accrued_rent_accounting
+        habitability_as_34_03_100
+        eviction_and_holdover_damages
+        local_ordinances
+        complete_AS_34_03
+        fair_housing_assistance_animals
+        interest_on_deposit
+        small_claims_procedure
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority AlaskaLegislature
+        citation "AS 34.03.070"
+        artifact "sources/as-34-03-070.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source PeriodicTenancyNotice {
+        kind statute
+        authority AlaskaLegislature
+        citation "AS 34.03.290"
+        artifact "sources/as-34-03-290.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    record_type DepositReceipt {
+        tenant: NaturalPerson
+        unit: Dwelling
+        deposit: Money<USD>
+        prepaid: Money<USD>
+        monthly_rent: Money<USD>
+    }
+
+    record_type RefundMailing {
+        unit: Dwelling
+        mailed_at: Time
+        refund: Money<USD>
+        itemized: Bool
+    }
+
+    proposition TenancyEnded(unit: Dwelling)
+    proposition PossessionDelivered(unit: Dwelling)
+    proposition ProperNoticeUnder290(unit: Dwelling)
+    proposition DamageDeducted(unit: Dwelling)
+    proposition ItemizedStatementMailed(unit: Dwelling, at: Time)
+    proposition DepositRefunded(unit: Dwelling, at: Time)
+    proposition DepositHeld(unit: Dwelling)
+    proposition WilfulFailureToComply(landlord: NaturalPerson)
+    proposition NormalWearAndTear(unit: Dwelling)
+    proposition ServiceAnimalOnPremises(unit: Dwelling)
+    proposition BadFaithRetention(landlord: NaturalPerson)
+
+    observation DepositTaken(record: DepositReceipt)
+        establishes DepositHeld(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    calc combined_cap_months() -> Decimal {
+        return 2.0
+    }
+
+    calc pet_deposit_months() -> Int {
+        return 1
+    }
+
+    calc rent_cap_threshold() -> Money<USD> {
+        return USD(2000.00)
+    }
+
+    calc fourteen_day_return() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc thirty_day_return() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc week_to_week_notice() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc month_to_month_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    rule CombinedCap : constitutive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit)
+        then derive DepositHeld(Unit)
+    }
+
+    duty MailRefundAndItemization {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit)
+        content mail_itemized_statement_and_balance_due_the_tenant
+        source SecurityDepositStatute
+    }
+
+    legal_act MailDepositRefund(mailing: RefundMailing) {
+        performer Landlord
+        recipient Tenant
+        effect establish DepositRefunded(mailing.unit, mailing.mailed_at)
+        source SecurityDepositStatute
+    }
+
+    judgment WilfulWithholding(landlord: NaturalPerson)
+        decides WilfulFailureToComply(landlord)
+        from SecurityDepositStatute
+    {
+        authority court
+        standard wilful_failure_to_comply_with_itemization_and_refund
+        establish when landlord_wilfully_fails_to_comply_with_subsection_b
+        source SecurityDepositStatute
+    }
+
+    query automatic rent_exceeds_cap_threshold(monthly: Money<USD>) -> Bool {
+        return monthly > rent_cap_threshold()
+    }
+
+    query automatic combined_cap_applies(monthly: Money<USD>) -> Bool {
+        return monthly <= rent_cap_threshold()
+    }
+
+    query automatic within_two_month_cap(
+        deposit: Money<USD>,
+        prepaid: Money<USD>,
+        monthly: Money<USD>
+    ) -> Bool {
+        return deposit + prepaid <= monthly + monthly
+    }
+
+    query automatic pet_deposit_within_one_month(
+        pet: Money<USD>,
+        monthly: Money<USD>
+    ) -> Bool {
+        return pet <= monthly
+    }
+
+    query automatic fourteen_day_window_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + fourteen_day_return()
+    }
+
+    query automatic thirty_day_window_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + thirty_day_return()
+    }
+
+    query automatic double_withheld_cap(withheld: Money<USD>) -> Money<USD> {
+        return withheld + withheld
+    }
+
+    query wilful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WilfulFailureToComply(Landlord)
+                using Determine
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    query damage_versus_wear()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined NormalWearAndTear(Unit)
+                using Determine
+        }
+    }
+
+    query proper_notice_under_290()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ProperNoticeUnder290(Unit)
+                using Determine
+        }
+    }
+
+    scenario TwoMonthCapAtTwoThousand {
+        assume combined_cap_applies(USD(2000.00))
+        assume within_two_month_cap(USD(2000.00), USD(2000.00), USD(2000.00))
+        at 2026-09-17T12:00:00-08:00
+    }
+
+    scenario FourteenDayNoDamage {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        assume ProperNoticeUnder290(Unit)
+        assume fourteen_day_window_running
+        at 2026-09-17T12:00:00-08:00
+    }
+
+    scenario WilfulWithholding {
+        assume TenancyEnded(Unit)
+        assume WilfulFailureToComply(Landlord)
+        assume BadFaithRetention(Landlord)
+        at 2026-09-17T12:00:00-08:00
+    }
+
+    scenario RentAboveTwoThousand {
+        assume rent_exceeds_cap_threshold(USD(2500.00))
+        at 2026-09-17T12:00:00-08:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_two_month_cap
+            has empty effect row
+        assert automatic fourteen_day_window_running
+            has empty effect row
+        assert automatic thirty_day_window_running
+            has empty effect row
+        assert automatic double_withheld_cap
+            has empty effect row
+        assert wilful_withholding
+            is never treated automatic
+        assert damage_versus_wear
+            is never treated automatic
+        assert proper_notice_under_290
+            is never treated automatic
+    }
+}

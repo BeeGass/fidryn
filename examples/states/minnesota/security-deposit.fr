@@ -1,0 +1,223 @@
+module Minnesota.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Minnesota
+    source_snapshot "2026-09-17-minn-stat-504b-178"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        minneapolis_and_local_deposit_caps
+        ordinary_wear_and_tear
+        reasonably_necessary_withholding
+        last_month_rent_withholding_presumption
+        successor_notice_disputes
+        inspection_504B_182_except_penalty_trigger
+        month_boundary_interest_accrual
+        commercial_tenancies
+        complete_Chapter_504B
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority MinnesotaLegislature
+        citation "Minn. Stat. § 504B.178"
+        artifact "sources/minn-stat-504b-178.txt"
+        digest fixture
+        effective [1973-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type DepositAccount {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        amount: Money<USD>
+        paid_at: Time
+    }
+
+    proposition TenancyTerminated(unit: Dwelling, at: Time)
+    proposition TenancyEnded(unit: Dwelling)
+    proposition ForwardingAddressReceived(landlord: LegalPerson, at: Time)
+    proposition AddressOnFile(landlord: LegalPerson)
+    proposition DepositReceived(landlord: LegalPerson, amount: Money<USD>)
+    proposition WrittenStatementFurnished(tenant: NaturalPerson)
+    proposition DepositReturned(tenant: NaturalPerson)
+    proposition DepositReturnDue(landlord: LegalPerson, tenant: NaturalPerson)
+    proposition CondemnationVacatur(unit: Dwelling)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition WrongfullyWithheld(landlord: LegalPerson, amount: Money<USD>)
+
+    observation DepositHeld(record: DepositAccount)
+        establishes DepositReceived(record.landlord, record.amount)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 21 counted_days
+    }
+
+    calc condemnation_deadline() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    calc successor_account_deadline() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc successor_objection_window() -> Duration<counted_days> {
+        return 20 counted_days
+    }
+
+    calc bad_faith_cure_after_suit() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc interest_rate() -> Decimal {
+        return 0.01
+    }
+
+    calc interest_exclusion() -> Money<USD> {
+        return USD(1.00)
+    }
+
+    calc punitive_damages_cap() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    rule ReturnOrItemize : constitutive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit)
+          and operative AddressOnFile(Landlord)
+        then establish DepositReturnDue(Landlord, Tenant)
+    }
+
+    duty ReturnDepositOrStatement {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DepositReturnDue(Landlord, Tenant)
+        content return_deposit_with_interest_or_furnish_written_statement
+        source SecurityDepositStatute
+    }
+
+    legal_act FurnishWrittenStatement {
+        performer Landlord
+        recipient Tenant
+        effect establish WrittenStatementFurnished(Tenant)
+        source SecurityDepositStatute
+    }
+
+    query automatic return_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic condemnation_deadline_running(left: Time, as_of: Time) -> Bool {
+        return as_of <= left + condemnation_deadline()
+    }
+
+    query automatic successor_deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + successor_account_deadline()
+    }
+
+    query automatic successor_objection_running(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + successor_objection_window()
+    }
+
+    query automatic cure_after_suit_running(suit: Time, as_of: Time) -> Bool {
+        return as_of <= suit + bad_faith_cure_after_suit()
+    }
+
+    query automatic statutory_interest_rate(rate: Decimal) -> Bool {
+        return rate == interest_rate()
+    }
+
+    query automatic interest_excluded_as_de_minimis(accrued: Money<USD>) -> Bool {
+        return accrued < interest_exclusion()
+    }
+
+    query automatic punitive_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= punitive_damages_cap()
+    }
+
+    query automatic penalty_equals_withheld(withheld: Money<USD>, penalty: Money<USD>) -> Bool {
+        return penalty == withheld
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed DepositHeld
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    scenario OrdinaryThreeWeekReturn {
+        assume TenancyEnded(Unit)
+        assume AddressOnFile(Landlord)
+        assume TenancyTerminated(Unit, 2026-08-27T12:00:00-05:00)
+        assume ForwardingAddressReceived(Landlord, 2026-08-27T12:00:00-05:00)
+        assume return_deadline_running(2026-08-27T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        assume statutory_interest_rate(0.01)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario CondemnationFiveDay {
+        assume TenancyEnded(Unit)
+        assume TenancyTerminated(Unit, 2026-09-12T12:00:00-05:00)
+        assume CondemnationVacatur(Unit)
+        assume condemnation_deadline_running(2026-09-12T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario InterestUnderOneDollar {
+        assume DepositReceived(Landlord, USD(50.00))
+        assume statutory_interest_rate(0.01)
+        assume interest_excluded_as_de_minimis(USD(0.50))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario PunitiveCapAndCure {
+        assume TenancyEnded(Unit)
+        assume TenancyTerminated(Unit, 2026-08-01T12:00:00-05:00)
+        assume punitive_within_cap(USD(500.00))
+        assume penalty_equals_withheld(USD(800.00), USD(800.00))
+        assume cure_after_suit_running(2026-09-03T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario SuccessorSixtyDays {
+        assume successor_deadline_running(2026-07-19T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        assume successor_objection_running(2026-08-28T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify DepositHonesty {
+        assert automatic return_deadline_running
+            has empty effect row
+        assert automatic condemnation_deadline_running
+            has empty effect row
+        assert automatic successor_deadline_running
+            has empty effect row
+        assert automatic successor_objection_running
+            has empty effect row
+        assert automatic cure_after_suit_running
+            has empty effect row
+        assert automatic statutory_interest_rate
+            has empty effect row
+        assert automatic interest_excluded_as_de_minimis
+            has empty effect row
+        assert automatic punitive_within_cap
+            has empty effect row
+        assert automatic penalty_equals_withheld
+            has empty effect row
+        assert bad_faith
+            is never treated automatic
+    }
+}

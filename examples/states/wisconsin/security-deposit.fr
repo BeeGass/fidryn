@@ -1,0 +1,247 @@
+module Wisconsin.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Wisconsin
+    source_snapshot "2026-09-17-wis-stat-704-28-atcp-134-06"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        no_statewide_residential_deposit_dollar_cap
+        interest_not_required
+        mobile_home_lot_deposit_under_710_15
+        earnest_money_ATCP_134_05
+        check_in_sheet_704_08
+        mitigation_under_704_29
+        pierce_norwick_offset_method
+        criminal_liability_under_100_26
+        complete_Wis_Stat_100_20
+        complete_chapter_704
+        complete_ATCP_134
+        madison_and_local_ordinances
+        commercial_tenancies
+        not_legal_advice
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority WisconsinLegislature
+        citation "Wis. Stat. § 704.28"
+        artifact "sources/wis-stat-704-28.txt"
+        digest fixture
+        effective [2014-03-01, +inf)
+    }
+
+    source ResidentialRentalPractices {
+        kind regulation
+        authority WisconsinDATCP
+        citation "Wis. Admin. Code ATCP 134.06"
+        artifact "sources/atcp-134-06.txt"
+        digest fixture
+        effective [2015-11-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+
+    record_type WithholdingStatement {
+        landlord: NaturalPerson
+        unit: Dwelling
+        mailed_at: Time
+        items: String
+    }
+
+    proposition ResidentialTenancy(unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition VacatedOnTerminationDate(unit: Dwelling)
+    proposition VacatedBeforeTermination(unit: Dwelling)
+    proposition RerentedBeforeTermination(unit: Dwelling)
+    proposition DepositReturned(unit: Dwelling, at: Time)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition AmountWithheld(unit: Dwelling)
+    proposition NormalWearAndTear(unit: Dwelling)
+    proposition WearAndTearNotWithholdable(unit: Dwelling)
+    proposition FalsifiedClaim(landlord: NaturalPerson)
+    proposition BadFaithRetention(landlord: NaturalPerson)
+    proposition LawfulWithholding(landlord: NaturalPerson, unit: Dwelling)
+
+    observation ItemizationMailed(record: WithholdingStatement)
+        establishes ItemizedStatementProvided(record.unit)
+        from ResidentialRentalPractices
+    {
+        require record.landlord == Landlord
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 21 counted_days
+    }
+
+    calc checkin_window() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc previous_damage_list_window() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    rule TwentyOneDayReturn : prescriptive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit, _)
+        then create Duty(
+            bearer = Landlord,
+            claimant = Tenant,
+            content = deliver_or_mail_deposit_within_twenty_one_counted_days
+        )
+    }
+
+    rule WearAndTearBar : constitutive
+        from SecurityDepositStatute
+    {
+        when operative NormalWearAndTear(Unit)
+        then derive WearAndTearNotWithholdable(Unit)
+    }
+
+    duty ReturnSecurityDeposit {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit, _)
+        due 21 counted_days after tenancy_end
+        content deliver_or_mail_full_deposit_less_lawful_withholdings
+        source SecurityDepositStatute
+    }
+
+    duty ProvideItemizedStatement {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative AmountWithheld(Unit)
+        due 21 counted_days after tenancy_end
+        content describe_each_claim_and_amount_withheld
+        source ResidentialRentalPractices
+    }
+
+    legal_act MailWithholdingStatement(record: WithholdingStatement) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedStatementProvided(record.unit)
+        source ResidentialRentalPractices
+    }
+
+    judgment BadFaithRetentionFinding(landlord: NaturalPerson)
+        decides BadFaithRetention(landlord)
+        from ResidentialRentalPractices
+    {
+        authority court
+        standard intentionally_falsified_claim_under_ATCP_134_06_4_b
+        establish when landlord_intentionally_misrepresented_or_falsified_claim
+        source ResidentialRentalPractices
+    }
+
+    query automatic deadline_running(trigger: Time, as_of: Time) -> Bool {
+        return as_of <= trigger + return_deadline()
+    }
+
+    query automatic deadline_passed(trigger: Time, as_of: Time) -> Bool {
+        return as_of > trigger + return_deadline()
+    }
+
+    query automatic checkin_window_open(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + checkin_window()
+    }
+
+    query automatic previous_list_window_open(request: Time, as_of: Time) -> Bool {
+        return as_of <= request + previous_damage_list_window()
+    }
+
+    query automatic twice_pecuniary_loss(loss: Money<USD>) -> Money<USD> {
+        return loss + loss
+    }
+
+    query itemization_mailed()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ItemizationMailed
+        }
+    }
+
+    query lawful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LawfulWithholding(Landlord, Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+            require determined FalsifiedClaim(Landlord)
+                using Determine
+        }
+    }
+
+    scenario VacateOnTermDay21 {
+        assume ResidentialTenancy(Unit)
+        assume TenancyEnded(Unit, 2026-08-27T12:00:00-05:00)
+        assume VacatedOnTerminationDate(Unit)
+        assume deadline_running(2026-08-27T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario VacateOnTermDay22 {
+        assume ResidentialTenancy(Unit)
+        assume TenancyEnded(Unit, 2026-08-26T12:00:00-05:00)
+        assume VacatedOnTerminationDate(Unit)
+        assume deadline_passed(2026-08-26T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario EarlyVacateThenRerent {
+        assume ResidentialTenancy(Unit)
+        assume VacatedBeforeTermination(Unit)
+        assume RerentedBeforeTermination(Unit)
+        assume deadline_running(2026-08-27T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario RoutineCarpetCleaning {
+        assume ResidentialTenancy(Unit)
+        assume AmountWithheld(Unit)
+        assume NormalWearAndTear(Unit)
+        assume WearAndTearNotWithholdable(Unit)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario FalsifiedRepairClaim {
+        assume ResidentialTenancy(Unit)
+        assume AmountWithheld(Unit)
+        assume ItemizedStatementProvided(Unit)
+        assume FalsifiedClaim(Landlord)
+        assume BadFaithRetention(Landlord)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify DepositHonesty {
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic checkin_window_open
+            has empty effect row
+        assert automatic previous_list_window_open
+            has empty effect row
+        assert automatic twice_pecuniary_loss
+            has empty effect row
+        assert itemization_mailed
+            is never treated automatic
+        assert lawful_withholding
+            is never treated automatic
+        assert bad_faith_retention
+            is never treated automatic
+    }
+}

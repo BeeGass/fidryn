@@ -1,0 +1,209 @@
+module Maryland.Employment.WagePayment version "0.1.0" {
+    jurisdiction Maryland
+    source_snapshot "2026-09-17-md-lab-empl-3-502"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        pay_stub_itemization_after_2024_amendment
+        construction_general_contractor_joint_liability
+        accrued_leave_forfeiture_policy_factfinding
+        wage_deduction_authorization_under_3_503
+        whether_a_bonus_is_a_promised_wage
+        administrative_executive_professional_classification
+        commissioner_enforcement_under_3_507
+        complete_Labor_and_Employment_Article
+        local_county_wage_ordinances
+    }
+
+    source WagePaymentTiming {
+        kind statute
+        authority MarylandGeneralAssembly
+        citation "Md. Code, Lab. & Empl. § 3-502"
+        artifact "sources/md-lab-empl-3-502.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source TerminationAndPrivateAction {
+        kind statute
+        authority MarylandGeneralAssembly
+        citation "Md. Code, Lab. & Empl. §§ 3-505, 3-507.2"
+        artifact "sources/md-lab-empl-3-505-507-2.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        ended_at: Time
+        scheduled_payday: Time
+    }
+
+    proposition RegularPayPeriodSet(employer: LegalPerson)
+    proposition AdministrativeExecutiveProfessional(employee: NaturalPerson)
+    proposition PaydayIsNonworkday(employer: LegalPerson)
+    proposition EmploymentTerminated(employee: NaturalPerson)
+    proposition FinalWagesDueByScheduledPayday(employee: NaturalPerson)
+    proposition WagesWithheld(employer: LegalPerson, employee: NaturalPerson)
+    proposition BonaFideDispute(employer: LegalPerson, employee: NaturalPerson)
+    proposition PayFrequencyDutyAttached(employer: LegalPerson)
+    proposition PayOnPrecedingWorkday(employer: LegalPerson)
+
+    observation SeparationObserved(record: SeparationRecord)
+        establishes EmploymentTerminated(record.employee)
+        from TerminationAndPrivateAction
+    {
+        require record.employee == Employee
+    }
+
+    calc biweekly_day_cap() -> Int {
+        return 14
+    }
+
+    calc twice_monthly_payday_floor() -> Int {
+        return 2
+    }
+
+    calc private_action_wait() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc treble_multiplier() -> Int {
+        return 3
+    }
+
+    calc payday_change_notice_periods() -> Int {
+        return 1
+    }
+
+    rule RegularFrequencyAttaches : constitutive
+        from WagePaymentTiming
+    {
+        when operative RegularPayPeriodSet(Employer)
+        then derive PayFrequencyDutyAttached(Employer)
+    }
+
+    rule FinalPayOnScheduledDay : constitutive
+        from TerminationAndPrivateAction
+    {
+        when operative EmploymentTerminated(Employee)
+        then establish FinalWagesDueByScheduledPayday(Employee)
+    }
+
+    rule NonworkdayPaysOnPrecedingWorkday : constitutive
+        from WagePaymentTiming
+    {
+        when operative PaydayIsNonworkday(Employer)
+        then derive PayOnPrecedingWorkday(Employer)
+    }
+
+    duty PayEarnedWagesOnPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative RegularPayPeriodSet(Employer)
+        content pay_all_earned_wages_on_the_regular_payday
+        source WagePaymentTiming
+    }
+
+    duty PayFinalWagesByScheduledPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative EmploymentTerminated(Employee)
+        content pay_wages_due_on_or_before_the_day_they_would_have_been_paid
+        source TerminationAndPrivateAction
+    }
+
+    query automatic within_biweekly_interval(interval_days: Int) -> Bool {
+        return interval_days <= biweekly_day_cap()
+    }
+
+    query automatic twice_monthly_paydays(paydays_in_month: Int) -> Bool {
+        return paydays_in_month >= twice_monthly_payday_floor()
+    }
+
+    query automatic pay_frequency_floor_met(interval_days: Int, paydays_in_month: Int) -> Bool {
+        return interval_days <= biweekly_day_cap()
+            or paydays_in_month >= twice_monthly_payday_floor()
+    }
+
+    query automatic private_action_open(due: Time, as_of: Time) -> Bool {
+        return as_of >= due + private_action_wait()
+    }
+
+    query automatic within_treble_cap(award_units: Int, unpaid_units: Int) -> Bool {
+        return award_units <= unpaid_units * treble_multiplier()
+    }
+
+    query automatic payday_change_notice_met(periods_ahead: Int) -> Bool {
+        return periods_ahead >= payday_change_notice_periods()
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDispute(Employer, Employee)
+                using Determine
+        }
+    }
+
+    scenario BiweeklyFloor {
+        assume RegularPayPeriodSet(Employer)
+        assume within_biweekly_interval(14)
+        assume pay_frequency_floor_met(14, 2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SemiMonthlyFloor {
+        assume RegularPayPeriodSet(Employer)
+        assume twice_monthly_paydays(2)
+        assume pay_frequency_floor_met(16, 2)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario NonworkdayPayday {
+        assume RegularPayPeriodSet(Employer)
+        assume PaydayIsNonworkday(Employer)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario AdministrativeExecutiveProfessionalPay {
+        assume AdministrativeExecutiveProfessional(Employee)
+        assume RegularPayPeriodSet(Employer)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario TerminatedNextPayday {
+        assume EmploymentTerminated(Employee)
+        assume FinalWagesDueByScheduledPayday(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario TwoWeeksElapsed {
+        assume EmploymentTerminated(Employee)
+        assume WagesWithheld(Employer, Employee)
+        assume within_treble_cap(3, 1)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic within_biweekly_interval
+            has empty effect row
+        assert automatic twice_monthly_paydays
+            has empty effect row
+        assert automatic pay_frequency_floor_met
+            has empty effect row
+        assert automatic private_action_open
+            has empty effect row
+        assert automatic within_treble_cap
+            has empty effect row
+        assert bona_fide_dispute
+            is never treated automatic
+    }
+}

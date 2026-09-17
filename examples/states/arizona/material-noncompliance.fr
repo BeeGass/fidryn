@@ -1,0 +1,241 @@
+module Arizona.Housing.MaterialNoncomplianceNotice version "0.1.0" {
+    jurisdiction Arizona
+    source_snapshot "2026-09-17-ars-33-1368"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        special_detainer_procedure_33_1377
+        notice_mailing_deemed_receipt_33_1313
+        utility_discontinuation_after_writ
+        tenant_personal_property_after_writ
+        guest_liability_for_lease_violations
+        commercial_tenancies
+        mobile_home_parks
+        complete_Arizona_Residential_Landlord_and_Tenant_Act
+    }
+
+    source NoncomplianceStatute {
+        kind statute
+        authority ArizonaLegislature
+        citation "A.R.S. § 33-1368"
+        artifact "sources/ars-33-1368.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source TenantObligations {
+        kind statute
+        authority ArizonaLegislature
+        citation "A.R.S. § 33-1341"
+        artifact "sources/ars-33-1341.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type NoncomplianceNotice {
+        landlord: LegalPerson
+        tenant: NaturalPerson
+        unit: Dwelling
+        delivered_at: Time
+        specifies_acts_and_omissions: String
+    }
+
+    proposition ResidentialTenancy(tenant: NaturalPerson, unit: Dwelling)
+    proposition MaterialNoncompliance(tenant: NaturalPerson, unit: Dwelling)
+    proposition TenantNoncomplianceWith1341(tenant: NaturalPerson, unit: Dwelling)
+    proposition MateriallyAffectsHealthAndSafety(tenant: NaturalPerson, unit: Dwelling)
+    proposition MaterialAndIrreparable(tenant: NaturalPerson, unit: Dwelling)
+    proposition RentUnpaidWhenDue(tenant: NaturalPerson, unit: Dwelling)
+    proposition NoticeDelivered(tenant: NaturalPerson, unit: Dwelling, at: Time)
+    proposition AdequatelyRemedied(tenant: NaturalPerson, unit: Dwelling)
+    proposition FiveDayCureApplies(unit: Dwelling)
+    proposition TenDayCureApplies(unit: Dwelling)
+    proposition ImmediateTerminationApplies(unit: Dwelling)
+    proposition TerminationAuthorized(unit: Dwelling)
+    proposition SecondSimilarNoncompliance(tenant: NaturalPerson, unit: Dwelling)
+
+    observation WrittenNoticeRecord(record: NoncomplianceNotice)
+        establishes NoticeDelivered(record.tenant, record.unit, record.delivered_at)
+        from NoncomplianceStatute
+    {
+        require record.landlord == Landlord
+        require record.tenant == Tenant
+        require record.unit == Unit
+    }
+
+    legal_act DeliverWrittenNotice(notice: NoncomplianceNotice) {
+        performer Landlord
+        recipient Tenant
+        effect establish NoticeDelivered(Tenant, Unit, notice.delivered_at)
+        source NoncomplianceStatute
+    }
+
+    duty RemedySpecifiedBreach {
+        bearer Tenant
+        claimant Landlord
+        attaches when operative NoticeDelivered(Tenant, Unit, NoticeTime)
+        content remedy_the_acts_and_omissions_specified_in_the_notice
+        source NoncomplianceStatute
+    }
+
+    calc health_safety_notice_days() -> Int {
+        return 5
+    }
+
+    calc material_lease_notice_days() -> Int {
+        return 10
+    }
+
+    calc unpaid_rent_notice_days() -> Int {
+        return 5
+    }
+
+    calc second_similar_notice_days() -> Int {
+        return 10
+    }
+
+    calc health_safety_cure() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    calc material_lease_cure() -> Duration<counted_days> {
+        return 10 counted_days
+    }
+
+    calc unpaid_rent_cure() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    rule HealthSafetyFiveDayTrack : constitutive
+        from NoncomplianceStatute
+    {
+        when operative TenantNoncomplianceWith1341(Tenant, Unit)
+          and operative MateriallyAffectsHealthAndSafety(Tenant, Unit)
+        then derive FiveDayCureApplies(Unit)
+    }
+
+    rule MaterialLeaseTenDayTrack : constitutive
+        from NoncomplianceStatute
+    {
+        when operative MaterialNoncompliance(Tenant, Unit)
+        then derive TenDayCureApplies(Unit)
+    }
+
+    rule IrreparableImmediateTrack : constitutive
+        from NoncomplianceStatute
+    {
+        when operative MaterialAndIrreparable(Tenant, Unit)
+        then derive ImmediateTerminationApplies(Unit)
+    }
+
+    rule CureBeforeSpecifiedDatePreventsTermination : constitutive
+        from NoncomplianceStatute
+    {
+        when operative AdequatelyRemedied(Tenant, Unit)
+        then defeat TerminationAuthorized(Unit)
+    }
+
+    query automatic health_safety_window(receipt: Time, as_of: Time) -> Bool {
+        return as_of <= receipt + health_safety_cure()
+    }
+
+    query automatic material_lease_window(receipt: Time, as_of: Time) -> Bool {
+        return as_of <= receipt + material_lease_cure()
+    }
+
+    query automatic unpaid_rent_window(receipt: Time, as_of: Time) -> Bool {
+        return as_of <= receipt + unpaid_rent_cure()
+    }
+
+    query automatic health_safety_days_are_five(days: Int) -> Bool {
+        return days >= health_safety_notice_days()
+    }
+
+    query automatic material_lease_days_are_ten(days: Int) -> Bool {
+        return days >= material_lease_notice_days()
+    }
+
+    query materiality()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined MaterialNoncompliance(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    query health_and_safety_materiality()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed WrittenNoticeRecord
+            require determined TenantNoncomplianceWith1341(Tenant, Unit)
+                using Determine
+            require determined MateriallyAffectsHealthAndSafety(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    query irreparable_breach()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined MaterialAndIrreparable(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    scenario HealthSafetyFiveDay {
+        assume ResidentialTenancy(Tenant, Unit)
+        assume TenantNoncomplianceWith1341(Tenant, Unit)
+        assume MateriallyAffectsHealthAndSafety(Tenant, Unit)
+        assume health_safety_days_are_five(5)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario MaterialLeaseTenDay {
+        assume ResidentialTenancy(Tenant, Unit)
+        assume MaterialNoncompliance(Tenant, Unit)
+        assume material_lease_days_are_ten(10)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario UnpaidRentFiveDay {
+        assume ResidentialTenancy(Tenant, Unit)
+        assume RentUnpaidWhenDue(Tenant, Unit)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario IrreparableOnPremises {
+        assume ResidentialTenancy(Tenant, Unit)
+        assume MaterialAndIrreparable(Tenant, Unit)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    verify NoticeHonesty {
+        assert automatic health_safety_window
+            has empty effect row
+        assert automatic material_lease_window
+            has empty effect row
+        assert automatic unpaid_rent_window
+            has empty effect row
+        assert automatic health_safety_days_are_five
+            has empty effect row
+        assert automatic material_lease_days_are_ten
+            has empty effect row
+        assert materiality
+            is never treated automatic
+        assert health_and_safety_materiality
+            is never treated automatic
+        assert irreparable_breach
+            is never treated automatic
+    }
+}

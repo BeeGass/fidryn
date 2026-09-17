@@ -1,0 +1,245 @@
+module Georgia.Housing.Dispossessory version "0.1.0" {
+    jurisdiction Georgia
+    source_snapshot "2026-09-17-ocga-44-7-50"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        tenancy_at_will_sixty_thirty_notice_44_7_7
+        seventh_day_weekend_holiday_answer_roll
+        appeal_and_rent_pending_appeal_44_7_56
+        rent_into_registry_44_7_54
+        croppers_and_servants_44_7_57
+        manufactured_housing_44_7_59
+        public_housing_federal_concurrent_notice
+        pre_july_2024_unrenewed_residential_leases
+        sealing_of_records_effective_2027_01_01
+        self_help_lockout_and_utility_shutoff
+        local_magistrate_practice
+        complete_Chapter_7
+    }
+
+    source DemandStatute {
+        kind statute
+        authority GeorgiaGeneralAssembly
+        citation "O.C.G.A. § 44-7-50"
+        artifact "sources/ocga-44-7-50.txt"
+        digest fixture
+        effective [2024-07-01, +inf)
+    }
+
+    source ProcedureStatute {
+        kind statute
+        authority GeorgiaGeneralAssembly
+        citation "O.C.G.A. § 44-7-51 et seq."
+        artifact "sources/ocga-44-7-51.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Landlord : LegalPerson
+    entity Tenant : NaturalPerson
+    entity Premises : RealProperty
+    entity MagistrateCourt : Authority
+
+    record_type DemandRecord {
+        landlord: LegalPerson
+        tenant: NaturalPerson
+        premises: RealProperty
+        given_at: Time
+    }
+
+    record_type ServiceRecord {
+        tenant: NaturalPerson
+        premises: RealProperty
+        served_at: Time
+    }
+
+    proposition HoldsOver(tenant: NaturalPerson, premises: RealProperty)
+    proposition RentUnpaid(tenant: NaturalPerson, premises: RealProperty)
+    proposition CoveredResidentialLease(premises: RealProperty)
+    proposition DemandMade(landlord: LegalPerson, tenant: NaturalPerson, premises: RealProperty)
+    proposition NonpaymentNoticeGiven(landlord: LegalPerson, tenant: NaturalPerson, premises: RealProperty)
+    proposition TenantRefusedPossession(tenant: NaturalPerson, premises: RealProperty)
+    proposition AffidavitFiled(premises: RealProperty)
+    proposition SummonsServed(tenant: NaturalPerson, premises: RealProperty)
+    proposition TenantAnswered(tenant: NaturalPerson)
+    proposition TenderedRentAndCosts(tenant: NaturalPerson)
+    proposition TenderAlreadyUsedThisYear(tenant: NaturalPerson)
+    proposition JudgmentAgainstTenant(premises: RealProperty)
+    proposition DefaultNoAnswer(premises: RealProperty)
+    proposition PossessionRight(landlord: LegalPerson, premises: RealProperty)
+    proposition WritIssued(premises: RealProperty)
+
+    observation DemandPosted(record: DemandRecord)
+        establishes DemandMade(record.landlord, record.tenant, record.premises)
+        from DemandStatute
+    {
+        require record.landlord == Landlord
+        require record.tenant == Tenant
+    }
+
+    observation SummonsServiceObservation(record: ServiceRecord)
+        establishes SummonsServed(record.tenant, record.premises)
+        from ProcedureStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act FileDispossessoryAffidavit() {
+        performer Landlord
+        recipient MagistrateCourt
+        validity requires operative DemandMade(Landlord, Tenant, Premises)
+        effect establish AffidavitFiled(Premises)
+        does_not_establish PossessionRight(Landlord, Premises)
+        source DemandStatute
+    }
+
+    calc nonpayment_notice_period() -> Duration<working_days> {
+        return 3 working_days
+    }
+
+    calc holdover_prefiling_wait() -> Duration<counted_days> {
+        return 0 counted_days
+    }
+
+    calc answer_period() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc tender_window() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc writ_after_contested_judgment() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    rule HoldoverDemandThenFile : constitutive
+        from DemandStatute
+    {
+        when operative HoldsOver(Tenant, Premises)
+          and operative DemandMade(Landlord, Tenant, Premises)
+          and operative TenantRefusedPossession(Tenant, Premises)
+        then derive AffidavitFiled(Premises)
+    }
+
+    rule NonpaymentThreeDayGate : constitutive
+        from DemandStatute
+    {
+        when operative CoveredResidentialLease(Premises)
+          and operative RentUnpaid(Tenant, Premises)
+          and operative NonpaymentNoticeGiven(Landlord, Tenant, Premises)
+        then derive AffidavitFiled(Premises)
+    }
+
+    duty AnswerWithinSevenDays {
+        bearer Tenant
+        claimant Landlord
+        attaches when operative SummonsServed(Tenant, Premises)
+        content answer_orally_or_in_writing_within_seven_days
+        source ProcedureStatute
+    }
+
+    judgment PossessionOnTheMerits(premises: RealProperty)
+    decides PossessionRight(Landlord, premises)
+        from ProcedureStatute
+    {
+        authority MagistrateCourt
+        record requires JudgmentEntry
+        establish when determined JudgmentAgainstTenant(premises)
+    }
+
+    query automatic nonpayment_notice_lapsed(served: Time, as_of: Time) -> Bool {
+        return as_of >= served + nonpayment_notice_period()
+    }
+
+    query automatic holdover_may_file_immediately() -> Bool {
+        return holdover_prefiling_wait() == 0 counted_days
+    }
+
+    query automatic answer_window_open(served: Time, as_of: Time) -> Bool {
+        return as_of <= served + answer_period()
+    }
+
+    query automatic tender_window_open(served: Time, as_of: Time) -> Bool {
+        return as_of <= served + tender_window()
+    }
+
+    query automatic writ_waiting_period_running(judgment: Time, as_of: Time) -> Bool {
+        return as_of <= judgment + writ_after_contested_judgment()
+    }
+
+    query demand_posted()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed DemandPosted
+        }
+    }
+
+    query possession_right()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PossessionRight(Landlord, Premises)
+                using Determine
+        }
+    }
+
+    scenario NonpaymentThreeBusinessDays {
+        assume CoveredResidentialLease(Premises)
+        assume RentUnpaid(Tenant, Premises)
+        assume NonpaymentNoticeGiven(Landlord, Tenant, Premises)
+        assume nonpayment_notice_lapsed(2026-09-01T09:00:00-04:00, 2026-09-04T09:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario HoldoverImmediateFiling {
+        assume HoldsOver(Tenant, Premises)
+        assume DemandMade(Landlord, Tenant, Premises)
+        assume TenantRefusedPossession(Tenant, Premises)
+        assume holdover_may_file_immediately()
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario AnswerWithinSevenDays {
+        assume SummonsServed(Tenant, Premises)
+        assume answer_window_open(2026-09-01T12:00:00-04:00, 2026-09-08T12:00:00-04:00)
+        assume tender_window_open(2026-09-01T12:00:00-04:00, 2026-09-08T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ContestedWritSevenDays {
+        assume TenantAnswered(Tenant)
+        assume JudgmentAgainstTenant(Premises)
+        assume writ_waiting_period_running(2026-09-10T12:00:00-04:00, 2026-09-17T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario PossessionStillADetermination {
+        assume DemandMade(Landlord, Tenant, Premises)
+        assume AffidavitFiled(Premises)
+        assume DefaultNoAnswer(Premises)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DispossessoryHonesty {
+        assert automatic nonpayment_notice_lapsed
+            has empty effect row
+        assert automatic holdover_may_file_immediately
+            has empty effect row
+        assert automatic answer_window_open
+            has empty effect row
+        assert automatic tender_window_open
+            has empty effect row
+        assert automatic writ_waiting_period_running
+            has empty effect row
+        assert demand_posted
+            is never treated automatic
+        assert possession_right
+            is never treated automatic
+    }
+}

@@ -1,0 +1,247 @@
+module Montana.Employment.WrongfulDischarge version "0.1.0" {
+    jurisdiction Montana
+    source_snapshot "2026-09-17-mca-39-2-901"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        MHRA_and_federal_discrimination_procedures
+        collective_bargaining_and_term_contracts
+        constructive_discharge_intolerability
+        public_policy_identification
+        free_speech_versus_harassment_or_trade_secrets
+        managerial_supervisory_broadest_discretion
+        lawful_product_off_premises_39_2_313
+        arbitration_offer_and_fee_shifting
+        independent_contractor_classification
+        complete_WDEA
+        not_legal_advice
+    }
+
+    source WDEAElements {
+        kind statute
+        authority MontanaLegislature
+        citation "Mont. Code Ann. §§ 39-2-903 to 39-2-905"
+        artifact "sources/mca-39-2-903.txt"
+        digest fixture
+        effective [2023-10-01, +inf)
+    }
+
+    source WDEAProcedure {
+        kind statute
+        authority MontanaLegislature
+        citation "Mont. Code Ann. §§ 39-2-910 to 39-2-912"
+        artifact "sources/mca-39-2-910.txt"
+        digest fixture
+        effective [2021-03-31, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type HireRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        began_work: Time
+    }
+
+    proposition Employed(employee: NaturalPerson, employer: LegalPerson)
+    proposition Discharged(employee: NaturalPerson, employer: LegalPerson)
+    proposition CompletedProbation(employee: NaturalPerson)
+    proposition DuringProbation(employee: NaturalPerson)
+    proposition GoodCauseRequired(employee: NaturalPerson)
+    proposition GoodCause(employer: LegalPerson, employee: NaturalPerson)
+    proposition PublicPolicyRetaliation(employer: LegalPerson, employee: NaturalPerson)
+    proposition PersonnelPolicyViolation(employer: LegalPerson)
+    proposition WrongfulDischarge(employer: LegalPerson, employee: NaturalPerson)
+    proposition WrittenProbationSetAtHire(employer: LegalPerson)
+
+    observation HireDateRecord(record: HireRecord)
+        establishes Employed(record.employee, record.employer)
+        from WDEAProcedure
+    {
+        require record.employee == Employee
+    }
+
+    legal_act DischargeEmployee() {
+        performer Employer
+        recipient Employee
+        effect establish Discharged(Employee, Employer)
+        source WDEAElements
+    }
+
+    calc default_probation_months() -> Int {
+        return 12
+    }
+
+    calc max_probation_months() -> Int {
+        return 18
+    }
+
+    calc leave_of_absence_threshold_days() -> Int {
+        return 5
+    }
+
+    calc action_limitation_years() -> Int {
+        return 1
+    }
+
+    calc internal_procedure_notice() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc internal_exhaustion_window() -> Duration<counted_days> {
+        return 90 counted_days
+    }
+
+    calc limitation_toll_cap() -> Duration<counted_days> {
+        return 120 counted_days
+    }
+
+    calc service_of_process_months() -> Int {
+        return 6
+    }
+
+    calc lost_wages_cap_years() -> Int {
+        return 4
+    }
+
+    rule DefaultProbationTwelveMonths : constitutive
+        from WDEAProcedure
+    {
+        when operative Employed(Employee, Employer)
+        then derive DuringProbation(Employee)
+    }
+
+    rule PostProbationNotAtWill : constitutive
+        from WDEAElements
+    {
+        when operative CompletedProbation(Employee)
+        then derive GoodCauseRequired(Employee)
+    }
+
+    duty RespectGoodCause {
+        bearer Employer
+        claimant Employee
+        attaches when operative CompletedProbation(Employee)
+        content refrain_from_discharge_without_good_cause
+        source WDEAElements
+    }
+
+    query automatic default_probation_complete(months_worked: Int) -> Bool {
+        return months_worked >= default_probation_months()
+    }
+
+    query automatic still_within_default_probation(months_worked: Int) -> Bool {
+        return months_worked < default_probation_months()
+    }
+
+    query automatic within_max_probation(original_plus_extension: Int) -> Bool {
+        return original_plus_extension <= max_probation_months()
+    }
+
+    query automatic exceeds_max_probation(original_plus_extension: Int) -> Bool {
+        return original_plus_extension > max_probation_months()
+    }
+
+    query automatic counts_as_leave_of_absence(consecutive_working_days: Int) -> Bool {
+        return consecutive_working_days > leave_of_absence_threshold_days()
+    }
+
+    query automatic action_within_limitation(years_after_discharge: Int) -> Bool {
+        return years_after_discharge <= action_limitation_years()
+    }
+
+    query automatic lost_wages_within_cap(years_claimed: Int) -> Bool {
+        return years_claimed <= lost_wages_cap_years()
+    }
+
+    query automatic internal_notice_timely(discharge: Time, notice: Time) -> Bool {
+        return notice <= discharge + internal_procedure_notice()
+    }
+
+    query automatic service_within_six_months(months_after_filing: Int) -> Bool {
+        return months_after_filing <= service_of_process_months()
+    }
+
+    query probation_complete()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed HireDateRecord
+            require determined CompletedProbation(Employee)
+                using Determine
+        }
+    }
+
+    query good_cause()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined GoodCause(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query public_policy_retaliation()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PublicPolicyRetaliation(Employer, Employee)
+                using Determine
+        }
+    }
+
+    scenario DefaultTwelveMonthsComplete {
+        assume Employed(Employee, Employer)
+        assume not WrittenProbationSetAtHire(Employer)
+        assume default_probation_complete(12)
+        assume Discharged(Employee, Employer)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario MidProbationSixMonths {
+        assume Employed(Employee, Employer)
+        assume not WrittenProbationSetAtHire(Employer)
+        assume still_within_default_probation(6)
+        assume Discharged(Employee, Employer)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario ExtendedToEighteen {
+        assume Employed(Employee, Employer)
+        assume within_max_probation(18)
+        assume Discharged(Employee, Employer)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario ExtendedPastEighteen {
+        assume Employed(Employee, Employer)
+        assume exceeds_max_probation(19)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify WDEAHonesty {
+        assert automatic default_probation_complete
+            has empty effect row
+        assert automatic within_max_probation
+            has empty effect row
+        assert automatic still_within_default_probation
+            has empty effect row
+        assert automatic counts_as_leave_of_absence
+            has empty effect row
+        assert automatic action_within_limitation
+            has empty effect row
+        assert automatic lost_wages_within_cap
+            has empty effect row
+        assert probation_complete
+            is never treated automatic
+        assert good_cause
+            is never treated automatic
+        assert public_policy_retaliation
+            is never treated automatic
+    }
+}

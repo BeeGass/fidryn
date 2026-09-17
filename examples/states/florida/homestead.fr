@@ -1,0 +1,155 @@
+module Florida.Property.Homestead version "0.1.0" {
+    jurisdiction Florida
+    source_snapshot "2026-09-17-fla-const-art-x-4"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        save_our_homes_assessment_cap
+        portability_of_assessment_difference
+        ad_valorem_exemption_application_procedure
+        devise_restrictions_if_spouse_or_minor_child
+        bankruptcy_opt_out_interaction
+        complete_Florida_Constitution
+        complete_Chapter_222
+    }
+
+    source HomesteadConstitution {
+        kind constitution
+        authority PeopleOfFlorida
+        citation "Fla. Const. art. X, § 4"
+        artifact "sources/fla-const-art-x-4.txt"
+        digest fixture
+        effective [1968-11-05, +inf)
+    }
+
+    source HomesteadExemptions {
+        kind statute
+        authority FloridaLegislature
+        citation "Fla. Stat. § 222.01 et seq."
+        artifact "sources/fla-stat-222.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Owner : NaturalPerson
+    entity Spouse : NaturalPerson
+    entity Creditor : LegalPerson
+    entity Home : RealProperty
+    entity Municipality : LegalEntity
+
+    proposition OccupiesAsResidence(person: NaturalPerson, property: RealProperty)
+    proposition InsideMunicipality(property: RealProperty)
+    proposition Rural(property: RealProperty)
+    proposition HomesteadCharacter(property: RealProperty, owner: NaturalPerson)
+    proposition ForcedSaleProtected(property: RealProperty)
+    proposition ExceptedCreditor(creditor: LegalPerson)
+    proposition TaxesDue(property: RealProperty)
+    proposition PurchaseMoneyMortgage(creditor: LegalPerson, property: RealProperty)
+    proposition LaborOrMaterialsLien(creditor: LegalPerson, property: RealProperty)
+
+    observation OccupancyRecord(record: ResidenceRecord)
+        establishes OccupiesAsResidence(record.person, record.property)
+        from HomesteadConstitution
+    {
+        require record.person == Owner
+    }
+
+    calc urban_acreage_cap() -> Decimal {
+        return 0.5
+    }
+
+    calc rural_acreage_cap() -> Decimal {
+        return 160.0
+    }
+
+    calc personal_property_cap() -> Money<USD> {
+        return USD(1000.00)
+    }
+
+    rule AcreageLimit : constitutive
+        from HomesteadConstitution
+    {
+        when operative OccupiesAsResidence(Owner, Home)
+        then derive HomesteadCharacter(Home, Owner)
+    }
+
+    rule ForcedSaleProtection : constitutive
+        from HomesteadConstitution
+    {
+        when operative HomesteadCharacter(Home, Owner)
+        then establish ForcedSaleProtected(Home)
+    }
+
+    duty RespectHomestead {
+        bearer Creditor
+        claimant Owner
+        attaches when operative ForcedSaleProtected(Home)
+        content refrain_from_forced_sale_except_enumerated_exceptions
+        source HomesteadConstitution
+    }
+
+    query automatic within_urban_acreage(acres: Decimal) -> Bool {
+        return acres <= urban_acreage_cap()
+    }
+
+    query automatic within_rural_acreage(acres: Decimal) -> Bool {
+        return acres <= rural_acreage_cap()
+    }
+
+    query automatic personal_property_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= personal_property_cap()
+    }
+
+    query homestead_character()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed OccupancyRecord
+            require determined HomesteadCharacter(Home, Owner)
+                using Determine
+        }
+    }
+
+    query forced_sale_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ExceptedCreditor(Creditor)
+                using Determine
+        }
+    }
+
+    scenario InsideCityHalfAcre {
+        assume OccupiesAsResidence(Owner, Home)
+        assume InsideMunicipality(Home)
+        assume within_urban_acreage(0.5)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario RuralHundredSixty {
+        assume OccupiesAsResidence(Owner, Home)
+        assume Rural(Home)
+        assume within_rural_acreage(160.0)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario TaxCreditor {
+        assume HomesteadCharacter(Home, Owner)
+        assume TaxesDue(Home)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify HomesteadHonesty {
+        assert automatic within_urban_acreage
+            has empty effect row
+        assert automatic within_rural_acreage
+            has empty effect row
+        assert homestead_character
+            is never treated automatic
+        assert forced_sale_exception
+            is never treated automatic
+    }
+}

@@ -1,0 +1,227 @@
+module Arkansas.Property.Homestead version "0.1.0" {
+    jurisdiction Arkansas
+    source_snapshot "2026-09-17-ark-const-art-9"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        amendment_79_homestead_tax_credit
+        ad_valorem_assessment_cap
+        widow_and_minor_children_survivorship
+        llc_member_claim_under_16_66_210_e
+        bankruptcy_federal_exemption_election
+        personal_property_exemptions_art_9_1_2
+        schedule_of_exemptions_procedure
+        complete_Arkansas_Constitution
+        complete_16_66_210
+    }
+
+    source HomesteadConstitution {
+        kind constitution
+        authority PeopleOfArkansas
+        citation "Ark. Const. art. IX, §§ 3-5"
+        artifact "sources/ark-const-art-9.txt"
+        digest fixture
+        effective [1874-10-13, +inf)
+    }
+
+    source HomesteadExemptionAct {
+        kind statute
+        authority ArkansasGeneralAssembly
+        citation "Ark. Code Ann. § 16-66-210"
+        artifact "sources/ark-code-16-66-210.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Owner : NaturalPerson
+    entity Spouse : NaturalPerson
+    entity Creditor : LegalPerson
+    entity Home : RealProperty
+    entity CityTownOrVillage : LegalEntity
+
+    record_type ResidenceRecord {
+        person: NaturalPerson
+        property: RealProperty
+    }
+
+    proposition ResidentOfArkansas(person: NaturalPerson)
+    proposition Married(person: NaturalPerson)
+    proposition HeadOfFamily(person: NaturalPerson)
+    proposition EligibleClaimant(person: NaturalPerson)
+    proposition OccupiesAsResidence(person: NaturalPerson, property: RealProperty)
+    proposition InsideCityTownOrVillage(property: RealProperty)
+    proposition Rural(property: RealProperty)
+    proposition HomesteadCharacter(property: RealProperty, owner: NaturalPerson)
+    proposition ForcedSaleProtected(property: RealProperty)
+    proposition ExceptedCreditor(creditor: LegalPerson)
+    proposition PurchaseMoney(creditor: LegalPerson, property: RealProperty)
+    proposition LaborersOrMechanicsLien(creditor: LegalPerson, property: RealProperty)
+    proposition TaxesDue(property: RealProperty)
+    proposition AnnexedButRuralInNature(property: RealProperty)
+
+    observation OccupancyRecord(record: ResidenceRecord)
+        establishes OccupiesAsResidence(record.person, record.property)
+        from HomesteadConstitution
+    {
+        require record.person == Owner
+    }
+
+    calc rural_max_acres() -> Decimal {
+        return 160.0
+    }
+
+    calc rural_floor_acres() -> Decimal {
+        return 80.0
+    }
+
+    calc urban_max_acres() -> Decimal {
+        return 1.0
+    }
+
+    calc urban_floor_acres() -> Decimal {
+        return 0.25
+    }
+
+    calc value_cap() -> Money<USD> {
+        return USD(2500.00)
+    }
+
+    rule EligibilityIsNotABoolean : constitutive
+        from HomesteadConstitution
+    {
+        when operative OccupiesAsResidence(Owner, Home)
+          and operative ResidentOfArkansas(Owner)
+        then derive HomesteadCharacter(Home, Owner)
+    }
+
+    rule ForcedSaleProtection : constitutive
+        from HomesteadConstitution
+    {
+        when operative HomesteadCharacter(Home, Owner)
+        then establish ForcedSaleProtected(Home)
+    }
+
+    rule AnnexedRuralKeepsRuralAcreage : constitutive
+        from HomesteadExemptionAct
+    {
+        when operative AnnexedButRuralInNature(Home)
+        then derive Rural(Home)
+    }
+
+    duty RespectHomestead {
+        bearer Creditor
+        claimant Owner
+        attaches when operative ForcedSaleProtected(Home)
+        content refrain_from_forced_sale_except_enumerated_exceptions
+        source HomesteadConstitution
+    }
+
+    query automatic rural_within_max(acres: Decimal) -> Bool {
+        return acres <= rural_max_acres()
+    }
+
+    query automatic rural_at_or_below_floor(acres: Decimal) -> Bool {
+        return acres <= rural_floor_acres()
+    }
+
+    query automatic urban_within_max(acres: Decimal) -> Bool {
+        return acres <= urban_max_acres()
+    }
+
+    query automatic urban_at_or_below_floor(acres: Decimal) -> Bool {
+        return acres <= urban_floor_acres()
+    }
+
+    query automatic within_value_cap(amount: Money<USD>) -> Bool {
+        return amount <= value_cap()
+    }
+
+    query homestead_character()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed OccupancyRecord
+            require determined HomesteadCharacter(Home, Owner)
+                using Determine
+            require determined EligibleClaimant(Owner)
+                using Determine
+        }
+    }
+
+    query forced_sale_exception()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ExceptedCreditor(Creditor)
+                using Determine
+        }
+    }
+
+    query annexed_rural_character()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined AnnexedButRuralInNature(Home)
+                using Determine
+        }
+    }
+
+    scenario RuralEightyFloor {
+        assume OccupiesAsResidence(Owner, Home)
+        assume Rural(Home)
+        assume rural_at_or_below_floor(80.0)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario RuralOneSixtyAtCap {
+        assume OccupiesAsResidence(Owner, Home)
+        assume Rural(Home)
+        assume rural_within_max(160.0)
+        assume within_value_cap(USD(2500.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario UrbanQuarterFloor {
+        assume OccupiesAsResidence(Owner, Home)
+        assume InsideCityTownOrVillage(Home)
+        assume urban_at_or_below_floor(0.25)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario UrbanOneAcreAtCap {
+        assume OccupiesAsResidence(Owner, Home)
+        assume InsideCityTownOrVillage(Home)
+        assume urban_within_max(1.0)
+        assume within_value_cap(USD(2500.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario TaxCreditor {
+        assume HomesteadCharacter(Home, Owner)
+        assume TaxesDue(Home)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify HomesteadHonesty {
+        assert automatic rural_within_max
+            has empty effect row
+        assert automatic rural_at_or_below_floor
+            has empty effect row
+        assert automatic urban_within_max
+            has empty effect row
+        assert automatic urban_at_or_below_floor
+            has empty effect row
+        assert automatic within_value_cap
+            has empty effect row
+        assert homestead_character
+            is never treated automatic
+        assert forced_sale_exception
+            is never treated automatic
+        assert annexed_rural_character
+            is never treated automatic
+    }
+}

@@ -1,0 +1,200 @@
+module Idaho.Employment.Noncompete version "0.1.0" {
+    jurisdiction Idaho
+    source_snapshot "2026-09-17-id-code-44-2701"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        idaho_trade_secrets_act
+        customer_nonsolicit_as_distinct_covenant
+        garden_leave
+        federal_ftc_noncompete_rule
+        physician_public_access_case_law
+        adequacy_of_additional_consideration
+        choice_of_law
+        judicial_modification_under_section_44_2703
+        complete_Idaho_Code
+    }
+
+    source NoncompeteStatute {
+        kind statute
+        authority IdahoLegislature
+        citation "Idaho Code § 44-2701"
+        artifact "sources/id-code-44-2701.txt"
+        digest fixture
+        effective [2008-07-01, +inf)
+    }
+
+    source NoncompetePresumptions {
+        kind statute
+        authority IdahoLegislature
+        citation "Idaho Code § 44-2704"
+        artifact "sources/id-code-44-2704.txt"
+        digest fixture
+        effective [2018-03-28, +inf)
+    }
+
+    entity Worker : NaturalPerson
+    entity Employer : LegalPerson
+    entity Covenant : Asset
+
+    record_type NoncompeteWriting {
+        worker: NaturalPerson
+        employer: LegalPerson
+        duration_months: Int
+        signed_at: Time
+    }
+
+    proposition WrittenCovenant(worker: NaturalPerson, employer: LegalPerson)
+    proposition KeyEmployee(worker: NaturalPerson)
+    proposition KeyIndependentContractor(worker: NaturalPerson)
+    proposition HighestPaidFivePercent(worker: NaturalPerson)
+    proposition LegitimateBusinessInterest(employer: LegalPerson)
+    proposition ReasonableDuration(covenant: Asset)
+    proposition ReasonableGeography(covenant: Asset)
+    proposition ReasonableLineOfBusiness(covenant: Asset)
+    proposition AdditionalConsideration(worker: NaturalPerson)
+    proposition DirectCompetitionRestricted(worker: NaturalPerson)
+    proposition EnforceableNoncompete(covenant: Asset)
+    proposition TerminatedEmployment(worker: NaturalPerson, at: Time)
+
+    observation SignedCovenant(record: NoncompeteWriting)
+        establishes WrittenCovenant(record.worker, record.employer)
+        from NoncompeteStatute
+    {
+        require record.worker == Worker
+    }
+
+    legal_act EnterWrittenCovenant(writing: NoncompeteWriting) {
+        performer writing.employer
+        recipient writing.worker
+        effect establish WrittenCovenant(writing.worker, writing.employer)
+        source NoncompeteStatute
+    }
+
+    calc duration_cap_months() -> Int {
+        return 18
+    }
+
+    calc key_pay_percentile() -> Int {
+        return 5
+    }
+
+    calc dollar_income_floor_absent() -> Bool {
+        return true
+    }
+
+    rule WrittenKeyEmployeePath : constitutive
+        from NoncompeteStatute
+    {
+        when operative WrittenCovenant(Worker, Employer)
+          and operative KeyEmployee(Worker)
+          and operative LegitimateBusinessInterest(Employer)
+          and operative ReasonableDuration(Covenant)
+          and operative ReasonableGeography(Covenant)
+          and operative ReasonableLineOfBusiness(Covenant)
+        then derive EnforceableNoncompete(Covenant)
+    }
+
+    duty RefrainFromDirectCompetition {
+        bearer Worker
+        claimant Employer
+        attaches when operative EnforceableNoncompete(Covenant)
+        content refrain_from_direct_competition_after_termination
+        source NoncompeteStatute
+    }
+
+    duty LimitRestraintToNecessity {
+        bearer Employer
+        claimant Worker
+        attaches when operative WrittenCovenant(Worker, Employer)
+        content no_greater_restraint_than_reasonably_necessary
+        source NoncompeteStatute
+    }
+
+    query automatic within_duration_cap(months: Int) -> Bool {
+        return months <= duration_cap_months()
+    }
+
+    query automatic additional_consideration_required(months: Int) -> Bool {
+        return months > duration_cap_months()
+    }
+
+    query automatic highest_paid_five_percent(top_pay_percent: Int) -> Bool {
+        return top_pay_percent <= key_pay_percentile()
+    }
+
+    query automatic no_dollar_income_threshold() -> Bool {
+        return dollar_income_floor_absent()
+    }
+
+    query legitimate_business_interest()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined LegitimateBusinessInterest(Employer)
+                using Determine
+        }
+    }
+
+    query key_employee_status()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed SignedCovenant
+            require determined KeyEmployee(Worker)
+                using Determine
+        }
+    }
+
+    query geographic_reasonableness()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ReasonableGeography(Covenant)
+                using Determine
+        }
+    }
+
+    scenario EighteenMonthTopFivePercent {
+        assume WrittenCovenant(Worker, Employer)
+        assume HighestPaidFivePercent(Worker)
+        assume within_duration_cap(18)
+        assume highest_paid_five_percent(5)
+        assume no_dollar_income_threshold()
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario TwentyFourMonthsWithoutExtraConsideration {
+        assume WrittenCovenant(Worker, Employer)
+        assume KeyEmployee(Worker)
+        assume additional_consideration_required(24)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario RankAndFileNotPresumedKey {
+        assume WrittenCovenant(Worker, Employer)
+        assume highest_paid_five_percent(20)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify NoncompeteHonesty {
+        assert automatic within_duration_cap
+            has empty effect row
+        assert automatic additional_consideration_required
+            has empty effect row
+        assert automatic highest_paid_five_percent
+            has empty effect row
+        assert automatic no_dollar_income_threshold
+            has empty effect row
+        assert legitimate_business_interest
+            is never treated automatic
+        assert key_employee_status
+            is never treated automatic
+        assert geographic_reasonableness
+            is never treated automatic
+    }
+}

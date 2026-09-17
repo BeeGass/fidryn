@@ -1,0 +1,38 @@
+Idaho Code section 44-2704 (fixture excerpt).
+Added 2008, ch. 295; amended 2016, ch. 281; amended 2018, ch. 349
+(repealing the 2016 irreparable-harm presumption). Current through the
+2025 legislative update posted by the Idaho Legislature.
+
+44-2704. RESTRICTION OF DIRECT COMPETITION -- REBUTTABLE PRESUMPTIONS.
+(1) Under no circumstances shall a provision of such agreement or
+covenant, as set forth herein, establish a postemployment restriction of
+direct competition that exceeds a period of eighteen (18) months from the
+time of the key employee's or key independent contractor's termination
+unless consideration, in addition to employment or continued employment, is
+given to a key employee or key independent contractor. Nothing in this
+chapter shall be construed to limit a party's ability to otherwise protect
+trade secrets or other information deemed proprietary or confidential.
+(2) It shall be a rebuttable presumption that an agreement or covenant
+with a postemployment term of eighteen (18) months or less is reasonable as
+to duration.
+(3) It shall be a rebuttable presumption that an agreement or covenant is
+reasonable as to geographic area if it is restricted to the geographic
+areas in which the key employee or key independent contractor provided
+services or had a significant presence or influence.
+(4) It shall be a rebuttable presumption that an agreement or covenant is
+reasonable as to type of employment or line of business if it is limited to
+the type of employment or line of business conducted by the key employee or
+key independent contractor, as defined in section 44-2702, Idaho Code,
+while working for the employer.
+(5) It shall be a rebuttable presumption that an employee or independent
+contractor who is among the highest paid five percent (5%) of the
+employer's employees or independent contractors is a "key employee" or a
+"key independent contractor." To rebut such presumption, an employee or
+independent contractor must show that it has no ability to adversely affect
+the employer's legitimate business interests.
+
+Idaho has no fixed dollar salary floor for noncompetes. The 18-month figure
+and the 5 percent pay rank are mechanical; whether a restraint protects a
+legitimate business interest, whether the worker is actually key, and
+whether extra consideration supports a longer term are determinations.
+Fixture text for Fidryn research. Not an official edition.

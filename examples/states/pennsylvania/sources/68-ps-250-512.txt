@@ -1,0 +1,50 @@
+Landlord and Tenant Act of 1951, 68 P.S. § 250.512 (fixture excerpt).
+Added 1968, May 3, P.L. 107, No. 56; amended 1972, Dec. 29, P.L. 1698,
+No. 363. Westlaw unofficial Purdon's compilation current through Act 51
+of the 2026 Regular Session. No later amendment to this section located.
+
+§ 250.512. Recovery of improperly held escrow funds
+
+(a) Every landlord shall within thirty days of termination of a lease or
+upon surrender and acceptance of the leasehold premises, whichever first
+occurs, provide a tenant with a written list of any damages to the
+leasehold premises for which the landlord claims the tenant is liable.
+Delivery of the list shall be accompanied by payment of the difference
+between any sum deposited in escrow, including any unpaid interest
+thereon, for the payment of damages to the leasehold premises and the
+actual amount of damages to the leasehold premises caused by the tenant.
+Nothing in this section shall preclude the landlord from refusing to
+return the escrow fund, including any unpaid interest thereon, for
+nonpayment of rent or for the breach of any other condition in the lease
+by the tenant.
+
+(b) Any landlord who fails to provide a written list within thirty days
+as required in subsection (a), above, shall forfeit all rights to withhold
+any portion of sums held in escrow, including any unpaid interest thereon,
+or to bring suit against the tenant for damages to the leasehold premises.
+
+(c) If the landlord fails to pay the tenant the difference between the
+sum deposited, including any unpaid interest thereon, and the actual
+damages to the leasehold premises caused by the tenant within thirty days
+after termination of the lease or surrender and acceptance of the
+leasehold premises, the landlord shall be liable in assumpsit to double
+the amount by which the sum deposited in escrow, including any unpaid
+interest thereon, exceeds the actual damages to the leasehold premises
+caused by the tenant as determined by any court of record or court not of
+record having jurisdiction in civil actions at law. The burden of proof
+of actual damages caused by the tenant to the leasehold premises shall be
+on the landlord.
+
+(d) Any attempted waiver of this section by a tenant by contract or
+otherwise shall be void and unenforceable.
+
+(e) Failure of the tenant to provide the landlord with his new address in
+writing upon termination of the lease or upon surrender and acceptance of
+the leasehold premises shall relieve the landlord from any liability under
+this section.
+
+(f) This section shall apply only to residential leaseholds and not to
+commercial leaseholds.
+
+Double the excess over actual damages is a court determination, not a
+Boolean. Fixture text for Fidryn research. Not an official edition.

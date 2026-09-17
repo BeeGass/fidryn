@@ -1,0 +1,61 @@
+9 V.S.A. § 4461. Security deposits (fixture excerpt).
+Cite as: 9 V.S.A. § 4461. Unofficial copy of the Vermont Statutes
+Online as published by the Vermont General Assembly, including the
+actions of the 2025 session. Last listed amendment: 2007, No. 176
+(Adj. Sess.), § 45. H.772 (2025-2026), which would have capped a
+deposit at two months' rent, did not amend this section.
+
+(a) A security deposit is any advance, deposit, or prepaid rent, however
+named, which is refundable to the tenant at the termination or expiration
+of the tenancy. The function of a security deposit is to secure the
+performance of a tenant's obligations to pay rent and to maintain a
+dwelling unit.
+
+(b) The landlord may retain all or a portion of the security deposit for:
+(1) nonpayment of rent;
+(2) damage to property of the landlord, unless the damage is the
+result of normal wear and tear or the result of actions or events
+beyond the control of the tenant;
+(3) nonpayment of utility or other charges that the tenant was
+required to pay directly to the landlord or to a utility; and
+(4) expenses required to remove from the rental unit articles
+abandoned by the tenant.
+
+(c) A landlord shall return the security deposit along with a written
+statement itemizing any deductions to a tenant within 14 days from the
+date on which the landlord discovers that the tenant vacated or abandoned
+the dwelling unit or the date the tenant vacated the dwelling unit,
+provided the landlord received notice from the tenant of that date. In
+the case of the seasonal occupancy and rental of a dwelling unit not
+intended as a primary residence, the security deposit and written
+statement shall be returned within 60 days.
+
+(d) The landlord shall comply with this section by hand-delivering or
+mailing the statement and any payment required to the last known address
+of the tenant.
+
+(e) If a landlord fails to return the security deposit with a statement
+within 14 days, the landlord forfeits the right to withhold any portion
+of the security deposit. If the failure is willful, the landlord shall
+be liable for double the amount wrongfully withheld, plus reasonable
+attorney's fees and costs.
+
+(f) Upon termination of the landlord's interest in the dwelling unit, the
+security deposit shall be transferred to the new landlord. The new
+landlord shall give the tenant actual notice of the new landlord's name
+and address with a statement that the security deposit has been
+transferred to the new landlord.
+
+(g) A town or municipality may adopt an ordinance governing security
+deposits on dwellings. The ordinance shall be supplemental to and not
+inconsistent with the minimum protections of the provisions of this
+section. The ordinance may not limit how a security deposit is held. The
+ordinance may authorize the payment of interest on a security deposit.
+The ordinance may provide that a housing board of review constituted
+pursuant to 24 V.S.A. § 5005 may hear and decide disputes related to
+security deposits upon request for a hearing by a landlord or tenant.
+
+The 14-day and 60-day clocks are counted days. Whether a failure is
+willful, whether damage exceeds normal wear and tear, and whether a
+municipal overlay applies are determinations, not Booleans. Research
+fixture. Not legal advice. Not an official edition.

@@ -1,0 +1,237 @@
+module Washington.Employment.PaidSickLeave version "0.1.0" {
+    jurisdiction Washington
+    source_snapshot "2026-09-17-rcw-49.46.210"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-07:00
+
+    outside_scope {
+        seattle_seatac_tacoma_ordinances
+        transportation_network_company_drivers
+        construction_industry_separation_payout
+        frontloading_policy_that_meets_or_exceeds
+        normal_hourly_compensation_calculation
+        rcw_49_46_180_collective_bargaining_variance
+        white_collar_exemptions_under_49_46_010
+        increment_of_use_and_shift_swapping
+        complete_chapter_49_46
+        complete_wac_296_128
+    }
+
+    source PaidSickLeaveStatute {
+        kind statute
+        authority WashingtonLegislature
+        citation "RCW 49.46.210"
+        artifact "sources/rcw-49.46.210.txt"
+        digest fixture
+        effective [2025-07-27, +inf)
+    }
+
+    source PaidSickLeaveAccrualRule {
+        kind regulation
+        authority WashingtonDepartmentOfLaborAndIndustries
+        citation "WAC 296-128-620"
+        artifact "sources/wac-296-128-620.txt"
+        digest fixture
+        effective [2018-01-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity FamilyMember : NaturalPerson
+
+    record_type HoursWorkedRecord {
+        employee: NaturalPerson
+        hours: Decimal
+        commenced_at: Time
+    }
+
+    record_type LeaveRequest {
+        employee: NaturalPerson
+        requested_at: Time
+        hours: Decimal
+    }
+
+    proposition CoveredEmployee(person: NaturalPerson)
+    proposition AccruesPaidSickLeave(person: NaturalPerson)
+    proposition EligibleAfterWaitingPeriod(person: NaturalPerson)
+    proposition OwnHealthCondition(person: NaturalPerson)
+    proposition FamilyMemberCare(person: NaturalPerson, member: NaturalPerson)
+    proposition PublicHealthClosure(person: NaturalPerson)
+    proposition ImmigrationProceeding(person: NaturalPerson)
+    proposition DomesticViolenceLeave(person: NaturalPerson)
+    proposition AuthorizedPurpose(person: NaturalPerson)
+    proposition LeaveRequested(person: NaturalPerson)
+    proposition RehiredWithinTwelveMonths(person: NaturalPerson)
+
+    observation HoursWorkedObservation(record: HoursWorkedRecord)
+        establishes CoveredEmployee(record.employee)
+        from PaidSickLeaveStatute
+    {
+        require record.employee == Employee
+    }
+
+    calc accrual_unit_hours() -> Decimal {
+        return 40.0
+    }
+
+    calc leave_hours_per_unit() -> Decimal {
+        return 1.0
+    }
+
+    calc use_waiting_period() -> Duration<counted_days> {
+        return 90 counted_days
+    }
+
+    calc mandatory_carryover_hours() -> Decimal {
+        return 40.0
+    }
+
+    calc verification_threshold_days() -> Int {
+        return 3
+    }
+
+    calc rehire_reinstatement_months() -> Int {
+        return 12
+    }
+
+    rule CoveredEmployeeAccrues : constitutive
+        from PaidSickLeaveStatute
+    {
+        when operative CoveredEmployee(Employee)
+        then derive AccruesPaidSickLeave(Employee)
+    }
+
+    duty ProvideMinimumAccrual {
+        bearer Employer
+        claimant Employee
+        attaches when operative CoveredEmployee(Employee)
+        content provide_at_least_one_hour_paid_sick_leave_per_forty_hours_worked
+        source PaidSickLeaveStatute
+    }
+
+    duty PermitAuthorizedUse {
+        bearer Employer
+        claimant Employee
+        attaches when operative EligibleAfterWaitingPeriod(Employee)
+        content permit_use_of_accrued_leave_for_an_authorized_purpose
+        source PaidSickLeaveStatute
+    }
+
+    duty DoNotRetaliateForLawfulUse {
+        bearer Employer
+        claimant Employee
+        attaches when operative CoveredEmployee(Employee)
+        content refrain_from_discipline_or_retaliation_for_lawful_paid_sick_leave_use
+        source PaidSickLeaveStatute
+    }
+
+    legal_act RequestPaidSickLeave(request: LeaveRequest) {
+        performer request.employee
+        recipient Employer
+        validity requires operative EligibleAfterWaitingPeriod(Employee)
+        effect establish LeaveRequested(Employee)
+        source PaidSickLeaveStatute
+    }
+
+    query automatic accrued_hours(hours_worked: Decimal) -> Decimal {
+        return hours_worked / accrual_unit_hours() * leave_hours_per_unit()
+    }
+
+    query automatic meets_minimum_accrual_unit(hours_worked: Decimal) -> Bool {
+        return hours_worked >= accrual_unit_hours()
+    }
+
+    query automatic eligible_to_use(commenced: Time, as_of: Time) -> Bool {
+        return as_of >= commenced + use_waiting_period()
+    }
+
+    query automatic within_mandatory_carryover(unused: Decimal) -> Bool {
+        return unused <= mandatory_carryover_hours()
+    }
+
+    query automatic verification_may_be_required(absent_days: Int) -> Bool {
+        return absent_days > verification_threshold_days()
+    }
+
+    query automatic rehire_within_window(months_apart: Int) -> Bool {
+        return months_apart <= rehire_reinstatement_months()
+    }
+
+    query coverage()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed HoursWorkedObservation
+            require determined CoveredEmployee(Employee)
+                using Determine
+        }
+    }
+
+    query authorized_purpose()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined AuthorizedPurpose(Employee)
+                using Determine
+        }
+    }
+
+    scenario FortyHoursAccruesOne {
+        assume CoveredEmployee(Employee)
+        assume AccruesPaidSickLeave(Employee)
+        assume meets_minimum_accrual_unit(40.0)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario EightyHoursWorked {
+        assume CoveredEmployee(Employee)
+        assume meets_minimum_accrual_unit(80.0)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario NinetiethCalendarDay {
+        assume CoveredEmployee(Employee)
+        assume eligible_to_use(2026-06-19T12:00:00-07:00, 2026-09-17T12:00:00-07:00)
+        assume EligibleAfterWaitingPeriod(Employee)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario CarryoverFortyHours {
+        assume CoveredEmployee(Employee)
+        assume within_mandatory_carryover(40.0)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario OwnHealthUse {
+        assume EligibleAfterWaitingPeriod(Employee)
+        assume OwnHealthCondition(Employee)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    scenario ImmigrationProceedingUse {
+        assume EligibleAfterWaitingPeriod(Employee)
+        assume ImmigrationProceeding(Employee)
+        at 2026-09-17T12:00:00-07:00
+    }
+
+    verify PaidSickLeaveHonesty {
+        assert automatic accrued_hours
+            has empty effect row
+        assert automatic meets_minimum_accrual_unit
+            has empty effect row
+        assert automatic eligible_to_use
+            has empty effect row
+        assert automatic within_mandatory_carryover
+            has empty effect row
+        assert automatic verification_may_be_required
+            has empty effect row
+        assert automatic rehire_within_window
+            has empty effect row
+        assert coverage
+            is never treated automatic
+        assert authorized_purpose
+            is never treated automatic
+    }
+}

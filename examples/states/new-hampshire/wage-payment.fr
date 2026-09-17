@@ -1,0 +1,242 @@
+module NewHampshire.Employment.WagePayment version "0.1.0" {
+    jurisdiction NewHampshire
+    source_snapshot "2026-09-17-rsa-275"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        RSA_275_43_a_reporting_pay
+        RSA_275_43_b_salaried_employees
+        RSA_275_48_withholding
+        RSA_275_51_wage_claim_procedure
+        Lab_803_administrative_rules
+        vacation_severance_when_due_factfinding
+        commission_reconciliation
+        bankruptcy_cutoff_for_liquidated_damages
+        at_will_exceptions_discrimination
+        complete_Chapter_275
+    }
+
+    source WeeklyBiweeklyPayStatute {
+        kind statute
+        authority NewHampshireGeneralCourt
+        citation "N.H. Rev. Stat. Ann. § 275:43"
+        artifact "sources/rsa-275-43.txt"
+        digest fixture
+        effective [2018-07-29, +inf)
+    }
+
+    source SeparationPayStatute {
+        kind statute
+        authority NewHampshireGeneralCourt
+        citation "N.H. Rev. Stat. Ann. § 275:44"
+        artifact "sources/rsa-275-44.txt"
+        digest fixture
+        effective [1967-09-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity DepartmentOfLabor : LegalEntity
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    record_type PaydaySchedule {
+        employer: LegalPerson
+        next_payday: Time
+        weekly: Bool
+    }
+
+    proposition WeeklyPaid(employee: NaturalPerson)
+    proposition BiweeklyPaid(employee: NaturalPerson)
+    proposition MonthlyPermit(employer: LegalPerson)
+    proposition Discharged(employee: NaturalPerson)
+    proposition Quit(employee: NaturalPerson)
+    proposition GavePayPeriodNotice(employee: NaturalPerson)
+    proposition LaidOff(employee: NaturalPerson)
+    proposition LaborDisputeSuspension(employee: NaturalPerson)
+    proposition WagesPaid(employee: NaturalPerson)
+    proposition WagesDue(employee: NaturalPerson)
+    proposition WillfulFailureWithoutGoodCause(employer: LegalPerson)
+    proposition BenefitsWhenDue(employee: NaturalPerson)
+
+    observation SeparationObserved(record: SeparationRecord)
+        establishes WagesDue(record.employee)
+        from SeparationPayStatute
+    {
+        require record.employee == Employee
+        require record.employer == Employer
+    }
+
+    observation PaydayObserved(record: PaydaySchedule)
+        establishes WeeklyPaid(Employee)
+        from WeeklyBiweeklyPayStatute
+    {
+        require record.employer == Employer
+        require record.weekly
+    }
+
+    calc weekly_pay_window() -> Duration<counted_days> {
+        return 8 counted_days
+    }
+
+    calc biweekly_pay_window() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    calc discharge_pay_window() -> Duration<hours> {
+        return 72 hours
+    }
+
+    calc quit_with_notice_window() -> Duration<hours> {
+        return 72 hours
+    }
+
+    calc liquidated_daily_fraction() -> Decimal {
+        return 0.10
+    }
+
+    calc minimum_pay_frequency_per_month() -> Int {
+        return 1
+    }
+
+    rule DischargeAcceleratesPay : constitutive
+        from SeparationPayStatute
+    {
+        when operative Discharged(Employee)
+        then derive WagesDue(Employee)
+    }
+
+    rule QuitWithNoticeAcceleratesPay : constitutive
+        from SeparationPayStatute
+    {
+        when operative Quit(Employee)
+        when operative GavePayPeriodNotice(Employee)
+        then derive WagesDue(Employee)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative WagesDue(Employee)
+        content pay_wages_in_full_within_applicable_window
+        source SeparationPayStatute
+    }
+
+    duty PayOnRegularPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative WeeklyPaid(Employee)
+        due 8 counted_days after work_week_expiration
+        content pay_all_wages_due_on_designated_payday
+        source WeeklyBiweeklyPayStatute
+    }
+
+    legal_act PayWages(at: Time) {
+        performer Employer
+        recipient Employee
+        effect establish WagesPaid(Employee)
+        source WeeklyBiweeklyPayStatute
+    }
+
+    judgment WillfulnessFinding()
+        decides WillfulFailureWithoutGoodCause(Employer)
+        from SeparationPayStatute
+    {
+        authority DepartmentOfLabor
+        standard WillfulAndWithoutGoodCause
+    }
+
+    query automatic weekly_pay_timely(week_end: Time, paid: Time) -> Bool {
+        return paid <= week_end + weekly_pay_window()
+    }
+
+    query automatic biweekly_pay_timely(week_end: Time, paid: Time) -> Bool {
+        return paid <= week_end + biweekly_pay_window()
+    }
+
+    query automatic discharge_pay_timely(discharge: Time, paid: Time) -> Bool {
+        return paid <= discharge + discharge_pay_window()
+    }
+
+    query automatic quit_with_notice_timely(quit: Time, paid: Time) -> Bool {
+        return paid <= quit + quit_with_notice_window()
+    }
+
+    query automatic liquidated_under_unpaid_cap(accrued: Money<USD>, unpaid: Money<USD>) -> Bool {
+        return accrued <= unpaid
+    }
+
+    query automatic monthly_permit_floor(times_per_month: Int) -> Bool {
+        return times_per_month >= minimum_pay_frequency_per_month()
+    }
+
+    query wage_dispute()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed SeparationObserved
+            require determined WagesDue(Employee)
+                using Determine
+        }
+    }
+
+    query liquidated_damages()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulFailureWithoutGoodCause(Employer)
+                using Determine
+        }
+    }
+
+    scenario DischargePaidWithinSeventyTwoHours {
+        assume Discharged(Employee)
+        assume WagesDue(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario QuitWithoutNoticeNextPayday {
+        assume Quit(Employee)
+        assume WagesDue(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario QuitWithOnePayPeriodNotice {
+        assume Quit(Employee)
+        assume GavePayPeriodNotice(Employee)
+        assume WagesDue(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WeeklyPayWithinEightDays {
+        assume WeeklyPaid(Employee)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WillfulLatePayDispute {
+        assume Discharged(Employee)
+        assume WagesDue(Employee)
+        assume WillfulFailureWithoutGoodCause(Employer)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic weekly_pay_timely
+            has empty effect row
+        assert automatic biweekly_pay_timely
+            has empty effect row
+        assert automatic discharge_pay_timely
+            has empty effect row
+        assert wage_dispute
+            is never treated automatic
+        assert liquidated_damages
+            is never treated automatic
+    }
+}

@@ -1,0 +1,52 @@
+Illinois Wage Payment and Collection Act, 820 ILCS 115/3, 115/4, and 115/5
+(fixture excerpt). Section 3 source P.A. 103-201, eff. 1-1-24. Sections 4 and
+5 as compiled. This is not a substitute for the Illinois Compiled Statutes.
+
+820 ILCS 115/3. Every employer shall be required, at least semi-monthly,
+to pay every employee all wages earned during the semi-monthly pay period.
+Wages of executive, administrative and professional employees, as defined
+in the Federal Fair Labor Standards Act of 1938, may be paid once a month.
+Commissions may be paid once a month.
+
+820 ILCS 115/4. All wages earned by any employee during a semi-monthly or
+bi-weekly pay period shall be paid to such employee not later than 13 days
+after the end of the pay period in which such wages were earned. All wages
+earned by any employee during a weekly pay period shall be paid not later
+than 7 days after the end of the weekly pay period in which the wages were
+earned. All wages paid on a daily basis shall be paid insofar as possible
+on the same day as the wages were earned, or not later in any event than
+24 hours after the day on which the wages were earned. Wages of executive,
+administrative and professional employees, as defined in the Federal Fair
+Labor Standards Act of 1938, may be paid on or before 21 calendar days
+after the period during which they are earned. The terms of this Section
+shall not apply, if there exists a valid collective bargaining agreement
+which provides for a different date or for different arrangements for the
+payment of wages. Employers shall pay to workers on strike or layoff, no
+later than the next regular payday, all wages earned up to the time of
+such strike or layoff. Any employee who is absent at the time fixed for
+payment, or who for any other reason is not paid at that time, shall be
+paid upon demand at any time within a period of 5 days after the time
+fixed for payment; and after the expiration of the 5 day period, payment
+shall be made upon 5 days demand.
+
+820 ILCS 115/5. Every employer shall pay the final compensation of
+separated employees in full, at the time of separation, if possible, but
+in no case later than the next regularly scheduled payday for such
+employee. Where such employee requests in writing that his final
+compensation be paid by check and mailed to him, the employer shall comply
+with this request. Unless otherwise provided in a collective bargaining
+agreement, whenever a contract of employment or employment policy provides
+for paid vacations, and an employee resigns or is terminated without having
+taken all vacation time earned, the monetary equivalent of all earned
+vacation shall be paid as part of final compensation at the final rate of
+pay, and no employment contract or employment policy shall provide for
+forfeiture of earned vacation time upon separation.
+
+820 ILCS 115/11. Complaints shall be filed with the Department of Labor
+within one year after the wages, final compensation, or wage supplements
+were due.
+
+Payday day counts are mechanical. Whether a worker is an executive,
+administrative, or professional employee under the FLSA, and whether a
+collective bargaining agreement supplies a different payday, are not
+Booleans. Fixture text for Fidryn research. Not an official edition.

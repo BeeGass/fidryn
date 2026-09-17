@@ -1,0 +1,209 @@
+module Connecticut.Employment.PaidSickLeave version "0.1.0" {
+    jurisdiction Connecticut
+    source_snapshot "2026-09-17-cgs-31-57s"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        connecticut_paid_family_and_medical_leave
+        construction_multiemployer_health_plan_exclusion
+        self_employed_individual_as_employer
+        january_first_payroll_week_headcount_factfinding
+        frontload_in_lieu_of_carryover_election
+        employer_headcount_floor_after_2027_01_01
+        family_member_affinity_equivalence
+        permitted_use_other_than_accrual
+        retaliation_hearing_procedure
+        complete_CGS_31_57r_to_31_57w
+        local_ordinances
+    }
+
+    source PaidSickLeaveDefinitions {
+        kind statute
+        authority ConnecticutGeneralAssembly
+        citation "Conn. Gen. Stat. § 31-57r"
+        artifact "sources/cgs-31-57r.txt"
+        digest fixture
+        effective [2025-01-01, +inf)
+    }
+
+    source PaidSickLeaveAccrual {
+        kind statute
+        authority ConnecticutGeneralAssembly
+        citation "Conn. Gen. Stat. § 31-57s"
+        artifact "sources/cgs-31-57s.txt"
+        digest fixture
+        effective [2025-01-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity LaborCommissioner : LegalEntity
+
+    record_type HoursWorkedRecord {
+        person: NaturalPerson
+        hour_count: Int
+    }
+
+    proposition CoveredEmployee(person: NaturalPerson)
+    proposition AccruesLeave(person: NaturalPerson)
+    proposition SeasonalEmployee(person: NaturalPerson)
+    proposition HoursWorked(person: NaturalPerson, hour_count: Int)
+    proposition LeaveRequested(person: NaturalPerson)
+    proposition PermittedPurpose(person: NaturalPerson)
+    proposition OvertimeExempt(person: NaturalPerson)
+    proposition SuccessorEmployer(employer: LegalPerson)
+
+    observation HoursWorkedObservation(record: HoursWorkedRecord)
+        establishes HoursWorked(record.person, record.hour_count)
+        from PaidSickLeaveAccrual
+    {
+        require record.person == Employee
+    }
+
+    calc hours_worked_per_accrued_hour() -> Int {
+        return 30
+    }
+
+    calc annual_hour_cap() -> Int {
+        return 40
+    }
+
+    calc carryover_hour_cap() -> Int {
+        return 40
+    }
+
+    calc hours_worked_to_annual_cap() -> Int {
+        return 1200
+    }
+
+    calc waiting_period() -> Duration<counted_days> {
+        return 120 counted_days
+    }
+
+    calc employer_headcount_floor() -> Int {
+        return 11
+    }
+
+    calc seasonal_day_cap() -> Int {
+        return 120
+    }
+
+    calc overtime_exempt_presumed_week() -> Int {
+        return 40
+    }
+
+    rule AccrualAttaches : constitutive
+        from PaidSickLeaveAccrual
+    {
+        when operative CoveredEmployee(Employee)
+        then derive AccruesLeave(Employee)
+    }
+
+    duty ProvidePaidSickLeave {
+        bearer Employer
+        claimant Employee
+        attaches when operative AccruesLeave(Employee)
+        content provide_accrued_paid_sick_leave
+        source PaidSickLeaveAccrual
+    }
+
+    legal_act RequestPaidSickLeave() {
+        performer Employee
+        recipient Employer
+        effect establish LeaveRequested(Employee)
+        source PaidSickLeaveAccrual
+    }
+
+    query automatic earned_one_hour(hours_worked: Int) -> Bool {
+        return hours_worked >= hours_worked_per_accrued_hour()
+    }
+
+    query automatic within_annual_cap(accrued: Int) -> Bool {
+        return accrued <= annual_hour_cap()
+    }
+
+    query automatic within_carryover_cap(carried: Int) -> Bool {
+        return carried <= carryover_hour_cap()
+    }
+
+    query automatic hours_worked_at_or_below_cap(hours_worked: Int) -> Bool {
+        return hours_worked <= hours_worked_to_annual_cap()
+    }
+
+    query automatic waiting_period_elapsed(hire: Time, as_of: Time) -> Bool {
+        return as_of >= hire + waiting_period()
+    }
+
+    query automatic employer_headcount_meets_2026_floor(headcount: Int) -> Bool {
+        return headcount >= employer_headcount_floor()
+    }
+
+    query automatic above_seasonal_day_cap(days_worked: Int) -> Bool {
+        return days_worked > seasonal_day_cap()
+    }
+
+    query automatic overtime_exempt_presumed_week_hours(week_hours: Int) -> Bool {
+        return week_hours == overtime_exempt_presumed_week()
+    }
+
+    query covered_employee()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined CoveredEmployee(Employee)
+                using Determine
+        }
+    }
+
+    query permitted_purpose()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PermittedPurpose(Employee)
+                using Determine
+        }
+    }
+
+    scenario AccrualAtFortyHourCap {
+        assume AccruesLeave(Employee)
+        assume earned_one_hour(30)
+        assume within_annual_cap(40)
+        assume hours_worked_at_or_below_cap(1200)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WaitingPeriodOneHundredTwenty {
+        assume CoveredEmployee(Employee)
+        assume waiting_period_elapsed(2026-05-20T12:00:00-04:00, 2026-09-17T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ElevenEmployeeEmployer {
+        assume employer_headcount_meets_2026_floor(11)
+        assume above_seasonal_day_cap(121)
+        assume within_carryover_cap(40)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario OvertimeExemptPresumedWeek {
+        assume OvertimeExempt(Employee)
+        assume overtime_exempt_presumed_week_hours(40)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify PaidSickLeaveHonesty {
+        assert automatic earned_one_hour
+            has empty effect row
+        assert automatic within_annual_cap
+            has empty effect row
+        assert automatic waiting_period_elapsed
+            has empty effect row
+        assert covered_employee
+            is never treated automatic
+        assert permitted_purpose
+            is never treated automatic
+    }
+}

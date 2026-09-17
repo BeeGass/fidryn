@@ -1,0 +1,244 @@
+module SouthDakota.Employment.WagePayment version "0.1.0" {
+    jurisdiction SouthDakota
+    source_snapshot "2026-09-17-sdcl-60-11"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        minimum_wage_and_tip_credit
+        opportunity_wage
+        vacation_and_pto_payout
+        manufacturing_eight_hour_day
+        labor_dispute_deposit_return
+        class_two_misdemeanor_prosecution
+        public_employer_double_damages
+        private_suit_uncapped_by_assignment_limit
+        reciprocal_out_of_state_enforcement
+        attorney_fees_after_repeal_of_15_39_59
+        independent_contractor_status
+        FLSA_waiting_time
+        complete_Chapter_60_11
+    }
+
+    source MonthlyPayday {
+        kind statute
+        authority SouthDakotaLegislature
+        citation "S.D. Codified Laws § 60-11-9"
+        artifact "sources/sdcl-60-11-9.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source SeparationAndDispute {
+        kind statute
+        authority SouthDakotaLegislature
+        citation "S.D. Codified Laws §§ 60-11-7, 60-11-10 to 60-11-13, 60-11-18"
+        artifact "sources/sdcl-60-11-10.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type PaydaySchedule {
+        employer: LegalPerson
+    }
+
+    record_type PropertyReturn {
+        employee: NaturalPerson
+        employer: LegalPerson
+    }
+
+    record_type ConcededWageNotice {
+        employer: LegalPerson
+        employee: NaturalPerson
+        conceded: Money<USD>
+    }
+
+    proposition EmployedInState(employee: NaturalPerson, employer: LegalPerson)
+    proposition PaydayDesignatedInAdvance(employer: LegalPerson)
+    proposition WagesDueAtLeastMonthly(employee: NaturalPerson, employer: LegalPerson)
+    proposition SeparatedByEmployer(employee: NaturalPerson, employer: LegalPerson)
+    proposition EmployeeQuit(employee: NaturalPerson, employer: LegalPerson)
+    proposition NoWrittenDefiniteTermContract(employee: NaturalPerson, employer: LegalPerson)
+    proposition EmployerPropertyReturned(employee: NaturalPerson, employer: LegalPerson)
+    proposition FinalWagesDueByNextPayday(employee: NaturalPerson, employer: LegalPerson)
+    proposition CashWages(employee: NaturalPerson, employer: LegalPerson)
+    proposition WageDispute(employer: LegalPerson, employee: NaturalPerson)
+    proposition WrittenNoticeOfConcededWages(employer: LegalPerson, employee: NaturalPerson)
+    proposition OppressiveFraudulentOrMaliciousRefusal(employer: LegalPerson)
+
+    observation ScheduleRecord(record: PaydaySchedule)
+        establishes PaydayDesignatedInAdvance(record.employer)
+        from MonthlyPayday
+    {
+        require record.employer == Employer
+    }
+
+    observation PropertyReturnRecord(record: PropertyReturn)
+        establishes EmployerPropertyReturned(record.employee, record.employer)
+        from SeparationAndDispute
+    {
+        require record.employee == Employee
+        require record.employer == Employer
+    }
+
+    calc payments_required_per_calendar_month() -> Int {
+        return 1
+    }
+
+    calc department_assignment_cap() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    calc double_damages(unpaid: Money<USD>) -> Money<USD> {
+        return unpaid + unpaid
+    }
+
+    rule MonthlyPayAttaches : constitutive
+        from MonthlyPayday
+    {
+        when operative EmployedInState(Employee, Employer)
+        then derive WagesDueAtLeastMonthly(Employee, Employer)
+    }
+
+    rule FinalPayOnEmployerSeparation : constitutive
+        from SeparationAndDispute
+    {
+        when operative SeparatedByEmployer(Employee, Employer)
+        then establish FinalWagesDueByNextPayday(Employee, Employer)
+    }
+
+    rule FinalPayOnQuitWithoutTermContract : constitutive
+        from SeparationAndDispute
+    {
+        when operative EmployeeQuit(Employee, Employer)
+            and operative NoWrittenDefiniteTermContract(Employee, Employer)
+        then establish FinalWagesDueByNextPayday(Employee, Employer)
+    }
+
+    duty PayAllWagesDue {
+        bearer Employer
+        claimant Employee
+        attaches when operative WagesDueAtLeastMonthly(Employee, Employer)
+        content pay_all_wages_due_at_least_once_each_calendar_month
+        source MonthlyPayday
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative FinalWagesDueByNextPayday(Employee, Employer)
+        content pay_unpaid_wages_not_later_than_next_regular_stated_payday_or_on_property_return
+        source SeparationAndDispute
+    }
+
+    duty PayConcededAmountWithoutCondition {
+        bearer Employer
+        claimant Employee
+        attaches when operative WageDispute(Employer, Employee)
+        content pay_conceded_wages_without_condition_and_give_written_notice
+        source SeparationAndDispute
+    }
+
+    legal_act GiveConcededWageNotice(notice: ConcededWageNotice) {
+        performer Employer
+        recipient Employee
+        validity requires operative WageDispute(Employer, Employee)
+        effect establish WrittenNoticeOfConcededWages(Employer, Employee)
+        source SeparationAndDispute
+    }
+
+    query automatic meets_monthly_payday_floor(payments_in_month: Int) -> Bool {
+        return payments_in_month >= payments_required_per_calendar_month()
+    }
+
+    query automatic within_assignment_cap(claim: Money<USD>) -> Bool {
+        return claim <= department_assignment_cap()
+    }
+
+    query automatic paid_not_later_than_payday(as_of: Time, payday: Time) -> Bool {
+        return as_of <= payday
+    }
+
+    query automatic doubled_wages(unpaid: Money<USD>) -> Money<USD> {
+        return double_damages(unpaid)
+    }
+
+    query wage_amount_in_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WageDispute(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query oppressive_refusal()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined OppressiveFraudulentOrMaliciousRefusal(Employer)
+                using Determine
+        }
+    }
+
+    query property_return_and_final_pay()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed PropertyReturnRecord
+            require determined FinalWagesDueByNextPayday(Employee, Employer)
+                using Determine
+        }
+    }
+
+    scenario MonthlyFloorSatisfied {
+        assume EmployedInState(Employee, Employer)
+        assume PaydayDesignatedInAdvance(Employer)
+        assume meets_monthly_payday_floor(1)
+        assume CashWages(Employee, Employer)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario EmployerSeparationNextPayday {
+        assume SeparatedByEmployer(Employee, Employer)
+        assume EmployerPropertyReturned(Employee, Employer)
+        assume paid_not_later_than_payday(2026-09-17T12:00:00-05:00, 2026-09-30T12:00:00-05:00)
+        assume within_assignment_cap(USD(500.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario QuitWithPropertyOutstanding {
+        assume EmployeeQuit(Employee, Employer)
+        assume NoWrittenDefiniteTermContract(Employee, Employer)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario WageDisputeConcededPortion {
+        assume WageDispute(Employer, Employee)
+        assume WrittenNoticeOfConcededWages(Employer, Employee)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic meets_monthly_payday_floor
+            has empty effect row
+        assert automatic within_assignment_cap
+            has empty effect row
+        assert automatic paid_not_later_than_payday
+            has empty effect row
+        assert automatic doubled_wages
+            has empty effect row
+        assert wage_amount_in_dispute
+            is never treated automatic
+        assert oppressive_refusal
+            is never treated automatic
+        assert property_return_and_final_pay
+            is never treated automatic
+    }
+}

@@ -1,0 +1,244 @@
+module Iowa.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Iowa
+    source_snapshot "2026-09-17-iowa-code-562a-12"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        successor_landlord_transfer
+        chapter_562A_exclusions
+        manufactured_home_chapter_562B
+        post_five_year_interest_ownership
+        attorney_fee_prevailing_party
+        late_fee_caps
+        habitability_and_eviction
+        complete_Iowa_Code_562A
+        local_ordinances
+    }
+
+    source RentalDepositStatute {
+        kind statute
+        authority IowaGeneralAssembly
+        citation "Iowa Code § 562A.12"
+        artifact "sources/iowa-code-562a-12.txt"
+        digest fixture
+        effective [2014-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type ForwardingAddress {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        supplied_at: Time
+    }
+
+    record_type WithholdingStatement {
+        unit: Dwelling
+        furnished_at: Time
+        withheld: Money<USD>
+    }
+
+    proposition TenancyTerminated(unit: Dwelling, at: Time)
+    proposition WrittenMailingAddress(tenant: NaturalPerson, landlord: LegalPerson)
+    proposition WrittenStatementFurnished(unit: Dwelling)
+    proposition StatementDeadlineMissed(unit: Dwelling)
+    proposition WithholdingRightsForfeited(unit: Dwelling)
+    proposition AddressYearLapsed(unit: Dwelling)
+    proposition TenantForfeitedDeposit(unit: Dwelling)
+    proposition DepositHeldInInsuredAccount(unit: Dwelling)
+    proposition DepositDispute(unit: Dwelling)
+    proposition RestorationBeyondWear(unit: Dwelling)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition LandlordBurdenOnWithholding(unit: Dwelling)
+
+    observation AddressRecord(record: ForwardingAddress)
+        establishes WrittenMailingAddress(record.tenant, record.landlord)
+        from RentalDepositStatute
+    {
+        require record.tenant == Tenant
+        require record.landlord == Landlord
+    }
+
+    observation StatementRecord(record: WithholdingStatement)
+        establishes WrittenStatementFurnished(record.unit)
+        from RentalDepositStatute
+    {
+        require record.unit == Unit
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc address_forfeiture_window() -> Duration<counted_days> {
+        return 365 counted_days
+    }
+
+    calc landlord_interest_years() -> Int {
+        return 5
+    }
+
+    legal_act FurnishWithholdingStatement(statement: WithholdingStatement) {
+        performer Landlord
+        recipient Tenant
+        effect establish WrittenStatementFurnished(statement.unit)
+        source RentalDepositStatute
+    }
+
+    duty ReturnOrExplain {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative WrittenMailingAddress(Tenant, Landlord)
+        content return_deposit_or_furnish_specific_written_reasons
+        source RentalDepositStatute
+    }
+
+    rule MissedStatementForfeitsWithholding : constitutive
+        from RentalDepositStatute
+    {
+        when operative StatementDeadlineMissed(Unit)
+        then derive WithholdingRightsForfeited(Unit)
+    }
+
+    rule SilentYearRevertsDeposit : constitutive
+        from RentalDepositStatute
+    {
+        when operative AddressYearLapsed(Unit)
+        then derive TenantForfeitedDeposit(Unit)
+    }
+
+    rule LandlordProvesWithholding : constitutive
+        from RentalDepositStatute
+    {
+        when operative DepositDispute(Unit)
+        then derive LandlordBurdenOnWithholding(Unit)
+    }
+
+    query automatic deposit_within_two_months(
+        deposit: Money<USD>,
+        monthly_rent: Money<USD>
+    ) -> Bool {
+        return deposit <= monthly_rent + monthly_rent
+    }
+
+    query automatic deadline_running(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + return_deadline()
+    }
+
+    query automatic address_year_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + address_forfeiture_window()
+    }
+
+    query automatic landlord_takes_interest(years_elapsed: Int) -> Bool {
+        return years_elapsed <= landlord_interest_years()
+    }
+
+    query automatic deductions_within_deposit(
+        deposit: Money<USD>,
+        deductions: Money<USD>
+    ) -> Bool {
+        return deductions <= deposit
+    }
+
+    query automatic punitive_cap(monthly_rent: Money<USD>) -> Money<USD> {
+        return monthly_rent + monthly_rent
+    }
+
+    query automatic punitive_within_twice_monthly(
+        award: Money<USD>,
+        monthly_rent: Money<USD>
+    ) -> Bool {
+        return award <= monthly_rent + monthly_rent
+    }
+
+    query mailing_address_supplied()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed AddressRecord
+            require determined WrittenMailingAddress(Tenant, Landlord)
+                using Observe
+        }
+    }
+
+    query restoration_beyond_ordinary_wear()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined RestorationBeyondWear(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    scenario TwoMonthCapObserved {
+        assume deposit_within_two_months(USD(1800.00), USD(900.00))
+        assume DepositHeldInInsuredAccount(Unit)
+        assume TenancyTerminated(Unit, 2026-08-01T12:00:00-05:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume WrittenStatementFurnished(Unit)
+        assume deadline_running(2026-08-01T12:00:00-05:00, 2026-08-31T12:00:00-05:00)
+        at 2026-08-31T12:00:00-05:00
+    }
+
+    scenario MissedThirtyDayStatement {
+        assume TenancyTerminated(Unit, 2026-07-01T12:00:00-05:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume StatementDeadlineMissed(Unit)
+        assume WithholdingRightsForfeited(Unit)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario BadFaithPunitiveCap {
+        assume TenancyTerminated(Unit, 2026-08-15T12:00:00-05:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume punitive_within_twice_monthly(USD(1800.00), USD(900.00))
+        assume landlord_takes_interest(3)
+        assume DepositDispute(Unit)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario AddressYearReversion {
+        assume TenancyTerminated(Unit, 2025-09-01T12:00:00-05:00)
+        assume AddressYearLapsed(Unit)
+        assume TenantForfeitedDeposit(Unit)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify DepositHonesty {
+        assert automatic deposit_within_two_months
+            has empty effect row
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic address_year_running
+            has empty effect row
+        assert automatic landlord_takes_interest
+            has empty effect row
+        assert automatic deductions_within_deposit
+            has empty effect row
+        assert automatic punitive_cap
+            has empty effect row
+        assert automatic punitive_within_twice_monthly
+            has empty effect row
+        assert mailing_address_supplied
+            is never treated automatic
+        assert restoration_beyond_ordinary_wear
+            is never treated automatic
+        assert bad_faith_retention
+            is never treated automatic
+    }
+}

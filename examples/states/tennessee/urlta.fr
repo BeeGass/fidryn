@@ -1,0 +1,250 @@
+module Tennessee.Housing.URLTA version "0.1.0" {
+    jurisdiction Tennessee
+    source_snapshot "2026-09-17-tenn-code-66-28"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        non_URLTA_counties_under_chapter_7
+        hotel_agricultural_HUD_and_other_102_exclusions
+        detainer_warrant_and_writ_of_possession
+        landlord_entry_except_as_expressly_timed
+        interest_on_security_deposit
+        domestic_abuse_early_termination
+        violence_three_day_notice_under_517
+        sunday_and_legal_holiday_grace_extension
+        complete_Chapter_28
+        2010_census_county_roster
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority TennesseeGeneralAssembly
+        citation "Tenn. Code Ann. § 66-28-301"
+        artifact "sources/tenn-code-66-28-301.txt"
+        digest fixture
+        effective [2012-05-09, +inf)
+    }
+
+    source NoticeAndRentStatute {
+        kind statute
+        authority TennesseeGeneralAssembly
+        citation "Tenn. Code Ann. §§ 66-28-102, 66-28-201, 66-28-505, 66-28-512"
+        artifact "sources/tenn-code-66-28-512.txt"
+        digest fixture
+        effective [2021-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Asset
+
+    record_type DamageListing {
+        unit: Asset
+        compiled_at: Time
+        estimated_cost: Money<USD>
+    }
+
+    proposition SecurityDepositTaken(unit: Asset)
+    proposition DamageListingProvided(unit: Asset)
+    proposition TenantVacated(unit: Asset)
+    proposition LandlordMayRetainDeposit(landlord: LegalPerson)
+    proposition MaterialNoncompliance(tenant: NaturalPerson)
+    proposition RemediableByPayment(tenant: NaturalPerson)
+    proposition RepeatBreachWithinSixMonths(tenant: NaturalPerson)
+    proposition MonthToMonthTenancy(unit: Asset)
+    proposition CureNoticeDelivered(unit: Asset)
+
+    observation ListingRecord(record: DamageListing)
+        establishes DamageListingProvided(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.unit == Unit
+    }
+
+    legal_act ServeCureNotice(unit: Asset) {
+        performer Landlord
+        recipient Tenant
+        effect establish CureNoticeDelivered(unit)
+        source NoticeAndRentStatute
+    }
+
+    duty HoldDepositInSeparateAccount {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative SecurityDepositTaken(Unit)
+        content deposit_in_account_used_only_for_that_purpose
+        source SecurityDepositStatute
+    }
+
+    rule RetentionConditionedOnProcedure : constitutive
+        from SecurityDepositStatute
+    {
+        when operative SecurityDepositTaken(Unit)
+        then derive LandlordMayRetainDeposit(Landlord)
+    }
+
+    calc urlta_population_floor() -> Int {
+        return 75000
+    }
+    calc inspection_days() -> Int {
+        return 4
+    }
+    calc physical_damage_vacate_days() -> Int {
+        return 30
+    }
+    calc new_tenant_discovery_days() -> Int {
+        return 7
+    }
+
+    calc unclaimed_refund_window() -> Duration<counted_days> {
+        return 60 counted_days
+    }
+
+    calc late_fee_grace_days() -> Int {
+        return 5
+    }
+
+    calc late_fee_percent_cap() -> Int {
+        return 10
+    }
+
+    calc week_to_week_days() -> Int {
+        return 10
+    }
+
+    calc month_to_month_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc remediable_cure_days() -> Int {
+        return 14
+    }
+
+    calc repeat_breach_days() -> Int {
+        return 7
+    }
+
+    query automatic population_exceeds_urlta_floor(population: Int) -> Bool {
+        return population > urlta_population_floor()
+    }
+
+    query automatic inspection_days_within_limit(days: Int) -> Bool {
+        return days <= inspection_days()
+    }
+
+    query automatic damage_discovery_within_vacate_limit(days: Int) -> Bool {
+        return days <= physical_damage_vacate_days()
+    }
+
+    query automatic damage_discovery_within_new_tenant_limit(days: Int) -> Bool {
+        return days <= new_tenant_discovery_days()
+    }
+
+    query automatic late_fee_percent_within_cap(percent: Int) -> Bool {
+        return percent <= late_fee_percent_cap()
+    }
+
+    query automatic late_fee_grace_elapsed(days: Int) -> Bool {
+        return days >= late_fee_grace_days()
+    }
+
+    query automatic week_to_week_notice_days_met(days: Int) -> Bool {
+        return days >= week_to_week_days()
+    }
+
+    query automatic remediable_cure_days_met(days: Int) -> Bool {
+        return days >= remediable_cure_days()
+    }
+
+    query automatic repeat_breach_days_met(days: Int) -> Bool {
+        return days >= repeat_breach_days()
+    }
+
+    query automatic refund_clock(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + unclaimed_refund_window()
+    }
+
+    query automatic month_to_month_notice_timely(given: Time, rental_date: Time) -> Bool {
+        return given + month_to_month_notice() <= rental_date
+    }
+
+    query deposit_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require observed ListingRecord
+            require determined LandlordMayRetainDeposit(Landlord)
+                using Determine
+        }
+    }
+
+    query material_noncompliance()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined MaterialNoncompliance(Tenant)
+                using Determine
+        }
+    }
+
+    scenario PopulationOverFloor {
+        assume population_exceeds_urlta_floor(75001)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario InspectionAndDamageWindows {
+        assume TenantVacated(Unit)
+        assume inspection_days_within_limit(4)
+        assume damage_discovery_within_vacate_limit(30)
+        assume damage_discovery_within_new_tenant_limit(7)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario RemediableFourteen {
+        assume MonthToMonthTenancy(Unit)
+        assume RemediableByPayment(Tenant)
+        assume remediable_cure_days_met(14)
+        assume week_to_week_notice_days_met(10)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario RepeatSevenLateFeeAndGrace {
+        assume RepeatBreachWithinSixMonths(Tenant)
+        assume repeat_breach_days_met(7)
+        assume late_fee_percent_within_cap(10)
+        assume late_fee_grace_elapsed(5)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify URLTAHonesty {
+        assert automatic population_exceeds_urlta_floor
+            has empty effect row
+        assert automatic inspection_days_within_limit
+            has empty effect row
+        assert automatic damage_discovery_within_vacate_limit
+            has empty effect row
+        assert automatic damage_discovery_within_new_tenant_limit
+            has empty effect row
+        assert automatic late_fee_percent_within_cap
+            has empty effect row
+        assert automatic late_fee_grace_elapsed
+            has empty effect row
+        assert automatic week_to_week_notice_days_met
+            has empty effect row
+        assert automatic remediable_cure_days_met
+            has empty effect row
+        assert automatic repeat_breach_days_met
+            has empty effect row
+        assert automatic refund_clock
+            has empty effect row
+        assert automatic month_to_month_notice_timely
+            has empty effect row
+        assert deposit_retention
+            is never treated automatic
+        assert material_noncompliance
+            is never treated automatic
+    }
+}

@@ -1,0 +1,225 @@
+module Colorado.Employment.FAMLI version "0.1.0" {
+    jurisdiction Colorado
+    source_snapshot "2026-09-17-colo-rev-stat-8-13-3"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        weekly_benefit_formula_and_saww_cap
+        premium_rate_setting
+        private_plan_substitution
+        local_government_opt_out
+        self_employed_elective_coverage
+        job_reinstatement_8_13_3_509
+        family_member_breadth
+        FMLA_concurrency
+        workers_compensation_exclusivity
+        intermittent_increment_and_eight_hour_accrual
+        foreseeable_thirty_day_notice
+        complete_Colo_Rev_Stat_8_13_3_part_5
+        complete_7_CCR_1107
+    }
+
+    source FamliEligibility {
+        kind statute
+        authority ColoradoGeneralAssembly
+        citation "Colo. Rev. Stat. §§ 8-13.3-503 to 8-13.3-504"
+        artifact "sources/colo-rev-stat-8-13-3-504.txt"
+        digest fixture
+        effective [2024-01-01, +inf)
+    }
+
+    source FamliDuration {
+        kind statute
+        authority ColoradoGeneralAssembly
+        citation "Colo. Rev. Stat. § 8-13.3-505"
+        artifact "sources/colo-rev-stat-8-13-3-505.txt"
+        digest fixture
+        effective [2026-01-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Child : NaturalPerson
+    entity FamilyMember : NaturalPerson
+    entity FamliDivision : LegalPerson
+
+    record_type FamliClaim {
+        claimant: NaturalPerson
+        wages_in_base_period: Money<USD>
+        weeks_requested: Int
+        filed_at: Time
+    }
+
+    proposition ClaimFiled(person: NaturalPerson)
+    proposition CoveredIndividual(person: NaturalPerson)
+    proposition QualifyingCondition(person: NaturalPerson)
+    proposition CaringForNewChild(person: NaturalPerson, child: NaturalPerson)
+    proposition CaringForFamilyMember(person: NaturalPerson, family: NaturalPerson)
+    proposition OwnSeriousHealthCondition(person: NaturalPerson)
+    proposition QualifyingExigency(person: NaturalPerson)
+    proposition SafeLeaveNeed(person: NaturalPerson)
+    proposition PregnancyOrChildbirthComplication(person: NaturalPerson)
+    proposition NeonatalIntensiveCare(child: NaturalPerson)
+    proposition BenefitsPayable(person: NaturalPerson)
+
+    observation ClaimRecord(record: FamliClaim)
+        establishes ClaimFiled(record.claimant)
+        from FamliEligibility
+    {
+        require record.claimant == Employee
+    }
+
+    calc wage_threshold() -> Money<USD> {
+        return USD(2500.00)
+    }
+
+    calc standard_week_cap() -> Int {
+        return 12
+    }
+
+    calc pregnancy_additional_weeks() -> Int {
+        return 4
+    }
+
+    calc pregnancy_complication_week_cap() -> Int {
+        return 16
+    }
+
+    calc nicu_additional_weeks() -> Int {
+        return 12
+    }
+
+    calc standard_plus_nicu_week_cap() -> Int {
+        return 24
+    }
+
+    calc application_year_months() -> Int {
+        return 12
+    }
+
+    rule BenefitsWhenCoveredAndQualifying : constitutive
+        from FamliEligibility
+    {
+        when operative CoveredIndividual(Employee)
+            and operative QualifyingCondition(Employee)
+        then derive BenefitsPayable(Employee)
+    }
+
+    duty RespectFamliLeave {
+        bearer Employer
+        claimant Employee
+        attaches when operative BenefitsPayable(Employee)
+        content refrain_from_interfering_with_paid_family_and_medical_leave
+        source FamliEligibility
+    }
+
+    legal_act FileFamliClaim(record: FamliClaim) {
+        performer Employee
+        recipient FamliDivision
+        effect establish ClaimFiled(record.claimant)
+        source FamliEligibility
+    }
+
+    query automatic wages_meet_threshold(wages: Money<USD>) -> Bool {
+        return wages >= wage_threshold()
+    }
+
+    query automatic within_standard_weeks(weeks: Int) -> Bool {
+        return weeks <= standard_week_cap()
+    }
+
+    query automatic within_pregnancy_complication_weeks(weeks: Int) -> Bool {
+        return weeks <= pregnancy_complication_week_cap()
+    }
+
+    query automatic within_nicu_additional_weeks(weeks: Int) -> Bool {
+        return weeks <= nicu_additional_weeks()
+    }
+
+    query automatic within_standard_plus_nicu_weeks(weeks: Int) -> Bool {
+        return weeks <= standard_plus_nicu_week_cap()
+    }
+
+    query automatic application_year_is_twelve_months(months: Int) -> Bool {
+        return months == application_year_months()
+    }
+
+    query qualifying_condition()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined QualifyingCondition(Employee)
+                using Determine
+        }
+    }
+
+    query pregnancy_or_childbirth_complication()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PregnancyOrChildbirthComplication(Employee)
+                using Determine
+        }
+    }
+
+    query nicu_inpatient_care()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined NeonatalIntensiveCare(Child)
+                using Determine
+        }
+    }
+
+    scenario MeetsWageFloorTwelveWeeks {
+        assume wages_meet_threshold(USD(2500.00))
+        assume within_standard_weeks(12)
+        assume application_year_is_twelve_months(12)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario BelowWageFloor {
+        assume wages_meet_threshold(USD(2499.99))
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario PregnancyComplicationSixteen {
+        assume wages_meet_threshold(USD(2500.00))
+        assume PregnancyOrChildbirthComplication(Employee)
+        assume within_pregnancy_complication_weeks(16)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario NicuAdditionalTwelve {
+        assume NeonatalIntensiveCare(Child)
+        assume within_nicu_additional_weeks(12)
+        assume within_standard_plus_nicu_weeks(24)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario QualifyingConditionOpen {
+        assume QualifyingCondition(Employee)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify FamliHonesty {
+        assert automatic wages_meet_threshold
+            has empty effect row
+        assert automatic within_standard_weeks
+            has empty effect row
+        assert automatic within_pregnancy_complication_weeks
+            has empty effect row
+        assert automatic within_nicu_additional_weeks
+            has empty effect row
+        assert qualifying_condition
+            is never treated automatic
+        assert pregnancy_or_childbirth_complication
+            is never treated automatic
+        assert nicu_inpatient_care
+            is never treated automatic
+    }
+}

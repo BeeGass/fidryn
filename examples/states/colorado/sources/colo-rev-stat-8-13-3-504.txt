@@ -1,0 +1,52 @@
+Colorado Revised Statutes sections 8-13.3-503 and 8-13.3-504
+(fixture excerpt). Paid Family and Medical Leave Insurance Act.
+
+8-13.3-503. Definitions.
+
+(1) "Application year" means the 12-month period beginning on the
+first day of the calendar week in which an individual files an
+application for family and medical leave insurance benefits.
+
+(3) "Covered individual" means any person who:
+(a)(I) Earned at least two thousand five hundred dollars ($2,500)
+in wages subject to premiums under this part 5 during the person's
+base period, as defined in section 8-70-103 (2), or alternative base
+period, as defined in section 8-70-103 (1.5); or
+(a)(II) Elects coverage and meets the requirements of
+section 8-13.3-514;
+(b) Meets the administrative requirements outlined in this part 5
+and in regulations; and
+(c) Submits an application with a claim for benefits pursuant to
+section 8-13.3-516 (6)(d).
+
+8-13.3-504. Eligibility.
+
+Beginning January 1, 2024, an individual has the right to take
+paid family and medical leave, and to receive family and medical
+leave insurance benefits while taking paid family and medical leave,
+if the individual:
+
+(1) Meets the definition of "covered individual" under
+section 8-13.3-503 (3); and
+
+(2) Meets one of the following requirements:
+
+(a) Because of birth, adoption or placement through foster care,
+is caring for a new child during the first year after the birth,
+adoption or placement of that child;
+
+(b) Is caring for a family member with a serious health
+condition;
+
+(c) Has a serious health condition;
+
+(d) Because of any qualifying exigency leave;
+
+(e) Has a need for safe leave.
+
+Whether a claimed event is a qualifying condition, including
+whether a health condition is "serious," whether a person is a
+"family member," and whether safe-leave or exigency facts are met,
+is a determination, not a Boolean.
+
+Fixture text for Fidryn research. Not an official edition.

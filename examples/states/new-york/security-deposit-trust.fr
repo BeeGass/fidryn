@@ -1,0 +1,213 @@
+module NewYork.Housing.SecurityDepositTrust version "0.1.0" {
+    jurisdiction NewYork
+    source_snapshot "2026-09-17-ny-gol-7-103"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        gol_7_108_one_month_cap_and_fourteen_day_return
+        gol_7_107_rent_stabilized_deposits
+        seasonal_use_and_owner_occupied_coop_exceptions
+        hstpa_inspection_walkthrough
+        conversion_and_rent_offset_case_law
+        harmless_error_corrected_commingling
+        prevailing_rate_factfinding
+        nyc_housing_court_procedure
+        complete_General_Obligations_Law
+        local_ordinances
+        not_legal_advice
+    }
+
+    source TrustStatute {
+        kind statute
+        authority NewYorkLegislature
+        citation "N.Y. Gen. Oblig. Law § 7-103"
+        artifact "sources/ny-gol-7-103.txt"
+        digest fixture
+        effective [2014-09-22, +inf)
+    }
+
+    source TurnoverStatute {
+        kind statute
+        authority NewYorkLegislature
+        citation "N.Y. Gen. Oblig. Law § 7-105"
+        artifact "sources/ny-gol-7-105.txt"
+        digest fixture
+        effective [2014-09-22, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+    entity Building : Asset
+    entity Bank : LegalPerson
+    entity Successor : LegalPerson
+
+    proposition SecurityAdvanceReceived(unit: Dwelling)
+    proposition HeldInTrust(unit: Dwelling)
+    proposition TenantOwnsDeposit(unit: Dwelling)
+    proposition CommingledWithPersonalMoneys(landlord: NaturalPerson)
+    proposition WillfulCommingling(landlord: NaturalPerson)
+    proposition DepositedInStateBank(unit: Dwelling)
+    proposition WrittenBankNoticeGiven(unit: Dwelling)
+    proposition InterestBearingAccount(unit: Dwelling)
+    proposition SixOrMoreFamilyUnits(building: Asset)
+    proposition WaiverAttempted(unit: Dwelling)
+    proposition WaiverVoid(unit: Dwelling)
+    proposition ConveyanceOfPremises(building: Asset, at: Time)
+    proposition DepositTurnedOverToSuccessor(unit: Dwelling)
+
+    observation BankNoticeRecord(record: BankNotice)
+        establishes WrittenBankNoticeGiven(record.unit)
+        from TrustStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act ReceiveSecurityAdvance() {
+        performer Tenant
+        recipient Landlord
+        effect establish SecurityAdvanceReceived(Unit)
+        source TrustStatute
+    }
+
+    calc interest_bearing_unit_threshold() -> Int {
+        return 6
+    }
+
+    calc administration_expense_percent() -> Int {
+        return 1
+    }
+
+    calc conveyance_turnover_deadline() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    rule TrustCharacter : constitutive
+        from TrustStatute
+    {
+        when operative SecurityAdvanceReceived(Unit)
+        then derive HeldInTrust(Unit)
+        then derive TenantOwnsDeposit(Unit)
+    }
+
+    rule MandatoryInterestAccount : constitutive
+        from TrustStatute
+    {
+        when operative SixOrMoreFamilyUnits(Building)
+        when operative SecurityAdvanceReceived(Unit)
+        then derive InterestBearingAccount(Unit)
+    }
+
+    rule WaiverIsAbsolutelyVoid : constitutive
+        from TrustStatute
+    {
+        when operative WaiverAttempted(Unit)
+        then derive WaiverVoid(Unit)
+    }
+
+    duty SegregateDeposit {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative HeldInTrust(Unit)
+        content refrain_from_commingling_with_personal_moneys
+        source TrustStatute
+    }
+
+    duty NotifyBankingOrganization {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DepositedInStateBank(Unit)
+        content written_name_address_and_amount_of_bank_deposit
+        source TrustStatute
+    }
+
+    duty PayTenantInterestBalance {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative InterestBearingAccount(Unit)
+        content pay_or_hold_interest_net_of_one_percent_admin
+        source TrustStatute
+    }
+
+    duty TurnOverOnConveyance {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative ConveyanceOfPremises(Building, 2026-09-17T12:00:00-04:00)
+        content turn_over_deposit_and_certified_mail_notice
+        source TurnoverStatute
+    }
+
+    query automatic interest_account_required(family_dwelling_units: Int) -> Bool {
+        return family_dwelling_units >= interest_bearing_unit_threshold()
+    }
+
+    query automatic admin_fee_at_or_under_one_percent(taken_percent: Int) -> Bool {
+        return taken_percent <= administration_expense_percent()
+    }
+
+    query automatic conveyance_turnover_running(conveyed: Time, as_of: Time) -> Bool {
+        return as_of <= conveyed + conveyance_turnover_deadline()
+    }
+
+    query bank_notice()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed BankNoticeRecord
+        }
+    }
+
+    query commingling_willful()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulCommingling(Landlord)
+                using Determine
+        }
+    }
+
+    scenario SixUnitInterestAccount {
+        assume SecurityAdvanceReceived(Unit)
+        assume SixOrMoreFamilyUnits(Building)
+        assume interest_account_required(6)
+        assume admin_fee_at_or_under_one_percent(1)
+        assume DepositedInStateBank(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FiveUnitNoMandatoryInterest {
+        assume SecurityAdvanceReceived(Unit)
+        assume HeldInTrust(Unit)
+        assume TenantOwnsDeposit(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario CommingledOperatingAccount {
+        assume SecurityAdvanceReceived(Unit)
+        assume CommingledWithPersonalMoneys(Landlord)
+        assume HeldInTrust(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ConveyanceWithinFiveDays {
+        assume ConveyanceOfPremises(Building, 2026-09-17T12:00:00-04:00)
+        assume conveyance_turnover_running(2026-09-17T12:00:00-04:00, 2026-09-20T12:00:00-04:00)
+        at 2026-09-20T12:00:00-04:00
+    }
+
+    verify TrustHonesty {
+        assert automatic interest_account_required
+            has empty effect row
+        assert automatic admin_fee_at_or_under_one_percent
+            has empty effect row
+        assert automatic conveyance_turnover_running
+            has empty effect row
+        assert bank_notice
+            is never treated automatic
+        assert commingling_willful
+            is never treated automatic
+    }
+}

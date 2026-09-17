@@ -1,0 +1,249 @@
+module Virginia.Housing.VRLTADeposit version "0.1.0" {
+    jurisdiction Virginia
+    source_snapshot "2026-09-17-va-code-55-1-1226"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        damage_insurance_in_lieu_of_deposit
+        damage_insurance_premiums_toward_cap
+        first_page_fee_disclosure
+        prepaid_rent_escrow
+        vrlta_occupancy_exclusions
+        manufactured_home_lot_deposits
+        notice_methods_under_55_1_1202
+        successor_landlord_transfer
+        unclaimed_property_administration
+        expedited_disposition_admin_fee
+        interest_on_deposits
+        complete_VRLTA
+        pending_SB349
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority VirginiaGeneralAssembly
+        citation "Va. Code § 55.1-1226"
+        artifact "sources/va-code-55-1-1226.txt"
+        digest fixture
+        effective [2023-07-01, +inf)
+    }
+
+    source VRLTADefinitions {
+        kind statute
+        authority VirginiaGeneralAssembly
+        citation "Va. Code § 55.1-1200"
+        artifact "sources/va-code-55-1-1200.txt"
+        digest fixture
+        effective [2026-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type VacateRecord {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        vacated_at: Time
+    }
+
+    record_type DispositionNotice {
+        landlord: LegalPerson
+        tenant: NaturalPerson
+        unit: Dwelling
+        given_at: Time
+    }
+
+    proposition OccupiesUnit(tenant: NaturalPerson, unit: Dwelling)
+    proposition TenancyEnded(unit: Dwelling)
+    proposition PossessionDelivered(unit: Dwelling)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition DispositionDue(unit: Dwelling)
+    proposition ThirdPartyContractorNeeded(unit: Dwelling)
+    proposition ContractorNoticeGiven(unit: Dwelling)
+    proposition BeyondReasonableWearAndTear(unit: Dwelling)
+    proposition WillfulFailureToComply(landlord: LegalPerson)
+    proposition DepositCapped(unit: Dwelling)
+
+    observation VacateNotice(record: VacateRecord)
+        establishes TenancyEnded(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act GiveItemizedNotice(notice: DispositionNotice) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedStatementProvided(notice.unit)
+        source SecurityDepositStatute
+    }
+
+    calc deposit_cap_months() -> Int {
+        return 2
+    }
+
+    calc itemization_deadline() -> Duration<counted_days> {
+        return 45 counted_days
+    }
+
+    calc contractor_extension() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    calc inspection_notice_window() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    calc inspection_after_possession() -> Duration<hours> {
+        return 72 hours
+    }
+
+    calc mid_tenancy_deduction_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc utility_late_confirmation_refund() -> Duration<counted_days> {
+        return 10 counted_days
+    }
+
+    rule DepositCap : constitutive
+        from SecurityDepositStatute
+    {
+        when operative OccupiesUnit(Tenant, Unit)
+        then derive DepositCapped(Unit)
+    }
+
+    rule DispositionDutyAttaches : constitutive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit)
+        then derive DispositionDue(Unit)
+    }
+
+    duty ReturnAndItemize {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DispositionDue(Unit)
+        due 45 counted_days after possession_delivered
+        content itemize_deductions_and_return_balance
+        source SecurityDepositStatute
+    }
+
+    query automatic months_within_cap(months: Int) -> Bool {
+        return months <= deposit_cap_months()
+    }
+
+    query automatic within_deposit_cap(deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return deposit <= monthly_rent + monthly_rent
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + itemization_deadline()
+    }
+
+    query automatic contractor_itemization_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + itemization_deadline() + contractor_extension()
+    }
+
+    query automatic inspection_notice_running(intent: Time, as_of: Time) -> Bool {
+        return as_of <= intent + inspection_notice_window()
+    }
+
+    query automatic inspection_timely(possession: Time, inspection: Time) -> Bool {
+        return inspection <= possession + inspection_after_possession()
+    }
+
+    query automatic utility_refund_running(confirmation: Time, as_of: Time) -> Bool {
+        return as_of <= confirmation + utility_late_confirmation_refund()
+    }
+
+    query automatic mid_tenancy_notice_running(determined_at: Time, as_of: Time) -> Bool {
+        return as_of <= determined_at + mid_tenancy_deduction_notice()
+    }
+
+    query wear_and_tear()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BeyondReasonableWearAndTear(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulFailureToComply(Landlord)
+                using Determine
+        }
+    }
+
+    query itemized_disposition()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed VacateNotice
+            require determined WillfulFailureToComply(Landlord)
+                using Determine
+        }
+    }
+
+    scenario TwoMonthCap {
+        assume OccupiesUnit(Tenant, Unit)
+        assume months_within_cap(2)
+        assume within_deposit_cap(USD(3600.00), USD(1800.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FortyFiveDayReturn {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        assume DispositionDue(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario ContractorExtension {
+        assume TenancyEnded(Unit)
+        assume ThirdPartyContractorNeeded(Unit)
+        assume ContractorNoticeGiven(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WillfulWithholding {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic months_within_cap
+            has empty effect row
+        assert automatic within_deposit_cap
+            has empty effect row
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic contractor_itemization_running
+            has empty effect row
+        assert automatic inspection_notice_running
+            has empty effect row
+        assert automatic inspection_timely
+            has empty effect row
+        assert automatic utility_refund_running
+            has empty effect row
+        assert automatic mid_tenancy_notice_running
+            has empty effect row
+        assert wear_and_tear
+            is never treated automatic
+        assert bad_faith
+            is never treated automatic
+        assert itemized_disposition
+            is never treated automatic
+    }
+}

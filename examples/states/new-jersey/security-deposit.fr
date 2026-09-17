@@ -1,0 +1,206 @@
+module NewJersey.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction NewJersey
+    source_snapshot "2026-09-17-njsa-46-8-21-1"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        interest_bearing_account_46_8_19
+        seven_percent_interest_fallback
+        seasonal_rental_exemption
+        owner_occupied_two_unit_exemption
+        state_entity_civil_penalty_500_to_2000
+        local_rent_control
+        complete_Title_46
+    }
+
+    source ReturnStatute {
+        kind statute
+        authority NewJerseyLegislature
+        citation "N.J.S.A. 46:8-21.1"
+        artifact "sources/njsa-46-8-21-1.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source CapStatute {
+        kind statute
+        authority NewJerseyLegislature
+        citation "N.J.S.A. 46:8-21.2"
+        artifact "sources/njsa-46-8-21-2.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Asset
+
+    record_type DepositReturnRecord {
+        tenant: NaturalPerson
+        unit: Asset
+        returned_at: Time
+    }
+
+    proposition TenancyEnded(unit: Asset)
+    proposition TenantStillInPossession(unit: Asset)
+    proposition DepositReturned(unit: Asset)
+    proposition ItemizedStatementProvided(unit: Asset)
+    proposition DepositReturnDue(landlord: LegalPerson)
+    proposition ResidentialDwelling(unit: Asset)
+    proposition DepositCapped(unit: Asset)
+    proposition DisplacedByDisaster(unit: Asset)
+    proposition SafeHousingActTermination(unit: Asset)
+    proposition WrongfulWithholding(landlord: LegalPerson)
+
+    observation ReturnMailing(record: DepositReturnRecord)
+        establishes DepositReturned(record.unit)
+        from ReturnStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc displacement_deadline() -> Duration<working_days> {
+        return 5 working_days
+    }
+
+    calc safe_housing_deadline() -> Duration<working_days> {
+        return 15 working_days
+    }
+
+    calc deposit_cap_months() -> Decimal {
+        return 1.5
+    }
+
+    calc annual_additional_cap_rate() -> Decimal {
+        return 0.10
+    }
+
+    rule ReturnDutyAttaches : prescriptive
+        from ReturnStatute
+    {
+        when operative TenancyEnded(Unit)
+        then establish DepositReturnDue(Landlord)
+    }
+
+    rule CapApplies : constitutive
+        from CapStatute
+    {
+        when operative ResidentialDwelling(Unit)
+        then derive DepositCapped(Unit)
+    }
+
+    duty ReturnDepositOnTime {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DepositReturnDue(Landlord)
+        content return_deposit_interest_and_itemization
+        source ReturnStatute
+    }
+
+    legal_act ReturnSecurityDeposit(unit: Asset) {
+        performer Landlord
+        recipient Tenant
+        effect establish DepositReturned(unit)
+        source ReturnStatute
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic within_return_days(days_after_end: Int) -> Bool {
+        return days_after_end <= 30
+    }
+
+    query automatic past_return_days(days_after_end: Int) -> Bool {
+        return days_after_end > 30
+    }
+
+    query automatic within_displacement_days(days_after: Int) -> Bool {
+        return days_after <= 5
+    }
+
+    query automatic within_safe_housing_days(days_after: Int) -> Bool {
+        return days_after <= 15
+    }
+
+    query automatic within_deposit_cap(deposit_in_months: Decimal) -> Bool {
+        return deposit_in_months <= deposit_cap_months()
+    }
+
+    query automatic additional_within_cap(increase_rate: Decimal) -> Bool {
+        return increase_rate <= annual_additional_cap_rate()
+    }
+
+    query automatic doubled_award(withheld: Money<USD>, award: Money<USD>) -> Bool {
+        return award == withheld + withheld
+    }
+
+    query itemization_mailed()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ReturnMailing
+        }
+    }
+
+    query wrongful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WrongfulWithholding(Landlord)
+                using Determine
+        }
+    }
+
+    scenario TimelyThirtyDayReturn {
+        assume TenancyEnded(Unit)
+        assume ResidentialDwelling(Unit)
+        assume within_return_days(30)
+        assume within_deposit_cap(1.5)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LateReturnDoubling {
+        assume TenancyEnded(Unit)
+        assume past_return_days(31)
+        assume doubled_award(USD(2000.00), USD(4000.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario DisplacementFiveBusinessDays {
+        assume DisplacedByDisaster(Unit)
+        assume within_displacement_days(5)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario SafeHousingFifteenBusinessDays {
+        assume SafeHousingActTermination(Unit)
+        assume within_safe_housing_days(15)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic within_return_days
+            has empty effect row
+        assert automatic past_return_days
+            has empty effect row
+        assert automatic within_deposit_cap
+            has empty effect row
+        assert automatic doubled_award
+            has empty effect row
+        assert itemization_mailed
+            is never treated automatic
+        assert wrongful_withholding
+            is never treated automatic
+    }
+}

@@ -1,0 +1,241 @@
+module Indiana.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Indiana
+    source_snapshot "2026-09-17-ind-code-32-31-3"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        motor_vehicle_lien_as_security
+        manager_and_agent_disclosure
+        successor_landlord_after_sale
+        last_month_rent_written_stipulation
+        cooperative_housing_membership
+        reasonableness_of_attorney_fees
+        habitability_and_eviction
+        statutory_multiplier_penalty
+        complete_IC_32_31
+        local_ordinances
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority IndianaGeneralAssembly
+        citation "Ind. Code § 32-31-3"
+        artifact "sources/ind-code-32-31-3.txt"
+        digest fixture
+        effective [2002-07-01, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type ForwardingAddress {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        supplied_at: Time
+    }
+
+    record_type ItemizedDamageList {
+        unit: Dwelling
+        mailed_at: Time
+        claimed: Money<USD>
+    }
+
+    proposition RentalAgreementTerminated(unit: Dwelling, at: Time)
+    proposition PossessionDelivered(unit: Dwelling, at: Time)
+    proposition OccupancyTerminated(unit: Dwelling, at: Time)
+    proposition WrittenMailingAddress(tenant: NaturalPerson, landlord: LegalPerson)
+    proposition ItemizedNoticeDelivered(unit: Dwelling)
+    proposition NoticeDeadlineMissed(unit: Dwelling)
+    proposition FullDepositDue(unit: Dwelling)
+    proposition ActualDamagesBeyondWear(unit: Dwelling)
+    proposition AccruedRentUnpaid(unit: Dwelling)
+    proposition UnpaidUtilityOrSewer(unit: Dwelling)
+    proposition BadFaithRetention(landlord: LegalPerson)
+    proposition WaiverAttempted(party: LegalPerson)
+    proposition WaiverUnenforceable(party: LegalPerson)
+    proposition ChapterLiabilityAttached(landlord: LegalPerson)
+
+    observation AddressRecord(record: ForwardingAddress)
+        establishes WrittenMailingAddress(record.tenant, record.landlord)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+        require record.landlord == Landlord
+    }
+
+    observation DamageListRecord(record: ItemizedDamageList)
+        establishes ItemizedNoticeDelivered(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.unit == Unit
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 45 counted_days
+    }
+
+    legal_act MailItemizedList(list: ItemizedDamageList) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedNoticeDelivered(list.unit)
+        source SecurityDepositStatute
+    }
+
+    duty ReturnOrItemize {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative WrittenMailingAddress(Tenant, Landlord)
+        content return_deposit_minus_lawful_uses_with_itemized_notice
+        source SecurityDepositStatute
+    }
+
+    duty RemitFullOnMissedNotice {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative NoticeDeadlineMissed(Unit)
+        content remit_full_security_deposit_immediately
+        source SecurityDepositStatute
+    }
+
+    rule LiabilityWaitsOnWrittenAddress : constitutive
+        from SecurityDepositStatute
+    {
+        when operative WrittenMailingAddress(Tenant, Landlord)
+        then derive ChapterLiabilityAttached(Landlord)
+    }
+
+    rule MissedNoticeAgreesNoDamages : constitutive
+        from SecurityDepositStatute
+    {
+        when operative NoticeDeadlineMissed(Unit)
+        then derive FullDepositDue(Unit)
+    }
+
+    rule WaiverOfChapterVoid : constitutive
+        from SecurityDepositStatute
+    {
+        when operative WaiverAttempted(Landlord)
+        then derive WaiverUnenforceable(Landlord)
+    }
+
+    query automatic statewide_deposit_uncapped() -> Bool {
+        return true
+    }
+
+    query automatic deadline_running(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic deductions_within_deposit(
+        deposit: Money<USD>,
+        deductions: Money<USD>
+    ) -> Bool {
+        return deductions <= deposit
+    }
+
+    query automatic remaining_after_deductions(
+        deposit: Money<USD>,
+        deductions: Money<USD>
+    ) -> Money<USD> {
+        return deposit - deductions
+    }
+
+    query automatic missed_notice_returns_full(deposit: Money<USD>) -> Money<USD> {
+        return deposit
+    }
+
+    query automatic withheld_portion_due(withheld: Money<USD>) -> Money<USD> {
+        return withheld
+    }
+
+    query mailing_address_supplied()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed AddressRecord
+            require determined WrittenMailingAddress(Tenant, Landlord)
+                using Observe
+        }
+    }
+
+    query actual_damages_beyond_wear()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ActualDamagesBeyondWear(Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_retention()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+        }
+    }
+
+    scenario TimelyFortyFiveDayReturn {
+        assume RentalAgreementTerminated(Unit, 2026-08-01T12:00:00-04:00)
+        assume PossessionDelivered(Unit, 2026-08-01T12:00:00-04:00)
+        assume OccupancyTerminated(Unit, 2026-08-01T12:00:00-04:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume ItemizedNoticeDelivered(Unit)
+        assume deadline_running(2026-08-01T12:00:00-04:00, 2026-09-15T12:00:00-04:00)
+        assume deductions_within_deposit(USD(1200.00), USD(150.00))
+        assume statewide_deposit_uncapped()
+        at 2026-09-15T12:00:00-04:00
+    }
+
+    scenario MissedItemizedNotice {
+        assume RentalAgreementTerminated(Unit, 2026-07-01T12:00:00-04:00)
+        assume PossessionDelivered(Unit, 2026-07-01T12:00:00-04:00)
+        assume OccupancyTerminated(Unit, 2026-07-01T12:00:00-04:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume NoticeDeadlineMissed(Unit)
+        assume FullDepositDue(Unit)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario WearVersusDamageOpen {
+        assume OccupancyTerminated(Unit, 2026-08-03T12:00:00-04:00)
+        assume WrittenMailingAddress(Tenant, Landlord)
+        assume ItemizedNoticeDelivered(Unit)
+        assume AccruedRentUnpaid(Unit)
+        assume deadline_running(2026-08-03T12:00:00-04:00, 2026-09-10T12:00:00-04:00)
+        at 2026-09-10T12:00:00-04:00
+    }
+
+    scenario WaiverDoesNotBind {
+        assume WaiverAttempted(Landlord)
+        assume WaiverUnenforceable(Landlord)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic statewide_deposit_uncapped
+            has empty effect row
+        assert automatic deadline_running
+            has empty effect row
+        assert automatic deductions_within_deposit
+            has empty effect row
+        assert automatic remaining_after_deductions
+            has empty effect row
+        assert automatic missed_notice_returns_full
+            has empty effect row
+        assert automatic withheld_portion_due
+            has empty effect row
+        assert mailing_address_supplied
+            is never treated automatic
+        assert actual_damages_beyond_wear
+            is never treated automatic
+        assert bad_faith_retention
+            is never treated automatic
+    }
+}

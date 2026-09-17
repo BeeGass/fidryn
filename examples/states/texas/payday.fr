@@ -1,0 +1,250 @@
+module Texas.Employment.Payday version "0.1.0" {
+    jurisdiction Texas
+    source_snapshot "2026-09-17-tex-lab-61"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        governmental_entities_tex_lab_61_003
+        franchisor_exclusion_61_0031
+        flsa_exemption_duties_and_salary_tests
+        commission_bonus_agreement_interpretation
+        vacation_pto_without_written_policy
+        criminal_intent_felony_61_019
+        wage_claim_hearing_procedure_beyond_deadlines
+        waiting_time_penalty_payable_to_employee
+        complete_Chapter_61
+        complete_40_TAC_821
+    }
+
+    source PaydayStatute {
+        kind statute
+        authority TexasLegislature
+        citation "Tex. Lab. Code ch. 61"
+        artifact "sources/tex-lab-61.txt"
+        digest fixture
+        effective [1993-09-01, +inf)
+    }
+
+    source PaydayRules {
+        kind regulation
+        authority TexasWorkforceCommission
+        citation "40 Tex. Admin. Code ch. 821"
+        artifact "sources/40-tac-821.txt"
+        digest fixture
+        effective [1998-06-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Commission : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    record_type PaydayWageClaim {
+        employee: NaturalPerson
+        employer: LegalPerson
+        wages_due: Time
+        filed_at: Time
+        amount: Money<USD>
+    }
+
+    proposition CoveredEmployee(person: NaturalPerson)
+    proposition Discharged(person: NaturalPerson)
+    proposition Quit(person: NaturalPerson)
+    proposition FinalWagesDue(person: NaturalPerson)
+    proposition WageClaimFiled(person: NaturalPerson)
+    proposition BonaFideDispute(employer: LegalPerson, employee: NaturalPerson)
+    proposition BadFaithNonpayment(employer: LegalPerson)
+
+    observation SeparationFiling(record: SeparationRecord)
+        establishes Discharged(record.employee)
+        from PaydayStatute
+    {
+        require record.employee == Employee
+        require record.employer == Employer
+    }
+
+    legal_act FileWageClaim(claim: PaydayWageClaim) {
+        performer claim.employee
+        recipient Commission
+        effect establish WageClaimFiled(claim.employee)
+        source PaydayStatute
+    }
+
+    calc discharge_pay_window() -> Duration<counted_days> {
+        return 6 counted_days
+    }
+
+    calc wage_claim_window() -> Duration<counted_days> {
+        return 180 counted_days
+    }
+
+    calc administrative_penalty_cap() -> Money<USD> {
+        return USD(1000.00)
+    }
+
+    calc undesignated_first_payday() -> Int {
+        return 1
+    }
+
+    calc undesignated_fifteenth_payday() -> Int {
+        return 15
+    }
+
+    calc nonexempt_min_paydays() -> Int {
+        return 2
+    }
+
+    calc exempt_min_paydays() -> Int {
+        return 1
+    }
+
+    rule DischargeCreatesFinalPay : constitutive
+        from PaydayStatute
+    {
+        when operative Discharged(Employee)
+        then derive FinalWagesDue(Employee)
+    }
+
+    rule QuitCreatesFinalPay : constitutive
+        from PaydayStatute
+    {
+        when operative Quit(Employee)
+        then derive FinalWagesDue(Employee)
+    }
+
+    duty PayDischargedEmployee {
+        bearer Employer
+        claimant Employee
+        attaches when operative Discharged(Employee)
+        content pay_in_full_by_sixth_calendar_day
+        source PaydayStatute
+    }
+
+    duty PayQuitEmployee {
+        bearer Employer
+        claimant Employee
+        attaches when operative Quit(Employee)
+        content pay_in_full_by_next_regularly_scheduled_payday
+        source PaydayStatute
+    }
+
+    query automatic discharge_pay_timely(discharge: Time, paid: Time) -> Bool {
+        return paid <= discharge + discharge_pay_window()
+    }
+
+    query automatic quit_pay_timely(paid: Time, next_payday: Time) -> Bool {
+        return paid <= next_payday
+    }
+
+    query automatic wage_claim_timely(wages_due: Time, filed: Time) -> Bool {
+        return filed <= wages_due + wage_claim_window()
+    }
+
+    query automatic payday_frequency_floor(
+        flsa_overtime_exempt: Bool,
+        paydays_per_month: Int
+    ) -> Bool {
+        return (flsa_overtime_exempt and paydays_per_month >= exempt_min_paydays())
+            or (not flsa_overtime_exempt
+                and paydays_per_month >= nonexempt_min_paydays())
+    }
+
+    query automatic undesignated_statutory_payday(
+        designated: Bool,
+        day_of_month: Int
+    ) -> Bool {
+        return not designated
+            and (day_of_month == undesignated_first_payday()
+                or day_of_month == undesignated_fifteenth_payday())
+    }
+
+    query automatic penalty_within_statutory_cap(
+        wages_in_question: Money<USD>,
+        penalty: Money<USD>
+    ) -> Bool {
+        return penalty <= wages_in_question
+            and penalty <= administrative_penalty_cap()
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDispute(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query bad_faith_nonpayment()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithNonpayment(Employer)
+                using Determine
+        }
+    }
+
+    query covered_employee()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed SeparationFiling
+            require determined CoveredEmployee(Employee)
+                using Determine
+        }
+    }
+
+    scenario DischargedEmployee {
+        assume Discharged(Employee)
+        assume CoveredEmployee(Employee)
+        assume payday_frequency_floor(false, 2)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario VoluntaryQuit {
+        assume Quit(Employee)
+        assume CoveredEmployee(Employee)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario UndesignatedPaydays {
+        assume undesignated_statutory_payday(false, 1)
+        assume undesignated_statutory_payday(false, 15)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario PenaltyCapOnLargeWage {
+        assume penalty_within_statutory_cap(USD(5000.00), USD(1000.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify PaydayHonesty {
+        assert automatic discharge_pay_timely
+            has empty effect row
+        assert automatic quit_pay_timely
+            has empty effect row
+        assert automatic wage_claim_timely
+            has empty effect row
+        assert automatic payday_frequency_floor
+            has empty effect row
+        assert automatic undesignated_statutory_payday
+            has empty effect row
+        assert automatic penalty_within_statutory_cap
+            has empty effect row
+        assert bona_fide_dispute
+            is never treated automatic
+        assert bad_faith_nonpayment
+            is never treated automatic
+        assert covered_employee
+            is never treated automatic
+    }
+}

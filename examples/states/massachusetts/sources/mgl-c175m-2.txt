@@ -1,0 +1,63 @@
+Massachusetts General Laws chapter 175M, sections 2 and 3
+(fixture excerpt). Family and medical leave.
+
+§ 2. Leave requirements (excerpt).
+
+(a)(1) Family leave shall be available to any covered individual
+for: (i) bonding with the covered individual's child during the
+first 12 months after birth or placement for adoption or foster
+care; (ii) a qualifying exigency arising out of a family member's
+active duty or impending call to active duty in the Armed Forces;
+or (iii) care for a family member who is a covered servicemember.
+
+(a)(2) Medical leave shall be available to any covered individual
+with a serious health condition that makes the covered individual
+unable to perform the functions of the covered individual's
+position. This provision shall be construed consistent with the
+equivalent provision of the federal Family and Medical Leave Act
+of 1993, 29 U.S.C. 2612(a)(1)(D).
+
+(b) Family leave shall be available to any covered individual to
+care for a family member with a serious health condition.
+
+(c)(1) A covered individual shall not be eligible for more than
+12 weeks of family leave in a benefit year; provided, however,
+that a covered individual taking family leave in order to care for
+a covered servicemember shall not be eligible for more than
+26 weeks of family leave in a benefit year. A covered individual
+shall not be eligible for medical leave for more than 20 weeks in
+a benefit year. A covered individual shall not take more than
+26 weeks, in the aggregate, of family and medical leave under this
+chapter in the same benefit year. Medical leave during pregnancy
+or recovery from childbirth immediately followed by family leave
+waives the 7 day waiting period for family leave.
+
+(e) An employee who has taken family or medical leave shall be
+restored to the employee's previous position or to an equivalent
+position, with the same status, pay, employment benefits,
+length-of-service credit and seniority as of the date of leave.
+
+§ 1 (definition used here). "Serious health condition" means an
+illness, injury, impairment or physical or mental condition that
+involves (i) inpatient care in a hospital, hospice or residential
+medical facility; or (ii) continuing treatment by a health care
+provider. Whether a condition is a serious health condition is a
+determination, not a Boolean.
+
+§ 3. Weekly benefit (excerpt).
+
+(a) No family or medical leave benefits shall be payable during
+the first 7 calendar days of such leave.
+
+(b)(1) The portion of the covered individual's average weekly wage
+that is equal to or less than 50 per cent of the state average
+weekly wage shall be replaced at a rate of 80 per cent; the
+portion that is more than 50 per cent of the state average weekly
+wage shall be replaced at a rate of 50 per cent.
+
+(b)(2) The maximum weekly benefit amount shall be 64 per cent of
+the state average weekly wage, adjusted annually. For benefit year
+2026 the department published a state average weekly wage of
+$1,922.48 and a maximum weekly benefit of $1,230.39.
+
+Fixture text for Fidryn research. Not an official edition.

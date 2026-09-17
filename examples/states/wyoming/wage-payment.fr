@@ -1,0 +1,246 @@
+module Wyoming.Employment.WagePayment version "0.1.0" {
+    jurisdiction Wyoming
+    source_snapshot "2026-09-17-wyo-stat-27-4-104"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        sales_agent_commission_audit_exception
+        agricultural_operations_exemption_factfinding
+        nonworking_day_predecessor_payday
+        state_officer_pay_under_9_3_101
+        bankruptcy_priority_cap_11_usc_507
+        complete_wage_offset_rules
+        complete_Title_27_Chapter_4
+        FLSA_overtime_computation
+        attorney_fee_reasonableness
+        collective_bargaining_payday_terms
+    }
+
+    source FinalPayStatute {
+        kind statute
+        authority WyomingLegislature
+        citation "Wyo. Stat. §§ 27-4-101, 27-4-104, 27-4-105"
+        artifact "sources/wyo-stat-27-4-104.txt"
+        digest fixture
+        effective [2015-03-04, +inf)
+    }
+
+    source WageCollectionStatute {
+        kind statute
+        authority WyomingLegislature
+        citation "Wyo. Stat. §§ 27-4-501 through 27-4-508"
+        artifact "sources/wyo-stat-27-4-501.txt"
+        digest fixture
+        effective [2013-07-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+    entity Department : LegalPerson
+    entity Court : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    record_type ForfeitureAcknowledgment {
+        employee: NaturalPerson
+        employer: LegalPerson
+        acknowledged_at: Time
+    }
+
+    proposition Separated(employee: NaturalPerson, employer: LegalPerson)
+    proposition Quit(employee: NaturalPerson)
+    proposition Discharged(employee: NaturalPerson)
+    proposition CoveredIndustryEmployer(employer: LegalPerson)
+    proposition FinalWagesDue(employee: NaturalPerson, employer: LegalPerson)
+    proposition BonaFideDispute(employer: LegalPerson, employee: NaturalPerson)
+    proposition JustlyDue(employee: NaturalPerson)
+    proposition StatutoryInterestApplies(employee: NaturalPerson)
+    proposition WrittenVacationForfeiture(employer: LegalPerson)
+    proposition EmployeeAcknowledgedForfeiture(employee: NaturalPerson)
+    proposition VacationForfeited(employee: NaturalPerson)
+    proposition WillfulViolation(employer: LegalPerson)
+    proposition SemimonthlyPaydayRequired(employer: LegalPerson)
+
+    observation SeparationEvent(record: SeparationRecord)
+        establishes Separated(record.employee, record.employer)
+        from FinalPayStatute
+    {
+        require record.employee == Employee
+    }
+
+    observation WrittenPolicyAcknowledgment(record: ForfeitureAcknowledgment)
+        establishes EmployeeAcknowledgedForfeiture(record.employee)
+        from WageCollectionStatute
+    {
+        require record.employee == Employee
+    }
+
+    calc first_of_month() -> Int {
+        return 1
+    }
+
+    calc fifteenth_of_month() -> Int {
+        return 15
+    }
+
+    calc past_due_interest_percent() -> Int {
+        return 18
+    }
+
+    calc willful_fine_minimum() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    calc willful_fine_maximum() -> Money<USD> {
+        return USD(750.00)
+    }
+
+    calc order_noncompliance_daily_fine() -> Money<USD> {
+        return USD(200.00)
+    }
+
+    calc hearing_request_window() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    calc administrative_claim_months() -> Int {
+        return 2
+    }
+
+    calc conspicuous_posting_places() -> Int {
+        return 2
+    }
+
+    rule FinalPayOnSeparation : constitutive
+        from FinalPayStatute
+    {
+        when operative Separated(Employee, Employer)
+        then derive FinalWagesDue(Employee, Employer)
+    }
+
+    rule CoveredIndustryPayday : constitutive
+        from FinalPayStatute
+    {
+        when operative CoveredIndustryEmployer(Employer)
+        then establish SemimonthlyPaydayRequired(Employer)
+    }
+
+    rule InterestWhenJustlyDue : constitutive
+        from FinalPayStatute
+    {
+        when operative JustlyDue(Employee)
+        then establish StatutoryInterestApplies(Employee)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative FinalWagesDue(Employee, Employer)
+        content pay_wages_due_no_later_than_usual_regularly_scheduled_payroll_date
+        source FinalPayStatute
+    }
+
+    query automatic first_half_due_by_first(day: Int) -> Bool {
+        return day <= first_of_month()
+    }
+
+    query automatic second_half_due_by_fifteenth(day: Int) -> Bool {
+        return day <= fifteenth_of_month()
+    }
+
+    query automatic willful_fine_within_range(amount: Money<USD>) -> Bool {
+        return amount >= willful_fine_minimum() and amount <= willful_fine_maximum()
+    }
+
+    query automatic hearing_request_timely(start: Time, as_of: Time) -> Bool {
+        return as_of <= start + hearing_request_window()
+    }
+
+    query automatic within_administrative_claim_months(months: Int) -> Bool {
+        return months <= administrative_claim_months()
+    }
+
+    query automatic posting_places_met(places: Int) -> Bool {
+        return places >= conspicuous_posting_places()
+    }
+
+    query automatic statutory_interest_rate(percent: Int) -> Bool {
+        return percent == past_due_interest_percent()
+    }
+
+    query automatic daily_fine_at_cap(amount: Money<USD>) -> Bool {
+        return amount <= order_noncompliance_daily_fine()
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDispute(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query vacation_forfeiture()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed WrittenPolicyAcknowledgment
+            require determined VacationForfeited(Employee)
+                using Determine
+        }
+    }
+
+    scenario DischargedUsualPayday {
+        assume Separated(Employee, Employer)
+        assume Discharged(Employee)
+        assume first_half_due_by_first(1)
+        assume willful_fine_within_range(USD(500.00))
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario QuitSamePaydayRule {
+        assume Separated(Employee, Employer)
+        assume Quit(Employee)
+        assume second_half_due_by_fifteenth(15)
+        assume statutory_interest_rate(18)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario CoveredIndustrySemimonthly {
+        assume CoveredIndustryEmployer(Employer)
+        assume first_half_due_by_first(1)
+        assume second_half_due_by_fifteenth(15)
+        assume posting_places_met(2)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario AdminClaimAndHearingWindow {
+        assume Separated(Employee, Employer)
+        assume within_administrative_claim_months(2)
+        assume daily_fine_at_cap(USD(200.00))
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic first_half_due_by_first
+            has empty effect row
+        assert automatic second_half_due_by_fifteenth
+            has empty effect row
+        assert automatic willful_fine_within_range
+            has empty effect row
+        assert automatic hearing_request_timely
+            has empty effect row
+        assert bona_fide_dispute
+            is never treated automatic
+        assert vacation_forfeiture
+            is never treated automatic
+    }
+}

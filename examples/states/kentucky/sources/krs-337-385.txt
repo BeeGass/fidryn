@@ -1,0 +1,31 @@
+Kentucky Revised Statutes 337.385 (fixture excerpt).
+
+337.385 Employer's liability -- Unpaid wages and liquidated damages --
+Punitive damages for forced labor or services -- Period of limitation.
+
+(1) Except as provided in subsection (3) of this section, any employer who
+pays any employee less than wages and overtime compensation to which
+such employee is entitled under or by virtue of KRS 337.020 to 337.285
+shall be liable to such employee affected for the full amount of such
+wages and overtime compensation, less any amount actually paid to such
+employee by the employer, for an additional equal amount as liquidated
+damages, and for costs and such reasonable attorney's fees as may be
+allowed by the court.
+
+(2) If, in any action commenced to recover such unpaid wages or liquidated
+damages, the employer shows to the satisfaction of the court that the act
+or omission giving rise to such action was in good faith and that he or she
+had reasonable grounds for believing that his or her act or omission was
+not a violation of KRS 337.020 to 337.285, the court may, in its sound
+discretion, award no liquidated damages, or award any amount thereof
+not to exceed the amount specified in this section. Any agreement
+between such employee and the employer to work for less than the
+applicable wage rate shall be no defense to such action. Such action may
+be maintained in any court of competent jurisdiction by any one (1) or
+more employees for and in behalf of himself, herself, or themselves.
+
+Good faith plus reasonable grounds is a court determination, not a
+Boolean clock. The default liquidated measure is an additional equal
+amount. Whether that measure is awarded, reduced, or withheld remains
+discretionary once the showing is made. Fixture text for Fidryn
+research. Not an official edition.

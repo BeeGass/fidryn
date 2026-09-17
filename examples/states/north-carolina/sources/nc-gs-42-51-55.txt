@@ -1,0 +1,119 @@
+North Carolina General Statutes §§ 42-51, 42-52, 42-53, 42-54, 42-55,
+and 42-56 (fixture excerpt). Official General Assembly HTML retrieved
+2026-09-17.
+
+§ 42-51. Permitted uses of the deposit.
+
+(a) Security deposits for residential dwelling units shall be permitted
+only for the following:
+
+(1) The tenant's possible nonpayment of rent and costs for water or sewer
+services provided pursuant to G.S. 62-110(g) and electric service
+pursuant to G.S. 62-110(h).
+
+(2) Damage to the premises, including damage to or destruction of smoke
+alarms or carbon monoxide alarms.
+
+(3) Damages as the result of the nonfulfillment of the rental period,
+except where the tenant terminated the rental agreement under G.S. 42-45,
+G.S. 42-45.1, or because the tenant was forced to leave the property
+because of the landlord's violation of Article 2A of Chapter 42 of the
+General Statutes or was constructively evicted by the landlord's
+violation of G.S. 42-42(a).
+
+(4) Any unpaid bills that become a lien against the demised property due
+to the tenant's occupancy.
+
+(5) The costs of re-renting the premises after breach by the tenant,
+including any reasonable fees or commissions paid by the landlord to a
+licensed real estate broker to re-rent the premises.
+
+(6) The costs of removal and storage of the tenant's property after a
+summary ejectment proceeding.
+
+(7) Court costs.
+
+(8) Any fee permitted by G.S. 42-46.
+
+(b) The security deposit shall not exceed an amount equal to two weeks'
+rent if a tenancy is week to week, one and one-half months' rent if a
+tenancy is month to month, and two months' rent for terms greater than
+month to month. These deposits must be fully accounted for by the
+landlord as set forth in G.S. 42-52. (1977, c. 914, s. 1; 1983, c. 672,
+s. 3; 2001-502, s. 5; 2004-143, s. 6; 2011-252, s. 3; 2012-17, s. 4;
+2012-194, s. 59(a), (b).)
+
+§ 42-52. Landlord's obligations.
+
+Upon termination of the tenancy, money held by the landlord as security
+may be applied as permitted in G.S. 42-51 or, if not so applied, shall be
+refunded to the tenant. In either case the landlord in writing shall
+itemize any damage and mail or deliver same to the tenant, together with
+the balance of the security deposit, no later than 30 days after
+termination of the tenancy and delivery of possession of the premises to
+the landlord. If the extent of the landlord's claim against the security
+deposit cannot be determined within 30 days, the landlord shall provide
+the tenant with an interim accounting no later than 30 days after
+termination of the tenancy and delivery of possession of the premises to
+the landlord and shall provide a final accounting within 60 days after
+termination of the tenancy and delivery of possession of the premises to
+the landlord. If the tenant's address is unknown the landlord shall apply
+the deposit as permitted in G.S. 42-51 after a period of 30 days and the
+landlord shall hold the balance of the deposit for collection by the
+tenant for at least six months. The landlord may not withhold as damages
+part of the security deposit for conditions that are due to normal wear
+and tear nor may the landlord retain an amount from the security deposit
+which exceeds his actual damages. (1977, c. 914, s. 1; 2009-279, s. 5.)
+
+§ 42-53. Pet deposits.
+
+Notwithstanding the provisions of this section, the landlord may charge
+a reasonable, nonrefundable fee for pets kept by the tenant on the
+premises. (1977, c. 914, s. 1.)
+
+§ 42-54. Transfer of dwelling units.
+
+Upon termination of the landlord's interest in the dwelling unit in
+question, whether by sale, assignment, death, appointment of receiver or
+otherwise, the landlord or his agent shall, within 30 days, do one of the
+following acts, either of which shall relieve him of further liability
+with respect to such payment or deposit:
+
+(1) Transfer the portion of such payment or deposit remaining after any
+lawful deductions made under this section to the landlord's successor in
+interest and thereafter notify the tenant by mail of such transfer and of
+the transferee's name and address; or
+
+(2) Return the portion of such payment or deposit remaining after any
+lawful deductions made under this section to the tenant. (1977, c. 914,
+s. 1.)
+
+§ 42-55. Remedies.
+
+If the landlord or the landlord's successor in interest fails to account
+for and refund the balance of the tenant's security deposit as required
+by this Article, the tenant may institute a civil action to require the
+accounting of and the recovery of the balance of the deposit. The willful
+failure of a landlord to comply with the deposit, bond, or notice
+requirements of this Article shall void the landlord's right to retain
+any portion of the tenant's security deposit as otherwise permitted under
+G.S. 42-51. In addition to other remedies at law and equity, the tenant
+may recover damages resulting from noncompliance by the landlord; and
+upon a finding by the court that the party against whom judgment is
+rendered was in willful noncompliance with this Article, such willful
+noncompliance is against the public policy of this State and the court
+may award attorney's fees to be taxed as part of the costs of court.
+(1977, c. 914, s. 1; 2009-279, s. 6.)
+
+§ 42-56. Application of Article.
+
+The provisions of this Article shall apply to all persons, firms, or
+corporations engaged in the business of renting or managing residential
+dwelling units, excluding single rooms, on a weekly, monthly or annual
+basis. (1977, c. 914, s. 2.)
+
+This Article does not encode a statutory multiple of the deposit as
+damages. Willful noncompliance, wear and tear versus damage, and
+reasonableness of a pet fee remain determinations. Not a Boolean.
+
+Fixture text for Fidryn research. Not an official edition.

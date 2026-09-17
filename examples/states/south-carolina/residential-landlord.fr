@@ -1,0 +1,248 @@
+module SouthCarolina.Housing.ResidentialLandlord version "0.1.0" {
+    jurisdiction SouthCarolina
+    source_snapshot "2026-09-17-sc-code-27-40-410"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        ejectment_procedure_under_chapter_37
+        retaliatory_conduct
+        essential_services_and_repair_and_deduct
+        fire_or_casualty
+        excluded_occupancies_under_27_40_120
+        scrcp_computation_of_time
+        distress_proceedings
+        health_and_safety_emergency_timing
+        conspicuous_lease_rent_notice_equivalence
+        week_to_week_seven_day_notice
+        twenty_four_hour_entry_notice
+        local_ordinances
+        statutory_deposit_amount_cap
+        interest_on_deposits
+        complete_Title_27_Chapter_40
+    }
+
+    source SecurityDeposits {
+        kind statute
+        authority SouthCarolinaGeneralAssembly
+        citation "S.C. Code Ann. § 27-40-410"
+        artifact "sources/sc-code-27-40-410.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source NoticeAndRemedies {
+        kind statute
+        authority SouthCarolinaGeneralAssembly
+        citation "S.C. Code Ann. § 27-40-710 et seq."
+        artifact "sources/sc-code-27-40-710.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity Unit : Dwelling
+
+    record_type PossessionRecord {
+        tenant: NaturalPerson
+        unit: Dwelling
+        delivered_at: Time
+    }
+
+    proposition TenancyTerminated(unit: Dwelling)
+    proposition PossessionDelivered(unit: Dwelling)
+    proposition DepositDemanded(unit: Dwelling)
+    proposition ForwardingAddressProvided(unit: Dwelling)
+    proposition ItemizedNoticeGiven(unit: Dwelling)
+    proposition AccountingDue(unit: Dwelling)
+    proposition TenantNoncomplianceWithDuties(tenant: NaturalPerson, unit: Dwelling)
+    proposition WrongfullyWithheld(landlord: LegalPerson, unit: Dwelling)
+    proposition UnpaidRent(unit: Dwelling)
+    proposition MaterialLeaseBreach(unit: Dwelling)
+    proposition DifferentDepositStandards(unit: Dwelling)
+
+    observation PossessionDelivery(record: PossessionRecord)
+        establishes PossessionDelivered(record.unit)
+        from SecurityDeposits
+    {
+        require record.tenant == Tenant
+        require record.unit == Unit
+    }
+
+    legal_act DemandDeposit(demand: RecordItem) {
+        performer Tenant
+        recipient Landlord
+        validity requires operative PossessionDelivered(Unit)
+        effect establish DepositDemanded(Unit)
+        source SecurityDeposits
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc unpaid_rent_notice() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    calc noncompliance_cure() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc month_to_month_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc abandonment_absence_days() -> Int {
+        return 15
+    }
+
+    calc adjoining_units_disclosure_threshold() -> Int {
+        return 4
+    }
+
+    calc wrongful_withholding_multiplier() -> Int {
+        return 3
+    }
+
+    calc leftover_property_summary_cap() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    rule AccountingTrigger : constitutive
+        from SecurityDeposits
+    {
+        when operative TenancyTerminated(Unit)
+          and operative PossessionDelivered(Unit)
+          and operative DepositDemanded(Unit)
+        then derive AccountingDue(Unit)
+    }
+
+    power DeductAccruedRentAndDamages
+        from SecurityDeposits
+    {
+        holder Landlord
+        subject Tenant
+        active_while operative AccountingDue(Unit)
+        effect itemized_deduction_for_accrued_rent_or_section_510_damages
+        source SecurityDeposits
+    }
+
+    duty ReturnDepositWithItemization {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative AccountingDue(Unit)
+        content return_balance_with_itemized_written_notice
+        source SecurityDeposits
+    }
+
+    query automatic return_window_open(trigger: Time, as_of: Time) -> Bool {
+        return as_of <= trigger + return_deadline()
+    }
+
+    query automatic rent_notice_window_open(due: Time, as_of: Time) -> Bool {
+        return as_of <= due + unpaid_rent_notice()
+    }
+
+    query automatic noncompliance_cure_open(notice: Time, as_of: Time) -> Bool {
+        return as_of <= notice + noncompliance_cure()
+    }
+
+    query automatic month_to_month_notice_sufficient(notice: Time, end: Time) -> Bool {
+        return end >= notice + month_to_month_notice()
+    }
+
+    query automatic deposit_standards_disclosure_required(adjoining_units: Int) -> Bool {
+        return adjoining_units > adjoining_units_disclosure_threshold()
+    }
+
+    query automatic leftover_property_summary_ok(value: Money<USD>) -> Bool {
+        return value <= leftover_property_summary_cap()
+    }
+
+    query automatic statutory_multiplier(factor: Int) -> Bool {
+        return factor == wrongful_withholding_multiplier()
+    }
+
+    query automatic abandonment_absence(days: Int) -> Bool {
+        return days >= abandonment_absence_days()
+    }
+
+    query deposit_accounting()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed PossessionDelivery
+            require determined AccountingDue(Unit)
+                using Determine
+        }
+    }
+
+    query tenant_noncompliance()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined TenantNoncomplianceWithDuties(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    query wrongful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WrongfullyWithheld(Landlord, Unit)
+                using Determine
+        }
+    }
+
+    scenario TimelyItemizedReturn {
+        assume TenancyTerminated(Unit)
+        assume PossessionDelivered(Unit)
+        assume DepositDemanded(Unit)
+        assume ForwardingAddressProvided(Unit)
+        assume return_window_open(2026-09-17T12:00:00-04:00, 2026-10-17T12:00:00-04:00)
+        assume statutory_multiplier(3)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FiveDayUnpaidRent {
+        assume UnpaidRent(Unit)
+        assume rent_notice_window_open(2026-09-17T12:00:00-04:00, 2026-09-22T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FourteenDayCureNotice {
+        assume MaterialLeaseBreach(Unit)
+        assume noncompliance_cure_open(2026-09-17T12:00:00-04:00, 2026-10-01T12:00:00-04:00)
+        assume month_to_month_notice_sufficient(2026-09-17T12:00:00-04:00, 2026-10-17T12:00:00-04:00)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario MultiUnitDepositAndAbandonment {
+        assume DifferentDepositStandards(Unit)
+        assume deposit_standards_disclosure_required(5)
+        assume leftover_property_summary_ok(USD(500.00))
+        assume abandonment_absence(15)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositNoticeHonesty {
+        assert automatic return_window_open
+            has empty effect row
+        assert automatic rent_notice_window_open
+            has empty effect row
+        assert automatic statutory_multiplier
+            has empty effect row
+        assert tenant_noncompliance
+            is never treated automatic
+        assert wrongful_withholding
+            is never treated automatic
+        assert deposit_accounting
+            is never treated automatic
+    }
+}

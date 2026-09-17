@@ -1,0 +1,15 @@
+North Dakota Constitution article XI, section 22 (fixture excerpt).
+
+The right of the debtor to enjoy the comforts and necessaries of life shall
+be recognized by wholesome laws, exempting from forced sale to all heads
+of families a homestead, the value of which shall be limited and defined
+by law; and a reasonable amount of personal property; the kind and value
+shall be fixed by law. This section shall not be construed to prevent liens
+against the homestead for labor done and materials furnished in the
+improvement thereof, in such manner as may be prescribed by law.
+
+The 1889 constitution took effect October 1, 1889. The legislature defined
+the homestead in N.D.C.C. chapter 47-18. Character of property as
+homestead remains a determination, not a Boolean.
+
+Fixture text for Fidryn research. Not an official edition.

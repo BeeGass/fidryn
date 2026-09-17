@@ -1,0 +1,220 @@
+module RhodeIsland.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction RhodeIsland
+    source_snapshot "2026-09-17-ri-gen-laws-34-18-19"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-04:00
+
+    outside_scope {
+        commercial_and_excluded_occupancies
+        escrow_or_interest_requirement
+        reasonableness_of_cleaning_and_trash_charges
+        ordinary_wear_and_tear_factfinding
+        pending_two_month_cap_legislation
+        small_claims_procedure
+        attorney_fee_reasonableness
+        complete_chapter_34_18
+        HUD_subsidized_deposit_rules
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority RhodeIslandGeneralAssembly
+        citation "R.I. Gen. Laws § 34-18-19"
+        artifact "sources/ri-gen-laws-34-18-19.txt"
+        digest fixture
+        effective [2018-07-02, +inf)
+    }
+
+    source TenantMaintenance {
+        kind statute
+        authority RhodeIslandGeneralAssembly
+        citation "R.I. Gen. Laws § 34-18-24"
+        artifact "sources/ri-gen-laws-34-18-24.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : LegalPerson
+    entity SuccessorHolder : LegalPerson
+    entity Unit : Dwelling
+
+    record_type ItemizedNotice {
+        tenant: NaturalPerson
+        landlord: LegalPerson
+        unit: Dwelling
+        delivered_at: Time
+    }
+
+    proposition TenancyEnded(unit: Dwelling)
+    proposition PossessionDelivered(unit: Dwelling)
+    proposition ForwardingAddressProvided(tenant: NaturalPerson)
+    proposition DepositBalanceDue(unit: Dwelling)
+    proposition ItemizedStatementProvided(unit: Dwelling)
+    proposition FurnishedApartment(unit: Dwelling)
+    proposition InterestTransferred(from: LegalPerson, to: LegalPerson)
+    proposition BoundByDepositSection(holder: LegalPerson)
+    proposition WaiverUnenforceable(unit: Dwelling)
+    proposition PhysicalDamageBeyondWear(unit: Dwelling)
+    proposition TenantNoncompliance(tenant: NaturalPerson, unit: Dwelling)
+    proposition BadFaithWithholding(landlord: LegalPerson)
+
+    observation ItemizedReturnNotice(record: ItemizedNotice)
+        establishes ItemizedStatementProvided(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+        require record.landlord == Landlord
+    }
+
+    calc return_window() -> Duration<counted_days> {
+        return 20 counted_days
+    }
+
+    calc furniture_value_threshold() -> Money<USD> {
+        return USD(5000.00)
+    }
+
+    calc withholding_multiplier() -> Int {
+        return 2
+    }
+
+    rule DepositDueOnTermination : constitutive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit)
+        then derive DepositBalanceDue(Unit)
+    }
+
+    rule SuccessorBound : constitutive
+        from SecurityDepositStatute
+    {
+        when operative InterestTransferred(Landlord, SuccessorHolder)
+        then derive BoundByDepositSection(SuccessorHolder)
+    }
+
+    rule NoContractualWaiver : prescriptive
+        from SecurityDepositStatute
+    {
+        when operative DepositBalanceDue(Unit)
+        then establish WaiverUnenforceable(Unit)
+    }
+
+    duty ReturnItemizedBalance {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DepositBalanceDue(Unit)
+        content deliver_itemized_notice_and_balance_within_return_window
+        source SecurityDepositStatute
+    }
+
+    legal_act DeliverItemizedNotice() {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedStatementProvided(Unit)
+        source SecurityDepositStatute
+    }
+
+    query automatic within_deposit_cap(
+        deposit: Money<USD>,
+        monthly_rent: Money<USD>
+    ) -> Bool {
+        return deposit <= monthly_rent
+    }
+
+    query automatic furniture_value_qualifies(value: Money<USD>) -> Bool {
+        return value >= furniture_value_threshold()
+    }
+
+    query automatic furniture_deposit_within_cap(
+        furniture_deposit: Money<USD>,
+        monthly_rent: Money<USD>
+    ) -> Bool {
+        return furniture_deposit <= monthly_rent
+    }
+
+    query automatic return_window_running(later_event: Time, as_of: Time) -> Bool {
+        return as_of <= later_event + return_window()
+    }
+
+    query automatic multiplier_is_double() -> Bool {
+        return withholding_multiplier() == 2
+    }
+
+    query itemized_notice()
+        -> Bool
+        ! {Observe}
+    {
+        goal Evaluate {
+            require observed ItemizedReturnNotice
+        }
+    }
+
+    query beyond_ordinary_wear()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined PhysicalDamageBeyondWear(Unit)
+                using Determine
+            require determined TenantNoncompliance(Tenant, Unit)
+                using Determine
+        }
+    }
+
+    query bad_faith_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithWithholding(Landlord)
+                using Determine
+        }
+    }
+
+    scenario InsideCapTimelyReturn {
+        assume TenancyEnded(Unit)
+        assume PossessionDelivered(Unit)
+        assume ForwardingAddressProvided(Tenant)
+        assume within_deposit_cap(USD(1500.00), USD(1500.00))
+        assume return_window_running(
+            2026-08-28T12:00:00-04:00,
+            2026-09-17T12:00:00-04:00
+        )
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario FurnitureThresholdMet {
+        assume FurnishedApartment(Unit)
+        assume furniture_value_qualifies(USD(5000.00))
+        assume furniture_deposit_within_cap(USD(1800.00), USD(1800.00))
+        assume within_deposit_cap(USD(1800.00), USD(1800.00))
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    scenario LateWithholding {
+        assume TenancyEnded(Unit)
+        assume DepositBalanceDue(Unit)
+        assume BadFaithWithholding(Landlord)
+        at 2026-09-17T12:00:00-04:00
+    }
+
+    verify DepositHonesty {
+        assert automatic within_deposit_cap
+            has empty effect row
+        assert automatic furniture_value_qualifies
+            has empty effect row
+        assert automatic furniture_deposit_within_cap
+            has empty effect row
+        assert automatic return_window_running
+            has empty effect row
+        assert automatic multiplier_is_double
+            has empty effect row
+        assert itemized_notice
+            is never treated automatic
+        assert beyond_ordinary_wear
+            is never treated automatic
+        assert bad_faith_withholding
+            is never treated automatic
+    }
+}

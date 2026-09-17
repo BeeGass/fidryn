@@ -1,0 +1,42 @@
+19 Del. C. § 1103 (fixture excerpt).
+Employees separated from the payroll before regular payday; damages for
+failure to pay wages. As amended by 83 Del. Laws, c. 444, effective
+October 7, 2022.
+
+(a) (1) Whenever an employee quits, resigns, is discharged, suspended, or
+laid off, the wages earned by the employee become due and payable by the
+employer on the later of the following:
+
+a. The next date the wages would be paid through the last day worked
+under the employer's regular pay cycle as if the employment had not
+stopped.
+
+b. Three business days after the last day worked.
+
+(2) The employer must make the payment due under paragraph (a)(1) of this
+section using either of the following methods:
+
+a. The usual pay channels as if the employment had not been suspended or
+terminated.
+
+b. If requested by the employee, by mail to the address provided in the
+employee's request or if no address is provided, the most recent address
+provided to the employer.
+
+(b) (1) Wages paid under subsection (a) of this section must be paid in
+compliance with the requirements under §§ 1104 and 1107 of this title.
+
+(2) If an employer, without any reasonable grounds for dispute under
+§ 1104 or § 1107 of this title, fails to pay an employee wages as required
+under this chapter, the employer is also liable to the employee for
+liquidated damages in the amount of the lower of the following:
+
+a. Ten percent of the unpaid wages for each day, except Sunday and legal
+holidays, upon which the failure continues after the day upon which
+payment is required.
+
+b. An amount equal to the unpaid wages.
+
+Payday and liquidated-damage arithmetic is mechanical. Whether the
+employer has reasonable grounds for dispute under § 1104 or § 1107 remains
+a determination, not a Boolean. Not an official edition.

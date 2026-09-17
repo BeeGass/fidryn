@@ -1,0 +1,242 @@
+module Oklahoma.Employment.WagePayment version "0.1.0" {
+    jurisdiction Oklahoma
+    source_snapshot "2026-09-17-ok-stat-40-165"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        collective_bargaining_agreement_override
+        surviving_spouse_and_children_165_3a
+        flsa_exempt_status_classification
+        vacation_policy_factfinding
+        offset_amount_computation
+        bankruptcy_petition_tolling
+        administrative_hearing_procedure
+        attorney_fee_reasonableness
+        independent_contractor_status
+        nsf_check_fee_reimbursement
+        wage_supplements_165_11
+        complete_Title_40
+    }
+
+    source PaydayStatute {
+        kind statute
+        authority OklahomaLegislature
+        citation "40 O.S. §§ 165.2, 165.2a, 165.5"
+        artifact "sources/ok-stat-40-165-2.txt"
+        digest fixture
+        effective [2022-11-01, +inf)
+    }
+
+    source FinalPayStatute {
+        kind statute
+        authority OklahomaLegislature
+        citation "40 O.S. §§ 165.1, 165.3, 165.4"
+        artifact "sources/ok-stat-40-165-3.txt"
+        digest fixture
+        effective [2005-11-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    proposition EmploymentTerminated(employee: NaturalPerson)
+    proposition EmployedInOklahoma(employee: NaturalPerson)
+    proposition ExemptOrPublicEmployee(employee: NaturalPerson)
+    proposition FinalWagesDue(employee: NaturalPerson)
+    proposition BonaFideDisagreement(employer: LegalPerson)
+    proposition ConcededWagesDueUnconditionally(employee: NaturalPerson)
+    proposition WillfullyWithheld(employer: LegalPerson)
+    proposition LiquidatedDamagesAvailable(employee: NaturalPerson)
+    proposition WrittenDemandReceived(employer: LegalPerson)
+
+    observation SeparationObserved(record: SeparationRecord)
+        establishes EmploymentTerminated(record.employee)
+        from FinalPayStatute
+    {
+        require record.employee == Employee
+        require record.employer == Employer
+    }
+
+    calc min_paydays_nonexempt() -> Int {
+        return 2
+    }
+
+    calc min_paydays_exempt_or_public() -> Int {
+        return 1
+    }
+
+    calc payday_lag_cap() -> Duration<counted_days> {
+        return 11 counted_days
+    }
+
+    calc payday_grace() -> Duration<counted_days> {
+        return 3 counted_days
+    }
+
+    calc liquidated_daily_percent() -> Decimal {
+        return 0.02
+    }
+
+    calc liquidated_cap_ratio() -> Decimal {
+        return 1.00
+    }
+
+    calc disagreement_explanation_window() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    calc administrative_fine_amount() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    rule NextPaydayFinalPay : constitutive
+        from FinalPayStatute
+    {
+        when operative EmploymentTerminated(Employee)
+        then derive FinalWagesDue(Employee)
+    }
+
+    rule ConcededWagesStillDue : constitutive
+        from FinalPayStatute
+    {
+        when operative BonaFideDisagreement(Employer)
+        then derive ConcededWagesDueUnconditionally(Employee)
+    }
+
+    rule LiquidatedIfWillfulUndisputed : constitutive
+        from FinalPayStatute
+    {
+        when operative WillfullyWithheld(Employer)
+        then derive LiquidatedDamagesAvailable(Employee)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative FinalWagesDue(Employee)
+        content pay_wages_in_full_less_offsets_and_bona_fide_disagreement
+        source FinalPayStatute
+    }
+
+    duty PayOnDesignatedPayday {
+        bearer Employer
+        claimant Employee
+        attaches when operative EmployedInOklahoma(Employee)
+        content pay_at_least_twice_each_calendar_month_on_advance_designated_paydays
+        source PaydayStatute
+    }
+
+    legal_act DemandWageExplanation(employee: NaturalPerson) {
+        performer employee
+        recipient Employer
+        effect establish WrittenDemandReceived(Employer)
+        source FinalPayStatute
+    }
+
+    query automatic payday_within_eleven_days(period_end: Time, payday: Time) -> Bool {
+        return payday <= period_end + payday_lag_cap()
+    }
+
+    query automatic payday_grace_running(payday: Time, as_of: Time) -> Bool {
+        return as_of <= payday + payday_grace()
+    }
+
+    query automatic meets_nonexempt_frequency(paydays: Int) -> Bool {
+        return paydays >= min_paydays_nonexempt()
+    }
+
+    query automatic meets_exempt_or_public_frequency(paydays: Int) -> Bool {
+        return paydays >= min_paydays_exempt_or_public()
+    }
+
+    query automatic paid_by_designated_payday(payday: Time, paid_at: Time) -> Bool {
+        return paid_at <= payday
+    }
+
+    query automatic liquidated_ratio_within_cap(accrued_ratio: Decimal) -> Bool {
+        return accrued_ratio <= liquidated_cap_ratio()
+    }
+
+    query automatic explanation_timely(demand: Time, explained: Time) -> Bool {
+        return explained <= demand + disagreement_explanation_window()
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDisagreement(Employer)
+                using Determine
+        }
+    }
+
+    query willful_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfullyWithheld(Employer)
+                using Determine
+        }
+    }
+
+    scenario NextPaydayAfterSeparation {
+        assume EmploymentTerminated(Employee)
+        assume paid_by_designated_payday
+        assume meets_nonexempt_frequency(2)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario ElevenDayLagOk {
+        assume EmployedInOklahoma(Employee)
+        assume payday_within_eleven_days
+        assume payday_grace_running
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario ExemptMonthlyPayday {
+        assume ExemptOrPublicEmployee(Employee)
+        assume meets_exempt_or_public_frequency(1)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario BonaFideDisagreementAsserted {
+        assume EmploymentTerminated(Employee)
+        assume BonaFideDisagreement(Employer)
+        assume ConcededWagesDueUnconditionally(Employee)
+        assume explanation_timely
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario WillfulUndisputedWithholding {
+        assume EmploymentTerminated(Employee)
+        assume WillfullyWithheld(Employer)
+        assume liquidated_ratio_within_cap(1.00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic payday_within_eleven_days
+            has empty effect row
+        assert automatic payday_grace_running
+            has empty effect row
+        assert automatic meets_nonexempt_frequency
+            has empty effect row
+        assert automatic paid_by_designated_payday
+            has empty effect row
+        assert automatic liquidated_ratio_within_cap
+            has empty effect row
+        assert bona_fide_dispute
+            is never treated automatic
+        assert willful_withholding
+            is never treated automatic
+    }
+}

@@ -1,0 +1,188 @@
+module Louisiana.Family.CommunityProperty version "0.1.0" {
+    jurisdiction Louisiana
+    source_snapshot "2026-09-17-la-civ-code-2338-2341"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        article_2341_1_undivided_interests
+        article_2342_acquisition_declarations
+        article_2343_transmutation_formalities
+        article_2344_personal_injury_damages
+        reimbursement_claims
+        management_of_community
+        termination_and_partition
+        matrimonial_agreements
+        conflict_of_laws
+        complete_Civil_Code
+    }
+
+    source CommunityClassification {
+        kind statute
+        authority LouisianaLegislature
+        citation "La. Civ. Code arts. 2338-2340"
+        artifact "sources/la-civ-code-2338.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source SeparateProperty {
+        kind statute
+        authority LouisianaLegislature
+        citation "La. Civ. Code art. 2341"
+        artifact "sources/la-civ-code-2341.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    entity SpouseA : NaturalPerson
+    entity SpouseB : NaturalPerson
+    entity Thing : Asset
+
+    record_type PossessionRecord {
+        spouse: NaturalPerson
+        thing: Asset
+    }
+
+    proposition LegalRegimeExists(a: NaturalPerson, b: NaturalPerson)
+    proposition PossessedDuringRegime(spouse: NaturalPerson, thing: Asset)
+    proposition AcquiredDuringRegime(thing: Asset)
+    proposition AcquiredBeforeRegime(thing: Asset)
+    proposition InheritedIndividually(spouse: NaturalPerson, thing: Asset)
+    proposition DonatedIndividually(spouse: NaturalPerson, thing: Asset)
+    proposition CommunityCharacter(thing: Asset)
+    proposition SeparateCharacter(thing: Asset)
+    proposition FruitsReservedAsSeparate(thing: Asset, spouse: NaturalPerson)
+    proposition TracedToSeparateSource(thing: Asset)
+    proposition Transmuted(thing: Asset)
+    proposition EqualUndividedOwnership(a: NaturalPerson, b: NaturalPerson, thing: Asset)
+
+    observation PossessionDuringRegime(record: PossessionRecord)
+        establishes PossessedDuringRegime(record.spouse, record.thing)
+        from CommunityClassification
+    {
+        require record.spouse == SpouseA
+    }
+
+    legal_act ReserveSeparateFruits(thing: Asset) {
+        performer SpouseA
+        recipient SpouseB
+        effect establish FruitsReservedAsSeparate(thing, SpouseA)
+        source CommunityClassification
+    }
+
+    calc undivided_community_share() -> Decimal {
+        return 0.5
+    }
+
+    rule DefaultCommunity : constitutive
+        from CommunityClassification
+    {
+        when operative PossessedDuringRegime(SpouseA, Thing)
+        then derive CommunityCharacter(Thing)
+    }
+
+    rule EqualShares : constitutive
+        from CommunityClassification
+    {
+        when operative CommunityCharacter(Thing)
+        then establish EqualUndividedOwnership(SpouseA, SpouseB, Thing)
+    }
+
+    duty RespectUndividedShare {
+        bearer SpouseA
+        claimant SpouseB
+        attaches when operative EqualUndividedOwnership(SpouseA, SpouseB, Thing)
+        content refrain_from_treating_the_thing_as_exclusively_owned
+        source CommunityClassification
+    }
+
+    query automatic default_community(possessed_during_regime: Bool) -> Bool {
+        return possessed_during_regime
+    }
+
+    query automatic fruits_default_community(reserved: Bool) -> Bool {
+        return not reserved
+    }
+
+    query automatic undivided_half(share: Decimal) -> Bool {
+        return share == undivided_community_share()
+    }
+
+    query community_character()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed PossessionDuringRegime
+            require determined CommunityCharacter(Thing)
+                using Determine
+        }
+    }
+
+    query tracing()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined TracedToSeparateSource(Thing)
+                using Determine
+        }
+    }
+
+    query transmutation()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined Transmuted(Thing)
+                using Determine
+        }
+    }
+
+    scenario WagesDuringMarriage {
+        assume LegalRegimeExists(SpouseA, SpouseB)
+        assume PossessedDuringRegime(SpouseA, Thing)
+        assume AcquiredDuringRegime(Thing)
+        assume default_community(true)
+        assume undivided_half(0.5)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario InheritanceDuringMarriage {
+        assume LegalRegimeExists(SpouseA, SpouseB)
+        assume PossessedDuringRegime(SpouseA, Thing)
+        assume InheritedIndividually(SpouseA, Thing)
+        assume default_community(true)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario MixedFundsTracing {
+        assume LegalRegimeExists(SpouseA, SpouseB)
+        assume AcquiredDuringRegime(Thing)
+        assume TracedToSeparateSource(Thing)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario FruitsDefaultCommunity {
+        assume LegalRegimeExists(SpouseA, SpouseB)
+        assume SeparateCharacter(Thing)
+        assume fruits_default_community(false)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify ClassificationHonesty {
+        assert automatic default_community
+            has empty effect row
+        assert automatic fruits_default_community
+            has empty effect row
+        assert automatic undivided_half
+            has empty effect row
+        assert community_character
+            is never treated automatic
+        assert tracing
+            is never treated automatic
+        assert transmutation
+            is never treated automatic
+    }
+}

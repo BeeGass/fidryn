@@ -1,0 +1,244 @@
+module Missouri.Housing.SecurityDeposit version "0.1.0" {
+    jurisdiction Missouri
+    source_snapshot "2026-09-17-mo-rev-stat-535-300"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        pet_deposits_excluded_from_security_deposit
+        housing_authority_account_exemption
+        commercial_tenancies
+        interest_belongs_to_landlord
+        carpet_cleaning_lease_carveout_factfinding
+        local_ordinances
+        small_claims_procedure
+        last_known_address_service_disputes
+        complete_Chapter_535
+        complete_Chapter_441
+    }
+
+    source SecurityDepositStatute {
+        kind statute
+        authority MissouriGeneralAssembly
+        citation "Mo. Rev. Stat. § 535.300"
+        artifact "sources/mo-rev-stat-535-300.txt"
+        digest fixture
+        effective [2018-08-28, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Landlord : NaturalPerson
+    entity Unit : Dwelling
+    entity Depository : LegalPerson
+
+    record_type TenancyEndRecord {
+        tenant: NaturalPerson
+        unit: Dwelling
+        ended_at: Time
+    }
+
+    record_type ItemizedStatement {
+        tenant: NaturalPerson
+        unit: Dwelling
+        mailed_at: Time
+        withheld: Money<USD>
+    }
+
+    proposition TenancyEnded(unit: Dwelling, at: Time)
+    proposition DepositHeld(landlord: NaturalPerson, unit: Dwelling)
+    proposition FederallyInsuredAccount(depository: LegalPerson)
+    proposition FullDepositReturned(unit: Dwelling, at: Time)
+    proposition ItemizedListFurnished(unit: Dwelling)
+    proposition UnpaidRentDefault(tenant: NaturalPerson)
+    proposition OrdinaryWearAndTear(unit: Dwelling)
+    proposition ReasonablyNecessaryWithholding(landlord: NaturalPerson)
+    proposition InspectionNoticeGiven(tenant: NaturalPerson)
+    proposition TenantPresentAtInspection(tenant: NaturalPerson)
+    proposition WrongfulWithholding(landlord: NaturalPerson)
+    proposition BadFaithRetention(landlord: NaturalPerson)
+    proposition InadequateTerminationNotice(tenant: NaturalPerson)
+    proposition MitigationEfforts(landlord: NaturalPerson)
+
+    observation TenancyEndObservation(record: TenancyEndRecord)
+        establishes TenancyEnded(record.unit, record.ended_at)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    observation ItemizationMailed(record: ItemizedStatement)
+        establishes ItemizedListFurnished(record.unit)
+        from SecurityDepositStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act ReturnFullDeposit(ended: Time, returned: Time) {
+        performer Landlord
+        recipient Tenant
+        validity requires operative TenancyEnded(Unit, ended)
+        effect establish FullDepositReturned(Unit, returned)
+        source SecurityDepositStatute
+    }
+
+    legal_act MailItemizedList(record: ItemizedStatement) {
+        performer Landlord
+        recipient Tenant
+        effect establish ItemizedListFurnished(Unit)
+        source SecurityDepositStatute
+    }
+
+    calc return_deadline() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc deposit_month_cap() -> Int {
+        return 2
+    }
+
+    calc wrongful_withholding_multiplier() -> Int {
+        return 2
+    }
+
+    rule ReturnOrItemize : prescriptive
+        from SecurityDepositStatute
+    {
+        when operative TenancyEnded(Unit, ended_at)
+        then derive DepositHeld(Landlord, Unit)
+    }
+
+    rule WearAndTearNotWithholdable : constitutive
+        from SecurityDepositStatute
+    {
+        when operative OrdinaryWearAndTear(Unit)
+        then defeat ReasonablyNecessaryWithholding(Landlord)
+    }
+
+    duty ReturnDepositOrItemize {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit, ended_at)
+        content return_full_deposit_or_mail_itemized_list_and_balance
+        source SecurityDepositStatute
+    }
+
+    duty HoldInInsuredAccount {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative DepositHeld(Landlord, Unit)
+        content hold_deposit_in_federally_insured_depository
+        source SecurityDepositStatute
+    }
+
+    duty GiveInspectionNotice {
+        bearer Landlord
+        claimant Tenant
+        attaches when operative TenancyEnded(Unit, ended_at)
+        content give_reasonable_written_notice_of_inspection_time
+        source SecurityDepositStatute
+    }
+
+    query automatic deadline_still_open(end: Time, as_of: Time) -> Bool {
+        return as_of <= end + return_deadline()
+    }
+
+    query automatic deadline_missed(end: Time, as_of: Time) -> Bool {
+        return as_of > end + return_deadline()
+    }
+
+    query automatic within_two_months_rent(deposit: Money<USD>, monthly_rent: Money<USD>) -> Bool {
+        return deposit <= monthly_rent + monthly_rent
+    }
+
+    query automatic double_the_withheld(amount: Money<USD>) -> Money<USD> {
+        return amount + amount
+    }
+
+    query automatic deposit_month_cap_is_two() -> Bool {
+        return deposit_month_cap() == 2
+    }
+
+    query automatic multiplier_is_two() -> Bool {
+        return wrongful_withholding_multiplier() == 2
+    }
+
+    query bad_faith_withholding()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BadFaithRetention(Landlord)
+                using Determine
+            require determined WrongfulWithholding(Landlord)
+                using Determine
+        }
+    }
+
+    query ordinary_wear_and_tear()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require determined OrdinaryWearAndTear(Unit)
+                using Determine
+        }
+    }
+
+    query reasonably_necessary_amount()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined ReasonablyNecessaryWithholding(Landlord)
+                using Determine
+        }
+    }
+
+    scenario ReturnOnDayThirty {
+        assume TenancyEnded(Unit, 2026-08-18T12:00:00-05:00)
+        assume deadline_still_open(2026-08-18T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        assume FullDepositReturned(Unit, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario CapAtTwoMonths {
+        assume DepositHeld(Landlord, Unit)
+        assume within_two_months_rent(USD(2400.00), USD(1200.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario ItemizedMailing {
+        assume TenancyEnded(Unit, 2026-08-18T12:00:00-05:00)
+        assume ItemizedListFurnished(Unit)
+        assume deadline_still_open(2026-08-18T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario WrongfulWithholdingClaim {
+        assume TenancyEnded(Unit, 2026-08-01T12:00:00-05:00)
+        assume deadline_missed(2026-08-01T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        assume double_the_withheld(USD(800.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify DepositHonesty {
+        assert automatic deadline_still_open
+            has empty effect row
+        assert automatic deadline_missed
+            has empty effect row
+        assert automatic within_two_months_rent
+            has empty effect row
+        assert automatic double_the_withheld
+            has empty effect row
+        assert automatic deposit_month_cap_is_two
+            has empty effect row
+        assert automatic multiplier_is_two
+            has empty effect row
+        assert bad_faith_withholding
+            is never treated automatic
+        assert ordinary_wear_and_tear
+            is never treated automatic
+        assert reasonably_necessary_amount
+            is never treated automatic
+    }
+}

@@ -1,0 +1,246 @@
+module Utah.Housing.Eviction version "0.1.0" {
+    jurisdiction Utah
+    source_snapshot "2026-09-17-utah-78b-6-802"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-06:00
+
+    outside_scope {
+        service_methods_78B_6_805
+        summons_appearance_78B_6_807
+        occupancy_hearing_timelines_78B_6_810
+        restitution_enforcement_78B_6_812
+        self_help_exclusion_78B_6_814
+        abandonment_presumption_78B_6_815
+        mobile_home_park_residency_Title_57
+        Protecting_Tenants_at_Foreclosure_Act
+        CARES_Act_15_USC_9058
+        agricultural_holdover_78B_6_803
+        nuisance_abatement_78B_6a_303
+        subsidized_housing_notice
+        local_ordinances
+        complete_Part_8
+    }
+
+    source UnlawfulDetainerStatute {
+        kind statute
+        authority UtahLegislature
+        citation "Utah Code § 78B-6-802"
+        artifact "sources/utah-78b-6-802.txt"
+        digest fixture
+        effective [2026-05-06, +inf)
+    }
+
+    source RestitutionStatute {
+        kind statute
+        authority UtahLegislature
+        citation "Utah Code § 78B-6-811"
+        artifact "sources/utah-78b-6-811.txt"
+        digest fixture
+        effective [2026-05-06, +inf)
+    }
+
+    entity Tenant : NaturalPerson
+    entity Owner : NaturalPerson
+    entity Premises : RealProperty
+    entity Court : Authority
+
+    record_type NoticeServiceRecord {
+        tenant: NaturalPerson
+        premises: RealProperty
+        served_at: Time
+    }
+
+    proposition ContinuesInPossession(person: NaturalPerson, property: RealProperty)
+    proposition RentDefault(person: NaturalPerson, property: RealProperty)
+    proposition PeriodicTenancy(person: NaturalPerson, property: RealProperty)
+    proposition TenancyAtWill(person: NaturalPerson, property: RealProperty)
+    proposition SpecifiedTermExpired(person: NaturalPerson, property: RealProperty)
+    proposition NoticeServed(person: NaturalPerson, property: RealProperty)
+    proposition UnconditionalQuitGround(person: NaturalPerson, property: RealProperty)
+    proposition CurableCovenantBreach(person: NaturalPerson, property: RealProperty)
+    proposition UnlawfulDetainer(person: NaturalPerson, property: RealProperty)
+    proposition RightOfOccupancy(person: NaturalPerson, property: RealProperty)
+    proposition JudgmentForPlaintiff(person: NaturalPerson, property: RealProperty)
+    proposition RestitutionOrdered(property: RealProperty)
+
+    observation NoticeServiceObservation(record: NoticeServiceRecord)
+        establishes NoticeServed(record.tenant, record.premises)
+        from UnlawfulDetainerStatute
+    {
+        require record.tenant == Tenant
+    }
+
+    legal_act ServeNotice(notice: Notice) {
+        performer Owner
+        recipient Tenant
+        effect establish NoticeServed(Tenant, Premises)
+        source UnlawfulDetainerStatute
+    }
+
+    calc specified_term_notice() -> Duration<counted_days> {
+        return 0 counted_days
+    }
+
+    calc periodic_quit_notice() -> Duration<counted_days> {
+        return 15 counted_days
+    }
+
+    calc tenancy_at_will_notice() -> Duration<counted_days> {
+        return 5 counted_days
+    }
+
+    calc pay_or_quit_period() -> Duration<working_days> {
+        return 3 working_days
+    }
+
+    calc comply_or_quit_period() -> Duration<counted_days> {
+        return 3 counted_days
+    }
+
+    calc unconditional_quit_period() -> Duration<counted_days> {
+        return 3 counted_days
+    }
+
+    calc treble_multiplier() -> Int {
+        return 3
+    }
+
+    rule UnlawfulDetainerAfterRentNotice : constitutive
+        from UnlawfulDetainerStatute
+    {
+        when operative ContinuesInPossession(Tenant, Premises)
+          and operative RentDefault(Tenant, Premises)
+          and operative NoticeServed(Tenant, Premises)
+        then derive UnlawfulDetainer(Tenant, Premises)
+    }
+
+    rule PlaintiffJudgmentIncludesRestitution : prescriptive
+        from RestitutionStatute
+    {
+        when operative JudgmentForPlaintiff(Owner, Premises)
+        then establish RestitutionOrdered(Premises)
+    }
+
+    duty PayOrSurrender {
+        bearer Tenant
+        claimant Owner
+        attaches when operative RentDefault(Tenant, Premises)
+          and operative NoticeServed(Tenant, Premises)
+        content pay_rent_and_other_amounts_due_or_surrender_premises
+        source UnlawfulDetainerStatute
+    }
+
+    judgment PossessionOnTheMerits(property: RealProperty)
+    decides RightOfOccupancy(Owner, property)
+        from RestitutionStatute
+    {
+        authority Court
+        record requires JudgmentEntry
+        establish when determined UnlawfulDetainer(Tenant, property)
+    }
+
+    query automatic specified_term_needs_no_advance_notice() -> Bool {
+        return specified_term_notice() == 0 counted_days
+    }
+
+    query automatic periodic_notice_timely(served: Time, period_end: Time) -> Bool {
+        return served + periodic_quit_notice() <= period_end
+    }
+
+    query automatic at_will_notice_lapsed(served: Time, as_of: Time) -> Bool {
+        return as_of >= served + tenancy_at_will_notice()
+    }
+
+    query automatic pay_or_quit_lapsed(served: Time, as_of: Time) -> Bool {
+        return as_of >= served + pay_or_quit_period()
+    }
+
+    query automatic comply_or_quit_lapsed(served: Time, as_of: Time) -> Bool {
+        return as_of >= served + comply_or_quit_period()
+    }
+
+    query automatic unconditional_quit_lapsed(served: Time, as_of: Time) -> Bool {
+        return as_of >= served + unconditional_quit_period()
+    }
+
+    query automatic treble_of(damages: Int) -> Int {
+        return damages * treble_multiplier()
+    }
+
+    query possession()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed NoticeServiceObservation
+            require determined RightOfOccupancy(Owner, Premises)
+                using Determine
+        }
+    }
+
+    query unlawful_detainer()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined UnlawfulDetainer(Tenant, Premises)
+                using Determine
+        }
+    }
+
+    scenario PayOrQuitThreeBusinessDays {
+        assume RentDefault(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume NoticeServed(Tenant, Premises)
+        assume pay_or_quit_lapsed(2026-09-01T09:00:00-06:00, 2026-09-04T09:00:00-06:00)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario MonthToMonthFifteenCalendarDays {
+        assume PeriodicTenancy(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume periodic_notice_timely(2026-09-15T09:00:00-06:00, 2026-09-30T23:59:59-06:00)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario TenancyAtWillFiveCalendarDays {
+        assume TenancyAtWill(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume at_will_notice_lapsed(2026-09-10T09:00:00-06:00, 2026-09-15T09:00:00-06:00)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario UnconditionalQuitWaste {
+        assume UnconditionalQuitGround(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume unconditional_quit_lapsed(2026-09-10T09:00:00-06:00, 2026-09-13T09:00:00-06:00)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario SpecifiedTermEndsWithoutNotice {
+        assume SpecifiedTermExpired(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume specified_term_needs_no_advance_notice()
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    scenario PossessionStillADetermination {
+        assume NoticeServed(Tenant, Premises)
+        assume ContinuesInPossession(Tenant, Premises)
+        assume pay_or_quit_lapsed(2026-09-01T09:00:00-06:00, 2026-09-08T09:00:00-06:00)
+        at 2026-09-17T12:00:00-06:00
+    }
+
+    verify EvictionHonesty {
+        assert automatic pay_or_quit_lapsed
+            has empty effect row
+        assert automatic periodic_notice_timely
+            has empty effect row
+        assert automatic treble_of
+            has empty effect row
+        assert possession
+            is never treated automatic
+        assert unlawful_detainer
+            is never treated automatic
+    }
+}

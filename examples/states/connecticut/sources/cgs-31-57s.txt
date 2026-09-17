@@ -1,0 +1,39 @@
+Connecticut General Statutes § 31-57s (fixture excerpt).
+Employer requirement to provide paid sick leave; accrual, use, and rate
+of pay, as amended by P.A. 24-8, effective January 1, 2025.
+
+(a) Each employer shall provide paid sick leave annually to each of such
+employer's employees in the state. Such paid sick leave shall accrue
+(1) (A) beginning (i) January 1, 2025, for an employee of an employer that
+employs twenty-five or more individuals in the state, (ii) January 1, 2026,
+for an employee of an employer that employs eleven or more individuals in
+the state, or (iii) January 1, 2027, for an employee of an employer that
+employs one or more individuals in the state, or (B) for an employee hired
+after said dates, beginning on the employee's first date of employment,
+(2) at a rate of one hour of paid sick leave for each thirty hours worked
+by an employee, and (3) in one-hour increments up to a maximum of forty
+hours per year. An employer may provide its employees with a greater amount
+of paid sick leave or provide paid sick leave at a faster rate than
+required by this subsection. Each employee shall be entitled to carry over
+up to forty unused accrued hours of paid sick leave from the current year
+to the following year, but no employee shall be entitled to use more than
+the maximum number of accrued hours, as described in subdivision (3) of
+this subsection, in any year. In lieu of any carry-over of unused paid
+sick leave from the current year to the following year, an employer may
+provide an employee with an amount of paid sick leave that meets or exceeds
+the requirements of this subsection and is available for the employee's
+immediate use at the beginning of the following year.
+
+(b) An employee shall be entitled to the use of any accrued paid sick
+leave on and after the one hundred twentieth calendar day of such
+employee's employment.
+
+(f) An employee who is exempt from overtime requirements under the
+provisions of 29 USC 213(a)(1), as amended from time to time, shall be
+presumed to work forty hours each work week for purposes of paid sick
+leave accrual, except each such employee, whose normal work week is less
+than forty hours, shall accrue paid sick leave based upon the hours worked
+in such normal work week.
+
+Accrual arithmetic is mechanical. Covered-employee status is not encoded
+as a Boolean. Not an official edition.

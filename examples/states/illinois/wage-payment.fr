@@ -1,0 +1,244 @@
+module Illinois.Employment.WagePayment version "0.1.0" {
+    jurisdiction Illinois
+    source_snapshot "2026-09-17-820-ilcs-115"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        wage_deduction_section_9
+        payroll_cards_section_14_5
+        expense_reimbursement_section_9_5
+        construction_primary_contractor_section_13_5
+        civil_action_limitations_period
+        overtime_next_payday_admin_rule
+        collective_bargaining_different_payday
+        flsa_white_collar_duties_test
+        complete_820_ILCS_115
+        ill_adm_code_title_56_part_300
+    }
+
+    source PaydayTiming {
+        kind statute
+        authority IllinoisGeneralAssembly
+        citation "820 ILCS 115/3 to 115/5"
+        artifact "sources/820-ilcs-115-payday.txt"
+        digest fixture
+        effective [2024-01-01, +inf)
+    }
+
+    source WagePenalties {
+        kind statute
+        authority IllinoisGeneralAssembly
+        citation "820 ILCS 115/14"
+        artifact "sources/820-ilcs-115-14.txt"
+        digest fixture
+        effective [2025-08-01, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type PayPeriodClose {
+        employee: NaturalPerson
+        period_end: Time
+        paid_at: Time
+    }
+
+    proposition WagesEarned(employee: NaturalPerson)
+    proposition SemiMonthlyOrBiweekly(employee: NaturalPerson)
+    proposition WeeklyPaid(employee: NaturalPerson)
+    proposition WhiteCollarMonthly(employee: NaturalPerson)
+    proposition Separated(employee: NaturalPerson)
+    proposition FinalCompensationDue(employee: NaturalPerson)
+    proposition PaidOnTime(employee: NaturalPerson)
+    proposition WillfulViolation(employer: LegalPerson)
+
+    observation PayPeriodRecord(record: PayPeriodClose)
+        establishes WagesEarned(record.employee)
+        from PaydayTiming
+    {
+        require record.employee == Employee
+    }
+
+    legal_act PayWages(period: PayPeriodClose) {
+        performer Employer
+        recipient period.employee
+        effect establish PaidOnTime(period.employee)
+        source PaydayTiming
+    }
+
+    calc semimonthly_days() -> Int {
+        return 13
+    }
+
+    calc weekly_days() -> Int {
+        return 7
+    }
+
+    calc eap_calendar_days() -> Int {
+        return 21
+    }
+
+    calc daily_hours() -> Int {
+        return 24
+    }
+
+    calc semimonthly_window() -> Duration<counted_days> {
+        return 13 counted_days
+    }
+
+    calc monthly_damages_percent() -> Decimal {
+        return 5.0
+    }
+
+    calc demand_compliance_days() -> Int {
+        return 15
+    }
+
+    calc order_compliance_days() -> Int {
+        return 35
+    }
+
+    calc idol_complaint_years() -> Int {
+        return 1
+    }
+
+    calc repeat_felony_years() -> Int {
+        return 2
+    }
+
+    calc idol_penalty_percent() -> Decimal {
+        return 20.0
+    }
+
+    calc daily_employee_penalty_percent() -> Decimal {
+        return 1.0
+    }
+
+    calc willful_class_b_cap() -> Money<USD> {
+        return USD(5000.00)
+    }
+
+    calc wage_owed_low_cap() -> Money<USD> {
+        return USD(3000.00)
+    }
+
+    calc wage_owed_high_floor() -> Money<USD> {
+        return USD(10000.00)
+    }
+
+    calc admin_fee_low() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    calc admin_fee_mid() -> Money<USD> {
+        return USD(750.00)
+    }
+
+    calc admin_fee_high() -> Money<USD> {
+        return USD(1250.00)
+    }
+
+    rule FinalPayNextPayday : constitutive
+        from PaydayTiming
+    {
+        when operative Separated(Employee)
+        then derive FinalCompensationDue(Employee)
+    }
+
+    duty PayEarnedWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative WagesEarned(Employee)
+        content pay_all_wages_earned_within_statutory_window
+        source PaydayTiming
+    }
+
+    duty PayFinalCompensation {
+        bearer Employer
+        claimant Employee
+        attaches when operative FinalCompensationDue(Employee)
+        content pay_final_compensation_by_next_regular_payday
+        source PaydayTiming
+    }
+
+    query automatic paid_within_semimonthly_window(days_after_period: Int) -> Bool {
+        return days_after_period <= semimonthly_days()
+    }
+
+    query automatic paid_within_weekly_window(days_after_period: Int) -> Bool {
+        return days_after_period <= weekly_days()
+    }
+
+    query automatic paid_within_eap_window(days_after_period: Int) -> Bool {
+        return days_after_period <= eap_calendar_days()
+    }
+
+    query automatic semimonthly_deadline_running(period_end: Time, as_of: Time) -> Bool {
+        return as_of <= period_end + semimonthly_window()
+    }
+
+    query automatic admin_fee_low_bracket(wages_owed: Money<USD>) -> Bool {
+        return wages_owed <= wage_owed_low_cap()
+    }
+
+    query automatic admin_fee_high_bracket(wages_owed: Money<USD>) -> Bool {
+        return wages_owed >= wage_owed_high_floor()
+    }
+
+    query automatic willful_class_b_amount(unpaid: Money<USD>) -> Bool {
+        return unpaid <= willful_class_b_cap()
+    }
+
+    query willful_violation()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed PayPeriodRecord
+            require determined WillfulViolation(Employer)
+                using Determine
+        }
+    }
+
+    scenario SemimonthlyDayThirteen {
+        assume WagesEarned(Employee)
+        assume SemiMonthlyOrBiweekly(Employee)
+        assume paid_within_semimonthly_window(13)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario WeeklyDayEightLate {
+        assume WagesEarned(Employee)
+        assume WeeklyPaid(Employee)
+        assume paid_within_weekly_window(8)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario FinalPayAndHighAdminFee {
+        assume Separated(Employee)
+        assume FinalCompensationDue(Employee)
+        assume admin_fee_high_bracket(USD(10000.00))
+        assume willful_class_b_amount(USD(5000.00))
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic paid_within_semimonthly_window
+            has empty effect row
+        assert automatic paid_within_weekly_window
+            has empty effect row
+        assert automatic paid_within_eap_window
+            has empty effect row
+        assert automatic semimonthly_deadline_running
+            has empty effect row
+        assert automatic admin_fee_low_bracket
+            has empty effect row
+        assert automatic admin_fee_high_bracket
+            has empty effect row
+        assert automatic willful_class_b_amount
+            has empty effect row
+        assert willful_violation
+            is never treated automatic
+    }
+}

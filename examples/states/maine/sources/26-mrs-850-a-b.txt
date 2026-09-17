@@ -1,0 +1,43 @@
+Maine Revised Statutes Title 26, sections 850-A and 850-B (fixture excerpt).
+Labor and Industry, Employment Practices, Subchapter 6-C, Paid Family and
+Medical Leave.
+
+Section 850-A. Covered individual means a person who earned at least 6
+times the state average weekly wage in wages subject to premiums during
+the individual's base period, or who elects coverage and meets section
+850-G, and who meets administrative requirements and files an application
+for family leave benefits or medical leave benefits.
+
+Base period means the first 4 of the last 5 completed calendar quarters
+immediately preceding the first day of an individual's benefit year.
+
+Benefit year means the 12-month period beginning on the first day of the
+calendar week immediately preceding the first date of approved family or
+medical leave.
+
+State average weekly wage means the average weekly wage as published by
+the department for the State as a whole for the 12 most recently reported
+months. The Maine Workers' Compensation Board published a state average
+weekly wage of $1,249.12 as of July 1, 2026.
+
+Section 850-B. A covered individual is eligible for family leave to bond
+with a child during the first 12 months after birth or placement for
+adoption or foster care; to care for a family member with a serious health
+condition; to attend to a qualifying exigency; to care for a family member
+who is a covered service member; to take safe leave; or for any other
+reason set forth in section 843, subsection 4.
+
+A covered individual with a serious health condition that makes the
+covered individual unable to work is eligible for medical leave.
+
+A covered individual is not eligible for more than 12 weeks of family
+leave in a benefit year, is not eligible for medical leave for more than
+12 weeks in a benefit year, and may not take more than 12 weeks, in the
+aggregate, of family leave and medical leave in the same benefit year.
+This subsection does not prevent medical leave immediately followed by
+family leave when the medical leave is taken during pregnancy or recovery
+from childbirth and is supported by documentation from a health care
+provider.
+
+Whether a claimed absence is a qualifying family or medical event is a
+determination, not a Boolean. Not an official edition.

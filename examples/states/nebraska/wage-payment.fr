@@ -1,0 +1,235 @@
+module Nebraska.Employment.WagePayment version "0.1.0" {
+    jurisdiction Nebraska
+    source_snapshot "2026-09-17-neb-rev-stat-48-1230"
+    effective_at 2026-09-17
+    recorded_at 2026-09-17T12:00:00-05:00
+
+    outside_scope {
+        political_subdivision_governing_body_calendar
+        commission_accounting_under_48_1230_01
+        vacation_versus_sick_or_PTO_classification
+        payroll_debit_card_EFTA_compulsory_use
+        wage_statement_FLSA_exempt_hours
+        retaliation_merits_under_48_1235
+        commissioner_investigation_procedure
+        complete_Wage_Payment_and_Collection_Act
+        not_legal_advice
+    }
+
+    source WagePaymentTiming {
+        kind statute
+        authority NebraskaLegislature
+        citation "Neb. Rev. Stat. §§ 48-1229 to 48-1230"
+        artifact "sources/neb-rev-stat-48-1230.txt"
+        digest fixture
+        effective [2026-09-17, +inf)
+    }
+
+    source WageClaimRemedy {
+        kind statute
+        authority NebraskaLegislature
+        citation "Neb. Rev. Stat. §§ 48-1231 to 48-1234"
+        artifact "sources/neb-rev-stat-48-1231.txt"
+        digest fixture
+        effective [2026-07-18, +inf)
+    }
+
+    entity Employee : NaturalPerson
+    entity Employer : LegalPerson
+
+    record_type SeparationRecord {
+        employee: NaturalPerson
+        employer: LegalPerson
+        separated_at: Time
+    }
+
+    proposition Employed(employee: NaturalPerson, employer: LegalPerson)
+    proposition SeparatedFromPayroll(employee: NaturalPerson, employer: LegalPerson)
+    proposition WagesDue(employee: NaturalPerson)
+    proposition RegularPaydayDesignated(employer: LegalPerson)
+    proposition WrittenPaydayChangeNotice(employer: LegalPerson, employee: NaturalPerson)
+    proposition PoliticalSubdivisionEmployer(employer: LegalPerson)
+    proposition BonaFideDispute(employer: LegalPerson, employee: NaturalPerson)
+    proposition WillfulNonpayment(employer: LegalPerson)
+
+    observation SeparationDate(record: SeparationRecord)
+        establishes SeparatedFromPayroll(record.employee, record.employer)
+        from WagePaymentTiming
+    {
+        require record.employee == Employee
+    }
+
+    legal_act SeparateFromPayroll() {
+        performer Employer
+        recipient Employee
+        effect establish SeparatedFromPayroll(Employee, Employer)
+        source WagePaymentTiming
+    }
+
+    calc payday_change_notice() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc two_weeks() -> Duration<counted_days> {
+        return 14 counted_days
+    }
+
+    calc one_week() -> Duration<counted_days> {
+        return 7 counted_days
+    }
+
+    calc suit_waiting() -> Duration<counted_days> {
+        return 30 counted_days
+    }
+
+    calc first_citation_cap() -> Money<USD> {
+        return USD(500.00)
+    }
+
+    calc subsequent_citation_cap() -> Money<USD> {
+        return USD(5000.00)
+    }
+
+    calc citation_contest_window() -> Duration<working_days> {
+        return 15 working_days
+    }
+
+    calc willful_multiplier() -> Int {
+        return 2
+    }
+
+    rule RegularPaydayDuty : constitutive
+        from WagePaymentTiming
+    {
+        when operative Employed(Employee, Employer)
+        then derive WagesDue(Employee)
+    }
+
+    duty PayFinalWages {
+        bearer Employer
+        claimant Employee
+        attaches when operative SeparatedFromPayroll(Employee, Employer)
+        content pay_unpaid_wages_by_sooner_of_next_payday_or_two_weeks
+        source WagePaymentTiming
+    }
+
+    query automatic payday_change_noticed(notice: Time, altered_payday: Time) -> Bool {
+        return altered_payday >= notice + payday_change_notice()
+    }
+
+    query automatic two_weeks_is_sooner(termination: Time, next_payday: Time) -> Bool {
+        return termination + two_weeks() <= next_payday
+    }
+
+    query automatic next_payday_is_sooner(termination: Time, next_payday: Time) -> Bool {
+        return next_payday < termination + two_weeks()
+    }
+
+    query automatic private_final_pay_timely(termination: Time, next_payday: Time, paid: Time) -> Bool {
+        return paid <= next_payday and paid <= termination + two_weeks()
+    }
+
+    query automatic political_subdivision_week_prior(separation: Time, next_meeting: Time) -> Bool {
+        return separation + one_week() <= next_meeting
+    }
+
+    query automatic suit_ripe(payday: Time, as_of: Time) -> Bool {
+        return as_of >= payday + suit_waiting()
+    }
+
+    query automatic first_citation_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= first_citation_cap()
+    }
+
+    query automatic subsequent_citation_within_cap(amount: Money<USD>) -> Bool {
+        return amount <= subsequent_citation_cap()
+    }
+
+    query automatic citation_contest_timely(citation: Time, contest: Time) -> Bool {
+        return contest <= citation + citation_contest_window()
+    }
+
+    query wages_due()
+        -> Bool
+        ! {Observe, Determine}
+    {
+        goal Evaluate {
+            require observed SeparationDate
+            require determined WagesDue(Employee)
+                using Determine
+        }
+    }
+
+    query bona_fide_dispute()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined BonaFideDispute(Employer, Employee)
+                using Determine
+        }
+    }
+
+    query willful_nonpayment()
+        -> Bool
+        ! {Determine}
+    {
+        goal Evaluate {
+            require determined WillfulNonpayment(Employer)
+                using Determine
+        }
+    }
+
+    scenario PaydaySoonerThanTwoWeeks {
+        assume Employed(Employee, Employer)
+        assume SeparatedFromPayroll(Employee, Employer)
+        assume not PoliticalSubdivisionEmployer(Employer)
+        assume next_payday_is_sooner(2026-09-17T12:00:00-05:00, 2026-09-24T12:00:00-05:00)
+        assume private_final_pay_timely(2026-09-17T12:00:00-05:00, 2026-09-24T12:00:00-05:00, 2026-09-24T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario TwoWeeksSoonerThanPayday {
+        assume Employed(Employee, Employer)
+        assume SeparatedFromPayroll(Employee, Employer)
+        assume not PoliticalSubdivisionEmployer(Employer)
+        assume two_weeks_is_sooner(2026-09-17T12:00:00-05:00, 2026-10-15T12:00:00-05:00)
+        assume private_final_pay_timely(2026-09-17T12:00:00-05:00, 2026-10-15T12:00:00-05:00, 2026-10-01T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario PaydayChangeWithThirtyDays {
+        assume Employed(Employee, Employer)
+        assume WrittenPaydayChangeNotice(Employer, Employee)
+        assume payday_change_noticed(2026-09-17T12:00:00-05:00, 2026-10-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    scenario AmountInDispute {
+        assume SeparatedFromPayroll(Employee, Employer)
+        assume WagesDue(Employee)
+        assume suit_ripe(2026-08-17T12:00:00-05:00, 2026-09-17T12:00:00-05:00)
+        at 2026-09-17T12:00:00-05:00
+    }
+
+    verify WagePaymentHonesty {
+        assert automatic payday_change_noticed
+            has empty effect row
+        assert automatic two_weeks_is_sooner
+            has empty effect row
+        assert automatic next_payday_is_sooner
+            has empty effect row
+        assert automatic private_final_pay_timely
+            has empty effect row
+        assert automatic suit_ripe
+            has empty effect row
+        assert automatic first_citation_within_cap
+            has empty effect row
+        assert wages_due
+            is never treated automatic
+        assert bona_fide_dispute
+            is never treated automatic
+        assert willful_nonpayment
+            is never treated automatic
+    }
+}
