@@ -85,8 +85,10 @@ pub struct HirRule {
     pub name: String,
     pub kind: String,
     pub source: Option<String>,
+    pub binders: Vec<String>,
     pub guard: Option<Guard>,
     pub consequences: Vec<(String, PropTerm)>,
+    pub fallback: Vec<(String, PropTerm)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -387,12 +389,22 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 }
             }
             fidryn_syntax::ast::Item::Rule(d) => {
-                let (parsed_guard, parsed_consequences) = body::parse_rule_parts(&d.source);
-                let guard = d.guard.as_ref().map(body::expr_to_guard).or(parsed_guard);
+                let parsed = body::parse_rule_parts(&d.source);
+                let mut guard = d.guard.as_ref().map(body::expr_to_guard).or(parsed.guard);
+                if let Some(req) = d.require.as_ref() {
+                    guard = Some(body::and_opt_guard(guard, body::expr_to_guard(req)));
+                } else if let Some(req) = parsed.require {
+                    guard = Some(body::and_opt_guard(guard, req));
+                }
                 let consequences = if d.consequences.is_empty() {
-                    parsed_consequences
+                    parsed.consequences
                 } else {
                     body::consequences_from_ast(&d.consequences)
+                };
+                let fallback = if d.fallback.is_empty() {
+                    parsed.fallback
+                } else {
+                    body::consequences_from_ast(&d.fallback)
                 };
                 hir.rules.push(HirRule {
                     name: d.name.clone().unwrap_or_default(),
@@ -404,8 +416,10 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         })
                         .unwrap_or_else(|| body::parse_rule_kind(&d.source)),
                     source: Some(d.source.clone()),
+                    binders: d.params.iter().map(|(name, _)| name.clone()).collect(),
                     guard,
                     consequences,
+                    fallback,
                 });
             }
             fidryn_syntax::ast::Item::Duty(d) => {
@@ -1227,6 +1241,56 @@ module Examples.Rule version "0.1.0" {
         assert!(!hir.rules[0].consequences.is_empty());
         assert_eq!(hir.rules[0].consequences[0].0, "derive");
         assert_eq!(hir.rules[0].consequences[0].1.predicate, "Q");
+        assert!(hir.rules[0].fallback.is_empty());
+        assert!(hir.rules[0].binders.is_empty());
+    }
+
+    #[test]
+    fn elaborates_false_guard_require_otherwise_and_binders() {
+        let src = r#"
+module Examples.RuleGuards version "0.1.0" {
+    rule R(x: Person) : derive {
+        when false
+        require true
+        then derive P()
+        otherwise derive Q()
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.rules.len(), 1);
+        let rule = &hir.rules[0];
+        assert_eq!(rule.binders, vec!["x".to_owned()]);
+        assert_eq!(
+            rule.guard,
+            Some(Guard::Not(Box::new(Guard::Satisfied))),
+            "{:?}",
+            rule.guard
+        );
+        assert_eq!(rule.consequences.len(), 1);
+        assert_eq!(rule.consequences[0].1.predicate, "P");
+        assert_eq!(rule.fallback.len(), 1);
+        assert_eq!(rule.fallback[0].1.predicate, "Q");
+    }
+
+    #[test]
+    fn elaborates_require_false_into_guard() {
+        let src = r#"
+module Examples.RuleRequire version "0.1.0" {
+    rule R : derive { when true require false then derive P() }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(
+            hir.rules[0].guard,
+            Some(Guard::Not(Box::new(Guard::Satisfied))),
+            "{:?}",
+            hir.rules[0].guard
+        );
+        assert_eq!(hir.rules[0].consequences[0].1.predicate, "P");
+        assert!(hir.rules[0].fallback.is_empty());
     }
 
     #[test]

@@ -280,34 +280,74 @@ pub fn parse_function_parts(src: &str) -> (Vec<(String, String)>, Option<Term>) 
     (extract_params(src), parse_fn_body_from_source(src))
 }
 
-pub fn parse_rule_parts(src: &str) -> (Option<Guard>, Vec<(String, PropTerm)>) {
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RuleParts {
+    pub guard: Option<Guard>,
+    pub consequences: Vec<(String, PropTerm)>,
+    pub fallback: Vec<(String, PropTerm)>,
+    pub require: Option<Guard>,
+}
+
+pub fn parse_rule_parts(src: &str) -> RuleParts {
     let inner = last_brace_inner(src).unwrap_or(src);
     let mut p = SliceParser::new(inner);
     let mut guard = None;
     let mut consequences = Vec::new();
+    let mut fallback = Vec::new();
+    let mut require = None;
     while !p.is_eof() {
         if p.eat_ident("when") {
             if let Some(term) = p.parse_expr() {
-                guard = Some(term_to_guard(&term));
+                guard = Some(and_opt_guard(guard.take(), term_to_guard(&term)));
             }
             continue;
         }
         if p.eat_ident("then") {
-            let op = if p.at_kind(TokenKind::Ident) {
-                p.bump_text()
-            } else {
-                "derive".into()
-            };
-            if let Some(term) = p.parse_expr()
-                && let Some(prop) = term_as_prop(&term)
-            {
-                consequences.push((op, prop));
+            if let Some(item) = parse_rule_consequence_pair(&mut p) {
+                consequences.push(item);
+            }
+            continue;
+        }
+        if p.eat_ident("otherwise") {
+            if let Some(item) = parse_rule_consequence_pair(&mut p) {
+                fallback.push(item);
+            }
+            continue;
+        }
+        if p.eat_ident("require") {
+            if let Some(term) = p.parse_expr() {
+                require = Some(and_opt_guard(require.take(), term_to_guard(&term)));
             }
             continue;
         }
         p.bump();
     }
-    (guard, consequences)
+    RuleParts {
+        guard,
+        consequences,
+        fallback,
+        require,
+    }
+}
+
+fn parse_rule_consequence_pair(p: &mut SliceParser<'_>) -> Option<(String, PropTerm)> {
+    let op = if p.at_kind(TokenKind::Ident) {
+        p.bump_text()
+    } else {
+        "derive".into()
+    };
+    let term = p.parse_expr()?;
+    term_as_prop(&term).map(|prop| (op, prop))
+}
+
+pub fn and_opt_guard(left: Option<Guard>, right: Guard) -> Guard {
+    match left {
+        None | Some(Guard::Satisfied) => right,
+        Some(prev) => match right {
+            Guard::Satisfied => prev,
+            other => Guard::And(vec![prev, other]),
+        },
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -932,6 +972,8 @@ fn split_top_level(src: &str, sep: char) -> impl Iterator<Item = &str> {
 
 fn term_to_guard(term: &Term) -> Guard {
     match term {
+        Term::Bool(true) => Guard::Satisfied,
+        Term::Bool(false) => Guard::Not(Box::new(Guard::Satisfied)),
         Term::Apply { ctor, args } if ctor == "operative" => operative_guard(args),
         Term::Call { callee, args } if callee == "operative" => operative_guard(args),
         Term::Apply { ctor, args } if ctor == "determined" || ctor == "assumed" => args
@@ -1725,17 +1767,60 @@ duty PayInvoice {
     #[test]
     fn parse_rule_operative_derive() {
         let src = "rule R : derive { when operative P() then derive Q() }";
-        let (guard, consequences) = parse_rule_parts(src);
+        let parts = parse_rule_parts(src);
         assert!(
             matches!(
-                guard,
+                parts.guard,
                 Some(Guard::Operative(ref p, _)) if p.predicate == "P"
             ),
-            "{guard:?}"
+            "{:?}",
+            parts.guard
         );
-        assert_eq!(consequences.len(), 1);
-        assert_eq!(consequences[0].0, "derive");
-        assert_eq!(consequences[0].1.predicate, "Q");
+        assert_eq!(parts.consequences.len(), 1);
+        assert_eq!(parts.consequences[0].0, "derive");
+        assert_eq!(parts.consequences[0].1.predicate, "Q");
+        assert!(parts.fallback.is_empty());
+        assert!(parts.require.is_none());
+    }
+
+    #[test]
+    fn term_to_guard_bool_false_is_not_satisfied() {
+        assert_eq!(expr_to_guard(&Expr::Bool(true)), Guard::Satisfied);
+        assert_eq!(
+            expr_to_guard(&Expr::Bool(false)),
+            Guard::Not(Box::new(Guard::Satisfied))
+        );
+        assert_ne!(expr_to_guard(&Expr::Bool(false)), Guard::Satisfied);
+        let parts = parse_rule_parts("rule R : derive { when false then derive P() }");
+        assert_eq!(
+            parts.guard,
+            Some(Guard::Not(Box::new(Guard::Satisfied))),
+            "{:?}",
+            parts.guard
+        );
+    }
+
+    #[test]
+    fn parse_rule_otherwise_is_fallback() {
+        let parts =
+            parse_rule_parts("rule R : derive { when true then derive P() otherwise derive Q() }");
+        assert_eq!(parts.guard, Some(Guard::Satisfied));
+        assert_eq!(parts.consequences.len(), 1);
+        assert_eq!(parts.consequences[0].1.predicate, "P");
+        assert_eq!(parts.fallback.len(), 1);
+        assert_eq!(parts.fallback[0].1.predicate, "Q");
+    }
+
+    #[test]
+    fn parse_rule_require_false_is_not_dropped() {
+        let parts = parse_rule_parts("rule R : derive { when true require false then derive P() }");
+        assert_eq!(parts.guard, Some(Guard::Satisfied));
+        assert_eq!(
+            parts.require,
+            Some(Guard::Not(Box::new(Guard::Satisfied))),
+            "{:?}",
+            parts.require
+        );
     }
 
     #[test]
