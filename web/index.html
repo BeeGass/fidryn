@@ -79,9 +79,8 @@
       color: var(--brass);
       margin-bottom: 8px;
     }
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      min-height: 280px;
       background: var(--ink-2);
       color: var(--paper);
       border: 1px solid #3d342a;
@@ -90,8 +89,14 @@
       font-size: 13px;
       line-height: 1.45;
       padding: 12px;
+    }
+    textarea {
+      min-height: 280px;
       resize: vertical;
     }
+    textarea.short { min-height: 120px; }
+    input[type="text"] { min-height: 40px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .tools { display: flex; gap: 8px; flex-wrap: wrap; }
     button {
       font-family: var(--mono);
@@ -136,8 +141,8 @@
       <div class="badge" id="health">health: ...</div>
     </header>
     <p class="deck">
-      Check a Fidryn module on this machine. Run, explore, and render remain
-      CLI commands. This mill never files.
+      Check, run, explore, and render a Fidryn module on this machine.
+      This mill never files.
     </p>
     <p class="warn">Live filing is not available from the UI.</p>
     <div>
@@ -149,11 +154,38 @@
 }
 </textarea>
     </div>
-    <div class="tools">
-      <button class="primary" id="check" type="button">Check</button>
+    <div>
+      <label for="query">Query</label>
+      <input id="query" type="text" value="q" spellcheck="false">
+    </div>
+    <div class="row">
+      <div>
+        <label for="validAt">validAt</label>
+        <input id="validAt" type="text" value="2033-01-01T00:00:00Z" spellcheck="false">
+      </div>
+      <div>
+        <label for="knownAt">knownAt</label>
+        <input id="knownAt" type="text" value="2033-01-01T00:00:00Z" spellcheck="false">
+      </div>
     </div>
     <div>
-      <label>Diagnostics</label>
+      <label for="case">Case JSON</label>
+      <textarea id="case" class="short" spellcheck="false">{}</textarea>
+    </div>
+    <div>
+      <label for="template">Template</label>
+      <textarea id="template" class="short" spellcheck="false">{{module}}@{{version}}
+outside: {{#each outside_scope}}{{item}} {{/each}}
+</textarea>
+    </div>
+    <div class="tools">
+      <button class="primary" id="check" type="button">Check</button>
+      <button id="run" type="button">Run</button>
+      <button id="explore" type="button">Explore</button>
+      <button id="render" type="button">Render</button>
+    </div>
+    <div>
+      <label>Outcome</label>
       <pre id="out">Ready.</pre>
     </div>
   </div>
@@ -165,13 +197,38 @@
     }).catch(function () {
       health.textContent = "health: unreachable";
     });
-    document.getElementById("check").addEventListener("click", function () {
-      out.textContent = "Checking...";
-      fetch("/api/check", {
+    function post(path, body) {
+      return fetch(path, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ source: document.getElementById("source").value })
-      }).then(function (r) { return r.json(); }).then(function (data) {
+        body: JSON.stringify(body)
+      }).then(function (r) { return r.json(); });
+    }
+    function fail(err) {
+      out.className = "";
+      out.textContent = String(err);
+    }
+    function readCase() {
+      var raw = document.getElementById("case").value.trim();
+      if (!raw) return {};
+      return JSON.parse(raw);
+    }
+    function evalBody() {
+      return {
+        source: document.getElementById("source").value,
+        query: document.getElementById("query").value,
+        case: readCase(),
+        validAt: document.getElementById("validAt").value,
+        knownAt: document.getElementById("knownAt").value
+      };
+    }
+    function showJson(data) {
+      out.className = data.ok ? "ok" : "";
+      out.textContent = JSON.stringify(data, null, 2);
+    }
+    document.getElementById("check").addEventListener("click", function () {
+      out.textContent = "Checking...";
+      post("/api/check", { source: document.getElementById("source").value }).then(function (data) {
         if (data.ok) {
           out.className = "ok";
           out.textContent = "ok";
@@ -182,10 +239,38 @@
           return (d.code || "") + " " + (d.message || JSON.stringify(d));
         });
         out.textContent = lines.join("\n") || "check failed";
-      }).catch(function (err) {
+      }).catch(fail);
+    });
+    document.getElementById("run").addEventListener("click", function () {
+      out.textContent = "Running...";
+      try {
+        post("/api/run", evalBody()).then(showJson).catch(fail);
+      } catch (err) {
+        fail(err);
+      }
+    });
+    document.getElementById("explore").addEventListener("click", function () {
+      out.textContent = "Exploring...";
+      try {
+        post("/api/explore", evalBody()).then(showJson).catch(fail);
+      } catch (err) {
+        fail(err);
+      }
+    });
+    document.getElementById("render").addEventListener("click", function () {
+      out.textContent = "Rendering...";
+      post("/api/render", {
+        source: document.getElementById("source").value,
+        template: document.getElementById("template").value
+      }).then(function (data) {
+        if (data.ok) {
+          out.className = "ok";
+          out.textContent = data.text || "";
+          return;
+        }
         out.className = "";
-        out.textContent = String(err);
-      });
+        out.textContent = data.error || JSON.stringify(data, null, 2);
+      }).catch(fail);
     });
   </script>
 </body>

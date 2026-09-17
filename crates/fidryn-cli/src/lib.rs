@@ -6,8 +6,8 @@ use clap::{Parser, Subcommand};
 use fidryn_adapt::{DryRun, FilingAdapter, MassachusettsCorporations};
 use fidryn_check::check;
 use fidryn_core::{
-    CaseRecord, CoreModule, Diagnostic, DiagnosticCode, Instant, QueryName, RunContext,
-    SourceManifest, TimeError, TraceId, Value, canonical_json,
+    AdmissibleCompletions, CaseRecord, CoreModule, Diagnostic, DiagnosticCode, Instant, QueryName,
+    RunContext, SourceManifest, TimeError, TraceId, Value, canonical_json,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
@@ -130,10 +130,17 @@ pub fn run(cli: Cli) -> ExitCode {
             path,
             query,
             case,
-            bounds: _,
+            bounds,
             valid_at,
             known_at,
-        } => cmd_explore(&path, &query, &case, &valid_at, &known_at),
+        } => cmd_explore(
+            &path,
+            &query,
+            &case,
+            bounds.as_deref(),
+            &valid_at,
+            &known_at,
+        ),
         Command::Explain { trace_id, format } => cmd_explain(&trace_id, &format),
         Command::Verify { path, property } => cmd_verify(&path, &property),
         Command::Diff {
@@ -332,19 +339,60 @@ fn cmd_run(
     ExitCode::SUCCESS
 }
 
+/// Merge bounds JSON into `case.admissible_completions` when it parses as
+/// `AdmissibleCompletions` or `{interpretations, evidence, choices}`.
+pub fn merge_bounds_json(case: &mut CaseRecord, bounds: &serde_json::Value) -> Result<(), String> {
+    let candidate = bounds
+        .get("admissibleCompletions")
+        .or_else(|| bounds.get("admissible_completions"))
+        .unwrap_or(bounds);
+    let ac: AdmissibleCompletions = serde_json::from_value(candidate.clone()).map_err(|err| {
+        format!(
+            "bounds JSON must be AdmissibleCompletions or {{interpretations, evidence, choices}}: {err}"
+        )
+    })?;
+    case.admissible_completions
+        .interpretations
+        .extend(ac.interpretations);
+    case.admissible_completions.evidence.extend(ac.evidence);
+    case.admissible_completions.choices.extend(ac.choices);
+    Ok(())
+}
+
 fn cmd_explore(
     path: &Path,
     query: &str,
     case_path: &Path,
+    bounds: Option<&Path>,
     valid_at: &str,
     known_at: &str,
 ) -> ExitCode {
     let Ok((module, _)) = compile_or_exit(path) else {
         return ExitCode::from(1);
     };
-    let Ok(case) = load_case(case_path) else {
+    let Ok(mut case) = load_case(case_path) else {
         return ExitCode::from(1);
     };
+    if let Some(bounds_path) = bounds {
+        let text = match fs::read_to_string(bounds_path) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("cannot read {}: {e}", bounds_path.display());
+                return ExitCode::from(1);
+            }
+        };
+        let value: serde_json::Value = match serde_json::from_str(&text) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("invalid bounds JSON: {e}");
+                return ExitCode::from(1);
+            }
+        };
+        if let Err(e) = merge_bounds_json(&mut case, &value) {
+            eprintln!("{e}");
+            return ExitCode::from(1);
+        }
+    }
     let Ok(valid) = instant_or_exit("--valid-at", valid_at) else {
         return ExitCode::from(1);
     };
@@ -760,5 +808,37 @@ module Examples.T version "0.1.0" {
         let names = snapshot_names_from_module(&module);
         assert!(names.contains_key("Examples.T"));
         assert!(names.contains_key("q"));
+    }
+
+    #[test]
+    fn merge_bounds_json_into_admissible_completions() {
+        let mut case = CaseRecord::default();
+        let bounds = json!({
+            "interpretations": {"SuccessorEligibility": ["I1", "I2"]},
+            "evidence": {},
+            "choices": {"k": ["a"]}
+        });
+        merge_bounds_json(&mut case, &bounds).unwrap();
+        assert_eq!(
+            case.admissible_completions
+                .interpretations
+                .get("SuccessorEligibility"),
+            Some(&vec!["I1".to_string(), "I2".to_string()])
+        );
+        assert_eq!(
+            case.admissible_completions.choices.get("k"),
+            Some(&vec!["a".to_string()])
+        );
+        let nested = json!({
+            "admissibleCompletions": {
+                "interpretations": {"Other": ["X"]},
+                "choices": {}
+            }
+        });
+        merge_bounds_json(&mut case, &nested).unwrap();
+        assert_eq!(
+            case.admissible_completions.interpretations.get("Other"),
+            Some(&vec!["X".to_string()])
+        );
     }
 }
