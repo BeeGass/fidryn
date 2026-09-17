@@ -104,10 +104,10 @@ The 2026-09-17 review is still **open**.
 | `fidryn-driver` crate split | Landed | `run_report`; `check_path_matching_blake3_authenticates_and_tamper_is_e200`; `render_report_schema_is_evaluation_report_v0_1`; `scenario_report_is_not_outcome_only_export` | Mill pasted source still uses `check` without files. Report envelope is `fidryn.evaluation-report/v0.1`; outcome JSON stays a projection (`additionalProperties: false`). Mill must not gain filesystem from paste. |
 | CLI `check_path` byte-auth | Implemented (this suite) | `Driver::check_path` → `check_with_sources(..., parent_dir)`; tamper is E200; `render_report_schema_is_evaluation_report_v0_1`; `mill_pasted_run_is_unauthenticated_evaluation_report` | In-memory `compile_source` / mill paste is not byte-verified (`sourceTrust: unauthenticated`). Mill must not gain filesystem from paste. |
 | Cross-feature programs | Landed | `late-payment.fr` / `late-payment-extended.fr` / `require-gate.fr` duty_status lifecycle | Not closed through mill explore vs run as one envelope. |
-| Packages | Remaining | none | No package language, lock, or authenticated package digest. |
+| Packages | Partial | `packages/std`; `check_path_matching_package_digest_authenticates`; mill/`check_source` does not read `packages/` | Path compile may authenticate `packages/` via `PackageLock`. No lockfile language in `.fr`, no store, no linking of imported declarations. |
 | Salsa | Remaining | none | Driver memo is blake3 / canonical JSON, not the salsa crate. |
 | SMT | Remaining | none | Search is fidryn-solve enumerate/DPLL. No Z3. |
-| Independent kernel without `evaluate` | Remaining | none | `accept_covering_eval` / `check_branches` call `fidryn_eval::evaluate`. |
+| Independent kernel without `evaluate` | Partial | kernel `eval_fragment` / `pure.rs`; tautology covering uses the fragment | Boolean/ident/`not`/`||`/`&&` covering does not call `evaluate`. Seq, duty, handlers, and other plans still use the trusted evaluator. |
 
 Trust profiles `Fixture`, `ByteVerified`, `PolicyAccepted`, and
 `Unauthenticated` exist on `TrustProfile`. Evaluation reports carry a
