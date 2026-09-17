@@ -24,9 +24,18 @@ pub struct CoreModule {
     pub jurisdiction: crate::ids::JurisdictionId,
     pub outside_scope: Vec<String>,
     pub declarations: Vec<CoreDecl>,
+    #[serde(default)]
+    pub nominations: Vec<CoreNomination>,
     pub queries: Vec<CoreQuery>,
     pub verifications: Vec<CoreVerify>,
     pub assertions: Vec<CoreAssertion>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoreNomination {
+    pub candidate: String,
+    pub office: String,
+    pub rank: i64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

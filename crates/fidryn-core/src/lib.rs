@@ -31,9 +31,10 @@ pub use ids::{
 };
 pub use ir::{
     ClauseSelector, Consequence, CoreAssertion, CoreConflictDoctrine, CoreDecision, CoreDecl,
-    CoreEffect, CoreEffectDecl, CoreEffectOp, CoreFact, CoreFunction, CoreModule, CoreObservation,
-    CoreQuery, CoreRule, CoreSelection, CoreVerify, DecisionReturn, DeclaredDecisionResult, Guard,
-    NodeMeta, QueryPlan, RuleKind, SelectionResult, VerificationBounds,
+    CoreEffect, CoreEffectDecl, CoreEffectOp, CoreFact, CoreFunction, CoreModule, CoreNomination,
+    CoreObservation, CoreQuery, CoreRule, CoreSelection, CoreVerify, DecisionReturn,
+    DeclaredDecisionResult, Guard, NodeMeta, QueryPlan, RuleKind, SelectionResult,
+    VerificationBounds,
 };
 pub use outcome::{OpenRequest, Outcome};
 pub use patterns::{

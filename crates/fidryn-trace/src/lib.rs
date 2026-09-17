@@ -201,6 +201,7 @@ mod tests {
             jurisdiction: fidryn_core::JurisdictionId::of(b"j"),
             outside_scope: vec!["tax".into()],
             declarations: vec![],
+            nominations: vec![],
             queries: vec![],
             verifications: vec![],
             assertions: vec![],
