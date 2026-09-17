@@ -40,11 +40,12 @@ module US.Federal.Housing.AssistanceAnimal version "0.1.0" {
 
     query request_received()
         -> Bool
-        ! {Observe}
+        ! {Observe, Determine}
     {
         goal Evaluate {
             require observed AccommodationRequest
-            return ReasonableAccommodationRequested(Resident)
+            require determined ReasonableAccommodationRequested(Resident)
+                using Determine
         }
     }
 
