@@ -5,23 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#120f0c">
   <title>Mill — Fidryn</title>
-  <meta name="description" content="The mill is a loopback-only web UI for checking, running, exploring, and rendering Fidryn source on this machine. Start it with the CLI:">
+  <meta name="description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/mill">
+  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/mill.md" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="Mill — Fidryn">
+  <meta property="og:description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/mill">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mill — Fidryn">
+  <meta name="twitter:description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Mill — Fidryn","description":"Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.","url":"https://fidryn.onlygass.dev/docs/mill","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/mill.md"}</script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/docs.css">
 </head>
 <body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
   <div class="docs-shell">
     <header class="docs-top">
       <a class="mark" href="/">fidryn</a>
-      <nav class="nav">
-        <a href="/docs/">Docs</a>
-        <a href="/#install">Install</a>
-        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-      </nav>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
     </header>
 
     <div class="docs-layout">
-      <aside class="docs-sidebar" aria-label="Documentation">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
         <p class="docs-sidebar-label">Guides</p>
         <nav class="docs-side-nav">
         <a href="/docs/">Overview</a>
@@ -37,11 +58,13 @@
         <p class="docs-sidebar-label">Also</p>
         <nav class="docs-side-nav">
           <a href="/">Home</a>
+          <a href="/docs/mill.md">Markdown</a>
           <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/llms.txt">llms.txt</a>
         </nav>
       </aside>
 
-      <main class="docs-main prose">
+      <main class="docs-main prose" id="main">
 <h1>Fidryn mill</h1>
 <p>The mill is a loopback-only web UI for checking, running, exploring, and
 rendering Fidryn source on this machine. Start it with the CLI:</p>
@@ -204,6 +227,12 @@ or a wrapper with <code>admissibleCompletions</code> / <code>admissible_completi
 <code>/api/run</code> ignores <code>bounds</code>. <code>/api/explore</code> still needs a nonempty
 completion space on the case, on <code>bounds</code>, or both; otherwise the
 outcome is an empty completion set.</p>
+<p>A nonempty <code>case.assumptions</code> array puts mill <code>/api/run</code> and
+<code>/api/explore</code> into scenario mode (<code>executionMode: scenario</code> on the
+report). There is no separate mill <code>--scenario</code> flag; the overlay is
+inferred from the case. An empty or omitted <code>assumptions</code> list is
+operative. CLI path <code>run</code> still requires explicit <code>--scenario</code> to apply
+the same overlay.</p>
 <p><code>validAt</code> and <code>knownAt</code> accept a <code>Z</code> suffix or a numeric offset, the same
 as CLI <code>--valid-at</code> and <code>--known-at</code>.</p>
 <p>On evaluation success, HTTP 200, and the body is a transport wrapper
@@ -321,8 +350,33 @@ request is sent.</p>
 
     <footer class="footer docs-footer">
       <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
     </footer>
   </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
 </body>
 </html>
