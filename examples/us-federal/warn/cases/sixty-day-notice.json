@@ -2,8 +2,14 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Federal.Labor.WARN@0.1.0",
   "facts": {
-    "notice": "2026-07-19T00:00:00Z",
-    "layoff": "2026-09-17T00:00:00Z",
+    "notice": {
+      "kind": "instant",
+      "data": "2026-07-19T00:00:00Z"
+    },
+    "layoff": {
+      "kind": "instant",
+      "data": "2026-09-17T00:00:00Z"
+    },
     "headcount": 150
   },
   "admissibleCompletions": {}

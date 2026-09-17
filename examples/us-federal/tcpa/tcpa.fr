@@ -40,11 +40,12 @@ module US.Federal.Consumer.TCPA version "0.1.0" {
 
     query consent_list()
         -> Bool
-        ! {Observe}
+        ! {Observe, Determine}
     {
         goal Evaluate {
             require observed ConsentList
-            return ConsentListIncludes(CalledParty)
+            require determined ConsentListIncludes(CalledParty)
+                using Determine
         }
     }
 
