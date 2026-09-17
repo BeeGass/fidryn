@@ -1,0 +1,3 @@
+module Examples.NoGoal version "0.1.0" {
+    query acting_trustee() -> LegalPerson
+}

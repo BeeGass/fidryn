@@ -1,0 +1,7 @@
+module Examples.DupRank version "0.1.0" {
+    nomination Alice for TrusteeOf(BRT) rank 1
+    nomination Bob for TrusteeOf(BRT) rank 1
+    query acting_trustee() -> LegalPerson {
+        goal UniqueOccupant { office TrusteeOf(BRT) }
+    }
+}

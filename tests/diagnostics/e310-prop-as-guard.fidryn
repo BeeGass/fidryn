@@ -1,0 +1,5 @@
+module Examples.PropGuard version "0.1.0" {
+    query bad() -> LegalPerson {
+        goal Evaluate { if Incapacitated(Bryan) { Bryan } }
+    }
+}
