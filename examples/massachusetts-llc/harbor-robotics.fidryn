@@ -1,0 +1,225 @@
+module Examples.FormHarborRoboticsLLC version "0.1.0" {
+    jurisdiction Massachusetts
+    source_snapshot "2026-08-23-ma-llc"
+    source_manifest "sources/ma-llc.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00-04:00
+
+    outside_scope {
+        professional_LLC_requirements
+        securities_law
+        tax_elections
+        licensing
+        employment
+        foreign_qualification
+    }
+
+    source MassachusettsLLCAct {
+        kind statute
+        authority MassachusettsGeneralCourt
+        citation "M.G.L. c. 156C"
+        artifact "sources/ma-c156c.txt"
+    }
+
+    source SecretaryInstructions {
+        kind administrative_material
+        authority MassachusettsSecretaryOfCommonwealth
+        artifact "sources/ma-llc-filing-instructions.html"
+        retrieved_at 2026-08-23T12:00:00-04:00
+    }
+
+    entity Bryan : NaturalPerson
+    entity ResidentAgentCo : DomesticCorporation
+    entity HarborRobotics : ProposedLLC
+
+    record_type CertificateOfOrganization {
+        name: LLCName
+        commonwealth_office: StreetAddress
+        resident_agent: LegalPerson
+        resident_agent_address: StreetAddress
+        resident_agent_consent: SignedConsent
+        dissolution_date: Option<Date>
+        managers: FiniteSet<NamedPersonAddress>
+        authorized_filers: FiniteSet<NamedPersonAddress>
+        real_property_signers: FiniteSet<NamedPersonAddress>
+        business_character: String
+        requested_effective_time: Option<Time>
+        federal_ein_if_available: Option<EIN>
+        executed_by: NonEmptySet<LegalPerson>
+    }
+
+    record_type OfficialFilingRecord {
+        filing_id: String
+        recorded_by: Authority
+        filed_at: Time
+        effective_at: Time
+        observed_at: Time
+        source_document: CertificateOfOrganization
+        source_digest: Digest
+    }
+
+    proposition NameConforms(name: LLCName)
+    proposition Filed(
+        certificate: CertificateOfOrganization,
+        filed_at: Time,
+        effective_at: Time
+    )
+    proposition SubstantiallyComplies(
+        certificate: CertificateOfOrganization,
+        source: SourceRef
+    )
+
+    observation OfficialFilingObservation(
+        filing: OfficialFilingRecord
+    )
+    establishes Filed(
+        filing.source_document,
+        filing.filed_at,
+        filing.effective_at
+    )
+        from {
+            MassachusettsLLCAct.section("12(b)")
+            SecretaryInstructions.section("Certificates of Organization")
+        }
+    {
+        authenticate filing.recorded_by ==
+            MassachusettsSecretaryOfCommonwealth.CorporationsDivision
+        authenticate digest(filing.source_document) == filing.source_digest
+        require filing.effective_at == later_effective_time_or(
+            filing.source_document.requested_effective_time,
+            filing.filed_at
+        )
+    }
+
+    judgment FormationCompliance(
+        certificate: CertificateOfOrganization
+    )
+    decides SubstantiallyComplies(certificate, MassachusettsLLCAct)
+        from MassachusettsLLCAct.section("12(b)")
+    {
+        authority CompetentFormationAuthority
+        record requires CertificateFieldRecord(certificate)
+        record requires OfficialFilingRecordFor(certificate)
+        standard SubstantialCompliance
+        review by CourtWithEntityJurisdiction under ApplicableStandard
+    }
+
+    query filing_readiness(certificate: CertificateOfOrganization)
+        -> FilingPacket
+        ! {Observe, Determine}
+    {
+        require certificate.name has_llc_designator
+        require operative NameConforms(certificate.name)
+            using Observe
+        require in_commonwealth(certificate.commonwealth_office)
+        require eligible_resident_agent(certificate.resident_agent)
+        require valid_service_address(certificate.resident_agent_address)
+        require valid(certificate.resident_agent_consent)
+        require every certificate.executed_by
+            is authorized_to_execute(certificate)
+        require certificate.managers is nonempty
+            or certificate.authorized_filers is nonempty
+        require every named_person_address is complete
+        require not_blank(certificate.business_character)
+
+        return FilingPacket {
+            certificate
+            fee: current_fee(
+                CertificateOfOrganization,
+                SecretaryInstructions
+            )
+            destination:
+                MassachusettsSecretaryOfCommonwealth.CorporationsDivision
+        }
+    }
+
+    legal_act SubmitCertificate(
+        organizer: NaturalPerson,
+        packet: FilingPacket
+    ) {
+        performer organizer
+        recipient MassachusettsSecretaryOfCommonwealth.CorporationsDivision
+        physical_effect TransmissionAttempted(packet)
+        does_not_establish Filed(packet.certificate, _, _)
+        source SecretaryInstructions.section("Certificates of Organization")
+    }
+
+    rule FormationByFiledCertificate(
+        certificate: CertificateOfOrganization,
+        filed_at: Time,
+        effective_at: Time
+    ) : constitutive
+        from MassachusettsLLCAct.section("12")
+    {
+        when operative Filed(certificate, filed_at, effective_at)
+            in EntityFormation(HarborRobotics)
+          and effective_at == later_effective_time_or(
+                certificate.requested_effective_time,
+                filed_at
+              )
+          and operative SubstantiallyComplies(
+                certificate,
+                MassachusettsLLCAct
+              )
+            in EntityFormation(HarborRobotics)
+
+        then establish FormedLLC(HarborRobotics)
+            valid_time [effective_at, +inf)
+            record_time [max_record_time(guard_trace), +inf)
+    }
+
+    legal_act ExecuteOperatingAgreement(agreement: OperatingAgreement) {
+        performers MembersNamedBy(agreement)
+        effect establish PrivateGovernanceTerms(
+            HarborRobotics,
+            agreement
+        )
+        does_not_establish FormedLLC(HarborRobotics)
+        source agreement
+    }
+
+    duty MaintainCommonwealthOfficeAndAgent {
+        bearer HarborRobotics
+        attaches when operative FormedLLC(HarborRobotics)
+        content Maintain(OfficeInCommonwealth)
+            and Maintain(ResidentAgentForService)
+        source MassachusettsLLCAct.section("5")
+    }
+
+    duty FileAnnualReport {
+        bearer HarborRobotics
+        attaches when operative FormedLLC(HarborRobotics)
+        due on_or_before every anniversary_of(original_filing_date)
+        content File(AnnualReportWithRequiredInformation)
+        source {
+            MassachusettsLLCAct.section("12(c)")
+            SecretaryInstructions.section("Annual Reports")
+        }
+    }
+
+    query entity_status()
+        -> EntityStatus
+        ! {Observe, Determine}
+    {
+        goal StatusOf {
+            status FormedLLC(HarborRobotics)
+            when_present FormedLLC(HarborRobotics)
+            when_closed_absent NotFormedLLC(HarborRobotics)
+        }
+    }
+
+    verify FormationIntegrity {
+        for every operative Filed(certificate, filed_at, effective_at):
+            assert not operative FormedLLC(HarborRobotics)
+                before effective_at
+
+        assert no FilingPacket
+            without ResidentAgentConsent
+
+        assert Effective(ExecuteOperatingAgreement)
+            does_not_imply FormedLLC(HarborRobotics)
+
+        assert operative FormedLLC(HarborRobotics)
+            implies scheduled FileAnnualReport
+    }
+}

@@ -1,0 +1,225 @@
+module Examples.BryanRevocableTrust version "0.1.0" {
+    jurisdiction Massachusetts
+    source_snapshot "2026-08-23-ma-trust-fixture"
+    source_manifest "sources/ma-trust-fixture.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00-04:00
+
+    outside_scope {
+        tax
+        creditor_priority
+        real_property_recording
+        complete_Massachusetts_trust_law
+    }
+
+    source Instrument {
+        kind private_instrument
+        authority Bryan as SettlorOf(BRT)
+        artifact "sources/bryan-revocable-trust.txt"
+        effective [execution_time, +inf)
+    }
+
+    import MA.TrustLaw.Fixture version "2026-08-23"
+
+    entity Bryan : NaturalPerson
+    entity Alice : NaturalPerson
+    entity Bob : NaturalPerson
+    entity BRT : Trust
+
+    office TrusteeOf(trust: Trust) occupied_by LegalPerson {
+        cardinality 0..1
+        acquired_by Effective(AcceptOffice)
+        suspended_by OperativeIncapacity
+        lost_by {Death, EffectiveResignation, EffectiveRemoval}
+        competence {AdministerTrust, DecideTrustDistributions}
+    }
+
+    proposition Alive(person: NaturalPerson)
+    proposition Dead(person: NaturalPerson)
+    proposition TrustInstrumentExecuted(trust: Trust)
+    proposition Incapacitated(
+        person: NaturalPerson,
+        purpose: CapacityPurpose
+    )
+    proposition Eligible(person: LegalPerson, office: Office)
+
+    interpretation_family SuccessorEligibility
+        for Instrument.clause("4.4")
+    {
+        alternative I1 {
+            defines Eligible(Alice, TrusteeOf(BRT)) as established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+        }
+
+        alternative I2 {
+            defines Eligible(Alice, TrusteeOf(BRT)) as not_established
+            defines Eligible(Bob, TrusteeOf(BRT)) as established
+        }
+
+        selector explicit_instrument_definition
+          or controlling_interpretation
+          or request Interpret
+    }
+
+    rule InitialTrustee : constitutive
+        from Instrument.clause("1.2")
+    {
+        when operative TrustInstrumentExecuted(BRT) in TrustCreation(BRT)
+        then establish Occupies(Bryan, TrusteeOf(BRT))
+    }
+
+    nomination Alice for TrusteeOf(BRT) rank 1
+        from Instrument.clause("4.4.a")
+
+    nomination Bob for TrusteeOf(BRT) rank 2
+        from Instrument.clause("4.4.b")
+
+    evidence_type PhysicianCertificate {
+        issuer: LicensedPhysician
+        subject: NaturalPerson
+        purpose: CapacityPurpose
+        conclusion: Supports | Opposes
+        examined_at: Time
+        signed_at: Time
+    }
+
+    judgment TrustIncapacity(person: NaturalPerson, trust: Trust)
+        decides Incapacitated(person, Administer(trust))
+        from Instrument.clause("4.2")
+    {
+        authority concurrence(2 distinct LicensedPhysician)
+
+        record requires c1: PhysicianCertificate
+        record requires c2: PhysicianCertificate
+        where same_subject_and_purpose(c1, c2)
+          and c1.issuer != c2.issuer
+          and fresh(c1, 90 days)
+          and fresh(c2, 90 days)
+
+        establish when c1.conclusion == Supports
+                     and c2.conclusion == Supports
+
+        reject when c1.conclusion == Opposes
+                  and c2.conclusion == Opposes
+
+        otherwise suspend NeedJudgment {
+            issue: Incapacitated(person, Administer(trust))
+            protocol: CourtCapacityDetermination
+        }
+
+        on established
+            make issue operative in Administration(trust)
+
+        review by CourtWithTrustJurisdiction(trust) under DeNovo
+    }
+
+    legal_act AcceptOffice(candidate: LegalPerson, office: Office) {
+        performer candidate
+        validity requires SignedWriting(candidate, office)
+        effect establish Accepted(candidate, office)
+        source Instrument.clause("4.4")
+    }
+
+    rule SuspendIncapacitatedTrustee : constitutive
+        from Instrument.clause("4.3")
+    {
+        when operative Incapacitated(Bryan, Administer(BRT))
+            in Administration(BRT)
+
+        then suspend Occupies(Bryan, TrusteeOf(BRT))
+    }
+
+    rule HighestRankedSuccessor : constitutive
+        from Instrument.clause("4.4")
+    {
+        require closed nominations_for(TrusteeOf(BRT))
+        require unique nomination_rank
+
+        select unique candidate
+            from nominations_for(TrusteeOf(BRT))
+            where operative Eligible(candidate, TrusteeOf(BRT))
+              and effective AcceptOffice(candidate, TrusteeOf(BRT))
+            order_by nomination_rank ascending
+
+        when vacancy_or_suspension(TrusteeOf(BRT))
+        then establish Occupies(candidate, TrusteeOf(BRT))
+        otherwise activate CourtAppointmentProcedure(BRT)
+    }
+
+    power SettlorAmendmentPower {
+        holder Bryan
+        subject BRT
+        effect Adopted(amendment: TrustAmendment)
+        active_while operative Alive(Bryan)
+        source Instrument.clause("2.1")
+    }
+
+    legal_act AmendTrust(amendment: TrustAmendment) {
+        performer Bryan
+        exercises SettlorAmendmentPower
+        validity requires operative HasCapacity(Bryan, Execute(amendment))
+            using Determine
+        validity requires SignedWriting(amendment, Bryan)
+        validity requires Delivered(amendment, ActingTrustee(BRT))
+        effect establish Adopted(amendment)
+    }
+
+    rule IrrevocableAtDeath : constitutive
+        from Instrument.clause("7.1")
+    {
+        when operative Dead(Bryan) in Administration(BRT)
+        then establish Irrevocable(BRT)
+        then terminate SettlorAmendmentPower
+    }
+
+    duty PostDeathAdministration {
+        bearer ActingTrustee(BRT)
+        claimant BeneficiariesOf(BRT)
+        attaches when operative Dead(Bryan) in Administration(BRT)
+        content {
+            IdentifyTrustAssets(BRT)
+            ResolveAllowedClaims(BRT)
+            ResolveApplicableTaxes(BRT)
+            MaintainReserve(BRT)
+            DistributeResidue(BRT)
+        }
+        discharge_by AdministrationTerminal(BRT)
+        violation_when due_and_unperformed
+    }
+
+    decision TrusteeDistributionDecision(
+        trustee: LegalPerson,
+        proposed: Distribution
+    ) {
+        authority occupant TrusteeOf(BRT)
+        options lawful_distributions(proposed)
+        must_consider {health, education, maintenance, support}
+        must_not_consider {trustee_personal_interest}
+        record requires WrittenReasons
+        standard GoodFaithAndBestInterests
+        review by CourtWithTrustJurisdiction(BRT)
+            under AbuseOfDiscretion
+    }
+
+    query acting_trustee()
+        -> LegalPerson
+        ! {Observe, Determine, Interpret}
+    {
+        goal UniqueOccupant {
+            office TrusteeOf(BRT)
+        }
+    }
+
+    verify TrusteeContinuity {
+        interpretations all_admissible
+        judgments all_lawful
+        choices all_lawful
+        bounds {persons: 8, events: 40, time_points: 80}
+
+        assuming fair_response(CourtAppointmentProcedure)
+
+        assert always
+            occupied(TrusteeOf(BRT))
+            or active CourtAppointmentProcedure(BRT)
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-08-23-ma-trust-fixture",
+  "jurisdiction": "Massachusetts",
+  "artifacts": [
+    {
+      "path": "bryan-revocable-trust.txt",
+      "digest": "fixture",
+      "kind": "private_instrument",
+      "effective": "2026-08-23"
+    }
+  ]
+}

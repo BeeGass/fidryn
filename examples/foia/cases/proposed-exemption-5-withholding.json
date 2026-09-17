@@ -1,0 +1,48 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "US.Federal.FOIA.RequestProcessing@0.1.0",
+  "facts": {
+    "responsive_record": "Record9",
+    "proposed_disposition": "withhold-part-17",
+    "part": "Part17",
+    "protected_interest": "DeliberativeProcessInterest",
+    "exemption": "Exemption5"
+  },
+  "evidence": [
+    {
+      "schema": "CitedWithholdingBasis",
+      "value": "exemption-5-part-17",
+      "observedAt": "2026-08-23T12:00:00-04:00"
+    }
+  ],
+  "determinations": [],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [],
+  "outsideScope": [
+    "proactive_disclosure",
+    "fee_waiver_merits",
+    "every_exemption_element",
+    "ten_day_component_rerouting_rule",
+    "time_limit_tolling",
+    "unusual_circumstances_extensions",
+    "PrivacyAct_interaction",
+    "complete_appeal_and_litigation_procedure",
+    "non_withholding_adverse_determination_categories",
+    "sources_not_listed_in_this_bundle"
+  ],
+  "admissibleCompletions": {
+    "interpretations": {},
+    "evidence": {
+      "HarmAnalysis": {
+        "responses": ["absent", "present"],
+        "effectOnValidTime": "unchanged_if_after_query_valid_time"
+      },
+      "SegregabilityAnalysis": {
+        "responses": ["absent", "present"],
+        "effectOnValidTime": "unchanged_if_after_query_valid_time"
+      }
+    },
+    "choices": {}
+  }
+}

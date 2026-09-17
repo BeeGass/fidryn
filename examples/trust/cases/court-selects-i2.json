@@ -1,0 +1,28 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.BryanRevocableTrust@0.1.0",
+  "facts": {
+    "alice_accepted": true,
+    "bob_accepted": true
+  },
+  "evidence": [
+    {
+      "schema": "PhysicianCertificate",
+      "value": "certificate-1",
+      "observedAt": "2026-08-23T12:00:00Z"
+    },
+    {
+      "schema": "PhysicianCertificate",
+      "value": "certificate-2",
+      "observedAt": "2026-08-23T12:00:00Z"
+    }
+  ],
+  "interpretations": {
+    "SuccessorEligibility": "I2"
+  },
+  "admissibleCompletions": {
+    "interpretations": {
+      "SuccessorEligibility": ["I1", "I2"]
+    }
+  }
+}

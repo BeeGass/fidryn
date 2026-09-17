@@ -1,0 +1,31 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-08-23-foia-bounded",
+  "jurisdiction": "UnitedStates.Federal",
+  "artifacts": [
+    {
+      "path": "usc-5-552.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-08-23"
+    },
+    {
+      "path": "agency-foia-regulations.txt",
+      "digest": "fixture",
+      "kind": "regulation",
+      "effective": "2026-08-23"
+    },
+    {
+      "path": "us-federal-cases-foia.txt",
+      "digest": "fixture",
+      "kind": "case_law",
+      "effective": "2026-08-23"
+    },
+    {
+      "path": "us-federal-calendars-2026.txt",
+      "digest": "fixture",
+      "kind": "calendar",
+      "effective": "2026-01-01"
+    }
+  ]
+}

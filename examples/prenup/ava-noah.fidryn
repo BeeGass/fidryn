@@ -1,0 +1,261 @@
+module Examples.AvaNoahPrenup version "0.1.0" {
+    jurisdiction California
+    source_snapshot "2026-08-23-ca-family-1610-1617"
+    source_manifest "sources/ca-family-1610-1617.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00-07:00
+
+    outside_scope {
+        complete_choice_of_law_analysis
+        tax
+        bankruptcy
+        probate
+        agreements_executed_before_2020
+        all_case_law_not_expressly_imported
+    }
+
+    source CaliforniaUPAA {
+        kind statute
+        authority CaliforniaLegislature
+        citation "Cal. Fam. Code §§ 1610-1617"
+        artifact "sources/ca-family-1610-1617.txt"
+        retrieved_at 2026-08-23T12:00:00-07:00
+        provision_intervals from "sources/ca-family-1610-1617.manifest.json"
+    }
+
+    source Agreement {
+        kind private_instrument
+        authority {Ava, Noah}
+        artifact "sources/ava-noah-prenup.txt"
+    }
+
+    entity Ava : NaturalPerson
+    entity Noah : NaturalPerson
+    entity ANP : PremaritalAgreement
+
+    record_type FinancialDisclosureSchedule {
+        owner: NaturalPerson
+        assets: FiniteSet<DisclosedAsset>
+        obligations: FiniteSet<DisclosedObligation>
+        delivered_to: NaturalPerson
+        delivered_at: Time
+    }
+
+    proposition Married(a: NaturalPerson, b: NaturalPerson)
+    proposition ProspectiveSpouses(
+        a: NaturalPerson,
+        b: NaturalPerson,
+        at: Time
+    )
+    proposition ExecutedVoluntarily(
+        agreement: PremaritalAgreement,
+        party: NaturalPerson
+    )
+    proposition EnforceableAgainst(
+        agreement: PremaritalAgreement,
+        party: NaturalPerson,
+        provision: Provision,
+        proceeding: Proceeding
+    )
+
+    legal_act ExecutePrenup(agreement: PremaritalAgreement) {
+        performers {Ava, Noah}
+        validity requires operative ProspectiveSpouses(
+            Ava,
+            Noah,
+            execution_time
+        ) in PrenupExecution
+        validity requires Written(agreement)
+        validity requires SignedBy(agreement, Ava)
+        validity requires SignedBy(agreement, Noah)
+        effect establish Executed(agreement)
+        source CaliforniaUPAA.section("1611")
+    }
+
+    rule EffectiveUponMarriage : constitutive
+        from CaliforniaUPAA.section("1613")
+    {
+        when effective ExecutePrenup(ANP)
+          and operative Married(Ava, Noah)
+        then establish Effective(ANP)
+    }
+
+    clause SeparateProperty(property: Asset, owner: NaturalPerson)
+        from Agreement.clause("3")
+    {
+        when operative Effective(ANP) in MaritalPropertyRegime
+        then purport_to establish ClassifiedAsSeparate(property, owner)
+        enforcement requires PrenupEnforceability(
+            against = party_opposing_classification,
+            provision = this,
+            case = current_proceeding
+        )
+        subject_to loaded_mandatory_law
+    }
+
+    clause SpousalSupportWaiver
+        from Agreement.clause("8")
+    {
+        purports_to establish Waived(SpousalSupportClaim)
+        subject_to CaliforniaUPAA.section("1612(c)")
+        enforcement requires Determine
+    }
+
+    clause ChildSupportWaiver
+        from Agreement.clause("9")
+    {
+        purports_to establish Waived(ChildSupportClaim)
+        subject_to CaliforniaUPAA.section("1612(b)")
+    }
+
+    conflict_doctrine ChildSupportCannotBeAdverselyAffected
+        from CaliforniaUPAA.section("1612(b)")
+    {
+        when ChildSupportWaiver adversely_affects ChildSupportRight
+        then defeat ChildSupportWaiver as_to ChildSupportRight
+        reason MandatoryStatutoryLimit
+    }
+
+    judgment PrenupVoluntariness(
+        against: NaturalPerson,
+        case: Proceeding
+    )
+    decides ExecutedVoluntarily(ANP, against)
+        from CaliforniaUPAA.section("1615")
+    {
+        authority CourtWithJurisdiction(case)
+
+        burden_of_persuasion {
+            bearer against
+            issue NotVoluntary(ANP, against)
+            source CaliforniaUPAA.section("1615(a)(1)")
+        }
+
+        court_finding form written_or_on_record
+        court_finding requires
+            IndependentCounselAtSigning(against)
+            or {
+                AdvisedToSeekIndependentCounselAtLeast(
+                    7 calendar_days_before_signing,
+                    against
+                )
+                and SeparateWrittenCounselWaiverAfterAdvisement(against)
+            }
+
+        court_finding requires
+            FinalAgreementPresentedAtLeast(7 calendar_days_before_signing)
+
+        when operative Unrepresented(against) in case:
+            court_finding requires WrittenExplanationOfRights(
+                against,
+                delivered_before_signing = true
+            )
+            court_finding requires LanguageProficiency(against)
+            court_finding requires SignedReceiptOfExplanation(
+                against,
+                identifies_explainer = true
+            )
+
+        court_finding requires no established {
+            Duress
+            Fraud
+            UndueInfluence
+            LackOfCapacity
+        }
+
+        court may_consider OtherRelevantFactors
+        otherwise not_established
+    }
+
+    judgment PrenupEnforceability(
+        against: NaturalPerson,
+        provision: Provision,
+        case: Proceeding
+    )
+    decides EnforceableAgainst(ANP, against, provision, case)
+        from CaliforniaUPAA.sections("1612(c)", "1615")
+    {
+        authority CourtWithJurisdiction(case)
+        record requires ExecutionRecord(ANP)
+        record may_include DisclosureRecord(ANP, against)
+        record may_include CounselAndWaiverRecord(ANP, against)
+
+        burden_of_persuasion {
+            bearer against
+            issue UnconscionableWithDisclosureFailures(ANP, against)
+            source CaliforniaUPAA.section("1615(a)(2)")
+        }
+
+        reject when determination PrenupVoluntariness(against, case)
+            is NotEstablished
+
+        reject when established UnconscionableAtExecution(ANP)
+          and established NoFairReasonableFullDisclosure(ANP, against)
+          and established NoValidDisclosureWaiver(ANP, against)
+          and established NoAdequateKnowledge(ANP, against)
+
+        for SpousalSupportWaiver:
+            reject when established NoIndependentCounselAtSigning(against)
+            reject when established UnconscionableAtEnforcement(
+                provision,
+                case
+            )
+
+        otherwise decide under this fixed source_snapshot
+        review under ApplicableAppellateStandard
+    }
+
+    legal_act AmendOrRevokePrenup(change: WrittenAgreement) {
+        performers {Ava, Noah}
+        active_while operative Married(Ava, Noah)
+        validity requires SignedBy(change, Ava)
+        validity requires SignedBy(change, Noah)
+        effect establish AgreementChangedBy(ANP, change)
+        source CaliforniaUPAA.section("1614")
+    }
+
+    query property_result(asset: Asset, case: Proceeding)
+        -> PropertyClassification
+        ! {Observe, Determine, Interpret}
+    {
+        goal EvaluateClause {
+            clause SeparateProperty(
+                asset,
+                case_input<NaturalPerson>("asserted_owner")
+            )
+            context case
+            result property_classification(asset, case)
+        }
+    }
+
+    query provision_result(
+        provision: ClauseRef,
+        against: NaturalPerson,
+        case: Proceeding
+    )
+        -> EnforcementResult
+        ! {Observe, Determine, Interpret}
+    {
+        goal EvaluateClause {
+            clause provision
+            context case
+            result enforcement_result(
+                agreement = ANP,
+                against = against,
+                clause = provision,
+                proceeding = case
+            )
+        }
+    }
+
+    verify AgreementSafety {
+        assert always
+            not EffectiveAdverseEffect(ANP, ChildSupportRight)
+
+        assert every ScheduledAsset
+            has disclosure_source_span
+
+        assert SpousalSupportWaiver
+            is never treated automatic
+    }
+}

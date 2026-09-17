@@ -1,0 +1,40 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.AvaNoahPrenup@0.1.0",
+  "facts": {
+    "provision": "Examples.AvaNoahPrenup@0.1.0::SpousalSupportWaiver()",
+    "against": "Ava",
+    "case": "DivorceCase",
+    "married": true,
+    "agreement_executed": true
+  },
+  "evidence": [
+    {
+      "schema": "ExecutionRecord",
+      "value": "anp-execution",
+      "observedAt": "2026-08-23T12:00:00-07:00"
+    }
+  ],
+  "determinations": [],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [],
+  "outsideScope": [
+    "complete_choice_of_law_analysis",
+    "tax",
+    "bankruptcy",
+    "probate",
+    "agreements_executed_before_2020",
+    "all_case_law_not_expressly_imported"
+  ],
+  "admissibleCompletions": {
+    "interpretations": {},
+    "evidence": {
+      "PrenupEnforceability": {
+        "responses": ["absent", "established", "not_established"],
+        "effectOnValidTime": "unchanged_if_after_query_valid_time"
+      }
+    },
+    "choices": {}
+  }
+}

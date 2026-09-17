@@ -1,0 +1,33 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.FormHarborRoboticsLLC@0.1.0",
+  "facts": {
+    "transmitted": true,
+    "certificate": "HarborRoboticsCertificate"
+  },
+  "evidence": [],
+  "determinations": [],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [
+    { "domain": "filings", "closed": false }
+  ],
+  "outsideScope": [
+    "professional_LLC_requirements",
+    "securities_law",
+    "tax_elections",
+    "licensing",
+    "employment",
+    "foreign_qualification"
+  ],
+  "admissibleCompletions": {
+    "interpretations": {},
+    "evidence": {
+      "OfficialFilingRecord": {
+        "responses": ["absent", "present"],
+        "effectOnValidTime": "unchanged_if_after_query_valid_time"
+      }
+    },
+    "choices": {}
+  }
+}

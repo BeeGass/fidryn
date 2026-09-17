@@ -1,0 +1,12 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.BryanRevocableTrust@0.1.0",
+  "facts": {
+    "open_alice_branch": true
+  },
+  "admissibleCompletions": {
+    "interpretations": {
+      "SuccessorEligibility": ["I1", "I2"]
+    }
+  }
+}

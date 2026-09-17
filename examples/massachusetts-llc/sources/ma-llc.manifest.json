@@ -1,0 +1,19 @@
+{
+  "schema": "fidryn.source-manifest/v0.1",
+  "snapshot": "2026-08-23-ma-llc",
+  "jurisdiction": "Massachusetts",
+  "artifacts": [
+    {
+      "path": "ma-c156c.txt",
+      "digest": "fixture",
+      "kind": "statute",
+      "effective": "2026-08-23"
+    },
+    {
+      "path": "ma-llc-filing-instructions.html",
+      "digest": "fixture",
+      "kind": "administrative_material",
+      "effective": "2026-08-23"
+    }
+  ]
+}

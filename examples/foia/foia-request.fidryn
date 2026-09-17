@@ -1,0 +1,273 @@
+module US.Federal.FOIA.RequestProcessing version "0.1.0" {
+    jurisdiction UnitedStates.Federal
+    source_snapshot "2026-08-23-foia-bounded"
+    source_manifest "sources/foia-bounded.manifest.json"
+    effective_at 2026-08-23
+    recorded_at 2026-08-23T12:00:00-04:00
+
+    outside_scope {
+        proactive_disclosure
+        fee_waiver_merits
+        every_exemption_element
+        ten_day_component_rerouting_rule
+        time_limit_tolling
+        unusual_circumstances_extensions
+        PrivacyAct_interaction
+        complete_appeal_and_litigation_procedure
+        non_withholding_adverse_determination_categories
+        sources_not_listed_in_this_bundle
+    }
+
+    source FOIAStatute {
+        kind statute
+        authority UnitedStatesCongress
+        citation "5 U.S.C. § 552"
+        artifact "sources/usc-5-552.txt"
+        digest required_in source_manifest
+        effective according_to source_manifest
+    }
+
+    import Agency.FOIARegulations version "fixture-2026-08-23" {
+        digest required_in source_manifest
+    }
+    import US.Federal.Cases.FOIA version "fixture-2026-08-23" {
+        digest required_in source_manifest
+    }
+    import US.Federal.Calendars version "2026"
+
+    entity Requester : LegalPerson
+    entity Agency : FederalAgency
+    office FOIAOfficeOf(agency: FederalAgency)
+        occupied_by AgencyComponent
+    {
+        competence {
+            DetermineRequestSufficiency
+            DecideRecordDisposition
+        }
+    }
+
+    record_type FOIARequest {
+        requester: LegalPerson
+        target_agency: FederalAgency
+        description: String
+        requested_format: MediaType
+        submitted_at: Time
+    }
+
+    proposition ProperRequest(request: FOIARequest)
+    proposition Responsive(part: RecordPart, request: FOIARequest)
+    proposition ExemptionApplies(part: RecordPart, exemption: FOIAExemption)
+    proposition ForeseeableHarm(
+        part: RecordPart,
+        protected_interest: LegalInterest
+    )
+    proposition DeterminationIssued(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    )
+    proposition AdverseDetermination(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    )
+
+    legal_act SubmitFOIARequest(request: FOIARequest) {
+        performer request.requester
+        recipient FOIAOfficeOf(request.target_agency)
+        effect establish Received(request, received_time)
+        source FOIAStatute.section("552(a)(3)(A)")
+    }
+
+    judgment RequestSufficiency(request: FOIARequest)
+        decides ProperRequest(request)
+        from FOIAStatute.section("552(a)(3)(A)")
+    {
+        authority occupant FOIAOfficeOf(request.target_agency)
+        record requires RequestRecord(request)
+        establish when reasonably_describes_records(request)
+          and conforms_to_published_agency_rules(request)
+
+        on unresolved
+            follow Agency.FOIARegulations.RequestClarification
+    }
+
+    duty InitialDetermination(request: FOIARequest) {
+        bearer FOIAOfficeOf(request.target_agency)
+        claimant request.requester
+        attaches when operative ProperRequest(request)
+        due 20 counted_days after received_by_appropriate_component(request)
+        exclude_from_count {
+            Saturday
+            Sunday
+            FederalLegalPublicHoliday
+        }
+        content DetermineComplianceAndNotify(request)
+        source FOIAStatute.section("552(a)(6)(A)(i)")
+    }
+
+    type WithholdingBasis =
+        HarmBased {
+            exemption: FOIAExemption
+            protected_interest: LegalInterest
+        }
+      | ValidExemption3 {
+            exemption: Exemption3
+            qualifying_statute: SourceRef
+        }
+      | OtherwiseProhibitedByLaw {
+            prohibiting_source: SourceRef
+        }
+
+    record_type Withholding {
+        part: RecordPart
+        basis: WithholdingBasis
+    }
+
+    record_type FOIADisposition {
+        released: FiniteSet<RecordPart>
+        withheld: FiniteSet<Withholding>
+    }
+
+    decision ProcessResponsiveRecord(
+        request: FOIARequest,
+        record: AgencyRecord,
+        proposed: FOIADisposition
+    ) -> FOIADisposition {
+        authority occupant FOIAOfficeOf(request.target_agency)
+        options lawful_partitions(record.parts)
+
+        for each withholding in proposed.withheld:
+            require operative Responsive(withholding.part, request)
+            record requires CitedWithholdingBasis(withholding)
+
+            when withholding.basis is HarmBased(exemption, interest):
+                require operative ExemptionApplies(
+                    withholding.part,
+                    exemption
+                )
+                require operative ForeseeableHarm(
+                    withholding.part,
+                    interest
+                )
+                record requires HarmAnalysis(withholding)
+
+            when withholding.basis is ValidExemption3(exemption, statute):
+                require operative ExemptionApplies(
+                    withholding.part,
+                    exemption
+                )
+                require operative QualifyingExemption3Statute(statute)
+                record requires ProhibitingLawTrace(withholding, statute)
+
+            when withholding.basis is OtherwiseProhibitedByLaw(source):
+                require operative DisclosureProhibitedByLaw(
+                    withholding.part,
+                    source
+                )
+                record requires ProhibitingLawTrace(withholding, source)
+
+        require every reasonably_segregable_nonexempt_part(record)
+            is in proposed.released
+
+        record requires SegregabilityAnalysis(record)
+            when proposed.withheld is nonempty
+
+        returns proposed when every requirement above is satisfied
+
+        source {
+            FOIAStatute.section("552(a)(8)(A)")
+            FOIAStatute.section("552(b)")
+        }
+    }
+
+    legal_act IssueFOIADetermination(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    ) {
+        performer occupant FOIAOfficeOf(request.target_agency)
+        validity requires operative ProperRequest(request)
+            in FOIARequestProcessing
+        effect establish DeterminationIssued(request, disposition)
+        source FOIAStatute.section("552(a)(6)(A)(i)")
+    }
+
+    rule EveryDeterminationTriggersReasonsAndAssistance(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    ) : prescriptive
+        from FOIAStatute.section("552(a)(6)(A)(i)")
+    {
+        when effective IssueFOIADetermination(request, disposition)
+        then create Duty(
+            bearer = Agency,
+            claimant = request.requester,
+            content = GiveNotice(
+                reasons_for(disposition),
+                right_to_seek_assistance_from(FOIAPublicLiaison)
+            )
+        )
+    }
+
+    rule WithholdingDispositionIsAdverse(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    ) : derive
+        from FOIAStatute.section("552(a)(6)(A)(i)(III)")
+    {
+        when disposition.withheld is nonempty
+        then derive AdverseDetermination(request, disposition)
+    }
+
+    rule AdverseDeterminationTriggersReviewNotice(
+        request: FOIARequest,
+        disposition: FOIADisposition
+    ) : prescriptive
+        from FOIAStatute.section("552(a)(6)(A)(i)(III)")
+    {
+        when effective IssueFOIADetermination(request, disposition)
+          and derived AdverseDetermination(request, disposition)
+        then create Duty(
+            bearer = Agency,
+            claimant = request.requester,
+            content = GiveNotice(
+                appeal_procedure,
+                appeal_deadline_at_least(90 days),
+                dispute_resolution_available_from {
+                    FOIAPublicLiaison,
+                    OGIS
+                }
+            )
+        )
+    }
+
+    query disposition(request: FOIARequest)
+        -> FOIADisposition
+        ! {Observe, Determine, Interpret}
+    {
+        goal RunDecision {
+            decision ProcessResponsiveRecord
+            arguments {
+                request
+                case_input<AgencyRecord>("responsive_record")
+                case_input<FOIADisposition>("proposed_disposition")
+            }
+            result declared_result
+        }
+    }
+
+    verify ProcessingIntegrity {
+        assert no withholding
+            without CitedWithholdingBasis(withholding)
+
+        assert every responsive part is exactly_one_of {
+            released
+            withheld_with_valid_basis_and_required_showing
+        }
+
+        assert every reasonably_segregable_nonexempt_part is released
+        assert every disposition with withheld parts
+            has SegregabilityAnalysis
+        assert every determination creates reasons_and_liaison_notice
+        assert every adverse_determination creates
+            appeal_and_dispute_resolution_notice
+    }
+}

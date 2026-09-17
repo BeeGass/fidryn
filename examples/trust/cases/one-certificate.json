@@ -1,0 +1,33 @@
+{
+  "schema": "fidryn.case-record/v0.1",
+  "module": "Examples.BryanRevocableTrust@0.1.0",
+  "facts": {
+    "acting_trustee": "Bryan"
+  },
+  "evidence": [
+    {
+      "schema": "PhysicianCertificate",
+      "value": "certificate-1",
+      "observedAt": "2026-08-23T12:00:00Z"
+    }
+  ],
+  "determinations": [],
+  "interpretations": {},
+  "decisions": {},
+  "closures": [
+    { "domain": "certificates_received", "closed": true }
+  ],
+  "outsideScope": ["tax", "creditor_priority"],
+  "admissibleCompletions": {
+    "interpretations": {
+      "SuccessorEligibility": ["I1", "I2"]
+    },
+    "evidence": {
+      "SecondConcurringCertificate": {
+        "responses": ["absent", "present_prospective"],
+        "effectOnValidTime": "unchanged_if_after_query_valid_time"
+      }
+    },
+    "choices": {}
+  }
+}

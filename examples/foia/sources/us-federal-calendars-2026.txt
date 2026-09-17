@@ -1,0 +1,2 @@
+US federal calendar 2026 (research fixture, not an official holiday list).
+Counted-day exclusions: Saturday, Sunday, FederalLegalPublicHoliday.
