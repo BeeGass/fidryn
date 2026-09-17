@@ -128,3 +128,8 @@ Catalog: [docs/examples.md](docs/examples.md) and
 
 Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is
 actually implemented: [docs/implementation-status.md](docs/implementation-status.md).
+
+## Website
+
+Public landing: [fidryn.onlygass.dev](https://fidryn.onlygass.dev) (static files in `site/`).
+
