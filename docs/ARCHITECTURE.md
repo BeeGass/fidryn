@@ -55,9 +55,11 @@ those as follows:
    set is `Inconsistent` or `Suspended`, never a vacuous determinate answer.
 5. An `OpenBranch` without a checked convergence certificate is never
    dropped. It yields `Suspended`.
-6. Canonical JSON is `fidryn.canonical/v0.1` (Rust `str` / Unicode scalar
-   key order, `serde_json` number spelling, no insignificant whitespace).
-   This is **not** RFC 8785. Replay is byte-identical under that encoding.
+6. Canonical JSON is `fidryn.canonical/v0.2+rfc8785` (RFC 8785 JCS: no
+   insignificant whitespace, object keys sorted by UTF-16 code units,
+   ECMAScript number format except `serde_json` i64/u64 integers stay
+   decimal without exponent). ASCII-only covering hashes match v0.1.
+   Replay is byte-identical under that encoding.
 7. `Parse.green` is a lossless Rowan CST with trivia.
    `syntax().text()` equals the source. Not every Pratt subexpression is
    its own node. The formatter round-trips modules apart from documented

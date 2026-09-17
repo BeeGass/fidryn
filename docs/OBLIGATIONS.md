@@ -24,14 +24,14 @@ byte-verified.
 | Require preservation | Landed | `requirement_is_not_discarded_from_query`; `requirement_is_not_discarded_from_evaluate_goal`; `goal_result_type_is_checked` | Query/Evaluate `require` lowers to `seq(require, …)`. Rule-body `require` and `using` names are not stored. False require suspends rather than a dedicated failed-guard outcome. The complete `require` contract is §2 (not this row). |
 | Handler identity | Landed | `remembered_judgments_distinguish_subjects_in_one_run`; `snapshot_change_does_not_retain_unvalidated_old_answers` | Keys are `Debug` of the full `OpenRequest`. Case-identity change discards `answered`. Residual is still the full term/plan, not a call-frame continuation. |
 | Succession aggregation | Landed | eval unit tests for suspended alternatives; UniqueOccupant tests | UniqueOccupant is still a specialized plan. Offices without a family still rank accepted nominees only. |
-| Decimal wire | Landed | `decimal_case_round_trip_preserves_nominal_variant`; `decimal_case_and_text_case_have_distinct_semantic_encodings`; `cached_case_result_agrees_with_uncached_result` | Canonical case JSON uses tagged `{"kind":"decimal","data":"1.25"}`. Friendly bare strings stay strings. RFC 8785 conformance is not claimed. |
+| Decimal wire | Landed | `decimal_case_round_trip_preserves_nominal_variant`; `decimal_case_and_text_case_have_distinct_semantic_encodings`; `cached_case_result_agrees_with_uncached_result` | Canonical case JSON uses tagged `{"kind":"decimal","data":"1.25"}`. Friendly bare strings stay strings. Covering JSON is `fidryn.canonical/v0.2+rfc8785`. |
 | Effects | Landed | `automatic_queries_cannot_hide_transitive_effects`; `evaluate_int_as_bool_query_is_e210` | Recursive Γ ⊢ e : τ ! ε is not a full inference engine. Money vs Decimal remains compatible for tax closed forms. |
 | Evidence subject | Landed | `evidence_does_not_match_subject_by_incidental_issuer_field` | Designated fields are subject/person/candidate/occupant/holder. `CaseDetermination.recorded_at` is optional. |
 | Worklist deltas | Landed | `worklist_replacement_with_equal_cardinality_is_not_quiescence` | Truncated substitutions are an engine error, not a covering certificate. |
 | Digest / program identity | Landed | `module_body_edit_invalidates_execution_cache`; `declared_empty_completion_domain_cannot_be_reopened_by_recorded_selection` | Run key hashes canonical CoreModule JSON. `ModuleId` is still name-derived. |
 | Artifact-byte authentication | Landed | `matching_blake3_hex_authenticates_required_import`; `mismatched_blake3_hex_is_e200`; `hex_digest_without_bytes_is_e200`; `fixture_digest_authenticates_required_import` | `"fixture"` is `TrustProfile::Fixture`, never `ByteVerified`. Hex without a readable file is E200. |
-| Verify pipeline (named literals) | Landed | `declared_true_property_survives_the_entire_compiler_pipeline` | Named `verify Trivial { assert true }` lowers. Only exact `true`/`false` literals are decided. |
-| Certificate covering | Implemented (this suite) | kernel fabricated-witness / duplicate-world / tautology tests; `structural_accept_covering_cannot_authorize_ignored_issues`; `finite_replay_accept_covering_eval_can_authorize_ignored_issues`; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Shape-only `accept_covering` is Structural (`!is_covering()`). FiniteReplay is `accept_covering_eval`. Kernel still calls `evaluate`; an independent kernel without evaluate is Remaining. |
+| Verify pipeline (named literals) | Landed | `declared_true_property_survives_the_entire_compiler_pipeline`; `verify_property_proves_forall_true_over_people` | Named `verify Trivial { assert true }` lowers. Bounded `for_all`/`exists` over People with true/false bodies are decided. `TrusteeContinuity` stays Unknown. |
+| Certificate covering | Implemented (this suite) | kernel fabricated-witness / duplicate-world / tautology tests; `structural_accept_covering_cannot_authorize_ignored_issues`; `finite_replay_accept_covering_eval_can_authorize_ignored_issues`; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Shape-only `accept_covering` is Structural (`!is_covering()`). FiniteReplay is `accept_covering_eval`. Pure-value covering uses `eval_fragment`; duty and handlers still call `evaluate`. |
 | String / arity | Landed | `ordinary_string_returning_function_executes`; `function_arity_is_not_filled_from_caller_bindings` | Callee env starts empty; arity mismatch is `InvalidInput`. |
 
 Outcome schema `fidryn.outcome/v0.1` (`schemas/outcome-v0.1.json`) now
@@ -73,23 +73,23 @@ and not Determinate false unless a later declared result says so.
 | --- | --- | --- | --- |
 | `seq` / `require` Core eval | Implemented | `independent_program_require_true_is_determinate_seven`; `independent_program_require_false_is_not_determinate_seven`; `nested_seq_under_add_skips_completed_attach_on_resume` | Nested seq is implemented in eval. This suite does not reimplement it. Rule-body `require` is not stored. RememberingHandler still used for reusable observations. |
 | Tax builtin | Landed | eval: missing-body helper is only `ordinary_income_tax`; other missing bodies are `Unsupported` | Closed-form `.fr` calc still used when a body exists. |
-| Records vs tagged values | Landed | `{"kind":"bool","data":false}` is Bool; `{"kind":"record","data":{…}}` is Map | Untagged objects still become `Value::Map`. RFC 8785 is not claimed. |
+| Records vs tagged values | Landed | `{"kind":"bool","data":false}` is Bool; `{"kind":"record","data":{…}}` is Map | Untagged objects still become `Value::Map`. Covering JSON is `fidryn.canonical/v0.2+rfc8785`. |
 
 ### 3. Institutional state
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
 | Duty status machine | Landed | eval `duty_step` tests: late perform keeps `breached`; illegal discharge commits nothing | History is in bindings/`duty:{name}`, not a full event ledger query API. |
-| Surface duty integration | Implemented (this suite) | `duty_status(PayInvoice)` from `.fr`; `operative_duty_performed_event_without_grant_is_not_performed`; `scenario_assumption_can_report_performed_without_mutating_events`; `scenario_render_report_includes_execution_mode_and_assumptions`; `two_duty_instances_isolation`; `transaction_rollback`; `transaction_suspend_does_not_commit_prefix`; `attach_guard_unknown_is_unresolved_established_false_is_not_attached` | Source-driven due is implemented. Scenario overlay is `evaluate_scenario`, not operative `evaluate`. Surface transaction syntax is Remaining. |
-| Authority grants | Landed | `AuthorityGrant` + `covers`; eval `require_authority` suspends without a grant | Occupancy is still a separate UniqueOccupant path. No full delegation/revocation language. |
+| Surface duty integration | Implemented (this suite) | `duty_status(PayInvoice)` from `.fr`; `operative_duty_performed_event_without_grant_is_not_performed`; `scenario_assumption_can_report_performed_without_mutating_events`; `scenario_render_report_includes_execution_mode_and_assumptions`; `two_duty_instances_isolation`; `transaction_rollback`; `transaction_suspend_does_not_commit_prefix`; `attach_guard_unknown_is_unresolved_established_false_is_not_attached`; `transaction-atomic.fr` | Source-driven due is implemented. Scenario overlay is `evaluate_scenario`, not operative `evaluate`. Surface `transaction { … }` lowers to `Apply("transaction", steps)`. |
+| Authority grants | Landed | `AuthorityGrant` + `covers`; eval `require_authority` suspends without a grant; revoked grant does not authorize; unrevoked `delegate_of` does | Occupancy is still a separate UniqueOccupant path. No appeal or supersession graph. |
 
 ### 4. Reasoning / proofs
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| Covering certificates | Implemented (this suite) | fabricated `false→true` rejected; duplicate-world omission rejected; `b \|\| !b` FiniteReplay accepted; Structural cannot `Outcome::determinate` with ignored issues; `empty_coverage_witness_cannot_cover_via_accept_covering_eval` | Digest is not covering. Kernel still depends on `evaluate`. Independent kernel without `evaluate` is Remaining. |
-| Streaming search | Landed | `stream_budget_one_on_two_by_two_exceeds_without_full_product`; `budget_exhaustion_is_unknown_not_convergent`; `counterexample_returns_before_remaining_space` | `enumerate` still collects a stream with a huge budget for existing tests. SMT is Remaining. |
-| Finite quantifiers | Partial | `for_all_over_closed_positive_set_is_true`; `for_all_open_ident_domain_without_closure_suspends` | Nested quantifiers and open-world proofs are not done. Quantifiers as a general language (not only `Term::Apply` over a closed `Value::Set`) remain incomplete. |
+| Covering certificates | Implemented (this suite) | fabricated `false→true` rejected; duplicate-world omission rejected; `b \|\| !b` FiniteReplay accepted; Structural cannot `Outcome::determinate` with ignored issues; `empty_coverage_witness_cannot_cover_via_accept_covering_eval` | Digest is not covering. Pure-value covering uses `eval_fragment`. Top-level `duty_status` / `require_authority` covering uses the institutional fragment, not `evaluate`. UniqueOccupant and handler plans still replay through `evaluate`. |
+| Streaming search | Landed | `stream_budget_one_on_two_by_two_exceeds_without_full_product`; `budget_exhaustion_is_unknown_not_convergent`; `counterexample_returns_before_remaining_space`; `smt_check` | `enumerate` still collects a stream with a huge budget for existing tests. SMT-lite is finite-domain equality plus DPLL, not Z3. |
+| Finite quantifiers | Partial | `for_all_over_closed_positive_set_is_true`; `nested_for_all_over_closed_sets_with_true_is_true`; `for_all_open_ident_domain_without_closure_suspends` | Nested closed-set `for_all`/`exists` evaluate. Open-world nested proofs and `TrusteeContinuity` stay Unknown. |
 
 A trusted evaluator may establish covering by exhaustive finite search.
 `fidryn-kernel` checks supplied branch derivations against `evaluate`;
@@ -100,14 +100,14 @@ The 2026-09-17 review is still **open**.
 
 | Item | Status | Evidence | Remaining |
 | --- | --- | --- | --- |
-| `fidryn-kernel` crate split | Implemented (this suite) | fabricated-witness rejection; Structural vs FiniteReplay determinate gate; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Not a proof generator. Independent kernel without `evaluate` is Remaining. |
+| `fidryn-kernel` crate split | Implemented (this suite) | fabricated-witness rejection; Structural vs FiniteReplay determinate gate; `empty_coverage_witness_cannot_cover_via_accept_covering_eval`; `accept_covering_eval_does_not_mutate_caller_case` | Not a proof generator. Pure-value covering is independent of `evaluate`; duty/handler plans are not. |
 | `fidryn-driver` crate split | Landed | `run_report`; `check_path_matching_blake3_authenticates_and_tamper_is_e200`; `render_report_schema_is_evaluation_report_v0_1`; `scenario_report_is_not_outcome_only_export` | Mill pasted source still uses `check` without files. Report envelope is `fidryn.evaluation-report/v0.1`; outcome JSON stays a projection (`additionalProperties: false`). Mill must not gain filesystem from paste. |
 | CLI `check_path` byte-auth | Implemented (this suite) | `Driver::check_path` → `check_with_sources(..., parent_dir)`; tamper is E200; `render_report_schema_is_evaluation_report_v0_1`; `mill_pasted_run_is_unauthenticated_evaluation_report` | In-memory `compile_source` / mill paste is not byte-verified (`sourceTrust: unauthenticated`). Mill must not gain filesystem from paste. |
 | Cross-feature programs | Landed | `late-payment.fr` / `late-payment-extended.fr` / `require-gate.fr` duty_status lifecycle | Not closed through mill explore vs run as one envelope. |
-| Packages | Partial | `packages/std`; `check_path_matching_package_digest_authenticates`; mill/`check_source` does not read `packages/` | Path compile may authenticate `packages/` via `PackageLock`. No lockfile language in `.fr`, no store, no linking of imported declarations. |
-| Salsa | Remaining | none | Driver memo is blake3 / canonical JSON, not the salsa crate. |
-| SMT | Remaining | none | Search is fidryn-solve enumerate/DPLL. No Z3. |
-| Independent kernel without `evaluate` | Partial | kernel `eval_fragment` / `pure.rs`; tautology covering uses the fragment | Boolean/ident/`not`/`||`/`&&` covering does not call `evaluate`. Seq, duty, handlers, and other plans still use the trusted evaluator. |
+| Packages | Partial | `nested_package_authenticates_and_links`; `matching_package_links_always_true_so_query_type_checks`; mill/`check_source` does not read `packages/` | Path compile authenticates nested `packages/` deps (depth 8; cycle or missing nested digest is E200) and merges unique decls (`always_true` from `Logic.True` via `Std.Core`). No lockfile language in `.fr`, no network store. Mill does not mill nested packages. |
+| Salsa | Landed | `fidryn_driver_depends_on_salsa_and_repeated_check_source_hits`; `same_driver_repeated_check_reports_hit` | Driver check/run memos are salsa 0.28 tracked functions. Hits/misses count salsa reuse. Not a whole-compiler query graph. |
+| SMT | Partial | `smt_check`; `verify_property_proves_forall_true_over_people` | Finite-domain equality SMT-lite in `fidryn-solve`. Not Z3; no bitvectors; `TrusteeContinuity` stays Unknown. |
+| Independent kernel without `evaluate` | Partial | kernel `eval_fragment` / `pure.rs` / `duty.rs`; `1+1`, `if`, `seq(require true, 7)`, top-level `duty_status` covering | Closed value and top-level duty/require_authority covering do not call `evaluate`. UniqueOccupant, Observe, `duty_step`, and nested handler plans still use the trusted evaluator. |
 
 Trust profiles `Fixture`, `ByteVerified`, `PolicyAccepted`, and
 `Unauthenticated` exist on `TrustProfile`. Evaluation reports carry a
@@ -118,7 +118,7 @@ profile; fixture execution must not be presented as byte-verified.
 | Obligation | Where | Tests | Remaining limit |
 | --- | --- | --- | --- |
 | RunDecision executes the referenced declaration | `eval_run_decision`; FOIA-by-name removed; unknown name is `EngineError::Unsupported` | `process_responsive_record_executes_its_declared_body`; `run_decision_does_not_silently_run_foia`; `independent_process_responsive_record_is_not_foia`; arity `run_decision_rejects_argument_arity_mismatch` | Bodies are `record requires` schemas plus a result ident, not full `when` trees. Options/authority are not yet a general interpreter. |
-| UniqueOccupant uses alternative *definitions* | `eval_succession` + `CoreInterpretationFamily`; families matched by `Eligible` office, not I1/I2 aliases | `i1_with_both_accepted_selects_highest_rank_not_the_label`; `i1_with_only_bob_accepted_selects_bob`; `changing_i1_definitions_without_renaming_changes_the_result`; `renamed_alternatives_keep_eligibility_results`; `third_nominee_can_win_from_declared_eligibility`; `two_offices_follow_distinct_succession_families`; independent programs under `tests/programs/` | Offices without a family still rank accepted nominees only. |
+| UniqueOccupant uses alternative *definitions* | `eval_succession` + `CoreInterpretationFamily`; families matched by `Eligible` office, not I1/I2 aliases | `i1_with_both_accepted_selects_highest_rank_not_the_label`; `i1_with_only_bob_accepted_selects_bob`; `changing_i1_definitions_without_renaming_changes_the_result`; `renamed_alternatives_keep_eligibility_results`; `third_nominee_can_win_from_declared_eligibility`; `two_offices_follow_distinct_succession_families`; `office_without_succession_family_does_not_rank_accepted_nominees`; independent programs under `tests/programs/` | An office with no family for that office is Suspended, not min-rank of accepted nominees. |
 | Determinacy: two answers disprove; incomplete is unknown | `check_determinacy` + `Coverage` | existing counterexample/convergent tests; unresolved requests outside declared domains → Unknown | No covering certificate. `Coverage` is an examination count, not `CoverageWitness`. Counterexample coverage does not enumerate every possible answer. |
 | Resume does not re-ask answered handler work | `RememberingHandler`; same-snapshot resume reuses full request keys; case-identity change discards `answered` | `resume_does_not_replay_answered_observe`; `snapshot_change_does_not_retain_unvalidated_old_answers` | Residual is still the full term/plan. Answering a pending request is not a separate pinned-snapshot API from case updates. |
 | Cache keys include query arguments | `Driver::run_with_args`; fuel exhaustion is not stored | `different_query_arguments_miss_the_run_cache`; `changed_import_digest_misses_check_cache`; `same_driver_repeated_check_reports_hit` | Handler/profile are not separate key fields (CaseFile is derived from the case). Whole-source hashing; no declaration-level invalidation. |
@@ -131,10 +131,10 @@ profile; fixture execution must not be presented as byte-verified.
 
 The four crate-level items **fabricated-witness**, **source-duty**, **nested seq**,
 and **CLI byte-auth** are implemented. This suite does not reimplement them.
-Remaining after that gate: independent kernel without `evaluate`, packages,
-Salsa, SMT, surface transaction syntax, mill must not gain filesystem from
-paste. The 2026-09-17 review stays **open**. Green tests are regressions,
-not language closure.
+Remaining after that gate: Z3, UniqueOccupant covering without `evaluate`,
+a full `apps/` crate reorg, and a network package store. Mill must not
+gain filesystem from paste. The 2026-09-17 review stays **open**. Green
+tests are regressions, not language closure.
 
 Commands: `cargo test --workspace --offline` and `cargo clippy --workspace -- -D warnings`.
 `cargo test -p fidryn-cli --test adversarial_regressions` is the 16-test kit.
