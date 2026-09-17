@@ -49,8 +49,8 @@ exits 1 with
 | `GET` | `/` | none | `web/index.html` (`text/html; charset=utf-8`) |
 | `GET` | `/api/health` | none | plain text `ok` |
 | `POST` | `/api/check` | JSON `CheckRequest` | JSON `{ok, diagnostics}` |
-| `POST` | `/api/run` | JSON `EvalRequest` | evaluation-report envelope plus mill-only `ok` |
-| `POST` | `/api/explore` | JSON `EvalRequest` | same envelope as `/api/run` |
+| `POST` | `/api/run` | JSON `EvalRequest` | `{ "ok": true, "report": <evaluation-report> }` |
+| `POST` | `/api/explore` | JSON `EvalRequest` | same transport as `/api/run` |
 | `POST` | `/api/render` | JSON `RenderRequest` | JSON `{ok, text?, error?}` |
 
 There is no `POST /api/file`, `/api/filing`, `/api/submit`, or
@@ -109,13 +109,15 @@ outcome is an empty completion set.
 `validAt` and `knownAt` accept a `Z` suffix or a numeric offset, the same
 as CLI `--valid-at` and `--known-at`.
 
-On evaluation success, HTTP 200, and the body is the
+On evaluation success, HTTP 200, and the body is a transport wrapper
+`{ "ok": true, "report": ... }`. `report` is the
 `fidryn.evaluation-report/v0.1` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`), with one mill-only
-extra field: `"ok": true`. Nested `outcomeDocument` is the
-`fidryn.outcome/v0.1` projection. Pasted compile is
-`sourceTrust: unauthenticated`. `run` never chooses a completion.
+`verificationMethod`, `coverage`, `outcomeDocument`). `ok` is not a
+field of that report schema (`additionalProperties` is false). Nested
+`outcomeDocument` is the `fidryn.outcome/v0.1` projection. Pasted
+compile is `sourceTrust: unauthenticated`. `run` never chooses a
+completion.
 
 On check failure, HTTP 400:
 

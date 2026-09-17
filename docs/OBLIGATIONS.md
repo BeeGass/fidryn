@@ -139,3 +139,27 @@ not language closure.
 Commands: `cargo test --workspace --offline` and `cargo clippy --workspace -- -D warnings`.
 `cargo test -p fidryn-cli --test adversarial_regressions` is the 16-test kit.
 `cargo test -p fidryn-cli --test integration_suite --offline` is the integration gate.
+`cargo test -p fidryn-cli --test boundary_review_20260917 --offline` is the 2026-09-17 11:35 boundary-review gate.
+
+## 2026-09-17 11:35 boundary review
+
+The review stays **open**. Green tests are regressions, not closure.
+This gate is `crates/fidryn-cli/tests/boundary_review_20260917.rs`
+(thirteen tests). Schema probes live at
+`conformance/schema_boundary_probes.py`.
+
+| Test | Contract |
+| --- | --- |
+| `caller_supplied_answers_cannot_mint_finite_replay_without_replay` | A witness with invented answers cannot manufacture a replay-verified capability. |
+| `replay_cannot_overwrite_a_fixed_case_fact` | Completions resolve declared unknown slots; they do not replace fixed evidence/facts. |
+| `matching_branch_count_does_not_replace_domain_membership` | Equal counts and distinct maps do not establish exact coverage. |
+| `replay_rejects_a_different_program_identity` | Bound claims identify the program actually replayed. |
+| `a_real_certificate_for_true_cannot_certify_false` | Certificate consumption checks the certified answer, not just its method tag. |
+| `future_determinations_are_not_visible_at_an_earlier_known_time` | Every determination-reading path respects knowledge time. |
+| `on_time_payment_remains_unbreached_after_its_deadline` | Later observation does not turn timely performance into historical breach. |
+| `relabeling_a_performed_payload_as_correction_does_not_authorize_it` | Event kind changes cannot bypass semantic admission. |
+| `rolled_back_nested_sequence_is_reexecuted_before_transaction_commit` | Aborting a transaction rolls back its progress markers as well as bindings. |
+| `rebase_cannot_reuse_a_require_that_is_now_false` | Changed dependencies invalidate completed guards on rebase, or rebase is rejected. |
+| `sequencing_does_not_hide_a_wrong_result_type` | A surrounding sequence does not conceal a wrong result type. |
+| `a_declared_function_result_does_not_replace_checking_its_body` | Function bodies must satisfy their declared results. |
+| `a_hex_manifest_entry_without_checked_bytes_is_not_byte_verified` | ByteVerified requires checked bytes, not a plausible hex label. |

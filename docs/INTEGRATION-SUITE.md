@@ -18,7 +18,10 @@ DEVELOPER_DIR=/Library/Developer/CommandLineTools.
 The 2026-09-17 review stays **open**. Green tests here are regressions,
 not language closure. Remaining after this gate: independent kernel
 without `evaluate`, packages, Salsa, SMT, surface transaction syntax,
-mill must not gain filesystem from paste.
+mill must not gain filesystem from paste. The next gate beyond this
+six-obligation suite is
+[`crates/fidryn-cli/tests/boundary_review_20260917.rs`](../crates/fidryn-cli/tests/boundary_review_20260917.rs)
+(2026-09-17 11:35 boundary review).
 
 ## 1. Verification strength
 

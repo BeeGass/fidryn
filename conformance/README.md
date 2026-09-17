@@ -27,3 +27,19 @@ The probe checks `schemas/outcome-v0.1.json` against three malformed
 trace, ignored open issues without a certificate, tagged bool with a
 non-boolean). After the schema strengthening, all three should report
 `accepted_by_current_schema: false`.
+
+Evaluation-report and mill-transport probes (optional; not invoked from
+cargo tests):
+
+```sh
+python3 conformance/schema_boundary_probes.py
+```
+
+The probe checks `schemas/evaluation-report-v0.1.json` and
+`schemas/mill-evaluation-response-v0.1.json`. Prefer `jsonschema` and
+`referencing`; without them the script uses a local Draft 2020-12 subset
+and does not fetch `$schema` URLs. A baseline operative report and
+`{ "ok": true, "report": ... }` should be accepted. Flattened mill
+`{ ..., "ok": true }` on the report object, scenario without
+`assumptions`, operative with a nonempty `assumptions` array, and
+`finiteReplay` without a coverage object should be rejected.

@@ -293,10 +293,13 @@ declared `true` or `assert true` formula). Passing a query name such as
 
 ## `diff`
 
-Compare two snapshots and print canonical JSON
-`{added, removed, changed}` of query and module names. A `.fr` path is
-compiled; any other path is read as JSON (an outcome document or a
-serialized module).
+Compare two snapshots and print canonical JSON with two named
+operations: `result` (outcomeDocument / compiled query bodies) and
+`assurance` (executionMode, sourceTrust, assumptions,
+verificationMethod). Each is `{added, removed, changed}`. Changing only
+qualifications is an assurance diff, not a silent equal. A `.fr` path is
+compiled; any other path is read as JSON (an evaluation report, mill
+`{ok, report}` wrapper, outcome document, or serialized module).
 
 **Arguments**
 
@@ -315,10 +318,17 @@ fidryn diff \
   --query acting_trustee
 ```
 
-Identical snapshots (the same file twice) print empty arrays.
+Identical snapshots (the same file twice) print empty arrays under both
+`result` and `assurance`.
 
-**Success.** One canonical JSON object on stdout, keys `added`,
-`removed`, and `changed` (each a sorted array of strings).
+**Success.** One canonical JSON object on stdout:
+
+```
+{"assurance":{"added":[],"changed":[],"removed":[]},"result":{"added":[],"changed":[],"removed":[]}}
+```
+
+Each of `result` and `assurance` has keys `added`, `removed`, and
+`changed` (sorted arrays of strings).
 
 **Failure.** Exit 1. Compile diagnostics for `.fr` inputs;
 `cannot read PATH`; `invalid snapshot JSON PATH: ...`; or
