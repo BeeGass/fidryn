@@ -1,1 +1,382 @@
-FILE:/tmp/mill_full.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120f0c">
+  <title>Mill — Fidryn</title>
+  <meta name="description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Bryan Gass">
+  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/mill">
+  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/mill.md" title="Markdown">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fidryn">
+  <meta property="og:title" content="Mill — Fidryn">
+  <meta property="og:description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/mill">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mill — Fidryn">
+  <meta name="twitter:description" content="Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Mill — Fidryn","description":"Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.","url":"https://fidryn.onlygass.dev/docs/mill","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/mill.md"}</script>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/docs.css">
+</head>
+<body class="docs-body">
+  <div class="docs-backdrop" data-docs-close hidden></div>
+  <div class="docs-shell">
+    <header class="docs-top">
+      <a class="mark" href="/">fidryn</a>
+      <div class="docs-top-actions">
+        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
+          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="docs-menu-btn-text">Menu</span>
+        </button>
+        <nav class="nav" aria-label="Site">
+          <a href="/docs/">Docs</a>
+          <a href="/#install">Install</a>
+          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="docs-layout">
+      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
+        <p class="docs-sidebar-label">Guides</p>
+        <nav class="docs-side-nav">
+        <a href="/docs/">Overview</a>
+        <a href="/docs/getting-started">Getting started</a>
+        <a href="/docs/language">Language</a>
+        <a href="/docs/cli">CLI</a>
+        <a href="/docs/mill" class="active">Mill</a>
+        <a href="/docs/cases-and-time">Cases &amp; time</a>
+        <a href="/docs/outcomes">Outcomes</a>
+        <a href="/docs/examples">Examples</a>
+        <a href="/docs/contributing">Contributing</a>
+        </nav>
+        <p class="docs-sidebar-label">Also</p>
+        <nav class="docs-side-nav">
+          <a href="/">Home</a>
+          <a href="/docs/mill.md">Markdown</a>
+          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="/llms.txt">llms.txt</a>
+        </nav>
+      </aside>
+
+      <main class="docs-main prose" id="main">
+<h1>Fidryn mill</h1>
+<p>The mill is a loopback-only web UI for checking, running, exploring, and
+rendering Fidryn source on this machine. Start it with the CLI:</p>
+<pre><code>fidryn ui [--port N] [--no-open]
+</code></pre>
+<p>Default port is 8751. The process listens on <code>127.0.0.1</code> only. It never
+binds <code>0.0.0.0</code> or other interfaces. There is no filing route. Live
+filing is not available from the mill.</p>
+<p>See <a href="/docs/getting-started">getting started</a> for a first module, and the
+<a href="/docs/cli">CLI</a> for path-based <code>check</code> / <code>run</code> / <code>explore</code> / <code>render</code> /
+<code>file</code>.</p>
+<h2>Start</h2>
+<p>From a clone:</p>
+<pre><code>cargo run -p fidryn-cli -- ui --no-open
+</code></pre>
+<p>Or, after <code>cargo install --path crates/fidryn-cli</code>:</p>
+<pre><code>fidryn ui --port 8751 --no-open
+</code></pre>
+<p>On success, stderr prints:</p>
+<pre><code>fidryn mill on http://127.0.0.1:8751
+127.0.0.1 only. live filing is disabled.
+</code></pre>
+<p>Without <code>--no-open</code>, a further line says browser auto-open is not linked
+and you should open the URL locally. This build does not launch a
+browser. Ctrl-C shuts the server down. If the port is taken, the process
+exits 1 with
+<code>127.0.0.1:PORT is already in use. Stop that process or pass --port.</code></p>
+<h2>Routes</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Body</th>
+<th>Success</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/</code></td>
+<td>none</td>
+<td><code>web/index.html</code> (<code>text/html; charset=utf-8</code>)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/health</code></td>
+<td>none</td>
+<td>plain text <code>ok</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/check</code></td>
+<td>JSON <code>CheckRequest</code></td>
+<td>JSON <code>{ok, diagnostics}</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/run</code></td>
+<td>JSON <code>EvalRequest</code></td>
+<td><code>{ &quot;ok&quot;: true, &quot;report&quot;: &lt;evaluation-report&gt; }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/explore</code></td>
+<td>JSON <code>EvalRequest</code></td>
+<td>same transport as <code>/api/run</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/render</code></td>
+<td>JSON <code>RenderRequest</code></td>
+<td>JSON <code>{ok, text?, error?}</code></td>
+</tr>
+</tbody>
+</table>
+<p>There is no <code>POST /api/file</code>, <code>/api/filing</code>, <code>/api/submit</code>, or
+<code>/api/live</code>. Those paths return 404.</p>
+<h2>JSON field names</h2>
+<p>Names below are the serde fields the mill actually reads. <code>EvalRequest</code>
+uses camelCase. <code>CheckRequest</code> and <code>RenderRequest</code> do not.</p>
+<h3><code>POST /api/check</code></h3>
+<pre><code>{&quot;source&quot;: &quot;&lt;fidryn module text&gt;&quot;}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>HTTP status is 200 in both cases. Success is <code>{&quot;ok&quot;: true, &quot;diagnostics&quot;: []}</code>.
+A failed check is <code>{&quot;ok&quot;: false, &quot;diagnostics&quot;: [...]}</code>. Each diagnostic
+object has <code>code</code>, <code>message</code>, <code>primary_span</code>, <code>related_spans</code>, and
+<code>suggestion</code> (Rust field names, snake_case).</p>
+<h3><code>POST /api/run</code> and <code>POST /api/explore</code></h3>
+<pre><code>{
+  &quot;source&quot;: &quot;&lt;fidryn module text&gt;&quot;,
+  &quot;query&quot;: &quot;q&quot;,
+  &quot;case&quot;: {},
+  &quot;bounds&quot;: null,
+  &quot;validAt&quot;: &quot;2033-01-01T00:00:00Z&quot;,
+  &quot;knownAt&quot;: &quot;2033-01-01T00:00:00Z&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>query</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>case</code></td>
+<td>JSON value</td>
+<td>no (omitted, <code>{}</code>, or <code>null</code> is an empty case)</td>
+</tr>
+<tr>
+<td><code>bounds</code></td>
+<td>JSON value or omitted</td>
+<td>no; used only by <code>/api/explore</code></td>
+</tr>
+<tr>
+<td><code>validAt</code></td>
+<td>RFC 3339 string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>knownAt</code></td>
+<td>RFC 3339 string</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><code>case</code> must be a <code>fidryn.case-record/v0.1</code> object, <code>{}</code>, or JSON null.
+<code>bounds</code> follows the same merge rules as CLI <code>--bounds</code>: an
+<code>AdmissibleCompletions</code> object (<code>interpretations</code>, <code>evidence</code>, <code>choices</code>)
+or a wrapper with <code>admissibleCompletions</code> / <code>admissible_completions</code>.
+<code>/api/run</code> ignores <code>bounds</code>. <code>/api/explore</code> still needs a nonempty
+completion space on the case, on <code>bounds</code>, or both; otherwise the
+outcome is an empty completion set.</p>
+<p>A nonempty <code>case.assumptions</code> array puts mill <code>/api/run</code> and
+<code>/api/explore</code> into scenario mode (<code>executionMode: scenario</code> on the
+report). There is no separate mill <code>--scenario</code> flag; the overlay is
+inferred from the case. An empty or omitted <code>assumptions</code> list is
+operative. CLI path <code>run</code> still requires explicit <code>--scenario</code> to apply
+the same overlay.</p>
+<p><code>validAt</code> and <code>knownAt</code> accept a <code>Z</code> suffix or a numeric offset, the same
+as CLI <code>--valid-at</code> and <code>--known-at</code>.</p>
+<p>On evaluation success, HTTP 200, and the body is a transport wrapper
+<code>{ &quot;ok&quot;: true, &quot;report&quot;: ... }</code>. <code>report</code> is the
+<code>fidryn.evaluation-report/v0.1</code> envelope the CLI prints
+(<code>schema</code>, <code>executionMode</code>, <code>assumptions</code>, <code>sourceTrust</code>,
+<code>verificationMethod</code>, <code>coverage</code>, <code>outcomeDocument</code>). <code>ok</code> is not a
+field of that report schema (<code>additionalProperties</code> is false). Nested
+<code>outcomeDocument</code> is the <code>fidryn.outcome/v0.1</code> projection. Pasted
+compile is <code>sourceTrust: unauthenticated</code>. <code>run</code> never chooses a
+completion.</p>
+<p>On check failure, HTTP 400:</p>
+<pre><code>{&quot;ok&quot;: false, &quot;error&quot;: &quot;check failed&quot;, &quot;diagnostics&quot;: [...]}
+</code></pre>
+<p>Invalid case, bounds, or timestamps are HTTP 400 with <code>ok</code> false, an
+<code>error</code> string (<code>invalid case: ...</code>, the bounds merge message, or
+<code>validAt:</code> / <code>knownAt:</code> plus the parse error), and <code>diagnostics: []</code>.</p>
+<p>Unknown queries and other engine failures are HTTP 400 (HTTP 500 only
+when the engine kind is <code>Internal</code>):</p>
+<pre><code>{&quot;kind&quot;: &quot;engineError&quot;, &quot;error&quot;: &quot;UnknownQuery&quot;, &quot;message&quot;: &quot;...&quot;, &quot;ok&quot;: false}
+</code></pre>
+<p><code>error</code> here is the engine kind (<code>UnknownQuery</code>, <code>Unsupported</code>,
+<code>FuelExhausted</code>, <code>InvalidInput</code>, <code>Internal</code>), not a legal outcome kind.
+It is not rewritten as <code>inconsistent</code>.</p>
+<h3><code>POST /api/render</code></h3>
+<pre><code>{&quot;source&quot;: &quot;&lt;fidryn module text&gt;&quot;, &quot;template&quot;: &quot;{{module}}@{{version}}&quot;}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>string</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>HTTP status is 200 in both cases. Success is <code>{&quot;ok&quot;: true, &quot;text&quot;: &quot;...&quot;}</code>.
+Failure (check diagnostics joined by newlines, or a missing template key)
+is <code>{&quot;ok&quot;: false, &quot;error&quot;: &quot;...&quot;}</code>. Template variables are <code>module</code>,
+<code>version</code>, and <code>outside_scope</code>. Missing keys fail closed.</p>
+<h2>In-memory compile versus path compile</h2>
+<p>Mill <code>source</code> is compiled with <code>compile_source</code> against
+<code>SourceManifest::default()</code>. A <code>source_manifest</code> header in the pasted
+text is not loaded. No artifact files are read. Hex import digests are
+not byte-authenticated. No <code>.fr</code> or manifest is written to disk.</p>
+<p>CLI <code>fidryn check PATH</code> (and <code>run</code> / <code>explore</code> / <code>verify</code> / <code>render</code> on a
+path) uses <code>Driver::check_path</code>. That authenticates hex import digests
+against files in the module directory. The digest <code>&quot;fixture&quot;</code> remains a
+test trust profile, not that byte check. Details are in <a href="/docs/cli">CLI</a>
+under source checking and trust.</p>
+<p>CLI path compile loads the declared manifest and, for hex digests, hashes
+files next to the module. Mill pasted source does neither. A module that
+<code>fidryn check</code> accepts can fail in the mill if its imports require a
+digest the empty default manifest does not supply. Mill check of a
+snippet never proves that on-disk artifacts are intact. Mill must not
+gain filesystem access from paste.</p>
+<h2>No live filing</h2>
+<p>The mill does not call filing adapters. <code>fidryn file</code> on the <a href="/docs/cli">CLI</a>
+is the only submit path, and even there live HTTP needs <code>--live</code> and
+<code>FIDRYN_ALLOW_LIVE_FILING=1</code>. A transport receipt is still not <code>Filed</code>.
+The HTML page states that live filing is not available from the UI.</p>
+<h2>The HTML page</h2>
+<p><code>GET /</code> serves <code>web/index.html</code>. The page is a single column:</p>
+<ol>
+<li><strong>Header.</strong> Title <code>fidryn mill</code> with subtitle <code>localhost 127.0.0.1</code>,
+and a health badge. On load the page <code>GET</code>s <code>/api/health</code> and shows
+<code>health: ok (localhost)</code> or <code>health: unreachable</code>.</li>
+<li><strong>Deck.</strong> “Check, run, explore, and render a Fidryn module on this
+machine. This mill never files.”</li>
+<li><strong>Warning.</strong> “Live filing is not available from the UI.”</li>
+<li><strong>Module source.</strong> Textarea <code>source</code>, prefilled with a tiny
+<code>Examples.T</code> module and query <code>q</code>.</li>
+<li><strong>Query.</strong> Text input, default <code>q</code>.</li>
+<li><strong>Times.</strong> <code>validAt</code> and <code>knownAt</code>, default <code>2033-01-01T00:00:00Z</code>.</li>
+<li><strong>Case JSON.</strong> Textarea, default <code>{}</code>. Completions for Explore belong
+here as <code>admissibleCompletions</code> on the case. The page does not send a
+separate <code>bounds</code> field.</li>
+<li><strong>Template.</strong> Textarea for Render, default
+<code>{{module}}@{{version}}</code> plus an <code>outside_scope</code> each-block.</li>
+<li><strong>Buttons.</strong> <code>Check</code> (primary), <code>Run</code>, <code>Explore</code>, <code>Render</code>.</li>
+<li><strong>Outcome.</strong> A <code>&lt;pre&gt;</code> that starts as <code>Ready.</code></li>
+</ol>
+<p><code>Check</code> posts <code>{source}</code> to <code>/api/check</code>. On <code>ok</code> the outcome area shows
+the word <code>ok</code>. Otherwise it lists <code>code</code> and <code>message</code> for each
+diagnostic.</p>
+<p><code>Run</code> posts <code>{source, query, case, validAt, knownAt}</code> to <code>/api/run</code> and
+pretty-prints the JSON response.</p>
+<p><code>Explore</code> posts the same body to <code>/api/explore</code> (no <code>bounds</code> key from the
+page). Put finite completions on the case JSON if the query needs them.</p>
+<p><code>Render</code> posts <code>{source, template}</code> to <code>/api/render</code>. On <code>ok</code> the outcome
+area shows <code>text</code>. Otherwise it shows <code>error</code>.</p>
+<p>Invalid case JSON in the textarea fails in the browser before the
+request is sent.</p>
+<h2>See also</h2>
+<ul>
+<li><a href="/docs/getting-started">Getting started</a></li>
+<li><a href="/docs/cli">CLI</a></li>
+</ul>
+
+        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+      </main>
+    </div>
+
+    <footer class="footer docs-footer">
+      <span>Research fixture · Bryan Gass</span>
+      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
+    </footer>
+  </div>
+  <script>
+  (function () {
+    var body = document.body;
+    var btn = document.querySelector("[data-docs-toggle]");
+    var backdrop = document.querySelector(".docs-backdrop");
+    if (!btn || !backdrop) return;
+    backdrop.hidden = false;
+    function setOpen(open) {
+      body.classList.toggle("docs-nav-open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
+      body.style.overflow = open ? "hidden" : "";
+    }
+    btn.addEventListener("click", function () {
+      setOpen(!body.classList.contains("docs-nav-open"));
+    });
+    backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
+    });
+    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+  })();
+  </script>
+</body>
+</html>
