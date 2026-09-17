@@ -446,6 +446,8 @@ name = "fidryn-kernel"
 version = "0.1.0"
 dependencies = [
  "fidryn-core",
+ "fidryn-eval",
+ "fidryn-handlers",
 ]
 
 [[package]]

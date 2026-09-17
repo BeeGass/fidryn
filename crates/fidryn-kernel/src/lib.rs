@@ -3,17 +3,20 @@
 //! a covering claim.
 
 use fidryn_core::{
-    CaseRecord, CheckedCertificate, CompletionProofId, CoverageWitness, ModuleId, OpenRequest,
-    QueryName, RunContext, SourceSnapshotId, Value,
+    BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
+    LegalState, ModuleId, OpenRequest, Outcome, QueryName, RunContext, SourceSnapshotId, Value,
 };
-use std::collections::BTreeSet;
+use fidryn_eval::evaluate;
+use fidryn_handlers::CaseFile;
+use std::collections::{BTreeMap, BTreeSet};
 
-/// Accept a covering witness and bind a certificate to the claimed answer.
+/// Accept a covering witness by shape and bind a certificate to the claimed
+/// answer.
 ///
-/// The witness must be complete (`examined == total`, `examined > 0`,
-/// `incomplete == false`) and its answer must equal `answer`. This does
-/// not invent worlds; the caller supplies the examined space. A claims
-/// digest is not covering proof.
+/// Completeness here is `examined == total`, `examined > 0`,
+/// `incomplete == false`, and a matching answer. This does **not** evaluate
+/// branch meaning. Use [`accept_covering_eval`] when a module and query are
+/// available. A claims digest is not covering proof.
 #[allow(clippy::too_many_arguments)]
 pub fn accept_covering(
     id: CompletionProofId,
@@ -27,6 +30,39 @@ pub fn accept_covering(
     witness: CoverageWitness,
 ) -> Result<CheckedCertificate, String> {
     witness_is_admissible(&witness, answer)?;
+    CheckedCertificate::verified_covering(
+        id,
+        program,
+        snapshot,
+        case,
+        query,
+        ctx.valid_time,
+        ctx.record_time,
+        constraints,
+        answer,
+        witness,
+    )
+}
+
+/// Accept a covering witness after evaluating each claimed branch.
+///
+/// Shape completeness is not enough: [`check_branches`] must re-evaluate the
+/// query under every binding. Then [`CheckedCertificate::verified_covering`]
+/// binds the certificate.
+#[allow(clippy::too_many_arguments)]
+pub fn accept_covering_eval(
+    id: CompletionProofId,
+    program: ModuleId,
+    snapshot: SourceSnapshotId,
+    case: &CaseRecord,
+    query: &QueryName,
+    module: &CoreModule,
+    ctx: &RunContext,
+    constraints: &BTreeSet<OpenRequest>,
+    answer: &Value,
+    witness: CoverageWitness,
+) -> Result<CheckedCertificate, String> {
+    check_branches(module, query, case, ctx, &witness, answer)?;
     CheckedCertificate::verified_covering(
         id,
         program,
@@ -69,22 +105,200 @@ pub fn witness_is_admissible(witness: &CoverageWitness, answer: &Value) -> Resul
     Ok(())
 }
 
+/// Re-evaluate each claimed world. Shape completeness is not covering.
+///
+/// Rejects duplicate bindings, a determinate value other than the branch
+/// answer (fabricated evaluation), and any suspend or engine error.
+pub fn check_branches(
+    module: &CoreModule,
+    query: &QueryName,
+    base: &CaseRecord,
+    ctx: &RunContext,
+    witness: &CoverageWitness,
+    claimed: &Value,
+) -> Result<(), String> {
+    witness_is_admissible(witness, claimed)?;
+    if witness.branches.is_empty() {
+        return Err("coverage witness has no branches".into());
+    }
+    if witness.branches.len() != witness.total || witness.branches.len() != witness.examined {
+        return Err(format!(
+            "coverage witness branches length {} does not match examined {} / total {}",
+            witness.branches.len(),
+            witness.examined,
+            witness.total
+        ));
+    }
+    if has_duplicate_worlds(&witness.branches) {
+        return Err("duplicate worlds in coverage witness".into());
+    }
+    for branch in &witness.branches {
+        if branch.answer != *claimed || branch.answer != witness.answer {
+            return Err("coverage witness branch answer does not match claimed answer".into());
+        }
+        check_branch_evaluation(module, query, base, ctx, branch)?;
+    }
+    Ok(())
+}
+
+fn has_duplicate_worlds(branches: &[BranchClaim]) -> bool {
+    branches.iter().enumerate().any(|(index, branch)| {
+        branches[..index]
+            .iter()
+            .any(|prior| prior.bindings == branch.bindings)
+    })
+}
+
+fn check_branch_evaluation(
+    module: &CoreModule,
+    query: &QueryName,
+    base: &CaseRecord,
+    ctx: &RunContext,
+    branch: &BranchClaim,
+) -> Result<(), String> {
+    let case = apply_branch_bindings(base, &branch.bindings);
+    let mut handler = CaseFile::new(case.clone());
+    let args = BTreeMap::new();
+    let state = LegalState::new();
+    match evaluate(module, query, &args, &state, ctx, &mut handler, &case) {
+        Ok(Outcome::Determinate { value, .. }) => {
+            if value != branch.answer {
+                return Err(format!(
+                    "fabricated evaluation: branch answer {:?} but evaluation produced {value:?}",
+                    branch.answer
+                ));
+            }
+            Ok(())
+        }
+        Ok(Outcome::Suspended { .. }) => {
+            Err("not a covering evaluation: evaluation suspended".into())
+        }
+        Ok(other) => Err(format!("not a covering evaluation: {other:?}")),
+        Err(err) => Err(format!("not a covering evaluation: {err}")),
+    }
+}
+
+fn apply_branch_bindings(base: &CaseRecord, bindings: &BTreeMap<String, Value>) -> CaseRecord {
+    let mut case = base.clone();
+    for (key, value) in bindings {
+        case.facts.insert(key.clone(), value.clone());
+        if let Some(family) = key.strip_prefix("i:")
+            && !family.is_empty()
+        {
+            case.interpretations
+                .insert(family.to_owned(), binding_label(value));
+        }
+        if let Some(protocol) = key.strip_prefix("c:")
+            && !protocol.is_empty()
+        {
+            case.decisions
+                .insert(protocol.to_owned(), binding_label(value));
+        }
+    }
+    case
+}
+
+fn binding_label(value: &Value) -> String {
+    match value {
+        Value::String(s) | Value::Entity(s) => s.clone(),
+        other => other.display_label(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fidryn_core::Instant;
+    use fidryn_core::ir::{CoreQuery, QueryPlan};
+    use fidryn_core::{
+        Instant, Interval, JurisdictionId, NodeId, NodeMeta, OriginId, PrimitiveType,
+        SourceManifestId, Term, Type,
+    };
 
     fn complete_witness(answer: Value) -> CoverageWitness {
-        CoverageWitness {
-            examined: 3,
-            total: 3,
-            incomplete: false,
-            answer,
-        }
+        CoverageWitness::complete(3, answer)
     }
 
     fn at() -> Instant {
         Instant::parse("2033-01-01T00:00:00Z").expect("instant")
+    }
+
+    fn run_ctx() -> RunContext {
+        let t = at();
+        RunContext::new(t, t)
+    }
+
+    fn test_meta(name: &str) -> NodeMeta {
+        NodeMeta {
+            span: None,
+            source: None,
+            jurisdiction: JurisdictionId::of(b"j"),
+            valid_time: Interval::always(),
+            record_time: Interval::always(),
+            origin: OriginId::Direct(NodeId::of(name.as_bytes())),
+        }
+    }
+
+    fn module_with_plan(plan: QueryPlan) -> CoreModule {
+        CoreModule {
+            id: ModuleId::of(b"test"),
+            name: "Test".into(),
+            version: "0.1.0".into(),
+            snapshot: SourceSnapshotId::of(b"s"),
+            manifest: SourceManifestId::of(b"m"),
+            jurisdiction: JurisdictionId::of(b"j"),
+            outside_scope: Vec::new(),
+            declarations: Vec::new(),
+            nominations: Vec::new(),
+            queries: vec![CoreQuery {
+                id: NodeId::of(b"q"),
+                name: "q".into(),
+                binders: Vec::new(),
+                result_type: Type::Primitive(PrimitiveType::Bool),
+                effects: BTreeSet::new(),
+                automatic: false,
+                plan,
+                meta: test_meta("q"),
+            }],
+            verifications: Vec::new(),
+            assertions: Vec::new(),
+        }
+    }
+
+    fn return_b_module() -> CoreModule {
+        module_with_plan(QueryPlan::Evaluate(Term::Ident("b".into())))
+    }
+
+    fn tautology_module() -> CoreModule {
+        module_with_plan(QueryPlan::Evaluate(Term::Apply {
+            ctor: "||".into(),
+            args: vec![
+                Term::Ident("b".into()),
+                Term::Apply {
+                    ctor: "not".into(),
+                    args: vec![Term::Ident("b".into())],
+                },
+            ],
+        }))
+    }
+
+    fn bool_branch(b: bool, answer: bool) -> BranchClaim {
+        let mut bindings = BTreeMap::new();
+        bindings.insert("b".into(), Value::Bool(b));
+        BranchClaim {
+            bindings,
+            answer: Value::Bool(answer),
+        }
+    }
+
+    fn covering_witness(answer: bool, branches: Vec<BranchClaim>) -> CoverageWitness {
+        let n = branches.len();
+        CoverageWitness {
+            examined: n,
+            total: n,
+            incomplete: false,
+            answer: Value::Bool(answer),
+            branches,
+        }
     }
 
     fn claims_digest_certificate(answer: &Value) -> CheckedCertificate {
@@ -119,6 +333,41 @@ mod tests {
         .expect("verified digest")
     }
 
+    fn covering_eval(
+        module: &CoreModule,
+        answer: &Value,
+        witness: CoverageWitness,
+    ) -> Result<CheckedCertificate, String> {
+        let query = QueryName::from("q");
+        let case = CaseRecord::default();
+        let ctx = run_ctx();
+        let constraints = BTreeSet::new();
+        let id = CheckedCertificate::covering_claims_id(
+            module.id,
+            module.snapshot,
+            &case,
+            &query,
+            ctx.valid_time,
+            ctx.record_time,
+            &constraints,
+            answer,
+            &witness,
+        )
+        .expect("covering claims id");
+        accept_covering_eval(
+            id,
+            module.id,
+            module.snapshot,
+            &case,
+            &query,
+            module,
+            &ctx,
+            &constraints,
+            answer,
+            witness,
+        )
+    }
+
     #[test]
     fn test_witness_is_admissible_with_complete_matching_answer_returns_ok() {
         let answer = Value::Int(7);
@@ -134,6 +383,7 @@ mod tests {
             total: 3,
             incomplete: true,
             answer: answer.clone(),
+            branches: Vec::new(),
         };
         let err = witness_is_admissible(&witness, &answer).expect_err("incomplete");
         assert!(err.contains("incomplete"), "{err}");
@@ -147,6 +397,7 @@ mod tests {
             total: 0,
             incomplete: false,
             answer: answer.clone(),
+            branches: Vec::new(),
         };
         let err = witness_is_admissible(&witness, &answer).expect_err("examined 0");
         assert!(
@@ -163,6 +414,7 @@ mod tests {
             total: 3,
             incomplete: false,
             answer: answer.clone(),
+            branches: Vec::new(),
         };
         let err = witness_is_admissible(&witness, &answer).expect_err("examined != total");
         assert!(err.contains("examined"), "{err}");
@@ -260,5 +512,70 @@ mod tests {
             err.contains("does not match") || err.contains("covering") || err.contains("digest"),
             "{err}"
         );
+    }
+
+    #[test]
+    fn test_check_branches_with_fabricated_false_world_returns_err() {
+        let module = return_b_module();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(
+            true,
+            vec![bool_branch(false, true), bool_branch(true, true)],
+        );
+        let err = check_branches(
+            &module,
+            &QueryName::from("q"),
+            &CaseRecord::default(),
+            &run_ctx(),
+            &witness,
+            &claimed,
+        )
+        .expect_err("false world is not true");
+        assert!(err.contains("fabricated"), "{err}");
+        let err = covering_eval(&module, &claimed, witness).expect_err("not covering");
+        assert!(err.contains("fabricated"), "{err}");
+    }
+
+    #[test]
+    fn test_check_branches_with_duplicate_false_worlds_claiming_total_two_returns_err() {
+        let module = return_b_module();
+        let claimed = Value::Bool(false);
+        let witness = covering_witness(
+            false,
+            vec![bool_branch(false, false), bool_branch(false, false)],
+        );
+        let err = check_branches(
+            &module,
+            &QueryName::from("q"),
+            &CaseRecord::default(),
+            &run_ctx(),
+            &witness,
+            &claimed,
+        )
+        .expect_err("duplicate worlds");
+        assert!(err.contains("duplicate"), "{err}");
+        let err = covering_eval(&module, &claimed, witness).expect_err("not covering");
+        assert!(err.contains("duplicate"), "{err}");
+    }
+
+    #[test]
+    fn test_accept_covering_eval_with_tautology_worlds_returns_covering_certificate() {
+        let module = tautology_module();
+        let claimed = Value::Bool(true);
+        let witness = covering_witness(
+            true,
+            vec![bool_branch(false, true), bool_branch(true, true)],
+        );
+        let cert = covering_eval(&module, &claimed, witness).expect("tautology covers");
+        assert!(cert.is_covering());
+        assert!(!reject_digest_as_covering(&cert));
+    }
+
+    #[test]
+    fn test_reject_digest_as_covering_with_digest_only_certificate_returns_true() {
+        let answer = Value::Bool(true);
+        let cert = claims_digest_certificate(&answer);
+        assert!(reject_digest_as_covering(&cert));
+        assert!(!cert.is_covering());
     }
 }

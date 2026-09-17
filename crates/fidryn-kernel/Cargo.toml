@@ -10,3 +10,5 @@ description = "Fidryn covering-proof checks for convergence certificates"
 
 [dependencies]
 fidryn-core.workspace = true
+fidryn-eval.workspace = true
+fidryn-handlers.workspace = true
