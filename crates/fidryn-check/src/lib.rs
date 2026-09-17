@@ -10,8 +10,8 @@ use fidryn_core::time::Interval;
 use fidryn_core::types::{PrimitiveType, Sort, Type};
 use fidryn_core::value::{PropTerm, Term};
 use fidryn_core::{
-    ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ModuleId, NodeId,
-    OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
+    ClauseId, Diagnostic, DiagnosticCode, EffectId, EffectName, JurisdictionId, ManifestArtifact,
+    ModuleId, NodeId, OriginId, SourceManifest, SourceManifestId, SourceSnapshotId,
 };
 use fidryn_hir::{
     HirFunction, HirModule, HirQuery, HirQueryBody, collect_source_callees, collect_term_callees,
@@ -19,14 +19,66 @@ use fidryn_hir::{
     split_qname_type_args, term_as_name, term_has_bare_prop_guard,
 };
 use std::collections::{BTreeMap, BTreeSet};
+use std::path::Path;
 
+/// How a source digest is classified.
+///
+/// `"fixture"` is a test policy, not a hash of artifact bytes. Hex digests
+/// authenticate only when they equal blake3 of those bytes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum TrustProfile {
+    /// Synthetic or test input; not source authentication.
+    Fixture,
+    /// Expected digest equals the blake3 hash of artifact bytes.
+    ByteVerified,
+    /// An explicit trust policy named in the manifest.
+    PolicyAccepted,
+    /// No digest, or a digest presented without matching bytes.
+    Unauthenticated,
+}
+
+impl TrustProfile {
+    /// Whether this profile satisfies a digest-required import.
+    pub fn permits_import(self) -> bool {
+        matches!(
+            self,
+            Self::Fixture | Self::ByteVerified | Self::PolicyAccepted
+        )
+    }
+}
+
+/// Classify `digest` without reading artifact bytes.
+///
+/// `"fixture"` is [`TrustProfile::Fixture`], not byte-verified. A 32- or
+/// 64-digit hex string with no bytes is [`TrustProfile::Unauthenticated`].
+pub fn digest_authenticates(digest: &str) -> TrustProfile {
+    authenticate_digest(digest, None)
+}
+
+/// Check `hir` against `manifest` without reading artifact files.
+///
+/// `"fixture"` still authenticates. A hex digest without file bytes does not.
 pub fn check(hir: &HirModule, manifest: &SourceManifest) -> Result<CoreModule, Vec<Diagnostic>> {
+    check_with_sources(hir, manifest, None)
+}
+
+/// Check `hir` against `manifest`, hashing artifact files under `source_root`.
+///
+/// Hex digests of length 32 or 64 authenticate when they match blake3 of the
+/// file at `artifact.path` relative to `source_root` (64 hex: full digest; 32
+/// hex: first 16 bytes). A missing file or mismatch is E200 for
+/// digest-required imports. `source_root = None` never byte-verifies.
+pub fn check_with_sources(
+    hir: &HirModule,
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+) -> Result<CoreModule, Vec<Diagnostic>> {
     let mut diagnostics = hir.diagnostics.clone();
     check_nominations(hir, &mut diagnostics);
     check_queries(hir, &mut diagnostics);
     check_doctrines(hir, &mut diagnostics);
     check_recursion(hir, &mut diagnostics);
-    check_imports(hir, manifest, &mut diagnostics);
+    check_imports(hir, manifest, source_root, &mut diagnostics);
     check_sources(hir, &mut diagnostics);
     check_instantiation_arity(hir, &mut diagnostics);
     if diagnostics
@@ -549,14 +601,19 @@ fn expand_conflict_clause_ids(source: &str, clauses: &BTreeMap<String, String>) 
     found
 }
 
-fn check_imports(hir: &HirModule, manifest: &SourceManifest, diagnostics: &mut Vec<Diagnostic>) {
+fn check_imports(
+    hir: &HirModule,
+    manifest: &SourceManifest,
+    source_root: Option<&Path>,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
     for import in &hir.imports {
         if !import.digest_required {
             continue;
         }
         let matched = manifest.artifacts.iter().any(|artifact| {
             artifact_matches_import(&artifact.path, &import.name)
-                && digest_authenticates(&artifact.digest)
+                && authenticate_artifact(artifact, source_root).permits_import()
         });
         if !matched {
             diagnostics.push(Diagnostic::new(
@@ -595,12 +652,64 @@ fn normalize_import_key(s: &str) -> String {
         .collect()
 }
 
-fn digest_authenticates(digest: &str) -> bool {
+fn authenticate_artifact(artifact: &ManifestArtifact, source_root: Option<&Path>) -> TrustProfile {
+    let digest = artifact.digest.trim();
+    if digest.eq_ignore_ascii_case("fixture") {
+        return TrustProfile::Fixture;
+    }
+    if !is_plausible_hex_digest(digest) {
+        return TrustProfile::Unauthenticated;
+    }
+    let Some(root) = source_root else {
+        return TrustProfile::Unauthenticated;
+    };
+    match read_artifact_bytes(root, &artifact.path) {
+        Some(bytes) => authenticate_digest(digest, Some(&bytes)),
+        None => TrustProfile::Unauthenticated,
+    }
+}
+
+fn authenticate_digest(digest: &str, bytes: Option<&[u8]>) -> TrustProfile {
     let digest = digest.trim();
     if digest.eq_ignore_ascii_case("fixture") {
-        return true;
+        return TrustProfile::Fixture;
     }
-    is_plausible_hex_digest(digest)
+    let Some(bytes) = bytes else {
+        return TrustProfile::Unauthenticated;
+    };
+    if is_plausible_hex_digest(digest) && digest_matches_bytes(digest, bytes) {
+        TrustProfile::ByteVerified
+    } else {
+        TrustProfile::Unauthenticated
+    }
+}
+
+fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
+    let path = Path::new(artifact_path);
+    if path.is_absolute() {
+        std::fs::read(path).ok()
+    } else {
+        std::fs::read(source_root.join(path)).ok()
+    }
+}
+
+fn digest_matches_bytes(digest: &str, bytes: &[u8]) -> bool {
+    let hash = *blake3::hash(bytes).as_bytes();
+    match digest.len() {
+        64 => digest.eq_ignore_ascii_case(&encode_hex(&hash)),
+        32 => digest.eq_ignore_ascii_case(&encode_hex(&hash[..16])),
+        _ => false,
+    }
+}
+
+fn encode_hex(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for &b in bytes {
+        out.push(HEX[(b >> 4) as usize] as char);
+        out.push(HEX[(b & 0x0f) as usize] as char);
+    }
+    out
 }
 
 fn is_plausible_hex_digest(digest: &str) -> bool {
@@ -1151,6 +1260,9 @@ mod tests {
     use super::*;
     use fidryn_hir::elaborate;
     use fidryn_syntax::parse_file;
+    use std::fs;
+    use std::path::PathBuf;
+    use std::sync::atomic::{AtomicU64, Ordering};
 
     #[test]
     fn duplicate_ranks_are_e410() {
@@ -1667,14 +1779,149 @@ module Examples.FnEff version "0.1.0" {
     }
 
     #[test]
-    fn digest_authenticates_fixture_and_plausible_hex() {
-        assert!(digest_authenticates("fixture"));
-        assert!(digest_authenticates("Fixture"));
-        assert!(digest_authenticates(&"ab".repeat(16)));
-        assert!(digest_authenticates(&"ab".repeat(32)));
-        assert!(!digest_authenticates("abc"));
-        assert!(!digest_authenticates("deadbeef"));
-        assert!(!digest_authenticates(""));
+    fn digest_authenticates_fixture_not_hex() {
+        assert_eq!(digest_authenticates("fixture"), TrustProfile::Fixture);
+        assert_eq!(digest_authenticates("Fixture"), TrustProfile::Fixture);
+        assert_ne!(digest_authenticates("fixture"), TrustProfile::ByteVerified);
+        assert_eq!(
+            digest_authenticates(&"ab".repeat(16)),
+            TrustProfile::Unauthenticated
+        );
+        assert_eq!(
+            digest_authenticates(&"ab".repeat(32)),
+            TrustProfile::Unauthenticated
+        );
+        assert_eq!(digest_authenticates("abc"), TrustProfile::Unauthenticated);
+        assert_eq!(
+            digest_authenticates("deadbeef"),
+            TrustProfile::Unauthenticated
+        );
+        assert_eq!(digest_authenticates(""), TrustProfile::Unauthenticated);
+    }
+
+    fn digest_import_src() -> &'static str {
+        r#"
+module Examples.ImpBytes version "0.1.0" {
+    import Other.Law version "1" { digest "abc" }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#
+    }
+
+    fn artifact_manifest(path: &str, digest: &str) -> SourceManifest {
+        SourceManifest {
+            schema: "fidryn.source-manifest/v0.1".into(),
+            snapshot: String::new(),
+            jurisdiction: String::new(),
+            artifacts: vec![ManifestArtifact {
+                path: path.into(),
+                digest: digest.into(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+        }
+    }
+
+    fn check_digest_import(
+        manifest: &SourceManifest,
+        source_root: Option<&Path>,
+    ) -> Result<CoreModule, Vec<Diagnostic>> {
+        let parsed = parse_file(digest_import_src());
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        check_with_sources(&hir, manifest, source_root)
+    }
+
+    struct TempRoot(PathBuf);
+
+    impl TempRoot {
+        fn new() -> Self {
+            static NEXT: AtomicU64 = AtomicU64::new(0);
+            let n = NEXT.fetch_add(1, Ordering::Relaxed);
+            let path =
+                std::env::temp_dir().join(format!("fidryn-check-{}-{n}", std::process::id()));
+            fs::create_dir_all(&path).expect("source_root");
+            Self(path)
+        }
+
+        fn write(&self, name: &str, bytes: &[u8]) {
+            fs::write(self.0.join(name), bytes).expect("write artifact");
+        }
+    }
+
+    impl Drop for TempRoot {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn hex_digest_without_bytes_is_e200() {
+        let bytes = b"fidryn-source-bytes";
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let manifest = artifact_manifest("Other.Law", &digest);
+        let err = check_digest_import(&manifest, None).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn matching_blake3_hex_authenticates_required_import() {
+        let bytes = b"fidryn-source-bytes";
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let root = TempRoot::new();
+        root.write("Other.Law", bytes);
+        let manifest = artifact_manifest("Other.Law", &digest);
+        check_digest_import(&manifest, Some(&root.0)).expect("matching blake3 hex authenticates");
+        assert_eq!(
+            authenticate_artifact(&manifest.artifacts[0], Some(&root.0)),
+            TrustProfile::ByteVerified
+        );
+    }
+
+    #[test]
+    fn matching_truncated_blake3_hex_authenticates_required_import() {
+        let bytes = b"fidryn-source-bytes";
+        let digest = encode_hex(&blake3::hash(bytes).as_bytes()[..16]);
+        assert_eq!(digest.len(), 32);
+        let root = TempRoot::new();
+        root.write("Other.Law", bytes);
+        let manifest = artifact_manifest("Other.Law", &digest);
+        check_digest_import(&manifest, Some(&root.0)).expect("32-hex blake3 prefix authenticates");
+    }
+
+    #[test]
+    fn mismatched_blake3_hex_is_e200() {
+        let bytes = b"fidryn-source-bytes";
+        let wrong = encode_hex(blake3::hash(b"tampered-bytes").as_bytes());
+        let root = TempRoot::new();
+        root.write("Other.Law", bytes);
+        let manifest = artifact_manifest("Other.Law", &wrong);
+        let err = check_digest_import(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
+        assert_eq!(
+            authenticate_artifact(&manifest.artifacts[0], Some(&root.0)),
+            TrustProfile::Unauthenticated
+        );
+    }
+
+    #[test]
+    fn missing_artifact_file_for_hex_digest_is_e200() {
+        let digest = encode_hex(blake3::hash(b"fidryn-source-bytes").as_bytes());
+        let root = TempRoot::new();
+        let manifest = artifact_manifest("Other.Law", &digest);
+        let err = check_digest_import(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            err.iter().any(|d| d.code == DiagnosticCode::E200),
+            "{err:?}"
+        );
     }
 
     #[test]

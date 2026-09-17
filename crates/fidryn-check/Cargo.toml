@@ -9,6 +9,7 @@ rust-version.workspace = true
 description = "Fidryn type, effect, authority, time, and stratification checking"
 
 [dependencies]
+blake3.workspace = true
 fidryn-core.workspace = true
 fidryn-hir.workspace = true
 indexmap.workspace = true
