@@ -74,6 +74,7 @@ hashed_id!(CompletionProofId, "proof");
 hashed_id!(SourceSnapshotId, "snapshot");
 hashed_id!(SourceManifestId, "manifest");
 hashed_id!(JurisdictionId, "jurisdiction");
+hashed_id!(PackageId, "package");
 
 /// Blake3 digest of a program's content fingerprint (32 bytes).
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
