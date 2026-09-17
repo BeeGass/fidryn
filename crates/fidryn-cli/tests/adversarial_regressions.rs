@@ -112,6 +112,23 @@ fn automatic_queries_cannot_hide_transitive_effects() {
 }
 
 #[test]
+fn automatic_query_calling_custom_effect_function_is_e420() {
+    let text = source(
+        r#"
+        effect DocketLookup {
+            request(docket_id: String) -> Bool
+        }
+        fn lookup() -> Bool ! {DocketLookup} { true }
+        query automatic q() -> Bool { return lookup() }
+    "#,
+    );
+    assert!(
+        compile_source(&text, &SourceManifest::default()).is_err(),
+        "An omitted effect annotation cannot hide a called function's custom effect"
+    );
+}
+
+#[test]
 fn ordinary_string_returning_function_executes() {
     let module = compile(&source(
         r#"
