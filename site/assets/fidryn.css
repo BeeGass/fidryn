@@ -812,7 +812,7 @@ html:not(.js) .spec-tabs, html:not(.js) .spec-dots { display: none; }
   .btn { height: auto; min-height: 44px; padding: 0 18px; }
   .copy { min-height: 32px; padding: 4px 10px; }
   .copy::after { content: ""; position: absolute; top: 50%; left: 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }
-  .code figcaption { min-height: 44px; padding-block: 0; }
+  .code figcaption { min-height: 46px; padding-block: 0; }
   .code pre { font-size: 12.5px; }
   .table-wrap table { font-size: 14px; }
   .prose .anchor { position: relative; display: inline-block; min-width: 24px; text-align: center; }
