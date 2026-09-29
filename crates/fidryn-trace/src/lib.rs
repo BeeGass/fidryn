@@ -8,9 +8,9 @@
 //! `sourceTrust`, `verificationMethod`, `coverage`) stay on the envelope.
 //! [`reject_lossy_export`] errors when a standalone outcome projection
 //! would drop them. Mill HTTP success is
-//! `{ "ok": true, "report": ..., "opinion": [...] }`; `ok` is not a
-//! field of this envelope. Result vs assurance/provenance diffs of those
-//! qualifications live in the CLI.
+//! `{ "ok": true, "report": ..., "opinion": [...] }`; `ok` and `opinion`
+//! are not fields of this envelope. Result vs assurance/provenance diffs
+//! of those qualifications live in the CLI.
 
 use fidryn_core::{
     AdmissibleCompletions, Assumption, CaseRecord, CoreModule, CoverageMethod, CoverageWitness,

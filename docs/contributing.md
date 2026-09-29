@@ -47,9 +47,10 @@ stale, and `cargo xtask ci` runs that check. The landing page's
 specimen is evaluated by the real interpreter at build time, so a
 change in semantics also makes the site stale.
 
-The styles and scripts in `site/assets/` are written by hand and are
-shared with the mill, whose page lives in [`web/`](../web/). When Node
-is installed, `cargo xtask ci` also runs the JavaScript unit tests in
+The stylesheet and script in `site/assets/` are written by hand. The
+mill, whose page lives in [`web/`](../web/), embeds the stylesheet
+`fidryn.css` and has its own script, `web/mill.js`. When Node is
+installed, `cargo xtask ci` also runs the JavaScript unit tests in
 `web/tests/`; Node is never needed to build or serve anything.
 
 ## Pipeline

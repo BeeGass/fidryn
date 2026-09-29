@@ -130,9 +130,10 @@ by the workspace task runner. After editing a guide in <code>docs/</code>, run:<
 stale, and <code>cargo xtask ci</code> runs that check. The landing page's
 specimen is evaluated by the real interpreter at build time, so a
 change in semantics also makes the site stale.</p>
-<p>The styles and scripts in <code>site/assets/</code> are written by hand and are
-shared with the mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>. When Node
-is installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
+<p>The stylesheet and script in <code>site/assets/</code> are written by hand. The
+mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>, embeds the stylesheet
+<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. When Node is
+installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
 <code>web/tests/</code>; Node is never needed to build or serve anything.</p>
 <h2 id="pipeline"><span class="hn">8.4</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>

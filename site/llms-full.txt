@@ -1960,7 +1960,9 @@ files, the fonts, and the samples are compiled into the binary, and the
 page sends requests only to 127.0.0.1. The response carries a strict
 Content-Security-Policy, so the page runs no inline script.
 
-The page has three columns on a wide screen and one column on a phone:
+On screens 1200px and wider the page has three columns (samples and
+history, the editor, and the query with the result); narrower screens
+stack them in one column. From the top:
 
 1. **Header.** The Fidryn monogram, `mill`, the health status
    (`localhost 127.0.0.1 · ok`, or a warning when the server cannot be
@@ -1976,15 +1978,17 @@ The page has three columns on a wide screen and one column on a phone:
    replacing them. The first visit loads `require-gate` without
    running it. History lists the last
    20 actions of this session. Choosing one reopens its result, and
-   "Restore inputs" puts its inputs back.
+   "Restore inputs" puts its inputs back, asking first if you have
+   unsaved edits.
 3. **Editor.** A segmented control switches between Module, Case JSON,
    and Template. The editor has line numbers and syntax highlighting;
    Tab and Shift-Tab indent and outdent, and Enter keeps the
-   indentation; press Escape, then Tab, to move focus out of the editor. About 700 ms after you stop typing in the module, the
-   page posts it to `/api/check`: each diagnostic gets a wavy underline
-   and a mark in the gutter, and its message appears under the line
-   while the cursor or pointer is on it. Case JSON is checked as you
-   type, with the line and column of the first error.
+   indentation; press Escape, then Tab, to move focus out of the editor.
+   About 700 ms after you stop typing in the module, the page posts it
+   to `/api/check`: each diagnostic gets a wavy underline and a mark in
+   the gutter, and its message appears under the line while the cursor
+   or pointer is on it. Case JSON is checked as you type, with the line
+   and column of the first error.
 4. **Query, clocks, and actions.** The query field suggests the
    module's `query` names. `validAt` and `knownAt` must be RFC 3339.
    `Check`, `Run`, `Explore`, and `Render` post to the routes above.
@@ -3100,9 +3104,10 @@ stale, and `cargo xtask ci` runs that check. The landing page's
 specimen is evaluated by the real interpreter at build time, so a
 change in semantics also makes the site stale.
 
-The styles and scripts in `site/assets/` are written by hand and are
-shared with the mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/). When Node
-is installed, `cargo xtask ci` also runs the JavaScript unit tests in
+The stylesheet and script in `site/assets/` are written by hand. The
+mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
+`fidryn.css` and has its own script, `web/mill.js`. When Node is
+installed, `cargo xtask ci` also runs the JavaScript unit tests in
 `web/tests/`; Node is never needed to build or serve anything.
 
 ## Pipeline

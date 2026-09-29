@@ -262,7 +262,9 @@ site's design system), <code>/assets/mill.css</code>, and <code>/assets/mill.js<
 files, the fonts, and the samples are compiled into the binary, and the
 page sends requests only to 127.0.0.1. The response carries a strict
 Content-Security-Policy, so the page runs no inline script.</p>
-<p>The page has three columns on a wide screen and one column on a phone:</p>
+<p>On screens 1200px and wider the page has three columns (samples and
+history, the editor, and the query with the result); narrower screens
+stack them in one column. From the top:</p>
 <ol>
 <li><strong>Header.</strong> The Fidryn monogram, <code>mill</code>, the health status
 (<code>localhost 127.0.0.1 · ok</code>, or a warning when the server cannot be
@@ -278,15 +280,17 @@ default action; if you have unsaved edits, the rail asks before
 replacing them. The first visit loads <code>require-gate</code> without
 running it. History lists the last
 20 actions of this session. Choosing one reopens its result, and
-"Restore inputs" puts its inputs back.</li>
+"Restore inputs" puts its inputs back, asking first if you have
+unsaved edits.</li>
 <li><strong>Editor.</strong> A segmented control switches between Module, Case JSON,
 and Template. The editor has line numbers and syntax highlighting;
 Tab and Shift-Tab indent and outdent, and Enter keeps the
-indentation; press Escape, then Tab, to move focus out of the editor. About 700 ms after you stop typing in the module, the
-page posts it to <code>/api/check</code>: each diagnostic gets a wavy underline
-and a mark in the gutter, and its message appears under the line
-while the cursor or pointer is on it. Case JSON is checked as you
-type, with the line and column of the first error.</li>
+indentation; press Escape, then Tab, to move focus out of the editor.
+About 700 ms after you stop typing in the module, the page posts it
+to <code>/api/check</code>: each diagnostic gets a wavy underline and a mark in
+the gutter, and its message appears under the line while the cursor
+or pointer is on it. Case JSON is checked as you type, with the line
+and column of the first error.</li>
 <li><strong>Query, clocks, and actions.</strong> The query field suggests the
 module's <code>query</code> names. <code>validAt</code> and <code>knownAt</code> must be RFC 3339.
 <code>Check</code>, <code>Run</code>, <code>Explore</code>, and <code>Render</code> post to the routes above.

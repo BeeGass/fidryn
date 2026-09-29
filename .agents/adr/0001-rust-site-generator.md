@@ -1,6 +1,6 @@
 # 0001: Generate the site with a Rust xtask
 
-Date: 2026-09-29. Status: accepted.
+Date: 2026-09-29. Status: Accepted.
 
 ## Context
 
@@ -19,8 +19,9 @@ pulldown-cmark, the `fidryn-syntax` lexer for `.fr` highlighting, and
 `fidryn-cli` to evaluate the landing specimen, so the page shows real
 interpreter output. `--check` fails when the committed output is
 stale, and `cargo xtask ci` runs it. The design system
-(`site/assets/fidryn.css`, `fidryn.js`) is hand-written and shared with
-the mill, which embeds it.
+(`site/assets/fidryn.css`) and the site script
+(`site/assets/fidryn.js`) are hand-written; the mill embeds the
+stylesheet and has its own script, `web/mill.js`.
 
 ## Consequences
 

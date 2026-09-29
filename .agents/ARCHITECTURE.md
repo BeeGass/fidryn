@@ -34,7 +34,7 @@ Those directories are under `crates/`.
 | `tests/` | Programs that exercise the interpreter |
 | `docs/` | Human handbook. Index: `docs/README.md` |
 | `site/` | Static site for fidryn.onlygass.dev. `cargo xtask site` generates the pages, mirrors, and search index from `docs/*.md`; `assets/`, `fonts/`, `favicon.svg`, and `vercel.json` are hand-written |
-| `web/` | The mill page (`index.html`, `mill.css`, `mill.js`), embedded in the `fidryn` binary by `fidryn-cli/src/ui.rs` |
+| `web/` | The mill page (`index.html`, `mill.css`, `mill.js`), embedded in the `fidryn` binary by `crates/fidryn-cli/src/ui.rs` |
 | `xtask/` | Workspace task runner: `test`, `bench`, `ci`, and `site` (see `.agents/adr/0001-rust-site-generator.md`) |
 | `grammar.ebnf` | Present. Not described in the README sections used here |
 | `benches/`, `conformance/`, `packages/`, `prelude/`, `schemas/`, `templates/` | Present. Not given a role in those README sections |

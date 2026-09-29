@@ -20,13 +20,17 @@ so a change in semantics also shows up as a stale site.
 
 | Path | What it is |
 | --- | --- |
-| `assets/fidryn.css`, `assets/fidryn.js` | Hand-written design system and behavior, shared with the mill |
+| `assets/fidryn.css` | Hand-written design system, also embedded by the mill |
+| `assets/fidryn.js` | Hand-written site behavior: theme, copy, drawer, search, contents, specimen tabs |
 | `fonts/`, `favicon.svg` | Self-hosted Fraunces and IBM Plex; the F monogram |
 | `index.html`, `404.html`, `docs/*.html` | Generated pages |
 | `index.md`, `docs/*.md` | Generated markdown mirrors for agents |
 | `search-index.json` | Generated search index |
 | `llms.txt`, `llms-full.txt`, `sitemap.xml`, `robots.txt` | Generated |
 | `vercel.json` | Deploy config: clean URLs, headers, caching |
+
+Implementer docs (`ARCHITECTURE.md`, `OBLIGATIONS.md`, contracts, the
+status matrix) stay on GitHub; the docs overview links to them.
 
 Never edit generated files by hand; the next run overwrites them.
 
@@ -42,7 +46,8 @@ python3 .agents/scripts/shoot.py serve   # http://127.0.0.1:8752 with clean URLs
   install, and build commands to null, so a deploy serves the committed
   files as they are.
 - Production domain: `fidryn.onlygass.dev` (CNAME `fidryn` →
-  `cname.vercel-dns.com` on the `onlygass.dev` zone).
+  `cname.vercel-dns.com`, or the value Vercel shows, on the Squarespace
+  zone for `onlygass.dev`).
 
 The localhost mill (`fidryn ui`, sources in `web/`) stays on 127.0.0.1.
 It is never deployed here, and this host exposes no mill API and no
