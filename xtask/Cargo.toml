@@ -13,3 +13,4 @@ description = "Fidryn workspace task runner"
 anyhow.workspace = true
 cargo_metadata = "0.23"
 clap.workspace = true
+fidryn-syntax.workspace = true

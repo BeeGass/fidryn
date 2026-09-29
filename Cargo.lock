@@ -2289,6 +2289,7 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
+ "fidryn-syntax",
 ]
 
 [[package]]

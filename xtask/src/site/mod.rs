@@ -1,6 +1,7 @@
 //! `cargo xtask site`: render the public site under `site/` from `docs/*.md`.
 
 mod guides;
+mod highlight;
 mod html;
 mod seo;
 mod templates;
