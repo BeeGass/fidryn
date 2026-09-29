@@ -998,7 +998,11 @@
     });
     el.samples.addEventListener("focusin", function (event) {
       var button = event.target.closest("[data-sample]");
-      if (button && button.scrollIntoView) button.scrollIntoView({ block: "nearest", inline: "nearest" });
+      if (!button || !button.scrollIntoView) return;
+      // "nearest" can stop between two of the phone row's snap points, and the
+      // snapping then pulls a chip cut off at the edge back out of view; a chip
+      // that is cut off goes to its own start, which is a snap point.
+      button.scrollIntoView({ block: "nearest", inline: chipCutOff(button) ? "start" : "nearest" });
     });
     el.confirmReplace.addEventListener("click", function () {
       var entry = pendingEntry;
@@ -1226,6 +1230,15 @@
       if (state && button.getAttribute("data-sample") === state.sample) button.setAttribute("aria-current", "true");
       else button.removeAttribute("aria-current");
     });
+  }
+
+  /** True when part of a sample chip lies outside the visible part of the chip row. */
+  function chipCutOff(button) {
+    var row = el.samples.getBoundingClientRect();
+    var box = button.getBoundingClientRect();
+    var style = window.getComputedStyle(el.samples);
+    return box.left < row.left + parseFloat(style.paddingLeft) - 1 ||
+      box.right > row.right - parseFloat(style.paddingRight) + 1;
   }
 
   function focusSample(id) {
