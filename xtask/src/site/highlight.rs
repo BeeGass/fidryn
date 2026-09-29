@@ -325,8 +325,8 @@ fn fr_class(
         | TokenKind::Date
         | TokenKind::DateTime
         | TokenKind::PlusInf
-        | TokenKind::MinusInf => Some(Tk::Nu),
-        TokenKind::DurationUnit => Some(Tk::Kw),
+        | TokenKind::MinusInf
+        | TokenKind::DurationUnit => Some(Tk::Nu),
         TokenKind::Comment | TokenKind::DocComment => Some(Tk::Co),
         TokenKind::LBrace
         | TokenKind::RBrace
@@ -806,7 +806,7 @@ mod tests {
                 ("Date", "tk-ty"),
                 ("2026-09-17", "tk-nu"),
                 ("30", "tk-nu"),
-                ("days", "tk-kw"),
+                ("days", "tk-nu"),
                 ("2026-09-17T12:00:00Z", "tk-nu"),
                 ("Interval", "tk-ty"),
                 ("Instant", "tk-ty"),
