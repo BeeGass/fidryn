@@ -1,5 +1,5 @@
 use crate::workspace::{
-    cargo_command, load_metadata, run_command, run_js_tests, run_schema_probes,
+    cargo_command, load_metadata, run_command, run_js_tests, run_python_checks, run_schema_probes,
     workspace_has_benches,
 };
 use anyhow::Result;
@@ -30,6 +30,7 @@ pub fn run(args: CiArgs) -> Result<()> {
     run_command(clippy)?;
 
     run_schema_probes()?;
+    run_python_checks()?;
     crate::site::check(&crate::workspace::workspace_root())?;
 
     run_js_tests()?;

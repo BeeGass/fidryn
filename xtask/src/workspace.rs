@@ -97,7 +97,7 @@ pub fn run_command(mut cmd: Command) -> Result<()> {
 }
 
 /// `uv run --locked python <script> <root>`, from `root`: the probes run on the
-/// Python version and packages that `pyproject.toml` and `uv.lock` pin.
+/// Python that `.python-version` names and the packages `uv.lock` pins.
 fn schema_probe_command(root: &Path, script: &Path) -> Command {
     let mut cmd = Command::new("uv");
     cmd.current_dir(root);
@@ -105,6 +105,36 @@ fn schema_probe_command(root: &Path, script: &Path) -> Command {
     cmd.arg(script);
     cmd.arg(root);
     cmd
+}
+
+/// One `uv run --locked <tool>` command per Python check, from `root`, in the
+/// order they run: lint, format, then types. ruff and mypy take their settings
+/// and their files from `pyproject.toml`.
+fn python_check_commands(root: &Path) -> Vec<Command> {
+    const CHECKS: [&[&str]; 3] = [
+        &["ruff", "check"],
+        &["ruff", "format", "--check"],
+        &["mypy"],
+    ];
+    CHECKS
+        .iter()
+        .map(|tool_args| {
+            let mut cmd = Command::new("uv");
+            cmd.current_dir(root);
+            cmd.args(["run", "--locked"]);
+            cmd.args(*tool_args);
+            cmd
+        })
+        .collect()
+}
+
+/// Lint, format-check, and type-check the Python in the workspace root.
+pub fn run_python_checks() -> Result<()> {
+    let root = workspace_root();
+    for cmd in python_check_commands(&root) {
+        run_command(cmd)?;
+    }
+    Ok(())
 }
 
 pub fn run_schema_probes() -> Result<()> {
@@ -200,7 +230,7 @@ fn quote_os(arg: &OsStr) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{js_test_files, schema_probe_command};
+    use super::{js_test_files, python_check_commands, schema_probe_command};
     use std::ffi::OsStr;
     use std::fs;
     use std::path::{Path, PathBuf};
@@ -261,5 +291,24 @@ mod tests {
             ]
         );
         assert_eq!(cmd.get_current_dir(), Some(root));
+    }
+
+    #[test]
+    fn python_checks_run_ruff_and_mypy_through_uv_on_the_locked_project() {
+        let root = Path::new("/repo");
+        let commands = python_check_commands(root);
+        let expected: [&[&str]; 3] = [
+            &["run", "--locked", "ruff", "check"],
+            &["run", "--locked", "ruff", "format", "--check"],
+            &["run", "--locked", "mypy"],
+        ];
+        assert_eq!(commands.len(), expected.len(), "{commands:?}");
+        for (cmd, want) in commands.iter().zip(expected) {
+            assert_eq!(cmd.get_program(), "uv", "{cmd:?}");
+            let args: Vec<&OsStr> = cmd.get_args().collect();
+            let want: Vec<&OsStr> = want.iter().map(OsStr::new).collect();
+            assert_eq!(args, want, "{cmd:?}");
+            assert_eq!(cmd.get_current_dir(), Some(root), "{cmd:?}");
+        }
     }
 }
