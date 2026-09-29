@@ -41,11 +41,15 @@ cargo clippy --workspace -- -D warnings
 cargo test --workspace --offline
 ```
 
-`cargo xtask ci` runs the tests and clippy, then the schema probes in
-`conformance/`, the site check, and the JavaScript tests when Node is
-installed. The probes need [uv](https://docs.astral.sh/uv/): `uv run`
-installs the Python version and packages that `pyproject.toml` and
-`uv.lock` pin.
+`cargo xtask ci` runs the tests and clippy, then the conformance
+probes and the Python checks (ruff and mypy), the site check, the
+JavaScript tests when Node is installed, and a bench build;
+`cargo xtask ci --fmt` also checks formatting first. The Python steps
+need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
+that `.python-version` names and the packages `uv.lock` pins. GitHub
+Actions runs `cargo xtask ci --fmt` on every push to `main` and every
+pull request (`.github/workflows/ci.yml`); the runner builds its own
+`.venv` from `uv.lock`, and nothing it builds is committed.
 
 Do not weaken no-false-determinacy to make a test pass.
 

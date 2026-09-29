@@ -10,9 +10,9 @@ The top-level listing has no `scripts/` directory. Do not invent product scripts
 
 Screenshots and audits the site and the mill in headless Chrome. Standard library only (Python 3.12+).
 
-- `python3 .agents/scripts/shoot.py serve` serves `site/` on http://127.0.0.1:8752 with clean URLs.
-- `python3 .agents/scripts/shoot.py site --out .agents/scratchpad/shots/site` screenshots every page at 390, 820, and 1440 pixels in light and dark, and fails on sideways scrolling, JavaScript errors (including `console.error`), or a failed search, drawer, theme, or specimen check.
-- `python3 .agents/scripts/shoot.py mill --out .agents/scratchpad/shots/mill` does the same for a running `fidryn ui` (default `http://127.0.0.1:8751`) in its first-run, run, table, JSON, contingent, and diagnostics states.
+- `uv run python .agents/scripts/shoot.py serve` serves `site/` on http://127.0.0.1:8752 with clean URLs.
+- `uv run python .agents/scripts/shoot.py site --out .agents/scratchpad/shots/site` screenshots every page at 390, 820, and 1440 pixels in light and dark, and fails on sideways scrolling, JavaScript errors (including `console.error`), or a failed search, drawer, theme, or specimen check.
+- `uv run python .agents/scripts/shoot.py mill --out .agents/scratchpad/shots/mill` does the same for a running `fidryn ui` (default `http://127.0.0.1:8751`) in its first-run, run, table, JSON, contingent, and diagnostics states.
 
 Both also press Tab round every page (the mill after its last state, with a result and history on it) and fail when a focus ring is missing or cut off, or a focused control is out of view or covered. The mill also fails when its page has no skip link.
 

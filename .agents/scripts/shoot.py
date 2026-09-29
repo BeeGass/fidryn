@@ -3,10 +3,10 @@
 
 Standard library only (Python 3.12+):
 
-    python3 .agents/scripts/shoot.py serve [--port 8752]
-    python3 .agents/scripts/shoot.py site --out DIR [--widths 390,820,1440]
-                                                    [--themes light,dark]
-    python3 .agents/scripts/shoot.py mill --url http://127.0.0.1:8751 --out DIR
+    uv run python .agents/scripts/shoot.py serve [--port 8752]
+    uv run python .agents/scripts/shoot.py site --out DIR [--widths 390,820,1440]
+                                                          [--themes light,dark]
+    uv run python .agents/scripts/shoot.py mill --url http://127.0.0.1:8751 --out DIR
 
 `site` serves `site/` with clean URLs, screenshots every page at each width
 and theme, fails when a page scrolls sideways or throws a JavaScript error,

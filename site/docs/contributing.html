@@ -120,11 +120,15 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt
 <span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
 <span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
-<p><code>cargo xtask ci</code> runs the tests and clippy, then the schema probes in
-<code>conformance/</code>, the site check, and the JavaScript tests when Node is
-installed. The probes need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code>
-installs the Python version and packages that <code>pyproject.toml</code> and
-<code>uv.lock</code> pin.</p>
+<p><code>cargo xtask ci</code> runs the tests and clippy, then the conformance
+probes and the Python checks (ruff and mypy), the site check, the
+JavaScript tests when Node is installed, and a bench build;
+<code>cargo xtask ci --fmt</code> also checks formatting first. The Python steps
+need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code> provides the Python
+that <code>.python-version</code> names and the packages <code>uv.lock</code> pins. GitHub
+Actions runs <code>cargo xtask ci --fmt</code> on every push to <code>main</code> and every
+pull request (<code>.github/workflows/ci.yml</code>); the runner builds its own
+<code>.venv</code> from <code>uv.lock</code>, and nothing it builds is committed.</p>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
 <h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
 <p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides
