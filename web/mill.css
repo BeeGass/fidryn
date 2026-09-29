@@ -13,7 +13,7 @@
 .mill-health[data-state="down"] .mill-health-text { color: var(--inc); }
 .mill-nofile { margin: 0 0 0 auto; padding: 4px 8px; border: 1px solid var(--rule); border-radius: var(--r); font: 600 12px/1.3 var(--sans); color: var(--ink-3); }
 .mill-guide { font: 600 12px/1.3 var(--sans); color: var(--ink); text-decoration: underline; text-decoration-color: var(--rubric); text-underline-offset: 3px; }
-.mill-noscript { margin: 0; padding: 12px 14px; border: 1px solid var(--inc); border-radius: var(--r); color: var(--ink); }
+.mill-noscript { width: 100%; max-width: 1360px; margin: 16px auto 0; padding: 12px 14px; border: 1px solid var(--inc); border-radius: var(--r); color: var(--ink); }
 
 /* ---------- page grid ---------- */
 .mill-page {
@@ -144,7 +144,7 @@
 .mill-diag-code { font: 500 12px/1.4 var(--mono); color: var(--inc); }
 .mill-diag-msg { color: var(--ink); font-size: 14px; overflow-wrap: anywhere; }
 .mill-diag-at { font: 12px/1.4 var(--mono); color: var(--ink-3); }
-.mill-diag-hint { grid-column: 2 / -1; color: var(--ink-3); font-size: 13px; }
+.mill-diag-hint { grid-column: 2 / -1; color: var(--ink-3); font-size: 13px; overflow-wrap: anywhere; }
 .mill-error { padding: 12px 14px; border: 1px solid var(--inc); border-left-width: 3px; border-radius: var(--r); background: color-mix(in srgb, var(--inc) 5%, var(--paper)); }
 .mill-error-title { margin: 0 0 4px; font: 600 13px/1.3 var(--sans); color: var(--inc); }
 .mill-error-msg { margin: 0; color: var(--ink); font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
