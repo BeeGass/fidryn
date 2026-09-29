@@ -16,4 +16,4 @@ Screenshots and audits the site and the mill in headless Chrome. Standard librar
 
 Both also press Tab round every page (the mill after its last state, with a result and history on it) and fail when a focus ring is missing or cut off, or a focused control is out of view or covered.
 
-Chrome runs with a throwaway profile and background downloads turned off, and the profile is deleted afterwards.
+Chrome runs with a throwaway profile, background downloads turned off, and every host except 127.0.0.1 blocked; the profile is deleted afterwards.

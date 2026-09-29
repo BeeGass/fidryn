@@ -16,8 +16,8 @@ sideways scrolling. Both press Tab round every page (the mill's after its
 last state, with a result and history on it) and fail on a focus ring that
 is missing or cut off, or a focused control that is out of view or covered.
 JavaScript errors include `console.error` calls. Chrome runs with a throwaway
-profile and background downloads disabled; the profile is deleted when the
-run ends.
+profile, background downloads turned off, and every host except 127.0.0.1
+blocked; the profile is deleted when the run ends.
 """
 
 from __future__ import annotations
@@ -58,6 +58,9 @@ CHROME_FLAGS = [
     "--disable-extensions",
     "--disable-features=OptimizationGuideModelDownloading,OptimizationHintsFetching,"
     "OptimizationTargetPrediction,OptimizationHints,MediaRouter",
+    # Chrome still calls Google (updates, GCM, autofill, time) with the flags
+    # above; resolving no host but 127.0.0.1 keeps it off the network.
+    "--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE 127.0.0.1",
 ]
 SITE_PAGES = [
     "/",
@@ -120,18 +123,22 @@ class WebSocket:
         hostport, _, path = url.removeprefix("ws://").partition("/")
         host, _, port = hostport.partition(":")
         sock = socket.create_connection((host, int(port)), timeout=timeout)
-        key = base64.b64encode(os.urandom(16)).decode()
-        sock.sendall(
-            (
-                f"GET /{path} HTTP/1.1\r\nHost: {hostport}\r\nUpgrade: websocket\r\n"
-                f"Connection: Upgrade\r\nSec-WebSocket-Key: {key}\r\n"
-                "Sec-WebSocket-Version: 13\r\n\r\n"
-            ).encode()
-        )
-        ws = cls(sock)
-        status = ws._read_until(b"\r\n\r\n").split(b"\r\n", 1)[0]
-        if b" 101 " not in status:
-            raise ConnectionError(f"websocket handshake refused: {status!r}")
+        try:
+            key = base64.b64encode(os.urandom(16)).decode()
+            sock.sendall(
+                (
+                    f"GET /{path} HTTP/1.1\r\nHost: {hostport}\r\nUpgrade: websocket\r\n"
+                    f"Connection: Upgrade\r\nSec-WebSocket-Key: {key}\r\n"
+                    "Sec-WebSocket-Version: 13\r\n\r\n"
+                ).encode()
+            )
+            ws = cls(sock)
+            status = ws._read_until(b"\r\n\r\n").split(b"\r\n", 1)[0]
+            if b" 101 " not in status:
+                raise ConnectionError(f"websocket handshake refused: {status!r}")
+        except BaseException:
+            sock.close()
+            raise
         return ws
 
     def close(self) -> None:
@@ -341,37 +348,56 @@ def fetch_devtools_port(profile: Path, timeout: float) -> Result[int, str]:
     return Err(f"Chrome did not open a DevTools port within {timeout:.0f}s")
 
 
+def stop_chrome(proc: subprocess.Popen[bytes]) -> None:
+    proc.terminate()
+    try:
+        proc.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait()
+
+
+def remove_profile(profile: Path) -> None:
+    """Delete the throwaway profile; a Chrome shutting down may still write to it."""
+    for _ in range(10):
+        shutil.rmtree(profile, ignore_errors=True)
+        if not profile.exists():
+            return
+        time.sleep(0.5)
+
+
 @contextmanager
 def launch_chrome() -> Iterator[int]:
+    """Start headless Chrome on a throwaway profile and yield its DevTools port.
+
+    The profile is deleted however the run ends: Chrome failing to start or
+    to open its port, an error or Ctrl-C in the caller, or a normal finish.
+    """
+    proc: subprocess.Popen[bytes] | None = None
     profile = Path(tempfile.mkdtemp(prefix="fidryn-shoot-"))
-    proc = subprocess.Popen(
-        [
-            CHROME,
-            *CHROME_FLAGS,
-            "--remote-debugging-port=0",
-            f"--user-data-dir={profile}",
-            "about:blank",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
     try:
+        proc = subprocess.Popen(
+            [
+                CHROME,
+                *CHROME_FLAGS,
+                "--remote-debugging-port=0",
+                f"--user-data-dir={profile}",
+                "about:blank",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         match fetch_devtools_port(profile, timeout=30.0):
             case Ok(value=port):
                 yield port
             case Err(error=message):
                 raise RuntimeError(message)
     finally:
-        proc.terminate()
         try:
-            proc.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-        for _ in range(10):
-            shutil.rmtree(profile, ignore_errors=True)
-            if not profile.exists():
-                break
-            time.sleep(0.5)
+            if proc is not None:
+                stop_chrome(proc)
+        finally:
+            remove_profile(profile)
 
 
 def fetch_page_ws(port: int, timeout: float) -> Result[str, str]:
@@ -398,13 +424,13 @@ def open_session(port: int) -> Iterator[Cdp]:
             ws = WebSocket.connect(url)
         case Err(error=message):
             raise RuntimeError(message)
-    cdp = Cdp(ws)
-    cdp.call("Page.enable")
-    cdp.call("Runtime.enable")
-    # Headless Chrome has no focused window, so element.focus() would move
-    # activeElement without firing focus events; behave like a focused tab.
-    cdp.call("Emulation.setFocusEmulationEnabled", enabled=True)
     try:
+        cdp = Cdp(ws)
+        cdp.call("Page.enable")
+        cdp.call("Runtime.enable")
+        # Headless Chrome has no focused window, so element.focus() would move
+        # activeElement without firing focus events; behave like a focused tab.
+        cdp.call("Emulation.setFocusEmulationEnabled", enabled=True)
         yield cdp
     finally:
         ws.close()
@@ -597,19 +623,24 @@ FOCUS_JS = r"""
 """
 
 
-def walk_focus(cdp: Cdp, label: str, report: Report, limit: int = 500) -> int:
+def walk_focus(
+    cdp: Cdp, label: str, report: Report, *, start_here: bool = False, limit: int = 500
+) -> int:
     """Press Tab through the loaded page; every stop must show its whole ring.
 
-    In a textarea, Escape comes first: the mill's editor keeps Tab for
-    indenting and gives it up after Escape. Stops when focus leaves the page
-    or comes back to a stop already seen. Returns the number of stops.
+    With `start_here`, the element focused now is the first stop, checked
+    before the first Tab. In a textarea, Escape comes first: the mill's editor
+    keeps Tab for indenting and gives it up after Escape. Stops when focus
+    leaves the page or comes back to a stop already seen. Returns the number
+    of stops.
     """
     seen: set[str] = set()
     in_textarea = False
-    for _ in range(limit):
-        if in_textarea:
-            cdp.key("Escape", "Escape", 27)
-        cdp.key("Tab", "Tab", 9)
+    for step in range(limit):
+        if step > 0 or not start_here:
+            if in_textarea:
+                cdp.key("Escape", "Escape", 27)
+            cdp.key("Tab", "Tab", 9)
         data = json.loads(str(cdp.run_js(FOCUS_JS)))
         stop = str(data["stop"])
         if not stop or stop in seen:
@@ -793,11 +824,12 @@ def run_mill(url: str, out: Path, widths: list[int], themes: list[str]) -> Repor
                         save_shot(cdp, out / f"{theme}-{width}-mill-{name}.png", width)
                     )
                     check_page(cdp, f"{theme} {width} mill {name}", report)
-                # Last, with a result and history on the page: Tab round the
-                # whole page from the skip link, its first stop.
+                # Last, with a result and history on the page: the skip link is
+                # focused as a keyboard user would see it and checked as the
+                # first stop, then Tab goes round the whole page back to it.
                 label = f"{theme} {width} mill"
-                cdp.run_js("document.querySelector('.skip')?.focus()")
-                if walk_focus(cdp, label, report) == 0:
+                cdp.run_js("document.querySelector('.skip')?.focus({focusVisible: true})")
+                if walk_focus(cdp, label, report, start_here=True) == 0:
                     report.failures.append(f"focus {label}: Tab reaches nothing")
                 for error in cdp.take_errors():
                     report.failures.append(f"focus {label}: JavaScript error: {error}")
