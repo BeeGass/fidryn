@@ -2313,8 +2313,10 @@ dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
+ "fidryn-cli",
  "fidryn-syntax",
  "pulldown-cmark",
+ "serde_json",
 ]
 
 [[package]]

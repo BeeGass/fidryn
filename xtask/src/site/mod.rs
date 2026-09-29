@@ -6,6 +6,7 @@ mod html;
 mod links;
 mod markdown;
 mod seo;
+mod specimen;
 mod templates;
 
 use crate::workspace::workspace_root;
