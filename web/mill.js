@@ -93,13 +93,22 @@
     }
   }
 
+  /** Positional fields in the server's order: by number (`_2` before `_10`), keys without a number first. */
+  function positionalOrder(a, b) {
+    var na = /^\d+$/.test(a.slice(1)) ? Number(a.slice(1)) : -1;
+    var nb = /^\d+$/.test(b.slice(1)) ? Number(b.slice(1)) : -1;
+    if (na !== nb) return na - nb;
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+
   function ctorText(value) {
     var data = value.data;
     if (!isObject(data) || typeof data.name !== "string") return compact(value);
     var fields = isObject(data.fields) ? data.fields : {};
-    var keys = Object.keys(fields).sort();
+    var keys = Object.keys(fields);
     if (keys.length === 0) return data.name;
     var positional = keys.every(function (key) { return key.charAt(0) === "_"; });
+    keys.sort(positional ? positionalOrder : undefined);
     return data.name + "(" + keys.map(function (key) {
       return (positional ? "" : key + ": ") + valueText(fields[key]);
     }).join(", ") + ")";
@@ -808,6 +817,7 @@
       isRfc3339: isRfc3339,
       valueText: valueText,
       requestText: requestText,
+      completionLabel: completionLabel,
       loadState: loadState,
       postJson: postJson,
       byteToIndex: byteToIndex,
@@ -1785,8 +1795,11 @@
     return text === undefined ? String(value) : text.replace(/\n\s*/g, " ");
   }
 
+  /** An explore key as the server's opinion reads it: every binding loses its `x:` prefix. */
   function completionLabel(key) {
-    return key.replace(/^[a-z]:/, "").split("=").join(" = ");
+    return key.split(",").map(function (binding) {
+      return binding.replace(/^[A-Za-z]:/, "").split("=").join(" = ");
+    }).join(", ");
   }
 
   function pivotNames(pivots) {

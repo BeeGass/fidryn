@@ -567,3 +567,21 @@ test("module and import paths continue across whitespace and comments, as on the
   assert.equal(classOf(mill.tokenizeFr(two), two, "A"), "tk-ty");
   assert.equal(classOf(mill.tokenizeFr(two), two, "B"), "");
 });
+
+test("valueText orders positional constructor fields by number, as the server does", () => {
+  const fields = {};
+  for (let i = 10; i >= 0; i -= 1) fields["_" + i] = { kind: "int", data: i };
+  assert.equal(
+    mill.valueText({ kind: "ctor", data: { name: "Row", fields } }),
+    "Row(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)"
+  );
+});
+
+test("completionLabel strips every binding prefix, as the server's opinion does", () => {
+  assert.equal(
+    mill.completionLabel("i:SuccessorEligibility=I1,e:SecondConcurringCertificate=absent"),
+    "SuccessorEligibility = I1, SecondConcurringCertificate = absent"
+  );
+  assert.equal(mill.completionLabel("x:A=I1"), "A = I1");
+  assert.equal(mill.completionLabel("A=I1"), "A = I1");
+});
