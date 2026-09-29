@@ -22,7 +22,7 @@ Fidryn is a **programming language for legal instruments**: precise where law is
 ## Install
 
 ```bash
-cargo install --git https://github.com/BeeGass/fidryn --locked
+cargo install --git https://github.com/BeeGass/fidryn --locked fidryn-cli
 ```
 
 Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `127.0.0.1:8751`). This public site does **not** expose live filing or the mill API.

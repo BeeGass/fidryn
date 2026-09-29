@@ -168,7 +168,7 @@ pub fn landing_markdown() -> String {
             "- It never invents a completion when the model still has open branches.\n",
             "- Determinate results only when invariant across every still-admissible resolution — or a competent authority has already determined them.\n\n",
             "## Install\n\n",
-            "```bash\ncargo install --git https://github.com/BeeGass/fidryn --locked\n```\n\n",
+            "```bash\ncargo install --git https://github.com/BeeGass/fidryn --locked fidryn-cli\n```\n\n",
             "Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `127.0.0.1:8751`). This public site does **not** expose live filing or the mill API.\n\n",
             "## Documentation\n\n",
             "{docs}\n",
