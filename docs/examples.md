@@ -613,6 +613,7 @@ fidryn check tests/programs/two-offices.fr
 fidryn check tests/programs/require-gate.fr
 fidryn check tests/programs/late-payment.fr
 fidryn check tests/programs/late-payment-extended.fr
+fidryn check tests/programs/transaction-atomic.fr
 ```
 
 | Path | Purpose |
@@ -623,6 +624,7 @@ fidryn check tests/programs/late-payment-extended.fr
 | `tests/programs/require-gate.fr` | Query `q` is `require true; return 7`. Query `r` is `require false; return 7`. False require does not run the return. |
 | `tests/programs/late-payment.fr` | `PayInvoice` duty, `TimelyPayment` decision, and `DeadlineMeaning` (strict versus 15 counted days). Queries `due`, `paid_on_time`, `obligation_status`. |
 | `tests/programs/late-payment-extended.fr` | Same duty shape with `due 15 counted_days after invoice_date` and no competing deadline family. |
+| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` returns `Bool`. Partial surface — not a general transaction engine. |
 
 ## Honesty
 
@@ -648,4 +650,3 @@ the interpreter cannot honestly claim completeness.
 
 `run` never chooses a completion. Open-textured queries must be allowed
 to `Suspend`. The kernel does not search.
-| `tests/programs/transaction-atomic.fr` | Transaction atomicity fixture. | `fidryn check tests/programs/transaction-atomic.fr` |
