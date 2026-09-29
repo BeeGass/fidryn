@@ -1,7 +1,8 @@
 //! Local mill: localhost-only web UI. Never live-files.
 
 use crate::{
-    EngineFailure, compile_source, explore_report, merge_bounds_json, parse_instant, render_report,
+    EngineFailure, compile_source, explore_report, merge_bounds_json, opinion, parse_instant,
+    render_report,
 };
 use axum::Router;
 use axum::extract::{Json, State};
@@ -249,10 +250,12 @@ fn mill_engine_err(err: &EngineFailure) -> JsonResponse {
     )
 }
 
-/// Mill success transport: `{ "ok": true, "report": <evaluation-report> }`.
+/// Mill success transport:
+/// `{ "ok": true, "report": <evaluation-report>, "opinion": [<sentence>, ...] }`.
 ///
-/// `ok` is not a field of `fidryn.evaluation-report/v0.1`. Pasted compile
-/// is `sourceTrust: unauthenticated` and is never `byteVerified`.
+/// `ok` and `opinion` are not fields of `fidryn.evaluation-report/v0.1`;
+/// `opinion` is [`opinion::sentences`] of the report. Pasted compile is
+/// `sourceTrust: unauthenticated` and is never `byteVerified`.
 fn mill_report_doc(
     module: &CoreModule,
     query: &QueryName,
@@ -268,6 +271,7 @@ fn mill_report_doc(
             Json(serde_json::json!({
                 "ok": true,
                 "report": report_json,
+                "opinion": opinion::sentences(&report_json),
             })),
         ),
         Err(err) => mill_err(
@@ -848,6 +852,101 @@ module Examples.T version "0.1.0" {
         let (status, json) = post_json("/api/explore", body).await;
         assert_eq!(status, StatusCode::OK);
         assert_outcome_document(&json, "q");
+    }
+
+    /// The `opinion` sentences of a success transport.
+    fn opinion_of(json: &serde_json::Value) -> Vec<&str> {
+        json["opinion"]
+            .as_array()
+            .unwrap_or_else(|| panic!("success transport must carry opinion: {json}"))
+            .iter()
+            .map(|sentence| {
+                sentence
+                    .as_str()
+                    .unwrap_or_else(|| panic!("opinion holds strings: {json}"))
+            })
+            .collect()
+    }
+
+    #[tokio::test]
+    async fn run_and_explore_transports_carry_opinion() {
+        for uri in ["/api/run", "/api/explore"] {
+            let (status, json) = post_json(uri, eval_body()).await;
+            assert_eq!(status, StatusCode::OK, "{uri} {json}");
+            let report = mill_report(&json);
+            let sentences = opinion_of(&json);
+            assert!(!sentences.is_empty(), "{uri} {json}");
+            assert_eq!(sentences, crate::opinion::sentences(report), "{uri}");
+            assert!(
+                report.get("opinion").is_none(),
+                "opinion is transport, not a report field: {json}"
+            );
+            assert_eq!(
+                crate::result_snapshot_names(&json, "q"),
+                crate::result_snapshot_names(report, "q"),
+                "fidryn diff reads the report through the transport: {uri}"
+            );
+            assert_eq!(
+                crate::assurance_snapshot_names(&json),
+                crate::assurance_snapshot_names(report),
+                "{uri}"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn success_transport_keys_are_in_the_mill_response_schema() {
+        let schema: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../schemas/mill-evaluation-response-v0.1.json"
+        ))
+        .expect("schema JSON");
+        let declared = schema["properties"].as_object().expect("properties");
+        let (status, json) = post_json("/api/run", eval_body()).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        for key in json.as_object().expect("transport object").keys() {
+            assert!(
+                declared.contains_key(key),
+                "`{key}` is not declared in the transport schema"
+            );
+        }
+        assert_eq!(
+            schema["properties"]["opinion"],
+            serde_json::json!({"type": "array", "items": {"type": "string"}})
+        );
+    }
+
+    const TRUST_MODULE: &str = include_str!("../../../examples/trust/bryan-revocable-trust.fr");
+    const TRUST_TWO_CERTIFICATES: &str =
+        include_str!("../../../examples/trust/cases/two-certificates-open-eligibility.json");
+
+    #[tokio::test]
+    async fn trust_run_opinion_reads_the_contingent_report() {
+        let case: serde_json::Value =
+            serde_json::from_str(TRUST_TWO_CERTIFICATES).expect("case JSON");
+        let body = serde_json::json!({
+            "source": TRUST_MODULE,
+            "query": "acting_trustee",
+            "case": case,
+            "validAt": "2034-03-01T09:00:00Z",
+            "knownAt": "2034-03-01T09:00:00Z"
+        });
+        let (status, json) = post_json("/api/run", body).await;
+        assert_eq!(status, StatusCode::OK, "{json}");
+        assert_eq!(
+            mill_report(&json)["outcomeDocument"]["outcome"]["kind"],
+            "contingent",
+            "{json}"
+        );
+        assert_eq!(
+            opinion_of(&json),
+            [
+                "acting_trustee depends on SuccessorEligibility.",
+                "Under I1 it is Alice.",
+                "Under I2 it is Bob.",
+                "No single answer is determinate across the admissible completions.",
+                "Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.",
+            ]
+        );
     }
 
     #[tokio::test]

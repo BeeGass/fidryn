@@ -49,7 +49,7 @@ exits 1 with
 | `GET` | `/` | none | `web/index.html` (`text/html; charset=utf-8`) |
 | `GET` | `/api/health` | none | plain text `ok` |
 | `POST` | `/api/check` | JSON `CheckRequest` | JSON `{ok, diagnostics}` |
-| `POST` | `/api/run` | JSON `EvalRequest` | `{ "ok": true, "report": <evaluation-report> }` |
+| `POST` | `/api/run` | JSON `EvalRequest` | `{ "ok": true, "report": <evaluation-report>, "opinion": [<sentence>, ...] }` |
 | `POST` | `/api/explore` | JSON `EvalRequest` | same transport as `/api/run` |
 | `POST` | `/api/render` | JSON `RenderRequest` | JSON `{ok, text?, error?}` |
 
@@ -117,14 +117,19 @@ the same overlay.
 as CLI `--valid-at` and `--known-at`.
 
 On evaluation success, HTTP 200, and the body is a transport wrapper
-`{ "ok": true, "report": ... }`. `report` is the
+`{ "ok": true, "report": ..., "opinion": [...] }`
+(`schemas/mill-evaluation-response-v0.1.json`). `report` is the
 `fidryn.evaluation-report/v0.1` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`). `ok` is not a
-field of that report schema (`additionalProperties` is false). Nested
-`outcomeDocument` is the `fidryn.outcome/v0.1` projection. Pasted
-compile is `sourceTrust: unauthenticated`. `run` never chooses a
-completion.
+`verificationMethod`, `coverage`, `outcomeDocument`). `opinion` is the
+report read as plain sentences, for example
+`acting_trustee depends on SuccessorEligibility.` and
+`Under I1 it is Alice.` for a contingent trust run. Each sentence is a
+fixed template filled from report fields, so it never says more than
+the report does. `ok` and `opinion` are not fields of that report schema
+(`additionalProperties` is false). Nested `outcomeDocument` is the
+`fidryn.outcome/v0.1` projection. Pasted compile is
+`sourceTrust: unauthenticated`. `run` never chooses a completion.
 
 On check failure, HTTP 400:
 
