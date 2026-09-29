@@ -325,8 +325,11 @@ fn fr_class(
         | TokenKind::Date
         | TokenKind::DateTime
         | TokenKind::PlusInf
-        | TokenKind::MinusInf
-        | TokenKind::DurationUnit => Some(Tk::Nu),
+        | TokenKind::MinusInf => Some(Tk::Nu),
+        TokenKind::DurationUnit if matches!(prev, Some(TokenKind::Int | TokenKind::Decimal)) => {
+            Some(Tk::Nu)
+        }
+        TokenKind::DurationUnit => Some(Tk::Kw),
         TokenKind::Comment | TokenKind::DocComment => Some(Tk::Co),
         TokenKind::LBrace
         | TokenKind::RBrace
@@ -825,6 +828,23 @@ mod tests {
             "capitalized but not after -> : <"
         );
         assert_eq!(plain(&html), src);
+    }
+
+    #[test]
+    fn duration_units_are_literals_only_after_a_number() {
+        let kw = keywords();
+        let src = "gap: Duration<counted_days> = 30 counted_days";
+        let html = highlight(Lang::Fr, src, &kw);
+        let units: Vec<String> = spans(&html)
+            .into_iter()
+            .filter(|(_, text)| text == "counted_days")
+            .map(|(class, _)| class)
+            .collect();
+        assert_eq!(
+            units,
+            ["tk-kw", "tk-nu"],
+            "a unit in Duration<...> is a keyword, a unit after 30 is a literal: {html}"
+        );
     }
 
     #[test]
