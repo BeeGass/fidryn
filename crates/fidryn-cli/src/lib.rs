@@ -226,6 +226,76 @@ pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<D
     DRIVER.with(|driver| driver.borrow_mut().check_path(path))
 }
 
+/// Where `fidryn run` reads its case record from.
+#[derive(Clone, Copy, Debug)]
+pub enum CaseInput<'a> {
+    /// A case record file, as passed to `--case`.
+    File(&'a Path),
+    /// Case record JSON text already in memory.
+    Json(&'a str),
+}
+
+/// One `fidryn run` invocation, field for field with its flags.
+#[derive(Clone, Copy, Debug)]
+pub struct RunRequest<'a> {
+    /// The `.fr` module path.
+    pub path: &'a Path,
+    /// `--query`.
+    pub query: &'a str,
+    /// `--case`, or case JSON text.
+    pub case: CaseInput<'a>,
+    /// `--valid-at`, ISO 8601 / RFC 3339.
+    pub valid_at: &'a str,
+    /// `--known-at`, ISO 8601 / RFC 3339.
+    pub known_at: &'a str,
+    /// `--arg KEY=VALUE` bindings.
+    pub args: &'a [String],
+    /// `--scenario`.
+    pub scenario: bool,
+}
+
+/// Evaluate exactly as `fidryn run` does; Ok is the canonical report JSON
+/// text the CLI prints, Err is the text the CLI writes to stderr.
+///
+/// Checks run in the CLI's order: compile, case, `--arg`, `--valid-at`,
+/// `--known-at`, then evaluation. Compile and evaluation share this
+/// thread's driver, so `sourceTrust` is the one the CLI reports.
+pub fn run_report_text(req: &RunRequest<'_>) -> Result<String, String> {
+    let (module, _) = compile_module(req.path).map_err(|ds| diagnostics_text(&ds))?;
+    let mut case = read_case(req.case)?;
+    apply_run_args(&mut case, req.args)?;
+    let valid = instant_arg("--valid-at", req.valid_at)?;
+    let known = instant_arg("--known-at", req.known_at)?;
+    let ctx = RunContext::new(valid, known);
+    let report = DRIVER
+        .with(|driver| {
+            let mut driver = driver.borrow_mut();
+            if req.scenario {
+                driver.run_report_scenario(&module, req.query, &case, &ctx)
+            } else {
+                driver.run_report(&module, req.query, &case, &ctx)
+            }
+        })
+        .map_err(|err| EngineFailure::from_err(err).to_string())?;
+    Ok(render_report(
+        &module,
+        &QueryName::from(req.query),
+        valid,
+        known,
+        &case,
+        &report,
+    ))
+}
+
+/// Compile diagnostics as the CLI prints them, one per line.
+fn diagnostics_text(diagnostics: &[Diagnostic]) -> String {
+    diagnostics
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 fn emit_diagnostics(diagnostics: &[Diagnostic]) {
     for d in diagnostics {
         eprintln!("{d}");
@@ -449,24 +519,41 @@ fn parse_manifest_json(text: &str, path: &Path) -> Result<SourceManifest, Vec<Di
     })
 }
 
-fn load_case(path: &Path) -> Result<CaseRecord, ExitCode> {
-    let text = fs::read_to_string(path).map_err(|e| {
-        eprintln!("cannot read {}: {e}", path.display());
-        ExitCode::from(1)
-    })?;
-    serde_json::from_str(&text).map_err(|e| {
-        eprintln!("invalid case record: {e}");
-        ExitCode::from(1)
+/// Read and parse a case record. Err is the CLI's stderr line.
+fn read_case(input: CaseInput<'_>) -> Result<CaseRecord, String> {
+    let owned;
+    let text = match input {
+        CaseInput::File(path) => {
+            owned = fs::read_to_string(path)
+                .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+            owned.as_str()
+        }
+        CaseInput::Json(text) => text,
+    };
+    serde_json::from_str(text).map_err(|e| format!("invalid case record: {e}"))
+}
+
+/// Parse a `--valid-at` / `--known-at` value. Err is the CLI's stderr line.
+fn instant_arg(flag: &str, text: &str) -> Result<Instant, String> {
+    parse_instant(text).map_err(|err| {
+        format!(
+            "{flag}: {err}. Use ISO 8601 / RFC 3339, for example 2033-01-01T00:00:00Z or 2033-01-01T00:00:00+00:00."
+        )
     })
 }
 
+/// Write `message` to stderr and return the failure exit code.
+fn fail(message: String) -> ExitCode {
+    eprintln!("{message}");
+    ExitCode::from(1)
+}
+
+fn load_case(path: &Path) -> Result<CaseRecord, ExitCode> {
+    read_case(CaseInput::File(path)).map_err(fail)
+}
+
 fn instant_or_exit(flag: &str, text: &str) -> Result<Instant, ExitCode> {
-    parse_instant(text).map_err(|err| {
-        eprintln!(
-            "{flag}: {err}. Use ISO 8601 / RFC 3339, for example 2033-01-01T00:00:00Z or 2033-01-01T00:00:00+00:00."
-        );
-        ExitCode::from(1)
-    })
+    instant_arg(flag, text).map_err(fail)
 }
 
 fn cmd_fmt(path: &Path) -> ExitCode {
@@ -537,49 +624,22 @@ fn cmd_run(
     args: &[String],
     scenario: bool,
 ) -> ExitCode {
-    let Ok((module, _)) = compile_or_exit(path) else {
-        return ExitCode::from(1);
+    let req = RunRequest {
+        path,
+        query,
+        case: CaseInput::File(case_path),
+        valid_at,
+        known_at,
+        args,
+        scenario,
     };
-    let Ok(mut case) = load_case(case_path) else {
-        return ExitCode::from(1);
-    };
-    if let Err(err) = apply_run_args(&mut case, args) {
-        eprintln!("{err}");
-        return ExitCode::from(1);
+    match run_report_text(&req) {
+        Ok(text) => {
+            println!("{text}");
+            ExitCode::SUCCESS
+        }
+        Err(message) => fail(message),
     }
-    let Ok(valid) = instant_or_exit("--valid-at", valid_at) else {
-        return ExitCode::from(1);
-    };
-    let Ok(known) = instant_or_exit("--known-at", known_at) else {
-        return ExitCode::from(1);
-    };
-    let ctx = RunContext::new(valid, known);
-    let report = match DRIVER.with(|driver| {
-        let mut driver = driver.borrow_mut();
-        if scenario {
-            driver.run_report_scenario(&module, query, &case, &ctx)
-        } else {
-            driver.run_report(&module, query, &case, &ctx)
-        }
-    }) {
-        Ok(report) => report,
-        Err(err) => {
-            eprintln!("{}", EngineFailure::from_err(err));
-            return ExitCode::from(1);
-        }
-    };
-    println!(
-        "{}",
-        render_report(
-            &module,
-            &QueryName::from(query),
-            valid,
-            known,
-            &case,
-            &report
-        )
-    );
-    ExitCode::SUCCESS
 }
 
 /// Merge bounds JSON into `case.admissible_completions` when it parses as
