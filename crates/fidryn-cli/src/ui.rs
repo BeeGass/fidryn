@@ -25,6 +25,7 @@ const INDEX: &str = include_str!("../../../web/index.html");
 const SITE_CSS: &str = include_str!("../../../site/assets/fidryn.css");
 const FAVICON: &str = include_str!("../../../site/favicon.svg");
 const MILL_CSS: &str = include_str!("../../../web/mill.css");
+const MILL_JS: &str = include_str!("../../../web/mill.js");
 const DEFAULT_PORT: u16 = 8751;
 /// Concurrent check / run / explore / render workers. Extra requests wait
 /// on the semaphore; they do not occupy extra blocking threads.
@@ -92,6 +93,7 @@ pub fn router() -> Router {
         .route("/", get(index))
         .route("/assets/fidryn.css", get(site_css))
         .route("/assets/mill.css", get(mill_css))
+        .route("/assets/mill.js", get(mill_js))
         .route("/favicon.svg", get(favicon))
         .route("/fonts/{name}", get(font))
         .route("/api/health", get(health))
@@ -170,6 +172,10 @@ async fn site_css() -> Response {
 
 async fn mill_css() -> Response {
     static_text("text/css; charset=utf-8", MILL_CSS)
+}
+
+async fn mill_js() -> Response {
+    static_text("text/javascript; charset=utf-8", MILL_JS)
 }
 
 async fn favicon() -> Response {
@@ -1406,6 +1412,28 @@ module Examples.T version "0.1.0" {
             css.contains(".mill-doc"),
             "mill.css styles the opinion view"
         );
+    }
+
+    #[tokio::test]
+    async fn mill_js_route_serves_the_embedded_script() {
+        let response = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/assets/mill.js")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers()[header::CONTENT_TYPE],
+            "text/javascript; charset=utf-8"
+        );
+        assert_eq!(response.headers()[header::CACHE_CONTROL], "no-cache");
+        let js = body_text(response).await;
+        assert!(js.contains("\"use strict\""), "{js}");
+        assert!(js.contains("/api/samples"), "mill.js loads the samples");
     }
 
     #[tokio::test]
