@@ -23,7 +23,6 @@
   gap: 20px;
   align-items: start;
   padding-block: 16px 48px;
-  padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
 }
 .mill-samples { grid-area: samples; min-width: 0; }
 .mill-editor { grid-area: editor; min-width: 0; }
@@ -180,11 +179,14 @@
 @media (max-width: 719px) {
   .mill-head { gap: 6px 12px; }
   .mill-host { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mill-health-text::before { content: none; }
   .mill-head .theme-toggle { order: 4; margin-left: auto; }
   .mill-nofile { order: 5; margin-left: 0; }
-  .mill-guide { order: 6; }
+  .mill-guide { order: 6; display: inline-flex; align-items: center; min-height: 44px; }
   .mill-page { gap: 16px; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   .mill-samples .stamp { display: none; }
+  /* Room inside the chip scroller for the 4px focus ring (2px outline plus 2px offset), which it would otherwise clip. */
+  .mill-samples .mill-list { padding: 4px; margin: -4px; scroll-padding-inline: 4px; }
   .mill-sample, .mill-hist, .mill-none { min-height: 44px; }
   .mill-editor-head { display: grid; justify-content: stretch; }
   .mill-seg { display: flex; width: 100%; }
