@@ -138,9 +138,10 @@ exits 1 with
 <tr><td><code>POST</code></td><td><code>/api/render</code></td><td>JSON <code>RenderRequest</code></td><td>JSON <code>{ok, text?, error?}</code></td></tr>
 </tbody></table>
 </div>
-<p>The page, stylesheet, favicon, fonts, and samples are compiled into the
-<code>fidryn</code> binary; the mill reads no files at runtime. The page,
-stylesheet, favicon, and fonts are sent with <code>Cache-Control: no-cache</code>.
+<p>The page, its two stylesheets and script, the favicon, the fonts, and
+the samples are compiled into the <code>fidryn</code> binary; the mill reads no
+files at runtime. The page, stylesheets, script, favicon, and fonts are
+sent with <code>Cache-Control: no-cache</code>.
 <code>GET /</code> also sends
 <code>Content-Security-Policy: default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'</code>,
 <code>X-Content-Type-Options: nosniff</code>, and <code>Referrer-Policy: no-referrer</code>,

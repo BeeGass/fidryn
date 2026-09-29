@@ -1796,9 +1796,10 @@ exits 1 with
 | `POST` | `/api/explore` | JSON `EvalRequest` | same transport as `/api/run` |
 | `POST` | `/api/render` | JSON `RenderRequest` | JSON `{ok, text?, error?}` |
 
-The page, stylesheet, favicon, fonts, and samples are compiled into the
-`fidryn` binary; the mill reads no files at runtime. The page,
-stylesheet, favicon, and fonts are sent with `Cache-Control: no-cache`.
+The page, its two stylesheets and script, the favicon, the fonts, and
+the samples are compiled into the `fidryn` binary; the mill reads no
+files at runtime. The page, stylesheets, script, favicon, and fonts are
+sent with `Cache-Control: no-cache`.
 `GET /` also sends
 `Content-Security-Policy: default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`,
 `X-Content-Type-Options: nosniff`, and `Referrer-Policy: no-referrer`,
