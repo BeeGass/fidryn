@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+{{head}}
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v={{css_v}}">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v={{js_v}}" defer></script>
+</head>
+<body class="{{body_class}}">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+  {{crumb}}
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/"{{nav_docs}}>Docs</a>
+    <a href="/docs/examples"{{nav_examples}}>Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+{{main}}
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
+</body>
+</html>

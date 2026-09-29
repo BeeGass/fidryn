@@ -5,6 +5,7 @@ mod highlight;
 mod html;
 mod links;
 mod markdown;
+mod pages;
 mod seo;
 mod specimen;
 mod templates;
