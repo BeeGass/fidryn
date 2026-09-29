@@ -386,10 +386,12 @@
           list.appendChild(li);
         });
       }
-      announce(failed ? "Search is unavailable right now."
-        : !index ? ""
-        : results.length === 0 ? "No matching sections."
-        : results.length === 1 ? "1 result" : results.length + " results");
+      if (document.activeElement === input) {
+        announce(failed ? "Search is unavailable right now."
+          : !index ? ""
+          : results.length === 0 ? "No matching sections."
+          : results.length === 1 ? "1 result" : results.length + " results");
+      }
       show();
     }
 
