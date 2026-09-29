@@ -184,11 +184,7 @@
     for (var i = 0; i < TEXT_FIELDS.length; i++) {
       if (typeof saved[TEXT_FIELDS[i]] !== "string") return base;
     }
-    TEXT_FIELDS.forEach(function (key) { base[key] = saved[key]; });
-    base.buffer = BUFFERS.indexOf(saved.buffer) >= 0 ? saved.buffer : "module";
-    base.sample = typeof saved.sample === "string" ? saved.sample : null;
-    base.view = VIEWS.indexOf(saved.view) >= 0 ? saved.view : "opinion";
-    return base;
+    return copyState(saved);
   }
 
   function parseJson(text) {
@@ -367,7 +363,8 @@
       return null;
     } catch (err) {
       if (err && typeof err.jsonIndex === "number") return { index: err.jsonIndex, message: err.message };
-      throw err;
+      // Anything else, such as a stack overflow on deeply nested input, falls back to JSON.parse's message.
+      return null;
     }
   }
 
@@ -440,8 +437,10 @@
   var shown = null;
   var shownFromHistory = false;
   var pendingSample = null;
+  var pendingEntry = null;
   var busy = false;
   var busyTimer = 0;
+  var queuedAction = null;
   var healthTimer = 0;
   var editorBuffer = null;
   var bufferViews = {};
@@ -571,19 +570,29 @@
       if (button && button.scrollIntoView) button.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
     el.confirmReplace.addEventListener("click", function () {
+      var entry = pendingEntry;
       var sample = hideConfirm();
+      if (entry) {
+        restoreInputs(entry);
+        focusRestore();
+        return;
+      }
       if (!sample) return;
       useSample(sample, true);
       focusSample(sample.id);
     });
     el.confirmCancel.addEventListener("click", function () {
+      var entry = pendingEntry;
       var sample = hideConfirm();
       if (sample) focusSample(sample.id);
+      else if (entry) focusRestore();
     });
     el.confirm.addEventListener("keydown", function (event) {
       if (event.key !== "Escape") return;
+      var entry = pendingEntry;
       var sample = hideConfirm();
       if (sample) focusSample(sample.id);
+      else if (entry) focusRestore();
     });
     el.buffers.addEventListener("click", function (event) {
       var tab = event.target.closest("[data-buffer]");
@@ -647,7 +656,7 @@
     var restore = event.target.closest("[data-restore]");
     if (restore) {
       var entry = findEntry(restore.getAttribute("data-restore"));
-      if (entry) restoreInputs(entry);
+      if (entry) askRestore(entry);
       return;
     }
     var jump = event.target.closest("[data-jump]");
@@ -699,6 +708,11 @@
     var inputs = { sample: state.sample };
     TEXT_FIELDS.forEach(function (key) { inputs[key] = state[key]; });
     return inputs;
+  }
+
+  /** True when two input snapshots would send the same request. */
+  function sameInputs(a, b) {
+    return TEXT_FIELDS.every(function (key) { return a[key] === b[key]; });
   }
 
   /** Put the saved inputs into the fields and the editor. */
@@ -797,6 +811,7 @@
       useSample(sample, true);
       return;
     }
+    pendingEntry = null;
     pendingSample = sample;
     document.getElementById("confirm-text").textContent = "Replace your edits with " + sample.title + "?";
     el.confirm.hidden = false;
@@ -807,6 +822,7 @@
   function hideConfirm() {
     var sample = pendingSample;
     pendingSample = null;
+    pendingEntry = null;
     el.confirm.hidden = true;
     return sample;
   }
@@ -818,7 +834,12 @@
     applyInputs();
     markSample();
     editorChanged("load");
-    if (runIt) runAction(sample.action === "explore" ? "explore" : "run");
+    if (runIt) {
+      var next = sample.action === "explore" ? "explore" : "run";
+      // A request still in flight answers for the old inputs; run this sample's action after it.
+      if (busy) queuedAction = next;
+      else runAction(next);
+    }
   }
 
   // ----------------------------------------------------------------- buffers
@@ -1004,16 +1025,23 @@
       }
       serverAnswered();
       var entry = makeEntry(action, inputs, res);
-      if (action === "check") noteDiagnostics(inputs.module, res.data);
+      if (action === "check" && res.status === 200) noteDiagnostics(inputs.module, res.data);
       historyEntries.unshift(entry);
       if (historyEntries.length > HISTORY_LIMIT) historyEntries.length = HISTORY_LIMIT;
       renderHistory();
-      showEntry(entry, false);
-      revealResult();
+      // An answer for inputs the user has since changed is history, not the current result.
+      var current = sameInputs(inputs, snapshot());
+      showEntry(entry, !current);
+      if (current) revealResult();
     }).catch(function (err) {
       showMessage(errorBox("The page could not show this result", String(err && err.message ? err.message : err)));
     }).then(function () {
       setBusy(action, false);
+      if (queuedAction) {
+        var next = queuedAction;
+        queuedAction = null;
+        runAction(next);
+      }
     });
   }
 
@@ -1036,13 +1064,14 @@
   function entryKind(action, res) {
     var data = isObject(res.data) ? res.data : null;
     if (!data) return "unexpected";
-    if (action === "check") return typeof data.ok === "boolean" ? "check" : "unexpected";
+    if (data.kind === "engineError") return "engine";
+    if (res.status >= 500) return "server";
+    if (action === "check") return res.status === 200 && typeof data.ok === "boolean" ? "check" : "unexpected";
     if (action === "render") {
       if (data.ok === true && typeof data.text === "string") return "rendered";
       return data.ok === false && typeof data.error === "string" ? "renderError" : "unexpected";
     }
     if (data.ok === true && isObject(data.report)) return "report";
-    if (data.kind === "engineError") return "engine";
     if (data.error === "check failed" && Array.isArray(data.diagnostics)) return "diagnostics";
     return data.ok === false && typeof data.error === "string" ? "invalid" : "unexpected";
   }
@@ -1100,6 +1129,8 @@
   // ----------------------------------------------------------------- history
 
   function renderHistory() {
+    var active = document.activeElement;
+    var focusedId = active && el.history.contains(active) ? active.getAttribute("data-history") : null;
     clear(el.history);
     if (historyEntries.length === 0) {
       el.history.appendChild(h("li", { className: "mill-none", text: "Nothing run yet" }));
@@ -1115,6 +1146,10 @@
       ]));
     });
     markHistory();
+    if (focusedId) {
+      var again = el.history.querySelector("[data-history=\"" + focusedId + "\"]") || el.history.querySelector("[data-history]");
+      if (again) again.focus({ preventScroll: true });
+    }
   }
 
   function markHistory() {
@@ -1132,6 +1167,24 @@
     applyInputs();
     markSample();
     editorChanged("load");
+  }
+
+  /** Restore an entry's inputs, asking first when that would throw away the user's edits. */
+  function askRestore(entry) {
+    if (!isDirty() || sameInputs(entry.inputs, snapshot())) {
+      restoreInputs(entry);
+      return;
+    }
+    hideConfirm();
+    pendingEntry = entry;
+    document.getElementById("confirm-text").textContent = "Replace your edits with the inputs of " + entryLabel(entry) + "?";
+    el.confirm.hidden = false;
+    el.confirmCancel.focus();
+  }
+
+  function focusRestore() {
+    var button = el.resultBody.querySelector("[data-restore]");
+    if (button) button.focus();
   }
 
   // ------------------------------------------------------------------ result
@@ -1188,6 +1241,9 @@
         return diagnosticsView(data.diagnostics, entry.inputs.module);
       case "engine":
         return errorBox("Engine error · " + str(data.error), str(data.message));
+      case "server":
+        return errorBox("Server error", (typeof data.error === "string" ? data.error : "The server could not finish this request.") +
+          " (HTTP " + entry.status + ")");
       case "invalid":
         return errorBox("Invalid input", data.error);
       case "rendered":
