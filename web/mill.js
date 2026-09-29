@@ -566,6 +566,10 @@
       var button = event.target.closest("[data-sample]");
       if (button) pickSample(button.getAttribute("data-sample"));
     });
+    el.samples.addEventListener("focusin", function (event) {
+      var button = event.target.closest("[data-sample]");
+      if (button && button.scrollIntoView) button.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
     el.confirmReplace.addEventListener("click", function () {
       var sample = hideConfirm();
       if (!sample) return;
