@@ -3,6 +3,8 @@
 mod guides;
 mod highlight;
 mod html;
+mod links;
+mod markdown;
 mod seo;
 mod templates;
 
