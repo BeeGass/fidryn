@@ -5,9 +5,9 @@ use crate::{
     render_report,
 };
 use axum::Router;
-use axum::extract::{Json, State};
+use axum::extract::{Json, Path, State};
 use axum::http::{StatusCode, header};
-use axum::response::{Html, IntoResponse};
+use axum::response::{Html, IntoResponse, Response};
 use axum::routing::{get, post};
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, EvaluationReport, Instant, QueryName, RunContext,
@@ -22,10 +22,35 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 
 const INDEX: &str = include_str!("../../../web/index.html");
+const SITE_CSS: &str = include_str!("../../../site/assets/fidryn.css");
+const FAVICON: &str = include_str!("../../../site/favicon.svg");
 const DEFAULT_PORT: u16 = 8751;
 /// Concurrent check / run / explore / render workers. Extra requests wait
 /// on the semaphore; they do not occupy extra blocking threads.
 const MILL_CPU_SLOTS: usize = 4;
+/// Sent with `GET /`: scripts, styles, and fonts from this origin only (no
+/// inline script or style), images from this origin or data URIs, no
+/// plugins, no `<base>`, and no framing.
+const CSP: &str = "default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'";
+/// The site's self-hosted fonts, served at `/fonts/{name}`.
+const FONTS: &[(&str, &[u8])] = &[
+    (
+        "fraunces.woff2",
+        include_bytes!("../../../site/fonts/fraunces.woff2"),
+    ),
+    (
+        "plex-sans.woff2",
+        include_bytes!("../../../site/fonts/plex-sans.woff2"),
+    ),
+    (
+        "plex-mono-400.woff2",
+        include_bytes!("../../../site/fonts/plex-mono-400.woff2"),
+    ),
+    (
+        "plex-mono-500.woff2",
+        include_bytes!("../../../site/fonts/plex-mono-500.woff2"),
+    ),
+];
 
 #[derive(Clone)]
 struct MillState {
@@ -64,7 +89,11 @@ where
 pub fn router() -> Router {
     Router::new()
         .route("/", get(index))
+        .route("/assets/fidryn.css", get(site_css))
+        .route("/favicon.svg", get(favicon))
+        .route("/fonts/{name}", get(font))
         .route("/api/health", get(health))
+        .route("/api/samples", get(samples))
         .route("/api/check", post(check))
         .route("/api/run", post(run))
         .route("/api/explore", post(explore))
@@ -107,15 +136,152 @@ pub fn default_port() -> u16 {
     DEFAULT_PORT
 }
 
-async fn index() -> impl IntoResponse {
+async fn index() -> Response {
     (
-        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        [
+            (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+            (header::CONTENT_SECURITY_POLICY, CSP),
+            (header::X_CONTENT_TYPE_OPTIONS, "nosniff"),
+            (header::REFERRER_POLICY, "no-referrer"),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
         Html(INDEX),
     )
+        .into_response()
+}
+
+/// A compile-time embedded text asset, revalidated on every load.
+fn static_text(content_type: &'static str, body: &'static str) -> Response {
+    (
+        [
+            (header::CONTENT_TYPE, content_type),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
+        body,
+    )
+        .into_response()
+}
+
+async fn site_css() -> Response {
+    static_text("text/css; charset=utf-8", SITE_CSS)
+}
+
+async fn favicon() -> Response {
+    static_text("image/svg+xml", FAVICON)
+}
+
+/// One of [`FONTS`] by file name. Any other name is 404; nothing is read
+/// from disk.
+async fn font(Path(name): Path<String>) -> Response {
+    match FONTS.iter().find(|(file, _)| *file == name) {
+        Some(&(_, bytes)) => (
+            [
+                (header::CONTENT_TYPE, "font/woff2"),
+                (header::CACHE_CONTROL, "no-cache"),
+            ],
+            bytes,
+        )
+            .into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
 }
 
 async fn health() -> &'static str {
     "ok"
+}
+
+/// One built-in example on the mill's Samples rail (`GET /api/samples`).
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Sample {
+    id: &'static str,
+    title: &'static str,
+    blurb: &'static str,
+    /// Module source text.
+    source: &'static str,
+    /// Case record JSON text, exactly as the editor shows it.
+    case: &'static str,
+    query: &'static str,
+    valid_at: &'static str,
+    known_at: &'static str,
+    /// The action the rail's stamp describes: `run` or `explore`.
+    action: &'static str,
+    /// The outcome kind `action` returns for this sample.
+    expect: &'static str,
+}
+
+/// The empty case record, pretty-printed for the editor.
+const EMPTY_CASE: &str =
+    "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"admissibleCompletions\": {}\n}\n";
+const TRUST_SOURCE: &str = include_str!("../../../examples/trust/bryan-revocable-trust.fr");
+
+/// Samples in rail order. Sources and cases are the repository fixtures,
+/// embedded at compile time.
+const SAMPLES: &[Sample] = &[
+    Sample {
+        id: "require-gate",
+        title: "require-gate",
+        blurb: "q returns 7; r stops at a false require",
+        source: include_str!("../../../tests/programs/require-gate.fr"),
+        case: EMPTY_CASE,
+        query: "q",
+        valid_at: "2026-09-17T12:00:00Z",
+        known_at: "2026-09-17T12:00:00Z",
+        action: "run",
+        expect: "determinate",
+    },
+    Sample {
+        id: "late-payment",
+        title: "late-payment",
+        blurb: "A duty; paid_on_time needs evidence",
+        source: include_str!("../../../tests/programs/late-payment.fr"),
+        case: EMPTY_CASE,
+        query: "due",
+        valid_at: "2026-09-17T12:00:00Z",
+        known_at: "2026-09-17T12:00:00Z",
+        action: "run",
+        expect: "determinate",
+    },
+    Sample {
+        id: "trust-open",
+        title: "Trust, open eligibility",
+        blurb: "Two certificates; clause 4.4 unresolved",
+        source: TRUST_SOURCE,
+        case: include_str!("../../../examples/trust/cases/two-certificates-open-eligibility.json"),
+        query: "acting_trustee",
+        valid_at: "2034-03-01T09:00:00Z",
+        known_at: "2034-03-01T09:00:00Z",
+        action: "run",
+        expect: "contingent",
+    },
+    Sample {
+        id: "trust-court",
+        title: "Trust, court selects I2",
+        blurb: "A competent authority has decided",
+        source: TRUST_SOURCE,
+        case: include_str!("../../../examples/trust/cases/court-selects-i2.json"),
+        query: "acting_trustee",
+        valid_at: "2034-03-01T09:00:00Z",
+        known_at: "2034-03-01T09:00:00Z",
+        action: "run",
+        expect: "determinate",
+    },
+    Sample {
+        id: "trust-one",
+        title: "Trust, one certificate",
+        blurb: "Evidence is still missing",
+        source: TRUST_SOURCE,
+        case: include_str!("../../../examples/trust/cases/one-certificate.json"),
+        query: "acting_trustee",
+        valid_at: "2034-03-01T09:00:00Z",
+        known_at: "2034-03-01T09:00:00Z",
+        action: "run",
+        expect: "suspended",
+    },
+];
+
+async fn samples() -> Json<&'static [Sample]> {
+    Json(SAMPLES)
 }
 
 #[derive(Debug, Deserialize)]
@@ -470,6 +636,230 @@ mod tests {
         assert!(html.contains(">Run<"), "{html}");
         assert!(html.contains(">Explore<"), "{html}");
         assert!(html.contains(">Render<"), "{html}");
+    }
+
+    async fn get_response(uri: &str) -> axum::response::Response {
+        router()
+            .oneshot(Request::builder().uri(uri).body(Body::empty()).unwrap())
+            .await
+            .unwrap()
+    }
+
+    fn header_text<'a>(
+        response: &'a axum::response::Response,
+        name: &header::HeaderName,
+    ) -> &'a str {
+        response
+            .headers()
+            .get(name)
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or("")
+    }
+
+    /// A repository file, read at test time to compare with what the
+    /// binary embedded at compile time.
+    fn repo_bytes(rel: &str) -> Vec<u8> {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../..")
+            .join(rel);
+        std::fs::read(&path).unwrap_or_else(|err| panic!("read {}: {err}", path.display()))
+    }
+
+    fn repo_text(rel: &str) -> String {
+        String::from_utf8(repo_bytes(rel)).expect("UTF-8 repository file")
+    }
+
+    /// `uri` answers 200 with `content_type`, `cache-control: no-cache`,
+    /// and exactly the bytes of the repository file `rel`.
+    async fn assert_static_route(uri: &str, content_type: &str, rel: &str) {
+        let response = get_response(uri).await;
+        assert_eq!(response.status(), StatusCode::OK, "{uri}");
+        assert_eq!(
+            header_text(&response, &header::CONTENT_TYPE),
+            content_type,
+            "{uri}"
+        );
+        assert_eq!(
+            header_text(&response, &header::CACHE_CONTROL),
+            "no-cache",
+            "{uri}"
+        );
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        assert!(
+            body.as_ref() == repo_bytes(rel).as_slice(),
+            "{uri} must serve {rel}"
+        );
+    }
+
+    #[tokio::test]
+    async fn index_sends_the_csp_and_security_headers() {
+        let response = get_response("/").await;
+        assert_eq!(response.status(), StatusCode::OK);
+        for (name, expected) in [
+            (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+            (
+                header::CONTENT_SECURITY_POLICY,
+                "default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+            ),
+            (header::X_CONTENT_TYPE_OPTIONS, "nosniff"),
+            (header::REFERRER_POLICY, "no-referrer"),
+            (header::CACHE_CONTROL, "no-cache"),
+        ] {
+            assert_eq!(header_text(&response, &name), expected, "{name}");
+        }
+    }
+
+    #[tokio::test]
+    async fn site_stylesheet_and_favicon_are_embedded() {
+        assert_static_route(
+            "/assets/fidryn.css",
+            "text/css; charset=utf-8",
+            "site/assets/fidryn.css",
+        )
+        .await;
+        assert_static_route("/favicon.svg", "image/svg+xml", "site/favicon.svg").await;
+    }
+
+    #[tokio::test]
+    async fn the_four_fonts_are_embedded() {
+        for name in [
+            "fraunces.woff2",
+            "plex-sans.woff2",
+            "plex-mono-400.woff2",
+            "plex-mono-500.woff2",
+        ] {
+            assert_static_route(
+                &format!("/fonts/{name}"),
+                "font/woff2",
+                &format!("site/fonts/{name}"),
+            )
+            .await;
+        }
+    }
+
+    #[tokio::test]
+    async fn unknown_fonts_and_assets_are_not_found() {
+        for uri in [
+            "/fonts/comic-sans.woff2",
+            "/fonts/LICENSE.md",
+            "/fonts/fraunces.woff",
+            "/assets/site.css",
+        ] {
+            assert_eq!(
+                get_response(uri).await.status(),
+                StatusCode::NOT_FOUND,
+                "{uri}"
+            );
+        }
+    }
+
+    const EMPTY_CASE_TEXT: &str =
+        "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"admissibleCompletions\": {}\n}\n";
+
+    #[tokio::test]
+    async fn samples_are_the_five_fixtures_in_order() {
+        let response = get_response("/api/samples").await;
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            header_text(&response, &header::CONTENT_TYPE),
+            "application/json"
+        );
+        let samples: serde_json::Value =
+            serde_json::from_str(&body_text(response).await).expect("samples JSON");
+        let gate = "2026-09-17T12:00:00Z";
+        let trust = "2034-03-01T09:00:00Z";
+        let trust_source = repo_text("examples/trust/bryan-revocable-trust.fr");
+        let expected = serde_json::json!([
+            {
+                "id": "require-gate",
+                "title": "require-gate",
+                "blurb": "q returns 7; r stops at a false require",
+                "source": repo_text("tests/programs/require-gate.fr"),
+                "case": EMPTY_CASE_TEXT,
+                "query": "q",
+                "validAt": gate,
+                "knownAt": gate,
+                "action": "run",
+                "expect": "determinate"
+            },
+            {
+                "id": "late-payment",
+                "title": "late-payment",
+                "blurb": "A duty; paid_on_time needs evidence",
+                "source": repo_text("tests/programs/late-payment.fr"),
+                "case": EMPTY_CASE_TEXT,
+                "query": "due",
+                "validAt": gate,
+                "knownAt": gate,
+                "action": "run",
+                "expect": "determinate"
+            },
+            {
+                "id": "trust-open",
+                "title": "Trust, open eligibility",
+                "blurb": "Two certificates; clause 4.4 unresolved",
+                "source": trust_source,
+                "case": repo_text("examples/trust/cases/two-certificates-open-eligibility.json"),
+                "query": "acting_trustee",
+                "validAt": trust,
+                "knownAt": trust,
+                "action": "run",
+                "expect": "contingent"
+            },
+            {
+                "id": "trust-court",
+                "title": "Trust, court selects I2",
+                "blurb": "A competent authority has decided",
+                "source": trust_source,
+                "case": repo_text("examples/trust/cases/court-selects-i2.json"),
+                "query": "acting_trustee",
+                "validAt": trust,
+                "knownAt": trust,
+                "action": "run",
+                "expect": "determinate"
+            },
+            {
+                "id": "trust-one",
+                "title": "Trust, one certificate",
+                "blurb": "Evidence is still missing",
+                "source": trust_source,
+                "case": repo_text("examples/trust/cases/one-certificate.json"),
+                "query": "acting_trustee",
+                "validAt": trust,
+                "knownAt": trust,
+                "action": "run",
+                "expect": "suspended"
+            }
+        ]);
+        assert_eq!(samples, expected);
+    }
+
+    #[tokio::test]
+    async fn every_sample_yields_its_expected_kind() {
+        let response = get_response("/api/samples").await;
+        let samples: serde_json::Value =
+            serde_json::from_str(&body_text(response).await).expect("samples JSON");
+        for sample in samples.as_array().expect("samples array") {
+            let id = &sample["id"];
+            let case: serde_json::Value =
+                serde_json::from_str(sample["case"].as_str().expect("case text"))
+                    .unwrap_or_else(|err| panic!("{id}: case JSON: {err}"));
+            let body = serde_json::json!({
+                "source": sample["source"],
+                "query": sample["query"],
+                "case": case,
+                "validAt": sample["validAt"],
+                "knownAt": sample["knownAt"],
+            });
+            let uri = format!("/api/{}", sample["action"].as_str().expect("action"));
+            let (status, json) = post_json(&uri, body).await;
+            assert_eq!(status, StatusCode::OK, "{id}: {json}");
+            assert_eq!(
+                mill_report(&json)["outcomeDocument"]["outcome"]["kind"],
+                sample["expect"],
+                "{id}: {json}"
+            );
+        }
     }
 
     #[tokio::test]
