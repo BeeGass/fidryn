@@ -15,9 +15,10 @@ running `fidryn ui` in its main states and fails on JavaScript errors or
 sideways scrolling. Both press Tab round every page (the mill's after its
 last state, with a result and history on it) and fail on a focus ring that
 is missing or cut off, or a focused control that is out of view or covered.
-JavaScript errors include `console.error` calls. Chrome runs with a throwaway
-profile, background downloads turned off, and every host except 127.0.0.1
-blocked; the profile is deleted when the run ends.
+The mill also fails when its page has no skip link. JavaScript errors include
+`console.error` calls. Chrome runs with a throwaway profile, background
+downloads turned off, and every host except 127.0.0.1 and localhost blocked;
+the profile is deleted when the run ends, Ctrl-C and SIGTERM included.
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ import http.server
 import json
 import os
 import shutil
+import signal
 import socket
 import struct
 import subprocess
@@ -41,7 +43,8 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from types import FrameType
+from typing import Any, NoReturn
 
 REPO = Path(__file__).resolve().parents[2]
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -59,8 +62,9 @@ CHROME_FLAGS = [
     "--disable-features=OptimizationGuideModelDownloading,OptimizationHintsFetching,"
     "OptimizationTargetPrediction,OptimizationHints,MediaRouter",
     # Chrome still calls Google (updates, GCM, autofill, time) with the flags
-    # above; resolving no host but 127.0.0.1 keeps it off the network.
-    "--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE 127.0.0.1",
+    # above; resolving no host but 127.0.0.1 and localhost keeps it off the
+    # network.
+    "--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE 127.0.0.1, EXCLUDE localhost",
 ]
 SITE_PAGES = [
     "/",
@@ -371,7 +375,8 @@ def launch_chrome() -> Iterator[int]:
     """Start headless Chrome on a throwaway profile and yield its DevTools port.
 
     The profile is deleted however the run ends: Chrome failing to start or
-    to open its port, an error or Ctrl-C in the caller, or a normal finish.
+    to open its port, an error, Ctrl-C, or SIGTERM in the caller, or a normal
+    finish.
     """
     proc: subprocess.Popen[bytes] | None = None
     profile = Path(tempfile.mkdtemp(prefix="fidryn-shoot-"))
@@ -827,7 +832,10 @@ def run_mill(url: str, out: Path, widths: list[int], themes: list[str]) -> Repor
                 # Last, with a result and history on the page: the skip link is
                 # focused as a keyboard user would see it and checked as the
                 # first stop, then Tab goes round the whole page back to it.
+                # Without a skip link the walk would start wherever focus is.
                 label = f"{theme} {width} mill"
+                if not cdp.run_js("document.querySelector('.skip') !== null"):
+                    report.failures.append(f"focus {label}: no skip link")
                 cdp.run_js("document.querySelector('.skip')?.focus({focusVisible: true})")
                 if walk_focus(cdp, label, report, start_here=True) == 0:
                     report.failures.append(f"focus {label}: Tab reaches nothing")
@@ -839,6 +847,15 @@ def run_mill(url: str, out: Path, widths: list[int], themes: list[str]) -> Repor
 
 def parse_list(text: str) -> list[str]:
     return [part.strip() for part in text.split(",") if part.strip()]
+
+
+def exit_on_sigterm(signum: int, frame: FrameType | None) -> NoReturn:
+    """Turn SIGTERM into SystemExit so the `finally` blocks run.
+
+    By default SIGTERM ends the process on the spot, and Chrome and its profile
+    are left behind. 143 is 128 plus SIGTERM, the status a shell reports for it.
+    """
+    raise SystemExit(143)
 
 
 def main(argv: list[str]) -> int:
@@ -858,6 +875,7 @@ def main(argv: list[str]) -> int:
     )
     sub.choices["mill"].add_argument("--url", default="http://127.0.0.1:8751")
     args = parser.parse_args(argv)
+    signal.signal(signal.SIGTERM, exit_on_sigterm)
 
     if args.command == "serve":
         with serve_site(REPO / "site", args.port) as base:
