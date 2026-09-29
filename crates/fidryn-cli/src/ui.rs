@@ -221,8 +221,8 @@ const EMPTY_CASE: &str =
     "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"admissibleCompletions\": {}\n}\n";
 const TRUST_SOURCE: &str = include_str!("../../../examples/trust/bryan-revocable-trust.fr");
 
-/// Samples in rail order. Sources and cases are the repository fixtures,
-/// embedded at compile time.
+/// Samples in rail order. Sources are repository fixtures and cases are
+/// case files or the empty case record, all embedded at compile time.
 const SAMPLES: &[Sample] = &[
     Sample {
         id: "require-gate",

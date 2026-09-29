@@ -192,7 +192,8 @@ values stay disjoint (`Value::Prop` ≠ `Value::Bool`).
 validates document shape. It does not authenticate artifacts.
 
 **Mill / CLI evaluation-report envelope.** Mill stays on `127.0.0.1`.
-`/api/run` and `/api/explore` return `{ok: true, report: <evaluation-report>}`
+`/api/run` and `/api/explore` return
+`{ok: true, report: <evaluation-report>, opinion: [<sentence>, …]}`
 (or an error wrapper). CLI `run` / `explore` print the same report via
 `render_report`: top-level `fidryn.evaluation-report/v0.1` with nested
 `outcomeDocument` of schema `fidryn.outcome/v0.1` (camelCase fields, hex
