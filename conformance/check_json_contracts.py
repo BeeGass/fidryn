@@ -120,16 +120,14 @@ def builtin_iter_errors(
             )
         for key, value in instance.items():
             if key in properties:
-                errors.extend(
-                    builtin_iter_errors(properties[key], value, location + [key])
-                )
+                errors.extend(builtin_iter_errors(properties[key], value, [*location, key]))
             elif isinstance(additional, dict):
-                errors.extend(builtin_iter_errors(additional, value, location + [key]))
+                errors.extend(builtin_iter_errors(additional, value, [*location, key]))
 
     if isinstance(instance, list) and "items" in schema:
         item_schema = schema["items"]
         for index, item in enumerate(instance):
-            errors.extend(builtin_iter_errors(item_schema, item, location + [index]))
+            errors.extend(builtin_iter_errors(item_schema, item, [*location, index]))
 
     return errors
 
@@ -137,9 +135,7 @@ def builtin_iter_errors(
 def load_validators(root: Path) -> tuple[dict[str, Any], bool]:
     schemas: dict[str, Any] = {}
     for name, filename in SCHEMA_FILES.items():
-        schemas[name] = json.loads(
-            (root / "schemas" / filename).read_text(encoding="utf-8")
-        )
+        schemas[name] = json.loads((root / "schemas" / filename).read_text(encoding="utf-8"))
 
     try:
         from jsonschema import Draft202012Validator

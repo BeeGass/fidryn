@@ -10,10 +10,13 @@ accepted_by_current_schema entries should be false.
 """
 
 from __future__ import annotations
+
 import argparse
 import copy
 import json
 from pathlib import Path
+from typing import Any
+
 from jsonschema import Draft202012Validator
 
 
@@ -35,7 +38,7 @@ def main() -> None:
     schema = json.loads((root / "schemas/outcome-v0.1.json").read_text())
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)
-    base = {
+    base: dict[str, Any] = {
         "schema": "fidryn.outcome/v0.1",
         "module": "Probe@0.1.0",
         "sourceSnapshot": "fixture",
