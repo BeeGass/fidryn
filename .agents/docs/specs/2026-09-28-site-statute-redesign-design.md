@@ -50,7 +50,6 @@ build tooling is Rust.
 site/                          deploy root (Vercel), committed
   assets/fidryn.css            hand-written design system (source)
   assets/fidryn.js             hand-written enhancement (source)
-  assets/grain.png             small tiled paper-grain texture (source)
   fonts/*.woff2                existing Fraunces / Plex (unchanged)
   favicon.svg                  F monogram (source)
   vercel.json, README.md       hand-maintained
@@ -146,7 +145,7 @@ script there; see CSP).
 | S10A | Bordered stamps | small caps, 1px border in the kind's color, square mark |
 | S11B | Framed code | 1px `--rule` border, a `--paper-2` header bar with the language and a Copy button |
 | S12B | Inline section marks | `§ 2 —` leads each landing heading in rubric |
-| S13B | Paper grain | a small tiled noise texture at about 6% opacity (3% in dark); no effect on contrast tokens |
+| S13B | Paper grain | a tiled SVG noise texture embedded in the CSS as a data URI, at about 6% opacity (3% in dark); no effect on contrast tokens |
 | S14D | F monogram | a square Fraunces F with an offset rubric shadow, beside the wordmark; also the favicon |
 | S15A | Comfortable density | rows 30px on desktop; every touch target at least 44px on phones |
 | S16C | Full-grid tables | every cell boxed, a tinted header row |
@@ -236,8 +235,9 @@ the section text. Typing in the header field (or `/`, or Ctrl/Cmd-K to
 focus it) opens a dropdown under the field; arrow keys and Enter navigate;
 Escape closes. The index is fetched on first focus. Matching is
 case-insensitive token prefix over heading (weighted) and text, with the
-match highlighted. On phones the same results fill the drawer. Without JS,
-the field is a link to `/docs/`.
+match highlighted. On phones the field sits on its own row under the
+header and results drop down full width. Without JS, submitting the
+field opens `/docs/`.
 
 ### Other pages and metadata
 
@@ -349,7 +349,6 @@ All dynamic content is written with `textContent` or built DOM nodes, never
 | Route | Body | Type |
 | --- | --- | --- |
 | `GET /assets/fidryn.css` | `site/assets/fidryn.css` | `text/css` |
-| `GET /assets/grain.png` | `site/assets/grain.png` | `image/png` |
 | `GET /assets/mill.css` | `web/mill.css` | `text/css` |
 | `GET /assets/mill.js` | `web/mill.js` | `text/javascript` |
 | `GET /fonts/{name}.woff2` | the four font files | `font/woff2` |
@@ -397,6 +396,13 @@ Generator (xtask tests):
   `--check` passes after a run.
 - Contrast: parse both token blocks from `fidryn.css` and assert 4.5:1 for
   the pairs in section 2.
+- The keyword list in `web/mill.js` equals the `grammar.ebnf` set (an
+  xtask test, since xtask already reads the grammar).
+
+JavaScript helpers (pure functions exported for tests) are tested with
+`node --test web/tests/` when Node is installed; `cargo xtask ci` runs
+them if `node` is on the PATH and skips them otherwise. Node is never
+needed to build, serve, or deploy anything.
 
 Mill (`ui.rs` tests):
 
@@ -405,7 +411,6 @@ Mill (`ui.rs` tests):
   asset or font returns 404; `/` carries the CSP header.
 - Each `/api/samples` entry, sent through the router as the page sends it,
   yields its expected outcome kind.
-- The keyword list in `web/mill.js` equals the `grammar.ebnf` set.
 - `opinion::sentences` has a test per outcome kind (including unknown
   fields falling back to labelled rows), and the run and explore
   transports include `opinion`.
