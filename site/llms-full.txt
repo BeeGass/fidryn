@@ -1785,6 +1785,8 @@ exits 1 with
 | --- | --- | --- | --- |
 | `GET` | `/` | none | `web/index.html` (`text/html; charset=utf-8`), with the security headers below |
 | `GET` | `/assets/fidryn.css` | none | `site/assets/fidryn.css`, the design system the site also uses (`text/css; charset=utf-8`) |
+| `GET` | `/assets/mill.css` | none | `web/mill.css`, the mill's own styles (`text/css; charset=utf-8`) |
+| `GET` | `/assets/mill.js` | none | `web/mill.js`, the mill app (`text/javascript; charset=utf-8`) |
 | `GET` | `/favicon.svg` | none | `site/favicon.svg` (`image/svg+xml`) |
 | `GET` | `/fonts/{name}` | none | `fraunces.woff2`, `plex-sans.woff2`, `plex-mono-400.woff2`, or `plex-mono-500.woff2` from `site/fonts/` (`font/woff2`); any other name is 404 |
 | `GET` | `/api/health` | none | plain text `ok` |
@@ -1801,9 +1803,11 @@ stylesheet, favicon, and fonts are sent with `Cache-Control: no-cache`.
 `Content-Security-Policy: default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`,
 `X-Content-Type-Options: nosniff`, and `Referrer-Policy: no-referrer`,
 so the browser runs no inline script or style on the page and will not
-show it inside a frame. In a sample, `source` and `case` are the text of
-a repository fixture (`case` is JSON text, not a parsed object), and
-`expect` is the outcome kind that `action` returns for it.
+show it inside a frame. In a sample, `source` is the text of a
+repository fixture and `case` is the text of a case file, or the empty
+case record for the first two samples (`case` is JSON text, not a
+parsed object); `expect` is the outcome kind that `action` returns
+for it.
 
 There is no `POST /api/file`, `/api/filing`, `/api/submit`, or
 `/api/live`. Those paths return 404.
@@ -1949,41 +1953,53 @@ The HTML page states that live filing is not available from the UI.
 
 ## The HTML page
 
-`GET /` serves `web/index.html`. The page is a single column:
+`GET /` serves `web/index.html`, which loads `/assets/fidryn.css` (the
+site's design system), `/assets/mill.css`, and `/assets/mill.js`. Those
+files, the fonts, and the samples are compiled into the binary, and the
+page sends requests only to 127.0.0.1. The response carries a strict
+Content-Security-Policy, so the page runs no inline script.
 
-1. **Header.** Title `fidryn mill` with subtitle `localhost 127.0.0.1`,
-   and a health badge. On load the page `GET`s `/api/health` and shows
-   `health: ok (localhost)` or `health: unreachable`.
-2. **Deck.** “Check, run, explore, and render a Fidryn module on this
-   machine. This mill never files.”
-3. **Warning.** “Live filing is not available from the UI.”
-4. **Module source.** Textarea `source`, prefilled with a tiny
-   `Examples.T` module and query `q`.
-5. **Query.** Text input, default `q`.
-6. **Times.** `validAt` and `knownAt`, default `2033-01-01T00:00:00Z`.
-7. **Case JSON.** Textarea, default `{}`. Completions for Explore belong
-   here as `admissibleCompletions` on the case. The page does not send a
-   separate `bounds` field.
-8. **Template.** Textarea for Render, default
-   `{{module}}@{{version}}` plus an `outside_scope` each-block.
-9. **Buttons.** `Check` (primary), `Run`, `Explore`, `Render`.
-10. **Outcome.** A `<pre>` that starts as `Ready.`
+The page has three columns on a wide screen and one column on a phone:
 
-`Check` posts `{source}` to `/api/check`. On `ok` the outcome area shows
-the word `ok`. Otherwise it lists `code` and `message` for each
-diagnostic.
+1. **Header.** The Fidryn monogram, `mill`, the health status
+   (`localhost 127.0.0.1 · ok`, or a warning when the server cannot be
+   reached), the notice "Live filing is not available from the UI", a
+   link to this guide, and the theme toggle. The theme follows the
+   system until you choose light or dark.
+2. **Samples and history.** Samples come from `GET /api/samples`, each
+   with the outcome kind its default action produces: `require-gate`,
+   `late-payment`, and three runs of the trust fixture (open
+   eligibility, court selects I2, one certificate). Choosing a sample
+   fills the module, case, query, and both clocks, then runs its
+   default action; if you have unsaved edits, the rail asks before
+   replacing them. The first visit loads `require-gate` without
+   running it. History lists the last
+   20 actions of this session. Choosing one reopens its result, and
+   "Restore inputs" puts its inputs back.
+3. **Editor.** A segmented control switches between Module, Case JSON,
+   and Template. The editor has line numbers and syntax highlighting;
+   Tab and Shift-Tab indent and outdent, and Enter keeps the
+   indentation; press Escape, then Tab, to move focus out of the editor. About 700 ms after you stop typing in the module, the
+   page posts it to `/api/check`: each diagnostic gets a wavy underline
+   and a mark in the gutter, and its message appears under the line
+   while the cursor or pointer is on it. Case JSON is checked as you
+   type, with the line and column of the first error.
+4. **Query, clocks, and actions.** The query field suggests the
+   module's `query` names. `validAt` and `knownAt` must be RFC 3339.
+   `Check`, `Run`, `Explore`, and `Render` post to the routes above.
+   Ctrl or Cmd with Enter runs; adding Shift explores.
+5. **Result.** Run and Explore results have three views: Opinion (the
+   `opinion` sentences set as a printed page, with the execution mode,
+   source trust, module, and `asOf`), Table (every field of the outcome
+   and the report envelope), and JSON (the raw report, with Copy).
+   Check shows `ok` or the diagnostics, each with a button that jumps to
+   its line. Render shows the rendered text. Engine errors, invalid
+   input, and an unreachable server are shown in place of a result.
 
-`Run` posts `{source, query, case, validAt, knownAt}` to `/api/run` and
-pretty-prints the JSON response.
-
-`Explore` posts the same body to `/api/explore` (no `bounds` key from the
-page). Put finite completions on the case JSON if the query needs them.
-
-`Render` posts `{source, template}` to `/api/render`. On `ok` the outcome
-area shows `text`. Otherwise it shows `error`.
-
-Invalid case JSON in the textarea fails in the browser before the
-request is sent.
+Inputs, the chosen sample, and the chosen result view are kept in the
+browser's local storage, so a reload keeps your work. `Explore` sends
+the same body as `Run` and no separate `bounds` field; put finite
+completions on the case JSON.
 
 ## See also
 
@@ -2112,9 +2128,9 @@ the issue in this context. `Determinate` additionally requires a
   not enough; the constructor refuses `determinate` with ignored issues
   and a non-covering certificate.
 
-**What it is not.** Listing one alternative first is not determination.
-Hashing the open issues is not covering. Shape-complete `examined ==
-total` with empty or fabricated `branches` is not covering.
+> **What it is not.** Listing one alternative first is not determination.
+> Hashing the open issues is not covering. Shape-complete `examined ==
+> total` with empty or fabricated `branches` is not covering.
 
 ### Contingent
 
@@ -3067,6 +3083,26 @@ cargo test --workspace --offline
 ```
 
 Do not weaken no-false-determinacy to make a test pass.
+
+## Website
+
+The public site in [`site/`](https://github.com/BeeGass/fidryn/tree/main/site/) is generated from these guides
+by the workspace task runner. After editing a guide in `docs/`, run:
+
+```
+cargo xtask site
+```
+
+and commit the markdown together with the regenerated files under
+`site/`. `cargo xtask site --check` fails when the committed site is
+stale, and `cargo xtask ci` runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.
+
+The styles and scripts in `site/assets/` are written by hand and are
+shared with the mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/). When Node
+is installed, `cargo xtask ci` also runs the JavaScript unit tests in
+`web/tests/`; Node is never needed to build or serve anything.
 
 ## Pipeline
 

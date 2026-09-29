@@ -189,8 +189,10 @@ together with a <strong>covering</strong> certificate. A claims-digest binder is
 not enough; the constructor refuses <code>determinate</code> with ignored issues
 and a non-covering certificate.</li>
 </ul>
+<blockquote>
 <p><strong>What it is not.</strong> Listing one alternative first is not determination.
 Hashing the open issues is not covering. Shape-complete <code>examined == total</code> with empty or fabricated <code>branches</code> is not covering.</p>
+</blockquote>
 <h3 id="contingent"><span class="hn">6.3.2</span> Contingent <a class="anchor" href="#contingent" aria-label="Link to this section">#</a></h3>
 <figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
   <span class="tk-ty">&quot;kind&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;contingent&quot;</span><span class="tk-pu">,</span>

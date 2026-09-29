@@ -32,6 +32,26 @@ cargo test --workspace --offline
 
 Do not weaken no-false-determinacy to make a test pass.
 
+## Website
+
+The public site in [`site/`](../site/) is generated from these guides
+by the workspace task runner. After editing a guide in `docs/`, run:
+
+```
+cargo xtask site
+```
+
+and commit the markdown together with the regenerated files under
+`site/`. `cargo xtask site --check` fails when the committed site is
+stale, and `cargo xtask ci` runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.
+
+The styles and scripts in `site/assets/` are written by hand and are
+shared with the mill, whose page lives in [`web/`](../web/). When Node
+is installed, `cargo xtask ci` also runs the JavaScript unit tests in
+`web/tests/`; Node is never needed to build or serve anything.
+
 ## Pipeline
 
 Land a change in the crate that owns that stage:

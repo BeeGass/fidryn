@@ -126,6 +126,8 @@ exits 1 with
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Method</th><th>Path</th><th>Body</th><th>Success</th></tr></thead><tbody>
 <tr><td><code>GET</code></td><td><code>/</code></td><td>none</td><td><code>web/index.html</code> (<code>text/html; charset=utf-8</code>), with the security headers below</td></tr>
 <tr><td><code>GET</code></td><td><code>/assets/fidryn.css</code></td><td>none</td><td><code>site/assets/fidryn.css</code>, the design system the site also uses (<code>text/css; charset=utf-8</code>)</td></tr>
+<tr><td><code>GET</code></td><td><code>/assets/mill.css</code></td><td>none</td><td><code>web/mill.css</code>, the mill's own styles (<code>text/css; charset=utf-8</code>)</td></tr>
+<tr><td><code>GET</code></td><td><code>/assets/mill.js</code></td><td>none</td><td><code>web/mill.js</code>, the mill app (<code>text/javascript; charset=utf-8</code>)</td></tr>
 <tr><td><code>GET</code></td><td><code>/favicon.svg</code></td><td>none</td><td><code>site/favicon.svg</code> (<code>image/svg+xml</code>)</td></tr>
 <tr><td><code>GET</code></td><td><code>/fonts/{name}</code></td><td>none</td><td><code>fraunces.woff2</code>, <code>plex-sans.woff2</code>, <code>plex-mono-400.woff2</code>, or <code>plex-mono-500.woff2</code> from <code>site/fonts/</code> (<code>font/woff2</code>); any other name is 404</td></tr>
 <tr><td><code>GET</code></td><td><code>/api/health</code></td><td>none</td><td>plain text <code>ok</code></td></tr>
@@ -143,9 +145,11 @@ stylesheet, favicon, and fonts are sent with <code>Cache-Control: no-cache</code
 <code>Content-Security-Policy: default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'</code>,
 <code>X-Content-Type-Options: nosniff</code>, and <code>Referrer-Policy: no-referrer</code>,
 so the browser runs no inline script or style on the page and will not
-show it inside a frame. In a sample, <code>source</code> and <code>case</code> are the text of
-a repository fixture (<code>case</code> is JSON text, not a parsed object), and
-<code>expect</code> is the outcome kind that <code>action</code> returns for it.</p>
+show it inside a frame. In a sample, <code>source</code> is the text of a
+repository fixture and <code>case</code> is the text of a case file, or the empty
+case record for the first two samples (<code>case</code> is JSON text, not a
+parsed object); <code>expect</code> is the outcome kind that <code>action</code> returns
+for it.</p>
 <p>There is no <code>POST /api/file</code>, <code>/api/filing</code>, <code>/api/submit</code>, or
 <code>/api/live</code>. Those paths return 404.</p>
 <h2 id="json-field-names"><span class="hn">5.3</span> JSON field names <a class="anchor" href="#json-field-names" aria-label="Link to this section">#</a></h2>
@@ -252,37 +256,52 @@ is the only submit path, and even there live HTTP needs <code>--live</code> and
 <code>FIDRYN_ALLOW_LIVE_FILING=1</code>. A transport receipt is still not <code>Filed</code>.
 The HTML page states that live filing is not available from the UI.</p>
 <h2 id="the-html-page"><span class="hn">5.6</span> The HTML page <a class="anchor" href="#the-html-page" aria-label="Link to this section">#</a></h2>
-<p><code>GET /</code> serves <code>web/index.html</code>. The page is a single column:</p>
+<p><code>GET /</code> serves <code>web/index.html</code>, which loads <code>/assets/fidryn.css</code> (the
+site's design system), <code>/assets/mill.css</code>, and <code>/assets/mill.js</code>. Those
+files, the fonts, and the samples are compiled into the binary, and the
+page sends requests only to 127.0.0.1. The response carries a strict
+Content-Security-Policy, so the page runs no inline script.</p>
+<p>The page has three columns on a wide screen and one column on a phone:</p>
 <ol>
-<li><strong>Header.</strong> Title <code>fidryn mill</code> with subtitle <code>localhost 127.0.0.1</code>,
-and a health badge. On load the page <code>GET</code>s <code>/api/health</code> and shows
-<code>health: ok (localhost)</code> or <code>health: unreachable</code>.</li>
-<li><strong>Deck.</strong> “Check, run, explore, and render a Fidryn module on this
-machine. This mill never files.”</li>
-<li><strong>Warning.</strong> “Live filing is not available from the UI.”</li>
-<li><strong>Module source.</strong> Textarea <code>source</code>, prefilled with a tiny
-<code>Examples.T</code> module and query <code>q</code>.</li>
-<li><strong>Query.</strong> Text input, default <code>q</code>.</li>
-<li><strong>Times.</strong> <code>validAt</code> and <code>knownAt</code>, default <code>2033-01-01T00:00:00Z</code>.</li>
-<li><strong>Case JSON.</strong> Textarea, default <code>{}</code>. Completions for Explore belong
-here as <code>admissibleCompletions</code> on the case. The page does not send a
-separate <code>bounds</code> field.</li>
-<li><strong>Template.</strong> Textarea for Render, default
-<code>{{module}}@{{version}}</code> plus an <code>outside_scope</code> each-block.</li>
-<li><strong>Buttons.</strong> <code>Check</code> (primary), <code>Run</code>, <code>Explore</code>, <code>Render</code>.</li>
-<li><strong>Outcome.</strong> A <code>&lt;pre&gt;</code> that starts as <code>Ready.</code></li>
+<li><strong>Header.</strong> The Fidryn monogram, <code>mill</code>, the health status
+(<code>localhost 127.0.0.1 · ok</code>, or a warning when the server cannot be
+reached), the notice "Live filing is not available from the UI", a
+link to this guide, and the theme toggle. The theme follows the
+system until you choose light or dark.</li>
+<li><strong>Samples and history.</strong> Samples come from <code>GET /api/samples</code>, each
+with the outcome kind its default action produces: <code>require-gate</code>,
+<code>late-payment</code>, and three runs of the trust fixture (open
+eligibility, court selects I2, one certificate). Choosing a sample
+fills the module, case, query, and both clocks, then runs its
+default action; if you have unsaved edits, the rail asks before
+replacing them. The first visit loads <code>require-gate</code> without
+running it. History lists the last
+20 actions of this session. Choosing one reopens its result, and
+"Restore inputs" puts its inputs back.</li>
+<li><strong>Editor.</strong> A segmented control switches between Module, Case JSON,
+and Template. The editor has line numbers and syntax highlighting;
+Tab and Shift-Tab indent and outdent, and Enter keeps the
+indentation; press Escape, then Tab, to move focus out of the editor. About 700 ms after you stop typing in the module, the
+page posts it to <code>/api/check</code>: each diagnostic gets a wavy underline
+and a mark in the gutter, and its message appears under the line
+while the cursor or pointer is on it. Case JSON is checked as you
+type, with the line and column of the first error.</li>
+<li><strong>Query, clocks, and actions.</strong> The query field suggests the
+module's <code>query</code> names. <code>validAt</code> and <code>knownAt</code> must be RFC 3339.
+<code>Check</code>, <code>Run</code>, <code>Explore</code>, and <code>Render</code> post to the routes above.
+Ctrl or Cmd with Enter runs; adding Shift explores.</li>
+<li><strong>Result.</strong> Run and Explore results have three views: Opinion (the
+<code>opinion</code> sentences set as a printed page, with the execution mode,
+source trust, module, and <code>asOf</code>), Table (every field of the outcome
+and the report envelope), and JSON (the raw report, with Copy).
+Check shows <code>ok</code> or the diagnostics, each with a button that jumps to
+its line. Render shows the rendered text. Engine errors, invalid
+input, and an unreachable server are shown in place of a result.</li>
 </ol>
-<p><code>Check</code> posts <code>{source}</code> to <code>/api/check</code>. On <code>ok</code> the outcome area shows
-the word <code>ok</code>. Otherwise it lists <code>code</code> and <code>message</code> for each
-diagnostic.</p>
-<p><code>Run</code> posts <code>{source, query, case, validAt, knownAt}</code> to <code>/api/run</code> and
-pretty-prints the JSON response.</p>
-<p><code>Explore</code> posts the same body to <code>/api/explore</code> (no <code>bounds</code> key from the
-page). Put finite completions on the case JSON if the query needs them.</p>
-<p><code>Render</code> posts <code>{source, template}</code> to <code>/api/render</code>. On <code>ok</code> the outcome
-area shows <code>text</code>. Otherwise it shows <code>error</code>.</p>
-<p>Invalid case JSON in the textarea fails in the browser before the
-request is sent.</p>
+<p>Inputs, the chosen sample, and the chosen result view are kept in the
+browser's local storage, so a reload keeps your work. <code>Explore</code> sends
+the same body as <code>Run</code> and no separate <code>bounds</code> field; put finite
+completions on the case JSON.</p>
 <h2 id="see-also"><span class="hn">5.7</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>

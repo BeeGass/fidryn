@@ -107,9 +107,9 @@ the issue in this context. `Determinate` additionally requires a
   not enough; the constructor refuses `determinate` with ignored issues
   and a non-covering certificate.
 
-**What it is not.** Listing one alternative first is not determination.
-Hashing the open issues is not covering. Shape-complete `examined ==
-total` with empty or fabricated `branches` is not covering.
+> **What it is not.** Listing one alternative first is not determination.
+> Hashing the open issues is not covering. Shape-complete `examined ==
+> total` with empty or fabricated `branches` is not covering.
 
 ### Contingent
 

@@ -98,7 +98,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 8 &middot; Contribute</p>
     <h1 id="doc-title">Contributing to Fidryn</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.3</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.4</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.5</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.6</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.7</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.8</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.9</span> Not legal advice</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></details>
     <div class="prose">
 <p>This file is for people building the v0.1 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
@@ -121,7 +121,20 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
 <span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
-<h2 id="pipeline"><span class="hn">8.3</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
+<h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
+<p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides
+by the workspace task runner. After editing a guide in <code>docs/</code>, run:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> xtask site</code></pre></figure>
+<p>and commit the markdown together with the regenerated files under
+<code>site/</code>. <code>cargo xtask site --check</code> fails when the committed site is
+stale, and <code>cargo xtask ci</code> runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.</p>
+<p>The styles and scripts in <code>site/assets/</code> are written by hand and are
+shared with the mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>. When Node
+is installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
+<code>web/tests/</code>; Node is never needed to build or serve anything.</p>
+<h2 id="pipeline"><span class="hn">8.4</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli</code></pre></figure>
 <p><code>fidryn-kernel</code> sits beside verify: it accepts or rejects covering
@@ -131,7 +144,7 @@ extra stages.</p>
 <p>Do not add reverse dependencies. Do not put evaluator logic in
 <code>syntax</code>. Do not put parser logic in <code>core</code>. <code>fidryn-driver</code> must not
 depend on <code>fidryn-cli</code>.</p>
-<h2 id="crates"><span class="hn">8.4</span> Crates <a class="anchor" href="#crates" aria-label="Link to this section">#</a></h2>
+<h2 id="crates"><span class="hn">8.5</span> Crates <a class="anchor" href="#crates" aria-label="Link to this section">#</a></h2>
 <p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml"><code>Cargo.toml</code></a>.</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
@@ -147,7 +160,7 @@ fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-cli             fidryn binary and localhost mill</code></pre></figure>
-<h2 id="tests"><span class="hn">8.5</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
+<h2 id="tests"><span class="hn">8.6</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
 <p>Tests live next to the crates they exercise (<code>#[cfg(test)]</code> in <code>src</code>,
 and <code>crates/&lt;name&gt;/tests/</code> when a crate has an integration kit).</p>
 <p>The adversarial review kit is
@@ -158,15 +171,15 @@ Those tests are regressions, not closure of the language.</p>
 runs them as independently named modules. Do not rewrite compiled Core
 to green fingerprint tests. Patching a <code>CoreModule</code> so a digest, plan,
 or outcome matches is not a passing test.</p>
-<h2 id="commits"><span class="hn">8.6</span> Commits <a class="anchor" href="#commits" aria-label="Link to this section">#</a></h2>
+<h2 id="commits"><span class="hn">8.7</span> Commits <a class="anchor" href="#commits" aria-label="Link to this section">#</a></h2>
 <p>Use Conventional Commits (<code>feat(syntax): ...</code>, <code>fix(eval): ...</code>,
 <code>test(cli): ...</code>, <code>docs: ...</code>). Prefer atomic commits in pipeline order,
 then tests and docs. Do not dump unrelated crates into one commit.</p>
-<h2 id="grammar"><span class="hn">8.7</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
+<h2 id="grammar"><span class="hn">8.8</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
 <p>The closed v0.1 grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the
 repository root. Unknown body fields are parse errors, not extension
 points.</p>
-<h2 id="implementer-documents"><span class="hn">8.8</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
+<h2 id="implementer-documents"><span class="hn">8.9</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
 <p>These files are crate contracts and evidence. They are not user
 tutorials.</p>
 <ul>
@@ -178,7 +191,7 @@ tutorials.</p>
 </ul>
 <p>Mill HTTP routes are documented in <a href="/docs/mill">mill.md</a>, not in
 ARCHITECTURE.md.</p>
-<h2 id="not-legal-advice"><span class="hn">8.9</span> Not legal advice <a class="anchor" href="#not-legal-advice" aria-label="Link to this section">#</a></h2>
+<h2 id="not-legal-advice"><span class="hn">8.10</span> Not legal advice <a class="anchor" href="#not-legal-advice" aria-label="Link to this section">#</a></h2>
 <p>This interpreter, its tests, and its example modules are not legal
 advice.</p>
 
@@ -187,7 +200,7 @@ advice.</p>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/contributing.md">Edit this page on GitHub</a><a href="/docs/contributing.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.3</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.4</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.5</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.6</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.7</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.8</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.9</span> Not legal advice</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
