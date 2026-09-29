@@ -269,7 +269,17 @@ mod build_tests {
     #[test]
     fn two_builds_are_byte_identical() {
         let root = workspace_root();
-        assert!(build(&root).expect("first build") == build(&root).expect("second build"));
+        let first = build(&root).expect("first build");
+        let second = build(&root).expect("second build");
+        let paths = |files: &[OutFile]| files.iter().map(|f| f.path.clone()).collect::<Vec<_>>();
+        assert_eq!(paths(&first), paths(&second));
+        for (a, b) in first.iter().zip(&second) {
+            assert!(
+                a.bytes == b.bytes,
+                "{} differs between two builds",
+                a.path.display()
+            );
+        }
     }
 
     #[test]
