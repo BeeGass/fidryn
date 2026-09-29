@@ -305,14 +305,17 @@ test("byteToIndex puts a span after section signs, accents, and astral character
   }
 });
 
-test("byteToIndex counts 2-, 2-, and 4-byte characters exactly", () => {
+test("byteToIndex counts 2-, 3-, and 4-byte characters exactly", () => {
   assert.equal(mill.byteToIndex("§x", 2), 1);
   assert.equal(mill.byteToIndex("éx", 2), 1);
+  assert.equal(mill.byteToIndex("—x", 3), 1);
+  assert.equal(mill.byteToIndex("中x", 3), 1);
+  assert.equal(mill.byteToIndex("“quoted”", 3), 1);
   assert.equal(mill.byteToIndex("𝔽x", 4), 2);
   assert.equal(mill.byteToIndex("a𝔽b", 5), 3);
   assert.equal(mill.byteToIndex("\"§é𝔽\"", 1 + 2 + 2 + 4), 5);
   let bytes = 0;
-  const text = "a§é𝔽\n// 𝔽§\nz";
+  const text = "a§é𝔽—“中”\n// 𝔽§ … →\nz";
   for (let i = 0; i < text.length; ) {
     assert.equal(mill.byteToIndex(text, bytes), i, `byte ${bytes}`);
     const cp = text.codePointAt(i);
@@ -325,6 +328,8 @@ test("byteToIndex counts 2-, 2-, and 4-byte characters exactly", () => {
 test("byteToIndex clamps offsets inside a character, past the end, and below zero", () => {
   assert.equal(mill.byteToIndex("𝔽", 2), 0);
   assert.equal(mill.byteToIndex("é", 1), 0);
+  assert.equal(mill.byteToIndex("—", 1), 0);
+  assert.equal(mill.byteToIndex("—", 2), 0);
   assert.equal(mill.byteToIndex("abc", 99), 3);
   assert.equal(mill.byteToIndex("abc", -1), 0);
   assert.equal(mill.byteToIndex("", 0), 0);
@@ -370,9 +375,9 @@ test("tokenizeFr classes keywords, types, strings, literals, comments, and punct
   ].join("\n");
   const segs = mill.tokenizeFr(source);
   const expect = [
-    ["module", 0, "tk-kw"], ["Programs", 0, "tk-ty"], [".RequireGate", 0, "tk-ty"], ["version", 0, "tk-kw"],
+    ["module", 0, "tk-kw"], ["Programs", 0, "tk-ty"], [".RequireGate", 0, "tk-pu"], ["version", 0, "tk-kw"],
     ["\"0.1.0\"", 0, "tk-st"], ["{", 0, "tk-pu"], ["// r must", 0, "tk-co"],
-    ["import", 0, "tk-kw"], ["MA", 0, "tk-ty"], ["TrustLaw", 0, "tk-ty"], ["Fixture", 0, "tk-ty"],
+    ["import", 0, "tk-kw"], ["MA", 0, "tk-ty"], [".TrustLaw", 0, "tk-pu"], ["TrustLaw", 0, "tk-ty"], ["Fixture", 0, "tk-ty"],
     ["effective_at", 0, "tk-kw"], ["2026-09-17", 0, "tk-nu"], ["2026-08-23T12:00:00-04:00", 0, "tk-nu"],
     ["entity", 0, "tk-kw"], ["Payer", 0, ""], [": Natural", 0, "tk-pu"], ["NaturalPerson", 0, "tk-ty"],
     ["query", 0, "tk-kw"], ["q()", 0, ""], ["->", 0, "tk-pu"], ["Int", 0, "tk-ty"], ["require", 0, "tk-kw"],
@@ -451,7 +456,7 @@ test("applyRanges ignores empty ranges and never changes the text", () => {
 });
 
 test("a server span after multi-byte text squiggles exactly the offending word", () => {
-  const source = "module A version \"1\" {\n    // § é 𝔽\n    colour blue\n}\n";
+  const source = "module A version \"1\" {\n    // § é 𝔽 — “q” → 中\n    colour blue\n}\n";
   const start = Buffer.byteLength(source.slice(0, source.indexOf("colour")), "utf8");
   const from = mill.byteToIndex(source, start);
   const to = mill.byteToIndex(source, start + "colour".length);
@@ -511,4 +516,17 @@ test("editorKey: any other key after Escape clears the flag", () => {
     assert.equal(step.escaped, false, key);
     assert.equal(mill.editorKey("Tab", {}, step.escaped).action, "indent", key);
   }
+});
+
+test("JSON literals highlight only as whole words, as on the site", () => {
+  const segs = mill.tokenizeJson("[nullable, null, truer, true, xfalse, false]");
+  assert.deepEqual(segs.filter((s) => s.cls === "tk-nu").map((s) => s.text), ["null", "true", "false"]);
+});
+
+test("loadState turns CRLF and CR line ends into LF", () => {
+  const stored = { v: 1, module: "a\r\nb\rc", case: "{\r\n}", template: "t\r\n", query: "q", validAt: "", knownAt: "" };
+  const state = mill.loadState({ getItem: () => JSON.stringify(stored) }, {});
+  assert.equal(state.module, "a\nb\nc");
+  assert.equal(state.case, "{\n}");
+  assert.equal(state.template, "t\n");
 });

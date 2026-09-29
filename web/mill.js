@@ -158,7 +158,7 @@
     var from = isObject(source) ? source : {};
     var out = { v: 1 };
     TEXT_FIELDS.forEach(function (key) {
-      out[key] = typeof from[key] === "string" ? from[key] : "";
+      out[key] = typeof from[key] === "string" ? from[key].replace(/\r\n?/g, "\n") : "";
     });
     out.buffer = BUFFERS.indexOf(from.buffer) >= 0 ? from.buffer : "module";
     out.sample = typeof from.sample === "string" ? from.sample : null;
@@ -270,6 +270,15 @@
   }
 
   var JSON_NUMBER = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/y;
+  var JSON_LITERAL = /(?:true|false|null)(?![A-Za-z0-9_])/y;
+
+  /** Length of `true`, `false`, or `null` at `i` as a whole word, as the site highlights it; 0 otherwise. */
+  function literalLength(text, i) {
+    if (i > 0 && /[A-Za-z0-9_]/.test(text.charAt(i - 1))) return 0;
+    JSON_LITERAL.lastIndex = i;
+    var m = JSON_LITERAL.exec(text);
+    return m ? m[0].length : 0;
+  }
 
   /**
    * Where and why `text` is not JSON, as `{ index, message }`, or null when it
@@ -663,7 +672,7 @@
         if (op) {
           i += op.length;
           if (path === 2 && op === ".") {
-            cls = "tk-ty";
+            cls = "tk-pu";
             path = 3;
           } else {
             cls = op === "+inf" || op === "-inf" ? "tk-nu" : "tk-pu";
@@ -711,8 +720,8 @@
         var number = JSON_NUMBER.exec(text);
         i += number ? number[0].length : 1;
         cls = number ? "tk-nu" : "";
-      } else if (text.startsWith("true", i) || text.startsWith("null", i) || text.startsWith("false", i)) {
-        i += c === "f" ? 5 : 4;
+      } else if (literalLength(text, i) > 0) {
+        i += literalLength(text, i);
         cls = "tk-nu";
       } else if ("{}[],:".indexOf(c) >= 0) {
         i += 1;
@@ -1169,9 +1178,17 @@
         renderSamples();
         return;
       }
-      samples = Array.isArray(res.data) ? res.data.filter(isSample) : [];
+      samples = Array.isArray(res.data) ? res.data.filter(isSample).map(normalizeSample) : [];
       samplesFailed = samples.length === 0;
       renderSamples();
+    });
+  }
+
+  /** Line ends as the editor holds them, so samples compare equal to unedited inputs. */
+  function normalizeSample(sample) {
+    return Object.assign({}, sample, {
+      source: sample.source.replace(/\r\n?/g, "\n"),
+      case: sample.case.replace(/\r\n?/g, "\n")
     });
   }
 
@@ -1356,13 +1373,17 @@
     } else {
       text = "Used by Render";
     }
-    var key = mood + "\n" + text + "\n" + (editorFocused ? "hint" : "");
-    if (key === bufferStatusKey) return;
-    bufferStatusKey = key;
-    clear(el.bufferStatus);
-    el.bufferStatus.appendChild(h("span", { className: "mill-status-main", text: text }));
-    if (editorFocused) el.bufferStatus.appendChild(h("span", { className: "mill-status-hint", text: LEAVE_HINT }));
-    el.bufferStatus.setAttribute("data-state", mood);
+    var key = mood + "\n" + text;
+    if (key !== bufferStatusKey) {
+      bufferStatusKey = key;
+      clear(el.bufferStatus);
+      el.bufferStatus.appendChild(h("span", { className: "mill-status-main", text: text }));
+      el.bufferStatus.appendChild(h("span", { className: "mill-status-hint", "aria-hidden": "true", text: LEAVE_HINT }));
+      el.bufferStatus.setAttribute("data-state", mood);
+    }
+    // The hint is visual only (#editor-help carries it), so showing or hiding it never re-announces the status.
+    var hint = el.bufferStatus.querySelector(".mill-status-hint");
+    if (hint) hint.hidden = !editorFocused;
   }
 
   /** Remember the diagnostics of a check of `source`. */
@@ -1923,6 +1944,7 @@
   var gutterKey = "";
   var lineMarks = {};
   var popLine = 0;
+  var popKey = "";
   var pointerLine = 0;
   var editorFocused = false;
   var escaped = false;
@@ -2064,15 +2086,18 @@
     if (!line || below < 0 || below > el.editor.clientHeight) {
       el.diagPop.hidden = true;
       popLine = 0;
+      popKey = "";
       return;
     }
-    if (line !== popLine) {
+    var key = line + "\n" + lineMarks[line].map(function (p) { return p.code + " " + p.message; }).join("\n");
+    if (key !== popKey) {
       clear(el.diagPop);
       lineMarks[line].forEach(function (p) {
-        el.diagPop.appendChild(h("p", null, [h("code", { text: p.code }), p.message]));
+        el.diagPop.appendChild(h("p", null, [h("code", { text: p.code }), " ", p.message]));
       });
-      popLine = line;
+      popKey = key;
     }
+    popLine = line;
     el.diagPop.hidden = false;
     var height = el.diagPop.offsetHeight;
     var above = below - metrics.line - height;
@@ -2089,6 +2114,7 @@
   }
 
   function onEditorKey(event) {
+    if (!state) return;
     var step = editorKey(event.key, {
       shift: event.shiftKey,
       ctrl: event.ctrlKey,
@@ -2109,7 +2135,7 @@
   }
 
   function lineStart(text, index) {
-    return text.lastIndexOf("\n", index - 1) + 1;
+    return index > 0 ? text.lastIndexOf("\n", index - 1) + 1 : 0;
   }
 
   /** The selection and the whole lines it touches (`from`..`to`, without the last newline). */
@@ -2145,16 +2171,21 @@
     var sel = selectedLines();
     var lines = sel.text.slice(sel.from, sel.to).split("\n");
     var firstCut = 0;
+    var endCut = 0;
     var removed = 0;
+    var offset = sel.from;
     var out = lines.map(function (line, i) {
       var cut = line.charAt(0) === "\t" ? 1 : Math.min(/^ */.exec(line)[0].length, unit.length);
       if (i === 0) firstCut = cut;
+      // Only the part of a cut that lies before the selection's end moves the end.
+      endCut += Math.max(0, Math.min(cut, sel.end - offset));
       removed += cut;
+      offset += line.length + 1;
       return line.slice(cut);
     }).join("\n");
     if (removed === 0) return;
     var start = Math.max(sel.from, sel.start - firstCut);
-    replaceRange(sel.from, sel.to, out, start, Math.max(start, sel.end - removed));
+    replaceRange(sel.from, sel.to, out, start, Math.max(start, sel.end - endCut));
   }
 
   /** Enter keeps the current line's indentation. */
