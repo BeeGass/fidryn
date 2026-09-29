@@ -1,7 +1,6 @@
 {
   "name": "fidryn-site",
   "private": true,
-  "type": "module",
   "scripts": {
     "build-docs": "node scripts/build-docs.mjs"
   },
