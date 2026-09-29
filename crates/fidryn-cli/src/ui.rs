@@ -24,6 +24,7 @@ use tokio::sync::Semaphore;
 const INDEX: &str = include_str!("../../../web/index.html");
 const SITE_CSS: &str = include_str!("../../../site/assets/fidryn.css");
 const FAVICON: &str = include_str!("../../../site/favicon.svg");
+const MILL_CSS: &str = include_str!("../../../web/mill.css");
 const DEFAULT_PORT: u16 = 8751;
 /// Concurrent check / run / explore / render workers. Extra requests wait
 /// on the semaphore; they do not occupy extra blocking threads.
@@ -90,6 +91,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(index))
         .route("/assets/fidryn.css", get(site_css))
+        .route("/assets/mill.css", get(mill_css))
         .route("/favicon.svg", get(favicon))
         .route("/fonts/{name}", get(font))
         .route("/api/health", get(health))
@@ -164,6 +166,10 @@ fn static_text(content_type: &'static str, body: &'static str) -> Response {
 
 async fn site_css() -> Response {
     static_text("text/css; charset=utf-8", SITE_CSS)
+}
+
+async fn mill_css() -> Response {
+    static_text("text/css; charset=utf-8", MILL_CSS)
 }
 
 async fn favicon() -> Response {
@@ -1371,6 +1377,34 @@ module Examples.T version "0.1.0" {
                 .as_str()
                 .is_some_and(|e| e.contains("missing")),
             "{json}"
+        );
+    }
+
+    #[tokio::test]
+    async fn mill_css_route_serves_the_embedded_stylesheet() {
+        let response = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/assets/mill.css")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers()[header::CONTENT_TYPE],
+            "text/css; charset=utf-8"
+        );
+        assert_eq!(response.headers()[header::CACHE_CONTROL], "no-cache");
+        let css = body_text(response).await;
+        assert!(
+            css.contains(".mill-ed"),
+            "mill.css styles the editor: {css}"
+        );
+        assert!(
+            css.contains(".mill-doc"),
+            "mill.css styles the opinion view"
         );
     }
 
