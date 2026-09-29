@@ -6,10 +6,9 @@ use super::guides::{self, Guide};
 use super::markdown::Page;
 use serde_json::{Value, json};
 
-/// Longest snippet, in characters.
-const SNIPPET_CHARS: usize = 300;
-
-/// The search index as compact JSON with a final newline.
+/// The search index as compact JSON with a final newline. `t` is the
+/// renderer's summary of the page lead or section text (`markdown` cuts it at
+/// 300 characters).
 pub fn index(pages: &[(&Guide, &Page)]) -> String {
     let mut entries = Vec::new();
     for (guide, page) in pages {
@@ -19,7 +18,7 @@ pub fn index(pages: &[(&Guide, &Page)]) -> String {
             "n": guide.number.map(|n| format!("§{n}")).unwrap_or_default(),
             "h": page.title,
             "p": guide.title,
-            "t": snippet(&page.lead),
+            "t": page.lead,
         }));
         for section in &page.sections {
             entries.push(json!({
@@ -27,21 +26,13 @@ pub fn index(pages: &[(&Guide, &Page)]) -> String {
                 "n": section.number,
                 "h": section.heading,
                 "p": guide.title,
-                "t": snippet(&section.text),
+                "t": section.text,
             }));
         }
     }
     let mut out = Value::Array(entries).to_string();
     out.push('\n');
     out
-}
-
-/// The first 300 characters of `text` with whitespace collapsed, cut at a
-/// character boundary, with no trailing space.
-fn snippet(text: &str) -> String {
-    let collapsed = text.split_whitespace().collect::<Vec<_>>().join(" ");
-    let cut: String = collapsed.chars().take(SNIPPET_CHARS).collect();
-    cut.trim_end().to_owned()
 }
 
 #[cfg(test)]
@@ -73,7 +64,7 @@ mod tests {
     fn page_then_sections_in_order_with_numbers() {
         let page = Page {
             title: "Outcomes".to_owned(),
-            lead: "This guide explains\n  the six honest results.".to_owned(),
+            lead: "This guide explains the six honest results.".to_owned(),
             body: String::new(),
             toc: Vec::new(),
             sections: vec![
@@ -119,17 +110,6 @@ mod tests {
                 "\n"
             )
         );
-    }
-
-    #[test]
-    fn snippets_are_collapsed_and_cut_at_300_characters() {
-        let long = "§ word ".repeat(60);
-        let cut = snippet(&long);
-        assert!(cut.chars().count() <= 300, "{}", cut.chars().count());
-        assert!(!cut.ends_with(' ') && !cut.contains("  "));
-        assert!(long.starts_with(&cut));
-        assert_eq!(snippet("  a \n\t b  "), "a b");
-        assert_eq!(snippet(&"é".repeat(350)), "é".repeat(300));
     }
 
     #[test]
