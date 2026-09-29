@@ -110,3 +110,10 @@ test("empty and separator-only queries return nothing", () => {
   assert.deepEqual(rank(INDEX, "-- / ."), []);
   assert.equal(score(INDEX[0], []), 0);
 });
+
+test("score and rank tolerate a missing entry and a non-array index", () => {
+  assert.equal(score(null, ["a"]), 0);
+  assert.equal(score(undefined, ["a"]), 0);
+  assert.deepEqual(rank(null, "a"), []);
+  assert.deepEqual(rank({ length: 1, 0: { u: "/x", h: "a", p: "", t: "" } }, "a"), []);
+});

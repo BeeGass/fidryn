@@ -128,14 +128,39 @@
       if (!code) return;
       button.hidden = false;
       button.addEventListener("click", function () {
-        copyText(code.textContent).then(function () { flagCopied(button, "Copied"); }, function () {});
+        copyText(code.textContent).then(function () { flagCopied(button, "Copied"); announce("Copied"); }, function () {});
       });
     });
     all(".anchor").forEach(function (anchor) {
       anchor.addEventListener("click", function () {
-        copyText(anchor.href).then(function () { flagCopied(anchor, null); }, function () {});
+        copyText(anchor.href).then(function () { flagCopied(anchor, null); announce("Link copied"); }, function () {});
       });
     });
+  }
+
+  // ---- status announcements ----
+
+  var statusRegion = null;
+  var statusTimer = null;
+
+  // One polite live region, created at start so later changes are announced.
+  function setupStatus() {
+    statusRegion = document.createElement("div");
+    statusRegion.className = "sr-only";
+    statusRegion.setAttribute("role", "status");
+    document.body.appendChild(statusRegion);
+  }
+
+  // Announce results that are otherwise only visual; the text clears after two
+  // seconds so the same message can be announced again later.
+  function announce(text) {
+    if (!statusRegion || !text || statusRegion.textContent === text) return;
+    statusRegion.textContent = text;
+    if (statusTimer) clearTimeout(statusTimer);
+    statusTimer = setTimeout(function () {
+      statusRegion.textContent = "";
+      statusTimer = null;
+    }, 2000);
   }
 
   // ---- theme ----
@@ -290,10 +315,12 @@
           return r.json();
         })
         .then(function (data) {
+          failed = false;
           index = Array.isArray(data) ? data : [];
           render();
         }, function () {
           failed = true;
+          loading = null;
           render();
         });
       return loading;
@@ -301,6 +328,7 @@
 
     function isShown() { return !list.hidden; }
     function show() {
+      if (document.activeElement !== input) return;
       list.hidden = false;
       input.setAttribute("aria-expanded", "true");
     }
@@ -358,6 +386,10 @@
           list.appendChild(li);
         });
       }
+      announce(failed ? "Search is unavailable right now."
+        : !index ? ""
+        : results.length === 0 ? "No matching sections."
+        : results.length === 1 ? "1 result" : results.length + " results");
       show();
     }
 
@@ -373,7 +405,9 @@
 
     function openActive() {
       var entry = results[active >= 0 ? active : 0];
-      if (entry) window.location.href = entry.u;
+      if (!entry) return;
+      hide();
+      window.location.href = entry.u;
     }
 
     input.addEventListener("focus", function () {
@@ -381,7 +415,7 @@
       if (input.value.trim() !== "") render();
     });
     input.addEventListener("input", function () {
-      load();
+      if (!failed) load();
       render();
     });
     input.addEventListener("keydown", function (e) {
@@ -400,6 +434,13 @@
           hide();
         }
       }
+    });
+    (form || input.parentNode).addEventListener("focusout", function (e) {
+      if (!(form || input.parentNode).contains(e.relatedTarget)) hide();
+    });
+    list.addEventListener("mousedown", function (e) { e.preventDefault(); });
+    list.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a")) hide();
     });
     if (form) {
       form.addEventListener("submit", function (e) {
@@ -441,11 +482,19 @@
     if (headings.length === 0) return;
     var visible = {};
     var currentId = null;
+    var bandId = null;
     function mark(id) {
       if (id === currentId) return;
       currentId = id;
       links.forEach(function (a) { a.removeAttribute("aria-current"); });
       if (id && byId[id]) byId[id].setAttribute("aria-current", "true");
+    }
+    // A short last section never reaches the band, so the bottom of a scrolling page marks it.
+    function sync() {
+      var doc = document.documentElement;
+      var scrolls = doc.scrollHeight - window.innerHeight > 2;
+      var bottom = scrolls && window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+      mark(bottom ? headings[headings.length - 1].id : bandId);
     }
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -455,20 +504,22 @@
         } else {
           delete visible[id];
           // Scrolling up past the current heading hands the mark to the one before it.
-          if (id === currentId && entry.boundingClientRect.top > 0) {
+          if (id === bandId && entry.boundingClientRect.top > 0) {
             var i = headings.indexOf(entry.target);
-            mark(i > 0 ? headings[i - 1].id : null);
+            bandId = i > 0 ? headings[i - 1].id : null;
           }
         }
       });
       for (var i = 0; i < headings.length; i++) {
         if (visible[headings[i].id]) {
-          mark(headings[i].id);
+          bandId = headings[i].id;
           break;
         }
       }
+      sync();
     }, { rootMargin: "0px 0px -70% 0px" });
     headings.forEach(function (h) { observer.observe(h); });
+    window.addEventListener("scroll", sync, { passive: true });
   }
 
   // ---- landing specimen ----
@@ -552,12 +603,18 @@
   }
 
   function start() {
-    setupTheme();
-    setupCopy();
-    setupDrawer();
-    setupSearch();
-    setupScrollspy();
-    all("[data-specimen]").forEach(setupSpecimen);
+    [
+      setupStatus,
+      setupTheme,
+      setupCopy,
+      setupDrawer,
+      setupSearch,
+      setupScrollspy,
+      function () { all("[data-specimen]").forEach(setupSpecimen); },
+    ].forEach(function (setup) {
+      // Each feature stands alone: one that throws must not stop the others.
+      try { setup(); } catch (err) { if (window.console) window.console.error(err); }
+    });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
