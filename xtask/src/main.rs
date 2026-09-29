@@ -27,7 +27,7 @@ enum Command {
     Test(test::TestArgs),
     /// Run `cargo bench --offline`
     Bench(bench::BenchArgs),
-    /// Workspace CI: tests, clippy -D warnings, schema probes
+    /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, site check, JS tests, bench build
     Ci(ci::CiArgs),
     /// Render the public site from docs/*.md (--check verifies the committed site)
     Site(site::SiteArgs),

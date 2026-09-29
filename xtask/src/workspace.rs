@@ -109,7 +109,8 @@ fn schema_probe_command(root: &Path, script: &Path) -> Command {
 
 /// One `uv run --locked <tool>` command per Python check, from `root`, in the
 /// order they run: lint, format, then types. ruff and mypy take their settings
-/// and their files from `pyproject.toml`.
+/// from `pyproject.toml`; mypy also takes its file list from there, while ruff
+/// checks every Python file under the root.
 fn python_check_commands(root: &Path) -> Vec<Command> {
     const CHECKS: [&[&str]; 3] = [
         &["ruff", "check"],

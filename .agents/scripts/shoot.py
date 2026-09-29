@@ -19,6 +19,7 @@ The mill also fails when its page has no skip link. JavaScript errors include
 `console.error` calls. Chrome runs with a throwaway profile, background
 downloads turned off, and every host except 127.0.0.1 and localhost blocked;
 the profile is deleted when the run ends, Ctrl-C and SIGTERM included.
+Set `CHROME` to another Chrome or Chromium binary on other systems.
 """
 
 from __future__ import annotations
@@ -47,7 +48,7 @@ from types import FrameType
 from typing import Any, NoReturn
 
 REPO = Path(__file__).resolve().parents[2]
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+CHROME = os.environ.get("CHROME", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
 CHROME_FLAGS = [
     "--headless=new",
     "--disable-gpu",

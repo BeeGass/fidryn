@@ -44,7 +44,7 @@ cargo test --workspace --offline
 `cargo xtask ci` runs the tests and clippy, then the conformance
 probes and the Python checks (ruff and mypy), the site check, the
 JavaScript tests when Node is installed, and a bench build;
-`cargo xtask ci --fmt` also checks formatting first. The Python steps
+`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
 need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
 that `.python-version` names and the packages `uv.lock` pins. GitHub
 Actions runs `cargo xtask ci --fmt` on every push to `main` and every

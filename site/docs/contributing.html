@@ -32,7 +32,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head">
   <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
-  <p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Contributing</p>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Contributing</p>
   <nav class="site-nav" aria-label="Site">
     <a href="/docs/" aria-current="page">Docs</a>
     <a href="/docs/examples">Examples</a>
@@ -123,7 +123,7 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <p><code>cargo xtask ci</code> runs the tests and clippy, then the conformance
 probes and the Python checks (ruff and mypy), the site check, the
 JavaScript tests when Node is installed, and a bench build;
-<code>cargo xtask ci --fmt</code> also checks formatting first. The Python steps
+<code>cargo xtask ci --fmt</code> also checks Rust formatting first. The Python steps
 need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code> provides the Python
 that <code>.python-version</code> names and the packages <code>uv.lock</code> pins. GitHub
 Actions runs <code>cargo xtask ci --fmt</code> on every push to <code>main</code> and every
