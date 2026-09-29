@@ -270,6 +270,9 @@
   }
 
   var JSON_NUMBER = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/y;
+  // What the highlighter reads as one number, as the site's `number_end` does: a whole run of digits (so `007` stays
+  // one number, though it is not valid JSON), then an optional fraction and exponent.
+  var JSON_NUMBER_RUN = /-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/y;
   var JSON_LITERAL = /(?:true|false|null)(?![A-Za-z0-9_])/y;
 
   /** Length of `true`, `false`, or `null` at `i` as a whole word, as the site highlights it; 0 otherwise. */
@@ -623,19 +626,17 @@
     var out = [];
     var i = 0;
     var prev = "";
-    var path = 0; // 1: after `module` or `import`; 2: after a path name; 3: after a path dot
+    var path = 0; // 1: after `module` or `import`; 2: after a path name; 3: after a path dot; whitespace and comments keep it
     while (i < text.length) {
       var start = i;
       var c = text.charAt(i);
       var cls = "";
       if (c === " " || c === "\t" || c === "\r" || c === "\n") {
         while (i < text.length && " \t\r\n".indexOf(text.charAt(i)) >= 0) i += 1;
-        if (path > 1) path = 0;
       } else if (c === "/" && text.charAt(i + 1) === "/") {
         var eol = text.indexOf("\n", i);
         i = eol < 0 ? text.length : eol;
         cls = "tk-co";
-        if (path > 1) path = 0;
       } else if (c === "\"") {
         i += 1;
         while (i < text.length) {
@@ -716,8 +717,10 @@
         while (next < text.length && " \t\r\n".indexOf(text.charAt(next)) >= 0) next += 1;
         cls = text.charAt(next) === ":" ? "tk-ty" : "tk-st";
       } else if (c === "-" || isDigit(c)) {
-        JSON_NUMBER.lastIndex = i;
-        var number = JSON_NUMBER.exec(text);
+        // As on the site, a number never starts right after a word character.
+        var afterWord = i > 0 && /[A-Za-z0-9_]/.test(text.charAt(i - 1));
+        JSON_NUMBER_RUN.lastIndex = i;
+        var number = afterWord ? null : JSON_NUMBER_RUN.exec(text);
         i += number ? number[0].length : 1;
         cls = number ? "tk-nu" : "";
       } else if (literalLength(text, i) > 0) {

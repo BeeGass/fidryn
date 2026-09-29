@@ -530,3 +530,40 @@ test("loadState turns CRLF and CR line ends into LF", () => {
   assert.equal(state.case, "{\n}");
   assert.equal(state.template, "t\n");
 });
+
+test("JSON numbers do not start right after a word character, as on the site", () => {
+  const numbers = (text) => mill.tokenizeJson(text).filter((s) => s.cls === "tk-nu").map((s) => s.text);
+  assert.deepEqual(numbers("{abc123, x1, true1}"), []);
+  assert.deepEqual(numbers("[1, -2.5e3]"), ["1", "-2.5e3"]);
+  assert.deepEqual(numbers("[1-2, x0.5]"), ["1", "2", "5"]);
+  // A whole run of digits is one number, so the guard never splits `007` or `09` (the site reads them the same way).
+  assert.deepEqual(numbers("[007, 2026-09-01]"), ["007", "2026", "09", "01"]);
+  assert.deepEqual(numbers("v0.00.1"), ["00.1"]);
+  const text = "{abc123, x1, true1, 1-2}";
+  assert.equal(joined(mill.tokenizeJson(text)), text);
+});
+
+test("module and import paths continue across whitespace and comments, as on the site", () => {
+  const spaced = "module A . B version \"1\" {}";
+  const segs = mill.tokenizeFr(spaced);
+  assert.equal(classOf(segs, spaced, "A"), "tk-ty");
+  assert.equal(classOf(segs, spaced, "."), "tk-pu");
+  assert.equal(classOf(segs, spaced, "B"), "tk-ty");
+  assert.equal(classOf(segs, spaced, "version"), "tk-kw");
+  const commented = "module A . // note\n    B version \"1\" {}";
+  const withComment = mill.tokenizeFr(commented);
+  assert.equal(classOf(withComment, commented, "."), "tk-pu");
+  assert.equal(classOf(withComment, commented, "B"), "tk-ty");
+  const before = "module A // note\n  . B version \"1\" {}";
+  assert.equal(classOf(mill.tokenizeFr(before), before, "B"), "tk-ty");
+  const named = "module // note\n  A.B version \"1\" {}";
+  assert.equal(classOf(mill.tokenizeFr(named), named, "B"), "tk-ty");
+  const imported = "import X.\n  Y . Z version \"1\"";
+  const imp = mill.tokenizeFr(imported);
+  for (const name of ["X", "Y", "Z"]) assert.equal(classOf(imp, imported, name), "tk-ty", name);
+  assert.equal(joined(withComment), commented);
+  // The path ends at the first token that is not a dot or a name: a second name after whitespace is an ordinary word.
+  const two = "import A B";
+  assert.equal(classOf(mill.tokenizeFr(two), two, "A"), "tk-ty");
+  assert.equal(classOf(mill.tokenizeFr(two), two, "B"), "");
+});
