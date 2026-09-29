@@ -520,9 +520,7 @@ impl<'a> ShellLine<'a, '_> {
         }
         while i < bytes.len() {
             let (end, tk) = match bytes[i] {
-                b' ' | b'\t' | b'\r' => {
-                    (run(bytes, i, |b| matches!(b, b' ' | b'\t' | b'\r')), None)
-                }
+                b if b.is_ascii_whitespace() => (run(bytes, i, |b| b.is_ascii_whitespace()), None),
                 b'#' if i == 0 || bytes[i - 1].is_ascii_whitespace() => (bytes.len(), Some(Tk::Co)),
                 b'\'' | b'"' => {
                     self.command = false;
@@ -1119,6 +1117,7 @@ mod tests {
             "$ ",
             "x = \"a\\\"b\" // c\n  /// d",
             "2026-09-17T12:00:00Z +inf -inf 0..1",
+            "a\u{c}b",
         ] {
             for lang in LANGS {
                 assert_eq!(
