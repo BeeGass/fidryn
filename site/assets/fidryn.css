@@ -194,9 +194,13 @@ hr { margin: 2em 0; border: 0; border-top: 1px solid var(--rule); }
   font-variation-settings: "opsz" 36;
 }
 .wordmark { font: 560 22px/1 var(--serif); font-variation-settings: "opsz" 72; color: var(--ink); }
+/* The padding is room inside the clip for the Docs link's focus ring (2px
+   outline plus 2px offset; the phone link's 44px box reaches 1px past the
+   line); the negative margin keeps the layout and the ellipsis where they were. */
 .crumb {
   min-width: 0;
-  margin: 0;
+  margin: -6px;
+  padding: 6px;
   overflow: hidden;
   font: 600 12px/1.35 var(--sans);
   color: var(--ink-3);
