@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    name: cargo xtask ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      # rust-toolchain.toml pins the channel and its components.
+      - name: Install the pinned Rust toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      # uv installs the Python in .python-version and the packages in uv.lock;
+      # the .venv it builds lives only on the runner.
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # cargo xtask ci runs cargo with --offline, so fetch the locked crates first.
+      - name: Fetch crates
+        run: cargo fetch --locked
+
+      - name: Sync the Python environment
+        run: uv sync --locked
+
+      - name: cargo xtask ci
+        run: cargo xtask ci --fmt
