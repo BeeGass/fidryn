@@ -43,9 +43,10 @@ rejects, independently of each other:
 
 There are no hand-authored `fidryn.outcome/v0.1` fixtures under
 `examples/` or `prelude/`. Informal snapshot JSON in CLI tests (`trace`
-`"aa"`) is not validated against this schema. Optional probe:
-`python3 conformance/probe_outcome_schema.py` (not invoked from cargo
-tests). Schema presence of a certificate id is not covering proof.
+`"aa"`) is not validated against this schema. Probe:
+`uv run python conformance/probe_outcome_schema.py` (not invoked from
+cargo tests; `cargo xtask ci` runs it). Schema presence of a
+certificate id is not covering proof.
 
 ## 2–5 workstreams
 

@@ -30,6 +30,12 @@ cargo clippy --workspace -- -D warnings
 cargo test --workspace --offline
 ```
 
+`cargo xtask ci` runs the tests and clippy, then the schema probes in
+`conformance/`, the site check, and the JavaScript tests when Node is
+installed. The probes need [uv](https://docs.astral.sh/uv/): `uv run`
+installs the Python version and packages that `pyproject.toml` and
+`uv.lock` pin.
+
 Do not weaken no-false-determinacy to make a test pass.
 
 ## Website

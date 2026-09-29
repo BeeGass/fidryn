@@ -37,7 +37,7 @@ Never edit generated files by hand; the next run overwrites them.
 ## Preview
 
 ```bash
-python3 .agents/scripts/shoot.py serve   # http://127.0.0.1:8752 with clean URLs
+uv run python .agents/scripts/shoot.py serve   # http://127.0.0.1:8752 with clean URLs
 ```
 
 ## Deploy

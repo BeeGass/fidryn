@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validate Fidryn case records and manifests against the supplied schemas.
 
-Requires: python -m pip install jsonschema (preferred). Falls back to a
+Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
-Usage: python check_json_contracts.py [root] --output validation.json
+Usage: uv run python conformance/check_json_contracts.py [root] --output validation.json
 Exit codes: 0 all checked documents valid; 1 validation failures; 2 setup/read error.
 This does not validate artifact authenticity, Rust output, or legal content.
 """

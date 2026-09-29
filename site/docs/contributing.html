@@ -120,6 +120,11 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt
 <span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
 <span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
+<p><code>cargo xtask ci</code> runs the tests and clippy, then the schema probes in
+<code>conformance/</code>, the site check, and the JavaScript tests when Node is
+installed. The probes need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code>
+installs the Python version and packages that <code>pyproject.toml</code> and
+<code>uv.lock</code> pin.</p>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
 <h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
 <p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides

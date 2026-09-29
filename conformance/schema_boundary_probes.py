@@ -5,7 +5,7 @@ Does not execute Rust. Prefers jsonschema + referencing when installed.
 Without those packages, uses a local Draft 2020-12 subset (no network).
 Reports observed acceptance, not semantic verification of an evaluation.
 
-Usage: python3 conformance/schema_boundary_probes.py [/path/to/fidryn]
+Usage: uv run python conformance/schema_boundary_probes.py [/path/to/fidryn]
 """
 
 from __future__ import annotations

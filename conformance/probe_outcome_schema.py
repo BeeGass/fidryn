@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Demonstrate underconstrained outcome schemas. No Rust execution involved.
 
-Usage: python3 conformance/probe_outcome_schema.py [/path/to/fidryn]
+Usage: uv run python conformance/probe_outcome_schema.py [/path/to/fidryn]
 Requires jsonschema.
 
-Cargo tests do not invoke this script; Python is optional for schema probes.
+Cargo tests do not invoke this script; `cargo xtask ci` runs it through uv.
 Once schemas/outcome-v0.1.json is strengthened, all three
 accepted_by_current_schema entries should be false.
 """
