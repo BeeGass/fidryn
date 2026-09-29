@@ -261,7 +261,7 @@
 
   // Only same-site paths from the index become links.
   function isSitePath(url) {
-    return typeof url === "string" && url.charAt(0) === "/" && url.charAt(1) !== "/";
+    return typeof url === "string" && /^\/(?![\/\\])/.test(url) && !/[\t\n\r]/.test(url);
   }
 
   function span(className, text) {
