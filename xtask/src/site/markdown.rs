@@ -29,7 +29,7 @@ pub struct Section {
     pub number: String,
     pub id: String,
     pub heading: String,
-    /// The first 200 characters of the section's text.
+    /// The first 300 characters of the section's text.
     pub text: String,
 }
 
@@ -38,7 +38,7 @@ pub struct Section {
 pub struct Page {
     /// The first `h1`, which is not part of `body`.
     pub title: String,
-    /// The first 200 characters of the text before the first `h2`/`h3`.
+    /// The first 300 characters of the text before the first `h2`/`h3`.
     pub lead: String,
     pub body: String,
     pub toc: Vec<TocEntry>,
@@ -50,7 +50,7 @@ const TABLE_WRAP: &str =
     "<div class=\"table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Table\">";
 
 /// Length of `Page::lead` and `Section::text`, in characters.
-const SUMMARY_CHARS: usize = 200;
+const SUMMARY_CHARS: usize = 300;
 
 /// Render one guide. `guide_number` numbers its `h2`/`h3` headings (`6.1`,
 /// `6.1.2`); `None`, for the overview, leaves them unnumbered. An `h3`
@@ -315,7 +315,7 @@ fn collapse(text: &str) -> String {
     text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-/// The first 200 characters of `text` after collapsing whitespace, cut at a
+/// The first 300 characters of `text` after collapsing whitespace, cut at a
 /// character boundary, without a trailing space.
 fn summary(text: &str) -> String {
     let collapsed = collapse(text);
@@ -585,13 +585,13 @@ mod tests {
     }
 
     #[test]
-    fn summaries_stop_at_200_characters_on_a_char_boundary() {
-        let long = format!("{} {}", "é".repeat(150), "x".repeat(100));
+    fn summaries_stop_at_300_characters_on_a_char_boundary() {
+        let long = format!("{} {}", "é".repeat(250), "x".repeat(100));
         let p = page(&format!("# T\n\n{long}\n"), None);
-        assert_eq!(p.lead.chars().count(), 200);
-        assert_eq!(p.lead, format!("{} {}", "é".repeat(150), "x".repeat(49)));
-        let p = page(&format!("# T\n\n{} tail\n", "a".repeat(199)), None);
-        assert_eq!(p.lead, "a".repeat(199), "no trailing space");
+        assert_eq!(p.lead.chars().count(), 300);
+        assert_eq!(p.lead, format!("{} {}", "é".repeat(250), "x".repeat(49)));
+        let p = page(&format!("# T\n\n{} tail\n", "a".repeat(299)), None);
+        assert_eq!(p.lead, "a".repeat(299), "no trailing space");
     }
 
     #[test]
