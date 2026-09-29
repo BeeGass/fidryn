@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,21 +19,23 @@ env:
 jobs:
   ci:
     name: cargo xtask ci
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
       # rust-toolchain.toml pins the channel and its components.
       - name: Install the pinned Rust toolchain
-        run: rustup toolchain install
+        run: rustup toolchain install --no-self-update
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      # uv installs the Python in .python-version and the packages in uv.lock;
-      # the .venv it builds lives only on the runner.
+      # uv uses the Python that .python-version names (downloading it if the runner lacks it) and the packages uv.lock pins; the .venv it builds lives only on the runner.
       - uses: astral-sh/setup-uv@v6
         with:
+          version: "0.11.8"
           enable-cache: true
           cache-dependency-glob: uv.lock
 
