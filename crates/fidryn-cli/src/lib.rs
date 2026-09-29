@@ -1,5 +1,6 @@
 //! Fidryn command-line toolchain.
 
+pub mod opinion;
 pub mod ui;
 
 use clap::{Parser, Subcommand};
