@@ -11,3 +11,7 @@
 !.agents/scratchpad/README.md
 .agents/memory/sessions/**
 !.agents/memory/sessions/.gitkeep
+
+# Python: the uv-managed environment and bytecode
+.venv/
+__pycache__/

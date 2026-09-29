@@ -1,0 +1,26 @@
+[project]
+name = "fidryn-tools"
+version = "0.0.0"
+description = "Python tooling for the Fidryn repository: the conformance schema probes and agent scripts."
+requires-python = ">=3.12"
+dependencies = [
+    "jsonschema>=4.23",
+    "referencing>=0.35",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true

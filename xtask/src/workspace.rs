@@ -96,6 +96,17 @@ pub fn run_command(mut cmd: Command) -> Result<()> {
     check_status(&status)
 }
 
+/// `uv run --locked python <script> <root>`, from `root`: the probes run on the
+/// Python version and packages that `pyproject.toml` and `uv.lock` pin.
+fn schema_probe_command(root: &Path, script: &Path) -> Command {
+    let mut cmd = Command::new("uv");
+    cmd.current_dir(root);
+    cmd.args(["run", "--locked", "python"]);
+    cmd.arg(script);
+    cmd.arg(root);
+    cmd
+}
+
 pub fn run_schema_probes() -> Result<()> {
     let root = workspace_root();
     let mut ran_any = false;
@@ -105,11 +116,7 @@ pub fn run_schema_probes() -> Result<()> {
             continue;
         }
         ran_any = true;
-        let mut cmd = Command::new("python3");
-        cmd.current_dir(&root);
-        cmd.arg(&script);
-        cmd.arg(&root);
-        run_command(cmd)?;
+        run_command(schema_probe_command(&root, &script))?;
     }
     if !ran_any {
         eprintln!("no schema probe scripts present; skipping");
@@ -193,9 +200,10 @@ fn quote_os(arg: &OsStr) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::js_test_files;
+    use super::{js_test_files, schema_probe_command};
+    use std::ffi::OsStr;
     use std::fs;
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
 
     /// A fresh directory under the system temp dir for one test.
     fn scratch(name: &str) -> PathBuf {
@@ -233,5 +241,25 @@ mod tests {
         let files = js_test_files(&root).expect("list tests");
         fs::remove_dir_all(&root).expect("remove scratch dir");
         assert!(files.is_empty(), "{files:?}");
+    }
+
+    #[test]
+    fn schema_probes_run_through_uv_on_the_locked_project() {
+        let root = Path::new("/repo");
+        let script = root.join("conformance/probe_outcome_schema.py");
+        let cmd = schema_probe_command(root, &script);
+        assert_eq!(cmd.get_program(), "uv");
+        let args: Vec<&OsStr> = cmd.get_args().collect();
+        assert_eq!(
+            args,
+            [
+                OsStr::new("run"),
+                OsStr::new("--locked"),
+                OsStr::new("python"),
+                script.as_os_str(),
+                root.as_os_str(),
+            ]
+        );
+        assert_eq!(cmd.get_current_dir(), Some(root));
     }
 }
