@@ -6,6 +6,7 @@ mod html;
 mod links;
 mod markdown;
 mod pages;
+mod search;
 mod seo;
 mod specimen;
 mod templates;
@@ -66,11 +67,48 @@ pub fn check(root: &Path) -> Result<()> {
 }
 
 /// Render every generated file. Reads inputs under `root`; writes nothing.
-pub fn build(_root: &Path) -> Result<Vec<OutFile>> {
-    Ok(vec![
-        OutFile::text("robots.txt", seo::robots()),
+pub fn build(root: &Path) -> Result<Vec<OutFile>> {
+    let kw = highlight::Keywords::load(root)?;
+    let assets = pages::Assets::read(root)?;
+    let runs = specimen::runs(root, &kw)?;
+    let mut sources = Vec::with_capacity(guides::GUIDES.len());
+    for guide in guides::GUIDES {
+        let path = root.join("docs").join(guide.file);
+        let md = fs::read_to_string(&path).with_context(|| format!("read {}", path.display()))?;
+        let page = markdown::render(&md, guide.number, &kw);
+        sources.push((guide, md, page));
+    }
+
+    let mut files = vec![
+        OutFile::text("index.html", pages::landing(&runs, &assets)),
+        OutFile::text("index.md", seo::landing_markdown()),
+        OutFile::text("404.html", pages::not_found(&assets)),
+    ];
+    let mut mirrors = Vec::with_capacity(sources.len());
+    for (guide, md, page) in &sources {
+        let mirror = seo::mirror(guide, md);
+        files.push(OutFile::text(
+            format!("docs/{}.html", guide.slug),
+            pages::doc(guide, page, &assets),
+        ));
+        files.push(OutFile::text(
+            format!("docs/{}.md", guide.slug),
+            mirror.clone(),
+        ));
+        mirrors.push((*guide, mirror));
+    }
+    let indexed: Vec<_> = sources
+        .iter()
+        .map(|(guide, _, page)| (*guide, page))
+        .collect();
+    files.extend([
+        OutFile::text("search-index.json", search::index(&indexed)),
         OutFile::text("sitemap.xml", seo::sitemap()),
-    ])
+        OutFile::text("robots.txt", seo::robots()),
+        OutFile::text("llms.txt", seo::llms_txt()),
+        OutFile::text("llms-full.txt", seo::llms_full(&mirrors)),
+    ]);
+    Ok(files)
 }
 
 /// Generated files that are missing or differ on disk, then files under
@@ -195,5 +233,75 @@ mod tests {
         write_files(&site, &files).unwrap();
         assert!(stale_files(&site, &files).unwrap().is_empty());
         fs::remove_dir_all(&site).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod build_tests {
+    use super::*;
+
+    #[test]
+    fn build_writes_exactly_the_site_files() {
+        let files = build(&workspace_root()).expect("build");
+        let mut got: Vec<String> = files.iter().map(|f| f.path.display().to_string()).collect();
+        got.sort();
+        let mut want: Vec<String> = [
+            "index.html",
+            "index.md",
+            "404.html",
+            "search-index.json",
+            "sitemap.xml",
+            "robots.txt",
+            "llms.txt",
+            "llms-full.txt",
+        ]
+        .iter()
+        .map(|s| (*s).to_owned())
+        .collect();
+        for guide in guides::GUIDES {
+            want.push(format!("docs/{}.html", guide.slug));
+            want.push(format!("docs/{}.md", guide.slug));
+        }
+        want.sort();
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn two_builds_are_byte_identical() {
+        let root = workspace_root();
+        assert!(build(&root).expect("first build") == build(&root).expect("second build"));
+    }
+
+    #[test]
+    fn every_mirror_is_in_llms_full_and_every_page_has_a_mirror_link() {
+        let files = build(&workspace_root()).expect("build");
+        let text = |path: &str| {
+            let file = files
+                .iter()
+                .find(|f| f.path == Path::new(path))
+                .unwrap_or_else(|| panic!("{path}"));
+            String::from_utf8(file.bytes.clone()).expect("utf-8")
+        };
+        let full = text("llms-full.txt");
+        for guide in guides::GUIDES {
+            let mirror = text(&format!("docs/{}.md", guide.slug));
+            assert!(mirror.starts_with("---\ntitle: "), "{}", guide.slug);
+            assert_eq!(
+                mirror.matches("\n> Canonical HTML: ").count(),
+                1,
+                "{}",
+                guide.slug
+            );
+            assert!(
+                full.contains(&mirror),
+                "{} mirror missing from llms-full.txt",
+                guide.slug
+            );
+            let html = text(&format!("docs/{}.html", guide.slug));
+            assert!(html.contains(&format!(
+                "<a href=\"/docs/{}.md\">View as Markdown</a>",
+                guide.slug
+            )));
+        }
     }
 }

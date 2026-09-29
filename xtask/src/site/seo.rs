@@ -1,7 +1,8 @@
 //! Files for search engines and agents.
 
-use super::guides::{GUIDES, SITE, url};
+use super::guides::{GUIDES, Guide, SITE, url};
 use super::html::esc;
+use super::links::rewrite_markdown_links;
 
 /// `robots.txt`: allow everything and point at the sitemap and the llms maps.
 pub fn robots() -> String {
@@ -121,6 +122,158 @@ pub fn head(
         "<script type=\"application/ld+json\">{json}</script>"
     ));
     lines.join("\n")
+}
+
+/// The markdown mirror of a guide (`site/docs/{slug}.md`): front matter, a
+/// note naming the canonical HTML page, then the source with every link
+/// made absolute.
+pub fn mirror(guide: &Guide, md: &str) -> String {
+    let html = format!("{SITE}{}", url(guide.slug));
+    format!(
+        "{}> Canonical HTML: {html}\n> This markdown mirror is for agents and plain-text readers.\n\n{}\n",
+        front_matter(
+            guide.title,
+            guide.description,
+            &html,
+            &format!("{SITE}/docs/{}.md", guide.slug)
+        ),
+        rewrite_markdown_links(md).trim_end()
+    )
+}
+
+/// `site/index.md`: the landing page as markdown.
+pub fn landing_markdown() -> String {
+    let mut docs = String::new();
+    for g in GUIDES {
+        let (label, file) = if g.number.is_some() {
+            (g.title, format!("{}.md", g.slug))
+        } else {
+            ("Docs hub", "docs/index.md".to_owned())
+        };
+        docs.push_str(&format!(
+            "- [{label}]({SITE}{}) · [{file}]({SITE}/docs/{}.md)\n",
+            url(g.slug),
+            g.slug
+        ));
+    }
+    format!(
+        concat!(
+            "{front}",
+            "# Fidryn (FID-rin)\n\n",
+            "Fidryn is a **programming language for legal instruments**: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority, discretion, or ambiguity inside a Boolean.\n\n",
+            "**Research fixture.** Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction's law.\n\n",
+            "## What it is\n\n",
+            "- Source files use the `.fr` extension.\n",
+            "- You write modules, queries, and duties; the reference interpreter checks them and evaluates queries against case records.\n",
+            "- It never invents a completion when the model still has open branches.\n",
+            "- Determinate results only when invariant across every still-admissible resolution — or a competent authority has already determined them.\n\n",
+            "## Install\n\n",
+            "```bash\ncargo install --git https://github.com/BeeGass/fidryn --locked\n```\n\n",
+            "Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `127.0.0.1:8751`). This public site does **not** expose live filing or the mill API.\n\n",
+            "## Documentation\n\n",
+            "{docs}\n",
+            "## Agent maps\n\n",
+            "- [llms.txt]({site}/llms.txt)\n",
+            "- [llms-full.txt]({site}/llms-full.txt)\n",
+            "- [sitemap.xml]({site}/sitemap.xml)\n\n",
+            "## Source\n\n",
+            "https://github.com/BeeGass/fidryn\n",
+        ),
+        front = front_matter(
+            LANDING_TITLE,
+            LANDING_DESCRIPTION,
+            &format!("{SITE}/"),
+            &format!("{SITE}/index.md")
+        ),
+        docs = docs,
+        site = SITE,
+    )
+}
+
+/// `site/llms.txt`: the curated map of public pages for agents.
+pub fn llms_txt() -> String {
+    let mut guides = String::new();
+    for g in GUIDES.iter().filter(|g| g.number.is_some()) {
+        guides.push_str(&format!(
+            "- [{}]({SITE}/docs/{}.md): {}\n  - HTML: {SITE}{}\n",
+            g.title,
+            g.slug,
+            g.description,
+            url(g.slug)
+        ));
+    }
+    format!(
+        concat!(
+            "# Fidryn\n\n",
+            "> {description}\n\n",
+            "This file follows the llms.txt convention: a curated map of public pages, with clean markdown mirrors for agents.\n",
+            "Human-facing HTML is unchanged; prefer `text/markdown` URLs below when you need the full text.\n\n",
+            "Site: {site}\n",
+            "Full corpus: {site}/llms-full.txt\n",
+            "Source: https://github.com/BeeGass/fidryn\n\n",
+            "## Primary pages\n\n",
+            "- [Home]({site}/): Overview — programming language for legal instruments\n",
+            "  - Markdown: {site}/index.md\n",
+            "- [Docs hub]({site}/docs/): Learner documentation index\n",
+            "  - Markdown: {site}/docs/index.md\n\n",
+            "## Learner guides\n\n",
+            "{guides}\n",
+            "## Notes for agents\n\n",
+            "- Research fixture — not legal advice.\n",
+            "- Per-page markdown mirrors use the `.md` suffix and `Content-Type: text/markdown`.\n",
+            "- HTML pages advertise the mirror via `rel=alternate` / `type=text/markdown`.\n",
+            "- The local mill (`fidryn ui`) binds loopback only and is not exposed on this site.\n",
+        ),
+        description = LANDING_DESCRIPTION,
+        site = SITE,
+        guides = guides,
+    )
+}
+
+/// `site/llms-full.txt`: a header, the guide index, then every mirror in
+/// full, each under a banner naming its URL.
+pub fn llms_full(mirrors: &[(&Guide, String)]) -> String {
+    let mut out = format!(
+        concat!(
+            "# Fidryn — full public documentation corpus\n\n",
+            "Source: {site}\n",
+            "Prefer per-page .md URLs from {site}/llms.txt when possible.\n\n",
+            "Research fixture — not legal advice.\n\n",
+            "---\n\n",
+            "## Guide index\n\n",
+            "| Guide | HTML | Markdown |\n",
+            "| --- | --- | --- |\n",
+            "| Home | {site}/ | {site}/index.md |\n",
+        ),
+        site = SITE
+    );
+    for (g, _) in mirrors {
+        out.push_str(&format!(
+            "| {} | {SITE}{} | {SITE}/docs/{}.md |\n",
+            g.title,
+            url(g.slug),
+            g.slug
+        ));
+    }
+    for (g, mirror) in mirrors {
+        out.push_str(&format!(
+            "\n========== {SITE}/docs/{}.md ==========\n\n{mirror}",
+            g.slug
+        ));
+    }
+    out
+}
+
+/// YAML front matter in the fixed key order the mirrors have always used.
+fn front_matter(title: &str, description: &str, url: &str, markdown: &str) -> String {
+    let quote = |s: &str| format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\""));
+    format!(
+        "---\ntitle: {}\ndescription: {}\nurl: {}\nmarkdown: {}\nauthor: \"Bryan Gass\"\n---\n\n",
+        quote(title),
+        quote(description),
+        quote(url),
+        quote(markdown)
+    )
 }
 
 #[cfg(test)]
@@ -271,5 +424,145 @@ mod head_tests {
         assert!(
             head.contains("<meta property=\"og:title\" content=\"A &lt;/script&gt;&lt;b&gt;\">")
         );
+    }
+}
+
+#[cfg(test)]
+mod corpus_tests {
+    use super::*;
+
+    fn guide(slug: &str) -> &'static Guide {
+        GUIDES.iter().find(|g| g.slug == slug).expect("guide")
+    }
+
+    /// Every `](target)` link target in markdown text.
+    fn link_targets(md: &str) -> Vec<&str> {
+        md.match_indices("](")
+            .filter_map(|(i, _)| {
+                let rest = &md[i + 2..];
+                rest.find(')').map(|end| &rest[..end])
+            })
+            .collect()
+    }
+
+    #[test]
+    fn mirror_has_front_matter_note_and_absolute_links() {
+        let md = "# Outcomes\n\nSee [CLI](cli.md), [the kinds](#outcome-kinds), [the overview](README.md), and [the schema](../schemas/outcome-v0.1.json).\n";
+        let text = mirror(guide("outcomes"), md);
+        assert!(text.starts_with(concat!(
+            "---\n",
+            "title: \"Outcomes\"\n",
+            "description: \"Determinate, Suspended, Contingent, and the rest of the Fidryn outcome envelope.\"\n",
+            "url: \"https://fidryn.onlygass.dev/docs/outcomes\"\n",
+            "markdown: \"https://fidryn.onlygass.dev/docs/outcomes.md\"\n",
+            "author: \"Bryan Gass\"\n",
+            "---\n",
+            "\n",
+            "> Canonical HTML: https://fidryn.onlygass.dev/docs/outcomes\n",
+            "> This markdown mirror is for agents and plain-text readers.\n",
+            "\n",
+            "# Outcomes\n",
+        )));
+        assert!(text.ends_with(".json).\n") && !text.ends_with("\n\n"));
+        let targets = link_targets(&text);
+        assert_eq!(targets.len(), 4, "{targets:?}");
+        for target in targets {
+            assert!(
+                target.starts_with("https://") || target.starts_with('#'),
+                "relative link left in the mirror: {target}"
+            );
+        }
+        assert!(
+            text.contains(
+                "](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json)"
+            )
+        );
+
+        let overview = mirror(guide("index"), "# Fidryn documentation\n");
+        assert!(overview.contains("url: \"https://fidryn.onlygass.dev/docs/\"\n"));
+        assert!(overview.contains("markdown: \"https://fidryn.onlygass.dev/docs/index.md\"\n"));
+    }
+
+    #[test]
+    fn landing_markdown_keeps_its_sections_and_lists_every_guide() {
+        let md = landing_markdown();
+        assert!(md.starts_with(
+            "---\ntitle: \"Fidryn — a programming language for legal instruments\"\n"
+        ));
+        assert!(md.contains("url: \"https://fidryn.onlygass.dev/\"\nmarkdown: \"https://fidryn.onlygass.dev/index.md\"\n"));
+        for heading in [
+            "# Fidryn (FID-rin)",
+            "## What it is",
+            "## Install",
+            "## Documentation",
+            "## Agent maps",
+            "## Source",
+        ] {
+            assert!(md.contains(&format!("\n{heading}\n")), "missing {heading}");
+        }
+        assert!(md.contains(
+            "- [Docs hub](https://fidryn.onlygass.dev/docs/) · [docs/index.md](https://fidryn.onlygass.dev/docs/index.md)\n"
+        ));
+        assert!(md.contains(
+            "- [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time) · [cases-and-time.md](https://fidryn.onlygass.dev/docs/cases-and-time.md)\n"
+        ));
+        let listed = md.matches("](https://fidryn.onlygass.dev/docs/").count();
+        assert_eq!(listed, 2 * GUIDES.len());
+        assert!(md.ends_with("## Source\n\nhttps://github.com/BeeGass/fidryn\n"));
+    }
+
+    #[test]
+    fn llms_txt_lists_every_guide_with_html_and_markdown_urls() {
+        let txt = llms_txt();
+        assert!(txt.starts_with(&format!("# Fidryn\n\n> {LANDING_DESCRIPTION}\n\n")));
+        assert!(txt.contains(&format!(
+            "- [Docs hub]({SITE}/docs/): Learner documentation index\n  - Markdown: {SITE}/docs/index.md\n"
+        )));
+        let mut last = 0;
+        for g in GUIDES.iter().filter(|g| g.number.is_some()) {
+            let entry = format!(
+                "- [{}]({SITE}/docs/{}.md): {}\n  - HTML: {SITE}/docs/{}\n",
+                g.title, g.slug, g.description, g.slug
+            );
+            let at = txt
+                .find(&entry)
+                .unwrap_or_else(|| panic!("missing {}:\n{txt}", g.slug));
+            assert!(at > last, "{} out of order", g.slug);
+            last = at;
+        }
+        assert!(txt.ends_with("is not exposed on this site.\n"));
+    }
+
+    #[test]
+    fn llms_full_contains_the_index_and_every_mirror() {
+        let mirrors: Vec<(&Guide, String)> = GUIDES
+            .iter()
+            .map(|g| {
+                (
+                    g,
+                    mirror(g, &format!("# {}\n\nBody of {}.\n", g.title, g.slug)),
+                )
+            })
+            .collect();
+        let full = llms_full(&mirrors);
+        assert!(full.starts_with("# Fidryn — full public documentation corpus\n\n"));
+        assert!(full.contains(&format!("| Home | {SITE}/ | {SITE}/index.md |\n")));
+        for (g, text) in &mirrors {
+            assert!(full.contains(&format!(
+                "| {} | {SITE}{} | {SITE}/docs/{}.md |\n",
+                g.title,
+                url(g.slug),
+                g.slug
+            )));
+            assert!(
+                full.contains(&format!(
+                    "\n========== {SITE}/docs/{}.md ==========\n\n{text}",
+                    g.slug
+                )),
+                "{} mirror missing",
+                g.slug
+            );
+        }
+        assert!(full.ends_with("Body of contributing.\n"));
     }
 }
