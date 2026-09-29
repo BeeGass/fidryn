@@ -1356,6 +1356,9 @@
     } else {
       text = "Used by Render";
     }
+    var key = mood + "\n" + text + "\n" + (editorFocused ? "hint" : "");
+    if (key === bufferStatusKey) return;
+    bufferStatusKey = key;
     clear(el.bufferStatus);
     el.bufferStatus.appendChild(h("span", { className: "mill-status-main", text: text }));
     if (editorFocused) el.bufferStatus.appendChild(h("span", { className: "mill-status-hint", text: LEAVE_HINT }));
@@ -1616,7 +1619,7 @@
 
   /** Restore an entry's inputs, asking first when that would throw away the user's edits. */
   function askRestore(entry) {
-    if (!isDirty() || sameInputs(entry.inputs, snapshot())) {
+    if ((!isDirty() && state.template === entry.inputs.template) || sameInputs(entry.inputs, snapshot())) {
       restoreInputs(entry);
       return;
     }
@@ -1630,6 +1633,7 @@
   function focusRestore() {
     var button = el.resultBody.querySelector("[data-restore]");
     if (button) button.focus();
+    else el.run.focus();
   }
 
   // ------------------------------------------------------------------ result
@@ -1922,6 +1926,7 @@
   var pointerLine = 0;
   var editorFocused = false;
   var escaped = false;
+  var bufferStatusKey = "";
   var checkTimer = 0;
   var checkSeq = 0;
   var checkInFlight = false;
@@ -2197,7 +2202,7 @@
         networkDown();
       } else {
         serverAnswered();
-        if (source === state.module && diagnostics.version === version) noteDiagnostics(source, res.data);
+        if (res.status === 200 && source === state.module && diagnostics.version === version) noteDiagnostics(source, res.data);
       }
       updateBufferStatus();
     });
