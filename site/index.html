@@ -1,157 +1,345 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>Fidryn — a programming language for legal instruments</title>
-  <meta name="description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="author" content="Bryan Gass">
-  <link rel="canonical" href="https://fidryn.onlygass.dev/">
-  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/index.md" title="Markdown">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Fidryn">
-  <meta property="og:title" content="Fidryn — a programming language for legal instruments">
-  <meta property="og:description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
-  <meta property="og:url" content="https://fidryn.onlygass.dev/">
-  <meta property="og:locale" content="en_US">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Fidryn — a programming language for legal instruments">
-  <meta name="twitter:description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Fidryn","applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows","programmingLanguage":"Fidryn","url":"https://fidryn.onlygass.dev","downloadUrl":"https://github.com/BeeGass/fidryn","author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass","url":"https://onlygass.dev"},"description":"Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.","license":"https://github.com/BeeGass/fidryn/blob/main/LICENSE"}</script>
-  <link rel="stylesheet" href="/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fidryn — a programming language for legal instruments</title>
+<meta name="description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/index.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Fidryn — a programming language for legal instruments">
+<meta property="og:description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fidryn — a programming language for legal instruments">
+<meta name="twitter:description" content="Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Fidryn","applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows","programmingLanguage":"Fidryn","url":"https://fidryn.onlygass.dev","downloadUrl":"https://github.com/BeeGass/fidryn","author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass","url":"https://onlygass.dev"},"description":"Fidryn (FID-rin) is a programming language for legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority inside a Boolean. Research fixture — not legal advice.","license":"https://github.com/BeeGass/fidryn/blob/main/LICENSE"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=0b215e7a">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
 </head>
-<body>
-  <div class="wrap">
-    <header class="top">
-      <a class="mark" href="/">fidryn</a>
-      <nav class="nav">
-        <a href="/docs/">Docs</a>
-        <a href="#install">Install</a>
-        <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-      </nav>
-    </header>
-
-    <main class="hero">
-      <p class="eyebrow">Programming language · legal instruments</p>
-      <h1>Fidryn <span class="pronounce">(FID-rin)</span></h1>
-      <p class="lede">A language for encoding legal instruments: precise where law is mechanical, explicit where judgment enters, and incapable of hiding authority, discretion, or ambiguity inside a Boolean.</p>
-      <div class="privacy"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</div>
-      <div class="actions">
-        <a class="btn btn-primary" href="/docs/getting-started">Get started</a>
-        <a class="btn btn-ghost" href="/docs/">Docs</a>
-        <a class="btn btn-ghost" href="#install">Install</a>
-        <a class="btn btn-ghost" href="https://github.com/BeeGass/fidryn">GitHub</a>
-      </div>
-    </main>
-
-    <section>
-      <h2>What it is</h2>
-      <p class="section-lede">Fidryn is a programming language. Source files use the <code>.fr</code> extension. You write modules, queries, and duties; the reference interpreter checks them and evaluates queries against case records. It never invents a completion when the model still has open branches.</p>
-      <div class="grid">
-        <article class="card">
-          <h3>Instruments, not slogans</h3>
-          <p>Encode bounded slices of trusts, tax, and statute-shaped rules as checkable programs — with <code>outside_scope</code> named so omissions stay visible.</p>
-        </article>
-        <article class="card">
-          <h3>Honest outcomes</h3>
-          <p>Results are determinate only when invariant across every still-admissible resolution — or a competent authority has already determined them. Otherwise: suspended, contingent, or another named kind.</p>
-        </article>
-        <article class="card">
-          <h3>Local mill</h3>
-          <p><code>fidryn ui</code> binds loopback only (default <code>127.0.0.1:8751</code>). This public site does not expose live filing or the mill API.</p>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2>Why</h2>
-      <div class="grid">
-        <article class="card">
-          <h3>No false determinacy</h3>
-          <p>A determinate result only when it is invariant across every still-admissible resolution — or a competent authority has already determined it.</p>
-        </article>
-        <article class="card">
-          <h3>Open branches stay suspended</h3>
-          <p><code>run</code> never chooses a completion. Empty completion sets are not vacuous determinate answers. Open branches without a covering certificate stay <code>Suspended</code>.</p>
-        </article>
-        <article class="card">
-          <h3>Model boundary carried</h3>
-          <p>Every outcome carries the declared <code>modelBoundary</code> so omitted interpretations cannot silently shrink the model.</p>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2>Learn</h2>
-      <p class="section-lede">Start with an hour on the CLI, then the language map and outcome kinds. All of these pages are on this site.</p>
-      <div class="grid learn-grid">
-        <a class="card card-link" href="/docs/getting-started">
-          <h3>Getting started</h3>
-          <p>Build, <code>check</code>, and <code>run</code> a tiny <code>.fr</code> program.</p>
-        </a>
-        <a class="card card-link" href="/docs/language">
-          <h3>Language</h3>
-          <p>Modules, queries, rules, duties, and what Fidryn will not do.</p>
-        </a>
-        <a class="card card-link" href="/docs/cli">
-          <h3>CLI</h3>
-          <p>Every <code>fidryn</code> subcommand and flag the binary accepts.</p>
-        </a>
-        <a class="card card-link" href="/docs/outcomes">
-          <h3>Outcomes</h3>
-          <p>Determinate, Suspended, Contingent, and the rest of the envelope.</p>
-        </a>
-        <a class="card card-link" href="/docs/cases-and-time">
-          <h3>Cases &amp; time</h3>
-          <p>Case records, admissible completions, valid-at and known-at.</p>
-        </a>
-        <a class="card card-link" href="/docs/examples">
-          <h3>Examples</h3>
-          <p>Trust, tax, federal slices, and the fifty-state corpus map.</p>
-        </a>
-        <a class="card card-link" href="/docs/mill">
-          <h3>Mill</h3>
-          <p>Localhost UI on 127.0.0.1 — checks modules; does not live-file.</p>
-        </a>
-        <a class="card card-link" href="/docs/contributing">
-          <h3>Contributing</h3>
-          <p>Toolchain, tests, and how to work on the reference interpreter.</p>
-        </a>
-      </div>
-    </section>
-
-    <section id="install">
-      <h2>Install</h2>
-      <pre><code>cargo install --git https://github.com/BeeGass/fidryn --locked</code></pre>
-      <p class="note">Requires Rust 1.98+. Source files use the <code>.fr</code> extension. For a local checkout, <code>cargo install --path crates/fidryn-cli</code> works too.</p>
-      <pre class="follow-pre"><code>fidryn check examples/trust/bryan-revocable-trust.fr
-fidryn ui --no-open</code></pre>
-      <p class="note">Mill binds loopback only (default <code>http://127.0.0.1:8751</code>). It checks modules in the browser — it does not live-file. Prefer <a href="/docs/getting-started">Getting started</a> for the first-hour walkthrough.</p>
-    </section>
-
-    <section>
-      <h2>A taste of <code>.fr</code></h2>
-      <p class="section-lede">A minimal module with two queries. <code>q</code> requires true and returns 7; <code>r</code> requires false and stays suspended — the interpreter will not skip ahead to a later return.</p>
-      <pre><code>module Programs.RequireGate version "0.1.0" {
-    jurisdiction Test
-    source_snapshot "2026-09-17-require-gate"
-    effective_at 2026-09-17
-    recorded_at 2026-09-17T12:00:00Z
-
-    outside_scope { complete_instruments }
-
-    query q() -&gt; Int { require true; return 7 }
-    query r() -&gt; Int { require false; return 7 }
-}</code></pre>
-      <p class="note">Full walkthrough: <a href="/docs/getting-started">Getting started</a>. More fixtures: <a href="/docs/examples">Examples</a>.</p>
-    </section>
-
-    <footer class="footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="/docs/">docs</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://github.com/BeeGass/fidryn">source</a></span>
-    </footer>
+<body class="page-landing">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+  
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
   </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+    </ol>
+  </div>
+</nav>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-top">
+    <div>
+      <p class="eyebrow">A programming language for legal instruments</p>
+      <h1 id="hero-title">No false determinacy.</h1>
+    </div>
+    <div class="hero-side">
+      <p class="lede">Precise where law is mechanical. Explicit where judgment enters. Incapable of hiding authority, discretion, or ambiguity inside a Boolean.</p>
+      <div class="actions"><a class="btn pri" href="/docs/getting-started">Get started</a><a class="btn sec" href="/docs/">Read the docs</a></div>
+      <div class="cmd"><span class="prompt" aria-hidden="true">$</span><code>cargo install --git https://github.com/BeeGass/fidryn --locked</code><button type="button" class="copy" data-copy hidden>Copy</button></div>
+    </div>
+  </div>
+  <div class="specimen" data-specimen>
+  <div class="spec-tabs" role="tablist" aria-label="Real runs">
+    <button type="button" role="tab" id="tab-trust-open" aria-controls="run-trust-open" aria-selected="true">Trust, open eligibility <span class="stamp con">Contingent</span></button>
+    <button type="button" role="tab" id="tab-trust-court" aria-controls="run-trust-court" aria-selected="false" tabindex="-1">Trust, court selects I2 <span class="stamp det">Determinate</span></button>
+    <button type="button" role="tab" id="tab-gate-q" aria-controls="run-gate-q" aria-selected="false" tabindex="-1">require-gate, query q <span class="stamp det">Determinate</span></button>
+    <button type="button" role="tab" id="tab-gate-r" aria-controls="run-gate-r" aria-selected="false" tabindex="-1">require-gate, query r <span class="stamp sus">Suspended</span></button>
+  </div>
+  <div class="spec-panels">
+    <section class="spec-panel" id="run-trust-open" role="tabpanel" aria-labelledby="tab-trust-open">
+      <p class="spec-label">Trust, open eligibility</p>
+      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z</code></p>
+      <div class="steps">
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="47">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
+<span class="line" data-n="48">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="49">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="50">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
+<span class="line" data-n="51">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="52">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="53">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="54"></span>
+<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
+<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+<span class="line" data-n="57">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="58">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="59"></span>
+<span class="line" data-n="60">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
+<span class="line" data-n="61">          <span class="tk-kw">or</span> controlling_interpretation</span>
+<span class="line" data-n="62">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
+<span class="line" data-n="63">    <span class="tk-pu">}</span></span>
+<span class="line gap" data-n="">&hellip;</span>
+<span class="line" data-n="205">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="206">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
+<span class="line" data-n="207">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
+<span class="line" data-n="208">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="209">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
+<span class="line" data-n="210">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
+<span class="line" data-n="211">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="212">    <span class="tk-pu">}</span></span>
+</code></pre></figure></div>
+        <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>examples/trust/cases/two-certificates-open-eligibility.json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;module&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Examples.BryanRevocableTrust@0.1.0&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;facts&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;alice_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;bob_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
+  <span class="tk-pu">}</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;evidence&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;OccupancyRecord&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-1&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-2&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">]</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span> <span class="tk-st">&quot;I2&quot;</span><span class="tk-pu">]</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp con">Contingent</span><ul class="opinion"><li>acting_trustee depends on SuccessorEligibility.</li><li>Under I1 it is Alice.</li><li>Under I2 it is Bob.</li><li>No single answer is determinate across the admissible completions.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
+      </div>
+    </section>
+    <section class="spec-panel" id="run-trust-court" role="tabpanel" aria-labelledby="tab-trust-court">
+      <p class="spec-label">Trust, court selects I2</p>
+      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z</code></p>
+      <div class="steps">
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="47">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
+<span class="line" data-n="48">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="49">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="50">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
+<span class="line" data-n="51">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="52">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="53">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="54"></span>
+<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
+<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+<span class="line" data-n="57">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="58">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="59"></span>
+<span class="line" data-n="60">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
+<span class="line" data-n="61">          <span class="tk-kw">or</span> controlling_interpretation</span>
+<span class="line" data-n="62">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
+<span class="line" data-n="63">    <span class="tk-pu">}</span></span>
+<span class="line gap" data-n="">&hellip;</span>
+<span class="line" data-n="205">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="206">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
+<span class="line" data-n="207">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
+<span class="line" data-n="208">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="209">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
+<span class="line" data-n="210">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
+<span class="line" data-n="211">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="212">    <span class="tk-pu">}</span></span>
+</code></pre></figure></div>
+        <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>examples/trust/cases/court-selects-i2.json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;module&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Examples.BryanRevocableTrust@0.1.0&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;facts&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;alice_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;bob_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
+  <span class="tk-pu">}</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;evidence&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;OccupancyRecord&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-1&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-2&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">]</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;I2&quot;</span>
+  <span class="tk-pu">}</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span> <span class="tk-st">&quot;I2&quot;</span><span class="tk-pu">]</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>acting_trustee is Bob.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
+      </div>
+    </section>
+    <section class="spec-panel" id="run-gate-q" role="tabpanel" aria-labelledby="tab-gate-q">
+      <p class="spec-label">require-gate, query q</p>
+      <p class="spec-cmd"><code>fidryn run tests/programs/require-gate.fr --query q --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z</code></p>
+      <div class="steps">
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>tests/programs/require-gate.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="1"><span class="tk-kw">module</span> <span class="tk-ty">Programs</span><span class="tk-pu">.</span><span class="tk-ty">RequireGate</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;0.1.0&quot;</span> <span class="tk-pu">{</span></span>
+<span class="line" data-n="2">    <span class="tk-kw">jurisdiction</span> Test</span>
+<span class="line" data-n="3">    <span class="tk-kw">source_snapshot</span> <span class="tk-st">&quot;2026-09-17-require-gate&quot;</span></span>
+<span class="line" data-n="4">    <span class="tk-kw">effective_at</span> <span class="tk-nu">2026-09-17</span></span>
+<span class="line" data-n="5">    <span class="tk-kw">recorded_at</span> <span class="tk-nu">2026-09-17T12:00:00Z</span></span>
+<span class="line" data-n="6"></span>
+<span class="line" data-n="7">    <span class="tk-kw">outside_scope</span> <span class="tk-pu">{</span> complete_instruments <span class="tk-pu">}</span></span>
+<span class="line" data-n="8"></span>
+<span class="line" data-n="9">    <span class="tk-kw">query</span> q<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">true</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span></span>
+<span class="line" data-n="10">    <span class="tk-kw">query</span> r<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">false</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span></span>
+<span class="line" data-n="11"><span class="tk-pu">}</span></span>
+</code></pre></figure></div>
+        <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>empty case record</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>q is 7.</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
+      </div>
+    </section>
+    <section class="spec-panel" id="run-gate-r" role="tabpanel" aria-labelledby="tab-gate-r">
+      <p class="spec-label">require-gate, query r</p>
+      <p class="spec-cmd"><code>fidryn run tests/programs/require-gate.fr --query r --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z</code></p>
+      <div class="steps">
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>tests/programs/require-gate.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="1"><span class="tk-kw">module</span> <span class="tk-ty">Programs</span><span class="tk-pu">.</span><span class="tk-ty">RequireGate</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;0.1.0&quot;</span> <span class="tk-pu">{</span></span>
+<span class="line" data-n="2">    <span class="tk-kw">jurisdiction</span> Test</span>
+<span class="line" data-n="3">    <span class="tk-kw">source_snapshot</span> <span class="tk-st">&quot;2026-09-17-require-gate&quot;</span></span>
+<span class="line" data-n="4">    <span class="tk-kw">effective_at</span> <span class="tk-nu">2026-09-17</span></span>
+<span class="line" data-n="5">    <span class="tk-kw">recorded_at</span> <span class="tk-nu">2026-09-17T12:00:00Z</span></span>
+<span class="line" data-n="6"></span>
+<span class="line" data-n="7">    <span class="tk-kw">outside_scope</span> <span class="tk-pu">{</span> complete_instruments <span class="tk-pu">}</span></span>
+<span class="line" data-n="8"></span>
+<span class="line" data-n="9">    <span class="tk-kw">query</span> q<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">true</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span></span>
+<span class="line" data-n="10">    <span class="tk-kw">query</span> r<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">false</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span></span>
+<span class="line" data-n="11"><span class="tk-pu">}</span></span>
+</code></pre></figure></div>
+        <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>empty case record</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp sus">Suspended</span><ul class="opinion"><li>r is suspended.</li><li>Outstanding request: requirement failed (require).</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
+      </div>
+    </section>
+  </div>
+  <div class="spec-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+  <p class="spec-foot">Computed by the Fidryn interpreter when this page was built.</p>
+</div>
+</section>
+<aside class="note" aria-label="Research fixture"><p><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p></aside>
+<section class="band" aria-labelledby="what-it-is">
+  <h2 id="what-it-is"><span class="mark">&sect; 2 &mdash;</span> What it is</h2>
+  <div class="three">
+    <div><h3>Instruments, not slogans</h3><p>Bounded slices of trusts, tax, and statute-shaped rules as checkable programs, with <code>outside_scope</code> named so omissions stay visible.</p></div>
+    <div><h3>Honest outcomes</h3><p>Determinate only when invariant across every still-admissible resolution, or when a competent authority has already decided. Otherwise suspended, contingent, or another named kind.</p></div>
+    <div><h3>A local mill</h3><p><code>fidryn ui</code> binds 127.0.0.1 only. It checks, runs, explores, and renders modules. It never files.</p></div>
+  </div>
+</section>
+<section class="band" aria-labelledby="six-outcomes">
+  <h2 id="six-outcomes"><span class="mark">&sect; 3 &mdash;</span> Six honest outcomes</h2>
+  <p class="band-lede">A query answers with exactly one of six kinds, and every answer carries the declared <code>modelBoundary</code>. Each kind answers one question.</p>
+  <ol class="legend">
+    <li><p class="q">Is there one answer, invariant across every admissible completion, or already determined by a competent authority?</p><a class="stamp det" href="/docs/outcomes#determinate">Determinate</a></li>
+    <li><p class="q">Do still-admissible answers disagree?</p><a class="stamp con" href="/docs/outcomes#contingent">Contingent</a></li>
+    <li><p class="q">Does evaluation need a legal operation the case does not discharge, with no covering certificate?</p><a class="stamp sus" href="/docs/outcomes#suspended">Suspended</a></li>
+    <li><p class="q">Do staged effects disagree with no single applicable doctrine?</p><a class="stamp nc" href="/docs/outcomes#normconflict">NormConflict</a></li>
+    <li><p class="q">Does the case ask for something outside the declared model or the module&rsquo;s competence?</p><a class="stamp oc" href="/docs/outcomes#outsidecompetence">OutsideCompetence</a></li>
+    <li><p class="q">Can the admitted model not be satisfied?</p><a class="stamp inc" href="/docs/outcomes#inconsistent">Inconsistent</a></li>
+  </ol>
+</section>
+<section class="band" aria-labelledby="contents">
+  <h2 id="contents"><span class="mark">&sect; 4 &mdash;</span> Contents</h2>
+  <ol class="contents">
+  <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="lead" aria-hidden="true"></span><span class="d">Check and run a tiny module</span></a></li>
+  <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="lead" aria-hidden="true"></span><span class="d">Modules, queries, rules, duties</span></a></li>
+  <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="lead" aria-hidden="true"></span><span class="d">Records, valid-at, known-at</span></a></li>
+  <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="lead" aria-hidden="true"></span><span class="d">Every subcommand and flag</span></a></li>
+  <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="lead" aria-hidden="true"></span><span class="d">The localhost UI</span></a></li>
+  <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="lead" aria-hidden="true"></span><span class="d">The six kinds and the envelope</span></a></li>
+  <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="lead" aria-hidden="true"></span><span class="d">Trust, tax, fifty states</span></a></li>
+  <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="lead" aria-hidden="true"></span><span class="d">Toolchain, tests, commits</span></a></li>
+</ol>
+</section>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
 </body>
 </html>

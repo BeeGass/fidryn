@@ -22,12 +22,12 @@ Source: https://github.com/BeeGass/fidryn
   - HTML: https://fidryn.onlygass.dev/docs/getting-started
 - [Language](https://fidryn.onlygass.dev/docs/language.md): Fidryn language map: modules, queries, rules, duties, and what the language will not do.
   - HTML: https://fidryn.onlygass.dev/docs/language
+- [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md): Case records, admissible completions, valid-at and known-at in Fidryn.
+  - HTML: https://fidryn.onlygass.dev/docs/cases-and-time
 - [CLI](https://fidryn.onlygass.dev/docs/cli.md): Every fidryn CLI subcommand and flag the reference binary accepts.
   - HTML: https://fidryn.onlygass.dev/docs/cli
 - [Mill](https://fidryn.onlygass.dev/docs/mill.md): Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.
   - HTML: https://fidryn.onlygass.dev/docs/mill
-- [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md): Case records, admissible completions, valid-at and known-at in Fidryn.
-  - HTML: https://fidryn.onlygass.dev/docs/cases-and-time
 - [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md): Determinate, Suspended, Contingent, and the rest of the Fidryn outcome envelope.
   - HTML: https://fidryn.onlygass.dev/docs/outcomes
 - [Examples](https://fidryn.onlygass.dev/docs/examples.md): Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.

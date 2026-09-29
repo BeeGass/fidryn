@@ -1,3 +1,14 @@
+---
+title: "Cases and time"
+description: "Case records, admissible completions, valid-at and known-at in Fidryn."
+url: "https://fidryn.onlygass.dev/docs/cases-and-time"
+markdown: "https://fidryn.onlygass.dev/docs/cases-and-time.md"
+author: "Bryan Gass"
+---
+
+> Canonical HTML: https://fidryn.onlygass.dev/docs/cases-and-time
+> This markdown mirror is for agents and plain-text readers.
+
 # Cases and time
 
 This guide explains how to supply a case record to Fidryn. Fidryn is a
@@ -6,7 +17,7 @@ operative filing system, and not a statement of any jurisdiction's law.
 The JSON you write is a fixture for evaluation, not a court record.
 
 A case is a `fidryn.case-record/v0.1` document. The interchange schema is
-[`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json). Wire
+[`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json). Wire
 names are camelCase except where a nested type keeps its Rust field names
 (determinations use `recorded_at`).
 
@@ -16,10 +27,10 @@ else may be omitted and defaults to empty. The published schema lists
 `interpretations`, `decisions`, `closures`, `outsideScope`, and
 `admissibleCompletions`. The interpreter also reads `events` and
 `assumptions` when present; those fields are not yet in
-[`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json)
+[`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json)
 (`additionalProperties` is false there). Treat that published schema lag
 as an evidence gap in
-[implementation-status](implementation-status.md), not as CLI behavior.
+[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md), not as CLI behavior.
 
 ## Supplying a case
 
@@ -40,8 +51,29 @@ KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
 declared domains into `admissibleCompletions`. Successful `run` /
 `explore` stdout is `fidryn.evaluation-report/v0.1`.
 
-See [CLI](cli.md), the [language grammar](../grammar.ebnf), and
-[Outcomes](outcomes.md).
+See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf), and
+[Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
+
+## Assumptions and scenario evaluation
+
+`Assumption` rows are `{ "id": "...", "payload": ... }`. They are overlay
+hypotheses, not operative ledger events.
+
+- CLI `run` without `--scenario` is **operative**: `case.assumptions` are
+  ignored for evaluation.
+- CLI `run --scenario` applies those rows as a scenario overlay and labels
+  the report `executionMode: scenario` (assumptions are serialized on the
+  evaluation-report envelope).
+- Mill `/api/run` and `/api/explore` have no `--scenario` flag; a nonempty
+  `assumptions` array selects the scenario path automatically.
+
+The published interchange schema
+[`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json) does
+not yet list `events` or `assumptions` (`additionalProperties` is false).
+The interpreter still reads both when present. Treat that as schema lag /
+an implementation extension documented in
+[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md), not as proof that the
+fields are invalid at runtime.
 
 ## Record shape
 
@@ -196,7 +228,7 @@ Other tagged forms you may need:
 ```
 
 A bare `"Alice"` is a string, not an entity. A proposition is never a
-boolean; see [Outcomes](outcomes.md).
+boolean; see [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
 
 ## Authority grants and duty events
 
@@ -246,7 +278,7 @@ is a single RFC 3339 instant.
 ## Annotated example: court selects I2
 
 The fixture
-[`examples/trust/cases/court-selects-i2.json`](../examples/trust/cases/court-selects-i2.json)
+[`examples/trust/cases/court-selects-i2.json`](https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/court-selects-i2.json)
 is a complete case for `Examples.BryanRevocableTrust`. The module
 declares interpretation family `SuccessorEligibility` with alternatives
 I1 (Alice and Bob both eligible) and I2 (only Bob eligible). Two
@@ -312,14 +344,14 @@ What each part is doing:
 - `admissibleCompletions` is nonempty. The still-admissible worlds are
   exactly those two named alternatives, of which one has been chosen.
   Contrast
-  [`two-certificates-open-eligibility.json`](../examples/trust/cases/two-certificates-open-eligibility.json),
+  [`two-certificates-open-eligibility.json`](https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/two-certificates-open-eligibility.json),
   which has the same certificates and domain but no recorded
   interpretation: `run` stays suspended, `explore` is contingent between
   Alice and Bob.
 
 Against `acting_trustee` with `--valid-at` / `--known-at` at or after
 the observation times, both `run` and `explore` answer Bob. That
-agreement is not a general guarantee; see [Outcomes](outcomes.md).
+agreement is not a general guarantee; see [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
 
 ## Checklist
 

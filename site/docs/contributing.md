@@ -8,11 +8,12 @@ author: "Bryan Gass"
 
 > Canonical HTML: https://fidryn.onlygass.dev/docs/contributing
 > This markdown mirror is for agents and plain-text readers.
+
 # Contributing to Fidryn
 
 This file is for people building the v0.1 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
-the [README](../README.md) and the [documentation hub](README.md).
+the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 
 Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
@@ -21,13 +22,13 @@ instruments and not a complete statement of any jurisdiction's law.
 ## Toolchain
 
 Rust 1.98, edition 2024. Workspace `package.rust-version` is 1.98.
-[`rust-toolchain.toml`](../rust-toolchain.toml) pins the 1.98.1
+[`rust-toolchain.toml`](https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml) pins the 1.98.1
 channel and the `rustfmt` and `clippy` components.
 
 If `cargo` or `git` pick the wrong tools on this Mac, a working PATH is
 `/opt/homebrew/bin:$HOME/.cargo/bin:/usr/bin:/bin`, with
 `DEVELOPER_DIR=/Library/Developer/CommandLineTools`.
-[`.cargo/config.toml`](../.cargo/config.toml) already points the linker
+[`.cargo/config.toml`](https://github.com/BeeGass/fidryn/blob/main/.cargo/config.toml) already points the linker
 at Command Line Tools clang because the Xcode license is unsigned.
 
 ## Checks
@@ -61,7 +62,7 @@ depend on `fidryn-cli`.
 
 ## Crates
 
-Workspace members are listed in [`Cargo.toml`](../Cargo.toml).
+Workspace members are listed in [`Cargo.toml`](https://github.com/BeeGass/fidryn/blob/main/Cargo.toml).
 
 ```
 fidryn-syntax          lossless CST, parser, formatter
@@ -86,11 +87,11 @@ Tests live next to the crates they exercise (`#[cfg(test)]` in `src`,
 and `crates/<name>/tests/` when a crate has an integration kit).
 
 The adversarial review kit is
-[`tests/integration/adversarial_regressions.rs`](../tests/integration/adversarial_regressions.rs).
+[`tests/integration/adversarial_regressions.rs`](https://github.com/BeeGass/fidryn/blob/main/tests/integration/adversarial_regressions.rs).
 Those tests are regressions, not closure of the language.
 
-Independent programs live under [`tests/programs/`](../tests/programs/).
-[`crates/fidryn-verify/tests/domains.rs`](../crates/fidryn-verify/tests/domains.rs)
+Independent programs live under [`tests/programs/`](https://github.com/BeeGass/fidryn/tree/main/tests/programs/).
+[`crates/fidryn-verify/tests/domains.rs`](https://github.com/BeeGass/fidryn/blob/main/crates/fidryn-verify/tests/domains.rs)
 runs them as independently named modules. Do not rewrite compiled Core
 to green fingerprint tests. Patching a `CoreModule` so a digest, plan,
 or outcome matches is not a passing test.
@@ -103,7 +104,7 @@ then tests and docs. Do not dump unrelated crates into one commit.
 
 ## Grammar
 
-The closed v0.1 grammar is [`grammar.ebnf`](../grammar.ebnf) at the
+The closed v0.1 grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the
 repository root. Unknown body fields are parse errors, not extension
 points.
 
@@ -112,13 +113,13 @@ points.
 These files are crate contracts and evidence. They are not user
 tutorials.
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+- [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
+- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
+- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
+- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
+- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
 
-Mill HTTP routes are documented in [mill.md](mill.md), not in
+Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
 ARCHITECTURE.md.
 
 ## Not legal advice

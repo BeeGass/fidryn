@@ -30,6 +30,7 @@ pub fn run(args: CiArgs) -> Result<()> {
     run_command(clippy)?;
 
     run_schema_probes()?;
+    crate::site::check(&crate::workspace::workspace_root())?;
 
     run_js_tests()?;
     if workspace_has_benches(&metadata) {

@@ -21,17 +21,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://fidryn.onlygass.dev/docs/cases-and-time</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://fidryn.onlygass.dev/docs/cli</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fidryn.onlygass.dev/docs/mill</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fidryn.onlygass.dev/docs/cases-and-time</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

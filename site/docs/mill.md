@@ -8,6 +8,7 @@ author: "Bryan Gass"
 
 > Canonical HTML: https://fidryn.onlygass.dev/docs/mill
 > This markdown mirror is for agents and plain-text readers.
+
 # Fidryn mill
 
 The mill is a loopback-only web UI for checking, running, exploring, and
@@ -21,8 +22,8 @@ Default port is 8751. The process listens on `127.0.0.1` only. It never
 binds `0.0.0.0` or other interfaces. There is no filing route. Live
 filing is not available from the mill.
 
-See [getting started](getting-started.md) for a first module, and the
-[CLI](cli.md) for path-based `check` / `run` / `explore` / `render` /
+See [getting started](https://fidryn.onlygass.dev/docs/getting-started.md) for a first module, and the
+[CLI](https://fidryn.onlygass.dev/docs/cli.md) for path-based `check` / `run` / `explore` / `render` /
 `file`.
 
 ## Start
@@ -56,12 +57,27 @@ exits 1 with
 
 | Method | Path | Body | Success |
 | --- | --- | --- | --- |
-| `GET` | `/` | none | `web/index.html` (`text/html; charset=utf-8`) |
+| `GET` | `/` | none | `web/index.html` (`text/html; charset=utf-8`), with the security headers below |
+| `GET` | `/assets/fidryn.css` | none | `site/assets/fidryn.css`, the design system the site also uses (`text/css; charset=utf-8`) |
+| `GET` | `/favicon.svg` | none | `site/favicon.svg` (`image/svg+xml`) |
+| `GET` | `/fonts/{name}` | none | `fraunces.woff2`, `plex-sans.woff2`, `plex-mono-400.woff2`, or `plex-mono-500.woff2` from `site/fonts/` (`font/woff2`); any other name is 404 |
 | `GET` | `/api/health` | none | plain text `ok` |
+| `GET` | `/api/samples` | none | JSON array of the built-in samples, each `{id, title, blurb, source, case, query, validAt, knownAt, action, expect}` |
 | `POST` | `/api/check` | JSON `CheckRequest` | JSON `{ok, diagnostics}` |
-| `POST` | `/api/run` | JSON `EvalRequest` | `{ "ok": true, "report": <evaluation-report> }` |
+| `POST` | `/api/run` | JSON `EvalRequest` | `{ "ok": true, "report": <evaluation-report>, "opinion": [<sentence>, ...] }` |
 | `POST` | `/api/explore` | JSON `EvalRequest` | same transport as `/api/run` |
 | `POST` | `/api/render` | JSON `RenderRequest` | JSON `{ok, text?, error?}` |
+
+The page, stylesheet, favicon, fonts, and samples are compiled into the
+`fidryn` binary; the mill reads no files at runtime. The page,
+stylesheet, favicon, and fonts are sent with `Cache-Control: no-cache`.
+`GET /` also sends
+`Content-Security-Policy: default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`,
+`X-Content-Type-Options: nosniff`, and `Referrer-Policy: no-referrer`,
+so the browser runs no inline script or style on the page and will not
+show it inside a frame. In a sample, `source` and `case` are the text of
+a repository fixture (`case` is JSON text, not a parsed object), and
+`expect` is the outcome kind that `action` returns for it.
 
 There is no `POST /api/file`, `/api/filing`, `/api/submit`, or
 `/api/live`. Those paths return 404.
@@ -127,14 +143,19 @@ the same overlay.
 as CLI `--valid-at` and `--known-at`.
 
 On evaluation success, HTTP 200, and the body is a transport wrapper
-`{ "ok": true, "report": ... }`. `report` is the
+`{ "ok": true, "report": ..., "opinion": [...] }`
+(`schemas/mill-evaluation-response-v0.1.json`). `report` is the
 `fidryn.evaluation-report/v0.1` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`). `ok` is not a
-field of that report schema (`additionalProperties` is false). Nested
-`outcomeDocument` is the `fidryn.outcome/v0.1` projection. Pasted
-compile is `sourceTrust: unauthenticated`. `run` never chooses a
-completion.
+`verificationMethod`, `coverage`, `outcomeDocument`). `opinion` is the
+report read as plain sentences, for example
+`acting_trustee depends on SuccessorEligibility.` and
+`Under I1 it is Alice.` for a contingent trust run. Each sentence is a
+fixed template filled from report fields, so it never says more than
+the report does. `ok` and `opinion` are not fields of that report schema
+(`additionalProperties` is false). Nested `outcomeDocument` is the
+`fidryn.outcome/v0.1` projection. Pasted compile is
+`sourceTrust: unauthenticated`. `run` never chooses a completion.
 
 On check failure, HTTP 400:
 
@@ -183,7 +204,7 @@ not byte-authenticated. No `.fr` or manifest is written to disk.
 CLI `fidryn check PATH` (and `run` / `explore` / `verify` / `render` on a
 path) uses `Driver::check_path`. That authenticates hex import digests
 against files in the module directory. The digest `"fixture"` remains a
-test trust profile, not that byte check. Details are in [CLI](cli.md)
+test trust profile, not that byte check. Details are in [CLI](https://fidryn.onlygass.dev/docs/cli.md)
 under source checking and trust.
 
 CLI path compile loads the declared manifest and, for hex digests, hashes
@@ -195,7 +216,7 @@ gain filesystem access from paste.
 
 ## No live filing
 
-The mill does not call filing adapters. `fidryn file` on the [CLI](cli.md)
+The mill does not call filing adapters. `fidryn file` on the [CLI](https://fidryn.onlygass.dev/docs/cli.md)
 is the only submit path, and even there live HTTP needs `--live` and
 `FIDRYN_ALLOW_LIVE_FILING=1`. A transport receipt is still not `Filed`.
 The HTML page states that live filing is not available from the UI.
@@ -211,7 +232,7 @@ The HTML page states that live filing is not available from the UI.
    machine. This mill never files.”
 3. **Warning.** “Live filing is not available from the UI.”
 4. **Module source.** Textarea `source`, prefilled with a tiny
-   `Examples.T` module and query `q`. The page is a single column.
+   `Examples.T` module and query `q`.
 5. **Query.** Text input, default `q`.
 6. **Times.** `validAt` and `knownAt`, default `2033-01-01T00:00:00Z`.
 7. **Case JSON.** Textarea, default `{}`. Completions for Explore belong
@@ -240,5 +261,5 @@ request is sent.
 
 ## See also
 
-- [Getting started](getting-started.md)
-- [CLI](cli.md)
+- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
+- [CLI](https://fidryn.onlygass.dev/docs/cli.md)
