@@ -689,6 +689,7 @@ mod tests {
     #[test]
     fn value_text_orders_positional_fields_by_number() {
         let fields: Map<String, Value> = (0..11)
+            .rev()
             .map(|i| (format!("_{i}"), json!({"kind": "int", "data": i})))
             .collect();
         let value = json!({"kind": "ctor", "data": {"name": "Row", "fields": fields}});
