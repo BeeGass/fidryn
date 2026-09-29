@@ -2,6 +2,7 @@
 
 mod bench;
 mod ci;
+mod site;
 mod test;
 mod workspace;
 
@@ -28,6 +29,8 @@ enum Command {
     Bench(bench::BenchArgs),
     /// Workspace CI: tests, clippy -D warnings, schema probes
     Ci(ci::CiArgs),
+    /// Render the public site from docs/*.md (--check verifies the committed site)
+    Site(site::SiteArgs),
 }
 
 fn main() -> Result<()> {
@@ -35,5 +38,6 @@ fn main() -> Result<()> {
         Command::Test(args) => test::run(args),
         Command::Bench(args) => bench::run(args),
         Command::Ci(args) => ci::run(args),
+        Command::Site(args) => site::run(args),
     }
 }
