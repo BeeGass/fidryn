@@ -3,8 +3,10 @@
 //! The stylesheet declares its colors in three token blocks: the light
 //! `:root {` block, the explicit `:root[data-theme="dark"] {` block, and the
 //! same dark values inside `@media (prefers-color-scheme: dark)`. These tests
-//! parse those blocks and hold every text pair the site and the mill rely on
-//! to 4.5:1 in both themes.
+//! parse those blocks, hold every pair in `PAIRS` to 4.5:1 in both themes,
+//! and check that the dark blocks redefine every light color. Muted, status,
+//! and code-comment text never sits on `--paper-3`: in the light theme
+//! `--ink-3`, `--sus`, `--tok-com`, and `--tok-punct` fall below 4.5:1 there.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -25,6 +27,7 @@ const PAIRS: &[(&str, &str)] = &[
     ("--ink-3", "--paper"),
     ("--ink-3", "--paper-2"),
     ("--ink", "--paper-2"),
+    ("--ink", "--paper-3"),
     ("--rubric", "--paper"),
     ("--paper", "--ink"),
     ("--det", "--paper"),
@@ -201,6 +204,28 @@ fn explicit_dark_block_equals_system_dark_block() {
         normalize(b.dark),
         normalize(b.dark_system),
         "`{DARK}` and the `{DARK_SYSTEM}` block inside `{DARK_MEDIA}` must declare the same values"
+    );
+}
+
+#[test]
+fn dark_block_redefines_every_light_color() {
+    let css = stylesheet();
+    let b = blocks(&css);
+    let light = tokens(b.light);
+    let dark = tokens(b.dark);
+    let missing: Vec<&str> = light
+        .iter()
+        .filter(|(name, value)| value.starts_with('#') && !dark.contains_key(*name))
+        .map(|(name, _)| *name)
+        .collect();
+    let extra: Vec<&str> = dark
+        .keys()
+        .copied()
+        .filter(|name| !light.contains_key(name))
+        .collect();
+    assert!(
+        missing.is_empty() && extra.is_empty(),
+        "`{DARK}` must redefine every light color and nothing the light block lacks; missing {missing:?}, extra {extra:?}"
     );
 }
 
