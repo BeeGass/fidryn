@@ -250,3 +250,265 @@ test("postJson keeps a body that is not JSON as text", async () => {
   assert.deepEqual(result, { network: false, status: 500, data: null, text: "Internal Server Error" });
   assert.equal((await mill.postJson("/api/run", {}, answering(200, "7"))).data, null);
 });
+
+// ---------------------------------------------------------------- editor
+
+const fs = require("node:fs");
+const path = require("node:path");
+
+const ROOT = path.join(__dirname, "..", "..");
+const read = (rel) => fs.readFileSync(path.join(ROOT, rel), "utf8");
+
+// Node 18's test runner cannot report non-ASCII names or messages, so escape them.
+const show = (text) => JSON.stringify(text).replace(/[^\x20-\x7e]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+
+/** The class of the segment covering string index `index`. */
+function classAt(segments, index) {
+  let pos = 0;
+  for (const seg of segments) {
+    if (index < pos + seg.text.length) return seg.cls;
+    pos += seg.text.length;
+  }
+  throw new Error(`index ${index} is past the end`);
+}
+
+/** The class at the `nth` occurrence (from 0) of `needle` in `source`. */
+function classOf(segments, source, needle, nth = 0) {
+  let at = -1;
+  for (let k = 0; k <= nth; k++) {
+    at = source.indexOf(needle, at + 1);
+    assert.notEqual(at, -1, `${show(needle)} #${nth} not in source`);
+  }
+  return classAt(segments, at);
+}
+
+const joined = (segments) => segments.map((s) => s.text).join("");
+
+test("byteToIndex puts a span after section signs, accents, and astral characters on the right text", () => {
+  const source = [
+    "module Programs.RequireGate version \"0.1.0\" {",
+    "    // § 4.4 é 𝔽 notes",
+    "    jurisdiction Test",
+    "    colour blue",
+    "    query q() -> Int { require \"§é𝔽\" == \"x\"; return 7 }",
+    "    colour red",
+    "}",
+    ""
+  ].join("\n");
+  const first = source.indexOf("colour");
+  const second = source.indexOf("colour", first + 1);
+  for (const index of [first, second]) {
+    const byte = Buffer.byteLength(source.slice(0, index), "utf8");
+    assert.notEqual(byte, index);
+    assert.equal(mill.byteToIndex(source, byte), index);
+    assert.equal(source.slice(mill.byteToIndex(source, byte), mill.byteToIndex(source, byte + 6)), "colour");
+  }
+});
+
+test("byteToIndex counts 2-, 2-, and 4-byte characters exactly", () => {
+  assert.equal(mill.byteToIndex("§x", 2), 1);
+  assert.equal(mill.byteToIndex("éx", 2), 1);
+  assert.equal(mill.byteToIndex("𝔽x", 4), 2);
+  assert.equal(mill.byteToIndex("a𝔽b", 5), 3);
+  assert.equal(mill.byteToIndex("\"§é𝔽\"", 1 + 2 + 2 + 4), 5);
+  let bytes = 0;
+  const text = "a§é𝔽\n// 𝔽§\nz";
+  for (let i = 0; i < text.length; ) {
+    assert.equal(mill.byteToIndex(text, bytes), i, `byte ${bytes}`);
+    const cp = text.codePointAt(i);
+    bytes += Buffer.byteLength(String.fromCodePoint(cp), "utf8");
+    i += cp > 0xffff ? 2 : 1;
+  }
+  assert.equal(mill.byteToIndex(text, bytes), text.length);
+});
+
+test("byteToIndex clamps offsets inside a character, past the end, and below zero", () => {
+  assert.equal(mill.byteToIndex("𝔽", 2), 0);
+  assert.equal(mill.byteToIndex("é", 1), 0);
+  assert.equal(mill.byteToIndex("abc", 99), 3);
+  assert.equal(mill.byteToIndex("abc", -1), 0);
+  assert.equal(mill.byteToIndex("", 0), 0);
+});
+
+test("lineCol counts lines and characters from 1", () => {
+  const text = "a§\n𝔽é colour\n";
+  assert.deepEqual(mill.lineCol(text, 0), { line: 1, col: 1 });
+  assert.deepEqual(mill.lineCol(text, 2), { line: 1, col: 3 });
+  assert.deepEqual(mill.lineCol(text, text.indexOf("colour")), { line: 2, col: 4 });
+  assert.deepEqual(mill.lineCol(text, text.length), { line: 3, col: 1 });
+  assert.deepEqual(mill.lineCol(text, 999), { line: 3, col: 1 });
+});
+
+test("tokenizeFr gives back every sample module exactly", () => {
+  for (const rel of [
+    "tests/programs/require-gate.fr",
+    "tests/programs/late-payment.fr",
+    "examples/trust/bryan-revocable-trust.fr"
+  ]) {
+    const source = read(rel);
+    assert.equal(joined(mill.tokenizeFr(source)), source, rel);
+  }
+  for (const odd of ["", "\"unterminated", "// only a comment", "x § é 𝔽 @ # $", "\"esc \\\" still\" 𝔽", "12026-01-01 2026-9 0..1"]) {
+    assert.equal(joined(mill.tokenizeFr(odd)), odd, show(odd));
+  }
+});
+
+test("tokenizeFr classes keywords, types, strings, literals, comments, and punctuation", () => {
+  const source = [
+    "module Programs.RequireGate version \"0.1.0\" {",
+    "    // r must not skip ahead",
+    "    import MA.TrustLaw.Fixture version \"2026-08-23\"",
+    "    effective_at 2026-09-17",
+    "    recorded_at 2026-08-23T12:00:00-04:00",
+    "    entity Payer : NaturalPerson",
+    "    query q() -> Int { require true; return 7 }",
+    "    query due() -> Money<USD> { goal Evaluate { USD(100.00) } }",
+    "    due 30 days after invoice_date",
+    "    effective [execution_time, +inf)",
+    "    flag false",
+    "}"
+  ].join("\n");
+  const segs = mill.tokenizeFr(source);
+  const expect = [
+    ["module", 0, "tk-kw"], ["Programs", 0, "tk-ty"], [".RequireGate", 0, "tk-ty"], ["version", 0, "tk-kw"],
+    ["\"0.1.0\"", 0, "tk-st"], ["{", 0, "tk-pu"], ["// r must", 0, "tk-co"],
+    ["import", 0, "tk-kw"], ["MA", 0, "tk-ty"], ["TrustLaw", 0, "tk-ty"], ["Fixture", 0, "tk-ty"],
+    ["effective_at", 0, "tk-kw"], ["2026-09-17", 0, "tk-nu"], ["2026-08-23T12:00:00-04:00", 0, "tk-nu"],
+    ["entity", 0, "tk-kw"], ["Payer", 0, ""], [": Natural", 0, "tk-pu"], ["NaturalPerson", 0, "tk-ty"],
+    ["query", 0, "tk-kw"], ["q()", 0, ""], ["->", 0, "tk-pu"], ["Int", 0, "tk-ty"], ["require", 0, "tk-kw"],
+    ["true", 0, "tk-nu"], [";", 0, "tk-pu"], ["return", 0, "tk-kw"], ["7 }", 0, "tk-nu"],
+    ["Money", 0, "tk-ty"], ["<", 0, "tk-pu"], ["USD>", 0, "tk-ty"], ["goal", 0, "tk-kw"], ["Evaluate", 0, ""],
+    ["100.00", 0, "tk-nu"], ["due", 1, "tk-kw"], ["30", 0, "tk-nu"], ["days", 0, "tk-nu"], ["after", 0, ""],
+    ["+inf", 0, "tk-nu"], ["false", 0, "tk-nu"]
+  ];
+  for (const [needle, nth, cls] of expect) {
+    assert.equal(classOf(segs, source, needle, nth), cls, `${show(needle)} #${nth}`);
+  }
+});
+
+test("tokenizeFr leaves non-ASCII outside strings and comments plain", () => {
+  const source = "query λx() { \"§\" } // é";
+  const segs = mill.tokenizeFr(source);
+  assert.equal(classOf(segs, source, "λ"), "");
+  assert.equal(classOf(segs, source, "\"§\""), "tk-st");
+  assert.equal(classOf(segs, source, "// é"), "tk-co");
+});
+
+test("tokenizeJson gives back every case file and classes keys, values, and punctuation", () => {
+  for (const rel of [
+    "examples/trust/cases/two-certificates-open-eligibility.json",
+    "examples/trust/cases/court-selects-i2.json",
+    "examples/trust/cases/one-certificate.json"
+  ]) {
+    const text = read(rel);
+    assert.equal(joined(mill.tokenizeJson(text)), text, rel);
+  }
+  const text = "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"n\" : -1.5e3,\n  \"ok\": [true, false, null],\n  bad §\n}";
+  const segs = mill.tokenizeJson(text);
+  assert.equal(joined(segs), text);
+  assert.equal(classOf(segs, text, "\"schema\""), "tk-ty");
+  assert.equal(classOf(segs, text, "\"fidryn"), "tk-st");
+  assert.equal(classOf(segs, text, "\"n\""), "tk-ty");
+  assert.equal(classOf(segs, text, "-1.5e3"), "tk-nu");
+  assert.equal(classOf(segs, text, "true"), "tk-nu");
+  assert.equal(classOf(segs, text, "null"), "tk-nu");
+  assert.equal(classOf(segs, text, "{"), "tk-pu");
+  assert.equal(classOf(segs, text, ":"), "tk-pu");
+  assert.equal(classOf(segs, text, "bad"), "");
+});
+
+test("applyRanges splits a segment at the range edges", () => {
+  assert.deepEqual(
+    mill.applyRanges([{ text: "hello world", cls: "tk-kw" }], [{ start: 2, end: 7, cls: "mill-sq" }]),
+    [
+      { text: "he", cls: "tk-kw" },
+      { text: "llo w", cls: "tk-kw mill-sq" },
+      { text: "orld", cls: "tk-kw" }
+    ]
+  );
+});
+
+test("applyRanges covers ranges across segments and overlapping ranges", () => {
+  const segs = [{ text: "ab", cls: "" }, { text: "cd", cls: "tk-st" }];
+  assert.deepEqual(mill.applyRanges(segs, [{ start: 1, end: 3, cls: "a" }, { start: 2, end: 4, cls: "b" }]), [
+    { text: "a", cls: "" },
+    { text: "b", cls: "a" },
+    { text: "c", cls: "tk-st a b" },
+    { text: "d", cls: "tk-st b" }
+  ]);
+  assert.deepEqual(mill.applyRanges(segs, [{ start: 0, end: 4, cls: "x" }, { start: 0, end: 4, cls: "x" }]), [
+    { text: "ab", cls: "x" },
+    { text: "cd", cls: "tk-st x" }
+  ]);
+});
+
+test("applyRanges ignores empty ranges and never changes the text", () => {
+  const segs = mill.tokenizeFr("query q() -> Int { return 7 }");
+  assert.deepEqual(mill.applyRanges(segs, [{ start: 3, end: 3, cls: "mill-sq" }]), segs);
+  assert.deepEqual(mill.applyRanges(segs, []), segs);
+  const marked = mill.applyRanges(segs, [{ start: 6, end: 20, cls: "mill-sq" }, { start: 9, end: 11, cls: "mill-sq" }]);
+  assert.equal(joined(marked), joined(segs));
+});
+
+test("a server span after multi-byte text squiggles exactly the offending word", () => {
+  const source = "module A version \"1\" {\n    // § é 𝔽\n    colour blue\n}\n";
+  const start = Buffer.byteLength(source.slice(0, source.indexOf("colour")), "utf8");
+  const from = mill.byteToIndex(source, start);
+  const to = mill.byteToIndex(source, start + "colour".length);
+  const segs = mill.applyRanges(mill.tokenizeFr(source), [{ start: from, end: to, cls: "mill-sq" }]);
+  const squiggled = segs.filter((s) => s.cls.split(" ").includes("mill-sq")).map((s) => s.text).join("");
+  assert.equal(squiggled, "colour");
+});
+
+test("segmentsToHtml escapes every segment", () => {
+  assert.equal(
+    mill.segmentsToHtml([
+      { text: "<b>", cls: "" },
+      { text: "\"&'", cls: "tk-st" },
+      { text: "x", cls: "tk-kw mill-sq" }
+    ]),
+    "&lt;b&gt;<span class=\"tk-st\">&quot;&amp;&#39;</span><span class=\"tk-kw mill-sq\">x</span>"
+  );
+  const html = mill.segmentsToHtml(mill.tokenizeFr("query q() -> Int { return \"<script>\" }"));
+  assert.equal(html.includes("<script>"), false);
+  assert.equal(html.includes("&lt;script&gt;"), true);
+});
+
+test("KEYWORDS is sorted, unique, and made of [a-z_]", () => {
+  assert.ok(mill.KEYWORDS.length > 100);
+  assert.deepEqual([...mill.KEYWORDS].sort(), mill.KEYWORDS);
+  assert.equal(new Set(mill.KEYWORDS).size, mill.KEYWORDS.length);
+  for (const word of mill.KEYWORDS) assert.match(word, /^[a-z_]{2,}$/);
+  for (const word of ["module", "query", "require", "return", "outside_scope"]) assert.ok(mill.KEYWORDS.includes(word), word);
+});
+
+test("editorKey: Tab indents, Shift-Tab outdents, Enter keeps indentation", () => {
+  assert.deepEqual(mill.editorKey("Tab", {}, false), { action: "indent", escaped: false });
+  assert.deepEqual(mill.editorKey("Tab", { shift: true }, false), { action: "outdent", escaped: false });
+  assert.deepEqual(mill.editorKey("Enter", {}, false), { action: "newline", escaped: false });
+  assert.deepEqual(mill.editorKey("Enter", { ctrl: true }, false), { action: "", escaped: false });
+  assert.deepEqual(mill.editorKey("Enter", { meta: true, shift: true }, false), { action: "", escaped: false });
+  assert.deepEqual(mill.editorKey("Enter", { composing: true }, false), { action: "", escaped: false });
+  assert.deepEqual(mill.editorKey("Tab", { ctrl: true }, false), { action: "", escaped: false });
+});
+
+test("editorKey: Escape lets the next Tab or Shift-Tab leave the editor once", () => {
+  let step = mill.editorKey("Escape", {}, false);
+  assert.deepEqual(step, { action: "", escaped: true });
+  step = mill.editorKey("Tab", {}, step.escaped);
+  assert.deepEqual(step, { action: "leave", escaped: false });
+  assert.equal(mill.editorKey("Tab", {}, step.escaped).action, "indent");
+
+  step = mill.editorKey("Escape", {}, false);
+  step = mill.editorKey("Shift", { shift: true }, step.escaped);
+  assert.equal(step.escaped, true);
+  assert.equal(mill.editorKey("Tab", { shift: true }, step.escaped).action, "leave");
+});
+
+test("editorKey: any other key after Escape clears the flag", () => {
+  for (const key of ["a", "Enter", "ArrowDown", "Backspace", " "]) {
+    const step = mill.editorKey(key, {}, true);
+    assert.equal(step.escaped, false, key);
+    assert.equal(mill.editorKey("Tab", {}, step.escaped).action, "indent", key);
+  }
+});

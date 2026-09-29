@@ -380,6 +380,416 @@
     }
   }
 
+  // ------------------------------------------------------ editor highlighting
+
+  // Every quoted terminal of grammar.ebnf made only of [a-z_] and longer than
+  // one character. xtask/tests/mill_keywords.rs fails when this drifts.
+  var KEYWORDS = [
+    // KEYWORDS-BEGIN
+    "acquired_by",
+    "activate",
+    "active_while",
+    "admissibility",
+    "alias",
+    "alternative",
+    "amendment",
+    "and",
+    "artifact",
+    "as",
+    "as_to",
+    "ascending",
+    "assert",
+    "assume",
+    "assuming",
+    "at",
+    "attaches",
+    "authenticate",
+    "authority",
+    "automatic",
+    "bearer",
+    "bounds",
+    "burden_of_persuasion",
+    "by",
+    "calc",
+    "calendar_days",
+    "cardinality",
+    "choice_space",
+    "choices",
+    "citation",
+    "claimant",
+    "clause",
+    "competence",
+    "competent_when",
+    "conflict_doctrine",
+    "constitute",
+    "constitutive",
+    "constitutive_effect",
+    "content",
+    "counted_days",
+    "court",
+    "court_finding",
+    "create",
+    "days",
+    "decides",
+    "decision",
+    "decision_rule",
+    "defeat",
+    "defects",
+    "defines",
+    "derive",
+    "descending",
+    "digest",
+    "discharge_by",
+    "does_not_establish",
+    "due",
+    "duration",
+    "duty",
+    "each",
+    "effect",
+    "effective",
+    "effective_at",
+    "enforcement",
+    "entity",
+    "establish",
+    "establishes",
+    "every",
+    "evidence_type",
+    "exclude_from_count",
+    "exercise_by",
+    "exercises",
+    "exists",
+    "fn",
+    "for",
+    "for_all",
+    "from",
+    "fuel",
+    "goal",
+    "holder",
+    "hours",
+    "import",
+    "in",
+    "interpretation_family",
+    "interpretations",
+    "judgment",
+    "judgments",
+    "jurisdiction",
+    "kind",
+    "legal_act",
+    "lost_by",
+    "make",
+    "may_include",
+    "minutes",
+    "module",
+    "must_consider",
+    "must_not_consider",
+    "nomination",
+    "not",
+    "observation",
+    "occupied_by",
+    "office",
+    "on",
+    "options",
+    "or",
+    "order_by",
+    "otherwise",
+    "output",
+    "outside_scope",
+    "performer",
+    "performers",
+    "physical_effect",
+    "power",
+    "prescriptive",
+    "primary_authority",
+    "proposition",
+    "provision_intervals",
+    "purport_to",
+    "purports_to",
+    "query",
+    "rank",
+    "reason",
+    "recipient",
+    "record",
+    "record_time",
+    "record_type",
+    "recorded_at",
+    "reject",
+    "request",
+    "require",
+    "requires",
+    "retrieved_at",
+    "return",
+    "returns",
+    "review",
+    "rule",
+    "scenario",
+    "seconds",
+    "select",
+    "selector",
+    "source",
+    "source_manifest",
+    "source_snapshot",
+    "standard",
+    "subject",
+    "subject_to",
+    "suspend",
+    "suspended_by",
+    "terminate",
+    "then",
+    "to",
+    "transaction",
+    "type",
+    "under",
+    "unique",
+    "using",
+    "valid_time",
+    "validity",
+    "verify",
+    "version",
+    "violation_when",
+    "when",
+    "where",
+    "working_days",
+    // KEYWORDS-END
+  ];
+  var KEYWORD_SET = Object.create(null);
+  KEYWORDS.forEach(function (word) { KEYWORD_SET[word] = true; });
+  var DURATION_UNITS = Object.create(null);
+  ["days", "working_days", "counted_days", "calendar_days", "hours", "minutes", "seconds"].forEach(function (unit) {
+    DURATION_UNITS[unit] = true;
+  });
+  var FR_OPERATORS = ["->", "=>", "==", "!=", "<=", ">=", "..", "{", "}", "(", ")", "[", "]", ",", ".", ":", ";", "!", "=", "<", ">", "+", "-", "*", "/", "|"];
+  var FR_DATE = /\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})?)?/y;
+
+  function isDigit(c) {
+    return c >= "0" && c <= "9";
+  }
+
+  function isIdentStart(c) {
+    return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c === "_";
+  }
+
+  /** Append a segment, merging it into the previous one when the class is the same. */
+  function pushSegment(out, text, cls) {
+    if (!text) return;
+    var last = out[out.length - 1];
+    if (last && last.cls === cls) last.text += text;
+    else out.push({ text: text, cls: cls });
+  }
+
+  /** End of the number, date, or date-time starting at `i`, as the lexer reads it. */
+  function frNumberEnd(text, i) {
+    FR_DATE.lastIndex = i;
+    var date = FR_DATE.exec(text);
+    if (date) return i + date[0].length;
+    var j = i;
+    while (j < text.length && isDigit(text.charAt(j))) j += 1;
+    if (text.charAt(j) === "." && isDigit(text.charAt(j + 1))) {
+      j += 1;
+      while (j < text.length && isDigit(text.charAt(j))) j += 1;
+    }
+    return j;
+  }
+
+  /** The operator or punctuation at `i`, longest first (`+inf` and `-inf` included). */
+  function frOperator(text, i) {
+    var sign = text.charAt(i);
+    if ((sign === "+" || sign === "-") && text.slice(i + 1, i + 4) === "inf") {
+      var after = text.charAt(i + 4);
+      if (!isIdentStart(after) && !isDigit(after)) return sign + "inf";
+    }
+    for (var k = 0; k < FR_OPERATORS.length; k++) {
+      if (text.startsWith(FR_OPERATORS[k], i)) return FR_OPERATORS[k];
+    }
+    return "";
+  }
+
+  /**
+   * Highlight segments `{ text, cls }` for `.fr` source, read the way the
+   * fidryn-syntax lexer reads it: grammar keywords; capitalized names after
+   * `->`, `:`, or `<` and module paths after `module` or `import` as types;
+   * strings; numbers, dates, durations, `true`, `false`, and infinities as
+   * literals; comments; punctuation. Joining the texts gives `text` back.
+   */
+  function tokenizeFr(text) {
+    var out = [];
+    var i = 0;
+    var prev = "";
+    var path = 0; // 1: after `module` or `import`; 2: after a path name; 3: after a path dot
+    while (i < text.length) {
+      var start = i;
+      var c = text.charAt(i);
+      var cls = "";
+      if (c === " " || c === "\t" || c === "\r" || c === "\n") {
+        while (i < text.length && " \t\r\n".indexOf(text.charAt(i)) >= 0) i += 1;
+        if (path > 1) path = 0;
+      } else if (c === "/" && text.charAt(i + 1) === "/") {
+        var eol = text.indexOf("\n", i);
+        i = eol < 0 ? text.length : eol;
+        cls = "tk-co";
+        if (path > 1) path = 0;
+      } else if (c === "\"") {
+        i += 1;
+        while (i < text.length) {
+          var d = text.charAt(i);
+          i += d === "\\" ? 2 : 1;
+          if (d === "\"") break;
+        }
+        i = Math.min(i, text.length);
+        cls = "tk-st";
+        prev = "str";
+        path = 0;
+      } else if (isDigit(c)) {
+        i = frNumberEnd(text, i);
+        cls = "tk-nu";
+        prev = "num";
+        path = 0;
+      } else if (isIdentStart(c)) {
+        while (i < text.length && (isIdentStart(text.charAt(i)) || isDigit(text.charAt(i)))) i += 1;
+        var word = text.slice(start, i);
+        if (path === 1 || path === 3) {
+          cls = "tk-ty";
+          path = 2;
+        } else {
+          path = 0;
+          if (word === "true" || word === "false") cls = "tk-nu";
+          else if (DURATION_UNITS[word] && prev === "num") cls = "tk-nu";
+          else if (KEYWORD_SET[word]) cls = "tk-kw";
+          else if (c >= "A" && c <= "Z" && (prev === "->" || prev === ":" || prev === "<")) cls = "tk-ty";
+          if (cls === "tk-kw" && (word === "module" || word === "import")) path = 1;
+        }
+        prev = "word";
+      } else {
+        var op = frOperator(text, i);
+        if (op) {
+          i += op.length;
+          if (path === 2 && op === ".") {
+            cls = "tk-ty";
+            path = 3;
+          } else {
+            cls = op === "+inf" || op === "-inf" ? "tk-nu" : "tk-pu";
+            path = 0;
+          }
+          prev = op;
+        } else {
+          i += text.codePointAt(i) > 0xffff ? 2 : 1;
+          prev = "";
+          path = 0;
+        }
+      }
+      pushSegment(out, text.slice(start, i), cls);
+    }
+    return out;
+  }
+
+  /**
+   * Highlight segments for JSON: object keys as types, strings, numbers,
+   * `true`, `false`, and `null` as literals, and punctuation. Text that is not
+   * JSON stays plain, so joining the texts always gives `text` back.
+   */
+  function tokenizeJson(text) {
+    var out = [];
+    var i = 0;
+    while (i < text.length) {
+      var start = i;
+      var c = text.charAt(i);
+      var cls = "";
+      if (" \t\r\n".indexOf(c) >= 0) {
+        while (i < text.length && " \t\r\n".indexOf(text.charAt(i)) >= 0) i += 1;
+      } else if (c === "\"") {
+        i += 1;
+        while (i < text.length && text.charAt(i) !== "\n") {
+          var d = text.charAt(i);
+          i += d === "\\" ? 2 : 1;
+          if (d === "\"") break;
+        }
+        i = Math.min(i, text.length);
+        var next = i;
+        while (next < text.length && " \t\r\n".indexOf(text.charAt(next)) >= 0) next += 1;
+        cls = text.charAt(next) === ":" ? "tk-ty" : "tk-st";
+      } else if (c === "-" || isDigit(c)) {
+        JSON_NUMBER.lastIndex = i;
+        var number = JSON_NUMBER.exec(text);
+        i += number ? number[0].length : 1;
+        cls = number ? "tk-nu" : "";
+      } else if (text.startsWith("true", i) || text.startsWith("null", i) || text.startsWith("false", i)) {
+        i += c === "f" ? 5 : 4;
+        cls = "tk-nu";
+      } else if ("{}[],:".indexOf(c) >= 0) {
+        i += 1;
+        cls = "tk-pu";
+      } else {
+        i += text.codePointAt(i) > 0xffff ? 2 : 1;
+      }
+      pushSegment(out, text.slice(start, i), cls);
+    }
+    return out;
+  }
+
+  /**
+   * Split `segments` at the edges of `ranges` (`{ start, end, cls }` in string
+   * indices) and add each range's class to the text inside it. Overlapping
+   * ranges add both classes; empty ranges change nothing.
+   */
+  function applyRanges(segments, ranges) {
+    var live = (ranges || []).filter(function (r) { return r && r.end > r.start; });
+    if (live.length === 0) return segments.slice();
+    var cuts = [];
+    live.forEach(function (r) { cuts.push(r.start, r.end); });
+    cuts.sort(function (a, b) { return a - b; });
+    var out = [];
+    var pos = 0;
+    segments.forEach(function (seg) {
+      var from = pos;
+      var to = pos + seg.text.length;
+      var edges = [from];
+      cuts.forEach(function (cut) {
+        if (cut > from && cut < to && edges[edges.length - 1] !== cut) edges.push(cut);
+      });
+      edges.push(to);
+      for (var k = 0; k + 1 < edges.length; k++) {
+        var a = edges[k];
+        var b = edges[k + 1];
+        var classes = seg.cls ? [seg.cls] : [];
+        live.forEach(function (r) {
+          if (r.start <= a && b <= r.end && classes.indexOf(r.cls) < 0) classes.push(r.cls);
+        });
+        if (b > a) out.push({ text: seg.text.slice(a - from, b - from), cls: classes.join(" ") });
+      }
+      pos = to;
+    });
+    return out;
+  }
+
+  /** HTML for highlight segments; every segment's text is escaped. */
+  function segmentsToHtml(segments) {
+    return segments.map(function (seg) {
+      return seg.cls ? "<span class=\"" + esc(seg.cls) + "\">" + esc(seg.text) + "</span>" : esc(seg.text);
+    }).join("");
+  }
+
+  /**
+   * What a key press in the editor does. `escaped` is the one-shot flag set by
+   * Escape: the next Tab or Shift-Tab then moves focus instead of indenting.
+   * Modifier keys keep the flag; any other key clears it. Returns the action
+   * (`indent`, `outdent`, `newline`, `leave`, or "" for the browser default)
+   * and the flag's next value.
+   */
+  function editorKey(key, mods, escaped) {
+    var m = mods || {};
+    if (key === "Escape") return { action: "", escaped: true };
+    if (key === "Shift" || key === "Control" || key === "Alt" || key === "Meta") {
+      return { action: "", escaped: Boolean(escaped) };
+    }
+    if (key === "Tab" && !m.ctrl && !m.meta && !m.alt) {
+      if (escaped) return { action: "leave", escaped: false };
+      return { action: m.shift ? "outdent" : "indent", escaped: false };
+    }
+    if (key === "Enter" && !m.shift && !m.ctrl && !m.meta && !m.alt && !m.composing) {
+      return { action: "newline", escaped: false };
+    }
+    return { action: "", escaped: false };
+  }
+
   if (typeof document === "undefined") {
     module.exports = {
       esc: esc,
@@ -387,7 +797,15 @@
       valueText: valueText,
       requestText: requestText,
       loadState: loadState,
-      postJson: postJson
+      postJson: postJson,
+      byteToIndex: byteToIndex,
+      lineCol: lineCol,
+      tokenizeFr: tokenizeFr,
+      tokenizeJson: tokenizeJson,
+      applyRanges: applyRanges,
+      segmentsToHtml: segmentsToHtml,
+      KEYWORDS: KEYWORDS,
+      editorKey: editorKey
     };
     return;
   }
@@ -460,6 +878,7 @@
     setupTheme();
     showPlatformKeys();
     wireEvents();
+    installEditor();
     renderHistory();
     checkHealth();
     loadSamples().then(function () {
@@ -898,22 +1317,48 @@
   }
 
   /** Called after the editor's text, buffer, or caret changes and after new diagnostics. */
-  function editorChanged() {
+  function editorChanged(reason) {
+    if (!state) return;
+    if (reason === "caret") {
+      updatePop();
+      return;
+    }
+    if (reason === "load") {
+      queryKey = null;
+      scheduleCheck(0);
+    } else if (reason === "edit" && state.buffer === "module") {
+      scheduleCheck(AUTO_CHECK_MS);
+    }
+    paintEditor();
     updateBufferStatus();
   }
 
   function updateBufferStatus() {
     var text = "";
     var mood = "";
-    if (state.buffer === "module" && diagnostics.source === state.module) {
-      var n = diagnostics.list.length;
-      text = n === 0 ? "No problems" : n === 1 ? "1 problem" : n + " problems";
-      mood = n === 0 ? "ok" : "err";
-    } else if (state.buffer === "template") {
+    if (state.buffer === "module") {
+      if (checkTimer || checkInFlight) {
+        text = "Checking…";
+      } else if (diagnostics.source === state.module) {
+        var n = diagnostics.list.length;
+        text = n === 0 ? "No problems" : n === 1 ? "1 problem" : n + " problems";
+        mood = n === 0 ? "ok" : "err";
+      }
+    } else if (state.buffer === "case") {
+      var parsed = caseResult();
+      if (parsed.ok) {
+        text = state.case.trim() === "" ? "Empty: sends {}" : "Valid JSON";
+        mood = "ok";
+      } else {
+        text = "Line " + parsed.line + ", column " + parsed.col + ": " + parsed.message;
+        mood = "err";
+      }
+    } else {
       text = "Used by Render";
     }
     clear(el.bufferStatus);
     el.bufferStatus.appendChild(h("span", { className: "mill-status-main", text: text }));
+    if (editorFocused) el.bufferStatus.appendChild(h("span", { className: "mill-status-hint", text: LEAVE_HINT }));
     el.bufferStatus.setAttribute("data-state", mood);
   }
 
@@ -1385,7 +1830,7 @@
   /** A framed code block with a Copy button, as on the site. */
   function codeFrame(lang, source) {
     var body = h("code");
-    body.textContent = source;
+    body.innerHTML = segmentsToHtml(lang === "json" ? tokenizeJson(source) : [{ text: source, cls: "" }]);
     return h("figure", { className: "code", "data-lang": lang }, [
       h("figcaption", null, [
         h("span", { text: lang }),
@@ -1463,5 +1908,322 @@
     document.body.removeChild(area);
     if (active && active.focus) active.focus();
     return ok;
+  }
+
+  // ------------------------------------------------------------------ editor
+
+  var AUTO_CHECK_MS = 700;
+  var LEAVE_HINT = "Esc then Tab to leave the editor";
+  var metrics = { line: 22, top: 12 };
+  var gutterLines = null;
+  var gutterKey = "";
+  var lineMarks = {};
+  var popLine = 0;
+  var pointerLine = 0;
+  var editorFocused = false;
+  var escaped = false;
+  var checkTimer = 0;
+  var checkSeq = 0;
+  var checkInFlight = false;
+  var queryKey = null;
+  var caseCache = { text: null, result: null };
+
+  /** Put the highlighted layer, the line numbers, and the key handling on the textarea. */
+  function installEditor() {
+    gutterLines = h("div", { className: "mill-gutter-in" });
+    el.gutter.appendChild(gutterLines);
+    el.editorWrap.setAttribute("data-hl", "");
+    el.editor.addEventListener("scroll", syncScroll);
+    el.editor.addEventListener("keydown", onEditorKey);
+    el.editor.addEventListener("keyup", updatePop);
+    el.editor.addEventListener("click", updatePop);
+    el.editor.addEventListener("mousemove", onPointer);
+    el.editor.addEventListener("mouseleave", function () {
+      pointerLine = 0;
+      updatePop();
+    });
+    el.editor.addEventListener("focus", function () {
+      editorFocused = true;
+      if (state) updateBufferStatus();
+      updatePop();
+    });
+    el.editor.addEventListener("blur", function () {
+      editorFocused = false;
+      escaped = false;
+      if (state) updateBufferStatus();
+      updatePop();
+    });
+    document.addEventListener("selectionchange", function () {
+      if (document.activeElement === el.editor) updatePop();
+    });
+    window.addEventListener("resize", function () {
+      measure();
+      syncScroll();
+    });
+    measure();
+  }
+
+  /** Line height and top padding of the textarea; the overlay and the gutter use the same. */
+  function measure() {
+    var style = window.getComputedStyle(el.editor);
+    metrics.line = parseFloat(style.lineHeight) || metrics.line;
+    metrics.top = parseFloat(style.paddingTop) || 0;
+  }
+
+  /** Highlight the current buffer, mark its problems, and number its lines. */
+  function paintEditor() {
+    var text = el.editor.value;
+    var segments = state.buffer === "module" ? tokenizeFr(text)
+      : state.buffer === "case" ? tokenizeJson(text) : [{ text: text, cls: "" }];
+    var ranges = [];
+    lineMarks = {};
+    problems(text).forEach(function (p) {
+      ranges.push({ start: p.start, end: p.end, cls: "mill-sq" });
+      var line = lineCol(text, p.start).line;
+      (lineMarks[line] = lineMarks[line] || []).push(p);
+    });
+    // A final newline needs a character after it, or the layer is a line short.
+    el.hl.innerHTML = segmentsToHtml(applyRanges(segments, ranges)) + (text.slice(-1) === "\n" ? " " : "");
+    paintGutter(text.split("\n").length);
+    popLine = 0;
+    syncScroll();
+  }
+
+  function caseResult() {
+    if (caseCache.text !== state.case) caseCache = { text: state.case, result: parseCase(state.case) };
+    return caseCache.result;
+  }
+
+  /** Problems to mark in the current buffer: `{ start, end, code, message }` in string indices. */
+  function problems(text) {
+    if (state.buffer === "module") {
+      if (diagnostics.source !== text) return [];
+      return diagnostics.list.map(function (d) {
+        var span = isObject(d.primary_span) ? d.primary_span : null;
+        if (!span || typeof span.start !== "number") return null;
+        var start = byteToIndex(text, span.start);
+        var end = byteToIndex(text, typeof span.end === "number" ? span.end : span.start);
+        var range = visibleRange(text, start, Math.max(start, end));
+        return { start: range.start, end: range.end, code: str(d.code), message: str(d.message) };
+      }).filter(function (p) { return p !== null; });
+    }
+    if (state.buffer === "case") {
+      var parsed = caseResult();
+      if (parsed.ok) return [];
+      var at = visibleRange(text, parsed.index, parsed.index);
+      return [{ start: at.start, end: at.end, code: "JSON", message: parsed.message }];
+    }
+    return [];
+  }
+
+  /** Widen an empty span to the character at it, or the one before it at a line end, so it can be underlined. */
+  function visibleRange(text, start, end) {
+    if (end > start) return { start: start, end: end };
+    if (start < text.length && text.charAt(start) !== "\n") {
+      return { start: start, end: start + (text.codePointAt(start) > 0xffff ? 2 : 1) };
+    }
+    if (start > 0 && text.charAt(start - 1) !== "\n") {
+      var low = text.charCodeAt(start - 1);
+      return { start: start - (low >= 0xdc00 && low <= 0xdfff && start > 1 ? 2 : 1), end: start };
+    }
+    return { start: start, end: start };
+  }
+
+  function paintGutter(count) {
+    var key = count + "|" + Object.keys(lineMarks).join(",");
+    if (key === gutterKey) return;
+    gutterKey = key;
+    clear(gutterLines);
+    for (var n = 1; n <= count; n++) {
+      gutterLines.appendChild(h("div", { className: lineMarks[n] ? "mill-ln has-diag" : "mill-ln", text: String(n) }));
+    }
+  }
+
+  /** Move the highlighted layer and the line numbers with the textarea's scroll. */
+  function syncScroll() {
+    var x = el.editor.scrollLeft;
+    var y = el.editor.scrollTop;
+    el.hl.style.transform = "translate(" + -x + "px, " + -y + "px)";
+    gutterLines.style.transform = "translateY(" + -y + "px)";
+    updatePop();
+  }
+
+  /** Show the problems of the line under the pointer, or else of the caret's line, right under that line. */
+  function updatePop() {
+    var line = pointerLine && lineMarks[pointerLine] ? pointerLine : 0;
+    if (!line && editorFocused) {
+      var caret = lineCol(el.editor.value, el.editor.selectionStart).line;
+      if (lineMarks[caret]) line = caret;
+    }
+    var below = metrics.top + line * metrics.line - el.editor.scrollTop;
+    if (!line || below < 0 || below > el.editor.clientHeight) {
+      el.diagPop.hidden = true;
+      popLine = 0;
+      return;
+    }
+    if (line !== popLine) {
+      clear(el.diagPop);
+      lineMarks[line].forEach(function (p) {
+        el.diagPop.appendChild(h("p", null, [h("code", { text: p.code }), p.message]));
+      });
+      popLine = line;
+    }
+    el.diagPop.hidden = false;
+    var height = el.diagPop.offsetHeight;
+    var above = below - metrics.line - height;
+    el.diagPop.style.top = (below + height > el.editor.clientHeight && above >= 0 ? above : below) + "px";
+  }
+
+  function onPointer(event) {
+    var rect = el.editor.getBoundingClientRect();
+    var y = event.clientY - rect.top - metrics.top + el.editor.scrollTop;
+    var line = y < 0 ? 0 : Math.floor(y / metrics.line) + 1;
+    if (line === pointerLine) return;
+    pointerLine = line;
+    updatePop();
+  }
+
+  function onEditorKey(event) {
+    var step = editorKey(event.key, {
+      shift: event.shiftKey,
+      ctrl: event.ctrlKey,
+      meta: event.metaKey,
+      alt: event.altKey,
+      composing: event.isComposing || event.keyCode === 229
+    }, escaped);
+    escaped = step.escaped;
+    if (step.action === "indent") indent();
+    else if (step.action === "outdent") outdent();
+    else if (step.action === "newline") newline();
+    else return;
+    event.preventDefault();
+  }
+
+  function indentUnit() {
+    return state.buffer === "module" ? "    " : "  ";
+  }
+
+  function lineStart(text, index) {
+    return text.lastIndexOf("\n", index - 1) + 1;
+  }
+
+  /** The selection and the whole lines it touches (`from`..`to`, without the last newline). */
+  function selectedLines() {
+    var text = el.editor.value;
+    var start = el.editor.selectionStart;
+    var end = el.editor.selectionEnd;
+    var last = end > start && text.charAt(end - 1) === "\n" ? end - 1 : end;
+    var eol = text.indexOf("\n", last);
+    return { text: text, start: start, end: end, from: lineStart(text, start), to: eol < 0 ? text.length : eol };
+  }
+
+  function indent() {
+    var unit = indentUnit();
+    var sel = selectedLines();
+    if (sel.text.slice(sel.start, sel.end).indexOf("\n") < 0) {
+      var pad = unit.slice((sel.start - sel.from) % unit.length);
+      replaceRange(sel.start, sel.end, pad, sel.start + pad.length, sel.start + pad.length);
+      return;
+    }
+    var lines = sel.text.slice(sel.from, sel.to).split("\n");
+    var added = 0;
+    var out = lines.map(function (line) {
+      if (!line) return line;
+      added += unit.length;
+      return unit + line;
+    }).join("\n");
+    replaceRange(sel.from, sel.to, out, sel.start + (lines[0] ? unit.length : 0), sel.end + added);
+  }
+
+  function outdent() {
+    var unit = indentUnit();
+    var sel = selectedLines();
+    var lines = sel.text.slice(sel.from, sel.to).split("\n");
+    var firstCut = 0;
+    var removed = 0;
+    var out = lines.map(function (line, i) {
+      var cut = line.charAt(0) === "\t" ? 1 : Math.min(/^ */.exec(line)[0].length, unit.length);
+      if (i === 0) firstCut = cut;
+      removed += cut;
+      return line.slice(cut);
+    }).join("\n");
+    if (removed === 0) return;
+    var start = Math.max(sel.from, sel.start - firstCut);
+    replaceRange(sel.from, sel.to, out, start, Math.max(start, sel.end - removed));
+  }
+
+  /** Enter keeps the current line's indentation. */
+  function newline() {
+    var text = el.editor.value;
+    var start = el.editor.selectionStart;
+    var insert = "\n" + /^[ \t]*/.exec(text.slice(lineStart(text, start), start))[0];
+    replaceRange(start, el.editor.selectionEnd, insert, start + insert.length, start + insert.length);
+  }
+
+  /** Replace `from`..`to` with `text` as one undoable edit, then select `selStart`..`selEnd`. */
+  function replaceRange(from, to, text, selStart, selEnd) {
+    el.editor.setSelectionRange(from, to);
+    var done = false;
+    try {
+      done = document.execCommand("insertText", false, text);
+    } catch (err) {
+      done = false;
+    }
+    if (!done) {
+      el.editor.setRangeText(text, from, to, "end");
+      el.editor.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    el.editor.setSelectionRange(selStart, selEnd);
+  }
+
+  function scheduleCheck(delay) {
+    clearTimeout(checkTimer);
+    checkTimer = setTimeout(autoCheck, delay);
+  }
+
+  /** Check the module in the background. Stale answers are dropped; auto-checks never enter History. */
+  function autoCheck() {
+    checkTimer = 0;
+    var source = state.module;
+    var seq = ++checkSeq;
+    var version = diagnostics.version;
+    checkInFlight = true;
+    updateQueryNames();
+    updateBufferStatus();
+    postJson("/api/check", { source: source }).then(function (res) {
+      if (seq !== checkSeq) return;
+      checkInFlight = false;
+      if (res.network) {
+        networkDown();
+      } else {
+        serverAnswered();
+        if (source === state.module && diagnostics.version === version) noteDiagnostics(source, res.data);
+      }
+      updateBufferStatus();
+    });
+  }
+
+  /** Offer the module's query names as suggestions for the Query field. */
+  function updateQueryNames() {
+    var names = queryNames(state.module);
+    var key = names.join("\n");
+    if (key === queryKey) return;
+    queryKey = key;
+    clear(el.queryNames);
+    names.forEach(function (name) { el.queryNames.appendChild(h("option", { value: name })); });
+  }
+
+  /** Names declared with `query` in `source`, ignoring comments and strings. */
+  function queryNames(source) {
+    var code = tokenizeFr(source).map(function (seg) {
+      return /(^| )tk-(co|st)( |$)/.test(seg.cls) ? " " : seg.text;
+    }).join("");
+    var decl = /(^|[^A-Za-z0-9_])query\s+(?:automatic\s+)?([A-Za-z_][A-Za-z0-9_]*)/g;
+    var names = [];
+    var m;
+    while ((m = decl.exec(code)) !== null) {
+      if (names.indexOf(m[2]) < 0) names.push(m[2]);
+    }
+    return names;
   }
 })();
