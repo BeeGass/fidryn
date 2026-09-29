@@ -39,6 +39,17 @@ fn help_lists_subcommands() {
     assert!(help.contains("test"), "{help}");
     assert!(help.contains("bench"), "{help}");
     assert!(help.contains("ci"), "{help}");
+    assert!(help.contains("site"), "{help}");
+    assert!(
+        help.contains("Render the public site from docs/*.md"),
+        "{help}"
+    );
+}
+
+#[test]
+fn site_help_lists_check() {
+    let help = stdout_ok(&["site", "--help"]);
+    assert!(help.contains("--check"), "{help}");
 }
 
 #[test]

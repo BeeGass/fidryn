@@ -1,277 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>fidryn mill</title>
-  <style>
-    :root {
-      --ink: #14110e;
-      --ink-2: #1d1914;
-      --paper: #f3e6cf;
-      --paper-2: #e7d5b4;
-      --rule: #c9b48a;
-      --rust: #c44b24;
-      --brass: #c4a056;
-      --mist: #9a8d7a;
-      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      --serif: Palatino, "Palatino Linotype", Georgia, serif;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; }
-    body {
-      min-height: 100dvh;
-      background:
-        radial-gradient(800px 380px at 0% -10%, #3a2a1c 0%, transparent 55%),
-        var(--ink);
-      color: var(--paper);
-      font-family: var(--serif);
-    }
-    .app {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px 20px 40px;
-      display: grid;
-      gap: 16px;
-    }
-    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-    .word {
-      font-size: 28px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin: 0;
-    }
-    .word small {
-      display: block;
-      margin-top: 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.22em;
-      color: var(--brass);
-    }
-    .badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--brass);
-      border: 1px solid color-mix(in srgb, var(--brass) 55%, transparent);
-      padding: 8px 10px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-    .deck { margin: 0; color: var(--mist); max-width: 42rem; line-height: 1.45; }
-    .warn {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: #f0b4a8;
-      border: 1px solid #5a342c;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #1a1210;
-    }
-    label {
-      display: block;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--brass);
-      margin-bottom: 8px;
-    }
-    textarea, input[type="text"] {
-      width: 100%;
-      background: var(--ink-2);
-      color: var(--paper);
-      border: 1px solid #3d342a;
-      border-radius: 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.45;
-      padding: 12px;
-    }
-    textarea {
-      min-height: 280px;
-      resize: vertical;
-    }
-    textarea.short { min-height: 120px; }
-    input[type="text"] { min-height: 40px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
-    button {
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      border: 1px solid var(--brass);
-      background: var(--ink-2);
-      color: var(--paper);
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button.primary { background: var(--rust); border-color: var(--rust); }
-    button:hover { filter: brightness(1.08); }
-    pre {
-      margin: 0;
-      min-height: 8rem;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          transparent 0 27px,
-          color-mix(in srgb, var(--rule) 35%, transparent) 28px
-        ),
-        var(--paper);
-      color: var(--ink);
-      border-radius: 12px;
-      padding: 14px;
-      font-family: var(--mono);
-      font-size: 12.5px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .ok { color: #3d6b3a; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>fidryn mill</title>
+<meta name="description" content="Check, run, explore, and render a Fidryn module on this machine. The mill never files.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css">
+<link rel="stylesheet" href="/assets/mill.css">
+<script src="/assets/mill.js"></script>
 </head>
-<body>
-  <div class="app">
-    <header>
-      <h1 class="word">fidryn mill<small>localhost 127.0.0.1</small></h1>
-      <div class="badge" id="health">health: ...</div>
-    </header>
-    <p class="deck">
-      Check, run, explore, and render a Fidryn module on this machine.
-      This mill never files.
-    </p>
-    <p class="warn">Live filing is not available from the UI.</p>
-    <div>
-      <label for="source">Module source</label>
-      <textarea id="source" spellcheck="false">module Examples.T version "0.1.0" {
-    query q() -> Bool {
-        goal Evaluate { true }
-    }
-}
-</textarea>
-    </div>
-    <div>
-      <label for="query">Query</label>
-      <input id="query" type="text" value="q" spellcheck="false">
-    </div>
-    <div class="row">
-      <div>
-        <label for="validAt">validAt</label>
-        <input id="validAt" type="text" value="2033-01-01T00:00:00Z" spellcheck="false">
-      </div>
-      <div>
-        <label for="knownAt">knownAt</label>
-        <input id="knownAt" type="text" value="2033-01-01T00:00:00Z" spellcheck="false">
+<body class="page-mill">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head mill-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+  <span class="mill-tag">mill</span>
+  <p id="health" class="mill-health" data-state="checking"><span class="mill-dot" aria-hidden="true"></span><span class="mill-host">localhost 127.0.0.1</span> <span class="mill-health-text" role="status">checking</span></p>
+  <p class="mill-nofile">Live filing is not available from the UI</p>
+  <a class="mill-guide" href="https://fidryn.onlygass.dev/docs/mill">Mill guide</a>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+</header>
+  <noscript><p class="mill-noscript">The mill needs JavaScript to talk to the fidryn ui server on 127.0.0.1.</p></noscript>
+<main id="main" class="mill-page">
+  <h1 class="sr-only">fidryn mill</h1>
+  <nav class="mill-samples" aria-labelledby="samples-title">
+    <h2 id="samples-title" class="label">Samples</h2>
+    <ul id="samples" class="mill-list"></ul>
+    <div id="confirm" class="mill-confirm" role="group" aria-labelledby="confirm-text" hidden>
+      <p id="confirm-text">Replace your edits with this sample?</p>
+      <div class="actions">
+        <button id="confirm-replace" class="btn pri sm" type="button">Replace</button>
+        <button id="confirm-cancel" class="btn sec sm" type="button">Cancel</button>
       </div>
     </div>
-    <div>
-      <label for="case">Case JSON</label>
-      <textarea id="case" class="short" spellcheck="false">{}</textarea>
+  </nav>
+  <section class="mill-editor" aria-label="Editor">
+    <div class="mill-editor-head">
+      <div id="buffers" class="mill-seg" role="tablist" aria-label="Input">
+        <button id="tab-module" type="button" role="tab" data-buffer="module" aria-selected="true" aria-controls="editor-wrap">Module</button>
+        <button id="tab-case" type="button" role="tab" data-buffer="case" aria-selected="false" aria-controls="editor-wrap" tabindex="-1">Case JSON</button>
+        <button id="tab-template" type="button" role="tab" data-buffer="template" aria-selected="false" aria-controls="editor-wrap" tabindex="-1">Template</button>
+      </div>
+      <p id="buffer-status" class="mill-status" role="status"></p>
     </div>
-    <div>
-      <label for="template">Template</label>
-      <textarea id="template" class="short" spellcheck="false">{{module}}@{{version}}
-outside: {{#each outside_scope}}{{item}} {{/each}}
-</textarea>
+    <div id="editor-wrap" class="mill-ed" role="tabpanel" aria-labelledby="tab-module">
+      <div id="gutter" class="mill-gutter" aria-hidden="true"></div>
+      <div class="mill-code">
+        <pre id="hl" class="mill-hl" aria-hidden="true"></pre>
+        <textarea id="editor" class="mill-input" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Module source" aria-describedby="editor-help buffer-status"></textarea>
+        <div id="diag-pop" class="mill-pop" role="status" hidden></div>
+      </div>
     </div>
-    <div class="tools">
-      <button class="primary" id="check" type="button">Check</button>
-      <button id="run" type="button">Run</button>
-      <button id="explore" type="button">Explore</button>
-      <button id="render" type="button">Render</button>
+    <p id="editor-help" class="sr-only">Tab indents and Shift+Tab outdents. Press Escape, then Tab, to leave the editor.</p>
+  </section>
+  <section class="mill-side" aria-label="Query and result">
+    <div class="mill-params">
+      <div class="mill-field mill-field-query">
+        <label class="label" for="query">Query</label>
+        <input id="query" type="text" list="query-names" spellcheck="false" autocapitalize="off" autocomplete="off">
+        <datalist id="query-names"></datalist>
+      </div>
+      <div class="mill-field">
+        <label class="label" for="validAt">validAt</label>
+        <input id="validAt" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="validAt-err">
+        <p id="validAt-err" class="mill-field-err" hidden></p>
+      </div>
+      <div class="mill-field">
+        <label class="label" for="knownAt">knownAt</label>
+        <input id="knownAt" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="knownAt-err">
+        <p id="knownAt-err" class="mill-field-err" hidden></p>
+      </div>
     </div>
-    <div>
-      <label>Outcome</label>
-      <pre id="out">Ready.</pre>
+    <div class="actions mill-actions" role="group" aria-label="Actions">
+      <button id="check" class="btn sec sm" type="button">Check</button>
+      <button id="run" class="btn pri sm" type="button">Run</button>
+      <button id="explore" class="btn sec sm" type="button">Explore</button>
+      <button id="render" class="btn sec sm" type="button">Render</button>
     </div>
-  </div>
-  <script>
-    const out = document.getElementById("out");
-    const health = document.getElementById("health");
-    fetch("/api/health").then(function (r) { return r.text(); }).then(function (t) {
-      health.textContent = "health: " + t.trim() + " (localhost)";
-    }).catch(function () {
-      health.textContent = "health: unreachable";
-    });
-    function post(path, body) {
-      return fetch(path, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body)
-      }).then(function (r) { return r.json(); });
-    }
-    function fail(err) {
-      out.className = "";
-      out.textContent = String(err);
-    }
-    function readCase() {
-      var raw = document.getElementById("case").value.trim();
-      if (!raw) return {};
-      return JSON.parse(raw);
-    }
-    function evalBody() {
-      return {
-        source: document.getElementById("source").value,
-        query: document.getElementById("query").value,
-        case: readCase(),
-        validAt: document.getElementById("validAt").value,
-        knownAt: document.getElementById("knownAt").value
-      };
-    }
-    function showJson(data) {
-      out.className = data.ok ? "ok" : "";
-      out.textContent = JSON.stringify(data, null, 2);
-    }
-    document.getElementById("check").addEventListener("click", function () {
-      out.textContent = "Checking...";
-      post("/api/check", { source: document.getElementById("source").value }).then(function (data) {
-        if (data.ok) {
-          out.className = "ok";
-          out.textContent = "ok";
-          return;
-        }
-        out.className = "";
-        var lines = (data.diagnostics || []).map(function (d) {
-          return (d.code || "") + " " + (d.message || JSON.stringify(d));
-        });
-        out.textContent = lines.join("\n") || "check failed";
-      }).catch(fail);
-    });
-    document.getElementById("run").addEventListener("click", function () {
-      out.textContent = "Running...";
-      try {
-        post("/api/run", evalBody()).then(showJson).catch(fail);
-      } catch (err) {
-        fail(err);
-      }
-    });
-    document.getElementById("explore").addEventListener("click", function () {
-      out.textContent = "Exploring...";
-      try {
-        post("/api/explore", evalBody()).then(showJson).catch(fail);
-      } catch (err) {
-        fail(err);
-      }
-    });
-    document.getElementById("render").addEventListener("click", function () {
-      out.textContent = "Rendering...";
-      post("/api/render", {
-        source: document.getElementById("source").value,
-        template: document.getElementById("template").value
-      }).then(function (data) {
-        if (data.ok) {
-          out.className = "ok";
-          out.textContent = data.text || "";
-          return;
-        }
-        out.className = "";
-        out.textContent = data.error || JSON.stringify(data, null, 2);
-      }).catch(fail);
-    });
-  </script>
+    <p class="mill-keys"><kbd class="mill-mod">Ctrl</kbd>+<kbd>Enter</kbd> runs &middot; <kbd class="mill-mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> explores</p>
+    <section class="mill-result" aria-labelledby="result-title">
+      <div class="mill-result-head">
+        <h2 id="result-title" class="label">Result</h2>
+        <div id="views" class="mill-seg" role="group" aria-label="Result view">
+          <button type="button" data-view="opinion" aria-pressed="true">Opinion</button>
+          <button type="button" data-view="table" aria-pressed="false">Table</button>
+          <button type="button" data-view="json" aria-pressed="false">JSON</button>
+        </div>
+      </div>
+      <div id="result-body" class="mill-result-body" aria-live="polite">
+        <div class="mill-empty">
+          <p>Nothing has run yet.</p>
+          <p class="mill-hint">Press Run (<kbd class="mill-mod">Ctrl</kbd>+<kbd>Enter</kbd>) or pick a sample.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+  <section class="mill-history" aria-labelledby="history-title">
+    <h2 id="history-title" class="label">History</h2>
+    <ol id="history" class="mill-list"><li class="mill-none">Nothing run yet</li></ol>
+  </section>
+</main>
 </body>
 </html>

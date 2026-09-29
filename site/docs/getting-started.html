@@ -1,71 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>Getting started — Fidryn</title>
-  <meta name="description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="author" content="Bryan Gass">
-  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/getting-started">
-  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/getting-started.md" title="Markdown">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Fidryn">
-  <meta property="og:title" content="Getting started — Fidryn">
-  <meta property="og:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/getting-started">
-  <meta property="og:locale" content="en_US">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Getting started — Fidryn">
-  <meta name="twitter:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Getting started — Fidryn","description":"Build, check, and run a tiny Fidryn (.fr) program in about an hour.","url":"https://fidryn.onlygass.dev/docs/getting-started","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/getting-started.md"}</script>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/docs.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Getting started — Fidryn</title>
+<meta name="description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/docs/getting-started">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/getting-started.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Getting started — Fidryn">
+<meta property="og:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/docs/getting-started">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Getting started — Fidryn">
+<meta name="twitter:description" content="Build, check, and run a tiny Fidryn (.fr) program in about an hour.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Getting started — Fidryn","description":"Build, check, and run a tiny Fidryn (.fr) program in about an hour.","url":"https://fidryn.onlygass.dev/docs/getting-started","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/getting-started.md"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=4c83b8bf">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
 </head>
-<body class="docs-body">
-  <div class="docs-backdrop" data-docs-close hidden></div>
-  <div class="docs-shell">
-    <header class="docs-top">
-      <a class="mark" href="/">fidryn</a>
-      <div class="docs-top-actions">
-        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span class="docs-menu-btn-text">Menu</span>
-        </button>
-        <nav class="nav" aria-label="Site">
-          <a href="/docs/">Docs</a>
-          <a href="/#install">Install</a>
-          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-        </nav>
-      </div>
-    </header>
-
-    <div class="docs-layout">
-      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-        <p class="docs-sidebar-label">Guides</p>
-        <nav class="docs-side-nav">
-        <a href="/docs/">Overview</a>
-        <a href="/docs/getting-started" class="active">Getting started</a>
-        <a href="/docs/language">Language</a>
-        <a href="/docs/cli">CLI</a>
-        <a href="/docs/mill">Mill</a>
-        <a href="/docs/cases-and-time">Cases &amp; time</a>
-        <a href="/docs/outcomes">Outcomes</a>
-        <a href="/docs/examples">Examples</a>
-        <a href="/docs/contributing">Contributing</a>
-        </nav>
-        <p class="docs-sidebar-label">Also</p>
-        <nav class="docs-side-nav">
-          <a href="/">Home</a>
-          <a href="/docs/getting-started.md">Markdown</a>
-          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-      </aside>
-
-      <main class="docs-main prose" id="main">
-<h1>Getting started with Fidryn</h1>
+<body class="page-doc">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Getting started</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/" aria-current="page">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<div class="doc-layout">
+  <nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started" aria-current="page"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+    </ol>
+  </div>
+</nav>
+  <article class="doc" aria-labelledby="doc-title">
+    <p class="kicker">&sect; 1 &middot; Start</p>
+    <h1 id="doc-title">Getting started with Fidryn</h1>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#prerequisites"><span class="n">1.1</span> Prerequisites</a></li><li class="lvl-2"><a href="#build"><span class="n">1.2</span> Build</a></li><li class="lvl-2"><a href="#check-a-tiny-program"><span class="n">1.3</span> Check a tiny program</a></li><li class="lvl-2"><a href="#run-a-query"><span class="n">1.4</span> Run a query</a></li><li class="lvl-2"><a href="#check-a-larger-fixture"><span class="n">1.5</span> Check a larger fixture</a></li><li class="lvl-2"><a href="#next-reading"><span class="n">1.6</span> Next reading</a></li></ol></details>
+    <div class="prose">
 <p>Clone the repository, install Rust 1.98, then check and run a tiny
 <code>.fr</code> program. This is a first hour, not a complete encoding of any
 jurisdiction.</p>
@@ -78,54 +112,50 @@ in the relevant context. The interpreter never invents a completion.</p>
 <p>This repository is the v0.1 research interpreter. The modules under
 <code>examples/</code> and the programs under <code>tests/</code> are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
-of any jurisdiction’s law.</p>
+of any jurisdiction's law.</p>
 <p>From the repository root, every command below uses
 <code>cargo run -p fidryn-cli --</code> so it works before you install a <code>fidryn</code>
 binary. After you build, the same arguments follow <code>fidryn</code>.</p>
-<h2>Prerequisites</h2>
+<h2 id="prerequisites"><span class="hn">1.1</span> Prerequisites <a class="anchor" href="#prerequisites" aria-label="Link to this section">#</a></h2>
 <p>Install Rust 1.98. The workspace <code>rust-version</code> is 1.98.
-<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml" target="_blank" rel="noopener noreferrer"><code>rust-toolchain.toml</code></a> pins the patch
+<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml"><code>rust-toolchain.toml</code></a> pins the patch
 (<code>1.98.1</code>) and the <code>rustfmt</code> / <code>clippy</code> components. <code>rustup</code> will pick
 that toolchain up when you enter the repository.</p>
 <p>You need a working C linker. On macOS, Command Line Tools clang is
 enough.</p>
-<h2>Build</h2>
+<h2 id="build"><span class="hn">1.2</span> Build <a class="anchor" href="#build" aria-label="Link to this section">#</a></h2>
 <p>From the repository root, compile the workspace and run the tests.
 The first pass takes a bit: it builds every crate, then runs the
 suite.</p>
-<pre><code>cargo test --workspace --offline
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
 <p>Confirm the CLI:</p>
-<pre><code>cargo run -p fidryn-cli -- --help
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> <span class="tk-ty">--help</span></code></pre></figure>
 <p>You should see the <code>fidryn</code> subcommands, including <code>check</code> and <code>run</code>.
 <code>run</code> evaluates a query against a case record and never chooses a
 completion. See the <a href="/docs/cli">CLI</a> guide for the rest of the surface.</p>
-<h2>Check a tiny program</h2>
-<p><a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/require-gate.fr" target="_blank" rel="noopener noreferrer"><code>tests/programs/require-gate.fr</code></a>
+<h2 id="check-a-tiny-program"><span class="hn">1.3</span> Check a tiny program <a class="anchor" href="#check-a-tiny-program" aria-label="Link to this section">#</a></h2>
+<p><a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/require-gate.fr"><code>tests/programs/require-gate.fr</code></a>
 is a complete module with two queries. <code>q</code> requires <code>true</code> and returns
 <code>7</code>. <code>r</code> requires <code>false</code> and does not reach <code>return 7</code>.</p>
-<pre><code>module Programs.RequireGate version &quot;0.1.0&quot; {
-    jurisdiction Test
-    source_snapshot &quot;2026-09-17-require-gate&quot;
-    effective_at 2026-09-17
-    recorded_at 2026-09-17T12:00:00Z
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">module</span> <span class="tk-ty">Programs</span><span class="tk-pu">.</span><span class="tk-ty">RequireGate</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;0.1.0&quot;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">jurisdiction</span> Test
+    <span class="tk-kw">source_snapshot</span> <span class="tk-st">&quot;2026-09-17-require-gate&quot;</span>
+    <span class="tk-kw">effective_at</span> <span class="tk-nu">2026-09-17</span>
+    <span class="tk-kw">recorded_at</span> <span class="tk-nu">2026-09-17T12:00:00Z</span>
 
-    outside_scope { complete_instruments }
+    <span class="tk-kw">outside_scope</span> <span class="tk-pu">{</span> complete_instruments <span class="tk-pu">}</span>
 
-    query q() -&gt; Int { require true; return 7 }
-    query r() -&gt; Int { require false; return 7 }
-}
-</code></pre>
+    <span class="tk-kw">query</span> q<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">true</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span>
+    <span class="tk-kw">query</span> r<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">false</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>Check it:</p>
-<pre><code>cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> check tests/programs/require-gate.fr</code></pre></figure>
 <p>Once <code>fidryn</code> is on your PATH, that is
 <code>fidryn check tests/programs/require-gate.fr</code>. Success prints <code>ok</code>
 and exits 0. Diagnostics go to stderr and the process exits 1.
 <code>check</code> parses, elaborates, and type-checks. It does not evaluate a
 query and does not need a case file.</p>
-<h2>Run a query</h2>
+<h2 id="run-a-query"><span class="hn">1.4</span> Run a query <a class="anchor" href="#run-a-query" aria-label="Link to this section">#</a></h2>
 <p><code>run</code> requires a case record plus both clocks. <code>--valid-at</code> is the
 instant on the legal timeline you are asking about. <code>--known-at</code> is
 the instant of the file you are willing to treat as known. Both are
@@ -135,50 +165,47 @@ the two clocks are in <a href="/docs/cases-and-time">Cases and time</a>.</p>
 <p><code>require-gate</code> does not need facts or an interpretation. Write a
 minimal empty case that satisfies the interchange schema
 (<code>schema</code> and <code>admissibleCompletions</code> are the required properties):</p>
-<pre><code>cat &gt; /tmp/fidryn-empty-case.json &lt;&lt;'EOF'
-{&quot;schema&quot;:&quot;fidryn.case-record/v0.1&quot;,&quot;admissibleCompletions&quot;:{}}
-EOF
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cat</span> <span class="tk-pu">&gt;</span> /tmp/fidryn-empty-case.json <span class="tk-pu">&lt;&lt;&#39;EOF&#39;</span>
+<span class="tk-st">{&quot;schema&quot;:&quot;fidryn.case-record/v0.1&quot;,&quot;admissibleCompletions&quot;:{}}</span>
+<span class="tk-pu">EOF</span></code></pre></figure>
 <p>Run <code>q</code>. It should be determinate <code>7</code>:</p>
-<pre><code>cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
-    --query q \
-    --case /tmp/fidryn-empty-case.json \
-    --valid-at 2026-09-17T12:00:00Z \
-    --known-at 2026-09-17T12:00:00Z
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> run tests/programs/require-gate.fr <span class="tk-pu">\</span>
+    <span class="tk-ty">--query</span> q <span class="tk-pu">\</span>
+    <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
+    <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
+    <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
 <p>The CLI prints one line of canonical JSON
 (<code>fidryn.evaluation-report/v0.1</code>). Pretty-printed, the important fields
 look like this:</p>
-<pre><code class="language-json">{
-  &quot;schema&quot;: &quot;fidryn.evaluation-report/v0.1&quot;,
-  &quot;executionMode&quot;: &quot;operative&quot;,
-  &quot;sourceTrust&quot;: &quot;unauthenticated&quot;,
-  &quot;verificationMethod&quot;: &quot;none&quot;,
-  &quot;assumptions&quot;: [],
-  &quot;coverage&quot;: null,
-  &quot;outcomeDocument&quot;: {
-    &quot;schema&quot;: &quot;fidryn.outcome/v0.1&quot;,
-    &quot;module&quot;: &quot;Programs.RequireGate@0.1.0&quot;,
-    &quot;query&quot;: &quot;q&quot;,
-    &quot;asOf&quot;: {
-      &quot;validTime&quot;: &quot;2026-09-17T12:00:00Z&quot;,
-      &quot;recordTime&quot;: &quot;2026-09-17T12:00:00Z&quot;
-    },
-    &quot;modelBoundary&quot;: {
-      &quot;outsideScope&quot;: [&quot;complete_instruments&quot;],
-      &quot;admissibleCompletions&quot;: {
-        &quot;interpretations&quot;: {},
-        &quot;evidence&quot;: {},
-        &quot;choices&quot;: {}
-      }
-    },
-    &quot;outcome&quot;: {
-      &quot;kind&quot;: &quot;determinate&quot;,
-      &quot;value&quot;: { &quot;kind&quot;: &quot;int&quot;, &quot;data&quot;: 7 }
-    }
-  }
-}
-</code></pre>
+<figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.evaluation-report/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;executionMode&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;operative&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;sourceTrust&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;unauthenticated&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;verificationMethod&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;none&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;assumptions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-pu">]</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;coverage&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">null</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;outcomeDocument&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.outcome/v0.1&quot;</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;module&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Programs.RequireGate@0.1.0&quot;</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;query&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;q&quot;</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;asOf&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;validTime&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-09-17T12:00:00Z&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;recordTime&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-09-17T12:00:00Z&quot;</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;modelBoundary&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;outsideScope&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-st">&quot;complete_instruments&quot;</span><span class="tk-pu">]</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;evidence&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;choices&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
+      <span class="tk-pu">}</span>
+    <span class="tk-pu">}</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;outcome&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;kind&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;determinate&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span> <span class="tk-ty">&quot;kind&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;int&quot;</span><span class="tk-pu">,</span> <span class="tk-ty">&quot;data&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>The six-kind legal result is nested under <code>outcomeDocument</code>.
 <code>modelBoundary</code> is part of that answer. The module declared
 <code>complete_instruments</code> as outside scope, so the envelope repeats that
@@ -186,50 +213,47 @@ exclusion. An omitted interpretation cannot silently shrink the model.
 Pass <code>--scenario</code> only when you intend <code>case.assumptions</code> as an overlay;
 operative <code>run</code> (the default) does not apply them.</p>
 <p>Now run <code>r</code>:</p>
-<pre><code>cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
-    --query r \
-    --case /tmp/fidryn-empty-case.json \
-    --valid-at 2026-09-17T12:00:00Z \
-    --known-at 2026-09-17T12:00:00Z
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> run tests/programs/require-gate.fr <span class="tk-pu">\</span>
+    <span class="tk-ty">--query</span> r <span class="tk-pu">\</span>
+    <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
+    <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
+    <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
 <p><code>require false</code> does not skip ahead to <code>return 7</code>. Nested
 <code>outcomeDocument.outcome</code> is <code>suspended</code>, with a request that the
 requirement failed:</p>
-<pre><code class="language-json">{
-  &quot;outcomeDocument&quot;: {
-    &quot;outcome&quot;: {
-      &quot;kind&quot;: &quot;suspended&quot;,
-      &quot;requests&quot;: [
-        {
-          &quot;kind&quot;: &quot;needCustom&quot;,
-          &quot;effect&quot;: &quot;require&quot;,
-          &quot;payload&quot;: &quot;requirement failed&quot;
-        }
-      ]
-    }
-  }
-}
-</code></pre>
+<figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;outcomeDocument&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+    <span class="tk-ty">&quot;outcome&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+      <span class="tk-ty">&quot;kind&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;suspended&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;requests&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
+        <span class="tk-pu">{</span>
+          <span class="tk-ty">&quot;kind&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;needCustom&quot;</span><span class="tk-pu">,</span>
+          <span class="tk-ty">&quot;effect&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;require&quot;</span><span class="tk-pu">,</span>
+          <span class="tk-ty">&quot;payload&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;requirement failed&quot;</span>
+        <span class="tk-pu">}</span>
+      <span class="tk-pu">]</span>
+    <span class="tk-pu">}</span>
+  <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>That is the governing rule in miniature: the interpreter will not
 pretend the later <code>7</code> is the answer. How those kinds compose is in
 <a href="/docs/outcomes">Outcomes</a>.</p>
 <p><code>--query</code> is the query name as written in the module (<code>q</code>, <code>r</code>).
-<code>--arg KEY=VALUE</code> writes <code>case.facts[&quot;KEY&quot;]</code>. You do not need it here.</p>
-<h2>Check a larger fixture</h2>
+<code>--arg KEY=VALUE</code> writes <code>case.facts["KEY"]</code>. You do not need it here.</p>
+<h2 id="check-a-larger-fixture"><span class="hn">1.5</span> Check a larger fixture <a class="anchor" href="#check-a-larger-fixture" aria-label="Link to this section">#</a></h2>
 <p>The Massachusetts trust fixture is a bounded slice of a private
 instrument, not Massachusetts trust law as a whole. Check it the same
 way:</p>
-<pre><code>cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> check examples/trust/bryan-revocable-trust.fr</code></pre></figure>
 <p>Success is again <code>ok</code>. The module lists <code>tax</code>, <code>creditor_priority</code>,
 <code>real_property_recording</code>, and <code>complete_Massachusetts_trust_law</code> as
 <code>outside_scope</code>. Those names will appear on <code>modelBoundary</code> if you
 later <code>run</code> a query against a case under
-<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/cases/" target="_blank" rel="noopener noreferrer"><code>examples/trust/cases/</code></a>.</p>
+<a href="https://github.com/BeeGass/fidryn/tree/main/examples/trust/cases/"><code>examples/trust/cases/</code></a>.</p>
 <p>The <a href="/docs/examples">examples</a> catalog has more fixtures. They encode
 bounded high-impact slices. They do not contain the entire United
 States Code.</p>
-<h2>Next reading</h2>
+<h2 id="next-reading"><span class="hn">1.6</span> Next reading <a class="anchor" href="#next-reading" aria-label="Link to this section">#</a></h2>
 <ol>
 <li><a href="/docs/language">Language</a> — module headers, queries, rules, duties,
 and what Fidryn will not do.</li>
@@ -245,39 +269,23 @@ port 8751). The mill checks a module in the browser. It does not
 live-file.</li>
 </ol>
 
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-      </main>
     </div>
-
-    <footer class="footer docs-footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
-    </footer>
-  </div>
-  <script>
-  (function () {
-    var body = document.body;
-    var btn = document.querySelector("[data-docs-toggle]");
-    var backdrop = document.querySelector(".docs-backdrop");
-    if (!btn || !backdrop) return;
-    backdrop.hidden = false;
-    function setOpen(open) {
-      body.classList.toggle("docs-nav-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-      body.style.overflow = open ? "hidden" : "";
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!body.classList.contains("docs-nav-open"));
-    });
-    backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
-    });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
-    });
-  })();
-  </script>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/"><span class="label">Previous</span><span class="t">Overview</span></a><a class="next" href="/docs/language"><span class="label">Next &middot; &sect;2</span><span class="t">Language</span></a></nav>
+    <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/getting-started.md">Edit this page on GitHub</a><a href="/docs/getting-started.md">View as Markdown</a></p>
+    <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+  </article>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#prerequisites"><span class="n">1.1</span> Prerequisites</a></li><li class="lvl-2"><a href="#build"><span class="n">1.2</span> Build</a></li><li class="lvl-2"><a href="#check-a-tiny-program"><span class="n">1.3</span> Check a tiny program</a></li><li class="lvl-2"><a href="#run-a-query"><span class="n">1.4</span> Run a query</a></li><li class="lvl-2"><a href="#check-a-larger-fixture"><span class="n">1.5</span> Check a larger fixture</a></li><li class="lvl-2"><a href="#next-reading"><span class="n">1.6</span> Next reading</a></li></ol></aside>
+</div>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
 </body>
 </html>

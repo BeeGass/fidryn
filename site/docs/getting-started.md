@@ -8,6 +8,7 @@ author: "Bryan Gass"
 
 > Canonical HTML: https://fidryn.onlygass.dev/docs/getting-started
 > This markdown mirror is for agents and plain-text readers.
+
 # Getting started with Fidryn
 
 Clone the repository, install Rust 1.98, then check and run a tiny
@@ -33,7 +34,7 @@ binary. After you build, the same arguments follow `fidryn`.
 ## Prerequisites
 
 Install Rust 1.98. The workspace `rust-version` is 1.98.
-[`rust-toolchain.toml`](../rust-toolchain.toml) pins the patch
+[`rust-toolchain.toml`](https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml) pins the patch
 (`1.98.1`) and the `rustfmt` / `clippy` components. `rustup` will pick
 that toolchain up when you enter the repository.
 
@@ -58,11 +59,11 @@ cargo run -p fidryn-cli -- --help
 
 You should see the `fidryn` subcommands, including `check` and `run`.
 `run` evaluates a query against a case record and never chooses a
-completion. See the [CLI](cli.md) guide for the rest of the surface.
+completion. See the [CLI](https://fidryn.onlygass.dev/docs/cli.md) guide for the rest of the surface.
 
 ## Check a tiny program
 
-[`tests/programs/require-gate.fr`](../tests/programs/require-gate.fr)
+[`tests/programs/require-gate.fr`](https://github.com/BeeGass/fidryn/blob/main/tests/programs/require-gate.fr)
 is a complete module with two queries. `q` requires `true` and returns
 `7`. `r` requires `false` and does not reach `return 7`.
 
@@ -99,7 +100,7 @@ instant on the legal timeline you are asking about. `--known-at` is
 the instant of the file you are willing to treat as known. Both are
 ISO 8601 / RFC 3339 (`Z` or a numeric offset). Use
 `2026-09-17T12:00:00Z` for this hour. Details of the case JSON and
-the two clocks are in [Cases and time](cases-and-time.md).
+the two clocks are in [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md).
 
 `require-gate` does not need facts or an interpretation. Write a
 minimal empty case that satisfies the interchange schema
@@ -197,7 +198,7 @@ requirement failed:
 
 That is the governing rule in miniature: the interpreter will not
 pretend the later `7` is the answer. How those kinds compose is in
-[Outcomes](outcomes.md).
+[Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
 
 `--query` is the query name as written in the module (`q`, `r`).
 `--arg KEY=VALUE` writes `case.facts["KEY"]`. You do not need it here.
@@ -216,23 +217,23 @@ Success is again `ok`. The module lists `tax`, `creditor_priority`,
 `real_property_recording`, and `complete_Massachusetts_trust_law` as
 `outside_scope`. Those names will appear on `modelBoundary` if you
 later `run` a query against a case under
-[`examples/trust/cases/`](../examples/trust/cases/).
+[`examples/trust/cases/`](https://github.com/BeeGass/fidryn/tree/main/examples/trust/cases/).
 
-The [examples](examples.md) catalog has more fixtures. They encode
+The [examples](https://fidryn.onlygass.dev/docs/examples.md) catalog has more fixtures. They encode
 bounded high-impact slices. They do not contain the entire United
 States Code.
 
 ## Next reading
 
-1. [Language](language.md) — module headers, queries, rules, duties,
+1. [Language](https://fidryn.onlygass.dev/docs/language.md) — module headers, queries, rules, duties,
    and what Fidryn will not do.
-2. [CLI](cli.md) — `check`, `run`, `explore`, and the other
+2. [CLI](https://fidryn.onlygass.dev/docs/cli.md) — `check`, `run`, `explore`, and the other
    subcommands, with the flags the binary actually accepts.
-3. [Outcomes](outcomes.md) — determinate, suspended, contingent, and
+3. [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md) — determinate, suspended, contingent, and
    the rest of the envelope.
-4. [Cases and time](cases-and-time.md) — case JSON, admissible
+4. [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) — case JSON, admissible
    completions, `--valid-at` / `--known-at`.
-5. [Examples](examples.md) — the fixture corpus under `examples/`.
-6. [Mill](mill.md) — localhost `fidryn ui` on `127.0.0.1` (default
+5. [Examples](https://fidryn.onlygass.dev/docs/examples.md) — the fixture corpus under `examples/`.
+6. [Mill](https://fidryn.onlygass.dev/docs/mill.md) — localhost `fidryn ui` on `127.0.0.1` (default
    port 8751). The mill checks a module in the browser. It does not
    live-file.

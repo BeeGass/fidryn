@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .shadow { fill: #a3281d; }
+    .ink { fill: #1c1813; }
+    .paper { fill: #f7f2e8; }
+    @media (prefers-color-scheme: dark) {
+      .shadow { fill: #e0725f; }
+      .ink { fill: #efe6d6; }
+      .paper { fill: #15120e; }
+    }
+  </style>
+  <rect class="shadow" x="6" y="6" width="24" height="24" rx="4"/>
+  <rect class="ink" x="2" y="2" width="24" height="24" rx="4"/>
+  <rect class="paper" x="4" y="4" width="20" height="20" rx="2.5"/>
+  <path class="ink" d="M8 8h12v6h-1.75v-3.25H14v3.5h4v2.75h-4V19h2v2H8v-2h2V11H8z"/>
+</svg>

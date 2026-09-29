@@ -22,7 +22,7 @@ Fidryn is a **programming language for legal instruments**: precise where law is
 ## Install
 
 ```bash
-cargo install --git https://github.com/BeeGass/fidryn --locked
+cargo install --git https://github.com/BeeGass/fidryn --locked fidryn-cli
 ```
 
 Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `127.0.0.1:8751`). This public site does **not** expose live filing or the mill API.
@@ -32,9 +32,9 @@ Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `
 - [Docs hub](https://fidryn.onlygass.dev/docs/) · [docs/index.md](https://fidryn.onlygass.dev/docs/index.md)
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started) · [getting-started.md](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [Language](https://fidryn.onlygass.dev/docs/language) · [language.md](https://fidryn.onlygass.dev/docs/language.md)
+- [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time) · [cases-and-time.md](https://fidryn.onlygass.dev/docs/cases-and-time.md)
 - [CLI](https://fidryn.onlygass.dev/docs/cli) · [cli.md](https://fidryn.onlygass.dev/docs/cli.md)
 - [Mill](https://fidryn.onlygass.dev/docs/mill) · [mill.md](https://fidryn.onlygass.dev/docs/mill.md)
-- [Cases & time](https://fidryn.onlygass.dev/docs/cases-and-time) · [cases-and-time.md](https://fidryn.onlygass.dev/docs/cases-and-time.md)
 - [Outcomes](https://fidryn.onlygass.dev/docs/outcomes) · [outcomes.md](https://fidryn.onlygass.dev/docs/outcomes.md)
 - [Examples](https://fidryn.onlygass.dev/docs/examples) · [examples.md](https://fidryn.onlygass.dev/docs/examples.md)
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing) · [contributing.md](https://fidryn.onlygass.dev/docs/contributing.md)

@@ -1,13 +1,3 @@
----
-title: "Examples"
-description: "Trust, tax, federal slices, and the fifty-state corpus map for Fidryn."
-url: "https://fidryn.onlygass.dev/docs/examples"
-markdown: "https://fidryn.onlygass.dev/docs/examples.md"
-author: "Bryan Gass"
----
-
-> Canonical HTML: https://fidryn.onlygass.dev/docs/examples
-> This markdown mirror is for agents and plain-text readers.
 # Example corpus
 
 This catalog is a map of the Fidryn example tree. The modules under
