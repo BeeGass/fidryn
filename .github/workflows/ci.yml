@@ -33,7 +33,8 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
       # uv uses the Python that .python-version names (downloading it if the runner lacks it) and the packages uv.lock pins; the .venv it builds lives only on the runner.
-      - uses: astral-sh/setup-uv@v10
+      # setup-uv publishes exact release tags only (no floating major tag).
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           version: "0.11.8"
           enable-cache: true
