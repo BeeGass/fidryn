@@ -1,97 +1,152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>Contributing — Fidryn</title>
-  <meta name="description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="author" content="Bryan Gass">
-  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/contributing">
-  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/contributing.md" title="Markdown">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Fidryn">
-  <meta property="og:title" content="Contributing — Fidryn">
-  <meta property="og:description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
-  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/contributing">
-  <meta property="og:locale" content="en_US">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Contributing — Fidryn">
-  <meta name="twitter:description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Contributing — Fidryn","description":"Toolchain, tests, and how to work on the Fidryn reference interpreter.","url":"https://fidryn.onlygass.dev/docs/contributing","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/contributing.md"}</script>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/docs.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contributing — Fidryn</title>
+<meta name="description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/docs/contributing">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/contributing.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Contributing — Fidryn">
+<meta property="og:description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/docs/contributing">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Contributing — Fidryn">
+<meta name="twitter:description" content="Toolchain, tests, and how to work on the Fidryn reference interpreter.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Contributing — Fidryn","description":"Toolchain, tests, and how to work on the Fidryn reference interpreter.","url":"https://fidryn.onlygass.dev/docs/contributing","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/contributing.md"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=4c83b8bf">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
 </head>
-<body class="docs-body">
-  <div class="docs-backdrop" data-docs-close hidden></div>
-  <div class="docs-shell">
-    <header class="docs-top">
-      <a class="mark" href="/">fidryn</a>
-      <div class="docs-top-actions">
-        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span class="docs-menu-btn-text">Menu</span>
-        </button>
-        <nav class="nav" aria-label="Site">
-          <a href="/docs/">Docs</a>
-          <a href="/#install">Install</a>
-          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-        </nav>
-      </div>
-    </header>
-
-    <div class="docs-layout">
-      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-        <p class="docs-sidebar-label">Guides</p>
-        <nav class="docs-side-nav">
-        <a href="/docs/">Overview</a>
-        <a href="/docs/getting-started">Getting started</a>
-        <a href="/docs/language">Language</a>
-        <a href="/docs/cli">CLI</a>
-        <a href="/docs/mill">Mill</a>
-        <a href="/docs/cases-and-time">Cases &amp; time</a>
-        <a href="/docs/outcomes">Outcomes</a>
-        <a href="/docs/examples">Examples</a>
-        <a href="/docs/contributing" class="active">Contributing</a>
-        </nav>
-        <p class="docs-sidebar-label">Also</p>
-        <nav class="docs-side-nav">
-          <a href="/">Home</a>
-          <a href="/docs/contributing.md">Markdown</a>
-          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-      </aside>
-
-      <main class="docs-main prose" id="main">
-<h1>Contributing to Fidryn</h1>
+<body class="page-doc">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Contributing</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/" aria-current="page">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<div class="doc-layout">
+  <nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing" aria-current="page"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+    </ol>
+  </div>
+</nav>
+  <article class="doc" aria-labelledby="doc-title">
+    <p class="kicker">&sect; 8 &middot; Contribute</p>
+    <h1 id="doc-title">Contributing to Fidryn</h1>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></details>
+    <div class="prose">
 <p>This file is for people building the v0.1 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
-the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> and the <a href="/docs/">documentation hub</a>.</p>
+the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md">README</a> and the <a href="/docs/">documentation hub</a>.</p>
 <p>Fidryn (FID-rin) is a research fixture. Modules under <code>examples/</code> and
 records under <code>tests/</code> exercise the interpreter. They are not operative
-instruments and not a complete statement of any jurisdiction’s law.</p>
-<h2>Toolchain</h2>
+instruments and not a complete statement of any jurisdiction's law.</p>
+<h2 id="toolchain"><span class="hn">8.1</span> Toolchain <a class="anchor" href="#toolchain" aria-label="Link to this section">#</a></h2>
 <p>Rust 1.98, edition 2024. Workspace <code>package.rust-version</code> is 1.98.
-<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml" target="_blank" rel="noopener noreferrer"><code>rust-toolchain.toml</code></a> pins the 1.98.1
+<a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml"><code>rust-toolchain.toml</code></a> pins the 1.98.1
 channel and the <code>rustfmt</code> and <code>clippy</code> components.</p>
 <p>If <code>cargo</code> or <code>git</code> pick the wrong tools on this Mac, a working PATH is
 <code>/opt/homebrew/bin:$HOME/.cargo/bin:/usr/bin:/bin</code>, with
 <code>DEVELOPER_DIR=/Library/Developer/CommandLineTools</code>.
-<a href="https://github.com/BeeGass/fidryn/blob/main/.cargo/config.toml" target="_blank" rel="noopener noreferrer"><code>.cargo/config.toml</code></a> already points the linker
+<a href="https://github.com/BeeGass/fidryn/blob/main/.cargo/config.toml"><code>.cargo/config.toml</code></a> already points the linker
 at Command Line Tools clang because the Xcode license is unsigned.</p>
-<h2>Checks</h2>
+<h2 id="checks"><span class="hn">8.2</span> Checks <a class="anchor" href="#checks" aria-label="Link to this section">#</a></h2>
 <p>From the repository root:</p>
-<pre><code>cargo fmt
-cargo clippy --workspace -- -D warnings
-cargo test --workspace --offline
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt
+<span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
+<span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
+<p><code>cargo xtask ci</code> runs the tests and clippy, then the conformance
+probes and the Python checks (ruff and mypy), the site check, the
+JavaScript tests when Node is installed, and a bench build;
+<code>cargo xtask ci --fmt</code> also checks Rust formatting first. The Python steps
+need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code> provides the Python
+that <code>.python-version</code> names and the packages <code>uv.lock</code> pins. GitHub
+Actions runs <code>cargo xtask ci --fmt</code> on every push to <code>main</code> and every
+pull request (<code>.github/workflows/ci.yml</code>); the runner builds its own
+<code>.venv</code> from <code>uv.lock</code>, and nothing it builds is committed.</p>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
-<h2>Pipeline</h2>
+<h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
+<p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides
+by the workspace task runner. After editing a guide in <code>docs/</code>, run:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> xtask site</code></pre></figure>
+<p>and commit the markdown together with the regenerated files under
+<code>site/</code>. <code>cargo xtask site --check</code> fails when the committed site is
+stale, and <code>cargo xtask ci</code> runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.</p>
+<p>The stylesheet and script in <code>site/assets/</code> are written by hand. The
+mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>, embeds the stylesheet
+<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. When Node is
+installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
+<code>web/tests/</code>; Node is never needed to build or serve anything.</p>
+<h2 id="pipeline"><span class="hn">8.4</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>
-<pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli
-</code></pre>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli</code></pre></figure>
 <p><code>fidryn-kernel</code> sits beside verify: it accepts or rejects covering
 claims and does not search. <code>fidryn-trace</code>, <code>fidryn-solve</code>,
 <code>fidryn-adapt</code>, and <code>fidryn-render</code> support the pipeline; they are not
@@ -99,9 +154,9 @@ extra stages.</p>
 <p>Do not add reverse dependencies. Do not put evaluator logic in
 <code>syntax</code>. Do not put parser logic in <code>core</code>. <code>fidryn-driver</code> must not
 depend on <code>fidryn-cli</code>.</p>
-<h2>Crates</h2>
-<p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml" target="_blank" rel="noopener noreferrer"><code>Cargo.toml</code></a>.</p>
-<pre><code>fidryn-syntax          lossless CST, parser, formatter
+<h2 id="crates"><span class="hn">8.5</span> Crates <a class="anchor" href="#crates" aria-label="Link to this section">#</a></h2>
+<p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml"><code>Cargo.toml</code></a>.</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
 fidryn-check           types, effects, authority, time, strata (hir + core)
@@ -114,76 +169,59 @@ fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
-fidryn-cli             fidryn binary and localhost mill
-</code></pre>
-<h2>Tests</h2>
+fidryn-cli             fidryn binary and localhost mill</code></pre></figure>
+<h2 id="tests"><span class="hn">8.6</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
 <p>Tests live next to the crates they exercise (<code>#[cfg(test)]</code> in <code>src</code>,
 and <code>crates/&lt;name&gt;/tests/</code> when a crate has an integration kit).</p>
 <p>The adversarial review kit is
-<a href="https://github.com/BeeGass/fidryn/blob/main/tests/integration/adversarial_regressions.rs" target="_blank" rel="noopener noreferrer"><code>tests/integration/adversarial_regressions.rs</code></a>.
+<a href="https://github.com/BeeGass/fidryn/blob/main/tests/integration/adversarial_regressions.rs"><code>tests/integration/adversarial_regressions.rs</code></a>.
 Those tests are regressions, not closure of the language.</p>
-<p>Independent programs live under <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/" target="_blank" rel="noopener noreferrer"><code>tests/programs/</code></a>.
-<a href="https://github.com/BeeGass/fidryn/blob/main/crates/fidryn-verify/tests/domains.rs" target="_blank" rel="noopener noreferrer"><code>crates/fidryn-verify/tests/domains.rs</code></a>
+<p>Independent programs live under <a href="https://github.com/BeeGass/fidryn/tree/main/tests/programs/"><code>tests/programs/</code></a>.
+<a href="https://github.com/BeeGass/fidryn/blob/main/crates/fidryn-verify/tests/domains.rs"><code>crates/fidryn-verify/tests/domains.rs</code></a>
 runs them as independently named modules. Do not rewrite compiled Core
 to green fingerprint tests. Patching a <code>CoreModule</code> so a digest, plan,
 or outcome matches is not a passing test.</p>
-<h2>Commits</h2>
+<h2 id="commits"><span class="hn">8.7</span> Commits <a class="anchor" href="#commits" aria-label="Link to this section">#</a></h2>
 <p>Use Conventional Commits (<code>feat(syntax): ...</code>, <code>fix(eval): ...</code>,
 <code>test(cli): ...</code>, <code>docs: ...</code>). Prefer atomic commits in pipeline order,
 then tests and docs. Do not dump unrelated crates into one commit.</p>
-<h2>Grammar</h2>
-<p>The closed v0.1 grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a> at the
+<h2 id="grammar"><span class="hn">8.8</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
+<p>The closed v0.1 grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the
 repository root. Unknown body fields are parse errors, not extension
 points.</p>
-<h2>Implementer documents</h2>
+<h2 id="implementer-documents"><span class="hn">8.9</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
 <p>These files are crate contracts and evidence. They are not user
 tutorials.</p>
 <ul>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">ARCHITECTURE.md</a> — Frozen crate graph, public APIs, and the pipeline of total functions over trees.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md" target="_blank" rel="noopener noreferrer">implementation-status.md</a> — Evidence-backed capability matrix. A <code>.fr</code> file is not an executable specification.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md" target="_blank" rel="noopener noreferrer">OBLIGATIONS.md</a> — Review obligation matrix. Green workspace tests are regressions, not language closure.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md" target="_blank" rel="noopener noreferrer">WORKSTREAM-CONTRACT.md</a> — Shared types and acceptance for covering certificates, <code>seq</code>/<code>require</code>, tax, and trust profiles.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md" target="_blank" rel="noopener noreferrer">INTEGRATION-CONTRACT.md</a> — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a> — Frozen crate graph, public APIs, and the pipeline of total functions over trees.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status.md</a> — Evidence-backed capability matrix. A <code>.fr</code> file is not an executable specification.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md">OBLIGATIONS.md</a> — Review obligation matrix. Green workspace tests are regressions, not language closure.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md">WORKSTREAM-CONTRACT.md</a> — Shared types and acceptance for covering certificates, <code>seq</code>/<code>require</code>, tax, and trust profiles.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md">INTEGRATION-CONTRACT.md</a> — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.</li>
 </ul>
 <p>Mill HTTP routes are documented in <a href="/docs/mill">mill.md</a>, not in
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">ARCHITECTURE.md</a>.</p>
-<h2>Not legal advice</h2>
+ARCHITECTURE.md.</p>
+<h2 id="not-legal-advice"><span class="hn">8.10</span> Not legal advice <a class="anchor" href="#not-legal-advice" aria-label="Link to this section">#</a></h2>
 <p>This interpreter, its tests, and its example modules are not legal
 advice.</p>
 
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-      </main>
     </div>
-
-    <footer class="footer docs-footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
-    </footer>
-  </div>
-  <script>
-  (function () {
-    var body = document.body;
-    var btn = document.querySelector("[data-docs-toggle]");
-    var backdrop = document.querySelector(".docs-backdrop");
-    if (!btn || !backdrop) return;
-    backdrop.hidden = false;
-    function setOpen(open) {
-      body.classList.toggle("docs-nav-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-      body.style.overflow = open ? "hidden" : "";
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!body.classList.contains("docs-nav-open"));
-    });
-    backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
-    });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
-    });
-  })();
-  </script>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/examples"><span class="label">Previous &middot; &sect;7</span><span class="t">Examples</span></a></nav>
+    <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/contributing.md">Edit this page on GitHub</a><a href="/docs/contributing.md">View as Markdown</a></p>
+    <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+  </article>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></aside>
+</div>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
 </body>
 </html>

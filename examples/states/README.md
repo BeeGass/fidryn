@@ -1,7 +1,7 @@
 # Fifty-state high-impact corpus
 
 One **full** Fidryn module per state: the statute or constitutional
-rule people and lawyers actually hit, encoded as a complete instrument
+rule people and lawyers actually hit, encoded as a self-contained fixture module
 (sources, entities, propositions, observations, rules, duties, queries,
 scenarios, verification). These are research fixtures, not legal advice,
 and not a complete statement of any state's code.

@@ -1,71 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>Language — Fidryn</title>
-  <meta name="description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="author" content="Bryan Gass">
-  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/language">
-  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/language.md" title="Markdown">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Fidryn">
-  <meta property="og:title" content="Language — Fidryn">
-  <meta property="og:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
-  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/language">
-  <meta property="og:locale" content="en_US">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Language — Fidryn">
-  <meta name="twitter:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Language — Fidryn","description":"Fidryn language map: modules, queries, rules, duties, and what the language will not do.","url":"https://fidryn.onlygass.dev/docs/language","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/language.md"}</script>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/docs.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Language — Fidryn</title>
+<meta name="description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/docs/language">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/language.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Language — Fidryn">
+<meta property="og:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/docs/language">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Language — Fidryn">
+<meta name="twitter:description" content="Fidryn language map: modules, queries, rules, duties, and what the language will not do.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Language — Fidryn","description":"Fidryn language map: modules, queries, rules, duties, and what the language will not do.","url":"https://fidryn.onlygass.dev/docs/language","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/language.md"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=4c83b8bf">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
 </head>
-<body class="docs-body">
-  <div class="docs-backdrop" data-docs-close hidden></div>
-  <div class="docs-shell">
-    <header class="docs-top">
-      <a class="mark" href="/">fidryn</a>
-      <div class="docs-top-actions">
-        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span class="docs-menu-btn-text">Menu</span>
-        </button>
-        <nav class="nav" aria-label="Site">
-          <a href="/docs/">Docs</a>
-          <a href="/#install">Install</a>
-          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-        </nav>
-      </div>
-    </header>
-
-    <div class="docs-layout">
-      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-        <p class="docs-sidebar-label">Guides</p>
-        <nav class="docs-side-nav">
-        <a href="/docs/">Overview</a>
-        <a href="/docs/getting-started">Getting started</a>
-        <a href="/docs/language" class="active">Language</a>
-        <a href="/docs/cli">CLI</a>
-        <a href="/docs/mill">Mill</a>
-        <a href="/docs/cases-and-time">Cases &amp; time</a>
-        <a href="/docs/outcomes">Outcomes</a>
-        <a href="/docs/examples">Examples</a>
-        <a href="/docs/contributing">Contributing</a>
-        </nav>
-        <p class="docs-sidebar-label">Also</p>
-        <nav class="docs-side-nav">
-          <a href="/">Home</a>
-          <a href="/docs/language.md">Markdown</a>
-          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-      </aside>
-
-      <main class="docs-main prose" id="main">
-<h1>The Fidryn language</h1>
+<body class="page-doc">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Language</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/" aria-current="page">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<div class="doc-layout">
+  <nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language" aria-current="page"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+    </ol>
+  </div>
+</nav>
+  <article class="doc" aria-labelledby="doc-title">
+    <p class="kicker">&sect; 2 &middot; Write</p>
+    <h1 id="doc-title">The Fidryn language</h1>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></details>
+    <div class="prose">
 <p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
 open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
@@ -73,48 +107,65 @@ open the fixtures and check them. For build, <code>check</code>, and the first
 law is mechanical, explicit where judgment enters. This repository is
 the v0.1 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
-statement of any jurisdiction’s law.</p>
+statement of any jurisdiction's law.</p>
 <p>The grammar is closed: unknown body fields are parse errors. Copy from
 an existing <code>.fr</code> file when you are unsure a spelling parses. The
-reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>.</p>
-<h2>Module header</h2>
+reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
+<h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
+<p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
+Use the table as a honesty check; open a fixture for the full field list.
+v0.1 support is <strong>parsed / checked / executed</strong> only where noted — see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
+<tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed/checked; hex digests authenticate under CLI <code>check_path</code></td></tr>
+<tr><td><code>record_type</code> / <code>evidence_type</code></td><td>FOIA / trust fixtures</td><td>Parsed/checked; used as named evidence schemas</td></tr>
+<tr><td><code>observation</code></td><td>LLC / state homestead modules</td><td>Parsed/checked; Observe matches schema + known-at</td></tr>
+<tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>In-module overlay fixtures; not JSON cases; not silent <code>run</code> defaults</td></tr>
+<tr><td><code>Evaluate</code> / <code>UniqueOccupant</code> / <code>RunDecision</code> / <code>StatusOf</code></td><td>trust, late-payment, LLC</td><td>Executed query plans</td></tr>
+<tr><td><code>EvaluateClause</code></td><td><code>examples/prenup/ava-noah.fr</code></td><td>Executed clause-plan queries</td></tr>
+<tr><td><code>power</code> / <code>legal_act</code> / <code>clause</code></td><td>trust, FOIA, prenup</td><td>Parsed/checked; specialized paths, not a general act engine</td></tr>
+<tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Parsed; conflict outcomes/requests when staged effects disagree</td></tr>
+<tr><td><code>transaction</code></td><td><code>tests/programs/transaction-atomic.fr</code></td><td>Partial; not a full commit engine</td></tr>
+<tr><td><code>for_all</code> / <code>exists</code></td><td>status + grammar</td><td>Finite declared domains only; open domains suspend; no open-world proofs</td></tr>
+<tr><td><code>fn</code></td><td>grammar / status</td><td>Limited/partial; no current example declaration</td></tr>
+<tr><td>Module type parameters</td><td>status</td><td>Type-name substitution only; no cross-file value-parameter calculus</td></tr>
+</tbody></table>
+</div>
+<h2 id="module-header"><span class="hn">2.2</span> Module header <a class="anchor" href="#module-header" aria-label="Link to this section">#</a></h2>
 <p>Every file is one module. The header names the instrument, the dated
 slice it encodes, and what it refuses to claim.</p>
-<pre><code>module Programs.LatePayment version &quot;0.1.0&quot; {
-    jurisdiction Test
-    source_snapshot &quot;2026-09-17-late-payment&quot;
-    effective_at 2026-09-17
-    recorded_at 2026-09-17T12:00:00Z
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">module</span> <span class="tk-ty">Programs</span><span class="tk-pu">.</span><span class="tk-ty">LatePayment</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;0.1.0&quot;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">jurisdiction</span> Test
+    <span class="tk-kw">source_snapshot</span> <span class="tk-st">&quot;2026-09-17-late-payment&quot;</span>
+    <span class="tk-kw">effective_at</span> <span class="tk-nu">2026-09-17</span>
+    <span class="tk-kw">recorded_at</span> <span class="tk-nu">2026-09-17T12:00:00Z</span>
 
-    outside_scope { complete_instruments }
+    <span class="tk-kw">outside_scope</span> <span class="tk-pu">{</span> complete_instruments <span class="tk-pu">}</span>
 
-    // queries, duties, and interpretation families follow
-}
-</code></pre>
+    <span class="tk-co">// queries, duties, and interpretation families follow</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>jurisdiction</code> is a name, not a choice of engine. <code>source_snapshot</code> is
 the dated slice this file encodes. <code>effective_at</code> is a date.
 <code>recorded_at</code> is a date-time (<code>Z</code> or a numeric offset).
 <code>outside_scope</code> is a set of named exclusions; those names reappear on
-the outcome’s <code>modelBoundary</code>.</p>
+the outcome's <code>modelBoundary</code>.</p>
 <p>The trust fixture also declares a source manifest, resolved relative
 to the module file:</p>
-<pre><code>source_manifest &quot;sources/ma-trust-fixture.manifest.json&quot;
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source_manifest</span> <span class="tk-st">&quot;sources/ma-trust-fixture.manifest.json&quot;</span></code></pre></figure>
 <p>A declared path that is missing or malformed is a diagnostic. Modules
 that omit a manifest get an empty default. CLI <code>check</code> / <code>run</code> of a
 path can byte-authenticate artifacts against files next to the module.
 Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
-<h2>Sources and digests</h2>
+<h2 id="sources-and-digests"><span class="hn">2.3</span> Sources and digests <a class="anchor" href="#sources-and-digests" aria-label="Link to this section">#</a></h2>
 <p>A <code>source { }</code> block names an artifact the module is encoding.</p>
-<pre><code>source FinalPayStatute {
-    kind statute
-    authority CaliforniaLegislature
-    citation &quot;Cal. Lab. Code §§ 201-203&quot;
-    artifact &quot;sources/ca-lab-201-203.txt&quot;
-    digest fixture
-    effective [2026-09-17, +inf)
-}
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source</span> FinalPayStatute <span class="tk-pu">{</span>
+    <span class="tk-kw">kind</span> statute
+    <span class="tk-kw">authority</span> CaliforniaLegislature
+    <span class="tk-kw">citation</span> <span class="tk-st">&quot;Cal. Lab. Code §§ 201-203&quot;</span>
+    <span class="tk-kw">artifact</span> <span class="tk-st">&quot;sources/ca-lab-201-203.txt&quot;</span>
+    <span class="tk-kw">digest</span> fixture
+    <span class="tk-kw">effective</span> <span class="tk-pu">[</span><span class="tk-nu">2026-09-17</span><span class="tk-pu">,</span> <span class="tk-nu">+inf</span><span class="tk-pu">)</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>digest fixture</code> is a fixture profile, not a hash of the file. It is
 not byte-verified authentication. A 32- or 64-digit hex digest is
 blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
@@ -122,91 +173,121 @@ first 16 bytes). <code>check</code> of a <code>.fr</code> path hashes the file a
 relative to the module directory. A missing file or a mismatch is
 unauthenticated; digest-required imports fail with E200. Hex without
 readable bytes is not a fixture profile. The source-manifest JSON uses
-the same <code>&quot;digest&quot;: &quot;fixture&quot;</code> versus hex distinction.</p>
-<h2>Entities, propositions, and offices</h2>
+the same <code>"digest": "fixture"</code> versus hex distinction.</p>
+<h2 id="imports"><span class="hn">2.4</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
+<p>Modules may import another module by name and version. Digests and aliases
+match the source-trust story above.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
+<span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">digest</span> fixture
+    <span class="tk-kw">alias</span> FOIARegs
+<span class="tk-pu">}</span></code></pre></figure>
+<p>CLI <code>check</code> / <code>run</code> of a path can byte-authenticate hex digests against
+artifacts under the module directory. <code>"digest": "fixture"</code> (or
+<code>digest fixture</code> in source) is a trust profile, not byte verification.
+Mill paste does not load manifests or artifact files.</p>
+<h2 id="entities-propositions-and-offices"><span class="hn">2.5</span> Entities, propositions, and offices <a class="anchor" href="#entities-propositions-and-offices" aria-label="Link to this section">#</a></h2>
 <p>Name the parties and the propositions you will later test. A
 proposition is not a Boolean.</p>
-<pre><code>entity Payer : NaturalPerson
-entity Payee : NaturalPerson
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">entity</span> Payer <span class="tk-pu">:</span> <span class="tk-ty">NaturalPerson</span>
+<span class="tk-kw">entity</span> Payee <span class="tk-pu">:</span> <span class="tk-ty">NaturalPerson</span>
 
-proposition InvoiceIssued(person: NaturalPerson)
-proposition Eligible(person: LegalPerson, office: Office)
-</code></pre>
+<span class="tk-kw">proposition</span> InvoiceIssued<span class="tk-pu">(</span>person<span class="tk-pu">:</span> <span class="tk-ty">NaturalPerson</span><span class="tk-pu">)</span>
+<span class="tk-kw">proposition</span> Eligible<span class="tk-pu">(</span>person<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span></code></pre></figure>
 <p>An <code>office</code> is a position someone can occupy. From
-<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/bryan-revocable-trust.fr" target="_blank" rel="noopener noreferrer"><code>examples/trust/bryan-revocable-trust.fr</code></a>:</p>
-<pre><code>office TrusteeOf(trust: Trust) occupied_by LegalPerson {
-    cardinality 0..1
-    acquired_by Effective(AcceptOffice)
-    suspended_by OperativeIncapacity
-    lost_by {Death, EffectiveResignation, EffectiveRemoval}
-    competence {AdministerTrust, DecideTrustDistributions}
-}
-</code></pre>
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/trust/bryan-revocable-trust.fr"><code>examples/trust/bryan-revocable-trust.fr</code></a>:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>trust<span class="tk-pu">:</span> <span class="tk-ty">Trust</span><span class="tk-pu">)</span> <span class="tk-kw">occupied_by</span> LegalPerson <span class="tk-pu">{</span>
+    <span class="tk-kw">cardinality</span> <span class="tk-nu">0</span><span class="tk-pu">..</span><span class="tk-nu">1</span>
+    <span class="tk-kw">acquired_by</span> Effective<span class="tk-pu">(</span>AcceptOffice<span class="tk-pu">)</span>
+    <span class="tk-kw">suspended_by</span> OperativeIncapacity
+    <span class="tk-kw">lost_by</span> <span class="tk-pu">{</span>Death<span class="tk-pu">,</span> EffectiveResignation<span class="tk-pu">,</span> EffectiveRemoval<span class="tk-pu">}</span>
+    <span class="tk-kw">competence</span> <span class="tk-pu">{</span>AdministerTrust<span class="tk-pu">,</span> DecideTrustDistributions<span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>Occupies(Bryan, TrusteeOf(BRT))</code> is a proposition about that office,
 not a <code>Bool</code>.</p>
-<h2>Queries, goals, and effects</h2>
+<h2 id="record-and-evidence-types"><span class="hn">2.6</span> Record and evidence types <a class="anchor" href="#record-and-evidence-types" aria-label="Link to this section">#</a></h2>
+<p>Name structured payloads the case and Observe paths will carry.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">record_type</span> FOIARequest <span class="tk-pu">{</span>
+    <span class="tk-co">// fields as in examples/foia/foia-request.fr</span>
+<span class="tk-pu">}</span>
+
+<span class="tk-kw">evidence_type</span> PhysicianCertificate <span class="tk-pu">{</span>
+    <span class="tk-co">// fields as in examples/trust/bryan-revocable-trust.fr</span>
+<span class="tk-pu">}</span></code></pre></figure>
+<p>These declarations are part of the closed grammar. Copy field shapes from
+an existing fixture rather than inventing spellings.</p>
+<h2 id="observations"><span class="hn">2.7</span> Observations <a class="anchor" href="#observations" aria-label="Link to this section">#</a></h2>
+<p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">observation</span> OfficialFilingObservation<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">OfficialFilingRecord</span><span class="tk-pu">)</span>
+<span class="tk-kw">observation</span> EndOfTenancy<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">TenancyRecord</span><span class="tk-pu">)</span></code></pre></figure>
+<p>Observe still requires a matching case evidence row with <code>observedAt</code> at
+or before <code>--known-at</code>. Declaring an observation does not invent the
+record.</p>
+<h2 id="queries-goals-and-effects"><span class="hn">2.8</span> Queries, goals, and effects <a class="anchor" href="#queries-goals-and-effects" aria-label="Link to this section">#</a></h2>
 <p>A query is the thing you <code>run</code>. The body is <code>return</code> / <code>require</code>
 statements or an explicit <code>goal</code>. Fixtures use <code>Evaluate</code>,
 <code>UniqueOccupant</code>, <code>RunDecision</code>, and <code>StatusOf</code>.</p>
-<pre><code>query due() -&gt; Money&lt;USD&gt; {
-    goal Evaluate { USD(100.00) }
-}
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> <span class="tk-kw">due</span><span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Money</span><span class="tk-pu">&lt;</span><span class="tk-ty">USD</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> USD<span class="tk-pu">(</span><span class="tk-nu">100.00</span><span class="tk-pu">)</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span>
 
-query acting_trustee() -&gt; LegalPerson ! {Observe, Determine, Interpret} {
-    goal UniqueOccupant { office TrusteeOf(BRT) }
-}
+<span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span> <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span>
 
-query paid_on_time() -&gt; Bool ! {Observe} {
-    goal RunDecision { decision TimelyPayment }
-}
+<span class="tk-kw">query</span> paid_on_time<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">}</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> RunDecision <span class="tk-pu">{</span> <span class="tk-kw">decision</span> TimelyPayment <span class="tk-pu">}</span>
+<span class="tk-pu">}</span>
 
-query entity_status() -&gt; EntityStatus ! {Observe, Determine} {
-    goal StatusOf {
-        status FormedLLC(HarborRobotics)
-        when_present FormedLLC(HarborRobotics)
-        when_closed_absent NotFormedLLC(HarborRobotics)
-    }
-}
-</code></pre>
+<span class="tk-kw">query</span> entity_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">EntityStatus</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">}</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> StatusOf <span class="tk-pu">{</span>
+        status FormedLLC<span class="tk-pu">(</span>HarborRobotics<span class="tk-pu">)</span>
+        when_present FormedLLC<span class="tk-pu">(</span>HarborRobotics<span class="tk-pu">)</span>
+        when_closed_absent NotFormedLLC<span class="tk-pu">(</span>HarborRobotics<span class="tk-pu">)</span>
+    <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>Evaluate</code> computes a term. <code>UniqueOccupant</code> asks who occupies an
 office. <code>RunDecision</code> runs a named <code>decision</code> against the case.
 <code>StatusOf</code> reports a legal status when present, or the closed-absent
 form when the domain is closed
-(<a href="https://github.com/BeeGass/fidryn/blob/main/examples/massachusetts-llc/harbor-robotics.fr" target="_blank" rel="noopener noreferrer"><code>harbor-robotics.fr</code></a>).</p>
+(<a href="https://github.com/BeeGass/fidryn/blob/main/examples/massachusetts-llc/harbor-robotics.fr"><code>harbor-robotics.fr</code></a>).</p>
+<p><code>EvaluateClause</code> is an additional query plan used by some instruments
+(for example <a href="https://github.com/BeeGass/fidryn/blob/main/examples/prenup/ava-noah.fr"><code>examples/prenup/ava-noah.fr</code></a>):</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> provision_result<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> EvaluateClause <span class="tk-pu">{</span> <span class="tk-pu">/</span><span class="tk-pu">*</span> <span class="tk-kw">clause</span> plan <span class="tk-pu">*</span><span class="tk-pu">/</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>The effect row <code>! {Observe, Determine, Interpret}</code> is permission, not
 a promise that the engine will invent evidence. If the case does not
 supply what the effect needs, the outcome is <code>suspended</code>. <code>run</code> never
 fills that request. See <a href="/docs/outcomes">Outcomes</a> and
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2>Automatic versus judgment</h2>
+<h2 id="automatic-versus-judgment"><span class="hn">2.9</span> Automatic versus judgment <a class="anchor" href="#automatic-versus-judgment" aria-label="Link to this section">#</a></h2>
 <p>Mark a query <code>automatic</code> only when the answer is mechanical and the
 effect row is empty.</p>
-<pre><code>query automatic pay_due_immediately(discharged: Bool) -&gt; Bool {
-    return discharged
-}
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> <span class="tk-kw">automatic</span> pay_due_immediately<span class="tk-pu">(</span>discharged<span class="tk-pu">:</span> <span class="tk-ty">Bool</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">return</span> discharged
+<span class="tk-pu">}</span>
 
-query waiting_time_penalty() -&gt; Bool ! {Determine} {
-    goal Evaluate {
-        require determined WillfulFailureToPay(Employer)
-            using Determine
-    }
-}
-</code></pre>
+<span class="tk-kw">query</span> waiting_time_penalty<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Determine<span class="tk-pu">}</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span>
+        <span class="tk-kw">require</span> determined WillfulFailureToPay<span class="tk-pu">(</span>Employer<span class="tk-pu">)</span>
+            <span class="tk-kw">using</span> Determine
+    <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>An automatic query that reaches <code>Determine</code>, <code>Observe</code>, or <code>Interpret</code>
 is E420. Willful failure is a judgment, not a Bool you compute in the
 module. The waiting-time query is allowed to suspend.</p>
 <p>A <code>judgment</code> declaration names who decides a proposition, what record
 it needs, and what happens on established / rejected / otherwise. The
-trust fixture’s incapacity judgment requires two distinct physician
+trust fixture's incapacity judgment requires two distinct physician
 certificates and otherwise suspends <code>NeedJudgment</code>. The language will
-not collapse “the physicians have not spoken” into <code>false</code>.</p>
-<h2>Require, return, and sequential evaluation</h2>
+not collapse "the physicians have not spoken" into <code>false</code>.</p>
+<h2 id="require-return-and-sequential-evaluation"><span class="hn">2.10</span> Require, return, and sequential evaluation <a class="anchor" href="#require-return-and-sequential-evaluation" aria-label="Link to this section">#</a></h2>
 <p>Statements in a block run left to right. Several statements lower to
 a <code>seq</code>; the last value is the result. <code>require</code> is a gate: <code>true</code>
 continues, <code>false</code> suspends and does not return the later value.</p>
-<pre><code>query q() -&gt; Int { require true; return 7 }
-query r() -&gt; Int { require false; return 7 }
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> q<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">true</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span>
+<span class="tk-kw">query</span> r<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Int</span> <span class="tk-pu">{</span> <span class="tk-kw">require</span> <span class="tk-nu">false</span><span class="tk-pu">;</span> <span class="tk-kw">return</span> <span class="tk-nu">7</span> <span class="tk-pu">}</span></code></pre></figure>
 <p><code>q</code> is determinate <code>7</code>. <code>r</code> is <code>suspended</code> (<code>needCustom</code> /
 <code>requirement failed</code>). That is why <a href="/docs/getting-started">Getting started</a>
 runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</code> resumes by skipping
@@ -214,28 +295,27 @@ the completed prefix, so a later term does not re-run an earlier
 attach.</p>
 <p><code>require determined P using Determine</code> requests a competent
 determination instead of treating <code>P</code> as a Bool.</p>
-<h2>Calc, conditionals, money, and durations</h2>
+<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.11</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
-<pre><code>calc return_deadline() -&gt; Duration&lt;counted_days&gt; {
-    return 21 counted_days
-}
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">return</span> <span class="tk-nu">21</span> <span class="tk-nu">counted_days</span>
+<span class="tk-pu">}</span>
 
-calc federal_hourly_floor() -&gt; Money&lt;USD&gt; {
-    return USD(7.25)
-}
+<span class="tk-kw">calc</span> federal_hourly_floor<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Money</span><span class="tk-pu">&lt;</span><span class="tk-ty">USD</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">return</span> USD<span class="tk-pu">(</span><span class="tk-nu">7.25</span><span class="tk-pu">)</span>
+<span class="tk-pu">}</span>
 
-query automatic deadline_running(end: Time, as_of: Time) -&gt; Bool {
-    return as_of &lt;= end + return_deadline()
-}
-</code></pre>
+<span class="tk-kw">query</span> <span class="tk-kw">automatic</span> deadline_running<span class="tk-pu">(</span>end<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">,</span> as_of<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">return</span> as_of <span class="tk-pu">&lt;=</span> end <span class="tk-pu">+</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
 calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
 <code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> is not
 <code>21 days</code>.</p>
 <p><code>if</code> / <code>else</code> is Boolean control flow. The condition must be a <code>Bool</code>,
-not a proposition. <a href="https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr" target="_blank" rel="noopener noreferrer"><code>prelude/tax.fr</code></a> uses it on
+not a proposition. <a href="https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr"><code>prelude/tax.fr</code></a> uses it on
 amounts:</p>
-<pre><code>if amount &lt;= 11925.00 {
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>if amount &lt;= 11925.00 {
     amount * 0.10
 } else {
     if amount &lt;= 48475.00 {
@@ -247,24 +327,24 @@ amounts:</p>
             17651.00 + (amount - 103350.00) * 0.24
         }
     }
-}
-</code></pre>
+}</code></pre></figure>
 <p>This is a rejected guard (E310):</p>
-<pre><code>query bad() -&gt; LegalPerson {
-    goal Evaluate { if Incapacitated(Bryan) { Bryan } }
-}
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> bad<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> if Incapacitated<span class="tk-pu">(</span>Bryan<span class="tk-pu">)</span> <span class="tk-pu">{</span> Bryan <span class="tk-pu">}</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>Use <code>when operative P</code> on a rule, or <code>require determined P using Determine</code> in a query. <code>Prop</code> has no conversion to <code>Bool</code>.</p>
-<h2>Rules</h2>
+<h2 id="rules"><span class="hn">2.12</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
 <p>A <code>rule</code> fires when a guard holds, then derives or establishes a
-proposition. The kind is <code>derive</code>, <code>constitutive</code>, or <code>prescriptive</code>.</p>
-<pre><code>rule InitialTrustee : constitutive
-    from Instrument.clause(&quot;1.2&quot;)
-{
-    when operative TrustInstrumentExecuted(BRT) in TrustCreation(BRT)
-    then establish Occupies(Bryan, TrusteeOf(BRT))
-}
-</code></pre>
+proposition. The current staged worklist is <strong>bounded and specialized</strong>
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>); this is not a
+general rule engine, and prescriptive duties / full transaction commit
+are not that worklist. The kind is <code>derive</code>, <code>constitutive</code>, or <code>prescriptive</code>.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">rule</span> InitialTrustee <span class="tk-pu">:</span> <span class="tk-kw">constitutive</span>
+    <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;1.2&quot;</span><span class="tk-pu">)</span>
+<span class="tk-pu">{</span>
+    <span class="tk-kw">when</span> operative TrustInstrumentExecuted<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">in</span> TrustCreation<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span>
+    <span class="tk-kw">then</span> <span class="tk-kw">establish</span> Occupies<span class="tk-pu">(</span>Bryan<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>when operative P</code> tests legal status. <code>when determined P</code> tests a
 competent determination already on the case. <code>then derive</code> and
 <code>then establish</code> are the usual consequences. Guards must use
@@ -272,22 +352,21 @@ competent determination already on the case. <code>then derive</code> and
 proposition. The successor rule in the trust fixture also
 <code>select unique candidate from nominations_for(...)</code> with
 <code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
-<h2>Interpretation families</h2>
+<h2 id="interpretation-families"><span class="hn">2.13</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
 <p>When the instrument still admits more than one reading, declare the
 family and what each alternative establishes.</p>
-<pre><code>interpretation_family DeadlineMeaning {
-    alternative Strict {
-        defines GracePeriod(0) as established
-        defines StrictDeadline() as established
-        defines ExtendedDeadline() as not_established
-    }
-    alternative Extended {
-        defines GracePeriod(15) as established
-        defines StrictDeadline() as not_established
-        defines ExtendedDeadline() as established
-    }
-}
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">interpretation_family</span> DeadlineMeaning <span class="tk-pu">{</span>
+    <span class="tk-kw">alternative</span> Strict <span class="tk-pu">{</span>
+        <span class="tk-kw">defines</span> GracePeriod<span class="tk-pu">(</span><span class="tk-nu">0</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established
+        <span class="tk-kw">defines</span> StrictDeadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established
+        <span class="tk-kw">defines</span> ExtendedDeadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established
+    <span class="tk-pu">}</span>
+    <span class="tk-kw">alternative</span> Extended <span class="tk-pu">{</span>
+        <span class="tk-kw">defines</span> GracePeriod<span class="tk-pu">(</span><span class="tk-nu">15</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established
+        <span class="tk-kw">defines</span> StrictDeadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established
+        <span class="tk-kw">defines</span> ExtendedDeadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established
+    <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>Each <code>defines P as established</code> or <code>defines P as not_established</code> is
 a claim in that world. The case lists still-admissible alternatives
 under <code>admissibleCompletions.interpretations</code>. <code>run</code> does not pick
@@ -297,37 +376,48 @@ and the case has not selected one, the outcome is <code>suspended</code>
 <p>The trust fixture binds a family to a clause and names a selector
 (<code>explicit_instrument_definition or controlling_interpretation or request Interpret</code>). That is how a court selection on the case becomes
 operative. It is not a default vote.</p>
-<h2>Nominations</h2>
+<h2 id="nominations"><span class="hn">2.14</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
 <p>A nomination is a ranked candidate for an office.</p>
-<pre><code>nomination Alice for TrusteeOf(BRT) rank 1
-    from Instrument.clause(&quot;4.4.a&quot;)
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">nomination</span> Alice <span class="tk-kw">for</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">rank</span> <span class="tk-nu">1</span>
+    <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4.a&quot;</span><span class="tk-pu">)</span>
 
-nomination Bob for TrusteeOf(BRT) rank 2
-    from Instrument.clause(&quot;4.4.b&quot;)
-</code></pre>
+<span class="tk-kw">nomination</span> Bob <span class="tk-kw">for</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">rank</span> <span class="tk-nu">2</span>
+    <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4.b&quot;</span><span class="tk-pu">)</span></code></pre></figure>
 <p>Rank <code>1</code> is higher than rank <code>2</code>. Duplicate ranks for the same office
 are E410. Rank is not occupancy: <code>UniqueOccupant</code> still needs an
 occupancy record, eligibility, and any required acceptance. Open
 eligibility stays <code>suspended</code>, or becomes <code>contingent</code> under
 <a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
 the first name on the list.</p>
-<h2>Duties</h2>
+<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.15</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
+<p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
+They are <strong>status-qualified</strong>: parsed and checked, with specialized
+evaluation paths — not a general operational law engine. See
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
+<span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
+<span class="tk-kw">conflict_doctrine</span> ChildSupportCannotBeAdverselyAffected <span class="tk-pu">..</span><span class="tk-pu">.</span></code></pre></figure>
+<p>When staged effects disagree and no unique doctrine applies, the outcome
+kind is <code>normConflict</code> (or a <code>needConflict</code> request). List order is never
+a silent tie-break.</p>
+<h2 id="duties"><span class="hn">2.16</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
 <p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
-From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr" target="_blank" rel="noopener noreferrer"><code>tests/programs/late-payment.fr</code></a>:</p>
-<pre><code>duty PayInvoice {
-    bearer Payer
-    claimant Payee
-    attaches when operative InvoiceIssued(Payer)
-    content USD(100.00)
-    due 0 counted_days after invoice_date
-}
+From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr"><code>tests/programs/late-payment.fr</code></a>:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">duty</span> PayInvoice <span class="tk-pu">{</span>
+    <span class="tk-kw">bearer</span> Payer
+    <span class="tk-kw">claimant</span> Payee
+    <span class="tk-kw">attaches</span> <span class="tk-kw">when</span> operative InvoiceIssued<span class="tk-pu">(</span>Payer<span class="tk-pu">)</span>
+    <span class="tk-kw">content</span> USD<span class="tk-pu">(</span><span class="tk-nu">100.00</span><span class="tk-pu">)</span>
+    <span class="tk-kw">due</span> <span class="tk-nu">0</span> <span class="tk-nu">counted_days</span> after invoice_date
+<span class="tk-pu">}</span>
 
-query obligation_status() -&gt; String {
-    goal Evaluate { duty_status(PayInvoice) }
-}
-</code></pre>
-<p><code>duty_status(Name)</code> looks up that duty declaration plus the case. It
-does not invent performance. Status is one of <code>Unresolved</code>,
+<span class="tk-kw">query</span> obligation_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">String</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> duty_status<span class="tk-pu">(</span>PayInvoice<span class="tk-pu">)</span> <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
+<p><code>duty_status(Name)</code> looks up that duty declaration plus the case on the
+<strong>implemented specialized duty path</strong> (see late-payment fixtures and
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>). It does not invent
+performance and is not a general legal-duty / transaction engine. Status is one of <code>Unresolved</code>,
 <code>Attached</code>, <code>Performed</code>, <code>Breached</code>, <code>Cured</code>, <code>Discharged</code>. A late
 perform can remain <code>Performed</code> with <code>breached: true</code>. Changing
 <code>due 0 counted_days</code> to <code>due 15 counted_days</code> changes when the same
@@ -337,41 +427,47 @@ guard. A <code>kind: duty</code> event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit <code>assumption</code>. That gate is in
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2>Scenarios (in-module)</h2>
+<h2 id="transactions-and-quantifiers"><span class="hn">2.17</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
+<p><code>transaction { ... }</code> blocks exist in the grammar and are exercised by
+<code>tests/programs/transaction-atomic.fr</code>. Support is <strong>partial</strong> — not a
+full atomic commit engine for arbitrary legal acts.</p>
+<p><code>for_all</code> / <code>exists</code> quantify over <strong>finite declared domains</strong> (and
+closures where required). Open domains suspend. Nested / open-world
+theorem proving is not implemented. Prefer reading
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a> before treating a
+quantified <code>verify</code> as a proved theorem.</p>
+<h2 id="scenarios-in-module"><span class="hn">2.18</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
 <p>A <code>scenario</code> block names overlay hypotheses for fixtures that do not
 ship companion JSON case files (for example under <code>examples/states/</code>).
 It is not a silent default for <code>run</code>.</p>
-<pre><code>scenario InsideCityHalfAcre {
-    assume OccupiesAsResidence(Owner, Home)
-    assume InsideMunicipality(Home)
-    assume within_urban_acreage(0.5)
-    at 2026-09-17T12:00:00-04:00
-}
-</code></pre>
-<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>. Case JSON
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">scenario</span> InsideCityHalfAcre <span class="tk-pu">{</span>
+    <span class="tk-kw">assume</span> OccupiesAsResidence<span class="tk-pu">(</span>Owner<span class="tk-pu">,</span> Home<span class="tk-pu">)</span>
+    <span class="tk-kw">assume</span> InsideMunicipality<span class="tk-pu">(</span>Home<span class="tk-pu">)</span>
+    <span class="tk-kw">assume</span> within_urban_acreage<span class="tk-pu">(</span><span class="tk-nu">0.5</span><span class="tk-pu">)</span>
+    <span class="tk-kw">at</span> <span class="tk-nu">2026-09-17T12:00:00-04:00</span>
+<span class="tk-pu">}</span></code></pre></figure>
+<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Case JSON
 can carry analogous overlay rows as <code>assumptions</code> (<code>id</code>, <code>payload</code>);
 CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
 <code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
 See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
-<h2>Verify</h2>
+<h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
 <p>A <code>verify</code> block is a named property. v0.1 discharges Boolean
 literals:</p>
-<pre><code>verify Trivial {
-    assert true
-}
-</code></pre>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Trivial <span class="tk-pu">{</span>
+    <span class="tk-kw">assert</span> <span class="tk-nu">true</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Other
 formulas parse, but the bounded verifier does not currently obtain a
 covering proof of them:</p>
-<pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME
-</code></pre>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> verify PATH <span class="tk-ty">--property</span> NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>
 lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
-<h2>What the language will not do</h2>
+<h2 id="what-the-language-will-not-do"><span class="hn">2.20</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
 <p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
 <code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,
 <code>assumed</code>, or <code>necessarily</code>, or request <code>Determine</code>.</p>
@@ -386,39 +482,23 @@ a proposition in one named alternative.</p>
 choose a completion either. The <a href="/docs/examples">examples</a> show the
 refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-file.</p>
 
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-      </main>
     </div>
-
-    <footer class="footer docs-footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
-    </footer>
-  </div>
-  <script>
-  (function () {
-    var body = document.body;
-    var btn = document.querySelector("[data-docs-toggle]");
-    var backdrop = document.querySelector(".docs-backdrop");
-    if (!btn || !backdrop) return;
-    backdrop.hidden = false;
-    function setOpen(open) {
-      body.classList.toggle("docs-nav-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-      body.style.overflow = open ? "hidden" : "";
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!body.classList.contains("docs-nav-open"));
-    });
-    backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
-    });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
-    });
-  })();
-  </script>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/getting-started"><span class="label">Previous &middot; &sect;1</span><span class="t">Getting started</span></a><a class="next" href="/docs/cases-and-time"><span class="label">Next &middot; &sect;3</span><span class="t">Cases and time</span></a></nav>
+    <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/language.md">Edit this page on GitHub</a><a href="/docs/language.md">View as Markdown</a></p>
+    <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+  </article>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></aside>
+</div>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
 </body>
 </html>

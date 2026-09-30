@@ -5,7 +5,7 @@ Does not execute Rust. Prefers jsonschema + referencing when installed.
 Without those packages, uses a local Draft 2020-12 subset (no network).
 Reports observed acceptance, not semantic verification of an evaluation.
 
-Usage: python3 conformance/schema_boundary_probes.py [/path/to/fidryn]
+Usage: uv run python conformance/schema_boundary_probes.py [/path/to/fidryn]
 """
 
 from __future__ import annotations
@@ -102,33 +102,23 @@ def builtin_iter_errors(
     if "$ref" in schema:
         target = resolve_ref(schema["$ref"], current_id, by_id)
         rest = {k: v for k, v in schema.items() if k != "$ref"}
-        errors.extend(
-            builtin_iter_errors(target, instance, by_id, current_id, location)
-        )
+        errors.extend(builtin_iter_errors(target, instance, by_id, current_id, location))
         if rest:
-            errors.extend(
-                builtin_iter_errors(rest, instance, by_id, current_id, location)
-            )
+            errors.extend(builtin_iter_errors(rest, instance, by_id, current_id, location))
         return errors
 
     for sub in schema.get("allOf", []):
         errors.extend(builtin_iter_errors(sub, instance, by_id, current_id, location))
 
     if "if" in schema:
-        if_errors = builtin_iter_errors(
-            schema["if"], instance, by_id, current_id, location
-        )
+        if_errors = builtin_iter_errors(schema["if"], instance, by_id, current_id, location)
         if not if_errors and "then" in schema:
             errors.extend(
-                builtin_iter_errors(
-                    schema["then"], instance, by_id, current_id, location
-                )
+                builtin_iter_errors(schema["then"], instance, by_id, current_id, location)
             )
         if if_errors and "else" in schema:
             errors.extend(
-                builtin_iter_errors(
-                    schema["else"], instance, by_id, current_id, location
-                )
+                builtin_iter_errors(schema["else"], instance, by_id, current_id, location)
             )
 
     if "const" in schema and instance != schema["const"]:
@@ -146,18 +136,14 @@ def builtin_iter_errors(
 
     if isinstance(instance, list):
         if "maxItems" in schema and len(instance) > schema["maxItems"]:
-            errors.append(
-                f"{instance!r} has too many items (maxItems {schema['maxItems']})"
-            )
+            errors.append(f"{instance!r} has too many items (maxItems {schema['maxItems']})")
         if "minItems" in schema and len(instance) < schema["minItems"]:
-            errors.append(
-                f"{instance!r} has too few items (minItems {schema['minItems']})"
-            )
+            errors.append(f"{instance!r} has too few items (minItems {schema['minItems']})")
         if "items" in schema:
             for index, item in enumerate(instance):
                 errors.extend(
                     builtin_iter_errors(
-                        schema["items"], item, by_id, current_id, location + [index]
+                        schema["items"], item, by_id, current_id, [*location, index]
                     )
                 )
 
@@ -177,15 +163,11 @@ def builtin_iter_errors(
         for key, value in instance.items():
             if key in properties:
                 errors.extend(
-                    builtin_iter_errors(
-                        properties[key], value, by_id, current_id, location + [key]
-                    )
+                    builtin_iter_errors(properties[key], value, by_id, current_id, [*location, key])
                 )
             elif isinstance(additional, dict):
                 errors.extend(
-                    builtin_iter_errors(
-                        additional, value, by_id, current_id, location + [key]
-                    )
+                    builtin_iter_errors(additional, value, by_id, current_id, [*location, key])
                 )
 
     return errors
@@ -226,9 +208,7 @@ def main() -> None:
     schema_dir = root / "schemas"
     by_id = load_schemas(schema_dir)
     report_schema = json.loads((schema_dir / "evaluation-report-v0.1.json").read_text())
-    mill_schema = json.loads(
-        (schema_dir / "mill-evaluation-response-v0.1.json").read_text()
-    )
+    mill_schema = json.loads((schema_dir / "mill-evaluation-response-v0.1.json").read_text())
     jsonschema_ok = False
     report_js = None
     mill_js = None
@@ -240,9 +220,7 @@ def main() -> None:
         for path in sorted(schema_dir.glob("*.json")):
             schema = json.loads(path.read_text(encoding="utf-8"))
             Draft202012Validator.check_schema(schema)
-            registry = registry.with_resource(
-                schema["$id"], Resource.from_contents(schema)
-            )
+            registry = registry.with_resource(schema["$id"], Resource.from_contents(schema))
         report_js = Draft202012Validator(report_schema, registry=registry)
         mill_js = Draft202012Validator(mill_schema, registry=registry)
         jsonschema_ok = True
@@ -290,14 +268,10 @@ def main() -> None:
     probes["finite_replay_with_no_coverage_or_certificate"] = finite
     rows = []
     for name, document in probes.items():
-        errors = validator_errors(
-            report_schema, document, by_id, jsonschema_ok, report_js
-        )
+        errors = validator_errors(report_schema, document, by_id, jsonschema_ok, report_js)
         rows.append({"name": name, "accepted_by_schema": not errors, "errors": errors})
     wrapper = {"ok": True, "report": copy.deepcopy(report)}
-    wrapper_errors = validator_errors(
-        mill_schema, wrapper, by_id, jsonschema_ok, mill_js
-    )
+    wrapper_errors = validator_errors(mill_schema, wrapper, by_id, jsonschema_ok, mill_js)
     rows.append(
         {
             "name": "mill_transport_wrapper",
@@ -305,9 +279,7 @@ def main() -> None:
             "errors": wrapper_errors,
         }
     )
-    flattened_mill_errors = validator_errors(
-        mill_schema, mill, by_id, jsonschema_ok, mill_js
-    )
+    flattened_mill_errors = validator_errors(mill_schema, mill, by_id, jsonschema_ok, mill_js)
     rows.append(
         {
             "name": "mill_flattened_rejected_by_transport_schema",

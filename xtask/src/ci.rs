@@ -1,5 +1,6 @@
 use crate::workspace::{
-    cargo_command, load_metadata, run_command, run_schema_probes, workspace_has_benches,
+    cargo_command, load_metadata, run_command, run_js_tests, run_python_checks, run_schema_probes,
+    workspace_has_benches,
 };
 use anyhow::Result;
 use clap::Args;
@@ -29,7 +30,10 @@ pub fn run(args: CiArgs) -> Result<()> {
     run_command(clippy)?;
 
     run_schema_probes()?;
+    run_python_checks()?;
+    crate::site::check(&crate::workspace::workspace_root())?;
 
+    run_js_tests()?;
     if workspace_has_benches(&metadata) {
         let mut bench = cargo_command();
         bench.args(["bench", "--no-run", "--offline"]);

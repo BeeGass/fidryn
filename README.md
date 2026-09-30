@@ -135,4 +135,3 @@ actually implemented: [docs/implementation-status.md](docs/implementation-status
 ## Website
 
 Public landing: [fidryn.onlygass.dev](https://fidryn.onlygass.dev) (static files in `site/`).
-

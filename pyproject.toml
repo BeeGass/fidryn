@@ -1,0 +1,35 @@
+[project]
+name = "fidryn-tools"
+version = "0.0.0"
+description = "Python tooling for the Fidryn repository: the conformance schema probes and agent scripts."
+requires-python = ">=3.12"
+dependencies = [
+    "jsonschema>=4.23",
+    "referencing>=0.35",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13",
+    "ruff>=0.8",
+    "types-jsonschema>=4.26.0.20260518",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Only Python files: the formatter must not rewrite code blocks in the Markdown
+# docs, which are the site's canonical sources.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "A", "C4", "DTZ", "T10", "RET", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["conformance", ".agents/scripts"]

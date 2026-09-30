@@ -30,7 +30,38 @@ cargo clippy --workspace -- -D warnings
 cargo test --workspace --offline
 ```
 
+`cargo xtask ci` runs the tests and clippy, then the conformance
+probes and the Python checks (ruff and mypy), the site check, the
+JavaScript tests when Node is installed, and a bench build;
+`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
+need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
+that `.python-version` names and the packages `uv.lock` pins. GitHub
+Actions runs `cargo xtask ci --fmt` on every push to `main` and every
+pull request (`.github/workflows/ci.yml`); the runner builds its own
+`.venv` from `uv.lock`, and nothing it builds is committed.
+
 Do not weaken no-false-determinacy to make a test pass.
+
+## Website
+
+The public site in [`site/`](../site/) is generated from these guides
+by the workspace task runner. After editing a guide in `docs/`, run:
+
+```
+cargo xtask site
+```
+
+and commit the markdown together with the regenerated files under
+`site/`. `cargo xtask site --check` fails when the committed site is
+stale, and `cargo xtask ci` runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.
+
+The stylesheet and script in `site/assets/` are written by hand. The
+mill, whose page lives in [`web/`](../web/), embeds the stylesheet
+`fidryn.css` and has its own script, `web/mill.js`. When Node is
+installed, `cargo xtask ci` also runs the JavaScript unit tests in
+`web/tests/`; Node is never needed to build or serve anything.
 
 ## Pipeline
 

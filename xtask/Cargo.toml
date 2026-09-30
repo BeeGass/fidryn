@@ -13,3 +13,7 @@ description = "Fidryn workspace task runner"
 anyhow.workspace = true
 cargo_metadata = "0.23"
 clap.workspace = true
+fidryn-cli.workspace = true
+fidryn-syntax.workspace = true
+pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
+serde_json.workspace = true

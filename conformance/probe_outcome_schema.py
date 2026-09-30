@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """Demonstrate underconstrained outcome schemas. No Rust execution involved.
 
-Usage: python3 conformance/probe_outcome_schema.py [/path/to/fidryn]
+Usage: uv run python conformance/probe_outcome_schema.py [/path/to/fidryn]
 Requires jsonschema.
 
-Cargo tests do not invoke this script; Python is optional for schema probes.
+Cargo tests do not invoke this script; `cargo xtask ci` runs it through uv.
 Once schemas/outcome-v0.1.json is strengthened, all three
 accepted_by_current_schema entries should be false.
 """
 
 from __future__ import annotations
+
 import argparse
 import copy
 import json
 from pathlib import Path
+from typing import Any
+
 from jsonschema import Draft202012Validator
 
 
@@ -35,7 +38,7 @@ def main() -> None:
     schema = json.loads((root / "schemas/outcome-v0.1.json").read_text())
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)
-    base = {
+    base: dict[str, Any] = {
         "schema": "fidryn.outcome/v0.1",
         "module": "Probe@0.1.0",
         "sourceSnapshot": "fixture",

@@ -45,4 +45,3 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 | [Full implementation](FULL-IMPLEMENTATION.md) | Older deferred-work list; status is the matrix |
 
 Mill HTTP routes live in [mill.md](mill.md), not in Architecture.
-

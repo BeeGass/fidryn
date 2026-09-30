@@ -1,175 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#120f0c">
-  <title>Documentation — Fidryn</title>
-  <meta name="description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="author" content="Bryan Gass">
-  <link rel="canonical" href="https://fidryn.onlygass.dev/docs/">
-  <link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/index.md" title="Markdown">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Fidryn">
-  <meta property="og:title" content="Documentation — Fidryn">
-  <meta property="og:description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
-  <meta property="og:url" content="https://fidryn.onlygass.dev/docs/">
-  <meta property="og:locale" content="en_US">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Documentation — Fidryn">
-  <meta name="twitter:description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Documentation — Fidryn","description":"Fidryn documentation hub — learner guides for the programming language for legal instruments.","url":"https://fidryn.onlygass.dev/docs/","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/index.md"}</script>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/docs.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Documentation — Fidryn</title>
+<meta name="description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/docs/">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/index.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Documentation — Fidryn">
+<meta property="og:description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/docs/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Documentation — Fidryn">
+<meta name="twitter:description" content="Fidryn documentation hub — learner guides for the programming language for legal instruments.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Documentation — Fidryn","description":"Fidryn documentation hub — learner guides for the programming language for legal instruments.","url":"https://fidryn.onlygass.dev/docs/","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/index.md"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=4c83b8bf">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
 </head>
-<body class="docs-body">
-  <div class="docs-backdrop" data-docs-close hidden></div>
-  <div class="docs-shell">
-    <header class="docs-top">
-      <a class="mark" href="/">fidryn</a>
-      <div class="docs-top-actions">
-        <button type="button" class="docs-menu-btn" data-docs-toggle aria-controls="docs-sidebar" aria-expanded="false" aria-label="Open documentation menu">
-          <span class="docs-menu-btn-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span class="docs-menu-btn-text">Menu</span>
-        </button>
-        <nav class="nav" aria-label="Site">
-          <a href="/docs/">Docs</a>
-          <a href="/#install">Install</a>
-          <a href="https://github.com/BeeGass/fidryn">GitHub</a>
-        </nav>
-      </div>
-    </header>
-
-    <div class="docs-layout">
-      <aside class="docs-sidebar" id="docs-sidebar" aria-label="Documentation">
-        <p class="docs-sidebar-label">Guides</p>
-        <nav class="docs-side-nav">
-        <a href="/docs/" class="active">Overview</a>
-        <a href="/docs/getting-started">Getting started</a>
-        <a href="/docs/language">Language</a>
-        <a href="/docs/cli">CLI</a>
-        <a href="/docs/mill">Mill</a>
-        <a href="/docs/cases-and-time">Cases &amp; time</a>
-        <a href="/docs/outcomes">Outcomes</a>
-        <a href="/docs/examples">Examples</a>
-        <a href="/docs/contributing">Contributing</a>
-        </nav>
-        <p class="docs-sidebar-label">Also</p>
-        <nav class="docs-side-nav">
-          <a href="/">Home</a>
-          <a href="/docs/index.md">Markdown</a>
-          <a href="https://github.com/BeeGass/fidryn" target="_blank" rel="noopener noreferrer">Source</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-      </aside>
-
-      <main class="docs-main prose" id="main">
-<h1>Fidryn documentation</h1>
+<body class="page-doc">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Overview</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/" aria-current="page">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<div class="doc-layout">
+  <nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/" aria-current="page"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+    </ol>
+  </div>
+</nav>
+  <article class="doc" aria-labelledby="doc-title">
+    <p class="kicker">Documentation</p>
+    <h1 id="doc-title">Fidryn documentation</h1>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#for-users">For users</a></li><li class="lvl-2"><a href="#for-implementers">For implementers</a></li></ol></details>
+    <div class="prose">
 <p>Fidryn (pronounced FID-rin) is a programming language for legal
 instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.</p>
 <p>This directory is the human documentation for the v0.1 reference
-interpreter. Start at the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md" target="_blank" rel="noopener noreferrer">product README</a> to clone and
+interpreter. Start at the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md">product README</a> to clone and
 build, then read <a href="/docs/getting-started">Getting started</a>. The modules,
 records, and examples in this repository are research fixtures. They
 are not legal advice, not operative instruments, and not a complete
-statement of any jurisdiction’s law.</p>
-<h2>For users</h2>
-<table>
-<thead>
-<tr>
-<th>Guide</th>
-<th>What it is for</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/docs/getting-started">Getting started</a></td>
-<td>First hour: build, <code>check</code>, <code>run</code></td>
-</tr>
-<tr>
-<td><a href="/docs/language">Language</a></td>
-<td><code>.fr</code> modules, queries, rules, duties, verify</td>
-</tr>
-<tr>
-<td><a href="/docs/cli">CLI</a></td>
-<td>Every <code>fidryn</code> subcommand and flag</td>
-</tr>
-<tr>
-<td><a href="/docs/mill">Mill</a></td>
-<td>Localhost UI on 127.0.0.1</td>
-</tr>
-<tr>
-<td><a href="/docs/cases-and-time">Cases and time</a></td>
-<td>Case records, valid time, known-at</td>
-</tr>
-<tr>
-<td><a href="/docs/outcomes">Outcomes</a></td>
-<td>Determinate, Suspended, Contingent, and the rest</td>
-</tr>
-<tr>
-<td><a href="/docs/examples">Examples</a></td>
-<td>Trust, tax, federal slices, fifty states</td>
-</tr>
-</tbody>
-</table>
-<p>The closed grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf" target="_blank" rel="noopener noreferrer"><code>grammar.ebnf</code></a>. Wire formats
-are <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/case-record-v0.1.json</code></a>,
-<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/outcome-v0.1.json</code></a>, and
-<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json" target="_blank" rel="noopener noreferrer"><code>schemas/evaluation-report-v0.1.json</code></a>
+statement of any jurisdiction's law.</p>
+<h2 id="for-users">For users <a class="anchor" href="#for-users" aria-label="Link to this section">#</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Guide</th><th>What it is for</th></tr></thead><tbody>
+<tr><td><a href="/docs/getting-started">Getting started</a></td><td>First hour: build, <code>check</code>, <code>run</code></td></tr>
+<tr><td><a href="/docs/language">Language</a></td><td><code>.fr</code> modules, queries, rules, duties, verify</td></tr>
+<tr><td><a href="/docs/cli">CLI</a></td><td>Every <code>fidryn</code> subcommand and flag</td></tr>
+<tr><td><a href="/docs/mill">Mill</a></td><td>Localhost UI on 127.0.0.1</td></tr>
+<tr><td><a href="/docs/cases-and-time">Cases and time</a></td><td>Case records, valid time, known-at</td></tr>
+<tr><td><a href="/docs/outcomes">Outcomes</a></td><td>Determinate, Suspended, Contingent, and the rest</td></tr>
+<tr><td><a href="/docs/examples">Examples</a></td><td>Trust, tax, federal slices, fifty states</td></tr>
+</tbody></table>
+</div>
+<p>The closed grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Wire formats
+are <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json"><code>schemas/case-record-v0.1.json</code></a>,
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json"><code>schemas/outcome-v0.1.json</code></a>, and
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json"><code>schemas/evaluation-report-v0.1.json</code></a>
 (CLI <code>run</code> / <code>explore</code> and mill eval responses nest the outcome as
 <code>outcomeDocument</code>).</p>
+<h2 id="for-implementers">For implementers <a class="anchor" href="#for-implementers" aria-label="Link to this section">#</a></h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Document</th><th>What it is</th></tr></thead><tbody>
+<tr><td><a href="/docs/contributing">Contributing</a></td><td>Toolchain, tests, commits</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md">Architecture</a></td><td>Pipeline and crate contract</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">Implementation status</a></td><td>Evidence-backed capability matrix</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md">Obligations</a></td><td>Review obligations; green tests are regressions</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md">Integration contract</a></td><td>How existing machinery must be wired</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md">Workstream contract</a></td><td>Covering, require, tax, trust profiles</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md">Review-fix contract</a></td><td>Historical pass-3 repair brief</td></tr>
+<tr><td><a href="https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md">Full implementation</a></td><td>Older deferred-work list; status is the matrix</td></tr>
+</tbody></table>
+</div>
+<p>Mill HTTP routes live in <a href="/docs/mill">mill.md</a>, not in Architecture.</p>
 
-<section class="implementers" id="implementers">
-<h2>For implementers</h2>
-<p>These live in the repository on GitHub (not rendered on this site):</p>
-<ul>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">Architecture</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md" target="_blank" rel="noopener noreferrer">Implementation status</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md" target="_blank" rel="noopener noreferrer">Obligations</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md" target="_blank" rel="noopener noreferrer">Integration contract</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-SUITE.md" target="_blank" rel="noopener noreferrer">Integration suite</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md" target="_blank" rel="noopener noreferrer">Workstream contract</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md" target="_blank" rel="noopener noreferrer">Review-fix contract</a></li>
-  <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md" target="_blank" rel="noopener noreferrer">Full implementation</a></li>
-</ul>
-</section>
-
-        <p class="docs-disclaimer"><strong>Research fixture.</strong> Not legal advice, not an operative instrument, and not a complete statement of any jurisdiction&rsquo;s law.</p>
-      </main>
     </div>
-
-    <footer class="footer docs-footer">
-      <span>Research fixture · Bryan Gass</span>
-      <span><a href="https://onlygass.dev">onlygass.dev</a> · <a href="https://github.com/BeeGass/fidryn">source</a> · <a href="/llms.txt">llms.txt</a></span>
-    </footer>
-  </div>
-  <script>
-  (function () {
-    var body = document.body;
-    var btn = document.querySelector("[data-docs-toggle]");
-    var backdrop = document.querySelector(".docs-backdrop");
-    if (!btn || !backdrop) return;
-    backdrop.hidden = false;
-    function setOpen(open) {
-      body.classList.toggle("docs-nav-open", open);
-      btn.setAttribute("aria-expanded", open ? "true" : "false");
-      btn.setAttribute("aria-label", open ? "Close documentation menu" : "Open documentation menu");
-      body.style.overflow = open ? "hidden" : "";
-    }
-    btn.addEventListener("click", function () {
-      setOpen(!body.classList.contains("docs-nav-open"));
-    });
-    backdrop.addEventListener("click", function () { setOpen(false); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
-    });
-    document.getElementById("docs-sidebar").addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
-    });
-  })();
-  </script>
+    <nav class="pager" aria-label="Previous and next guide"><a class="next" href="/docs/getting-started"><span class="label">Next &middot; &sect;1</span><span class="t">Getting started</span></a></nav>
+    <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/README.md">Edit this page on GitHub</a><a href="/docs/index.md">View as Markdown</a></p>
+    <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+  </article>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#for-users">For users</a></li><li class="lvl-2"><a href="#for-implementers">For implementers</a></li></ol></aside>
+</div>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
 </body>
 </html>

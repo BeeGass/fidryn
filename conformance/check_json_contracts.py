@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validate Fidryn case records and manifests against the supplied schemas.
 
-Requires: python -m pip install jsonschema (preferred). Falls back to a
+Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
-Usage: python check_json_contracts.py [root] --output validation.json
+Usage: uv run python conformance/check_json_contracts.py [root] --output validation.json
 Exit codes: 0 all checked documents valid; 1 validation failures; 2 setup/read error.
 This does not validate artifact authenticity, Rust output, or legal content.
 """
@@ -120,16 +120,14 @@ def builtin_iter_errors(
             )
         for key, value in instance.items():
             if key in properties:
-                errors.extend(
-                    builtin_iter_errors(properties[key], value, location + [key])
-                )
+                errors.extend(builtin_iter_errors(properties[key], value, [*location, key]))
             elif isinstance(additional, dict):
-                errors.extend(builtin_iter_errors(additional, value, location + [key]))
+                errors.extend(builtin_iter_errors(additional, value, [*location, key]))
 
     if isinstance(instance, list) and "items" in schema:
         item_schema = schema["items"]
         for index, item in enumerate(instance):
-            errors.extend(builtin_iter_errors(item_schema, item, location + [index]))
+            errors.extend(builtin_iter_errors(item_schema, item, [*location, index]))
 
     return errors
 
@@ -137,9 +135,7 @@ def builtin_iter_errors(
 def load_validators(root: Path) -> tuple[dict[str, Any], bool]:
     schemas: dict[str, Any] = {}
     for name, filename in SCHEMA_FILES.items():
-        schemas[name] = json.loads(
-            (root / "schemas" / filename).read_text(encoding="utf-8")
-        )
+        schemas[name] = json.loads((root / "schemas" / filename).read_text(encoding="utf-8"))
 
     try:
         from jsonschema import Draft202012Validator

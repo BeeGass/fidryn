@@ -1,0 +1,159 @@
+---
+title: "Contributing"
+description: "Toolchain, tests, and how to work on the Fidryn reference interpreter."
+url: "https://fidryn.onlygass.dev/docs/contributing"
+markdown: "https://fidryn.onlygass.dev/docs/contributing.md"
+author: "Bryan Gass"
+---
+
+> Canonical HTML: https://fidryn.onlygass.dev/docs/contributing
+> This markdown mirror is for agents and plain-text readers.
+
+# Contributing to Fidryn
+
+This file is for people building the v0.1 reference interpreter. It is
+not a language tutorial and not legal advice. Product usage lives in
+the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
+
+Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
+records under `tests/` exercise the interpreter. They are not operative
+instruments and not a complete statement of any jurisdiction's law.
+
+## Toolchain
+
+Rust 1.98, edition 2024. Workspace `package.rust-version` is 1.98.
+[`rust-toolchain.toml`](https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml) pins the 1.98.1
+channel and the `rustfmt` and `clippy` components.
+
+If `cargo` or `git` pick the wrong tools on this Mac, a working PATH is
+`/opt/homebrew/bin:$HOME/.cargo/bin:/usr/bin:/bin`, with
+`DEVELOPER_DIR=/Library/Developer/CommandLineTools`.
+[`.cargo/config.toml`](https://github.com/BeeGass/fidryn/blob/main/.cargo/config.toml) already points the linker
+at Command Line Tools clang because the Xcode license is unsigned.
+
+## Checks
+
+From the repository root:
+
+```
+cargo fmt
+cargo clippy --workspace -- -D warnings
+cargo test --workspace --offline
+```
+
+`cargo xtask ci` runs the tests and clippy, then the conformance
+probes and the Python checks (ruff and mypy), the site check, the
+JavaScript tests when Node is installed, and a bench build;
+`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
+need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
+that `.python-version` names and the packages `uv.lock` pins. GitHub
+Actions runs `cargo xtask ci --fmt` on every push to `main` and every
+pull request (`.github/workflows/ci.yml`); the runner builds its own
+`.venv` from `uv.lock`, and nothing it builds is committed.
+
+Do not weaken no-false-determinacy to make a test pass.
+
+## Website
+
+The public site in [`site/`](https://github.com/BeeGass/fidryn/tree/main/site/) is generated from these guides
+by the workspace task runner. After editing a guide in `docs/`, run:
+
+```
+cargo xtask site
+```
+
+and commit the markdown together with the regenerated files under
+`site/`. `cargo xtask site --check` fails when the committed site is
+stale, and `cargo xtask ci` runs that check. The landing page's
+specimen is evaluated by the real interpreter at build time, so a
+change in semantics also makes the site stale.
+
+The stylesheet and script in `site/assets/` are written by hand. The
+mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
+`fidryn.css` and has its own script, `web/mill.js`. When Node is
+installed, `cargo xtask ci` also runs the JavaScript unit tests in
+`web/tests/`; Node is never needed to build or serve anything.
+
+## Pipeline
+
+Land a change in the crate that owns that stage:
+
+```
+syntax → hir → check → core → eval → handlers → verify → driver → cli
+```
+
+`fidryn-kernel` sits beside verify: it accepts or rejects covering
+claims and does not search. `fidryn-trace`, `fidryn-solve`,
+`fidryn-adapt`, and `fidryn-render` support the pipeline; they are not
+extra stages.
+
+Do not add reverse dependencies. Do not put evaluator logic in
+`syntax`. Do not put parser logic in `core`. `fidryn-driver` must not
+depend on `fidryn-cli`.
+
+## Crates
+
+Workspace members are listed in [`Cargo.toml`](https://github.com/BeeGass/fidryn/blob/main/Cargo.toml).
+
+```
+fidryn-syntax          lossless CST, parser, formatter
+fidryn-core            IR, types, Outcome, LegalState, diagnostics
+fidryn-hir             names, imports, elaboration  (syntax + core)
+fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-eval            worklist evaluator (core)
+fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
+fidryn-verify          bounded explorer and invariants (eval + handlers)
+fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
+fidryn-driver          incremental check/run memo
+fidryn-trace           DAG, canonical JSON, source maps (core)
+fidryn-render          constrained templates (missing keys fail closed)
+fidryn-adapt           capability-gated filing adapters
+fidryn-solve           bounded DPLL over declared finite domains
+fidryn-cli             fidryn binary and localhost mill
+```
+
+## Tests
+
+Tests live next to the crates they exercise (`#[cfg(test)]` in `src`,
+and `crates/<name>/tests/` when a crate has an integration kit).
+
+The adversarial review kit is
+[`tests/integration/adversarial_regressions.rs`](https://github.com/BeeGass/fidryn/blob/main/tests/integration/adversarial_regressions.rs).
+Those tests are regressions, not closure of the language.
+
+Independent programs live under [`tests/programs/`](https://github.com/BeeGass/fidryn/tree/main/tests/programs/).
+[`crates/fidryn-verify/tests/domains.rs`](https://github.com/BeeGass/fidryn/blob/main/crates/fidryn-verify/tests/domains.rs)
+runs them as independently named modules. Do not rewrite compiled Core
+to green fingerprint tests. Patching a `CoreModule` so a digest, plan,
+or outcome matches is not a passing test.
+
+## Commits
+
+Use Conventional Commits (`feat(syntax): ...`, `fix(eval): ...`,
+`test(cli): ...`, `docs: ...`). Prefer atomic commits in pipeline order,
+then tests and docs. Do not dump unrelated crates into one commit.
+
+## Grammar
+
+The closed v0.1 grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the
+repository root. Unknown body fields are parse errors, not extension
+points.
+
+## Implementer documents
+
+These files are crate contracts and evidence. They are not user
+tutorials.
+
+- [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
+- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
+- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
+- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
+- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+
+Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
+ARCHITECTURE.md.
+
+## Not legal advice
+
+This interpreter, its tests, and its example modules are not legal
+advice.
