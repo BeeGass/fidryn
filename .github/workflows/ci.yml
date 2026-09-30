@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # rust-toolchain.toml pins the channel and its components.
       - name: Install the pinned Rust toolchain
@@ -33,13 +33,13 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
       # uv uses the Python that .python-version names (downloading it if the runner lacks it) and the packages uv.lock pins; the .venv it builds lives only on the runner.
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
         with:
           version: "0.11.8"
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
