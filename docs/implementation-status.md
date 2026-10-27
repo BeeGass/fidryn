@@ -129,7 +129,9 @@ staged set; missing is Unknown (may Suspend), not closed-world false.
 and full transaction commit are not this worklist.
 
 **UniqueOccupant.** Unique occupancy from the authority ledger or
-`OccupancyRecord`. Succession when `Incapacitated` is derived/determined
+`OccupancyRecord`. A parameterized office matches its bare head and that
+same application. It does not match the same head with different
+arguments. Succession when `Incapacitated` is derived/determined
 or concurring evidence meets `required_concurring` (default 2). Schema
 comes from the case/module, not a `"Filing"` substring. Ranked accepted
 nominations are filtered by the recorded alternative's *declared*

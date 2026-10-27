@@ -2070,12 +2070,20 @@ fn office_matches(nomination_office: &str, key: &str) -> bool {
     if nomination_office == key {
         return true;
     }
-    let nom_head = nomination_office
-        .split('(')
-        .next()
-        .unwrap_or(nomination_office);
-    let key_head = key.split('(').next().unwrap_or(key);
-    nom_head == key_head || key.starts_with(nomination_office) || nomination_office.starts_with(key)
+    // A bare head such as `TrusteeOf` still names `TrusteeOf(BRT)`.
+    // `TrusteeOf(A)` does not name `TrusteeOf(B)`.
+    bare_office_head_extends(nomination_office, key)
+        || bare_office_head_extends(key, nomination_office)
+}
+
+fn bare_office_head_extends(shorter: &str, longer: &str) -> bool {
+    if shorter.contains('(') {
+        return false;
+    }
+    match longer.strip_prefix(shorter) {
+        Some(rest) => rest.starts_with('('),
+        None => false,
+    }
 }
 
 fn eval_unique_occupant<H: Handler>(
@@ -5213,6 +5221,19 @@ mod tests {
             Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Carol"),
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn parameterized_offices_do_not_match_across_arguments() {
+        assert!(office_matches("TrusteeOf", "TrusteeOf(BRT)"));
+        assert!(office_matches("TrusteeOf(BRT)", "TrusteeOf"));
+        assert!(office_matches("TrusteeOf(BRT)", "TrusteeOf(BRT)"));
+        assert!(!office_matches(
+            "FreeCtrlManager(FreeCtrl)",
+            "FreeCtrlManager(RecursiveHoldings)"
+        ));
+        assert!(!office_matches("TrusteeOf(BRT)", "TrusteeOf(Other)"));
+        assert!(!office_matches("Trustee", "TrusteeOf(BRT)"));
     }
 
     #[test]
