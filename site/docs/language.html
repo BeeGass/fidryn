@@ -345,11 +345,13 @@ are not that worklist. The kind is <code>derive</code>, <code>constitutive</code
     <span class="tk-kw">when</span> operative TrustInstrumentExecuted<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">in</span> TrustCreation<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span>
     <span class="tk-kw">then</span> <span class="tk-kw">establish</span> Occupies<span class="tk-pu">(</span>Bryan<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>when operative P</code> tests legal status. <code>when determined P</code> tests a
-competent determination already on the case. <code>then derive</code> and
-<code>then establish</code> are the usual consequences. Guards must use
-<code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a bare
-proposition. The successor rule in the trust fixture also
+<p><code>when operative P</code> tests legal status. <code>in TrustCreation(BRT)</code> names the
+legal context of that test. The guard still turns on the proposition
+<code>TrustInstrumentExecuted(BRT)</code>. It is not a proposition named <code>in</code>.
+<code>when determined P</code> tests a competent determination already on the case.
+<code>then derive</code> and <code>then establish</code> are the usual consequences. Guards
+must use <code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a
+bare proposition. The successor rule in the trust fixture also
 <code>select unique candidate from nominations_for(...)</code> with
 <code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
 <h2 id="interpretation-families"><span class="hn">2.13</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>

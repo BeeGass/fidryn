@@ -123,6 +123,8 @@ plans.
 runs a bounded (64) staged worklist over `CoreDecl::Rule`.
 `Guard::Operative` / `Derived` hold only when the proposition is in the
 staged set; missing is Unknown (may Suspend), not closed-world false.
+`operative P in Context` stores `Context` on the guard and still tests
+`P`.
 `operative ExemptFromBOI` is not a date heuristic. Prescriptive duties
 and full transaction commit are not this worklist.
 

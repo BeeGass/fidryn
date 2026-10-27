@@ -1671,9 +1671,21 @@ impl<'a> Parser<'a> {
                 let name = self.text(t).to_owned();
                 self.bump();
                 let rhs = self.parse_bp(PREFIX_RBP)?;
+                // `operative P in Context` is the proposition plus its legal
+                // context. `in` binds looser than this prefix, so without this
+                // the outer Pratt loop would parse a proposition named `in`.
+                let mut args = vec![rhs];
+                if matches!(
+                    name.as_str(),
+                    "operative" | "determined" | "assumed" | "necessarily"
+                ) && self.eat_ident("in")
+                    && let Some(ctx) = self.parse_bp(PREFIX_RBP)
+                {
+                    args.push(ctx);
+                }
                 Some(Expr::Apply {
                     callee: Box::new(Expr::Ident(name)),
-                    args: vec![rhs],
+                    args,
                 })
             }
             TokenKind::Ident if Self::is_expr_stop_word(self.text(t)) => None,
@@ -2962,6 +2974,37 @@ module Examples.FuelRow version "0.1.0" {
                 args: vec![],
             }
         );
+    }
+
+    #[test]
+    fn parses_operative_in_as_context_not_as_infix() {
+        let parsed =
+            parse_body("rule R : derive { when operative P() in Context(X) then derive Q() }");
+        let d = match &parsed.module().unwrap().items[0] {
+            Item::Rule(d) => d,
+            other => panic!("{other:?}"),
+        };
+        match d.guard.as_ref() {
+            Some(Expr::Apply { callee, args }) => {
+                assert_eq!(callee.as_ref(), &Expr::Ident("operative".to_owned()));
+                assert_eq!(args.len(), 2, "{args:?}");
+                assert_eq!(
+                    args[0],
+                    Expr::Call {
+                        callee: "P".to_owned(),
+                        args: vec![],
+                    }
+                );
+                assert_eq!(
+                    args[1],
+                    Expr::Call {
+                        callee: "Context".to_owned(),
+                        args: vec![Expr::Ident("X".to_owned())],
+                    }
+                );
+            }
+            other => panic!("guard must stay operative, not a proposition named in: {other:?}"),
+        }
     }
 
     #[test]

@@ -2881,6 +2881,32 @@ module Examples.Rule version "0.1.0" {
     }
 
     #[test]
+    fn operative_in_context_lowers_to_the_proposition() {
+        let src = r#"
+module Examples.Context version "0.1.0" {
+    rule R : derive { when operative P() in Context(X) then derive Q() }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = check_src(src).expect("operative in context should check");
+        let rule = module.declarations.iter().find_map(|d| match d {
+            CoreDecl::Rule(r) if r.name == "R" => Some(r),
+            _ => None,
+        });
+        let rule = rule.expect("rule R");
+        match &rule.guard {
+            Guard::Operative(prop, ctx) => {
+                assert_eq!(prop.predicate, "P", "{prop:?}");
+                assert!(prop.arguments.is_empty(), "{prop:?}");
+                assert_eq!(ctx, "Context(X)");
+            }
+            other => panic!("context must not become the proposition `in`: {other:?}"),
+        }
+    }
+
+    #[test]
     fn mutual_recursion_without_fuel_is_e530() {
         let src = r#"
 module Examples.Mutual version "0.1.0" {

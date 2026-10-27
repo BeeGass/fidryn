@@ -179,6 +179,63 @@ fn rule_consequences_survive_lowering() {
 }
 
 #[test]
+fn operative_in_context_fires_on_the_proposition() {
+    let module = compile(
+        r#"module Regression version "0.1.0" {
+        proposition P()
+        proposition Q()
+        rule R : derive {
+            when operative P() in Context(X)
+            then derive Q()
+        }
+        query q() -> Bool {
+            goal Evaluate { operative Q() }
+        }
+    }"#,
+    );
+    let rule = module
+        .declarations
+        .iter()
+        .find_map(|d| match d {
+            CoreDecl::Rule(rule) if rule.name == "R" => Some(rule),
+            _ => None,
+        })
+        .expect("rule R");
+    match &rule.guard {
+        fidryn_core::Guard::Operative(prop, ctx) => {
+            assert_eq!(prop.predicate, "P");
+            assert_eq!(ctx, "Context(X)");
+        }
+        other => panic!("{other:?}"),
+    }
+    let mut adopted = CaseRecord::default();
+    adopted.determinations.push(CaseDetermination {
+        issue: "P".into(),
+        protocol: "P".into(),
+        established: true,
+        decider: "test".into(),
+        recorded_at: None,
+    });
+    match run(&module, "q", &adopted) {
+        Outcome::Determinate {
+            value: Value::Bool(true),
+            ..
+        } => {}
+        other => panic!("the rule must fire when P is established: {other:?}"),
+    }
+    assert!(
+        !matches!(
+            run(&module, "q", &CaseRecord::default()),
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            }
+        ),
+        "the rule must not fire before P is established"
+    );
+}
+
+#[test]
 fn unknown_fields_inside_declarations_are_parse_errors() {
     let parsed = parse_file(
         r#"module Regression version "0.1.0" {

@@ -976,6 +976,13 @@ fn term_to_guard(term: &Term) -> Guard {
         Term::Bool(false) => Guard::Not(Box::new(Guard::Satisfied)),
         Term::Apply { ctor, args } if ctor == "operative" => operative_guard(args),
         Term::Call { callee, args } if callee == "operative" => operative_guard(args),
+        // A Pratt `in` that escaped the modal prefix is still the context,
+        // not a proposition whose predicate is the word `in`.
+        Term::Apply { ctor, args }
+            if ctor == "in" && args.len() == 2 && modal_operative(&args[0]) =>
+        {
+            operative_guard_in_context(&args[0], &args[1])
+        }
         Term::Apply { ctor, args } if ctor == "determined" || ctor == "assumed" => args
             .first()
             .and_then(term_as_prop)
@@ -1027,8 +1034,42 @@ fn operative_guard(args: &[Term]) -> Guard {
         .first()
         .and_then(term_as_prop)
         .unwrap_or_else(|| PropTerm::new("", Vec::new()));
-    let ctx = args.get(1).and_then(term_as_name).unwrap_or_default();
+    let ctx = args.get(1).map(term_context_label).unwrap_or_default();
     Guard::Operative(prop, ctx)
+}
+
+fn modal_operative(term: &Term) -> bool {
+    match term {
+        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => ctor == "operative",
+        _ => false,
+    }
+}
+
+fn operative_guard_in_context(modal: &Term, context: &Term) -> Guard {
+    let mut args = match modal {
+        Term::Apply { args, .. } | Term::Call { args, .. } => args.clone(),
+        _ => Vec::new(),
+    };
+    if args.len() == 1 {
+        args.push(context.clone());
+    }
+    operative_guard(&args)
+}
+
+fn term_context_label(term: &Term) -> String {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name.clone(),
+        Term::Call { callee, args } | Term::Apply { ctor: callee, args } => {
+            if args.is_empty() {
+                callee.clone()
+            } else {
+                let parts: Vec<String> = args.iter().map(term_context_label).collect();
+                format!("{callee}({})", parts.join(", "))
+            }
+        }
+        Term::Field { base, name } => format!("{}.{}", term_context_label(base), name),
+        _ => String::new(),
+    }
 }
 
 fn binop_compare(op: BinOp) -> Option<CompareOp> {

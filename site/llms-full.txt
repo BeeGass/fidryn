@@ -684,11 +684,13 @@ rule InitialTrustee : constitutive
 }
 ```
 
-`when operative P` tests legal status. `when determined P` tests a
-competent determination already on the case. `then derive` and
-`then establish` are the usual consequences. Guards must use
-`operative`, `determined`, `assumed`, or `necessarily` — not a bare
-proposition. The successor rule in the trust fixture also
+`when operative P` tests legal status. `in TrustCreation(BRT)` names the
+legal context of that test. The guard still turns on the proposition
+`TrustInstrumentExecuted(BRT)`. It is not a proposition named `in`.
+`when determined P` tests a competent determination already on the case.
+`then derive` and `then establish` are the usual consequences. Guards
+must use `operative`, `determined`, `assumed`, or `necessarily` — not a
+bare proposition. The successor rule in the trust fixture also
 `select unique candidate from nominations_for(...)` with
 `require unique nomination_rank`. A tie is not a silent pick.
 
