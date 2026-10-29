@@ -59,7 +59,7 @@ module Programs.LatePayment version "0.1.0" {
         goal RunDecision { decision TimelyPayment }
     }
 
-    query obligation_status() -> String {
+    query obligation_status() -> DutyState {
         goal Evaluate {
             duty_status(PayInvoice)
         }

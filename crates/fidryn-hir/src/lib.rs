@@ -11,8 +11,12 @@ use std::collections::BTreeMap;
 pub use body::{
     collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
     parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
-    term_from_decl, term_has_bare_prop_guard,
+    term_from_decl, term_has_bare_prop_guard, term_to_guard,
 };
+
+pub type HirRecordTypes = BTreeMap<String, (bool, Vec<(String, String)>)>;
+pub type HirTypes = fidryn_core::types::TypeEnvironment;
+pub type HirCallableSignatures = BTreeMap<String, (Vec<(String, String)>, String)>;
 
 #[derive(Clone, Debug)]
 pub struct HirModule {
@@ -27,13 +31,18 @@ pub struct HirModule {
     pub outside_scope: Vec<String>,
     pub entities: BTreeMap<String, String>,
     pub propositions: BTreeMap<String, Vec<(String, String)>>,
+    pub record_types: HirRecordTypes,
+    pub types: HirTypes,
     pub offices: BTreeMap<String, String>,
+    pub callable_signatures: HirCallableSignatures,
     pub queries: BTreeMap<String, HirQuery>,
     pub rules: Vec<HirRule>,
     pub duties: Vec<HirDuty>,
     pub nominations: Vec<HirNomination>,
     pub interpretation_families: BTreeMap<String, InterpretationAlts>,
     pub decisions: Vec<HirDecision>,
+    pub judgments: Vec<HirJudgment>,
+    pub observations: Vec<HirObservation>,
     pub conflict_doctrines: Vec<HirDoctrine>,
     pub clauses: BTreeMap<String, String>,
     pub imports: Vec<HirImport>,
@@ -86,7 +95,10 @@ pub struct HirRule {
     pub kind: String,
     pub source: Option<String>,
     pub binders: Vec<String>,
+    pub typed_binders: Vec<(String, String)>,
+    pub guard_terms: Vec<Term>,
     pub guard: Option<Guard>,
+    pub selection: Option<HirSelection>,
     pub consequences: Vec<(String, PropTerm)>,
     pub fallback: Vec<(String, PropTerm)>,
 }
@@ -94,11 +106,25 @@ pub struct HirRule {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirDuty {
     pub name: String,
+    pub params: Vec<(String, String)>,
     pub bearer: String,
+    pub bearer_term: Term,
     pub claimant: Option<String>,
+    pub claimant_term: Option<Term>,
     pub attaches: Option<Guard>,
+    pub attaches_term: Option<Term>,
     pub content: Vec<Term>,
     pub due: Option<Term>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirSelection {
+    pub binder: String,
+    pub finite_domain: Term,
+    pub predicate: Term,
+    pub ordering: Vec<String>,
+    pub ascending: Vec<bool>,
+    pub require_unique_keys: bool,
 }
 
 pub type EligibilityDef = (PropTerm, bool);
@@ -116,6 +142,37 @@ pub struct HirDecision {
     pub name: String,
     pub requirements: Vec<String>,
     pub result: Option<Term>,
+    pub params: Vec<(String, String)>,
+    pub result_type: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct HirJudgment {
+    pub name: String,
+    pub params: Vec<(String, String)>,
+    pub decides: PropTerm,
+    pub source: Option<Term>,
+    pub authority: fidryn_core::ir::JudgmentAuthority,
+    pub records: Vec<(String, String)>,
+    pub record_patterns: Vec<Term>,
+    pub constraints: Vec<Term>,
+    pub establish_when: Option<Term>,
+    pub reject_when: Option<Term>,
+    pub otherwise: Option<fidryn_core::ir::JudgmentFallback>,
+    pub on_established: Vec<fidryn_core::ir::JudgmentAction>,
+    pub standard: Option<Term>,
+    pub review: Option<fidryn_core::ir::JudgmentReview>,
+    pub unsupported_clauses: Vec<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct HirObservation {
+    pub name: String,
+    pub params: Vec<(String, String)>,
+    pub establishes: PropTerm,
+    pub validators: Vec<Term>,
+    pub source: Option<Term>,
+    pub unsupported_clauses: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -138,6 +195,7 @@ pub struct HirFunction {
     pub fuel: Option<u32>,
     pub result_type: String,
     pub source: String,
+    pub effects: Vec<String>,
     pub params: Vec<(String, String)>,
     pub body: Option<Term>,
 }
@@ -186,6 +244,7 @@ pub struct HirQuantifier {
 pub struct HirVerification {
     pub name: String,
     pub formula: String,
+    pub assertions: Vec<Term>,
     pub bounds: Option<HirVerificationBounds>,
 }
 
@@ -213,13 +272,18 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         outside_scope: Vec::new(),
         entities: BTreeMap::new(),
         propositions: BTreeMap::new(),
+        record_types: standard_type_environment().1.clone(),
+        types: standard_type_environment().0.clone(),
         offices: BTreeMap::new(),
+        callable_signatures: BTreeMap::new(),
         queries: BTreeMap::new(),
         rules: Vec::new(),
         duties: Vec::new(),
         nominations: Vec::new(),
         interpretation_families: BTreeMap::new(),
         decisions: Vec::new(),
+        judgments: Vec::new(),
+        observations: Vec::new(),
         conflict_doctrines: Vec::new(),
         clauses: BTreeMap::new(),
         imports: Vec::new(),
@@ -231,6 +295,38 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         retained: Vec::new(),
         diagnostics: parse.diagnostics.clone(),
     };
+    let mut declared = BTreeMap::new();
+    for item in &module.items {
+        let decl = match item {
+            fidryn_syntax::ast::Item::Header(_)
+            | fidryn_syntax::ast::Item::Import(_)
+            | fidryn_syntax::ast::Item::Nomination(_) => continue,
+            other => other.decl(),
+        };
+        let Some(decl) = decl else {
+            continue;
+        };
+        let Some(name) = decl.name.as_ref() else {
+            continue;
+        };
+        let namespace = if matches!(
+            item,
+            fidryn_syntax::ast::Item::Type(_) | fidryn_syntax::ast::Item::RecordType(_)
+        ) {
+            "type"
+        } else {
+            "value"
+        };
+        if let Some(first) = declared.insert((namespace, name.clone()), decl.span) {
+            let mut diagnostic = Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("duplicate {namespace} declaration `{name}`"),
+            )
+            .with_span(decl.span);
+            diagnostic.related_spans.push(first);
+            hir.diagnostics.push(diagnostic);
+        }
+    }
     for item in &module.items {
         match item {
             fidryn_syntax::ast::Item::Header(h) => match h.kind {
@@ -238,17 +334,26 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     hir.jurisdiction = h.value.clone();
                 }
                 fidryn_syntax::ast::HeaderKind::SourceSnapshot => {
-                    hir.snapshot = trim_quotes(&h.value).to_owned();
+                    hir.snapshot =
+                        fidryn_syntax::decode_string_literal(&h.value).unwrap_or_default();
                 }
                 fidryn_syntax::ast::HeaderKind::SourceManifest => {
-                    hir.manifest_path = trim_quotes(&h.value).to_owned();
+                    hir.manifest_path =
+                        fidryn_syntax::decode_string_literal(&h.value).unwrap_or_default();
                 }
                 fidryn_syntax::ast::HeaderKind::OutsideScope => {
-                    hir.outside_scope = h
-                        .value
-                        .split(|c: char| c == '{' || c == '}' || c == ',' || c.is_whitespace())
-                        .filter(|s| !s.is_empty())
-                        .map(str::to_owned)
+                    hir.outside_scope = fidryn_syntax::lexer::lex(&h.value)
+                        .iter()
+                        .filter_map(|token| {
+                            let raw = &h.value[token.start as usize..token.end as usize];
+                            match token.kind {
+                                fidryn_syntax::lexer::TokenKind::Ident => Some(raw.to_owned()),
+                                fidryn_syntax::lexer::TokenKind::String => {
+                                    fidryn_syntax::decode_string_literal(raw).ok()
+                                }
+                                _ => None,
+                            }
+                        })
                         .collect();
                 }
                 fidryn_syntax::ast::HeaderKind::EffectiveAt => {
@@ -287,6 +392,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         .unwrap_or("")
                         .trim_start_matches(':')
                         .trim()
+                        .trim_end_matches(';')
+                        .trim()
                         .to_owned();
                     hir.entities.insert(name.clone(), ty);
                 }
@@ -298,6 +405,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Office(d) => {
                 if let Some(name) = &d.name {
+                    hir.callable_signatures
+                        .insert(name.clone(), (decl_params(d), "Office".into()));
                     hir.offices
                         .insert(name.clone(), d.signature.clone().unwrap_or_default());
                 }
@@ -308,12 +417,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 let body = body::query_body_from_decl(d);
                 let has_goal = !matches!(body, HirQueryBody::None)
                     || query_body_has_quantifier_or_require(src);
-                let automatic = d.automatic || body::query_is_automatic(src);
-                let effects = if d.effects.is_empty() {
-                    extract_effects(src)
-                } else {
-                    d.effects.clone()
-                };
+                let automatic = d.automatic;
+                let effects = d.effects.clone();
                 let result_type = d
                     .result_type
                     .clone()
@@ -351,12 +456,13 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         name.clone(),
                         HirFunction {
                             is_calc: d.keyword == "calc",
-                            fuel: d.fuel.or_else(|| extract_fuel(&d.source)),
+                            fuel: d.fuel,
                             result_type: d
                                 .result_type
                                 .clone()
                                 .unwrap_or_else(|| extract_return_type(&d.source)),
                             source: d.source.clone(),
+                            effects: d.effects.clone(),
                             params,
                             body: d
                                 .expr
@@ -417,7 +523,22 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         .unwrap_or_else(|| body::parse_rule_kind(&d.source)),
                     source: Some(d.source.clone()),
                     binders: d.params.iter().map(|(name, _)| name.clone()).collect(),
+                    typed_binders: d.params.clone(),
+                    guard_terms: d
+                        .guard
+                        .iter()
+                        .chain(d.require.iter())
+                        .map(body::expr_to_term)
+                        .collect(),
                     guard,
+                    selection: d.selection.as_ref().map(|selection| HirSelection {
+                        binder: selection.binder.clone(),
+                        finite_domain: body::expr_to_term(&selection.finite_domain),
+                        predicate: body::expr_to_term(&selection.predicate),
+                        ordering: selection.ordering.clone(),
+                        ascending: selection.ascending.clone(),
+                        require_unique_keys: selection.require_unique_keys,
+                    }),
                     consequences,
                     fallback,
                 });
@@ -426,11 +547,18 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 let name = d.name.clone().unwrap_or_default();
                 if !name.is_empty() {
                     let parts = body::parse_duty_parts(&d.source);
+                    if parts.invalid {
+                        hir.diagnostics.push(Diagnostic::new(DiagnosticCode::E100, format!("duty `{name}` contains an invalid or over-budget attachment/deadline expression")).with_span(d.span));
+                    }
                     hir.duties.push(HirDuty {
                         name,
+                        params: decl_params(d),
                         bearer: parts.bearer,
+                        bearer_term: parts.bearer_term,
                         claimant: parts.claimant,
+                        claimant_term: parts.claimant_term,
                         attaches: parts.attaches,
+                        attaches_term: parts.attaches_term,
                         content: parts.content,
                         due: parts.due,
                     });
@@ -450,10 +578,32 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 hir.interpretation_families.insert(name, alts);
             }
             fidryn_syntax::ast::Item::Decision(d) => {
+                let result = extract_returns(&d.source).unwrap_or_else(|()| {
+                    hir.diagnostics.push(
+                        Diagnostic::new(
+                            DiagnosticCode::E100,
+                            "decision return expression is invalid or exceeds resource limits",
+                        )
+                        .with_span(d.span),
+                    );
+                    None
+                });
                 hir.decisions.push(HirDecision {
                     name: d.name.clone().unwrap_or_default(),
                     requirements: extract_record_requires(&d.source),
-                    result: extract_returns(&d.source),
+                    result,
+                    params: d.params.clone(),
+                    result_type: d.result_type.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Judgment(d) => {
+                if let Some(judgment) = judgment_from_decl(d, &mut hir.diagnostics) {
+                    hir.judgments.push(judgment);
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name: d.name.clone().unwrap_or_default(),
+                    source: d.source.clone(),
                 });
             }
             fidryn_syntax::ast::Item::ConflictDoctrine(d) => {
@@ -464,16 +614,97 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Clause(d) => {
                 if let Some(name) = &d.name {
+                    hir.callable_signatures
+                        .insert(name.clone(), (d.params.clone(), "ClauseRef".into()));
                     hir.clauses.insert(name.clone(), d.source.clone());
                 }
             }
-            fidryn_syntax::ast::Item::Type(d)
-            | fidryn_syntax::ast::Item::RecordType(d)
-            | fidryn_syntax::ast::Item::Observation(d)
-            | fidryn_syntax::ast::Item::Power(d)
-            | fidryn_syntax::ast::Item::Judgment(d)
-            | fidryn_syntax::ast::Item::LegalAct(d)
-            | fidryn_syntax::ast::Item::Scenario(d) => {
+            fidryn_syntax::ast::Item::RecordType(d) => {
+                hir.types.remove(d.name.as_deref().unwrap_or_default());
+                hir.record_types.insert(
+                    d.name.clone().unwrap_or_default(),
+                    (
+                        d.keyword == "evidence_type",
+                        d.fields
+                            .iter()
+                            .map(|(name, ty)| (name.clone(), ty.clone()))
+                            .collect(),
+                    ),
+                );
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name: d.name.clone().unwrap_or_default(),
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Type(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                hir.record_types.remove(&name);
+                if let Some(definition) = type_definition_from_decl(d) {
+                    hir.types
+                        .insert(name.clone(), (d.type_args.clone(), definition));
+                }
+                if let Some(fidryn_syntax::ast::TypeDefinitionAst::Sum(variants)) =
+                    &d.type_definition
+                {
+                    for variant in variants {
+                        if !variant.fields.is_empty() {
+                            hir.record_types
+                                .insert(variant.name.clone(), (false, variant.fields.clone()));
+                        }
+                    }
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::LegalAct(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                hir.callable_signatures
+                    .insert(name.clone(), (decl_params(d), "LegalAction".into()));
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Observation(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                if let Some(observation) = &d.observation {
+                    if let Some(establishes) =
+                        body::term_as_prop(&body::expr_to_term(&observation.establishes))
+                    {
+                        hir.observations.push(HirObservation {
+                            name: name.clone(),
+                            params: d.params.clone(),
+                            establishes,
+                            validators: observation
+                                .validators
+                                .iter()
+                                .map(body::expr_to_term)
+                                .collect(),
+                            source: d.source_basis.as_ref().map(body::expr_to_term),
+                            unsupported_clauses: observation.unsupported_clauses.clone(),
+                        });
+                    } else {
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E210,
+                                "observation must establish a proposition",
+                            )
+                            .with_span(d.span),
+                        );
+                    }
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Power(d) | fidryn_syntax::ast::Item::Scenario(d) => {
                 hir.retained.push(HirRetainedDecl {
                     kind: d.keyword.clone(),
                     name: d.name.clone().unwrap_or_default(),
@@ -496,8 +727,153 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
     Ok(hir)
 }
 
-fn trim_quotes(s: &str) -> &str {
-    s.trim().trim_matches('"').trim()
+fn type_definition_from_decl(
+    d: &fidryn_syntax::ast::Decl,
+) -> Option<fidryn_core::ir::TypeDefinition> {
+    use fidryn_core::ir::{CoreConstructor, TypeDefinition};
+    Some(match d.type_definition.as_ref()? {
+        fidryn_syntax::ast::TypeDefinitionAst::Alias(ty) => {
+            TypeDefinition::Alias(parse_type_name(ty))
+        }
+        fidryn_syntax::ast::TypeDefinitionAst::Sum(variants) => TypeDefinition::Sum(
+            variants
+                .iter()
+                .map(|variant| CoreConstructor {
+                    name: variant.name.clone(),
+                    arguments: variant
+                        .arguments
+                        .iter()
+                        .map(|ty| parse_type_name(ty))
+                        .collect(),
+                    fields: variant
+                        .fields
+                        .iter()
+                        .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+                        .collect(),
+                })
+                .collect(),
+        ),
+    })
+}
+
+fn standard_type_environment() -> &'static (HirTypes, HirRecordTypes) {
+    static STANDARD: std::sync::OnceLock<(HirTypes, HirRecordTypes)> = std::sync::OnceLock::new();
+    STANDARD.get_or_init(|| {
+        let parsed = fidryn_syntax::parse_file(include_str!("../../../prelude/prelude.fr"));
+        assert!(
+            !parsed.has_errors(),
+            "invalid standard type environment: {:?}",
+            parsed.diagnostics
+        );
+        let mut types = BTreeMap::new();
+        let mut records = BTreeMap::new();
+        for item in &parsed.module().expect("standard module").items {
+            match item {
+                fidryn_syntax::ast::Item::Type(d) => {
+                    if let Some(definition) = type_definition_from_decl(d) {
+                        types.insert(
+                            d.name.clone().unwrap_or_default(),
+                            (d.type_args.clone(), definition),
+                        );
+                    }
+                }
+                fidryn_syntax::ast::Item::RecordType(d) => {
+                    records.insert(
+                        d.name.clone().unwrap_or_default(),
+                        (
+                            d.keyword == "evidence_type",
+                            d.fields
+                                .iter()
+                                .map(|(name, ty)| (name.clone(), ty.clone()))
+                                .collect(),
+                        ),
+                    );
+                }
+                _ => {}
+            }
+        }
+        (types, records)
+    })
+}
+
+fn judgment_from_decl(
+    d: &fidryn_syntax::ast::Decl,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> Option<HirJudgment> {
+    use fidryn_core::ir::{JudgmentAction, JudgmentAuthority, JudgmentFallback, JudgmentReview};
+    use fidryn_syntax::ast::JudgmentAuthorityAst;
+    let parsed = d.judgment.as_ref()?;
+    let Some(decides) = term_as_prop(&body::expr_to_term(&parsed.decides)) else {
+        diagnostics.push(
+            Diagnostic::new(
+                DiagnosticCode::E210,
+                "judgment decides requires a proposition",
+            )
+            .with_span(d.span),
+        );
+        return None;
+    };
+    let authority = match parsed.authority.as_ref()? {
+        JudgmentAuthorityAst::Actor(actor) => JudgmentAuthority::Actor(body::expr_to_term(actor)),
+        JudgmentAuthorityAst::Concurrence {
+            minimum,
+            distinct,
+            issuer_type,
+        } => JudgmentAuthority::Concurrence {
+            minimum: *minimum,
+            distinct: *distinct,
+            issuer_type: parse_type_name(issuer_type),
+        },
+    };
+    let otherwise = if let Some((issue, protocol)) = &parsed.otherwise {
+        let Some(issue) = term_as_prop(&body::expr_to_term(issue)) else {
+            diagnostics.push(
+                Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "judgment suspension issue requires a proposition",
+                )
+                .with_span(d.span),
+            );
+            return None;
+        };
+        Some(JudgmentFallback::Suspend {
+            issue,
+            protocol: body::expr_to_term(protocol),
+        })
+    } else {
+        None
+    };
+    Some(HirJudgment {
+        name: d.name.clone().unwrap_or_default(),
+        params: d.params.clone(),
+        decides,
+        source: d.source_basis.as_ref().map(body::expr_to_term),
+        authority,
+        records: parsed.records.clone(),
+        record_patterns: parsed
+            .record_patterns
+            .iter()
+            .map(body::expr_to_term)
+            .collect(),
+        constraints: parsed.constraints.iter().map(body::expr_to_term).collect(),
+        establish_when: parsed.establish_when.as_ref().map(body::expr_to_term),
+        reject_when: parsed.reject_when.as_ref().map(body::expr_to_term),
+        otherwise,
+        on_established: parsed
+            .on_established
+            .iter()
+            .map(|(issue, context)| JudgmentAction::MakeOperative {
+                issue: body::expr_to_term(issue),
+                context: body::expr_to_term(context),
+            })
+            .collect(),
+        standard: parsed.standard.as_ref().map(body::expr_to_term),
+        review: parsed.review.as_ref().map(|(by, standard)| JudgmentReview {
+            by: body::expr_to_term(by),
+            standard: body::expr_to_term(standard),
+        }),
+        unsupported_clauses: parsed.unsupported_clauses.clone(),
+    })
 }
 
 fn decl_params(d: &fidryn_syntax::ast::Decl) -> Vec<(String, String)> {
@@ -516,24 +892,6 @@ fn query_body_has_quantifier_or_require(src: &str) -> bool {
             || contains_ident(inner, "exists")
             || contains_ident(inner, "goal")
             || contains_ident(inner, "return"))
-}
-
-fn extract_effects(src: &str) -> Vec<String> {
-    let Some(start) = src.find('!') else {
-        return Vec::new();
-    };
-    let rest = &src[start..];
-    let Some(open) = rest.find('{') else {
-        return Vec::new();
-    };
-    let Some(close) = rest.find('}') else {
-        return Vec::new();
-    };
-    rest[open + 1..close]
-        .split(',')
-        .map(|s| s.trim().to_owned())
-        .filter(|s| !s.is_empty())
-        .collect()
 }
 
 fn extract_return_type(src: &str) -> String {
@@ -621,51 +979,11 @@ fn extract_alternative_defs(src: &str) -> InterpretationAlts {
 }
 
 fn extract_record_requires(src: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut rest = src;
-    while let Some(idx) = rest.find("record requires ") {
-        rest = &rest[idx + "record requires ".len()..];
-        let name: String = rest
-            .chars()
-            .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
-            .collect();
-        if !name.is_empty() && !out.contains(&name) {
-            out.push(name);
-        }
-    }
-    out
+    body::parse_record_requirements(src)
 }
 
-fn extract_returns(src: &str) -> Option<Term> {
-    let rest = src.split("returns ").nth(1)?.trim();
-    let token: String = rest
-        .chars()
-        .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
-        .collect();
-    if token.is_empty() {
-        None
-    } else {
-        Some(Term::Ident(token))
-    }
-}
-
-fn extract_fuel(src: &str) -> Option<u32> {
-    let mut start = 0;
-    while let Some(rel) = src[start..].find("fuel") {
-        let i = start + rel;
-        if is_ident_boundary(src, i, 4) {
-            let rest = src[i + 4..].trim_start();
-            if let Some(rest) = rest.strip_prefix('=') {
-                let rest = rest.trim_start();
-                let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
-                if let Ok(n) = digits.parse() {
-                    return Some(n);
-                }
-            }
-        }
-        start = i + 1;
-    }
-    None
+fn extract_returns(src: &str) -> Result<Option<Term>, ()> {
+    body::parse_decl_result(src)
 }
 
 fn extract_effect_result(src: &str) -> String {
@@ -691,6 +1009,7 @@ fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificatio
     let name = d.name.as_ref().filter(|n| !n.is_empty())?.clone();
     Some(HirVerification {
         formula: verify_formula(d),
+        assertions: d.assertions.iter().map(body::expr_to_term).collect(),
         bounds: verify_bounds(d),
         name,
     })
@@ -1704,9 +2023,9 @@ module Examples.Retain version "0.1.0" {
     recorded_at 2026-01-01T00:00:00Z
     type TaxYear = Int
     record_type TaxableIncome { amount: Money<USD> }
-    observation Filing(record: TaxableIncome)
+    observation Filing(record: TaxableIncome) establishes FilingReceived(record) { require true }
     power Amend { holder Settlor }
-    judgment Capacity(person: NaturalPerson)
+    judgment Capacity(person: NaturalPerson) decides Issued(person) { authority Court }
     legal_act Sign(doc: TaxableIncome)
     scenario HappyPath { assume true }
     proposition Issued(person: NaturalPerson)

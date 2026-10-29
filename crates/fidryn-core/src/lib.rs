@@ -5,6 +5,7 @@
 pub mod bundle;
 pub mod canonical;
 pub mod case;
+pub mod completion;
 pub mod diagnostics;
 pub mod duty;
 pub mod effects;
@@ -29,6 +30,10 @@ pub use canonical::{CANONICAL_SCHEMA, canonical_json, canonical_to_vec};
 pub use case::{
     AdmissibleCompletions, Assumption, CaseRecord, ClosureRecord, CompletionDomain, EvidenceItem,
     LedgerEvent, ManifestArtifact, ModelBoundary, SourceManifest, SourceWeight,
+};
+pub use completion::{
+    CompletionAdmissionError, CompletionBranch, CompletionSearchEvidence, CompletionSlot,
+    ValidatedCompletionModel,
 };
 pub use diagnostics::{Diagnostic, DiagnosticCode, Severity, Span};
 pub use duty::{DutyState, DutyStatus};
@@ -62,7 +67,9 @@ pub use patterns::{
     PropPattern, TermPattern,
 };
 pub use positions::{Position, PositionKind};
-pub use request::{CaseSnapshotIdentity, ExecutionRequest, ExecutionRequestId, ProgramIdentity};
+pub use request::{
+    CaseSnapshotIdentity, ExecutionOperation, ExecutionRequest, ExecutionRequestId, ProgramIdentity,
+};
 pub use state::{
     AuthorityGrant, AuthorityLedger, DecisionLedger, InterpretationLedger, LegalState,
     LegalStatusLedger, Occupancy, PositionLedger, RecordLedger, SourceLedger, StatusMode,

@@ -262,45 +262,165 @@ pub fn has_authority_constraint(case: &CaseRecord) -> bool {
 }
 
 pub fn action_is_granted(case: &CaseRecord, action: &str, record_time: Instant) -> bool {
-    FrozenCaseView::new(case, record_time, record_time)
-        .grants()
-        .any(|value| value_grants_action(value, action))
+    action_is_granted_for(case, action, None, None, record_time)
 }
 
-fn value_grants_action(value: &Value, action: &str) -> bool {
-    match value {
-        Value::String(name) | Value::Entity(name) => name.eq_ignore_ascii_case(action),
-        Value::Ctor { name, fields } => {
-            if grant_record_is_revoked(fields) {
-                return false;
-            }
-            name.eq_ignore_ascii_case(action) || fields_grant_action(fields, action)
-        }
-        Value::Set(items) => items.iter().any(|item| value_grants_action(item, action)),
-        Value::Map(fields) => {
-            if grant_record_is_revoked(fields) {
-                return false;
-            }
-            fields_grant_action(fields, action)
-        }
-        _ => false,
+pub fn action_is_granted_for(
+    case: &CaseRecord,
+    action: &str,
+    scope: Option<&str>,
+    context: Option<&str>,
+    record_time: Instant,
+) -> bool {
+    let mut grants = Vec::new();
+    for value in FrozenCaseView::new(case, record_time, record_time).grants() {
+        collect_grants(value, &mut grants);
     }
-}
-
-/// A key grants only as `Bool(true)` or a nested true grant. `Bool(false)` never grants.
-fn fields_grant_action(fields: &BTreeMap<String, Value>, action: &str) -> bool {
-    if let Some(named) = fields.get("action") {
-        return value_grants_action(named, action);
-    }
-    fields.iter().any(|(key, val)| match val {
-        Value::Bool(true) => key.eq_ignore_ascii_case(action),
-        Value::Bool(false) => false,
-        _ => value_grants_action(val, action),
+    grants.iter().any(|grant| {
+        grant_covers(
+            grant,
+            &grants,
+            action,
+            scope,
+            context,
+            record_time,
+            &mut Vec::new(),
+        )
     })
 }
 
-fn grant_record_is_revoked(fields: &BTreeMap<String, Value>) -> bool {
-    matches!(fields.get("revoked"), Some(Value::Bool(true)))
+fn collect_grants(value: &Value, grants: &mut Vec<fidryn_core::state::AuthorityGrant>) {
+    match value {
+        Value::Set(values) => values
+            .iter()
+            .for_each(|value| collect_grants(value, grants)),
+        Value::Map(fields) | Value::Ctor { fields, .. } => {
+            if let Some(grant) = parse_grant(fields) {
+                grants.push(grant);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn parse_grant(fields: &BTreeMap<String, Value>) -> Option<fidryn_core::state::AuthorityGrant> {
+    let action = fields.get("action").and_then(value_as_name)?;
+    let scope = fields.get("scope").and_then(value_as_name)?;
+    let context = fields.get("context").and_then(value_as_name)?;
+    let source = fields.get("source").and_then(value_as_name)?;
+    if action.is_empty() || source.is_empty() {
+        return None;
+    }
+    let valid_time = value_as_interval(
+        fields
+            .get("validTime")
+            .or_else(|| fields.get("valid_time"))?,
+    )?;
+    let revoked = match fields.get("revoked") {
+        None => false,
+        Some(Value::Bool(revoked)) => *revoked,
+        _ => return None,
+    };
+    let revoked_at = match fields.get("revokedAt").or_else(|| fields.get("revoked_at")) {
+        None | Some(Value::Unit) => None,
+        Some(value) => Some(value_as_instant(value)?),
+    };
+    Some(fidryn_core::state::AuthorityGrant {
+        action,
+        scope,
+        context,
+        valid_time,
+        source,
+        revoked,
+        revoked_at,
+        principal: fields.get("principal").and_then(value_as_name),
+        delegate_of: fields
+            .get("delegateOf")
+            .or_else(|| fields.get("delegate_of"))
+            .and_then(value_as_name),
+    })
+}
+
+pub(crate) fn value_as_interval(value: &Value) -> Option<Interval> {
+    let fields = match value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => fields,
+        _ => return None,
+    };
+    let start = value_as_bound(fields.get("start")?)?;
+    let end = value_as_bound(fields.get("end")?)?;
+    let interval = Interval { start, end };
+    match (start, end) {
+        (Bound::PosInf, _) | (_, Bound::NegInf) => None,
+        (Bound::Inclusive(a) | Bound::Exclusive(a), Bound::Inclusive(b) | Bound::Exclusive(b))
+            if a > b =>
+        {
+            None
+        }
+        _ => Some(interval),
+    }
+}
+
+fn value_as_bound(value: &Value) -> Option<Bound> {
+    match value {
+        Value::String(name) | Value::Entity(name) if name == "NegInf" => Some(Bound::NegInf),
+        Value::String(name) | Value::Entity(name) if name == "PosInf" => Some(Bound::PosInf),
+        Value::Map(fields) if fields.len() == 1 => {
+            if let Some(value) = fields.get("Inclusive") {
+                Some(Bound::Inclusive(value_as_instant(value)?))
+            } else {
+                Some(Bound::Exclusive(value_as_instant(
+                    fields.get("Exclusive")?,
+                )?))
+            }
+        }
+        Value::Ctor { name, fields } => match name.as_str() {
+            "NegInf" => Some(Bound::NegInf),
+            "PosInf" => Some(Bound::PosInf),
+            "Inclusive" => Some(Bound::Inclusive(value_as_instant(fields.values().next()?)?)),
+            "Exclusive" => Some(Bound::Exclusive(value_as_instant(fields.values().next()?)?)),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn grant_covers(
+    grant: &fidryn_core::state::AuthorityGrant,
+    grants: &[fidryn_core::state::AuthorityGrant],
+    action: &str,
+    scope: Option<&str>,
+    context: Option<&str>,
+    at: Instant,
+    chain: &mut Vec<String>,
+) -> bool {
+    if !grant.covers(action, at)
+        || scope.is_some_and(|scope| grant.scope != "*" && grant.scope != scope)
+        || context.is_some_and(|context| grant.context != "*" && grant.context != context)
+    {
+        return false;
+    }
+    let Some(grantor) = &grant.delegate_of else {
+        return true;
+    };
+    if chain.len() >= 16 || chain.contains(grantor) {
+        return false;
+    }
+    chain.push(grantor.clone());
+    let authorized = grants.iter().any(|parent| {
+        parent.principal.as_ref() == Some(grantor)
+            && grant_covers(
+                parent,
+                grants,
+                action,
+                Some(&grant.scope),
+                Some(&grant.context),
+                at,
+                chain,
+            )
+    });
+    chain.pop();
+    authorized
 }
 
 /// Admission keys off payload semantics and authority, not only kind strings.
@@ -316,8 +436,23 @@ pub fn event_is_admitted(case: &CaseRecord, event: &LedgerEvent, record_time: In
         return false;
     }
     if is_gated_event_kind(&event.kind) || payload_is_gated_duty_transition(&event.payload) {
-        return event_action(&event.payload)
-            .is_some_and(|action| action_is_granted(case, &action, record_time));
+        let fields = match &event.payload {
+            Value::Map(fields) | Value::Ctor { fields, .. } => Some(fields),
+            _ => None,
+        };
+        let scope = fields.and_then(duty_name_from_fields);
+        let context = fields
+            .and_then(|fields| fields.get("context"))
+            .and_then(value_as_name);
+        return event_action(&event.payload).is_some_and(|action| {
+            action_is_granted_for(
+                case,
+                &action,
+                scope.as_deref(),
+                context.as_deref(),
+                record_time,
+            )
+        });
     }
     true
 }
@@ -422,16 +557,15 @@ pub fn surface_duty_state(
     let named = is_named_instance(&instance);
     // Named instances ignore definition-level `performed` / `<duty>_performed`
     // shortcuts from the derived world and case facts.
-    let performed =
-        (!named && performed_held) || performance_exists(&duty.name, &instance, case, ctx);
+    let _ = performed_held;
+    let performed = performance_exists(duty, &instance, case, ctx);
     let deadline_passed = deadline_has_passed(&duty.name, &instance, &duty.content, case, ctx);
     let already_breached = stored_duty_breached(&duty.name, &instance, case)
         || (!named && fact_flag(case, &format!("{}_breached", duty.name)).unwrap_or(false));
     if performed {
         // Historical breach is occurrence vs deadline, not "the query is after
         // the deadline". An on-time payment stays unbreached when asked later.
-        let late = already_breached
-            || performance_is_after_deadline(&duty.name, &instance, &duty.content, case, ctx);
+        let late = already_breached || performance_is_after_deadline(duty, &instance, case, ctx);
         return DutyState {
             name: duty.name.clone(),
             status: DutyStatus::Performed,
@@ -485,27 +619,82 @@ pub(crate) fn payload_applies_to_default_instance(payload: &Value) -> bool {
     }
 }
 
-fn performance_exists(name: &str, instance: &str, case: &CaseRecord, ctx: &RunContext) -> bool {
-    if !is_named_instance(instance)
-        && (fact_flag(case, &format!("{name}_performed")).unwrap_or(false)
-            || fact_flag(case, "performed").unwrap_or(false))
-    {
-        return true;
-    }
-    if stored_duty_performed(name, instance, case) {
+fn performance_exists(
+    duty: &CoreDuty,
+    instance: &str,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> bool {
+    if stored_duty_performed(&duty.name, instance, case) {
         return true;
     }
     let view = FrozenCaseView::from_context(case, ctx);
     if view
         .evidence()
-        .any(|item| payment_matches_instance(item, name, instance))
+        .any(|item| payment_matches_duty(item, duty, instance, ctx))
     {
         return true;
     }
     view.events().any(|event| {
         event_is_admitted(case, event, ctx.record_time)
-            && event_marks_performed(event, name, instance)
+            && event_marks_performed(event, &duty.name, instance)
+            && event_occurred_at(event).is_some_and(|at| at <= ctx.valid_time)
     })
+}
+
+fn payment_matches_duty(
+    item: &EvidenceItem,
+    duty: &CoreDuty,
+    instance: &str,
+    ctx: &RunContext,
+) -> bool {
+    if !payment_matches_instance(item, &duty.name, instance)
+        || !payment_occurred_at(item).is_some_and(|at| at <= ctx.valid_time)
+    {
+        return false;
+    }
+    let fields = match &item.value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => fields,
+        _ => return false,
+    };
+    if fields.get("payer").and_then(value_as_name).as_deref()
+        != Some(party_name(&duty.bearer).as_str())
+    {
+        return false;
+    }
+    if let Some(claimant) = &duty.claimant
+        && fields.get("payee").and_then(value_as_name).as_deref()
+            != Some(party_name(claimant).as_str())
+    {
+        return false;
+    }
+    let Some((currency, required)) = duty.content.iter().find_map(monetary_content) else {
+        return false;
+    };
+    if fields.get("currency").and_then(value_as_name).as_deref() != Some(currency.as_str()) {
+        return false;
+    }
+    let paid = match fields.get("amount") {
+        Some(Value::Decimal(amount)) => Some(*amount),
+        Some(Value::Int(amount)) => Some(rust_decimal::Decimal::from(*amount)),
+        _ => None,
+    };
+    paid.is_some_and(|amount| amount >= required)
+}
+
+fn monetary_content(term: &Term) -> Option<(String, rust_decimal::Decimal)> {
+    match term {
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor.len() == 3 && ctor.bytes().all(|byte| byte.is_ascii_uppercase()) =>
+        {
+            match args.as_slice() {
+                [Term::Decimal(amount)] => Some((ctor.clone(), *amount)),
+                [Term::Int(amount)] => Some((ctor.clone(), rust_decimal::Decimal::from(*amount))),
+                _ => None,
+            }
+        }
+        _ => None,
+    }
 }
 
 fn payment_matches_instance(item: &EvidenceItem, duty_name: &str, instance: &str) -> bool {
@@ -513,9 +702,9 @@ fn payment_matches_instance(item: &EvidenceItem, duty_name: &str, instance: &str
         return false;
     }
     match &item.value {
-        Value::String(_) | Value::Entity(_) => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+        Value::String(_) | Value::Entity(_) => false,
         Value::Map(fields) | Value::Ctor { fields, .. } => {
-            if duty_field_mismatch(fields, duty_name) {
+            if duty_name_from_fields(fields).as_deref() != Some(duty_name) {
                 return false;
             }
             match instance_from_fields(fields) {
@@ -523,7 +712,7 @@ fn payment_matches_instance(item: &EvidenceItem, duty_name: &str, instance: &str
                 None => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
             }
         }
-        _ => instance.eq_ignore_ascii_case(DEFAULT_DUTY_INSTANCE),
+        _ => false,
     }
 }
 
@@ -644,149 +833,153 @@ fn deadline_has_passed(
 }
 
 fn performance_is_after_deadline(
-    name: &str,
+    duty: &CoreDuty,
     instance: &str,
-    content: &[Term],
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> bool {
-    let Some(deadline) = due_deadline_instant(content, case) else {
-        return !is_named_instance(instance)
-            && (fact_flag(case, &format!("{name}_late")).unwrap_or(false)
-                || fact_flag(case, &format!("{name}_deadline_passed")).unwrap_or(false));
+    let Some(deadline) = due_deadline_instant(&duty.content, case) else {
+        return false;
     };
-    match performance_instant(name, instance, case, ctx) {
-        Some(at) => at > deadline,
-        // Unknown occurrence time does not silently establish lateness.
-        None => false,
+    performance_instant(duty, instance, case, ctx).is_some_and(|at| at > deadline)
+}
+
+pub fn validate_deadline(content: &[Term], case: &CaseRecord) -> Result<(), EngineError> {
+    if due_duration(content).is_some() {
+        checked_deadline(content, case)?;
     }
+    Ok(())
 }
 
 fn due_deadline_instant(content: &[Term], case: &CaseRecord) -> Option<Instant> {
-    let days = due_counted_days(content)?;
-    let start = due_anchor_instant(content, case)?;
-    add_counted_days(start, days)
+    checked_deadline(content, case).ok().flatten()
+}
+
+fn checked_deadline(content: &[Term], case: &CaseRecord) -> Result<Option<Instant>, EngineError> {
+    let Some(duration) = due_duration(content) else {
+        return Ok(None);
+    };
+    let start = due_anchor_instant(content, case)
+        .ok_or_else(|| EngineError::InvalidInput("deadline anchor is missing or invalid".into()))?;
+    if duration.kind == CalendarKind::WorkingDays {
+        let closed = case
+            .closures
+            .iter()
+            .any(|closure| closure.domain == "working_days" && closure.closed);
+        let holidays = match case.facts.get("working_days_holidays") {
+            Some(Value::Set(values)) if closed => values,
+            _ => return Err(EngineError::Unsupported(
+                "working_days requires a closed working_days calendar and working_days_holidays"
+                    .into(),
+            )),
+        };
+        if duration.amount.unsigned_abs() > 100_000 {
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        let dates: Option<Vec<_>> = holidays
+            .iter()
+            .map(value_as_instant)
+            .map(|date| date.map(|date| date.as_offset().date()))
+            .collect();
+        let dates = dates
+            .ok_or_else(|| EngineError::InvalidInput("invalid working-day holiday date".into()))?;
+        let mut at = start.as_offset();
+        let mut remaining = duration.amount.unsigned_abs();
+        let step = if duration.amount < 0 { -1 } else { 1 };
+        while remaining > 0 {
+            at = at
+                .checked_add(time::Duration::seconds(step * 86_400))
+                .ok_or_else(|| EngineError::InvalidInput("deadline overflow".into()))?;
+            if !matches!(
+                at.weekday(),
+                time::Weekday::Saturday | time::Weekday::Sunday
+            ) && !dates.contains(&at.date())
+            {
+                remaining -= 1;
+            }
+        }
+        return Ok(Some(Instant::from_offset(at)));
+    }
+    let seconds_per_unit = match duration.kind {
+        CalendarKind::Days | CalendarKind::CalendarDays | CalendarKind::CountedDays => 86_400,
+        CalendarKind::Hours => 3_600,
+        CalendarKind::Minutes => 60,
+        CalendarKind::Seconds => 1,
+        CalendarKind::WorkingDays => unreachable!(),
+    };
+    let seconds = duration
+        .amount
+        .checked_mul(seconds_per_unit)
+        .ok_or_else(|| EngineError::InvalidInput("deadline duration overflow".into()))?;
+    start
+        .as_offset()
+        .checked_add(time::Duration::seconds(seconds))
+        .map(Instant::from_offset)
+        .map(Some)
+        .ok_or_else(|| EngineError::InvalidInput("deadline overflow".into()))
 }
 
 fn due_anchor_instant(content: &[Term], case: &CaseRecord) -> Option<Instant> {
-    if let Some(name) = due_after_ident(content)
-        && let Some(instant) = fact_instant(case, &name)
-    {
-        return Some(instant);
+    fn after(term: &Term) -> Option<&Term> {
+        match term {
+            Term::Apply { ctor, args } | Term::Call { callee: ctor, args } if ctor == "after" => {
+                args.get(1)
+            }
+            Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
+                args.iter().find_map(after)
+            }
+            Term::Binary { left, right, .. } => after(left).or_else(|| after(right)),
+            _ => None,
+        }
+    }
+    if let Some(anchor) = content.iter().find_map(after) {
+        return match anchor {
+            Term::Instant(at) => Some(*at),
+            Term::Ident(name) | Term::String(name) => {
+                fact_instant(case, name).or_else(|| Instant::parse(name).ok())
+            }
+            _ => None,
+        };
     }
     fact_instant(case, "invoice_date").or_else(|| fact_instant(case, "due_at"))
 }
 
-fn due_after_ident(content: &[Term]) -> Option<String> {
-    content.iter().find_map(find_after_ident)
+fn due_duration(content: &[Term]) -> Option<fidryn_core::time::FidrynDuration> {
+    content.iter().find_map(find_duration)
 }
 
-fn find_after_ident(term: &Term) -> Option<String> {
+fn find_duration(term: &Term) -> Option<fidryn_core::time::FidrynDuration> {
+    use fidryn_core::time::FidrynDuration;
     match term {
-        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
-            if ctor.eq_ignore_ascii_case("after") =>
-        {
-            after_anchor_name(args).or_else(|| args.iter().find_map(find_after_ident))
-        }
-        Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
-            args.iter().find_map(find_after_ident)
-        }
-        Term::Binary { left, right, .. } => {
-            find_after_ident(left).or_else(|| find_after_ident(right))
-        }
-        Term::If { cond, then, else_ } => find_after_ident(cond)
-            .or_else(|| find_after_ident(then))
-            .or_else(|| find_after_ident(else_)),
-        Term::Field { base, .. } => find_after_ident(base),
-        Term::Record(fields) => fields.values().find_map(find_after_ident),
-        _ => None,
-    }
-}
-
-fn after_anchor_name(args: &[Term]) -> Option<String> {
-    if args.len() >= 2 {
-        let name = party_name(&args[1]);
-        if !name.is_empty() && !is_counted_ctor(&name) {
-            return Some(name);
-        }
-    }
-    args.iter().find_map(|arg| {
-        let name = party_name(arg);
-        if name.is_empty() || is_counted_ctor(&name) {
-            None
-        } else {
-            Some(name)
-        }
-    })
-}
-
-fn due_counted_days(content: &[Term]) -> Option<i64> {
-    content.iter().find_map(find_due_days)
-}
-
-fn find_due_days(term: &Term) -> Option<i64> {
-    match term {
-        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
-            if ctor.eq_ignore_ascii_case("due")
-                || ctor.eq_ignore_ascii_case("after")
-                || is_counted_ctor(ctor) =>
-        {
-            extract_days(args).or_else(|| args.iter().find_map(find_due_days))
-        }
-        Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
-            args.iter().find_map(find_due_days)
-        }
-        Term::Binary { left, right, .. } => find_due_days(left).or_else(|| find_due_days(right)),
-        Term::If { cond, then, else_ } => find_due_days(cond)
-            .or_else(|| find_due_days(then))
-            .or_else(|| find_due_days(else_)),
-        Term::Field { base, .. } => find_due_days(base),
-        Term::Record(fields) => fields.values().find_map(find_due_days),
-        Term::Duration(duration) if is_counted_calendar(duration.kind) => Some(duration.amount),
-        _ => None,
-    }
-}
-
-fn extract_days(args: &[Term]) -> Option<i64> {
-    for arg in args {
-        match arg {
-            Term::Int(n) => return Some(*n),
-            Term::Duration(duration) => return Some(duration.amount),
-            Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
-                if is_counted_ctor(ctor) =>
-            {
-                if let Some(Term::Int(n)) = args.first() {
-                    return Some(*n);
-                }
+        Term::Duration(duration) => Some(*duration),
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
+            let kind = match ctor.as_str() {
+                "days" => Some(CalendarKind::Days),
+                "calendar_days" => Some(CalendarKind::CalendarDays),
+                "counted_days" => Some(CalendarKind::CountedDays),
+                "working_days" => Some(CalendarKind::WorkingDays),
+                "hours" => Some(CalendarKind::Hours),
+                "minutes" => Some(CalendarKind::Minutes),
+                "seconds" => Some(CalendarKind::Seconds),
+                _ => None,
+            };
+            if let (Some(kind), Some(Term::Int(amount))) = (kind, args.first()) {
+                Some(FidrynDuration {
+                    amount: *amount,
+                    kind,
+                })
+            } else {
+                args.iter().find_map(find_duration)
             }
-            _ => {}
         }
+        Term::Binary { left, right, .. } => find_duration(left).or_else(|| find_duration(right)),
+        Term::Set(values) => values.iter().find_map(find_duration),
+        _ => None,
     }
-    args.iter().find_map(find_due_days)
-}
-
-fn is_counted_ctor(name: &str) -> bool {
-    name.eq_ignore_ascii_case("counted_days")
-        || name.eq_ignore_ascii_case("days")
-        || name.eq_ignore_ascii_case("calendar_days")
-}
-
-fn is_counted_calendar(kind: CalendarKind) -> bool {
-    matches!(
-        kind,
-        CalendarKind::CountedDays | CalendarKind::Days | CalendarKind::CalendarDays
-    )
-}
-
-fn add_counted_days(start: Instant, days: i64) -> Option<Instant> {
-    start
-        .as_offset()
-        .checked_add(time::Duration::days(days))
-        .map(Instant::from_offset)
 }
 
 fn performance_instant(
-    name: &str,
+    duty: &CoreDuty,
     instance: &str,
     case: &CaseRecord,
     ctx: &RunContext,
@@ -794,7 +987,7 @@ fn performance_instant(
     let view = FrozenCaseView::from_context(case, ctx);
     let from_evidence = view
         .evidence()
-        .filter(|item| payment_matches_instance(item, name, instance))
+        .filter(|item| payment_matches_duty(item, duty, instance, ctx))
         .filter_map(payment_occurred_at)
         .min();
     if from_evidence.is_some() {
@@ -803,7 +996,8 @@ fn performance_instant(
     view.events()
         .filter(|event| {
             event_is_admitted(case, event, ctx.record_time)
-                && event_marks_performed(event, name, instance)
+                && event_marks_performed(event, &duty.name, instance)
+                && event_occurred_at(event).is_some_and(|at| at <= ctx.valid_time)
         })
         .filter_map(event_occurred_at)
         .min()
@@ -824,6 +1018,8 @@ fn occurrence_from_value(value: &Value) -> Option<Instant> {
         Value::Map(fields) | Value::Ctor { fields, .. } => fields
             .get("occurred_at")
             .or_else(|| fields.get("occurredAt"))
+            .or_else(|| fields.get("paid_at"))
+            .or_else(|| fields.get("paidAt"))
             .and_then(value_as_instant),
         _ => None,
     }
@@ -867,18 +1063,34 @@ fn value_as_instant(value: &Value) -> Option<Instant> {
 /// Never appends to `events`.
 pub fn scenario_overlay_case(case: &CaseRecord) -> CaseRecord {
     let mut overlay = case.clone();
-    let assumptions = overlay.assumptions.clone();
-    for assumption in &assumptions {
+    for assumption in &case.assumptions {
         apply_assumption_payload(&mut overlay, &assumption.payload);
     }
-    let event_payloads: Vec<Value> = overlay
-        .events
-        .iter()
-        .filter(|event| event.kind.eq_ignore_ascii_case("assumption"))
-        .map(|event| event.payload.clone())
-        .collect();
-    for payload in &event_payloads {
-        apply_assumption_payload(&mut overlay, payload);
+    overlay
+}
+
+pub fn scenario_hypotheses(case: &CaseRecord, ctx: &RunContext) -> Vec<fidryn_core::Assumption> {
+    let mut hypotheses = case.assumptions.clone();
+    for (index, event) in case.events.iter().enumerate() {
+        if event.kind == "assumption"
+            && event.record_time <= ctx.record_time
+            && event.valid_time.contains(ctx.valid_time)
+        {
+            hypotheses.push(fidryn_core::Assumption {
+                id: format!("event:{index}:{}", event.record_time),
+                payload: event.payload.clone(),
+            });
+        }
+    }
+    hypotheses
+}
+
+pub fn scenario_overlay_at(case: &CaseRecord, ctx: &RunContext) -> CaseRecord {
+    let mut overlay = case.clone();
+    overlay.assumptions = scenario_hypotheses(case, ctx);
+    let hypotheses = overlay.assumptions.clone();
+    for assumption in &hypotheses {
+        apply_assumption_payload(&mut overlay, &assumption.payload);
     }
     overlay
 }
@@ -1006,7 +1218,7 @@ mod tests {
         let mut case = CaseRecord::default();
         case.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![Value::String("attach".into())]),
+            Value::Set(vec![grant_map("attach", false, None)]),
         );
         assert!(action_is_granted(&case, "attach", t));
         assert!(!action_is_granted(&case, "perform", t));
@@ -1014,10 +1226,7 @@ mod tests {
         let mut evidence_only = CaseRecord::default();
         evidence_only.evidence.push(EvidenceItem {
             schema: "AuthorityGrant".into(),
-            value: Value::Map(BTreeMap::from([(
-                "action".into(),
-                Value::String("perform".into()),
-            )])),
+            value: grant_map("perform", false, None),
             observed_at: t,
         });
         assert!(action_is_granted(&evidence_only, "perform", t));
@@ -1028,6 +1237,16 @@ mod tests {
     fn grant_map(action: &str, revoked: bool, delegate_of: Option<&str>) -> Value {
         let mut fields = BTreeMap::from([
             ("action".into(), Value::String(action.into())),
+            ("scope".into(), Value::String("*".into())),
+            ("context".into(), Value::String("*".into())),
+            ("source".into(), Value::String("test-grant".into())),
+            (
+                "validTime".into(),
+                Value::Map(BTreeMap::from([
+                    ("start".into(), Value::String("NegInf".into())),
+                    ("end".into(), Value::String("PosInf".into())),
+                ])),
+            ),
             ("revoked".into(), Value::Bool(revoked)),
         ]);
         if let Some(grantor) = delegate_of {
@@ -1079,7 +1298,10 @@ mod tests {
             "authority_grants".into(),
             Value::Map(BTreeMap::from([("perform".into(), Value::Bool(true))])),
         );
-        assert!(action_is_granted(&case, "perform", t));
+        assert!(
+            !action_is_granted(&case, "perform", t),
+            "a Boolean entry has no grant scope, provenance, or validity interval"
+        );
         assert!(!action_is_granted(&case, "attach", t));
     }
 
@@ -1087,9 +1309,16 @@ mod tests {
     fn unrevoked_delegated_grant_map_grants() {
         let t = Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let mut case = CaseRecord::default();
+        let Value::Map(mut parent) = grant_map("attach", false, None) else {
+            unreachable!()
+        };
+        parent.insert("principal".into(), Value::String("grantor".into()));
         case.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![grant_map("attach", false, Some("grantor"))]),
+            Value::Set(vec![
+                Value::Map(parent),
+                grant_map("attach", false, Some("grantor")),
+            ]),
         );
         assert!(action_is_granted(&case, "attach", t));
         assert!(!action_is_granted(&case, "perform", t));
@@ -1170,22 +1399,29 @@ mod tests {
         CoreDuty {
             id: NodeId::of(b"PayInvoice"),
             name: "PayInvoice".into(),
+            binders: Vec::new(),
             bearer: Term::Ident("Payer".into()),
             claimant: Some(Term::Ident("Payee".into())),
             attaches: Guard::Satisfied,
-            content: vec![Term::Apply {
-                ctor: "due".into(),
-                args: vec![Term::Apply {
-                    ctor: "after".into(),
-                    args: vec![
-                        Term::Apply {
-                            ctor: "counted_days".into(),
-                            args: vec![Term::Int(days)],
-                        },
-                        Term::Ident(after.into()),
-                    ],
-                }],
-            }],
+            content: vec![
+                Term::Apply {
+                    ctor: "USD".into(),
+                    args: vec![Term::Int(100)],
+                },
+                Term::Apply {
+                    ctor: "due".into(),
+                    args: vec![Term::Apply {
+                        ctor: "after".into(),
+                        args: vec![
+                            Term::Apply {
+                                ctor: "counted_days".into(),
+                                args: vec![Term::Int(days)],
+                            },
+                            Term::Ident(after.into()),
+                        ],
+                    }],
+                },
+            ],
             meta: NodeMeta {
                 span: None,
                 source: None,
@@ -1215,6 +1451,10 @@ mod tests {
             value: Value::Map(BTreeMap::from([
                 ("name".into(), Value::String("PayInvoice".into())),
                 ("instance".into(), Value::String("invoice_a".into())),
+                ("payer".into(), Value::String("Payer".into())),
+                ("payee".into(), Value::String("Payee".into())),
+                ("amount".into(), Value::Int(100)),
+                ("currency".into(), Value::String("USD".into())),
             ])),
         });
         let duty = pay_invoice_duty_after(30, "invoice_date");
@@ -1293,7 +1533,7 @@ mod tests {
             true,
             DEFAULT_DUTY_INSTANCE,
         );
-        assert_eq!(default.status, DutyStatus::Performed);
+        assert_ne!(default.status, DutyStatus::Performed);
     }
 
     #[test]
@@ -1361,6 +1601,10 @@ mod tests {
                 ("name".into(), Value::String("PayInvoice".into())),
                 ("instance".into(), Value::String("invoice_a".into())),
                 ("occurred_at".into(), Value::Instant(occurred)),
+                ("payer".into(), Value::String("Payer".into())),
+                ("payee".into(), Value::String("Payee".into())),
+                ("amount".into(), Value::Int(100)),
+                ("currency".into(), Value::String("USD".into())),
             ])),
         });
         let duty = pay_invoice_duty_after(30, "invoice_date");

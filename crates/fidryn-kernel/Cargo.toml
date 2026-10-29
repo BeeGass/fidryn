@@ -9,6 +9,11 @@ rust-version.workspace = true
 description = "Fidryn covering-proof checks for convergence certificates"
 
 [dependencies]
-fidryn-core = { workspace = true, features = ["kernel-issue"] }
+fidryn-core.workspace = true
 fidryn-eval.workspace = true
 fidryn-handlers.workspace = true
+
+[dev-dependencies]
+fidryn-check.workspace = true
+fidryn-hir.workspace = true
+fidryn-syntax.workspace = true

@@ -2,9 +2,15 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "Examples.AvaNoahPrenup@0.1.0",
   "facts": {
-    "provision": "Examples.AvaNoahPrenup@0.1.0::ChildSupportWaiver()",
-    "against": "Ava",
-    "case": "DivorceCase",
+    "provision": "ChildSupportWaiver",
+    "against": {
+      "kind": "entity",
+      "data": "Ava"
+    },
+    "case": {
+      "kind": "entity",
+      "data": "DivorceCase"
+    },
     "married": true,
     "agreement_executed": true
   },
@@ -19,7 +25,10 @@
   "interpretations": {},
   "decisions": {},
   "closures": [
-    { "domain": "child_support_rights", "closed": true }
+    {
+      "domain": "child_support_rights",
+      "closed": true
+    }
   ],
   "outsideScope": [
     "complete_choice_of_law_analysis",

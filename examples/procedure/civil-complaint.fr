@@ -98,7 +98,7 @@ module Examples.CivilComplaint version "0.1.0" {
         from FRCP.rule("58")
     {
         authority CourtWithJurisdiction(case)
-        record requires JudgmentEntry
+        record requires entry: JudgmentEntry
         establish when observed JudgmentEntryObservation(entry)
           and entry.proceeding == case
         otherwise suspend NeedJudgment {

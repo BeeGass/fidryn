@@ -127,7 +127,7 @@ fn caller_supplied_answers_cannot_mint_finite_replay_without_replay() {
 
 #[test]
 fn replay_cannot_overwrite_a_fixed_case_fact() {
-    let module = compile("query q() -> Bool { return fixed }");
+    let module = compile("query q(fixed: Bool) -> Bool { return fixed }");
     let mut case = CaseRecord::default();
     case.facts.insert("fixed".into(), Value::Bool(false));
     case.admissible_completions
@@ -301,7 +301,7 @@ fn duty_module() -> CoreModule {
             content USD(100.00)
             due 30 counted_days after invoice_date
         }
-        query q() -> String { goal Evaluate { duty_status(PayInvoice, invoice_a) } }
+        query q() -> DutyState { goal Evaluate { duty_status(PayInvoice, invoice_a) } }
     "#,
     )
 }
@@ -337,6 +337,14 @@ fn on_time_payment_remains_unbreached_after_its_deadline() {
         value: Value::Map(BTreeMap::from([
             ("name".into(), Value::String("PayInvoice".into())),
             ("instance".into(), Value::String("invoice_a".into())),
+            ("payer".into(), Value::Entity("Payer".into())),
+            ("payee".into(), Value::Entity("Payee".into())),
+            ("currency".into(), Value::String("USD".into())),
+            ("amount".into(), Value::Int(100)),
+            (
+                "paid_at".into(),
+                Value::Instant(instant("2033-01-10T00:00:00Z")),
+            ),
         ])),
     });
     let later = instant("2033-02-15T00:00:00Z");
@@ -382,10 +390,28 @@ fn relabeling_a_performed_payload_as_correction_does_not_authorize_it() {
     }
 }
 
+fn grant(action: &str) -> Value {
+    Value::Map(BTreeMap::from([
+        ("action".into(), Value::String(action.into())),
+        ("scope".into(), Value::String("*".into())),
+        ("context".into(), Value::String("*".into())),
+        ("source".into(), Value::String("fixture-grant".into())),
+        (
+            "validTime".into(),
+            Value::Map(BTreeMap::from([
+                ("start".into(), Value::String("NegInf".into())),
+                ("end".into(), Value::String("PosInf".into())),
+            ])),
+        ),
+    ]))
+}
+
 #[test]
 fn rolled_back_nested_sequence_is_reexecuted_before_transaction_commit() {
     let module = compile(
         r#"
+        entity Payer : NaturalPerson
+        duty pay { bearer Payer attaches when true content Work }
         query q() -> Bool {
             goal Evaluate {
                 transaction(seq(duty_step(pay, attach), true), require_authority(release), true)
@@ -393,7 +419,9 @@ fn rolled_back_nested_sequence_is_reexecuted_before_transaction_commit() {
         }
     "#,
     );
-    let case = CaseRecord::default();
+    let mut case = CaseRecord::default();
+    case.facts
+        .insert("authority_grants".into(), Value::Set(vec![grant("attach")]));
     let ctx = context();
     let query = QueryName::from("q");
     let args = BTreeMap::new();
@@ -416,10 +444,7 @@ fn rolled_back_nested_sequence_is_reexecuted_before_transaction_commit() {
     let mut granted = case.clone();
     granted.facts.insert(
         "authority_grants".into(),
-        Value::Set(vec![
-            Value::String("attach".into()),
-            Value::String("release".into()),
-        ]),
+        Value::Set(vec![grant("attach"), grant("release")]),
     );
     let mut handler = CaseFile {
         record: granted.clone(),
@@ -449,7 +474,7 @@ fn rebase_cannot_reuse_a_require_that_is_now_false() {
         r#"
         entity A : NaturalPerson
         proposition P(person: NaturalPerson)
-        query q() -> Bool ! {Determine} { require gate; return determined(P(A)) }
+        query q(gate: Bool) -> Bool ! {Determine} { require gate; return determined(P(A)) }
     "#,
     );
     let mut case = CaseRecord::default();

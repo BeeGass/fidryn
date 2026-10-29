@@ -12,6 +12,7 @@ module Programs.TwoOffices version "0.1.0" {
     entity Eve : NaturalPerson
     entity Pat : NaturalPerson
 
+    proposition Incapacitated(person: NaturalPerson, office: Office)
     proposition Eligible(person: NaturalPerson, office: Office)
 
     interpretation_family TrusteeEligibility {

@@ -79,6 +79,67 @@ pub struct Decl {
     pub source_basis: Option<Expr>,
     pub fields: BTreeMap<String, String>,
     pub type_args: Vec<String>,
+    pub assertions: Vec<Expr>,
+    pub judgment: Option<JudgmentAst>,
+    pub type_definition: Option<TypeDefinitionAst>,
+    pub selection: Option<SelectionAst>,
+    pub observation: Option<ObservationAst>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ObservationAst {
+    pub establishes: Expr,
+    pub validators: Vec<Expr>,
+    pub unsupported_clauses: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SelectionAst {
+    pub binder: String,
+    pub finite_domain: Expr,
+    pub predicate: Expr,
+    pub ordering: Vec<String>,
+    pub ascending: Vec<bool>,
+    pub require_unique_keys: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TypeDefinitionAst {
+    Alias(String),
+    Sum(Vec<TypeConstructorAst>),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TypeConstructorAst {
+    pub name: String,
+    pub arguments: Vec<String>,
+    pub fields: Vec<(String, String)>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct JudgmentAst {
+    pub decides: Expr,
+    pub authority: Option<JudgmentAuthorityAst>,
+    pub records: Vec<(String, String)>,
+    pub record_patterns: Vec<Expr>,
+    pub constraints: Vec<Expr>,
+    pub establish_when: Option<Expr>,
+    pub reject_when: Option<Expr>,
+    pub otherwise: Option<(Expr, Expr)>,
+    pub on_established: Vec<(Expr, Expr)>,
+    pub standard: Option<Expr>,
+    pub review: Option<(Expr, Expr)>,
+    pub unsupported_clauses: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum JudgmentAuthorityAst {
+    Actor(Expr),
+    Concurrence {
+        minimum: u32,
+        distinct: bool,
+        issuer_type: String,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -119,6 +180,13 @@ pub enum Expr {
         unit: String,
     },
     Require(Box<Expr>),
+    NamedArg {
+        name: String,
+        value: Box<Expr>,
+    },
+    Set(Vec<Expr>),
+    Record(BTreeMap<String, Expr>),
+    Grouped(Box<Expr>),
     Block(Vec<Expr>),
 }
 
@@ -180,11 +248,45 @@ impl Decl {
             source_basis: None,
             fields: BTreeMap::new(),
             type_args: Vec::new(),
+            assertions: Vec::new(),
+            judgment: None,
+            type_definition: None,
+            selection: None,
+            observation: None,
         }
     }
 }
 
 impl Item {
+    pub fn decl(&self) -> Option<&Decl> {
+        match self {
+            Item::Header(_) => None,
+            Item::Source(d)
+            | Item::Import(d)
+            | Item::Entity(d)
+            | Item::Type(d)
+            | Item::RecordType(d)
+            | Item::Office(d)
+            | Item::Proposition(d)
+            | Item::Observation(d)
+            | Item::Nomination(d)
+            | Item::Function(d)
+            | Item::Effect(d)
+            | Item::Rule(d)
+            | Item::Power(d)
+            | Item::Duty(d)
+            | Item::Judgment(d)
+            | Item::Decision(d)
+            | Item::LegalAct(d)
+            | Item::Clause(d)
+            | Item::Interpretation(d)
+            | Item::ConflictDoctrine(d)
+            | Item::Query(d)
+            | Item::Scenario(d)
+            | Item::Verify(d) => Some(d),
+        }
+    }
+
     pub fn span(&self) -> Span {
         match self {
             Item::Header(h) => h.span,

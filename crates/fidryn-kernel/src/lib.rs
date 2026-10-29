@@ -21,15 +21,16 @@
 //! or publishes. Query args overlay facts on the pure path. This crate does
 //! not import `fidryn-adapt`.
 
+mod checked;
 mod completion;
 mod duty;
 mod pure;
 
+pub use checked::CheckedEvaluation;
 pub use completion::ValidatedCompletionModel;
 pub use duty::{eval_institutional, is_institutional_fragment};
 pub use pure::{eval_fragment, is_boolean_fragment, is_pure_fragment};
 
-use crate::completion::{CHOICE_NS, EVIDENCE_NS, INTERPRETATION_NS};
 use fidryn_core::{
     BranchClaim, CaseRecord, CheckedCertificate, CompletionProofId, CoreModule, CoverageWitness,
     ExecutionMode, Handler, HandlerResult, Instant, LegalState, ModuleId, OpenRequest, Outcome,
@@ -268,7 +269,7 @@ pub fn accept_covering_eval_with_args(
             sealed_id.hex()
         ));
     }
-    CheckedCertificate::stamp_finite_replay(
+    CheckedCertificate::unverified_replay_claim(
         sealed_id,
         ReplayIssuance {
             program,
@@ -324,52 +325,17 @@ fn admit_witness_shape(
     witness_matches_declared_space(case, witness)
 }
 
-/// Cartesian size of declared interpretation, choice, and evidence domains.
-///
-/// `None` when no domains are listed: that is not an extra constraint.
-/// An empty listed domain contributes size 0.
-fn declared_completion_product(case: &CaseRecord) -> Result<Option<usize>, String> {
-    let completions = &case.admissible_completions;
-    let mut sizes: Vec<usize> = Vec::new();
-    sizes.extend(completions.interpretations.values().map(Vec::len));
-    sizes.extend(completions.choices.values().map(Vec::len));
-    sizes.extend(
-        completions
-            .evidence
-            .values()
-            .map(|domain| domain.responses.len()),
-    );
-    if sizes.is_empty() {
-        return Ok(None);
-    }
-    let product = sizes
-        .into_iter()
-        .try_fold(1usize, |acc, size| acc.checked_mul(size))
-        .ok_or_else(|| "declared admissible completion product overflows usize".to_string())?;
-    Ok(Some(product))
-}
-
-/// Do not trust a claimed total larger than the declared model.
+/// Structural admission uses the same normalized completion space as execution.
 fn witness_matches_declared_space(
     case: &CaseRecord,
     witness: &CoverageWitness,
 ) -> Result<(), String> {
-    let Some(expected) = declared_completion_product(case)? else {
+    let model = ValidatedCompletionModel::admit(case).map_err(|error| error.to_string())?;
+    // Historical shape-only evidence may omit the sole empty binding map.
+    if model.slots().is_empty() && witness.branches.is_empty() && witness.total == 1 {
         return Ok(());
-    };
-    if witness.total > expected {
-        return Err(format!(
-            "coverage witness total {} exceeds declared completion product {expected}",
-            witness.total
-        ));
     }
-    if expected > 0 && (witness.total != expected || witness.branches.len() != expected) {
-        return Err(format!(
-            "coverage witness total {} / branches {} does not match declared completion product {expected}",
-            witness.total,
-            witness.branches.len()
-        ));
-    }
+    model.admit_witness(witness)?;
     Ok(())
 }
 
@@ -401,6 +367,9 @@ fn check_branches_with_args(
     claimed: &Value,
     args: &BTreeMap<String, Value>,
 ) -> Result<(), String> {
+    if witness.branches.len() > 4096 {
+        return Err("covering replay exceeds the branch budget".into());
+    }
     admit_witness_shape(base, witness, claimed)?;
     if witness.branches.is_empty() {
         return Err("coverage witness has no branches".into());
@@ -413,7 +382,7 @@ fn check_branches_with_args(
             witness.total
         ));
     }
-    let model = ValidatedCompletionModel::from_case(base)?;
+    let model = ValidatedCompletionModel::admit(base).map_err(|error| error.to_string())?;
     let _admitted = model.admit_witness(witness)?;
     for branch in &witness.branches {
         if branch.answer != *claimed || branch.answer != witness.answer {
@@ -444,6 +413,20 @@ fn check_branch_evaluation(
     model: &ValidatedCompletionModel,
 ) -> Result<(), String> {
     let cloned = model.overlay(base, &branch.bindings, ctx)?;
+    let declaration = module
+        .query(query.as_str())
+        .ok_or_else(|| format!("unknown query `{}`", query.as_str()))?;
+    let resolved_args = fidryn_eval::resolve_query_args(module, declaration, args, &cloned)
+        .map_err(|error| error.to_string())?;
+    let args = &resolved_args;
+    let derived = fidryn_eval::DerivedWorld::compute(module, &cloned, ctx, args)
+        .map_err(|error| error.to_string())?;
+    if derived.has_conflict() {
+        return Err("not a covering evaluation: conflicting institutional effects".into());
+    }
+    if let QueryPlan::Evaluate(term) = &declaration.plan {
+        admit_fragment_resources(term, derived.work_units())?;
+    }
     if let Some(term) = pure_fragment_term(module, query) {
         let assignment = fragment_assignment(&cloned.facts, &branch.bindings, args);
         return match eval_fragment(term, &assignment) {
@@ -485,6 +468,42 @@ fn check_branch_evaluation(
     }
 }
 
+/// Independent fragments still consume finite construction and execution
+/// resources. Count conservatively before recursive fragment inspection.
+fn admit_fragment_resources(term: &Term, foundational_work: u64) -> Result<(), String> {
+    let limit = u64::from(fidryn_eval::ExecutionBudget::default().operations);
+    let mut used = foundational_work;
+    let mut pending = vec![(term, 0usize)];
+    while let Some((term, depth)) = pending.pop() {
+        used = used
+            .checked_add(1)
+            .ok_or("covering resource accounting overflow")?;
+        if used > limit || depth > 128 {
+            return Err("covering evaluation exceeds the operation or depth budget".into());
+        }
+        match term {
+            Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
+                if args.len() as u64 > limit.saturating_sub(used) {
+                    return Err("covering expression exceeds the operation budget".into());
+                }
+                pending.extend(args.iter().map(|term| (term, depth + 1)));
+            }
+            Term::Binary { left, right, .. } => {
+                pending.extend([(left.as_ref(), depth + 1), (right.as_ref(), depth + 1)])
+            }
+            Term::If { cond, then, else_ } => pending.extend([
+                (cond.as_ref(), depth + 1),
+                (then.as_ref(), depth + 1),
+                (else_.as_ref(), depth + 1),
+            ]),
+            Term::Field { base, .. } => pending.push((base, depth + 1)),
+            Term::Record(fields) => pending.extend(fields.values().map(|term| (term, depth + 1))),
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
 fn pure_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) -> Option<&'a Term> {
     match &module.query(query.as_str())?.plan {
         QueryPlan::Evaluate(term) if is_pure_fragment(term) => Some(term),
@@ -506,28 +525,14 @@ fn institutional_fragment_term<'a>(module: &'a CoreModule, query: &QueryName) ->
 /// matching evaluate lookup (`bindings` then `args` then `facts`).
 fn fragment_assignment(
     facts: &BTreeMap<String, Value>,
-    bindings: &BTreeMap<String, Value>,
+    _bindings: &BTreeMap<String, Value>,
     args: &BTreeMap<String, Value>,
 ) -> BTreeMap<String, Value> {
     let mut env = facts.clone();
-    for (key, value) in bindings {
-        env.entry(key.clone()).or_insert(value.clone());
-        if let Some(name) = strip_slot_name(key)
-            && !name.is_empty()
-        {
-            env.entry(name.to_owned()).or_insert(value.clone());
-        }
-    }
     for (key, value) in args {
         env.insert(key.clone(), value.clone());
     }
     env
-}
-
-fn strip_slot_name(key: &str) -> Option<&str> {
-    key.strip_prefix(INTERPRETATION_NS)
-        .or_else(|| key.strip_prefix(CHOICE_NS))
-        .or_else(|| key.strip_prefix(EVIDENCE_NS))
 }
 
 #[cfg(test)]
@@ -544,7 +549,7 @@ mod tests {
     use fidryn_eval::evaluate;
 
     fn complete_witness(answer: Value) -> CoverageWitness {
-        CoverageWitness::complete(3, answer)
+        CoverageWitness::complete(1, answer)
     }
 
     fn at() -> Instant {
@@ -1353,6 +1358,7 @@ mod tests {
         case.admissible_completions
             .interpretations
             .insert("b".into(), vec!["true".into(), "false".into()]);
+        case.facts.insert("b".into(), Value::Bool(true));
         case
     }
 
@@ -1449,7 +1455,7 @@ mod tests {
     }
 
     #[test]
-    fn test_eval_fragment_is_used_when_evaluate_would_suspend_on_handlers() {
+    fn test_fragment_cannot_turn_choice_labels_into_judgment_facts() {
         let module = module_with_plan(QueryPlan::Evaluate(Term::Ident("judgment".into())));
         match &module.queries[0].plan {
             QueryPlan::Evaluate(term) => {
@@ -1492,10 +1498,12 @@ mod tests {
             "evaluate must suspend on NeedJudgment without a determination, got {eval_result:?}"
         );
 
-        let cert = covering_eval_case(&module, &case, &claimed, witness)
-            .expect("fragment checker decides Ident from admitted bindings");
-        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
-        assert!(cert.is_covering());
+        let error = covering_eval_case(&module, &case, &claimed, witness)
+            .expect_err("a choice label cannot manufacture a determinate judgment");
+        assert!(
+            error.contains("unbound") || error.contains("covering"),
+            "{error}"
+        );
     }
 
     #[test]
@@ -1618,7 +1626,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seq_with_duty_still_replays_with_evaluate() {
+    fn test_seq_with_undeclared_duty_cannot_cover() {
         let term = seq_term(vec![duty_step_term(), Term::Bool(true)]);
         assert!(!is_pure_fragment(&term));
         assert!(!is_institutional_fragment(&term));
@@ -1627,10 +1635,9 @@ mod tests {
         assert!(institutional_fragment_term(&module, &QueryName::from("q")).is_none());
         let claimed = Value::Bool(true);
         let witness = covering_witness(true, vec![empty_branch(true)]);
-        let cert = covering_eval(&module, &claimed, witness)
-            .expect("seq with duty_step still covers via evaluate");
-        assert_eq!(cert.method(), CoverageMethod::FiniteReplay);
-        assert!(cert.is_covering());
+        let error = covering_eval(&module, &claimed, witness)
+            .expect_err("an undeclared duty cannot establish covering");
+        assert!(error.contains("unknown duty"), "{error}");
     }
 
     #[test]
@@ -1653,6 +1660,7 @@ mod tests {
         CoreDuty {
             id: NodeId::of(b"PayInvoice"),
             name: "PayInvoice".into(),
+            binders: Vec::new(),
             bearer: Term::Ident("Payer".into()),
             claimant: Some(Term::Ident("Payee".into())),
             attaches: Guard::Satisfied,
@@ -1804,7 +1812,19 @@ mod tests {
         let mut case = CaseRecord::default();
         case.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![Value::String("release".into())]),
+            Value::Set(vec![Value::Map(BTreeMap::from([
+                ("action".into(), Value::String("release".into())),
+                ("scope".into(), Value::String("*".into())),
+                ("context".into(), Value::String("*".into())),
+                ("source".into(), Value::String("grant-1".into())),
+                (
+                    "validTime".into(),
+                    Value::Map(BTreeMap::from([
+                        ("start".into(), Value::String("NegInf".into())),
+                        ("end".into(), Value::String("PosInf".into())),
+                    ])),
+                ),
+            ]))]),
         );
         let claimed = Value::Unit;
         let cert = covering_eval_case(&module, &case, &claimed, covering_value(claimed.clone()))

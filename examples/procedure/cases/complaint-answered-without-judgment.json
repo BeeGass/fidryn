@@ -2,9 +2,18 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "Examples.CivilComplaint@0.1.0",
   "facts": {
-    "case": "DistrictCase",
-    "complaint": "ComplaintPleading",
-    "answer": "AnswerPleading",
+    "case": {
+      "kind": "entity",
+      "data": "DistrictCase"
+    },
+    "complaint": {
+      "kind": "entity",
+      "data": "ComplaintPleading"
+    },
+    "answer": {
+      "kind": "entity",
+      "data": "AnswerPleading"
+    },
     "commenced": true,
     "answered": true
   },
@@ -37,7 +46,10 @@
     "interpretations": {},
     "evidence": {
       "JudgmentEntry": {
-        "responses": ["absent", "present"],
+        "responses": [
+          "absent",
+          "present"
+        ],
         "effectOnValidTime": "unchanged_if_after_query_valid_time"
       }
     },

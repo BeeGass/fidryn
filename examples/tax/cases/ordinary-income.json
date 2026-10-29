@@ -2,7 +2,18 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Federal.Tax.ClosedForms@0.1.0",
   "facts": {
-    "amount": "USD(50000.00)",
+    "amount": {
+      "kind": "ctor",
+      "data": {
+        "name": "USD",
+        "fields": {
+          "_0": {
+            "kind": "decimal",
+            "data": "50000.00"
+          }
+        }
+      }
+    },
     "year": 2026,
     "status": "Single"
   },

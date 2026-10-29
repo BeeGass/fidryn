@@ -1,9 +1,28 @@
 //! Deterministic worklist evaluator. No partial mutation on Open or Conflict.
 
+mod admission;
 pub mod conflict;
 pub mod duty;
+mod judgment;
 pub mod law;
+mod money;
+mod trace;
 mod worklist;
+pub use trace::DerivationStep;
+use trace::{bind_outcome, record_step};
+
+/// Operation allowance shared by judgment admission, worklist firing, and evaluation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ExecutionBudget {
+    pub operations: u32,
+}
+impl Default for ExecutionBudget {
+    fn default() -> Self {
+        Self {
+            operations: 100_000,
+        }
+    }
+}
 
 pub use conflict::resolve_conflict;
 pub use law::select_applicable_law;
@@ -64,6 +83,8 @@ pub struct Continuation {
     pub answered: BTreeMap<String, Value>,
     pub completed: Vec<Value>,
     pub seq_index: usize,
+    steps: u64,
+    derivation: Vec<DerivationStep>,
     seq_frames: Vec<SeqFrame>,
     case_identity: CaseIdentity,
 }
@@ -87,12 +108,17 @@ struct TxSavepoint {
 #[derive(Clone, Debug)]
 pub struct EvalSession {
     pub outcome: Outcome<Value>,
+    pub derivation: Vec<DerivationStep>,
+    pub consumed_operations: u64,
+    pub budget: ExecutionBudget,
     pub continuation: Option<Continuation>,
     pub bindings: BTreeMap<String, Value>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct CaseIdentity {
+    snapshot: fidryn_core::CaseSnapshotIdentity,
+    mode: ExecutionMode,
     facts: BTreeMap<String, Value>,
     evidence: Vec<(String, Instant, Value)>,
     events: Vec<(String, Interval, Instant, Value)>,
@@ -116,8 +142,11 @@ impl CaseIdentity {
         args: &BTreeMap<String, Value>,
         ctx: &RunContext,
         case: &CaseRecord,
+        mode: ExecutionMode,
     ) -> Self {
         Self {
+            snapshot: fidryn_core::CaseSnapshotIdentity::of(case).expect("case serializes"),
+            mode,
             facts: case.facts.clone(),
             evidence: case
                 .evidence
@@ -179,6 +208,20 @@ pub fn evaluate<H: Handler>(
     Ok(evaluate_session(module, query, args, state, ctx, handler, case)?.outcome)
 }
 
+/// Evaluate an operative invocation while retaining its actual derivation records.
+#[allow(clippy::too_many_arguments)]
+pub fn evaluate_traced<H: Handler>(
+    module: &CoreModule,
+    query: &QueryName,
+    args: &BTreeMap<String, Value>,
+    state: &LegalState,
+    ctx: &RunContext,
+    handler: &mut H,
+    case: &CaseRecord,
+) -> Result<EvalSession, EngineError> {
+    evaluate_session(module, query, args, state, ctx, handler, case)
+}
+
 /// Evaluate with `case.assumptions` as a facts overlay. Does not mutate `case.events`.
 #[allow(clippy::too_many_arguments, clippy::result_large_err)]
 pub fn evaluate_scenario<H: Handler>(
@@ -190,8 +233,68 @@ pub fn evaluate_scenario<H: Handler>(
     handler: &mut H,
     case: &CaseRecord,
 ) -> Result<Outcome<Value>, EngineError> {
-    let overlay = duty::scenario_overlay_case(case);
-    evaluate(module, query, args, state, ctx, handler, &overlay)
+    Ok(evaluate_scenario_traced(module, query, args, state, ctx, handler, case)?.outcome)
+}
+
+/// Evaluate the timed hypothesis overlay and retain its derivation records.
+#[allow(clippy::too_many_arguments)]
+pub fn evaluate_scenario_traced<H: Handler>(
+    module: &CoreModule,
+    query: &QueryName,
+    args: &BTreeMap<String, Value>,
+    state: &LegalState,
+    ctx: &RunContext,
+    handler: &mut H,
+    case: &CaseRecord,
+) -> Result<EvalSession, EngineError> {
+    evaluate_scenario_traced_with_budget(
+        module,
+        query,
+        args,
+        state,
+        ctx,
+        handler,
+        case,
+        ExecutionBudget::default(),
+    )
+}
+
+/// Evaluate a scenario with a caller-selected operation allowance.
+#[allow(clippy::too_many_arguments)]
+pub fn evaluate_scenario_traced_with_budget<H: Handler>(
+    module: &CoreModule,
+    query: &QueryName,
+    args: &BTreeMap<String, Value>,
+    state: &LegalState,
+    ctx: &RunContext,
+    handler: &mut H,
+    case: &CaseRecord,
+    budget: ExecutionBudget,
+) -> Result<EvalSession, EngineError> {
+    let overlay = duty::scenario_overlay_at(case, ctx);
+    let q = module
+        .query(query.as_str())
+        .ok_or_else(|| EngineError::UnknownQuery(query.as_str().into()))?;
+    let resolved_args = resolve_query_args(module, q, args, &overlay)?;
+    let args = &resolved_args;
+    let derived = DerivedWorld::compute_with_budget(module, &overlay, ctx, args, true, budget)?;
+    eval_with_state(
+        &q.plan,
+        module,
+        query,
+        args,
+        state,
+        ctx,
+        handler,
+        &overlay,
+        args.clone(),
+        derived,
+        None,
+        0,
+        BTreeMap::new(),
+        Vec::new(),
+        Vec::new(),
+    )
 }
 
 /// Wrap an outcome as an [`EvaluationReport`]. Coverage is unset.
@@ -221,10 +324,36 @@ pub fn evaluate_session<H: Handler>(
     handler: &mut H,
     case: &CaseRecord,
 ) -> Result<EvalSession, EngineError> {
+    evaluate_traced_with_budget(
+        module,
+        query,
+        args,
+        state,
+        ctx,
+        handler,
+        case,
+        ExecutionBudget::default(),
+    )
+}
+
+/// Evaluate an operative invocation with a caller-selected operation allowance.
+#[allow(clippy::too_many_arguments)]
+pub fn evaluate_traced_with_budget<H: Handler>(
+    module: &CoreModule,
+    query: &QueryName,
+    args: &BTreeMap<String, Value>,
+    state: &LegalState,
+    ctx: &RunContext,
+    handler: &mut H,
+    case: &CaseRecord,
+    budget: ExecutionBudget,
+) -> Result<EvalSession, EngineError> {
     let Some(q) = module.query(query.as_str()) else {
         return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
     };
-    let derived = DerivedWorld::compute(module, case, ctx, args)?;
+    let resolved_args = resolve_query_args(module, q, args, case)?;
+    let args = &resolved_args;
+    let derived = DerivedWorld::compute_with_budget(module, case, ctx, args, false, budget)?;
     eval_with_state(
         &q.plan,
         module,
@@ -237,7 +366,9 @@ pub fn evaluate_session<H: Handler>(
         args.clone(),
         derived,
         None,
+        0,
         BTreeMap::new(),
+        Vec::new(),
         Vec::new(),
     )
 }
@@ -264,19 +395,40 @@ pub fn resume<H: Handler>(
     let Some(cont) = session.continuation else {
         return evaluate_session(module, query, args, state, ctx, handler, case);
     };
+    let overlay;
+    let case = if cont.case_identity.mode == ExecutionMode::Scenario {
+        overlay = duty::scenario_overlay_at(case, ctx);
+        &overlay
+    } else {
+        case
+    };
     if module.query(query.as_str()).is_none() {
         return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
     }
-    let identity = CaseIdentity::of(module, query, args, ctx, case);
-    if program_or_query_changed(&cont, module, query, &identity) {
-        return evaluate_session(module, query, args, state, ctx, handler, case);
-    }
-    let residual = match &cont.residual {
-        Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
-        Residual::Plan(plan) => plan.clone(),
+    let q = module.query(query.as_str()).expect("query checked above");
+    let resolved_args = resolve_query_args(module, q, args, case)?;
+    let args = &resolved_args;
+    let identity = CaseIdentity::of(module, query, args, ctx, case, cont.case_identity.mode);
+    let program_changed = program_or_query_changed(&cont, module, query, &identity);
+    let residual = if program_changed {
+        q.plan.clone()
+    } else {
+        match &cont.residual {
+            Residual::Term(term) => QueryPlan::Evaluate(term.clone()),
+            Residual::Plan(plan) => plan.clone(),
+        }
     };
     if cont.case_identity != identity {
-        let derived = DerivedWorld::compute(module, case, ctx, args)?;
+        let derived = DerivedWorld::compute_with_budget(
+            module,
+            case,
+            ctx,
+            args,
+            cont.case_identity.mode == ExecutionMode::Scenario,
+            ExecutionBudget {
+                operations: cont.derived.operation_limit() as u32,
+            },
+        )?;
         return eval_with_state(
             &residual,
             module,
@@ -289,7 +441,9 @@ pub fn resume<H: Handler>(
             args.clone(),
             derived,
             cont.fuel,
+            0,
             BTreeMap::new(),
+            Vec::new(),
             Vec::new(),
         );
     }
@@ -305,8 +459,10 @@ pub fn resume<H: Handler>(
         cont.bindings,
         cont.derived,
         cont.fuel,
+        cont.steps,
         cont.answered,
         cont.seq_frames,
+        cont.derivation,
     )
 }
 
@@ -323,75 +479,181 @@ fn eval_with_state<H: Handler>(
     bindings: BTreeMap<String, Value>,
     derived: DerivedWorld,
     fuel: Option<u32>,
+    steps: u64,
     answered: BTreeMap<String, Value>,
     seq_frames: Vec<SeqFrame>,
+    mut prior_derivation: Vec<DerivationStep>,
 ) -> Result<EvalSession, EngineError> {
     let mut handler = RememberingHandler {
         inner: handler,
         answered,
     };
-    let identity = CaseIdentity::of(module, query, args, ctx, case);
-    match plan {
-        QueryPlan::Evaluate(term) => {
-            let mut frame = EvalFrame {
-                module,
-                args,
-                bindings,
-                ctx,
-                handler: &mut handler,
-                case,
-                derived,
-                fuel,
-                seq_frames,
-                seq_path: Vec::new(),
-            };
-            let outcome = frame.eval_term(term)?;
-            let EvalFrame {
-                bindings,
-                derived,
-                fuel,
-                seq_frames,
-                ..
-            } = frame;
-            Ok(session_from(
-                outcome,
-                Residual::Term(term.clone()),
-                bindings,
-                derived,
-                fuel,
-                handler.answered,
-                identity,
-                seq_frames,
-            ))
+    let mode = if derived.is_scenario() {
+        ExecutionMode::Scenario
+    } else {
+        ExecutionMode::Operative
+    };
+    let steps = if steps == 0 {
+        derived.work_units()
+    } else {
+        steps
+    };
+    if steps >= derived.operation_limit() {
+        return Err(EngineError::FuelExhausted { remaining: 0 });
+    }
+    let steps = steps + 1;
+    let identity = CaseIdentity::of(module, query, args, ctx, case, mode);
+    let admission = fidryn_core::ValidatedCompletionModel::admit(case);
+    let admission_detail = format!("{admission:?}");
+    let refused = match admission {
+        Ok(_) => None,
+        Err(fidryn_core::CompletionAdmissionError::EmptyDomain { slot }) => {
+            Some(Outcome::Inconsistent {
+                core: vec![format!("empty completion set: {slot}")],
+                trace: TraceId::of(b"empty-completion-model"),
+            })
         }
-        other => {
-            let outcome =
-                eval_specialized_plan(other, module, state, ctx, &mut handler, case, &derived)?;
-            Ok(session_from(
-                outcome,
-                Residual::Plan(other.clone()),
-                bindings,
-                derived,
-                fuel,
-                handler.answered,
-                identity,
-                Vec::new(),
-            ))
+        Err(fidryn_core::CompletionAdmissionError::OutsideDomain { request, selection }) => {
+            Some(Outcome::OutsideCompetence {
+                request,
+                reason: format!("recorded selection `{selection}` is not in the admissible domain"),
+                trace: TraceId::of(b"outside-completion-model"),
+            })
+        }
+        Err(fidryn_core::CompletionAdmissionError::InvalidModel(message)) => {
+            return Err(EngineError::InvalidInput(message));
+        }
+    };
+    if let Some(outcome) = refused {
+        let mut derivation = derived.derivation().to_vec();
+        record_step(
+            &mut derivation,
+            "completion_admission",
+            admission_detail,
+            Vec::new(),
+        );
+        return session_from(
+            outcome,
+            Residual::Plan(plan.clone()),
+            bindings,
+            derived.clone(),
+            fuel,
+            steps,
+            handler.answered,
+            identity,
+            seq_frames,
+            derivation,
+        );
+    }
+    if derived.has_conflict() {
+        return session_from(
+            Outcome::NormConflict {
+                doctrines: Vec::new(),
+                trace: TraceId::of(b"staged-conflict"),
+            },
+            Residual::Plan(plan.clone()),
+            bindings,
+            derived.clone(),
+            fuel,
+            steps,
+            handler.answered,
+            identity,
+            seq_frames,
+            derived.derivation().to_vec(),
+        );
+    }
+    for step in derived.derivation() {
+        if !prior_derivation.iter().any(|prior| prior.id == step.id) {
+            prior_derivation.push(step.clone());
         }
     }
+    record_step(
+        &mut prior_derivation,
+        "completion_admission",
+        admission_detail,
+        Vec::new(),
+    );
+    let derivation = prior_derivation;
+    let mut frame = EvalFrame {
+        module,
+        args,
+        bindings,
+        ctx,
+        handler: &mut handler,
+        case,
+        operation_limit: derived.operation_limit(),
+        derived,
+        fuel,
+        seq_frames,
+        seq_path: Vec::new(),
+        child_counts: Vec::new(),
+        steps,
+        derivation,
+        trace_frames: Vec::new(),
+    };
+    let outcome = frame.eval_plan(plan, state)?;
+    let EvalFrame {
+        bindings,
+        derived,
+        fuel,
+        seq_frames,
+        steps,
+        derivation,
+        ..
+    } = frame;
+    let residual = match plan {
+        QueryPlan::Evaluate(term) => Residual::Term(term.clone()),
+        other => Residual::Plan(other.clone()),
+    };
+    session_from(
+        outcome,
+        residual,
+        bindings,
+        derived,
+        fuel,
+        steps,
+        handler.answered,
+        identity,
+        seq_frames,
+        derivation,
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
 fn session_from(
-    outcome: Outcome<Value>,
+    mut outcome: Outcome<Value>,
     residual: Residual,
     bindings: BTreeMap<String, Value>,
     derived: DerivedWorld,
     fuel: Option<u32>,
+    steps: u64,
     answered: BTreeMap<String, Value>,
     identity: CaseIdentity,
     seq_frames: Vec<SeqFrame>,
-) -> EvalSession {
+    mut derivation: Vec<DerivationStep>,
+) -> Result<EvalSession, EngineError> {
+    if derivation.len() >= 100_000 || trace::exhausted(&derivation) {
+        return Err(EngineError::FuelExhausted { remaining: 0 });
+    }
+    let mut seen = BTreeSet::new();
+    derivation.retain(|step| seen.insert(step.id.clone()));
+    let parents = derivation_roots(&derivation);
+    let root = record_step(
+        &mut derivation,
+        "invocation",
+        format!(
+            "{identity:?}; budget={}; steps={steps}; result={outcome:?}",
+            derived.operation_limit()
+        ),
+        parents,
+    );
+    bind_outcome(&mut outcome, &root);
+    if trace::exhausted(&derivation) {
+        return Err(EngineError::FuelExhausted { remaining: 0 });
+    }
+    let budget = ExecutionBudget {
+        operations: derived.operation_limit() as u32,
+    };
     let (seq_index, completed) = seq_progress(&seq_frames);
     let continuation = match &outcome {
         Outcome::Suspended { .. } => Some(Continuation {
@@ -402,16 +664,30 @@ fn session_from(
             answered,
             completed,
             seq_index,
+            steps,
+            derivation: derivation.clone(),
             seq_frames,
             case_identity: identity,
         }),
         _ => None,
     };
-    EvalSession {
+    Ok(EvalSession {
         outcome,
+        derivation,
+        budget,
+        consumed_operations: steps,
         continuation,
         bindings,
-    }
+    })
+}
+
+fn derivation_roots(steps: &[DerivationStep]) -> Vec<String> {
+    let parents: BTreeSet<_> = steps.iter().flat_map(|step| step.parents.iter()).collect();
+    steps
+        .iter()
+        .filter(|step| !parents.contains(&step.id))
+        .map(|step| step.id.clone())
+        .collect()
 }
 
 struct RememberingHandler<'a, H> {
@@ -468,6 +744,7 @@ impl<H: Handler> RememberingHandler<'_, H> {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn eval_specialized_plan<H: Handler>(
     plan: &QueryPlan,
     module: &CoreModule,
@@ -476,10 +753,11 @@ fn eval_specialized_plan<H: Handler>(
     handler: &mut H,
     case: &CaseRecord,
     derived: &DerivedWorld,
+    derivation: &mut Vec<DerivationStep>,
 ) -> Result<Outcome<Value>, EngineError> {
     match plan {
         QueryPlan::UniqueOccupant { office } => Ok(eval_unique_occupant(
-            module, office, state, ctx, handler, case, derived,
+            module, office, state, ctx, handler, case, derived, derivation,
         )),
         QueryPlan::StatusOf {
             status,
@@ -497,11 +775,13 @@ fn eval_specialized_plan<H: Handler>(
             decision,
             arguments,
             ..
-        } => eval_run_decision(module, decision, arguments, case, handler, ctx, derived),
-        QueryPlan::Evaluate(_) => Ok(Outcome::Suspended {
-            requests: BTreeSet::new(),
-            trace: TraceId::of(b"eval"),
-        }),
+        } => Err(unsupported(format!(
+            "decision `{decision}` requires an evaluation frame ({} arguments)",
+            arguments.len()
+        ))),
+        QueryPlan::Evaluate(_) | QueryPlan::Guarded { .. } => {
+            Err(unsupported("term plans require an evaluation frame"))
+        }
     }
 }
 
@@ -516,10 +796,285 @@ struct EvalFrame<'a, H: Handler> {
     fuel: Option<u32>,
     seq_frames: Vec<SeqFrame>,
     seq_path: Vec<usize>,
+    child_counts: Vec<usize>,
+    steps: u64,
+    derivation: Vec<DerivationStep>,
+    trace_frames: Vec<Vec<String>>,
+    operation_limit: u64,
 }
 
 impl<'a, H: Handler> EvalFrame<'a, H> {
+    fn eval_plan(
+        &mut self,
+        plan: &QueryPlan,
+        state: &LegalState,
+    ) -> Result<Outcome<Value>, EngineError> {
+        if !matches!(plan, QueryPlan::Evaluate(_)) {
+            if self.steps >= self.operation_limit {
+                return Err(EngineError::FuelExhausted { remaining: 0 });
+            }
+            self.steps += 1;
+        }
+        if matches!(plan, QueryPlan::UniqueOccupant { .. }) {
+            let definitions = self
+                .module
+                .declarations
+                .iter()
+                .filter_map(|declaration| match declaration {
+                    CoreDecl::InterpretationFamily(family) => Some(
+                        family
+                            .alternatives
+                            .iter()
+                            .map(|(_, definitions)| definitions.len() as u64)
+                            .sum::<u64>(),
+                    ),
+                    _ => None,
+                })
+                .sum::<u64>();
+            let candidates = self.module.nominations.len() as u64;
+            let work = candidates
+                .saturating_mul(
+                    definitions
+                        .saturating_add(candidates)
+                        .saturating_add(self.case.evidence.len() as u64)
+                        .saturating_add(self.case.facts.len() as u64)
+                        .saturating_add(1),
+                )
+                .saturating_mul(4);
+            self.steps = self.steps.saturating_add(work);
+            if self.steps >= self.operation_limit {
+                return Err(EngineError::FuelExhausted { remaining: 0 });
+            }
+        }
+        match plan {
+            QueryPlan::Evaluate(term) => self.eval_term(term),
+            QueryPlan::RunDecision {
+                decision,
+                arguments,
+                ..
+            } => self.eval_decision(decision, arguments),
+            QueryPlan::Guarded { prefix, plan } => {
+                if !prefix.is_empty() {
+                    let prefix = Term::Apply {
+                        ctor: "seq".into(),
+                        args: prefix.clone(),
+                    };
+                    if let Err(outcome) = as_determinate(self.eval_term(&prefix)?) {
+                        return Ok(outcome);
+                    }
+                }
+                self.eval_plan(plan, state)
+            }
+            other => eval_specialized_plan(
+                other,
+                self.module,
+                state,
+                self.ctx,
+                self.handler,
+                self.case,
+                &self.derived,
+                &mut self.derivation,
+            ),
+        }
+    }
+
+    fn eval_decision(
+        &mut self,
+        name: &str,
+        arguments: &[Term],
+    ) -> Result<Outcome<Value>, EngineError> {
+        let decl = find_decision(self.module, name)
+            .cloned()
+            .ok_or_else(|| unsupported(format!("unknown decision `{name}`")))?;
+        if decl.binders.len() != arguments.len() {
+            return Err(EngineError::InvalidInput(format!(
+                "decision `{name}` expects {} argument(s), got {}",
+                decl.binders.len(),
+                arguments.len()
+            )));
+        }
+        let mut environment = BTreeMap::new();
+        for ((binder, ty), argument) in decl.binders.iter().zip(arguments) {
+            let value = match as_determinate(self.eval_term(argument)?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            if !runtime_value_matches(self.module, &value, ty) {
+                return Err(EngineError::InvalidInput(format!(
+                    "decision argument `{binder}` is incompatible with {ty}"
+                )));
+            }
+            environment.insert(binder.clone(), value);
+        }
+        let saved = std::mem::replace(&mut self.bindings, environment);
+        let result = (|| {
+            let mut open = BTreeSet::new();
+            for requirement in &decl.requirements {
+                let requirement = self.ground_guard(requirement);
+                if let Some(halt) = gather_unmet_requirement(
+                    &requirement,
+                    self.case,
+                    self.ctx,
+                    &self.derived,
+                    self.handler,
+                    &mut open,
+                ) {
+                    return Ok(halt);
+                }
+            }
+            if !open.is_empty() {
+                return Ok(Outcome::Suspended {
+                    requests: open,
+                    trace: TraceId::of(name.as_bytes()),
+                });
+            }
+            if let Some(result) = &decl.declared_result {
+                let outcome = self.eval_term(&result.expression)?;
+                if let Outcome::Determinate { value, .. } = &outcome
+                    && !runtime_value_matches(self.module, value, &result.result_type)
+                {
+                    return Err(EngineError::InvalidInput(format!(
+                        "decision `{name}` returned a value incompatible with {}",
+                        result.result_type
+                    )));
+                }
+                return Ok(outcome);
+            }
+            if let Some(recorded) = self.case.decisions.get(name) {
+                return Ok(determinate(
+                    Value::String(recorded.clone()),
+                    TraceId::of(name.as_bytes()),
+                ));
+            }
+            Ok(Outcome::Suspended {
+                requests: BTreeSet::from([OpenRequest::NeedJudgment {
+                    issue: PropTerm::new(name, Vec::new()),
+                    protocol: name.to_owned(),
+                }]),
+                trace: TraceId::of(name.as_bytes()),
+            })
+        })();
+        let updated = std::mem::replace(&mut self.bindings, saved);
+        for (key, value) in updated {
+            if key.starts_with(duty::DUTY_KEY_PREFIX) {
+                self.bindings.insert(key, value);
+            }
+        }
+        let parents = derivation_roots(&self.derivation);
+        record_step(
+            &mut self.derivation,
+            "decision",
+            format!("decision={name}; result={result:?}"),
+            parents,
+        );
+        result
+    }
+
+    fn ground_guard(&self, guard: &Guard) -> Guard {
+        let prop = |prop: &PropTerm| {
+            PropTerm::new(
+                prop.predicate.clone(),
+                prop.arguments
+                    .iter()
+                    .cloned()
+                    .map(|term| self.ground_term(term))
+                    .collect(),
+            )
+        };
+        match guard {
+            Guard::Operative(term, context) => Guard::Operative(prop(term), context.clone()),
+            Guard::Derived(term) => Guard::Derived(prop(term)),
+            Guard::Determined(term) => Guard::Determined(prop(term)),
+            Guard::Assumed(term) => Guard::Assumed(prop(term)),
+            Guard::EffectiveActTerm(term) => {
+                Guard::EffectiveActTerm(self.ground_term(term.clone()))
+            }
+            Guard::Compare { op, left, right } => Guard::Compare {
+                op: *op,
+                left: self.ground_term(left.clone()),
+                right: self.ground_term(right.clone()),
+            },
+            Guard::And(parts) => {
+                Guard::And(parts.iter().map(|part| self.ground_guard(part)).collect())
+            }
+            Guard::Or(parts) => {
+                Guard::Or(parts.iter().map(|part| self.ground_guard(part)).collect())
+            }
+            Guard::Not(inner) => Guard::Not(Box::new(self.ground_guard(inner))),
+            Guard::Request(OpenRequest::NeedJudgment { issue, protocol }) => {
+                Guard::Request(OpenRequest::NeedJudgment {
+                    issue: prop(issue),
+                    protocol: protocol.clone(),
+                })
+            }
+            Guard::Request(OpenRequest::NeedEvidence {
+                issue: PropPattern::Ground(issue),
+                schema,
+            }) => Guard::Request(OpenRequest::NeedEvidence {
+                issue: PropPattern::Ground(prop(issue)),
+                schema: schema.clone(),
+            }),
+            other => other.clone(),
+        }
+    }
+
     fn eval_term(&mut self, term: &Term) -> Result<Outcome<Value>, EngineError> {
+        if self.steps >= self.operation_limit
+            || self
+                .derivation
+                .len()
+                .saturating_add(self.trace_frames.len())
+                >= 99_999
+            || self.seq_path.len() >= 256
+        {
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        self.steps += 1;
+        let child = self
+            .child_counts
+            .last_mut()
+            .map(|next| {
+                let index = *next;
+                *next += 1;
+                index
+            })
+            .unwrap_or(0);
+        self.seq_path.push(child);
+        self.child_counts.push(0);
+        self.trace_frames.push(Vec::new());
+        let mut result = self.eval_term_inner(term);
+        let parents = self.trace_frames.pop().expect("trace frame entered");
+        if trace::exhausted(&self.derivation) {
+            self.child_counts.pop();
+            self.seq_path.pop();
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        let id = record_step(
+            &mut self.derivation,
+            "evaluation",
+            format!(
+                "location={:?}; term={term:?}; result={result:?}",
+                self.seq_path
+            ),
+            parents,
+        );
+        if trace::exhausted(&self.derivation) {
+            self.child_counts.pop();
+            self.seq_path.pop();
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        if let Some(parent) = self.trace_frames.last_mut() {
+            parent.push(id.clone());
+        }
+        if let Ok(outcome) = &mut result {
+            bind_outcome(outcome, &id);
+        }
+        self.child_counts.pop();
+        self.seq_path.pop();
+        result
+    }
+
+    fn eval_term_inner(&mut self, term: &Term) -> Result<Outcome<Value>, EngineError> {
         if term_is_named(term, "ResolveNormConflict") {
             let (doctrines, graph) = conflict_inputs(term, self.case);
             return Ok(eval_resolve_norm_conflict(doctrines, graph, self.handler));
@@ -535,11 +1090,11 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             Term::String(s) => Ok(determinate(Value::String(s.clone()), TraceId::of(b"eval"))),
             Term::Instant(i) => Ok(determinate(Value::Instant(*i), TraceId::of(b"eval"))),
             Term::Duration(d) => Ok(determinate(Value::Duration(*d), TraceId::of(b"eval"))),
-            Term::Ident(name) => self.eval_ident(name),
+            Term::Ident(name) | Term::Binder(name) => self.eval_ident(name),
             Term::Apply { ctor, args } => self.eval_apply(ctor, args),
             Term::Set(xs) => self.eval_set(xs),
             Term::Record(fields) => self.eval_record(fields),
-            Term::Wildcard | Term::Binder(_) => Err(unsupported(format!("term `{term:?}`"))),
+            Term::Wildcard => Err(unsupported(format!("term `{term:?}`"))),
             Term::Binary { op, left, right } => self.eval_binary(binop_name(*op), left, right),
             Term::Call { callee, args } => self.eval_call(callee, args),
             Term::If { cond, then, else_ } => self.eval_if(cond, then, else_),
@@ -557,6 +1112,9 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if name == "false" {
             return Ok(determinate(Value::Bool(false), TraceId::of(b"eval")));
         }
+        if name == "None" {
+            return Ok(determinate(Value::Option(None), TraceId::of(b"option")));
+        }
         if let Ok(i) = name.parse::<i64>() {
             return Ok(determinate(Value::Int(i), TraceId::of(b"eval")));
         }
@@ -566,7 +1124,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if term_is_named(&Term::Ident(name.into()), "judgment")
             || name.eq_ignore_ascii_case("adjudicated")
         {
-            return Ok(eval_judgment(self.handler, self.case));
+            return Ok(eval_judgment(self.handler, self.case, self.ctx));
         }
         if name.eq_ignore_ascii_case("EligibleForOpenTexturedCredit") {
             return Ok(eval_need_determine(
@@ -579,7 +1137,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             return self.eval_function(&function, &[]);
         }
         if let Some(effect) = find_effect_name(self.module, name) {
-            return Ok(self.eval_effect(&effect, name));
+            return self.eval_effect(&effect, &[]);
         }
         if is_entity(self.module, name) {
             return Ok(determinate(
@@ -587,10 +1145,147 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
                 TraceId::of(b"eval"),
             ));
         }
+        if self.module.declarations.iter().any(|declaration| matches!(declaration,CoreDecl::Type(declaration) if matches!(&declaration.definition,fidryn_core::ir::TypeDefinition::Sum(constructors) if constructors.iter().any(|constructor|constructor.name == name && constructor.arguments.is_empty() && constructor.fields.is_empty())))) {
+            return Ok(determinate(Value::Ctor{name:name.into(),fields:BTreeMap::new()},TraceId::of(b"constructor")));
+        }
         Err(unsupported(format!("unbound identifier `{name}`")))
     }
 
     fn eval_apply(&mut self, ctor: &str, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if ctor == "digest" && args.len() == 1 {
+            let value = match as_determinate(self.eval_term(&args[0])?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            let digest =
+                fidryn_core::value::value_digest(&value).map_err(EngineError::InvalidInput)?;
+            return Ok(determinate(
+                Value::String(digest),
+                TraceId::of(b"value-digest"),
+            ));
+        }
+        if ctor == "is"
+            && args.len() == 2
+            && matches!(&args[1],Term::Ident(name) if name == "nonempty")
+        {
+            let value = match as_determinate(self.eval_term(&args[0])?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            return match value {
+                Value::Set(values) => Ok(determinate(
+                    Value::Bool(!values.is_empty()),
+                    TraceId::of(b"nonempty"),
+                )),
+                _ => Err(EngineError::InvalidInput(
+                    "nonempty requires a finite collection".into(),
+                )),
+            };
+        }
+        if ctor == "None" && args.is_empty() {
+            return Ok(determinate(Value::Option(None), TraceId::of(b"option")));
+        }
+        if ctor == "Some" && args.len() == 1 {
+            return Ok(match as_determinate(self.eval_term(&args[0])?) {
+                Ok(value) => {
+                    determinate(Value::Option(Some(Box::new(value))), TraceId::of(b"option"))
+                }
+                Err(outcome) => outcome,
+            });
+        }
+        if ctor == "later_effective_time_or" {
+            if args.len() != 2 {
+                return Err(EngineError::InvalidInput(
+                    "later_effective_time_or expects Option<Time> and Time".into(),
+                ));
+            }
+            let requested = match as_determinate(self.eval_term(&args[0])?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            let filed = match as_determinate(self.eval_term(&args[1])?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            let filed = judgment::as_instant(&filed)
+                .ok_or_else(|| EngineError::InvalidInput("filed time must be Time".into()))?;
+            let requested = match requested {
+                Value::Option(None) | Value::Unit => None,
+                Value::Option(Some(value)) => {
+                    Some(judgment::as_instant(&value).ok_or_else(|| {
+                        EngineError::InvalidInput(
+                            "requested effective time must contain Time".into(),
+                        )
+                    })?)
+                }
+                _ => {
+                    return Err(EngineError::InvalidInput(
+                        "requested effective time must be Option<Time>".into(),
+                    ));
+                }
+            };
+            return Ok(determinate(
+                Value::Instant(requested.map_or(filed, |requested| requested.max(filed))),
+                TraceId::of(b"effective-time"),
+            ));
+        }
+        let calendar = match ctor {
+            "days" => Some(fidryn_core::time::CalendarKind::Days),
+            "counted_days" => Some(fidryn_core::time::CalendarKind::CountedDays),
+            "calendar_days" => Some(fidryn_core::time::CalendarKind::CalendarDays),
+            "working_days" => Some(fidryn_core::time::CalendarKind::WorkingDays),
+            "hours" => Some(fidryn_core::time::CalendarKind::Hours),
+            "minutes" => Some(fidryn_core::time::CalendarKind::Minutes),
+            "seconds" => Some(fidryn_core::time::CalendarKind::Seconds),
+            _ => None,
+        };
+        if let Some(kind) = calendar {
+            if args.len() != 1 {
+                return Err(EngineError::InvalidInput(
+                    "duration constructor expects one Int amount".into(),
+                ));
+            }
+            return match as_determinate(self.eval_term(&args[0])?) {
+                Ok(Value::Int(amount)) => Ok(determinate(
+                    Value::Duration(fidryn_core::time::FidrynDuration { amount, kind }),
+                    TraceId::of(b"duration"),
+                )),
+                Ok(_) => Err(EngineError::InvalidInput(
+                    "duration amount must be Int".into(),
+                )),
+                Err(outcome) => Ok(outcome),
+            };
+        }
+        if matches!(ctor, "fresh" | "same_subject_and_purpose") {
+            return self.eval_evidence_condition(ctor, args);
+        }
+        if let Some(type_name) = ctor
+            .strip_prefix("case_input<")
+            .and_then(|text| text.strip_suffix('>'))
+        {
+            if args.len() != 1 {
+                return Err(EngineError::InvalidInput(
+                    "case_input expects one String key".into(),
+                ));
+            }
+            let key = match as_determinate(self.eval_term(&args[0])?) {
+                Ok(Value::String(key)) => key,
+                Ok(_) => {
+                    return Err(EngineError::InvalidInput(
+                        "case_input key must be String".into(),
+                    ));
+                }
+                Err(outcome) => return Ok(outcome),
+            };
+            let value = self.case.facts.get(&key).ok_or_else(|| {
+                EngineError::InvalidInput(format!("missing declared case input `{key}`"))
+            })?;
+            let ty = admission::parse_type(type_name);
+            let value = admission::admit(self.module, value, &ty).ok_or_else(|| {
+                EngineError::InvalidInput(format!("case input `{key}` is incompatible with {ty}"))
+            })?;
+            return Ok(determinate(value, TraceId::of(b"case-input")));
+        }
         if let Some(kind) = quantifier_kind(ctor) {
             return self.eval_quantifier(kind, args);
         }
@@ -644,13 +1339,13 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             ));
         }
         if ctor.eq_ignore_ascii_case("judgment") || ctor.eq_ignore_ascii_case("Adjudicated") {
-            return Ok(eval_judgment(self.handler, self.case));
+            return Ok(eval_judgment(self.handler, self.case, self.ctx));
         }
         if let Some(function) = find_function(self.module, ctor).cloned() {
             return self.eval_function(&function, args);
         }
         if let Some(effect) = find_effect_name(self.module, ctor) {
-            return Ok(self.eval_effect(&effect, &custom_effect_payload(&effect, args)));
+            return self.eval_effect(&effect, args);
         }
         self.eval_ctor(ctor, args)
     }
@@ -668,6 +1363,22 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             || is_duty_step(callee)
             || is_duty_status(callee)
             || is_require_authority(callee)
+            || matches!(callee, "fresh" | "same_subject_and_purpose")
+            || callee.starts_with("case_input<")
+            || matches!(
+                callee,
+                "Some" | "None" | "later_effective_time_or" | "digest" | "is"
+            )
+            || matches!(
+                callee,
+                "days"
+                    | "counted_days"
+                    | "calendar_days"
+                    | "working_days"
+                    | "hours"
+                    | "minutes"
+                    | "seconds"
+            )
             || binop_ctor(callee).is_some()
         {
             return self.eval_apply(callee, args);
@@ -676,7 +1387,7 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             return self.eval_function(function, args);
         }
         if let Some(effect) = find_effect_name(self.module, callee) {
-            return Ok(self.eval_effect(&effect, &custom_effect_payload(&effect, args)));
+            return self.eval_effect(&effect, args);
         }
         Err(unsupported(format!("unknown function `{callee}`")))
     }
@@ -712,13 +1423,57 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             )));
         }
 
+        let mut supplied = BTreeSet::new();
+        let mut bound = Vec::new();
+        for arg in arg_terms {
+            let (name, value_term) = match arg {
+                Term::Apply { ctor, args } if ctor == "$named" => {
+                    let [Term::String(name), value] = args.as_slice() else {
+                        return Err(EngineError::InvalidInput("malformed named argument".into()));
+                    };
+                    (name.clone(), value)
+                }
+                value => {
+                    let name = function
+                        .params
+                        .iter()
+                        .map(|(name, _)| name)
+                        .find(|name| !supplied.contains(*name))
+                        .ok_or_else(|| {
+                            EngineError::InvalidInput("too many positional arguments".into())
+                        })?;
+                    (name.clone(), value)
+                }
+            };
+            let Some((_, ty)) = function.params.iter().find(|(param, _)| *param == name) else {
+                return Err(EngineError::InvalidInput(format!(
+                    "unknown parameter `{name}` for `{}`",
+                    function.name
+                )));
+            };
+            if !supplied.insert(name.clone()) {
+                return Err(EngineError::InvalidInput(format!(
+                    "duplicate argument `{name}`"
+                )));
+            }
+            bound.push((name, ty, value_term));
+        }
         let mut call_env = BTreeMap::new();
-        for ((name, _), arg) in function.params.iter().zip(arg_terms) {
-            let value = match as_determinate(self.eval_term(arg)?) {
+        for (name, ty, term) in bound {
+            let value = match as_determinate(self.eval_term(term)?) {
                 Ok(v) => v,
                 Err(outcome) => return Ok(outcome),
             };
-            call_env.insert(name.clone(), value);
+            if !runtime_value_matches(self.module, &value, ty) {
+                return Err(EngineError::InvalidInput(format!(
+                    "argument `{name}` for `{}` is incompatible with {ty}",
+                    function.name
+                )));
+            }
+            call_env.insert(
+                name,
+                admission::admit(self.module, &value, ty).expect("argument admitted above"),
+            );
         }
 
         let mut nested = EvalFrame {
@@ -732,8 +1487,13 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             fuel: budget.map(|n| n.saturating_sub(1)),
             seq_frames: std::mem::take(&mut self.seq_frames),
             seq_path: self.seq_path.clone(),
+            child_counts: self.child_counts.clone(),
+            steps: self.steps,
+            derivation: std::mem::take(&mut self.derivation),
+            trace_frames: std::mem::take(&mut self.trace_frames),
+            operation_limit: self.operation_limit,
         };
-        let result = if let Some(body) = &function.body {
+        let mut result = if let Some(body) = &function.body {
             nested.eval_term(body)
         } else if function.name == "ordinary_income_tax" {
             nested.eval_tax()
@@ -744,7 +1504,24 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             )))
         };
         self.seq_frames = nested.seq_frames;
-        self.seq_path = nested.seq_path;
+        self.steps = nested.steps;
+        self.derivation = nested.derivation;
+        self.trace_frames = nested.trace_frames;
+        self.child_counts = nested.child_counts;
+        // Institutional writes survive a call; lexical parameters do not.
+        for (key, value) in nested.bindings {
+            if key.starts_with(duty::DUTY_KEY_PREFIX) {
+                self.bindings.insert(key, value);
+            }
+        }
+        if let Ok(Outcome::Determinate { value, .. }) = &mut result {
+            *value = admission::admit(self.module, value, &function.result).ok_or_else(|| {
+                EngineError::InvalidInput(format!(
+                    "function `{}` returned a value incompatible with {}",
+                    function.name, function.result
+                ))
+            })?;
+        }
         result
     }
 
@@ -817,9 +1594,10 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
             None
         };
         for (index, arg) in args.iter().enumerate().skip(start) {
-            self.seq_path.push(index);
+            if let Some(next) = self.child_counts.last_mut() {
+                *next = index;
+            }
             let step = self.eval_term(arg);
-            self.seq_path.pop();
             match as_determinate(step?) {
                 Ok(v) => {
                     last = Some(v.clone());
@@ -862,21 +1640,47 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         }
         let saved = self.capture_savepoint();
         let mut last = None;
+        record_step(
+            &mut self.derivation,
+            "transaction_begin",
+            format!("location={:?}", self.seq_path),
+            Vec::new(),
+        );
         for step in args {
             match self.eval_term(step) {
                 Ok(Outcome::Determinate { value, .. }) => last = Some(value),
                 Ok(outcome) => {
                     self.restore_savepoint(&saved);
+                    record_step(
+                        &mut self.derivation,
+                        "transaction_rollback",
+                        format!("suspended at {:?}: {outcome:?}", self.seq_path),
+                        Vec::new(),
+                    );
                     return Ok(outcome);
                 }
                 Err(err) => {
                     self.restore_savepoint(&saved);
+                    record_step(
+                        &mut self.derivation,
+                        "transaction_rollback",
+                        format!("failed at {:?}: {err:?}", self.seq_path),
+                        Vec::new(),
+                    );
                     return Err(err);
                 }
             }
         }
         match last {
-            Some(value) => Ok(determinate(value, TraceId::of(b"transaction"))),
+            Some(value) => {
+                record_step(
+                    &mut self.derivation,
+                    "transaction_commit",
+                    format!("location={:?}; bindings={:?}", self.seq_path, self.bindings),
+                    Vec::new(),
+                );
+                Ok(determinate(value, TraceId::of(b"transaction")))
+            }
             None => {
                 self.restore_savepoint(&saved);
                 Err(unsupported("empty transaction"))
@@ -898,25 +1702,98 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         self.seq_path = saved.seq_path.clone();
     }
 
+    fn bind_duty(&mut self, term: &Term) -> Result<(CoreDuty, String), EngineError> {
+        let (name, arguments) = match term {
+            Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
+                (ctor.clone(), Some(args.as_slice()))
+            }
+            _ => (term_literal_name(term)?, None),
+        };
+        let mut declaration = find_duty(self.module, &name)
+            .cloned()
+            .ok_or_else(|| EngineError::InvalidInput(format!("unknown duty `{name}`")))?;
+        if arguments.is_some_and(|arguments| arguments.len() != declaration.binders.len()) {
+            return Err(EngineError::InvalidInput(format!(
+                "duty `{name}` expects {} arguments",
+                declaration.binders.len()
+            )));
+        }
+        let mut bindings = BTreeMap::new();
+        for (index, (binder, ty)) in declaration.binders.iter().enumerate() {
+            let value = if let Some(arguments) = arguments {
+                match as_determinate(self.eval_term(&arguments[index])?) {
+                    Ok(value) => value,
+                    Err(_) => {
+                        return Err(EngineError::Unsupported(
+                            "suspended duty arguments require an explicit completed input".into(),
+                        ));
+                    }
+                }
+            } else {
+                self.lookup(binder).ok_or_else(|| {
+                    EngineError::InvalidInput(format!("missing declared duty argument `{binder}`"))
+                })?
+            };
+            let value = admission::admit(self.module, &value, ty).ok_or_else(|| {
+                EngineError::InvalidInput(format!(
+                    "duty argument `{binder}` is incompatible with {ty}"
+                ))
+            })?;
+            bindings.insert(binder.clone(), value);
+        }
+        let instance = if bindings.is_empty() {
+            duty::DEFAULT_DUTY_INSTANCE.into()
+        } else {
+            format!(
+                "binding:{}",
+                TraceId::of(
+                    fidryn_core::canonical_json(&bindings)
+                        .map_err(|error| EngineError::InvalidInput(error.to_string()))?
+                        .as_bytes()
+                )
+            )
+        };
+        let saved = self.bindings.clone();
+        self.bindings.extend(bindings);
+        declaration.bearer = self.ground_term(declaration.bearer);
+        declaration.claimant = declaration.claimant.map(|term| self.ground_term(term));
+        declaration.attaches = self.ground_guard(&declaration.attaches);
+        declaration.content = declaration
+            .content
+            .into_iter()
+            .map(|term| self.ground_term(term))
+            .collect();
+        self.bindings = saved;
+        Ok((declaration, instance))
+    }
+
     fn eval_duty_status(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
-        if args.is_empty() {
+        if args.is_empty() || args.len() > 2 {
             return Err(unsupported("duty_status expects a duty name"));
         }
-        let name = term_literal_name(&args[0])?;
+        let (duty, default_instance) = self.bind_duty(&args[0])?;
+        let name = duty.name.clone();
         let instance = if args.len() >= 2 {
             term_literal_name(&args[1])?
         } else {
-            duty::DEFAULT_DUTY_INSTANCE.to_owned()
+            default_instance
         };
-        let Some(duty) = find_duty(self.module, &name).cloned() else {
-            return Err(unsupported(format!("unknown duty `{name}`")));
-        };
+        if let Some(value) = self
+            .bindings
+            .get(&duty::duty_instance_key(&name, &instance))
+            .cloned()
+        {
+            return Ok(determinate(value, TraceId::of(b"staged-duty-status")));
+        }
         let attaches_held = self
             .derived
             .is_guard_held(&duty.attaches, self.case, self.ctx);
         let attaches_denied = self
             .derived
             .is_guard_denied(&duty.attaches, self.case, self.ctx);
+        if attaches_held {
+            duty::validate_deadline(&duty.content, self.case)?;
+        }
         let performed_held = self.derived.holds_named("performed")
             || self.derived.holds_named(&format!("{name}_performed"));
         let state = duty::surface_duty_state(
@@ -939,12 +1816,13 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
     }
 
     fn eval_duty_step(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
-        if args.len() < 2 {
+        if args.len() < 2 || args.len() > 4 {
             return Err(EngineError::InvalidInput(
                 "duty_step expects [name, action]".into(),
             ));
         }
-        let name = term_literal_name(&args[0])?;
+        let (declaration, default_instance) = self.bind_duty(&args[0])?;
+        let name = declaration.name.clone();
         let action = term_literal_name(&args[1])?;
         let person = if args.len() >= 3 {
             Some(term_literal_name(&args[2])?)
@@ -954,23 +1832,55 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         let instance = if args.len() >= 4 {
             term_literal_name(&args[3])?
         } else {
-            duty::DEFAULT_DUTY_INSTANCE.to_owned()
+            default_instance
         };
-        if duty::has_authority_constraint(self.case)
-            && !duty::action_is_granted(self.case, &action, self.ctx.record_time)
+        if !self
+            .derived
+            .is_guard_held(&declaration.attaches, self.case, self.ctx)
         {
+            return Ok(require_failed());
+        }
+        let granted = duty::action_is_granted_for(
+            self.case,
+            &action,
+            Some(&name),
+            Some("*"),
+            self.ctx.record_time,
+        );
+        record_step(
+            &mut self.derivation,
+            "authority",
+            format!(
+                "action={action}; scope={name}; at={}; granted={granted}",
+                self.ctx.record_time
+            ),
+            Vec::new(),
+        );
+        if !granted {
             return Ok(authority_missing(&action));
         }
-        let key = if args.len() >= 4 {
-            duty::duty_instance_key(&name, &instance)
-        } else {
-            duty::duty_fact_key(&name)
-        };
+        let key = duty::duty_instance_key(&name, &instance);
         let current = self
             .lookup(&key)
             .and_then(|value| duty::parse_duty_state(&value, &name));
         let mut next = duty::apply_duty_action(current.as_ref(), &name, &action, person)?;
+        if next.bearer.is_empty() {
+            next.bearer = term_literal_name(&declaration.bearer)?;
+        }
+        if next.claimant.is_none() {
+            next.claimant = declaration
+                .claimant
+                .as_ref()
+                .map(term_literal_name)
+                .transpose()?;
+        }
         next.instance = instance;
+        record_step(
+            &mut self.derivation,
+            "institutional_transition",
+            format!("action={action}; before={current:?}; after={next:?}"),
+            Vec::new(),
+        );
         self.bindings.insert(key, duty::duty_state_value(&next));
         Ok(determinate(
             duty::status_value(next.status),
@@ -978,12 +1888,108 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         ))
     }
 
+    fn eval_evidence_condition(
+        &mut self,
+        name: &str,
+        args: &[Term],
+    ) -> Result<Outcome<Value>, EngineError> {
+        if args.len() != 2 {
+            return Err(EngineError::InvalidInput(format!(
+                "{name} expects two arguments"
+            )));
+        }
+        let left = match as_determinate(self.eval_term(&args[0])?) {
+            Ok(value) => value,
+            Err(outcome) => return Ok(outcome),
+        };
+        let right = match as_determinate(self.eval_term(&args[1])?) {
+            Ok(value) => value,
+            Err(outcome) => return Ok(outcome),
+        };
+        let (Value::Map(fields) | Value::Ctor { fields, .. }) = left else {
+            return Err(EngineError::InvalidInput(format!(
+                "{name} requires a typed evidence record"
+            )));
+        };
+        let answer = if name == "same_subject_and_purpose" {
+            let (Value::Map(other) | Value::Ctor { fields: other, .. }) = right else {
+                return Err(EngineError::InvalidInput(
+                    "same_subject_and_purpose requires two evidence records".into(),
+                ));
+            };
+            ["subject", "purpose"].iter().all(|field| {
+                fields
+                    .get(*field)
+                    .is_some_and(|value| other.get(*field) == Some(value))
+            })
+        } else {
+            let Value::Duration(duration) = right else {
+                return Err(EngineError::InvalidInput(
+                    "fresh requires a duration".into(),
+                ));
+            };
+            let multiplier = match duration.kind {
+                fidryn_core::time::CalendarKind::Days
+                | fidryn_core::time::CalendarKind::CountedDays
+                | fidryn_core::time::CalendarKind::CalendarDays => 86_400,
+                fidryn_core::time::CalendarKind::Hours => 3_600,
+                fidryn_core::time::CalendarKind::Minutes => 60,
+                fidryn_core::time::CalendarKind::Seconds => 1,
+                _ => {
+                    return Err(EngineError::Unsupported(
+                        "fresh requires a fixed duration calendar".into(),
+                    ));
+                }
+            };
+            let maximum = duration
+                .amount
+                .checked_mul(multiplier)
+                .filter(|maximum| *maximum >= 0)
+                .ok_or_else(|| {
+                    EngineError::InvalidInput("fresh duration overflows or is negative".into())
+                })?;
+            let mut timestamps = Vec::new();
+            for field in ["examined_at", "signed_at"] {
+                if let Some(value) = fields.get(field) {
+                    let Some(at) = judgment::as_instant(value) else {
+                        return Ok(determinate(Value::Bool(false), TraceId::of(b"fresh")));
+                    };
+                    timestamps.push(at);
+                }
+            }
+            !timestamps.is_empty()
+                && timestamps.iter().all(|at| {
+                    *at <= self.ctx.valid_time
+                        && *at <= self.ctx.record_time
+                        && self
+                            .ctx
+                            .valid_time
+                            .as_offset()
+                            .unix_timestamp()
+                            .checked_sub(at.as_offset().unix_timestamp())
+                            .is_some_and(|age| age <= maximum)
+                })
+        };
+        Ok(determinate(
+            Value::Bool(answer),
+            TraceId::of(name.as_bytes()),
+        ))
+    }
+
     fn eval_require_authority(&mut self, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
-        if args.is_empty() {
+        if args.is_empty() || args.len() > 3 {
             return Err(unsupported("require_authority expects an action"));
         }
         let action = term_literal_name(&args[0])?;
-        if duty::action_is_granted(self.case, &action, self.ctx.record_time) {
+        let scope = args.get(1).map(term_literal_name).transpose()?;
+        let context = args.get(2).map(term_literal_name).transpose()?;
+        if duty::action_is_granted_for(
+            self.case,
+            &action,
+            scope.as_deref(),
+            Some(context.as_deref().unwrap_or("*")),
+            self.ctx.record_time,
+        ) {
             Ok(determinate(Value::Unit, TraceId::of(b"authority")))
         } else {
             Ok(authority_missing(&action))
@@ -1003,6 +2009,23 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
     }
 
     fn eval_field(&mut self, base: &Term, name: &str) -> Result<Outcome<Value>, EngineError> {
+        fn qualified(term: &Term) -> Option<String> {
+            match term {
+                Term::Ident(name) => Some(name.clone()),
+                Term::Field { base, name } => Some(format!("{}.{}", qualified(base)?, name)),
+                _ => None,
+            }
+        }
+        if let Some(prefix) = qualified(base) {
+            let root = prefix.split('.').next().unwrap_or(&prefix);
+            let full = format!("{prefix}.{name}");
+            if self.lookup(root).is_none() && is_entity(self.module, &full) {
+                return Ok(determinate(
+                    Value::Entity(full),
+                    TraceId::of(b"qualified-entity"),
+                ));
+            }
+        }
         match as_determinate(self.eval_term(base)?) {
             Ok(Value::Map(fields) | Value::Ctor { fields, .. }) => {
                 fields.get(name).cloned().map_or_else(
@@ -1043,6 +2066,143 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
     }
 
     fn eval_ctor(&mut self, ctor: &str, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
+        if let Some(record) = self.module.declarations.iter().find_map(|decl| match decl {
+            CoreDecl::RecordType(record) if record.name == ctor => Some(record.clone()),
+            _ => None,
+        }) {
+            if record.fields.len() != args.len() {
+                return Err(EngineError::InvalidInput(format!(
+                    "record `{ctor}` expects {} fields",
+                    record.fields.len()
+                )));
+            }
+            let mut fields = BTreeMap::new();
+            for term in args {
+                let (name, value_term) = match term {
+                    Term::Apply { ctor, args } if ctor == "$named" => match args.as_slice() {
+                        [Term::String(name), value] => (name.clone(), value),
+                        _ => {
+                            return Err(EngineError::InvalidInput(
+                                "malformed named record field".into(),
+                            ));
+                        }
+                    },
+                    value => (
+                        record
+                            .fields
+                            .iter()
+                            .map(|(name, _)| name)
+                            .find(|name| !fields.contains_key(*name))
+                            .ok_or_else(|| {
+                                EngineError::InvalidInput("too many record fields".into())
+                            })?
+                            .clone(),
+                        value,
+                    ),
+                };
+                let Some((_, ty)) = record.fields.iter().find(|(field, _)| *field == name) else {
+                    return Err(EngineError::InvalidInput(format!(
+                        "unknown record field `{name}`"
+                    )));
+                };
+                if fields.contains_key(&name) {
+                    return Err(EngineError::InvalidInput(format!(
+                        "duplicate record field `{name}`"
+                    )));
+                }
+                let value = match as_determinate(self.eval_term(value_term)?) {
+                    Ok(value) => value,
+                    Err(outcome) => return Ok(outcome),
+                };
+                if !runtime_value_matches(self.module, &value, ty) {
+                    return Err(EngineError::InvalidInput(format!(
+                        "record field `{name}` is incompatible with {ty}"
+                    )));
+                }
+                fields.insert(name, value);
+            }
+            return Ok(determinate(Value::Map(fields), TraceId::of(b"record")));
+        }
+        if let Some(constructor) = self
+            .module
+            .declarations
+            .iter()
+            .find_map(|declaration| match declaration {
+                CoreDecl::Type(declaration) => match &declaration.definition {
+                    fidryn_core::ir::TypeDefinition::Sum(constructors) => constructors
+                        .iter()
+                        .find(|constructor| constructor.name == ctor),
+                    _ => None,
+                },
+                _ => None,
+            })
+            .cloned()
+        {
+            let expected: Vec<_> = if constructor.fields.is_empty() {
+                constructor
+                    .arguments
+                    .iter()
+                    .enumerate()
+                    .map(|(index, ty)| (format!("_{index}"), ty))
+                    .collect()
+            } else {
+                constructor
+                    .fields
+                    .iter()
+                    .map(|(name, ty)| (name.clone(), ty))
+                    .collect()
+            };
+            if expected.len() != args.len() {
+                return Err(EngineError::InvalidInput(format!(
+                    "constructor `{ctor}` expects {} arguments",
+                    expected.len()
+                )));
+            }
+            let mut fields = BTreeMap::new();
+            for (index, term) in args.iter().enumerate() {
+                let (name, term) = if let Term::Apply { ctor, args } = term {
+                    if ctor == "$named" {
+                        let [Term::String(name), term] = args.as_slice() else {
+                            return Err(EngineError::InvalidInput(
+                                "malformed constructor named argument".into(),
+                            ));
+                        };
+                        (name.clone(), term)
+                    } else {
+                        (expected[index].0.clone(), term)
+                    }
+                } else {
+                    (expected[index].0.clone(), term)
+                };
+                let Some((_, ty)) = expected.iter().find(|(field, _)| *field == name) else {
+                    return Err(EngineError::InvalidInput(format!(
+                        "unknown constructor field `{name}`"
+                    )));
+                };
+                if fields.contains_key(&name) {
+                    return Err(EngineError::InvalidInput(format!(
+                        "duplicate constructor field `{name}`"
+                    )));
+                }
+                let value = match as_determinate(self.eval_term(term)?) {
+                    Ok(value) => value,
+                    Err(outcome) => return Ok(outcome),
+                };
+                let value = admission::admit(self.module, &value, ty).ok_or_else(|| {
+                    EngineError::InvalidInput(format!(
+                        "constructor `{ctor}` field {name} is incompatible with {ty}"
+                    ))
+                })?;
+                fields.insert(name, value);
+            }
+            return Ok(determinate(
+                Value::Ctor {
+                    name: ctor.into(),
+                    fields,
+                },
+                TraceId::of(b"constructor"),
+            ));
+        }
         if args.is_empty() {
             return Ok(determinate(
                 Value::Ctor {
@@ -1070,30 +2230,181 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         ))
     }
 
-    fn eval_effect(&mut self, effect: &str, payload: &str) -> Outcome<Value> {
-        let req = OpenRequest::NeedCustom {
-            effect: effect.to_owned(),
-            payload: payload.to_owned(),
+    fn eval_effect(
+        &mut self,
+        callee: &str,
+        arguments: &[Term],
+    ) -> Result<Outcome<Value>, EngineError> {
+        let declaration = self
+            .module
+            .declarations
+            .iter()
+            .find_map(|declaration| match declaration {
+                CoreDecl::EffectDecl(effect)
+                    if effect.name == callee
+                        || effect.operations.iter().any(|operation| {
+                            format!("{}.{}", effect.name, operation.name) == callee
+                        }) =>
+                {
+                    Some(effect)
+                }
+                _ => None,
+            })
+            .cloned()
+            .ok_or_else(|| EngineError::InvalidInput(format!("unknown effect `{callee}`")))?;
+        let operation = if declaration.operations.len() == 1 && declaration.name == callee {
+            declaration.operations.first()
+        } else {
+            declaration
+                .operations
+                .iter()
+                .find(|operation| format!("{}.{}", declaration.name, operation.name) == callee)
+        }
+        .ok_or_else(|| {
+            EngineError::InvalidInput(format!("effect `{callee}` requires a declared operation"))
+        })?;
+        if operation.params.len() != arguments.len() {
+            return Err(EngineError::InvalidInput(format!(
+                "effect `{callee}` expects {} arguments",
+                operation.params.len()
+            )));
+        }
+        let mut values = BTreeMap::new();
+        for argument in arguments {
+            let (name, term) = match argument {
+                Term::Apply { ctor, args } if ctor == "$named" => {
+                    let [Term::String(name), term] = args.as_slice() else {
+                        return Err(EngineError::InvalidInput(
+                            "malformed named effect argument".into(),
+                        ));
+                    };
+                    (name.clone(), term)
+                }
+                term => {
+                    let name = operation
+                        .params
+                        .iter()
+                        .map(|(name, _)| name)
+                        .find(|name| !values.contains_key(*name))
+                        .ok_or_else(|| {
+                            EngineError::InvalidInput("too many effect arguments".into())
+                        })?;
+                    (name.clone(), term)
+                }
+            };
+            let ty = operation
+                .params
+                .iter()
+                .find_map(|(parameter, ty)| if parameter == &name { Some(ty) } else { None })
+                .ok_or_else(|| {
+                    EngineError::InvalidInput(format!("unknown effect argument `{name}`"))
+                })?;
+            if values.contains_key(&name) {
+                return Err(EngineError::InvalidInput(format!(
+                    "duplicate effect argument `{name}`"
+                )));
+            }
+            let value = match as_determinate(self.eval_term(term)?) {
+                Ok(value) => value,
+                Err(outcome) => return Ok(outcome),
+            };
+            let value = admission::admit(self.module, &value, ty).ok_or_else(|| {
+                EngineError::InvalidInput(format!(
+                    "effect argument `{name}` is incompatible with {ty}"
+                ))
+            })?;
+            values.insert(name, value);
+        }
+        let payload = if values.is_empty() {
+            declaration.name.clone()
+        } else {
+            format!(
+                "{}.{}:{}",
+                declaration.name,
+                operation.name,
+                fidryn_core::canonical_json(&values)
+                    .map_err(|error| EngineError::InvalidInput(error.to_string()))?
+            )
         };
-        match self.handler.handle(&req) {
-            HandlerResult::Resume { value, .. } => determinate(value, TraceId::of(b"custom")),
-            HandlerResult::Suspend { requests, .. } => Outcome::Suspended {
-                requests,
-                trace: TraceId::of(b"custom"),
-            },
+        let request = OpenRequest::NeedCustom {
+            effect: declaration.name.clone(),
+            payload,
+        };
+        let request_id = record_step(
+            &mut self.derivation,
+            "effect_request",
+            format!("{request:?}"),
+            Vec::new(),
+        );
+        let response = self.handler.handle(&request);
+        record_step(
+            &mut self.derivation,
+            "effect_response",
+            format!("{response:?}"),
+            vec![request_id],
+        );
+        Ok(match response {
+            HandlerResult::Resume { value, .. } => {
+                let value =
+                    admission::admit(self.module, &value, &operation.result).ok_or_else(|| {
+                        EngineError::InvalidInput(format!(
+                            "effect `{callee}` response is incompatible with {}",
+                            operation.result
+                        ))
+                    })?;
+                determinate(value, TraceId::of(b"custom"))
+            }
+            HandlerResult::Suspend { mut requests, .. } => {
+                if requests.is_empty() {
+                    requests.insert(request);
+                }
+                Outcome::Suspended {
+                    requests,
+                    trace: TraceId::of(b"custom"),
+                }
+            }
             HandlerResult::Halt { reason, .. } => {
                 halt_to_outcome(reason, &[], TraceId::of(b"custom"))
             }
-        }
+        })
     }
 
     fn eval_modal(&mut self, ctor: &str, args: &[Term]) -> Result<Outcome<Value>, EngineError> {
-        if args.is_empty() {
+        if args.len() != 1 {
             return Err(unsupported(format!("`{ctor}` expects one argument")));
         }
         let Some(prop) = self.ground_proposition(&args[0]) else {
             return self.eval_term(&args[0]);
         };
+        if ctor == "assumed" {
+            return Ok(match self.derived.assumed_value(&prop) {
+                Some(value) => determinate(Value::Bool(value), TraceId::of(b"assumption")),
+                None => Outcome::Suspended {
+                    requests: BTreeSet::from([OpenRequest::NeedCustom {
+                        effect: "Assume".into(),
+                        payload: format!("{prop:?}"),
+                    }]),
+                    trace: TraceId::of(b"need-assumption"),
+                },
+            });
+        }
+        if self.derived.proposition_conflicted(&prop) {
+            return Ok(Outcome::Suspended {
+                requests: BTreeSet::from([OpenRequest::NeedConflict {
+                    graph: vec![format!("conflicting determinations for {prop:?}")],
+                    doctrines: Vec::new(),
+                }]),
+                trace: TraceId::of(b"determination-conflict"),
+            });
+        }
+        if self.derived.modal_determined(&prop).is_none()
+            && let Some(requests) = self.derived.judgment_requests(&prop)
+        {
+            return Ok(Outcome::Suspended {
+                requests: requests.clone(),
+                trace: TraceId::of(b"declared-judgment-open"),
+            });
+        }
         if ctor.eq_ignore_ascii_case("determined") {
             match self.derived.modal_determined(&prop) {
                 Some(value) => {
@@ -1236,26 +2547,82 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
 
     fn ground_term(&self, term: Term) -> Term {
         match term {
-            Term::Ident(name) | Term::Binder(name) => match self.lookup(&name) {
-                Some(Value::Entity(s) | Value::String(s)) => Term::Ident(s),
-                Some(Value::Int(i)) => Term::Int(i),
-                Some(Value::Decimal(d)) => Term::Decimal(d),
-                Some(Value::Bool(b)) => Term::Bool(b),
-                _ => Term::Ident(name),
-            },
+            Term::Ident(name) | Term::Binder(name) => self
+                .lookup(&name)
+                .as_ref()
+                .map(judgment::value_ground_term)
+                .unwrap_or(Term::Ident(name)),
             Term::Apply { ctor, args } => Term::Apply {
                 ctor,
-                args: args.into_iter().map(|a| self.ground_term(a)).collect(),
+                args: args
+                    .into_iter()
+                    .map(|term| self.ground_term(term))
+                    .collect(),
             },
             Term::Call { callee, args } => Term::Call {
                 callee,
-                args: args.into_iter().map(|a| self.ground_term(a)).collect(),
+                args: args
+                    .into_iter()
+                    .map(|term| self.ground_term(term))
+                    .collect(),
+            },
+            Term::Field { base, name } => {
+                let base = self.ground_term(*base);
+                if let Term::Record(fields) = &base
+                    && let Some(value) = fields.get(&name)
+                {
+                    return value.clone();
+                }
+                Term::Field {
+                    base: Box::new(base),
+                    name,
+                }
+            }
+            Term::Record(fields) => Term::Record(
+                fields
+                    .into_iter()
+                    .map(|(name, term)| (name, self.ground_term(term)))
+                    .collect(),
+            ),
+            Term::Set(values) => Term::Set(
+                values
+                    .into_iter()
+                    .map(|term| self.ground_term(term))
+                    .collect(),
+            ),
+            Term::Binary { op, left, right } => Term::Binary {
+                op,
+                left: Box::new(self.ground_term(*left)),
+                right: Box::new(self.ground_term(*right)),
+            },
+            Term::If { cond, then, else_ } => Term::If {
+                cond: Box::new(self.ground_term(*cond)),
+                then: Box::new(self.ground_term(*then)),
+                else_: Box::new(self.ground_term(*else_)),
             },
             other => other,
         }
     }
 
     fn lookup(&self, name: &str) -> Option<Value> {
+        if let Some((root, path)) = name.split_once('.')
+            && let Some(mut value) = self
+                .bindings
+                .get(root)
+                .or_else(|| self.args.get(root))
+                .or_else(|| self.case.facts.get(root))
+                .cloned()
+        {
+            for field in path.split('.') {
+                value = match value {
+                    Value::Map(fields) | Value::Ctor { fields, .. } => {
+                        fields.get(field).cloned()?
+                    }
+                    _ => return None,
+                };
+            }
+            return Some(value);
+        }
         self.bindings
             .get(name)
             .or_else(|| self.args.get(name))
@@ -1327,6 +2694,144 @@ fn eval_need_determine_prop<H: Handler>(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
+fn eval_judgment_expression(
+    module: &CoreModule,
+    term: &Term,
+    environment: &BTreeMap<String, Value>,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    derived: &DerivedWorld,
+    consumed: &mut u64,
+    derivation: &mut Vec<DerivationStep>,
+) -> Result<Option<Value>, EngineError> {
+    let mut pending = vec![term];
+    while let Some(term) = pending.pop() {
+        match term {
+            Term::Call { callee: ctor, args } | Term::Apply { ctor, args } => {
+                if matches!(
+                    ctor.as_str(),
+                    "duty_step" | "require_authority" | "transaction"
+                ) || find_function(module, ctor)
+                    .is_some_and(|function| !function.effects.is_empty())
+                {
+                    return Err(EngineError::Unsupported(
+                        "judgment conditions require pure expressions".into(),
+                    ));
+                }
+                pending.extend(args);
+            }
+            Term::Binary { left, right, .. } => {
+                pending.push(left);
+                pending.push(right);
+            }
+            Term::If { cond, then, else_ } => {
+                pending.push(cond);
+                pending.push(then);
+                pending.push(else_);
+            }
+            Term::Field { base, .. } => pending.push(base),
+            Term::Record(fields) => pending.extend(fields.values()),
+            Term::Set(items) => pending.extend(items),
+            _ => {}
+        }
+    }
+    struct Closed;
+    impl Handler for Closed {
+        fn handle_observe(&mut self, request: &OpenRequest) -> HandlerResult {
+            HandlerResult::Suspend {
+                requests: BTreeSet::from([request.clone()]),
+                reason: fidryn_core::SuspensionReason::MissingRecord,
+                trace_fragment: String::new(),
+            }
+        }
+        fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+        fn handle_choose(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+        fn handle_interpret(&mut self, request: &OpenRequest) -> HandlerResult {
+            self.handle_observe(request)
+        }
+    }
+    let mut environment = environment.clone();
+    for name in ["Supports", "Opposes"] {
+        let is_constructor=module.declarations.iter().any(|declaration|matches!(declaration,CoreDecl::Type(declaration) if matches!(&declaration.definition,fidryn_core::ir::TypeDefinition::Sum(constructors) if constructors.iter().any(|constructor|constructor.name == name && constructor.arguments.is_empty() && constructor.fields.is_empty()))));
+        environment.insert(
+            name.into(),
+            if is_constructor {
+                Value::Ctor {
+                    name: name.into(),
+                    fields: BTreeMap::new(),
+                }
+            } else {
+                Value::String(name.into())
+            },
+        );
+    }
+    let args = BTreeMap::new();
+    let mut handler = Closed;
+    let mut frame = EvalFrame {
+        module,
+        args: &args,
+        bindings: environment,
+        ctx,
+        handler: &mut handler,
+        case,
+        derived: derived.clone(),
+        fuel: None,
+        seq_frames: Vec::new(),
+        seq_path: Vec::new(),
+        child_counts: Vec::new(),
+        steps: *consumed,
+        derivation: std::mem::take(derivation),
+        trace_frames: Vec::new(),
+        operation_limit: derived.operation_limit(),
+    };
+    let result = frame.eval_term(term);
+    *consumed = frame.steps;
+    *derivation = frame.derivation;
+    result.map(|outcome| match outcome {
+        Outcome::Determinate { value, .. } => Some(value),
+        _ => None,
+    })
+}
+
+/// Admit typed query inputs identically for evaluation and checked replay.
+pub fn resolve_query_args(
+    module: &CoreModule,
+    query: &fidryn_core::ir::CoreQuery,
+    args: &BTreeMap<String, Value>,
+    case: &CaseRecord,
+) -> Result<BTreeMap<String, Value>, EngineError> {
+    if let Some(name) = args
+        .keys()
+        .find(|name| !query.binders.iter().any(|(binder, _)| binder == *name))
+    {
+        return Err(EngineError::InvalidInput(format!(
+            "unknown query argument `{name}`"
+        )));
+    }
+    let mut resolved = BTreeMap::new();
+    for (name, ty) in &query.binders {
+        let value = args
+            .get(name)
+            .or_else(|| case.facts.get(name))
+            .ok_or_else(|| EngineError::InvalidInput(format!("missing query argument `{name}`")))?;
+        let value = admission::admit(module, value, ty).ok_or_else(|| {
+            EngineError::InvalidInput(format!("query argument `{name}` is incompatible with {ty}"))
+        })?;
+        resolved.insert(name.clone(), value);
+    }
+    Ok(resolved)
+}
+
+/// Validate a runtime value at the shared query, function, and replay boundary.
+pub fn runtime_value_matches(module: &CoreModule, value: &Value, ty: &Type) -> bool {
+    admission::admit(module, value, ty).is_some()
+}
+
 fn unsupported(detail: impl Into<String>) -> EngineError {
     EngineError::Unsupported(detail.into())
 }
@@ -1387,35 +2892,16 @@ fn program_or_query_changed(
 
 fn find_effect_name(module: &CoreModule, name: &str) -> Option<String> {
     module.declarations.iter().find_map(|d| match d {
-        CoreDecl::EffectDecl(e) if e.name == name => Some(e.name.clone()),
+        CoreDecl::EffectDecl(e)
+            if e.name == name
+                || e.operations
+                    .iter()
+                    .any(|operation| format!("{}.{}", e.name, operation.name) == name) =>
+        {
+            Some(name.to_owned())
+        }
         _ => None,
     })
-}
-
-fn custom_effect_payload(effect: &str, args: &[Term]) -> String {
-    if args.is_empty() {
-        return effect.to_owned();
-    }
-    format!(
-        "{effect}({})",
-        args.iter()
-            .map(term_effect_arg)
-            .collect::<Vec<_>>()
-            .join(",")
-    )
-}
-
-fn term_effect_arg(term: &Term) -> String {
-    match term {
-        Term::String(s) | Term::Ident(s) | Term::Binder(s) => s.clone(),
-        Term::Int(n) => n.to_string(),
-        Term::Bool(b) => b.to_string(),
-        Term::Decimal(d) => d.to_string(),
-        Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
-            custom_effect_payload(ctor, args)
-        }
-        other => format!("{other:?}"),
-    }
 }
 
 fn find_decision<'m>(module: &'m CoreModule, name: &str) -> Option<&'m CoreDecision> {
@@ -1536,6 +3022,9 @@ fn binop_name(op: BinOp) -> &'static str {
 }
 
 fn eval_binop(op: &str, left: &Value, right: &Value) -> Result<Value, EngineError> {
+    if let Some(value) = money::try_binop(op, left, right)? {
+        return Ok(value);
+    }
     match op {
         "+" | "-" | "*" | "/" => eval_arith(op, left, right),
         "&&" => bool_bin(left, right, |a, b| a && b),
@@ -1607,15 +3096,6 @@ fn promote_num(value: &Value) -> Result<Num, EngineError> {
     match value {
         Value::Int(i) => Ok(Num::Int(*i)),
         Value::Decimal(d) => Ok(Num::Dec(*d)),
-        Value::String(s) => {
-            if let Ok(i) = s.parse::<i64>() {
-                return Ok(Num::Int(i));
-            }
-            if let Ok(d) = s.parse::<Decimal>() {
-                return Ok(Num::Dec(d));
-            }
-            money_amount(Some(value)).map(Num::Dec)
-        }
         _ => Err(unsupported(format!("not a number `{value:?}`"))),
     }
 }
@@ -1656,14 +3136,14 @@ fn money_amount(value: Option<&Value>) -> Result<Decimal, EngineError> {
     match value {
         Value::Decimal(d) => Ok(*d),
         Value::Int(i) => Ok(Decimal::from(*i)),
-        Value::String(s) => {
-            let t = s
-                .trim()
-                .trim_start_matches("USD(")
-                .trim_end_matches(')')
-                .trim();
-            t.parse()
-                .map_err(|_| EngineError::InvalidInput(format!("invalid money `{s}`")))
+        Value::Ctor { name, fields } if name == "USD" && fields.len() == 1 => {
+            match fields.get("_0") {
+                Some(Value::Decimal(amount)) => Ok(*amount),
+                Some(Value::Int(amount)) => Ok(Decimal::from(*amount)),
+                _ => Err(EngineError::InvalidInput(
+                    "USD requires one numeric amount".into(),
+                )),
+            }
         }
         other => Err(EngineError::InvalidInput(format!(
             "invalid money `{other:?}`"
@@ -1694,11 +3174,18 @@ fn ordinary_income_tax(amount: Decimal) -> Decimal {
     tax + (amount - b3) * p24
 }
 
-fn eval_judgment<H: Handler>(handler: &mut H, case: &CaseRecord) -> Outcome<Value> {
-    if let Some(d) = case
-        .determinations
-        .iter()
-        .find(|d| d.protocol.contains("Judgment") && d.established)
+fn eval_judgment<H: Handler>(
+    handler: &mut H,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Outcome<Value> {
+    if let Some(d) = FrozenCaseView::from_context(case, ctx)
+        .determinations()
+        .find(|d| {
+            d.protocol == "JudgmentOnTheMerits"
+                && parse_prop_issue(&d.issue) == PropTerm::new("Adjudicated", vec![])
+                && d.established
+        })
     {
         return determinate(
             case.facts
@@ -2067,25 +3554,10 @@ fn format_office(head: &str, args: &[Term]) -> String {
 }
 
 fn office_matches(nomination_office: &str, key: &str) -> bool {
-    if nomination_office == key {
-        return true;
-    }
-    // A bare head such as `TrusteeOf` still names `TrusteeOf(BRT)`.
-    // `TrusteeOf(A)` does not name `TrusteeOf(B)`.
-    bare_office_head_extends(nomination_office, key)
-        || bare_office_head_extends(key, nomination_office)
+    nomination_office == key
 }
 
-fn bare_office_head_extends(shorter: &str, longer: &str) -> bool {
-    if shorter.contains('(') {
-        return false;
-    }
-    match longer.strip_prefix(shorter) {
-        Some(rest) => rest.starts_with('('),
-        None => false,
-    }
-}
-
+#[allow(clippy::too_many_arguments)]
 fn eval_unique_occupant<H: Handler>(
     module: &CoreModule,
     office: &Term,
@@ -2094,6 +3566,7 @@ fn eval_unique_occupant<H: Handler>(
     handler: &mut H,
     case: &CaseRecord,
     derived: &DerivedWorld,
+    derivation: &mut Vec<DerivationStep>,
 ) -> Outcome<Value> {
     let trace = TraceId::of(b"unique-occupant");
     let key = office_key(office);
@@ -2117,20 +3590,81 @@ fn eval_unique_occupant<H: Handler>(
         };
     }
     let current = occupants[0].person.clone();
+    let structured=module.declarations.iter().any(|decl|matches!(decl,CoreDecl::Judgment(judgment) if judgment.decides.predicate == "Incapacitated" && judgment.authority_policy.is_some()));
+    if structured {
+        let Some(issue) = declared_suspension_issue(module, &current, office) else {
+            return determinate(Value::Entity(current), trace);
+        };
+        if derived.proposition_conflicted(&issue) {
+            return Outcome::Suspended {
+                requests: BTreeSet::from([OpenRequest::NeedConflict {
+                    graph: vec![format!("opposed judgments for {issue:?}")],
+                    doctrines: Vec::new(),
+                }]),
+                trace,
+            };
+        }
+        if derived.denied(&issue) {
+            return determinate(Value::Entity(current), trace);
+        }
+        if derived.holds(&issue) {
+            return eval_succession(module, office, &key, case, ctx, trace, derivation);
+        }
+        return Outcome::Suspended {
+            requests: derived
+                .judgment_requests(&issue)
+                .cloned()
+                .unwrap_or_else(|| {
+                    BTreeSet::from([OpenRequest::NeedJudgment {
+                        issue: issue.clone(),
+                        protocol: incapacity_protocol(module),
+                    }])
+                }),
+            trace,
+        };
+    }
     let required = required_concurring(case);
     let schemas = concurring_schemas(module, case);
-    let matching = count_concurring(case, &schemas, Some(current.as_str()), ctx.record_time);
+    let matching = count_concurring(
+        case,
+        &schemas,
+        Some(current.as_str()),
+        &key,
+        ctx.record_time,
+    );
     match occupant_incapacitated(derived, case, &current, office) {
         Some(false) => determinate(Value::Entity(current), trace),
-        Some(true) => eval_succession(module, office, &key, case, ctx, trace),
+        Some(true) => eval_succession(module, office, &key, case, ctx, trace, derivation),
         None if required > 0 && matching >= required => {
-            eval_succession(module, office, &key, case, ctx, trace)
+            eval_succession(module, office, &key, case, ctx, trace, derivation)
         }
         None if required > 0 && matching < required => {
             incomplete_concurring(module, office, &current, case, &schemas, handler, trace)
         }
         None => determinate(Value::Entity(current), trace),
     }
+}
+
+fn declared_suspension_issue(module: &CoreModule, person: &str, office: &Term) -> Option<PropTerm> {
+    fn find(guard: &Guard, person: &str) -> Option<PropTerm> {
+        match guard {
+            Guard::Operative(prop, _)
+                if prop.predicate == "Incapacitated"
+                    && prop.arguments.first().is_some_and(|arg| {
+                        worklist::canonical_ground_term(arg) == Term::Ident(person.to_owned())
+                    }) =>
+            {
+                Some(prop.clone())
+            }
+            Guard::And(parts) => parts.iter().find_map(|part| find(part, person)),
+            _ => None,
+        }
+    }
+    module.declarations.iter().find_map(|decl| {
+        let CoreDecl::Rule(rule)=decl else {return None};
+        let matches=rule.consequences.iter().any(|effect|matches!(&effect.consequence,fidryn_core::ir::Consequence::Suspend(prop)|fidryn_core::ir::Consequence::Terminate(prop) if prop.predicate == "Occupies" && prop.arguments.first().is_some_and(|arg|worklist::canonical_ground_term(arg) == Term::Ident(person.to_owned())) && prop.arguments.get(1).is_some_and(|arg|worklist::canonical_ground_term(arg) == worklist::canonical_ground_term(office))));
+        if matches {find(&rule.guard,person)} else {None}
+    })
 }
 
 fn occupants_for_office(
@@ -2144,18 +3678,20 @@ fn occupants_for_office(
         .occupancy
         .iter()
         .filter(|o| {
-            office_matches(&o.office, office)
+            o.office == office
                 && o.mode == StatusMode::Established
                 && o.valid_time.contains(ctx.valid_time)
                 && o.record_time <= ctx.record_time
         })
         .cloned()
         .collect();
-    if from_state.is_empty() {
-        recorded
-    } else {
-        from_state
-    }
+    recorded
+        .into_iter()
+        .chain(from_state)
+        .map(|occupancy| (occupancy.person.clone(), occupancy))
+        .collect::<BTreeMap<_, _>>()
+        .into_values()
+        .collect()
 }
 
 fn required_concurring(case: &CaseRecord) -> usize {
@@ -2179,24 +3715,9 @@ fn is_structural_schema(schema: &str) -> bool {
 
 fn concurring_schemas(module: &CoreModule, case: &CaseRecord) -> Vec<String> {
     let mut out = BTreeSet::new();
-    for item in &case.evidence {
-        if !is_structural_schema(&item.schema) {
-            out.insert(item.schema.clone());
-        }
-    }
-    for schema in case.admissible_completions.evidence.keys() {
-        if !is_structural_schema(schema) {
-            out.insert(schema.clone());
-        }
-    }
+    let _ = case;
     for decl in &module.declarations {
         match decl {
-            CoreDecl::RecordType(rt) if rt.is_evidence && !is_structural_schema(&rt.name) => {
-                out.insert(rt.name.clone());
-            }
-            CoreDecl::Observation(obs) if !is_structural_schema(&obs.name) => {
-                out.insert(obs.name.clone());
-            }
             CoreDecl::Judgment(judgment)
                 if judgment
                     .decides
@@ -2229,18 +3750,27 @@ fn count_concurring(
     case: &CaseRecord,
     schemas: &[String],
     subject: Option<&str>,
+    purpose: &str,
     known_at: Instant,
 ) -> usize {
     case.evidence
         .iter()
-        .filter(|item| concurring_matches(item, schemas, subject, known_at))
-        .count()
+        .filter(|item| concurring_matches(item, schemas, subject, purpose, known_at))
+        .filter_map(|item| match &item.value {
+            Value::Map(fields) | Value::Ctor { fields, .. } => fields
+                .get("issuer")
+                .and_then(|value| strings_from_value(value).into_iter().next()),
+            _ => None,
+        })
+        .collect::<BTreeSet<_>>()
+        .len()
 }
 
 fn concurring_matches(
     evidence: &EvidenceItem,
     schemas: &[String],
     subject: Option<&str>,
+    purpose: &str,
     known_at: Instant,
 ) -> bool {
     if evidence.observed_at > known_at {
@@ -2249,13 +3779,25 @@ fn concurring_matches(
     if !schemas.iter().any(|schema| schema == &evidence.schema) {
         return false;
     }
-    let got_subject = evidence_subject(&evidence.value);
-    if let (Some(want), Some(got)) = (subject, got_subject.as_deref())
-        && !want.eq_ignore_ascii_case(got)
-    {
+    let Some(want) = subject else { return false };
+    if evidence_subject(&evidence.value).as_deref() != Some(want) {
         return false;
     }
-    true
+    let fields = match &evidence.value {
+        Value::Map(fields) | Value::Ctor { fields, .. } => fields,
+        _ => return false,
+    };
+    fields
+        .get("issuer")
+        .is_some_and(|value| !strings_from_value(value).is_empty())
+        && fields
+            .get("purpose")
+            .is_some_and(|value| strings_from_value(value).iter().any(|name| name == purpose))
+        && fields.get("conclusion").is_some_and(|value| {
+            strings_from_value(value)
+                .iter()
+                .any(|name| name == "Supports")
+        })
 }
 
 fn evidence_subject(value: &Value) -> Option<String> {
@@ -2270,41 +3812,20 @@ fn evidence_subject(value: &Value) -> Option<String> {
 
 fn occupant_incapacitated(
     derived: &DerivedWorld,
-    case: &CaseRecord,
+    _case: &CaseRecord,
     occupant: &str,
     office: &Term,
 ) -> Option<bool> {
     let grounded = incapacitated_prop(occupant, office);
+    if derived.proposition_conflicted(&grounded) {
+        return None;
+    }
     if derived.denied(&grounded) {
-        return Some(false);
-    }
-    if derived.holds(&grounded) || derived.holds(&PropTerm::new("Incapacitated", Vec::new())) {
-        return Some(true);
-    }
-    for det in &case.determinations {
-        let prop = parse_prop_issue(&det.issue);
-        if !prop.predicate.eq_ignore_ascii_case("Incapacitated") {
-            continue;
-        }
-        let args: Vec<String> = prop.arguments.iter().map(arg_label_term).collect();
-        if !args.is_empty()
-            && !args
-                .iter()
-                .any(|arg| arg.eq_ignore_ascii_case(occupant) || office_matches(arg, occupant))
-        {
-            continue;
-        }
-        return Some(det.established);
-    }
-    None
-}
-
-fn arg_label_term(term: &Term) -> String {
-    match term {
-        Term::Ident(s) | Term::String(s) | Term::Binder(s) => s.clone(),
-        Term::Apply { ctor, args } => format_office(ctor, args),
-        Term::Call { callee, args } => format_office(callee, args),
-        other => format!("{other:?}"),
+        Some(false)
+    } else if derived.holds(&grounded) {
+        Some(true)
+    } else {
+        None
     }
 }
 
@@ -2402,7 +3923,41 @@ fn eval_succession(
     case: &CaseRecord,
     ctx: &RunContext,
     trace: TraceId,
+    derivation: &mut Vec<DerivationStep>,
 ) -> Outcome<Value> {
+    for declaration in &module.declarations {
+        let CoreDecl::Rule(rule) = declaration else {
+            continue;
+        };
+        let Some(selection) = &rule.selection else {
+            continue;
+        };
+        let governs=rule.consequences.iter().any(|effect|matches!(&effect.consequence,fidryn_core::ir::Consequence::Establish(proposition) if proposition.predicate == "Occupies" && proposition.arguments.get(1).is_some_and(|term|office_key(term) == key)));
+        let implemented = implemented_succession_policy(selection, &rule.guard, office);
+        if governs {
+            record_step(
+                derivation,
+                "selection_policy",
+                format!(
+                    "rule={}; source_selection={selection:?}; source_guard={:?}; supported={implemented}",
+                    rule.name, rule.guard
+                ),
+                Vec::new(),
+            );
+        }
+        if governs && !implemented {
+            return Outcome::Suspended {
+                requests: BTreeSet::from([OpenRequest::NeedCustom {
+                    effect: "SelectionPolicy".into(),
+                    payload: format!(
+                        "{} requires selection {:?} under {:?}",
+                        rule.name, selection, rule.guard
+                    ),
+                }]),
+                trace,
+            };
+        }
+    }
     let mut nominations: Vec<_> = module
         .nominations
         .iter()
@@ -2414,17 +3969,139 @@ fn eval_succession(
         .iter()
         .map(|n| (n.candidate.clone(), n.rank))
         .collect();
+    record_step(
+        derivation,
+        "nomination_index",
+        format!("office={key}; ranked={ranked:?}"),
+        Vec::new(),
+    );
+    let ranks: BTreeSet<_> = ranked.iter().map(|(_, rank)| rank).collect();
+    let candidates: BTreeSet<_> = ranked.iter().map(|(candidate, _)| candidate).collect();
+    if ranks.len() != ranked.len() || candidates.len() != ranked.len() {
+        return Outcome::Inconsistent {
+            core: vec![format!(
+                "office `{key}` has duplicate nomination candidates or rank keys"
+            )],
+            trace,
+        };
+    }
     if ranked.is_empty() {
         return need_appointment(office, trace);
     }
     let Some((family_name, alts)) = succession_family(module, case, key) else {
         return need_appointment(office, trace);
     };
+    let Some(admissible) = case
+        .admissible_completions
+        .interpretations
+        .get(&family_name)
+    else {
+        return Outcome::Suspended {
+            requests: BTreeSet::from([OpenRequest::NeedInterpretation {
+                source: key.into(),
+                family: family_name,
+            }]),
+            trace,
+        };
+    };
     if let Some(label) = case.interpretations.get(&family_name) {
         let defs = defs_for_alternative(alts, label);
-        return select_from_eligibility(&ranked, defs, office, case, ctx, trace);
+        return select_from_eligibility(&ranked, defs, office, case, ctx, trace, derivation);
     }
-    contingent_from_alternatives(&family_name, alts, &ranked, office, case, ctx, trace)
+    let admitted: Vec<_> = alts
+        .iter()
+        .filter(|(label, _)| admissible.contains(label))
+        .cloned()
+        .collect();
+    if admitted.len() != admissible.len() {
+        return Outcome::OutsideCompetence {
+            request: OpenRequest::NeedInterpretation {
+                source: key.into(),
+                family: family_name,
+            },
+            reason: "declared completion contains an unknown source alternative".into(),
+            trace,
+        };
+    }
+    contingent_from_alternatives(
+        &family_name,
+        &admitted,
+        &ranked,
+        office,
+        case,
+        ctx,
+        trace,
+        derivation,
+    )
+}
+
+fn implemented_succession_policy(
+    selection: &fidryn_core::ir::CoreSelection,
+    guard: &Guard,
+    office: &Term,
+) -> bool {
+    fn call<'a>(term: &'a Term, name: &str) -> Option<&'a [Term]> {
+        match term {
+            Term::Apply { ctor, args } | Term::Call { callee: ctor, args } if ctor == name => {
+                Some(args)
+            }
+            _ => None,
+        }
+    }
+    let same_office = |term: &Term| {
+        worklist::canonical_ground_term(term) == worklist::canonical_ground_term(office)
+    };
+    let candidate = |term: &Term| matches!(term,Term::Ident(name)|Term::Binder(name) if name == &selection.binder);
+    let domain = call(&selection.finite_domain, "nominations_for")
+        .is_some_and(|args| matches!(args,[term] if same_office(term)));
+    fn predicate(
+        guard: &Guard,
+        candidate: &impl Fn(&Term) -> bool,
+        office: &impl Fn(&Term) -> bool,
+        seen: &mut (bool, bool),
+    ) -> bool {
+        match guard {
+            Guard::And(parts) => parts
+                .iter()
+                .all(|part| predicate(part, candidate, office, seen)),
+            Guard::Operative(prop, context)
+                if prop.predicate == "Eligible"
+                    && context.is_empty()
+                    && matches!(prop.arguments.as_slice(),[person,at] if candidate(person) && office(at)) =>
+            {
+                seen.0 = true;
+                true
+            }
+            Guard::EffectiveActTerm(
+                Term::Apply { ctor, args } | Term::Call { callee: ctor, args },
+            ) if ctor == "AcceptOffice"
+                && matches!(args.as_slice(),[person,at] if candidate(person) && office(at)) =>
+            {
+                seen.1 = true;
+                true
+            }
+            _ => false,
+        }
+    }
+    fn requirements(guard: &Guard, office: &impl Fn(&Term) -> bool) -> bool {
+        match guard {
+            Guard::Satisfied=>true,
+            Guard::And(parts)=>parts.iter().all(|part|requirements(part,office)),
+            Guard::Compare{op:CompareOp::Eq,left,right:Term::Bool(true)}=>{
+                call(left,"vacancy_or_suspension").is_some_and(|args|matches!(args,[term] if office(term))) || call(left,"unique").is_some_and(|args|matches!(args,[Term::Ident(name)] if name == "nomination_rank")) || call(left,"closed").is_some_and(|args|matches!(args,[term] if call(term,"nominations_for").is_some_and(|args|matches!(args,[term] if office(term)))))
+            }
+            _=>false,
+        }
+    }
+    let mut seen = (false, false);
+    domain
+        && selection.ordering == ["nomination_rank"]
+        && selection.ascending == [true]
+        && selection.require_unique_keys
+        && predicate(&selection.predicate, &candidate, &same_office, &mut seen)
+        && seen.0
+        && seen.1
+        && requirements(guard, &same_office)
 }
 
 type EligibilityDef = (PropTerm, bool);
@@ -2447,7 +4124,7 @@ fn succession_family<'m>(
             _ => None,
         })
         .collect();
-    if matching.is_empty() {
+    if matching.len() != 1 {
         return None;
     }
     if let Some(name) = case
@@ -2485,6 +4162,7 @@ fn select_from_eligibility(
     case: &CaseRecord,
     ctx: &RunContext,
     trace: TraceId,
+    derivation: &mut Vec<DerivationStep>,
 ) -> Outcome<Value> {
     let office_key = office_key(office);
     let eligible: Vec<(String, i64)> = ranked
@@ -2497,6 +4175,7 @@ fn select_from_eligibility(
         .filter(|(name, _)| is_accepted(case, name, &office_key, ctx))
         .cloned()
         .collect();
+    let checks:Vec<_>=ranked.iter().map(|(candidate,rank)|record_step(derivation,"selection_candidate",format!("office={office_key}; candidate={candidate}; rank={rank}; definitions={defs:?}; eligible={}; accepted={}",is_defined_eligible(defs,candidate,&office_key),is_accepted(case,candidate,&office_key,ctx)),Vec::new())).collect();
     if accepted.is_empty() {
         if eligible.is_empty() {
             let mut requests = BTreeSet::new();
@@ -2509,6 +4188,56 @@ fn select_from_eligibility(
         return need_accept_office(office, trace);
     }
     let winner = accepted.iter().min_by_key(|(_, rank)| *rank).unwrap();
+    let open: BTreeSet<_> = ranked
+        .iter()
+        .filter(|(_, rank)| *rank < winner.1)
+        .filter_map(|(name, _)| {
+            let statuses: BTreeSet<_> = defs
+                .iter()
+                .filter(|(prop, _)| {
+                    prop.predicate == "Eligible"
+                        && argument_names_person(prop.arguments.first(), name)
+                        && argument_names_office(prop.arguments.get(1), &office_key)
+                })
+                .map(|(_, value)| *value)
+                .collect();
+            if statuses.is_empty() || statuses.len() > 1 {
+                return Some(OpenRequest::NeedJudgment {
+                    issue: PropTerm::new(
+                        "Eligible",
+                        vec![Term::Ident(name.clone()), office.clone()],
+                    ),
+                    protocol: "Eligibility".into(),
+                });
+            }
+            if statuses.contains(&true)
+                && !is_accepted(case, name, &office_key, ctx)
+                && case.facts.get(&format!("Accepted({name},{office_key})"))
+                    != Some(&Value::Bool(false))
+            {
+                return Some(OpenRequest::NeedEvidence {
+                    issue: PropPattern::Ground(PropTerm::new(
+                        "Accepted",
+                        vec![Term::Ident(name.clone()), office.clone()],
+                    )),
+                    schema: "AcceptOffice".into(),
+                });
+            }
+            None
+        })
+        .collect();
+    if !open.is_empty() {
+        return Outcome::Suspended {
+            requests: open,
+            trace,
+        };
+    }
+    record_step(
+        derivation,
+        "selection",
+        format!("office={office_key}; winner={winner:?}; minimum_rank"),
+        checks,
+    );
     determinate(Value::Entity(winner.0.clone()), trace)
 }
 
@@ -2523,7 +4252,7 @@ fn is_defined_eligible(defs: &[EligibilityDef], person: &str, office: &str) -> b
 
 fn argument_names_person(term: Option<&Term>, person: &str) -> bool {
     match term {
-        Some(Term::Ident(name) | Term::String(name)) => name.eq_ignore_ascii_case(person),
+        Some(Term::Ident(name) | Term::String(name)) => name == person,
         _ => false,
     }
 }
@@ -2535,6 +4264,7 @@ fn argument_names_office(term: Option<&Term>, office: &str) -> bool {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn contingent_from_alternatives(
     family: &str,
     alts: &InterpretationAlts,
@@ -2543,6 +4273,7 @@ fn contingent_from_alternatives(
     case: &CaseRecord,
     ctx: &RunContext,
     trace: TraceId,
+    derivation: &mut Vec<DerivationStep>,
 ) -> Outcome<Value> {
     if alts.is_empty() {
         return need_accept_office(office, trace);
@@ -2552,10 +4283,16 @@ fn contingent_from_alternatives(
         .map(|(label, defs)| {
             (
                 label.clone(),
-                select_from_eligibility(ranked, defs, office, case, ctx, trace),
+                select_from_eligibility(ranked, defs, office, case, ctx, trace, derivation),
             )
         })
         .collect();
+    record_step(
+        derivation,
+        "succession_aggregation",
+        format!("family={family}; branches={branches:?}"),
+        Vec::new(),
+    );
     combine_succession_alternatives(family, branches, office, trace)
 }
 
@@ -2693,7 +4430,7 @@ fn need_accept_office(office: &Term, trace: TraceId) -> Outcome<Value> {
 }
 
 fn is_accepted(case: &CaseRecord, name: &str, office: &str, ctx: &RunContext) -> bool {
-    let key = format!("{}_accepted", name.to_ascii_lowercase());
+    let key = format!("Accepted({name},{office})");
     if case.facts.get(&key) == Some(&Value::Bool(true)) {
         return true;
     }
@@ -2706,19 +4443,15 @@ fn is_accepted(case: &CaseRecord, name: &str, office: &str, ctx: &RunContext) ->
 
 fn accept_office_matches(value: &Value, name: &str, office: &str) -> bool {
     match value {
-        Value::Entity(got) | Value::String(got) => got.eq_ignore_ascii_case(name),
+        Value::Entity(_) | Value::String(_) => false,
         Value::Map(fields) | Value::Ctor { fields, .. } => {
-            let person_ok = person_field(fields)
-                .map(|got| got.eq_ignore_ascii_case(name))
-                .unwrap_or_else(|| value_names_person(value, name));
+            let person_ok = person_field(fields).map(|got| got == name).unwrap_or(false);
             if !person_ok {
                 return false;
             }
             match fields.get("office") {
-                Some(rec) => strings_from_value(rec)
-                    .iter()
-                    .any(|got| office_matches(got, office)),
-                None => true,
+                Some(rec) => strings_from_value(rec).iter().any(|got| got == office),
+                None => false,
             }
         }
         _ => false,
@@ -2733,18 +4466,6 @@ fn person_field(fields: &BTreeMap<String, Value>) -> Option<String> {
         .or_else(|| fields.get("holder"))
         .or_else(|| fields.get("name"))
         .and_then(|v| strings_from_value(v).into_iter().next())
-}
-
-fn value_names_person(value: &Value, name: &str) -> bool {
-    match value {
-        Value::Entity(got) | Value::String(got) => got.eq_ignore_ascii_case(name),
-        Value::Map(fields) | Value::Ctor { fields, .. } => fields.values().any(|v| {
-            strings_from_value(v)
-                .iter()
-                .any(|s| s.eq_ignore_ascii_case(name))
-        }),
-        _ => false,
-    }
 }
 
 fn eval_status_of(
@@ -3291,72 +5012,9 @@ fn clause_ident(raw: &str) -> &str {
 fn value_as_clause_raw(value: &Value) -> Option<String> {
     match value {
         Value::String(s) | Value::Entity(s) => Some(s.clone()),
+        Value::ClauseRef { module, clause, .. } => Some(format!("{module}::{clause}")),
         Value::Ctor { name, .. } => Some(name.clone()),
         _ => None,
-    }
-}
-
-fn eval_run_decision<H: Handler>(
-    module: &CoreModule,
-    decision: &str,
-    arguments: &[Term],
-    case: &CaseRecord,
-    handler: &mut H,
-    ctx: &RunContext,
-    derived: &DerivedWorld,
-) -> Result<Outcome<Value>, EngineError> {
-    let Some(decl) = find_decision(module, decision) else {
-        return Err(unsupported(format!("unknown decision `{decision}`")));
-    };
-    if !decl.binders.is_empty() && decl.binders.len() != arguments.len() {
-        return Err(EngineError::InvalidInput(format!(
-            "decision `{decision}` expects {} argument(s), got {}",
-            decl.binders.len(),
-            arguments.len()
-        )));
-    }
-    let trace = TraceId::of(decision.as_bytes());
-    let mut open = BTreeSet::new();
-    for req in &decl.requirements {
-        if let Some(halt) = gather_unmet_requirement(req, case, ctx, derived, handler, &mut open) {
-            return Ok(halt);
-        }
-    }
-    if !open.is_empty() {
-        return Ok(Outcome::Suspended {
-            requests: open,
-            trace,
-        });
-    }
-    if let Some(ret) = &decl.declared_result
-        && let Some(value) = decision_result_value(&ret.expression, case)
-    {
-        return Ok(determinate(value, trace));
-    }
-    if let Some(recorded) = case.decisions.get(decision) {
-        return Ok(determinate(Value::String(recorded.clone()), trace));
-    }
-    let mut requests = BTreeSet::new();
-    requests.insert(OpenRequest::NeedJudgment {
-        issue: PropTerm::new(decision, vec![]),
-        protocol: decision.to_owned(),
-    });
-    Ok(Outcome::Suspended { requests, trace })
-}
-
-fn decision_result_value(term: &Term, case: &CaseRecord) -> Option<Value> {
-    if let Some(value) = term_as_value_literal(term) {
-        match &value {
-            Value::String(name) => case
-                .facts
-                .get(name)
-                .cloned()
-                .or_else(|| case.facts.get("proposed_disposition").cloned())
-                .or(Some(value)),
-            other => Some(other.clone()),
-        }
-    } else {
-        None
     }
 }
 
@@ -3368,6 +5026,12 @@ fn gather_unmet_requirement<H: Handler>(
     handler: &mut H,
     open: &mut BTreeSet<OpenRequest>,
 ) -> Option<Outcome<Value>> {
+    if derived.is_guard_held(guard, case, ctx) {
+        return None;
+    }
+    if derived.is_guard_denied(guard, case, ctx) {
+        return Some(require_failed());
+    }
     match guard {
         Guard::Satisfied => None,
         Guard::Request(req) => push_handler_request(handler, req, open),
@@ -3400,6 +5064,10 @@ fn gather_unmet_requirement<H: Handler>(
                 if let Some(halt) =
                     gather_unmet_requirement(g, case, ctx, derived, handler, &mut part)
                 {
+                    if matches!(&halt, Outcome::Suspended { requests, .. } if requests.iter().all(|request| matches!(request, OpenRequest::NeedCustom { effect, payload } if effect == "require" && payload == "requirement failed")))
+                    {
+                        continue;
+                    }
                     return Some(halt);
                 }
                 if part.is_empty() {
@@ -3407,19 +5075,19 @@ fn gather_unmet_requirement<H: Handler>(
                 }
                 nested.extend(part);
             }
-            open.extend(nested);
-            None
-        }
-        Guard::Operative(prop, _) | Guard::Derived(prop) => {
-            if derived.holds(prop) {
-                None
+            if nested.is_empty() {
+                Some(require_failed())
             } else {
-                open.insert(OpenRequest::NeedJudgment {
-                    issue: prop.clone(),
-                    protocol: prop.predicate.clone(),
-                });
+                open.extend(nested);
                 None
             }
+        }
+        Guard::Operative(prop, _) | Guard::Derived(prop) | Guard::Determined(prop) => {
+            open.insert(OpenRequest::NeedJudgment {
+                issue: prop.clone(),
+                protocol: prop.predicate.clone(),
+            });
+            None
         }
         Guard::Compare { op, left, right } => {
             match (term_as_value_literal(left), term_as_value_literal(right)) {
@@ -3433,27 +5101,39 @@ fn gather_unmet_requirement<H: Handler>(
                 }
             }
         }
-        Guard::Not(inner) => {
-            let mut part = BTreeSet::new();
-            if let Some(halt) =
-                gather_unmet_requirement(inner, case, ctx, derived, handler, &mut part)
-            {
-                return Some(halt);
-            }
-            if part.is_empty() {
-                open.insert(OpenRequest::NeedJudgment {
-                    issue: PropTerm::new("requirement", vec![]),
-                    protocol: "decision".into(),
-                });
-            }
+        Guard::Assumed(prop) => {
+            open.insert(OpenRequest::NeedCustom {
+                effect: "Assume".into(),
+                payload: format!("{prop:?}"),
+            });
+            None
+        }
+        Guard::Not(_) => {
+            open.insert(OpenRequest::NeedJudgment {
+                issue: PropTerm::new("negated_requirement", vec![]),
+                protocol: "decision".into(),
+            });
+            None
+        }
+        Guard::EffectiveActTerm(term) => {
+            open.insert(OpenRequest::NeedJudgment {
+                issue: PropTerm::new("Effective", vec![term.clone()]),
+                protocol: "ActValidity".into(),
+            });
             None
         }
         Guard::CompletedAct(name) | Guard::EffectiveAct(name) => {
-            let done = case.facts.contains_key(name)
-                || case
-                    .determinations
-                    .iter()
-                    .any(|d| d.issue == *name && d.established);
+            let done = case.facts.get(name) == Some(&Value::Bool(true))
+                || case.determinations.iter().any(|d| {
+                    d.issue == *name
+                        && d.established
+                        && !d.protocol.is_empty()
+                        && !d.decider.is_empty()
+                        && FrozenCaseView::determination_is_known(
+                            d.recorded_at,
+                            Some(ctx.record_time),
+                        )
+                });
             if done {
                 None
             } else {
@@ -3473,6 +5153,10 @@ fn push_handler_request<H: Handler>(
     open: &mut BTreeSet<OpenRequest>,
 ) -> Option<Outcome<Value>> {
     match handler.handle(req) {
+        HandlerResult::Resume {
+            value: Value::Bool(false),
+            ..
+        } => Some(require_failed()),
         HandlerResult::Resume { .. } => None,
         HandlerResult::Suspend { requests, .. } => {
             if requests.is_empty() {
@@ -3517,18 +5201,30 @@ fn occupancy_from_records(case: &CaseRecord, office: &str, ctx: &RunContext) -> 
         .filter(|e| e.schema == "OccupancyRecord" && e.observed_at <= ctx.record_time)
         .filter_map(|e| {
             let (person, rec_office) = occupancy_fields(&e.value)?;
-            let rec_office = rec_office.unwrap_or_else(|| office.to_owned());
-            if !office_matches(&rec_office, office) {
+            let rec_office = rec_office?;
+            if rec_office != office {
+                return None;
+            }
+            let interval = match &e.value {
+                Value::Map(fields) | Value::Ctor { fields, .. } => {
+                    match fields.get("validTime").or_else(|| fields.get("valid_time")) {
+                        Some(value) => duty::value_as_interval(value)?,
+                        None => Interval {
+                            start: fidryn_core::time::Bound::Inclusive(e.observed_at),
+                            end: fidryn_core::time::Bound::PosInf,
+                        },
+                    }
+                }
+                _ => return None,
+            };
+            if !interval.contains(ctx.valid_time) {
                 return None;
             }
             Some(Occupancy {
                 person,
                 office: rec_office,
                 mode: StatusMode::Established,
-                valid_time: Interval {
-                    start: fidryn_core::time::Bound::Inclusive(e.observed_at),
-                    end: fidryn_core::time::Bound::PosInf,
-                },
+                valid_time: interval,
                 record_time: e.observed_at,
             })
         })
@@ -3734,7 +5430,7 @@ mod tests {
             QueryPlan::UniqueOccupant {
                 office: Term::Ident(office.into()),
             },
-            vec![family],
+            vec![family, incapacity_judgment("PhysicianCertificate")],
         );
         module.nominations = vec![
             CoreNomination {
@@ -3826,7 +5522,11 @@ mod tests {
             QueryPlan::UniqueOccupant {
                 office: Term::Ident(trustee.into()),
             },
-            vec![trustee_family, executor_family],
+            vec![
+                trustee_family,
+                executor_family,
+                incapacity_judgment("PhysicianCertificate"),
+            ],
         );
         module.queries.push(CoreQuery {
             id: NodeId::of(b"acting_executor"),
@@ -3851,8 +5551,26 @@ mod tests {
 
     fn two_office_case() -> CaseRecord {
         let mut case = successor_case(2, None);
-        case.facts.insert("dana_accepted".into(), Value::Bool(true));
-        case.facts.insert("eve_accepted".into(), Value::Bool(true));
+        case.facts
+            .insert("Accepted(Dana,ExecutorOf(Est))".into(), Value::Bool(true));
+        case.facts
+            .insert("Accepted(Eve,ExecutorOf(Est))".into(), Value::Bool(true));
+        let at = fidryn_core::Instant::parse("2026-08-23T12:00:00Z").unwrap();
+        case.evidence.push(EvidenceItem {
+            schema: "OccupancyRecord".into(),
+            value: Value::Map(BTreeMap::from([
+                ("person".into(), Value::String("Pat".into())),
+                ("office".into(), Value::String("ExecutorOf(Est)".into())),
+            ])),
+            observed_at: at,
+        });
+        for issuer in ["DoctorA", "DoctorB"] {
+            case.evidence.push(EvidenceItem {
+                schema: "PhysicianCertificate".into(),
+                value: certificate(issuer, "Pat", "ExecutorOf(Est)"),
+                observed_at: at,
+            });
+        }
         case.admissible_completions
             .interpretations
             .insert("TrusteeEligibility".into(), vec!["HighRank".into()]);
@@ -3870,23 +5588,27 @@ mod tests {
         let t = fidryn_core::Instant::parse("2026-08-23T12:00:00Z").unwrap();
         let mut case = CaseRecord::default();
         case.facts
-            .insert("alice_accepted".into(), Value::Bool(true));
-        case.facts.insert("bob_accepted".into(), Value::Bool(true));
+            .insert("Accepted(Alice,TrusteeOf(BRT))".into(), Value::Bool(true));
+        case.facts
+            .insert("Accepted(Bob,TrusteeOf(BRT))".into(), Value::Bool(true));
         case.evidence.push(EvidenceItem {
             schema: "OccupancyRecord".into(),
-            value: Value::String("Pat".into()),
+            value: Value::Map(BTreeMap::from([
+                ("person".into(), Value::String("Pat".into())),
+                ("office".into(), Value::String("TrusteeOf(BRT)".into())),
+            ])),
             observed_at: t,
         });
         for i in 0..certs {
             case.evidence.push(EvidenceItem {
                 schema: "PhysicianCertificate".into(),
-                value: Value::String(format!("c{i}")),
+                value: certificate(&format!("Doctor{i}"), "Pat", "TrusteeOf(BRT)"),
                 observed_at: t,
             });
         }
         case.admissible_completions.interpretations.insert(
             "SuccessorEligibility".into(),
-            vec!["I1".into(), "I2".into()],
+            vec!["I1".into(), "I2".into(), "BobOnly".into()],
         );
         if let Some(label) = interpretation {
             case.interpretations
@@ -3906,8 +5628,106 @@ mod tests {
         }
     }
 
+    fn payment_record(name: &str, instance: Option<&str>) -> Value {
+        let mut fields = BTreeMap::from([
+            ("name".into(), Value::String(name.into())),
+            ("payer".into(), Value::String("Payer".into())),
+            ("payee".into(), Value::String("Payee".into())),
+            ("amount".into(), Value::Int(100)),
+            ("currency".into(), Value::String("USD".into())),
+        ]);
+        if let Some(instance) = instance {
+            fields.insert("instance".into(), Value::String(instance.into()));
+        }
+        Value::Map(fields)
+    }
+
+    fn grant_record(action: &str) -> Value {
+        Value::Map(BTreeMap::from([
+            ("action".into(), Value::String(action.into())),
+            ("scope".into(), Value::String("*".into())),
+            ("context".into(), Value::String("*".into())),
+            ("source".into(), Value::String("test-grant".into())),
+            (
+                "validTime".into(),
+                Value::Map(BTreeMap::from([
+                    ("start".into(), Value::String("NegInf".into())),
+                    ("end".into(), Value::String("PosInf".into())),
+                ])),
+            ),
+        ]))
+    }
+
+    fn authorized_case() -> CaseRecord {
+        let mut case = CaseRecord::default();
+        case.facts.insert(
+            "authority_grants".into(),
+            Value::Set(
+                ["attach", "perform", "breach", "cure", "discharge"]
+                    .into_iter()
+                    .map(grant_record)
+                    .collect(),
+            ),
+        );
+        case
+    }
+
+    fn fixture_duty() -> CoreDecl {
+        CoreDecl::Duty(CoreDuty {
+            id: NodeId::of(b"pay"),
+            name: "pay".into(),
+            binders: Vec::new(),
+            bearer: Term::Ident("Payer".into()),
+            claimant: Some(Term::Ident("Payee".into())),
+            attaches: Guard::Satisfied,
+            content: Vec::new(),
+            meta: test_meta("pay"),
+        })
+    }
+
+    fn incapacity_judgment(schema: &str) -> CoreDecl {
+        CoreDecl::Judgment(Box::new(fidryn_core::ir::CoreJudgment {
+            id: NodeId::of(schema.as_bytes()),
+            name: "Incapacity".into(),
+            decides: PropTerm::new(
+                "Incapacitated",
+                vec![
+                    Term::Binder("person".into()),
+                    Term::Binder("purpose".into()),
+                ],
+            ),
+            authority: Term::Ident("Court".into()),
+            binders: Vec::new(),
+            source: None,
+            authority_policy: None,
+            record_requires: vec![(
+                "certificate".into(),
+                Type::Sort(Sort::Nominal(schema.into())),
+            )],
+            record_patterns: Vec::new(),
+            standard: None,
+            constraints: Vec::new(),
+            establish_when: None,
+            reject_when: None,
+            otherwise: None,
+            on_established: Vec::new(),
+            review: None,
+            unsupported_clauses: Vec::new(),
+            meta: test_meta("Incapacity"),
+        }))
+    }
+
+    fn certificate(issuer: &str, subject: &str, purpose: &str) -> Value {
+        Value::Map(BTreeMap::from([
+            ("issuer".into(), Value::String(issuer.into())),
+            ("subject".into(), Value::String(subject.into())),
+            ("purpose".into(), Value::String(purpose.into())),
+            ("conclusion".into(), Value::String("Supports".into())),
+        ]))
+    }
+
     fn module_with_plan(name: &str, plan: QueryPlan) -> CoreModule {
-        module_with_plan_decls(name, plan, Vec::new())
+        module_with_plan_decls(name, plan, vec![fixture_duty()])
     }
 
     fn module_with_plan_decls(
@@ -4215,10 +6035,9 @@ mod tests {
         );
         let out = run_module(&module, "q", &case, &mut Refusing).expect("evaluate");
         match out {
-            Outcome::Determinate { value, .. } => match value {
-                Value::Decimal(d) => assert!(d > Decimal::ZERO),
-                other => panic!("{other:?}"),
-            },
+            Outcome::Determinate { value, .. } => {
+                assert!(money_amount(Some(&value)).unwrap() > Decimal::ZERO)
+            }
             other => panic!("{other:?}"),
         }
     }
@@ -4241,10 +6060,7 @@ mod tests {
             let mut case = CaseRecord::default();
             case.facts.insert("amount".into(), Value::Decimal(amount));
             match run_module(&module, "q", &case, &mut Refusing).expect("evaluate") {
-                Outcome::Determinate {
-                    value: Value::Decimal(d),
-                    ..
-                } => d,
+                Outcome::Determinate { value, .. } => money_amount(Some(&value)).unwrap(),
                 other => panic!("{other:?}"),
             }
         };
@@ -4339,6 +6155,11 @@ mod tests {
         }
 
         let mut function = tax_function("inc", None);
+        function.params = vec![(
+            "amount".into(),
+            Type::Primitive(fidryn_core::PrimitiveType::Int),
+        )];
+        function.result = Type::Primitive(fidryn_core::PrimitiveType::Int);
         function.body = Some(Term::Binary {
             op: BinOp::Add,
             left: Box::new(Term::Ident("amount".into())),
@@ -4722,6 +6543,8 @@ mod tests {
                 CoreDecl::Clause(CoreClause {
                     id: clause_id,
                     name: "ChildSupportWaiver".into(),
+                    source: "clause ChildSupportWaiver {}".into(),
+                    binders: Vec::new(),
                     rules: Vec::new(),
                     meta: test_meta("ChildSupportWaiver"),
                 }),
@@ -4885,7 +6708,11 @@ mod tests {
                 .into_iter()
                 .map(|p| (p.to_owned(), Type::bool()))
                 .collect(),
-            result: Type::bool(),
+            result: match &body {
+                Some(Term::String(_)) => Type::Primitive(PrimitiveType::String),
+                Some(Term::Int(_)) => Type::Primitive(PrimitiveType::Int),
+                _ => Type::bool(),
+            },
             effects: BTreeSet::new(),
             is_calc: false,
             fuel: None,
@@ -5140,7 +6967,7 @@ mod tests {
         let module = module_with_occupant();
         let mut case = successor_case(2, Some("I1"));
         case.facts
-            .insert("alice_accepted".into(), Value::Bool(false));
+            .insert("Accepted(Alice,TrusteeOf(BRT))".into(), Value::Bool(false));
         let t = fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap();
         let out = evaluate(
             &module,
@@ -5216,7 +7043,7 @@ mod tests {
         );
         let mut case = successor_case(2, Some("I1"));
         case.facts
-            .insert("carol_accepted".into(), Value::Bool(true));
+            .insert("Accepted(Carol,TrusteeOf(BRT))".into(), Value::Bool(true));
         match run_succession(&module, "acting_trustee", &case) {
             Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Carol"),
             other => panic!("{other:?}"),
@@ -5225,8 +7052,8 @@ mod tests {
 
     #[test]
     fn parameterized_offices_do_not_match_across_arguments() {
-        assert!(office_matches("TrusteeOf", "TrusteeOf(BRT)"));
-        assert!(office_matches("TrusteeOf(BRT)", "TrusteeOf"));
+        assert!(!office_matches("TrusteeOf", "TrusteeOf(BRT)"));
+        assert!(!office_matches("TrusteeOf(BRT)", "TrusteeOf"));
         assert!(office_matches("TrusteeOf(BRT)", "TrusteeOf(BRT)"));
         assert!(!office_matches(
             "FreeCtrlManager(FreeCtrl)",
@@ -5274,7 +7101,17 @@ mod tests {
             vec![unrelated],
         );
         module.nominations = vec![nomination("Alice", office, 1), nomination("Bob", office, 2)];
-        let case = successor_case(2, None);
+        let mut case = successor_case(2, None);
+        case.facts
+            .insert("Incapacitated(Pat,ClerkOf(X))".into(), Value::Bool(true));
+        case.evidence.push(EvidenceItem {
+            schema: "OccupancyRecord".into(),
+            value: Value::Map(BTreeMap::from([
+                ("person".into(), Value::String("Pat".into())),
+                ("office".into(), Value::String(office.into())),
+            ])),
+            observed_at: fidryn_core::Instant::parse("2026-08-23T12:00:00Z").unwrap(),
+        });
         let out = run_succession(&module, "acting_clerk", &case);
         assert!(
             !matches!(out, Outcome::Determinate { .. }),
@@ -5373,14 +7210,20 @@ mod tests {
 
     #[test]
     fn concurring_schema_need_not_be_physician_certificate() {
-        let module = module_with_occupant();
+        let mut module = module_with_occupant();
+        module
+            .declarations
+            .retain(|decl| !matches!(decl, CoreDecl::Judgment(_)));
+        module
+            .declarations
+            .push(incapacity_judgment("CapacityAffidavit"));
         let t = fidryn_core::Instant::parse("2026-08-23T12:00:00Z").unwrap();
         let mut case = successor_case(0, Some("I2"));
         case.evidence.retain(|e| e.schema == "OccupancyRecord");
         for i in 0..2 {
             case.evidence.push(EvidenceItem {
                 schema: "CapacityAffidavit".into(),
-                value: Value::String(format!("a{i}")),
+                value: certificate(&format!("Witness{i}"), "Pat", "TrusteeOf(BRT)"),
                 observed_at: t,
             });
         }
@@ -6021,7 +7864,11 @@ mod tests {
         family_mut(&mut module)
             .alternatives
             .retain(|(label, _)| label == "I1" || label == "I2");
-        let case = successor_case(2, None);
+        let mut case = successor_case(2, None);
+        case.admissible_completions.interpretations.insert(
+            "SuccessorEligibility".into(),
+            vec!["I1".into(), "I2".into()],
+        );
         let out = run_succession(&module, "acting_trustee", &case);
         assert!(
             !matches!(out, Outcome::Determinate { .. }),
@@ -6133,6 +7980,7 @@ mod tests {
     fn tax_named_function_with_string_body_returns_the_string() {
         let mut function = tax_function("tax_on", None);
         function.body = Some(Term::String("hello".into()));
+        function.result = Type::Primitive(fidryn_core::PrimitiveType::String);
         let plan = QueryPlan::Evaluate(Term::Call {
             callee: "tax_on".into(),
             args: vec![Term::Int(10_000)],
@@ -6209,11 +8057,11 @@ mod tests {
         assert!(!is_accepted(&case, "Alice", "ExecutorOf(Est)", &ctx));
         case.facts
             .insert("alice_accepted".into(), Value::Bool(true));
-        assert!(is_accepted(&case, "Alice", "ExecutorOf(Est)", &ctx));
+        assert!(!is_accepted(&case, "Alice", "ExecutorOf(Est)", &ctx));
     }
 
     #[test]
-    fn accept_office_person_string_still_matches() {
+    fn accept_office_person_string_lacks_office_scope() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let mut case = CaseRecord::default();
         case.evidence.push(EvidenceItem {
@@ -6222,7 +8070,7 @@ mod tests {
             observed_at: t,
         });
         let ctx = RunContext::new(t, t);
-        assert!(is_accepted(&case, "Alice", "TrusteeOf(BRT)", &ctx));
+        assert!(!is_accepted(&case, "Alice", "TrusteeOf(BRT)", &ctx));
     }
 
     #[test]
@@ -6445,10 +8293,9 @@ mod tests {
             ))],
         );
         match run_module(&module, "q", &case, &mut Refusing).expect("evaluate") {
-            Outcome::Determinate {
-                value: Value::Decimal(d),
-                ..
-            } => assert!(d > Decimal::ZERO),
+            Outcome::Determinate { value, .. } => {
+                assert!(money_amount(Some(&value)).unwrap() > Decimal::ZERO)
+            }
             other => panic!("{other:?}"),
         }
     }
@@ -6464,7 +8311,7 @@ mod tests {
                 name: "breached".into(),
             },
         ]);
-        match run_plan(plan, &CaseRecord::default(), &mut Refusing) {
+        match run_plan(plan, &authorized_case(), &mut Refusing) {
             Outcome::Determinate {
                 value: Value::Bool(true),
                 ..
@@ -6475,7 +8322,7 @@ mod tests {
 
     #[test]
     fn duty_illegal_discharge_from_attached_does_not_change_state() {
-        let mut case = CaseRecord::default();
+        let mut case = authorized_case();
         case.facts
             .insert("duty:pay:default".into(), attached_duty_fact());
         let err = run_module(
@@ -6508,7 +8355,7 @@ mod tests {
         let mut case = CaseRecord::default();
         case.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![Value::String("attach".into())]),
+            Value::Set(vec![grant_record("attach")]),
         );
         let plan = QueryPlan::Evaluate(Term::Apply {
             ctor: "require_authority".into(),
@@ -6574,15 +8421,23 @@ mod tests {
     }
 
     fn authority_grant_map(action: &str, revoked: bool, delegate_of: Option<&str>) -> Value {
-        let mut fields = BTreeMap::from([
-            ("action".into(), Value::String(action.into())),
-            ("revoked".into(), Value::Bool(revoked)),
-        ]);
+        let Value::Map(mut fields) = grant_record(action) else {
+            unreachable!()
+        };
+        fields.insert("revoked".into(), Value::Bool(revoked));
         if let Some(grantor) = delegate_of {
             fields.insert("delegate_of".into(), Value::String(grantor.into()));
             fields.insert("principal".into(), Value::String("delegate".into()));
         }
-        Value::Map(fields)
+        if let Some(grantor) = delegate_of {
+            let Value::Map(mut parent) = grant_record(action) else {
+                unreachable!()
+            };
+            parent.insert("principal".into(), Value::String(grantor.into()));
+            Value::Set(vec![Value::Map(parent), Value::Map(fields)])
+        } else {
+            Value::Map(fields)
+        }
     }
 
     #[test]
@@ -6693,7 +8548,7 @@ mod tests {
         let ctx = RunContext::new(t, t);
         let args = BTreeMap::new();
         let state = LegalState::new();
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let first = evaluate_session(
             &module,
             &QueryName::from("q"),
@@ -6767,7 +8622,10 @@ mod tests {
     fn due_apply(days: i64) -> Term {
         Term::Apply {
             ctor: "due".into(),
-            args: vec![Term::Int(days), Term::Ident("counted_days".into())],
+            args: vec![Term::Duration(fidryn_core::time::FidrynDuration {
+                amount: days,
+                kind: fidryn_core::time::CalendarKind::CountedDays,
+            })],
         }
     }
 
@@ -6775,10 +8633,17 @@ mod tests {
         CoreDuty {
             id: NodeId::of(b"pay"),
             name: "pay".into(),
+            binders: Vec::new(),
             bearer: Term::Ident("Payer".into()),
             claimant: Some(Term::Ident("Payee".into())),
             attaches,
-            content: vec![due_apply(due_days)],
+            content: vec![
+                Term::Apply {
+                    ctor: "USD".into(),
+                    args: vec![Term::Decimal(Decimal::from(100))],
+                },
+                due_apply(due_days),
+            ],
             meta: test_meta("pay"),
         }
     }
@@ -6889,7 +8754,7 @@ mod tests {
             .insert("invoice_date".into(), Value::Instant(invoice));
         case.evidence.push(EvidenceItem {
             schema: "PaymentRecord".into(),
-            value: Value::Entity("Payer".into()),
+            value: payment_record("pay", None),
             observed_at: paid,
         });
         let module = duty_status_module(pay_duty(Guard::Satisfied, 0));
@@ -6905,7 +8770,11 @@ mod tests {
         let mut case = CaseRecord::default();
         case.facts
             .insert("invoice_date".into(), Value::Instant(invoice));
-        case.facts.insert("pay_performed".into(), Value::Bool(true));
+        case.evidence.push(EvidenceItem {
+            schema: "PaymentRecord".into(),
+            value: payment_record("pay", None),
+            observed_at: at,
+        });
         let module = duty_status_module(pay_duty(Guard::Satisfied, 30));
         let state = status_state(run_status_at(&module, &case, at));
         assert_eq!(state.status, fidryn_core::DutyStatus::Performed);
@@ -6913,13 +8782,13 @@ mod tests {
     }
 
     #[test]
-    fn duty_status_honors_named_late_fact_without_invoice_date() {
+    fn duty_status_rejects_missing_deadline_anchor_despite_named_late_fact() {
         let mut case = CaseRecord::default();
         case.facts.insert("pay_late".into(), Value::Bool(true));
         let module = duty_status_module(pay_duty(Guard::Satisfied, 10));
-        let state = status_state(run_module(&module, "q", &case, &mut Refusing).expect("evaluate"));
-        assert_eq!(state.status, fidryn_core::DutyStatus::Breached);
-        assert!(state.breached);
+        assert!(
+            matches!(run_module(&module, "q", &case, &mut Refusing), Err(EngineError::InvalidInput(message)) if message.contains("anchor"))
+        );
     }
 
     #[test]
@@ -6933,7 +8802,22 @@ mod tests {
             vec![CoreDecl::Duty(pay_duty(Guard::Satisfied, 30))],
         );
         let state = status_state(
-            run_module(&module, "q", &CaseRecord::default(), &mut Refusing).expect("evaluate"),
+            run_module(
+                &module,
+                "q",
+                &{
+                    let mut case = CaseRecord::default();
+                    case.facts.insert(
+                        "invoice_date".into(),
+                        Value::Instant(
+                            fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap(),
+                        ),
+                    );
+                    case
+                },
+                &mut Refusing,
+            )
+            .expect("evaluate"),
         );
         assert_eq!(state.status, fidryn_core::DutyStatus::Attached);
     }
@@ -6941,6 +8825,10 @@ mod tests {
     #[test]
     fn operative_assumptions_vec_does_not_make_duty_status_performed() {
         let mut case = CaseRecord::default();
+        case.facts.insert(
+            "invoice_date".into(),
+            Value::Instant(fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap()),
+        );
         case.assumptions.push(Assumption {
             id: "hyp-performed".into(),
             payload: Value::Ctor {
@@ -6961,6 +8849,10 @@ mod tests {
     fn duty_event_performed_without_grant_does_not_make_duty_status_performed() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let mut case = CaseRecord::default();
+        case.facts.insert(
+            "invoice_date".into(),
+            Value::Instant(fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap()),
+        );
         case.events.push(fidryn_core::LedgerEvent {
             kind: "duty".into(),
             valid_time: Interval::always(),
@@ -6981,9 +8873,13 @@ mod tests {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let payload = Value::Ctor {
             name: "Performed".into(),
-            fields: BTreeMap::new(),
+            fields: BTreeMap::from([("name".into(), Value::String("pay".into()))]),
         };
         let mut case = CaseRecord::default();
+        case.facts.insert(
+            "invoice_date".into(),
+            Value::Instant(fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap()),
+        );
         case.events.push(fidryn_core::LedgerEvent {
             kind: "assumption".into(),
             valid_time: Interval::always(),
@@ -7025,7 +8921,7 @@ mod tests {
     fn duty_step_fourth_arg_selects_instance() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let ctx = RunContext::new(t, t);
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let session = evaluate_session(
             &module_with_plan(
                 "q",
@@ -7072,7 +8968,7 @@ mod tests {
     fn duty_step_three_arg_is_person_on_default_instance() {
         let t = fidryn_core::Instant::parse("2026-01-01T00:00:00Z").unwrap();
         let ctx = RunContext::new(t, t);
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let session = evaluate_session(
             &module_with_plan(
                 "q",
@@ -7114,10 +9010,7 @@ mod tests {
             .insert("invoice_date".into(), Value::Instant(invoice));
         case.evidence.push(EvidenceItem {
             schema: "PaymentRecord".into(),
-            value: Value::Map(BTreeMap::from([(
-                "instance".into(),
-                Value::String("A".into()),
-            )])),
+            value: payment_record("pay", Some("A")),
             observed_at: paid,
         });
         let duty = pay_duty(Guard::Satisfied, 30);
@@ -7160,7 +9053,7 @@ mod tests {
     #[test]
     fn independent_transaction_atomic_does_not_keep_attach() {
         let module = compile_program("tests/programs/transaction-atomic.fr");
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let before = case.clone();
         let err = run_module(&module, "q", &case, &mut Refusing)
             .expect_err("illegal discharge must not commit");
@@ -7192,7 +9085,7 @@ mod tests {
                 duty_step_term("pay", "discharge"),
             ],
         });
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let err = run_module(&module_with_plan("q", plan), "q", &case, &mut Refusing)
             .expect_err("illegal discharge");
         assert!(
@@ -7264,7 +9157,7 @@ mod tests {
         let ctx = RunContext::new(t, t);
         let args = BTreeMap::new();
         let state = LegalState::new();
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let before = case.clone();
         let first = evaluate_session(
             &module,
@@ -7294,9 +9187,9 @@ mod tests {
         granted.facts.insert(
             "authority_grants".into(),
             Value::Set(vec![
-                Value::String("missing_action".into()),
-                Value::String("attach".into()),
-                Value::String("perform".into()),
+                grant_record("missing_action"),
+                grant_record("attach"),
+                grant_record("perform"),
             ]),
         );
         let second = resume(
@@ -7349,7 +9242,7 @@ mod tests {
         let ctx = RunContext::new(t, t);
         let args = BTreeMap::new();
         let state = LegalState::new();
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let first = evaluate_session(
             &module,
             &QueryName::from("q"),
@@ -7372,10 +9265,7 @@ mod tests {
         let mut granted = case.clone();
         granted.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![
-                Value::String("attach".into()),
-                Value::String("missing_action".into()),
-            ]),
+            Value::Set(vec![grant_record("attach"), grant_record("missing_action")]),
         );
         let second = resume(
             first,
@@ -7414,7 +9304,7 @@ mod tests {
         let ctx = RunContext::new(t, t);
         let args = BTreeMap::new();
         let state = LegalState::new();
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let first = evaluate_session(
             &module,
             &QueryName::from("q"),
@@ -7469,7 +9359,7 @@ mod tests {
         let ctx = RunContext::new(t, t);
         let args = BTreeMap::new();
         let state = LegalState::new();
-        let case = CaseRecord::default();
+        let case = authorized_case();
         let session = evaluate_session(
             &module,
             &QueryName::from("q"),
@@ -7494,10 +9384,7 @@ mod tests {
         let mut granted = case.clone();
         granted.facts.insert(
             "authority_grants".into(),
-            Value::Set(vec![
-                Value::String("attach".into()),
-                Value::String("release".into()),
-            ]),
+            Value::Set(vec![grant_record("attach"), grant_record("release")]),
         );
         let resumed = resume(
             session,

@@ -1,12 +1,8 @@
 //! v0.1 no-false-determinacy acceptance tests.
 
-use fidryn_check::check;
-use fidryn_core::ir::QueryPlan;
-use fidryn_core::{CaseRecord, Outcome, QueryName, RunContext, SourceManifest, Term, Value};
-use fidryn_eval::{evaluate, seed_initial_occupancy};
+use fidryn_core::{CaseRecord, Outcome, QueryName, RunContext, Value};
+use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
-use fidryn_hir::elaborate;
-use fidryn_syntax::parse_file;
 use fidryn_verify::{
     Determinacy, PropertyVerdict, check_determinacy, explore_query, skeptical, verify_property,
 };
@@ -19,37 +15,9 @@ fn root() -> PathBuf {
 }
 
 fn compile_trust() -> fidryn_core::CoreModule {
-    let src = fs::read_to_string(root().join("examples/trust/bryan-revocable-trust.fr")).unwrap();
-    let parsed = parse_file(&src);
-    assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
-    let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
-    let mut module = check(&hir, &SourceManifest::default()).unwrap();
-    for query in &mut module.queries {
-        if let QueryPlan::UniqueOccupant { office } = &mut query.plan {
-            *office = Term::Ident(office_label(office));
-        }
-    }
-    module
-}
-
-fn office_label(office: &Term) -> String {
-    match office {
-        Term::Ident(name) | Term::String(name) => name.clone(),
-        Term::Apply { ctor, args } => format_office(ctor, args),
-        Term::Call { callee, args } => format_office(callee, args),
-        other => format!("{other:?}"),
-    }
-}
-
-fn format_office(ctor: &str, args: &[Term]) -> String {
-    if args.is_empty() {
-        ctor.to_owned()
-    } else {
-        format!(
-            "{ctor}({})",
-            args.iter().map(office_label).collect::<Vec<_>>().join(",")
-        )
-    }
+    fidryn_driver::Driver::new()
+        .check(&root().join("examples/trust/bryan-revocable-trust.fr"))
+        .unwrap_or_else(|diagnostics| panic!("trust source failed: {diagnostics:?}"))
 }
 
 fn load_case(name: &str) -> CaseRecord {
@@ -58,7 +26,7 @@ fn load_case(name: &str) -> CaseRecord {
 }
 
 fn at() -> fidryn_core::Instant {
-    fidryn_core::Instant::parse("2033-01-01T00:00:00Z").unwrap()
+    fidryn_core::Instant::parse("2026-08-24T12:00:00Z").unwrap()
 }
 
 trait IntoWorldOutcome {
@@ -79,17 +47,9 @@ impl<E: std::fmt::Display> IntoWorldOutcome for Result<Outcome<Value>, E> {
     }
 }
 
-fn eval_out(
-    module: &fidryn_core::CoreModule,
-    query: &str,
-    case: &CaseRecord,
-    seed_bryan: bool,
-) -> Outcome<Value> {
+fn eval_out(module: &fidryn_core::CoreModule, query: &str, case: &CaseRecord) -> Outcome<Value> {
     let t = at();
-    let mut state = case.into_state();
-    if seed_bryan {
-        seed_initial_occupancy(&mut state, "Bryan", "TrusteeOf(BRT)", t);
-    }
+    let state = case.into_state();
     let mut handler = CaseFile {
         record: case.clone(),
         known_at: Some(t),
@@ -115,7 +75,7 @@ fn trust_module_parses() {
 fn one_certificate_without_checked_certificate_is_suspended() {
     let module = compile_trust();
     let case = load_case("one-certificate.json");
-    let out = eval_out(&module, "acting_trustee", &case, true);
+    let out = eval_out(&module, "acting_trustee", &case);
     assert!(
         matches!(out, Outcome::Suspended { .. }),
         "ignored open issues without a CheckedCertificate must be Suspended: {out:?}"
@@ -126,21 +86,14 @@ fn one_certificate_without_checked_certificate_is_suspended() {
 fn uncertified_open_branch_is_suspended() {
     let module = compile_trust();
     let case = load_case("bob-plus-open-alice.json");
-    let out = eval_out(&module, "acting_trustee", &case, true);
+    let out = eval_out(&module, "acting_trustee", &case);
     assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
-}
-
-fn with_incumbent(mut case: CaseRecord) -> CaseRecord {
-    case.facts
-        .entry("acting_trustee".into())
-        .or_insert_with(|| Value::Entity("Bryan".into()));
-    case
 }
 
 #[test]
 fn two_interpretations_are_contingent() {
     let module = compile_trust();
-    let case = with_incumbent(load_case("two-certificates-open-eligibility.json"));
+    let case = load_case("two-certificates-open-eligibility.json");
     let t = at();
     let ctx = RunContext::new(t, t);
     let out =
@@ -174,9 +127,9 @@ fn two_interpretations_are_contingent() {
 #[test]
 fn court_selects_i2_determinate_bob() {
     let module = compile_trust();
-    let case = with_incumbent(load_case("court-selects-i2.json"));
+    let case = load_case("court-selects-i2.json");
     let t = at();
-    let out = eval_out(&module, "acting_trustee", &case, true);
+    let out = eval_out(&module, "acting_trustee", &case);
     match out {
         Outcome::Determinate { value, .. } => assert_eq!(value.display_label(), "Bob"),
         other => panic!("{other:?}"),
@@ -238,4 +191,29 @@ fn skeptical_preserves_suspended_open_branch() {
     )
     .expect("skeptical");
     assert!(matches!(out, Outcome::Suspended { .. }), "{out:?}");
+}
+
+#[test]
+fn stale_physician_records_do_not_authorize_later_succession() {
+    let module = compile_trust();
+    let case = load_case("court-selects-i2.json");
+    let at = fidryn_core::Instant::parse("2034-03-01T09:00:00Z").unwrap();
+    let mut handler = CaseFile {
+        record: case.clone(),
+        known_at: Some(at),
+    };
+    let outcome = evaluate(
+        &module,
+        &QueryName::from("acting_trustee"),
+        &Default::default(),
+        &case.into_state(),
+        &RunContext::new(at, at),
+        &mut handler,
+        &case,
+    )
+    .unwrap();
+    assert!(
+        matches!(outcome, Outcome::Suspended { .. }),
+        "expired source-policy evidence must remain unresolved: {outcome:?}"
+    );
 }

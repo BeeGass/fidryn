@@ -6,8 +6,23 @@
   },
   "evidence": [
     {
+      "schema": "OccupancyRecord",
+      "value": {
+        "person": "Bryan",
+        "office": "TrusteeOf(BRT)"
+      },
+      "observedAt": "2026-08-23T12:00:00Z"
+    },
+    {
       "schema": "PhysicianCertificate",
-      "value": "certificate-1",
+      "value": {
+        "issuer": "PhysicianOne",
+        "subject": "Bryan",
+        "purpose": "Administer(BRT)",
+        "conclusion": "Supports",
+        "examined_at": "2026-08-23T10:00:00Z",
+        "signed_at": "2026-08-23T11:00:00Z"
+      },
       "observedAt": "2026-08-23T12:00:00Z"
     }
   ],
@@ -15,16 +30,28 @@
   "interpretations": {},
   "decisions": {},
   "closures": [
-    { "domain": "certificates_received", "closed": true }
+    {
+      "domain": "certificates_received",
+      "closed": true
+    }
   ],
-  "outsideScope": ["tax", "creditor_priority"],
+  "outsideScope": [
+    "tax",
+    "creditor_priority"
+  ],
   "admissibleCompletions": {
     "interpretations": {
-      "SuccessorEligibility": ["I1", "I2"]
+      "SuccessorEligibility": [
+        "I1",
+        "I2"
+      ]
     },
     "evidence": {
       "SecondConcurringCertificate": {
-        "responses": ["absent", "present_prospective"],
+        "responses": [
+          "absent",
+          "present_prospective"
+        ],
         "effectOnValidTime": "unchanged_if_after_query_valid_time"
       }
     },

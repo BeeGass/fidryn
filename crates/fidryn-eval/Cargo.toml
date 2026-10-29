@@ -18,3 +18,4 @@ time.workspace = true
 fidryn-check.workspace = true
 fidryn-hir.workspace = true
 fidryn-syntax.workspace = true
+serde_json.workspace = true

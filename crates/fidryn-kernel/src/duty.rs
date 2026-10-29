@@ -91,6 +91,10 @@ fn eval_duty_status(
         DerivedWorld::compute(module, overlay, ctx, args).map_err(|err| err.to_string())?;
     let attaches_held = derived.is_guard_held(&duty.attaches, overlay, ctx);
     let attaches_denied = derived.is_guard_denied(&duty.attaches, overlay, ctx);
+    if attaches_held {
+        fidryn_eval::duty::validate_deadline(&duty.content, overlay)
+            .map_err(|error| error.to_string())?;
+    }
     let performed_held =
         derived.holds_named("performed") || derived.holds_named(&format!("{name}_performed"));
     let state = surface_duty_state(
