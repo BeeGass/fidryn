@@ -81,17 +81,17 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - run: cargo test --workspace --all-features --locked
       - name: Build and verify native package
-        run: cargo xtask package --output-dir target/packages
+        run: cargo xtask package --output-dir "${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: fidryn-${{ matrix.os }}
           if-no-files-found: error
           path: |
-            target/packages/*.tar.gz
-            target/packages/*.zip
-            target/packages/*.sha256
-            target/packages/*.blake3
-            target/packages/*.manifest.json
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.tar.gz
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.zip
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.sha256
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.blake3
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.manifest.json
   security:
     name: Security
     runs-on: ubuntu-24.04

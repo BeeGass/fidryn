@@ -153,3 +153,21 @@ checks and artifact uploads succeeded in both push and PR runs. PR CodeQL also
 passed. Its clean local Linux package was built from5e7cd4d with dirty:false;
 that artifact does not qualify the subsequent path correction. The final
 committed candidate must be repackaged and checked remotely.
+
+
+## Final local gate and CI cache correction
+
+The committed review-path candidate 083a63c passed the complete canonical local
+`cargo xtask ci --fmt`: 1174 Rust tests, 14 Python controls, 52 JavaScript tests,
+all required lint/type/doc/schema/site checks and benchmark compilation. A clean
+Linux package from that exact commit passed extraction, file hashes and CLI smoke
+checks (`/cache/tmp/fidryn-0.2.0-final-ci.log` and clean-package log).
+
+PR CI 40970378283 then passed Linux and macOS workspace tests but correctly
+refused packaging into a cached `target/packages` directory restored without its
+hidden ownership marker. CI now creates package output under a fresh runner temp
+directory scoped by run id and attempt, with matching artifact-upload globs.
+The refusal to overwrite unowned data is preserved. Actionlint and all 14 Python
+controls passed after this workflow correction. New exact-candidate remote
+qualification and a clean package remain required; previous failed job statuses
+are not upgraded to success.
