@@ -9,6 +9,7 @@ rust-version.workspace = true
 description = "Fidryn proof-relevant traces and canonical JSON"
 
 [dependencies]
+fidryn-kernel.workspace = true
 fidryn-core.workspace = true
 indexmap.workspace = true
 serde.workspace = true

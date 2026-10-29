@@ -53,6 +53,14 @@ pub struct TraceNode {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub enum TraceKind {
+    Evaluation,
+    RuleApplication,
+    AuthorityCheck,
+    TemporalFilter,
+    InstitutionalTransition,
+    Transaction,
+    Invocation,
+    Foundation,
     SourceText,
     StrictRuleApplication,
     DefeasibleRuleApplication,
@@ -147,6 +155,12 @@ pub fn reject_lossy_export<T>(report: &EvaluationReport<T>) -> Result<(), String
     if report.trust != TrustProfile::Unauthenticated {
         dropped.push("sourceTrust");
     }
+    if report.request.is_some() {
+        dropped.push("invocation");
+    }
+    if report.source_bundle.is_some() {
+        dropped.push("sourceBundle");
+    }
     if dropped.is_empty() {
         Ok(())
     } else {
@@ -189,6 +203,13 @@ pub const REPORT_QUALIFICATION_FIELDS: &[&str] = &[
     "sourceTrust",
     "assumptions",
     "verificationMethod",
+    "coverage",
+    "invocation",
+    "invocationId",
+    "sourceBundle",
+    "engineVersion",
+    "engineArtifact",
+    "searchEvidence",
 ];
 
 /// Canonical evaluation-report envelope (`fidryn.evaluation-report/v0.1`).
@@ -207,6 +228,20 @@ pub struct EvaluationReportDocument {
     #[serde(default)]
     pub coverage: Option<CoverageWitness>,
     pub outcome_document: OutcomeDocument,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub invocation: Option<fidryn_core::ExecutionRequest>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub invocation_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_bundle: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub engine_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub engine_artifact: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace_document: Option<TraceDocument>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search_evidence: Option<fidryn_core::CompletionSearchEvidence>,
 }
 
 /// Wrap [`outcome_document`] as `outcomeDocument` plus report fields.
@@ -231,7 +266,57 @@ pub fn report_document(
         assumptions: report.assumptions.clone(),
         coverage: report.coverage.clone(),
         outcome_document: outcome_document(module, query, valid, known, case, &report.outcome),
+        invocation: None,
+        invocation_id: None,
+        source_bundle: None,
+        engine_version: None,
+        engine_artifact: None,
+        trace_document: None,
+        search_evidence: None,
     }
+}
+
+/// Invocation-bound v0.2 export. Qualification is accepted only from the kernel boundary.
+pub fn render_checked_report(
+    module: &CoreModule,
+    query: &QueryName,
+    valid: Instant,
+    known: Instant,
+    case: &CaseRecord,
+    checked: &fidryn_kernel::CheckedEvaluation,
+) -> Result<String, String> {
+    let report = checked.report();
+    let request = report
+        .request
+        .as_ref()
+        .ok_or("checked report has no invocation")?;
+    let mut actual = fidryn_core::ExecutionRequest::from_eval(
+        module,
+        query.as_str(),
+        &request.args,
+        case,
+        &fidryn_core::RunContext::new(valid, known),
+        report.execution_mode,
+    )?;
+    actual.operation = request.operation;
+    actual.budget = request.budget;
+    if actual != *request {
+        return Err("report export context does not match the checked invocation".into());
+    }
+    let mut document = report_document(module, query, valid, known, case, report);
+    document.schema = "fidryn.evaluation-report/v0.2".into();
+    document.invocation = report.request.clone();
+    document.invocation_id = report
+        .request
+        .as_ref()
+        .map(|request| request.identity().hex());
+    document.source_bundle = report.source_bundle.clone();
+    document.engine_version = Some(format!(
+        "fidryn/{};semantics=0.2",
+        env!("CARGO_PKG_VERSION")
+    ));
+    document.search_evidence = checked.exploration_evidence().cloned();
+    canonical_json(&document).map_err(|error| error.to_string())
 }
 
 /// Canonical JSON for [`report_document`].
@@ -353,6 +438,15 @@ fn rename_field(obj: &mut serde_json::Map<String, serde_json::Value>, from: &str
 }
 
 fn trace_document_from_value(value: &serde_json::Value) -> TraceDocument {
+    if let Some(trace) = value.get("traceDocument") {
+        return trace_document_from_value(trace);
+    }
+    if let Some(report) = value.get("report") {
+        return trace_document_from_value(report);
+    }
+    if let Some(outcome) = value.get("outcomeDocument") {
+        return trace_document_from_value(outcome);
+    }
     if is_trace_artifact(value)
         && let Ok(doc) = serde_json::from_value::<TraceDocument>(value.clone())
     {
@@ -605,8 +699,10 @@ mod tests {
     #[test]
     fn source_snapshot_uses_module_snapshot_identity() {
         let module = sample_module();
-        let mut case = CaseRecord::default();
-        case.module = Some("Examples.T".into());
+        let case = CaseRecord {
+            module: Some("Examples.T".into()),
+            ..CaseRecord::default()
+        };
         let json = render_sample(&module, &case);
         let doc: OutcomeDocument = serde_json::from_str(&json).unwrap();
         assert_eq!(doc.source_snapshot, module.snapshot.hex());
@@ -630,8 +726,10 @@ mod tests {
             vec!["tax".to_string(), "creditor_priority".to_string()]
         );
 
-        let mut case = CaseRecord::default();
-        case.outside_scope = vec!["tax".into()];
+        let case = CaseRecord {
+            outside_scope: vec!["tax".into()],
+            ..CaseRecord::default()
+        };
         let json = render_sample(&module, &case);
         assert!(
             json.contains("creditor_priority"),
@@ -864,6 +962,13 @@ mod tests {
                 "sourceTrust",
                 "assumptions",
                 "verificationMethod",
+                "coverage",
+                "invocation",
+                "invocationId",
+                "sourceBundle",
+                "engineVersion",
+                "engineArtifact",
+                "searchEvidence",
             ]
         );
         let parsed: EvaluationReportDocument = serde_json::from_str(&json).unwrap();

@@ -4,11 +4,30 @@
   "title": "fidryn.mill-evaluation-response/v0.1",
   "$comment": "HTTP success transport for mill /api/run and /api/explore. ok and opinion are not fields of fidryn.evaluation-report/v0.1. opinion holds plain sentences filled from the report by fixed templates. Error bodies use a different shape ({ok: false, ...}) and are not this schema.",
   "type": "object",
-  "required": ["ok", "report"],
+  "required": [
+    "ok",
+    "report"
+  ],
   "additionalProperties": false,
   "properties": {
-    "ok": { "const": true },
-    "report": { "$ref": "evaluation-report-v0.1.json" },
-    "opinion": { "type": "array", "items": { "type": "string" } }
+    "ok": {
+      "const": true
+    },
+    "report": {
+      "anyOf": [
+        {
+          "$ref": "evaluation-report-v0.1.json"
+        },
+        {
+          "$ref": "evaluation-report-v0.2.json"
+        }
+      ]
+    },
+    "opinion": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
   }
 }

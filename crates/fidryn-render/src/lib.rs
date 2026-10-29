@@ -1,10 +1,10 @@
-//! Constrained templates. Missing keys fail closed.
+//! Parsed, bounded templates over typed values. Missing keys fail closed.
 //!
-//! Interpolation is not semantic certification. A path segment named
-//! `certified` does not approve a template. Approval is an explicit
-//! digest plus `CertifiedTemplate::approved`.
+//! Interpolation is not semantic certification. Template approval is an
+//! explicit digest plus `CertifiedTemplate::approved`.
 
 use fidryn_core::{CoreModule, Value};
+use serde_json::Value as JsonValue;
 use std::collections::BTreeMap;
 use thiserror::Error;
 
@@ -12,10 +12,353 @@ use thiserror::Error;
 pub enum RenderError {
     #[error("missing template key `{0}`")]
     MissingKey(String),
+    #[error("malformed template at byte {offset}: {message}")]
+    MalformedTemplate { offset: usize, message: String },
+    #[error("template key `{path}` requires {expected}, found {actual}")]
+    TypeMismatch {
+        path: String,
+        expected: &'static str,
+        actual: &'static str,
+    },
+    #[error("template {resource} limit exceeded ({limit})")]
+    LimitExceeded {
+        resource: &'static str,
+        limit: usize,
+    },
     #[error("template `{0}` is not certified for semantics-preserving claims")]
     Uncertified(String),
     #[error("template digest mismatch")]
     DigestMismatch,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RenderLimits {
+    pub max_template_bytes: usize,
+    pub max_nesting: usize,
+    pub max_nodes: usize,
+    pub max_iterations: usize,
+    pub max_steps: usize,
+    pub max_output_bytes: usize,
+}
+
+impl Default for RenderLimits {
+    fn default() -> Self {
+        Self {
+            max_template_bytes: 1_048_576,
+            max_nesting: 32,
+            max_nodes: 100_000,
+            max_iterations: 10_000,
+            max_steps: 1_000_000,
+            max_output_bytes: 8_388_608,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Node {
+    Text(String),
+    Interpolate(ValuePath),
+    Each { path: ValuePath, body: Vec<Node> },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ValuePath {
+    source: String,
+    parents: usize,
+    root: bool,
+    segments: Vec<String>,
+}
+
+impl ValuePath {
+    fn parse(source: &str, offset: usize) -> Result<Self, RenderError> {
+        let mut rest = source;
+        let mut parents = 0;
+        while let Some(tail) = rest.strip_prefix("../") {
+            parents += 1;
+            rest = tail;
+        }
+        let root = rest == "@root" || rest.starts_with("@root.");
+        if root {
+            if parents > 0 {
+                return Err(malformed(offset, "root paths cannot have parent prefixes"));
+            }
+            rest = rest.strip_prefix("@root").unwrap();
+            rest = rest.strip_prefix('.').unwrap_or(rest);
+        }
+        let segments = if rest.is_empty() && root {
+            Vec::new()
+        } else {
+            rest.split('.').map(str::to_owned).collect::<Vec<_>>()
+        };
+        if segments.iter().any(|segment| {
+            segment.is_empty()
+                || !segment
+                    .chars()
+                    .all(|c| c.is_alphanumeric() || c == '_' || c == '-')
+        }) || (segments.is_empty() && !root)
+        {
+            return Err(malformed(offset, "expected a field path"));
+        }
+        Ok(Self {
+            source: source.into(),
+            parents,
+            root,
+            segments,
+        })
+    }
+}
+
+/// A template parsed once before any values are interpolated.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Template {
+    nodes: Vec<Node>,
+    limits: RenderLimits,
+}
+
+impl Template {
+    pub fn parse(source: &str) -> Result<Self, RenderError> {
+        Self::parse_with_limits(source, RenderLimits::default())
+    }
+
+    pub fn parse_with_limits(source: &str, limits: RenderLimits) -> Result<Self, RenderError> {
+        if source.len() > limits.max_template_bytes {
+            return Err(limit("source bytes", limits.max_template_bytes));
+        }
+        let mut parser = TemplateParser {
+            source,
+            offset: 0,
+            node_count: 0,
+            limits,
+        };
+        let nodes = parser.parse_nodes(0, false)?;
+        Ok(Self { nodes, limits })
+    }
+
+    pub fn render_values(&self, values: &JsonValue) -> Result<String, RenderError> {
+        let mut renderer = Renderer {
+            root: values,
+            output: String::new(),
+            iterations: 0,
+            steps: 0,
+            limits: self.limits,
+        };
+        renderer.render_nodes(&self.nodes, &mut Vec::new())?;
+        Ok(renderer.output)
+    }
+}
+
+struct TemplateParser<'a> {
+    source: &'a str,
+    offset: usize,
+    node_count: usize,
+    limits: RenderLimits,
+}
+
+impl TemplateParser<'_> {
+    fn push(&mut self, nodes: &mut Vec<Node>, node: Node) -> Result<(), RenderError> {
+        if self.node_count >= self.limits.max_nodes {
+            return Err(limit("nodes", self.limits.max_nodes));
+        }
+        self.node_count += 1;
+        nodes.push(node);
+        Ok(())
+    }
+
+    fn parse_nodes(&mut self, depth: usize, in_each: bool) -> Result<Vec<Node>, RenderError> {
+        // Keep the recursive parser bounded even if a caller raises its limit.
+        let nesting_limit = self.limits.max_nesting.min(128);
+        if depth > nesting_limit {
+            return Err(limit("nesting", nesting_limit));
+        }
+        let mut nodes = Vec::new();
+        while self.offset < self.source.len() {
+            let rest = &self.source[self.offset..];
+            let next_open = rest.find("{{");
+            if let Some(close) = rest.find("}}")
+                && next_open.is_none_or(|open| close < open)
+            {
+                return Err(malformed(self.offset + close, "unexpected `}}`"));
+            }
+            let Some(start) = next_open else {
+                self.push(&mut nodes, Node::Text(rest.into()))?;
+                self.offset = self.source.len();
+                break;
+            };
+            if start > 0 {
+                self.push(&mut nodes, Node::Text(rest[..start].into()))?;
+            }
+            self.offset += start;
+            let tag_offset = self.offset;
+            let after = &self.source[self.offset + 2..];
+            let end = after
+                .find("}}")
+                .ok_or_else(|| malformed(tag_offset, "unclosed tag"))?;
+            let tag = after[..end].trim();
+            self.offset += 2 + end + 2;
+            if tag == "/each" {
+                if !in_each {
+                    return Err(malformed(tag_offset, "unexpected `/each`"));
+                }
+                return Ok(nodes);
+            }
+            if let Some(path) = tag.strip_prefix("#each")
+                && path.starts_with(char::is_whitespace)
+            {
+                let path = ValuePath::parse(path.trim(), tag_offset)?;
+                let body = self.parse_nodes(depth + 1, true)?;
+                self.push(&mut nodes, Node::Each { path, body })?;
+            } else if tag.starts_with(['#', '/']) {
+                return Err(malformed(tag_offset, "unsupported or malformed block tag"));
+            } else {
+                let path = ValuePath::parse(tag, tag_offset)?;
+                self.push(&mut nodes, Node::Interpolate(path))?;
+            }
+        }
+        if in_each {
+            Err(malformed(self.offset, "unclosed `each` block"))
+        } else {
+            Ok(nodes)
+        }
+    }
+}
+
+struct Renderer<'a> {
+    root: &'a JsonValue,
+    output: String,
+    iterations: usize,
+    steps: usize,
+    limits: RenderLimits,
+}
+
+impl<'a> Renderer<'a> {
+    fn append(&mut self, text: &str) -> Result<(), RenderError> {
+        if self
+            .output
+            .len()
+            .checked_add(text.len())
+            .is_none_or(|size| size > self.limits.max_output_bytes)
+        {
+            return Err(limit("output bytes", self.limits.max_output_bytes));
+        }
+        self.output.push_str(text);
+        Ok(())
+    }
+
+    fn resolve(
+        &self,
+        path: &ValuePath,
+        scopes: &[&'a JsonValue],
+    ) -> Result<&'a JsonValue, RenderError> {
+        let missing = || RenderError::MissingKey(path.source.clone());
+        let scope = if path.root {
+            self.root
+        } else if path.parents > scopes.len() {
+            return Err(missing());
+        } else {
+            scopes
+                .len()
+                .checked_sub(path.parents + 1)
+                .and_then(|index| scopes.get(index))
+                .copied()
+                .unwrap_or(self.root)
+        };
+        let mut segments = path.segments.iter();
+        let mut value = if path.root {
+            scope
+        } else if let Some(first) = segments.next() {
+            if first == "item" || first == "this" {
+                scope
+            } else {
+                scope
+                    .get(first)
+                    .or_else(|| self.root.get(first))
+                    .ok_or_else(missing)?
+            }
+        } else {
+            scope
+        };
+        for segment in segments {
+            value = match value {
+                JsonValue::Array(items) => segment
+                    .parse::<usize>()
+                    .ok()
+                    .and_then(|index| items.get(index)),
+                JsonValue::Object(fields) => fields.get(segment),
+                _ => None,
+            }
+            .ok_or_else(missing)?;
+        }
+        Ok(value)
+    }
+
+    fn render_nodes(
+        &mut self,
+        nodes: &[Node],
+        scopes: &mut Vec<&'a JsonValue>,
+    ) -> Result<(), RenderError> {
+        for node in nodes {
+            if self.steps >= self.limits.max_steps {
+                return Err(limit("steps", self.limits.max_steps));
+            }
+            self.steps += 1;
+            match node {
+                Node::Text(text) => self.append(text)?,
+                Node::Interpolate(path) => match self.resolve(path, scopes)? {
+                    JsonValue::String(text) => self.append(text)?,
+                    JsonValue::Bool(value) => self.append(if *value { "true" } else { "false" })?,
+                    JsonValue::Number(value) => self.append(&value.to_string())?,
+                    value => {
+                        return Err(RenderError::TypeMismatch {
+                            path: path.source.clone(),
+                            expected: "a string, number, or Boolean",
+                            actual: value_kind(value),
+                        });
+                    }
+                },
+                Node::Each { path, body } => {
+                    let value = self.resolve(path, scopes)?;
+                    let items = value.as_array().ok_or_else(|| RenderError::TypeMismatch {
+                        path: path.source.clone(),
+                        expected: "an array",
+                        actual: value_kind(value),
+                    })?;
+                    for item in items {
+                        if self.iterations >= self.limits.max_iterations {
+                            return Err(limit("iterations", self.limits.max_iterations));
+                        }
+                        self.iterations += 1;
+                        scopes.push(item);
+                        let result = self.render_nodes(body, scopes);
+                        scopes.pop();
+                        result?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+fn malformed(offset: usize, message: &str) -> RenderError {
+    RenderError::MalformedTemplate {
+        offset,
+        message: message.into(),
+    }
+}
+
+fn limit(resource: &'static str, limit: usize) -> RenderError {
+    RenderError::LimitExceeded { resource, limit }
+}
+
+fn value_kind(value: &JsonValue) -> &'static str {
+    match value {
+        JsonValue::Null => "null",
+        JsonValue::Bool(_) => "a Boolean",
+        JsonValue::Number(_) => "a number",
+        JsonValue::String(_) => "a string",
+        JsonValue::Array(_) => "an array",
+        JsonValue::Object(_) => "an object",
+    }
 }
 
 /// Explicit approval record. A directory named `certified` is not this.
@@ -35,101 +378,81 @@ pub fn template_digest(source: &str) -> String {
     hasher.finalize().to_hex().to_string()
 }
 
-/// Interpolate only. The result is not a certified legal claim.
+/// Interpolate strings. Iteration requires [`render_values`] with an array.
 pub fn render(template: &str, vars: &BTreeMap<String, String>) -> Result<String, RenderError> {
-    let mut out = String::new();
-    let mut rest = template;
-    while let Some(start) = rest.find("{{") {
-        out.push_str(&rest[..start]);
-        let after = &rest[start + 2..];
-        let Some(end) = after.find("}}") else {
-            out.push_str("{{");
-            rest = after;
-            continue;
-        };
-        let key = after[..end].trim();
-        if let Some(each_key) = each_block_key(key) {
-            let Some(list) = vars.get(each_key) else {
-                return Err(RenderError::MissingKey(each_key.to_owned()));
-            };
-            let body_and_rest = &after[end + 2..];
-            let Some((inner, after_block)) = split_each_body(body_and_rest) else {
-                return Err(RenderError::MissingKey("/each".into()));
-            };
-            for item in list.split(", ") {
-                let mut item_vars = vars.clone();
-                item_vars.insert("item".into(), item.to_owned());
-                out.push_str(&render(inner, &item_vars)?);
-            }
-            rest = after_block;
-            continue;
-        }
-        let Some(value) = vars.get(key) else {
-            return Err(RenderError::MissingKey(key.to_owned()));
-        };
-        out.push_str(value);
-        rest = &after[end + 2..];
-    }
-    out.push_str(rest);
-    Ok(out)
+    let values = JsonValue::Object(
+        vars.iter()
+            .map(|(key, value)| (key.clone(), JsonValue::String(value.clone())))
+            .collect(),
+    );
+    render_values(template, &values)
 }
 
-fn each_block_key(tag: &str) -> Option<&str> {
-    let rest = tag.strip_prefix("#each")?;
-    if rest.is_empty() {
-        return Some("");
-    }
-    if rest.starts_with(|c: char| c.is_whitespace()) {
-        return Some(rest.trim());
-    }
-    None
+/// Render scalar paths and nested `each` blocks over JSON arrays of typed values.
+/// `item` addresses the current element, `../item` its parent, and `@root` the root.
+pub fn render_values(template: &str, values: &JsonValue) -> Result<String, RenderError> {
+    Template::parse(template)?.render_values(values)
 }
 
-fn split_each_body(src: &str) -> Option<(&str, &str)> {
-    let mut rest = src;
-    let mut offset = 0;
-    while let Some(rel) = rest.find("{{") {
-        let after = &rest[rel + 2..];
-        let end = after.find("}}")?;
-        if after[..end].trim() == "/each" {
-            let close_start = offset + rel;
-            let close_end = close_start + 2 + end + 2;
-            return Some((&src[..close_start], &src[close_end..]));
-        }
-        let consumed = rel + 2 + end + 2;
-        offset += consumed;
-        rest = &rest[consumed..];
-    }
-    None
-}
-
-/// Interpolate only if the digest matches and `approved` is set.
-/// Path names such as `templates/certified/` do not satisfy this.
-pub fn render_certified(
-    spec: CertifiedTemplate<'_>,
-    vars: &BTreeMap<String, String>,
+pub fn render_values_with_limits(
+    template: &str,
+    values: &JsonValue,
+    limits: RenderLimits,
 ) -> Result<String, RenderError> {
+    Template::parse_with_limits(template, limits)?.render_values(values)
+}
+
+fn require_approval(spec: &CertifiedTemplate<'_>) -> Result<(), RenderError> {
     if !spec.approved {
         return Err(RenderError::Uncertified(spec.name.to_owned()));
     }
     if template_digest(spec.source) != spec.digest_hex {
         return Err(RenderError::DigestMismatch);
     }
+    Ok(())
+}
+
+/// Interpolate only if the digest matches and `approved` is set.
+pub fn render_certified(
+    spec: CertifiedTemplate<'_>,
+    vars: &BTreeMap<String, String>,
+) -> Result<String, RenderError> {
+    require_approval(&spec)?;
     render(spec.source, vars)
 }
 
-/// Interpolate Core module fields. Missing keys fail closed.
-/// Not certified unless [`render_certified`] is used.
+pub fn render_certified_values(
+    spec: CertifiedTemplate<'_>,
+    values: &JsonValue,
+) -> Result<String, RenderError> {
+    require_approval(&spec)?;
+    render_values(spec.source, values)
+}
+
+/// Render Core module metadata. Approval still requires [`render_certified_values`].
 pub fn render_module(template: &str, module: &CoreModule) -> Result<String, RenderError> {
-    render(template, &module_vars(module))
+    render_values(template, &module_values(module))
+}
+
+pub fn module_values(module: &CoreModule) -> JsonValue {
+    serde_json::json!({
+        "module": module.name,
+        "version": module.version,
+        "outside_scope": module.outside_scope,
+        "outside_scope_label": module.outside_scope.join(", "),
+    })
 }
 
 pub fn module_vars(module: &CoreModule) -> BTreeMap<String, String> {
-    let mut vars = BTreeMap::new();
-    vars.insert("module".into(), module.name.clone());
-    vars.insert("version".into(), module.version.clone());
-    vars.insert("outside_scope".into(), module.outside_scope.join(", "));
-    vars
+    BTreeMap::from([
+        ("module".into(), module.name.clone()),
+        ("version".into(), module.version.clone()),
+        ("outside_scope".into(), module.outside_scope.join(", ")),
+        (
+            "outside_scope_label".into(),
+            module.outside_scope.join(", "),
+        ),
+    ])
 }
 
 pub fn value_label(value: &Value) -> String {
@@ -141,106 +464,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn interpolates_and_fails_closed() {
-        let mut vars = BTreeMap::new();
-        vars.insert("name".into(), "Bryan".into());
+    fn strings_interpolate_and_missing_keys_fail_closed() {
+        let vars = BTreeMap::from([("name".into(), "Bryan".into())]);
         assert_eq!(
             render("Trustee: {{name}}", &vars).unwrap(),
             "Trustee: Bryan"
         );
-        assert!(matches!(
-            render("{{missing}}", &vars),
-            Err(RenderError::MissingKey(_))
-        ));
-    }
-
-    fn sample_module() -> CoreModule {
-        CoreModule {
-            id: fidryn_core::ModuleId::of(b"m"),
-            name: "Examples.T".into(),
-            version: "0.1.0".into(),
-            snapshot: fidryn_core::SourceSnapshotId::of(b"s"),
-            manifest: fidryn_core::SourceManifestId::of(b"m"),
-            jurisdiction: fidryn_core::JurisdictionId::of(b"j"),
-            outside_scope: vec!["tax".into(), "creditor_priority".into()],
-            declarations: vec![],
-            nominations: vec![],
-            queries: vec![],
-            verifications: vec![],
-            assertions: vec![],
-        }
-    }
-
-    #[test]
-    fn render_module_interpolates_core_fields() {
-        let module = sample_module();
-        let text = render_module(
-            "{{module}}@{{version}}\noutside: {{outside_scope}}\n",
-            &module,
-        )
-        .unwrap();
-        assert_eq!(text, "Examples.T@0.1.0\noutside: tax, creditor_priority\n");
-        assert!(matches!(
-            render_module("{{unknown}}", &module),
-            Err(RenderError::MissingKey(k)) if k == "unknown"
-        ));
-    }
-
-    #[test]
-    fn each_block_repeats_comma_separated_items() {
-        let mut vars = BTreeMap::new();
-        vars.insert("outside_scope".into(), "tax, creditor_priority".into());
-        vars.insert("module".into(), "Examples.T".into());
         assert_eq!(
-            render(
-                "{{module}}: {{#each outside_scope}}[{{item}}]{{/each}}",
-                &vars
-            )
-            .unwrap(),
-            "Examples.T: [tax][creditor_priority]"
+            render("{{missing}}", &vars),
+            Err(RenderError::MissingKey("missing".into()))
         );
         assert!(matches!(
-            render("{{#each missing}}{{item}}{{/each}}", &vars),
-            Err(RenderError::MissingKey(k)) if k == "missing"
-        ));
-        assert!(matches!(
-            render("{{#each outside_scope}}{{item}}", &vars),
-            Err(RenderError::MissingKey(k)) if k == "/each"
+            render("{{#each name}}{{item}}{{/each}}", &vars),
+            Err(RenderError::TypeMismatch { .. })
         ));
     }
 
     #[test]
-    fn path_named_certified_is_not_approval() {
-        let mut vars = BTreeMap::new();
-        vars.insert("module".into(), "Examples.T".into());
-        let source = "Module: {{module}}";
-        let spec = CertifiedTemplate {
+    fn path_names_never_approve_a_template() {
+        let values = serde_json::json!({"name": "Bryan"});
+        let source = "Trustee: {{name}}";
+        let mut spec = CertifiedTemplate {
             name: "templates/certified/instrument-outline.txt",
             source,
             digest_hex: "deadbeef",
             approved: false,
         };
         assert!(matches!(
-            render_certified(spec, &vars),
+            render_certified_values(spec.clone(), &values),
             Err(RenderError::Uncertified(_))
         ));
-        let spec = CertifiedTemplate {
-            name: "templates/certified/instrument-outline.txt",
-            source,
-            digest_hex: "deadbeef",
-            approved: true,
-        };
-        assert!(matches!(
-            render_certified(spec, &vars),
+        spec.approved = true;
+        assert_eq!(
+            render_certified_values(spec.clone(), &values),
             Err(RenderError::DigestMismatch)
-        ));
+        );
         let digest = template_digest(source);
-        let spec = CertifiedTemplate {
-            name: "instrument-outline",
-            source,
-            digest_hex: digest.as_str(),
-            approved: true,
-        };
-        assert_eq!(render_certified(spec, &vars).unwrap(), "Module: Examples.T");
+        spec.digest_hex = &digest;
+        assert_eq!(
+            render_certified_values(spec, &values).unwrap(),
+            "Trustee: Bryan"
+        );
     }
 }

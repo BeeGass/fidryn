@@ -22,6 +22,9 @@ http-body-util = "0.1.3"
 tower.workspace = true
 
 [dependencies]
+blake3.workspace = true
+fidryn-kernel.workspace = true
+fidryn-eval.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 fidryn-check.workspace = true
