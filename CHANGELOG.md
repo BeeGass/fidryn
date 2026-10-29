@@ -36,6 +36,8 @@ interchange schema versions are maintained independently of the interpreter.
 ### Fixed
 
 - Timestamp ordering and named record-constructor calls through nested functions.
+- Canonical portable review-bundle paths on Windows, including nested and missing
+  source observations.
 - Requirements and assertions discarded by parsing or lowering; untyped Boolean
   and result escapes; literal overflow and string/collection corruption.
 - Circular rule support, order-dependent conflicts, shared continuation frames,

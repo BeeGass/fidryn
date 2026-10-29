@@ -128,3 +128,28 @@ Final dependency scan covers267 dependencies and1386 cached advisories with zero
 vulnerabilities/warnings. Cargo deny bans/licenses/sources passed with the same
 two unused-license-allowance warnings; actionlint and current-tree Gitleaks passed.
 The general language/proof/resource obligations in the audit remain open.
+
+
+## Windows candidate finding and scoped correction
+
+At5e7cd4d, PR CI40969506655 and push CI40969500459 each exposed the same
+review-bundle regression on Windows: the exporter rebuilt validated components
+as a host PathBuf and emitted backslashes for nested archive paths. Review path
+serialization now joins those validated components with `/`; root/parent/UTF-8
+and separator validation is retained. The nested-manifest regression asserts all
+archive paths, source links and rerun paths, restores its exact layout while
+retaining missing inputs, and requires identical invocation/source-bundle
+identities after actual Driver rerun. A second regression refuses decoded
+manifest references containing platform-dependent separators before host path
+interpretation; exact source bytes are retained. Compatible filesystem name/case/
+normalization rules remain a documented restoration requirement. All122 CLI tests,
+focused CLI Clippy,
+formatting and release metadata checks passed after this correction. A fresh
+complete remote candidate run is still required; the older failed Windows jobs
+are not presented as successful qualification.
+
+The preceding candidate's Ubuntu and macOS package creation, extracted-binary
+checks and artifact uploads succeeded in both push and PR runs. PR CodeQL also
+passed. Its clean local Linux package was built from5e7cd4d with dirty:false;
+that artifact does not qualify the subsequent path correction. The final
+committed candidate must be repackaged and checked remotely.

@@ -97,6 +97,12 @@ semantic manifest is explicitly labeled; original manifest formatting is not
 reconstructed. Optional `--template` retains reviewer material. The review status
 remains `not_assessed`, separate from compilation, byte checks and execution.
 
+Archive paths use `/` independently of the exporting host. Restoring exact source
+bytes requires a filesystem that can represent the recorded names; case folding,
+Unicode normalization and reserved-name rules can differ between filesystems.
+The exporter does not rename retained source references to accommodate another
+filesystem, and the bundle does not provide a general archive importer.
+
 Source capture assumes a trusted local filesystem while files are observed.
 Static path and symlink checks do not provide descriptor-based isolation against
 hostile concurrent path replacement. Compilation uses exclusively created private

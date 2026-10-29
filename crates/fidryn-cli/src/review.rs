@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Read;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, Path};
 
 const MAX_CASE_BYTES: usize = 8 * 1024 * 1024;
 const MAX_ARCHIVE_INPUT_BYTES: usize = 64 * 1024 * 1024;
@@ -135,7 +135,7 @@ pub fn build_review(request: &ReviewRequest<'_>) -> Result<String, String> {
         Some(&case_bytes),
     )?;
     for (path, bytes) in artifact.source_inputs() {
-        let path = format!("program/{}", portable_path(Path::new(path))?);
+        let path = format!("program/{}", portable_path(portable_reference(path)?)?);
         insert_file(
             &mut files,
             &mut total_bytes,
@@ -164,7 +164,7 @@ pub fn build_review(request: &ReviewRequest<'_>) -> Result<String, String> {
         } else {
             raw.trim().to_owned()
         };
-        portable_path(&module_dir.join(path))?
+        portable_path(&module_dir.join(portable_reference(&path)?))?
     } else {
         portable_path(&module_dir.join("sources/manifest.json"))?
     };
@@ -187,7 +187,7 @@ pub fn build_review(request: &ReviewRequest<'_>) -> Result<String, String> {
         {
             collect_source_links(
                 &mut source_links,
-                &format!("program/{}", portable_path(Path::new(path))?),
+                &format!("program/{}", portable_path(portable_reference(path)?)?),
                 source,
             )?;
         }
@@ -318,8 +318,15 @@ fn insert_file(
     Ok(())
 }
 
+fn portable_reference(path: &str) -> Result<&Path, String> {
+    if path.contains(['\\', ':']) {
+        return Err("review input paths cannot contain platform-dependent separators".into());
+    }
+    Ok(Path::new(path))
+}
+
 fn portable_path(path: &Path) -> Result<String, String> {
-    let mut clean = PathBuf::new();
+    let mut clean = Vec::new();
     for component in path.components() {
         match component {
             Component::Normal(value) => {
@@ -332,7 +339,7 @@ fn portable_path(path: &Path) -> Result<String, String> {
                 clean.push(value);
             }
             Component::CurDir => {}
-            Component::ParentDir if clean.pop() => {}
+            Component::ParentDir if clean.pop().is_some() => {}
             _ => {
                 return Err(format!(
                     "source reference `{}` is not portable within the review root",
@@ -341,10 +348,7 @@ fn portable_path(path: &Path) -> Result<String, String> {
             }
         }
     }
-    let text = clean
-        .to_str()
-        .ok_or("review paths must be UTF-8")?
-        .to_owned();
+    let text = clean.join("/");
     if text.is_empty() {
         return Err("review input path is empty".into());
     }

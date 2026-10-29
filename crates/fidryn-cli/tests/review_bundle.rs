@@ -232,10 +232,87 @@ fn review_supports_nested_manifest_layout_and_retains_missing_observations() {
         archive["normalizedManifest"]["path"],
         "program/manifest.json"
     );
+    for entry in archive["files"].as_array().unwrap() {
+        let path = entry["path"].as_str().unwrap();
+        assert!(!path.contains('\\'), "nonportable review path: {path}");
+        assert!(path.split('/').all(|part| !matches!(part, "" | "." | "..")));
+    }
+    assert_eq!(archive["rerun"]["modulePath"], "program/nested/module.fr");
+    assert_eq!(
+        archive["sourceLinks"][0]["path"],
+        "program/nested/module.fr"
+    );
     let missing = file(&archive, "program/sources/missing.txt");
     assert_eq!(missing["availability"], "missing");
     assert!(missing["bytesHex"].is_null());
     assert_eq!(archive["qualification"]["sourceTrust"], "fixture");
+    let restored = Fixture::new();
+    for entry in archive["files"].as_array().unwrap() {
+        if let Some(bytes) = entry["bytesHex"].as_str() {
+            restored.write(entry["path"].as_str().unwrap(), &decode_hex(bytes));
+        }
+    }
+    assert!(!restored.0.join("program/sources/missing.txt").exists());
+    let mut driver = Driver::new();
+    let (artifact, _) = driver
+        .check_path_artifact_with_root(
+            &restored.0.join("program/nested/module.fr"),
+            &restored.0.join("program"),
+        )
+        .unwrap();
+    let case: CaseRecord =
+        serde_json::from_slice(&fs::read(restored.0.join("case/case-record.json")).unwrap())
+            .unwrap();
+    let checked = driver
+        .run_artifact_checked(&artifact, "q", &case, &ctx, false)
+        .unwrap();
+    assert!(matches!(
+        checked.report().outcome,
+        Outcome::Determinate {
+            value: RuntimeValue::Bool(true),
+            ..
+        }
+    ));
+    assert_eq!(
+        checked.report().request.as_ref().unwrap().identity().hex(),
+        archive["invocationId"]
+    );
+    assert_eq!(
+        artifact.sources().identity().hex(),
+        archive["sourceBundle"]["identity"]
+    );
+}
+
+#[test]
+fn review_refuses_platform_dependent_manifest_references() {
+    let fixture = Fixture::new();
+    let reference = r"sources\manifest.json";
+    fixture.write(
+        reference,
+        br#"{"schema":"fidryn.source-manifest/v0.1","snapshot":"S","jurisdiction":"Test","artifacts":[]}"#,
+    );
+    let source = format!(
+        "module Review.Path version \"0.1.0\" {{ source_manifest {}\n query q() -> Bool {{ return true }} }}",
+        serde_json::to_string(reference).unwrap()
+    );
+    let source_path = fixture.write("module.fr", source.as_bytes());
+    let case_path = fixture.write(
+        "case.json",
+        br#"{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}"#,
+    );
+    let ctx = context();
+    let error = build_review(&ReviewRequest {
+        path: &source_path,
+        query: "q",
+        case_path: &case_path,
+        context: &ctx,
+        scenario: false,
+        source_root: Some(&fixture.0),
+        template: None,
+        budget: None,
+    })
+    .unwrap_err();
+    assert!(error.contains("platform-dependent separators"), "{error}");
 }
 
 #[test]
