@@ -1,0 +1,24 @@
+name: Main source policy
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  source:
+    name: Main source policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require same-repository dev as the PR source
+        env:
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+          BASE_BRANCH: ${{ github.base_ref }}
+        run: |
+          test "$HEAD_REPOSITORY" = "$GITHUB_REPOSITORY"
+          test "$BASE_REPOSITORY" = "$GITHUB_REPOSITORY"
+          test "$HEAD_BRANCH" = dev
+          test "$BASE_BRANCH" = main

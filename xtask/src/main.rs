@@ -2,6 +2,7 @@
 
 mod bench;
 mod ci;
+mod governance;
 mod site;
 mod test;
 mod workspace;
@@ -31,6 +32,8 @@ enum Command {
     Ci(ci::CiArgs),
     /// Render the public site from docs/*.md (--check verifies the committed site)
     Site(site::SiteArgs),
+    /// Render or reconcile repository protection rules
+    Governance(governance::GovernanceArgs),
 }
 
 fn main() -> Result<()> {
@@ -39,5 +42,6 @@ fn main() -> Result<()> {
         Command::Bench(args) => bench::run(args),
         Command::Ci(args) => ci::run(args),
         Command::Site(args) => site::run(args),
+        Command::Governance(args) => governance::run(args),
     }
 }

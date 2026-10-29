@@ -63,7 +63,7 @@ const SPECS: &[Spec] = &[
         excerpt: TRUST_EXCERPT,
         case: Some("examples/trust/cases/two-certificates-open-eligibility.json"),
         query: "acting_trustee",
-        at: "2034-03-01T09:00:00Z",
+        at: "2026-08-24T09:00:00Z",
     },
     Spec {
         id: "trust-court",
@@ -72,7 +72,7 @@ const SPECS: &[Spec] = &[
         excerpt: TRUST_EXCERPT,
         case: Some("examples/trust/cases/court-selects-i2.json"),
         query: "acting_trustee",
-        at: "2034-03-01T09:00:00Z",
+        at: "2026-08-24T09:00:00Z",
     },
     Spec {
         id: "gate-q",
@@ -265,7 +265,7 @@ mod tests {
         assert_eq!(blocks.len(), 2, "{blocks:?}");
 
         let (first, family) = &blocks[0];
-        assert_eq!(*first, 47);
+        assert_eq!(*first, 52);
         assert!(
             family.starts_with("    interpretation_family SuccessorEligibility\n"),
             "{family}"
@@ -274,16 +274,16 @@ mod tests {
             family.ends_with("          or request Interpret\n    }"),
             "{family}"
         );
-        assert_eq!(family.lines().count(), 17, "lines 47 through 63");
+        assert_eq!(family.lines().count(), 17, "lines 52 through 68");
 
         let (first, query) = &blocks[1];
-        assert_eq!(*first, 205);
+        assert_eq!(*first, 210);
         assert!(query.starts_with("    query acting_trustee()\n"), "{query}");
         assert!(
             query.ends_with("            office TrusteeOf(BRT)\n        }\n    }"),
             "{query}"
         );
-        assert_eq!(query.lines().count(), 8, "lines 205 through 212");
+        assert_eq!(query.lines().count(), 8, "lines 210 through 217");
 
         let file: Vec<&str> = src.lines().collect();
         for (first, text) in &blocks {
@@ -327,7 +327,7 @@ mod tests {
         let runs = runs(&workspace_root(), &keywords()).expect("specimen runs");
         let got: Vec<(&str, &str, &str, &str)> = runs
             .iter()
-            .map(|r| (r.id, r.label, r.kind.as_str(), r.opinion[0].as_str()))
+            .map(|r| (r.id, r.label, r.kind.as_str(), r.opinion[3].as_str()))
             .collect();
         assert_eq!(
             got,
@@ -353,6 +353,11 @@ mod tests {
                 ),
             ]
         );
+        for run in &runs {
+            assert_eq!(run.opinion[0], "Evaluation mode: operative.");
+            assert!(run.opinion[1].starts_with("Source trust: "));
+            assert!(run.opinion[2].starts_with("Legal time: "));
+        }
         let open = &runs[0].opinion;
         assert!(
             open.contains(&"Under I1 it is Alice.".to_owned()),
@@ -378,8 +383,8 @@ mod tests {
         assert_eq!(
             commands,
             vec![
-                "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z",
-                "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z",
+                "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z",
+                "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z",
                 "fidryn run tests/programs/require-gate.fr --query q --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
                 "fidryn run tests/programs/require-gate.fr --query r --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
             ]
@@ -393,13 +398,13 @@ mod tests {
 
         let trust = &runs[0].source_html;
         assert!(trust.contains(&format!("<span>{TRUST}</span>")), "{trust}");
-        for n in ["47", "63", "205", "212"] {
+        for n in ["52", "68", "210", "217"] {
             assert!(
                 trust.contains(&format!("data-n=\"{n}\"")),
                 "line {n} missing"
             );
         }
-        for n in ["46", "64", "204", "213"] {
+        for n in ["51", "69", "209", "218"] {
             assert!(
                 !trust.contains(&format!("data-n=\"{n}\"")),
                 "line {n} should be cut"

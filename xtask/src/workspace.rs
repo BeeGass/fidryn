@@ -13,6 +13,7 @@ pub const SCHEMA_PROBE_SCRIPTS: &[&str] = &[
     "conformance/check_json_contracts.py",
     "conformance/probe_outcome_schema.py",
     "conformance/schema_boundary_probes.py",
+    "conformance/probe_report_schema.py",
 ];
 
 pub fn workspace_root() -> PathBuf {
@@ -140,17 +141,21 @@ pub fn run_python_checks() -> Result<()> {
 
 pub fn run_schema_probes() -> Result<()> {
     let root = workspace_root();
-    let mut ran_any = false;
+    let mut build = cargo_command();
+    build.args(["build", "-p", "fidryn-cli", "--locked", "--offline"]);
+    run_command(build)?;
+    let binary = load_metadata()?
+        .target_directory
+        .join("debug")
+        .join(format!("fidryn{}", std::env::consts::EXE_SUFFIX));
     for rel in SCHEMA_PROBE_SCRIPTS {
         let script = root.join(rel);
         if !script.is_file() {
-            continue;
+            bail!("required schema probe is missing: {rel}");
         }
-        ran_any = true;
-        run_command(schema_probe_command(&root, &script))?;
-    }
-    if !ran_any {
-        eprintln!("no schema probe scripts present; skipping");
+        let mut command = schema_probe_command(&root, &script);
+        command.env("FIDRYN_BINARY", binary.as_std_path());
+        run_command(command)?;
     }
     Ok(())
 }
@@ -177,23 +182,23 @@ fn js_test_files(root: &Path) -> Result<Vec<PathBuf>> {
 
 /// Run the JavaScript unit tests in `web/tests/` with `node --test`.
 ///
-/// Node is optional for this workspace: nothing is built or served with it.
-/// When `node --version` cannot be spawned the step is skipped.
+/// Node and the browser test corpus are required for qualification.
 pub fn run_js_tests() -> Result<()> {
     let probe = Command::new("node")
         .arg("--version")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status();
-    if probe.is_err() {
-        eprintln!("node not found; skipping JS tests in web/tests");
-        return Ok(());
+    if !probe
+        .context("node is required for browser tests")?
+        .success()
+    {
+        bail!("node --version failed");
     }
     let root = workspace_root();
     let files = js_test_files(&root)?;
     if files.is_empty() {
-        eprintln!("no JS tests in web/tests; skipping");
-        return Ok(());
+        bail!("required browser tests are missing from web/tests");
     }
     let mut cmd = Command::new("node");
     cmd.current_dir(&root);

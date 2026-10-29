@@ -22,21 +22,64 @@ pub fn run(args: CiArgs) -> Result<()> {
     }
 
     let mut test = cargo_command();
-    test.args(["test", "--workspace", "--offline"]);
+    test.args([
+        "test",
+        "--workspace",
+        "--all-features",
+        "--locked",
+        "--offline",
+    ]);
     run_command(test)?;
 
     let mut clippy = cargo_command();
-    clippy.args(["clippy", "--workspace", "--offline", "--", "-D", "warnings"]);
+    clippy.args([
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--locked",
+        "--offline",
+        "--",
+        "-D",
+        "warnings",
+    ]);
     run_command(clippy)?;
+
+    let mut docs = cargo_command();
+    docs.env("RUSTDOCFLAGS", "-D warnings");
+    docs.args([
+        "doc",
+        "--workspace",
+        "--all-features",
+        "--no-deps",
+        "--locked",
+        "--offline",
+    ]);
+    run_command(docs)?;
 
     run_schema_probes()?;
     run_python_checks()?;
+    let mut probes = std::process::Command::new("uv");
+    probes.current_dir(crate::workspace::workspace_root());
+    probes.args([
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "conformance",
+        "-p",
+        "test_*.py",
+    ]);
+    run_command(probes)?;
     crate::site::check(&crate::workspace::workspace_root())?;
 
     run_js_tests()?;
     if workspace_has_benches(&metadata) {
         let mut bench = cargo_command();
-        bench.args(["bench", "--no-run", "--offline"]);
+        bench.args(["bench", "--no-run", "--locked", "--offline"]);
         run_command(bench)?;
     } else {
         eprintln!("no bench targets in the workspace; skipping cargo bench --no-run");
