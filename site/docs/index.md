@@ -48,6 +48,7 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
 | [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | Current terms, retained grants and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |

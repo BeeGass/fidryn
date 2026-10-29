@@ -1,0 +1,19 @@
+{
+  "crate": "la-arena",
+  "version": "0.3.1",
+  "cargoSource": "registry+https://github.com/rust-lang/crates.io-index",
+  "sourceRepository": "https://github.com/rust-lang/rust-analyzer",
+  "sourceCommit": "a0467c546c1e412cd1b35257f8d5ae08f79072d6",
+  "files": [
+    {
+      "path": "LICENSE-APACHE",
+      "sourceUrl": "https://raw.githubusercontent.com/rust-lang/rust-analyzer/a0467c546c1e412cd1b35257f8d5ae08f79072d6/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+    },
+    {
+      "path": "LICENSE-MIT",
+      "sourceUrl": "https://raw.githubusercontent.com/rust-lang/rust-analyzer/a0467c546c1e412cd1b35257f8d5ae08f79072d6/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    }
+  ]
+}

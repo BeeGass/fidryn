@@ -10,6 +10,9 @@ fixture, not legal advice, not an operative instrument, and not a
 complete statement of any jurisdiction's law. Modules under `examples/`
 and programs under `tests/` exist to exercise the interpreter.
 
+Current licensing terms and retained prior grants are described in
+[Licensing](LICENSING.md).
+
 Source files use the `.fr` extension.
 
 **Documentation:** [docs/README.md](docs/README.md) — start with

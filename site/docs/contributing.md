@@ -19,6 +19,10 @@ Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
 
+Current licensing and contribution rights are described in
+[Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions require the separate rights
+agreement described there before acceptance.
+
 ## Toolchain
 
 Rust 1.98, edition 2024. Workspace `package.rust-version` is 1.98.

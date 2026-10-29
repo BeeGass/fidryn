@@ -37,7 +37,9 @@ capability obligations. Full details and counterexamples are in
 6. Prepare 0.2.0 with a classified changelog, version/lock consistency checks,
    clean native packages and native-token release publication after main CI and
    exact-commit CodeQL. Include concurrent Time/record changes only after review
-   and tests, as explicitly authorized by the user.
+   and tests, as explicitly authorized by the user. Include the subsequently
+   authorized licensing update with retained prior/font/dependency notices,
+   consistent metadata and narrow hash-bound first-party license checks.
 
 ## Acceptance laws
 
@@ -185,3 +187,43 @@ xtask Clippy, formatting and diff checks passed locally. Platform test commands
 now use `--no-fail-fast` to report all failing test targets while retaining a
 failed gate whenever any target fails. Native Windows package construction and
 the next complete remote candidate remain required.
+
+
+## User-authorized licensing integration
+
+After new concurrent licensing edits appeared, the user explicitly requested
+review and inclusion in 0.2.0. Current root terms and Cargo/Python license-file
+metadata are retained as supplied. The exact original 1067-byte MIT text is kept
+under LICENSES/prior-project-LICENSE.txt and at the end of LICENSE. This records
+text retention and technical packaging, not legal ownership or enforceability.
+Cargo metadata and locked/offline UV checks pass without changing lockfiles.
+
+The first-party custom-license policy uses 17 exact crate@0.2.0 clarifications,
+license file hash0xaea016eb, and matching narrow LicenseRef exceptions. The
+third-party allowlist/confidence threshold and other security checks remain
+unchanged. Wrong-hash and removed-MIT negative controls fail as intended; current
+bans/licenses/sources pass with the same two unused allowance warnings.
+
+Full font terms, actual embedded copyright/version/file identities, and pinned
+upstream documents for four crates missing packaged notices are retained. The
+new bounded Rust notice collector inventories all 250 non-workspace packages in
+the locked/all-features Cargo graph, uses the published r-efi AUTHORS directly,
+and verifies exact-version/source/commit/URL/hash fallback provenance. It refuses
+unverified or missing documents, aliases/escapes/symlinks, output collisions and
+excessive resources. The graph is a superset, not an exact binary-linkage map;
+fonts and toolchain/runtime components are separate scopes.
+
+A complete development-preview archive passed extraction, all-file hashes and
+actual CLI version/check/run smoke tests: 530 manifest files, 496 licensing files,
+250 dependency entries and four verified fallbacks. Prior MIT/font/current terms
+were independently compared with the archive. The canonical local gate passed
+1187 Rust tests, 14 Python controls, 52 JavaScript tests, lint/type/doc/schema/site
+checks and benchmark compilation. A final Windows-prefix safety correction in
+the notice helper then passed its 10 tests and strict xtask Clippy again. Sources
+are frozen for commit, clean packaging and fresh remote qualification.
+
+The preceding f6102f3 candidate passed both CI/CodeQL runs, main source policy and
+all three native package/extracted-binary/artifact-upload jobs, including Windows.
+Those receipts do not qualify the subsequently authorized licensing revision.
+See reviews/2026-10-29-licensing-review.md for the content/provenance audit and
+/cache/tmp/fidryn-0.2.0-licensed-ci.log for the full local gate.

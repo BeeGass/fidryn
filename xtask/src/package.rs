@@ -132,6 +132,7 @@ pub fn run(args: PackageArgs) -> Result<()> {
     let binary_name = binary.file_name().context("binary has no filename")?;
     copy_file(&binary, &payload.join(binary_name))?;
     copy_assets(&root, &payload)?;
+    crate::licenses::copy_third_party_notices(&payload)?;
     fs::create_dir_all(payload.join("examples"))?;
     fs::write(payload.join("examples/package-smoke.fr"), SMOKE_SOURCE)?;
     fs::write(payload.join("examples/package-smoke.case.json"), SMOKE_CASE)?;
@@ -440,7 +441,12 @@ fn copy_assets(root: &Path, payload: &Path) -> Result<()> {
         "--others",
         "--exclude-standard",
         "--",
-        "LICENSE",
+        ":(top,glob,icase)*LICENSE*",
+        ":(top,glob,icase)*LICENSING*",
+        ":(top,glob,icase)COPYING*",
+        ":(top,glob,icase)COPYRIGHT*",
+        ":(top,glob,icase)*NOTICE*",
+        "LICENSES",
         "README.md",
         "CHANGELOG.md",
         "schemas",
@@ -460,13 +466,13 @@ fn copy_assets(root: &Path, payload: &Path) -> Result<()> {
             assets.insert(name.to_owned());
         }
     }
-    for name in ["LICENSE", "README.md", "CHANGELOG.md"] {
+    for name in ["LICENSE", "LICENSING.md", "README.md", "CHANGELOG.md"] {
         ensure!(
             assets.contains(name),
             "required package asset is missing, ignored or outside the source inventory: {name}"
         );
     }
-    for name in ["schemas", "templates", "docs"] {
+    for name in ["LICENSES", "schemas", "templates", "docs"] {
         ensure!(
             fs::symlink_metadata(root.join(name))?.file_type().is_dir(),
             "required package assets must be real directories: {name}"
@@ -1024,10 +1030,10 @@ mod tests {
         init.current_dir(&fixture.0).args(["init", "--quiet"]);
         checked_status(&mut init).unwrap();
         fs::write(fixture.0.join(".gitignore"), ".DS_Store\n__pycache__/\n").unwrap();
-        for name in ["LICENSE", "README.md", "CHANGELOG.md"] {
+        for name in ["LICENSE", "LICENSING.md", "README.md", "CHANGELOG.md"] {
             fs::write(fixture.0.join(name), name).unwrap();
         }
-        for name in ["docs", "schemas", "templates"] {
+        for name in ["LICENSES", "docs", "schemas", "templates"] {
             fs::create_dir(fixture.0.join(name)).unwrap();
             fs::write(fixture.0.join(name).join("visible.txt"), name).unwrap();
         }
@@ -1069,5 +1075,163 @@ mod tests {
             fs::read_to_string(output.join("fidryn-2-host.tar.gz")).unwrap(),
             "unowned archive"
         );
+    }
+
+    const LICENSING_FILES: &[&str] = &[
+        "LICENSE",
+        "LICENSING.md",
+        "LICENSE-MIT",
+        "LICENSE-APACHE",
+        "THIRD_PARTY_LICENSES.md",
+        "COPYING",
+        "COPYRIGHT",
+        "THIRD-PARTY-NOTICES.md",
+        "LICENSES/prior-project-LICENSE.txt",
+        "LICENSES/fonts/FONT-LICENSE.txt",
+    ];
+
+    fn licensing_source(root: &Path) {
+        let mut init = Command::new("git");
+        init.current_dir(root).args(["init", "--quiet"]);
+        checked_status(&mut init).unwrap();
+        for name in LICENSING_FILES {
+            let path = root.join(name);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, format!("Retained fixture terms for {name}\n")).unwrap();
+        }
+        for name in [
+            "README.md",
+            "CHANGELOG.md",
+            "schemas/case.json",
+            "templates/example.txt",
+            "docs/index.md",
+        ] {
+            let path = root.join(name);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, format!("fixture {name}\n")).unwrap();
+        }
+    }
+
+    #[test]
+    fn licensing_documents_and_retained_texts_survive_the_archive_with_hashes() {
+        let fixture = Fixture::new();
+        licensing_source(&fixture.0);
+        fs::create_dir(fixture.0.join("scratch")).unwrap();
+        fs::write(
+            fixture.0.join("scratch/NOTICE.txt"),
+            "outside package assets",
+        )
+        .unwrap();
+        let stage = fixture.0.join("stage");
+        let stem = "fidryn-test-host";
+        let payload = stage.join(stem);
+        copy_assets(&fixture.0, &payload).unwrap();
+        assert!(!payload.join("scratch").exists());
+        fs::write(payload.join("fidryn"), b"binary fixture").unwrap();
+        let manifest = build_manifest(
+            &payload,
+            "1.2.3",
+            "test-host",
+            &provenance_fixture(),
+            "fidryn",
+        )
+        .unwrap();
+        for name in LICENSING_FILES {
+            assert_eq!(
+                fs::read(payload.join(name)).unwrap(),
+                fs::read(fixture.0.join(name)).unwrap()
+            );
+            assert!(
+                manifest["includedFiles"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|file| file == name)
+            );
+            let file = manifest["files"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|file| file["path"] == *name)
+                .unwrap();
+            let original = digest_file(&fixture.0.join(name)).unwrap();
+            assert_eq!(file["size"].as_u64(), Some(original.size));
+            assert_eq!(file["sha256"], original.sha256);
+            assert_eq!(file["blake3"], original.blake3);
+        }
+        fs::write(
+            payload.join(MANIFEST),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        let kind = if cfg!(windows) {
+            ArchiveKind::Zip
+        } else {
+            ArchiveKind::TarGz
+        };
+        let tar = tar_program(kind).unwrap();
+        let archive = fixture.0.join(format!("licensed.{}", kind.extension()));
+        create_archive(&tar, kind, &archive, &stage, stem).unwrap();
+        let extraction = fixture.0.join("extracted");
+        extract_archive(&tar, &archive, &extraction, stem).unwrap();
+        let extracted = extraction.join(stem);
+        verify_manifest(&extracted, &manifest).unwrap();
+        for name in LICENSING_FILES {
+            assert_eq!(
+                fs::read(extracted.join(name)).unwrap(),
+                fs::read(fixture.0.join(name)).unwrap()
+            );
+        }
+        fs::write(
+            extracted.join("LICENSES/prior-project-LICENSE.txt"),
+            "altered terms",
+        )
+        .unwrap();
+        assert!(verify_manifest(&extracted, &manifest).is_err());
+    }
+
+    #[test]
+    fn missing_ignored_or_empty_required_licensing_assets_refuse_packaging() {
+        for missing in ["LICENSING.md", "LICENSES"] {
+            let fixture = Fixture::new();
+            licensing_source(&fixture.0);
+            let path = fixture.0.join(missing);
+            if path.is_dir() {
+                fs::remove_dir_all(path).unwrap();
+            } else {
+                fs::remove_file(path).unwrap();
+            }
+            assert!(
+                copy_assets(&fixture.0, &fixture.0.join("payload")).is_err(),
+                "missing {missing}"
+            );
+        }
+        let fixture = Fixture::new();
+        licensing_source(&fixture.0);
+        fs::write(fixture.0.join(".gitignore"), "LICENSING.md\n").unwrap();
+        assert!(copy_assets(&fixture.0, &fixture.0.join("payload")).is_err());
+        let fixture = Fixture::new();
+        licensing_source(&fixture.0);
+        fs::remove_dir_all(fixture.0.join("LICENSES")).unwrap();
+        fs::create_dir(fixture.0.join("LICENSES")).unwrap();
+        assert!(copy_assets(&fixture.0, &fixture.0.join("payload")).is_err());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn licensing_files_and_directories_cannot_follow_symlinks() {
+        for name in ["LICENSING.md", "LICENSES"] {
+            let fixture = Fixture::new();
+            licensing_source(&fixture.0);
+            let source = fixture.0.join(name);
+            let moved = fixture.0.join("original-licensing");
+            fs::rename(&source, &moved).unwrap();
+            std::os::unix::fs::symlink(&moved, &source).unwrap();
+            assert!(
+                copy_assets(&fixture.0, &fixture.0.join("payload")).is_err(),
+                "symlink {name}"
+            );
+            assert!(moved.exists());
+        }
     }
 }

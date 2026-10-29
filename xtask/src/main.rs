@@ -3,6 +3,7 @@
 mod bench;
 mod ci;
 mod governance;
+mod licenses;
 mod package;
 mod release;
 mod site;

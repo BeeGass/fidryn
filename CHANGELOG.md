@@ -9,6 +9,10 @@ interchange schema versions are maintained independently of the interpreter.
 
 ### Changed
 
+- Current original-project licensing uses the supplied proprietary terms. Prior
+  project license text and third-party notices remain retained under their own
+  terms; Rust and Python metadata point to the root license file.
+
 - Breaking API and input changes: typed query arguments, nominal entities,
   collections, money currencies and clause references are checked consistently.
   Invalid or undeclared inputs now fail explicitly. Case, source-manifest and
@@ -28,6 +32,8 @@ interchange schema versions are maintained independently of the interpreter.
   temporal evidence validation; grounded parameterized duty instances.
 - Configurable shared evaluation budgets, continuation accounting, parser/input
   limits, bounded completion search and retained trace limits.
+- Retained project/font license texts and locked dependency notice inventories in
+  release archives, with narrowly scoped first-party license hash checks.
 - Typed query input schemas, editor diagnostic ranges, structured document
   rendering and portable review bundles with retained inputs and rerun metadata.
 - Native GitHub protections, mandatory test/security checks, release metadata

@@ -1,6 +1,8 @@
 # Releases and packages
 
-The interpreter's workspace version is the release version. Source instruments,
+The interpreter's workspace version is the release version. Current project terms
+and retained prior/third-party grants are documented in
+[Licensing](../LICENSING.md). Source instruments,
 prelude modules and interchange schemas retain their own version histories.
 The 0.2.0 release therefore continues to load the repository's 0.1.0 instrument
 fixtures and emits checked evaluation reports using schema v0.2.
@@ -25,15 +27,21 @@ tags are never forced or moved by the release workflow.
 ## Package contents
 
 `cargo xtask package` builds the native Rust host target with the pinned
-toolchain, locked dependencies and release profile. Each platform produces:
+toolchain, locked dependencies and release profile. Run `cargo fetch --locked`
+first to make the resolved dependency sources and their notices available to the
+offline packager. Each platform produces:
 
 - `fidryn-VERSION-HOST.tar.gz`, or `.zip` for Windows.
 - A matching `.manifest.json` containing the version, source commit, dirty flag,
   actual host target, binary digests and complete file inventory.
 - SHA-256 and BLAKE3 checksum sidecars for the archive.
 
-The archive contains the executable, license, README, changelog, documentation,
-schemas, templates and a self-contained smoke fixture. The packager extracts its
+The archive contains the executable, `LICENSE`, `LICENSING.md`, retained notices
+under `LICENSES/`, README, changelog, documentation, schemas, templates and a
+self-contained smoke fixture. `THIRD_PARTY_NOTICES.md` and `THIRD_PARTY_LICENSES/`
+retain resolved Cargo dependency notices from the locked workspace graph. This
+inventory includes a superset of the binary dependencies; it does not infer an
+exact binary linkage map. The packager extracts its
 own output, checks file hashes and inventory, then runs the extracted executable
 with `--version`, `check` and `run` before publishing the four local files.
 It refuses dirty sources by default. `--allow-dirty` explicitly produces a
@@ -59,3 +67,7 @@ retaining its tested CI artifacts or prepared draft for inspection.
 
 Releases identify their source and executable bytes. They do not establish legal
 approval or close the general-language obligations in the implementation audit.
+
+First-party custom license checks in `deny.toml` bind exact workspace crate
+versions and the license-file hash. Version or license-text changes must update
+those entries; the third-party license allowlist remains separate.

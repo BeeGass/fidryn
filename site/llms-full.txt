@@ -74,6 +74,7 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
 | [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | Current terms, retained grants and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
@@ -3138,6 +3139,10 @@ the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [doc
 Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
+
+Current licensing and contribution rights are described in
+[Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions require the separate rights
+agreement described there before acceptance.
 
 ## Toolchain
 
