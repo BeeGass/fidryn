@@ -1389,6 +1389,23 @@ impl<'a, H: Handler> EvalFrame<'a, H> {
         if let Some(effect) = find_effect_name(self.module, callee) {
             return self.eval_effect(&effect, args);
         }
+        let declared_constructor =
+            self.module
+                .declarations
+                .iter()
+                .any(|declaration| match declaration {
+                    CoreDecl::RecordType(record) => record.name == callee,
+                    CoreDecl::Type(declaration) => match &declaration.definition {
+                        fidryn_core::ir::TypeDefinition::Sum(constructors) => constructors
+                            .iter()
+                            .any(|constructor| constructor.name == callee),
+                        _ => false,
+                    },
+                    _ => false,
+                });
+        if declared_constructor {
+            return self.eval_ctor(callee, args);
+        }
         Err(unsupported(format!("unknown function `{callee}`")))
     }
 
@@ -3113,11 +3130,14 @@ fn checked_dec(value: Option<Decimal>, op: &str) -> Result<Value, EngineError> {
 }
 
 fn eval_cmp(op: &str, left: &Value, right: &Value) -> Result<Value, EngineError> {
-    let ord = match (promote_num(left)?, promote_num(right)?) {
-        (Num::Int(a), Num::Int(b)) => a.cmp(&b),
-        (Num::Dec(a), Num::Dec(b)) => a.cmp(&b),
-        (Num::Int(a), Num::Dec(b)) => Decimal::from(a).cmp(&b),
-        (Num::Dec(a), Num::Int(b)) => a.cmp(&Decimal::from(b)),
+    let ord = match (left, right) {
+        (Value::Instant(a), Value::Instant(b)) => a.cmp(b),
+        _ => match (promote_num(left)?, promote_num(right)?) {
+            (Num::Int(a), Num::Int(b)) => a.cmp(&b),
+            (Num::Dec(a), Num::Dec(b)) => a.cmp(&b),
+            (Num::Int(a), Num::Dec(b)) => Decimal::from(a).cmp(&b),
+            (Num::Dec(a), Num::Int(b)) => a.cmp(&Decimal::from(b)),
+        },
     };
     let result = match op {
         "<" => ord.is_lt(),
