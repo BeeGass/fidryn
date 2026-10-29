@@ -8,6 +8,7 @@ use std::collections::BTreeMap;
 
 /// Overlay hypothesis; not operative case state.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Assumption {
     pub id: String,
     #[serde(with = "crate::value::case_value")]
@@ -15,8 +16,9 @@ pub struct Assumption {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CaseRecord {
+    #[serde(deserialize_with = "deserialize_case_schema")]
     pub schema: String,
     pub module: Option<String>,
     #[serde(default, with = "crate::value::case_value_map")]
@@ -40,6 +42,18 @@ pub struct CaseRecord {
     pub assumptions: Vec<Assumption>,
 }
 
+fn deserialize_case_schema<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<String, D::Error> {
+    let schema = String::deserialize(deserializer)?;
+    if schema != "fidryn.case-record/v0.1" {
+        return Err(serde::de::Error::custom(format!(
+            "unsupported case schema `{schema}`"
+        )));
+    }
+    Ok(schema)
+}
+
 impl Default for CaseRecord {
     fn default() -> Self {
         Self {
@@ -60,7 +74,7 @@ impl Default for CaseRecord {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct EvidenceItem {
     pub schema: String,
     #[serde(with = "crate::value::case_value")]
@@ -69,7 +83,7 @@ pub struct EvidenceItem {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LedgerEvent {
     /// `"evidence"` | `"duty"` | `"authority"` | `"correction"` | `"retraction"`
     pub kind: String,
@@ -80,23 +94,25 @@ pub struct LedgerEvent {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaseDetermination {
     pub issue: String,
     pub protocol: String,
     pub established: bool,
     pub decider: String,
-    #[serde(default)]
+    #[serde(default, alias = "recordedAt")]
     pub recorded_at: Option<Instant>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ClosureRecord {
     pub domain: String,
     pub closed: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct AdmissibleCompletions {
     #[serde(default)]
     pub interpretations: BTreeMap<String, Vec<String>>,
@@ -107,7 +123,7 @@ pub struct AdmissibleCompletions {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CompletionDomain {
     pub responses: Vec<String>,
     #[serde(default)]
@@ -158,12 +174,25 @@ impl CaseRecord {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SourceManifest {
+    #[serde(deserialize_with = "deserialize_source_schema")]
     pub schema: String,
     pub snapshot: String,
     pub jurisdiction: String,
     pub artifacts: Vec<ManifestArtifact>,
+}
+
+fn deserialize_source_schema<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<String, D::Error> {
+    let schema = String::deserialize(deserializer)?;
+    if schema != "fidryn.source-manifest/v0.1" {
+        return Err(serde::de::Error::custom(format!(
+            "unsupported source manifest schema `{schema}`"
+        )));
+    }
+    Ok(schema)
 }
 
 #[derive(
@@ -179,6 +208,7 @@ pub enum SourceWeight {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ManifestArtifact {
     pub path: String,
     pub digest: String,

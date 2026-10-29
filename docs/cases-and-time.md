@@ -38,7 +38,7 @@ canonicalize to UTC. `run` never chooses a missing completion. `--arg
 KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
 `case.assumptions` as an overlay. `explore --bounds` merges extra
 declared domains into `admissibleCompletions`. Successful `run` /
-`explore` stdout is `fidryn.evaluation-report/v0.1`.
+`explore` stdout is `fidryn.evaluation-report/v0.2`.
 
 See [CLI](cli.md), the [language grammar](../grammar.ebnf), and
 [Outcomes](outcomes.md).

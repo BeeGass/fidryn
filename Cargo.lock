@@ -186,7 +186,16 @@ dependencies = [
  "cc",
  "cfg-if",
  "constant_time_eq",
- "cpufeatures",
+ "cpufeatures 0.3.1",
+]
+
+[[package]]
+name = "block-buffer"
+version = "0.10.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
+dependencies = [
+ "generic-array",
 ]
 
 [[package]]
@@ -379,6 +388,15 @@ checksum = "7704b5fdd17b18ae31c4c1da5a2e0305a2bf17b5249300a9ee9ed7b72114c636"
 
 [[package]]
 name = "cpufeatures"
+version = "0.2.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "cpufeatures"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566"
@@ -471,12 +489,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
+name = "crypto-common"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a"
+dependencies = [
+ "generic-array",
+ "typenum",
+]
+
+[[package]]
 name = "deranged"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7cd812cc2bc1d69d4764bd80df88b4317eaef9e773c75226407d9bc0876b211c"
 dependencies = [
  "serde_core",
+]
+
+[[package]]
+name = "digest"
+version = "0.10.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
+dependencies = [
+ "block-buffer",
+ "crypto-common",
 ]
 
 [[package]]
@@ -514,7 +552,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-adapt"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "serde",
@@ -525,7 +563,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-check"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
@@ -538,16 +576,19 @@ dependencies = [
 
 [[package]]
 name = "fidryn-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
+ "blake3",
  "clap",
  "fidryn-adapt",
  "fidryn-check",
  "fidryn-core",
  "fidryn-driver",
+ "fidryn-eval",
  "fidryn-hir",
+ "fidryn-kernel",
  "fidryn-render",
  "fidryn-solve",
  "fidryn-syntax",
@@ -564,7 +605,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "indexmap",
@@ -579,7 +620,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-driver"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-check",
@@ -587,6 +628,7 @@ dependencies = [
  "fidryn-eval",
  "fidryn-handlers",
  "fidryn-hir",
+ "fidryn-kernel",
  "fidryn-syntax",
  "salsa",
  "serde_json",
@@ -594,7 +636,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-eval"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-check",
  "fidryn-core",
@@ -602,12 +644,13 @@ dependencies = [
  "fidryn-syntax",
  "indexmap",
  "rust_decimal",
+ "serde_json",
  "time",
 ]
 
 [[package]]
 name = "fidryn-handlers"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "fidryn-eval",
@@ -617,7 +660,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-hir"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "fidryn-syntax",
@@ -629,7 +672,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-integration-benches"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "criterion",
  "fidryn-cli",
@@ -640,7 +683,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-integration-tests"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "axum",
  "fidryn-cli",
@@ -660,25 +703,29 @@ dependencies = [
 
 [[package]]
 name = "fidryn-kernel"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
+ "fidryn-check",
  "fidryn-core",
  "fidryn-eval",
  "fidryn-handlers",
+ "fidryn-hir",
+ "fidryn-syntax",
 ]
 
 [[package]]
 name = "fidryn-render"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
+ "serde_json",
  "thiserror",
 ]
 
 [[package]]
 name = "fidryn-solve"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "indexmap",
@@ -687,19 +734,22 @@ dependencies = [
 
 [[package]]
 name = "fidryn-syntax"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "rowan",
+ "rust_decimal",
+ "serde_json",
  "thiserror",
 ]
 
 [[package]]
 name = "fidryn-trace"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
+ "fidryn-kernel",
  "indexmap",
  "serde",
  "serde_json",
@@ -709,13 +759,15 @@ dependencies = [
 
 [[package]]
 name = "fidryn-verify"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "fidryn-check",
  "fidryn-core",
+ "fidryn-driver",
  "fidryn-eval",
  "fidryn-handlers",
  "fidryn-hir",
+ "fidryn-kernel",
  "fidryn-solve",
  "fidryn-syntax",
  "indexmap",
@@ -786,6 +838,16 @@ dependencies = [
  "futures-task",
  "pin-project-lite",
  "slab",
+]
+
+[[package]]
+name = "generic-array"
+version = "0.14.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
+dependencies = [
+ "typenum",
+ "version_check",
 ]
 
 [[package]]
@@ -1325,9 +1387,9 @@ dependencies = [
 
 [[package]]
 name = "pulldown-cmark"
-version = "0.13.4"
+version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9f068eba8e7071c5f9511831b44f32c740d5adf574e990f946ddb53db2f314e"
+checksum = "278e9268c93b9e498a2da46c34d90ba93a3255eb99009646398f34bc73ab36eb"
 dependencies = [
  "bitflags",
  "memchr",
@@ -1530,9 +1592,9 @@ checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
 
 [[package]]
 name = "rustls"
-version = "0.23.45"
+version = "0.23.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
+checksum = "48e13bd8c0e9365c43cfa5c9e8f9ad49d3c8444926c9aac819e0e4dc503c8fdf"
 dependencies = [
  "log",
  "once_cell",
@@ -1554,9 +1616,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.15"
+version = "0.103.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2"
+checksum = "4443b1b6d39d7c663139942cc4558262562d2c84123bb6282ef177009ca8b281"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -1583,9 +1645,9 @@ checksum = "04d056b875a9d2e6cb9a61d127afee9ac5999b9f87bcb32079d1318e505be714"
 
 [[package]]
 name = "salsa"
-version = "0.28.2"
+version = "0.28.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf0e374215cd2db2b5c75d7b3a99cb0cc052c0595335dfdefc03d4eb08f4aa81"
+checksum = "27d2e6e19e39591cd99c01ac4141544b4d012cfd0831348629b8187fa9fe6d34"
 dependencies = [
  "boxcar",
  "crossbeam-queue",
@@ -1609,15 +1671,15 @@ dependencies = [
 
 [[package]]
 name = "salsa-macro-rules"
-version = "0.28.2"
+version = "0.28.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85f4b7d4405540bbd6d4ffa52d4322d983f3781954d3073067ac1bdb028459b3"
+checksum = "baf90a551c38f25ed8489111d3d5827aa18e1b85963f5e6a298505b1d1e2cb7e"
 
 [[package]]
 name = "salsa-macros"
-version = "0.28.2"
+version = "0.28.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "445be2bfbb2f67cb663225ecd7bc5a25370c0250fca30f9d8cbad9a913650370"
+checksum = "69dd77f86ec10e72e314f4ddf7c44c8d349e73cdff1aad524ba9668603fb0549"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1714,6 +1776,17 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
+dependencies = [
+ "cfg-if",
+ "cpufeatures 0.2.17",
+ "digest",
 ]
 
 [[package]]
@@ -1901,9 +1974,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.53.1"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "202caea871b69668250d242070849eb495be178ed697a3e98aebce5bc81a0bed"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "libc",
  "mio",
@@ -2010,6 +2083,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
 
 [[package]]
+name = "typenum"
+version = "1.20.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
+
+[[package]]
 name = "unicase"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2066,6 +2145,12 @@ name = "utf8parse"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
+
+[[package]]
+name = "version_check"
+version = "0.9.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "walkdir"
@@ -2154,14 +2239,14 @@ version = "0.26.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
 dependencies = [
- "webpki-roots 1.0.9",
+ "webpki-roots 1.0.11",
 ]
 
 [[package]]
 name = "webpki-roots"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a"
+checksum = "f5f280bbb2b287bc8e7de7e3852945a0ff50d1bbcb5ed42b6c7a568c546df171"
 dependencies = [
  "rustls-pki-types",
 ]
@@ -2308,15 +2393,19 @@ checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
 name = "xtask"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
+ "blake3",
  "cargo_metadata",
  "clap",
  "fidryn-cli",
  "fidryn-syntax",
  "pulldown-cmark",
+ "semver",
  "serde_json",
+ "sha2",
+ "toml_edit",
 ]
 
 [[package]]
@@ -2332,9 +2421,9 @@ dependencies = [
 
 [[package]]
 name = "yoke-derive"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33811428bee40dbceb6d545e95754741d17a6aef9a4849f0fd62e2ba4f412a78"
+checksum = "ec8ebde2db3681e8c9980cc27822030e68752690ddfa9473e739aeb4dbde6d71"
 dependencies = [
  "proc-macro2",
  "quote",

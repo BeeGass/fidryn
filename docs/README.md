@@ -5,7 +5,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the v0.1 reference
+This directory is the human documentation for the 0.2.0 reference
 interpreter. Start at the [product README](../README.md) to clone and
 build, then read [Getting started](getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -27,7 +27,7 @@ statement of any jurisdiction's law.
 The closed grammar is [`grammar.ebnf`](../grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 [`schemas/outcome-v0.1.json`](../schemas/outcome-v0.1.json), and
-[`schemas/evaluation-report-v0.1.json`](../schemas/evaluation-report-v0.1.json)
+[`schemas/evaluation-report-v0.2.json`](../schemas/evaluation-report-v0.2.json)
 (CLI `run` / `explore` and mill eval responses nest the outcome as
 `outcomeDocument`).
 
@@ -36,6 +36,9 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 | Document | What it is |
 | --- | --- |
 | [Contributing](contributing.md) | Toolchain, tests, commits |
+| [Development and promotion](development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](../LICENSING.md) | Current terms, retained grants and third-party notices |
+| [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](implementation-status.md) | Evidence-backed capability matrix |
 | [Obligations](OBLIGATIONS.md) | Review obligations; green tests are regressions |

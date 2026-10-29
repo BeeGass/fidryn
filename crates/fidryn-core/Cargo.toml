@@ -2,7 +2,7 @@
 name = "fidryn-core"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
@@ -10,8 +10,8 @@ description = "Canonical Fidryn Core IR, legal state, outcomes, and diagnostics"
 
 [features]
 default = []
-# Trusted FiniteReplay stamp. Default public consumers cannot produce
-# is_covering(); only fidryn-kernel should enable this.
+# Compatibility feature. Qualification is enforced by kernel-owned handles,
+# never by feature selection.
 kernel-issue = []
 
 [dependencies]

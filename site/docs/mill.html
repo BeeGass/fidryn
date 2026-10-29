@@ -98,7 +98,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 5 &middot; Run</p>
     <h1 id="doc-title">Fidryn mill</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">5.7.1</span> POST /api/inputs</a></li></ol></details>
     <div class="prose">
 <p>The mill is a loopback-only web UI for checking, running, exploring, and
 rendering Fidryn source on this machine. Start it with the CLI:</p>
@@ -202,9 +202,11 @@ as CLI <code>--valid-at</code> and <code>--known-at</code>.</p>
 <p>On evaluation success, HTTP 200, and the body is a transport wrapper
 <code>{ "ok": true, "report": ..., "opinion": [...] }</code>
 (<code>schemas/mill-evaluation-response-v0.1.json</code>). <code>report</code> is the
-<code>fidryn.evaluation-report/v0.1</code> envelope the CLI prints
+<code>fidryn.evaluation-report/v0.2</code> envelope the CLI prints
 (<code>schema</code>, <code>executionMode</code>, <code>assumptions</code>, <code>sourceTrust</code>,
-<code>verificationMethod</code>, <code>coverage</code>, <code>outcomeDocument</code>). <code>opinion</code> is the
+<code>verificationMethod</code>, <code>coverage</code>, checked invocation and source/executable
+identities, retained actual <code>traceDocument</code>, <code>outcomeDocument</code>, and exploration
+<code>searchEvidence</code> when applicable). <code>opinion</code> is the
 report read as plain sentences, for example
 <code>acting_trustee depends on SuccessorEligibility.</code> and
 <code>Under I1 it is Alice.</code> for a contingent trust run. Each sentence is a
@@ -234,7 +236,9 @@ It is not rewritten as <code>inconsistent</code>.</p>
 <p>HTTP status is 200 in both cases. Success is <code>{"ok": true, "text": "..."}</code>.
 Failure (check diagnostics joined by newlines, or a missing template key)
 is <code>{"ok": false, "error": "..."}</code>. Template variables are <code>module</code>,
-<code>version</code>, and <code>outside_scope</code>. Missing keys fail closed.</p>
+<code>version</code>, typed <code>outside_scope</code>, and <code>outside_scope_label</code>. An optional JSON
+<code>data</code> field is available under the template key <code>data</code>; typed arrays and record
+fields are preserved. Missing keys and collection type mismatches fail closed.</p>
 <h2 id="in-memory-compile-versus-path-compile"><span class="hn">5.4</span> In-memory compile versus path compile <a class="anchor" href="#in-memory-compile-versus-path-compile" aria-label="Link to this section">#</a></h2>
 <p>Mill <code>source</code> is compiled with <code>compile_source</code> against
 <code>SourceManifest::default()</code>. A <code>source_manifest</code> header in the pasted
@@ -312,13 +316,20 @@ completions on the case JSON.</p>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/cli">CLI</a></li>
 </ul>
+<h3 id="post-apiinputs"><span class="hn">5.7.1</span> <code>POST /api/inputs</code> <a class="anchor" href="#post-apiinputs" aria-label="Link to this section">#</a></h3>
+<p>Accepts <code>source</code> and <code>query</code> and returns <code>{ok: true, schema: ...}</code> with the input
+schema derived from checked declarations, including evidence and effect request
+metadata. Unsupported input representations return an explicit error. <code>/api/check</code>
+diagnostic responses also include <code>locations</code> with source paths, byte spans and
+UTF-16 editor ranges when available. These ranges identify the exact submitted
+source; unavailable locations stay explicit.</p>
 
     </div>
     <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cli"><span class="label">Previous &middot; &sect;4</span><span class="t">CLI</span></a><a class="next" href="/docs/outcomes"><span class="label">Next &middot; &sect;6</span><span class="t">Outcomes</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/mill.md">Edit this page on GitHub</a><a href="/docs/mill.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">5.7.1</span> POST /api/inputs</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

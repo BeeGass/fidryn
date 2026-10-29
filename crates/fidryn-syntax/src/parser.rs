@@ -1,7 +1,10 @@
 //! Recursive-descent parser with automatic semicolon insertion and a Pratt expression parser.
 
-use crate::ast::{BinOp, ConsequenceAst, Decl, Expr, GoalAst, Header, HeaderKind, Item, Module};
-use crate::lexer::{Token, TokenKind, lex};
+use crate::ast::{
+    BinOp, ConsequenceAst, Decl, Expr, GoalAst, Header, HeaderKind, Item, JudgmentAst,
+    JudgmentAuthorityAst, Module,
+};
+use crate::lexer::{Token, TokenKind, lex_bounded};
 use crate::syntax::{FidrynLanguage, SyntaxKind};
 use fidryn_core::Span;
 use fidryn_core::{Diagnostic, DiagnosticCode};
@@ -53,6 +56,10 @@ const CONSEQUENCE_OPS: &[&str] = &[
 ];
 
 const PREFIX_RBP: u8 = 16;
+const MAX_EXPRESSION_DEPTH: usize = 128;
+const MAX_EXPRESSION_NODES: usize = 10_000;
+const MAX_SOURCE_BYTES: usize = 8 * 1024 * 1024;
+const MAX_SOURCE_TOKENS: usize = 262_144;
 
 pub struct Parse {
     pub source: String,
@@ -85,8 +92,15 @@ impl Parse {
 }
 
 pub fn parse_file(source: &str) -> Parse {
-    let tokens = lex(source);
+    if source.len() > MAX_SOURCE_BYTES {
+        return refused_parse("source exceeds the byte budget of 8388608");
+    }
+    let tokens = match lex_bounded(source, MAX_SOURCE_TOKENS) {
+        Ok(tokens) => tokens,
+        Err(()) => return refused_parse("source exceeds the token budget of 262144"),
+    };
     let mut diagnostics = Vec::new();
+    let mut previous = TokenKind::Eof;
     for t in &tokens {
         if t.kind == TokenKind::Error {
             let text = source.get(t.start as usize..t.end as usize).unwrap_or("");
@@ -99,6 +113,64 @@ pub fn parse_file(source: &str) -> Parse {
                 ),
             );
         }
+        if t.kind == TokenKind::String
+            && let Err(error) = serde_json::from_str::<String>(
+                source.get(t.start as usize..t.end as usize).unwrap_or(""),
+            )
+        {
+            diagnostics.push(
+                Diagnostic::new(
+                    DiagnosticCode::E100,
+                    format!("invalid JSON string: {error}"),
+                )
+                .with_span(Span {
+                    start: t.start,
+                    end: t.end,
+                }),
+            );
+        }
+        if t.kind == TokenKind::Decimal
+            && source
+                .get(t.start as usize..t.end as usize)
+                .unwrap_or("")
+                .parse::<rust_decimal::Decimal>()
+                .is_err()
+        {
+            diagnostics.push(
+                Diagnostic::new(DiagnosticCode::E100, "decimal literal is out of range").with_span(
+                    Span {
+                        start: t.start,
+                        end: t.end,
+                    },
+                ),
+            );
+        }
+        if t.kind == TokenKind::Int {
+            let raw = source.get(t.start as usize..t.end as usize).unwrap_or("");
+            let largest = if previous == TokenKind::Minus {
+                (i64::MAX as u128) + 1
+            } else {
+                i64::MAX as u128
+            };
+            if raw.parse::<u128>().map_or(true, |value| value > largest) {
+                diagnostics.push(
+                    Diagnostic::new(
+                        DiagnosticCode::E100,
+                        "integer literal is out of range for Int",
+                    )
+                    .with_span(Span {
+                        start: t.start,
+                        end: t.end,
+                    }),
+                );
+            }
+        }
+        if !matches!(
+            t.kind,
+            TokenKind::Whitespace | TokenKind::Newline | TokenKind::Comment | TokenKind::DocComment
+        ) {
+            previous = t.kind;
+        }
     }
     let mut p = Parser {
         source,
@@ -108,6 +180,10 @@ pub fn parse_file(source: &str) -> Parse {
         builder: GreenNodeBuilder::new(),
         node_depth: 0,
         token_cursor: 0,
+        expression_depth: 0,
+        judgment_body: false,
+        judgment_header: false,
+        observation_body: false,
     };
     let module = p.parse_module();
     let green = p.take_green();
@@ -118,6 +194,19 @@ pub fn parse_file(source: &str) -> Parse {
         diagnostics,
         green,
         module,
+    }
+}
+
+fn refused_parse(message: &str) -> Parse {
+    let mut builder = GreenNodeBuilder::new();
+    builder.start_node(SyntaxKind::MODULE.into());
+    builder.finish_node();
+    Parse {
+        source: String::new(),
+        tokens: Vec::new(),
+        diagnostics: vec![Diagnostic::new(DiagnosticCode::E100, message)],
+        green: builder.finish(),
+        module: None,
     }
 }
 
@@ -155,6 +244,10 @@ struct Parser<'a> {
     builder: GreenNodeBuilder<'static>,
     node_depth: usize,
     token_cursor: usize,
+    expression_depth: usize,
+    judgment_body: bool,
+    judgment_header: bool,
+    observation_body: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -198,7 +291,15 @@ impl<'a> Parser<'a> {
                 return;
             }
             let after = self.lookahead_non_trivia(1);
-            if self.is_continuation(after) {
+            let before = self.tokens[..self.idx]
+                .iter()
+                .rev()
+                .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline);
+            let needs_operand = before.is_some_and(|token| {
+                !Self::can_end_statement(token.kind)
+                    || token.kind == TokenKind::Ident && Self::is_prefix_word(self.text(*token))
+            });
+            if self.is_continuation(after) || needs_operand {
                 self.idx += 1;
                 continue;
             }
@@ -302,6 +403,7 @@ impl<'a> Parser<'a> {
                 | TokenKind::RParen
                 | TokenKind::RBracket
                 | TokenKind::Star
+                | TokenKind::Gt
         )
     }
 
@@ -375,6 +477,15 @@ impl<'a> Parser<'a> {
     fn eat_semi(&mut self) {
         if self.peek().kind == TokenKind::Semicolon {
             self.bump();
+        }
+    }
+
+    fn eat_kind(&mut self, kind: TokenKind) -> bool {
+        if self.peek().kind == kind {
+            self.bump();
+            true
+        } else {
+            false
         }
     }
 
@@ -619,7 +730,7 @@ impl<'a> Parser<'a> {
                     break;
                 }
             }
-            if self.peek().kind == TokenKind::Dot {
+            if !self.at_stmt_break() && self.peek().kind == TokenKind::Dot {
                 self.bump();
             } else {
                 break;
@@ -681,17 +792,17 @@ impl<'a> Parser<'a> {
             "source" => Some(self.wrap_item(|p| Item::Source(p.parse_source_decl()))),
             "import" => Some(self.wrap_item(|p| Item::Import(p.parse_import_decl()))),
             "entity" => Some(self.wrap_item(|p| Item::Entity(p.parse_decl("entity")))),
-            "type" => Some(self.wrap_item(|p| Item::Type(p.parse_decl("type")))),
+            "type" => Some(self.wrap_item(|p| Item::Type(p.parse_type_decl()))),
             "record_type" | "evidence_type" => {
                 let kw = kw.to_owned();
-                Some(self.wrap_item(|p| Item::RecordType(p.parse_decl(&kw))))
+                Some(self.wrap_item(|p| Item::RecordType(p.parse_record_decl(&kw))))
             }
             "office" => Some(self.wrap_item(|p| Item::Office(p.parse_decl("office")))),
             "proposition" => {
                 Some(self.wrap_item(|p| Item::Proposition(p.parse_decl("proposition"))))
             }
             "observation" => {
-                Some(self.wrap_item(|p| Item::Observation(p.parse_decl("observation"))))
+                Some(self.wrap_item(|p| Item::Observation(p.parse_observation_decl())))
             }
             "nomination" => Some(self.wrap_item(|p| Item::Nomination(p.parse_decl("nomination")))),
             "fn" | "calc" => {
@@ -706,7 +817,7 @@ impl<'a> Parser<'a> {
             "rule" => Some(self.wrap_item(|p| Item::Rule(p.parse_rule_decl()))),
             "power" => Some(self.wrap_item(|p| Item::Power(p.parse_decl("power")))),
             "duty" => Some(self.wrap_item(|p| Item::Duty(p.parse_decl("duty")))),
-            "judgment" => Some(self.wrap_item(|p| Item::Judgment(p.parse_decl("judgment")))),
+            "judgment" => Some(self.wrap_item(|p| Item::Judgment(p.parse_judgment_decl()))),
             "decision" => Some(self.wrap_item(|p| Item::Decision(p.parse_decl("decision")))),
             "legal_act" => Some(self.wrap_item(|p| Item::LegalAct(p.parse_decl("legal_act")))),
             "clause" => Some(self.wrap_item(|p| Item::Clause(p.parse_decl("clause")))),
@@ -730,7 +841,32 @@ impl<'a> Parser<'a> {
         self.start_node(SyntaxKind::HEADER);
         let start = self.bump();
         let value_start = self.peek().start;
-        self.skip_balanced_until_end();
+        let value = if matches!(
+            kind,
+            HeaderKind::SourceSnapshot | HeaderKind::SourceManifest
+        ) {
+            let token = self.peek();
+            self.expect_kind(TokenKind::String, "expected a JSON string");
+            let value = self.src_slice(token.start, token.end);
+            if !self.at_stmt_break()
+                && !matches!(
+                    self.peek().kind,
+                    TokenKind::Semicolon | TokenKind::RBrace | TokenKind::Eof
+                )
+            {
+                self.error_here("unexpected value after header string");
+                self.skip_balanced_until_end();
+            }
+            self.eat_semi();
+            value
+        } else {
+            self.skip_balanced_until_end();
+            self.src_slice(value_start, self.last_end(start.end))
+                .trim()
+                .trim_end_matches(';')
+                .trim_end()
+                .to_owned()
+        };
         let end = self.last_end(start.end);
         self.finish_node();
         Header {
@@ -739,7 +875,7 @@ impl<'a> Parser<'a> {
                 end,
             },
             kind,
-            value: self.src_slice(value_start, end).trim().to_owned(),
+            value,
         }
     }
 
@@ -752,9 +888,25 @@ impl<'a> Parser<'a> {
             name = Some(self.parse_qname());
         }
         let sig_start = self.peek().start;
+        let params = if matches!(
+            keyword,
+            "proposition" | "decision" | "clause" | "office" | "legal_act" | "duty" | "power"
+        ) && self.peek().kind == TokenKind::LParen
+        {
+            self.parse_paren_params()
+        } else {
+            Vec::new()
+        };
+        let result_type = if keyword == "entity" && self.eat_kind(TokenKind::Colon)
+            || keyword == "decision" && self.eat_kind(TokenKind::Arrow)
+        {
+            Some(self.parse_type_string())
+        } else {
+            None
+        };
         self.skip_balanced_until_end();
         let end = self.last_end(start.end);
-        let decl = Decl::new(
+        let mut decl = Decl::new(
             Span {
                 start: start.start,
                 end,
@@ -764,6 +916,374 @@ impl<'a> Parser<'a> {
             Some(self.src_slice(sig_start, end).trim().to_owned()),
             self.src_slice(start.start, end),
         );
+        decl.params = params;
+        decl.result_type = result_type;
+        self.finish_node();
+        decl
+    }
+
+    fn judgment_expr(&mut self, message: &str) -> Expr {
+        self.parse_expr().unwrap_or_else(|| {
+            self.error_here(message);
+            Expr::Bool(false)
+        })
+    }
+
+    fn parse_observation_decl(&mut self) -> Decl {
+        self.start_node(SyntaxKind::DECL);
+        let start = self.bump();
+        let name = Some(self.parse_ident_name());
+        let params = if self.peek().kind == TokenKind::LParen {
+            self.parse_paren_params()
+        } else {
+            Vec::new()
+        };
+        if params.len() != 1 {
+            self.error_here("observation requires exactly one typed record binder");
+        }
+        self.expect_word("establishes");
+        let establishes = self.judgment_expr("expected observation proposition");
+        let source = if self.eat_ident("from") {
+            self.judgment_header = true;
+            let source = self.judgment_expr("expected observation source");
+            self.judgment_header = false;
+            Some(source)
+        } else {
+            None
+        };
+        let mut observation = crate::ast::ObservationAst {
+            establishes,
+            validators: Vec::new(),
+            unsupported_clauses: Vec::new(),
+        };
+        self.expect_kind(TokenKind::LBrace, "expected `{`");
+        self.observation_body = true;
+        while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if self.eat_kind(TokenKind::Semicolon) {
+                continue;
+            }
+            let clause_start = self.peek().start;
+            if self.eat_ident("authenticate") || self.eat_ident("require") {
+                observation
+                    .validators
+                    .push(self.judgment_expr("expected observation validation condition"));
+            } else {
+                self.skip_balanced_until_end();
+                observation.unsupported_clauses.push(
+                    self.src_slice(clause_start, self.last_end(clause_start))
+                        .to_owned(),
+                );
+            }
+            self.eat_semi();
+        }
+        self.expect_kind(TokenKind::RBrace, "expected `}`");
+        self.observation_body = false;
+        let end = self.last_end(start.end);
+        let mut decl = Decl::new(
+            Span {
+                start: start.start,
+                end,
+            },
+            "observation",
+            name,
+            None,
+            self.src_slice(start.start, end),
+        );
+        decl.params = params;
+        decl.source_basis = source;
+        decl.observation = Some(observation);
+        self.finish_node();
+        decl
+    }
+
+    fn parse_type_decl(&mut self) -> Decl {
+        self.start_node(SyntaxKind::DECL);
+        let start = self.bump();
+        let name = Some(self.parse_ident_name());
+        let parameters = self.parse_type_args_opt();
+        self.expect_kind(TokenKind::Eq, "expected `=` in type declaration");
+        let first = self.parse_type_string();
+        let mut variants = Vec::new();
+        let mut current = first.clone();
+        loop {
+            let mut arguments = Vec::new();
+            let mut fields = Vec::new();
+            if !self.at_stmt_break() && self.eat_kind(TokenKind::LParen) {
+                while !matches!(self.peek().kind, TokenKind::RParen | TokenKind::Eof) {
+                    arguments.push(self.parse_type_string());
+                    if !self.eat_kind(TokenKind::Comma) {
+                        break;
+                    }
+                }
+                self.expect_kind(TokenKind::RParen, "expected `)`");
+            }
+            if self.eat_kind(TokenKind::LBrace) {
+                while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                    if self.eat_kind(TokenKind::Comma) || self.eat_kind(TokenKind::Semicolon) {
+                        continue;
+                    }
+                    let field = self.parse_ident_name();
+                    self.expect_kind(TokenKind::Colon, "expected `:`");
+                    let ty = self.parse_type_string();
+                    if fields.iter().any(|(name, _)| name == &field) {
+                        self.error_here("duplicate variant field");
+                    }
+                    fields.push((field, ty));
+                }
+                self.expect_kind(TokenKind::RBrace, "expected `}`");
+            }
+            variants.push(crate::ast::TypeConstructorAst {
+                name: current,
+                arguments,
+                fields,
+            });
+            if !self.eat_kind(TokenKind::Pipe) {
+                break;
+            }
+            current = self.parse_type_string();
+        }
+        let definition = if variants.len() == 1
+            && variants[0].arguments.is_empty()
+            && variants[0].fields.is_empty()
+        {
+            crate::ast::TypeDefinitionAst::Alias(first)
+        } else {
+            crate::ast::TypeDefinitionAst::Sum(variants)
+        };
+        self.eat_semi();
+        let end = self.last_end(start.end);
+        let mut decl = Decl::new(
+            Span {
+                start: start.start,
+                end,
+            },
+            "type",
+            name,
+            None,
+            self.src_slice(start.start, end),
+        );
+        decl.type_args = parameters;
+        decl.type_definition = Some(definition);
+        self.finish_node();
+        decl
+    }
+
+    fn expect_word(&mut self, word: &str) {
+        if !self.eat_ident(word) {
+            self.error_here(&format!("expected `{word}`"));
+        }
+    }
+
+    fn parse_judgment_decl(&mut self) -> Decl {
+        self.start_node(SyntaxKind::DECL);
+        let start = self.bump();
+        let name = Some(self.parse_ident_name());
+        let sig_start = self.peek().start;
+        let params = if self.peek().kind == TokenKind::LParen {
+            self.parse_paren_params()
+        } else {
+            Vec::new()
+        };
+        self.expect_word("decides");
+        let decides = self.judgment_expr("expected the proposition decided by the judgment");
+        let source = if self.eat_ident("from") {
+            self.judgment_header = true;
+            let source = self.judgment_expr("expected judgment source");
+            self.judgment_header = false;
+            Some(source)
+        } else {
+            None
+        };
+        let mut judgment = JudgmentAst {
+            decides,
+            authority: None,
+            records: Vec::new(),
+            record_patterns: Vec::new(),
+            constraints: Vec::new(),
+            establish_when: None,
+            reject_when: None,
+            otherwise: None,
+            on_established: Vec::new(),
+            standard: None,
+            review: None,
+            unsupported_clauses: Vec::new(),
+        };
+        self.expect_kind(TokenKind::LBrace, "expected `{`");
+        self.judgment_body = true;
+        while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if self.eat_kind(TokenKind::Semicolon) {
+                continue;
+            }
+            let clause_start = self.peek().start;
+            if self.eat_ident("authority") {
+                if judgment.authority.is_some() {
+                    self.error_here("duplicate judgment authority");
+                }
+                judgment.authority = Some(if self.eat_ident("concurrence") {
+                    self.expect_kind(TokenKind::LParen, "expected `(`");
+                    let token = self.bump();
+                    let minimum = self.text(token).parse::<u32>().unwrap_or(0);
+                    if token.kind != TokenKind::Int || minimum == 0 {
+                        self.error_here("concurrence requires a positive integer threshold");
+                    }
+                    let distinct = self.eat_ident("distinct");
+                    let issuer_type = self.parse_type_string();
+                    self.expect_kind(TokenKind::RParen, "expected `)`");
+                    JudgmentAuthorityAst::Concurrence {
+                        minimum,
+                        distinct,
+                        issuer_type,
+                    }
+                } else {
+                    JudgmentAuthorityAst::Actor(self.judgment_expr("expected judgment authority"))
+                });
+            } else if self.eat_ident("record") {
+                if !self.at_ident("requires") {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                self.expect_word("requires");
+                if self.peek_nth(1).kind == TokenKind::Colon {
+                    let binder = self.parse_ident_name();
+                    self.expect_kind(TokenKind::Colon, "expected `:`");
+                    let ty = self.parse_type_string();
+                    judgment.records.push((binder, ty));
+                } else {
+                    judgment
+                        .record_patterns
+                        .push(self.judgment_expr("expected record requirement"));
+                }
+            } else if self.eat_ident("where") {
+                judgment
+                    .constraints
+                    .push(self.judgment_expr("expected judgment constraint"));
+            } else if self.eat_ident("establish") {
+                self.expect_word("when");
+                if self.at_ident("determination") || self.at_ident("established") {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                let condition = self.judgment_expr("expected establishment condition");
+                judgment.establish_when =
+                    Some(or_opt_expr(judgment.establish_when.take(), condition));
+            } else if self.eat_ident("reject") {
+                self.expect_word("when");
+                if self.at_ident("determination") || self.at_ident("established") {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                let condition = self.judgment_expr("expected rejection condition");
+                judgment.reject_when = Some(or_opt_expr(judgment.reject_when.take(), condition));
+            } else if self.eat_ident("otherwise") {
+                if !self.at_ident("suspend") || self.text(self.peek_nth(1)) != "NeedJudgment" {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                self.expect_word("suspend");
+                self.expect_word("NeedJudgment");
+                self.expect_kind(TokenKind::LBrace, "expected `{`");
+                let mut issue = None;
+                let mut protocol = None;
+                while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                    if self.eat_kind(TokenKind::Semicolon) || self.eat_kind(TokenKind::Comma) {
+                        continue;
+                    }
+                    let field = self.parse_ident_name();
+                    self.expect_kind(TokenKind::Colon, "expected `:`");
+                    let value = self.judgment_expr("expected request field");
+                    match field.as_str() {
+                        "issue" if issue.is_none() => issue = Some(value),
+                        "protocol" if protocol.is_none() => protocol = Some(value),
+                        _ => self.error_here("unknown or duplicate judgment request field"),
+                    }
+                }
+                self.expect_kind(TokenKind::RBrace, "expected `}`");
+                judgment.otherwise = match (issue, protocol) {
+                    (Some(issue), Some(protocol)) => Some((issue, protocol)),
+                    _ => {
+                        self.error_here("judgment suspension requires issue and protocol");
+                        None
+                    }
+                };
+            } else if self.eat_ident("on") {
+                if !self.at_ident("established") {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                self.expect_word("established");
+                self.expect_word("make");
+                let issue = self.parse_bp(PREFIX_RBP).unwrap_or_else(|| {
+                    self.error_here("expected the issue made operative");
+                    Expr::Bool(false)
+                });
+                self.expect_word("operative");
+                self.expect_word("in");
+                let context = self.judgment_expr("expected operative context");
+                judgment.on_established.push((issue, context));
+            } else if self.eat_ident("standard") {
+                judgment.standard = Some(self.judgment_expr("expected judgment standard"));
+            } else if self.eat_ident("review") {
+                if !self.at_ident("by") {
+                    self.skip_balanced_until_end();
+                    judgment.unsupported_clauses.push(
+                        self.src_slice(clause_start, self.last_end(clause_start))
+                            .to_owned(),
+                    );
+                    continue;
+                }
+                self.expect_word("by");
+                let by = self.judgment_expr("expected reviewer");
+                self.expect_word("under");
+                let standard = self.judgment_expr("expected review standard");
+                judgment.review = Some((by, standard));
+            } else {
+                self.skip_balanced_until_end();
+                judgment.unsupported_clauses.push(
+                    self.src_slice(clause_start, self.last_end(clause_start))
+                        .to_owned(),
+                );
+            }
+            self.eat_semi();
+        }
+        self.expect_kind(TokenKind::RBrace, "expected `}`");
+        self.judgment_body = false;
+        if judgment.authority.is_none() {
+            self.error_here("judgment requires an authority policy");
+        }
+        let end = self.last_end(start.end);
+        let mut decl = Decl::new(
+            Span {
+                start: start.start,
+                end,
+            },
+            "judgment",
+            name,
+            Some(self.src_slice(sig_start, end).trim().to_owned()),
+            self.src_slice(start.start, end),
+        );
+        decl.params = params;
+        decl.source_basis = source;
+        decl.judgment = Some(judgment);
         self.finish_node();
         decl
     }
@@ -792,6 +1312,39 @@ impl<'a> Parser<'a> {
             self.src_slice(start.start, end),
         );
         decl.type_args = type_args;
+        self.finish_node();
+        decl
+    }
+
+    fn parse_record_decl(&mut self, keyword: &str) -> Decl {
+        self.start_node(SyntaxKind::DECL);
+        let start = self.bump();
+        let name = Some(self.parse_ident_name());
+        let mut fields = BTreeMap::new();
+        self.expect_kind(TokenKind::LBrace, "expected `{`");
+        while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if self.eat_kind(TokenKind::Semicolon) || self.eat_kind(TokenKind::Comma) {
+                continue;
+            }
+            let field = self.parse_ident_name();
+            if field.is_empty() {
+                self.skip_balanced_until_end();
+                continue;
+            }
+            self.expect_kind(TokenKind::Colon, "expected `:` after record field");
+            let mut ty = self.parse_type_string();
+            while self.eat_kind(TokenKind::Pipe) {
+                ty.push_str(" | ");
+                ty.push_str(&self.parse_type_string());
+            }
+            if fields.insert(field.clone(), ty).is_some() {
+                self.error_here(&format!("duplicate record field `{field}`"));
+            }
+            self.eat_semi();
+        }
+        self.expect_kind(TokenKind::RBrace, "expected `}`");
+        let mut decl = self.finish_decl(start, keyword, name);
+        decl.fields = fields;
         self.finish_node();
         decl
     }
@@ -828,13 +1381,16 @@ impl<'a> Parser<'a> {
             return String::new();
         }
         let _ = self.parse_qname();
-        if self.peek().kind == TokenKind::Lt {
+        if !self.at_stmt_break() && self.peek().kind == TokenKind::Lt {
             let mut depth = 1u32;
             self.bump();
             while depth > 0 {
                 match self.peek().kind {
                     TokenKind::Lt => {
                         depth += 1;
+                        if depth > MAX_EXPRESSION_DEPTH as u32 {
+                            self.error_here("type nesting exceeds the limit of 128");
+                        }
                         self.bump();
                     }
                     TokenKind::Gt => {
@@ -1040,15 +1596,23 @@ impl<'a> Parser<'a> {
         self.bump();
         let mut stmts = Vec::new();
         let mut goal = None;
+        let mut returned = false;
         while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if returned || goal.is_some() {
+                self.error_here("query statement follows its result");
+            }
+            returned |= self.at_ident("return");
             if self.eat_ident("goal") {
                 let parsed = self.parse_goal();
                 if goal.is_none() {
                     goal = Some(parsed);
+                } else {
+                    self.error_here("query can declare only one goal");
                 }
             } else if let Some(e) = self.parse_eval_stmt() {
                 stmts.push(e);
             } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                self.error_here("expected query statement");
                 self.skip_balanced_until_end();
             }
         }
@@ -1087,6 +1651,9 @@ impl<'a> Parser<'a> {
 
     fn parse_require_tail(&mut self) -> Option<Expr> {
         let expr = self.parse_expr();
+        if expr.is_none() {
+            self.error_here("require expects a Boolean expression");
+        }
         if self.eat_ident("using") && self.at_name() {
             let _ = self.parse_ident_name();
         }
@@ -1113,7 +1680,12 @@ impl<'a> Parser<'a> {
         if goal.kind == "Evaluate" {
             self.bump();
             let mut stmts = Vec::new();
+            let mut returned = false;
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                if returned {
+                    self.error_here("evaluation statement follows `return`");
+                }
+                returned |= self.at_ident("return");
                 if let Some(e) = self.parse_eval_stmt() {
                     stmts.push(e);
                 } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
@@ -1167,21 +1739,35 @@ impl<'a> Parser<'a> {
         let sig_start = self.peek().start;
         let mut fields = BTreeMap::new();
         let mut expr = None;
+        let mut assertions = Vec::new();
         if self.peek().kind == TokenKind::LBrace {
             self.bump();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
                 if self.at_ident("assert") {
                     let clause_start = self.peek().start;
+                    let assertion_count = assertions.len();
                     self.bump();
-                    if let Some(e) = self.parse_expr()
-                        && expr.is_none()
-                    {
-                        expr = Some(e);
+                    if let Some(e) = self.parse_expr() {
+                        expr.get_or_insert_with(|| e.clone());
+                        assertions.push(e);
                     }
                     if !self.at_verify_field()
-                        && !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof)
+                        && !matches!(
+                            self.peek().kind,
+                            TokenKind::RBrace | TokenKind::Eof | TokenKind::Semicolon
+                        )
                     {
+                        if self.peek().kind != TokenKind::Ident {
+                            self.error_here("unexpected tokens after verification assertion");
+                        }
                         self.skip_balanced_until_end();
+                        assertions.truncate(assertion_count);
+                        assertions.push(Expr::Apply {
+                            callee: Box::new(Expr::Ident("$unsupported_assertion".into())),
+                            args: vec![Expr::String(
+                                self.src_slice(clause_start, self.last_end(clause_start)),
+                            )],
+                        });
                     }
                     self.eat_semi();
                     let text = self
@@ -1234,6 +1820,7 @@ impl<'a> Parser<'a> {
             self.src_slice(start.start, end),
         );
         decl.expr = expr;
+        decl.assertions = assertions;
         decl.fields = fields;
         self.finish_node();
         decl
@@ -1314,12 +1901,22 @@ impl<'a> Parser<'a> {
         }
         self.bump();
         let mut stmts = Vec::new();
-        let mut ret = None;
         let mut fuel = None;
+        let mut returned = false;
         while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+            if returned && !self.at_ident("else") {
+                self.error_here("function statement follows `return`");
+            }
             if self.eat_ident("return") {
-                ret = self.parse_expr();
+                returned = true;
+                if let Some(expr) = self.parse_expr() {
+                    stmts.push(expr);
+                }
                 self.eat_semi();
+            } else if self.eat_ident("require") {
+                if let Some(expr) = self.parse_require_tail() {
+                    stmts.push(expr);
+                }
             } else if self.at_ident("fuel") {
                 fuel = self.parse_fuel_clause();
                 self.eat_semi();
@@ -1331,19 +1928,12 @@ impl<'a> Parser<'a> {
                 // skip_balanced would swallow the else-branch as leftover.
                 self.take_fn_block_else(&mut stmts);
             } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                self.error_here("expected function statement");
                 self.skip_balanced_until_end();
             }
         }
         self.expect_kind(TokenKind::RBrace, "expected `}`");
-        let expr = ret.or_else(|| {
-            if stmts.len() == 1 {
-                stmts.pop()
-            } else if stmts.is_empty() {
-                None
-            } else {
-                Some(Expr::Block(stmts))
-            }
-        });
+        let expr = seq_exprs(stmts);
         (expr, fuel)
     }
 
@@ -1392,6 +1982,7 @@ impl<'a> Parser<'a> {
             source_basis = self.parse_expr();
         }
         let mut guard = None;
+        let mut selection = None;
         let mut consequences = Vec::new();
         let mut fallback = Vec::new();
         let mut require = None;
@@ -1421,6 +2012,41 @@ impl<'a> Parser<'a> {
                     if let Some(e) = self.parse_expr() {
                         require = Some(and_opt_expr(require.take(), e));
                     }
+                    self.eat_semi();
+                } else if self.eat_ident("select") {
+                    self.expect_word("unique");
+                    let binder = self.parse_ident_name();
+                    self.expect_word("from");
+                    let finite_domain = self.judgment_expr("expected finite selection domain");
+                    self.expect_word("where");
+                    let predicate = self.judgment_expr("expected selection predicate");
+                    let mut ordering = Vec::new();
+                    let mut ascending = Vec::new();
+                    if self.eat_ident("order_by") {
+                        loop {
+                            ordering.push(self.parse_ident_name());
+                            ascending.push(if self.eat_ident("descending") {
+                                false
+                            } else {
+                                self.eat_ident("ascending");
+                                true
+                            });
+                            if !self.eat_kind(TokenKind::Comma) {
+                                break;
+                            }
+                        }
+                    }
+                    if selection.is_some() {
+                        self.error_here("rule can declare only one selection");
+                    }
+                    selection = Some(crate::ast::SelectionAst {
+                        binder,
+                        finite_domain,
+                        predicate,
+                        ordering,
+                        ascending,
+                        require_unique_keys: true,
+                    });
                     self.eat_semi();
                 } else if self.eat_ident("source") {
                     if let Some(e) = self.parse_expr()
@@ -1454,6 +2080,7 @@ impl<'a> Parser<'a> {
         decl.consequences = consequences;
         decl.fallback = fallback;
         decl.require = require;
+        decl.selection = selection;
         decl.source_basis = source_basis;
         self.finish_node();
         decl
@@ -1506,6 +2133,64 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_bp(&mut self, min_bp: u8) -> Option<Expr> {
+        if self.expression_depth >= MAX_EXPRESSION_DEPTH {
+            self.error_here("expression nesting exceeds the limit of 128");
+            self.skip_one_transaction_step();
+            return None;
+        }
+        self.expression_depth += 1;
+        let result = self.parse_bp_inner(min_bp);
+        self.expression_depth -= 1;
+        result.filter(|expression| self.expression_within_budget(expression))
+    }
+
+    fn expression_within_budget(&mut self, expression: &Expr) -> bool {
+        let mut pending = vec![(expression, 1usize)];
+        let mut nodes = 0;
+        while let Some((expression, depth)) = pending.pop() {
+            nodes += 1;
+            if depth > MAX_EXPRESSION_DEPTH || nodes > MAX_EXPRESSION_NODES {
+                self.error_here("expression tree exceeds depth or node budget");
+                return false;
+            }
+            let child_depth = depth + 1;
+            match expression {
+                Expr::Apply { callee, args } => {
+                    pending.push((callee, child_depth));
+                    pending.extend(args.iter().map(|arg| (arg, child_depth)));
+                }
+                Expr::Binary { left, right, .. } => {
+                    pending.push((left, child_depth));
+                    pending.push((right, child_depth));
+                }
+                Expr::Field { base, .. } => pending.push((base, child_depth)),
+                Expr::Call { args, .. } | Expr::Block(args) | Expr::Set(args) => {
+                    pending.extend(args.iter().map(|arg| (arg, child_depth)))
+                }
+                Expr::If { cond, then, else_ } => {
+                    pending.push((cond, child_depth));
+                    pending.push((then, child_depth));
+                    pending.extend(else_.as_deref().map(|branch| (branch, child_depth)));
+                }
+                Expr::Require(inner)
+                | Expr::Grouped(inner)
+                | Expr::NamedArg { value: inner, .. } => pending.push((inner, child_depth)),
+                Expr::Record(fields) => {
+                    pending.extend(fields.values().map(|value| (value, child_depth)))
+                }
+                Expr::Bool(_)
+                | Expr::Int(_)
+                | Expr::Decimal(_)
+                | Expr::String(_)
+                | Expr::Ident(_)
+                | Expr::Money { .. }
+                | Expr::Duration { .. } => {}
+            }
+        }
+        true
+    }
+
+    fn parse_bp_inner(&mut self, min_bp: u8) -> Option<Expr> {
         let mut lhs = self.parse_prefix()?;
         loop {
             if self.at_stmt_break() {
@@ -1514,6 +2199,20 @@ impl<'a> Parser<'a> {
             if let Some((lbp, rbp, op)) = self.infix_info() {
                 if lbp < min_bp {
                     break;
+                }
+                if matches!(
+                    op,
+                    InfixOp::Bin(
+                        BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge
+                    )
+                ) && matches!(
+                    lhs,
+                    Expr::Binary {
+                        op: BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge,
+                        ..
+                    }
+                ) {
+                    self.error_here("chained comparisons require explicit logical conjunction");
                 }
                 self.bump();
                 if let Some(rhs) = self.parse_bp(rbp) {
@@ -1528,6 +2227,10 @@ impl<'a> Parser<'a> {
                             args: vec![lhs, rhs],
                         },
                     };
+                    if !self.expression_within_budget(&lhs) {
+                        self.skip_one_transaction_step();
+                        return None;
+                    }
                     continue;
                 }
                 self.error_here("expected expression after operator");
@@ -1541,6 +2244,10 @@ impl<'a> Parser<'a> {
                     callee: Box::new(lhs),
                     args: vec![rhs],
                 };
+                if !self.expression_within_budget(&lhs) {
+                    self.skip_one_transaction_step();
+                    return None;
+                }
                 continue;
             }
             break;
@@ -1595,6 +2302,7 @@ impl<'a> Parser<'a> {
                 | "valid_time"
                 | "record_time"
                 | "module"
+                | "under"
         )
     }
 
@@ -1622,6 +2330,23 @@ impl<'a> Parser<'a> {
         match t.kind {
             TokenKind::Ident | TokenKind::DurationUnit => {
                 let w = self.text(t);
+                if self.observation_body && w == "authenticate" {
+                    return false;
+                }
+                if self.judgment_body
+                    && matches!(
+                        w,
+                        "authority"
+                            | "record"
+                            | "establish"
+                            | "reject"
+                            | "on"
+                            | "review"
+                            | "standard"
+                    )
+                {
+                    return false;
+                }
                 !Self::is_expr_stop_word(w)
                     && !matches!(w, "and" | "or" | "in" | "as" | "is")
                     && !Self::is_prefix_word(w)
@@ -1671,17 +2396,38 @@ impl<'a> Parser<'a> {
                 let name = self.text(t).to_owned();
                 self.bump();
                 let rhs = self.parse_bp(PREFIX_RBP)?;
+                // `operative P in Context` is the proposition plus its legal
+                // context. `in` binds looser than this prefix, so without this
+                // the outer Pratt loop would parse a proposition named `in`.
+                let mut args = vec![rhs];
+                if matches!(
+                    name.as_str(),
+                    "operative" | "determined" | "assumed" | "necessarily"
+                ) && self.eat_ident("in")
+                    && let Some(ctx) = self.parse_bp(PREFIX_RBP)
+                {
+                    args.push(ctx);
+                }
                 Some(Expr::Apply {
                     callee: Box::new(Expr::Ident(name)),
-                    args: vec![rhs],
+                    args,
                 })
             }
             TokenKind::Ident if Self::is_expr_stop_word(self.text(t)) => None,
             TokenKind::Minus => {
                 self.bump();
+                if self.peek().kind == TokenKind::Int {
+                    return Some(self.parse_signed_int_or_duration(true));
+                }
                 let rhs = self.parse_bp(PREFIX_RBP)?;
                 Some(match rhs {
-                    Expr::Int(n) => Expr::Int(-n),
+                    Expr::Int(n) => match n.checked_neg() {
+                        Some(value) => Expr::Int(value),
+                        None => {
+                            self.error(t, "integer negation is out of range");
+                            Expr::Int(n)
+                        }
+                    },
                     other => Expr::Apply {
                         callee: Box::new(Expr::Ident("-".to_owned())),
                         args: vec![other],
@@ -1734,7 +2480,7 @@ impl<'a> Parser<'a> {
             self.bump();
             self.parse_expr().unwrap_or(Expr::Block(Vec::new()))
         } else if self.peek().kind == TokenKind::LBrace {
-            self.parse_braced_expr()
+            self.parse_brace_unwrapped()
         } else {
             Expr::Block(Vec::new())
         };
@@ -1755,7 +2501,7 @@ impl<'a> Parser<'a> {
                 Some(Expr::Decimal(s))
             }
             TokenKind::String => {
-                let s = trim_quotes(self.text(t)).to_owned();
+                let s = serde_json::from_str::<String>(self.text(t)).unwrap_or_default();
                 self.bump();
                 Some(Expr::String(s))
             }
@@ -1768,7 +2514,7 @@ impl<'a> Parser<'a> {
                 self.bump();
                 let inner = self.parse_expr();
                 self.expect_kind(TokenKind::RParen, "expected `)`");
-                inner
+                inner.map(|expr| Expr::Grouped(Box::new(expr)))
             }
             TokenKind::LBrace => Some(self.parse_braced_expr()),
             TokenKind::LBracket => Some(self.parse_interval_expr()),
@@ -1800,6 +2546,9 @@ impl<'a> Parser<'a> {
             return Expr::Bool(false);
         }
         let mut name = self.parse_ident_name();
+        if self.at_stmt_break() {
+            return Expr::Ident(name);
+        }
         if self.looks_like_call_generics() {
             name.push_str(&self.consume_generic_args_text());
         }
@@ -1817,14 +2566,14 @@ impl<'a> Parser<'a> {
                 amount,
             };
         }
-        if self.peek().kind == TokenKind::LBrace {
+        if !self.judgment_header && self.peek().kind == TokenKind::LBrace {
             if name == "transaction" {
                 return Expr::Apply {
                     callee: Box::new(Expr::Ident(name)),
                     args: self.parse_transaction_block(),
                 };
             }
-            let block = self.parse_braced_expr();
+            let block = self.parse_block_expr();
             return Expr::Apply {
                 callee: Box::new(Expr::Ident(name)),
                 args: vec![block],
@@ -1913,8 +2662,23 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_int_or_duration(&mut self) -> Expr {
+        self.parse_signed_int_or_duration(false)
+    }
+
+    fn parse_signed_int_or_duration(&mut self, negative: bool) -> Expr {
         let t = self.bump();
-        let n = self.text(t).parse::<i64>().unwrap_or(0);
+        let raw = if negative {
+            format!("-{}", self.text(t))
+        } else {
+            self.text(t).to_owned()
+        };
+        let n = match raw.parse::<i64>() {
+            Ok(value) => value,
+            Err(_) => {
+                self.error(t, "integer literal is out of range for Int");
+                0
+            }
+        };
         if self.peek().kind == TokenKind::DurationUnit {
             let unit_tok = self.peek();
             let unit = self.text(unit_tok).to_owned();
@@ -1949,7 +2713,7 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_brace_unwrapped(&mut self) -> Expr {
-        match self.parse_braced_expr() {
+        match self.parse_block_expr() {
             Expr::Block(mut items) if items.len() == 1 => {
                 items.pop().unwrap_or(Expr::Block(Vec::new()))
             }
@@ -1958,10 +2722,26 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_braced_expr(&mut self) -> Expr {
+        self.parse_brace_contents(true)
+    }
+
+    fn parse_block_expr(&mut self) -> Expr {
+        self.parse_brace_contents(false)
+    }
+
+    fn parse_brace_contents(&mut self, collection: bool) -> Expr {
         self.bump();
         let mut items = Vec::new();
+        let mut fields = BTreeMap::new();
+        let mut is_record = false;
+        let mut is_sequence = !collection;
         while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-            if matches!(self.peek().kind, TokenKind::Comma | TokenKind::Semicolon) {
+            if self.peek().kind == TokenKind::Semicolon {
+                is_sequence = true;
+                self.bump();
+                continue;
+            }
+            if self.peek().kind == TokenKind::Comma {
                 self.bump();
                 continue;
             }
@@ -1969,10 +2749,17 @@ impl<'a> Parser<'a> {
                 let name = self.parse_ident_name();
                 self.bump();
                 let val = self.parse_expr().unwrap_or(Expr::Ident(String::new()));
-                items.push(Expr::Apply {
-                    callee: Box::new(Expr::Ident(name)),
-                    args: vec![val],
-                });
+                if collection {
+                    is_record = true;
+                    if fields.insert(name.clone(), val).is_some() {
+                        self.error_here(&format!("duplicate record field `{name}`"));
+                    }
+                } else {
+                    items.push(Expr::NamedArg {
+                        name,
+                        value: Box::new(val),
+                    });
+                }
             } else if let Some(e) = self.parse_expr() {
                 items.push(e);
             } else if self.at_name() {
@@ -1983,12 +2770,24 @@ impl<'a> Parser<'a> {
             } else {
                 break;
             }
-            if matches!(self.peek().kind, TokenKind::Comma | TokenKind::Semicolon) {
+            if self.peek().kind == TokenKind::Semicolon {
+                is_sequence = true;
+                self.bump();
+            } else if self.peek().kind == TokenKind::Comma {
                 self.bump();
             }
         }
         self.expect_kind(TokenKind::RBrace, "expected `}`");
-        Expr::Block(items)
+        if is_record {
+            if !items.is_empty() {
+                self.error_here("record fields cannot be mixed with positional elements");
+            }
+            Expr::Record(fields)
+        } else if is_sequence {
+            Expr::Block(items)
+        } else {
+            Expr::Set(items)
+        }
     }
 
     fn parse_postfix(&mut self, mut expr: Expr) -> Expr {
@@ -2017,6 +2816,10 @@ impl<'a> Parser<'a> {
                     };
                 }
                 _ => break,
+            }
+            if !self.expression_within_budget(&expr) {
+                self.skip_one_transaction_step();
+                break;
             }
         }
         expr
@@ -2047,9 +2850,9 @@ impl<'a> Parser<'a> {
             let name = self.parse_ident_name();
             self.bump();
             let val = self.parse_expr()?;
-            return Some(Expr::Apply {
-                callee: Box::new(Expr::Ident(name)),
-                args: vec![val],
+            return Some(Expr::NamedArg {
+                name,
+                value: Box::new(val),
             });
         }
         self.parse_expr()
@@ -2115,7 +2918,11 @@ impl<'a> Parser<'a> {
         let mut depth_brace = 0u32;
         let mut depth_paren = 0u32;
         let mut depth_brack = 0u32;
-        let mut last_sig = TokenKind::Eof;
+        let mut last_sig = self.tokens[..self.idx]
+            .iter()
+            .rev()
+            .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline)
+            .map_or(TokenKind::Eof, |token| token.kind);
         loop {
             let t = self.peek_raw();
             if Self::is_trivia(t.kind) {
@@ -2235,6 +3042,17 @@ fn and_opt_expr(prev: Option<Expr>, next: Expr) -> Expr {
     match prev {
         Some(prev) => Expr::Binary {
             op: BinOp::And,
+            left: Box::new(prev),
+            right: Box::new(next),
+        },
+        None => next,
+    }
+}
+
+fn or_opt_expr(prev: Option<Expr>, next: Expr) -> Expr {
+    match prev {
+        Some(prev) => Expr::Binary {
+            op: BinOp::Or,
             left: Box::new(prev),
             right: Box::new(next),
         },
@@ -2965,6 +3783,37 @@ module Examples.FuelRow version "0.1.0" {
     }
 
     #[test]
+    fn parses_operative_in_as_context_not_as_infix() {
+        let parsed =
+            parse_body("rule R : derive { when operative P() in Context(X) then derive Q() }");
+        let d = match &parsed.module().unwrap().items[0] {
+            Item::Rule(d) => d,
+            other => panic!("{other:?}"),
+        };
+        match d.guard.as_ref() {
+            Some(Expr::Apply { callee, args }) => {
+                assert_eq!(callee.as_ref(), &Expr::Ident("operative".to_owned()));
+                assert_eq!(args.len(), 2, "{args:?}");
+                assert_eq!(
+                    args[0],
+                    Expr::Call {
+                        callee: "P".to_owned(),
+                        args: vec![],
+                    }
+                );
+                assert_eq!(
+                    args[1],
+                    Expr::Call {
+                        callee: "Context".to_owned(),
+                        args: vec![Expr::Ident("X".to_owned())],
+                    }
+                );
+            }
+            other => panic!("guard must stay operative, not a proposition named in: {other:?}"),
+        }
+    }
+
+    #[test]
     fn parses_otherwise_as_fallback_not_then() {
         let parsed =
             parse_body("rule R : derive { when true then derive P() otherwise derive Q() }");
@@ -3250,14 +4099,14 @@ module X version "0.1.0" {
                     [Expr::Block(items)] => {
                         assert_eq!(items[0], Expr::Ident("certificate".to_owned()));
                         match &items[1] {
-                            Expr::Apply { callee, args } => {
-                                assert_eq!(callee.as_ref(), &Expr::Ident("fee".to_owned()));
+                            Expr::NamedArg { name, value } => {
+                                assert_eq!(name, "fee");
                                 assert_eq!(
-                                    args,
-                                    &vec![Expr::Call {
+                                    value.as_ref(),
+                                    &Expr::Call {
                                         callee: "current_fee".to_owned(),
                                         args: vec![Expr::Ident("X".to_owned())],
-                                    }]
+                                    }
                                 );
                             }
                             other => panic!("{other:?}"),

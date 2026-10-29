@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
+    branches: [main, dev]
   workflow_dispatch:
 
 permissions:
@@ -17,39 +18,254 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  metadata:
+    name: Release metadata
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - run: rustup toolchain install --no-self-update
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - run: cargo fetch --locked
+      - name: Require version and changelog updates for main
+        env:
+          PROMOTION_BASE: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.base.sha || github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.before || '' }}
+        run: |
+          if test -n "$PROMOTION_BASE"; then
+            cargo xtask release-check --base "$PROMOTION_BASE"
+          else
+            cargo xtask release-check
+          fi
+      - id: version
+        run: cargo metadata --no-deps --offline --format-version 1 | jq -r '.packages[] | select(.name == "fidryn-cli") | "version=" + .version' >> "$GITHUB_OUTPUT"
   ci:
     name: cargo xtask ci
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v7
-
-      # rust-toolchain.toml pins the channel and its components.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install the pinned Rust toolchain
         run: rustup toolchain install --no-self-update
-
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
-
-      # uv uses the Python that .python-version names (downloading it if the runner lacks it) and the packages uv.lock pins; the .venv it builds lives only on the runner.
-      # setup-uv publishes exact release tags only (no floating major tag).
-      - uses: astral-sh/setup-uv@v10.2.0
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: "0.11.8"
           enable-cache: true
           cache-dependency-glob: uv.lock
-
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
-
-      # cargo xtask ci runs cargo with --offline, so fetch the locked crates first.
-      - name: Fetch crates
+      - name: Fetch locked crates
         run: cargo fetch --locked
-
-      - name: Sync the Python environment
+      - name: Sync locked Python environment
         run: uv sync --locked
-
-      - name: cargo xtask ci
+      - name: Run complete qualification
         run: cargo xtask ci --fmt
+  platforms:
+    name: Rust tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: rustup toolchain install --no-self-update
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - run: cargo fetch --locked
+      - run: cargo test --workspace --all-features --locked --no-fail-fast
+      - name: Build and verify native package
+        run: cargo xtask package --output-dir "${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fidryn-${{ matrix.os }}
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.tar.gz
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.zip
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.sha256
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.blake3
+            ${{ runner.temp }}/fidryn-packages-${{ github.run_id }}-${{ github.run_attempt }}/*.manifest.json
+  security:
+    name: Security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: taiki-e/install-action@86f7a0ffb25f40114606501a311ebcfaf882ea32 # v2
+        with:
+          tool: cargo-audit@0.22.2,cargo-deny@0.20.2
+      - run: cargo audit --deny warnings
+      - run: cargo deny check
+      - name: Scan for secrets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          gh release download v8.30.1 --repo gitleaks/gitleaks --pattern gitleaks_8.30.1_linux_x64.tar.gz --pattern gitleaks_8.30.1_checksums.txt --dir "$RUNNER_TEMP/gitleaks"
+          cd "$RUNNER_TEMP/gitleaks"
+          sha256sum --check --ignore-missing gitleaks_8.30.1_checksums.txt
+          tar -xzf gitleaks_8.30.1_linux_x64.tar.gz
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/gitleaks/gitleaks" git --redact --no-banner --log-opts='--all --full-history -m'
+          "$RUNNER_TEMP/gitleaks/gitleaks" dir --redact --no-banner
+  workflows:
+    name: Workflow lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+  release:
+    name: Publish release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [metadata, ci, platforms, security, workflows]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: fidryn-release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
+      security-events: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          pattern: fidryn-*
+          path: release-assets
+          merge-multiple: true
+      - name: Require CodeQL on the exact main commit
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            echo "Waiting for CodeQL on $GITHUB_SHA ($attempt/60)"
+            gh run list --repo "$GITHUB_REPOSITORY" --workflow codeql.yml --event push --branch main --commit "$GITHUB_SHA" --limit 1 --json status,conclusion > "$RUNNER_TEMP/codeql.json"
+            if jq -e 'length == 1 and .[0].status == "completed" and .[0].conclusion == "success"' "$RUNNER_TEMP/codeql.json" >/dev/null; then
+              exit 0
+            fi
+            if jq -e 'length == 1 and .[0].status == "completed" and .[0].conclusion != "success"' "$RUNNER_TEMP/codeql.json" >/dev/null; then
+              echo "CodeQL did not pass for this main commit" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "CodeQL did not complete within the publication wait limit" >&2
+          exit 1
+      - name: Refuse unresolved CodeQL errors and high-severity findings
+        shell: bash
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/code-scanning/alerts?ref=refs/heads/main&state=open&tool_name=CodeQL&per_page=100" --jq '.[]' |
+            jq --slurp --exit-status '
+              all(.[];
+                (.rule | type) == "object" and
+                (.rule | has("security_severity_level")) and
+                (.rule.severity == "note" or .rule.severity == "warning") and
+                (.rule.security_severity_level == null or
+                 .rule.security_severity_level == "low" or
+                 .rule.security_severity_level == "medium"))'
+      - name: Verify package identity and checksums
+        shell: bash
+        run: |
+          cd release-assets
+          export LC_ALL=C
+          shopt -s nullglob
+          manifests=(*.manifest.json)
+          files=(*)
+          test "${#manifests[@]}" -eq 3
+          test "${#files[@]}" -eq 12
+          expected=()
+          families=()
+          for manifest in "${manifests[@]}"; do
+            jq -e '.schema == "fidryn.package/v0.1" and .version == env.RELEASE_VERSION and .sourceCommit == env.GITHUB_SHA and .dirty == false and (.host | test("^[A-Za-z0-9_]+(-[A-Za-z0-9_]+)+$"))' "$manifest" >/dev/null
+            host="$(jq -r .host "$manifest")"
+            stem="${manifest%.manifest.json}"
+            test "$stem" = "fidryn-$RELEASE_VERSION-$host"
+            case "$host" in
+              *-unknown-linux-gnu) family=linux; extension=tar.gz ;;
+              *-apple-darwin) family=macos; extension=tar.gz ;;
+              *-pc-windows-msvc) family=windows; extension=zip ;;
+              *) echo "Unexpected release host: $host" >&2; exit 1 ;;
+            esac
+            families+=("$family")
+            archive="$stem.$extension"
+            for asset in "$manifest" "$archive" "$archive.sha256" "$archive.blake3"; do
+              test -f "$asset" && test ! -L "$asset"
+              expected+=("$asset")
+            done
+            read -r digest filename < "$archive.sha256"
+            test "$filename" = "$archive"
+            [[ "$digest" =~ ^[0-9a-f]{64}$ ]]
+            printf '%s  %s\n' "$digest" "$archive" | cmp - "$archive.sha256"
+            read -r digest filename < "$archive.blake3"
+            test "$filename" = "$archive"
+            [[ "$digest" =~ ^[0-9a-f]{64}$ ]]
+            printf '%s  %s\n' "$digest" "$archive" | cmp - "$archive.blake3"
+          done
+          test "$(printf '%s\n' "${families[@]}" | sort -u | wc -l)" -eq 3
+          printf '%s\n' "${expected[@]}" | sort > "$RUNNER_TEMP/expected-release-assets.txt"
+          printf '%s\n' "${files[@]}" | sort > "$RUNNER_TEMP/actual-release-assets.txt"
+          cmp "$RUNNER_TEMP/expected-release-assets.txt" "$RUNNER_TEMP/actual-release-assets.txt"
+          sha256sum --check --strict ./*.sha256
+      - name: Prepare release notes
+        run: |
+          cargo fetch --locked
+          cargo xtask release-notes > "$RUNNER_TEMP/release-notes.md"
+      - name: Publish tested packages through GitHub releases
+        shell: bash
+        run: |
+          export LC_ALL=C
+          current_main="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if test "$current_main" != "$GITHUB_SHA"; then
+            echo "Main advanced; this older run retains its CI packages and skips publication"
+            exit 0
+          fi
+          tag="v$RELEASE_VERSION"
+          if gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha > "$RUNNER_TEMP/release-tag.txt" 2>/dev/null; then
+            test "$(cat "$RUNNER_TEMP/release-tag.txt")" = "$GITHUB_SHA"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA"
+          fi
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha)" = "$GITHUB_SHA"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isDraft,apiUrl > "$RUNNER_TEMP/existing-release.json" 2>/dev/null; then
+            release_api="$(jq -r .apiUrl "$RUNNER_TEMP/existing-release.json")"
+            gh api "$release_api" --jq '.assets[].name' | sort > "$RUNNER_TEMP/remote-release-assets.txt"
+            comm -23 "$RUNNER_TEMP/remote-release-assets.txt" "$RUNNER_TEMP/expected-release-assets.txt" > "$RUNNER_TEMP/unexpected-release-assets.txt"
+            test ! -s "$RUNNER_TEMP/unexpected-release-assets.txt"
+            if jq -e '.isDraft == false' "$RUNNER_TEMP/existing-release.json" >/dev/null; then
+              cmp "$RUNNER_TEMP/expected-release-assets.txt" "$RUNNER_TEMP/remote-release-assets.txt"
+              gh api "$release_api" --jq 'all(.assets[]; .state == "uploaded" and .size > 0)' | grep -qx true
+              echo "The matching release is already published; assets are preserved"
+              exit 0
+            fi
+            gh release upload "$tag" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/release-notes.md"
+          else
+            gh release create "$tag" release-assets/* --repo "$GITHUB_REPOSITORY" --verify-tag --title "Fidryn $RELEASE_VERSION" --notes-file "$RUNNER_TEMP/release-notes.md" --draft
+            release_api="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json apiUrl --jq .apiUrl)"
+          fi
+          gh api "$release_api" --jq '.assets[].name' | sort > "$RUNNER_TEMP/uploaded-release-assets.txt"
+          cmp "$RUNNER_TEMP/expected-release-assets.txt" "$RUNNER_TEMP/uploaded-release-assets.txt"
+          gh api "$release_api" --jq 'all(.assets[]; .state == "uploaded" and .size > 0)' | grep -qx true
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$tag" --jq .sha)" = "$GITHUB_SHA"
+          if test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" != "$GITHUB_SHA"; then
+            echo "Main advanced; the prepared draft is retained without publication"
+            exit 0
+          fi
+          gh api --method PATCH "$release_api" -F draft=false -f make_latest=legacy

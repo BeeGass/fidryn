@@ -43,6 +43,7 @@ pub struct CoreNomination {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind")]
 pub enum CoreDecl {
+    Type(CoreTypeDecl),
     Source(CoreSource),
     Entity(CoreEntity),
     RecordType(CoreRecordType),
@@ -56,12 +57,35 @@ pub enum CoreDecl {
     Position(Position),
     Power(CorePower),
     Duty(CoreDuty),
-    Judgment(CoreJudgment),
+    Judgment(Box<CoreJudgment>),
     Decision(CoreDecision),
     LegalAct(CoreLegalAct),
     InterpretationFamily(CoreInterpretationFamily),
     ConflictDoctrine(CoreConflictDoctrine),
     Clause(CoreClause),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoreTypeDecl {
+    pub id: NodeId,
+    pub name: String,
+    pub parameters: Vec<String>,
+    pub definition: TypeDefinition,
+    pub meta: NodeMeta,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TypeDefinition {
+    Alias(Type),
+    Sum(Vec<CoreConstructor>),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoreConstructor {
+    pub name: String,
+    pub arguments: Vec<Type>,
+    #[serde(default)]
+    pub fields: Vec<(String, Type)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -114,8 +138,16 @@ pub struct CoreObservation {
     pub id: NodeId,
     pub name: String,
     pub record_binder: String,
+    #[serde(default)]
+    pub record_type: Option<Type>,
     pub validators: Vec<Guard>,
+    #[serde(default)]
+    pub validator_terms: Vec<Term>,
     pub establishes: PropTerm,
+    #[serde(default)]
+    pub source: Option<Term>,
+    #[serde(default)]
+    pub unsupported_clauses: Vec<String>,
     pub meta: NodeMeta,
 }
 
@@ -183,6 +215,8 @@ pub struct CoreSelection {
     pub finite_domain: Term,
     pub predicate: Guard,
     pub ordering: Vec<String>,
+    #[serde(default)]
+    pub ascending: Vec<bool>,
     pub require_unique_keys: bool,
 }
 
@@ -209,6 +243,8 @@ pub struct CorePower {
 pub struct CoreDuty {
     pub id: NodeId,
     pub name: String,
+    #[serde(default)]
+    pub binders: Vec<(String, Type)>,
     pub bearer: Term,
     pub claimant: Option<Term>,
     pub attaches: Guard,
@@ -222,8 +258,58 @@ pub struct CoreJudgment {
     pub name: String,
     pub decides: PropTerm,
     pub authority: Term,
+    #[serde(default)]
+    pub binders: Vec<(String, Type)>,
+    #[serde(default)]
+    pub source: Option<Term>,
+    #[serde(default)]
+    pub authority_policy: Option<JudgmentAuthority>,
     pub record_requires: Vec<(String, Type)>,
+    #[serde(default)]
+    pub record_patterns: Vec<Term>,
+    #[serde(default)]
+    pub standard: Option<Term>,
+    #[serde(default)]
+    pub constraints: Vec<Term>,
+    #[serde(default)]
+    pub establish_when: Option<Term>,
+    #[serde(default)]
+    pub reject_when: Option<Term>,
+    #[serde(default)]
+    pub otherwise: Option<JudgmentFallback>,
+    #[serde(default)]
+    pub on_established: Vec<JudgmentAction>,
+    #[serde(default)]
+    pub review: Option<JudgmentReview>,
+    #[serde(default)]
+    pub unsupported_clauses: Vec<String>,
     pub meta: NodeMeta,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum JudgmentAuthority {
+    Actor(Term),
+    Concurrence {
+        minimum: u32,
+        distinct: bool,
+        issuer_type: Type,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum JudgmentFallback {
+    Suspend { issue: PropTerm, protocol: Term },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum JudgmentAction {
+    MakeOperative { issue: Term, context: Term },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct JudgmentReview {
+    pub by: Term,
+    pub standard: Term,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -286,6 +372,10 @@ pub enum ConflictTarget {
 pub struct CoreClause {
     pub id: ClauseId,
     pub name: String,
+    #[serde(default)]
+    pub binders: Vec<(String, Type)>,
+    #[serde(default)]
+    pub source: String,
     pub rules: Vec<NodeId>,
     pub meta: NodeMeta,
 }
@@ -305,6 +395,7 @@ pub enum Consequence {
     Terminate(PropTerm),
     Suspend(PropTerm),
     CreatePosition(Position),
+    CreatePositionExpr(Term),
     Discharge(String),
     Activate(String),
     Defeat { target: ConflictTarget },
@@ -316,11 +407,14 @@ pub enum Guard {
     Operative(PropTerm, String),
     CompletedAct(String),
     EffectiveAct(String),
+    EffectiveActTerm(Term),
     Observed {
         schema: String,
         binder: String,
     },
     Derived(PropTerm),
+    Determined(PropTerm),
+    Assumed(PropTerm),
     Compare {
         op: CompareOp,
         left: Term,
@@ -356,6 +450,10 @@ pub struct CoreQuery {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum QueryPlan {
+    Guarded {
+        prefix: Vec<Term>,
+        plan: Box<QueryPlan>,
+    },
     Evaluate(Term),
     UniqueOccupant {
         office: Term,
@@ -400,6 +498,9 @@ pub struct CoreVerify {
     pub name: String,
     pub bounds: VerificationBounds,
     pub formula: String,
+    /// Every declared assertion, preserved as executable expression structure.
+    #[serde(default)]
+    pub assertions: Vec<Term>,
     pub meta: NodeMeta,
 }
 
@@ -440,29 +541,11 @@ impl CoreModule {
             .map(crate::ids::ProgramDigest::from_bytes)
     }
 
-    /// Blake3 of canonical JSON over name, version, queries, declarations,
-    /// and nominations.
-    ///
-    /// Distinct from [`Self::id`], which is name-based via [`ModuleId::of`].
-    /// Covering claims bind both identities; this digest is not a substitute
-    /// for [`ModuleId`].
+    /// Blake3 of the complete canonical module, including source identity,
+    /// jurisdiction, exclusions and declared verification obligations.
+    /// Name-derived ModuleId alone never identifies an executable artifact.
     pub fn content_fingerprint(&self) -> Result<[u8; 32], String> {
-        #[derive(Serialize)]
-        struct Fingerprint<'a> {
-            name: &'a str,
-            version: &'a str,
-            queries: &'a [CoreQuery],
-            declarations: &'a [CoreDecl],
-            nominations: &'a [CoreNomination],
-        }
-        let bytes = crate::canonical_to_vec(&Fingerprint {
-            name: &self.name,
-            version: &self.version,
-            queries: &self.queries,
-            declarations: &self.declarations,
-            nominations: &self.nominations,
-        })
-        .map_err(|e| e.to_string())?;
+        let bytes = crate::canonical_to_vec(self).map_err(|e| e.to_string())?;
         Ok(*blake3::hash(&bytes).as_bytes())
     }
 }

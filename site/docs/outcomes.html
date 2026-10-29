@@ -107,14 +107,14 @@ legal advice, and not a filing.</p>
 <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json"><code>schemas/outcome-v0.1.json</code></a>. Field names
 are camelCase. Trust, coverage, execution mode, and assumptions that
 cannot fit that schema live on the evaluation-report envelope
-(<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json"><code>fidryn.evaluation-report/v0.1</code></a>);
+(<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json"><code>fidryn.evaluation-report/v0.2</code></a>);
 they are not extra keys on the outcome object (<code>additionalProperties</code>
 is false).</p>
 <p>See <a href="/docs/cli">CLI</a>, the <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf">language grammar</a>, and
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
 <h2 id="envelope"><span class="hn">6.1</span> Envelope <a class="anchor" href="#envelope" aria-label="Link to this section">#</a></h2>
 <p>CLI <code>run</code> / <code>explore</code> and mill <code>/api/run</code> / <code>/api/explore</code> emit
-<code>fidryn.evaluation-report/v0.1</code>. The six-kind legal result is nested as
+<code>fidryn.evaluation-report/v0.2</code>. The six-kind legal result is nested as
 <code>outcomeDocument</code>. That nested object is:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>schema</code></td><td><code>fidryn.outcome/v0.1</code>.</td></tr>
@@ -136,17 +136,24 @@ result.</p>
 failures (exit 1). They are never rewritten as <code>inconsistent</code>.</p>
 <h2 id="evaluation-report-envelope"><span class="hn">6.2</span> Evaluation report envelope <a class="anchor" href="#evaluation-report-envelope" aria-label="Link to this section">#</a></h2>
 <p>Qualifications that the outcome schema cannot carry live on
-<code>fidryn.evaluation-report/v0.1</code>. <code>fidryn_trace::render_report</code> emits
-that object. <code>outcomeDocument</code> is the <code>fidryn.outcome/v0.1</code> projection
+<code>fidryn.evaluation-report/v0.2</code>. <code>fidryn_trace::render_checked_report</code>
+requires an invocation-bound checked evaluation. The legacy <code>render_report</code>
+API remains a v0.1 compatibility projection and does not supply a checked v0.2
+invocation. <code>outcomeDocument</code> is the <code>fidryn.outcome/v0.1</code> projection
 above; that schema is unchanged.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
-<tr><td><code>schema</code></td><td><code>fidryn.evaluation-report/v0.1</code>.</td></tr>
+<tr><td><code>schema</code></td><td><code>fidryn.evaluation-report/v0.2</code>.</td></tr>
 <tr><td><code>executionMode</code></td><td><code>operative</code> or <code>scenario</code>. Operative <code>evaluate</code> does not apply <code>case.assumptions</code>.</td></tr>
 <tr><td><code>assumptions</code></td><td>Overlay hypotheses copied onto a scenario report. Empty for operative runs.</td></tr>
 <tr><td><code>sourceTrust</code></td><td>How the compiled source was authenticated. In-memory / mill pasted compile is <code>unauthenticated</code>. A path compile may be <code>fixture</code> or <code>byteVerified</code>. <code>fixture</code> is not byte-verified.</td></tr>
 <tr><td><code>verificationMethod</code></td><td><code>none</code> (no covering verification; a claims-digest binding is not covering), <code>structural</code> (shape only), or <code>finiteReplay</code> (each declared branch re-evaluated). Only <code>finiteReplay</code> is covering.</td></tr>
 <tr><td><code>coverage</code></td><td>Optional <code>CoverageWitness</code>. Shape completeness is not covering meaning.</td></tr>
 <tr><td><code>outcomeDocument</code></td><td>The <code>fidryn.outcome/v0.1</code> object from the previous section.</td></tr>
+<tr><td><code>invocation</code>, <code>invocationId</code></td><td>Program/case identity, query arguments, clocks, execution mode, operation and actual operation budget.</td></tr>
+<tr><td><code>sourceBundle</code></td><td>Identity of this compilation's immutable source observations.</td></tr>
+<tr><td><code>engineVersion</code>, <code>engineArtifact</code></td><td>Engine semantics and, for CLI/mill reports, executable digest/size/platform/capture method.</td></tr>
+<tr><td><code>traceDocument</code></td><td>Actual retained derivation nodes and parent links.</td></tr>
+<tr><td><code>searchEvidence</code></td><td>Checked executed branches and exact coverage for exploration.</td></tr>
 </tbody></table>
 </div>
 <p>Do not drop trust or coverage to keep an old outcome printer happy.
@@ -158,7 +165,9 @@ outcome-only <code>fidryn.outcome/v0.1</code> export.</p>
 <p><code>outcome</code> is tagged by <code>kind</code>. Every kind includes <code>trace</code>, a 32-character
 hex <code>TraceId</code>. <code>fidryn explain TRACE_ID</code> loads <code>TRACE_ID.json</code> when that
 file exists; otherwise it prints the hashed id. JSON traces always
-include a <code>nodes</code> array.</p>
+include a <code>nodes</code> array. Saving the complete evaluation report preserves its
+actual graph for a later <code>fidryn explain report.json</code>; a bare hash cannot
+reconstruct discarded execution records.</p>
 <p>Values inside an outcome are tagged runtime values
 (<code>{"kind":"bool","data":true}</code>, <code>{"kind":"entity","data":"Bob"}</code>,
 <code>{"kind":"unit"}</code>). They are not the looser case-JSON literals. A
@@ -379,7 +388,7 @@ user record must use <code>{ "kind": "record", "data": { ... } }</code>; see
 <h2 id="reading-a-result"><span class="hn">6.5</span> Reading a result <a class="anchor" href="#reading-a-result" aria-label="Link to this section">#</a></h2>
 <ol>
 <li>Confirm the CLI/mill report <code>schema</code> is
-<code>fidryn.evaluation-report/v0.1</code>, then open nested <code>outcomeDocument</code>
+<code>fidryn.evaluation-report/v0.2</code>, then open nested <code>outcomeDocument</code>
 (<code>schema</code> <code>fidryn.outcome/v0.1</code>). Read <code>executionMode</code>,
 <code>sourceTrust</code>, and <code>assumptions</code> on the report before treating the
 answer as operative.</li>

@@ -71,6 +71,12 @@ pub fn query_body_from_decl(d: &Decl) -> HirQueryBody {
         {
             *goal_expr = Some(concat_seq(expr_to_term(expr), goal_expr.take()));
         }
+        if goal.kind != "Evaluate"
+            && let Some(expr) = &d.expr
+            && let HirQueryBody::Goal { fields, .. } = &mut body
+        {
+            fields.insert("$prefix".into(), expr_to_term(expr));
+        }
         return body;
     }
     if let Some(expr) = &d.expr {
@@ -117,6 +123,18 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             args: vec![Term::Int(*n)],
         },
         Expr::Require(inner) => require_term(expr_to_term(inner)),
+        Expr::NamedArg { name, value } => Term::Apply {
+            ctor: "$named".into(),
+            args: vec![Term::String(name.clone()), expr_to_term(value)],
+        },
+        Expr::Set(items) => Term::Set(items.iter().map(expr_to_term).collect()),
+        Expr::Record(fields) => Term::Record(
+            fields
+                .iter()
+                .map(|(name, value)| (name.clone(), expr_to_term(value)))
+                .collect(),
+        ),
+        Expr::Grouped(inner) => expr_to_term(inner),
         Expr::Block(items) => seq_term(items.iter().map(expr_to_term).collect()),
     }
 }
@@ -162,7 +180,10 @@ fn apply_expr_to_term(callee: &Expr, args: &[Expr]) -> Term {
         }
         Term::Ident(ctor) => Term::Apply {
             ctor,
-            args: args.iter().map(expr_to_term).collect(),
+            args: match args {
+                [Expr::Block(fields)] => fields.iter().map(expr_to_term).collect(),
+                _ => args.iter().map(expr_to_term).collect(),
+            },
         },
         Term::Call { callee, args: prev } if prev.is_empty() => {
             if callee.eq_ignore_ascii_case("transaction") {
@@ -280,6 +301,41 @@ pub fn parse_function_parts(src: &str) -> (Vec<(String, String)>, Option<Term>) 
     (extract_params(src), parse_fn_body_from_source(src))
 }
 
+pub fn parse_decl_result(src: &str) -> Result<Option<Term>, ()> {
+    let mut parser = SliceParser::new(src);
+    while !parser.is_eof() {
+        if parser.eat_ident("returns") {
+            return parser.parse_expr().map(Some).ok_or(());
+        }
+        parser.bump();
+    }
+    Ok(None)
+}
+
+pub fn parse_record_requirements(src: &str) -> Vec<String> {
+    let mut parser = SliceParser::new(src);
+    let mut schemas = Vec::new();
+    while !parser.is_eof() {
+        if parser.eat_ident("record") && parser.eat_ident("requires") {
+            if parser.at_kind(TokenKind::Ident) {
+                let first = parser.parse_qname();
+                let schema =
+                    if parser.eat_kind(TokenKind::Colon) && parser.at_kind(TokenKind::Ident) {
+                        parser.parse_qname()
+                    } else {
+                        first
+                    };
+                if !schemas.contains(&schema) {
+                    schemas.push(schema);
+                }
+            }
+        } else {
+            parser.bump();
+        }
+    }
+    schemas
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RuleParts {
     pub guard: Option<Guard>,
@@ -353,37 +409,51 @@ pub fn and_opt_guard(left: Option<Guard>, right: Guard) -> Guard {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DutyParts {
     pub bearer: String,
+    pub bearer_term: Term,
     pub claimant: Option<String>,
+    pub claimant_term: Option<Term>,
     pub attaches: Option<Guard>,
+    pub attaches_term: Option<Term>,
     pub content: Vec<Term>,
     pub due: Option<Term>,
+    pub invalid: bool,
 }
 
 pub fn parse_duty_parts(src: &str) -> DutyParts {
     let inner = last_brace_inner(src).unwrap_or(src);
     let mut p = SliceParser::new(inner);
     let mut bearer = String::new();
+    let mut bearer_term = Term::Wildcard;
     let mut claimant = None;
+    let mut claimant_term = None;
     let mut attaches = None;
+    let mut attaches_term = None;
     let mut content = Vec::new();
     let mut due = None;
+    let mut invalid = false;
     while !p.is_eof() {
         if p.eat_ident("bearer") {
-            if p.at_kind(TokenKind::Ident) {
-                bearer = p.bump_text();
+            if let Some(term) = p.parse_expr() {
+                bearer = term_as_name(&term).unwrap_or_default();
+                bearer_term = term;
+            } else {
+                invalid = true;
             }
             continue;
         }
         if p.eat_ident("claimant") {
-            if p.at_kind(TokenKind::Ident) {
-                claimant = Some(p.bump_text());
-            }
+            claimant_term = p.parse_expr();
+            claimant = claimant_term.as_ref().and_then(term_as_name);
+            invalid |= claimant_term.is_none();
             continue;
         }
         if p.eat_ident("attaches") {
             let _ = p.eat_ident("when");
             if let Some(term) = p.parse_expr() {
                 attaches = Some(term_to_guard(&term));
+                attaches_term = Some(term);
+            } else {
+                invalid = true;
             }
             continue;
         }
@@ -395,16 +465,21 @@ pub fn parse_duty_parts(src: &str) -> DutyParts {
         }
         if p.eat_ident("due") {
             due = parse_due_expr(&mut p);
+            invalid |= due.is_none();
             continue;
         }
         p.bump();
     }
     DutyParts {
         bearer,
+        bearer_term,
         claimant,
+        claimant_term,
         attaches,
+        attaches_term,
         content,
         due,
+        invalid: invalid || p.exhausted,
     }
 }
 
@@ -440,6 +515,13 @@ pub fn parse_type_name(raw: &str) -> Type {
     let s = raw.trim();
     if s.is_empty() {
         return Type::Sort(Sort::Nominal(String::new()));
+    }
+    let members = split_top_level(s, '|').collect::<Vec<_>>();
+    if members.len() > 1 {
+        return Type::Applied {
+            ctor: "Union".into(),
+            args: members.into_iter().map(parse_type_name).collect(),
+        };
     }
     if let Some(open) = s.find('<')
         && s.ends_with('>')
@@ -570,11 +652,6 @@ pub fn flatten_term_list(term: &Term) -> Vec<Term> {
 
 pub fn collect_term_callees(term: &Term, functions: &BTreeSet<&str>, out: &mut BTreeSet<String>) {
     match term {
-        Term::Ident(name) | Term::Binder(name) => {
-            if functions.contains(name.as_str()) {
-                out.insert(name.clone());
-            }
-        }
         Term::Call { callee, args } => {
             if functions.contains(callee.as_str()) {
                 out.insert(callee.clone());
@@ -687,12 +764,6 @@ pub fn source_has_bare_prop_if(src: &str, propositions: &BTreeSet<String>) -> bo
         i += 1;
     }
     false
-}
-
-pub fn query_is_automatic(src: &str) -> bool {
-    let mut p = SliceParser::new(src);
-    let _ = p.eat_ident("query");
-    p.at_ident("automatic")
 }
 
 pub fn import_requires_digest(src: &str) -> bool {
@@ -970,17 +1041,46 @@ fn split_top_level(src: &str, sep: char) -> impl Iterator<Item = &str> {
     parts.into_iter().filter(|s| !s.is_empty())
 }
 
-fn term_to_guard(term: &Term) -> Guard {
+pub fn term_to_guard(term: &Term) -> Guard {
     match term {
         Term::Bool(true) => Guard::Satisfied,
         Term::Bool(false) => Guard::Not(Box::new(Guard::Satisfied)),
         Term::Apply { ctor, args } if ctor == "operative" => operative_guard(args),
         Term::Call { callee, args } if callee == "operative" => operative_guard(args),
-        Term::Apply { ctor, args } if ctor == "determined" || ctor == "assumed" => args
-            .first()
-            .and_then(term_as_prop)
-            .map(Guard::Derived)
-            .unwrap_or(Guard::Satisfied),
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "effective" && args.len() == 1 =>
+        {
+            Guard::EffectiveActTerm(args[0].clone())
+        }
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "derived" && args.len() == 1 =>
+        {
+            args.first()
+                .and_then(term_as_prop)
+                .map(Guard::Derived)
+                .unwrap_or_else(|| Guard::Not(Box::new(Guard::Satisfied)))
+        }
+        // A Pratt `in` that escaped the modal prefix is still the context,
+        // not a proposition whose predicate is the word `in`.
+        Term::Apply { ctor, args }
+            if ctor == "in" && args.len() == 2 && modal_operative(&args[0]) =>
+        {
+            operative_guard_in_context(&args[0], &args[1])
+        }
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "determined" || ctor == "assumed" =>
+        {
+            args.first()
+                .and_then(term_as_prop)
+                .map(|prop| {
+                    if ctor == "determined" {
+                        Guard::Determined(prop)
+                    } else {
+                        Guard::Assumed(prop)
+                    }
+                })
+                .unwrap_or_else(|| Guard::Not(Box::new(Guard::Satisfied)))
+        }
         Term::Apply { ctor, args } if ctor == "observed" => Guard::Observed {
             schema: args.first().and_then(term_as_name).unwrap_or_default(),
             binder: args.get(1).and_then(term_as_name).unwrap_or_default(),
@@ -1016,9 +1116,11 @@ fn term_to_guard(term: &Term) -> Guard {
                 right: args[1].clone(),
             }
         }
-        other => term_as_prop(other)
-            .map(|prop| Guard::Operative(prop, String::new()))
-            .unwrap_or(Guard::Satisfied),
+        other => Guard::Compare {
+            op: CompareOp::Eq,
+            left: other.clone(),
+            right: Term::Bool(true),
+        },
     }
 }
 
@@ -1027,8 +1129,42 @@ fn operative_guard(args: &[Term]) -> Guard {
         .first()
         .and_then(term_as_prop)
         .unwrap_or_else(|| PropTerm::new("", Vec::new()));
-    let ctx = args.get(1).and_then(term_as_name).unwrap_or_default();
+    let ctx = args.get(1).map(term_context_label).unwrap_or_default();
     Guard::Operative(prop, ctx)
+}
+
+fn modal_operative(term: &Term) -> bool {
+    match term {
+        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => ctor == "operative",
+        _ => false,
+    }
+}
+
+fn operative_guard_in_context(modal: &Term, context: &Term) -> Guard {
+    let mut args = match modal {
+        Term::Apply { args, .. } | Term::Call { args, .. } => args.clone(),
+        _ => Vec::new(),
+    };
+    if args.len() == 1 {
+        args.push(context.clone());
+    }
+    operative_guard(&args)
+}
+
+fn term_context_label(term: &Term) -> String {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name.clone(),
+        Term::Call { callee, args } | Term::Apply { ctor: callee, args } => {
+            if args.is_empty() {
+                callee.clone()
+            } else {
+                let parts: Vec<String> = args.iter().map(term_context_label).collect();
+                format!("{callee}({})", parts.join(", "))
+            }
+        }
+        Term::Field { base, name } => format!("{}.{}", term_context_label(base), name),
+        _ => String::new(),
+    }
 }
 
 fn binop_compare(op: BinOp) -> Option<CompareOp> {
@@ -1120,6 +1256,8 @@ struct SliceParser<'a> {
     src: &'a str,
     tokens: Vec<Token>,
     idx: usize,
+    depth: usize,
+    exhausted: bool,
 }
 
 impl<'a> SliceParser<'a> {
@@ -1141,6 +1279,8 @@ impl<'a> SliceParser<'a> {
             src,
             tokens,
             idx: 0,
+            depth: 0,
+            exhausted: false,
         }
     }
 
@@ -1215,14 +1355,54 @@ impl<'a> SliceParser<'a> {
     }
 
     fn parse_expr(&mut self) -> Option<Term> {
-        self.parse_or()
+        if self.depth >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.depth += 1;
+        let result = self.parse_or();
+        self.depth -= 1;
+        result.and_then(|term| self.bounded_term(term))
+    }
+
+    fn bounded_term(&mut self, term: Term) -> Option<Term> {
+        let mut pending = vec![(&term, 1usize)];
+        let mut count = 0;
+        while let Some((term, depth)) = pending.pop() {
+            count += 1;
+            if depth > 128 || count > 10_000 {
+                self.exhausted = true;
+                self.idx = self.tokens.len();
+                return None;
+            }
+            let child = depth + 1;
+            match term {
+                Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
+                    pending.extend(args.iter().map(|term| (term, child)))
+                }
+                Term::Field { base, .. } => pending.push((base, child)),
+                Term::Record(fields) => pending.extend(fields.values().map(|term| (term, child))),
+                Term::Binary { left, right, .. } => {
+                    pending.push((left, child));
+                    pending.push((right, child));
+                }
+                Term::If { cond, then, else_ } => {
+                    pending.push((cond, child));
+                    pending.push((then, child));
+                    pending.push((else_, child));
+                }
+                _ => {}
+            }
+        }
+        Some(term)
     }
 
     fn parse_or(&mut self) -> Option<Term> {
         let mut left = self.parse_and()?;
         while self.eat_ident("or") {
             let right = self.parse_and()?;
-            left = bin("or", left, right);
+            left = self.bounded_term(bin("or", left, right))?;
         }
         Some(left)
     }
@@ -1231,7 +1411,7 @@ impl<'a> SliceParser<'a> {
         let mut left = self.parse_compare()?;
         while self.eat_ident("and") {
             let right = self.parse_compare()?;
-            left = bin("and", left, right);
+            left = self.bounded_term(bin("and", left, right))?;
         }
         Some(left)
     }
@@ -1263,7 +1443,7 @@ impl<'a> SliceParser<'a> {
             };
             self.bump();
             let right = self.parse_mul()?;
-            left = bin(op, left, right);
+            left = self.bounded_term(bin(op, left, right))?;
         }
         Some(left)
     }
@@ -1278,12 +1458,24 @@ impl<'a> SliceParser<'a> {
             };
             self.bump();
             let right = self.parse_unary()?;
-            left = bin(op, left, right);
+            left = self.bounded_term(bin(op, left, right))?;
         }
         Some(left)
     }
 
     fn parse_unary(&mut self) -> Option<Term> {
+        if self.depth >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.depth += 1;
+        let result = self.parse_unary_inner();
+        self.depth -= 1;
+        result
+    }
+
+    fn parse_unary_inner(&mut self) -> Option<Term> {
         if self.eat_ident("not") {
             let inner = self.parse_unary()?;
             return Some(Term::Apply {
@@ -1292,9 +1484,21 @@ impl<'a> SliceParser<'a> {
             });
         }
         if self.eat_kind(TokenKind::Minus) {
+            if self.at_kind(TokenKind::Int) {
+                let raw = self.bump_text();
+                let value = format!("-{raw}").parse::<i64>().ok()?;
+                return if self.at_kind(TokenKind::DurationUnit) {
+                    Some(Term::Apply {
+                        ctor: self.bump_text(),
+                        args: vec![Term::Int(value)],
+                    })
+                } else {
+                    Some(Term::Int(value))
+                };
+            }
             let inner = self.parse_unary()?;
             return Some(match inner {
-                Term::Int(n) => Term::Int(-n),
+                Term::Int(n) => Term::Int(n.checked_neg()?),
                 other => Term::Apply {
                     ctor: "-".into(),
                     args: vec![Term::Int(0), other],
@@ -1447,14 +1651,16 @@ impl<'a> SliceParser<'a> {
                         }
                     }
                 };
+                term = self.bounded_term(term)?;
                 continue;
             }
             if self.eat_kind(TokenKind::Dot) && self.at_kind(TokenKind::Ident) {
                 let name = self.bump_text();
-                term = Term::Apply {
-                    ctor: ".".into(),
-                    args: vec![term, Term::Ident(name)],
+                term = Term::Field {
+                    base: Box::new(term),
+                    name,
                 };
+                term = self.bounded_term(term)?;
                 continue;
             }
             break;
@@ -1474,7 +1680,7 @@ impl<'a> SliceParser<'a> {
                     self.bump();
                     return Some(Term::Bool(false));
                 }
-                Some(Term::Ident(self.parse_qname()))
+                Some(Term::Ident(self.bump_text()))
             }
             TokenKind::Int => {
                 let text = self.bump_text();
@@ -1492,7 +1698,9 @@ impl<'a> SliceParser<'a> {
             TokenKind::Date | TokenKind::DateTime => Some(Term::Ident(self.bump_text())),
             TokenKind::String => {
                 let raw = self.bump_text();
-                Some(Term::String(trim_quotes(&raw).to_owned()))
+                fidryn_syntax::decode_string_literal(&raw)
+                    .ok()
+                    .map(Term::String)
             }
             TokenKind::LParen => {
                 self.bump();
@@ -1645,10 +1853,6 @@ fn bin(op: &str, left: Term, right: Term) -> Term {
         ctor: op.to_owned(),
         args: vec![left, right],
     }
-}
-
-fn trim_quotes(s: &str) -> &str {
-    s.trim().trim_matches('"')
 }
 
 #[cfg(test)]

@@ -1,0 +1,169 @@
+[advisories]
+version = 2
+yanked = "deny"
+
+[licenses]
+version = 2
+confidence-threshold = 0.95
+allow = ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "CC0-1.0", "0BSD", "MPL-2.0", "CDLA-Permissive-2.0"]
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+
+[[licenses.clarify]]
+crate = "fidryn-syntax@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-syntax@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-core@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-core@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-hir@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-hir@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-check@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-check@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-eval@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-eval@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-handlers@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-handlers@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-driver@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-driver@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-kernel@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-kernel@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-verify@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-verify@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-solve@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-solve@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-trace@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-trace@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-cli@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-cli@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-adapt@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-adapt@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-render@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-render@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-integration-tests@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-integration-tests@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "fidryn-integration-benches@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "fidryn-integration-benches@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]
+
+[[licenses.clarify]]
+crate = "xtask@0.2.0"
+expression = "LicenseRef-Fidryn-Proprietary"
+license-files = [{ path = "../LICENSE", hash = 0xaea016eb }]
+
+[[licenses.exceptions]]
+crate = "xtask@0.2.0"
+allow = ["LicenseRef-Fidryn-Proprietary"]

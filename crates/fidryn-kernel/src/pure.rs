@@ -235,7 +235,7 @@ fn eval_int_cmp(op: &str, left: &Value, right: &Value) -> Result<Value, String> 
 
 fn lookup_ident(name: &str, assignment: &BTreeMap<String, Value>) -> Result<Value, String> {
     if let Some(value) = assignment.get(name) {
-        return Ok(coerce_bool_atom(value));
+        return Ok(value.clone());
     }
     match name {
         "true" => Ok(Value::Bool(true)),
@@ -244,21 +244,9 @@ fn lookup_ident(name: &str, assignment: &BTreeMap<String, Value>) -> Result<Valu
     }
 }
 
-fn coerce_bool_atom(value: &Value) -> Value {
-    match as_bool(value) {
-        Ok(b) => Value::Bool(b),
-        Err(_) => value.clone(),
-    }
-}
-
 fn as_bool(value: &Value) -> Result<bool, String> {
     match value {
         Value::Bool(b) => Ok(*b),
-        Value::String(text) | Value::Entity(text) => match text.as_str() {
-            "true" => Ok(true),
-            "false" => Ok(false),
-            _ => Err(format!("boolean operator on non-bool `{text}`")),
-        },
         other => Err(format!("boolean operator on non-bool `{other:?}`")),
     }
 }
@@ -442,18 +430,20 @@ mod tests {
     }
 
     #[test]
-    fn eval_fragment_or_not_accepts_string_true_false_labels() {
+    fn eval_fragment_does_not_coerce_string_or_entity_values_to_booleans() {
         let term = or_not_ident("b");
-        let true_world = BTreeMap::from([("b".into(), Value::String("true".into()))]);
-        let false_world = BTreeMap::from([("b".into(), Value::String("false".into()))]);
-        assert_eq!(
-            eval_fragment(&term, &true_world).unwrap(),
-            Value::Bool(true)
-        );
-        assert_eq!(
-            eval_fragment(&term, &false_world).unwrap(),
-            Value::Bool(true)
-        );
+        for value in [
+            Value::String("true".into()),
+            Value::String("false".into()),
+            Value::Entity("true".into()),
+        ] {
+            let world = BTreeMap::from([("b".into(), value.clone())]);
+            assert_eq!(
+                eval_fragment(&Term::Ident("b".into()), &world).unwrap(),
+                value
+            );
+            assert!(eval_fragment(&term, &world).is_err());
+        }
     }
 
     #[test]

@@ -6,7 +6,7 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
@@ -19,7 +19,7 @@ reference is [`grammar.ebnf`](../grammar.ebnf).
 
 The grammar ([`grammar.ebnf`](../grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is **parsed / checked / executed** only where noted — see
+Support in 0.2.0 is **parsed / checked / executed** only where noted — see
 [implementation-status](implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -344,11 +344,13 @@ rule InitialTrustee : constitutive
 }
 ```
 
-`when operative P` tests legal status. `when determined P` tests a
-competent determination already on the case. `then derive` and
-`then establish` are the usual consequences. Guards must use
-`operative`, `determined`, `assumed`, or `necessarily` — not a bare
-proposition. The successor rule in the trust fixture also
+`when operative P` tests legal status. `in TrustCreation(BRT)` names the
+legal context of that test. The guard still turns on the proposition
+`TrustInstrumentExecuted(BRT)`. It is not a proposition named `in`.
+`when determined P` tests a competent determination already on the case.
+`then derive` and `then establish` are the usual consequences. Guards
+must use `operative`, `determined`, `assumed`, or `necessarily` — not a
+bare proposition. The successor rule in the trust fixture also
 `select unique candidate from nominations_for(...)` with
 `require unique nomination_rank`. A tie is not a silent pick.
 
@@ -491,7 +493,7 @@ See [Cases and time](cases-and-time.md) and [CLI](cli.md).
 
 ## Verify
 
-A `verify` block is a named property. v0.1 discharges Boolean
+A `verify` block is a named property. Fidryn 0.2.0 discharges Boolean
 literals:
 
 ```
@@ -500,9 +502,8 @@ verify Trivial {
 }
 ```
 
-`assert true` proves. `assert false` is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:
+`assert true` proves. `assert false` is a counterexample. Unsupported
+formulas can parse without yielding a covering proof. For those properties,
 
 ```
 cargo run -p fidryn-cli -- verify PATH --property NAME

@@ -2,7 +2,7 @@
 name = "fidryn-driver"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
@@ -15,6 +15,7 @@ fidryn-core.workspace = true
 fidryn-eval.workspace = true
 fidryn-handlers.workspace = true
 fidryn-hir.workspace = true
+fidryn-kernel.workspace = true
 fidryn-syntax.workspace = true
 salsa.workspace = true
 serde_json.workspace = true

@@ -1,3 +1,89 @@
+PROPRIETARY LICENSE
+
+Copyright (c) the respective lawful rights holders. All Rights Reserved.
+
+IMPORTANT: READ CAREFULLY BEFORE USING THIS SOFTWARE
+
+This software and associated documentation files (the "Software") are the
+proprietary property of its applicable copyright holder ("Licensor"). The Software
+is protected by copyright laws and international copyright treaties, as well
+as other intellectual property laws and treaties.
+
+1. RESTRICTIONS
+
+The Software is licensed, not sold. You are NOT permitted to:
+
+   a) Use the Software for any purpose, commercial or non-commercial
+   b) Copy, reproduce, distribute, or create derivative works of the Software
+   c) Reverse engineer, decompile, or disassemble the Software
+   d) Modify, adapt, translate, or create derivative works of the Software
+   e) Rent, lease, loan, sell, sublicense, or transfer the Software
+   f) Remove or alter any copyright, trademark, or other proprietary notices
+   g) Use the Software in any way that competes with Licensor's business
+   h) Extract or attempt to extract source code from the Software
+   i) Access the Software to build a similar or competitive product or service
+   j) Publicly display, perform, or communicate the Software
+   k) Use the Software for benchmarking or competitive analysis
+
+2. NO LICENSE GRANTED
+
+Unless you have a separate written agreement with Licensor that explicitly
+grants you rights to use this Software, you have NO LICENSE and NO RIGHT
+to access, use, copy, or distribute this Software in any way.
+
+3. OWNERSHIP
+
+Licensor retains all right, title, and interest in and to the Software,
+including all intellectual property rights. No ownership rights are
+transferred to you under this license.
+
+4. TERMINATION
+
+Any unauthorized use of this Software will result in immediate termination
+of any implied rights and may result in criminal and/or civil prosecution.
+
+5. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL COMPANY BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+7. GOVERNING LAW
+
+This license shall be governed by and construed in accordance with the
+laws of the United States, without regard to its conflict of law provisions.
+
+8. CONTACT
+
+For licensing inquiries, please contact: legal@freectrl.ai
+
+UNAUTHORIZED ACCESS OR USE OF THIS SOFTWARE IS STRICTLY PROHIBITED AND
+MAY RESULT IN SEVERE CIVIL AND CRIMINAL PENALTIES.
+
+SCOPE, THIRD-PARTY MATERIAL, AND PRIOR GRANTS
+
+These restrictions apply only to original project material controlled by the
+applicable licensor and only to the extent permitted by law. They do not claim
+third-party material, general ideas, or rights the licensor does not hold.
+Third-party components, copied source, fonts, assets, and notices retain their
+respective licenses. Existing valid grants, including earlier permissive and
+non-commercial grants, remain effective according to their terms; this notice
+does not revoke them or retroactively restrict previously licensed copies.
+Retained LICENSE-MIT, LICENSE-APACHE, and prior-license copies document those
+rights; they are not an additional license offer for new licensor-controlled
+material. Public availability alone does not establish confidentiality. This
+notice does not assign title to a person or company. Separate written grants
+and mandatory law take precedence to the extent applicable.
+
+PRIOR/APPLICABLE THIRD-PARTY TEXT (NOT A NEW ORIGINAL-MATERIAL GRANT)
+
 MIT License
 
 Copyright (c) 2026 Bryan Gass

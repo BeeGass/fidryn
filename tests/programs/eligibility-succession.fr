@@ -11,6 +11,7 @@ module Programs.EligibilitySuccession version "0.1.0" {
     entity Carol : NaturalPerson
     entity Pat : NaturalPerson
 
+    proposition Incapacitated(person: NaturalPerson, office: Office)
     proposition Eligible(person: NaturalPerson, office: Office)
 
     interpretation_family SuccessorEligibility {

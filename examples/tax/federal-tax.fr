@@ -61,16 +61,16 @@ module US.Federal.Tax.ClosedForms version "0.1.0" {
     }
 
     calc ordinary_income_tax_formula(amount: Money<USD>) -> Money<USD> {
-        if amount <= 11925.00 {
+        if amount <= USD(11925.00) {
             amount * 0.10
         } else {
-            if amount <= 48475.00 {
-                11925.00 * 0.10 + (amount - 11925.00) * 0.12
+            if amount <= USD(48475.00) {
+                USD(11925.00) * 0.10 + (amount - USD(11925.00)) * 0.12
             } else {
-                if amount <= 103350.00 {
-                    11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
+                if amount <= USD(103350.00) {
+                    USD(11925.00) * 0.10 + (USD(48475.00) - USD(11925.00)) * 0.12 + (amount - USD(48475.00)) * 0.22
                 } else {
-                    17651.00 + (amount - 103350.00) * 0.24
+                    USD(17651.00) + (amount - USD(103350.00)) * 0.24
                 }
             }
         }
@@ -94,7 +94,7 @@ module US.Federal.Tax.ClosedForms version "0.1.0" {
         goal Evaluate {
             require determined EligibleForOpenTexturedCredit(Taxpayer)
                 using Determine
-            return open_textured_credit_amount(amount)
+            return case_input<Money<USD>>("open_textured_credit_amount")
         }
     }
 

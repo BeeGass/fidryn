@@ -2,13 +2,14 @@
 name = "fidryn-trace"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 description = "Fidryn proof-relevant traces and canonical JSON"
 
 [dependencies]
+fidryn-kernel.workspace = true
 fidryn-core.workspace = true
 indexmap.workspace = true
 serde.workspace = true

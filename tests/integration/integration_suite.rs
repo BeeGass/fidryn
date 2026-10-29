@@ -128,15 +128,18 @@ fn performed_assumption() -> Assumption {
         id: "performed".into(),
         payload: Value::Ctor {
             name: "Performed".into(),
-            fields: BTreeMap::new(),
+            fields: BTreeMap::from([("name".into(), Value::String("PayInvoice".into()))]),
         },
     }
 }
 
 /// Scenario reports must keep qualifications on the envelope.
 fn assert_not_outcome_only_export(json: &serde_json::Value) {
-    assert_eq!(
-        json["schema"], "fidryn.evaluation-report/v0.1",
+    assert!(
+        matches!(
+            json["schema"].as_str(),
+            Some("fidryn.evaluation-report/v0.1" | "fidryn.evaluation-report/v0.2")
+        ),
         "lossy outcome-only export is not the public report: {json}"
     );
     assert_ne!(json["schema"], "fidryn.outcome/v0.1");
@@ -240,7 +243,7 @@ fn duty_module() -> fidryn_core::CoreModule {
             content USD(100.00)
             due 30 counted_days after invoice_date
         }
-        query q() -> String {
+        query q() -> DutyState {
             goal Evaluate { duty_status(PayInvoice) }
         }
     "#,
@@ -261,6 +264,34 @@ fn attached_case() -> CaseRecord {
     case
 }
 
+fn transition_case() -> CaseRecord {
+    let mut case = CaseRecord::default();
+    case.facts.insert(
+        "authority_grants".into(),
+        Value::Set(
+            ["attach", "discharge"]
+                .into_iter()
+                .map(|action| {
+                    Value::Map(BTreeMap::from([
+                        ("action".into(), Value::String(action.into())),
+                        ("scope".into(), Value::String("*".into())),
+                        ("context".into(), Value::String("*".into())),
+                        ("source".into(), Value::String("fixture-grant".into())),
+                        (
+                            "validTime".into(),
+                            Value::Map(BTreeMap::from([
+                                ("start".into(), Value::String("NegInf".into())),
+                                ("end".into(), Value::String("PosInf".into())),
+                            ])),
+                        ),
+                    ]))
+                })
+                .collect(),
+        ),
+    );
+    case
+}
+
 fn performed_event(kind: &str) -> LedgerEvent {
     LedgerEvent {
         kind: kind.into(),
@@ -268,7 +299,7 @@ fn performed_event(kind: &str) -> LedgerEvent {
         record_time: context().record_time,
         payload: Value::Ctor {
             name: "Performed".into(),
-            fields: BTreeMap::new(),
+            fields: BTreeMap::from([("name".into(), Value::String("PayInvoice".into()))]),
         },
     }
 }
@@ -491,7 +522,7 @@ fn operative_evaluate_does_not_treat_assumptions_as_performed() {
         id: "performed".into(),
         payload: Value::Ctor {
             name: "Performed".into(),
-            fields: BTreeMap::new(),
+            fields: BTreeMap::from([("name".into(), Value::String("PayInvoice".into()))]),
         },
     });
     let assumed_value = answer(execute(&module, &assumed));
@@ -522,7 +553,7 @@ fn scenario_assumption_can_report_performed_without_mutating_events() {
         id: "performed".into(),
         payload: Value::Ctor {
             name: "Performed".into(),
-            fields: BTreeMap::new(),
+            fields: BTreeMap::from([("name".into(), Value::String("PayInvoice".into()))]),
         },
     });
     let events_before = case.events.clone();
@@ -640,10 +671,10 @@ fn two_duty_instances_isolation() {
             content USD(100.00)
             due 30 counted_days after invoice_date
         }
-        query a() -> String {
+        query a() -> DutyState {
             goal Evaluate { duty_status(PayInvoice, invoice_a) }
         }
-        query b() -> String {
+        query b() -> DutyState {
             goal Evaluate { duty_status(PayInvoice, invoice_b) }
         }
     "#,
@@ -655,6 +686,10 @@ fn two_duty_instances_isolation() {
         value: Value::Map(BTreeMap::from([
             ("name".into(), Value::String("PayInvoice".into())),
             ("instance".into(), Value::String("invoice_a".into())),
+            ("payer".into(), Value::String("Payer".into())),
+            ("payee".into(), Value::String("Payee".into())),
+            ("amount".into(), Value::Int(100)),
+            ("currency".into(), Value::String("USD".into())),
         ])),
     });
     let paid = answer(execute_query(&module, "a", &case));
@@ -674,14 +709,17 @@ fn two_duty_instances_isolation() {
 fn transaction_rollback() {
     let module = compile(&source(
         r#"
-        query q() -> Bool {
+        entity Payer : NaturalPerson
+        entity Payee : NaturalPerson
+        duty pay { bearer Payer; claimant Payee; attaches when true; content USD(100) }
+        query q() -> DutyStatus {
             goal Evaluate {
                 transaction(duty_step(pay, attach), duty_step(pay, discharge))
             }
         }
     "#,
     ));
-    let case = CaseRecord::default();
+    let case = transition_case();
     let before = case.clone();
     let err = execute(&module, &case).expect_err("illegal discharge must not commit");
     let msg = err.to_string();
@@ -694,8 +732,7 @@ fn transaction_rollback() {
 
 /// 5. Unknown attach guard vs a negative determination.
 ///
-/// `DutyStatus::NotAttached` is not on the enum yet. Assert via the
-/// unknown attach is Unresolved; established:false is NotAttached.
+/// An unknown attachment is Unresolved; an established denial is NotAttached.
 #[test]
 fn attach_guard_unknown_is_unresolved_established_false_is_not_attached() {
     let module = duty_module();
@@ -736,14 +773,17 @@ fn attach_guard_unknown_is_unresolved_established_false_is_not_attached() {
 fn transaction_suspend_does_not_commit_prefix() {
     let module = compile(&source(
         r#"
-        query q() -> Bool {
+        entity Payer : NaturalPerson
+        entity Payee : NaturalPerson
+        duty pay { bearer Payer; claimant Payee; attaches when true; content USD(100) }
+        query q() -> Unit {
             goal Evaluate {
                 transaction(duty_step(pay, attach), require_authority(missing_grant))
             }
         }
     "#,
     ));
-    let case = CaseRecord::default();
+    let case = transition_case();
     let before = case.clone();
     let session = execute_session(&module, &case).expect("transaction suspends");
     assert!(
@@ -830,6 +870,7 @@ async fn mill_pasted_run_is_unauthenticated_evaluation_report() {
         "ok is not an evaluation-report field: {json}"
     );
     assert_not_outcome_only_export(report);
+    assert_eq!(report["schema"], "fidryn.evaluation-report/v0.2");
     assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
     assert_eq!(report["executionMode"], "operative", "{json}");
     assert_eq!(report["outcomeDocument"]["schema"], "fidryn.outcome/v0.1");

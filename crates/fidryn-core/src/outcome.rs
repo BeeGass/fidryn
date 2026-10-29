@@ -7,6 +7,7 @@ use crate::ids::{
 };
 use crate::ir::CoreConflictDoctrine;
 use crate::patterns::PropPattern;
+use crate::request::{CaseSnapshotIdentity, ExecutionOperation, ExecutionRequest};
 use crate::time::Instant;
 use crate::value::Value;
 use serde::de::Error as _;
@@ -64,7 +65,7 @@ impl CoverageWitness {
 /// How an artifact or evaluation was authenticated.
 ///
 /// `fixture` is not byte-verified. Missing digest, or a digest without
-/// bytes, is [`Unauthenticated`].
+/// bytes, is [`TrustProfile::Unauthenticated`].
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TrustProfile {
@@ -78,9 +79,9 @@ pub enum TrustProfile {
 /// How a certificate's coverage claim was established.
 ///
 /// `None` is a claims digest ([`BoundClaims`]). `Structural` is shape-only
-/// ([`StructurallyCheckedCoverage`]). `FiniteReplay` is finite coverage
-/// verification by replay ([`ReplayVerifiedCoverage`]). Only FiniteReplay
-/// is covering. This is not independent Lean / SMT proof checking.
+/// ([`StructurallyCheckedCoverage`]). `FiniteReplay` marks a finite replay
+/// claim ([`ReplayVerifiedCoverage`]). Its execution meaning is checked at
+/// the kernel report boundary. This is not independent Lean / SMT proof checking.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum CoverageMethod {
@@ -114,6 +115,10 @@ pub struct EvaluationReport<T = Value> {
     pub assumptions: Vec<Assumption>,
     #[serde(default)]
     pub verification_method: CoverageMethod,
+    #[serde(default)]
+    pub request: Option<ExecutionRequest>,
+    #[serde(default)]
+    pub source_bundle: Option<String>,
 }
 
 impl<T> EvaluationReport<T> {
@@ -137,6 +142,8 @@ impl<T> EvaluationReport<T> {
             execution_mode: ExecutionMode::Operative,
             assumptions: Vec::new(),
             verification_method: CoverageMethod::None,
+            request: None,
+            source_bundle: None,
         }
     }
 }
@@ -179,17 +186,18 @@ pub enum OpenRequest {
 /// Strength is type-distinct: [`BoundClaims`] (`None`),
 /// [`StructurallyCheckedCoverage`] (`Structural`),
 /// [`ReplayVerifiedCoverage`] (`FiniteReplay`).
-/// [`verified`](Self::verified) is a claims-digest binder, not a covering
+/// [`Self::verified`](Self::verified) is a claims-digest binder, not a covering
 /// proof checker. Matching claims do not discharge open constraints.
-/// [`verified_structural`](Self::verified_structural) binds a
+/// [`Self::verified_structural`](Self::verified_structural) binds a
 /// shape-complete witness and is not covering. Public
-/// [`verified_covering`](Self::verified_covering) never stamps
-/// FiniteReplay. Ignoring open issues requires a kernel-issued
-/// FiniteReplay certificate. Empty [`CoverageWitness::complete`] is not
+/// [`Self::verified_covering`](Self::verified_covering) never stamps
+/// FiniteReplay. Qualified reports with ignored open issues require kernel
+/// replay of the bound FiniteReplay claim. Empty [`CoverageWitness::complete`] is not
 /// FiniteReplay. A raw [`CompletionProofId`] is not a certificate.
 /// Public [`Self::issue_finite_replay`] is not a covering factory:
 /// it always returns `Err`. `#[doc(hidden)]` is not access control.
-/// Kernel replay stamps via `stamp_finite_replay` (feature `kernel-issue`).
+/// Core stores claims; qualified reports require kernel `CheckedEvaluation`
+/// validation. `unverified_replay_claim` does not check branch execution.
 ///
 /// ```compile_fail
 /// use fidryn_core::{CheckedCertificate, CompletionProofId, CoverageMethod};
@@ -212,6 +220,10 @@ pub struct CheckedCertificate {
 /// Invocation identity sealed into a FiniteReplay certificate.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct SealedReplayClaims {
+    operation: ExecutionOperation,
+    semantics_version: String,
+    budget: Option<u32>,
+    case: CaseSnapshotIdentity,
     program: ModuleId,
     snapshot: SourceSnapshotId,
     fingerprint: [u8; 32],
@@ -225,10 +237,8 @@ struct SealedReplayClaims {
     branch_root: [u8; 32],
 }
 
-/// Kernel issuance request for a FiniteReplay certificate.
-///
-/// Public constructors never stamp [`CoverageMethod::FiniteReplay`].
-/// `fidryn_kernel::accept_covering_eval` is the issuance path.
+/// Bound inputs for a finite replay claim. These inputs do not establish
+/// that execution occurred; the kernel checks actual branch execution.
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct ReplayIssuance<'a> {
@@ -264,6 +274,9 @@ struct CertificateClaims<'a> {
 struct CoveringClaims<'a> {
     #[serde(flatten)]
     claims: CertificateClaims<'a>,
+    semantics_version: &'static str,
+    operation: ExecutionOperation,
+    budget: Option<u32>,
     tag: &'static str,
     examined: usize,
     total: usize,
@@ -393,6 +406,46 @@ impl<'de> Deserialize<'de> for ReplayVerifiedCoverage {
 }
 
 impl CheckedCertificate {
+    /// Check covering evidence at its consumption boundary. A matching
+    /// answer alone cannot authorize reuse for a different invocation.
+    pub fn validate_invocation(
+        &self,
+        request: &ExecutionRequest,
+        answer: &Value,
+        ignored: &BTreeSet<OpenRequest>,
+    ) -> Result<(), String> {
+        if !self.is_covering() {
+            return Err("certificate does not establish covering".into());
+        }
+        let sealed = self
+            .replay
+            .as_ref()
+            .ok_or("covering certificate has no sealed invocation")?;
+        if sealed.semantics_version != request.semantics_version
+            || sealed.operation != request.operation
+            || sealed.budget != request.budget
+            || sealed.program != request.program.module_id
+            || sealed.fingerprint != *request.program.fingerprint.as_bytes()
+            || sealed.case != request.case
+            || sealed.query != request.query.as_str()
+            || sealed.args != request.args
+            || sealed.valid != request.valid_at
+            || sealed.known != request.known_at
+            || sealed.execution_mode != request.mode
+        {
+            return Err("covering certificate belongs to a different invocation".into());
+        }
+        if &sealed.answer != answer {
+            return Err("covering certificate answer does not match outcome value".into());
+        }
+        if &sealed.constraints != ignored {
+            return Err(
+                "covering certificate ignored issues do not match bound constraints".into(),
+            );
+        }
+        Ok(())
+    }
+
     fn claims_payload(claims: &CertificateClaims<'_>) -> Result<Vec<u8>, String> {
         crate::canonical_to_vec(claims).map_err(|e| e.to_string())
     }
@@ -433,7 +486,7 @@ impl CheckedCertificate {
         Ok((payload, id))
     }
 
-    /// Content hash of the certificate claims. Pass this as `id` to [`verified`].
+    /// Content hash of the certificate claims. Pass this as `id` to [`Self::verified`].
     #[allow(clippy::too_many_arguments)]
     pub fn claims_id(
         program: ModuleId,
@@ -458,7 +511,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`claims_id`] with query arguments bound into the digest.
+    /// [`Self::claims_id`] with query arguments bound into the digest.
     #[allow(clippy::too_many_arguments)]
     pub fn claims_id_with_args(
         program: ModuleId,
@@ -493,7 +546,7 @@ impl CheckedCertificate {
     /// path used when constructing a certificate that names ignored issues)
     /// so they cannot be swapped silently; they are not discharged by a
     /// kernel proof. Assumptions live on [`CaseRecord`] and are hashed with
-    /// the case. Query arguments default to empty; see [`verified_with_args`].
+    /// the case. Query arguments default to empty; see [`Self::verified_with_args`].
     #[allow(clippy::too_many_arguments)]
     pub fn verified(
         id: CompletionProofId,
@@ -520,7 +573,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`verified`] with query arguments bound into the claims digest.
+    /// [`Self::verified`] with query arguments bound into the claims digest.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_with_args(
         id: CompletionProofId,
@@ -589,6 +642,9 @@ impl CheckedCertificate {
                 answer,
                 args,
             },
+            semantics_version: "0.2",
+            operation: ExecutionOperation::Run,
+            budget: None,
             tag: Self::covering_tag(method)?,
             examined: witness.examined,
             total: witness.total,
@@ -604,8 +660,8 @@ impl CheckedCertificate {
     }
 
     /// Content hash of FiniteReplay covering claims. Pass this as `id` to
-    /// [`verified_covering`]. For Structural evidence use
-    /// [`structural_claims_id`].
+    /// [`Self::verified_covering`]. For Structural evidence use
+    /// [`Self::structural_claims_id`].
     #[allow(clippy::too_many_arguments)]
     pub fn covering_claims_id(
         program: ModuleId,
@@ -632,7 +688,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`covering_claims_id`] with query arguments bound into the digest.
+    /// [`Self::covering_claims_id`] with query arguments bound into the digest.
     #[allow(clippy::too_many_arguments)]
     pub fn covering_claims_id_with_args(
         program: ModuleId,
@@ -699,7 +755,7 @@ impl CheckedCertificate {
     }
 
     /// Content hash of Structural covering claims. Pass this as `id` to
-    /// [`verified_structural`]. Distinct from [`covering_claims_id`].
+    /// [`Self::verified_structural`]. Distinct from [`Self::covering_claims_id`].
     #[allow(clippy::too_many_arguments)]
     pub fn structural_claims_id(
         program: ModuleId,
@@ -726,7 +782,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`structural_claims_id`] with query arguments bound into the digest.
+    /// [`Self::structural_claims_id`] with query arguments bound into the digest.
     #[allow(clippy::too_many_arguments)]
     pub fn structural_claims_id_with_args(
         program: ModuleId,
@@ -760,7 +816,7 @@ impl CheckedCertificate {
 
     /// Bind an untrusted proof id to checked claims plus a shape-complete
     /// witness. Completeness is `is_complete` and a matching answer. This
-    /// is not covering: [`is_covering`] is false.
+    /// is not covering: [`Self::is_covering`] is false.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_structural(
         id: CompletionProofId,
@@ -789,7 +845,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`verified_structural`] with query arguments bound into the claims.
+    /// [`Self::verified_structural`] with query arguments bound into the claims.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_structural_with_args(
         id: CompletionProofId,
@@ -839,7 +895,7 @@ impl CheckedCertificate {
     ///
     /// Shape and digest are still checked so callers get precise errors.
     /// A matching digest is not covering authority; only kernel
-    /// `stamp_finite_replay` (feature `kernel-issue`) stamps FiniteReplay.
+    /// Kernel replay validates branches before constructing a Core replay claim.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_covering(
         id: CompletionProofId,
@@ -868,7 +924,7 @@ impl CheckedCertificate {
         )
     }
 
-    /// [`verified_covering`] with query arguments bound into the claims.
+    /// [`Self::verified_covering`] with query arguments bound into the claims.
     #[allow(clippy::too_many_arguments)]
     pub fn verified_covering_with_args(
         id: CompletionProofId,
@@ -917,7 +973,7 @@ impl CheckedCertificate {
     /// `#[doc(hidden)]` is not access control. Shape and digest are still
     /// checked so callers get precise errors. A matching digest is not
     /// covering: this factory always returns `Err`. Kernel replay stamps
-    /// via `stamp_finite_replay` (feature `kernel-issue` only).
+    /// via an explicitly unverified Core claim; qualification requires kernel checking.
     ///
     /// ```
     /// # use fidryn_core::*;
@@ -976,15 +1032,11 @@ impl CheckedCertificate {
         )
     }
 
-    /// Kernel FiniteReplay stamp after actual replay.
-    ///
-    /// Exists only with feature `kernel-issue`. `fidryn-kernel` is the
-    /// in-tree crate that enables it. Public [`Self::issue_finite_replay`]
-    /// never stamps, including when this feature is unified into a larger
-    /// test graph.
-    #[cfg(feature = "kernel-issue")]
-    #[doc(hidden)]
-    pub fn stamp_finite_replay(
+    /// Construct a digest-bound replay claim without checking its branches.
+    /// This is an untrusted Core artifact. Only kernel validation can turn
+    /// it into a qualified `CheckedEvaluation`; Cargo features grant no
+    /// authority. Artifact readers must preserve this distinction.
+    pub fn unverified_replay_claim(
         id: CompletionProofId,
         issuance: ReplayIssuance<'_>,
     ) -> Result<Self, String> {
@@ -1022,7 +1074,6 @@ impl CheckedCertificate {
         Ok((id, payload, issuance))
     }
 
-    #[cfg(any(feature = "kernel-issue", test))]
     fn seal_finite_replay(
         id: CompletionProofId,
         payload: Vec<u8>,
@@ -1034,6 +1085,10 @@ impl CheckedCertificate {
             claims_digest: Self::digest_from_payload(&payload),
             method: CoverageMethod::FiniteReplay,
             replay: Some(Box::new(SealedReplayClaims {
+                operation: ExecutionOperation::Run,
+                semantics_version: "0.2".into(),
+                budget: None,
+                case: CaseSnapshotIdentity::of(issuance.case)?,
                 program: issuance.program,
                 snapshot: issuance.snapshot,
                 fingerprint: issuance.fingerprint,
@@ -1104,7 +1159,8 @@ impl CheckedCertificate {
         self.method
     }
 
-    /// True only for [`CoverageMethod::FiniteReplay`].
+    /// Whether a complete replay claim is present. This marker alone is
+    /// untrusted; report admission must validate invocation and replay.
     pub fn is_covering(&self) -> bool {
         matches!(self.method, CoverageMethod::FiniteReplay) && self.replay.is_some()
     }
@@ -1136,11 +1192,13 @@ impl CheckedCertificate {
 }
 
 fn has_duplicate_bindings(branches: &[BranchClaim]) -> bool {
-    branches.iter().enumerate().any(|(index, branch)| {
-        branches[..index]
-            .iter()
-            .any(|prior| prior.bindings == branch.bindings)
-    })
+    let mut seen = BTreeSet::new();
+    branches
+        .iter()
+        .any(|branch| match crate::canonical_json(&branch.bindings) {
+            Ok(identity) => !seen.insert(identity),
+            Err(_) => true,
+        })
 }
 
 /// Hash of sorted unique branch assignment maps.
@@ -1226,9 +1284,10 @@ pub enum Outcome<T = Value> {
 }
 
 impl Outcome<Value> {
-    /// Construct a determinate result. Nonempty ignored issues require a
-    /// covering certificate. A claims-digest binder is not covering.
-    /// A covering certificate must certify this value and ignored set.
+    /// Construct a Core result claim. Nonempty ignored issues require a
+    /// replay claim bound to this value and ignored set. Qualification at
+    /// the kernel report boundary additionally checks the invocation and
+    /// actual branch execution.
     pub fn determinate(
         value: Value,
         trace: TraceId,
@@ -1372,8 +1431,8 @@ mod tests {
             ExecutionMode::Operative,
         )
         .unwrap();
-        // Outcome tests need a covering certificate. Public mint is sealed
-        // without kernel-issue; this helper stamps via the private sealer.
+        // Core outcome tests exercise claim binding. Kernel tests establish
+        // whether a claim can qualify an actual invocation.
         let (id, payload, issuance) = CheckedCertificate::prepare_finite_replay(
             id,
             ReplayIssuance {

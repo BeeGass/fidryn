@@ -56,6 +56,17 @@ pub fn lex(source: &str) -> Vec<Token> {
     Lexer::new(source).collect()
 }
 
+pub(crate) fn lex_bounded(source: &str, maximum: usize) -> Result<Vec<Token>, ()> {
+    let mut tokens = Vec::new();
+    for token in Lexer::new(source) {
+        if tokens.len() >= maximum {
+            return Err(());
+        }
+        tokens.push(token);
+    }
+    Ok(tokens)
+}
+
 struct Lexer<'a> {
     src: &'a str,
     bytes: &'a [u8],

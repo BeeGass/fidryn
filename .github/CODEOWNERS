@@ -1,0 +1,6 @@
+/.github/ @BeeGass
+/xtask/src/governance.rs @BeeGass
+/crates/fidryn-kernel/ @BeeGass
+/crates/fidryn-check/ @BeeGass
+/crates/fidryn-eval/ @BeeGass
+/schemas/ @BeeGass

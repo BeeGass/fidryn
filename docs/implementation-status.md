@@ -123,11 +123,15 @@ plans.
 runs a bounded (64) staged worklist over `CoreDecl::Rule`.
 `Guard::Operative` / `Derived` hold only when the proposition is in the
 staged set; missing is Unknown (may Suspend), not closed-world false.
+`operative P in Context` stores `Context` on the guard and still tests
+`P`.
 `operative ExemptFromBOI` is not a date heuristic. Prescriptive duties
 and full transaction commit are not this worklist.
 
 **UniqueOccupant.** Unique occupancy from the authority ledger or
-`OccupancyRecord`. Succession when `Incapacitated` is derived/determined
+`OccupancyRecord`. A parameterized office matches its bare head and that
+same application. It does not match the same head with different
+arguments. Succession when `Incapacitated` is derived/determined
 or concurring evidence meets `required_concurring` (default 2). Schema
 comes from the case/module, not a `"Filing"` substring. Ranked accepted
 nominations are filtered by the recorded alternative's *declared*
@@ -195,7 +199,7 @@ validates document shape. It does not authenticate artifacts.
 `/api/run` and `/api/explore` return
 `{ok: true, report: <evaluation-report>, opinion: [<sentence>, …]}`
 (or an error wrapper). CLI `run` / `explore` print the same report via
-`render_report`: top-level `fidryn.evaluation-report/v0.1` with nested
+the invocation-checked exporter: top-level `fidryn.evaluation-report/v0.2` with nested
 `outcomeDocument` of schema `fidryn.outcome/v0.1` (camelCase fields, hex
 trace/certificate ids, internally tagged `Value`, including
 `modelBoundary`).
@@ -205,7 +209,11 @@ requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`. A transport receipt
 does not establish `Filed`. No live filing from the mill.
 
 **Trace DAG parent edges.** `TraceNode` gains parent edges this pass.
-Eval does not yet emit a parented node for every rule application.
+Evaluator sessions retain actual parented records for foundation admission,
+rule application, authority/time checks, judgments, transactions and the final
+invocation. CLI and mill v0.2 reports embed this graph, and exploration includes
+executed branch evidence. A report identifies inputs by digest; a separate
+review bundle is needed to carry the input bytes for independent rerun.
 `explain` of a bare hashed id may still have an empty `nodes` array;
 emptiness means no persisted DAG, not an omitted field.
 
@@ -221,7 +229,9 @@ value).
 
 **Incremental compilation.** `fidryn-driver::Driver` memos parse/check
 by blake3(source)+manifest and run by program+query+case+times.
-Salsa-style explicit memoization; the `salsa` crate is not a dependency.
+The `salsa` crate owns dependency tracking. A `CompilationArtifact` retains
+its immutable module, root text, observed dependency/lock bytes and source bundle;
+its trust does not depend on the order of other compilations in the same driver.
 Comment-only edits miss the check cache (byte identity).
 
 **Counterexample to determinacy.** `check_determinacy` evaluates one

@@ -1,15 +1,20 @@
 //! Bounded completion explorer and invariant checks.
 
+mod property;
+
+pub use property::{VerificationBudget, verify_property, verify_property_with_budget};
+
 use fidryn_core::ir::CoreModule;
 use fidryn_core::{
-    CaseRecord, CoverageWitness, EngineError, EvidenceItem, Instant, LegalState, OpenRequest,
-    Outcome, QueryName, RunContext, TraceId, Value, VerificationBounds,
+    CaseRecord, CompletionAdmissionError, CompletionBranch, CompletionSearchEvidence,
+    CoverageWitness, EngineError, OpenRequest, Outcome, QueryName, RunContext, TraceId,
+    ValidatedCompletionModel, Value, VerificationBounds,
 };
-use fidryn_eval::{evaluate, evaluate_scenario, seed_initial_occupancy};
-use fidryn_handlers::{CaseFile, ExplorationBounds, Explore, Skeptical, aggregate};
-use fidryn_solve::{
-    Assignment, Constraint, Domain, SearchBudget, SearchEvent, SmtAnswer, smt_check, stream,
+use fidryn_eval::{
+    DerivationStep, EvalSession, evaluate, evaluate_scenario_traced, evaluate_traced,
 };
+use fidryn_handlers::{CaseFile, ExplorationBounds, Explore, Skeptical, aggregate_completions};
+use fidryn_solve::{Assignment, Domain, SearchBudget, SearchEvent, stream};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
@@ -161,42 +166,203 @@ pub fn explore_query(
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<Outcome<Value>, EngineError> {
+    Ok(explore_query_traced(module, query, case, ctx)?.outcome)
+}
+
+/// Actual evaluated branches and their content-addressed derivations.
+#[derive(Clone, Debug)]
+pub struct ExplorationSession {
+    pub outcome: Outcome<Value>,
+    pub derivation: Vec<DerivationStep>,
+    pub coverage: Coverage,
+    pub evidence: CompletionSearchEvidence,
+}
+
+/// Explore once, retaining each executed branch's derivation and exact
+/// coverage. The combined graph and branch count have independent limits.
+pub fn explore_query_traced(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Result<ExplorationSession, EngineError> {
     if module.query(query.as_str()).is_none() {
         return Err(EngineError::UnknownQuery(query.as_str().to_owned()));
     }
-    if let Ok(determinacy) = check_determinacy(module, query, case, ctx) {
-        match determinacy {
-            Determinacy::Convergent { value, .. } => return Ok(determinate_explored(value)),
-            Determinacy::Suspended { requests } => {
-                return Ok(Outcome::Suspended {
-                    requests,
-                    trace: TraceId::of(b"explore"),
+    let model = match ValidatedCompletionModel::admit(case) {
+        Ok(model) => model,
+        Err(error) => {
+            let outcome = admission_outcome(error)?;
+            return finish_session(
+                module,
+                query,
+                case,
+                ctx,
+                outcome,
+                Vec::new(),
+                Vec::new(),
+                CompletionSearchEvidence {
+                    examined: 0,
+                    total: 0,
+                    incomplete: false,
+                    branches: Vec::new(),
+                },
+            );
+        }
+    };
+    let total = model.product_size().map_err(EngineError::InvalidInput)?;
+    let domains = model
+        .slots()
+        .iter()
+        .map(|slot| Domain {
+            name: slot.name.clone(),
+            values: slot.values.clone(),
+        })
+        .collect::<Vec<_>>();
+    let mut derivation = Vec::new();
+    let mut ids = BTreeSet::new();
+    let mut roots = Vec::new();
+    let mut branches = Vec::new();
+    let mut evidence_branches = Vec::new();
+    let mut incomplete = false;
+    for event in stream(
+        &domains,
+        SearchBudget {
+            max_assignments: MAX_COMPLETIONS,
+        },
+    ) {
+        match event {
+            SearchEvent::Assignment(assignment) => {
+                let session = eval_assignment_traced(module, query, case, ctx, &assignment)?;
+                for step in session.derivation {
+                    if ids.insert(step.id.clone()) {
+                        push_derivation(&mut derivation, step)?;
+                    }
+                }
+                let label = assignment_identity(&assignment);
+                let root = session.outcome.trace().hex();
+                if !ids.contains(&root) {
+                    return Err(EngineError::Internal(
+                        "evaluated completion has no derivation root".into(),
+                    ));
+                }
+                let parents = vec![root];
+                let detail = fidryn_core::canonical_json(&serde_json::json!({ "assignment":assignment.bindings, "outcome":session.outcome })).map_err(|error| EngineError::Internal(error.to_string()))?;
+                let id = TraceId::of(
+                    format!("fidryn.completion-assignment/v0.1\0{detail}\0{parents:?}").as_bytes(),
+                )
+                .hex();
+                if ids.insert(id.clone()) {
+                    push_derivation(
+                        &mut derivation,
+                        DerivationStep {
+                            id: id.clone(),
+                            kind: "completion_assignment".into(),
+                            detail,
+                            parents,
+                            retained_bytes: 0,
+                        },
+                    )?;
+                }
+                roots.push(id);
+                evidence_branches.push(CompletionBranch {
+                    bindings: assignment.bindings,
+                    outcome: session.outcome.clone(),
                 });
+                branches.push((label, session.outcome));
             }
-            Determinacy::Other(outcome) => return Ok(outcome),
-            Determinacy::Counterexample { .. } | Determinacy::Unknown { .. } => {}
+            SearchEvent::BudgetExceeded { .. } => incomplete = true,
+            SearchEvent::Exhausted => {}
         }
     }
-
-    let Some((assignments, incomplete)) = declared_assignments(case) else {
-        return Ok(empty_completion_set());
+    let evidence = CompletionSearchEvidence {
+        examined: branches.len(),
+        total,
+        incomplete,
+        branches: evidence_branches,
     };
-    if assignments.is_empty() {
-        return Ok(empty_completion_set());
-    }
+    let outcome = aggregate_completions(branches, incomplete)?;
+    finish_session(
+        module, query, case, ctx, outcome, derivation, roots, evidence,
+    )
+}
 
-    let mut labeled_branches: Vec<(String, Outcome<Value>)> = Vec::new();
-    for assignment in &assignments {
-        let out = eval_assignment(module, query, case, ctx, assignment)?;
-        labeled_branches.push((assignment_identity(assignment), out));
+#[allow(clippy::too_many_arguments)]
+fn finish_session(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    mut outcome: Outcome<Value>,
+    mut derivation: Vec<DerivationStep>,
+    mut roots: Vec<String>,
+    evidence: CompletionSearchEvidence,
+) -> Result<ExplorationSession, EngineError> {
+    let coverage = Coverage {
+        examined: evidence.examined,
+        total: evidence.total,
+        incomplete: evidence.incomplete,
+    };
+    roots.sort();
+    roots.dedup();
+    let detail = fidryn_core::canonical_json(&serde_json::json!({
+        "program":module.program_digest().map_err(EngineError::Internal)?, "case":fidryn_core::CaseSnapshotIdentity::of(case).map_err(EngineError::Internal)?,
+        "query":query, "validAt":ctx.valid_time, "knownAt":ctx.record_time,
+        "examined":coverage.examined, "total":coverage.total, "incomplete":coverage.incomplete, "outcome":outcome,
+    })).map_err(|error| EngineError::Internal(error.to_string()))?;
+    let trace =
+        TraceId::of(format!("fidryn.completion-search/v0.1\0{detail}\0{roots:?}").as_bytes());
+    push_derivation(
+        &mut derivation,
+        DerivationStep {
+            id: trace.hex(),
+            kind: "completion_search".into(),
+            detail,
+            parents: roots,
+            retained_bytes: 0,
+        },
+    )?;
+    match &mut outcome {
+        Outcome::Determinate { trace: id, .. }
+        | Outcome::Contingent { trace: id, .. }
+        | Outcome::Suspended { trace: id, .. }
+        | Outcome::NormConflict { trace: id, .. }
+        | Outcome::OutsideCompetence { trace: id, .. }
+        | Outcome::Inconsistent { trace: id, .. } => *id = trace,
     }
-    Ok(finalize_exploration(labeled_branches, incomplete))
+    Ok(ExplorationSession {
+        outcome,
+        derivation,
+        coverage,
+        evidence,
+    })
+}
+
+fn push_derivation(
+    derivation: &mut Vec<DerivationStep>,
+    mut step: DerivationStep,
+) -> Result<(), EngineError> {
+    let prior = derivation.last().map_or(0, |step| step.retained_bytes);
+    let bytes = step
+        .id
+        .len()
+        .saturating_add(step.kind.len())
+        .saturating_add(step.detail.len())
+        .saturating_add(step.parents.iter().map(String::len).sum::<usize>());
+    let retained = prior.saturating_add(bytes);
+    if derivation.len() >= 100_000 || step.detail.len() > 1024 * 1024 || retained > 16 * 1024 * 1024
+    {
+        return Err(EngineError::FuelExhausted { remaining: 0 });
+    }
+    step.retained_bytes = retained;
+    derivation.push(step);
+    Ok(())
 }
 
 /// Two-phase search: one admissible `v`, then a witness of `≠ v`.
 ///
 /// Domains are exactly `case.admissible_completions`. Completions are
-/// streamed under [`MAX_COMPLETIONS`]; the full product is never built
+/// streamed under the fixed completion budget; the full product is never built
 /// and then truncated. Engine errors and budget exhaustion are
 /// [`Determinacy::Unknown`], never [`Determinacy::Convergent`].
 pub fn check_determinacy(
@@ -223,15 +389,26 @@ fn check_determinacy_with_budget(
     ctx: &RunContext,
     budget: SearchBudget,
 ) -> Result<Determinacy, EngineError> {
-    let domains = completion_domains(case);
-    if domains.iter().any(|domain| domain.values.is_empty()) {
-        return Ok(Determinacy::Other(empty_completion_set()));
-    }
-
-    let mut scan = DetScan::default();
+    let model = match ValidatedCompletionModel::admit(case) {
+        Ok(model) => model,
+        Err(error) => return Ok(Determinacy::Other(admission_outcome(error)?)),
+    };
+    let domains = model
+        .slots()
+        .iter()
+        .map(|slot| Domain {
+            name: slot.name.clone(),
+            values: slot.values.clone(),
+        })
+        .collect::<Vec<_>>();
+    let mut scan = DetScan {
+        total: model.product_size().map_err(EngineError::InvalidInput)?,
+        ..DetScan::default()
+    };
     for event in stream(&domains, budget) {
         match event {
             SearchEvent::Assignment(assignment) => {
+                scan.examined += 1;
                 let label = assignment_identity(&assignment);
                 match eval_assignment(module, query, case, ctx, &assignment) {
                     Ok(outcome) => {
@@ -274,7 +451,7 @@ pub fn skeptical(
             branch: case.interpretations.clone(),
         },
     };
-    let state = state_from_case(case, ctx);
+    let state = case.into_state();
     let inner = match evaluate(
         module,
         query,
@@ -315,326 +492,6 @@ pub fn skeptical(
     }
 }
 
-/// Verify a declared [`fidryn_core::CoreVerify`] formula.
-///
-/// Query names are not properties. `TrusteeContinuity` is not special: it
-/// must appear in `module.verifications`. A universal with empty bounds is
-/// [`PropertyVerdict::Unknown`], not proved.
-///
-/// Quantified `true` / `false` (and finite-domain `x = v` / `x ≠ v`) over
-/// nonempty `People` bounds are decided by Fidryn SMT-lite, not Z3.
-/// `assert always occupied(...)` stays Unknown.
-pub fn verify_property(module: &CoreModule, name: &str) -> PropertyVerdict {
-    let Some(property) = module.verifications.iter().find(|item| item.name == name) else {
-        let diagnostics = if module.queries.iter().any(|query| query.name == name) {
-            format!("`{name}` is a query, not a declared verification property")
-        } else {
-            format!("unknown property {name}")
-        };
-        return PropertyVerdict::InvalidProperty { diagnostics };
-    };
-
-    if bounds_are_empty(&property.bounds) && formula_is_universal(&property.formula) {
-        return PropertyVerdict::Unknown {
-            name: property.name.clone(),
-            reason: "W620 BoundedVerification: quantifier has empty bounds".into(),
-            bounds: property.bounds.clone(),
-        };
-    }
-    if bounds_are_empty(&property.bounds) && formula_is_existential(&property.formula) {
-        return PropertyVerdict::Unknown {
-            name: property.name.clone(),
-            reason: "bounded check cannot witness an existential over empty bounds".into(),
-            bounds: property.bounds.clone(),
-        };
-    }
-
-    let formula = property.formula.trim().trim_end_matches(';').trim();
-    if formula_is_true_literal(formula) {
-        return PropertyVerdict::Proved {
-            name: property.name.clone(),
-            bounds: property.bounds.clone(),
-        };
-    }
-    if formula_is_false_literal(formula) {
-        return PropertyVerdict::Counterexample {
-            name: property.name.clone(),
-            detail: "formula evaluates to false".into(),
-        };
-    }
-    if let Some(verdict) = verify_quantified_lite(&property.name, formula, &property.bounds) {
-        return verdict;
-    }
-
-    PropertyVerdict::Unknown {
-        name: property.name.clone(),
-        reason: "bounded check did not obtain a covering proof of the declared formula".into(),
-        bounds: property.bounds.clone(),
-    }
-}
-
-fn formula_is_true_literal(formula: &str) -> bool {
-    formula == "true" || formula == "assert true"
-}
-
-fn formula_is_false_literal(formula: &str) -> bool {
-    formula == "false" || formula == "assert false"
-}
-
-/// SMT-lite decision for a single `for_all` / `exists` over a finite bound
-/// sort (`People`, `Events`, `TimePoints`) whose body is `true`, `false`,
-/// or a finite-domain equality/disequality.
-///
-/// `assert always occupied(...)` and other uninterpreted bodies stay
-/// [`None`] so [`verify_property`] reports Unknown. Empty person bounds on
-/// a universal remain W620, never a vacuous proof.
-fn verify_quantified_lite(
-    name: &str,
-    formula: &str,
-    bounds: &VerificationBounds,
-) -> Option<PropertyVerdict> {
-    let quantified = parse_quantified_lite(formula)?;
-    let domain = finite_sort_domain(&quantified.binder, &quantified.domain, bounds)?;
-    if domain.values.is_empty() {
-        let reason = match quantified.kind {
-            QuantKind::ForAll => "W620 BoundedVerification: quantifier has empty bounds".to_owned(),
-            QuantKind::Exists => {
-                "bounded check cannot witness an existential over empty bounds".to_owned()
-            }
-        };
-        return Some(PropertyVerdict::Unknown {
-            name: name.to_owned(),
-            reason,
-            bounds: bounds.clone(),
-        });
-    }
-
-    let negate = matches!(quantified.kind, QuantKind::ForAll);
-    let constraints = lite_body_constraints(&quantified.body, negate);
-    match smt_check(std::slice::from_ref(&domain), &constraints) {
-        SmtAnswer::Sat(assignment) => match quantified.kind {
-            QuantKind::ForAll => Some(PropertyVerdict::Counterexample {
-                name: name.to_owned(),
-                detail: format!(
-                    "formula is false under {}",
-                    assignment_identity(&assignment)
-                ),
-            }),
-            QuantKind::Exists => Some(PropertyVerdict::Proved {
-                name: name.to_owned(),
-                bounds: bounds.clone(),
-            }),
-        },
-        SmtAnswer::Unsat => match quantified.kind {
-            QuantKind::ForAll => Some(PropertyVerdict::Proved {
-                name: name.to_owned(),
-                bounds: bounds.clone(),
-            }),
-            QuantKind::Exists => Some(PropertyVerdict::Counterexample {
-                name: name.to_owned(),
-                detail: "no finite witness".into(),
-            }),
-        },
-        SmtAnswer::Unknown { reason } => Some(PropertyVerdict::Unknown {
-            name: name.to_owned(),
-            reason,
-            bounds: bounds.clone(),
-        }),
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum QuantKind {
-    ForAll,
-    Exists,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-enum LiteBody {
-    Bool(bool),
-    Eq(String, Value),
-    Ne(String, Value),
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct LiteQuantifier {
-    kind: QuantKind,
-    binder: String,
-    domain: String,
-    body: LiteBody,
-}
-
-fn parse_quantified_lite(formula: &str) -> Option<LiteQuantifier> {
-    let rest = strip_leading_assert(formula);
-    // Temporal `always` is not this fragment. TrusteeContinuity stays Unknown.
-    if ident_prefix(rest, "always").is_some() {
-        return None;
-    }
-    let (kind, rest) = if let Some(rest) = ident_prefix(rest, "for_all") {
-        (QuantKind::ForAll, rest)
-    } else {
-        let rest = ident_prefix(rest, "exists")?;
-        (QuantKind::Exists, rest)
-    };
-    let (binder, rest) = take_ident(rest.trim_start())?;
-    let rest = ident_prefix(rest.trim_start(), "in")?;
-    let (domain, rest) = take_ident(rest.trim_start())?;
-    let rest = rest.trim_start().strip_prefix(':')?;
-    let body_src = rest.trim().trim_end_matches(';').trim();
-    if body_src.is_empty() {
-        return None;
-    }
-    let body = parse_lite_body(body_src)?;
-    Some(LiteQuantifier {
-        kind,
-        binder,
-        domain,
-        body,
-    })
-}
-
-fn strip_leading_assert(formula: &str) -> &str {
-    let trimmed = formula.trim();
-    ident_prefix(trimmed, "assert").unwrap_or(trimmed)
-}
-
-fn ident_prefix<'a>(src: &'a str, ident: &str) -> Option<&'a str> {
-    if src.starts_with(ident) && ident_boundary(src, ident.len()) {
-        Some(src[ident.len()..].trim_start())
-    } else {
-        None
-    }
-}
-
-fn ident_boundary(src: &str, end: usize) -> bool {
-    match src[end..].chars().next() {
-        None => true,
-        Some(c) => !c.is_ascii_alphanumeric() && c != '_',
-    }
-}
-
-fn take_ident(src: &str) -> Option<(String, &str)> {
-    let mut chars = src.char_indices();
-    let (_, first) = chars.next()?;
-    if !(first.is_ascii_alphabetic() || first == '_') {
-        return None;
-    }
-    let mut end = first.len_utf8();
-    for (i, c) in chars {
-        if c.is_ascii_alphanumeric() || c == '_' {
-            end = i + c.len_utf8();
-        } else {
-            break;
-        }
-    }
-    Some((src[..end].to_owned(), &src[end..]))
-}
-
-fn parse_lite_body(src: &str) -> Option<LiteBody> {
-    match src {
-        "true" => return Some(LiteBody::Bool(true)),
-        "false" => return Some(LiteBody::Bool(false)),
-        _ => {}
-    }
-    if let Some((left, right)) = split_once_op(src, "!=").or_else(|| split_once_op(src, "≠")) {
-        return Some(LiteBody::Ne(
-            parse_lite_var(left)?,
-            parse_lite_value(right)?,
-        ));
-    }
-    if let Some((left, right)) = split_once_op(src, "=") {
-        return Some(LiteBody::Eq(
-            parse_lite_var(left)?,
-            parse_lite_value(right)?,
-        ));
-    }
-    None
-}
-
-fn split_once_op<'a>(src: &'a str, op: &str) -> Option<(&'a str, &'a str)> {
-    let i = src.find(op)?;
-    Some((&src[..i], &src[i + op.len()..]))
-}
-
-fn parse_lite_var(src: &str) -> Option<String> {
-    let src = src.trim();
-    let (ident, rest) = take_ident(src)?;
-    if rest.trim().is_empty() {
-        Some(ident)
-    } else {
-        None
-    }
-}
-
-fn is_lite_entity_token(src: &str) -> bool {
-    let mut chars = src.chars();
-    let Some(first) = chars.next() else {
-        return false;
-    };
-    if !(first.is_ascii_alphabetic() || first == '_') {
-        return false;
-    }
-    chars.all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
-}
-
-fn parse_lite_value(src: &str) -> Option<Value> {
-    let src = src.trim();
-    match src {
-        "true" => Some(Value::Bool(true)),
-        "false" => Some(Value::Bool(false)),
-        _ => {
-            if let Ok(n) = src.parse::<i64>() {
-                return Some(Value::Int(n));
-            }
-            if src.len() >= 2 {
-                let bytes = src.as_bytes();
-                if (bytes[0] == b'"' && *bytes.last()? == b'"')
-                    || (bytes[0] == b'\'' && *bytes.last()? == b'\'')
-                {
-                    return Some(Value::String(src[1..src.len() - 1].to_owned()));
-                }
-            }
-            if is_lite_entity_token(src) {
-                Some(Value::Entity(src.to_owned()))
-            } else {
-                None
-            }
-        }
-    }
-}
-
-fn lite_body_constraints(body: &LiteBody, negate: bool) -> Vec<Constraint> {
-    match (body, negate) {
-        (LiteBody::Bool(true), false) | (LiteBody::Bool(false), true) => Vec::new(),
-        (LiteBody::Bool(true), true) | (LiteBody::Bool(false), false) => {
-            vec![Constraint::nogood(Vec::new())]
-        }
-        (LiteBody::Eq(var, value), false) | (LiteBody::Ne(var, value), true) => {
-            vec![Constraint::eq(var.clone(), value.clone())]
-        }
-        (LiteBody::Eq(var, value), true) | (LiteBody::Ne(var, value), false) => {
-            vec![Constraint::ne(var.clone(), value.clone())]
-        }
-    }
-}
-
-fn finite_sort_domain(binder: &str, sort: &str, bounds: &VerificationBounds) -> Option<Domain> {
-    let (n, prefix) = match sort {
-        "People" | "people" | "Person" | "persons" => (bounds.persons, "person"),
-        "Events" | "events" | "Event" => (bounds.events, "event"),
-        "Time" | "Times" | "TimePoint" | "TimePoints" | "time_points" => {
-            (bounds.time_points, "time")
-        }
-        _ => return None,
-    };
-    Some(Domain {
-        name: binder.to_owned(),
-        values: (0..n)
-            .map(|i| Value::Entity(format!("{prefix}-{i}")))
-            .collect(),
-    })
-}
-
 fn eval_assignment(
     module: &CoreModule,
     query: &QueryName,
@@ -642,16 +499,30 @@ fn eval_assignment(
     ctx: &RunContext,
     assignment: &Assignment,
 ) -> Result<Outcome<Value>, EngineError> {
-    let branched = apply_assignment(case, assignment, ctx);
+    Ok(eval_assignment_traced(module, query, case, ctx, assignment)?.outcome)
+}
+
+fn eval_assignment_traced(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+    assignment: &Assignment,
+) -> Result<EvalSession, EngineError> {
+    let model = ValidatedCompletionModel::admit(case)
+        .map_err(|error| EngineError::InvalidInput(error.to_string()))?;
+    let branched = model
+        .overlay(case, &assignment.bindings, ctx)
+        .map_err(EngineError::InvalidInput)?;
     let mut handler = CaseFile {
         record: branched.clone(),
         known_at: Some(ctx.record_time),
     };
-    let state = state_from_case(&branched, ctx);
+    let state = branched.into_state();
     // Nonempty case.assumptions must change the explored answer, not only
     // the CLI/mill envelope. Operative `evaluate` ignores that overlay.
     if branched.assumptions.is_empty() {
-        evaluate(
+        evaluate_traced(
             module,
             query,
             &BTreeMap::new(),
@@ -661,7 +532,7 @@ fn eval_assignment(
             &branched,
         )
     } else {
-        evaluate_scenario(
+        evaluate_scenario_traced(
             module,
             query,
             &BTreeMap::new(),
@@ -671,30 +542,6 @@ fn eval_assignment(
             &branched,
         )
     }
-}
-
-/// Declared finite product, streamed under [`MAX_COMPLETIONS`].
-/// `None` when a domain is explicitly empty.
-fn declared_assignments(case: &CaseRecord) -> Option<(Vec<Assignment>, bool)> {
-    let domains = completion_domains(case);
-    if domains.iter().any(|domain| domain.values.is_empty()) {
-        return None;
-    }
-    let mut assignments = Vec::new();
-    let mut incomplete = false;
-    for event in stream(
-        &domains,
-        SearchBudget {
-            max_assignments: MAX_COMPLETIONS,
-        },
-    ) {
-        match event {
-            SearchEvent::Assignment(assignment) => assignments.push(assignment),
-            SearchEvent::BudgetExceeded { .. } => incomplete = true,
-            SearchEvent::Exhausted => {}
-        }
-    }
-    Some((assignments, incomplete))
 }
 
 #[derive(Default)]
@@ -705,6 +552,7 @@ struct DetScan {
     saw_suspended: bool,
     other: Option<Outcome<Value>>,
     examined: usize,
+    total: usize,
     incomplete: bool,
     unresolved_outside: bool,
 }
@@ -733,8 +581,8 @@ impl DetScan {
     fn coverage(&self) -> Coverage {
         Coverage {
             examined: self.examined,
-            total: self.examined,
-            incomplete: self.incomplete || self.unresolved_outside,
+            total: self.total,
+            incomplete: self.incomplete || self.unresolved_outside || self.examined < self.total,
         }
     }
 
@@ -744,20 +592,12 @@ impl DetScan {
         outcome: Outcome<Value>,
         domains: &[Domain],
     ) -> Option<Determinacy> {
-        self.examined += 1;
         match outcome {
             Outcome::Determinate { value, .. } => self.record(label.to_owned(), value),
-            Outcome::Contingent { alternatives, .. } => {
-                for (nested, value) in alternatives {
-                    let nested_label = if label == "{}" {
-                        nested
-                    } else {
-                        format!("{label}/{nested}")
-                    };
-                    if let Some(found) = self.record(nested_label, value) {
-                        return Some(found);
-                    }
-                }
+            contingent @ Outcome::Contingent { .. } => {
+                // Inner alternatives have not become determinate admitted
+                // assignments merely by sharing an outer completion.
+                self.other.get_or_insert(contingent);
                 None
             }
             Outcome::Suspended { requests, .. } => {
@@ -780,6 +620,7 @@ impl DetScan {
     fn finish(self) -> Determinacy {
         if let Some((_, value)) = self.witness {
             if self.incomplete
+                || self.examined != self.total
                 || self.engine.is_some()
                 || self.saw_suspended
                 || self.other.is_some()
@@ -843,260 +684,31 @@ fn request_in_domains(request: &OpenRequest, domains: &[Domain]) -> bool {
     domains.iter().any(|domain| domain.name == key)
 }
 
-fn determinate_explored(value: Value) -> Outcome<Value> {
-    Outcome::Determinate {
-        value,
-        trace: TraceId::of(b"explore"),
-        convergence_certificate: None,
-        ignored_open_issues: BTreeSet::new(),
-    }
-}
-
-fn state_from_case(case: &CaseRecord, ctx: &RunContext) -> LegalState {
-    let mut state = case.into_state();
-    if !state.authority.occupancy.is_empty() {
-        return state;
-    }
-    let Some(person) = fact_name(case, "acting_trustee") else {
-        return state;
-    };
-    let office = fact_name(case, "office").unwrap_or_else(|| "TrusteeOf(BRT)".into());
-    seed_initial_occupancy(&mut state, &person, &office, ctx.valid_time);
-    state
-}
-
-fn fact_name(case: &CaseRecord, key: &str) -> Option<String> {
-    match case.facts.get(key) {
-        Some(Value::Entity(name) | Value::String(name)) => Some(name.clone()),
-        _ => None,
-    }
-}
-
-fn completion_domains(case: &CaseRecord) -> Vec<Domain> {
-    let mut domains = Vec::new();
-    for (family, alternatives) in &case.admissible_completions.interpretations {
-        let values = recorded_or_declared(case.interpretations.get(family), alternatives);
-        domains.push(Domain {
-            name: format!("{INTERPRETATION_NS}{family}"),
-            values,
-        });
-    }
-    for (schema, domain) in &case.admissible_completions.evidence {
-        domains.push(Domain {
-            name: format!("{EVIDENCE_NS}{schema}"),
-            values: domain
-                .responses
-                .iter()
-                .cloned()
-                .map(Value::String)
-                .collect(),
-        });
-    }
-    for (protocol, options) in &case.admissible_completions.choices {
-        let values = recorded_or_declared(case.decisions.get(protocol), options);
-        domains.push(Domain {
-            name: format!("{CHOICE_NS}{protocol}"),
-            values,
-        });
-    }
-    domains
-}
-
-fn recorded_or_declared(recorded: Option<&String>, declared: &[String]) -> Vec<Value> {
-    if declared.is_empty() {
-        return Vec::new();
-    }
-    if let Some(value) = recorded {
-        if declared.iter().any(|item| item == value) {
-            return vec![Value::String(value.clone())];
+fn admission_outcome(error: CompletionAdmissionError) -> Result<Outcome<Value>, EngineError> {
+    match error {
+        CompletionAdmissionError::EmptyDomain { .. } => Ok(Outcome::Inconsistent {
+            core: vec!["empty completion set".into()],
+            trace: TraceId::of(b"empty"),
+        }),
+        CompletionAdmissionError::OutsideDomain { request, selection } => {
+            Ok(Outcome::OutsideCompetence {
+                request,
+                reason: format!("recorded selection `{selection}` is not in the admissible set"),
+                trace: TraceId::of(b"completion-admission"),
+            })
         }
-        return Vec::new();
-    }
-    declared.iter().cloned().map(Value::String).collect()
-}
-
-fn apply_assignment(case: &CaseRecord, assignment: &Assignment, ctx: &RunContext) -> CaseRecord {
-    let mut branched = case.clone();
-    for (key, value) in &assignment.bindings {
-        let text = binding_text(value);
-        if let Some(family) = key.strip_prefix(INTERPRETATION_NS) {
-            if !branched.interpretations.contains_key(family) {
-                branched.interpretations.insert(family.to_owned(), text);
-            }
-        } else if let Some(schema) = key.strip_prefix(EVIDENCE_NS) {
-            apply_evidence_response(&mut branched, case, schema, &text, ctx);
-        } else if let Some(protocol) = key.strip_prefix(CHOICE_NS)
-            && !branched.decisions.contains_key(protocol)
-        {
-            branched.decisions.insert(protocol.to_owned(), text);
-        }
-    }
-    branched
-}
-
-fn apply_evidence_response(
-    branched: &mut CaseRecord,
-    original: &CaseRecord,
-    schema: &str,
-    response: &str,
-    ctx: &RunContext,
-) {
-    if is_absent_response(response) {
-        return;
-    }
-    if original.evidence.iter().any(|item| item.schema == schema) {
-        return;
-    }
-    let effect = original
-        .admissible_completions
-        .evidence
-        .get(schema)
-        .and_then(|domain| domain.effect_on_valid_time.as_deref());
-    branched.evidence.push(EvidenceItem {
-        schema: schema.to_owned(),
-        value: Value::String(response.to_owned()),
-        observed_at: evidence_observed_at(response, effect, ctx),
-    });
-}
-
-fn is_absent_response(response: &str) -> bool {
-    matches!(response, "absent" | "none" | "missing" | "not_present" | "")
-}
-
-fn evidence_observed_at(response: &str, effect: Option<&str>, ctx: &RunContext) -> Instant {
-    let prospective = response.contains("prospective")
-        || effect.is_some_and(|text| text.contains("after") || text.contains("unchanged"));
-    if prospective {
-        Instant::parse("2099-01-01T00:00:00Z").unwrap_or(ctx.record_time)
-    } else {
-        ctx.record_time
+        CompletionAdmissionError::InvalidModel(reason) => Err(EngineError::InvalidInput(reason)),
     }
 }
 
 fn assignment_identity(assignment: &Assignment) -> String {
-    if assignment.bindings.is_empty() {
-        return "{}".into();
-    }
-    assignment
-        .bindings
-        .iter()
-        .map(|(family, value)| format!("{family}={}", binding_text(value)))
-        .collect::<Vec<_>>()
-        .join(",")
-}
-
-fn binding_text(value: &Value) -> String {
-    match value {
-        Value::String(text) | Value::Entity(text) => text.clone(),
-        Value::Bool(flag) => flag.to_string(),
-        Value::Int(n) => n.to_string(),
-        other => other.display_label(),
-    }
-}
-
-fn finalize_exploration(
-    branches: Vec<(String, Outcome<Value>)>,
-    incomplete: bool,
-) -> Outcome<Value> {
-    if branches.is_empty() {
-        if incomplete {
-            return incomplete_search();
-        }
-        return empty_completion_set();
-    }
-
-    let outcomes: Vec<Outcome<Value>> = branches.iter().map(|(_, out)| out.clone()).collect();
-    if outcomes.iter().any(|out| {
-        matches!(
-            out,
-            Outcome::Suspended { .. }
-                | Outcome::NormConflict { .. }
-                | Outcome::OutsideCompetence { .. }
-                | Outcome::Inconsistent { .. }
-        )
-    }) {
-        return aggregate(outcomes);
-    }
-
-    let mut labeled = BTreeMap::new();
-    for (label, out) in &branches {
-        match out {
-            Outcome::Determinate { value, .. } => {
-                labeled.insert(label.clone(), value.clone());
-            }
-            Outcome::Contingent { alternatives, .. } => {
-                for (nested, value) in alternatives {
-                    labeled.insert(format!("{label}/{nested}"), value.clone());
-                }
-            }
-            _ => {}
-        }
-    }
-    if labeled.is_empty() {
-        return aggregate(outcomes);
-    }
-
-    let mut values = labeled.values();
-    let Some(first) = values.next() else {
-        return aggregate(outcomes);
-    };
-    let all_equal = values.all(|value| value == first);
-    if all_equal {
-        if incomplete {
-            return incomplete_search();
-        }
-        return outcomes
-            .into_iter()
-            .find(|out| matches!(out, Outcome::Determinate { .. }))
-            .unwrap_or_else(|| aggregate(branches.into_iter().map(|(_, out)| out).collect()));
-    }
-
-    Outcome::Contingent {
-        alternatives: labeled,
-        pivots: BTreeSet::new(),
-        trace: TraceId::of(b"explore"),
-    }
-}
-
-fn empty_completion_set() -> Outcome<Value> {
-    Outcome::Inconsistent {
-        core: vec!["empty completion set".into()],
-        trace: TraceId::of(b"empty"),
-    }
-}
-
-fn incomplete_search() -> Outcome<Value> {
-    let mut requests = BTreeSet::new();
-    requests.insert(OpenRequest::NeedCustom {
-        effect: "Explore".into(),
-        payload: "incomplete completion search".into(),
-    });
-    Outcome::Suspended {
-        requests,
-        trace: TraceId::of(b"explore-incomplete"),
-    }
-}
-
-fn bounds_are_empty(bounds: &VerificationBounds) -> bool {
-    bounds.persons == 0 && bounds.events == 0 && bounds.time_points == 0
-}
-
-fn formula_is_universal(formula: &str) -> bool {
-    contains_ident(formula, "for_all") || contains_ident(formula, "always")
-}
-
-fn formula_is_existential(formula: &str) -> bool {
-    contains_ident(formula, "exists")
-}
-
-fn contains_ident(src: &str, ident: &str) -> bool {
-    src.split(|c: char| !c.is_ascii_alphanumeric() && c != '_')
-        .any(|token| token == ident)
+    fidryn_core::canonical_json(&assignment.bindings).expect("completion assignment is encodable")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fidryn_core::EvidenceItem;
     use fidryn_core::ir::{
         CoreDecl, CoreInterpretationFamily, CoreNomination, CoreQuery, CoreVerify, QueryPlan,
     };
@@ -1197,7 +809,54 @@ mod tests {
                 ],
                 meta: node_meta("SuccessorEligibility"),
             }));
+        module.declarations.push(CoreDecl::Judgment(Box::new(
+            fidryn_core::ir::CoreJudgment {
+                id: NodeId::of(b"Incapacity"),
+                name: "Incapacity".into(),
+                decides: PropTerm::new(
+                    "Incapacitated",
+                    vec![
+                        Term::Binder("person".into()),
+                        Term::Binder("purpose".into()),
+                    ],
+                ),
+                authority: Term::Ident("Court".into()),
+                record_requires: vec![(
+                    "certificate".into(),
+                    Type::Sort(fidryn_core::Sort::Nominal("PhysicianCertificate".into())),
+                )],
+                binders: Vec::new(),
+                source: None,
+                authority_policy: None,
+                record_patterns: Vec::new(),
+                standard: None,
+                constraints: Vec::new(),
+                establish_when: None,
+                reject_when: None,
+                otherwise: None,
+                on_established: Vec::new(),
+                review: None,
+                unsupported_clauses: Vec::new(),
+                meta: node_meta("Incapacity"),
+            },
+        )));
         module
+    }
+
+    fn certificate(issuer: &str) -> Value {
+        Value::Map(BTreeMap::from([
+            ("issuer".into(), Value::String(issuer.into())),
+            ("subject".into(), Value::String("Bryan".into())),
+            ("purpose".into(), Value::String("TrusteeOf(BRT)".into())),
+            ("conclusion".into(), Value::String("Supports".into())),
+        ]))
+    }
+
+    fn occupancy() -> Value {
+        Value::Map(BTreeMap::from([
+            ("person".into(), Value::String("Bryan".into())),
+            ("office".into(), Value::String("TrusteeOf(BRT)".into())),
+        ]))
     }
 
     fn bool_module() -> CoreModule {
@@ -1224,6 +883,7 @@ mod tests {
             name: name.to_owned(),
             bounds,
             formula: formula.to_owned(),
+            assertions: Vec::new(),
             meta: NodeMeta {
                 span: None,
                 source: None,
@@ -1242,19 +902,23 @@ mod tests {
     fn two_cert_case() -> CaseRecord {
         let mut case = CaseRecord::default();
         let t = at();
+        case.evidence.push(EvidenceItem {
+            schema: "OccupancyRecord".into(),
+            value: occupancy(),
+            observed_at: t,
+        });
         case.facts
-            .insert("acting_trustee".into(), Value::Entity("Bryan".into()));
+            .insert("Accepted(Alice,TrusteeOf(BRT))".into(), Value::Bool(true));
         case.facts
-            .insert("alice_accepted".into(), Value::Bool(true));
-        case.facts.insert("bob_accepted".into(), Value::Bool(true));
+            .insert("Accepted(Bob,TrusteeOf(BRT))".into(), Value::Bool(true));
         case.evidence.push(EvidenceItem {
             schema: "PhysicianCertificate".into(),
-            value: Value::String("c1".into()),
+            value: certificate("Doctor1"),
             observed_at: t,
         });
         case.evidence.push(EvidenceItem {
             schema: "PhysicianCertificate".into(),
-            value: Value::String("c2".into()),
+            value: certificate("Doctor2"),
             observed_at: t,
         });
         case.admissible_completions.interpretations.insert(
@@ -1268,21 +932,22 @@ mod tests {
         let observed = Instant::parse("2026-08-23T12:00:00Z").unwrap();
         let mut case = CaseRecord::default();
         case.facts
-            .insert("alice_accepted".into(), Value::Bool(true));
-        case.facts.insert("bob_accepted".into(), Value::Bool(true));
+            .insert("Accepted(Alice,TrusteeOf(BRT))".into(), Value::Bool(true));
+        case.facts
+            .insert("Accepted(Bob,TrusteeOf(BRT))".into(), Value::Bool(true));
         case.evidence.push(EvidenceItem {
             schema: "OccupancyRecord".into(),
-            value: Value::String("Bryan".into()),
+            value: occupancy(),
             observed_at: observed,
         });
         case.evidence.push(EvidenceItem {
             schema: "PhysicianCertificate".into(),
-            value: Value::String("certificate-1".into()),
+            value: certificate("Doctor1"),
             observed_at: observed,
         });
         case.evidence.push(EvidenceItem {
             schema: "PhysicianCertificate".into(),
-            value: Value::String("certificate-2".into()),
+            value: certificate("Doctor2"),
             observed_at: observed,
         });
         case.interpretations

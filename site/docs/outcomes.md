@@ -19,7 +19,7 @@ The six-kind result is a `fidryn.outcome/v0.1` object, defined by
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json). Field names
 are camelCase. Trust, coverage, execution mode, and assumptions that
 cannot fit that schema live on the evaluation-report envelope
-([`fidryn.evaluation-report/v0.1`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json));
+([`fidryn.evaluation-report/v0.2`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json));
 they are not extra keys on the outcome object (`additionalProperties`
 is false).
 
@@ -29,7 +29,7 @@ See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https
 ## Envelope
 
 CLI `run` / `explore` and mill `/api/run` / `/api/explore` emit
-`fidryn.evaluation-report/v0.1`. The six-kind legal result is nested as
+`fidryn.evaluation-report/v0.2`. The six-kind legal result is nested as
 `outcomeDocument`. That nested object is:
 
 | Field | Meaning |
@@ -55,19 +55,26 @@ failures (exit 1). They are never rewritten as `inconsistent`.
 ## Evaluation report envelope
 
 Qualifications that the outcome schema cannot carry live on
-`fidryn.evaluation-report/v0.1`. `fidryn_trace::render_report` emits
-that object. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
+`fidryn.evaluation-report/v0.2`. `fidryn_trace::render_checked_report`
+requires an invocation-bound checked evaluation. The legacy `render_report`
+API remains a v0.1 compatibility projection and does not supply a checked v0.2
+invocation. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
 above; that schema is unchanged.
 
 | Field | Meaning |
 | --- | --- |
-| `schema` | `fidryn.evaluation-report/v0.1`. |
+| `schema` | `fidryn.evaluation-report/v0.2`. |
 | `executionMode` | `operative` or `scenario`. Operative `evaluate` does not apply `case.assumptions`. |
 | `assumptions` | Overlay hypotheses copied onto a scenario report. Empty for operative runs. |
 | `sourceTrust` | How the compiled source was authenticated. In-memory / mill pasted compile is `unauthenticated`. A path compile may be `fixture` or `byteVerified`. `fixture` is not byte-verified. |
 | `verificationMethod` | `none` (no covering verification; a claims-digest binding is not covering), `structural` (shape only), or `finiteReplay` (each declared branch re-evaluated). Only `finiteReplay` is covering. |
 | `coverage` | Optional `CoverageWitness`. Shape completeness is not covering meaning. |
 | `outcomeDocument` | The `fidryn.outcome/v0.1` object from the previous section. |
+| `invocation`, `invocationId` | Program/case identity, query arguments, clocks, execution mode, operation and actual operation budget. |
+| `sourceBundle` | Identity of this compilation's immutable source observations. |
+| `engineVersion`, `engineArtifact` | Engine semantics and, for CLI/mill reports, executable digest/size/platform/capture method. |
+| `traceDocument` | Actual retained derivation nodes and parent links. |
+| `searchEvidence` | Checked executed branches and exact coverage for exploration. |
 
 Do not drop trust or coverage to keep an old outcome printer happy.
 If a qualification cannot fit `fidryn.outcome/v0.1`, it belongs here.
@@ -80,7 +87,9 @@ outcome-only `fidryn.outcome/v0.1` export.
 `outcome` is tagged by `kind`. Every kind includes `trace`, a 32-character
 hex `TraceId`. `fidryn explain TRACE_ID` loads `TRACE_ID.json` when that
 file exists; otherwise it prints the hashed id. JSON traces always
-include a `nodes` array.
+include a `nodes` array. Saving the complete evaluation report preserves its
+actual graph for a later `fidryn explain report.json`; a bare hash cannot
+reconstruct discarded execution records.
 
 Values inside an outcome are tagged runtime values
 (`{"kind":"bool","data":true}`, `{"kind":"entity","data":"Bob"}`,
@@ -355,7 +364,7 @@ user record must use `{ "kind": "record", "data": { ... } }`; see
 ## Reading a result
 
 1. Confirm the CLI/mill report `schema` is
-   `fidryn.evaluation-report/v0.1`, then open nested `outcomeDocument`
+   `fidryn.evaluation-report/v0.2`, then open nested `outcomeDocument`
    (`schema` `fidryn.outcome/v0.1`). Read `executionMode`,
    `sourceTrust`, and `assumptions` on the report before treating the
    answer as operative.

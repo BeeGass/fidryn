@@ -116,120 +116,157 @@
   <div class="spec-panels">
     <section class="spec-panel" id="run-trust-open" role="tabpanel" aria-labelledby="tab-trust-open">
       <p class="spec-label">Trust, open eligibility</p>
-      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z</code></p>
+      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z</code></p>
       <div class="steps">
-        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="47">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
-<span class="line" data-n="48">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
-<span class="line" data-n="49">    <span class="tk-pu">{</span></span>
-<span class="line" data-n="50">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
-<span class="line" data-n="51">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
-<span class="line" data-n="52">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
-<span class="line" data-n="53">        <span class="tk-pu">}</span></span>
-<span class="line" data-n="54"></span>
-<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
-<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="52">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
+<span class="line" data-n="53">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="54">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
+<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
 <span class="line" data-n="57">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
 <span class="line" data-n="58">        <span class="tk-pu">}</span></span>
 <span class="line" data-n="59"></span>
-<span class="line" data-n="60">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
-<span class="line" data-n="61">          <span class="tk-kw">or</span> controlling_interpretation</span>
-<span class="line" data-n="62">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
-<span class="line" data-n="63">    <span class="tk-pu">}</span></span>
+<span class="line" data-n="60">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
+<span class="line" data-n="61">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+<span class="line" data-n="62">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="63">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="64"></span>
+<span class="line" data-n="65">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
+<span class="line" data-n="66">          <span class="tk-kw">or</span> controlling_interpretation</span>
+<span class="line" data-n="67">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
+<span class="line" data-n="68">    <span class="tk-pu">}</span></span>
 <span class="line gap" data-n="">&hellip;</span>
-<span class="line" data-n="205">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
-<span class="line" data-n="206">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
-<span class="line" data-n="207">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
-<span class="line" data-n="208">    <span class="tk-pu">{</span></span>
-<span class="line" data-n="209">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
-<span class="line" data-n="210">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
-<span class="line" data-n="211">        <span class="tk-pu">}</span></span>
-<span class="line" data-n="212">    <span class="tk-pu">}</span></span>
+<span class="line" data-n="210">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="211">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
+<span class="line" data-n="212">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
+<span class="line" data-n="213">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="214">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
+<span class="line" data-n="215">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
+<span class="line" data-n="216">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="217">    <span class="tk-pu">}</span></span>
 </code></pre></figure></div>
         <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>examples/trust/cases/two-certificates-open-eligibility.json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
   <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;module&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Examples.BryanRevocableTrust@0.1.0&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;facts&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
-    <span class="tk-ty">&quot;alice_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
-    <span class="tk-ty">&quot;bob_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
+    <span class="tk-ty">&quot;Accepted(Alice,TrusteeOf(BRT))&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;Accepted(Bob,TrusteeOf(BRT))&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
   <span class="tk-pu">}</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;evidence&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;OccupancyRecord&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;person&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;office&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;TrusteeOf(BRT)&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span><span class="tk-pu">,</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-1&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;issuer&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianOne&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;subject&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;purpose&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Administer(BRT)&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;conclusion&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Supports&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;examined_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T10:00:00Z&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;signed_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T11:00:00Z&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span><span class="tk-pu">,</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-2&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;issuer&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianTwo&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;subject&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;purpose&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Administer(BRT)&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;conclusion&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Supports&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;examined_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T10:00:00Z&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;signed_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T11:00:00Z&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span>
   <span class="tk-pu">]</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
     <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
-      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span> <span class="tk-st">&quot;I2&quot;</span><span class="tk-pu">]</span>
+      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
+        <span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-st">&quot;I2&quot;</span>
+      <span class="tk-pu">]</span>
     <span class="tk-pu">}</span>
   <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure></div>
-        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp con">Contingent</span><ul class="opinion"><li>acting_trustee depends on SuccessorEligibility.</li><li>Under I1 it is Alice.</li><li>Under I2 it is Bob.</li><li>No single answer is determinate across the admissible completions.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp con">Contingent</span><ul class="opinion"><li>Evaluation mode: operative.</li><li>Source trust: fixture.</li><li>Legal time: 2026-08-24T09:00:00Z; known at: 2026-08-24T09:00:00Z.</li><li>acting_trustee depends on SuccessorEligibility.</li><li>Under I1 it is Alice.</li><li>Under I2 it is Bob.</li><li>No single answer is determinate across the admissible completions.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
       </div>
     </section>
     <section class="spec-panel" id="run-trust-court" role="tabpanel" aria-labelledby="tab-trust-court">
       <p class="spec-label">Trust, court selects I2</p>
-      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2034-03-01T09:00:00Z --known-at 2034-03-01T09:00:00Z</code></p>
+      <p class="spec-cmd"><code>fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z</code></p>
       <div class="steps">
-        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="47">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
-<span class="line" data-n="48">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
-<span class="line" data-n="49">    <span class="tk-pu">{</span></span>
-<span class="line" data-n="50">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
-<span class="line" data-n="51">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
-<span class="line" data-n="52">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
-<span class="line" data-n="53">        <span class="tk-pu">}</span></span>
-<span class="line" data-n="54"></span>
-<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
-<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+        <div class="step step-source"><p class="step-h"><span class="step-n">1</span>Source</p><figure class="code" data-lang="fr"><figcaption><span>examples/trust/bryan-revocable-trust.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre class="lines"><code><span class="line" data-n="52">    <span class="tk-kw">interpretation_family</span> SuccessorEligibility</span>
+<span class="line" data-n="53">        <span class="tk-kw">for</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4&quot;</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="54">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="55">        <span class="tk-kw">alternative</span> I1 <span class="tk-pu">{</span></span>
+<span class="line" data-n="56">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
 <span class="line" data-n="57">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
 <span class="line" data-n="58">        <span class="tk-pu">}</span></span>
 <span class="line" data-n="59"></span>
-<span class="line" data-n="60">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
-<span class="line" data-n="61">          <span class="tk-kw">or</span> controlling_interpretation</span>
-<span class="line" data-n="62">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
-<span class="line" data-n="63">    <span class="tk-pu">}</span></span>
+<span class="line" data-n="60">        <span class="tk-kw">alternative</span> I2 <span class="tk-pu">{</span></span>
+<span class="line" data-n="61">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Alice<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> not_established</span>
+<span class="line" data-n="62">            <span class="tk-kw">defines</span> Eligible<span class="tk-pu">(</span>Bob<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span> <span class="tk-kw">as</span> established</span>
+<span class="line" data-n="63">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="64"></span>
+<span class="line" data-n="65">        <span class="tk-kw">selector</span> explicit_instrument_definition</span>
+<span class="line" data-n="66">          <span class="tk-kw">or</span> controlling_interpretation</span>
+<span class="line" data-n="67">          <span class="tk-kw">or</span> <span class="tk-kw">request</span> Interpret</span>
+<span class="line" data-n="68">    <span class="tk-pu">}</span></span>
 <span class="line gap" data-n="">&hellip;</span>
-<span class="line" data-n="205">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
-<span class="line" data-n="206">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
-<span class="line" data-n="207">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
-<span class="line" data-n="208">    <span class="tk-pu">{</span></span>
-<span class="line" data-n="209">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
-<span class="line" data-n="210">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
-<span class="line" data-n="211">        <span class="tk-pu">}</span></span>
-<span class="line" data-n="212">    <span class="tk-pu">}</span></span>
+<span class="line" data-n="210">    <span class="tk-kw">query</span> acting_trustee<span class="tk-pu">(</span><span class="tk-pu">)</span></span>
+<span class="line" data-n="211">        <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span></span>
+<span class="line" data-n="212">        <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span></span>
+<span class="line" data-n="213">    <span class="tk-pu">{</span></span>
+<span class="line" data-n="214">        <span class="tk-kw">goal</span> UniqueOccupant <span class="tk-pu">{</span></span>
+<span class="line" data-n="215">            <span class="tk-kw">office</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span></span>
+<span class="line" data-n="216">        <span class="tk-pu">}</span></span>
+<span class="line" data-n="217">    <span class="tk-pu">}</span></span>
 </code></pre></figure></div>
         <div class="step step-case"><p class="step-h"><span class="step-n">2</span>Case</p><figure class="code" data-lang="json"><figcaption><span>examples/trust/cases/court-selects-i2.json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
   <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;module&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Examples.BryanRevocableTrust@0.1.0&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;facts&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
-    <span class="tk-ty">&quot;alice_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
-    <span class="tk-ty">&quot;bob_accepted&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
+    <span class="tk-ty">&quot;Accepted(Alice,TrusteeOf(BRT))&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span><span class="tk-pu">,</span>
+    <span class="tk-ty">&quot;Accepted(Bob,TrusteeOf(BRT))&quot;</span><span class="tk-pu">:</span> <span class="tk-nu">true</span>
   <span class="tk-pu">}</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;evidence&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;OccupancyRecord&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;person&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;office&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;TrusteeOf(BRT)&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span><span class="tk-pu">,</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-1&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;issuer&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianOne&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;subject&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;purpose&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Administer(BRT)&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;conclusion&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Supports&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;examined_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T10:00:00Z&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;signed_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T11:00:00Z&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span><span class="tk-pu">,</span>
     <span class="tk-pu">{</span>
       <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianCertificate&quot;</span><span class="tk-pu">,</span>
-      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;certificate-2&quot;</span><span class="tk-pu">,</span>
+      <span class="tk-ty">&quot;value&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
+        <span class="tk-ty">&quot;issuer&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;PhysicianTwo&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;subject&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Bryan&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;purpose&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Administer(BRT)&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;conclusion&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;Supports&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;examined_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T10:00:00Z&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-ty">&quot;signed_at&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T11:00:00Z&quot;</span>
+      <span class="tk-pu">}</span><span class="tk-pu">,</span>
       <span class="tk-ty">&quot;observedAt&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;2026-08-23T12:00:00Z&quot;</span>
     <span class="tk-pu">}</span>
   <span class="tk-pu">]</span><span class="tk-pu">,</span>
@@ -238,11 +275,14 @@
   <span class="tk-pu">}</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
     <span class="tk-ty">&quot;interpretations&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span>
-      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span><span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span> <span class="tk-st">&quot;I2&quot;</span><span class="tk-pu">]</span>
+      <span class="tk-ty">&quot;SuccessorEligibility&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">[</span>
+        <span class="tk-st">&quot;I1&quot;</span><span class="tk-pu">,</span>
+        <span class="tk-st">&quot;I2&quot;</span>
+      <span class="tk-pu">]</span>
     <span class="tk-pu">}</span>
   <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure></div>
-        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>acting_trustee is Bob.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>Evaluation mode: operative.</li><li>Source trust: fixture.</li><li>Legal time: 2026-08-24T09:00:00Z; known at: 2026-08-24T09:00:00Z.</li><li>acting_trustee is Bob.</li><li class="boundary">Outside scope: tax, creditor_priority, real_property_recording, complete_Massachusetts_trust_law.</li></ul></div>
       </div>
     </section>
     <section class="spec-panel" id="run-gate-q" role="tabpanel" aria-labelledby="tab-gate-q">
@@ -265,7 +305,7 @@
   <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure></div>
-        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>q is 7.</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp det">Determinate</span><ul class="opinion"><li>Evaluation mode: operative.</li><li>Source trust: unauthenticated.</li><li>Legal time: 2026-09-17T12:00:00Z; known at: 2026-09-17T12:00:00Z.</li><li>q is 7.</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
       </div>
     </section>
     <section class="spec-panel" id="run-gate-r" role="tabpanel" aria-labelledby="tab-gate-r">
@@ -288,7 +328,7 @@
   <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure></div>
-        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp sus">Suspended</span><ul class="opinion"><li>r is suspended.</li><li>Outstanding request: requirement failed (require).</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
+        <div class="step step-outcome"><p class="step-h"><span class="step-n">3</span>Outcome</p><span class="stamp sus">Suspended</span><ul class="opinion"><li>Evaluation mode: operative.</li><li>Source trust: unauthenticated.</li><li>Legal time: 2026-09-17T12:00:00Z; known at: 2026-09-17T12:00:00Z.</li><li>r is suspended.</li><li>Outstanding request: requirement failed (require).</li><li class="boundary">Outside scope: complete_instruments.</li></ul></div>
       </div>
     </section>
   </div>

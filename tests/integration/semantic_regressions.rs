@@ -179,6 +179,63 @@ fn rule_consequences_survive_lowering() {
 }
 
 #[test]
+fn operative_in_context_fires_on_the_proposition() {
+    let module = compile(
+        r#"module Regression version "0.1.0" {
+        proposition P()
+        proposition Q()
+        rule R : derive {
+            when operative P() in Context(X)
+            then derive Q()
+        }
+        query q() -> Bool {
+            goal Evaluate { operative Q() }
+        }
+    }"#,
+    );
+    let rule = module
+        .declarations
+        .iter()
+        .find_map(|d| match d {
+            CoreDecl::Rule(rule) if rule.name == "R" => Some(rule),
+            _ => None,
+        })
+        .expect("rule R");
+    match &rule.guard {
+        fidryn_core::Guard::Operative(prop, ctx) => {
+            assert_eq!(prop.predicate, "P");
+            assert_eq!(ctx, "Context(X)");
+        }
+        other => panic!("{other:?}"),
+    }
+    let mut adopted = CaseRecord::default();
+    adopted.determinations.push(CaseDetermination {
+        issue: "P".into(),
+        protocol: "P".into(),
+        established: true,
+        decider: "test".into(),
+        recorded_at: None,
+    });
+    match run(&module, "q", &adopted) {
+        Outcome::Determinate {
+            value: Value::Bool(true),
+            ..
+        } => {}
+        other => panic!("the rule must fire when P is established: {other:?}"),
+    }
+    assert!(
+        !matches!(
+            run(&module, "q", &CaseRecord::default()),
+            Outcome::Determinate {
+                value: Value::Bool(true),
+                ..
+            }
+        ),
+        "the rule must not fire before P is established"
+    );
+}
+
+#[test]
 fn unknown_fields_inside_declarations_are_parse_errors() {
     let parsed = parse_file(
         r#"module Regression version "0.1.0" {
@@ -295,7 +352,11 @@ fn determination_for_one_subject_does_not_discharge_another_subject() {
 fn future_evidence_cannot_discharge_a_past_query() {
     let (module, _) = compile_module(&root().join("examples/foia/foia-request.fr"))
         .expect("compile FOIA fixture");
-    let mut case = CaseRecord::default();
+    let text = std::fs::read_to_string(
+        root().join("examples/foia/cases/proposed-exemption-5-withholding.json"),
+    )
+    .unwrap();
+    let mut case: CaseRecord = serde_json::from_str(&text).unwrap();
     for schema in ["HarmAnalysis", "SegregabilityAnalysis"] {
         case.evidence.push(EvidenceItem {
             schema: schema.into(),
@@ -360,11 +421,19 @@ fn tax_fixture_does_not_drop_at_third_threshold() {
         compile_module(&root().join("examples/tax/federal-tax.fr")).expect("compile tax fixture");
     let amount = |text: &str| {
         let mut case = CaseRecord::default();
-        case.facts
-            .insert("amount".into(), Value::String(text.into()));
+        case.facts.insert(
+            "amount".into(),
+            Value::Ctor {
+                name: "USD".into(),
+                fields: BTreeMap::from([("_0".into(), Value::Decimal(text.parse().unwrap()))]),
+            },
+        );
         match answer(run(&module, "tax_on", &case)) {
-            Value::Decimal(d) => d,
-            other => panic!("expected decimal tax, got {other:?}"),
+            Value::Ctor { name, fields } if name == "USD" => match fields.get("_0") {
+                Some(Value::Decimal(amount)) => *amount,
+                other => panic!("expected numeric USD amount: {other:?}"),
+            },
+            other => panic!("expected USD tax, got {other:?}"),
         }
     };
     let below = amount("103350.00");
@@ -398,8 +467,10 @@ fn model_boundary_preserves_module_exclusions_when_case_adds_its_own() {
         query q() -> Bool { goal Evaluate { true } }
     }"#,
     );
-    let mut case = CaseRecord::default();
-    case.outside_scope = vec!["tax".into()];
+    let case = CaseRecord {
+        outside_scope: vec!["tax".into()],
+        ..CaseRecord::default()
+    };
     let doc = render_outcome(
         &module,
         &QueryName::from("q"),
@@ -485,11 +556,12 @@ fn exploration_respects_an_already_recorded_interpretation() {
     let text = std::fs::read_to_string(root().join("examples/trust/cases/court-selects-i2.json"))
         .expect("selected interpretation fixture");
     let case: CaseRecord = serde_json::from_str(&text).expect("case");
+    let fresh = Instant::parse("2026-08-24T09:00:00Z").unwrap();
     let out = eval_outcome(explore_query(
         &module,
         &QueryName::from("acting_trustee"),
         &case,
-        &RunContext::new(at(), at()),
+        &RunContext::new(fresh, fresh),
     ));
     assert_eq!(answer(out).display_label(), "Bob");
 }

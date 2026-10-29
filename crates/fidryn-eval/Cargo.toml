@@ -2,7 +2,7 @@
 name = "fidryn-eval"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
@@ -18,3 +18,4 @@ time.workspace = true
 fidryn-check.workspace = true
 fidryn-hir.workspace = true
 fidryn-syntax.workspace = true
+serde_json.workspace = true

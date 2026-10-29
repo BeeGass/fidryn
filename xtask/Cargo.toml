@@ -2,7 +2,7 @@
 name = "xtask"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
@@ -17,3 +17,8 @@ fidryn-cli.workspace = true
 fidryn-syntax.workspace = true
 pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
 serde_json.workspace = true
+
+blake3.workspace = true
+sha2 = "0.10.9"
+semver = "1.0.28"
+toml_edit = { version = "0.25.15", default-features = false, features = ["parse"] }

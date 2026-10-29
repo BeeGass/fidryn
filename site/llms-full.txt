@@ -42,7 +42,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the v0.1 reference
+This directory is the human documentation for the 0.2.0 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -64,7 +64,7 @@ statement of any jurisdiction's law.
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json), and
-[`schemas/evaluation-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json)
+[`schemas/evaluation-report-v0.2.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json)
 (CLI `run` / `explore` and mill eval responses nest the outcome as
 `outcomeDocument`).
 
@@ -73,6 +73,9 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | Document | What it is |
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
+| [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | Current terms, retained grants and third-party notices |
+| [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
 | [Obligations](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) | Review obligations; green tests are regressions |
@@ -109,7 +112,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the v0.1 research interpreter. The modules under
+This repository is the 0.2.0 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
@@ -210,12 +213,14 @@ cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
 ```
 
 The CLI prints one line of canonical JSON
-(`fidryn.evaluation-report/v0.1`). Pretty-printed, the important fields
-look like this:
+(`fidryn.evaluation-report/v0.2`). Pretty-printed, the important fields
+look like this. This excerpt omits invocation hashes and derivation nodes; the
+actual document also includes `invocation`, `invocationId`, `engineVersion`,
+`sourceBundle` and `traceDocument`:
 
 ```json
 {
-  "schema": "fidryn.evaluation-report/v0.1",
+  "schema": "fidryn.evaluation-report/v0.2",
   "executionMode": "operative",
   "sourceTrust": "unauthenticated",
   "verificationMethod": "none",
@@ -250,7 +255,23 @@ The six-kind legal result is nested under `outcomeDocument`.
 `complete_instruments` as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
 Pass `--scenario` only when you intend `case.assumptions` as an overlay;
-operative `run` (the default) does not apply them.
+operative `run` (the default) does not apply them. `--budget N` sets the maximum
+number of evaluation operations; exhaustion is an engine error and cannot
+produce a qualified determinate answer. The selected budget is part of the
+invocation identity.
+
+Save the complete report to retain its actual trace:
+
+```sh
+fidryn run tests/programs/require-gate.fr --query q \
+  --case /tmp/fidryn-empty-case.json \
+  --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
+fidryn explain report.json --format text
+```
+
+`--source-root PATH` explicitly grants the filesystem root for artifacts and
+packages. It defaults to the module directory; absolute paths, parent traversal
+and symlinks cannot make an artifact escape that root.
 
 Now run `r`:
 
@@ -346,7 +367,7 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
@@ -359,7 +380,7 @@ reference is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/gramma
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is **parsed / checked / executed** only where noted — see
+Support in 0.2.0 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -684,11 +705,13 @@ rule InitialTrustee : constitutive
 }
 ```
 
-`when operative P` tests legal status. `when determined P` tests a
-competent determination already on the case. `then derive` and
-`then establish` are the usual consequences. Guards must use
-`operative`, `determined`, `assumed`, or `necessarily` — not a bare
-proposition. The successor rule in the trust fixture also
+`when operative P` tests legal status. `in TrustCreation(BRT)` names the
+legal context of that test. The guard still turns on the proposition
+`TrustInstrumentExecuted(BRT)`. It is not a proposition named `in`.
+`when determined P` tests a competent determination already on the case.
+`then derive` and `then establish` are the usual consequences. Guards
+must use `operative`, `determined`, `assumed`, or `necessarily` — not a
+bare proposition. The successor rule in the trust fixture also
 `select unique candidate from nominations_for(...)` with
 `require unique nomination_rank`. A tie is not a silent pick.
 
@@ -831,7 +854,7 @@ See [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) and [CL
 
 ## Verify
 
-A `verify` block is a named property. v0.1 discharges Boolean
+A `verify` block is a named property. Fidryn 0.2.0 discharges Boolean
 literals:
 
 ```
@@ -840,9 +863,8 @@ verify Trivial {
 }
 ```
 
-`assert true` proves. `assert false` is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:
+`assert true` proves. `assert false` is a counterexample. Unsupported
+formulas can parse without yielding a covering proof. For those properties,
 
 ```
 cargo run -p fidryn-cli -- verify PATH --property NAME
@@ -928,7 +950,7 @@ canonicalize to UTC. `run` never chooses a missing completion. `--arg
 KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
 `case.assumptions` as an overlay. `explore --bounds` merges extra
 declared domains into `admissibleCompletions`. Successful `run` /
-`explore` stdout is `fidryn.evaluation-report/v0.1`.
+`explore` stdout is `fidryn.evaluation-report/v0.2`.
 
 See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf), and
 [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
@@ -1265,7 +1287,7 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the v0.1 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2.0 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
@@ -1298,7 +1320,7 @@ payloads (formatted source, the word `ok`, evaluation-report JSON, rendered text
 diff JSON, filing receipts) go to stdout.
 
 A legal `Outcome` is not a process failure. `run` and `explore` print a
-`fidryn.evaluation-report/v0.1` document (with nested
+`fidryn.evaluation-report/v0.2` document (with nested
 `outcomeDocument` of schema `fidryn.outcome/v0.1`) and exit 0 even when
 the nested outcome kind is `suspended`, `contingent`, `normConflict`,
 `outsideCompetence`, or `inconsistent`. Unknown queries, invalid
@@ -1307,11 +1329,12 @@ failures and exit 1.
 
 ## Source checking and trust
 
-`check`, `run`, `explore`, `verify`, `diff` (when a snapshot is a `.fr`
+`check`, `inputs`, `run`, `explore`, `review`, `verify`, `diff` (when a snapshot is a `.fr`
 file), and `render` compile through `Driver::check_path`. That call loads
 the module’s `source_manifest` (or a `sources/` fallback) and then
 `check_with_sources` with `source_root` set to the directory that contains
-the `.fr` file. Hex import digests are authenticated against artifact
+the `.fr` file, or the explicit global `--source-root PATH`. Static paths and
+symlinks must remain inside that root. Hex import digests are authenticated against artifact
 bytes next to the module:
 
 - a 64-digit hex digest must equal the full blake3 of the file at
@@ -1383,7 +1406,8 @@ fidryn check tests/diagnostics/e310-prop-as-guard.fr
 Evaluate one query against one case record at a pair of bitemporal
 instants. `run` never chooses a completion. It does not search
 `admissibleCompletions`, pick an interpretation, or fill in missing
-evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]`).
+evidence. `--arg KEY=VALUE` writes a typed fact onto the case (`case.facts[KEY]`): JSON literals and tagged
+values are decoded, while unquoted names remain strings.
 
 **Arguments**
 
@@ -1394,7 +1418,8 @@ evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]
 | `--case RECORD.json` | yes | path to a `fidryn.case-record/v0.1` JSON file |
 | `--valid-at TIME` | yes | ISO 8601 / RFC 3339 instant |
 | `--known-at TIME` | yes | ISO 8601 / RFC 3339 instant |
-| `--arg KEY=VALUE` | no, repeatable | sets `case.facts[KEY]` to the string `VALUE` |
+| `--arg KEY=VALUE` | no, repeatable | sets `case.facts[KEY]` to decoded JSON or an unquoted name string |
+| `--budget N` | no | maximum actual evaluator operations; exhaustion is an engine failure |
 | `--scenario` | no | flag; evaluate with `case.assumptions` as a scenario overlay (`executionMode: scenario`) |
 
 `--valid-at` is valid time. `--known-at` is record time. Both accept a
@@ -1427,10 +1452,12 @@ fidryn run examples/prenup/ava-noah.fr \
   --arg provision=ChildSupportWaiver
 ```
 
-**Success.** Canonical JSON for schema `fidryn.evaluation-report/v0.1`
+**Success.** Canonical JSON for schema `fidryn.evaluation-report/v0.2`
 on stdout: `schema`, `executionMode` (`operative` or `scenario`),
 `sourceTrust`, `verificationMethod`, `assumptions`, optional `coverage`,
-and `outcomeDocument`. Nested `outcomeDocument` is the
+`invocation`, `invocationId`, `engineVersion`, `engineArtifact`, source bundle
+identity, retained `traceDocument`, and `outcomeDocument`. Exploration also
+retains checked branch `searchEvidence`. Nested `outcomeDocument` is the
 `fidryn.outcome/v0.1` projection (`module`, `sourceSnapshot`, `query`,
 `asOf`, `modelBoundary`, `outcome`). Exit 0. See [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
 
@@ -1484,7 +1511,7 @@ fidryn explore examples/trust/bryan-revocable-trust.fr \
 Omit `--bounds` when the case record is already admissible, as
 `examples/trust/cases/one-certificate.json` is.
 
-**Success.** The same `fidryn.evaluation-report/v0.1` envelope as `run`,
+**Success.** The same `fidryn.evaluation-report/v0.2` envelope as `run`,
 on stdout. If `case.assumptions` is nonempty, explore labels the report
 `executionMode: scenario` (there is no separate `--scenario` flag on
 `explore`).
@@ -1506,9 +1533,10 @@ Render a trace as text, JSON, or Graphviz DOT.
 | `--format FORMAT` | no | `text` (default), `json`, or `dot` |
 
 If `TRACE_ID` is an existing file, or `TRACE_ID.json` exists, that JSON
-is loaded. An evaluation-report or outcome document from a prior `run` /
-`explore` is wrapped as a small DAG (nested `outcomeDocument` is used
-when present). If no such file exists, the argument is hashed as a
+is loaded. A saved v0.2 report from `run` / `explore` retains the actual
+parented derivation in `traceDocument`; `explain` uses those nodes. Legacy
+outcome-only documents have only the provenance their compatibility projection
+retained. If no such file exists, the argument is hashed as a
 `TraceId` and the node list is empty. JSON always includes a `nodes`
 array; emptiness means no persisted DAG was loaded, not an omitted field.
 Unknown `--format` values are treated as `text`.
@@ -1557,8 +1585,10 @@ fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinui
 
 `TrusteeContinuity` is declared on that module. A bounded check that does
 not obtain a covering proof is not success: the CLI prints the verdict to
-stderr and exits 1. Only a proved verdict is exit 0 (today that is a
-declared `true` or `assert true` formula). Passing a query name such as
+stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
+fragment includes structured Boolean/arithmetic assertions and finite quantified
+formulas; every assertion in the named block must hold. Unsupported formulas
+and resource exhaustion remain `unknown`. Passing a query name such as
 `acting_trustee` is invalid.
 
 **Success.** Stdout, for example
@@ -1574,7 +1604,8 @@ declared `true` or `assert true` formula). Passing a query name such as
 Compare two snapshots and print canonical JSON with two named
 operations: `result` (outcomeDocument / compiled query bodies) and
 `assurance` (executionMode, sourceTrust, assumptions,
-verificationMethod). Each is `{added, removed, changed}`. Changing only
+verificationMethod, coverage, invocation/source/executable identity and
+exploration evidence). Each is `{added, removed, changed}`. Changing only
 qualifications is an assurance diff, not a silent equal. A `.fr` path is
 compiled; any other path is read as JSON (an evaluation report, mill
 `{ok, report}` wrapper, outcome document, or serialized module).
@@ -1615,7 +1646,10 @@ Each of `result` and `assurance` has keys `added`, `removed`, and
 ## `render`
 
 Interpolate Core fields into a template. Available keys from the compiled
-module are `module`, `version`, and `outside_scope`. Missing keys fail
+module are `module`, `version`, typed `outside_scope` and its text
+`outside_scope_label`. Optional `--data DATA.json` adds typed values under `data`.
+`{{#each data.people}}{{name}}{{/each}}` iterates records without splitting names
+on punctuation. Missing keys fail
 closed. A directory named `certified` does not approve legal content;
 `templates/certified/` files are interpolation fixtures only.
 
@@ -1625,6 +1659,7 @@ closed. A directory named `certified` does not approve legal content;
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file |
 | `--template TEMPLATE` | yes | path to a template file |
+| `--data DATA.json` | no | typed JSON under the `data` template key |
 
 **Example**
 
@@ -1721,6 +1756,24 @@ Other bind or runtime errors are printed to stderr.
 
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [Mill](https://fidryn.onlygass.dev/docs/mill.md)
+
+## `inputs`
+
+`fidryn inputs MODULE --query QUERY` emits JSON Schema for the declared query
+argument object. Aliases, sum constructors, records, nominal entities and
+collections come from checked declarations. Observation schemas and external
+review requests appear as metadata. Unsupported representations refuse instead
+of producing an unconstrained input schema.
+
+## `review`
+
+`fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at
+TIME` emits a portable `fidryn.review-bundle/v0.1` JSON archive. It retains exact
+source/case/dependency/lock bytes, a labeled normalized manifest, checked report
+and actual trace, source spans, executable digest and rerun arguments. Optional
+`--scenario`, `--budget N` and `--template FILE` select the disclosed evaluation
+or retain reviewer material. Reviewer status is `not_assessed`; the archive does
+not constitute legal approval. See [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md).
 
 ========== https://fidryn.onlygass.dev/docs/mill.md ==========
 
@@ -1876,9 +1929,11 @@ as CLI `--valid-at` and `--known-at`.
 On evaluation success, HTTP 200, and the body is a transport wrapper
 `{ "ok": true, "report": ..., "opinion": [...] }`
 (`schemas/mill-evaluation-response-v0.1.json`). `report` is the
-`fidryn.evaluation-report/v0.1` envelope the CLI prints
+`fidryn.evaluation-report/v0.2` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`). `opinion` is the
+`verificationMethod`, `coverage`, checked invocation and source/executable
+identities, retained actual `traceDocument`, `outcomeDocument`, and exploration
+`searchEvidence` when applicable). `opinion` is the
 report read as plain sentences, for example
 `acting_trustee depends on SuccessorEligibility.` and
 `Under I1 it is Alice.` for a contingent trust run. Each sentence is a
@@ -1923,7 +1978,9 @@ It is not rewritten as `inconsistent`.
 HTTP status is 200 in both cases. Success is `{"ok": true, "text": "..."}`.
 Failure (check diagnostics joined by newlines, or a missing template key)
 is `{"ok": false, "error": "..."}`. Template variables are `module`,
-`version`, and `outside_scope`. Missing keys fail closed.
+`version`, typed `outside_scope`, and `outside_scope_label`. An optional JSON
+`data` field is available under the template key `data`; typed arrays and record
+fields are preserved. Missing keys and collection type mismatches fail closed.
 
 ## In-memory compile versus path compile
 
@@ -2011,6 +2068,15 @@ completions on the case JSON.
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [CLI](https://fidryn.onlygass.dev/docs/cli.md)
 
+### `POST /api/inputs`
+
+Accepts `source` and `query` and returns `{ok: true, schema: ...}` with the input
+schema derived from checked declarations, including evidence and effect request
+metadata. Unsupported input representations return an explicit error. `/api/check`
+diagnostic responses also include `locations` with source paths, byte spans and
+UTF-16 editor ranges when available. These ranges identify the exact submitted
+source; unavailable locations stay explicit.
+
 ========== https://fidryn.onlygass.dev/docs/outcomes.md ==========
 
 ---
@@ -2034,7 +2100,7 @@ The six-kind result is a `fidryn.outcome/v0.1` object, defined by
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json). Field names
 are camelCase. Trust, coverage, execution mode, and assumptions that
 cannot fit that schema live on the evaluation-report envelope
-([`fidryn.evaluation-report/v0.1`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json));
+([`fidryn.evaluation-report/v0.2`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json));
 they are not extra keys on the outcome object (`additionalProperties`
 is false).
 
@@ -2044,7 +2110,7 @@ See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https
 ## Envelope
 
 CLI `run` / `explore` and mill `/api/run` / `/api/explore` emit
-`fidryn.evaluation-report/v0.1`. The six-kind legal result is nested as
+`fidryn.evaluation-report/v0.2`. The six-kind legal result is nested as
 `outcomeDocument`. That nested object is:
 
 | Field | Meaning |
@@ -2070,19 +2136,26 @@ failures (exit 1). They are never rewritten as `inconsistent`.
 ## Evaluation report envelope
 
 Qualifications that the outcome schema cannot carry live on
-`fidryn.evaluation-report/v0.1`. `fidryn_trace::render_report` emits
-that object. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
+`fidryn.evaluation-report/v0.2`. `fidryn_trace::render_checked_report`
+requires an invocation-bound checked evaluation. The legacy `render_report`
+API remains a v0.1 compatibility projection and does not supply a checked v0.2
+invocation. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
 above; that schema is unchanged.
 
 | Field | Meaning |
 | --- | --- |
-| `schema` | `fidryn.evaluation-report/v0.1`. |
+| `schema` | `fidryn.evaluation-report/v0.2`. |
 | `executionMode` | `operative` or `scenario`. Operative `evaluate` does not apply `case.assumptions`. |
 | `assumptions` | Overlay hypotheses copied onto a scenario report. Empty for operative runs. |
 | `sourceTrust` | How the compiled source was authenticated. In-memory / mill pasted compile is `unauthenticated`. A path compile may be `fixture` or `byteVerified`. `fixture` is not byte-verified. |
 | `verificationMethod` | `none` (no covering verification; a claims-digest binding is not covering), `structural` (shape only), or `finiteReplay` (each declared branch re-evaluated). Only `finiteReplay` is covering. |
 | `coverage` | Optional `CoverageWitness`. Shape completeness is not covering meaning. |
 | `outcomeDocument` | The `fidryn.outcome/v0.1` object from the previous section. |
+| `invocation`, `invocationId` | Program/case identity, query arguments, clocks, execution mode, operation and actual operation budget. |
+| `sourceBundle` | Identity of this compilation's immutable source observations. |
+| `engineVersion`, `engineArtifact` | Engine semantics and, for CLI/mill reports, executable digest/size/platform/capture method. |
+| `traceDocument` | Actual retained derivation nodes and parent links. |
+| `searchEvidence` | Checked executed branches and exact coverage for exploration. |
 
 Do not drop trust or coverage to keep an old outcome printer happy.
 If a qualification cannot fit `fidryn.outcome/v0.1`, it belongs here.
@@ -2095,7 +2168,9 @@ outcome-only `fidryn.outcome/v0.1` export.
 `outcome` is tagged by `kind`. Every kind includes `trace`, a 32-character
 hex `TraceId`. `fidryn explain TRACE_ID` loads `TRACE_ID.json` when that
 file exists; otherwise it prints the hashed id. JSON traces always
-include a `nodes` array.
+include a `nodes` array. Saving the complete evaluation report preserves its
+actual graph for a later `fidryn explain report.json`; a bare hash cannot
+reconstruct discarded execution records.
 
 Values inside an outcome are tagged runtime values
 (`{"kind":"bool","data":true}`, `{"kind":"entity","data":"Bob"}`,
@@ -2370,7 +2445,7 @@ user record must use `{ "kind": "record", "data": { ... } }`; see
 ## Reading a result
 
 1. Confirm the CLI/mill report `schema` is
-   `fidryn.evaluation-report/v0.1`, then open nested `outcomeDocument`
+   `fidryn.evaluation-report/v0.2`, then open nested `outcomeDocument`
    (`schema` `fidryn.outcome/v0.1`). Read `executionMode`,
    `sourceTrust`, and `assumptions` on the report before treating the
    answer as operative.
@@ -3057,13 +3132,17 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the v0.1 reference interpreter. It is
+This file is for people building the 0.2.0 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 
 Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
+
+Current licensing and contribution rights are described in
+[Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions require the separate rights
+agreement described there before acceptance.
 
 ## Toolchain
 
@@ -3082,20 +3161,22 @@ at Command Line Tools clang because the Xcode license is unsigned.
 From the repository root:
 
 ```
-cargo fmt
-cargo clippy --workspace -- -D warnings
-cargo test --workspace --offline
+cargo fmt --all
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci` runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
-need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
-that `.python-version` names and the packages `uv.lock` pins. GitHub
-Actions runs `cargo xtask ci --fmt` on every push to `main` and every
-pull request (`.github/workflows/ci.yml`); the runner builds its own
-`.venv` from `uv.lock`, and nothing it builds is committed.
+`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, and
+benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
+qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+
+GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+[Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md). Generated environments and build
+outputs are not committed.
 
 Do not weaken no-false-determinacy to make a test pass.
 
@@ -3116,9 +3197,8 @@ change in semantics also makes the site stale.
 
 The stylesheet and script in `site/assets/` are written by hand. The
 mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
-`fidryn.css` and has its own script, `web/mill.js`. When Node is
-installed, `cargo xtask ci` also runs the JavaScript unit tests in
-`web/tests/`; Node is never needed to build or serve anything.
+`fidryn.css` and has its own script, `web/mill.js`. `cargo xtask ci` requires Node to run the JavaScript unit tests in
+`web/tests/`; Node is not needed to build or serve the interpreter.
 
 ## Pipeline
 

@@ -21,28 +21,28 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
-license = "MIT"
+license-file = "LICENSE"
 authors = ["Bryan Gass"]
 repository = "https://github.com/BeeGass/fidryn"
 rust-version = "1.98"
 
 [workspace.dependencies]
-fidryn-syntax = { path = "crates/fidryn-syntax" }
-fidryn-hir = { path = "crates/fidryn-hir" }
-fidryn-core = { path = "crates/fidryn-core" }
-fidryn-check = { path = "crates/fidryn-check" }
-fidryn-eval = { path = "crates/fidryn-eval" }
-fidryn-handlers = { path = "crates/fidryn-handlers" }
-fidryn-driver = { path = "crates/fidryn-driver" }
-fidryn-verify = { path = "crates/fidryn-verify" }
-fidryn-kernel = { path = "crates/fidryn-kernel" }
-fidryn-trace = { path = "crates/fidryn-trace" }
-fidryn-solve = { path = "crates/fidryn-solve" }
-fidryn-adapt = { path = "crates/fidryn-adapt" }
-fidryn-render = { path = "crates/fidryn-render" }
-fidryn-cli = { path = "crates/fidryn-cli" }
+fidryn-syntax = { version = "0.2.0", path = "crates/fidryn-syntax" }
+fidryn-hir = { version = "0.2.0", path = "crates/fidryn-hir" }
+fidryn-core = { version = "0.2.0", path = "crates/fidryn-core" }
+fidryn-check = { version = "0.2.0", path = "crates/fidryn-check" }
+fidryn-eval = { version = "0.2.0", path = "crates/fidryn-eval" }
+fidryn-handlers = { version = "0.2.0", path = "crates/fidryn-handlers" }
+fidryn-driver = { version = "0.2.0", path = "crates/fidryn-driver" }
+fidryn-verify = { version = "0.2.0", path = "crates/fidryn-verify" }
+fidryn-kernel = { version = "0.2.0", path = "crates/fidryn-kernel" }
+fidryn-trace = { version = "0.2.0", path = "crates/fidryn-trace" }
+fidryn-solve = { version = "0.2.0", path = "crates/fidryn-solve" }
+fidryn-adapt = { version = "0.2.0", path = "crates/fidryn-adapt" }
+fidryn-render = { version = "0.2.0", path = "crates/fidryn-render" }
+fidryn-cli = { version = "0.2.0", path = "crates/fidryn-cli" }
 anyhow = "1.0.100"
 axum = { version = "0.8.9", features = ["json"] }
 tokio = { version = "1.47.1", features = ["rt-multi-thread", "macros", "net", "signal", "sync"] }
@@ -58,7 +58,7 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
 thiserror = "2.0.17"
 time = { version = "0.3.44", features = ["formatting", "macros", "parsing", "serde"] }
-salsa = "0.28.2"
+salsa = "0.28.5"
 
 [profile.release]
 lto = "thin"

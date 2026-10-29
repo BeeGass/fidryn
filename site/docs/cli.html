@@ -98,9 +98,9 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.15</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.16</span> review</a></li></ol></details>
     <div class="prose">
-<p>The binary name is <code>fidryn</code>. It is the v0.1 reference interpreter: parse a
+<p>The binary name is <code>fidryn</code>. It is the 0.2.0 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under <a href="#file"><code>file</code></a>.</p>
@@ -119,18 +119,19 @@ errors, adapter errors, and usage problems go to stderr. Successful
 payloads (formatted source, the word <code>ok</code>, evaluation-report JSON, rendered text,
 diff JSON, filing receipts) go to stdout.</p>
 <p>A legal <code>Outcome</code> is not a process failure. <code>run</code> and <code>explore</code> print a
-<code>fidryn.evaluation-report/v0.1</code> document (with nested
+<code>fidryn.evaluation-report/v0.2</code> document (with nested
 <code>outcomeDocument</code> of schema <code>fidryn.outcome/v0.1</code>) and exit 0 even when
 the nested outcome kind is <code>suspended</code>, <code>contingent</code>, <code>normConflict</code>,
 <code>outsideCompetence</code>, or <code>inconsistent</code>. Unknown queries, invalid
 timestamps, missing files, and check errors are engine or compiler
 failures and exit 1.</p>
 <h2 id="source-checking-and-trust"><span class="hn">4.3</span> Source checking and trust <a class="anchor" href="#source-checking-and-trust" aria-label="Link to this section">#</a></h2>
-<p><code>check</code>, <code>run</code>, <code>explore</code>, <code>verify</code>, <code>diff</code> (when a snapshot is a <code>.fr</code>
+<p><code>check</code>, <code>inputs</code>, <code>run</code>, <code>explore</code>, <code>review</code>, <code>verify</code>, <code>diff</code> (when a snapshot is a <code>.fr</code>
 file), and <code>render</code> compile through <code>Driver::check_path</code>. That call loads
 the module’s <code>source_manifest</code> (or a <code>sources/</code> fallback) and then
 <code>check_with_sources</code> with <code>source_root</code> set to the directory that contains
-the <code>.fr</code> file. Hex import digests are authenticated against artifact
+the <code>.fr</code> file, or the explicit global <code>--source-root PATH</code>. Static paths and
+symlinks must remain inside that root. Hex import digests are authenticated against artifact
 bytes next to the module:</p>
 <ul>
 <li>a 64-digit hex digest must equal the full blake3 of the file at
@@ -177,7 +178,8 @@ authentication as described above.</p>
 <p>Evaluate one query against one case record at a pair of bitemporal
 instants. <code>run</code> never chooses a completion. It does not search
 <code>admissibleCompletions</code>, pick an interpretation, or fill in missing
-evidence. <code>--arg KEY=VALUE</code> writes a string fact onto the case (<code>case.facts[KEY]</code>).</p>
+evidence. <code>--arg KEY=VALUE</code> writes a typed fact onto the case (<code>case.facts[KEY]</code>): JSON literals and tagged
+values are decoded, while unquoted names remain strings.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
@@ -185,7 +187,8 @@ evidence. <code>--arg KEY=VALUE</code> writes a string fact onto the case (<code
 <tr><td><code>--case RECORD.json</code></td><td>yes</td><td>path to a <code>fidryn.case-record/v0.1</code> JSON file</td></tr>
 <tr><td><code>--valid-at TIME</code></td><td>yes</td><td>ISO 8601 / RFC 3339 instant</td></tr>
 <tr><td><code>--known-at TIME</code></td><td>yes</td><td>ISO 8601 / RFC 3339 instant</td></tr>
-<tr><td><code>--arg KEY=VALUE</code></td><td>no, repeatable</td><td>sets <code>case.facts[KEY]</code> to the string <code>VALUE</code></td></tr>
+<tr><td><code>--arg KEY=VALUE</code></td><td>no, repeatable</td><td>sets <code>case.facts[KEY]</code> to decoded JSON or an unquoted name string</td></tr>
+<tr><td><code>--budget N</code></td><td>no</td><td>maximum actual evaluator operations; exhaustion is an engine failure</td></tr>
 <tr><td><code>--scenario</code></td><td>no</td><td>flag; evaluate with <code>case.assumptions</code> as a scenario overlay (<code>executionMode: scenario</code>)</td></tr>
 </tbody></table>
 </div>
@@ -210,10 +213,12 @@ when the case has none).</p>
   <span class="tk-ty">--valid-at</span> 2026-08-23T12:00:00-07:00 <span class="tk-pu">\</span>
   <span class="tk-ty">--known-at</span> 2026-08-23T12:00:00-07:00 <span class="tk-pu">\</span>
   <span class="tk-ty">--arg</span> provision=ChildSupportWaiver</code></pre></figure>
-<p><strong>Success.</strong> Canonical JSON for schema <code>fidryn.evaluation-report/v0.1</code>
+<p><strong>Success.</strong> Canonical JSON for schema <code>fidryn.evaluation-report/v0.2</code>
 on stdout: <code>schema</code>, <code>executionMode</code> (<code>operative</code> or <code>scenario</code>),
 <code>sourceTrust</code>, <code>verificationMethod</code>, <code>assumptions</code>, optional <code>coverage</code>,
-and <code>outcomeDocument</code>. Nested <code>outcomeDocument</code> is the
+<code>invocation</code>, <code>invocationId</code>, <code>engineVersion</code>, <code>engineArtifact</code>, source bundle
+identity, retained <code>traceDocument</code>, and <code>outcomeDocument</code>. Exploration also
+retains checked branch <code>searchEvidence</code>. Nested <code>outcomeDocument</code> is the
 <code>fidryn.outcome/v0.1</code> projection (<code>module</code>, <code>sourceSnapshot</code>, <code>query</code>,
 <code>asOf</code>, <code>modelBoundary</code>, <code>outcome</code>). Exit 0. See <a href="/docs/outcomes">Outcomes</a>.</p>
 <p><strong>Failure.</strong> Exit 1, stderr only. Check diagnostics; <code>cannot read PATH</code>;
@@ -255,7 +260,7 @@ merges another copy of the same family from a second record in the repo):</p>
   <span class="tk-ty">--known-at</span> 2026-08-23T12:00:00Z</code></pre></figure>
 <p>Omit <code>--bounds</code> when the case record is already admissible, as
 <code>examples/trust/cases/one-certificate.json</code> is.</p>
-<p><strong>Success.</strong> The same <code>fidryn.evaluation-report/v0.1</code> envelope as <code>run</code>,
+<p><strong>Success.</strong> The same <code>fidryn.evaluation-report/v0.2</code> envelope as <code>run</code>,
 on stdout. If <code>case.assumptions</code> is nonempty, explore labels the report
 <code>executionMode: scenario</code> (there is no separate <code>--scenario</code> flag on
 <code>explore</code>).</p>
@@ -272,9 +277,10 @@ Engine failures print <code>kind: message</code> to stderr.</p>
 </tbody></table>
 </div>
 <p>If <code>TRACE_ID</code> is an existing file, or <code>TRACE_ID.json</code> exists, that JSON
-is loaded. An evaluation-report or outcome document from a prior <code>run</code> /
-<code>explore</code> is wrapped as a small DAG (nested <code>outcomeDocument</code> is used
-when present). If no such file exists, the argument is hashed as a
+is loaded. A saved v0.2 report from <code>run</code> / <code>explore</code> retains the actual
+parented derivation in <code>traceDocument</code>; <code>explain</code> uses those nodes. Legacy
+outcome-only documents have only the provenance their compatibility projection
+retained. If no such file exists, the argument is hashed as a
 <code>TraceId</code> and the node list is empty. JSON always includes a <code>nodes</code>
 array; emptiness means no persisted DAG was loaded, not an omitted field.
 Unknown <code>--format</code> values are treated as <code>text</code>.</p>
@@ -305,8 +311,10 @@ properties. The name must appear in the module’s <code>verify</code> blocks.</
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> verify examples/trust/bryan-revocable-trust.fr <span class="tk-ty">--property</span> TrusteeContinuity</code></pre></figure>
 <p><code>TrusteeContinuity</code> is declared on that module. A bounded check that does
 not obtain a covering proof is not success: the CLI prints the verdict to
-stderr and exits 1. Only a proved verdict is exit 0 (today that is a
-declared <code>true</code> or <code>assert true</code> formula). Passing a query name such as
+stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
+fragment includes structured Boolean/arithmetic assertions and finite quantified
+formulas; every assertion in the named block must hold. Unsupported formulas
+and resource exhaustion remain <code>unknown</code>. Passing a query name such as
 <code>acting_trustee</code> is invalid.</p>
 <p><strong>Success.</strong> Stdout, for example
 <code>proved NAME (persons=..., events=..., time_points=...)</code>.</p>
@@ -318,7 +326,8 @@ declared <code>true</code> or <code>assert true</code> formula). Passing a query
 <p>Compare two snapshots and print canonical JSON with two named
 operations: <code>result</code> (outcomeDocument / compiled query bodies) and
 <code>assurance</code> (executionMode, sourceTrust, assumptions,
-verificationMethod). Each is <code>{added, removed, changed}</code>. Changing only
+verificationMethod, coverage, invocation/source/executable identity and
+exploration evidence). Each is <code>{added, removed, changed}</code>. Changing only
 qualifications is an assurance diff, not a silent equal. A <code>.fr</code> path is
 compiled; any other path is read as JSON (an evaluation report, mill
 <code>{ok, report}</code> wrapper, outcome document, or serialized module).</p>
@@ -345,13 +354,17 @@ compiled; any other path is read as JSON (an evaluation report, mill
 <code>cannot encode diff: ...</code>.</p>
 <h2 id="render"><span class="hn">4.11</span> <code>render</code> <a class="anchor" href="#render" aria-label="Link to this section">#</a></h2>
 <p>Interpolate Core fields into a template. Available keys from the compiled
-module are <code>module</code>, <code>version</code>, and <code>outside_scope</code>. Missing keys fail
+module are <code>module</code>, <code>version</code>, typed <code>outside_scope</code> and its text
+<code>outside_scope_label</code>. Optional <code>--data DATA.json</code> adds typed values under <code>data</code>.
+<code>{{#each data.people}}{{name}}{{/each}}</code> iterates records without splitting names
+on punctuation. Missing keys fail
 closed. A directory named <code>certified</code> does not approve legal content;
 <code>templates/certified/</code> files are interpolation fixtures only.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
 <tr><td><code>--template TEMPLATE</code></td><td>yes</td><td>path to a template file</td></tr>
+<tr><td><code>--data DATA.json</code></td><td>no</td><td>typed JSON under the <code>data</code> template key</td></tr>
 </tbody></table>
 </div>
 <p><strong>Example</strong></p>
@@ -419,13 +432,26 @@ Other bind or runtime errors are printed to stderr.</p>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
 </ul>
+<h2 id="inputs"><span class="hn">4.15</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn inputs MODULE --query QUERY</code> emits JSON Schema for the declared query
+argument object. Aliases, sum constructors, records, nominal entities and
+collections come from checked declarations. Observation schemas and external
+review requests appear as metadata. Unsupported representations refuse instead
+of producing an unconstrained input schema.</p>
+<h2 id="review"><span class="hn">4.16</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at TIME</code> emits a portable <code>fidryn.review-bundle/v0.1</code> JSON archive. It retains exact
+source/case/dependency/lock bytes, a labeled normalized manifest, checked report
+and actual trace, source spans, executable digest and rerun arguments. Optional
+<code>--scenario</code>, <code>--budget N</code> and <code>--template FILE</code> select the disclosed evaluation
+or retain reviewer material. Reviewer status is <code>not_assessed</code>; the archive does
+not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>.</p>
 
     </div>
     <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cases-and-time"><span class="label">Previous &middot; &sect;3</span><span class="t">Cases and time</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;5</span><span class="t">Mill</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.15</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.16</span> review</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
