@@ -4006,10 +4006,10 @@ fn eval_succession(
         };
     }
     if ranked.is_empty() {
-        return need_appointment(office, trace);
+        return need_occupancy_judgment(office, trace);
     }
     let Some((family_name, alts)) = succession_family(module, case, key) else {
-        return need_appointment(office, trace);
+        return need_occupancy_judgment(office, trace);
     };
     let Some(admissible) = case
         .admissible_completions
@@ -4428,7 +4428,7 @@ fn succession_contingent(
     }
 }
 
-fn need_appointment(office: &Term, trace: TraceId) -> Outcome<Value> {
+fn need_occupancy_judgment(office: &Term, trace: TraceId) -> Outcome<Value> {
     let mut requests = BTreeSet::new();
     requests.insert(OpenRequest::NeedJudgment {
         issue: PropTerm::new("Occupies", vec![Term::Wildcard, office.clone()]),

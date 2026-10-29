@@ -227,3 +227,32 @@ all three native package/extracted-binary/artifact-upload jobs, including Window
 Those receipts do not qualify the subsequently authorized licensing revision.
 See reviews/2026-10-29-licensing-review.md for the content/provenance audit and
 /cache/tmp/fidryn-0.2.0-licensed-ci.log for the full local gate.
+
+## Findings-aware CodeQL protection
+
+At b0f8930 all11 configured PR workflow checks and every native package passed,
+but the separate GitHub Advanced Security CodeQL summary failed on202 findings.
+Triage established a medical-name heuristic applied to the unchanged legal
+need_appointment helper; all reported sinks are synthetic tests or one fixed
+benchmark. The private helper now has the precise name need_occupancy_judgment;
+its body and Appointment protocol are unchanged. No query exclusions or alert
+dismissals were used. The source/model evidence is in the code-scanning review.
+
+Main now requires12 native checks, adding the CodeQL findings summary pinned to
+GitHub Advanced Security provider57789. Dev contribution PRs require11. Live
+rules were reapplied/read back with strict checks and no main safety bypass.
+Publication waits for processed exact-main CodeQL results, then refuses errors,
+high/critical findings, malformed/unknown severity data and API failures across
+all pages. Native publication permissions add only security-events:read. CodeQL
+security-extended remains enabled and wait-for-processing is explicit.
+
+Nine new controls exercise the actual publication shell and preserve the ten
+inventory controls; pagination and pipefail removal mutants fail their controls.
+The complete Python control suite now totals23 tests. Final canonical local
+qualification and fresh exact-candidate remote analysis are recorded separately;
+successful analysis execution alone is not treated as successful findings review.
+
+The findings-aware candidate passed `cargo xtask ci --fmt`:1188 Rust tests,
+23 Python controls,52 JavaScript tests, workspace lint/type/doc/schema/site checks
+and benchmark compilation (/cache/tmp/fidryn-0.2.0-code-scanning-ci.log). Source
+and workflow changes are frozen for commit, clean packaging and remote checks.

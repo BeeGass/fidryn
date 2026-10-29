@@ -23,7 +23,8 @@ environment, and Node. It runs workspace tests, Clippy across targets/features,
 Rustdoc, schema assertions and controls, Python/JavaScript checks, generated-site
 consistency and benchmark compilation. Adapter tests require local mock listeners.
 GitHub also runs Linux/macOS/Windows tests, dependency/security checks, secret
-scanning, workflow linting and CodeQL.
+scanning, workflow linting and CodeQL. The required code-scanning summary also
+gates findings; successful analysis execution alone does not satisfy that check.
 
 ## Promote through GitHub
 

@@ -58,6 +58,9 @@ interchange schema versions are maintained independently of the interpreter.
 
 ### Security
 
+- Required code-scanning findings checks and a publication guard for unresolved
+  errors or high/critical findings, in addition to analysis execution checks.
+
 - Updated vulnerable or unsound pinned dependencies and added locked dependency,
   secret-history/current-tree, workflow and CodeQL checks.
 - Main's mandatory checks have no bypass actors; the owner's review exception

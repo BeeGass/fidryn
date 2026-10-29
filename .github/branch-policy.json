@@ -27,5 +27,11 @@
       ]
     }
   ],
-  "mainSourceCheck": "Main source policy"
+  "mainSourceCheck": "Main source policy",
+  "requiredChecks": [
+    {
+      "context": "CodeQL",
+      "integrationId": 57789
+    }
+  ]
 }

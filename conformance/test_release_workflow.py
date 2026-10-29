@@ -1,11 +1,13 @@
-"""Exercise the real publication inventory gate with independent package mutations."""
+"""Exercise publication gates with independent findings and package mutations."""
 
 from __future__ import annotations
 
 import hashlib
 import json
 import os
+import shutil
 import subprocess
+import sys
 import tempfile
 import textwrap
 import unittest
@@ -20,6 +22,160 @@ def inventory_script() -> str:
     step = workflow.split("      - name: Verify package identity and checksums\n", 1)[1]
     step = step.split("      - name: Prepare release notes\n", 1)[0]
     return textwrap.dedent(step.split("        run: |\n", 1)[1])
+
+
+def codeql_script() -> str:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    step = workflow.split(
+        "      - name: Refuse unresolved CodeQL errors and high-severity findings\n", 1
+    )[1]
+    step = step.split("      - name: Verify package identity and checksums\n", 1)[0]
+    return textwrap.dedent(step.split("        run: |\n", 1)[1])
+
+
+class ReleaseCodeQL(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory(prefix="fidryn-codeql-control-")
+        self.root = Path(self.temporary.name)
+        self.bin = self.root / "bin"
+        self.bin.mkdir()
+        for tool in ["bash", "jq"]:
+            executable = shutil.which(tool)
+            if executable is None:
+                self.fail(f"release control requires {tool}")
+            (self.bin / tool).symlink_to(executable)
+        stub = self.bin / "gh"
+        stub.write_text(
+            f"#!{sys.executable}\n"
+            + textwrap.dedent(
+                """\
+                import json
+                import os
+                import sys
+                from pathlib import Path
+
+                args = sys.argv[1:]
+                endpoint = (
+                    "repos/fixture/project/code-scanning/alerts?ref=refs/heads/main"
+                    "&state=open&tool_name=CodeQL&per_page=100"
+                )
+                if args[:1] != ["api"] or endpoint not in args:
+                    sys.exit("unexpected GitHub operation")
+                if "--jq" not in args or args[args.index("--jq") + 1] != ".[]":
+                    sys.exit("expected alert records")
+                response = Path(os.environ["STUB_GH_RESPONSE"]).read_text()
+                if os.environ["STUB_GH_RAW"] == "1":
+                    sys.stdout.write(response)
+                else:
+                    pages = json.loads(response)
+                    if "--paginate" not in args:
+                        pages = pages[:1]
+                    for page in pages:
+                        for alert in page:
+                            print(json.dumps(alert))
+                sys.exit(int(os.environ["STUB_GH_EXIT"]))
+                """
+            )
+        )
+        stub.chmod(0o700)
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    @staticmethod
+    def alert(severity: str = "warning", security: str | None = "low") -> dict[str, object]:
+        return {"rule": {"severity": severity, "security_severity_level": security}}
+
+    def run_gate(
+        self,
+        pages: list[list[dict[str, object]]],
+        *,
+        api_exit: int = 0,
+        raw: str | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        response = self.root / "response.json"
+        response.write_text(json.dumps(pages) if raw is None else raw)
+        return subprocess.run(
+            [str(self.bin / "bash"), "-e", "-o", "pipefail", "-c", codeql_script()],
+            cwd=self.root,
+            env={
+                **os.environ,
+                "PATH": str(self.bin),
+                "GITHUB_REPOSITORY": "fixture/project",
+                "STUB_GH_RESPONSE": str(response),
+                "STUB_GH_RAW": "0" if raw is None else "1",
+                "STUB_GH_EXIT": str(api_exit),
+            },
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+
+    def test_no_findings_are_accepted(self) -> None:
+        result = self.run_gate([[]])
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_benign_findings_are_accepted(self) -> None:
+        result = self.run_gate(
+            [
+                [
+                    self.alert(),
+                    self.alert(severity="note", security="medium"),
+                    self.alert(security=None),
+                ]
+            ]
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_high_and_critical_security_findings_are_rejected(self) -> None:
+        for security in ["high", "critical"]:
+            with self.subTest(security=security):
+                result = self.run_gate([[self.alert(security=security)]])
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_error_findings_are_rejected_without_security_severity(self) -> None:
+        result = self.run_gate([[self.alert(severity="error", security=None)]])
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_high_finding_after_first_full_page_is_rejected(self) -> None:
+        result = self.run_gate([[self.alert()] * 100, [self.alert(security="high")]])
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_api_failure_is_rejected_after_benign_output(self) -> None:
+        result = self.run_gate([[self.alert()]], api_exit=7)
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_invalid_json_is_rejected(self) -> None:
+        for raw in ["not-json", '{"rule":', json.dumps(self.alert()) + "\n{invalid}"]:
+            with self.subTest(raw=raw):
+                result = self.run_gate([[]], raw=raw)
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_malformed_alert_records_are_rejected(self) -> None:
+        records: list[dict[str, object]] = [
+            {},
+            {"rule": None},
+            {"rule": []},
+            {"rule": {"severity": "warning"}},
+            {"rule": {"security_severity_level": None}},
+            {"rule": {"severity": "warning", "security_severity_level": 42}},
+        ]
+        for record in records:
+            with self.subTest(record=record):
+                result = self.run_gate([[record]])
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+
+    def test_unknown_rule_or_security_severity_is_rejected(self) -> None:
+        records = [
+            self.alert(severity="unknown", security=None),
+            self.alert(severity="Warning", security=None),
+            self.alert(security="unknown"),
+            self.alert(security="HIGH"),
+        ]
+        for record in records:
+            with self.subTest(record=record):
+                result = self.run_gate([[record]])
+                self.assertNotEqual(result.returncode, 0, result.stdout)
 
 
 class ReleaseInventory(unittest.TestCase):

@@ -52,7 +52,8 @@ development package labeled `dirty: true`; CI publication rejects such packages.
 
 Linux, macOS and Windows test jobs build and verify packages and upload them as
 artifacts in the same CI run. Main's publication job waits for the complete CI
-gate and the separate CodeQL run on the exact main SHA. Its write token is limited
+gate and the separate CodeQL run on the exact main SHA. It then refuses unresolved
+CodeQL errors or high/critical security findings on main. Its write token is limited
 to the publication job; no dedicated App or private key is required.
 
 Publication checks the three platform families, exact archive/manifest/checksum

@@ -138,6 +138,7 @@ jobs:
     permissions:
       contents: write
       actions: read
+      security-events: read
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
@@ -167,6 +168,18 @@ jobs:
           done
           echo "CodeQL did not complete within the publication wait limit" >&2
           exit 1
+      - name: Refuse unresolved CodeQL errors and high-severity findings
+        shell: bash
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/code-scanning/alerts?ref=refs/heads/main&state=open&tool_name=CodeQL&per_page=100" --jq '.[]' |
+            jq --slurp --exit-status '
+              all(.[];
+                (.rule | type) == "object" and
+                (.rule | has("security_severity_level")) and
+                (.rule.severity == "note" or .rule.severity == "warning") and
+                (.rule.security_severity_level == null or
+                 .rule.security_severity_level == "low" or
+                 .rule.security_severity_level == "medium"))'
       - name: Verify package identity and checksums
         shell: bash
         run: |

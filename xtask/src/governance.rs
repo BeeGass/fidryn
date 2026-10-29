@@ -43,13 +43,29 @@ fn proposed(policy: &Value) -> Result<Vec<Value>> {
             Ok(json!({"actor_id":id,"actor_type":"User","bypass_mode":"always"}))
         })
         .collect::<Result<Vec<_>>>()?;
-    let checks: Vec<Value> = policy["requiredWorkflows"]
+    let mut checks: Vec<Value> = policy["requiredWorkflows"]
         .as_array()
         .context("missing workflows")?
         .iter()
         .flat_map(|workflow| workflow["jobs"].as_array().into_iter().flatten())
         .map(|name| json!({"context":name,"integration_id":15368}))
         .collect();
+    if let Some(additional) = policy.get("requiredChecks") {
+        for check in additional
+            .as_array()
+            .context("requiredChecks must be an array")?
+        {
+            let context = check["context"].as_str().context("missing check context")?;
+            let integration = check["integrationId"]
+                .as_u64()
+                .context("missing check provider")?;
+            ensure!(
+                !context.is_empty() && integration > 0,
+                "invalid required check identity"
+            );
+            checks.push(json!({"context":context,"integration_id":integration}));
+        }
+    }
     let status = json!({"type":"required_status_checks","parameters":{
         "required_status_checks":checks,"strict_required_status_checks_policy":true,
         "do_not_enforce_on_create":false}});
@@ -232,5 +248,35 @@ mod tests {
             &json!([{"actor_id":1},{"actor_id":2}]),
             &json!([{"actor_id":1}])
         ));
+    }
+
+    #[test]
+    fn code_scanning_summary_is_required_with_its_actual_provider() {
+        let policy = json!({"ownerUserId":1,"approvedContributorIds":[1],"requiredWorkflows":[{"jobs":["ci"]}],"mainSourceCheck":"source","requiredChecks":[{"context":"CodeQL","integrationId":57789}]});
+        let sets = proposed(&policy).unwrap();
+        let expected = json!({"context":"CodeQL","integration_id":57789});
+        for index in [0, 3] {
+            let required = sets[index]["rules"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|rule| rule["type"] == "required_status_checks")
+                .unwrap();
+            assert!(
+                required["parameters"]["required_status_checks"]
+                    .as_array()
+                    .unwrap()
+                    .contains(&expected)
+            );
+        }
+        assert_eq!(sets[0]["bypass_actors"], json!([]));
+        for check in [
+            json!({"context":"","integrationId":57789}),
+            json!({"context":"CodeQL","integrationId":0}),
+        ] {
+            let mut invalid = policy.clone();
+            invalid["requiredChecks"] = json!([check]);
+            assert!(proposed(&invalid).is_err());
+        }
     }
 }
