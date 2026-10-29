@@ -34,6 +34,10 @@ capability obligations. Full details and counterexamples are in
    source-linked prose and portable attorney-review bundles.
 5. Reconcile status/obligation docs and generated site; run complete local gate,
    remote CI matrix/security/CodeQL, policy checks and promotion refusal tests.
+6. Prepare 0.2.0 with a classified changelog, version/lock consistency checks,
+   clean native packages and native-token release publication after main CI and
+   exact-commit CodeQL. Include concurrent Time/record changes only after review
+   and tests, as explicitly authorized by the user.
 
 ## Acceptance laws
 
@@ -82,3 +86,45 @@ review),93d40dd(native governance/qualification). Each is GPG signed. Full remot
 Linux/macOS/Windows, Security and CodeQL checks remain required on the final PR
 candidate. These local receipts do not assert remote execution or closure of the
 open general-language obligations in the tracked review ledger.
+
+
+## 0.2.0 release candidate follow-up
+
+The user explicitly authorized including the concurrent timestamp-comparison and
+record-constructor changes after review/testing. The reviewed change passed its
+three source-to-CLI regressions and all-target linting, and is committed as
+541c4242703eab692fb0b4883db5cf8368bc3d00. It is included in the 0.2.0 changelog.
+The workspace, internal dependency versions and lockfile advance to 0.2.0;
+instrument/prelude versions and existing interchange schemas remain independent.
+
+The complete canonical local gate passed with 1173 Rust tests including doctests,
+12 Python controls, 52 JavaScript tests, all-target/all-feature Clippy, strict
+Rustdoc, executable schema probes, site consistency and benchmark compilation
+(`/cache/tmp/fidryn-0.2.0-ci.log`). Final checksum-path review then added two
+negative controls and required exactly one canonical line in each checksum
+sidecar; all14 Python controls, Python lint/format/types and actionlint passed.
+Handbook labels were reconciled and the site regenerated; all5 site-output tests,
+site consistency and browser site test passed again. These scoped follow-ups
+preserve the exact qualification history rather than claiming the earlier full
+command covered later documentation/workflow bytes.
+
+Release metadata passed against pinned main base c5c5f4596d2361c78b6de8ac8877f1ce3087acc9.
+The packager builds the actual native rustc host, retains clean commit/version/file
+identities and both checksum formats, extracts and verifies all packaged files,
+and runs the extracted CLI version/check/query smoke test. A dirty development
+preview succeeded; a clean committed candidate must still be packaged separately.
+
+Native main protection was reapplied and read back with11 required Actions
+contexts and no mandatory-check bypass; dev contribution checks total10. Platform
+CI now includes package construction. Publication uses only the native job token,
+waits for all CI and exact-main-SHA CodeQL, validates all12 assets across3 platform
+families, never moves a version tag and publishes only a complete draft. Existing
+published releases retain their assets after tag/name/upload-state checks; that
+retry path does not rehash remote asset bytes. A superseded main run skips
+publication explicitly. No main promotion, tag creation or published release is
+asserted by these local receipts. Remote candidate checks remain required.
+
+Final dependency scan covers267 dependencies and1386 cached advisories with zero
+vulnerabilities/warnings. Cargo deny bans/licenses/sources passed with the same
+two unused-license-allowance warnings; actionlint and current-tree Gitleaks passed.
+The general language/proof/resource obligations in the audit remain open.

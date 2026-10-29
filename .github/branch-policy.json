@@ -14,7 +14,8 @@
         "Rust tests (macos-15)",
         "Rust tests (windows-2025)",
         "Security",
-        "Workflow lint"
+        "Workflow lint",
+        "Release metadata"
       ]
     },
     {

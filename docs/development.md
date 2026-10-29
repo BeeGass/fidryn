@@ -114,3 +114,16 @@ BLAKE3 digest, byte count, package/semantics versions, architecture and OS of th
 executable. Linux hashes the running process inode; other platforms label the
 current executable file capture. This identifies the tested artifact without
 claiming that the archive distributes it or that rebuilding reproduces its bytes.
+
+## Versioned main promotion
+
+Every main promotion must increase the workspace version and include that
+version's dated changelog entry. The required `Release metadata` check compares
+the pinned base commit, checks internal dependency and lockfile consistency, and
+rejects a reused version. All three platform jobs also build, extract and smoke
+test their native packages.
+
+A successful push to main publishes through GitHub releases after the full CI
+gate and CodeQL on that exact main commit pass. Packages carry the source commit,
+version, native target and hashes. A superseded main run skips publication.
+See [Releases](releases.md) for artifact contents and retry behavior.

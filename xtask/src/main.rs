@@ -3,6 +3,8 @@
 mod bench;
 mod ci;
 mod governance;
+mod package;
+mod release;
 mod site;
 mod test;
 mod workspace;
@@ -34,6 +36,12 @@ enum Command {
     Site(site::SiteArgs),
     /// Render or reconcile repository protection rules
     Governance(governance::GovernanceArgs),
+    /// Build a checked native release archive and checksum manifests
+    Package(package::PackageArgs),
+    /// Check the workspace version, changelog and optional main promotion base
+    ReleaseCheck(release::ReleaseCheckArgs),
+    /// Print the changelog entry for the current workspace version
+    ReleaseNotes(release::ReleaseNotesArgs),
 }
 
 fn main() -> Result<()> {
@@ -43,5 +51,8 @@ fn main() -> Result<()> {
         Command::Ci(args) => ci::run(args),
         Command::Site(args) => site::run(args),
         Command::Governance(args) => governance::run(args),
+        Command::Package(args) => package::run(args),
+        Command::ReleaseCheck(args) => release::run_check(args),
+        Command::ReleaseNotes(args) => release::run_notes(args),
     }
 }

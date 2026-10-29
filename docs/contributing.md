@@ -1,6 +1,6 @@
 # Contributing to Fidryn
 
-This file is for people building the v0.1 reference interpreter. It is
+This file is for people building the 0.2.0 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](../README.md) and the [documentation hub](README.md).
 

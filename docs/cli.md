@@ -1,6 +1,6 @@
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the v0.1 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2.0 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).

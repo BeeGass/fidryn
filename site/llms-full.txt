@@ -42,7 +42,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the v0.1 reference
+This directory is the human documentation for the 0.2.0 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -74,6 +74,7 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
 | [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
 | [Obligations](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) | Review obligations; green tests are regressions |
@@ -110,7 +111,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the v0.1 research interpreter. The modules under
+This repository is the 0.2.0 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
@@ -365,7 +366,7 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
@@ -378,7 +379,7 @@ reference is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/gramma
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is **parsed / checked / executed** only where noted — see
+Support in 0.2.0 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -852,7 +853,7 @@ See [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) and [CL
 
 ## Verify
 
-A `verify` block is a named property. v0.1 discharges Boolean
+A `verify` block is a named property. Fidryn 0.2.0 discharges Boolean
 literals:
 
 ```
@@ -861,9 +862,8 @@ verify Trivial {
 }
 ```
 
-`assert true` proves. `assert false` is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:
+`assert true` proves. `assert false` is a counterexample. Unsupported
+formulas can parse without yielding a covering proof. For those properties,
 
 ```
 cargo run -p fidryn-cli -- verify PATH --property NAME
@@ -1286,7 +1286,7 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the v0.1 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2.0 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
@@ -3131,7 +3131,7 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the v0.1 reference interpreter. It is
+This file is for people building the 0.2.0 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 

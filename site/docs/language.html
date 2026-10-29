@@ -105,7 +105,7 @@ open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
 <p>Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
 <p>The grammar is closed: unknown body fields are parse errors. Copy from
@@ -114,7 +114,7 @@ reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf">
 <h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is <strong>parsed / checked / executed</strong> only where noted — see
+Support in 0.2.0 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
 <tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed/checked; hex digests authenticate under CLI <code>check_path</code></td></tr>
@@ -454,14 +454,13 @@ CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
 <code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
 See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property. v0.1 discharges Boolean
+<p>A <code>verify</code> block is a named property. Fidryn 0.2.0 discharges Boolean
 literals:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Trivial <span class="tk-pu">{</span>
     <span class="tk-kw">assert</span> <span class="tk-nu">true</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:</p>
+<p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Unsupported
+formulas can parse without yielding a covering proof. For those properties,</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> verify PATH <span class="tk-ty">--property</span> NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>

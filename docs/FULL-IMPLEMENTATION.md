@@ -1,7 +1,8 @@
 # Fidryn: required subsystems
 
 The originating essay deferred several subsystems. They remain **language
-requirements** for v0.1. Nothing in this list is an accepted deferral.
+requirements** first specified for v0.1 and carried forward to 0.2.0.
+Nothing in this list is an accepted deferral.
 
 A `.fr` module is not an executable specification. A feature is
 implemented only when parse, resolution, checking, evaluation, uncertainty,
@@ -128,7 +129,7 @@ determination that is operative in the relevant context.
 14. **Mill UI**
     - `fidryn ui [--port N] [--no-open]` on 127.0.0.1 only.
     - Check, run, explore, render. No live filing from the UI.
-    - Outcome JSON uses the mill/CLI evaluation-report envelope (`fidryn.evaluation-report/v0.1` with nested `fidryn.outcome/v0.1`
+    - Outcome JSON uses the mill/CLI evaluation-report envelope (`fidryn.evaluation-report/v0.2` with nested `fidryn.outcome/v0.1`
       fields, camelCase, hex ids, tagged `Value`).
 
 15. **General worklist evaluator**

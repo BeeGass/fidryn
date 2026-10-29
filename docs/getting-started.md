@@ -11,7 +11,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the v0.1 research interpreter. The modules under
+This repository is the 0.2.0 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.

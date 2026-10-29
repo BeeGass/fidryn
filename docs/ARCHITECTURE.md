@@ -1,4 +1,4 @@
-# Fidryn v0.1 architecture
+# Fidryn 0.2.0 architecture
 
 Fidryn is a reference interpreter for legal instruments. It is a compiler
 plus a partial evaluator: parse a `.fr` module, authenticate a source
@@ -33,15 +33,15 @@ bytes
   -> Outcome<T> + proof-relevant trace
 ```
 
-v0.1 is a reference interpreter, not a native-code compiler. There is no
+Fidryn 0.2.0 is a reference interpreter, not a native-code compiler. There is no
 LLVM backend. `calc` functions are total, effect-free, and terminating;
 they run in the evaluator, not as machine code.
 
 ## Improvements over the essay's gaps
 
 The essay left a grammar sketch, deferred conflict oracles, and noted that
-no-false-determinacy is only as honest as the admitted model. v0.1 closes
-those as follows:
+no-false-determinacy is only as honest as the admitted model. Fidryn 0.2.0
+retains the following contracts:
 
 1. `grammar.ebnf` is closed. Unknown body fields are parse errors, not
    extension points. There is no catch-all `Ident Expr` statement.

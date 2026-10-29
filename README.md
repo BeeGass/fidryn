@@ -5,7 +5,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This repository is the v0.1 **reference interpreter**. It is a research
+This repository is the 0.2.0 **reference interpreter**. It is a research
 fixture, not legal advice, not an operative instrument, and not a
 complete statement of any jurisdiction's law. Modules under `examples/`
 and programs under `tests/` exist to exercise the interpreter.
@@ -91,7 +91,7 @@ fidryn ui [--port N] [--no-open]
 ```
 
 `--arg provision=...` writes `case.facts["provision"]`. Times are ISO 8601
-/ RFC 3339. `run` / `explore` print `fidryn.evaluation-report/v0.1` (nested
+/ RFC 3339. `run` / `explore` print `fidryn.evaluation-report/v0.2` (nested
 `outcomeDocument` is `fidryn.outcome/v0.1`). `--scenario` applies
 `case.assumptions` as an overlay; default `run` is operative. `explore`
 searches only the declared finite completion space. `file` is dry-run
@@ -135,3 +135,5 @@ actually implemented: [docs/implementation-status.md](docs/implementation-status
 ## Website
 
 Public landing: [fidryn.onlygass.dev](https://fidryn.onlygass.dev) (static files in `site/`).
+
+Release packages and the version/changelog gate are described in [Releases](docs/releases.md).
