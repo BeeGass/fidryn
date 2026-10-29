@@ -1615,6 +1615,6 @@ module Examples.T version "0.1.0" {
             .unwrap();
         let mut buf = String::new();
         stream.read_to_string(&mut buf).unwrap();
-        assert!(buf.contains("ok"), "{buf}");
+        assert!(buf.contains("ok"), "mock health response must contain ok");
     }
 }

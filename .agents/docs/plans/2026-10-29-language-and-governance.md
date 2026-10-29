@@ -256,3 +256,11 @@ The findings-aware candidate passed `cargo xtask ci --fmt`:1188 Rust tests,
 23 Python controls,52 JavaScript tests, workspace lint/type/doc/schema/site checks
 and benchmark compilation (/cache/tmp/fidryn-0.2.0-code-scanning-ci.log). Source
 and workflow changes are frozen for commit, clean packaging and remote checks.
+
+The ceef0c0 candidate passed all12 PR contexts, both full CI and CodeQL workflows,
+and all platform packages. Its PR scan automatically fixed the202 false-positive
+classifications without dismissals. The complete dev scan also exposed one
+unchanged legacy test diagnostic (rust/log-injection203, medium/error). The
+loopback test now uses a static failure message while preserving its assertion
+and I/O; scoped test/Clippy/formatting passed. Fresh full qualification and
+branch findings are required for this final one-line source correction.

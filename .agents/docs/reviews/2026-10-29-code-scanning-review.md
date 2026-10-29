@@ -86,3 +86,19 @@ outcome behavior remain byte-for-byte unchanged. All172 evaluator units,3money
 and27runtime source regressions and focused evaluator Clippy passed. No query
 was removed, no path excluded and no alert dismissed. Fresh remote analysis must
 establish whether the observed name classification is cleared.
+
+## Legacy raw-response test diagnostic
+
+Fresh ceef0c0 PR analysis automatically fixed all202 name-model findings, with
+zero dismissals and no new PR alerts. Both complete CI/CodeQL workflows and all
+12 mandatory PR checks passed. The full dev-branch scan additionally exposed
+one unchanged legacy finding203: rust/log-injection, medium security severity
+but error rule severity, at cli/src/ui.rs1618. The same assertion exists in
+main c5c5f45. It is inside a loopback mock test and prints raw HTTP response
+bytes only when its health assertion fails; no production log sink is involved.
+
+The assertion now uses a fixed failure message instead of raw response data.
+Its predicate and network I/O are unchanged. The existing loopback test, strict
+all-target CLI Clippy and formatting passed. The publication findings guard
+correctly refuses this error-level category; the new source candidate therefore
+requires fresh dev/PR analysis before claiming every scoped finding is clear.
