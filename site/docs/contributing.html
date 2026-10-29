@@ -117,18 +117,19 @@ channel and the <code>rustfmt</code> and <code>clippy</code> components.</p>
 at Command Line Tools clang because the Xcode license is unsigned.</p>
 <h2 id="checks"><span class="hn">8.2</span> Checks <a class="anchor" href="#checks" aria-label="Link to this section">#</a></h2>
 <p>From the repository root:</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt
-<span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
-<span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
-<p><code>cargo xtask ci</code> runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-<code>cargo xtask ci --fmt</code> also checks Rust formatting first. The Python steps
-need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code> provides the Python
-that <code>.python-version</code> names and the packages <code>uv.lock</code> pins. GitHub
-Actions runs <code>cargo xtask ci --fmt</code> on every push to <code>main</code> and every
-pull request (<code>.github/workflows/ci.yml</code>); the runner builds its own
-<code>.venv</code> from <code>uv.lock</code>, and nothing it builds is committed.</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt <span class="tk-ty">--all</span>
+<span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-targets</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
+<span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span></code></pre></figure>
+<p><code>cargo xtask ci --fmt</code> runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, and
+benchmark compilation. Node and <a href="https://docs.astral.sh/uv/">uv</a> are required for
+qualification. <code>uv run --locked</code> uses <code>.python-version</code> and <code>uv.lock</code>.</p>
+<p>GitHub runs this gate for pushes and PRs to <code>dev</code> and <code>main</code>, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>. Generated environments and build
+outputs are not committed.</p>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
 <h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
 <p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides
@@ -141,9 +142,8 @@ specimen is evaluated by the real interpreter at build time, so a
 change in semantics also makes the site stale.</p>
 <p>The stylesheet and script in <code>site/assets/</code> are written by hand. The
 mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>, embeds the stylesheet
-<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. When Node is
-installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
-<code>web/tests/</code>; Node is never needed to build or serve anything.</p>
+<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. <code>cargo xtask ci</code> requires Node to run the JavaScript unit tests in
+<code>web/tests/</code>; Node is not needed to build or serve the interpreter.</p>
 <h2 id="pipeline"><span class="hn">8.4</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli</code></pre></figure>

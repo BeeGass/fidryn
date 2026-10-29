@@ -123,12 +123,14 @@ cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
 ```
 
 The CLI prints one line of canonical JSON
-(`fidryn.evaluation-report/v0.1`). Pretty-printed, the important fields
-look like this:
+(`fidryn.evaluation-report/v0.2`). Pretty-printed, the important fields
+look like this. This excerpt omits invocation hashes and derivation nodes; the
+actual document also includes `invocation`, `invocationId`, `engineVersion`,
+`sourceBundle` and `traceDocument`:
 
 ```json
 {
-  "schema": "fidryn.evaluation-report/v0.1",
+  "schema": "fidryn.evaluation-report/v0.2",
   "executionMode": "operative",
   "sourceTrust": "unauthenticated",
   "verificationMethod": "none",
@@ -163,7 +165,23 @@ The six-kind legal result is nested under `outcomeDocument`.
 `complete_instruments` as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
 Pass `--scenario` only when you intend `case.assumptions` as an overlay;
-operative `run` (the default) does not apply them.
+operative `run` (the default) does not apply them. `--budget N` sets the maximum
+number of evaluation operations; exhaustion is an engine error and cannot
+produce a qualified determinate answer. The selected budget is part of the
+invocation identity.
+
+Save the complete report to retain its actual trace:
+
+```sh
+fidryn run tests/programs/require-gate.fr --query q \
+  --case /tmp/fidryn-empty-case.json \
+  --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
+fidryn explain report.json --format text
+```
+
+`--source-root PATH` explicitly grants the filesystem root for artifacts and
+packages. It defaults to the module directory; absolute paths, parent traversal
+and symlinks cannot make an artifact escape that root.
 
 Now run `r`:
 

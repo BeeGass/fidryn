@@ -49,8 +49,8 @@ Run a query against a case record (RFC 3339 times are required):
 fidryn run examples/tax/federal-tax.fr \
   --query tax_on \
   --case examples/tax/cases/ordinary-income.json \
-  --valid-at 2034-03-01T09:00:00Z \
-  --known-at 2034-03-01T09:00:00Z
+  --valid-at 2026-08-24T09:00:00Z \
+  --known-at 2026-08-24T09:00:00Z
 ```
 
 Local mill (loopback only, default port 8751):

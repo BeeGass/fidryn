@@ -175,10 +175,12 @@ minimal empty case that satisfies the interchange schema
     <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
     <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
 <p>The CLI prints one line of canonical JSON
-(<code>fidryn.evaluation-report/v0.1</code>). Pretty-printed, the important fields
-look like this:</p>
+(<code>fidryn.evaluation-report/v0.2</code>). Pretty-printed, the important fields
+look like this. This excerpt omits invocation hashes and derivation nodes; the
+actual document also includes <code>invocation</code>, <code>invocationId</code>, <code>engineVersion</code>,
+<code>sourceBundle</code> and <code>traceDocument</code>:</p>
 <figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
-  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.evaluation-report/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.evaluation-report/v0.2&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;executionMode&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;operative&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;sourceTrust&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;unauthenticated&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;verificationMethod&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;none&quot;</span><span class="tk-pu">,</span>
@@ -211,7 +213,18 @@ look like this:</p>
 <code>complete_instruments</code> as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
 Pass <code>--scenario</code> only when you intend <code>case.assumptions</code> as an overlay;
-operative <code>run</code> (the default) does not apply them.</p>
+operative <code>run</code> (the default) does not apply them. <code>--budget N</code> sets the maximum
+number of evaluation operations; exhaustion is an engine error and cannot
+produce a qualified determinate answer. The selected budget is part of the
+invocation identity.</p>
+<p>Save the complete report to retain its actual trace:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> run tests/programs/require-gate.fr <span class="tk-ty">--query</span> q <span class="tk-pu">\</span>
+  <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
+  <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">&gt;</span> report.json
+<span class="tk-kw">fidryn</span> explain report.json <span class="tk-ty">--format</span> text</code></pre></figure>
+<p><code>--source-root PATH</code> explicitly grants the filesystem root for artifacts and
+packages. It defaults to the module directory; absolute paths, parent traversal
+and symlinks cannot make an artifact escape that root.</p>
 <p>Now run <code>r</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> run tests/programs/require-gate.fr <span class="tk-pu">\</span>
     <span class="tk-ty">--query</span> r <span class="tk-pu">\</span>

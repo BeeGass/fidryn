@@ -150,9 +150,11 @@ as CLI `--valid-at` and `--known-at`.
 On evaluation success, HTTP 200, and the body is a transport wrapper
 `{ "ok": true, "report": ..., "opinion": [...] }`
 (`schemas/mill-evaluation-response-v0.1.json`). `report` is the
-`fidryn.evaluation-report/v0.1` envelope the CLI prints
+`fidryn.evaluation-report/v0.2` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`). `opinion` is the
+`verificationMethod`, `coverage`, checked invocation and source/executable
+identities, retained actual `traceDocument`, `outcomeDocument`, and exploration
+`searchEvidence` when applicable). `opinion` is the
 report read as plain sentences, for example
 `acting_trustee depends on SuccessorEligibility.` and
 `Under I1 it is Alice.` for a contingent trust run. Each sentence is a
@@ -197,7 +199,9 @@ It is not rewritten as `inconsistent`.
 HTTP status is 200 in both cases. Success is `{"ok": true, "text": "..."}`.
 Failure (check diagnostics joined by newlines, or a missing template key)
 is `{"ok": false, "error": "..."}`. Template variables are `module`,
-`version`, and `outside_scope`. Missing keys fail closed.
+`version`, typed `outside_scope`, and `outside_scope_label`. An optional JSON
+`data` field is available under the template key `data`; typed arrays and record
+fields are preserved. Missing keys and collection type mismatches fail closed.
 
 ## In-memory compile versus path compile
 
@@ -284,3 +288,12 @@ completions on the case JSON.
 
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [CLI](https://fidryn.onlygass.dev/docs/cli.md)
+
+### `POST /api/inputs`
+
+Accepts `source` and `query` and returns `{ok: true, schema: ...}` with the input
+schema derived from checked declarations, including evidence and effect request
+metadata. Unsupported input representations return an explicit error. `/api/check`
+diagnostic responses also include `locations` with source paths, byte spans and
+UTF-16 editor ranges when available. These ranges identify the exact submitted
+source; unavailable locations stay explicit.

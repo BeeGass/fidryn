@@ -36,20 +36,22 @@ at Command Line Tools clang because the Xcode license is unsigned.
 From the repository root:
 
 ```
-cargo fmt
-cargo clippy --workspace -- -D warnings
-cargo test --workspace --offline
+cargo fmt --all
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci` runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
-need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
-that `.python-version` names and the packages `uv.lock` pins. GitHub
-Actions runs `cargo xtask ci --fmt` on every push to `main` and every
-pull request (`.github/workflows/ci.yml`); the runner builds its own
-`.venv` from `uv.lock`, and nothing it builds is committed.
+`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, and
+benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
+qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+
+GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+[Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md). Generated environments and build
+outputs are not committed.
 
 Do not weaken no-false-determinacy to make a test pass.
 
@@ -70,9 +72,8 @@ change in semantics also makes the site stale.
 
 The stylesheet and script in `site/assets/` are written by hand. The
 mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
-`fidryn.css` and has its own script, `web/mill.js`. When Node is
-installed, `cargo xtask ci` also runs the JavaScript unit tests in
-`web/tests/`; Node is never needed to build or serve anything.
+`fidryn.css` and has its own script, `web/mill.js`. `cargo xtask ci` requires Node to run the JavaScript unit tests in
+`web/tests/`; Node is not needed to build or serve the interpreter.
 
 ## Pipeline
 
