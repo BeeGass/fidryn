@@ -171,3 +171,17 @@ The refusal to overwrite unowned data is preserved. Actionlint and all 14 Python
 controls passed after this workflow correction. New exact-candidate remote
 qualification and a clean package remain required; previous failed job statuses
 are not upgraded to success.
+
+
+## Windows site diagnostic correction
+
+At 4bfa437 the Windows runs passed the language, LF package-authentication and all
+five review-bundle regressions, then failed one xtask unit test because stale-site
+diagnostics used native backslash separators. Missing, changed and extra generated
+file diagnostics now format relative path components with `/`; filesystem reads,
+writes and comparisons remain native. The regression covers native joined paths
+and a nested missing file. All three site units, five site-output integrations,
+xtask Clippy, formatting and diff checks passed locally. Platform test commands
+now use `--no-fail-fast` to report all failing test targets while retaining a
+failed gate whenever any target fails. Native Windows package construction and
+the next complete remote candidate remain required.

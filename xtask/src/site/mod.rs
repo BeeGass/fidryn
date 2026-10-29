@@ -118,8 +118,8 @@ pub fn stale_files(site: &Path, files: &[OutFile]) -> Result<Vec<String>> {
     for file in files {
         match fs::read(site.join(&file.path)) {
             Ok(bytes) if bytes == file.bytes => {}
-            Ok(_) => stale.push(format!("{} differs", file.path.display())),
-            Err(_) => stale.push(format!("{} is missing", file.path.display())),
+            Ok(_) => stale.push(format!("{} differs", relative_display(&file.path))),
+            Err(_) => stale.push(format!("{} is missing", relative_display(&file.path))),
         }
     }
     let expected: BTreeSet<PathBuf> = files.iter().map(|f| f.path.clone()).collect();
@@ -129,13 +129,23 @@ pub fn stale_files(site: &Path, files: &[OutFile]) -> Result<Vec<String>> {
         for entry in fs::read_dir(&docs).with_context(|| format!("read {}", docs.display()))? {
             let rel = Path::new("docs").join(entry?.file_name());
             if !expected.contains(&rel) {
-                extra.push(format!("{} is not generated; delete it", rel.display()));
+                extra.push(format!(
+                    "{} is not generated; delete it",
+                    relative_display(&rel)
+                ));
             }
         }
         extra.sort();
         stale.extend(extra);
     }
     Ok(stale)
+}
+
+fn relative_display(path: &Path) -> String {
+    path.iter()
+        .map(|component| component.to_string_lossy())
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 /// Write `files` under `site`, creating directories as needed.
@@ -175,9 +185,10 @@ mod tests {
         fs::write(site.join("assets/fidryn.css"), "hand-written").unwrap();
         fs::write(site.join("README.md"), "hand-written").unwrap();
         let files = [
-            OutFile::text("docs/cli.html", "new"),
+            OutFile::text(Path::new("docs").join("cli.html"), "new"),
             OutFile::text("robots.txt", "same"),
             OutFile::text("sitemap.xml", "<urlset/>"),
+            OutFile::text(Path::new("docs").join("nested/missing.html"), "missing"),
         ];
         let stale = stale_files(&site, &files).unwrap();
         assert_eq!(
@@ -185,6 +196,7 @@ mod tests {
             [
                 "docs/cli.html differs",
                 "sitemap.xml is missing",
+                "docs/nested/missing.html is missing",
                 "docs/alpha.html is not generated; delete it",
                 "docs/zeta.md is not generated; delete it",
             ]
