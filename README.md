@@ -5,66 +5,69 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This repository is the 0.2.0 **reference interpreter**. It is a research
-fixture, not legal advice, not an operative instrument, and not a
-complete statement of any jurisdiction's law. Modules under `examples/`
-and programs under `tests/` exist to exercise the interpreter.
-
 Current licensing terms and retained prior grants are described in
 [Licensing](LICENSING.md).
 
-Source files use the `.fr` extension.
+## Status
 
-**Documentation:** [docs/README.md](docs/README.md) — start with
-[Getting started](docs/getting-started.md).
+Fidryn 0.2 is a research interpreter. It checks and runs modules (`.fr`
+files) built from queries, functions, calculations, rules, observations,
+judgments that use a concurrence policy, and duties, which run only
+through the built-in calls `duty_status` and `duty_step`. Each run prints
+a JSON report that records the query, the valid and known times, and
+digests of the program and the case record. Several kinds of declaration,
+such as `power`, `office` and `legal_act`, are accepted but not run;
+expressions have no date arithmetic; and an `import` brings in
+declarations only from a package under `packages/`. A module that does
+not pass the checker cannot be run, and in some modules that do pass, the
+interpreter
+[drops a declaration without a diagnostic](docs/implementation-status.md#declarations-that-are-lost).
+[Implementation status](docs/implementation-status.md) lists what works
+and what does not, with the test or code that shows each one.
 
-## No false determinacy
-
-A computation may return one determinate result only when that result
-is invariant across every still-admissible resolution of the unresolved
-issues, or when a competent authority has already made a determination
-that is operative in the relevant context.
-
-`run` never chooses a completion. An empty completion set is not a
-vacuous determinate answer. Open branches without a covering certificate
-stay `Suspended`. Every outcome carries the declared `modelBoundary`.
+Nothing in this repository is legal advice. The modules under `examples/`
+and the programs under `tests/` exist to exercise the interpreter. None of
+them is a complete statement of any jurisdiction's law.
 
 ## Quick start
 
-Rust 1.98 (`rust-toolchain.toml` pins the patch). From the repository
-root:
-
-```
-cargo test --workspace --offline
-cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
-```
-
-Install the binary:
+Rust 1.98 is required; `rust-toolchain.toml` selects it.
 
 ```sh
-cargo install --path crates/fidryn-cli
-fidryn check examples/trust/bryan-revocable-trust.fr
+cargo install --path crates/fidryn-cli --locked
+fidryn check tests/programs/require-gate.fr
 ```
 
-Run a query against a case record (RFC 3339 times are required):
+`check` prints `ok`. Run a query against a case record:
 
 ```sh
-fidryn run examples/tax/federal-tax.fr \
-  --query tax_on \
-  --case examples/tax/cases/ordinary-income.json \
-  --valid-at 2026-08-24T09:00:00Z \
-  --known-at 2026-08-24T09:00:00Z
+fidryn run tests/programs/require-gate.fr \
+  --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
 ```
 
-Local mill (loopback only, default port 8751):
+The report's outcome is determinate `7`. Query `r` in the same file is
+suspended, because its requirement fails:
 
 ```sh
-fidryn ui --no-open
+fidryn run tests/programs/require-gate.fr \
+  --query r \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
 ```
 
-Then open `http://127.0.0.1:8751`. See [the mill guide](docs/mill.md).
+Run the tests:
 
-## What to read next
+```sh
+cargo test --workspace --locked
+```
+
+## Documentation
+
+The guides are indexed in [docs/README.md](docs/README.md).
 
 | If you want to… | Read |
 | --- | --- |
