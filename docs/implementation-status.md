@@ -138,27 +138,34 @@ unknown query. It also affects these rules and duties:
 
 In a `verify` block, an assertion that ends in an integer literal, such
 as `assert 1 + 1 == 2`, swallows the `assert` line that follows it, and
-the two lines are decided as one assertion (test
-`an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion`).
-While it looks for a duration unit after the integer, the parser steps
-over the line break, so the expression continues into the next line,
-starting by applying the integer to the word `assert`
-(`crates/fidryn-syntax/src/parser.rs:2682`, `:2239`). The joined
-assertion is unresolved unless `verify` can decide it without the
-swallowed line. So `assert 1 + 1 == 2` followed by `assert false` is
-`unknown`, and `assert true or 1 == 2` followed by `assert false` is
-`proved`, because `true or ...` is true whatever follows it
-(`crates/fidryn-verify/src/property.rs:210`). A `proved` verdict is
-therefore not reliable for a block that has such an assertion. When both
-lines are comparisons, as with `assert 1 + 1 == 2` followed by
+that line swallows the next one if it also ends in an integer literal.
+The lines joined this way are decided as one assertion (test
+`an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion`),
+and the assertion numbers in a counterexample count them as one. While it
+looks for a duration unit after the integer, the parser steps over the
+line break, so the expression continues into the next line, starting by
+applying the integer to the word `assert`
+(`crates/fidryn-syntax/src/parser.rs:2682`, `:2239`). That application
+cannot be evaluated (`crates/fidryn-verify/src/property.rs:165`), so the
+joined assertion is unresolved unless the rest of it settles the result.
+`verify` ignores an operand of `and` or `or` when the other operand
+settles the result, and it evaluates only the branch of an `if` that is
+taken (`crates/fidryn-verify/src/property.rs:140`, `:206`). An `and`,
+`or` or `if` in any of the joined lines can settle the result this way.
+So `assert 1 + 1 == 2` followed by `assert false` is `unknown`, but each
+of these blocks is `proved`, although it holds a false assertion:
+`assert true or 1 == 2` followed by `assert false`, and
+`assert 1 + 1 == 3` followed by `assert true or true`. A `proved` verdict
+is therefore not reliable for a block that has such an assertion. When
+both lines are comparisons, as with `assert 1 + 1 == 2` followed by
 `assert 2 == 2`, the module is rejected with `E100`. An assertion that
 ends in `;`, or in a literal in parentheses such as `(2)`, is not
 affected.
 
-Among the modules that pass the checker, 41 declare a `verify` property,
-one each. None of those 41 properties has an assertion that ends in an
-integer literal with another line after it, so none is affected, and
-`verify` reports all 41 `unknown`.
+In the modules shipped with 0.2, 41 of those that pass the checker
+declare a `verify` property, one each. None of those 41 properties has an
+assertion that ends in an integer literal with another line after it, so
+none is affected, and `verify` reports all 41 `unknown`.
 
 ## Names the evaluator knows
 

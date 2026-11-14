@@ -937,14 +937,19 @@ whether or not a `verify` block repeats it.
 
 The rules above do not hold for an assertion that ends in an integer
 literal, such as `assert 1 + 1 == 2`, when another `assert` line follows
-it. The assertion swallows that line, and the two lines are decided as
-one assertion, which is unresolved unless `verify` can decide it without
-the swallowed line. So `assert 1 + 1 == 3` followed by `assert true` is
-`unknown`, not a counterexample, and `assert true or 1 == 2` followed by
-`assert false` is `proved`. When both lines are comparisons, as with
-`assert 1 + 1 == 2` followed by `assert 2 == 2`, the module is rejected
-with `E100`. Ending the assertion with `;`, or writing the literal in
-parentheses, as in `assert 1 + 1 == (2)`, avoids this.
+it. The assertion swallows that line, and that line swallows the next one
+if it also ends in an integer literal. The lines joined this way are
+decided as one assertion. The parser applies the integer to the word
+`assert`, and that application cannot be evaluated, so the joined
+assertion is unresolved unless an `and`, `or` or `if` in any of its
+lines settles the result without that part. So `assert 1 + 1 == 3`
+followed by `assert true` is `unknown`, not a counterexample, while
+`assert true or 1 == 2` followed by `assert false` is `proved`, and so
+is `assert 1 + 1 == 3` followed by `assert true or true`. When both lines
+are comparisons, as with `assert 1 + 1 == 2` followed by `assert 2 == 2`,
+the module is rejected with `E100`. Ending the assertion with `;`, or
+writing the literal in parentheses, as in `assert 1 + 1 == (2)`, avoids
+this.
 [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)
 describes the defect.
 

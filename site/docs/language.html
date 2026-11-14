@@ -521,14 +521,19 @@ as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
 <p>The rules above do not hold for an assertion that ends in an integer
 literal, such as <code>assert 1 + 1 == 2</code>, when another <code>assert</code> line follows
-it. The assertion swallows that line, and the two lines are decided as
-one assertion, which is unresolved unless <code>verify</code> can decide it without
-the swallowed line. So <code>assert 1 + 1 == 3</code> followed by <code>assert true</code> is
-<code>unknown</code>, not a counterexample, and <code>assert true or 1 == 2</code> followed by
-<code>assert false</code> is <code>proved</code>. When both lines are comparisons, as with
-<code>assert 1 + 1 == 2</code> followed by <code>assert 2 == 2</code>, the module is rejected
-with <code>E100</code>. Ending the assertion with <code>;</code>, or writing the literal in
-parentheses, as in <code>assert 1 + 1 == (2)</code>, avoids this.
+it. The assertion swallows that line, and that line swallows the next one
+if it also ends in an integer literal. The lines joined this way are
+decided as one assertion. The parser applies the integer to the word
+<code>assert</code>, and that application cannot be evaluated, so the joined
+assertion is unresolved unless an <code>and</code>, <code>or</code> or <code>if</code> in any of its
+lines settles the result without that part. So <code>assert 1 + 1 == 3</code>
+followed by <code>assert true</code> is <code>unknown</code>, not a counterexample, while
+<code>assert true or 1 == 2</code> followed by <code>assert false</code> is <code>proved</code>, and so
+is <code>assert 1 + 1 == 3</code> followed by <code>assert true or true</code>. When both lines
+are comparisons, as with <code>assert 1 + 1 == 2</code> followed by <code>assert 2 == 2</code>,
+the module is rejected with <code>E100</code>. Ending the assertion with <code>;</code>, or
+writing the literal in parentheses, as in <code>assert 1 + 1 == (2)</code>, avoids
+this.
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed">Implementation status</a>
 describes the defect.</p>
 <h2 id="what-the-language-will-not-do"><span class="hn">2.20</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
