@@ -139,22 +139,28 @@ pub fn run_python_checks() -> Result<()> {
     Ok(())
 }
 
-pub fn run_schema_probes() -> Result<()> {
-    let root = workspace_root();
+/// Build the debug `fidryn` binary and return its path.
+pub fn fidryn_binary() -> Result<PathBuf> {
     let mut build = cargo_command();
     build.args(["build", "-p", "fidryn-cli", "--locked", "--offline"]);
     run_command(build)?;
-    let binary = load_metadata()?
+    let path = load_metadata()?
         .target_directory
         .join("debug")
         .join(format!("fidryn{}", std::env::consts::EXE_SUFFIX));
+    Ok(path.into_std_path_buf())
+}
+
+pub fn run_schema_probes() -> Result<()> {
+    let root = workspace_root();
+    let binary = fidryn_binary()?;
     for rel in SCHEMA_PROBE_SCRIPTS {
         let script = root.join(rel);
         if !script.is_file() {
             bail!("required schema probe is missing: {rel}");
         }
         let mut command = schema_probe_command(&root, &script);
-        command.env("FIDRYN_BINARY", binary.as_std_path());
+        command.env("FIDRYN_BINARY", &binary);
         run_command(command)?;
     }
     Ok(())

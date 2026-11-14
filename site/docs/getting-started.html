@@ -218,10 +218,10 @@ number of evaluation operations; exhaustion is an engine error and cannot
 produce a qualified determinate answer. The selected budget is part of the
 invocation identity.</p>
 <p>Save the complete report to retain its actual trace:</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> run tests/programs/require-gate.fr <span class="tk-ty">--query</span> q <span class="tk-pu">\</span>
-  <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
-  <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">&gt;</span> report.json
-<span class="tk-kw">fidryn</span> explain report.json <span class="tk-ty">--format</span> text</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn run tests/programs/require-gate.fr --query q \
+  --case /tmp/fidryn-empty-case.json \
+  --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z &gt; report.json
+fidryn explain report.json --format text</code></pre></figure>
 <p><code>--source-root PATH</code> explicitly grants the filesystem root for artifacts and
 packages. It defaults to the module directory; absolute paths, parent traversal
 and symlinks cannot make an artifact escape that root.</p>

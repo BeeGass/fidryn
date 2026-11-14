@@ -161,7 +161,7 @@ invocation identity.
 
 Save the complete report to retain its actual trace:
 
-```sh
+```text
 fidryn run tests/programs/require-gate.fr --query q \
   --case /tmp/fidryn-empty-case.json \
   --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json

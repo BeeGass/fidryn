@@ -285,14 +285,14 @@ retained. If no such file exists, the argument is hashed as a
 array; emptiness means no persisted DAG was loaded, not an omitted field.
 Unknown <code>--format</code> values are treated as <code>text</code>.</p>
 <p><strong>Example</strong></p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> run examples/trust/bryan-revocable-trust.fr <span class="tk-pu">\</span>
-  <span class="tk-ty">--query</span> acting_trustee <span class="tk-pu">\</span>
-  <span class="tk-ty">--case</span> examples/trust/cases/one-certificate.json <span class="tk-pu">\</span>
-  <span class="tk-ty">--valid-at</span> 2026-08-23T12:00:00Z <span class="tk-pu">\</span>
-  <span class="tk-ty">--known-at</span> 2026-08-23T12:00:00Z <span class="tk-pu">\</span>
-  <span class="tk-pu">&gt;</span> /tmp/fidryn-outcome.json
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn run examples/trust/bryan-revocable-trust.fr \
+  --query acting_trustee \
+  --case examples/trust/cases/one-certificate.json \
+  --valid-at 2026-08-23T12:00:00Z \
+  --known-at 2026-08-23T12:00:00Z \
+  &gt; /tmp/fidryn-outcome.json
 
-<span class="tk-kw">fidryn</span> explain /tmp/fidryn-outcome.json <span class="tk-ty">--format</span> text</code></pre></figure>
+fidryn explain /tmp/fidryn-outcome.json --format text</code></pre></figure>
 <p>Without a file, the id is hashed and the DAG is empty:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> explain 00000000000000000000000000000000 <span class="tk-ty">--format</span> json</code></pre></figure>
 <p><strong>Success.</strong> Formatted trace on stdout. Text with no nodes is
@@ -393,7 +393,7 @@ the environment variable is set. The Massachusetts adapter’s default
 endpoint is <code>https://www.sec.state.ma.us/filing</code>.</p>
 <p>There is no dedicated packet fixture in-tree; any JSON value is accepted.
 The LLC case record is a realistic dry-run body:</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> file examples/massachusetts-llc/cases/transmitted-without-official-record.json</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn file examples/massachusetts-llc/cases/transmitted-without-official-record.json</code></pre></figure>
 <p>Live shape (does not establish <code>Filed</code>):</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>FIDRYN_ALLOW_LIVE_FILING=1 fidryn file \
   examples/massachusetts-llc/cases/transmitted-without-official-record.json \

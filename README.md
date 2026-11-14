@@ -41,14 +41,14 @@ cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 
 Install the binary:
 
-```
+```sh
 cargo install --path crates/fidryn-cli
 fidryn check examples/trust/bryan-revocable-trust.fr
 ```
 
 Run a query against a case record (RFC 3339 times are required):
 
-```
+```sh
 fidryn run examples/tax/federal-tax.fr \
   --query tax_on \
   --case examples/tax/cases/ordinary-income.json \
@@ -58,7 +58,7 @@ fidryn run examples/tax/federal-tax.fr \
 
 Local mill (loopback only, default port 8751):
 
-```
+```sh
 fidryn ui --no-open
 ```
 
@@ -80,7 +80,7 @@ Then open `http://127.0.0.1:8751`. See [the mill guide](docs/mill.md).
 
 The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 
-```
+```text
 fidryn fmt PATH
 fidryn check PATH
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario]

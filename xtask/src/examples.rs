@@ -226,26 +226,10 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
 
-    const HEADER: &str = "    jurisdiction Test\n    source_snapshot \"scratch\"\n    effective_at 2026-01-01\n    recorded_at 2026-01-01T00:00:00Z\n    outside_scope { everything_else }\n";
-
-    fn module(name: &str, body: &str) -> String {
-        format!("module {name} version \"0.1.0\" {{\n{HEADER}    {body}\n}}\n")
-    }
+    use crate::test_support::{module, write};
 
     fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!(
-            "fidryn-xtask-examples-{}-{name}",
-            std::process::id()
-        ));
-        let _ = fs::remove_dir_all(&dir);
-        fs::create_dir_all(&dir).expect("create scratch dir");
-        dir
-    }
-
-    fn write(root: &Path, rel: &str, text: &str) {
-        let path = root.join(rel);
-        fs::create_dir_all(path.parent().unwrap()).unwrap();
-        fs::write(path, text).unwrap();
+        crate::test_support::scratch("fidryn-xtask-examples-", name)
     }
 
     fn ok(path: &str) -> FileStatus {

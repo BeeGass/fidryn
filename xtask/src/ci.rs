@@ -76,6 +76,9 @@ pub fn run(args: CiArgs) -> Result<()> {
     run_command(probes)?;
     crate::site::check(&crate::workspace::workspace_root())?;
     crate::examples::check(&crate::workspace::workspace_root())?;
+    let root = crate::workspace::workspace_root();
+    crate::docs_check::check_static(&root)?;
+    crate::docs_check::check_commands(&root, &crate::workspace::fidryn_binary()?)?;
 
     run_js_tests()?;
     if workspace_has_benches(&metadata) {

@@ -3,7 +3,7 @@
 The mill is a loopback-only web UI for checking, running, exploring, and
 rendering Fidryn source on this machine. Start it with the CLI:
 
-```
+```text
 fidryn ui [--port N] [--no-open]
 ```
 
@@ -25,13 +25,13 @@ cargo run -p fidryn-cli -- ui --no-open
 
 Or, after `cargo install --path crates/fidryn-cli`:
 
-```
+```sh
 fidryn ui --port 8751 --no-open
 ```
 
 On success, stderr prints:
 
-```
+```text
 fidryn mill on http://127.0.0.1:8751
 127.0.0.1 only. live filing is disabled.
 ```

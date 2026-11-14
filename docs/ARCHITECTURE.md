@@ -218,7 +218,7 @@ Conservative precedence (first match wins):
 
 ### fidryn-cli
 
-```
+```text
 fidryn fmt PATH
 fidryn check PATH
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME

@@ -88,7 +88,7 @@ modified.
 
 **Example**
 
-```
+```sh
 fidryn fmt examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -111,7 +111,7 @@ authentication as described above.
 
 **Example**
 
-```
+```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -121,7 +121,7 @@ fidryn check examples/trust/bryan-revocable-trust.fr
 `CODE Title: message` (for example
 `E310 PropAsGuard: ...`). A module that cannot check:
 
-```
+```sh exit=1
 fidryn check tests/diagnostics/e310-prop-as-guard.fr
 ```
 
@@ -157,7 +157,7 @@ when the case has none).
 
 **Example**
 
-```
+```sh
 fidryn run examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -167,7 +167,7 @@ fidryn run examples/trust/bryan-revocable-trust.fr \
 
 Override a fact without editing the case file:
 
-```
+```sh
 fidryn run examples/prenup/ava-noah.fr \
   --query provision_result \
   --case examples/prenup/cases/divorce-record.json \
@@ -223,7 +223,7 @@ an outcome document on stdout.
 **Example** (case already declares `admissibleCompletions`; `--bounds`
 merges another copy of the same family from a second record in the repo):
 
-```
+```sh
 fidryn explore examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -267,7 +267,7 @@ Unknown `--format` values are treated as `text`.
 
 **Example**
 
-```
+```text
 fidryn run examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -280,7 +280,7 @@ fidryn explain /tmp/fidryn-outcome.json --format text
 
 Without a file, the id is hashed and the DAG is empty:
 
-```
+```sh
 fidryn explain 00000000000000000000000000000000 --format json
 ```
 
@@ -303,7 +303,7 @@ properties. The name must appear in the module’s `verify` blocks.
 
 **Example**
 
-```
+```sh exit=1
 fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinuity
 ```
 
@@ -344,7 +344,7 @@ compiled; any other path is read as JSON (an evaluation report, mill
 
 **Example**
 
-```
+```sh
 fidryn diff \
   examples/trust/bryan-revocable-trust.fr \
   examples/california/final-pay/final-pay.fr \
@@ -387,7 +387,7 @@ closed. A directory named `certified` does not approve legal content;
 
 **Example**
 
-```
+```sh
 fidryn render examples/trust/bryan-revocable-trust.fr \
   --template templates/certified/instrument-outline.txt
 ```
@@ -422,7 +422,7 @@ endpoint is `https://www.sec.state.ma.us/filing`.
 There is no dedicated packet fixture in-tree; any JSON value is accepted.
 The LLC case record is a realistic dry-run body:
 
-```
+```text
 fidryn file examples/massachusetts-llc/cases/transmitted-without-official-record.json
 ```
 
@@ -464,7 +464,7 @@ is omitted.
 
 **Example**
 
-```
+```sh
 fidryn ui --port 8751 --no-open
 ```
 
