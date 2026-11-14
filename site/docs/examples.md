@@ -602,7 +602,7 @@ official editions.
 **Not the United States Code.** The United States Code is a codification
 of statutes, not the whole of federal law. Regulations, case law,
 internal guidance, and uncodified provisions sit elsewhere. This corpus
-encodes bounded high-impact slices. `US.Federal.Code.Catalog` exists so
+encodes bounded slices of the law. `US.Federal.Code.Catalog` exists so
 the interpreter cannot honestly claim completeness.
 
 `run` never chooses a completion. Open-textured queries must be allowed

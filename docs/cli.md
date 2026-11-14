@@ -322,7 +322,12 @@ fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinui
 not obtain a covering proof is not success: the CLI prints the verdict to
 stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
 fragment includes structured Boolean/arithmetic assertions and finite quantified
-formulas; every assertion in the named block must hold. Unsupported formulas
+formulas; every assertion the parser reads in the named block must hold.
+An assertion that ends in an integer literal swallows the `assert` line
+after it, so a `proved` verdict for a block with such an assertion is not
+reliable
+([implementation status](implementation-status.md#assertions-that-are-swallowed)).
+Unsupported formulas
 and resource exhaustion remain `unknown`. Passing a query name such as
 `acting_trustee` is invalid.
 

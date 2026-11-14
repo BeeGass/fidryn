@@ -230,7 +230,7 @@ later `run` a query against a case under
 [`examples/trust/cases/`](../examples/trust/cases/).
 
 The [examples](examples.md) catalog has more fixtures. They encode
-bounded high-impact slices. They do not contain the entire United
+bounded slices of the law. They do not contain the entire United
 States Code.
 
 ## Next reading

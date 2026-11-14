@@ -596,8 +596,8 @@ the swallowed line. So `assert 1 + 1 == 3` followed by `assert true` is
 `assert 1 + 1 == 2` followed by `assert 2 == 2`, the module is rejected
 with `E100`. Ending the assertion with `;`, or writing the literal in
 parentheses, as in `assert 1 + 1 == (2)`, avoids this.
-[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations) describes
-the defect.
+[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)
+describes the defect.
 
 ## What the language will not do
 

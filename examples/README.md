@@ -11,8 +11,8 @@ lists what it leaves `outside_scope`.
 Fidryn cannot honestly claim to contain "all of federal law." The United
 States Code is a codification of statutes, not the whole of federal law
 (regulations, case law, internal guidance, and uncodified provisions sit
-elsewhere). This corpus therefore encodes **bounded, high-impact
-slices** and keeps a catalog of the rest as explicit outside scope.
+elsewhere). This corpus therefore encodes **bounded slices** of the law
+and keeps a catalog of the rest as explicit outside scope.
 
 ## Who each slice is for
 

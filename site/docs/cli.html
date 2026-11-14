@@ -329,7 +329,12 @@ properties. The name must appear in the module’s <code>verify</code> blocks.</
 not obtain a covering proof is not success: the CLI prints the verdict to
 stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
 fragment includes structured Boolean/arithmetic assertions and finite quantified
-formulas; every assertion in the named block must hold. Unsupported formulas
+formulas; every assertion the parser reads in the named block must hold.
+An assertion that ends in an integer literal swallows the <code>assert</code> line
+after it, so a <code>proved</code> verdict for a block with such an assertion is not
+reliable
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed">implementation status</a>).
+Unsupported formulas
 and resource exhaustion remain <code>unknown</code>. Passing a query name such as
 <code>acting_trustee</code> is invalid.</p>
 <p><strong>Success.</strong> Stdout, for example

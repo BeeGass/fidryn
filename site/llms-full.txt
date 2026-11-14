@@ -327,7 +327,7 @@ later `run` a query against a case under
 [`examples/trust/cases/`](https://github.com/BeeGass/fidryn/tree/main/examples/trust/cases/).
 
 The [examples](https://fidryn.onlygass.dev/docs/examples.md) catalog has more fixtures. They encode
-bounded high-impact slices. They do not contain the entire United
+bounded slices of the law. They do not contain the entire United
 States Code.
 
 ## Next reading
@@ -945,8 +945,8 @@ the swallowed line. So `assert 1 + 1 == 3` followed by `assert true` is
 `assert 1 + 1 == 2` followed by `assert 2 == 2`, the module is rejected
 with `E100`. Ending the assertion with `;`, or writing the literal in
 parentheses, as in `assert 1 + 1 == (2)`, avoids this.
-[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations) describes
-the defect.
+[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)
+describes the defect.
 
 ## What the language will not do
 
@@ -1680,7 +1680,12 @@ fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinui
 not obtain a covering proof is not success: the CLI prints the verdict to
 stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
 fragment includes structured Boolean/arithmetic assertions and finite quantified
-formulas; every assertion in the named block must hold. Unsupported formulas
+formulas; every assertion the parser reads in the named block must hold.
+An assertion that ends in an integer literal swallows the `assert` line
+after it, so a `proved` verdict for a block with such an assertion is not
+reliable
+([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)).
+Unsupported formulas
 and resource exhaustion remain `unknown`. Passing a query name such as
 `acting_trustee` is invalid.
 
@@ -3169,7 +3174,7 @@ official editions.
 **Not the United States Code.** The United States Code is a codification
 of statutes, not the whole of federal law. Regulations, case law,
 internal guidance, and uncodified provisions sit elsewhere. This corpus
-encodes bounded high-impact slices. `US.Federal.Code.Catalog` exists so
+encodes bounded slices of the law. `US.Federal.Code.Catalog` exists so
 the interpreter cannot honestly claim completeness.
 
 `run` never chooses a completion. Open-textured queries must be allowed
