@@ -654,14 +654,22 @@ An assertion that cannot be decided leaves the property `unknown` unless
 another assertion is false. A block with no assertion is `unknown` too,
 whatever its comments say: a comment is never read as an assertion.
 
-The bounds come from a `bounds` field and from nowhere else. The field is
-read for the number that follows each of the words `persons`, `events` and
-`time_points`, directly or after a `:`, and a number it does not give in
-that way is zero. A comment or another field that holds the word `bounds`
-does not set the bounds, and a block with no `bounds` field has zero of
-each: the test `the_bounds_come_only_from_a_bounds_field` in
-`tests/integration/verify_blocks.rs` pins that. When a block has several
-`bounds` fields, the last one counts.
+The bounds come from a `bounds` field and from nowhere else. Each of the
+three numbers is read at the first place where its word, `persons`,
+`events` or `time_points`, stands as a token in the field. When the next
+token is an integer, or a `:` followed by an integer, that integer is the
+number. Otherwise the number is zero, as it is when the word is not in the
+field. So `bounds persons x persons 2` gives zero persons, and so do
+`persons: 2.5`, which is not an integer, and an integer that does not fit
+in 32 bits.
+
+No comment sets a number, wherever it stands: inside the field, after it
+on its line, or on the lines below it. The contents of a string are not
+read either. Another field that holds the word `bounds` does not set the
+bounds, and a block with no `bounds` field has zero of each. When a block
+has several `bounds` fields, the last one counts. The test
+`the_bounds_come_only_from_a_bounds_field` in
+`tests/integration/verify_blocks.rs` pins each of these rules.
 
 A field ends where its statement ends; see
 [Where a statement ends](#where-a-statement-ends). An `assert`, `for_all`,

@@ -22,7 +22,7 @@ with it.
 
 | Kind | Body parsed into structure | Reaches the intermediate representation | Executed | Evidence |
 | --- | --- | --- | --- | --- |
-| `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1644`, `:2030` |
+| `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1644`, `:2048` |
 | `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
 | `judgment` | Yes. An unrecognized clause is kept as text | Yes | Concurrence policies only. One with an unrecognized clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
 | `observation` | Yes. An unrecognized clause is kept as text | Yes | Yes. An unrecognized clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
@@ -58,7 +58,7 @@ Where a verify field ends. The tests named here are in
 - A field ends where its statement ends. An `assert`, `for_all`, `exists`
   or `bounds` field, and a field that is not read, ends earlier where the
   next field begins: it is read or stepped over as if a `;` stood there
-  (`crates/fidryn-syntax/src/parser.rs:1952`, `:1973`; parser test
+  (`crates/fidryn-syntax/src/parser.rs:1970`, `:1991`; parser test
   `a_verify_field_is_read_as_if_a_semicolon_stood_where_the_next_field_begins`).
 - The word `assert` begins a field wherever it stands
   (`two_assertions_on_one_line_are_two_assertions`,
@@ -124,13 +124,25 @@ Where a verify field ends. The tests named here are in
   formula, so a comment is never read as an assertion
   (`crates/fidryn-hir/src/lib.rs:1005`; test
   `a_block_with_no_assertion_is_unknown_whatever_its_comments_say`).
-- The bounds come from a `bounds` field and from nowhere else. The field
-  is read for the number that follows each of the words `persons`,
-  `events` and `time_points`, directly or after a `:`. A comment or
-  another field that holds the word `bounds` does not set the bounds, and
-  a block with no `bounds` field has zero of each
-  (`crates/fidryn-hir/src/lib.rs:1045`; test
-  `the_bounds_come_only_from_a_bounds_field`).
+- The bounds come from a `bounds` field and from nowhere else. The parser
+  records the field as the text of its tokens and leaves out every
+  comment, wherever it stands: inside the field, after it on its line, or
+  on the lines below it (`crates/fidryn-syntax/src/parser.rs:1867`,
+  `:1934`; parser test
+  `a_bounds_field_is_recorded_as_the_text_of_its_tokens`). The numbers are
+  read from those tokens, so no comment sets a number and the contents of
+  a string are not read (`crates/fidryn-hir/src/lib.rs:1045`). Each number
+  is read at the first place where its word, `persons`, `events` or
+  `time_points`, stands as a token. When the next token is an integer, or
+  a `:` followed by an integer, that integer is the number. Otherwise the
+  number is zero, as it is when the word is not in the field and when the
+  integer does not fit in 32 bits (`crates/fidryn-hir/src/lib.rs:1073` and
+  the unit test
+  `the_bounds_of_a_verify_block_come_only_from_a_bounds_field` in that
+  file). Another field that holds the word `bounds` does not set the
+  bounds, and a block with no `bounds` field has zero of each. The test
+  `the_bounds_come_only_from_a_bounds_field` has a row for each of these
+  rules.
 - Two limits remain. What stands inside the parentheses, brackets or
   braces of a `bounds` field, or of a field that is not read, belongs to
   that field and is not read as an assertion (test

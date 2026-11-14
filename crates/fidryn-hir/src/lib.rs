@@ -5,7 +5,7 @@ mod body;
 use fidryn_core::ir::Guard;
 use fidryn_core::value::{PropTerm, Term};
 use fidryn_core::{Diagnostic, DiagnosticCode, SourceManifest};
-use fidryn_syntax::Parse;
+use fidryn_syntax::{Parse, TokenKind, lex};
 use std::collections::BTreeMap;
 
 pub use body::{
@@ -1040,15 +1040,49 @@ fn verify_formula(d: &fidryn_syntax::ast::Decl) -> String {
 }
 
 /// The bounds of a verify block: the three numbers in the `bounds` field the
-/// parser recorded. The text of the block is not searched for the word
-/// `bounds`, so a comment or another field never sets them.
+/// parser recorded. That record is the text of the field's tokens, and it is
+/// read token by token, so no comment and no string sets a number.
 fn verify_bounds(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificationBounds> {
     let text = d.fields.get("bounds")?;
+    let tokens: Vec<(TokenKind, &str)> = lex(text)
+        .iter()
+        .filter(|token| {
+            !matches!(
+                token.kind,
+                TokenKind::Whitespace
+                    | TokenKind::Comment
+                    | TokenKind::DocComment
+                    | TokenKind::Newline
+                    | TokenKind::Eof
+            )
+        })
+        .map(|token| (token.kind, &text[token.start as usize..token.end as usize]))
+        .collect();
     Some(HirVerificationBounds {
-        persons: labeled_u32(text, "persons").unwrap_or(0),
-        events: labeled_u32(text, "events").unwrap_or(0),
-        time_points: labeled_u32(text, "time_points").unwrap_or(0),
+        persons: bound_in(&tokens, "persons"),
+        events: bound_in(&tokens, "events"),
+        time_points: bound_in(&tokens, "time_points"),
     })
+}
+
+/// The number the tokens of a `bounds` field give for `word`. The first
+/// token that is the word decides: the number is the integer token that
+/// follows it, directly or after a `:`. It is zero when no integer token
+/// follows there, when the integer does not fit in 32 bits and when the word
+/// is not among the tokens.
+fn bound_in(tokens: &[(TokenKind, &str)], word: &str) -> u32 {
+    let mut after = tokens
+        .iter()
+        .skip_while(|(kind, text)| *kind != TokenKind::Ident || *text != word)
+        .skip(1);
+    let number = match after.next() {
+        Some((TokenKind::Colon, _)) => after.next(),
+        token => token,
+    };
+    match number {
+        Some((TokenKind::Int, digits)) => digits.parse().unwrap_or(0),
+        _ => 0,
+    }
 }
 
 fn extract_assert_clause(src: &str) -> Option<String> {
@@ -1080,16 +1114,6 @@ fn take_clause_to_end(s: &str) -> String {
         }
     }
     s.trim().trim_end_matches(';').trim().to_owned()
-}
-
-fn labeled_u32(src: &str, label: &str) -> Option<u32> {
-    let i = find_ident(src, label)?;
-    let rest = src[i + label.len()..]
-        .trim_start()
-        .trim_start_matches(':')
-        .trim_start();
-    let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
-    digits.parse().ok()
 }
 
 fn extract_quantifiers(src: &str) -> Vec<HirQuantifier> {
@@ -1969,6 +1993,74 @@ module Examples.Bounds version "0.1.0" {
         bounds { events: 1 }
         assert true
     }
+    verify CommentBelow {
+        bounds { events: 1 }
+        // bounds { persons: 2 }
+        assert true
+    }
+    verify CommentBelowTheLastField {
+        assert true
+        bounds { events: 1 }
+        // note: persons 2 is enough
+    }
+    verify CommentOnTheLine {
+        bounds events 1 // persons: 2
+        assert true
+    }
+    verify CommentOnTheNextLine {
+        bounds events 1
+        // persons: 2
+        assert true
+    }
+    verify CommentBelowABlankLine {
+        bounds { events: 1 }
+
+        // persons: 2
+
+        assert true
+    }
+    verify CommentAboveAnotherField {
+        bounds { events: 1 }
+        // persons: 2
+        assuming fair
+        assert true
+    }
+    verify CommentInsideTheBraces {
+        bounds {
+            // persons: 9
+            persons: 2
+        }
+        assert true
+    }
+    verify CommentAfterAComma {
+        bounds { events: 1, // persons: 5
+            persons: 2 }
+        assert true
+    }
+    verify InAString {
+        bounds { label: "persons: 2" }
+        assert true
+    }
+    verify Decimal {
+        bounds { persons: 2.5 }
+        assert true
+    }
+    verify SecondOccurrence {
+        bounds persons x persons 2
+        assert true
+    }
+    verify TooLarge {
+        bounds { persons: 99999999999 }
+        assert true
+    }
+    verify OneColon {
+        bounds persons : 2
+        assert true
+    }
+    verify TwoColons {
+        bounds persons :: 2
+        assert true
+    }
 }
 "#;
         let parsed = parse_file(src);
@@ -1997,6 +2089,27 @@ module Examples.Bounds version "0.1.0" {
                 // The last `bounds` field counts, and a number it does not
                 // give is zero.
                 ("TwoFields", Some((0, 1, 0))),
+                // A comment sets nothing: not below the field, not on its
+                // line and not inside it.
+                ("CommentBelow", Some((0, 1, 0))),
+                ("CommentBelowTheLastField", Some((0, 1, 0))),
+                ("CommentOnTheLine", Some((0, 1, 0))),
+                ("CommentOnTheNextLine", Some((0, 1, 0))),
+                ("CommentBelowABlankLine", Some((0, 1, 0))),
+                ("CommentAboveAnotherField", Some((0, 1, 0))),
+                ("CommentInsideTheBraces", Some((2, 0, 0))),
+                ("CommentAfterAComma", Some((2, 1, 0))),
+                // The contents of a string are not read, and a number is an
+                // integer token.
+                ("InAString", Some((0, 0, 0))),
+                ("Decimal", Some((0, 0, 0))),
+                // The first place where a word stands decides, and an
+                // integer that does not fit in 32 bits gives zero.
+                ("SecondOccurrence", Some((0, 0, 0))),
+                ("TooLarge", Some((0, 0, 0))),
+                // The integer follows its word directly or after one `:`.
+                ("OneColon", Some((2, 0, 0))),
+                ("TwoColons", Some((0, 0, 0))),
             ]
         );
     }

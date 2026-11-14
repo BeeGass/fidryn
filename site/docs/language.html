@@ -576,14 +576,21 @@ whether or not a <code>verify</code> block repeats it.</p>
 <p>An assertion that cannot be decided leaves the property <code>unknown</code> unless
 another assertion is false. A block with no assertion is <code>unknown</code> too,
 whatever its comments say: a comment is never read as an assertion.</p>
-<p>The bounds come from a <code>bounds</code> field and from nowhere else. The field is
-read for the number that follows each of the words <code>persons</code>, <code>events</code> and
-<code>time_points</code>, directly or after a <code>:</code>, and a number it does not give in
-that way is zero. A comment or another field that holds the word <code>bounds</code>
-does not set the bounds, and a block with no <code>bounds</code> field has zero of
-each: the test <code>the_bounds_come_only_from_a_bounds_field</code> in
-<code>tests/integration/verify_blocks.rs</code> pins that. When a block has several
-<code>bounds</code> fields, the last one counts.</p>
+<p>The bounds come from a <code>bounds</code> field and from nowhere else. Each of the
+three numbers is read at the first place where its word, <code>persons</code>,
+<code>events</code> or <code>time_points</code>, stands as a token in the field. When the next
+token is an integer, or a <code>:</code> followed by an integer, that integer is the
+number. Otherwise the number is zero, as it is when the word is not in the
+field. So <code>bounds persons x persons 2</code> gives zero persons, and so do
+<code>persons: 2.5</code>, which is not an integer, and an integer that does not fit
+in 32 bits.</p>
+<p>No comment sets a number, wherever it stands: inside the field, after it
+on its line, or on the lines below it. The contents of a string are not
+read either. Another field that holds the word <code>bounds</code> does not set the
+bounds, and a block with no <code>bounds</code> field has zero of each. When a block
+has several <code>bounds</code> fields, the last one counts. The test
+<code>the_bounds_come_only_from_a_bounds_field</code> in
+<code>tests/integration/verify_blocks.rs</code> pins each of these rules.</p>
 <p>A field ends where its statement ends; see
 <a href="#where-a-statement-ends">Where a statement ends</a>. An <code>assert</code>, <code>for_all</code>,
 <code>exists</code> or <code>bounds</code> field, and a field that is not read, ends earlier

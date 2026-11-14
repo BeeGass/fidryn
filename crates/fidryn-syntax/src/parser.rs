@@ -1865,22 +1865,18 @@ impl<'a> Parser<'a> {
                         }
                     }
                     Some(field @ VerifyField::Bounds) => {
+                        let first = self.idx;
                         if self.peek_nth(1).kind == TokenKind::LBrace {
                             self.bump();
                             let _ = self.parse_braced_expr();
                         } else {
                             self.until_next_verify_field(field, Self::skip_balanced_until_end);
                         }
+                        // The field is recorded as the text of its tokens.
+                        // The source between them is left out: it holds the
+                        // comments inside the field, beside it and below it.
+                        fields.insert("bounds".to_owned(), self.token_text_from(first));
                         self.eat_semi();
-                        let text = self
-                            .src_slice(clause_start, self.last_end(clause_start))
-                            .trim()
-                            .trim_end_matches(';')
-                            .trim()
-                            .to_owned();
-                        if !text.is_empty() {
-                            fields.insert("bounds".to_owned(), text);
-                        }
                     }
                     Some(field @ VerifyField::Quantifier) => {
                         if let Some(e) = self.until_next_verify_field(field, Self::parse_expr) {
@@ -1929,6 +1925,28 @@ impl<'a> Parser<'a> {
             callee: Box::new(Expr::Ident("$unsupported_assertion".into())),
             args: vec![Expr::String(self.src_slice(start, self.last_end(start)))],
         }
+    }
+
+    /// The text of the tokens from the one at index `first` up to the cursor,
+    /// with one space between them and without a `;` that ends them. White
+    /// space, comments and line breaks are left out, so the text holds no
+    /// comment, wherever one stands among those tokens or after them.
+    fn token_text_from(&self, first: usize) -> String {
+        let mut tokens: Vec<&Token> = self
+            .tokens
+            .get(first..self.idx)
+            .unwrap_or_default()
+            .iter()
+            .filter(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline)
+            .collect();
+        if tokens
+            .last()
+            .is_some_and(|token| token.kind == TokenKind::Semicolon)
+        {
+            tokens.pop();
+        }
+        let texts: Vec<&str> = tokens.iter().map(|token| self.text(**token)).collect();
+        texts.join(" ")
     }
 
     /// The verify field the next token begins, when that token is one of the
@@ -4877,6 +4895,75 @@ module M version "0.1.0" {
         );
         // Reading each field with the rest of the block hidden loses no token.
         assert_eq!(parsed.syntax().text(), parsed.source.as_str());
+    }
+
+    #[test]
+    fn a_bounds_field_is_recorded_as_the_text_of_its_tokens() {
+        // The lines of a verify block, and what the parser records for its
+        // `bounds` field: the field's tokens with one space between them.
+        let rows = [
+            // A comment inside the field is left out,
+            (
+                "bounds {\n// persons: 9\npersons: 2\n}\nassert true",
+                "bounds { persons : 2 }",
+            ),
+            (
+                "bounds { events: 1, // persons: 5\npersons: 2 }\nassert true",
+                "bounds { events : 1 , persons : 2 }",
+            ),
+            (
+                "bounds\n// persons: 7\n{ persons: 3 }\nassert true",
+                "bounds { persons : 3 }",
+            ),
+            // and so is one beside it,
+            (
+                "bounds events 1 // persons: 2\nassert true",
+                "bounds events 1",
+            ),
+            (
+                "bounds { events: 1 }; // persons: 2\nassert true",
+                "bounds { events : 1 }",
+            ),
+            // and one below it, whatever stands between or after.
+            (
+                "bounds events 1\n// persons: 2\nassert true",
+                "bounds events 1",
+            ),
+            (
+                "bounds { events: 1 }\n\n// persons: 2\n\nassert true",
+                "bounds { events : 1 }",
+            ),
+            (
+                "bounds { events: 1 }\n// persons: 2\nassuming fair",
+                "bounds { events : 1 }",
+            ),
+            (
+                "assert true\nbounds { events: 1 }\n/// persons: 2",
+                "bounds { events : 1 }",
+            ),
+            // A string is recorded whole, and the `;` that ends the field is
+            // left out.
+            (
+                "bounds { label: \"persons: 2\" }\nassert true",
+                "bounds { label : \"persons: 2\" }",
+            ),
+            (
+                "bounds persons 2 events 1;\nassert true",
+                "bounds persons 2 events 1",
+            ),
+        ];
+        let recorded: Vec<Option<String>> = rows
+            .iter()
+            .map(|(lines, _)| {
+                let parsed = parse_body(&format!("verify V {{\n{lines}\n}}"));
+                first_decl(&parsed).fields.get("bounds").cloned()
+            })
+            .collect();
+        let expected: Vec<Option<String>> = rows
+            .iter()
+            .map(|(_, tokens)| Some((*tokens).to_owned()))
+            .collect();
+        assert_eq!(recorded, expected);
     }
 
     #[test]

@@ -4,9 +4,10 @@
 //! a verify block": which words begin a field, where a field ends, and what
 //! becomes of a line the block does not recognize.
 
-use fidryn_cli::compile_source;
+use fidryn_cli::{compile_module, compile_source};
 use fidryn_core::{CoreModule, CoreVerify, DiagnosticCode, SourceManifest, Term};
 use fidryn_verify::{PropertyVerdict, verify_property};
+use std::path::PathBuf;
 
 const PROPERTY: &str = "Checked";
 const UNDECIDED_LINE: &str = "unsupported verification operation `$unsupported_assertion`";
@@ -432,32 +433,102 @@ fn a_block_with_no_assertion_is_unknown_whatever_its_comments_say() {
 
 #[test]
 fn the_bounds_come_only_from_a_bounds_field() {
-    // With no `bounds` field there is no synthetic person to quantify over.
-    let module = block(&["assert for_all p in People: true"]);
-    assert_eq!(bounds(&module), (0, 0, 0));
-    assert_eq!(unknown(&module), EMPTY_BOUNDS);
-    // A comment does not set the bounds, and neither does another field.
-    let module = block(&[
-        "// bounds { persons: 2 }",
-        "assert for_all p in People: true",
-    ]);
-    assert_eq!(bounds(&module), (0, 0, 0));
-    assert_eq!(unknown(&module), EMPTY_BOUNDS);
-    let module = block(&[
-        "assuming bounds persons 3",
-        "assert exists p in People: true",
-    ]);
-    assert_eq!(bounds(&module), (0, 0, 0));
-    assert_eq!(unknown(&module), EMPTY_BOUNDS);
-    // A `bounds` field sets them, in each of its forms.
-    for (mut lines, expected) in [
-        (vec!["bounds { persons: 2 }"], (2, 0, 0)),
-        (vec!["bounds persons 2 events 1 time_points 1"], (2, 1, 1)),
-        (vec!["bounds", "{ persons: 3 }"], (3, 0, 0)),
-    ] {
-        lines.push("assert for_all p in People: true");
+    const FOR_ALL: &str = "assert for_all p in People: true";
+    const EXISTS: &str = "assert exists p in People: true";
+    // The lines of a block, and its numbers of persons, events and time
+    // points. Each block quantifies over the persons, so it is proved when
+    // it has one and `unknown` when it has none.
+    let blocks = [
+        // With no `bounds` field there is no synthetic person.
+        (vec![FOR_ALL], (0, 0, 0)),
+        // A comment does not set the bounds, and neither does another field.
+        (vec!["// bounds { persons: 2 }", FOR_ALL], (0, 0, 0)),
+        (vec!["assuming bounds persons 3", EXISTS], (0, 0, 0)),
+        // A `bounds` field sets them, in each of its forms.
+        (vec!["bounds { persons: 2 }", FOR_ALL], (2, 0, 0)),
+        (
+            vec!["bounds persons 2 events 1 time_points 1", FOR_ALL],
+            (2, 1, 1),
+        ),
+        (vec!["bounds", "{ persons: 3 }", FOR_ALL], (3, 0, 0)),
+        // The last of several `bounds` fields counts.
+        (
+            vec!["bounds { persons: 2 }", "bounds { events: 1 }", EXISTS],
+            (0, 1, 0),
+        ),
+        // A comment below a `bounds` field sets nothing,
+        (
+            vec!["bounds { events: 1 }", "// bounds { persons: 2 }", FOR_ALL],
+            (0, 1, 0),
+        ),
+        (
+            vec![
+                EXISTS,
+                "bounds { events: 1 }",
+                "// note: persons 2 is enough",
+            ],
+            (0, 1, 0),
+        ),
+        (vec!["bounds events 1", "// persons: 2", EXISTS], (0, 1, 0)),
+        (
+            vec!["bounds { events: 1 }", "", "// persons: 2", "", EXISTS],
+            (0, 1, 0),
+        ),
+        (
+            vec![
+                "bounds { events: 1 }",
+                "// persons: 2",
+                "assuming fair",
+                EXISTS,
+            ],
+            (0, 1, 0),
+        ),
+        // nor does one on its line or inside it.
+        (vec!["bounds events 1 // persons: 2", EXISTS], (0, 1, 0)),
+        (
+            vec!["bounds {", "// persons: 9", "persons: 2", "}", EXISTS],
+            (2, 0, 0),
+        ),
+        (
+            vec!["bounds { events: 1, // persons: 5", "persons: 2 }", EXISTS],
+            (2, 1, 0),
+        ),
+        // The contents of a string are not read, and a number is an integer
+        // token.
+        (vec!["bounds { label: \"persons: 2\" }", EXISTS], (0, 0, 0)),
+        (vec!["bounds { persons: 2.5 }", EXISTS], (0, 0, 0)),
+        // The first place where a word stands decides, and an integer that
+        // does not fit in 32 bits gives zero.
+        (vec!["bounds persons x persons 2", EXISTS], (0, 0, 0)),
+        (vec!["bounds { persons: 99999999999 }", EXISTS], (0, 0, 0)),
+        // The integer follows its word directly or after one `:`.
+        (vec!["bounds persons : 2", EXISTS], (2, 0, 0)),
+        (vec!["bounds persons :: 2", EXISTS], (0, 0, 0)),
+    ];
+    let mut failures = Vec::new();
+    for (lines, expected) in blocks {
         let module = block(&lines);
-        assert_eq!(bounds(&module), expected, "{lines:?}");
-        assert_proved(&module);
+        let verdict = verify_property(&module, PROPERTY);
+        let decided = match &verdict {
+            PropertyVerdict::Proved { .. } => expected.0 > 0,
+            PropertyVerdict::Unknown { reason, .. } => expected.0 == 0 && reason == EMPTY_BOUNDS,
+            _ => false,
+        };
+        if bounds(&module) != expected || !decided {
+            failures.push(format!("{lines:?}: expected {expected:?}, read {verdict}"));
+        }
     }
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn the_bounds_field_of_the_trust_example_gives_its_three_numbers() {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../examples/trust/bryan-revocable-trust.fr");
+    let (module, _) = compile_module(&path).expect("the trust example compiles");
+    let printed = verify_property(&module, "TrusteeContinuity").to_string();
+    assert!(
+        printed.ends_with("(persons=8, events=40, time_points=80)"),
+        "{printed}"
+    );
 }
