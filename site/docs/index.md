@@ -52,10 +52,6 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
-| [Obligations](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) | Review obligations; green tests are regressions |
-| [Integration contract](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) | How existing machinery must be wired |
-| [Workstream contract](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) | Covering, require, tax, trust profiles |
-| [Review-fix contract](https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md) | Historical pass-3 repair brief |
-| [Full implementation](https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md) | Older deferred-work list; status is the matrix |
+| [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Review and repair records kept for history |
 
 Mill HTTP routes live in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in Architecture.

@@ -140,9 +140,9 @@ tutorials.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
 - [implementation-status.md](implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+- [OBLIGATIONS.md](internal/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
+- [WORKSTREAM-CONTRACT.md](internal/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
+- [INTEGRATION-CONTRACT.md](internal/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
 
 Mill HTTP routes are documented in [mill.md](mill.md), not in
 ARCHITECTURE.md.

@@ -41,10 +41,6 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 | [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
 | [Implementation status](implementation-status.md) | Evidence-backed capability matrix |
-| [Obligations](OBLIGATIONS.md) | Review obligations; green tests are regressions |
-| [Integration contract](INTEGRATION-CONTRACT.md) | How existing machinery must be wired |
-| [Workstream contract](WORKSTREAM-CONTRACT.md) | Covering, require, tax, trust profiles |
-| [Review-fix contract](REVIEW-FIX-CONTRACT.md) | Historical pass-3 repair brief |
-| [Full implementation](FULL-IMPLEMENTATION.md) | Older deferred-work list; status is the matrix |
+| [Internal ledgers](internal/README.md) | Review and repair records kept for history |
 
 Mill HTTP routes live in [mill.md](mill.md), not in Architecture.

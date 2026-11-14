@@ -5,7 +5,7 @@ or `prelude/` does not mean the interpreter implements the feature.
 
 A feature counts as implemented only when syntax, name resolution, checking,
 evaluation, uncertainty, provenance, and tests agree
-([`REVIEW-FIX-CONTRACT.md`](REVIEW-FIX-CONTRACT.md)).
+([`REVIEW-FIX-CONTRACT.md`](internal/REVIEW-FIX-CONTRACT.md)).
 
 **Determinate** only when every still-admissible resolution of the open
 issues agrees, or a competent authority has already made a determination
@@ -16,8 +16,8 @@ completion. Uncertified open issues are `Suspended`, never a silent
 This table is the **evidence-backed status after the previous review-fix
 pass**. It is not a snapshot of the pre-pass tree, which still
 name-dispatched many queries. A later review (2026-09-17) is **open**;
-see [`OBLIGATIONS.md`](OBLIGATIONS.md) and
-[`WORKSTREAM-CONTRACT.md`](WORKSTREAM-CONTRACT.md). The 28 earlier
+see [`OBLIGATIONS.md`](internal/OBLIGATIONS.md) and
+[`WORKSTREAM-CONTRACT.md`](internal/WORKSTREAM-CONTRACT.md). The 28 earlier
 review-kit regressions remain. The 16 tests in
 `adversarial_regressions.rs` pass as regressions for section-1 defects;
 they are not closure of the review. Green tests are regressions.
@@ -58,7 +58,7 @@ Cells are `Yes` / `Partial` / `No`.
 
 Language ambition is unchanged. `No` and `Partial` are evidence, not
 deferrals of the requirement. See
-[`FULL-IMPLEMENTATION.md`](FULL-IMPLEMENTATION.md) and
+[`FULL-IMPLEMENTATION.md`](internal/FULL-IMPLEMENTATION.md) and
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Matrix

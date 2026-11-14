@@ -151,9 +151,9 @@ tutorials.
 
 - [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
 - [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
+- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
+- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
 
 Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
 ARCHITECTURE.md.

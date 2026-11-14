@@ -146,7 +146,7 @@ See the crate itself. The important types are `CoreModule`, `Outcome<T>`,
 covering proof. Ignoring open issues requires a covering certificate
 (`verified_covering` + complete `CoverageWitness`). A hash of the open
 issues is not covering. `CompletionProofId::of(b"P11")` is never a
-certificate. See [`OBLIGATIONS.md`](OBLIGATIONS.md).
+certificate. See [`OBLIGATIONS.md`](internal/OBLIGATIONS.md).
 
 ### fidryn-hir
 

@@ -3,7 +3,7 @@
 Do not reimplement fabricated-witness, source-driven due, nested seq, or
 CLI `check_path` byte-auth. Those crate tests remain the evidence. This
 file lists the six finite public-API obligations and the named tests in
-[`tests/integration/integration_suite.rs`](../tests/integration/integration_suite.rs).
+[`tests/integration/integration_suite.rs`](../../tests/integration/integration_suite.rs).
 
 Command: `cargo test -p fidryn-integration-tests --offline integration_suite`.
 
@@ -20,7 +20,7 @@ not language closure. Remaining after this gate: independent kernel
 without `evaluate`, packages, Salsa, SMT, surface transaction syntax,
 mill must not gain filesystem from paste. The next gate beyond this
 six-obligation suite is
-[`tests/integration/boundary_review_20260917.rs`](../tests/integration/boundary_review_20260917.rs)
+[`tests/integration/boundary_review_20260917.rs`](../../tests/integration/boundary_review_20260917.rs)
 (2026-09-17 11:35 boundary review).
 
 ## 1. Verification strength

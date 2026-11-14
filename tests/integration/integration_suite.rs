@@ -2,7 +2,7 @@
 //!
 //! Does not reimplement fabricated-witness, source-driven due, nested seq,
 //! or CLI `check_path` byte-auth. Those crate tests remain the evidence.
-//! This file closes the public-API boundaries in `docs/INTEGRATION-SUITE.md`.
+//! This file closes the public-API boundaries in `docs/internal/INTEGRATION-SUITE.md`.
 //!
 //! Six obligations:
 //! 1. Verification strength (Structural vs FiniteReplay; empty branches)

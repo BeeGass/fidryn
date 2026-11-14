@@ -119,10 +119,14 @@ pub const IMPLEMENTER_DOCS: &[(&str, &str, &str)] = &[
         "implementation-status.md",
         "Evidence-backed capability matrix",
     ),
-    ("Obligations", "OBLIGATIONS.md", "Review obligations"),
+    (
+        "Obligations",
+        "internal/OBLIGATIONS.md",
+        "Review obligations",
+    ),
     (
         "Integration contract",
-        "INTEGRATION-CONTRACT.md",
+        "internal/INTEGRATION-CONTRACT.md",
         "How the machinery is wired",
     ),
 ];
@@ -216,5 +220,25 @@ mod tests {
         assert_eq!(by_file("README.md").map(|g| g.slug), Some("index"));
         assert!(by_file("ARCHITECTURE.md").is_none());
         assert!(by_file("docs/cli.md").is_none());
+    }
+
+    #[test]
+    fn internal_ledgers_live_under_docs_internal_only() {
+        let docs = workspace_root().join("docs");
+        for name in [
+            "WORKSTREAM-CONTRACT.md",
+            "REVIEW-FIX-CONTRACT.md",
+            "INTEGRATION-CONTRACT.md",
+            "INTEGRATION-SUITE.md",
+            "FULL-IMPLEMENTATION.md",
+            "OBLIGATIONS.md",
+        ] {
+            assert!(
+                docs.join("internal").join(name).is_file(),
+                "docs/internal/{name} is missing"
+            );
+            assert!(!docs.join(name).exists(), "docs/{name} should have moved");
+        }
+        assert!(docs.join("internal/README.md").is_file());
     }
 }

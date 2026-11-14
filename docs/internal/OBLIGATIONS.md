@@ -170,7 +170,7 @@ This gate is `tests/integration/boundary_review_20260917.rs`
 ## 2026-09-17 14:45 review
 
 The review stays **open**. Green tests are regressions, not closure.
-This gate is [`tests/integration/review_regressions.rs`](../tests/integration/review_regressions.rs)
+This gate is [`tests/integration/review_regressions.rs`](../../tests/integration/review_regressions.rs)
 (ten semantic tests). Command:
 `cargo test -p fidryn-integration-tests --offline review_regressions`.
 Do not weaken assertions.
