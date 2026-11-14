@@ -568,7 +568,7 @@ whether or not a <code>verify</code> block repeats it.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>First word</th><th>What <code>verify</code> does with the field</th></tr></thead><tbody>
 <tr><td><code>assert</code></td><td>The expression after it is an assertion.</td></tr>
 <tr><td><code>for_all</code>, <code>exists</code></td><td>The expression the word begins is an assertion, checked in the same way.</td></tr>
-<tr><td><code>bounds</code></td><td>It gives the numbers of synthetic persons, events and time points.</td></tr>
+<tr><td><code>bounds</code></td><td>It is read for three numbers, the synthetic persons, events and time points, and for nothing else.</td></tr>
 <tr><td><code>interpretations</code>, <code>judgments</code>, <code>choices</code>, <code>assuming</code></td><td>The field is recognized and not read.</td></tr>
 <tr><td><code>for</code></td><td>A <code>for every</code> line is not evaluated. It is kept as an assertion that cannot be decided.</td></tr>
 </tbody></table>
@@ -576,6 +576,14 @@ whether or not a <code>verify</code> block repeats it.</p>
 <p>An assertion that cannot be decided leaves the property <code>unknown</code> unless
 another assertion is false. A block with no assertion is <code>unknown</code> too,
 whatever its comments say: a comment is never read as an assertion.</p>
+<p>The bounds come from a <code>bounds</code> field and from nowhere else. The field is
+read for the number that follows each of the words <code>persons</code>, <code>events</code> and
+<code>time_points</code>, directly or after a <code>:</code>, and a number it does not give in
+that way is zero. A comment or another field that holds the word <code>bounds</code>
+does not set the bounds, and a block with no <code>bounds</code> field has zero of
+each: the test <code>the_bounds_come_only_from_a_bounds_field</code> in
+<code>tests/integration/verify_blocks.rs</code> pins that. When a block has several
+<code>bounds</code> fields, the last one counts.</p>
 <p>A field ends where its statement ends; see
 <a href="#where-a-statement-ends">Where a statement ends</a>. An <code>assert</code>, <code>for_all</code>,
 <code>exists</code> or <code>bounds</code> field, and a field that is not read, ends earlier
@@ -614,8 +622,13 @@ included, and the whole is one assertion that cannot be decided.</p>
 <p>An expression that is complete where the next field begins is an
 assertion. One that is cut off there gets the diagnostic it would get
 before a <code>;</code>: <code>assert true or 1 +</code> followed by the line <code>assert false</code> is
-rejected with <code>E100</code>, "expected expression after operator". An <code>assert</code>
-with no expression is an assertion that cannot be decided.</p>
+rejected with <code>E100</code>, "expected expression after operator". Where the
+parser has no diagnostic before a <code>;</code>, there is none here either. The
+parser accepts an <code>else</code> with nothing after it, so
+<code>assert if true { true } else</code> followed by the line <code>assert true</code> is
+proved, and <code>not</code> with nothing after it gives no expression. An <code>assert</code>
+with no expression, <code>assert not</code> included, is an assertion that cannot be
+decided.</p>
 <p>Text that follows the expression of an <code>assert</code>, <code>for_all</code> or <code>exists</code>
 field is read as the next field when it begins with one of the nine
 words. That is rare on one line, because a word that directly follows an
@@ -634,11 +647,12 @@ and the module is rejected with <code>E100</code> when that text begins with
 something other than a word.</p>
 <p>Two limits remain.</p>
 <ul>
-<li>What stands inside the parentheses, brackets or braces of a field that
-is not read belongs to that field, and so does a line that begins with
-none of the nine words when the field goes on into it. An
-<code>assert false</code> between the braces of an <code>interpretations</code> field is not
-read.</li>
+<li>What stands inside the parentheses, brackets or braces of a <code>bounds</code>
+field, or of a field that is not read, belongs to that field, and so
+does a line that begins with none of the nine words when the field goes
+on into it. None of it is read as an assertion: an <code>assert false</code>
+between the braces of an <code>interpretations</code> field or of a <code>bounds</code> field
+is not read.</li>
 <li><code>verify</code> evaluates an assertion; it does not type-check it. A true
 operand of <code>or</code> and a false operand of <code>and</code> settle the result whatever
 the other operand is, and the branch an <code>if</code> does not take is not

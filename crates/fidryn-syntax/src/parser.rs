@@ -2013,7 +2013,9 @@ impl<'a> Parser<'a> {
                 TokenKind::RBrace | TokenKind::Eof | TokenKind::Semicolon
             );
         if !ended {
-            if self.peek().kind != TokenKind::Ident {
+            // Text that begins with a word, a duration unit included, joins
+            // the assertion. Anything else is rejected.
+            if !self.at_name() {
                 self.error_here("unexpected tokens after verification assertion");
             }
             self.skip_balanced_until_end();
@@ -5199,6 +5201,66 @@ module M version "0.1.0" {
         assert!(applied[0].starts_with("Apply"), "{applied:?}");
     }
 
+    /// The seven duration unit words.
+    const DURATION_UNIT_WORDS: &[&str] = &[
+        "days",
+        "working_days",
+        "counted_days",
+        "calendar_days",
+        "hours",
+        "minutes",
+        "seconds",
+    ];
+
+    #[test]
+    fn text_after_the_expression_of_an_assert_joins_it_or_is_e100() {
+        // The assertions of a verify block of these lines, and the messages
+        // of its diagnostics.
+        let read = |lines: &str| {
+            let parsed = parse_file(&wrap_module(&format!("verify V {{\n{lines}\n}}")));
+            let assertions: Vec<String> =
+                first_decl(&parsed).assertions.iter().map(shown).collect();
+            let messages: Vec<String> = parsed
+                .diagnostics
+                .iter()
+                .map(|diagnostic| diagnostic.message.clone())
+                .collect();
+            (assertions, messages)
+        };
+        // Text that begins with a word joins the `assert`: together they are
+        // one assertion that cannot be decided, and there is no diagnostic.
+        // A duration unit is a word like any other.
+        let words = ["asert false", "x", "dayz", "working_days x"];
+        for text in words.iter().chain(DURATION_UNIT_WORDS) {
+            let lines = format!("assert 1 == 1\n{text}");
+            assert_eq!(
+                read(&lines),
+                (vec![undecided(&lines)], Vec::new()),
+                "{lines:?}"
+            );
+        }
+        assert_eq!(
+            read("assert true every x"),
+            (vec![undecided("assert true every x")], Vec::new())
+        );
+        // Text that begins with anything else is rejected.
+        for lines in [
+            "assert true\n1 == 2",
+            "assert true\n\"s\"",
+            "assert 1 == 1\n-1 == 2",
+            "assert true )",
+        ] {
+            assert_eq!(
+                read(lines),
+                (
+                    vec![undecided(lines)],
+                    vec!["unexpected tokens after verification assertion".to_owned()]
+                ),
+                "{lines:?}"
+            );
+        }
+    }
+
     #[test]
     fn a_line_verify_does_not_decide_takes_with_it_what_continues_it() {
         // The first line ends in `:`, so the `assert` line below continues
@@ -5245,6 +5307,11 @@ module M version "0.1.0" {
         assert_eq!(
             verify_assertions("assert; assert true"),
             [undecided("assert"), asserted("true")]
+        );
+        // `not` with nothing after it gives no expression either.
+        assert_eq!(
+            verify_assertions("assert not\nassert true"),
+            [undecided("assert not"), asserted("true")]
         );
     }
 

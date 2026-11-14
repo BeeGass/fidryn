@@ -11,6 +11,7 @@ use fidryn_verify::{PropertyVerdict, verify_property};
 const PROPERTY: &str = "Checked";
 const UNDECIDED_LINE: &str = "unsupported verification operation `$unsupported_assertion`";
 const NO_ASSERTIONS: &str = "verification contains no assertions";
+const EMPTY_BOUNDS: &str = "W620 BoundedVerification: quantifier has empty bounds";
 const FOR_EVERY: &str = "for every x in {1, 2}: x == 3";
 
 fn source(lines: &[&str]) -> String {
@@ -47,6 +48,12 @@ fn property(module: &CoreModule) -> &CoreVerify {
 
 fn assertion_count(module: &CoreModule) -> usize {
     property(module).assertions.len()
+}
+
+/// The numbers of synthetic persons, events and time points of the property.
+fn bounds(module: &CoreModule) -> (u32, u32, u32) {
+    let bounds = &property(module).bounds;
+    (bounds.persons, bounds.events, bounds.time_points)
 }
 
 /// The text of each assertion kept from lines `verify` cannot decide.
@@ -143,6 +150,24 @@ fn tokens_that_are_not_a_word_below_an_assertion_are_e100() {
             "unexpected tokens after verification assertion".to_owned()
         )]
     );
+}
+
+#[test]
+fn a_unit_word_below_an_assertion_is_text_like_any_other_word() {
+    // `dayz` is no unit; it shows what any other word gives.
+    for lines in [
+        ["assert true", "days"],
+        ["assert 1 == 1", "working_days x"],
+        ["assert true", "dayz"],
+    ] {
+        let module = block(&lines);
+        assert_eq!(
+            undecided_text(&module),
+            [format!("{}\n        {}", lines[0], lines[1])],
+            "{lines:?}"
+        );
+        assert_eq!(unknown(&module), UNDECIDED_LINE, "{lines:?}");
+    }
 }
 
 #[test]
@@ -332,14 +357,19 @@ fn a_field_that_is_not_read_ends_where_the_next_field_begins() {
 
 #[test]
 fn a_line_a_field_that_is_not_read_goes_on_into_is_not_read() {
-    // `(` continues a statement, and so does a line below a `+`. Neither
-    // line begins with a field word, so each belongs to the `assuming`
-    // field.
-    for lines in [
-        ["assuming fair", "(1 == 2)", "assert true"],
-        ["assuming fair +", "asert false", "assert true"],
-    ] {
-        let module = block(&lines);
+    // `(` continues a statement, and so does a line below a `+` or a `,`,
+    // and a line that begins with `and` below a blank line. None of these
+    // lines begins with a field word, so each belongs to the field above it.
+    // A `bounds` field is read for its three numbers only, so the same holds
+    // for it.
+    let blocks: [&[&str]; 4] = [
+        &["assuming fair", "(1 == 2)", "assert true"],
+        &["assuming fair +", "asert false", "assert true"],
+        &["assuming fair", "", "and asert false", "assert true"],
+        &["bounds persons 2,", "asert false", "assert true"],
+    ];
+    for lines in blocks {
+        let module = block(lines);
         assert_eq!(assertion_count(&module), 1, "{lines:?}");
         assert_proved(&module);
     }
@@ -374,6 +404,11 @@ fn an_assert_with_no_expression_leaves_the_property_unknown() {
     let module = block(&["assert", "assert false", "assert true"]);
     assert_eq!(assertion_count(&module), 3);
     assert_eq!(counterexample(&module), "assertion 2 evaluates to false");
+    // `not` with nothing after it gives no expression either.
+    let module = block(&["assert not", "assert true"]);
+    assert_eq!(assertion_count(&module), 2);
+    assert_eq!(undecided_text(&module), ["assert not"]);
+    assert_eq!(unknown(&module), UNDECIDED_LINE);
 }
 
 #[test]
@@ -392,5 +427,37 @@ fn a_block_with_no_assertion_is_unknown_whatever_its_comments_say() {
         assert_eq!(assertion_count(&module), 0, "{lines:?}");
         assert_eq!(property(&module).formula, "", "{lines:?}");
         assert_eq!(unknown(&module), NO_ASSERTIONS, "{lines:?}");
+    }
+}
+
+#[test]
+fn the_bounds_come_only_from_a_bounds_field() {
+    // With no `bounds` field there is no synthetic person to quantify over.
+    let module = block(&["assert for_all p in People: true"]);
+    assert_eq!(bounds(&module), (0, 0, 0));
+    assert_eq!(unknown(&module), EMPTY_BOUNDS);
+    // A comment does not set the bounds, and neither does another field.
+    let module = block(&[
+        "// bounds { persons: 2 }",
+        "assert for_all p in People: true",
+    ]);
+    assert_eq!(bounds(&module), (0, 0, 0));
+    assert_eq!(unknown(&module), EMPTY_BOUNDS);
+    let module = block(&[
+        "assuming bounds persons 3",
+        "assert exists p in People: true",
+    ]);
+    assert_eq!(bounds(&module), (0, 0, 0));
+    assert_eq!(unknown(&module), EMPTY_BOUNDS);
+    // A `bounds` field sets them, in each of its forms.
+    for (mut lines, expected) in [
+        (vec!["bounds { persons: 2 }"], (2, 0, 0)),
+        (vec!["bounds persons 2 events 1 time_points 1"], (2, 1, 1)),
+        (vec!["bounds", "{ persons: 3 }"], (3, 0, 0)),
+    ] {
+        lines.push("assert for_all p in People: true");
+        let module = block(&lines);
+        assert_eq!(bounds(&module), expected, "{lines:?}");
+        assert_proved(&module);
     }
 }

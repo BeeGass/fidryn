@@ -167,9 +167,9 @@ fn a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declar
 fn a_claim_inside_the_brackets_of_a_field_that_is_not_read_is_not_read() {
     let module = compile(
         "Limits.VerifyBrackets",
-        "    verify Braces {\n        interpretations {\n            assert false\n        }\n        assert true\n    }\n    verify Parentheses {\n        assuming (fair\n            for every x in {1, 2}: x == 3\n        )\n        assert true\n    }",
+        "    verify Braces {\n        interpretations {\n            assert false\n        }\n        assert true\n    }\n    verify Parentheses {\n        assuming (fair\n            for every x in {1, 2}: x == 3\n        )\n        assert true\n    }\n    verify BoundsBraces {\n        bounds { assert false }\n        assert true\n    }\n    verify BoundsParentheses {\n        bounds persons 2 (assert false)\n        assert true\n    }",
     );
-    for name in ["Braces", "Parentheses"] {
+    for name in ["Braces", "Parentheses", "BoundsBraces", "BoundsParentheses"] {
         let verdict = verify_property(&module, name);
         assert!(verdict.is_proved(), "{name}: {verdict}");
     }
@@ -179,13 +179,15 @@ fn a_claim_inside_the_brackets_of_a_field_that_is_not_read_is_not_read() {
 fn an_operand_that_is_not_needed_is_not_examined() {
     let module = compile(
         "Limits.VerifyOperand",
-        "    verify UndeclaredName {\n        assert true or no_such_name\n        assert no_such_name or true\n        assert not (false and no_such_name)\n        assert if true { true } else { no_such_name }\n    }\n    verify LineBelow {\n        assert true or 1 +\n        for_all x in {1, 2}: x == 3\n    }\n    verify MisspelledLineBelow {\n        assert true or 1 +\n        asert false\n    }\n    verify Parentheses {\n        assert true or f(\n            assert false\n        )\n    }",
+        "    verify UndeclaredName {\n        assert true or no_such_name\n        assert no_such_name or true\n        assert not (false and no_such_name)\n        assert if true { true } else { no_such_name }\n    }\n    verify LineBelow {\n        assert true or 1 +\n        for_all x in {1, 2}: x == 3\n    }\n    verify MisspelledLineBelow {\n        assert true or 1 +\n        asert false\n    }\n    verify Parentheses {\n        assert true or f(\n            assert false\n        )\n    }\n    verify BelowABlankLine {\n        assert true\n\n        or asert false\n    }\n    verify OperandOfNot {\n        assuming fair ) +\n        assert true or not\n        for_all x in {1, 2}: x == 3\n    }",
     );
     for name in [
         "UndeclaredName",
         "LineBelow",
         "MisspelledLineBelow",
         "Parentheses",
+        "BelowABlankLine",
+        "OperandOfNot",
     ] {
         let verdict = verify_property(&module, name);
         assert!(verdict.is_proved(), "{name}: {verdict}");

@@ -1039,37 +1039,21 @@ fn verify_formula(d: &fidryn_syntax::ast::Decl) -> String {
     }
 }
 
+/// The bounds of a verify block: the three numbers in the `bounds` field the
+/// parser recorded. The text of the block is not searched for the word
+/// `bounds`, so a comment or another field never sets them.
 fn verify_bounds(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificationBounds> {
-    let text = d
-        .fields
-        .get("bounds")
-        .cloned()
-        .or_else(|| extract_bounds_clause(&d.source))?;
+    let text = d.fields.get("bounds")?;
     Some(HirVerificationBounds {
-        persons: labeled_u32(&text, "persons").unwrap_or(0),
-        events: labeled_u32(&text, "events").unwrap_or(0),
-        time_points: labeled_u32(&text, "time_points").unwrap_or(0),
+        persons: labeled_u32(text, "persons").unwrap_or(0),
+        events: labeled_u32(text, "events").unwrap_or(0),
+        time_points: labeled_u32(text, "time_points").unwrap_or(0),
     })
 }
 
 fn extract_assert_clause(src: &str) -> Option<String> {
     let i = find_ident(src, "assert")?;
     Some(take_clause_to_end(&src[i..]))
-}
-
-fn extract_bounds_clause(src: &str) -> Option<String> {
-    let i = find_ident(src, "bounds")?;
-    let rest = src[i..].trim_start();
-    if rest.len() < 6 {
-        return None;
-    }
-    let after = rest[6..].trim_start();
-    if after.starts_with('{') {
-        let inner = brace_inner(after)?;
-        Some(format!("bounds {{{inner}}}"))
-    } else {
-        Some(take_clause_to_end(&src[i..]))
-    }
 }
 
 fn take_clause_to_end(s: &str) -> String {
@@ -1953,6 +1937,68 @@ module Examples.Comment version "0.1.0" {
         // The text of the block is not searched for an assertion.
         assert_eq!(v.formula, "");
         assert_eq!(v.bounds.as_ref().map(|bounds| bounds.persons), Some(2));
+    }
+
+    #[test]
+    fn the_bounds_of_a_verify_block_come_only_from_a_bounds_field() {
+        let src = r#"
+module Examples.Bounds version "0.1.0" {
+    verify InAComment {
+        // bounds { persons: 2 }
+        assert true
+    }
+    verify InAnotherField {
+        assuming bounds persons 3
+        assert true
+    }
+    verify Braces {
+        bounds { persons: 2 }
+        assert true
+    }
+    verify Words {
+        bounds persons 2 events 1 time_points 1
+        assert true
+    }
+    verify BraceOnTheNextLine {
+        bounds
+        { persons: 3 }
+        assert true
+    }
+    verify TwoFields {
+        bounds { persons: 2 }
+        bounds { events: 1 }
+        assert true
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let bounds: Vec<_> = hir
+            .verifications
+            .iter()
+            .map(|verification| {
+                (
+                    verification.name.as_str(),
+                    verification
+                        .bounds
+                        .as_ref()
+                        .map(|bounds| (bounds.persons, bounds.events, bounds.time_points)),
+                )
+            })
+            .collect();
+        assert_eq!(
+            bounds,
+            [
+                ("InAComment", None),
+                ("InAnotherField", None),
+                ("Braces", Some((2, 0, 0))),
+                ("Words", Some((2, 1, 1))),
+                ("BraceOnTheNextLine", Some((3, 0, 0))),
+                // The last `bounds` field counts, and a number it does not
+                // give is zero.
+                ("TwoFields", Some((0, 1, 0))),
+            ]
+        );
     }
 
     #[test]

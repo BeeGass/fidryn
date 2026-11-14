@@ -62,7 +62,9 @@ interchange schema versions are maintained independently of the interpreter.
   the line `assert false` is rejected with `E100`.
 - A `verify` block with no assertion is `unknown`, whatever its comments
   say. The text of such a block was searched for the word `assert` before,
-  and a comment that held it was read as the assertion.
+  and a comment that held it was read as the assertion. The bounds of a
+  block are read only from its `bounds` field: a comment or another field
+  that holds the word `bounds` no longer sets them.
 
 ## [0.2.0] - 2026-10-29
 

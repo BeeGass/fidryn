@@ -635,13 +635,22 @@ A verify block is a list of fields. Nine words begin a field:
 | --- | --- |
 | `assert` | The expression after it is an assertion. |
 | `for_all`, `exists` | The expression the word begins is an assertion, checked in the same way. |
-| `bounds` | It gives the numbers of synthetic persons, events and time points. |
+| `bounds` | It is read for three numbers, the synthetic persons, events and time points, and for nothing else. |
 | `interpretations`, `judgments`, `choices`, `assuming` | The field is recognized and not read. |
 | `for` | A `for every` line is not evaluated. It is kept as an assertion that cannot be decided. |
 
 An assertion that cannot be decided leaves the property `unknown` unless
 another assertion is false. A block with no assertion is `unknown` too,
 whatever its comments say: a comment is never read as an assertion.
+
+The bounds come from a `bounds` field and from nowhere else. The field is
+read for the number that follows each of the words `persons`, `events` and
+`time_points`, directly or after a `:`, and a number it does not give in
+that way is zero. A comment or another field that holds the word `bounds`
+does not set the bounds, and a block with no `bounds` field has zero of
+each: the test `the_bounds_come_only_from_a_bounds_field` in
+`tests/integration/verify_blocks.rs` pins that. When a block has several
+`bounds` fields, the last one counts.
 
 A field ends where its statement ends; see
 [Where a statement ends](#where-a-statement-ends). An `assert`, `for_all`,
@@ -678,8 +687,13 @@ included, and the whole is one assertion that cannot be decided.
 An expression that is complete where the next field begins is an
 assertion. One that is cut off there gets the diagnostic it would get
 before a `;`: `assert true or 1 +` followed by the line `assert false` is
-rejected with `E100`, "expected expression after operator". An `assert`
-with no expression is an assertion that cannot be decided.
+rejected with `E100`, "expected expression after operator". Where the
+parser has no diagnostic before a `;`, there is none here either. The
+parser accepts an `else` with nothing after it, so
+`assert if true { true } else` followed by the line `assert true` is
+proved, and `not` with nothing after it gives no expression. An `assert`
+with no expression, `assert not` included, is an assertion that cannot be
+decided.
 
 Text that follows the expression of an `assert`, `for_all` or `exists`
 field is read as the next field when it begins with one of the nine
@@ -701,11 +715,12 @@ something other than a word.
 
 Two limits remain.
 
-- What stands inside the parentheses, brackets or braces of a field that
-  is not read belongs to that field, and so does a line that begins with
-  none of the nine words when the field goes on into it. An
-  `assert false` between the braces of an `interpretations` field is not
-  read.
+- What stands inside the parentheses, brackets or braces of a `bounds`
+  field, or of a field that is not read, belongs to that field, and so
+  does a line that begins with none of the nine words when the field goes
+  on into it. None of it is read as an assertion: an `assert false`
+  between the braces of an `interpretations` field or of a `bounds` field
+  is not read.
 - `verify` evaluates an assertion; it does not type-check it. A true
   operand of `or` and a false operand of `and` settle the result whatever
   the other operand is, and the branch an `if` does not take is not
