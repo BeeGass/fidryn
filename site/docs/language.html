@@ -509,9 +509,9 @@ entities.</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Both assertions hold, so the property is proved. A false assertion, such
 as <code>assert false</code> or <code>assert 1 + 1 == 3</code>, is a counterexample. An
-assertion that names a query or a proposition is unresolved, and the
-property is then <code>unknown</code> unless another assertion is false. For those
-properties,</p>
+assertion that cannot be decided without a query or a proposition is
+unresolved, and the property is then <code>unknown</code> unless another assertion
+is false. For those properties,</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>
@@ -519,6 +519,18 @@ lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
+<p>The rules above do not hold for an assertion that ends in an integer
+literal, such as <code>assert 1 + 1 == 2</code>, when another <code>assert</code> line follows
+it. The assertion swallows that line, and the two lines are decided as
+one assertion, which is unresolved unless <code>verify</code> can decide it without
+the swallowed line. So <code>assert 1 + 1 == 3</code> followed by <code>assert true</code> is
+<code>unknown</code>, not a counterexample, and <code>assert true or 1 == 2</code> followed by
+<code>assert false</code> is <code>proved</code>. When both lines are comparisons, as with
+<code>assert 1 + 1 == 2</code> followed by <code>assert 2 == 2</code>, the module is rejected
+with <code>E100</code>. Ending the assertion with <code>;</code>, or writing the literal in
+parentheses, as in <code>assert 1 + 1 == (2)</code>, avoids this.
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations">Implementation status</a> describes
+the defect.</p>
 <h2 id="what-the-language-will-not-do"><span class="hn">2.20</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
 <p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
 <code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,

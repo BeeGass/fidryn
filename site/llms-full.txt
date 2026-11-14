@@ -920,9 +920,9 @@ verify Arithmetic {
 
 Both assertions hold, so the property is proved. A false assertion, such
 as `assert false` or `assert 1 + 1 == 3`, is a counterexample. An
-assertion that names a query or a proposition is unresolved, and the
-property is then `unknown` unless another assertion is false. For those
-properties,
+assertion that cannot be decided without a query or a proposition is
+unresolved, and the property is then `unknown` unless another assertion
+is false. For those properties,
 
 ```text
 cargo run -p fidryn-cli -- verify PATH --property NAME
@@ -934,6 +934,19 @@ lines (`assert automatic pay_due_immediately has empty effect row`).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for `automatic` is E420
 whether or not a `verify` block repeats it.
+
+The rules above do not hold for an assertion that ends in an integer
+literal, such as `assert 1 + 1 == 2`, when another `assert` line follows
+it. The assertion swallows that line, and the two lines are decided as
+one assertion, which is unresolved unless `verify` can decide it without
+the swallowed line. So `assert 1 + 1 == 3` followed by `assert true` is
+`unknown`, not a counterexample, and `assert true or 1 == 2` followed by
+`assert false` is `proved`. When both lines are comparisons, as with
+`assert 1 + 1 == 2` followed by `assert 2 == 2`, the module is rejected
+with `E100`. Ending the assertion with `;`, or writing the literal in
+parentheses, as in `assert 1 + 1 == (2)`, avoids this.
+[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations) describes
+the defect.
 
 ## What the language will not do
 
@@ -1530,10 +1543,11 @@ as `outcome.kind = inconsistent`.
 
 ## `explore`
 
-Evaluate a query under an explicit finite completion space. The space
-must already be on the case as `admissibleCompletions`, or you must pass
-`--bounds` to merge more completions into the case. `explore` still does
-not invent interpretations; it only examines the declared finite bounds.
+Evaluate a query under an explicit finite completion space: the case's
+`admissibleCompletions`, with any completions from `--bounds` merged in.
+When neither supplies a completion, `explore` evaluates the case as it
+stands (see below). `explore` does not invent interpretations; it only
+examines the declared finite bounds.
 
 **Arguments**
 
@@ -3280,13 +3294,17 @@ A code block that shows a `fidryn` command takes one of these tags:
   it is not run either. The check does not use a shell, so a command
   must not use `>`, `>>`, `<`, `|`, `&&`, `||` or `;`. A command that has
   not exited after 60 seconds is stopped and reported.
-- `sh exit=N`: the same, but each command must exit with status `N`. Any
-  other tag that starts with `sh` is reported.
+- `sh exit=N`: the same, but each command must exit with status `N`. A
+  tag whose first word is `sh` and which is neither `sh` nor `sh exit=N`
+  with `N` an integer, such as `sh exit 1`, is reported.
 - `text`: the block is shown and not run. Use it for placeholders such as
   `PATH`, for output redirection, and for commands that cannot run
   unattended.
 
-A block with any other tag, or none, must not show a `fidryn` command.
+A block with any other tag, such as `shell`, or with none, must not show
+a `fidryn` command. Such a tag is not itself reported, but a block under
+it that shows a `fidryn` command is reported as an untagged block would
+be.
 
 ## Pipeline
 

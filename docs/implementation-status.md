@@ -38,7 +38,7 @@ with it.
 | `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2190` |
 | `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:376`; `crates/fidryn-check/src/lib.rs:3239`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
 | `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2232`, `:2587`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
-| `verify` | Assertions kept | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that names a query or a proposition is unresolved, and the property is `unknown` unless another assertion is false | `crates/fidryn-verify/src/property.rs:123`, `:172` |
+| `verify` | Assertions kept | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that cannot be decided without a query or a proposition is unresolved, and the property is `unknown` unless another assertion is false (but see Verify assertions below) | `crates/fidryn-verify/src/property.rs:123`, `:172`, `:206` |
 
 Unknown fields. The parser rejects an unknown field only inside a `source`
 block and inside the request of a judgment's `otherwise suspend NeedJudgment
@@ -60,6 +60,23 @@ text is read again and an unrecognized verb becomes a derive
 Rule selection. The worklist does not fire a rule that has a `select`
 clause. Only `UniqueOccupant` succession reads the selection
 (`crates/fidryn-eval/src/worklist.rs:210`).
+
+Verify assertions. In a `verify` block, an assertion that ends in an
+integer literal, such as `assert 1 + 1 == 2`, swallows the `assert` line
+that follows it, and the two lines are decided as one assertion (test
+`an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion`).
+While it looks for a duration unit after the integer, the parser steps
+over the line break, so the expression continues into the next line,
+starting by applying the integer to the word `assert`
+(`crates/fidryn-syntax/src/parser.rs:2682`, `:2239`). The
+joined assertion is unresolved unless `verify` can decide it without the
+swallowed line. So `assert 1 + 1 == 2` followed by `assert false` is
+`unknown`, and `assert true or 1 == 2` followed by `assert false` is
+`proved`, because `true or ...` is true whatever follows it
+(`crates/fidryn-verify/src/property.rs:210`). When both lines are
+comparisons, as with `assert 1 + 1 == 2` followed by `assert 2 == 2`, the
+module is rejected with `E100`. An assertion that ends in `;`, or in a
+literal in parentheses such as `(2)`, is not affected.
 
 ## Expressions and types
 
@@ -187,6 +204,7 @@ another name for the same idea does not get this behavior.
 | `a_misspelled_type_name_becomes_a_new_sort_without_a_diagnostic` | A parameter of type `NaturalPersn` passes the checker. |
 | `a_query_that_ends_in_a_require_has_an_untyped_result` | A query declared `-> Bool` whose goal ends in `require determined ...` is rejected with `E210`. |
 | `a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration` | A rule written `from Basis` with an undeclared name in its guard passes the checker, and the query after it is missing. |
+| `an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion` | A `verify` block of `assert true or 1 == 2` followed by `assert false` reaches the intermediate representation with one assertion, and `verify` reports it `proved`. |
 
 ## Budgets
 

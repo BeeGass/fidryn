@@ -185,10 +185,11 @@ as `outcome.kind = inconsistent`.
 
 ## `explore`
 
-Evaluate a query under an explicit finite completion space. The space
-must already be on the case as `admissibleCompletions`, or you must pass
-`--bounds` to merge more completions into the case. `explore` still does
-not invent interpretations; it only examines the declared finite bounds.
+Evaluate a query under an explicit finite completion space: the case's
+`admissibleCompletions`, with any completions from `--bounds` merged in.
+When neither supplies a completion, `explore` evaluates the case as it
+stands (see below). `explore` does not invent interpretations; it only
+examines the declared finite bounds.
 
 **Arguments**
 

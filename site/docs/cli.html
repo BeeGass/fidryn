@@ -229,10 +229,11 @@ retains checked branch <code>searchEvidence</code>. Nested <code>outcomeDocument
 <code>UnknownQuery: unknown query ...</code>. Those engine errors are not rewritten
 as <code>outcome.kind = inconsistent</code>.</p>
 <h2 id="explore"><span class="hn">4.7</span> <code>explore</code> <a class="anchor" href="#explore" aria-label="Link to this section">#</a></h2>
-<p>Evaluate a query under an explicit finite completion space. The space
-must already be on the case as <code>admissibleCompletions</code>, or you must pass
-<code>--bounds</code> to merge more completions into the case. <code>explore</code> still does
-not invent interpretations; it only examines the declared finite bounds.</p>
+<p>Evaluate a query under an explicit finite completion space: the case's
+<code>admissibleCompletions</code>, with any completions from <code>--bounds</code> merged in.
+When neither supplies a completion, <code>explore</code> evaluates the case as it
+stands (see below). <code>explore</code> does not invent interpretations; it only
+examines the declared finite bounds.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>

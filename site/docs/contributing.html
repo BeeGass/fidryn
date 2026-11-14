@@ -179,13 +179,17 @@ A command with <code>ui</code> as one of its words is taken to start the mill, s
 it is not run either. The check does not use a shell, so a command
 must not use <code>&gt;</code>, <code>&gt;&gt;</code>, <code>&lt;</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>||</code> or <code>;</code>. A command that has
 not exited after 60 seconds is stopped and reported.</li>
-<li><code>sh exit=N</code>: the same, but each command must exit with status <code>N</code>. Any
-other tag that starts with <code>sh</code> is reported.</li>
+<li><code>sh exit=N</code>: the same, but each command must exit with status <code>N</code>. A
+tag whose first word is <code>sh</code> and which is neither <code>sh</code> nor <code>sh exit=N</code>
+with <code>N</code> an integer, such as <code>sh exit 1</code>, is reported.</li>
 <li><code>text</code>: the block is shown and not run. Use it for placeholders such as
 <code>PATH</code>, for output redirection, and for commands that cannot run
 unattended.</li>
 </ul>
-<p>A block with any other tag, or none, must not show a <code>fidryn</code> command.</p>
+<p>A block with any other tag, such as <code>shell</code>, or with none, must not show
+a <code>fidryn</code> command. Such a tag is not itself reported, but a block under
+it that shows a <code>fidryn</code> command is reported as an untagged block would
+be.</p>
 <h2 id="pipeline"><span class="hn">8.5</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli</code></pre></figure>

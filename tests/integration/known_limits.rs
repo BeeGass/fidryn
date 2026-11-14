@@ -8,6 +8,7 @@
 use fidryn_cli::compile_source;
 use fidryn_core::ir::Consequence;
 use fidryn_core::{CoreDecl, CoreModule, DiagnosticCode, SourceManifest};
+use fidryn_verify::verify_property;
 
 fn source(name: &str, body: &str) -> String {
     format!(
@@ -160,4 +161,19 @@ fn a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declar
         .map(|query| query.name.as_str())
         .collect();
     assert_eq!(names, ["b"]);
+}
+
+#[test]
+fn an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion() {
+    let module = compile(
+        "Limits.SwallowedAssertion",
+        "    verify Swallowed {\n        assert true or 1 == 2\n        assert false\n    }",
+    );
+    let property = module
+        .verifications
+        .iter()
+        .find(|property| property.name == "Swallowed")
+        .expect("property Swallowed");
+    assert_eq!(property.assertions.len(), 1);
+    assert!(verify_property(&module, "Swallowed").is_proved());
 }

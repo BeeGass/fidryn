@@ -137,7 +137,7 @@ This index lists every module by name, including drafts that do not pass `fidryn
 - `Examples.FormHarborRoboticsLLC` — Massachusetts LLC formation
 - `Examples.BryanRevocableTrust` / `Examples.AvaNoahPrenup` — original instruments
 
-### Fifty-state high-impact slices
+### Fifty-state slices
 
 One module per state under `states/<slug>/`. Principal citations and
 file names are in `states/README.md`. Examples:

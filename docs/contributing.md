@@ -104,13 +104,17 @@ A code block that shows a `fidryn` command takes one of these tags:
   it is not run either. The check does not use a shell, so a command
   must not use `>`, `>>`, `<`, `|`, `&&`, `||` or `;`. A command that has
   not exited after 60 seconds is stopped and reported.
-- `sh exit=N`: the same, but each command must exit with status `N`. Any
-  other tag that starts with `sh` is reported.
+- `sh exit=N`: the same, but each command must exit with status `N`. A
+  tag whose first word is `sh` and which is neither `sh` nor `sh exit=N`
+  with `N` an integer, such as `sh exit 1`, is reported.
 - `text`: the block is shown and not run. Use it for placeholders such as
   `PATH`, for output redirection, and for commands that cannot run
   unattended.
 
-A block with any other tag, or none, must not show a `fidryn` command.
+A block with any other tag, such as `shell`, or with none, must not show
+a `fidryn` command. Such a tag is not itself reported, but a block under
+it that shows a `fidryn` command is reported as an untagged block would
+be.
 
 ## Pipeline
 

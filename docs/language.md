@@ -560,9 +560,9 @@ verify Arithmetic {
 
 Both assertions hold, so the property is proved. A false assertion, such
 as `assert false` or `assert 1 + 1 == 3`, is a counterexample. An
-assertion that names a query or a proposition is unresolved, and the
-property is then `unknown` unless another assertion is false. For those
-properties,
+assertion that cannot be decided without a query or a proposition is
+unresolved, and the property is then `unknown` unless another assertion
+is false. For those properties,
 
 ```text
 cargo run -p fidryn-cli -- verify PATH --property NAME
@@ -574,6 +574,19 @@ lines (`assert automatic pay_due_immediately has empty effect row`).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for `automatic` is E420
 whether or not a `verify` block repeats it.
+
+The rules above do not hold for an assertion that ends in an integer
+literal, such as `assert 1 + 1 == 2`, when another `assert` line follows
+it. The assertion swallows that line, and the two lines are decided as
+one assertion, which is unresolved unless `verify` can decide it without
+the swallowed line. So `assert 1 + 1 == 3` followed by `assert true` is
+`unknown`, not a counterexample, and `assert true or 1 == 2` followed by
+`assert false` is `proved`. When both lines are comparisons, as with
+`assert 1 + 1 == 2` followed by `assert 2 == 2`, the module is rejected
+with `E100`. Ending the assertion with `;`, or writing the literal in
+parentheses, as in `assert 1 + 1 == (2)`, avoids this.
+[Implementation status](implementation-status.md#declarations) describes
+the defect.
 
 ## What the language will not do
 
