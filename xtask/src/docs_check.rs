@@ -22,7 +22,7 @@ pub const MARKDOWN_ROOTS: [&str; 9] = [
 ];
 
 /// Documents whose command blocks are not yet tagged. Task 6 empties it.
-pub const COMMAND_RULE_PENDING: &[&str] = &["docs/examples.md"];
+pub const COMMAND_RULE_PENDING: &[&str] = &[];
 
 /// Tokens that mean the shell would do something the check does not.
 const SHELL_OPERATORS: [&str; 7] = [">", ">>", "<", "|", "&&", "||", ";"];
@@ -489,7 +489,6 @@ mod tests {
                 "docs/x.md:5: `fidryn run a.fr --query q > out.json` uses the shell operator `>`; the check runs `fidryn` directly, so split the block or tag it `text`",
             ]
         );
-        assert!(command_block_problems("docs/examples.md", md).is_empty());
     }
 
     #[test]
