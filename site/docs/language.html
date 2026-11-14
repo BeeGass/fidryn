@@ -173,9 +173,11 @@ Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>In 0.2 a <code>source</code> block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an <code>artifact</code> field
-(<code>E540</code>). Nothing else reads the block: it does not reach evaluation,
-and the file named by <code>artifact</code> is never read, whatever <code>digest</code> says
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
+(<code>E540</code>). The checker also types the source's name as a <code>String</code>, so a
+query that returns <code>FinalPayStatute</code> passes <code>check</code>, but <code>run</code> fails
+with <code>unbound identifier</code>. Nothing else reads the block: it does not
+reach evaluation, and the file named by <code>artifact</code> is never read,
+whatever <code>digest</code> says (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
 <p>Digests are checked in the source manifest instead. That is the JSON
 file the module names with <code>source_manifest</code>, or, when it names none,
 <code>sources/manifest.json</code> or the only <code>*.manifest.json</code> in <code>sources/</code> next
@@ -197,10 +199,12 @@ in an import is accepted and ignored in 0.2.</p>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture
 <span class="tk-pu">}</span></code></pre></figure>
-<p>CLI <code>check</code> / <code>run</code> of a path can byte-authenticate hex digests against
-artifacts under the module directory. <code>"digest": "fixture"</code> (or
-<code>digest fixture</code> in source) is a trust profile, not byte verification.
-Mill paste does not load manifests or artifact files.</p>
+<p>In an import, <code>digest fixture</code> asks for a manifest artifact whose digest
+is <code>fixture</code>. That is a trust profile, not byte verification. A hex
+digest in an import asks for a manifest artifact with that digest whose
+file <code>check</code> or <code>run</code> of a path has read and matched. With no matching
+manifest artifact the import is E200. Mill paste loads no manifest, so
+there an import with a digest is always E200.</p>
 <h2 id="entities-propositions-and-offices"><span class="hn">2.5</span> Entities, propositions, and offices <a class="anchor" href="#entities-propositions-and-offices" aria-label="Link to this section">#</a></h2>
 <p>Name the parties and the propositions you will later test. A
 proposition is not a Boolean.</p>

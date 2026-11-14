@@ -23,7 +23,7 @@ with it.
 | Kind | Body parsed into structure | Reaches the intermediate representation | Executed | Evidence |
 | --- | --- | --- | --- | --- |
 | `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1546`, `:1846` |
-| `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `an_unrecognised_rule_verb_is_lowered_as_derive` |
+| `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
 | `judgment` | Yes. An unrecognised clause is kept as text | Yes | Concurrence policies only. One with an unrecognised clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
 | `observation` | Yes. An unrecognised clause is kept as text | Yes | Yes. An unrecognised clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
 | `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3277` |
@@ -104,24 +104,34 @@ A rule whose `from` basis is a bare name, as in `from Basis`, is not
 checked, and the declaration that follows it is dropped without a
 diagnostic (test
 `a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration`).
-The rule keeps the `when` and `then` lines of the dropped declaration's
-body, and its own are lost (`crates/fidryn-hir/src/lib.rs:498`,
-`crates/fidryn-hir/src/body.rs:347`). A basis written as a dotted name or a
-call, such as `from Instrument.clause("1.2")`, is not affected. Among the
-modules that pass, this hides one query: `encoding_is_bounded` in
-`examples/us-federal/catalog/usc-titles.fr`, which `run` reports as an
-unknown query. It also drops these rules and duties:
+The rule then takes the `when` and `then` lines of the last braced block
+in its text, which is the dropped declaration's body, and its own are lost
+(`crates/fidryn-hir/src/lib.rs:498`, `crates/fidryn-hir/src/body.rs:347`).
+So when the dropped declaration is a rule, that rule's guard and
+consequence still run, under the earlier rule's name, and what is lost is
+the earlier rule's own consequence. When the dropped declaration is a duty,
+the duty is gone and the earlier rule has the duty's `attaches when` line
+as its guard and no consequence. A basis written as a dotted name or a
+call, such as `from Instrument.clause("1.2")`, is not affected.
 
-| Module | Dropped |
-| --- | --- |
-| `examples/states/arkansas/homestead.fr` | rule `ForcedSaleProtection`, duty `RespectHomestead` |
-| `examples/states/colorado/famli.fr` | duty `RespectFamliLeave` |
-| `examples/states/florida/homestead.fr` | rule `ForcedSaleProtection` |
-| `examples/states/idaho/noncompete.fr` | duty `RefrainFromDirectCompetition` |
-| `examples/states/kansas/homestead.fr` | rule `FamilyOccupancyConstitutes`, duty `RespectHomestead` |
-| `examples/states/louisiana/community-property.fr` | rule `EqualShares` |
-| `examples/states/michigan/no-fault-pip.fr` | duty `PayPIPBenefits` |
-| `examples/states/south-dakota/wage-payment.fr` | rule `FinalPayOnEmployerSeparation`, duty `PayAllWagesDue` |
+Among the modules that pass, this hides one query: `encoding_is_bounded` in
+`examples/us-federal/catalog/usc-titles.fr`, which `run` reports as an
+unknown query. It also affects these rules and duties:
+
+| Module | Rule whose own `when` and `then` are replaced | Declaration dropped after it |
+| --- | --- | --- |
+| `examples/us-federal/catalog/usc-titles.fr` | `CatalogHonesty` | query `encoding_is_bounded` |
+| `examples/states/arkansas/homestead.fr` | `EligibilityIsNotABoolean` | rule `ForcedSaleProtection`, which runs under `EligibilityIsNotABoolean` |
+| `examples/states/arkansas/homestead.fr` | `AnnexedRuralKeepsRuralAcreage` | duty `RespectHomestead` |
+| `examples/states/colorado/famli.fr` | `BenefitsWhenCoveredAndQualifying` | duty `RespectFamliLeave` |
+| `examples/states/florida/homestead.fr` | `AcreageLimit` | rule `ForcedSaleProtection`, which runs under `AcreageLimit` |
+| `examples/states/idaho/noncompete.fr` | `WrittenKeyEmployeePath` | duty `RefrainFromDirectCompetition` |
+| `examples/states/kansas/homestead.fr` | `OccupancyConstitutes` | rule `FamilyOccupancyConstitutes`, which runs under `OccupancyConstitutes` |
+| `examples/states/kansas/homestead.fr` | `ForcedSaleProtection` | duty `RespectHomestead` |
+| `examples/states/louisiana/community-property.fr` | `DefaultCommunity` | rule `EqualShares`, which runs under `DefaultCommunity` |
+| `examples/states/michigan/no-fault-pip.fr` | `NoFaultLiability` | duty `PayPIPBenefits` |
+| `examples/states/south-dakota/wage-payment.fr` | `MonthlyPayAttaches` | rule `FinalPayOnEmployerSeparation`, which runs under `MonthlyPayAttaches` |
+| `examples/states/south-dakota/wage-payment.fr` | `FinalPayOnQuitWithoutTermContract` | duty `PayAllWagesDue` |
 
 ## Names the evaluator knows
 
@@ -168,7 +178,7 @@ another name for the same idea does not get this behaviour.
 | --- | --- |
 | `a_duration_cannot_be_added_to_a_time_in_an_expression` | `start + 30 days`, with `start: Time`, is rejected with `E210`. |
 | `a_date_literal_is_untyped_in_an_expression` | `d <= 2026-12-31`, with `d: Date`, is rejected with `E210`, because the date literal has no type. |
-| `an_unrecognised_rule_verb_is_lowered_as_derive` | `then activate Flagged(Acme)` becomes a derive consequence. |
+| `the_activate_verb_is_lowered_as_derive` | `then activate Flagged(Acme)`: the parser accepts `activate` as a verb, and the checker lowers it as a derive consequence. |
 | `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` | An import of a module that does not exist, with an `alias`, passes the checker. |
 | `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` | A `power` and a `legal_act` with made-up fields pass the checker, and neither reaches the intermediate representation. |
 | `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` | A `source` block that names an artifact file that does not exist passes the checker, and no source declaration reaches the intermediate representation. |

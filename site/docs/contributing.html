@@ -189,9 +189,11 @@ or outcome matches is not a passing test.</p>
 <code>test(cli): ...</code>, <code>docs: ...</code>). Prefer atomic commits in pipeline order,
 then tests and docs. Do not dump unrelated crates into one commit.</p>
 <h2 id="grammar"><span class="hn">8.8</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
-<p>The closed v0.1 grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the
-repository root. Unknown body fields are parse errors, not extension
-points.</p>
+<p>The grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+<code>source</code> blocks and judgment request blocks. In most other declarations
+an unknown field is skipped without a diagnostic; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>.</p>
 <h2 id="implementer-documents"><span class="hn">8.9</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
 <p>These files are crate contracts and evidence. They are not user
 tutorials.</p>

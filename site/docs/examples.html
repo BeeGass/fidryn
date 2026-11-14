@@ -161,7 +161,7 @@ and two interpreter programs. The rows not marked (draft) check clean.</p>
 <tr><td><code>examples/prenup/ava-noah.fr</code></td><td>California UPAA provision enforcement for the Ava–Noah agreement.</td><td><code>fidryn check examples/prenup/ava-noah.fr</code></td></tr>
 <tr><td><code>examples/procedure/civil-complaint.fr</code></td><td>FRCP 3/4/12/58 complaint-to-judgment spine.</td><td><code>fidryn check examples/procedure/civil-complaint.fr</code></td></tr>
 <tr><td><code>examples/california/security-deposit/security-deposit.fr</code> (draft)</td><td>California 21-day security-deposit return clock versus bad-faith doubling.</td><td>not runnable</td></tr>
-<tr><td><code>examples/states/florida/homestead.fr</code></td><td>Florida homestead acreage caps and forced-sale character; scenarios live in the <code>.fr</code> file.</td><td><code>fidryn check examples/states/florida/homestead.fr</code></td></tr>
+<tr><td><code>examples/states/florida/homestead.fr</code></td><td>Florida homestead acreage caps and forced-sale character. Its <code>scenario</code> blocks are not read by the interpreter.</td><td><code>fidryn check examples/states/florida/homestead.fr</code></td></tr>
 <tr><td><code>examples/us-federal/flsa/flsa.fr</code></td><td>FLSA 40-hour overtime versus the white-collar exemption.</td><td><code>fidryn check examples/us-federal/flsa/flsa.fr</code></td></tr>
 <tr><td><code>tests/programs/require-gate.fr</code></td><td><code>require true</code> returns 7; <code>require false</code> does not run the return.</td><td><code>fidryn check tests/programs/require-gate.fr</code></td></tr>
 <tr><td><code>tests/programs/late-payment.fr</code></td><td>Invoice duty, timely-payment decision, and a strict-versus-extended deadline family.</td><td><code>fidryn check tests/programs/late-payment.fr</code></td></tr>
@@ -223,10 +223,11 @@ judgment entry.</p>
   <span class="tk-ty">--case</span> examples/us-federal/flsa/cases/forty-one-hours.json <span class="tk-pu">\</span>
   <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00-04:00 <span class="tk-pu">\</span>
   <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00-04:00</code></pre></figure>
-<p>Florida homestead has no JSON case file. The scenarios <code>InsideCityHalfAcre</code>,
-<code>RuralHundredSixty</code>, and <code>TaxCreditor</code> are in
-<code>examples/states/florida/homestead.fr</code>. <code>require-gate.fr</code> and
-<code>late-payment.fr</code> also have no JSON; they are check-only programs. See
+<p>Florida homestead has no JSON case file, and the interpreter does not read
+its <code>scenario</code> blocks (<code>InsideCityHalfAcre</code>, <code>RuralHundredSixty</code>,
+<code>TaxCreditor</code>), so this guide never passes it to <code>fidryn run</code>.
+<code>require-gate.fr</code> and <code>late-payment.fr</code> also have no JSON; they are
+check-only programs. See
 <a href="#independent-programs">Independent programs</a>.</p>
 <h2 id="federal-slices"><span class="hn">7.3</span> Federal slices <a class="anchor" href="#federal-slices" aria-label="Link to this section">#</a></h2>
 <p>Bounded United States Code and CFR slices live under
@@ -381,8 +382,10 @@ file is read from it.</p>
 <p>The quality bar for writing a state module is
 <code>examples/states/florida/homestead.fr</code> (<code>Florida.Property.Homestead</code>,
 Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted: the interpreter drops its <code>ForcedSaleProtection</code> rule
-without a diagnostic (see
+interpreted. Its <code>AcreageLimit</code> rule loses its own derivation of
+<code>HomesteadCharacter(Home, Owner)</code>. The <code>ForcedSaleProtection</code> rule after
+it is dropped as a declaration, but its guard and consequence run under
+<code>AcreageLimit</code>'s name. There is no diagnostic (see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost">Declarations that are lost</a>).
 Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
 cap are <code>automatic</code>. Homestead character and excepted-creditor status stay in
@@ -455,8 +458,8 @@ editions.</p>
 <span class="tk-kw">fidryn</span> check examples/states/michigan/no-fault-pip.fr
 <span class="tk-kw">fidryn</span> check examples/states/south-dakota/wage-payment.fr</code></pre></figure>
 <p>Passing the checker does not mean every declaration was read. In each of
-these eight modules the interpreter drops at least one rule or duty
-without a diagnostic; see
+these eight modules at least one rule loses its own <code>when</code> and <code>then</code>,
+and the rule or duty after it is dropped, without a diagnostic; see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost">Declarations that are lost</a>.</p>
 <h2 id="independent-programs"><span class="hn">7.6</span> Independent programs <a class="anchor" href="#independent-programs" aria-label="Link to this section">#</a></h2>
 <p><code>tests/programs/</code> holds small modules that exercise the interpreter.

@@ -452,9 +452,11 @@ source FinalPayStatute {
 
 In 0.2 a `source` block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an `artifact` field
-(`E540`). Nothing else reads the block: it does not reach evaluation,
-and the file named by `artifact` is never read, whatever `digest` says
-([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+(`E540`). The checker also types the source's name as a `String`, so a
+query that returns `FinalPayStatute` passes `check`, but `run` fails
+with `unbound identifier`. Nothing else reads the block: it does not
+reach evaluation, and the file named by `artifact` is never read,
+whatever `digest` says ([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
 
 Digests are checked in the source manifest instead. That is the JSON
 file the module names with `source_manifest`, or, when it names none,
@@ -484,10 +486,12 @@ import Agency.FOIARegulations version "fixture-2026-08-23" {
 }
 ```
 
-CLI `check` / `run` of a path can byte-authenticate hex digests against
-artifacts under the module directory. `"digest": "fixture"` (or
-`digest fixture` in source) is a trust profile, not byte verification.
-Mill paste does not load manifests or artifact files.
+In an import, `digest fixture` asks for a manifest artifact whose digest
+is `fixture`. That is a trust profile, not byte verification. A hex
+digest in an import asks for a manifest artifact with that digest whose
+file `check` or `run` of a path has read and matched. With no matching
+manifest artifact the import is E200. Mill paste loads no manifest, so
+there an import with a digest is always E200.
 
 ## Entities, propositions, and offices
 
@@ -2597,7 +2601,7 @@ and two interpreter programs. The rows not marked (draft) check clean.
 | `examples/prenup/ava-noah.fr` | California UPAA provision enforcement for the Ava–Noah agreement. | `fidryn check examples/prenup/ava-noah.fr` |
 | `examples/procedure/civil-complaint.fr` | FRCP 3/4/12/58 complaint-to-judgment spine. | `fidryn check examples/procedure/civil-complaint.fr` |
 | `examples/california/security-deposit/security-deposit.fr` (draft) | California 21-day security-deposit return clock versus bad-faith doubling. | not runnable |
-| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character; scenarios live in the `.fr` file. | `fidryn check examples/states/florida/homestead.fr` |
+| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character. Its `scenario` blocks are not read by the interpreter. | `fidryn check examples/states/florida/homestead.fr` |
 | `examples/us-federal/flsa/flsa.fr` | FLSA 40-hour overtime versus the white-collar exemption. | `fidryn check examples/us-federal/flsa/flsa.fr` |
 | `tests/programs/require-gate.fr` | `require true` returns 7; `require false` does not run the return. | `fidryn check tests/programs/require-gate.fr` |
 | `tests/programs/late-payment.fr` | Invoice duty, timely-payment decision, and a strict-versus-extended deadline family. | `fidryn check tests/programs/late-payment.fr` |
@@ -2687,10 +2691,11 @@ fidryn run examples/us-federal/flsa/flsa.fr \
   --known-at 2026-09-17T12:00:00-04:00
 ```
 
-Florida homestead has no JSON case file. The scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` are in
-`examples/states/florida/homestead.fr`. `require-gate.fr` and
-`late-payment.fr` also have no JSON; they are check-only programs. See
+Florida homestead has no JSON case file, and the interpreter does not read
+its `scenario` blocks (`InsideCityHalfAcre`, `RuralHundredSixty`,
+`TaxCreditor`), so this guide never passes it to `fidryn run`.
+`require-gate.fr` and `late-payment.fr` also have no JSON; they are
+check-only programs. See
 [Independent programs](#independent-programs).
 
 ## Federal slices
@@ -2956,8 +2961,10 @@ file is read from it.
 The quality bar for writing a state module is
 `examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
 Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted: the interpreter drops its `ForcedSaleProtection` rule
-without a diagnostic (see
+interpreted. Its `AcreageLimit` rule loses its own derivation of
+`HomesteadCharacter(Home, Owner)`. The `ForcedSaleProtection` rule after
+it is dropped as a declaration, but its guard and consequence run under
+`AcreageLimit`'s name. There is no diagnostic (see
 [Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost)).
 Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
 cap are `automatic`. Homestead character and excepted-creditor status stay in
@@ -3039,8 +3046,8 @@ fidryn check examples/states/south-dakota/wage-payment.fr
 ```
 
 Passing the checker does not mean every declaration was read. In each of
-these eight modules the interpreter drops at least one rule or duty
-without a diagnostic; see
+these eight modules at least one rule loses its own `when` and `then`,
+and the rule or duty after it is dropped, without a diagnostic; see
 [Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost).
 
 ## Independent programs
@@ -3239,9 +3246,11 @@ then tests and docs. Do not dump unrelated crates into one commit.
 
 ## Grammar
 
-The closed v0.1 grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the
-repository root. Unknown body fields are parse errors, not extension
-points.
+The grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+`source` blocks and judgment request blocks. In most other declarations
+an unknown field is skipped without a diagnostic; see
+[implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 ## Implementer documents
 

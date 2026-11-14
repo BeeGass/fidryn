@@ -43,8 +43,11 @@ The essay left a grammar sketch, deferred conflict oracles, and noted that
 no-false-determinacy is only as honest as the admitted model. Fidryn 0.2.0
 retains the following contracts:
 
-1. `grammar.ebnf` is closed. Unknown body fields are parse errors, not
-   extension points. There is no catch-all `Ident Expr` statement.
+1. `grammar.ebnf` is closed. It has no catch-all `Ident Expr` statement.
+   The 0.2 parser enforces closed field sets only in `source` blocks and
+   judgment request blocks; in most other declarations an unknown field
+   is skipped without a diagnostic (see
+   [implementation status](implementation-status.md)).
 2. Keywords that introduce declarations are contextual. `source`, `entity`,
    `office`, `rule`, and similar words are identifiers except in declaration
    position. Reserved words are the small set in the grammar.

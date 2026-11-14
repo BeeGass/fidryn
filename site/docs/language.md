@@ -106,9 +106,11 @@ source FinalPayStatute {
 
 In 0.2 a `source` block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an `artifact` field
-(`E540`). Nothing else reads the block: it does not reach evaluation,
-and the file named by `artifact` is never read, whatever `digest` says
-([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+(`E540`). The checker also types the source's name as a `String`, so a
+query that returns `FinalPayStatute` passes `check`, but `run` fails
+with `unbound identifier`. Nothing else reads the block: it does not
+reach evaluation, and the file named by `artifact` is never read,
+whatever `digest` says ([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
 
 Digests are checked in the source manifest instead. That is the JSON
 file the module names with `source_manifest`, or, when it names none,
@@ -138,10 +140,12 @@ import Agency.FOIARegulations version "fixture-2026-08-23" {
 }
 ```
 
-CLI `check` / `run` of a path can byte-authenticate hex digests against
-artifacts under the module directory. `"digest": "fixture"` (or
-`digest fixture` in source) is a trust profile, not byte verification.
-Mill paste does not load manifests or artifact files.
+In an import, `digest fixture` asks for a manifest artifact whose digest
+is `fixture`. That is a trust profile, not byte verification. A hex
+digest in an import asks for a manifest artifact with that digest whose
+file `check` or `run` of a path has read and matched. With no matching
+manifest artifact the import is E200. Mill paste loads no manifest, so
+there an import with a digest is always E200.
 
 ## Entities, propositions, and offices
 

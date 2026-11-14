@@ -129,9 +129,11 @@ then tests and docs. Do not dump unrelated crates into one commit.
 
 ## Grammar
 
-The closed v0.1 grammar is [`grammar.ebnf`](../grammar.ebnf) at the
-repository root. Unknown body fields are parse errors, not extension
-points.
+The grammar is [`grammar.ebnf`](../grammar.ebnf) at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+`source` blocks and judgment request blocks. In most other declarations
+an unknown field is skipped without a diagnostic; see
+[implementation status](implementation-status.md).
 
 ## Implementer documents
 

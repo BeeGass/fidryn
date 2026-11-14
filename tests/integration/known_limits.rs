@@ -50,7 +50,7 @@ fn a_date_literal_is_untyped_in_an_expression() {
 }
 
 #[test]
-fn an_unrecognised_rule_verb_is_lowered_as_derive() {
+fn the_activate_verb_is_lowered_as_derive() {
     let module = compile(
         "Limits.RuleVerb",
         "    entity Acme : LegalPerson\n    proposition Registered(who: LegalPerson)\n    proposition Flagged(who: LegalPerson)\n    rule Flag : constitutive {\n        when operative Registered(Acme)\n        then activate Flagged(Acme)\n    }\n    query q() -> Int { return 7 }",

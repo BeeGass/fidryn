@@ -86,7 +86,7 @@ and two interpreter programs. The rows not marked (draft) check clean.
 | `examples/prenup/ava-noah.fr` | California UPAA provision enforcement for the Ava–Noah agreement. | `fidryn check examples/prenup/ava-noah.fr` |
 | `examples/procedure/civil-complaint.fr` | FRCP 3/4/12/58 complaint-to-judgment spine. | `fidryn check examples/procedure/civil-complaint.fr` |
 | `examples/california/security-deposit/security-deposit.fr` (draft) | California 21-day security-deposit return clock versus bad-faith doubling. | not runnable |
-| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character; scenarios live in the `.fr` file. | `fidryn check examples/states/florida/homestead.fr` |
+| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character. Its `scenario` blocks are not read by the interpreter. | `fidryn check examples/states/florida/homestead.fr` |
 | `examples/us-federal/flsa/flsa.fr` | FLSA 40-hour overtime versus the white-collar exemption. | `fidryn check examples/us-federal/flsa/flsa.fr` |
 | `tests/programs/require-gate.fr` | `require true` returns 7; `require false` does not run the return. | `fidryn check tests/programs/require-gate.fr` |
 | `tests/programs/late-payment.fr` | Invoice duty, timely-payment decision, and a strict-versus-extended deadline family. | `fidryn check tests/programs/late-payment.fr` |
@@ -176,10 +176,11 @@ fidryn run examples/us-federal/flsa/flsa.fr \
   --known-at 2026-09-17T12:00:00-04:00
 ```
 
-Florida homestead has no JSON case file. The scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` are in
-`examples/states/florida/homestead.fr`. `require-gate.fr` and
-`late-payment.fr` also have no JSON; they are check-only programs. See
+Florida homestead has no JSON case file, and the interpreter does not read
+its `scenario` blocks (`InsideCityHalfAcre`, `RuralHundredSixty`,
+`TaxCreditor`), so this guide never passes it to `fidryn run`.
+`require-gate.fr` and `late-payment.fr` also have no JSON; they are
+check-only programs. See
 [Independent programs](#independent-programs).
 
 ## Federal slices
@@ -445,8 +446,10 @@ file is read from it.
 The quality bar for writing a state module is
 `examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
 Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted: the interpreter drops its `ForcedSaleProtection` rule
-without a diagnostic (see
+interpreted. Its `AcreageLimit` rule loses its own derivation of
+`HomesteadCharacter(Home, Owner)`. The `ForcedSaleProtection` rule after
+it is dropped as a declaration, but its guard and consequence run under
+`AcreageLimit`'s name. There is no diagnostic (see
 [Declarations that are lost](implementation-status.md#declarations-that-are-lost)).
 Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
 cap are `automatic`. Homestead character and excepted-creditor status stay in
@@ -528,8 +531,8 @@ fidryn check examples/states/south-dakota/wage-payment.fr
 ```
 
 Passing the checker does not mean every declaration was read. In each of
-these eight modules the interpreter drops at least one rule or duty
-without a diagnostic; see
+these eight modules at least one rule loses its own `when` and `then`,
+and the rule or duty after it is dropped, without a diagnostic; see
 [Declarations that are lost](implementation-status.md#declarations-that-are-lost).
 
 ## Independent programs

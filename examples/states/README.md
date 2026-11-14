@@ -26,9 +26,9 @@ willfulness, habitability, and similar open-textured questions stay in
 <!-- examples-status:end -->
 
 Passing the checker does not mean every declaration was read: in each
-of the eight state modules that pass, the interpreter drops at least one
-rule or duty without a diagnostic
-([implementation status](../../docs/implementation-status.md)).
+of the eight state modules that pass, at least one rule loses its own
+`when` and `then`, and the rule or duty after it is dropped, without a
+diagnostic ([declarations that are lost](../../docs/implementation-status.md#declarations-that-are-lost)).
 
 ## Signature doctrine per state
 
@@ -86,9 +86,11 @@ rule or duty without a diagnostic
 | Wyoming | `wyoming/wage-payment.fr` (draft) | `Wyoming.Employment.WagePayment` | Wyo. Stat. § 27-4-104 |
 
 The quality bar for writing a state module is `florida/homestead.fr`. It
-passes the checker but is not fully interpreted: the interpreter drops
-its `ForcedSaleProtection` rule without a diagnostic. Fixture excerpts
-live next to each module under `sources/` and are not official
-editions.
+passes the checker but is not fully interpreted. Its `AcreageLimit` rule
+loses its own derivation of `HomesteadCharacter(Home, Owner)`. The
+`ForcedSaleProtection` rule after it is dropped as a declaration, but its
+guard and consequence run under `AcreageLimit`'s name. There is no
+diagnostic. Fixture excerpts live next to each module under `sources/`
+and are not official editions.
 
 District of Columbia and the territories are outside this corpus.
