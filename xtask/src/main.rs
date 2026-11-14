@@ -2,6 +2,7 @@
 
 mod bench;
 mod ci;
+mod examples;
 mod governance;
 mod licenses;
 mod package;
@@ -33,6 +34,8 @@ enum Command {
     Bench(bench::BenchArgs),
     /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, site check, JS tests, bench build
     Ci(ci::CiArgs),
+    /// Check or regenerate the recorded check status of every .fr file
+    Examples(examples::ExamplesArgs),
     /// Render the public site from docs/*.md (--check verifies the committed site)
     Site(site::SiteArgs),
     /// Render or reconcile repository protection rules
@@ -50,6 +53,7 @@ fn main() -> Result<()> {
         Command::Test(args) => test::run(args),
         Command::Bench(args) => bench::run(args),
         Command::Ci(args) => ci::run(args),
+        Command::Examples(args) => examples::run(args),
         Command::Site(args) => site::run(args),
         Command::Governance(args) => governance::run(args),
         Command::Package(args) => package::run(args),

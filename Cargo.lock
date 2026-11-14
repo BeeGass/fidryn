@@ -2400,6 +2400,7 @@ dependencies = [
  "cargo_metadata",
  "clap",
  "fidryn-cli",
+ "fidryn-core",
  "fidryn-syntax",
  "pulldown-cmark",
  "semver",
