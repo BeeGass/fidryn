@@ -559,7 +559,7 @@ verify Trivial {
 `assert true` proves. `assert false` is a counterexample. Unsupported
 formulas can parse without yielding a covering proof. For those properties,
 
-```
+```text
 cargo run -p fidryn-cli -- verify PATH --property NAME
 ```
 

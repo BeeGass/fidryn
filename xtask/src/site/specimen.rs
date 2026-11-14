@@ -33,7 +33,8 @@ const GATE: &str = "tests/programs/require-gate.fr";
 const EMPTY_CASE: &str =
     "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"admissibleCompletions\": {}\n}\n";
 
-/// Where the Getting started guide writes the empty case record.
+/// The committed copy of `EMPTY_CASE`, which the equivalent command line names.
+/// A test checks that the two agree.
 const EMPTY_CASE_PATH: &str = "tests/programs/cases/empty.json";
 
 /// First lines of the two trust blocks the specimen shows.
@@ -439,6 +440,12 @@ mod tests {
         assert_eq!(
             frame_text(&runs[2].case_html),
             EMPTY_CASE.trim_end_matches('\n')
+        );
+        let committed = fs::read_to_string(root.join(EMPTY_CASE_PATH)).unwrap();
+        assert_eq!(
+            committed.replace("\r\n", "\n"),
+            EMPTY_CASE,
+            "{EMPTY_CASE_PATH} and the specimen's empty case record differ"
         );
     }
 }

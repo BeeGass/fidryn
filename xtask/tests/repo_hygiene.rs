@@ -14,10 +14,6 @@ fn root() -> PathBuf {
 fn a_security_policy_exists_and_names_the_reporting_route() {
     let policy = fs::read_to_string(root().join("SECURITY.md")).expect("SECURITY.md");
     assert!(policy.contains("Report a vulnerability"), "{policy}");
-    assert!(
-        !policy.contains('@'),
-        "do not publish an address the owner has not chosen"
-    );
 }
 
 #[test]

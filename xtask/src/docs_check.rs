@@ -6,8 +6,11 @@ use anyhow::{Context, Result, bail};
 use fidryn_core::SourceManifest;
 use pulldown_cmark::{CodeBlockKind, Event, Options, Parser, Tag, TagEnd};
 use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 pub const MARKDOWN_ROOTS: [&str; 9] = [
     "README.md",
@@ -21,11 +24,14 @@ pub const MARKDOWN_ROOTS: [&str; 9] = [
     "site/README.md",
 ];
 
-/// Documents whose command blocks are not yet tagged. Task 6 empties it.
-pub const COMMAND_RULE_PENDING: &[&str] = &[];
-
 /// Tokens that mean the shell would do something the check does not.
 const SHELL_OPERATORS: [&str; 7] = [">", ">>", "<", "|", "&&", "||", ";"];
+
+/// Words that run the CLI from a checkout; what follows them are its arguments.
+const CARGO_RUN_PREFIX: [&str; 5] = ["cargo", "run", "-p", "fidryn-cli", "--"];
+
+/// How long one documented command may run before the check stops it.
+const COMMAND_TIMEOUT: Duration = Duration::from_secs(60);
 
 #[derive(Debug, clap::Args)]
 pub struct DocsArgs {
@@ -39,7 +45,7 @@ pub struct DocsArgs {
 pub struct DocCommand {
     /// 1-based line of the block's opening fence.
     pub line: usize,
-    /// The words after `fidryn`.
+    /// The words after `fidryn`, or after `cargo run -p fidryn-cli --`.
     pub args: Vec<String>,
     /// The exit status the block declares: 0 for `sh`, N for `sh exit=N`.
     pub exit: i32,
@@ -54,9 +60,31 @@ struct Block {
     text: String,
 }
 
+/// What a block's tag asks of the check.
+#[derive(Debug, PartialEq, Eq)]
+enum BlockTag {
+    /// `sh` or `sh exit=N`: run its commands and expect this exit status.
+    Sh(i32),
+    /// A first word of `sh` followed by anything other than `exit=N`.
+    MalformedSh,
+    /// `text`: show its commands unchecked.
+    Text,
+    Other,
+}
+
 impl Block {
-    fn first_word(&self) -> &str {
-        self.info.split_ascii_whitespace().next().unwrap_or("")
+    fn tag(&self) -> BlockTag {
+        let words: Vec<&str> = self.info.split_ascii_whitespace().collect();
+        match words.as_slice() {
+            ["sh"] => BlockTag::Sh(0),
+            ["sh", second] => match second.strip_prefix("exit=").map(str::parse) {
+                Some(Ok(exit)) => BlockTag::Sh(exit),
+                _ => BlockTag::MalformedSh,
+            },
+            ["sh", ..] => BlockTag::MalformedSh,
+            ["text", ..] => BlockTag::Text,
+            _ => BlockTag::Other,
+        }
     }
 }
 
@@ -236,32 +264,43 @@ fn logical_lines(text: &str) -> Vec<String> {
     lines
 }
 
-/// The words after `fidryn` for each `fidryn` command line of a block.
+/// The arguments of a `fidryn` command line: the words after `fidryn`, or
+/// after `cargo run -p fidryn-cli --`. `None` for any other line.
+fn command_args(words: &[String]) -> Option<Vec<String>> {
+    if words.first().is_some_and(|w| w == "fidryn") {
+        return Some(words[1..].to_vec());
+    }
+    let prefix = CARGO_RUN_PREFIX.len();
+    let runs_the_cli = words.len() >= prefix
+        && words
+            .iter()
+            .zip(CARGO_RUN_PREFIX)
+            .all(|(word, expected)| word == expected);
+    runs_the_cli.then(|| words[prefix..].to_vec())
+}
+
+/// The arguments of each `fidryn` command line of a block.
 fn fidryn_invocations(text: &str) -> Vec<Vec<String>> {
     logical_lines(text)
         .iter()
-        .map(|line| split_words(line))
-        .filter(|words| words.first().is_some_and(|w| w == "fidryn"))
-        .map(|words| words[1..].to_vec())
+        .filter_map(|line| command_args(&split_words(line)))
         .collect()
 }
 
-fn declared_exit(info: &str) -> i32 {
-    info.split_ascii_whitespace()
-        .skip(1)
-        .find_map(|word| word.strip_prefix("exit=")?.parse().ok())
-        .unwrap_or(0)
+/// A command with `ui` as any of its words is taken to start the mill, which
+/// runs until it is stopped, so the check does not run it.
+fn starts_the_server(args: &[String]) -> bool {
+    args.iter().any(|word| word == "ui")
 }
 
 pub fn doc_commands(markdown: &str) -> Vec<DocCommand> {
     let mut commands = Vec::new();
     for block in fenced_blocks(markdown) {
-        if block.first_word() != "sh" {
+        let BlockTag::Sh(exit) = block.tag() else {
             continue;
-        }
-        let exit = declared_exit(&block.info);
+        };
         for args in fidryn_invocations(&block.text) {
-            if args.first().is_some_and(|w| w == "ui") {
+            if starts_the_server(&args) {
                 continue;
             }
             commands.push(DocCommand {
@@ -275,14 +314,11 @@ pub fn doc_commands(markdown: &str) -> Vec<DocCommand> {
 }
 
 pub fn command_block_problems(file: &str, markdown: &str) -> Vec<String> {
-    if COMMAND_RULE_PENDING.contains(&file) {
-        return Vec::new();
-    }
     let mut problems = Vec::new();
     for block in fenced_blocks(markdown) {
-        match block.first_word() {
-            "text" => {}
-            "sh" => {
+        match block.tag() {
+            BlockTag::Text => {}
+            BlockTag::Sh(_) => {
                 for args in fidryn_invocations(&block.text) {
                     if let Some(op) = args.iter().find(|w| SHELL_OPERATORS.contains(&w.as_str())) {
                         problems.push(format!(
@@ -293,12 +329,13 @@ pub fn command_block_problems(file: &str, markdown: &str) -> Vec<String> {
                     }
                 }
             }
-            _ => {
-                let shows_command = block
-                    .text
-                    .lines()
-                    .any(|line| line.split_ascii_whitespace().next() == Some("fidryn"));
-                if shows_command {
+            BlockTag::MalformedSh => problems.push(format!(
+                "{file}:{}: block tag `{}` is not `sh` or `sh exit=N` with N an integer",
+                block.line,
+                block.info.trim()
+            )),
+            BlockTag::Other => {
+                if !fidryn_invocations(&block.text).is_empty() {
                     problems.push(format!(
                         "{file}:{}: block shows a `fidryn` command; tag it `sh` to have the check run it or `text` to show it unchecked",
                         block.line
@@ -328,27 +365,78 @@ pub fn check_static(root: &Path) -> Result<()> {
     Ok(())
 }
 
+/// How a documented command ended.
+enum Ran {
+    Exited {
+        status: i32,
+        stderr: String,
+    },
+    /// Still running when the timeout expired; it was killed.
+    TimedOut,
+}
+
+/// Runs `command` with no stdin and its stdout discarded, killing it if it
+/// has not exited within `timeout`.
+fn run_with_timeout(mut command: Command, timeout: Duration) -> std::io::Result<Ran> {
+    let mut child = command
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()?;
+    let mut pipe = child.stderr.take().expect("stderr is piped");
+    let reader = thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let _ = pipe.read_to_end(&mut bytes);
+        bytes
+    });
+    let deadline = Instant::now() + timeout;
+    let status = loop {
+        if let Some(status) = child.try_wait()? {
+            break Some(status);
+        }
+        if Instant::now() >= deadline {
+            let _ = child.kill();
+            child.wait()?;
+            break None;
+        }
+        thread::sleep(Duration::from_millis(5));
+    };
+    let stderr = reader.join().unwrap_or_default();
+    Ok(match status {
+        Some(status) => Ran::Exited {
+            status: status.code().unwrap_or(-1),
+            stderr: String::from_utf8_lossy(&stderr).into_owned(),
+        },
+        None => Ran::TimedOut,
+    })
+}
+
 pub fn check_commands(root: &Path, fidryn: &Path) -> Result<()> {
     let mut problems = Vec::new();
     for file in markdown_files(root)? {
         let markdown = read_document(root, &file)?;
         for command in doc_commands(&markdown) {
-            let output = Command::new(fidryn)
-                .current_dir(root)
-                .args(&command.args)
-                .stdin(Stdio::null())
-                .output()
+            let mut process = Command::new(fidryn);
+            process.current_dir(root).args(&command.args);
+            let ran = run_with_timeout(process, COMMAND_TIMEOUT)
                 .with_context(|| format!("run {}", fidryn.display()))?;
-            let actual = output.status.code().unwrap_or(-1);
-            if actual != command.exit {
-                let stderr = String::from_utf8_lossy(&output.stderr);
-                let first = stderr.lines().next().unwrap_or("");
-                problems.push(format!(
-                    "{file}:{}: `fidryn {}` exited with status {actual}, expected {}\n    {first}",
+            match ran {
+                Ran::Exited { status, .. } if status == command.exit => {}
+                Ran::Exited { status, stderr } => {
+                    let first = stderr.lines().next().unwrap_or("");
+                    problems.push(format!(
+                        "{file}:{}: `fidryn {}` exited with status {status}, expected {}\n    {first}",
+                        command.line,
+                        command.args.join(" "),
+                        command.exit
+                    ));
+                }
+                Ran::TimedOut => problems.push(format!(
+                    "{file}:{}: `fidryn {}` did not exit within {} seconds and was stopped",
                     command.line,
                     command.args.join(" "),
-                    command.exit
-                ));
+                    COMMAND_TIMEOUT.as_secs()
+                )),
             }
         }
     }
@@ -422,7 +510,7 @@ mod tests {
     }
 
     #[test]
-    fn complete_modules_are_fenced_blocks_that_start_with_module_and_crlf_is_normalised() {
+    fn complete_modules_are_fenced_blocks_that_start_with_module_and_crlf_is_normalized() {
         let md = "intro\r\n\r\n```\r\nmodule A version \"1\" {\r\n}\r\n```\r\n\r\n```text\r\nmodule NotChecked version \"1\" {\r\n```\r\n\r\n```\r\nquery q() -> Int { return 7 }\r\n```\r\n";
         assert_eq!(
             complete_modules(md),
@@ -498,6 +586,74 @@ mod tests {
             command_block_problems("docs/x.md", md),
             [
                 "docs/x.md:1: `fidryn check a.fr ; fidryn check b.fr` uses the shell operator `;`; the check runs `fidryn` directly, so split the block or tag it `text`"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_command_with_ui_as_any_word_is_the_server_and_is_not_run() {
+        let md = "```sh\nfidryn --source-root . ui\nfidryn ui --no-open\ncargo run -p fidryn-cli -- ui --port 8751\nfidryn check a.fr\n```\n";
+        assert_eq!(
+            doc_commands(md),
+            [DocCommand {
+                line: 1,
+                args: words(&["check", "a.fr"]),
+                exit: 0
+            }]
+        );
+    }
+
+    #[test]
+    fn cargo_run_of_the_cli_is_a_fidryn_command() {
+        let md = "```sh\ncargo run -p fidryn-cli -- check a.fr\ncargo run -p fidryn-cli -- run b.fr \\\n    --query q\ncargo run -p fidryn-cli --\ncargo run -p other -- check c.fr\ncargo test --workspace --locked\n```\n\n```sh exit=1\ncargo run -p fidryn-cli -- check broken.fr\n```\n";
+        assert_eq!(
+            doc_commands(md),
+            [
+                DocCommand {
+                    line: 1,
+                    args: words(&["check", "a.fr"]),
+                    exit: 0
+                },
+                DocCommand {
+                    line: 1,
+                    args: words(&["run", "b.fr", "--query", "q"]),
+                    exit: 0
+                },
+                DocCommand {
+                    line: 1,
+                    args: Vec::new(),
+                    exit: 0
+                },
+                DocCommand {
+                    line: 10,
+                    args: words(&["check", "broken.fr"]),
+                    exit: 1
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_cargo_run_command_must_be_tagged_and_must_not_use_shell_operators() {
+        let md = "```\ncargo run -p fidryn-cli -- check untagged.fr\n```\n\n```sh\ncargo run -p fidryn-cli -- run a.fr --query q > out.json\n```\n\n```text\ncargo run -p fidryn-cli -- <subcommand> ...\n```\n\n```\ncargo run -p other -- check x.fr\n```\n";
+        assert_eq!(
+            command_block_problems("docs/x.md", md),
+            [
+                "docs/x.md:1: block shows a `fidryn` command; tag it `sh` to have the check run it or `text` to show it unchecked",
+                "docs/x.md:5: `fidryn run a.fr --query q > out.json` uses the shell operator `>`; the check runs `fidryn` directly, so split the block or tag it `text`",
+            ]
+        );
+    }
+
+    #[test]
+    fn an_sh_tag_other_than_sh_or_sh_exit_n_is_reported() {
+        let md = "```sh exit=abc\nfidryn check a.fr\n```\n\n```sh exit 1\nfidryn check b.fr\n```\n\n```sh exit=1 more\n```\n\n```sh exit=1\nfidryn check c.fr\n```\n\n```sh\nfidryn check d.fr\n```\n\n```shell\ncargo test\n```\n";
+        assert_eq!(
+            command_block_problems("docs/x.md", md),
+            [
+                "docs/x.md:1: block tag `sh exit=abc` is not `sh` or `sh exit=N` with N an integer",
+                "docs/x.md:5: block tag `sh exit 1` is not `sh` or `sh exit=N` with N an integer",
+                "docs/x.md:9: block tag `sh exit=1 more` is not `sh` or `sh exit=N` with N an integer",
             ]
         );
     }

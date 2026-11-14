@@ -498,7 +498,7 @@ literals:</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Unsupported
 formulas can parse without yielding a covering proof. For those properties,</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> verify PATH <span class="tk-ty">--property</span> NAME</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>
 lines (<code>assert automatic pay_due_immediately has empty effect row</code>).

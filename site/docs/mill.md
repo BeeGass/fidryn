@@ -30,7 +30,7 @@ See [getting started](https://fidryn.onlygass.dev/docs/getting-started.md) for a
 
 From a clone:
 
-```
+```sh
 cargo run -p fidryn-cli -- ui --no-open
 ```
 

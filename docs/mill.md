@@ -19,7 +19,7 @@ See [getting started](getting-started.md) for a first module, and the
 
 From a clone:
 
-```
+```sh
 cargo run -p fidryn-cli -- ui --no-open
 ```
 

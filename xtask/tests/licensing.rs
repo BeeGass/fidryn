@@ -1,4 +1,4 @@
-//! The licence text, the package metadata and the documents agree.
+//! The license text, the package metadata and the documents agree.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -34,7 +34,7 @@ fn root() -> PathBuf {
 }
 
 #[test]
-fn the_licence_file_is_the_mit_text() {
+fn the_license_file_is_the_mit_text() {
     let text = fs::read_to_string(root().join("LICENSE")).expect("LICENSE");
     assert_eq!(text.replace("\r\n", "\n"), MIT);
 }

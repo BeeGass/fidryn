@@ -7,7 +7,7 @@ HTTP as described under [`file`](#file).
 
 From a clone of this repository:
 
-```
+```text
 cargo run -p fidryn-cli -- <subcommand> ...
 ```
 

@@ -47,13 +47,13 @@ From the repository root, compile the workspace and run the tests.
 The first pass takes a bit: it builds every crate, then runs the
 suite.
 
-```
+```sh
 cargo test --workspace --offline
 ```
 
 Confirm the CLI:
 
-```
+```sh
 cargo run -p fidryn-cli -- --help
 ```
 
@@ -83,7 +83,7 @@ module Programs.RequireGate version "0.1.0" {
 
 Check it:
 
-```
+```sh
 cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 ```
 
@@ -116,7 +116,7 @@ a minimal empty case record that satisfies the interchange schema
 
 Run `q`. It should be determinate `7`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query q \
     --case tests/programs/cases/empty.json \
@@ -187,7 +187,7 @@ and symlinks cannot make an artifact escape that root.
 
 Now run `r`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query r \
     --case tests/programs/cases/empty.json \
@@ -229,7 +229,7 @@ The Massachusetts trust fixture is a bounded slice of a private
 instrument, not Massachusetts trust law as a whole. Check it the same
 way:
 
-```
+```sh
 cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
 ```
 
