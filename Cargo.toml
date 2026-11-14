@@ -23,7 +23,7 @@ members = [
 [workspace.package]
 version = "0.2.0"
 edition = "2024"
-license-file = "LICENSE"
+license = "MIT"
 authors = ["Bryan Gass"]
 repository = "https://github.com/BeeGass/fidryn"
 rust-version = "1.98"

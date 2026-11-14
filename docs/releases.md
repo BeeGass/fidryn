@@ -1,8 +1,6 @@
 # Releases and packages
 
-The interpreter's workspace version is the release version. Current project terms
-and retained prior/third-party grants are documented in
-[Licensing](../LICENSING.md). Source instruments,
+The interpreter's workspace version is the release version. The project is under the MIT License; [Licensing](../LICENSING.md) describes it and the third-party notices. Source instruments,
 prelude modules and interchange schemas retain their own version histories.
 Release 0.2 therefore still loads the repository's 0.1.0 instrument
 fixtures and emits checked evaluation reports using schema v0.2.
@@ -69,6 +67,4 @@ retaining its tested CI artifacts or prepared draft for inspection.
 Releases identify their source and executable bytes. They do not establish legal
 approval or close the general-language obligations in the implementation audit.
 
-First-party custom license checks in `deny.toml` bind exact workspace crate
-versions and the license-file hash. Version or license-text changes must update
-those entries; the third-party license allowlist remains separate.
+`deny.toml` allows a fixed list of licences for dependencies. Workspace crates declare `MIT`, which is on that list, so a release needs no licence entries of its own.

@@ -5,8 +5,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-Current licensing terms and retained prior grants are described in
-[Licensing](LICENSING.md).
+Fidryn is released under the MIT License: see [LICENSE](LICENSE). [Licensing](LICENSING.md) covers third-party notices.
 
 ## Status
 

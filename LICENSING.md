@@ -1,7 +1,23 @@
 # Licensing
 
-Original project material controlled by the applicable rights holder uses the proprietary terms in [LICENSE](LICENSE). A separate written agreement is required for a new grant. This notice does not transfer legal title or establish confidentiality merely because material is public.
+Fidryn is released under the MIT License. The full text is in
+[LICENSE](LICENSE). It covers the source code, documentation, example
+modules and fixtures in this repository, except the third-party material
+described below.
 
-Third-party code, dependencies, fonts, assets, and their copyright notices retain their own terms. Existing valid permissions, including prior MIT, Apache, dual-license or non-commercial grants, are preserved. Retained license texts and `LICENSES/prior-project-*` document those prior or third-party rights; they are not an alternative current grant for new original material controlled by the licensor. Do not remove attribution or treat upstream material as exclusively owned by this project.
+## Third-party material
 
-Contributions require an appropriate separate rights agreement before acceptance. Repository access or a contribution does not automatically grant equity or management. Contact the project maintainer or applicable rights holder for licensing.
+Dependencies, fonts and other third-party material keep their own
+licences and copyright notices. `LICENSES/` holds the notices this
+repository retains: `LICENSES/fonts/` for the fonts used by the site and
+the local interface, and `LICENSES/crates/` for crates whose published
+archives omit their licence files. Release archives also carry
+`THIRD_PARTY_NOTICES.md` and `THIRD_PARTY_LICENSES/`, collected from the
+locked dependency graph. Do not remove an attribution or present upstream
+material as this project's own.
+
+## Contributions
+
+Contributions require an appropriate separate rights agreement before
+acceptance. Repository access or a contribution does not automatically
+grant equity or management.
