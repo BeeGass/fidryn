@@ -66,6 +66,7 @@ module US.Everyday.MinimumWageStack version "0.1.0" {
         goal Evaluate {
             require determined HigherLocalOrdinanceApplies(Employee)
                 using Determine
+            return true
         }
     }
 

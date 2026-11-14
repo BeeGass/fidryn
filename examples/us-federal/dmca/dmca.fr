@@ -37,13 +37,14 @@ module US.Federal.Copyright.DMCA512 version "0.1.0" {
         return count >= required_notice_elements()
     }
 
-    query counter_notice_good_faith()
+    query counter_notice_good_faith(notice: RecordItem)
         -> Bool
         ! {Determine}
     {
         goal Evaluate {
             require determined CounterNoticeGoodFaith(notice)
                 using Determine
+            return true
         }
     }
 

@@ -46,6 +46,7 @@ module US.Federal.Labor.FLSAOvertime version "0.1.0" {
         goal Evaluate {
             require determined WhiteCollarExempt(Employee)
                 using Determine
+            return true
         }
     }
 

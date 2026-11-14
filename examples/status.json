@@ -3,10 +3,7 @@
   "files": [
     {
       "path": "examples/california/abc-test/abc-test.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 2
-      }
+      "check": "ok"
     },
     {
       "path": "examples/california/cpra/cpra.fr",
@@ -17,24 +14,15 @@
     },
     {
       "path": "examples/california/final-pay/final-pay.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/california/lemon/lemon.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/california/noncompete/noncompete.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/california/security-deposit/security-deposit.fr",
@@ -45,24 +33,15 @@
     },
     {
       "path": "examples/delaware/dgcl-220/dgcl-220.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/everyday/final-paycheck/final-paycheck.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/everyday/minimum-wage/minimum-wage.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/foia/foia-request.fr",
@@ -124,10 +103,7 @@
     },
     {
       "path": "examples/states/arkansas/homestead.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/california/wage-statements.fr",
@@ -138,10 +114,7 @@
     },
     {
       "path": "examples/states/colorado/famli.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/connecticut/paid-sick-leave.fr",
@@ -159,10 +132,7 @@
     },
     {
       "path": "examples/states/florida/homestead.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 5
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/georgia/dispossessory.fr",
@@ -180,10 +150,7 @@
     },
     {
       "path": "examples/states/idaho/noncompete.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/illinois/wage-payment.fr",
@@ -208,10 +175,7 @@
     },
     {
       "path": "examples/states/kansas/homestead.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/kentucky/final-wages.fr",
@@ -222,10 +186,7 @@
     },
     {
       "path": "examples/states/louisiana/community-property.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/maine/paid-family-leave.fr",
@@ -250,10 +211,7 @@
     },
     {
       "path": "examples/states/michigan/no-fault-pip.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/minnesota/security-deposit.fr",
@@ -383,10 +341,7 @@
     },
     {
       "path": "examples/states/south-dakota/wage-payment.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/states/tennessee/urlta.fr",
@@ -457,10 +412,7 @@
     },
     {
       "path": "examples/texas/homestead/homestead.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/trust/bryan-revocable-trust.fr",
@@ -468,31 +420,19 @@
     },
     {
       "path": "examples/ucc/battle-of-forms/battle-of-forms.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/accredited-investor/accredited-investor.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 2
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/ada-service-animal/ada-service-animal.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/catalog/usc-titles.fr",
@@ -507,17 +447,11 @@
     },
     {
       "path": "examples/us-federal/diversity/diversity.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 3
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/dmca/dmca.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/efta/efta.fr",
@@ -535,10 +469,7 @@
     },
     {
       "path": "examples/us-federal/fair-housing/fair-housing.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 2
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/fcra/fcra.fr",
@@ -556,31 +487,19 @@
     },
     {
       "path": "examples/us-federal/flsa/flsa.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/fmla/fmla.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/garnishment/garnishment.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/hearsay/hearsay.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 2
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/hipaa/hipaa.fr",
@@ -591,10 +510,7 @@
     },
     {
       "path": "examples/us-federal/means-test/means-test.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/medicare/medicare.fr",
@@ -612,10 +528,7 @@
     },
     {
       "path": "examples/us-federal/pslf/pslf.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/removal/removal.fr",
@@ -626,10 +539,7 @@
     },
     {
       "path": "examples/us-federal/scra/scra.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/speedy-trial/speedy-trial.fr",
@@ -640,24 +550,15 @@
     },
     {
       "path": "examples/us-federal/ssa-fra/ssa-fra.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/ssi/ssi.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/tcpa/tcpa.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 2
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/title-vii/title-vii.fr",
@@ -668,10 +569,7 @@
     },
     {
       "path": "examples/us-federal/unlawful-presence/unlawful-presence.fr",
-      "check": "fails",
-      "codes": {
-        "E210": 1
-      }
+      "check": "ok"
     },
     {
       "path": "examples/us-federal/userra/userra.fr",

@@ -37,13 +37,14 @@ module US.Federal.Garnishment.CCPA version "0.1.0" {
         return garnished <= cap
     }
 
-    query support_order_priority()
+    query support_order_priority(order: RecordItem)
         -> Bool
         ! {Determine}
     {
         goal Evaluate {
             require determined SupportOrderPriority(order)
                 using Determine
+            return true
         }
     }
 

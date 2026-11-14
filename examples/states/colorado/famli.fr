@@ -152,6 +152,7 @@ module Colorado.Employment.FAMLI version "0.1.0" {
         goal Evaluate {
             require determined QualifyingCondition(Employee)
                 using Determine
+            return true
         }
     }
 
@@ -162,6 +163,7 @@ module Colorado.Employment.FAMLI version "0.1.0" {
         goal Evaluate {
             require determined PregnancyOrChildbirthComplication(Employee)
                 using Determine
+            return true
         }
     }
 
@@ -172,6 +174,7 @@ module Colorado.Employment.FAMLI version "0.1.0" {
         goal Evaluate {
             require determined NeonatalIntensiveCare(Child)
                 using Determine
+            return true
         }
     }
 

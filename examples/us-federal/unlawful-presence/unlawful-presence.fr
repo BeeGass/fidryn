@@ -51,6 +51,7 @@ module US.Federal.Immigration.UnlawfulPresenceBars version "0.1.0" {
         goal Evaluate {
             require determined WaiverAvailable(Noncitizen)
                 using Determine
+            return true
         }
     }
 

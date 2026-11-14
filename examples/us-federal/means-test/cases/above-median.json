@@ -2,8 +2,30 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Federal.Bankruptcy.MeansTest@0.1.0",
   "facts": {
-    "current_monthly": "USD(8000.00)",
-    "median": "USD(6000.00)"
+    "current_monthly": {
+      "kind": "ctor",
+      "data": {
+        "name": "USD",
+        "fields": {
+          "_0": {
+            "kind": "decimal",
+            "data": "8000.00"
+          }
+        }
+      }
+    },
+    "median": {
+      "kind": "ctor",
+      "data": {
+        "name": "USD",
+        "fields": {
+          "_0": {
+            "kind": "decimal",
+            "data": "6000.00"
+          }
+        }
+      }
+    }
   },
   "admissibleCompletions": {}
 }

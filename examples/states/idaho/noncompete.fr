@@ -135,6 +135,7 @@ module Idaho.Employment.Noncompete version "0.1.0" {
         goal Evaluate {
             require determined LegitimateBusinessInterest(Employer)
                 using Determine
+            return true
         }
     }
 
@@ -146,6 +147,7 @@ module Idaho.Employment.Noncompete version "0.1.0" {
             require observed SignedCovenant
             require determined KeyEmployee(Worker)
                 using Determine
+            return true
         }
     }
 
@@ -156,6 +158,7 @@ module Idaho.Employment.Noncompete version "0.1.0" {
         goal Evaluate {
             require determined ReasonableGeography(Covenant)
                 using Determine
+            return true
         }
     }
 

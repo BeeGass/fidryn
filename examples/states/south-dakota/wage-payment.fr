@@ -173,6 +173,7 @@ module SouthDakota.Employment.WagePayment version "0.1.0" {
         goal Evaluate {
             require determined WageDispute(Employer, Employee)
                 using Determine
+            return true
         }
     }
 
@@ -183,6 +184,7 @@ module SouthDakota.Employment.WagePayment version "0.1.0" {
         goal Evaluate {
             require determined OppressiveFraudulentOrMaliciousRefusal(Employer)
                 using Determine
+            return true
         }
     }
 
@@ -194,6 +196,7 @@ module SouthDakota.Employment.WagePayment version "0.1.0" {
             require observed PropertyReturnRecord
             require determined FinalWagesDueByNextPayday(Employee, Employer)
                 using Determine
+            return true
         }
     }
 

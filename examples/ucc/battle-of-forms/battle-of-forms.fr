@@ -34,13 +34,14 @@ module US.Commercial.UCC.BattleOfForms version "0.1.0" {
         return additional_term and offeror_merchant and offeree_merchant
     }
 
-    query material_alteration()
+    query material_alteration(term: String)
         -> Bool
         ! {Determine}
     {
         goal Evaluate {
             require determined MaterialAlteration(term)
                 using Determine
+            return true
         }
     }
 

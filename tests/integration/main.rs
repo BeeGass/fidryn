@@ -6,5 +6,6 @@
 mod adversarial_regressions;
 mod boundary_review_20260917;
 mod integration_suite;
+mod repaired_examples;
 mod review_regressions;
 mod semantic_regressions;

@@ -46,6 +46,7 @@ module US.Federal.Housing.AssistanceAnimal version "0.1.0" {
             require observed AccommodationRequest
             require determined ReasonableAccommodationRequested(Resident)
                 using Determine
+            return true
         }
     }
 
@@ -56,6 +57,7 @@ module US.Federal.Housing.AssistanceAnimal version "0.1.0" {
         goal Evaluate {
             require determined DisabilityAndNexus(Resident)
                 using Determine
+            return true
         }
     }
 

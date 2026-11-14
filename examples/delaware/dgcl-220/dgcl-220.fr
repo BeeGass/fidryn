@@ -41,6 +41,7 @@ module Delaware.DGCL.BooksAndRecords version "0.1.0" {
         goal Evaluate {
             require determined ProperPurpose(Stockholder)
                 using Determine
+            return true
         }
     }
 

@@ -46,6 +46,7 @@ module US.Federal.Consumer.TCPA version "0.1.0" {
             require observed ConsentList
             require determined ConsentListIncludes(CalledParty)
                 using Determine
+            return true
         }
     }
 
@@ -56,6 +57,7 @@ module US.Federal.Consumer.TCPA version "0.1.0" {
         goal Evaluate {
             require determined AutodialerUsed(Caller)
                 using Determine
+            return true
         }
     }
 

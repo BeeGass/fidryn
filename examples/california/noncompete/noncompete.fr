@@ -43,6 +43,7 @@ module California.Employment.Noncompete version "0.1.0" {
         goal Evaluate {
             require determined SaleOfBusinessException(Worker)
                 using Determine
+            return true
         }
     }
 
