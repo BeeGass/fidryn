@@ -10,3 +10,4 @@ mod known_limits;
 mod repaired_examples;
 mod review_regressions;
 mod semantic_regressions;
+mod verify_blocks;

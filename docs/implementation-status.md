@@ -22,7 +22,7 @@ with it.
 
 | Kind | Body parsed into structure | Reaches the intermediate representation | Executed | Evidence |
 | --- | --- | --- | --- | --- |
-| `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1546`, `:1846` |
+| `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1576`, `:1935` |
 | `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
 | `judgment` | Yes. An unrecognized clause is kept as text | Yes | Concurrence policies only. One with an unrecognized clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
 | `observation` | Yes. An unrecognized clause is kept as text | Yes | Yes. An unrecognized clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
@@ -34,19 +34,22 @@ with it.
 | `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3342`; test `an_office_keeps_none_of_its_declared_fields` |
 | `clause` | Name and parameters only | Body kept as text | Only through `EvaluateClause`, which knows two clause names (see below) | `crates/fidryn-eval/src/lib.rs:4791`, `:4986` |
 | `legal_act` | Name and parameters only. Unknown fields are accepted | Nothing. The checker types a call of its name as a `LegalAction` | Nothing | `crates/fidryn-hir/src/lib.rs:663`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
-| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:882`; `crates/fidryn-hir/src/lib.rs:707`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:912`; `crates/fidryn-hir/src/lib.rs:707`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
 | `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2190` |
 | `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:376`; `crates/fidryn-check/src/lib.rs:3239`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
 | `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2232`, `:2587`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
-| `verify` | Assertions kept | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that cannot be decided without a query or a proposition is unresolved, and the property is `unknown` unless another assertion is false (but see [Assertions that are swallowed](#assertions-that-are-swallowed)) | `crates/fidryn-verify/src/property.rs:123`, `:172`, `:206` |
+| `verify` | `assert`, `for_all`, `exists` and `bounds` lines are read. The expression after `assert`, and a top-level `for_all` or `exists` expression, is an assertion, in the order written. When more text follows the expression of an `assert`, the whole `assert` is one assertion that cannot be decided instead, or the module is rejected with `E100`. `interpretations`, `judgments`, `choices` and `assuming` lines are recognized and not read. A line that begins with anything else and does not continue the line above it is not dropped either: it is kept as text, as an assertion that cannot be decided, or the module is rejected with `E100` | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that cannot be decided is unresolved, and the property is `unknown` unless another assertion is false. That holds for an assertion that needs a query or a proposition, and for one kept from a line the block does not recognize, such as a misspelled `assert`. A property whose block has a `for every` line is never `proved` | `crates/fidryn-syntax/src/parser.rs:1760`, `:1874`; `crates/fidryn-verify/src/property.rs:123`, `:172`, `:206`; in `tests/integration/verify_blocks.rs`, tests `two_comparisons_on_consecutive_lines_are_two_assertions`, `a_false_quantifier_line_is_a_counterexample`, `an_assuming_line_is_recognized_and_not_read`, `a_misspelled_assert_line_before_an_assertion_leaves_the_property_unknown`, `a_for_every_line_leaves_the_property_unknown` and `a_for_every_line_leaves_the_property_unknown_below_any_other_line` |
 
 Unknown fields. The parser rejects an unknown field only inside a `source`
 block and inside the request of a judgment's `otherwise suspend NeedJudgment
-{ ... }` (`crates/fidryn-syntax/src/parser.rs:1515`, `:1213`). In the other
+{ ... }` (`crates/fidryn-syntax/src/parser.rs:1545`, `:1243`). In the other
 declarations whose body is a list of fields, an unknown field is skipped
 without a diagnostic, and so is an unknown line in a `rule`. In a `judgment`
 or an `observation`, an unrecognized clause is kept and refused at run time,
-as the table says.
+as the table says. In a `verify` block, a line the block does not recognize
+is not skipped unless it continues the line above it: it is kept as an
+assertion that cannot be decided, or the module is rejected, as the table
+says.
 
 Rule verbs. The parser recognizes nine verbs after `then`: `establish`,
 `constitute`, `terminate`, `suspend`, `create`, `derive`, `activate`,
@@ -91,7 +94,7 @@ clause. Only `UniqueOccupant` succession reads the selection
   that ends in `require` is rejected with `E210` (test
   `a_query_that_ends_in_a_require_has_an_untyped_result`).
 - In `require determined P using Determine`, the `using` clause is parsed
-  and discarded (`crates/fidryn-syntax/src/parser.rs:1657`). Any
+  and discarded (`crates/fidryn-syntax/src/parser.rs:1687`). Any
   determination of `P` on the case that names a protocol and a decider
   answers it (`crates/fidryn-eval/src/worklist.rs:908`).
 - A module that does not pass the checker cannot be run (test
@@ -133,39 +136,6 @@ unknown query. It also affects these rules and duties:
 | `examples/states/michigan/no-fault-pip.fr` | `NoFaultLiability` | duty `PayPIPBenefits` |
 | `examples/states/south-dakota/wage-payment.fr` | `MonthlyPayAttaches` | rule `FinalPayOnEmployerSeparation`, which runs under `MonthlyPayAttaches` |
 | `examples/states/south-dakota/wage-payment.fr` | `FinalPayOnQuitWithoutTermContract` | duty `PayAllWagesDue` |
-
-## Assertions that are swallowed
-
-In a `verify` block, an assertion that ends in an integer literal, such
-as `assert 1 + 1 == 2`, swallows the `assert` line that follows it, and
-that line swallows the next one if it also ends in an integer literal.
-The lines joined this way are decided as one assertion (test
-`an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion`),
-and the assertion numbers in a counterexample count them as one. While it
-looks for a duration unit after the integer, the parser steps over the
-line break, so the expression continues into the next line, starting by
-applying the integer to the word `assert`
-(`crates/fidryn-syntax/src/parser.rs:2682`, `:2239`). That application
-cannot be evaluated (`crates/fidryn-verify/src/property.rs:165`), so the
-joined assertion is unresolved unless the rest of it settles the result.
-`verify` ignores an operand of `and` or `or` when the other operand
-settles the result, and it evaluates only the branch of an `if` that is
-taken (`crates/fidryn-verify/src/property.rs:140`, `:206`). An `and`,
-`or` or `if` in any of the joined lines can settle the result this way.
-So `assert 1 + 1 == 2` followed by `assert false` is `unknown`, but each
-of these blocks is `proved`, although it holds a false assertion:
-`assert true or 1 == 2` followed by `assert false`, and
-`assert 1 + 1 == 3` followed by `assert true or true`. A `proved` verdict
-is therefore not reliable for a block that has such an assertion. When
-both lines are comparisons, as with `assert 1 + 1 == 2` followed by
-`assert 2 == 2`, the module is rejected with `E100`. An assertion that
-ends in `;`, or in a literal in parentheses such as `(2)`, is not
-affected.
-
-In the modules shipped with 0.2, 41 of those that pass the checker
-declare a `verify` property, one each. None of those 41 properties has an
-assertion that ends in an integer literal with another line after it, so
-none is affected, and `verify` reports all 41 `unknown`.
 
 ## Names the evaluator knows
 
@@ -220,7 +190,6 @@ another name for the same idea does not get this behavior.
 | `a_misspelled_type_name_becomes_a_new_sort_without_a_diagnostic` | A parameter of type `NaturalPersn` passes the checker. |
 | `a_query_that_ends_in_a_require_has_an_untyped_result` | A query declared `-> Bool` whose goal ends in `require determined ...` is rejected with `E210`. |
 | `a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration` | A rule written `from Basis` with an undeclared name in its guard passes the checker, and the query after it is missing. |
-| `an_assertion_ending_in_an_integer_literal_swallows_the_next_assertion` | A `verify` block of `assert true or 1 == 2` followed by `assert false` reaches the intermediate representation with one assertion, and `verify` reports it `proved`. |
 
 ## Budgets
 

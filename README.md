@@ -16,11 +16,7 @@ query's `RunDecision` goal; duties, which run only through the built-in
 calls `duty_status` and `duty_step`; and `verify` properties, whose
 assertions `fidryn verify` decides from closed formulas only: literals,
 arithmetic, comparisons, Boolean connectives, and quantifiers over a
-literal set or bounded synthetic entities. A `proved` verdict is not
-reliable in every case, because an assertion that ends in an integer
-literal
-[swallows the assertion after it](docs/implementation-status.md#assertions-that-are-swallowed).
-Each run prints
+literal set or bounded synthetic entities. Each run prints
 a JSON report that records the query, the valid and known times, and
 digests of the program and the case record. Several kinds of declaration,
 such as `power`, `office` and `legal_act`, are accepted but not run;

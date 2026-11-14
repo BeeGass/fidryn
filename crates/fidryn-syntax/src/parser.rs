@@ -287,24 +287,46 @@ impl<'a> Parser<'a> {
             while Self::is_trivia(self.peek_raw().kind) {
                 self.idx += 1;
             }
-            if self.peek_raw().kind != TokenKind::Newline {
+            if self.peek_raw().kind != TokenKind::Newline || self.newline_ends_statement(self.idx) {
                 return;
             }
-            let after = self.lookahead_non_trivia(1);
-            let before = self.tokens[..self.idx]
-                .iter()
-                .rev()
-                .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline);
-            let needs_operand = before.is_some_and(|token| {
-                !Self::can_end_statement(token.kind)
-                    || token.kind == TokenKind::Ident && Self::is_prefix_word(self.text(*token))
-            });
-            if self.is_continuation(after) || needs_operand {
-                self.idx += 1;
-                continue;
-            }
-            return;
+            self.idx += 1;
         }
+    }
+
+    /// True when the newline token at `index` ends a statement. It continues
+    /// the statement instead when the first token after it is a continuation,
+    /// or when the last token before it cannot end a statement or is a prefix
+    /// word.
+    fn newline_ends_statement(&self, index: usize) -> bool {
+        let after = self.tokens[index + 1..]
+            .iter()
+            .find(|token| !Self::is_trivia(token.kind));
+        let before = self.tokens[..index]
+            .iter()
+            .rev()
+            .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline);
+        let needs_operand = before.is_some_and(|token| {
+            !Self::can_end_statement(token.kind)
+                || token.kind == TokenKind::Ident && Self::is_prefix_word(self.text(*token))
+        });
+        !(after.is_some_and(|token| self.is_continuation(*token)) || needs_operand)
+    }
+
+    /// True when a statement-ending newline lies between the last consumed
+    /// token and the cursor. `peek` steps over that newline, so this is how
+    /// the parser still knows the statement ended.
+    fn passed_statement_end(&self) -> bool {
+        self.tokens[..self.idx]
+            .iter()
+            .enumerate()
+            .rev()
+            .take_while(|(_, token)| {
+                Self::is_trivia(token.kind) || token.kind == TokenKind::Newline
+            })
+            .any(|(index, token)| {
+                token.kind == TokenKind::Newline && self.newline_ends_statement(index)
+            })
     }
 
     fn peek_significant(&self) -> Token {
@@ -489,12 +511,20 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn at_stmt_break(&mut self) -> bool {
+    /// True when the next token ends the statement: a newline that does not
+    /// continue it, `;` or the end of the file.
+    fn next_token_ends_statement(&mut self) -> bool {
         self.apply_asi();
         matches!(
             self.peek_raw().kind,
             TokenKind::Newline | TokenKind::Semicolon | TokenKind::Eof
         )
+    }
+
+    /// True when the statement has ended: the next token ends it, or a
+    /// lookahead has already stepped over the newline that ended it.
+    fn at_stmt_break(&mut self) -> bool {
+        self.next_token_ends_statement() || self.passed_statement_end()
     }
 
     fn checkpoint(&self) -> (usize, usize) {
@@ -1743,6 +1773,9 @@ impl<'a> Parser<'a> {
         if self.peek().kind == TokenKind::LBrace {
             self.bump();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                if self.eat_kind(TokenKind::Semicolon) {
+                    continue;
+                }
                 if self.at_ident("assert") {
                     let clause_start = self.peek().start;
                     let assertion_count = assertions.len();
@@ -1762,12 +1795,7 @@ impl<'a> Parser<'a> {
                         }
                         self.skip_balanced_until_end();
                         assertions.truncate(assertion_count);
-                        assertions.push(Expr::Apply {
-                            callee: Box::new(Expr::Ident("$unsupported_assertion".into())),
-                            args: vec![Expr::String(
-                                self.src_slice(clause_start, self.last_end(clause_start)),
-                            )],
-                        });
+                        assertions.push(self.unsupported_assertion(clause_start));
                     }
                     self.eat_semi();
                     let text = self
@@ -1781,11 +1809,11 @@ impl<'a> Parser<'a> {
                     }
                 } else if self.at_ident("bounds") {
                     let clause_start = self.peek().start;
-                    self.bump();
-                    if self.peek().kind == TokenKind::LBrace {
+                    if self.peek_nth(1).kind == TokenKind::LBrace {
+                        self.bump();
                         let _ = self.parse_braced_expr();
                     } else {
-                        self.skip_balanced_until_end();
+                        self.skip_verify_field();
                     }
                     self.eat_semi();
                     let text = self
@@ -1798,10 +1826,17 @@ impl<'a> Parser<'a> {
                         fields.insert("bounds".to_owned(), text);
                     }
                 } else if self.at_ident("for_all") || self.at_ident("exists") {
-                    let _ = self.parse_expr();
+                    if let Some(e) = self.parse_expr() {
+                        assertions.push(e);
+                    }
                     self.eat_semi();
-                } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+                } else if self.at_unread_verify_field() {
+                    self.skip_verify_field();
+                } else {
+                    // A `for every` line, or a line the block does not recognize.
+                    let clause_start = self.peek().start;
                     self.skip_balanced_until_end();
+                    assertions.push(self.unsupported_assertion(clause_start));
                 }
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
@@ -1826,21 +1861,75 @@ impl<'a> Parser<'a> {
         decl
     }
 
-    fn at_verify_field(&mut self) -> bool {
+    /// The source text from `start` to the cursor as an assertion that
+    /// `verify` cannot decide, so the property is never proved.
+    fn unsupported_assertion(&self, start: u32) -> Expr {
+        Expr::Apply {
+            callee: Box::new(Expr::Ident("$unsupported_assertion".into())),
+            args: vec![Expr::String(self.src_slice(start, self.last_end(start)))],
+        }
+    }
+
+    /// True at a verify field the block recognizes and does not read.
+    fn at_unread_verify_field(&mut self) -> bool {
         let t = self.peek();
         t.kind == TokenKind::Ident
             && matches!(
                 self.text(t),
-                "interpretations"
-                    | "judgments"
-                    | "choices"
-                    | "bounds"
-                    | "assuming"
-                    | "assert"
-                    | "for_all"
-                    | "exists"
-                    | "for"
+                "interpretations" | "judgments" | "choices" | "assuming"
             )
+    }
+
+    /// Steps over a verify field without reading it. A statement runs on into
+    /// the line below it when its last token cannot end a statement, or when
+    /// that line begins with `for`, which continues a statement. A field ends
+    /// where the next field begins instead, so the cursor goes back to the
+    /// first line that begins one: that line makes a claim of its own.
+    fn skip_verify_field(&mut self) {
+        let start = self.idx;
+        self.skip_balanced_until_end();
+        let end = self.idx;
+        let mut depth = 0i32;
+        for index in start..end {
+            match self.tokens[index].kind {
+                TokenKind::LBrace | TokenKind::LParen | TokenKind::LBracket => depth += 1,
+                TokenKind::RBrace | TokenKind::RParen | TokenKind::RBracket => depth -= 1,
+                TokenKind::Newline if depth == 0 => {
+                    let first = self.tokens[index + 1..end].iter().find(|token| {
+                        !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline
+                    });
+                    if first.is_some_and(|token| {
+                        token.kind == TokenKind::Ident
+                            && Self::begins_verify_field(self.text(*token))
+                    }) {
+                        self.idx = index + 1;
+                        return;
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    fn at_verify_field(&mut self) -> bool {
+        let t = self.peek();
+        t.kind == TokenKind::Ident && Self::begins_verify_field(self.text(t))
+    }
+
+    /// True for a word that begins a field of a verify block.
+    fn begins_verify_field(word: &str) -> bool {
+        matches!(
+            word,
+            "interpretations"
+                | "judgments"
+                | "choices"
+                | "bounds"
+                | "assuming"
+                | "assert"
+                | "for_all"
+                | "exists"
+                | "for"
+        )
     }
 
     fn parse_function_decl(&mut self, keyword: &str) -> Decl {
@@ -2366,7 +2455,10 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_prefix(&mut self) -> Option<Expr> {
-        if self.at_stmt_break() {
+        // An operand begins here. At the start of a statement the cursor has
+        // already passed the end of the statement before it, so only the
+        // next token says whether there is an operand.
+        if self.next_token_ends_statement() {
             return None;
         }
         let t = self.peek();
@@ -2441,7 +2533,11 @@ impl<'a> Parser<'a> {
     fn parse_if_expr(&mut self) -> Expr {
         self.bump();
         let cond = self.parse_expr().unwrap_or(Expr::Ident(String::new()));
-        let then = if self.peek().kind == TokenKind::LBrace {
+        let then = if self.at_stmt_break() {
+            // The statement has ended, so what follows is not the branch.
+            self.error_here("expected `{` after the `if` condition");
+            Expr::Block(Vec::new())
+        } else if self.peek().kind == TokenKind::LBrace {
             self.parse_brace_unwrapped()
         } else {
             self.parse_expr().unwrap_or(Expr::Block(Vec::new()))
@@ -2679,7 +2775,7 @@ impl<'a> Parser<'a> {
                 0
             }
         };
-        if self.peek().kind == TokenKind::DurationUnit {
+        if !self.at_stmt_break() && self.peek().kind == TokenKind::DurationUnit {
             let unit_tok = self.peek();
             let unit = self.text(unit_tok).to_owned();
             self.bump();
@@ -4270,5 +4366,413 @@ module M version "0.1.0" {
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    /// Expressions a statement can end in. After each of the last three the
+    /// parser looks at the next token before it decides the expression is
+    /// complete: for generic arguments, for a block and for a quantifier body.
+    const STATEMENT_ENDINGS: &[&str] = &[
+        "1",
+        "-1",
+        "1 // a comment",
+        "1.5",
+        "\"s\"",
+        "x",
+        "true",
+        "f(x)",
+        "(x)",
+        "USD(1.00)",
+        "3 days",
+        "2026-01-01",
+        "+inf",
+        "a.b",
+        "{1, 2}",
+        "operative P",
+        "determined P",
+        "not P",
+        "if c > 0 { a }",
+        "if c > 0 { a } else { b }",
+        "for_all x in {1, 2}: x > 0",
+        "a < b",
+        "transaction",
+        "for_all x in D",
+    ];
+
+    /// Lines that begin with a name, the word `assert`, a number, a negative
+    /// number and a duration unit, and a name below a blank line and below a
+    /// comment line. None of them continues the line before it.
+    const EXPRESSION_LINES: &[&str] = &["y", "assert", "2", "-1", "days", "\ny", "// a comment\ny"];
+    const LINES_AFTER_REQUIRE: &[&str] = &["return y", "y", "assert", "2", "-1", "days"];
+
+    /// A place where two statements stand on consecutive lines.
+    struct StatementContext {
+        name: &'static str,
+        /// The lines before the first statement.
+        open: &'static str,
+        /// The lines after the last statement.
+        close: &'static str,
+        /// What stands before the first statement's expression on its line.
+        lead: &'static str,
+        /// The second lines that are valid here.
+        second_lines: &'static [&'static str],
+        /// The statements the parser read, in source order.
+        statements: fn(&Parse) -> Vec<String>,
+    }
+
+    const STATEMENT_CONTEXTS: &[StatementContext] = &[
+        StatementContext {
+            name: "two assert lines in verify",
+            open: "verify V {",
+            close: "}",
+            lead: "assert ",
+            second_lines: &["assert q", "assert 2 == 2", "assert -1 < 0", "assert days"],
+            statements: verify_statements,
+        },
+        StatementContext {
+            name: "assert then bounds in verify",
+            open: "verify V {",
+            close: "}",
+            lead: "assert ",
+            second_lines: &["bounds { persons: 1 }", "bounds persons 1"],
+            statements: verify_statements,
+        },
+        StatementContext {
+            name: "two expression statements in a calc body",
+            open: "calc f() -> Int {",
+            close: "}",
+            lead: "",
+            second_lines: EXPRESSION_LINES,
+            statements: body_statements,
+        },
+        StatementContext {
+            name: "require then a statement in a query body",
+            open: "query q() -> Bool {",
+            close: "}",
+            lead: "require ",
+            second_lines: LINES_AFTER_REQUIRE,
+            statements: body_statements,
+        },
+        StatementContext {
+            name: "require then a statement in goal Evaluate",
+            open: "query q() -> Bool {\ngoal Evaluate {",
+            close: "}\n}",
+            lead: "require ",
+            second_lines: LINES_AFTER_REQUIRE,
+            statements: goal_statements,
+        },
+        StatementContext {
+            name: "two steps in a transaction",
+            open: "query q() -> Bool {\ntransaction {",
+            close: "}\n}",
+            lead: "",
+            second_lines: EXPRESSION_LINES,
+            statements: transaction_steps,
+        },
+        StatementContext {
+            name: "when then then in a rule",
+            open: "rule R : derive {",
+            close: "}",
+            lead: "when ",
+            second_lines: &["then derive Q"],
+            statements: rule_statements,
+        },
+        StatementContext {
+            name: "two then lines in a rule",
+            open: "rule R : derive {",
+            close: "}",
+            lead: "then derive ",
+            second_lines: &["then derive Q"],
+            statements: rule_statements,
+        },
+    ];
+
+    fn first_decl(parsed: &Parse) -> &Decl {
+        parsed
+            .module()
+            .and_then(|module| module.items.first())
+            .and_then(Item::decl)
+            .expect("a first declaration")
+    }
+
+    /// The statements of a body the parser folds into one expression.
+    fn sequence(body: Option<&Expr>) -> Vec<String> {
+        match body {
+            Some(Expr::Block(statements)) => statements.iter().map(|s| format!("{s:?}")).collect(),
+            Some(statement) => vec![format!("{statement:?}")],
+            None => Vec::new(),
+        }
+    }
+
+    fn verify_statements(parsed: &Parse) -> Vec<String> {
+        let decl = first_decl(parsed);
+        let mut statements: Vec<String> =
+            decl.assertions.iter().map(|a| format!("{a:?}")).collect();
+        statements.extend(decl.fields.get("bounds").cloned());
+        statements
+    }
+
+    fn body_statements(parsed: &Parse) -> Vec<String> {
+        sequence(first_decl(parsed).expr.as_ref())
+    }
+
+    fn goal_statements(parsed: &Parse) -> Vec<String> {
+        let goal = first_decl(parsed).goal.as_ref().expect("a goal");
+        sequence(goal.expr.as_ref())
+    }
+
+    fn transaction_steps(parsed: &Parse) -> Vec<String> {
+        let body = first_decl(parsed).expr.as_ref().expect("a query body");
+        expect_transaction_steps(body)
+            .iter()
+            .map(|step| format!("{step:?}"))
+            .collect()
+    }
+
+    fn rule_statements(parsed: &Parse) -> Vec<String> {
+        let decl = first_decl(parsed);
+        let guard = decl.guard.iter().map(|guard| format!("when {guard:?}"));
+        let consequences = decl
+            .consequences
+            .iter()
+            .map(|then| format!("then {} {:?}", then.verb, then.expr));
+        guard.chain(consequences).collect()
+    }
+
+    #[test]
+    fn a_statement_ends_at_its_line_whatever_the_next_line_begins_with() {
+        let mut failures = Vec::new();
+        for context in STATEMENT_CONTEXTS {
+            // The statements of the context holding these lines, or its parse errors.
+            let read = |lines: &[&str]| {
+                let body = format!("{}\n{}\n{}", context.open, lines.join("\n"), context.close);
+                let parsed = parse_file(&wrap_module(&body));
+                if parsed.has_errors() {
+                    let messages: Vec<&str> = parsed
+                        .diagnostics
+                        .iter()
+                        .map(|diagnostic| diagnostic.message.as_str())
+                        .collect();
+                    Err(format!("rejected: {messages:?}"))
+                } else {
+                    Ok((context.statements)(&parsed))
+                }
+            };
+            for ending in STATEMENT_ENDINGS {
+                let first = format!("{}{ending}", context.lead);
+                for &second in context.second_lines {
+                    let expected = match (read(&[first.as_str()]), read(&[second])) {
+                        (Ok(alone), Ok(next)) if alone.len() == 1 && next.len() == 1 => {
+                            Ok([alone, next].concat())
+                        }
+                        apart => Err(format!("each line alone is not one statement: {apart:?}")),
+                    };
+                    let together = read(&[first.as_str(), second]);
+                    if expected.is_err() || together != expected {
+                        failures.push(format!(
+                            "{}: `{first}` then `{second}`\n    read:     {together:?}\n    expected: {expected:?}",
+                            context.name
+                        ));
+                    }
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "{} pairs of lines are not read as the two statements they are:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn a_line_that_begins_with_a_continuation_joins_the_line_before_it() {
+        let returned = |expression: &str| {
+            let parsed = parse_body(&format!("query q() -> Bool {{\nreturn {expression}\n}}"));
+            first_query(&parsed).expr.clone().expect("a returned value")
+        };
+        let name = |text: &str| Box::new(Expr::Ident(text.to_owned()));
+        for (two_lines, one_line, tree) in [
+            (
+                "a\nand b",
+                "a and b",
+                Expr::Binary {
+                    op: BinOp::And,
+                    left: name("a"),
+                    right: name("b"),
+                },
+            ),
+            (
+                "a\nor b",
+                "a or b",
+                Expr::Binary {
+                    op: BinOp::Or,
+                    left: name("a"),
+                    right: name("b"),
+                },
+            ),
+            (
+                "a\n.b",
+                "a.b",
+                Expr::Field {
+                    base: name("a"),
+                    name: "b".to_owned(),
+                },
+            ),
+            (
+                "f\n(x)",
+                "f(x)",
+                Expr::Call {
+                    callee: "f".to_owned(),
+                    args: vec![*name("x")],
+                },
+            ),
+            (
+                "if c > 0 { a }\nelse { b }",
+                "if c > 0 { a } else { b }",
+                Expr::If {
+                    cond: Box::new(Expr::Binary {
+                        op: BinOp::Gt,
+                        left: name("c"),
+                        right: Box::new(Expr::Int(0)),
+                    }),
+                    then: name("a"),
+                    else_: Some(name("b")),
+                },
+            ),
+        ] {
+            assert_eq!(returned(two_lines), tree, "{two_lines:?}");
+            assert_eq!(returned(one_line), tree, "{one_line:?}");
+        }
+        // The same after each operand the parser looks past.
+        for (two_lines, one_line) in [
+            ("x == 1\nand y == 2", "x == 1 and y == 2"),
+            (
+                "operative P\nand operative Q",
+                "operative P and operative Q",
+            ),
+            ("operative P\nin C", "operative P in C"),
+            ("if c > 0\n{ a }", "if c > 0 { a }"),
+            ("for_all x in D\n: x > 0", "for_all x in D: x > 0"),
+        ] {
+            assert_eq!(returned(two_lines), returned(one_line), "{two_lines:?}");
+        }
+    }
+
+    #[test]
+    fn an_if_condition_followed_by_a_statement_end_is_e100() {
+        let parsed = parse_file(&wrap_module("calc f(c: Bool) -> Int {\nif c\n1\n}"));
+        let diagnostics: Vec<(DiagnosticCode, &str)> = parsed
+            .diagnostics
+            .iter()
+            .map(|diagnostic| (diagnostic.code, diagnostic.message.as_str()))
+            .collect();
+        assert_eq!(
+            diagnostics,
+            [(
+                DiagnosticCode::E100,
+                "expected `{` after the `if` condition"
+            )]
+        );
+        // The next line is a statement of its own, not the branch.
+        assert_eq!(
+            first_fn(&parsed).expr,
+            Some(Expr::Block(vec![
+                Expr::If {
+                    cond: Box::new(Expr::Ident("c".to_owned())),
+                    then: Box::new(Expr::Block(Vec::new())),
+                    else_: None,
+                },
+                Expr::Int(1),
+            ]))
+        );
+    }
+
+    #[test]
+    fn a_header_without_its_string_does_not_take_the_next_line() {
+        let parsed = parse_file(&wrap_module(
+            "source_snapshot\nentity Bryan : NaturalPerson",
+        ));
+        let messages: Vec<&str> = parsed
+            .diagnostics
+            .iter()
+            .map(|diagnostic| diagnostic.message.as_str())
+            .collect();
+        assert_eq!(messages, ["expected a JSON string"]);
+        let kinds: Vec<&str> = parsed
+            .module()
+            .expect("a module")
+            .items
+            .iter()
+            .map(Item::keyword)
+            .collect();
+        assert_eq!(kinds, ["source_snapshot", "entity"]);
+    }
+
+    /// An assertion of a verify block: the text of a line `verify` cannot
+    /// decide, or the tree of an expression it can.
+    fn shown(assertion: &Expr) -> String {
+        match assertion {
+            Expr::Apply { callee, args }
+                if **callee == Expr::Ident("$unsupported_assertion".to_owned()) =>
+            {
+                match args.as_slice() {
+                    [Expr::String(text)] => format!("undecided: {}", text.trim()),
+                    other => format!("undecided: {other:?}"),
+                }
+            }
+            decided => format!("{decided:?}"),
+        }
+    }
+
+    #[test]
+    fn a_verify_block_keeps_every_line_that_makes_a_claim_in_source_order() {
+        let parsed = parse_body(
+            "verify V {\n\
+             interpretations all_admissible\n\
+             for every x in {1, 2}: x == 3\n\
+             judgments all_lawful\n\
+             choices all_lawful\n\
+             for_all x in {1, 2}: x > 0\n\
+             assert true\n\
+             bounds persons 1\n\
+             for every y in {1}: y == 2\n\
+             asert false\n\
+             assuming fair\n\
+             exists y in {1}: y == 1\n\
+             }",
+        );
+        let decl = first_decl(&parsed);
+        let read: Vec<String> = decl.assertions.iter().map(shown).collect();
+        // The tree the same expression has on an `assert` line.
+        let asserted = |expression: &str| {
+            let alone = parse_body(&format!("verify V {{ assert {expression} }}"));
+            shown(&first_decl(&alone).assertions[0])
+        };
+        assert_eq!(
+            read,
+            [
+                "undecided: for every x in {1, 2}: x == 3".to_owned(),
+                asserted("for_all x in {1, 2}: x > 0"),
+                asserted("true"),
+                "undecided: for every y in {1}: y == 2".to_owned(),
+                "undecided: asert false".to_owned(),
+                asserted("exists y in {1}: y == 1"),
+            ]
+        );
+        assert_eq!(
+            decl.fields.get("bounds").map(String::as_str),
+            Some("bounds persons 1")
+        );
+        // Going back to the start of a line loses no token.
+        assert_eq!(parsed.syntax().text(), parsed.source.as_str());
+    }
+
+    #[test]
+    fn an_empty_statement_in_a_verify_block_is_not_an_assertion() {
+        let parsed = parse_body("verify V { assert true;; assert false; }");
+        assert_eq!(
+            first_decl(&parsed).assertions,
+            [Expr::Bool(true), Expr::Bool(false)]
+        );
     }
 }

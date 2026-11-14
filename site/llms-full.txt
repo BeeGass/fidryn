@@ -935,23 +935,16 @@ Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for `automatic` is E420
 whether or not a `verify` block repeats it.
 
-The rules above do not hold for an assertion that ends in an integer
-literal, such as `assert 1 + 1 == 2`, when another `assert` line follows
-it. The assertion swallows that line, and that line swallows the next one
-if it also ends in an integer literal. The lines joined this way are
-decided as one assertion. The parser applies the integer to the word
-`assert`, and that application cannot be evaluated, so the joined
-assertion is unresolved unless an `and`, `or` or `if` in any of its
-lines settles the result without that part. So `assert 1 + 1 == 3`
-followed by `assert true` is `unknown`, not a counterexample, while
-`assert true or 1 == 2` followed by `assert false` is `proved`, and so
-is `assert 1 + 1 == 3` followed by `assert true or true`. When both lines
-are comparisons, as with `assert 1 + 1 == 2` followed by `assert 2 == 2`,
-the module is rejected with `E100`. Ending the assertion with `;`, or
-writing the literal in parentheses, as in `assert 1 + 1 == (2)`, avoids
-this.
-[Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)
-describes the defect.
+A top-level `for_all` or `exists` line is checked as an assertion, in the
+same way as an `assert` line. A `bounds` line gives the numbers of
+synthetic persons, events and time points. `interpretations`,
+`judgments`, `choices` and `assuming` lines are recognized and not read.
+A `for every` line is not evaluated, and a property whose block has one
+is never `proved`. A line that begins with any other word, such as a
+misspelled `assert`, is not dropped unless it continues the line above
+it: it is kept as an assertion that cannot be decided, or the module is
+rejected with `E100`. An assertion that cannot be decided leaves the
+property `unknown` unless another assertion is false.
 
 ## What the language will not do
 
@@ -1685,12 +1678,7 @@ fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinui
 not obtain a covering proof is not success: the CLI prints the verdict to
 stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
 fragment includes structured Boolean/arithmetic assertions and finite quantified
-formulas; every assertion the parser reads in the named block must hold.
-An assertion that ends in an integer literal swallows the `assert` line
-after it, so a `proved` verdict for a block with such an assertion is not
-reliable
-([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#assertions-that-are-swallowed)).
-Unsupported formulas
+formulas; every assertion in the named block must hold. Unsupported formulas
 and resource exhaustion remain `unknown`. Passing a query name such as
 `acting_trustee` is invalid.
 

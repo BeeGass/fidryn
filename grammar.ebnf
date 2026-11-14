@@ -333,7 +333,10 @@ End             ::= inserted-newline | ";"
 
 (* Automatic semicolon insertion: insert End at newline when delimiter
    depth is zero, the previous token can end a statement, and the next
-   token is not a continuation: and, or, where, then, else, ".", ",". *)
+   token is not a continuation. The continuations are the words and, or,
+   where, then, else, from, decides, occupied_by, establishes, using, for,
+   rank, as, to, version, fuel and in, and the tokens ".", ",", "->", "=>",
+   ":", "!", "=", "|", "<", "{", "(" and "[". *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.

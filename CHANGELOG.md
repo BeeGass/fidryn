@@ -35,6 +35,17 @@ interchange schema versions are maintained independently of the interpreter.
 - The site footer shows the workspace version.
 - Guides no longer rely on a POSIX-only temporary path.
 - The examples guide shows only commands that behave as stated.
+- A line that does not begin with a continuation is no longer joined to the
+  line before it when that line ends in an integer literal, in `operative P`
+  or `determined P`, or in an `if` without `else`. `1` followed by a line
+  that begins with `days` is no longer the duration `1 days`. An `if` whose
+  condition is followed by the end of the statement is rejected with `E100`,
+  and the next line is no longer read as its branch.
+- `fidryn verify` decides each `assert` line on its own and checks a
+  top-level `for_all` or `exists` line as an assertion. A property is no
+  longer `proved` when its block holds a false assertion on a later line, a
+  false top-level `for_all` or `exists` line, a `for every` line, or a line
+  that begins a statement with a word the block does not recognize.
 
 ## [0.2.0] - 2026-10-29
 
