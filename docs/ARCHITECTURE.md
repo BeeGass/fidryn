@@ -84,8 +84,8 @@ retains the following contracts:
 16. Filing adapters, tax calc modules, guarded recursion, user-defined
     effects, quantification, court procedure, case-law graphs, constrained
     render, a bounded solver, and a localhost mill UI are in-tree. In-tree
-    is not executed. See the capability matrix. Live filing still requires
-    `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
+    is not executed. See [implementation status](implementation-status.md).
+    Live filing still requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
 
 ## Crate graph
 

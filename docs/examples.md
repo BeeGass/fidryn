@@ -45,10 +45,13 @@ Evidence whose `observedAt` is after `--known-at` does not discharge a
 query. `--arg KEY=VALUE` writes `case.facts["KEY"]` on top of the JSON
 (for example `--arg provision=ChildSupportWaiver`).
 
-State modules under `examples/states/` do not ship companion JSON. Case
-facts live in `scenario` blocks inside the `.fr` file. There is no JSON
-source manifest either: the `source { ... }` block already carries
-citation, artifact, and `digest fixture`. Check the module:
+State modules under `examples/states/` do not ship a companion JSON case
+record or a JSON source manifest. Their `scenario` blocks write down
+example facts, but the interpreter does not read them: a run takes its
+facts from a case record. The `source { ... }` block carries the
+citation, artifact, and `digest fixture`, and no file is read from it
+(see [implementation status](implementation-status.md)). Check the
+module:
 
 ```sh
 fidryn check examples/states/florida/homestead.fr
@@ -431,16 +434,22 @@ rules, duties, queries, scenarios, verification). These are research
 fixtures, not legal advice, and not a complete statement of any state's
 code.
 
-Case facts are `scenario` blocks in the `.fr` file. There is no companion
-JSON case file and no JSON source manifest. `source_manifest` is omitted
-when the module's `source { ... }` block already carries citation,
-artifact, and `digest fixture`; the compiler loads an empty manifest in
-that case.
+There is no companion JSON case file and no JSON source manifest. The
+`scenario` blocks in each `.fr` file write down example facts, but the
+interpreter does not read them; a run takes its facts from a case
+record. `source_manifest` is omitted, so the compiler uses an empty
+manifest. The `source { ... }` block, which carries the citation,
+artifact, and `digest fixture`, does not take the manifest's place: no
+file is read from it.
 
-The quality bar is `examples/states/florida/homestead.fr`
-(`Florida.Property.Homestead`, Fla. Const. art. X, § 4). Urban acreage
-0.5, rural acreage 160, and the $1,000 personal-property cap are
-`automatic`. Homestead character and excepted-creditor status stay in
+The quality bar for writing a state module is
+`examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
+Fla. Const. art. X, § 4). It passes the checker but is not fully
+interpreted: the interpreter drops its `ForcedSaleProtection` rule
+without a diagnostic (see
+[Declarations that are lost](implementation-status.md#declarations-that-are-lost)).
+Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
+cap are `automatic`. Homestead character and excepted-creditor status stay in
 `Determine` / `Observe`. Scenarios `InsideCityHalfAcre`,
 `RuralHundredSixty`, and `TaxCreditor` sit in the same file. Fixture
 excerpts live next to each module under `sources/` and are not official
@@ -517,6 +526,11 @@ fidryn check examples/states/louisiana/community-property.fr
 fidryn check examples/states/michigan/no-fault-pip.fr
 fidryn check examples/states/south-dakota/wage-payment.fr
 ```
+
+Passing the checker does not mean every declaration was read. In each of
+these eight modules the interpreter drops at least one rule or duty
+without a diagnostic; see
+[Declarations that are lost](implementation-status.md#declarations-that-are-lost).
 
 ## Independent programs
 

@@ -30,7 +30,7 @@ so a change in semantics also shows up as a stale site.
 | `vercel.json` | Deploy config: clean URLs, headers, caching |
 
 Implementer docs (`ARCHITECTURE.md`, `internal/OBLIGATIONS.md`, contracts, the
-status matrix) stay on GitHub; the docs overview links to them.
+implementation status page) stay on GitHub; the docs overview links to them.
 
 Never edit generated files by hand; the next run overwrites them.
 

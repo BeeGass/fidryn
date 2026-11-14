@@ -89,7 +89,7 @@
     <p class="label">Implementers</p>
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
     </ol>
@@ -124,11 +124,12 @@ Support in 0.2.0 is <strong>parsed / checked / executed</strong> only where note
 <tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
 <tr><td><code>record_type</code> / <code>evidence_type</code></td><td>FOIA / trust fixtures</td><td>Parsed/checked; used as named evidence schemas</td></tr>
 <tr><td><code>observation</code></td><td>LLC / state homestead modules</td><td>Parsed/checked; Observe matches schema + known-at</td></tr>
-<tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>In-module overlay fixtures; not JSON cases; not silent <code>run</code> defaults</td></tr>
+<tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>Name read; body not interpreted. Scenario runs use the case record's <code>assumptions</code>, not these blocks</td></tr>
 <tr><td><code>Evaluate</code> / <code>UniqueOccupant</code> / <code>RunDecision</code> / <code>StatusOf</code></td><td>trust, late-payment, LLC</td><td>Executed query plans</td></tr>
 <tr><td><code>EvaluateClause</code></td><td><code>examples/prenup/ava-noah.fr</code></td><td>Executed clause-plan queries</td></tr>
-<tr><td><code>power</code> / <code>legal_act</code> / <code>clause</code></td><td>trust, FOIA, prenup</td><td>Parsed/checked; specialized paths, not a general act engine</td></tr>
-<tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Parsed; conflict outcomes/requests when staged effects disagree</td></tr>
+<tr><td><code>power</code> / <code>legal_act</code></td><td>trust, FOIA, prenup</td><td>Name and parameters read; body not interpreted, so unknown fields pass. A <code>legal_act</code> name types as a <code>LegalAction</code> in calls. Neither reaches evaluation</td></tr>
+<tr><td><code>clause</code></td><td>prenup, minimum-wage</td><td>Name and parameters read; body kept as text. At run time only <code>EvaluateClause</code> uses it, and the evaluator knows two clause names</td></tr>
+<tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Body not interpreted; the text must name a declared clause after <code>defeat</code> (E511). Never consulted when staged effects disagree</td></tr>
 <tr><td><code>transaction</code></td><td><code>tests/programs/transaction-atomic.fr</code></td><td>Partial; not a full commit engine</td></tr>
 <tr><td><code>for_all</code> / <code>exists</code></td><td>status + grammar</td><td>Finite declared domains only; open domains suspend; no open-world proofs</td></tr>
 <tr><td><code>fn</code></td><td>grammar / status</td><td>Limited/partial; no current example declaration</td></tr>
@@ -170,18 +171,28 @@ Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
     <span class="tk-kw">digest</span> fixture
     <span class="tk-kw">effective</span> <span class="tk-pu">[</span><span class="tk-nu">2026-09-17</span><span class="tk-pu">,</span> <span class="tk-nu">+inf</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>digest fixture</code> is a fixture profile, not a hash of the file. It is
-not byte-verified authentication. A 32- or 64-digit hex digest is
-blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
-first 16 bytes). <code>check</code> of a <code>.fr</code> path hashes the file at <code>artifact</code>
-relative to the module directory. A missing file or a mismatch is
-unauthenticated; digest-required imports fail with E200. Hex without
-readable bytes is not a fixture profile. The source-manifest JSON uses
-the same <code>"digest": "fixture"</code> versus hex distinction.</p>
+<p>In 0.2 a <code>source</code> block is a record for the reader. The parser rejects
+an unknown field in it, and the checker requires an <code>artifact</code> field
+(<code>E540</code>). Nothing else reads the block: it does not reach evaluation,
+and the file named by <code>artifact</code> is never read, whatever <code>digest</code> says
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
+<p>Digests are checked in the source manifest instead. That is the JSON
+file the module names with <code>source_manifest</code>, or, when it names none,
+<code>sources/manifest.json</code> or the only <code>*.manifest.json</code> in <code>sources/</code> next
+to the module. Each manifest artifact has a <code>path</code> and a <code>digest</code>.
+<code>"digest": "fixture"</code> is a fixture trust profile, not a hash of the file
+and not byte verification. A 32- or 64-digit hex digest is blake3 of the
+artifact bytes (64 hex: the full digest; 32 hex: the first 16 bytes).
+<code>check</code> and <code>run</code> of a <code>.fr</code> path read the file at <code>path</code>, relative to
+the module directory or to <code>--source-root</code>, and compare. A missing file
+or a mismatch leaves the artifact unauthenticated, and an import that
+requires that digest fails with E200. Pasted source in the
+<a href="/docs/mill">Mill</a> reads no manifest and no files.</p>
 <h2 id="imports"><span class="hn">2.4</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
-<p>Modules may import another module by name and version. Digests match the
-source-trust story above. An <code>alias</code> line in an import is accepted and
-ignored in 0.2.</p>
+<p>Modules may import another module by name and version. An import that
+carries a <code>digest</code> must find that digest on an authenticated artifact of
+the source manifest above, or the checker reports E200. An <code>alias</code> line
+in an import is accepted and ignored in 0.2.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture
@@ -304,8 +315,12 @@ continues, <code>false</code> suspends and does not return the later value.</p>
 runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</code> resumes by skipping
 the completed prefix, so a later term does not re-run an earlier
 attach.</p>
-<p><code>require determined P using Determine</code> requests a competent
-determination instead of treating <code>P</code> as a Bool.</p>
+<p><code>require determined P using Determine</code> asks for a determination of <code>P</code>
+instead of treating <code>P</code> as a Bool. In 0.2 the <code>using</code> clause is parsed
+and discarded. Any determination of <code>P</code> on the case that names a
+protocol and a decider answers the requirement. A negative determination
+fails it, and with none the query suspends with a request for a judgment
+on <code>P</code>.</p>
 <h2 id="calc-conditionals-money-and-durations"><span class="hn">2.11</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
@@ -358,7 +373,7 @@ are not that worklist. The kind is <code>derive</code>, <code>constitutive</code
 <p><code>when operative P</code> tests legal status. <code>in TrustCreation(BRT)</code> names the
 legal context of that test. The guard still turns on the proposition
 <code>TrustInstrumentExecuted(BRT)</code>. It is not a proposition named <code>in</code>.
-<code>when determined P</code> tests a competent determination already on the case.
+<code>when determined P</code> tests for a determination of <code>P</code> already on the case.
 <code>then derive</code> and <code>then establish</code> are the usual consequences. Guards
 must use <code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a
 bare proposition. The successor rule in the trust fixture also
@@ -451,20 +466,26 @@ theorem proving is not implemented. Prefer reading
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a> before treating a
 quantified <code>verify</code> as a proved theorem.</p>
 <h2 id="scenarios-in-module"><span class="hn">2.18</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
-<p>A <code>scenario</code> block names overlay hypotheses for fixtures that do not
-ship companion JSON case files (for example under <code>examples/states/</code>).
-It is not a silent default for <code>run</code>.</p>
+<p>A <code>scenario</code> block writes down example hypotheses in fixtures that do
+not ship companion JSON case files (for example under
+<code>examples/states/</code>).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">scenario</span> InsideCityHalfAcre <span class="tk-pu">{</span>
     <span class="tk-kw">assume</span> OccupiesAsResidence<span class="tk-pu">(</span>Owner<span class="tk-pu">,</span> Home<span class="tk-pu">)</span>
     <span class="tk-kw">assume</span> InsideMunicipality<span class="tk-pu">(</span>Home<span class="tk-pu">)</span>
     <span class="tk-kw">assume</span> within_urban_acreage<span class="tk-pu">(</span><span class="tk-nu">0.5</span><span class="tk-pu">)</span>
     <span class="tk-kw">at</span> <span class="tk-nu">2026-09-17T12:00:00-04:00</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Case JSON
-can carry analogous overlay rows as <code>assumptions</code> (<code>id</code>, <code>payload</code>);
-CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
-<code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
-See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
+<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Fidryn
+0.2 does not interpret a <code>scenario</code> block: the parser reads its name and
+skips its body, and nothing in it reaches evaluation
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>). Neither <code>run</code> nor
+<code>run --scenario</code> reads these blocks.</p>
+<p>Scenario evaluation is driven by the case record. Its <code>assumptions</code>
+rows (<code>id</code>, <code>payload</code>) are applied when you pass <code>run --scenario</code>, and
+the report's <code>executionMode</code> is then <code>scenario</code>. The mill uses scenario
+mode when the pasted case has a nonempty <code>assumptions</code> list. A default
+<code>run</code> is operative and ignores <code>assumptions</code>. See
+<a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
 <p>A <code>verify</code> block is a named property. Fidryn 0.2.0 discharges Boolean
 literals:</p>

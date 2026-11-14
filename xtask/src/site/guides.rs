@@ -117,7 +117,7 @@ pub const IMPLEMENTER_DOCS: &[(&str, &str, &str)] = &[
     (
         "Implementation status",
         "implementation-status.md",
-        "Evidence-backed capability matrix",
+        "What the interpreter does today",
     ),
     (
         "Obligations",

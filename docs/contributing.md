@@ -139,7 +139,7 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
+- [implementation-status.md](implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
 - [OBLIGATIONS.md](internal/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
 - [WORKSTREAM-CONTRACT.md](internal/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
 - [INTEGRATION-CONTRACT.md](internal/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.

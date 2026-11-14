@@ -31,11 +31,12 @@ Support in 0.2.0 is **parsed / checked / executed** only where noted — see
 | `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed. `alias` is accepted and ignored. An import with no digest and no matching package does nothing. |
 | `record_type` / `evidence_type` | FOIA / trust fixtures | Parsed/checked; used as named evidence schemas |
 | `observation` | LLC / state homestead modules | Parsed/checked; Observe matches schema + known-at |
-| `scenario` | all 50 `examples/states/` modules | In-module overlay fixtures; not JSON cases; not silent `run` defaults |
+| `scenario` | all 50 `examples/states/` modules | Name read; body not interpreted. Scenario runs use the case record's `assumptions`, not these blocks |
 | `Evaluate` / `UniqueOccupant` / `RunDecision` / `StatusOf` | trust, late-payment, LLC | Executed query plans |
 | `EvaluateClause` | `examples/prenup/ava-noah.fr` | Executed clause-plan queries |
-| `power` / `legal_act` / `clause` | trust, FOIA, prenup | Parsed/checked; specialized paths, not a general act engine |
-| `conflict_doctrine` | prenup, minimum-wage | Parsed; conflict outcomes/requests when staged effects disagree |
+| `power` / `legal_act` | trust, FOIA, prenup | Name and parameters read; body not interpreted, so unknown fields pass. A `legal_act` name types as a `LegalAction` in calls. Neither reaches evaluation |
+| `clause` | prenup, minimum-wage | Name and parameters read; body kept as text. At run time only `EvaluateClause` uses it, and the evaluator knows two clause names |
+| `conflict_doctrine` | prenup, minimum-wage | Body not interpreted; the text must name a declared clause after `defeat` (E511). Never consulted when staged effects disagree |
 | `transaction` | `tests/programs/transaction-atomic.fr` | Partial; not a full commit engine |
 | `for_all` / `exists` | status + grammar | Finite declared domains only; open domains suspend; no open-world proofs |
 | `fn` | grammar / status | Limited/partial; no current example declaration |
@@ -92,21 +93,32 @@ source FinalPayStatute {
 }
 ```
 
-`digest fixture` is a fixture profile, not a hash of the file. It is
-not byte-verified authentication. A 32- or 64-digit hex digest is
-blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
-first 16 bytes). `check` of a `.fr` path hashes the file at `artifact`
-relative to the module directory. A missing file or a mismatch is
-unauthenticated; digest-required imports fail with E200. Hex without
-readable bytes is not a fixture profile. The source-manifest JSON uses
-the same `"digest": "fixture"` versus hex distinction.
+In 0.2 a `source` block is a record for the reader. The parser rejects
+an unknown field in it, and the checker requires an `artifact` field
+(`E540`). Nothing else reads the block: it does not reach evaluation,
+and the file named by `artifact` is never read, whatever `digest` says
+([implementation status](implementation-status.md)).
+
+Digests are checked in the source manifest instead. That is the JSON
+file the module names with `source_manifest`, or, when it names none,
+`sources/manifest.json` or the only `*.manifest.json` in `sources/` next
+to the module. Each manifest artifact has a `path` and a `digest`.
+`"digest": "fixture"` is a fixture trust profile, not a hash of the file
+and not byte verification. A 32- or 64-digit hex digest is blake3 of the
+artifact bytes (64 hex: the full digest; 32 hex: the first 16 bytes).
+`check` and `run` of a `.fr` path read the file at `path`, relative to
+the module directory or to `--source-root`, and compare. A missing file
+or a mismatch leaves the artifact unauthenticated, and an import that
+requires that digest fails with E200. Pasted source in the
+[Mill](mill.md) reads no manifest and no files.
 
 
 ## Imports
 
-Modules may import another module by name and version. Digests match the
-source-trust story above. An `alias` line in an import is accepted and
-ignored in 0.2.
+Modules may import another module by name and version. An import that
+carries a `digest` must find that digest on an authenticated artifact of
+the source manifest above, or the checker reports E200. An `alias` line
+in an import is accepted and ignored in 0.2.
 
 ```
 import MA.TrustLaw.Fixture version "2026-08-23"
@@ -282,8 +294,12 @@ runs both. Nested `seq` under `+`, a call, or `if` resumes by skipping
 the completed prefix, so a later term does not re-run an earlier
 attach.
 
-`require determined P using Determine` requests a competent
-determination instead of treating `P` as a Bool.
+`require determined P using Determine` asks for a determination of `P`
+instead of treating `P` as a Bool. In 0.2 the `using` clause is parsed
+and discarded. Any determination of `P` on the case that names a
+protocol and a decider answers the requirement. A negative determination
+fails it, and with none the query suspends with a request for a judgment
+on `P`.
 
 ## Calc, conditionals, money, and durations
 
@@ -360,7 +376,7 @@ rule InitialTrustee : constitutive
 `when operative P` tests legal status. `in TrustCreation(BRT)` names the
 legal context of that test. The guard still turns on the proposition
 `TrustInstrumentExecuted(BRT)`. It is not a proposition named `in`.
-`when determined P` tests a competent determination already on the case.
+`when determined P` tests for a determination of `P` already on the case.
 `then derive` and `then establish` are the usual consequences. Guards
 must use `operative`, `determined`, `assumed`, or `necessarily` — not a
 bare proposition. The successor rule in the trust fixture also
@@ -488,9 +504,9 @@ quantified `verify` as a proved theorem.
 
 ## Scenarios (in-module)
 
-A `scenario` block names overlay hypotheses for fixtures that do not
-ship companion JSON case files (for example under `examples/states/`).
-It is not a silent default for `run`.
+A `scenario` block writes down example hypotheses in fixtures that do
+not ship companion JSON case files (for example under
+`examples/states/`).
 
 ```
 scenario InsideCityHalfAcre {
@@ -501,11 +517,18 @@ scenario InsideCityHalfAcre {
 }
 ```
 
-Grammar: `ScenarioDecl` in [`grammar.ebnf`](../grammar.ebnf). Case JSON
-can carry analogous overlay rows as `assumptions` (`id`, `payload`);
-CLI `run --scenario` applies them, and the mill treats a nonempty
-`assumptions` list as scenario mode. Default operative `run` does not.
-See [Cases and time](cases-and-time.md) and [CLI](cli.md).
+Grammar: `ScenarioDecl` in [`grammar.ebnf`](../grammar.ebnf). Fidryn
+0.2 does not interpret a `scenario` block: the parser reads its name and
+skips its body, and nothing in it reaches evaluation
+([implementation status](implementation-status.md)). Neither `run` nor
+`run --scenario` reads these blocks.
+
+Scenario evaluation is driven by the case record. Its `assumptions`
+rows (`id`, `payload`) are applied when you pass `run --scenario`, and
+the report's `executionMode` is then `scenario`. The mill uses scenario
+mode when the pasted case has a nonempty `assumptions` list. A default
+`run` is operative and ignores `assumptions`. See
+[Cases and time](cases-and-time.md) and [CLI](cli.md).
 
 ## Verify
 
