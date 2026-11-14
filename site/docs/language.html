@@ -105,7 +105,7 @@ open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
 <p>Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2.0 research interpreter. Example modules are fixtures. They are
+the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
 <p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
@@ -118,7 +118,7 @@ field is skipped without a diagnostic; see
 <h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2.0 is <strong>parsed / checked / executed</strong> only where noted — see
+Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
 <tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
@@ -491,7 +491,7 @@ mode when the pasted case has a nonempty <code>assumptions</code> list. A defaul
 <code>run</code> is operative and ignores <code>assumptions</code>. See
 <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property. Fidryn 0.2.0 discharges Boolean
+<p>A <code>verify</code> block is a named property. Fidryn 0.2 discharges Boolean
 literals:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Trivial <span class="tk-pu">{</span>
     <span class="tk-kw">assert</span> <span class="tk-nu">true</span>
@@ -530,7 +530,7 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

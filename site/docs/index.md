@@ -16,7 +16,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the 0.2.0 reference
+This directory is the human documentation for the 0.2 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They

@@ -68,7 +68,8 @@ pub use patterns::{
 };
 pub use positions::{Position, PositionKind};
 pub use request::{
-    CaseSnapshotIdentity, ExecutionOperation, ExecutionRequest, ExecutionRequestId, ProgramIdentity,
+    CaseSnapshotIdentity, ExecutionOperation, ExecutionRequest, ExecutionRequestId,
+    ProgramIdentity, SEMANTICS_VERSION,
 };
 pub use state::{
     AuthorityGrant, AuthorityLedger, DecisionLedger, InterpretationLedger, LegalState,

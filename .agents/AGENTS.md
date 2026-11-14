@@ -26,7 +26,7 @@ Do not copy human handbooks into `.agents/`. Human docs stay in [`README.md`](..
 
 Other top-level directories are present and are not given a role in the README sections used for this map: `benches/`, `conformance/`, `packages/`, `prelude/`, `schemas/`, `templates/`. Do not invent what they contain.
 
-The README says Fidryn is a programming language for legal instruments and that this repository is the v0.1 reference interpreter: a research fixture, not legal advice and not an operative instrument. Source files use `.fr`.
+The README says Fidryn is a programming language for legal instruments and that this repository is the 0.2 reference interpreter: a research fixture, not legal advice and not an operative instrument. Source files use `.fr`.
 
 Commands the README documents:
 

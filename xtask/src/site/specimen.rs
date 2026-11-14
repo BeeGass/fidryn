@@ -34,7 +34,7 @@ const EMPTY_CASE: &str =
     "{\n  \"schema\": \"fidryn.case-record/v0.1\",\n  \"admissibleCompletions\": {}\n}\n";
 
 /// Where the Getting started guide writes the empty case record.
-const EMPTY_CASE_PATH: &str = "/tmp/fidryn-empty-case.json";
+const EMPTY_CASE_PATH: &str = "tests/programs/cases/empty.json";
 
 /// First lines of the two trust blocks the specimen shows.
 const TRUST_EXCERPT: &[&str] = &[
@@ -385,8 +385,8 @@ mod tests {
             vec![
                 "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/two-certificates-open-eligibility.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z",
                 "fidryn run examples/trust/bryan-revocable-trust.fr --query acting_trustee --case examples/trust/cases/court-selects-i2.json --valid-at 2026-08-24T09:00:00Z --known-at 2026-08-24T09:00:00Z",
-                "fidryn run tests/programs/require-gate.fr --query q --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
-                "fidryn run tests/programs/require-gate.fr --query r --case /tmp/fidryn-empty-case.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
+                "fidryn run tests/programs/require-gate.fr --query q --case tests/programs/cases/empty.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
+                "fidryn run tests/programs/require-gate.fr --query r --case tests/programs/cases/empty.json --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z",
             ]
         );
     }

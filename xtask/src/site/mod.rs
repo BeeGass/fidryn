@@ -279,6 +279,26 @@ mod build_tests {
     }
 
     #[test]
+    fn every_page_footer_shows_the_workspace_version() {
+        let files = build(&workspace_root()).expect("build");
+        let footer = format!(
+            "<p>Fidryn {} &middot; a research fixture, not legal advice &middot; Bryan Gass</p>",
+            env!("CARGO_PKG_VERSION")
+        );
+        let mut pages = 0;
+        for file in files
+            .iter()
+            .filter(|f| f.path.extension().is_some_and(|e| e == "html"))
+        {
+            let html = String::from_utf8(file.bytes.clone()).expect("utf-8");
+            assert!(html.contains(&footer), "{}", file.path.display());
+            assert!(!html.contains("Fidryn v0.1"), "{}", file.path.display());
+            pages += 1;
+        }
+        assert!(pages >= 10, "only {pages} pages");
+    }
+
+    #[test]
     fn two_builds_are_byte_identical() {
         let root = workspace_root();
         let first = build(&root).expect("first build");

@@ -2,7 +2,7 @@
 
 Short map of this checkout, taken from [`README.md`](../README.md) and the top-level names. Human docs win if they disagree. Crate internals are not expanded here. The README points at [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) for the pipeline.
 
-Fidryn is a programming language for legal instruments. The README says this repository is the v0.1 reference interpreter, a research fixture, not legal advice and not an operative instrument. Source files use `.fr`. `run` does not choose a completion; open branches without a covering certificate stay `Suspended`.
+Fidryn is a programming language for legal instruments. The README says this repository is the 0.2 reference interpreter, a research fixture, not legal advice and not an operative instrument. Source files use `.fr`. `run` does not choose a completion; open branches without a covering certificate stay `Suspended`.
 
 ## Crates named in the README
 

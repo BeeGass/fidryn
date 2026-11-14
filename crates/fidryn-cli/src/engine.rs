@@ -41,7 +41,7 @@ fn capture() -> Result<Value, String> {
     }
     Ok(json!({
         "algorithm":"blake3", "digest":hasher.finalize().to_hex().to_string(), "bytes":bytes,
-        "packageVersion":env!("CARGO_PKG_VERSION"), "semanticsVersion":"0.2",
+        "packageVersion":env!("CARGO_PKG_VERSION"), "semanticsVersion":fidryn_core::SEMANTICS_VERSION,
         "arch":std::env::consts::ARCH, "os":std::env::consts::OS,
         "captureMethod": if cfg!(target_os = "linux") { "running_process_inode" } else { "current_executable_file" },
     }))

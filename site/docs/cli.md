@@ -11,7 +11,7 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the 0.2.0 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
@@ -476,11 +476,6 @@ fidryn ui --port 8751 --no-open
 `127.0.0.1:PORT is already in use. Stop that process or pass --port.`
 Other bind or runtime errors are printed to stderr.
 
-## See also
-
-- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
-- [Mill](https://fidryn.onlygass.dev/docs/mill.md)
-
 ## `inputs`
 
 `fidryn inputs MODULE --query QUERY` emits JSON Schema for the declared query
@@ -498,3 +493,8 @@ and actual trace, source spans, executable digest and rerun arguments. Optional
 `--scenario`, `--budget N` and `--template FILE` select the disclosed evaluation
 or retain reviewer material. Reviewer status is `not_assessed`; the archive does
 not constitute legal approval. See [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md).
+
+## See also
+
+- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
+- [Mill](https://fidryn.onlygass.dev/docs/mill.md)

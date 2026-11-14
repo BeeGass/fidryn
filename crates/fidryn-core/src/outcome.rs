@@ -642,7 +642,7 @@ impl CheckedCertificate {
                 answer,
                 args,
             },
-            semantics_version: "0.2",
+            semantics_version: crate::request::SEMANTICS_VERSION,
             operation: ExecutionOperation::Run,
             budget: None,
             tag: Self::covering_tag(method)?,
@@ -1086,7 +1086,7 @@ impl CheckedCertificate {
             method: CoverageMethod::FiniteReplay,
             replay: Some(Box::new(SealedReplayClaims {
                 operation: ExecutionOperation::Run,
-                semantics_version: "0.2".into(),
+                semantics_version: crate::request::SEMANTICS_VERSION.into(),
                 budget: None,
                 case: CaseSnapshotIdentity::of(issuance.case)?,
                 program: issuance.program,

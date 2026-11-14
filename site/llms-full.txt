@@ -42,7 +42,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the 0.2.0 reference
+This directory is the human documentation for the 0.2 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -108,7 +108,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the 0.2.0 research interpreter. The modules under
+This repository is the 0.2 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
@@ -188,14 +188,16 @@ ISO 8601 / RFC 3339 (`Z` or a numeric offset). Use
 `2026-09-17T12:00:00Z` for this hour. Details of the case JSON and
 the two clocks are in [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md).
 
-`require-gate` does not need facts or an interpretation. Write a
-minimal empty case that satisfies the interchange schema
-(`schema` and `admissibleCompletions` are the required properties):
+`require-gate` does not need facts or an interpretation. The repository ships
+a minimal empty case record that satisfies the interchange schema
+(`schema` and `admissibleCompletions` are the required properties), at
+`tests/programs/cases/empty.json`:
 
-```
-cat > /tmp/fidryn-empty-case.json <<'EOF'
-{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}
-EOF
+```json
+{
+  "schema": "fidryn.case-record/v0.1",
+  "admissibleCompletions": {}
+}
 ```
 
 Run `q`. It should be determinate `7`:
@@ -203,7 +205,7 @@ Run `q`. It should be determinate `7`:
 ```
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query q \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
@@ -260,7 +262,7 @@ Save the complete report to retain its actual trace:
 
 ```text
 fidryn run tests/programs/require-gate.fr --query q \
-  --case /tmp/fidryn-empty-case.json \
+  --case tests/programs/cases/empty.json \
   --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
 fidryn explain report.json --format text
 ```
@@ -274,7 +276,7 @@ Now run `r`:
 ```
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query r \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
@@ -363,7 +365,7 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2.0 research interpreter. Example modules are fixtures. They are
+the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
@@ -380,7 +382,7 @@ field is skipped without a diagnostic; see
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2.0 is **parsed / checked / executed** only where noted — see
+Support in 0.2 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -893,7 +895,7 @@ mode when the pasted case has a nonempty `assumptions` list. A default
 
 ## Verify
 
-A `verify` block is a named property. Fidryn 0.2.0 discharges Boolean
+A `verify` block is a named property. Fidryn 0.2 discharges Boolean
 literals:
 
 ```
@@ -1326,7 +1328,7 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the 0.2.0 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
@@ -1791,11 +1793,6 @@ fidryn ui --port 8751 --no-open
 `127.0.0.1:PORT is already in use. Stop that process or pass --port.`
 Other bind or runtime errors are printed to stderr.
 
-## See also
-
-- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
-- [Mill](https://fidryn.onlygass.dev/docs/mill.md)
-
 ## `inputs`
 
 `fidryn inputs MODULE --query QUERY` emits JSON Schema for the declared query
@@ -1813,6 +1810,11 @@ and actual trace, source spans, executable digest and rerun arguments. Optional
 `--scenario`, `--budget N` and `--template FILE` select the disclosed evaluation
 or retain reviewer material. Reviewer status is `not_assessed`; the archive does
 not constitute legal approval. See [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md).
+
+## See also
+
+- [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
+- [Mill](https://fidryn.onlygass.dev/docs/mill.md)
 
 ========== https://fidryn.onlygass.dev/docs/mill.md ==========
 
@@ -3117,7 +3119,7 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the 0.2.0 reference interpreter. It is
+This file is for people building the 0.2 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 

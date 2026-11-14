@@ -17,7 +17,7 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2.0 research interpreter. Example modules are fixtures. They are
+the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
@@ -34,7 +34,7 @@ field is skipped without a diagnostic; see
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2.0 is **parsed / checked / executed** only where noted — see
+Support in 0.2 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -547,7 +547,7 @@ mode when the pasted case has a nonempty `assumptions` list. A default
 
 ## Verify
 
-A `verify` block is a named property. Fidryn 0.2.0 discharges Boolean
+A `verify` block is a named property. Fidryn 0.2 discharges Boolean
 literals:
 
 ```

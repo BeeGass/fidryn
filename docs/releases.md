@@ -4,7 +4,7 @@ The interpreter's workspace version is the release version. Current project term
 and retained prior/third-party grants are documented in
 [Licensing](../LICENSING.md). Source instruments,
 prelude modules and interchange schemas retain their own version histories.
-The 0.2.0 release therefore continues to load the repository's 0.1.0 instrument
+Release 0.2 therefore still loads the repository's 0.1.0 instrument
 fixtures and emits checked evaluation reports using schema v0.2.
 
 ## Prepare a release

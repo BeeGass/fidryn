@@ -312,8 +312,9 @@ pub fn render_checked_report(
         .map(|request| request.identity().hex());
     document.source_bundle = report.source_bundle.clone();
     document.engine_version = Some(format!(
-        "fidryn/{};semantics=0.2",
-        env!("CARGO_PKG_VERSION")
+        "fidryn/{};semantics={}",
+        env!("CARGO_PKG_VERSION"),
+        fidryn_core::SEMANTICS_VERSION
     ));
     document.search_evidence = checked.exploration_evidence().cloned();
     canonical_json(&document).map_err(|error| error.to_string())
@@ -342,8 +343,10 @@ pub fn render_report(
 /// and did not read a `TRACE_ID.json` file. This crate does not invent
 /// a constant-hash eval chain in that case.
 ///
-/// When an outcome document is wrapped, `provenance_root` is the source
-/// snapshot (or the outcome `trace` if no snapshot is present).
+/// When the CLI builds the document for a run, `provenance_root` is the
+/// invocation id, and `nodes` are the evaluator's real derivation steps.
+/// When this crate wraps an outcome by itself, `provenance_root` is the
+/// source snapshot (or the outcome `trace` if no snapshot is present).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TraceDocument {
@@ -377,9 +380,11 @@ pub fn explain_value(value: &serde_json::Value, format: &str) -> String {
 
 /// Wrap an evaluator outcome as a small DAG.
 ///
-/// The evaluator does not yet pass per-step nodes. The wrap uses the
+/// This wrap sees only the outcome, so it has no per-step nodes. It uses the
 /// outcome's [`TraceId`] (hex) and an optional provenance root (module
-/// snapshot identity). It does not emit a shared constant hash.
+/// snapshot identity). It does not emit a shared constant hash. The CLI does
+/// not use this for `run`: it attaches the evaluator's real derivation steps
+/// and sets the provenance root to the invocation id.
 pub fn wrap_outcome(outcome: &Outcome<Value>, provenance_root: Option<&str>) -> TraceDocument {
     wrap_outcome_json(&envelope_outcome(outcome), provenance_root)
 }

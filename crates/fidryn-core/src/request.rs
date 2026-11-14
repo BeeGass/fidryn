@@ -11,6 +11,10 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::BTreeMap;
 use std::fmt;
 
+/// The semantics version this engine implements. Every report and request
+/// that names it takes the value from here.
+pub const SEMANTICS_VERSION: &str = "0.2";
+
 /// Name-derived module id plus executable content fingerprint.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -151,7 +155,7 @@ impl ExecutionRequest {
         mode: ExecutionMode,
     ) -> Result<Self, String> {
         Ok(Self {
-            semantics_version: "0.2".into(),
+            semantics_version: SEMANTICS_VERSION.into(),
             operation: ExecutionOperation::Run,
             program: ProgramIdentity::of(module)?,
             query: QueryName::from(query),

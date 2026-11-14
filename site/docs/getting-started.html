@@ -109,7 +109,7 @@ determinate result only when that result is invariant across every
 still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.</p>
-<p>This repository is the 0.2.0 research interpreter. The modules under
+<p>This repository is the 0.2 research interpreter. The modules under
 <code>examples/</code> and the programs under <code>tests/</code> are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.</p>
@@ -162,16 +162,18 @@ the instant of the file you are willing to treat as known. Both are
 ISO 8601 / RFC 3339 (<code>Z</code> or a numeric offset). Use
 <code>2026-09-17T12:00:00Z</code> for this hour. Details of the case JSON and
 the two clocks are in <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<p><code>require-gate</code> does not need facts or an interpretation. Write a
-minimal empty case that satisfies the interchange schema
-(<code>schema</code> and <code>admissibleCompletions</code> are the required properties):</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cat</span> <span class="tk-pu">&gt;</span> /tmp/fidryn-empty-case.json <span class="tk-pu">&lt;&lt;&#39;EOF&#39;</span>
-<span class="tk-st">{&quot;schema&quot;:&quot;fidryn.case-record/v0.1&quot;,&quot;admissibleCompletions&quot;:{}}</span>
-<span class="tk-pu">EOF</span></code></pre></figure>
+<p><code>require-gate</code> does not need facts or an interpretation. The repository ships
+a minimal empty case record that satisfies the interchange schema
+(<code>schema</code> and <code>admissibleCompletions</code> are the required properties), at
+<code>tests/programs/cases/empty.json</code>:</p>
+<figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
+  <span class="tk-ty">&quot;schema&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;fidryn.case-record/v0.1&quot;</span><span class="tk-pu">,</span>
+  <span class="tk-ty">&quot;admissibleCompletions&quot;</span><span class="tk-pu">:</span> <span class="tk-pu">{</span><span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
 <p>Run <code>q</code>. It should be determinate <code>7</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> run tests/programs/require-gate.fr <span class="tk-pu">\</span>
     <span class="tk-ty">--query</span> q <span class="tk-pu">\</span>
-    <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
+    <span class="tk-ty">--case</span> tests/programs/cases/empty.json <span class="tk-pu">\</span>
     <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
     <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
 <p>The CLI prints one line of canonical JSON
@@ -219,7 +221,7 @@ produce a qualified determinate answer. The selected budget is part of the
 invocation identity.</p>
 <p>Save the complete report to retain its actual trace:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn run tests/programs/require-gate.fr --query q \
-  --case /tmp/fidryn-empty-case.json \
+  --case tests/programs/cases/empty.json \
   --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z &gt; report.json
 fidryn explain report.json --format text</code></pre></figure>
 <p><code>--source-root PATH</code> explicitly grants the filesystem root for artifacts and
@@ -228,7 +230,7 @@ and symlinks cannot make an artifact escape that root.</p>
 <p>Now run <code>r</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> run tests/programs/require-gate.fr <span class="tk-pu">\</span>
     <span class="tk-ty">--query</span> r <span class="tk-pu">\</span>
-    <span class="tk-ty">--case</span> /tmp/fidryn-empty-case.json <span class="tk-pu">\</span>
+    <span class="tk-ty">--case</span> tests/programs/cases/empty.json <span class="tk-pu">\</span>
     <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
     <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
 <p><code>require false</code> does not skip ahead to <code>return 7</code>. Nested
@@ -292,7 +294,7 @@ live-file.</li>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

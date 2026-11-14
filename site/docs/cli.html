@@ -98,9 +98,9 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.15</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.16</span> review</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></details>
     <div class="prose">
-<p>The binary name is <code>fidryn</code>. It is the 0.2.0 reference interpreter: parse a
+<p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under <a href="#file"><code>file</code></a>.</p>
@@ -427,36 +427,36 @@ is omitted.</p>
 <p><strong>Failure.</strong> Exit 1.
 <code>127.0.0.1:PORT is already in use. Stop that process or pass --port.</code>
 Other bind or runtime errors are printed to stderr.</p>
-<h2 id="see-also"><span class="hn">4.14</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
-<ul>
-<li><a href="/docs/getting-started">Getting started</a></li>
-<li><a href="/docs/mill">Mill</a></li>
-</ul>
-<h2 id="inputs"><span class="hn">4.15</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
+<h2 id="inputs"><span class="hn">4.14</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn inputs MODULE --query QUERY</code> emits JSON Schema for the declared query
 argument object. Aliases, sum constructors, records, nominal entities and
 collections come from checked declarations. Observation schemas and external
 review requests appear as metadata. Unsupported representations refuse instead
 of producing an unconstrained input schema.</p>
-<h2 id="review"><span class="hn">4.16</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
+<h2 id="review"><span class="hn">4.15</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at TIME</code> emits a portable <code>fidryn.review-bundle/v0.1</code> JSON archive. It retains exact
 source/case/dependency/lock bytes, a labeled normalized manifest, checked report
 and actual trace, source spans, executable digest and rerun arguments. Optional
 <code>--scenario</code>, <code>--budget N</code> and <code>--template FILE</code> select the disclosed evaluation
 or retain reviewer material. Reviewer status is <code>not_assessed</code>; the archive does
 not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>.</p>
+<h2 id="see-also"><span class="hn">4.16</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><a href="/docs/getting-started">Getting started</a></li>
+<li><a href="/docs/mill">Mill</a></li>
+</ul>
 
     </div>
     <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cases-and-time"><span class="label">Previous &middot; &sect;3</span><span class="t">Cases and time</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;5</span><span class="t">Mill</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.14</span> See also</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.15</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.16</span> review</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

@@ -22,7 +22,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the 0.2.0 research interpreter. The modules under
+This repository is the 0.2 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
@@ -102,14 +102,16 @@ ISO 8601 / RFC 3339 (`Z` or a numeric offset). Use
 `2026-09-17T12:00:00Z` for this hour. Details of the case JSON and
 the two clocks are in [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md).
 
-`require-gate` does not need facts or an interpretation. Write a
-minimal empty case that satisfies the interchange schema
-(`schema` and `admissibleCompletions` are the required properties):
+`require-gate` does not need facts or an interpretation. The repository ships
+a minimal empty case record that satisfies the interchange schema
+(`schema` and `admissibleCompletions` are the required properties), at
+`tests/programs/cases/empty.json`:
 
-```
-cat > /tmp/fidryn-empty-case.json <<'EOF'
-{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}
-EOF
+```json
+{
+  "schema": "fidryn.case-record/v0.1",
+  "admissibleCompletions": {}
+}
 ```
 
 Run `q`. It should be determinate `7`:
@@ -117,7 +119,7 @@ Run `q`. It should be determinate `7`:
 ```
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query q \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
@@ -174,7 +176,7 @@ Save the complete report to retain its actual trace:
 
 ```text
 fidryn run tests/programs/require-gate.fr --query q \
-  --case /tmp/fidryn-empty-case.json \
+  --case tests/programs/cases/empty.json \
   --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
 fidryn explain report.json --format text
 ```
@@ -188,7 +190,7 @@ Now run `r`:
 ```
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query r \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```

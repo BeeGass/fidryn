@@ -251,7 +251,7 @@ pub fn build_review(request: &ReviewRequest<'_>) -> Result<String, String> {
         },
         "rerun":{
             "modulePath":program_path,"casePath":case_path,"sourceRoot":"program",
-            "engineVersion":format!("fidryn/{};semantics=0.2",env!("CARGO_PKG_VERSION")),
+            "engineVersion":format!("fidryn/{};semantics={}",env!("CARGO_PKG_VERSION"),fidryn_core::SEMANTICS_VERSION),
             "engineArtifact":engine,
             "arguments":command,
             "instructions":"Restore present files at their relative archive paths, keep missing observations absent, and run the argument vector from the restored archive root. Compare the available executable fingerprint with engineArtifact; the archive identifies that binary but does not distribute it."

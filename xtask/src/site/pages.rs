@@ -262,6 +262,7 @@ fn shell(page: &Shell<'_>, main: &str, assets: &Assets) -> String {
             ("nav_docs", mark(Nav::Docs)),
             ("nav_examples", mark(Nav::Examples)),
             ("main", main.trim_end()),
+            ("version", env!("CARGO_PKG_VERSION")),
         ],
     )
 }
