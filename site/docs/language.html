@@ -97,7 +97,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 2 &middot; Write</p>
     <h1 id="doc-title">The Fidryn language</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></details>
     <div class="prose">
 <p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
 open the fixtures and check them. For build, <code>check</code>, and the first
@@ -331,7 +331,51 @@ and discarded. Any determination of <code>P</code> on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
 on <code>P</code>.</p>
-<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.11</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
+<h2 id="where-a-statement-ends"><span class="hn">2.11</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
+<p>A statement ends at a <code>;</code> or at the end of its line. It goes on into the
+next line in two cases.</p>
+<ul>
+<li>The line ends in a token that cannot end a statement. The tokens that
+can are a name or word, a literal, <code>)</code>, <code>]</code>, <code>}</code>, <code>*</code> and <code>&gt;</code>. A line
+that ends in one of the prefix words <code>not</code>, <code>operative</code>, <code>effective</code>,
+<code>established</code>, <code>determined</code>, <code>always</code>, <code>active</code>, <code>every</code>, <code>unique</code> and
+<code>closed</code> goes on as well.</li>
+<li>The next line begins with a continuation: one of the words <code>and</code>, <code>or</code>,
+<code>in</code>, <code>where</code>, <code>then</code>, <code>else</code>, <code>from</code>, <code>decides</code>, <code>occupied_by</code>,
+<code>establishes</code>, <code>using</code>, <code>for</code>, <code>rank</code>, <code>as</code>, <code>to</code>, <code>version</code> and <code>fuel</code>,
+or one of the tokens <code>.</code>, <code>,</code>, <code>-&gt;</code>, <code>=&gt;</code>, <code>:</code>, <code>=</code>, <code>|</code>, <code>&lt;</code>, <code>!</code>, <code>{</code>,
+<code>(</code> and <code>[</code>.</li>
+</ul>
+<p>A blank line has no token, and neither has a line that holds only a
+comment. The first case holds across such lines. The second holds across
+them only for a line that begins with <code>and</code>, <code>or</code>, <code>in</code>, <code>.</code>, <code>,</code>, <code>-&gt;</code>,
+<code>=&gt;</code>, <code>:</code>, <code>=</code>, <code>|</code> or <code>&lt;</code>. No statement begins with one of those, so a
+condition can carry a comment between its lines:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">rule</span> BothConditions <span class="tk-pu">:</span> <span class="tk-kw">derive</span> <span class="tk-kw">from</span> <span class="tk-st">&quot;cite&quot;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">when</span> operative A
+        <span class="tk-co">// the second condition</span>
+        <span class="tk-kw">and</span> operative B
+    <span class="tk-kw">then</span> <span class="tk-kw">derive</span> C
+<span class="tk-pu">}</span></code></pre></figure>
+<p>The guard of that rule is <code>operative A and operative B</code>. Each of the
+other continuations, such as <code>then</code>, <code>for</code> or <code>(</code>, can begin a statement
+of its own, so below a blank line or a comment line it does not continue
+the statement above. That holds where the parser tests whether a
+statement has ended. Where it expects the next part of a form it does not
+test, and reads on across blank and comment lines: an <code>else</code> after the
+block of an <code>if</code>, for example, and the <code>{ ... }</code> block that follows the
+domain of a quantifier or the word <code>transaction</code>.</p>
+<p>Parentheses, brackets and braces do not change the rule: a line break
+inside them ends the expression before it in the same cases. <code>(1</code>
+followed by the line <code>+ 2)</code> is rejected, because <code>+</code> is not a
+continuation. Write <code>(1 +</code> and then <code>2)</code>.</p>
+<p>Text the parser steps over without reading it, such as a <code>verify</code> field
+it does not read or a clause it keeps as text, ends by the same rule with
+three differences. A line break inside its parentheses, brackets or
+braces does not end it. A prefix word at the end of a line does not carry
+it into the next line. And it ends after the <code>}</code> that closes its
+outermost brace, unless a continuation follows.</p>
+<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> <span class="tk-nu">21</span> <span class="tk-nu">counted_days</span>
@@ -368,7 +412,7 @@ amounts:</p>
     <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> if Incapacitated<span class="tk-pu">(</span>Bryan<span class="tk-pu">)</span> <span class="tk-pu">{</span> Bryan <span class="tk-pu">}</span> <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Use <code>when operative P</code> on a rule, or <code>require determined P using Determine</code> in a query. <code>Prop</code> has no conversion to <code>Bool</code>.</p>
-<h2 id="rules"><span class="hn">2.12</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
+<h2 id="rules"><span class="hn">2.13</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
 <p>A <code>rule</code> fires when a guard holds, then derives or establishes a
 proposition. The current staged worklist is <strong>bounded and specialized</strong>
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>); this is not a
@@ -389,7 +433,7 @@ must use <code>operative</code>, <code>determined</code>, <code>assumed</code>, 
 bare proposition. The successor rule in the trust fixture also
 <code>select unique candidate from nominations_for(...)</code> with
 <code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
-<h2 id="interpretation-families"><span class="hn">2.13</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
+<h2 id="interpretation-families"><span class="hn">2.14</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
 <p>When the instrument still admits more than one reading, declare the
 family and what each alternative establishes.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">interpretation_family</span> DeadlineMeaning <span class="tk-pu">{</span>
@@ -413,7 +457,7 @@ and the case has not selected one, the outcome is <code>suspended</code>
 <p>The trust fixture binds a family to a clause and names a selector
 (<code>explicit_instrument_definition or controlling_interpretation or request Interpret</code>). That is how a court selection on the case becomes
 operative. It is not a default vote.</p>
-<h2 id="nominations"><span class="hn">2.14</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
+<h2 id="nominations"><span class="hn">2.15</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
 <p>A nomination is a ranked candidate for an office.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">nomination</span> Alice <span class="tk-kw">for</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">rank</span> <span class="tk-nu">1</span>
     <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4.a&quot;</span><span class="tk-pu">)</span>
@@ -426,7 +470,7 @@ occupancy record, eligibility, and any required acceptance. Open
 eligibility stays <code>suspended</code>, or becomes <code>contingent</code> under
 <a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
 the first name on the list.</p>
-<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.15</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
+<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.16</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
 <p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
@@ -439,7 +483,7 @@ The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
 <p>When the rules' staged effects both add and withdraw the same
 proposition, the outcome kind is <code>normConflict</code>. No <code>conflict_doctrine</code>
 is consulted, and list order is never a silent tie-break.</p>
-<h2 id="duties"><span class="hn">2.16</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
+<h2 id="duties"><span class="hn">2.17</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
 <p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
 From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr"><code>tests/programs/late-payment.fr</code></a>:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">duty</span> PayInvoice <span class="tk-pu">{</span>
@@ -468,7 +512,7 @@ guard. A <code>kind: duty</code> event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit <code>assumption</code>. That gate is in
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2 id="transactions-and-quantifiers"><span class="hn">2.17</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
+<h2 id="transactions-and-quantifiers"><span class="hn">2.18</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
 <p><code>transaction { ... }</code> blocks exist in the grammar and are exercised by
 <code>tests/programs/transaction-atomic.fr</code>. Support is <strong>partial</strong> — not a
 full atomic commit engine for arbitrary legal acts.</p>
@@ -477,7 +521,7 @@ closures where required). Open domains suspend. Nested / open-world
 theorem proving is not implemented. Prefer reading
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a> before treating a
 quantified <code>verify</code> as a proved theorem.</p>
-<h2 id="scenarios-in-module"><span class="hn">2.18</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
+<h2 id="scenarios-in-module"><span class="hn">2.19</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
 <p>A <code>scenario</code> block writes down example hypotheses in fixtures that do
 not ship companion JSON case files (for example under
 <code>examples/states/</code>).</p>
@@ -498,7 +542,7 @@ the report's <code>executionMode</code> is then <code>scenario</code>. The mill 
 mode when the pasted case has a nonempty <code>assumptions</code> list. A default
 <code>run</code> is operative and ignores <code>assumptions</code>. See
 <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
-<h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
+<h2 id="verify"><span class="hn">2.20</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
 <p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.2
 decides closed formulas only: literals, arithmetic, comparisons, Boolean
 connectives, and quantifiers over a literal set or bounded synthetic
@@ -519,17 +563,91 @@ lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
-<p>A top-level <code>for_all</code> or <code>exists</code> line is checked as an assertion, in the
-same way as an <code>assert</code> line. A <code>bounds</code> line gives the numbers of
-synthetic persons, events and time points. <code>interpretations</code>,
-<code>judgments</code>, <code>choices</code> and <code>assuming</code> lines are recognized and not read.
-A <code>for every</code> line is not evaluated, and a property whose block has one
-is never <code>proved</code>. A line that begins with any other word, such as a
-misspelled <code>assert</code>, is not dropped unless it continues the line above
-it: it is kept as an assertion that cannot be decided, or the module is
-rejected with <code>E100</code>. An assertion that cannot be decided leaves the
-property <code>unknown</code> unless another assertion is false.</p>
-<h2 id="what-the-language-will-not-do"><span class="hn">2.20</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
+<h3 id="the-fields-of-a-verify-block"><span class="hn">2.20.1</span> The fields of a verify block <a class="anchor" href="#the-fields-of-a-verify-block" aria-label="Link to this section">#</a></h3>
+<p>A verify block is a list of fields. Nine words begin a field:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>First word</th><th>What <code>verify</code> does with the field</th></tr></thead><tbody>
+<tr><td><code>assert</code></td><td>The expression after it is an assertion.</td></tr>
+<tr><td><code>for_all</code>, <code>exists</code></td><td>The expression the word begins is an assertion, checked in the same way.</td></tr>
+<tr><td><code>bounds</code></td><td>It gives the numbers of synthetic persons, events and time points.</td></tr>
+<tr><td><code>interpretations</code>, <code>judgments</code>, <code>choices</code>, <code>assuming</code></td><td>The field is recognized and not read.</td></tr>
+<tr><td><code>for</code></td><td>A <code>for every</code> line is not evaluated. It is kept as an assertion that cannot be decided.</td></tr>
+</tbody></table>
+</div>
+<p>An assertion that cannot be decided leaves the property <code>unknown</code> unless
+another assertion is false. A block with no assertion is <code>unknown</code> too,
+whatever its comments say: a comment is never read as an assertion.</p>
+<p>A field ends where its statement ends; see
+<a href="#where-a-statement-ends">Where a statement ends</a>. An <code>assert</code>, <code>for_all</code>,
+<code>exists</code> or <code>bounds</code> field, and a field that is not read, ends earlier
+where the next field begins, as if a <code>;</code> stood there:</p>
+<ul>
+<li>
+<p>The word <code>assert</code> begins a field wherever it stands, in the middle of a
+line too.</p>
+</li>
+<li>
+<p>A line that begins with one of the other eight words begins a field. In
+the middle of a line those words do not cut a field short:
+<code>assuming fair for every x in {1, 2}: x == 3</code> is one <code>assuming</code> field,
+and none of it is read.</p>
+</li>
+<li>
+<p>There is one exception. Below an <code>assert</code>, <code>for_all</code> or <code>exists</code> field,
+a line that begins with <code>for_all</code> or <code>exists</code> does not end that field.
+It continues the line above when the statement goes on into it, and is
+a field of its own when the statement has ended. This is one assertion,
+and it is proved:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> EveryNumberHasAnEqual <span class="tk-pu">{</span>
+    <span class="tk-kw">for_all</span> x <span class="tk-kw">in</span> <span class="tk-pu">{</span><span class="tk-nu">1</span><span class="tk-pu">,</span> <span class="tk-nu">2</span><span class="tk-pu">}</span><span class="tk-pu">:</span>
+        <span class="tk-kw">exists</span> y <span class="tk-kw">in</span> <span class="tk-pu">{</span><span class="tk-nu">1</span><span class="tk-pu">,</span> <span class="tk-nu">2</span><span class="tk-pu">}</span><span class="tk-pu">:</span> x <span class="tk-pu">==</span> y
+<span class="tk-pu">}</span></code></pre></figure>
+</li>
+<li>
+<p>Nothing inside the parentheses, brackets or braces of a field begins a
+field.</p>
+</li>
+</ul>
+<p>A <code>for every</code> line, and a line the block does not recognize, have no
+early end. The parser steps over such a line as text it does not read,
+together with every line that text goes on into, an <code>assert</code> line
+included, and the whole is one assertion that cannot be decided.</p>
+<p>An expression that is complete where the next field begins is an
+assertion. One that is cut off there gets the diagnostic it would get
+before a <code>;</code>: <code>assert true or 1 +</code> followed by the line <code>assert false</code> is
+rejected with <code>E100</code>, "expected expression after operator". An <code>assert</code>
+with no expression is an assertion that cannot be decided.</p>
+<p>Text that follows the expression of an <code>assert</code>, <code>for_all</code> or <code>exists</code>
+field is read as the next field when it begins with one of the nine
+words. That is rare on one line, because a word that directly follows an
+expression is normally taken into the expression as an operand:
+<code>assert true assuming fair</code> is one assertion, and it cannot be decided.
+Before a <code>:</code> or an <code>=</code> a word is not an operand, so
+<code>assert true assuming: x</code> is the assertion <code>true</code> followed by an
+<code>assuming</code> field.</p>
+<p>Text that begins with none of the nine words, such as a misspelled
+<code>assert</code>, is not dropped either. When the field above goes on into it, it
+is part of that field. Otherwise it is read as a line of its own and kept
+as an assertion that cannot be decided, with one difference after an
+<code>assert</code>: the <code>assert</code> and the text that follows its expression, on the
+same line or below it, are together one assertion that cannot be decided,
+and the module is rejected with <code>E100</code> when that text begins with
+something other than a word.</p>
+<p>Two limits remain.</p>
+<ul>
+<li>What stands inside the parentheses, brackets or braces of a field that
+is not read belongs to that field, and so does a line that begins with
+none of the nine words when the field goes on into it. An
+<code>assert false</code> between the braces of an <code>interpretations</code> field is not
+read.</li>
+<li><code>verify</code> evaluates an assertion; it does not type-check it. A true
+operand of <code>or</code> and a false operand of <code>and</code> settle the result whatever
+the other operand is, and the branch an <code>if</code> does not take is not
+examined. So <code>assert true or no_such_name</code> is proved, and so is
+<code>assert true or 1 +</code> followed by the line
+<code>for_all x in {1, 2}: x == 3</code>, where the second line is the right
+operand of <code>+</code>.</li>
+</ul>
+<h2 id="what-the-language-will-not-do"><span class="hn">2.21</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
 <p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
 <code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,
 <code>assumed</code>, or <code>necessarily</code>, or request <code>Determine</code>.</p>
@@ -549,7 +667,7 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/language.md">Edit this page on GitHub</a><a href="/docs/language.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

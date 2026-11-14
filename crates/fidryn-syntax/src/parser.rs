@@ -256,13 +256,74 @@ enum InfixOp {
     Word(&'static str),
 }
 
+/// What a verify block does with a field, by the word the field begins with.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum VerifyField {
+    /// `assert`: the expression after it is an assertion.
+    Assert,
+    /// `for_all` or `exists`: the expression it begins is an assertion.
+    Quantifier,
+    /// `bounds`: the numbers of synthetic persons, events and time points.
+    Bounds,
+    /// `interpretations`, `judgments`, `choices` or `assuming`: recognized
+    /// and not read.
+    NotRead,
+    /// `for`, the first word of a `for every` line: kept as an assertion
+    /// that cannot be decided.
+    ForEvery,
+}
+
+impl VerifyField {
+    /// The field a word begins. These nine words are the ones that begin a
+    /// field of a verify block.
+    fn begun_by(word: &str) -> Option<Self> {
+        match word {
+            "assert" => Some(Self::Assert),
+            "for_all" | "exists" => Some(Self::Quantifier),
+            "bounds" => Some(Self::Bounds),
+            "interpretations" | "judgments" | "choices" | "assuming" => Some(Self::NotRead),
+            "for" => Some(Self::ForEvery),
+            _ => None,
+        }
+    }
+
+    /// True for a field whose expression the block reads as an assertion.
+    fn is_read(self) -> bool {
+        matches!(self, Self::Assert | Self::Quantifier)
+    }
+}
+
 impl<'a> Parser<'a> {
     fn peek_raw(&self) -> Token {
-        self.tokens.get(self.idx).copied().unwrap_or(Token {
+        self.tokens
+            .get(self.idx)
+            .copied()
+            .unwrap_or_else(|| self.end_of_input())
+    }
+
+    /// The token that stands for the end of the input. It sits at the end of
+    /// the last token the parser can see, which is the end of the source
+    /// unless `with_tokens_until` has hidden the rest.
+    fn end_of_input(&self) -> Token {
+        let at = self
+            .tokens
+            .last()
+            .map_or(self.source.len() as u32, |token| token.end);
+        Token {
             kind: TokenKind::Eof,
-            start: self.source.len() as u32,
-            end: self.source.len() as u32,
-        })
+            start: at,
+            end: at,
+        }
+    }
+
+    /// Runs `read` with the tokens from `end` on hidden, so that it sees the
+    /// end of the input where the token at `end` stands.
+    fn with_tokens_until<R>(&mut self, end: usize, read: impl FnOnce(&mut Self) -> R) -> R {
+        let all = self.tokens;
+        self.tokens = &all[..end.min(all.len())];
+        let result = read(self);
+        self.tokens = all;
+        result
     }
 
     fn is_trivia(kind: TokenKind) -> bool {
@@ -295,13 +356,9 @@ impl<'a> Parser<'a> {
     }
 
     /// True when the newline token at `index` ends a statement. It continues
-    /// the statement instead when the first token after it is a continuation,
-    /// or when the last token before it cannot end a statement or is a prefix
-    /// word.
+    /// the statement instead when the line after it continues it, or when the
+    /// last token before it cannot end a statement or is a prefix word.
     fn newline_ends_statement(&self, index: usize) -> bool {
-        let after = self.tokens[index + 1..]
-            .iter()
-            .find(|token| !Self::is_trivia(token.kind));
         let before = self.tokens[..index]
             .iter()
             .rev()
@@ -310,7 +367,25 @@ impl<'a> Parser<'a> {
             !Self::can_end_statement(token.kind)
                 || token.kind == TokenKind::Ident && Self::is_prefix_word(self.text(*token))
         });
-        !(after.is_some_and(|token| self.is_continuation(*token)) || needs_operand)
+        !(self.next_line_continues(index) || needs_operand)
+    }
+
+    /// True when the line after the newline token at `index` continues the
+    /// statement: its first token is a continuation. A blank line and a line
+    /// that holds only a comment have no token. Below such lines the first
+    /// line that has a token continues the statement only when that token is
+    /// one no statement begins with.
+    fn next_line_continues(&self, index: usize) -> bool {
+        let mut after = self.tokens[index + 1..]
+            .iter()
+            .filter(|token| !Self::is_trivia(token.kind));
+        match after.next() {
+            Some(first) if first.kind == TokenKind::Newline => after
+                .find(|token| token.kind != TokenKind::Newline)
+                .is_some_and(|token| self.only_continues(*token)),
+            Some(first) => self.is_continuation(*first),
+            None => false,
+        }
     }
 
     /// True when a statement-ending newline lies between the last consumed
@@ -338,11 +413,7 @@ impl<'a> Parser<'a> {
             }
             return *t;
         }
-        Token {
-            kind: TokenKind::Eof,
-            start: self.source.len() as u32,
-            end: self.source.len() as u32,
-        }
+        self.end_of_input()
     }
 
     fn peek_nth(&self, n: usize) -> Token {
@@ -359,34 +430,24 @@ impl<'a> Parser<'a> {
             seen += 1;
             i += 1;
         }
-        Token {
-            kind: TokenKind::Eof,
-            start: self.source.len() as u32,
-            end: self.source.len() as u32,
-        }
+        self.end_of_input()
     }
 
-    fn lookahead_non_trivia(&self, mut skip_newlines: usize) -> Token {
-        let mut i = self.idx;
-        while let Some(t) = self.tokens.get(i) {
-            if Self::is_trivia(t.kind) {
-                i += 1;
-                continue;
-            }
-            if t.kind == TokenKind::Newline {
-                if skip_newlines == 0 {
-                    return *t;
-                }
-                skip_newlines -= 1;
-                i += 1;
-                continue;
-            }
-            return *t;
-        }
-        Token {
-            kind: TokenKind::Eof,
-            start: self.source.len() as u32,
-            end: self.source.len() as u32,
+    /// True for a continuation that no statement begins with. Each of the
+    /// others can begin a line in its own right: the remaining words of
+    /// `CONTINUATION`, such as `then` and `for`, and `{`, `(`, `[` and `!`.
+    fn only_continues(&self, tok: Token) -> bool {
+        match tok.kind {
+            TokenKind::Dot
+            | TokenKind::Comma
+            | TokenKind::Arrow
+            | TokenKind::FatArrow
+            | TokenKind::Colon
+            | TokenKind::Eq
+            | TokenKind::Pipe
+            | TokenKind::Lt => true,
+            TokenKind::Ident => matches!(self.text(tok), "and" | "or" | "in"),
+            _ => false,
         }
     }
 
@@ -512,7 +573,7 @@ impl<'a> Parser<'a> {
     }
 
     /// True when the next token ends the statement: a newline that does not
-    /// continue it, `;` or the end of the file.
+    /// continue it, `;` or the end of the input.
     fn next_token_ends_statement(&mut self) -> bool {
         self.apply_asi();
         matches!(
@@ -523,6 +584,13 @@ impl<'a> Parser<'a> {
 
     /// True when the statement has ended: the next token ends it, or a
     /// lookahead has already stepped over the newline that ended it.
+    ///
+    /// Call this only after a token of the statement has been consumed. At
+    /// the start of a statement the cursor has usually passed the newline
+    /// that ended the statement before it, so this is true there although
+    /// the new statement has not ended. `parse_prefix` can run at the start
+    /// of a statement, which is why it asks `next_token_ends_statement`
+    /// instead.
     fn at_stmt_break(&mut self) -> bool {
         self.next_token_ends_statement() || self.passed_statement_end()
     }
@@ -1776,67 +1844,60 @@ impl<'a> Parser<'a> {
                 if self.eat_kind(TokenKind::Semicolon) {
                     continue;
                 }
-                if self.at_ident("assert") {
-                    let clause_start = self.peek().start;
-                    let assertion_count = assertions.len();
-                    self.bump();
-                    if let Some(e) = self.parse_expr() {
-                        expr.get_or_insert_with(|| e.clone());
-                        assertions.push(e);
-                    }
-                    if !self.at_verify_field()
-                        && !matches!(
-                            self.peek().kind,
-                            TokenKind::RBrace | TokenKind::Eof | TokenKind::Semicolon
-                        )
-                    {
-                        if self.peek().kind != TokenKind::Ident {
-                            self.error_here("unexpected tokens after verification assertion");
+                let clause_start = self.peek().start;
+                match self.verify_field_ahead() {
+                    Some(field @ VerifyField::Assert) => {
+                        let (parsed, assertion) =
+                            self.until_next_verify_field(field, Self::parse_assert_field);
+                        if expr.is_none() {
+                            expr = parsed;
                         }
+                        assertions.push(assertion);
+                        self.eat_semi();
+                        let text = self
+                            .src_slice(clause_start, self.last_end(clause_start))
+                            .trim()
+                            .trim_end_matches(';')
+                            .trim()
+                            .to_owned();
+                        if !text.is_empty() && !fields.contains_key("assert") {
+                            fields.insert("assert".to_owned(), text);
+                        }
+                    }
+                    Some(field @ VerifyField::Bounds) => {
+                        if self.peek_nth(1).kind == TokenKind::LBrace {
+                            self.bump();
+                            let _ = self.parse_braced_expr();
+                        } else {
+                            self.until_next_verify_field(field, Self::skip_balanced_until_end);
+                        }
+                        self.eat_semi();
+                        let text = self
+                            .src_slice(clause_start, self.last_end(clause_start))
+                            .trim()
+                            .trim_end_matches(';')
+                            .trim()
+                            .to_owned();
+                        if !text.is_empty() {
+                            fields.insert("bounds".to_owned(), text);
+                        }
+                    }
+                    Some(field @ VerifyField::Quantifier) => {
+                        if let Some(e) = self.until_next_verify_field(field, Self::parse_expr) {
+                            assertions.push(e);
+                        }
+                        self.eat_semi();
+                    }
+                    Some(field @ VerifyField::NotRead) => {
+                        self.until_next_verify_field(field, Self::skip_balanced_until_end);
+                    }
+                    Some(VerifyField::ForEvery) | None => {
+                        // A `for every` line, or a line the block does not
+                        // recognize. It is not decided, so it has no early
+                        // end: what the line rule joins to it stays with it.
                         self.skip_balanced_until_end();
-                        assertions.truncate(assertion_count);
                         assertions.push(self.unsupported_assertion(clause_start));
                     }
-                    self.eat_semi();
-                    let text = self
-                        .src_slice(clause_start, self.last_end(clause_start))
-                        .trim()
-                        .trim_end_matches(';')
-                        .trim()
-                        .to_owned();
-                    if !text.is_empty() && !fields.contains_key("assert") {
-                        fields.insert("assert".to_owned(), text);
-                    }
-                } else if self.at_ident("bounds") {
-                    let clause_start = self.peek().start;
-                    if self.peek_nth(1).kind == TokenKind::LBrace {
-                        self.bump();
-                        let _ = self.parse_braced_expr();
-                    } else {
-                        self.skip_verify_field();
-                    }
-                    self.eat_semi();
-                    let text = self
-                        .src_slice(clause_start, self.last_end(clause_start))
-                        .trim()
-                        .trim_end_matches(';')
-                        .trim()
-                        .to_owned();
-                    if !text.is_empty() {
-                        fields.insert("bounds".to_owned(), text);
-                    }
-                } else if self.at_ident("for_all") || self.at_ident("exists") {
-                    if let Some(e) = self.parse_expr() {
-                        assertions.push(e);
-                    }
-                    self.eat_semi();
-                } else if self.at_unread_verify_field() {
-                    self.skip_verify_field();
-                } else {
-                    // A `for every` line, or a line the block does not recognize.
-                    let clause_start = self.peek().start;
-                    self.skip_balanced_until_end();
-                    assertions.push(self.unsupported_assertion(clause_start));
                 }
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
@@ -1870,66 +1931,98 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// True at a verify field the block recognizes and does not read.
-    fn at_unread_verify_field(&mut self) -> bool {
+    /// The verify field the next token begins, when that token is one of the
+    /// nine words that begin one.
+    fn verify_field_ahead(&mut self) -> Option<VerifyField> {
         let t = self.peek();
-        t.kind == TokenKind::Ident
-            && matches!(
-                self.text(t),
-                "interpretations" | "judgments" | "choices" | "assuming"
-            )
-    }
-
-    /// Steps over a verify field without reading it. A statement runs on into
-    /// the line below it when its last token cannot end a statement, or when
-    /// that line begins with `for`, which continues a statement. A field ends
-    /// where the next field begins instead, so the cursor goes back to the
-    /// first line that begins one: that line makes a claim of its own.
-    fn skip_verify_field(&mut self) {
-        let start = self.idx;
-        self.skip_balanced_until_end();
-        let end = self.idx;
-        let mut depth = 0i32;
-        for index in start..end {
-            match self.tokens[index].kind {
-                TokenKind::LBrace | TokenKind::LParen | TokenKind::LBracket => depth += 1,
-                TokenKind::RBrace | TokenKind::RParen | TokenKind::RBracket => depth -= 1,
-                TokenKind::Newline if depth == 0 => {
-                    let first = self.tokens[index + 1..end].iter().find(|token| {
-                        !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline
-                    });
-                    if first.is_some_and(|token| {
-                        token.kind == TokenKind::Ident
-                            && Self::begins_verify_field(self.text(*token))
-                    }) {
-                        self.idx = index + 1;
-                        return;
-                    }
-                }
-                _ => {}
-            }
+        if t.kind == TokenKind::Ident {
+            VerifyField::begun_by(self.text(t))
+        } else {
+            None
         }
     }
 
-    fn at_verify_field(&mut self) -> bool {
-        let t = self.peek();
-        t.kind == TokenKind::Ident && Self::begins_verify_field(self.text(t))
+    /// Reads or steps over the verify field `field`, whose first word is at
+    /// the cursor, with `read`. A field ends where the next one begins, as if
+    /// a `;` stood there, so `read` sees the end of the input at that place.
+    /// A statement would otherwise run on into the next field when its last
+    /// token cannot end a statement, when the next field is on the same
+    /// line, or when the next field begins with `for`, which continues a
+    /// statement.
+    fn until_next_verify_field<R>(
+        &mut self,
+        field: VerifyField,
+        read: impl FnOnce(&mut Self) -> R,
+    ) -> R {
+        let end = self.next_verify_field(field);
+        self.with_tokens_until(end, read)
     }
 
-    /// True for a word that begins a field of a verify block.
-    fn begins_verify_field(word: &str) -> bool {
-        matches!(
-            word,
-            "interpretations"
-                | "judgments"
-                | "choices"
-                | "bounds"
-                | "assuming"
-                | "assert"
-                | "for_all"
-                | "exists"
-                | "for"
-        )
+    /// The index of the token where the next field of a verify block begins,
+    /// seen from the first word of `field` at the cursor, or the number of
+    /// tokens when no field begins before the block ends.
+    ///
+    /// The word `assert` begins a field wherever it stands. Each other field
+    /// word begins one when it begins a line, with one exception: below a
+    /// field that is read, a line that begins with `for_all` or `exists` can
+    /// be the rest of that field's expression, as the body of a quantifier
+    /// is, so it does not end that field. Nothing inside the parentheses,
+    /// brackets or braces of the field begins a field. A closing parenthesis
+    /// or bracket that closes nothing is stepped over, and a `}` that closes
+    /// nothing ends the block.
+    fn next_verify_field(&self, field: VerifyField) -> usize {
+        let mut depth = 0usize;
+        let mut begins_line = false;
+        for (index, token) in self.tokens.iter().enumerate().skip(self.idx + 1) {
+            if Self::is_trivia(token.kind) {
+                continue;
+            }
+            match token.kind {
+                TokenKind::LBrace | TokenKind::LParen | TokenKind::LBracket => depth += 1,
+                TokenKind::RBrace if depth == 0 => break,
+                TokenKind::RBrace | TokenKind::RParen | TokenKind::RBracket => {
+                    depth = depth.saturating_sub(1);
+                }
+                TokenKind::Ident if depth == 0 => match VerifyField::begun_by(self.text(*token)) {
+                    Some(VerifyField::Assert) => return index,
+                    Some(next)
+                        if begins_line && !(field.is_read() && next == VerifyField::Quantifier) =>
+                    {
+                        return index;
+                    }
+                    _ => {}
+                },
+                _ => {}
+            }
+            begins_line = token.kind == TokenKind::Newline;
+        }
+        self.tokens.len()
+    }
+
+    /// Reads an `assert` field: the expression it parsed, if any, and the
+    /// assertion the field gives. With no expression, or with more text after
+    /// the expression that does not begin a field, the whole field is one
+    /// assertion that cannot be decided.
+    fn parse_assert_field(&mut self) -> (Option<Expr>, Expr) {
+        let clause_start = self.peek().start;
+        self.bump();
+        let parsed = self.parse_expr();
+        let ended = self.verify_field_ahead().is_some()
+            || matches!(
+                self.peek().kind,
+                TokenKind::RBrace | TokenKind::Eof | TokenKind::Semicolon
+            );
+        if !ended {
+            if self.peek().kind != TokenKind::Ident {
+                self.error_here("unexpected tokens after verification assertion");
+            }
+            self.skip_balanced_until_end();
+        }
+        let assertion = match &parsed {
+            Some(expression) if ended => expression.clone(),
+            _ => self.unsupported_assertion(clause_start),
+        };
+        (parsed, assertion)
     }
 
     fn parse_function_decl(&mut self, keyword: &str) -> Decl {
@@ -3078,12 +3171,11 @@ impl<'a> Parser<'a> {
                     }
                 }
                 TokenKind::Newline => {
-                    let after = self.lookahead_non_trivia(1);
                     if depth_brace == 0
                         && depth_paren == 0
                         && depth_brack == 0
                         && Self::can_end_statement(last_sig)
-                        && !self.is_continuation(after)
+                        && !self.next_line_continues(self.idx)
                     {
                         self.idx += 1;
                         return;
@@ -4602,6 +4694,24 @@ module M version "0.1.0" {
                 },
             ),
             (
+                "a\n\nand b",
+                "a and b",
+                Expr::Binary {
+                    op: BinOp::And,
+                    left: name("a"),
+                    right: name("b"),
+                },
+            ),
+            (
+                "a\n// why\nand b",
+                "a and b",
+                Expr::Binary {
+                    op: BinOp::And,
+                    left: name("a"),
+                    right: name("b"),
+                },
+            ),
+            (
                 "a\nor b",
                 "a or b",
                 Expr::Binary {
@@ -4763,7 +4873,7 @@ module M version "0.1.0" {
             decl.fields.get("bounds").map(String::as_str),
             Some("bounds persons 1")
         );
-        // Going back to the start of a line loses no token.
+        // Reading each field with the rest of the block hidden loses no token.
         assert_eq!(parsed.syntax().text(), parsed.source.as_str());
     }
 
@@ -4774,5 +4884,616 @@ module M version "0.1.0" {
             first_decl(&parsed).assertions,
             [Expr::Bool(true), Expr::Bool(false)]
         );
+    }
+
+    /// The assertions of a verify block of these lines, which parses without
+    /// a diagnostic.
+    fn verify_assertions(lines: &str) -> Vec<String> {
+        let parsed = parse_body(&format!("verify V {{\n{lines}\n}}"));
+        first_decl(&parsed).assertions.iter().map(shown).collect()
+    }
+
+    /// The assertion an `assert` line with this expression gives.
+    fn asserted(expression: &str) -> String {
+        verify_assertions(&format!("assert {expression}"))
+            .pop()
+            .expect("an assertion")
+    }
+
+    const FOR_EVERY: &str = "for every x in {1, 2}: x == 3";
+
+    fn undecided(text: &str) -> String {
+        format!("undecided: {text}")
+    }
+
+    #[test]
+    fn a_verify_field_ends_where_the_next_field_begins() {
+        // The word `assert` begins a field wherever it stands.
+        assert_eq!(
+            verify_assertions("assert true or 1 == 2 assert false"),
+            [asserted("true or 1 == 2"), asserted("false")]
+        );
+        assert_eq!(
+            verify_assertions("assuming fair assert true"),
+            [asserted("true")]
+        );
+        // Another field word in the middle of a line does not end the field
+        // it stands in, so this `for every` is part of a field that is not
+        // read.
+        assert_eq!(
+            verify_assertions(&format!("assuming fair {FOR_EVERY}\nassert true")),
+            [asserted("true")]
+        );
+        // Below a field that is not read, a line that begins with a field
+        // word is a field of its own, although the line above it does not
+        // end a statement.
+        for unread in [
+            "assuming fair +",
+            "interpretations all_admissible,",
+            "judgments all_lawful +",
+            "choices all_lawful,",
+            "bounds persons 2,",
+        ] {
+            for (line, kept) in [
+                ("assert false", asserted("false")),
+                (
+                    "for_all x in {1, 2}: x == 3",
+                    asserted("for_all x in {1, 2}: x == 3"),
+                ),
+                (
+                    "exists x in {1, 2}: x == 3",
+                    asserted("exists x in {1, 2}: x == 3"),
+                ),
+                (FOR_EVERY, undecided(FOR_EVERY)),
+            ] {
+                assert_eq!(
+                    verify_assertions(&format!("{unread}\n{line}")),
+                    [kept],
+                    "`{unread}` then `{line}`"
+                );
+            }
+        }
+        // A closing parenthesis or bracket that closes nothing does not hide
+        // the line below it.
+        for unread in [
+            "assuming fair_response(Court))",
+            "interpretations all_admissible ]",
+            "bounds persons 2 )",
+            "assuming fair ) +",
+        ] {
+            assert_eq!(
+                verify_assertions(&format!("{unread}\n{FOR_EVERY}\nassert true")),
+                [undecided(FOR_EVERY), asserted("true")],
+                "below `{unread}`"
+            );
+        }
+        // Below a line that is read, a `for every` line is a field of its
+        // own, although `for` continues a statement.
+        assert_eq!(
+            verify_assertions(&format!("assert true\n{FOR_EVERY}")),
+            [asserted("true"), undecided(FOR_EVERY)]
+        );
+        assert_eq!(
+            verify_assertions(&format!("for_all x in {{1, 2}}: x < 3\n{FOR_EVERY}")),
+            [asserted("for_all x in {1, 2}: x < 3"), undecided(FOR_EVERY)]
+        );
+        assert_eq!(
+            verify_assertions("assert true or x\nfor y"),
+            [asserted("true or x"), undecided("for y")]
+        );
+    }
+
+    /// First lines of a verify field that is read: complete, cut off, and
+    /// with tokens left over after the expression.
+    const READ_FIELD_LINES: &[&str] = &[
+        "assert true",
+        "assert true or x",
+        "assert 1 == 1",
+        "assert f(x)",
+        "assert a.b",
+        "assert 3 days",
+        "assert operative P",
+        "assert x in {1, 2}",
+        "assert if c > 0 { a }",
+        "for_all x in {1, 2}: x < 3",
+        "exists x in {1, 2}: x == 2",
+        "assert",
+        "assert true or",
+        "assert true or 1 +",
+        "assert true or 1 ==",
+        "assert true or not",
+        "assert true or operative",
+        "assert 1 ==",
+        "assert f(x) =>",
+        "for_all x in {1, 2}:",
+        "for_all x in {1, 2}: true or 1 +",
+        "for_all x in",
+        "exists",
+        "assert true )",
+        "assert true ]",
+        "assert true,",
+        "assert true every x",
+    ];
+
+    /// First lines of a verify field that is not read: complete, ending in a
+    /// token that cannot end a statement, and with a closer that closes
+    /// nothing.
+    const FIELD_LINES_NOT_READ: &[&str] = &[
+        "assuming fair",
+        "assuming fair +",
+        "assuming fair )",
+        "assuming fair ) +",
+        "assuming fair_response(Court))",
+        "assuming",
+        "interpretations all_admissible",
+        "interpretations all_admissible ]",
+        "interpretations all_admissible,",
+        "judgments all_lawful",
+        "judgments all_lawful +",
+        "choices all_lawful",
+        "choices",
+        "bounds persons 2",
+        "bounds persons 2 )",
+        "bounds persons 2,",
+        "bounds",
+    ];
+
+    /// Lines that begin a field below any field.
+    const LINES_THAT_BEGIN_A_FIELD: &[&str] = &[
+        "assert false",
+        "bounds persons 1",
+        "assuming fair",
+        "interpretations all_admissible",
+        "judgments all_lawful",
+        "choices all_lawful",
+        FOR_EVERY,
+    ];
+
+    /// Lines that begin a field below a field that is not read, and can
+    /// continue a field that is read.
+    const QUANTIFIER_LINES: &[&str] = &["for_all y in {1}: y == 2", "exists y in {1}: y == 2"];
+
+    #[test]
+    fn a_verify_field_is_read_as_if_a_semicolon_stood_where_the_next_field_begins() {
+        // What the parser makes of a verify block: its assertions, its
+        // bounds and the messages of its diagnostics.
+        let read = |lines: &str| {
+            let parsed = parse_file(&wrap_module(&format!("verify V {{\n{lines}\n}}")));
+            let decl = first_decl(&parsed);
+            let assertions: Vec<String> = decl
+                .assertions
+                .iter()
+                .map(|assertion| shown(assertion).trim_end_matches(';').trim_end().to_owned())
+                .collect();
+            let messages: Vec<String> = parsed
+                .diagnostics
+                .iter()
+                .map(|diagnostic| diagnostic.message.clone())
+                .collect();
+            (assertions, decl.fields.get("bounds").cloned(), messages)
+        };
+        let mut failures = Vec::new();
+        let mut compare = |without: String, with: String| {
+            let (read_without, read_with) = (read(&without), read(&with));
+            if read_without != read_with {
+                failures.push(format!(
+                    "{without:?}\n    read:              {read_without:?}\n    with a semicolon:  {read_with:?}"
+                ));
+            }
+        };
+        for first in READ_FIELD_LINES {
+            for next in LINES_THAT_BEGIN_A_FIELD {
+                compare(format!("{first}\n{next}"), format!("{first};\n{next}"));
+            }
+            compare(
+                format!("{first} assert false"),
+                format!("{first}; assert false"),
+            );
+        }
+        for first in FIELD_LINES_NOT_READ {
+            for next in LINES_THAT_BEGIN_A_FIELD.iter().chain(QUANTIFIER_LINES) {
+                compare(format!("{first}\n{next}"), format!("{first};\n{next}"));
+            }
+            compare(
+                format!("{first} assert false"),
+                format!("{first}; assert false"),
+            );
+        }
+        assert!(
+            failures.is_empty(),
+            "{} blocks are not read as they are with a semicolon before the next field:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn an_assertion_cut_off_where_the_next_field_begins_is_e100_there() {
+        for (cut_off, next) in [
+            ("assert true or 1 +", "assert false"),
+            ("assert true or 1 ==", "assert false"),
+            ("assert true or not", "assert false"),
+            ("assert 1 ==", "assert false"),
+            ("for_all x in {1, 2}: true or 1 +", "assert false"),
+            ("assert true or 1 +", "bounds persons 1"),
+            ("assert true or 1 +", "assuming fair"),
+            ("assert true or 1 +", "interpretations all_admissible"),
+            ("assert true or 1 +", "judgments all_lawful"),
+            ("assert true or 1 +", "choices all_lawful"),
+            ("assert true or 1 +", FOR_EVERY),
+        ] {
+            for separator in ["\n    ", " "] {
+                // A field word other than `assert` begins a field only when
+                // it begins a line.
+                if separator == " " && next != "assert false" {
+                    continue;
+                }
+                let source = wrap_module(&format!("verify V {{\n{cut_off}{separator}{next}\n}}"));
+                let parsed = parse_file(&source);
+                let diagnostics: Vec<(DiagnosticCode, &str, Option<Span>)> = parsed
+                    .diagnostics
+                    .iter()
+                    .map(|diagnostic| {
+                        (
+                            diagnostic.code,
+                            diagnostic.message.as_str(),
+                            diagnostic.primary_span,
+                        )
+                    })
+                    .collect();
+                // The diagnostic points at the place where the assertion was
+                // cut off: the start of the next field.
+                let at = source.find(next).expect("the next field") as u32;
+                assert_eq!(
+                    diagnostics,
+                    [(
+                        DiagnosticCode::E100,
+                        "expected expression after operator",
+                        Some(Span { start: at, end: at })
+                    )],
+                    "`{cut_off}` then `{next}`, separated by {separator:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_quantifier_line_below_a_line_that_is_read_can_continue_it() {
+        assert_eq!(
+            verify_assertions("for_all x in {1, 2}:\n  exists y in {1, 2}: x == y"),
+            [asserted("for_all x in {1, 2}: exists y in {1, 2}: x == y")]
+        );
+        assert_eq!(
+            verify_assertions("assert true or 1 +\nfor_all x in {1, 2}: x == 3"),
+            [asserted("true or 1 + for_all x in {1, 2}: x == 3")]
+        );
+        // When the line above is complete, the quantifier line is a field of
+        // its own.
+        assert_eq!(
+            verify_assertions("assert true\nfor_all x in {1, 2}: x == 3"),
+            [asserted("true"), asserted("for_all x in {1, 2}: x == 3")]
+        );
+        // An `assert` line is never the body of the quantifier above it.
+        assert_eq!(
+            verify_assertions("for_all x in {1, 2}:\nassert true"),
+            [asserted("for_all x in {1, 2}:"), asserted("true")]
+        );
+    }
+
+    #[test]
+    fn a_field_word_after_a_complete_verify_expression_begins_the_next_field() {
+        // A word before `:` is not an operand, so the expression has ended
+        // and `assuming` begins a field, which is not read.
+        assert_eq!(
+            verify_assertions("assert true assuming: x"),
+            [asserted("true")]
+        );
+        assert_eq!(
+            verify_assertions("for_all x in {1, 2}: x < 3 assuming: y"),
+            [asserted("for_all x in {1, 2}: x < 3")]
+        );
+        // Without the `:` the word is an operand: the one assertion is
+        // `true` applied to it, not `true`.
+        let applied = verify_assertions("assert true assuming x");
+        assert_eq!(applied.len(), 1, "{applied:?}");
+        assert!(applied[0].starts_with("Apply"), "{applied:?}");
+    }
+
+    #[test]
+    fn a_line_verify_does_not_decide_takes_with_it_what_continues_it() {
+        // The first line ends in `:`, so the `assert` line below continues
+        // it.
+        assert_eq!(
+            verify_assertions(
+                "for every operative Filed(c):\n    assert not operative Formed(H)\nassert true"
+            ),
+            [
+                undecided("for every operative Filed(c):\n    assert not operative Formed(H)"),
+                asserted("true")
+            ]
+        );
+        // `for` continues a statement.
+        assert_eq!(
+            verify_assertions(&format!("asert true\n{FOR_EVERY}")),
+            [undecided(&format!("asert true\n{FOR_EVERY}"))]
+        );
+    }
+
+    #[test]
+    fn nothing_inside_the_brackets_of_a_verify_field_begins_a_field() {
+        assert_eq!(
+            verify_assertions("interpretations {\nassert false\n}\nassert true"),
+            [asserted("true")]
+        );
+        assert_eq!(
+            verify_assertions(&format!("assuming (fair\n{FOR_EVERY}\n)\nassert true")),
+            [asserted("true")]
+        );
+        assert_eq!(
+            verify_assertions("assert true or f(\nassert false\n)").len(),
+            1
+        );
+    }
+
+    #[test]
+    fn an_assert_with_no_expression_is_an_assertion_that_cannot_be_decided() {
+        assert_eq!(
+            verify_assertions("assert\nassert true"),
+            [undecided("assert"), asserted("true")]
+        );
+        assert_eq!(verify_assertions("assert"), [undecided("assert")]);
+        assert_eq!(
+            verify_assertions("assert; assert true"),
+            [undecided("assert"), asserted("true")]
+        );
+    }
+
+    #[test]
+    fn a_blank_or_comment_line_inside_a_condition_does_not_end_it() {
+        // `between` stands between the first line of the guard and the line
+        // that begins with `and`.
+        let rule = |between: &str| {
+            parse_body(&format!(
+                "rule R : derive from \"cite\" {{\nwhen operative A\n{between}and operative B\nthen derive C\n}}"
+            ))
+        };
+        let plain = rule("");
+        assert!(
+            matches!(
+                first_decl(&plain).guard,
+                Some(Expr::Binary { op: BinOp::And, .. })
+            ),
+            "{:?}",
+            first_decl(&plain).guard
+        );
+        assert_eq!(first_decl(&plain).consequences.len(), 1);
+        for between in [
+            "// the second condition\n",
+            "\n",
+            "\n// the second condition\n\n",
+        ] {
+            assert_eq!(
+                rule_statements(&rule(between)),
+                rule_statements(&plain),
+                "between the two lines: {between:?}"
+            );
+        }
+        let body = |lines: &str| {
+            let parsed = parse_body(&format!("query q() -> Bool {{\n{lines}\n}}"));
+            first_query(&parsed).expr.clone().expect("a query body")
+        };
+        for (lines, one_line) in [
+            (
+                "require operative A\n// why\nand operative B\nreturn true",
+                "require operative A and operative B\nreturn true",
+            ),
+            (
+                "return operative A\n// why\nor operative B",
+                "return operative A or operative B",
+            ),
+            ("return x\n// why\n.field", "return x.field"),
+            (
+                "return operative P\n// why\nin C",
+                "return operative P in C",
+            ),
+        ] {
+            assert_eq!(body(lines), body(one_line), "{lines:?}");
+        }
+    }
+
+    /// Lines that begin with a token no statement begins with.
+    const LINES_THAT_ONLY_CONTINUE: &[&str] = &[
+        "and b", "or b", "in b", ".b", ", b", "-> b", "=> b", ": b", "= b", "| b", "< b",
+    ];
+
+    /// Lines that begin with a continuation a statement can begin with.
+    const LINES_THAT_CAN_STAND_ALONE: &[&str] = &[
+        "where b",
+        "then b",
+        "else b",
+        "from b",
+        "decides b",
+        "occupied_by b",
+        "establishes b",
+        "using b",
+        "for b",
+        "rank b",
+        "as b",
+        "to b",
+        "version b",
+        "fuel b",
+        "(b)",
+        "{ b }",
+        "[b]",
+        "! b",
+    ];
+
+    #[test]
+    fn below_a_blank_or_comment_line_only_a_token_no_statement_begins_with_continues() {
+        // `asert a` is a line a verify block does not recognize. The parser
+        // steps over it, and over what continues it, with the rule it has
+        // for the end of every statement it does not read.
+        let mut failures = Vec::new();
+        let mut check = |lines: String, expected: Vec<String>| {
+            let read = verify_assertions(&format!("{lines}\nassert true"));
+            let expected = [expected, vec![asserted("true")]].concat();
+            if read != expected {
+                failures.push(format!(
+                    "{lines:?}\n    read:     {read:?}\n    expected: {expected:?}"
+                ));
+            }
+        };
+        for between in ["\n", "// why\n", "\n// why\n\n"] {
+            for line in LINES_THAT_ONLY_CONTINUE {
+                let lines = format!("asert a\n{between}{line}");
+                let joined = vec![undecided(&lines)];
+                check(lines, joined);
+            }
+            for line in LINES_THAT_CAN_STAND_ALONE {
+                check(
+                    format!("asert a\n{between}{line}"),
+                    vec![undecided("asert a"), undecided(line)],
+                );
+            }
+        }
+        // Directly below the line, each of them continues it.
+        for line in LINES_THAT_ONLY_CONTINUE
+            .iter()
+            .chain(LINES_THAT_CAN_STAND_ALONE)
+        {
+            let lines = format!("asert a\n{line}");
+            let joined = vec![undecided(&lines)];
+            check(lines, joined);
+        }
+        assert!(
+            failures.is_empty(),
+            "{} lines are not joined or kept apart as they should be:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn a_blank_or_comment_line_does_not_end_an_expression_before_an_operator() {
+        // The value a query returns, or its parse errors.
+        let returned = |expression: &str| {
+            let parsed = parse_file(&wrap_module(&format!(
+                "query q() -> Bool {{\nreturn {expression}\n}}"
+            )));
+            if parsed.has_errors() {
+                Err(format!("{:?}", parsed.diagnostics))
+            } else {
+                Ok(first_query(&parsed).expr.clone())
+            }
+        };
+        let mut failures = Vec::new();
+        for (left, right, one_line) in [
+            ("a", "and b", "a and b"),
+            ("a", "or b", "a or b"),
+            ("a", "in b", "a in b"),
+            ("a", ".b", "a.b"),
+            ("a", "=> b", "a => b"),
+            ("a", "< b", "a < b"),
+            ("f(a", ", b)", "f(a, b)"),
+            ("for_all x in d", ": x > 0", "for_all x in d: x > 0"),
+        ] {
+            for between in ["\n", "// why\n", "\n// why\n\n"] {
+                let lines = format!("{left}\n{between}{right}");
+                let read = returned(&lines);
+                let expected = returned(one_line);
+                if expected.is_err() || read != expected {
+                    failures.push(format!(
+                        "{lines:?}\n    read:     {read:?}\n    expected: {expected:?}"
+                    ));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "{} expressions are cut short:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn a_blank_or_comment_line_still_ends_a_statement_before_a_line_that_can_stand_alone() {
+        for between in ["\n", "// why\n"] {
+            // A parenthesized expression is a statement of its own.
+            let parsed = parse_body(&format!("calc f() -> Int {{\nx\n{between}(y)\n}}"));
+            assert_eq!(
+                first_fn(&parsed).expr,
+                Some(Expr::Block(vec![
+                    Expr::Ident("x".to_owned()),
+                    Expr::Grouped(Box::new(Expr::Ident("y".to_owned()))),
+                ])),
+                "between the two lines: {between:?}"
+            );
+            // Two clauses of a judgment that the parser keeps as text.
+            let parsed = parse_body(&format!(
+                "judgment J(x: T) decides P(x) {{\nauthority A\noptions f(x)\n{between}for each y in ys:\nrequire operative R(y)\n}}"
+            ));
+            let clauses: Vec<&str> = first_decl(&parsed)
+                .judgment
+                .as_ref()
+                .expect("a judgment")
+                .unsupported_clauses
+                .iter()
+                .map(|clause| clause.trim())
+                .collect();
+            assert_eq!(
+                clauses,
+                ["options f(x)", "for each y in ys:\nrequire operative R(y)"],
+                "between the two lines: {between:?}"
+            );
+            // The block of an `if` does not follow a blank or comment line.
+            let parsed = parse_file(&wrap_module(&format!(
+                "calc f(c: Int) -> Int {{\nif c > 0\n{between}{{ 1 }}\n}}"
+            )));
+            let messages: Vec<&str> = parsed
+                .diagnostics
+                .iter()
+                .map(|diagnostic| diagnostic.message.as_str())
+                .collect();
+            assert_eq!(
+                messages,
+                ["expected `{` after the `if` condition"],
+                "between the two lines: {between:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_next_part_of_a_form_is_read_across_a_blank_or_comment_line() {
+        let returned = |expression: &str| {
+            let parsed = parse_body(&format!("query q() -> Bool {{\nreturn {expression}\n}}"));
+            first_query(&parsed).expr.clone().expect("a returned value")
+        };
+        for between in ["\n", "// why\n"] {
+            for (first, next) in [
+                ("if c > 0 { a }", "else { b }"),
+                ("for_all x in {1, 2}", "{ p(x) }"),
+                ("transaction", "{ a }"),
+            ] {
+                assert_eq!(
+                    returned(&format!("{first}\n{between}{next}")),
+                    returned(&format!("{first} {next}")),
+                    "`{first}` then `{next}`, between them: {between:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_clause_the_parser_keeps_as_text_goes_on_below_a_comment_line() {
+        let parsed =
+            parse_body("judgment J(x: T) decides P(x) {\nauthority A\noptions a\n// why\nand b\n}");
+        let judgment = first_decl(&parsed).judgment.as_ref().expect("a judgment");
+        let clauses: Vec<&str> = judgment
+            .unsupported_clauses
+            .iter()
+            .map(|clause| clause.trim())
+            .collect();
+        assert_eq!(clauses, ["options a\n// why\nand b"]);
     }
 }

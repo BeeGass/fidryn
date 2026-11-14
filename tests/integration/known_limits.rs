@@ -8,6 +8,7 @@
 use fidryn_cli::compile_source;
 use fidryn_core::ir::Consequence;
 use fidryn_core::{CoreDecl, CoreModule, DiagnosticCode, SourceManifest};
+use fidryn_verify::verify_property;
 
 fn source(name: &str, body: &str) -> String {
     format!(
@@ -160,4 +161,33 @@ fn a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declar
         .map(|query| query.name.as_str())
         .collect();
     assert_eq!(names, ["b"]);
+}
+
+#[test]
+fn a_claim_inside_the_brackets_of_a_field_that_is_not_read_is_not_read() {
+    let module = compile(
+        "Limits.VerifyBrackets",
+        "    verify Braces {\n        interpretations {\n            assert false\n        }\n        assert true\n    }\n    verify Parentheses {\n        assuming (fair\n            for every x in {1, 2}: x == 3\n        )\n        assert true\n    }",
+    );
+    for name in ["Braces", "Parentheses"] {
+        let verdict = verify_property(&module, name);
+        assert!(verdict.is_proved(), "{name}: {verdict}");
+    }
+}
+
+#[test]
+fn an_operand_that_is_not_needed_is_not_examined() {
+    let module = compile(
+        "Limits.VerifyOperand",
+        "    verify UndeclaredName {\n        assert true or no_such_name\n        assert no_such_name or true\n        assert not (false and no_such_name)\n        assert if true { true } else { no_such_name }\n    }\n    verify LineBelow {\n        assert true or 1 +\n        for_all x in {1, 2}: x == 3\n    }\n    verify MisspelledLineBelow {\n        assert true or 1 +\n        asert false\n    }\n    verify Parentheses {\n        assert true or f(\n            assert false\n        )\n    }",
+    );
+    for name in [
+        "UndeclaredName",
+        "LineBelow",
+        "MisspelledLineBelow",
+        "Parentheses",
+    ] {
+        let verdict = verify_property(&module, name);
+        assert!(verdict.is_proved(), "{name}: {verdict}");
+    }
 }

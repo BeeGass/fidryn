@@ -324,6 +324,58 @@ protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
 on `P`.
 
+## Where a statement ends
+
+A statement ends at a `;` or at the end of its line. It goes on into the
+next line in two cases.
+
+- The line ends in a token that cannot end a statement. The tokens that
+  can are a name or word, a literal, `)`, `]`, `}`, `*` and `>`. A line
+  that ends in one of the prefix words `not`, `operative`, `effective`,
+  `established`, `determined`, `always`, `active`, `every`, `unique` and
+  `closed` goes on as well.
+- The next line begins with a continuation: one of the words `and`, `or`,
+  `in`, `where`, `then`, `else`, `from`, `decides`, `occupied_by`,
+  `establishes`, `using`, `for`, `rank`, `as`, `to`, `version` and `fuel`,
+  or one of the tokens `.`, `,`, `->`, `=>`, `:`, `=`, `|`, `<`, `!`, `{`,
+  `(` and `[`.
+
+A blank line has no token, and neither has a line that holds only a
+comment. The first case holds across such lines. The second holds across
+them only for a line that begins with `and`, `or`, `in`, `.`, `,`, `->`,
+`=>`, `:`, `=`, `|` or `<`. No statement begins with one of those, so a
+condition can carry a comment between its lines:
+
+```
+rule BothConditions : derive from "cite" {
+    when operative A
+        // the second condition
+        and operative B
+    then derive C
+}
+```
+
+The guard of that rule is `operative A and operative B`. Each of the
+other continuations, such as `then`, `for` or `(`, can begin a statement
+of its own, so below a blank line or a comment line it does not continue
+the statement above. That holds where the parser tests whether a
+statement has ended. Where it expects the next part of a form it does not
+test, and reads on across blank and comment lines: an `else` after the
+block of an `if`, for example, and the `{ ... }` block that follows the
+domain of a quantifier or the word `transaction`.
+
+Parentheses, brackets and braces do not change the rule: a line break
+inside them ends the expression before it in the same cases. `(1`
+followed by the line `+ 2)` is rejected, because `+` is not a
+continuation. Write `(1 +` and then `2)`.
+
+Text the parser steps over without reading it, such as a `verify` field
+it does not read or a clause it keeps as text, ends by the same rule with
+three differences. A line break inside its parentheses, brackets or
+braces does not end it. A prefix word at the end of a line does not carry
+it into the next line. And it ends after the `}` that closes its
+outermost brace, unless a continuation follows.
+
 ## Calc, conditionals, money, and durations
 
 `calc` is a total, effect-free function. It must not recurse (E530).
@@ -586,16 +638,92 @@ Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for `automatic` is E420
 whether or not a `verify` block repeats it.
 
-A top-level `for_all` or `exists` line is checked as an assertion, in the
-same way as an `assert` line. A `bounds` line gives the numbers of
-synthetic persons, events and time points. `interpretations`,
-`judgments`, `choices` and `assuming` lines are recognized and not read.
-A `for every` line is not evaluated, and a property whose block has one
-is never `proved`. A line that begins with any other word, such as a
-misspelled `assert`, is not dropped unless it continues the line above
-it: it is kept as an assertion that cannot be decided, or the module is
-rejected with `E100`. An assertion that cannot be decided leaves the
-property `unknown` unless another assertion is false.
+### The fields of a verify block
+
+A verify block is a list of fields. Nine words begin a field:
+
+| First word | What `verify` does with the field |
+| --- | --- |
+| `assert` | The expression after it is an assertion. |
+| `for_all`, `exists` | The expression the word begins is an assertion, checked in the same way. |
+| `bounds` | It gives the numbers of synthetic persons, events and time points. |
+| `interpretations`, `judgments`, `choices`, `assuming` | The field is recognized and not read. |
+| `for` | A `for every` line is not evaluated. It is kept as an assertion that cannot be decided. |
+
+An assertion that cannot be decided leaves the property `unknown` unless
+another assertion is false. A block with no assertion is `unknown` too,
+whatever its comments say: a comment is never read as an assertion.
+
+A field ends where its statement ends; see
+[Where a statement ends](#where-a-statement-ends). An `assert`, `for_all`,
+`exists` or `bounds` field, and a field that is not read, ends earlier
+where the next field begins, as if a `;` stood there:
+
+- The word `assert` begins a field wherever it stands, in the middle of a
+  line too.
+- A line that begins with one of the other eight words begins a field. In
+  the middle of a line those words do not cut a field short:
+  `assuming fair for every x in {1, 2}: x == 3` is one `assuming` field,
+  and none of it is read.
+- There is one exception. Below an `assert`, `for_all` or `exists` field,
+  a line that begins with `for_all` or `exists` does not end that field.
+  It continues the line above when the statement goes on into it, and is
+  a field of its own when the statement has ended. This is one assertion,
+  and it is proved:
+
+  ```
+  verify EveryNumberHasAnEqual {
+      for_all x in {1, 2}:
+          exists y in {1, 2}: x == y
+  }
+  ```
+
+- Nothing inside the parentheses, brackets or braces of a field begins a
+  field.
+
+A `for every` line, and a line the block does not recognize, have no
+early end. The parser steps over such a line as text it does not read,
+together with every line that text goes on into, an `assert` line
+included, and the whole is one assertion that cannot be decided.
+
+An expression that is complete where the next field begins is an
+assertion. One that is cut off there gets the diagnostic it would get
+before a `;`: `assert true or 1 +` followed by the line `assert false` is
+rejected with `E100`, "expected expression after operator". An `assert`
+with no expression is an assertion that cannot be decided.
+
+Text that follows the expression of an `assert`, `for_all` or `exists`
+field is read as the next field when it begins with one of the nine
+words. That is rare on one line, because a word that directly follows an
+expression is normally taken into the expression as an operand:
+`assert true assuming fair` is one assertion, and it cannot be decided.
+Before a `:` or an `=` a word is not an operand, so
+`assert true assuming: x` is the assertion `true` followed by an
+`assuming` field.
+
+Text that begins with none of the nine words, such as a misspelled
+`assert`, is not dropped either. When the field above goes on into it, it
+is part of that field. Otherwise it is read as a line of its own and kept
+as an assertion that cannot be decided, with one difference after an
+`assert`: the `assert` and the text that follows its expression, on the
+same line or below it, are together one assertion that cannot be decided,
+and the module is rejected with `E100` when that text begins with
+something other than a word.
+
+Two limits remain.
+
+- What stands inside the parentheses, brackets or braces of a field that
+  is not read belongs to that field, and so does a line that begins with
+  none of the nine words when the field goes on into it. An
+  `assert false` between the braces of an `interpretations` field is not
+  read.
+- `verify` evaluates an assertion; it does not type-check it. A true
+  operand of `or` and a false operand of `and` settle the result whatever
+  the other operand is, and the branch an `if` does not take is not
+  examined. So `assert true or no_such_name` is proved, and so is
+  `assert true or 1 +` followed by the line
+  `for_all x in {1, 2}: x == 3`, where the second line is the right
+  operand of `+`.
 
 ## What the language will not do
 

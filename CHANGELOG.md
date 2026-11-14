@@ -41,11 +41,28 @@ interchange schema versions are maintained independently of the interpreter.
   that begins with `days` is no longer the duration `1 days`. An `if` whose
   condition is followed by the end of the statement is rejected with `E100`,
   and the next line is no longer read as its branch.
-- `fidryn verify` decides each `assert` line on its own and checks a
-  top-level `for_all` or `exists` line as an assertion. A property is no
-  longer `proved` when its block holds a false assertion on a later line, a
-  false top-level `for_all` or `exists` line, a `for every` line, or a line
-  that begins a statement with a word the block does not recognize.
+- A blank line or a comment line no longer cuts a statement short before a
+  line that begins with `and`, `or`, `in`, `.`, `,`, `->`, `=>`, `:`, `=`,
+  `|` or `<`, so a condition can carry a comment between its lines. After a
+  line that ends in an integer literal, in `operative P` or in
+  `determined P`, a blank line or a comment line now ends the statement
+  before a line that begins with any other continuation, as it already did
+  after other lines: `if c > 0`, a comment line and then `{ 1 }` is rejected
+  with `E100`.
+- `fidryn verify` reads a `verify` block as a list of fields. With the
+  exceptions that "The fields of a verify block" in `docs/language.md`
+  lists: a field ends where the next one begins, so an `assert` line is its
+  own assertion even when the line above it is incomplete; a line that
+  begins with `for_all` or `exists` is checked as an assertion; and a
+  `for every` line, an `assert` with no expression and a line the block
+  does not recognize are kept as assertions that cannot be decided, which
+  leaves the property `unknown` unless another assertion is false. Two
+  blocks that were `proved`: `assert true or 1 == 2` followed by the line
+  `assert false` is a counterexample, and `assert true or 1 +` followed by
+  the line `assert false` is rejected with `E100`.
+- A `verify` block with no assertion is `unknown`, whatever its comments
+  say. The text of such a block was searched for the word `assert` before,
+  and a comment that held it was read as the assertion.
 
 ## [0.2.0] - 2026-10-29
 

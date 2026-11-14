@@ -329,9 +329,11 @@ properties. The name must appear in the module’s <code>verify</code> blocks.</
 not obtain a covering proof is not success: the CLI prints the verdict to
 stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
 fragment includes structured Boolean/arithmetic assertions and finite quantified
-formulas; every assertion in the named block must hold. Unsupported formulas
-and resource exhaustion remain <code>unknown</code>. Passing a query name such as
-<code>acting_trustee</code> is invalid.</p>
+formulas; every assertion in the named block must hold.
+<a href="/docs/language#the-fields-of-a-verify-block">The fields of a verify block</a>
+says which parts of a block are its assertions. Unsupported formulas, a
+block with no assertion and resource exhaustion remain <code>unknown</code>. Passing a
+query name such as <code>acting_trustee</code> is invalid.</p>
 <p><strong>Success.</strong> Stdout, for example
 <code>proved NAME (persons=..., events=..., time_points=...)</code>.</p>
 <p><strong>Failure.</strong> Exit 1, stderr. Check diagnostics, or a verdict such as

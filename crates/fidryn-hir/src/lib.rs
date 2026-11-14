@@ -1008,7 +1008,14 @@ fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificatio
     }
     let name = d.name.as_ref().filter(|n| !n.is_empty())?.clone();
     Some(HirVerification {
-        formula: verify_formula(d),
+        // A block the parser read no assertion from gets no formula. Its
+        // text is not searched for one: the search would find the word
+        // `assert` in a comment and take the comment for the assertion.
+        formula: if d.assertions.is_empty() {
+            String::new()
+        } else {
+            verify_formula(d)
+        },
         assertions: d.assertions.iter().map(body::expr_to_term).collect(),
         bounds: verify_bounds(d),
         name,
@@ -1925,6 +1932,27 @@ module Examples.Trivial version "0.1.0" {
             v.formula
         );
         assert!(v.bounds.is_none(), "{:?}", v.bounds);
+    }
+
+    #[test]
+    fn a_verify_block_with_no_assertion_has_no_formula() {
+        let src = r#"
+module Examples.Comment version "0.1.0" {
+    verify OnlyAComment {
+        bounds { persons: 2 }
+        assuming fair
+        // assert true
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.verifications.len(), 1, "{:?}", hir.verifications);
+        let v = &hir.verifications[0];
+        assert!(v.assertions.is_empty(), "{:?}", v.assertions);
+        // The text of the block is not searched for an assertion.
+        assert_eq!(v.formula, "");
+        assert_eq!(v.bounds.as_ref().map(|bounds| bounds.persons), Some(2));
     }
 
     #[test]

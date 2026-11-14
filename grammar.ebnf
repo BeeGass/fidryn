@@ -331,12 +331,49 @@ DurationUnit    ::= "days" | "working_days" | "counted_days"
 Infinity        ::= "+inf" | "-inf"
 End             ::= inserted-newline | ";"
 
-(* Automatic semicolon insertion: insert End at newline when delimiter
-   depth is zero, the previous token can end a statement, and the next
-   token is not a continuation. The continuations are the words and, or,
-   where, then, else, from, decides, occupied_by, establishes, using, for,
-   rank, as, to, version, fuel and in, and the tokens ".", ",", "->", "=>",
-   ":", "!", "=", "|", "<", "{", "(" and "[". *)
+(* Automatic semicolon insertion: the parser inserts End at a newline when
+   the last token before the newline can end a statement and the first
+   token after it is not a continuation.
+
+   The tokens that can end a statement are a name or word, a literal, ")",
+   "]", "}", "*" and ">". The prefix words are the exception: after not,
+   operative, effective, established, determined, always, active, every,
+   unique or closed a newline does not end the statement.
+
+   The continuations are the words and, or, where, then, else, from,
+   decides, occupied_by, establishes, using, for, rank, as, to, version,
+   fuel and in, and the tokens ".", ",", "->", "=>", ":", "!", "=", "|",
+   "<", "{", "(" and "[".
+
+   A blank line and a line that holds only a comment have no token, so the
+   first token after the newline is then the first token of the next line
+   that has one. Across such lines it counts as a continuation only when
+   it is and, or or in, or one of ".", ",", "->", "=>", ":", "=", "|" and
+   "<": no statement begins with one of those. Each of the other
+   continuations can begin a line in its own right.
+
+   Delimiter depth is not tested. Inside parentheses, brackets and braces a
+   newline ends the expression before it by the same rule, and what follows
+   must be what the enclosing form allows next. In the arguments of a call
+   and in the elements of a braced collection that can be another argument
+   or element, so g(a <newline> b) has two arguments. In a parenthesized
+   expression it must be the closing parenthesis, so (1 <newline> + 2) is
+   rejected, and inside brackets it must be a comma or the closing
+   delimiter.
+
+   The parser does not test for End everywhere. Where it expects the next
+   part of a form it reads on across any newlines: for example before else
+   after the block of an if, before the block that follows the domain of a
+   quantifier, and before the block that follows the word transaction.
+
+   Text the parser steps over without reading it (the body of a
+   declaration it does not interpret, a verify field it does not read, a
+   clause it keeps as text) ends differently. Parentheses, brackets and
+   braces are counted there, and a newline inside them never ends the
+   text. Outside them a newline ends it by the rule above, except that a
+   prefix word ends a line as any other word does. The text also ends
+   after a ";" outside them, and after the "}" that closes its outermost
+   brace unless a continuation follows that brace. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.
