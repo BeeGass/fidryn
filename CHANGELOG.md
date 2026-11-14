@@ -5,6 +5,36 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-14
+
+### Changed
+
+- The project is licensed under the MIT License again. `LICENSE` holds the
+  MIT text and every workspace package declares `MIT`.
+- Thirty-four example modules and seven case records were repaired with
+  typing-only edits. 54 of the 114 example and test modules now pass
+  `fidryn check`; the rest are marked as drafts wherever a document names
+  them.
+- The implementation status and language guides state what the 0.2
+  interpreter interprets and what it does not.
+- Internal review ledgers moved under `docs/internal/`.
+
+### Added
+
+- A recorded check status for every example module, enforced in CI, with
+  the counts stated in the README and example guides.
+- A documentation check that follows links, compiles complete module
+  samples and runs every command the documents show.
+- Tests that pin known limits of the interpreter, cited by the
+  implementation status guide.
+- A security policy.
+
+### Fixed
+
+- The site footer shows the workspace version.
+- Guides no longer rely on a POSIX-only temporary path.
+- The examples guide no longer shows commands that fail.
+
 ## [0.2.0] - 2026-10-29
 
 ### Changed
