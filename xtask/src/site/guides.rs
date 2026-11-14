@@ -120,14 +120,9 @@ pub const IMPLEMENTER_DOCS: &[(&str, &str, &str)] = &[
         "What the interpreter does today",
     ),
     (
-        "Obligations",
-        "internal/OBLIGATIONS.md",
-        "Review obligations",
-    ),
-    (
-        "Integration contract",
-        "internal/INTEGRATION-CONTRACT.md",
-        "How the machinery is wired",
+        "Internal ledgers",
+        "internal/README.md",
+        "Working ledgers, partly out of date",
     ),
 ];
 

@@ -12,9 +12,9 @@ interchange schema versions are maintained independently of the interpreter.
 - The project is licensed under the MIT License again. `LICENSE` holds the
   MIT text and every workspace package declares `MIT`.
 - Thirty-four example modules and seven case records were repaired with
-  typing-only edits. 54 of the 114 example and test modules now pass
-  `fidryn check`; the rest are marked as drafts wherever a document names
-  them.
+  typing-only edits. 54 of the 114 modules under `examples/`, `packages/`,
+  `prelude/` and `tests/programs/` now pass `fidryn check`. Documents mark
+  the rest as drafts where they name them by path.
 - The implementation status and language guides state what the 0.2
   interpreter interprets and what it does not.
 - Internal review ledgers moved under `docs/internal/`.
@@ -24,7 +24,8 @@ interchange schema versions are maintained independently of the interpreter.
 - A recorded check status for every example module, enforced in CI, with
   the counts stated in the README and example guides.
 - A documentation check that follows links, compiles complete module
-  samples and runs every command the documents show.
+  samples and runs the `fidryn` commands that documents show in blocks
+  tagged `sh`.
 - Tests that pin known limits of the interpreter, cited by the
   implementation status guide.
 - A security policy.
@@ -33,7 +34,7 @@ interchange schema versions are maintained independently of the interpreter.
 
 - The site footer shows the workspace version.
 - Guides no longer rely on a POSIX-only temporary path.
-- The examples guide no longer shows commands that fail.
+- The examples guide shows only commands that behave as stated.
 
 ## [0.2.0] - 2026-10-29
 

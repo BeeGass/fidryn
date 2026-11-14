@@ -92,8 +92,8 @@ and two interpreter programs. The rows not marked (draft) check clean.
 | `tests/programs/late-payment.fr` | Invoice duty, timely-payment decision, and a strict-versus-extended deadline family. | `fidryn check tests/programs/late-payment.fr` |
 
 Run the clean modules that ship JSON case records. Each command's
-timestamps are the module's `recorded_at` or the latest `observedAt`
-among the record's evidence.
+timestamps are the latest `observedAt` among the record's evidence, or
+the module's `recorded_at` when the record has no evidence.
 
 ```sh
 fidryn run examples/trust/bryan-revocable-trust.fr \
@@ -179,9 +179,9 @@ fidryn run examples/us-federal/flsa/flsa.fr \
 Florida homestead has no JSON case file, and the interpreter does not read
 its `scenario` blocks (`InsideCityHalfAcre`, `RuralHundredSixty`,
 `TaxCreditor`), so this guide never passes it to `fidryn run`.
-`require-gate.fr` and `late-payment.fr` also have no JSON; they are
-check-only programs. See
-[Independent programs](#independent-programs).
+`require-gate.fr` and `late-payment.fr` have no case records of their
+own; they run with the empty case record that `tests/programs/` ships.
+See [Independent programs](#independent-programs).
 
 ## Federal slices
 
@@ -427,13 +427,11 @@ and `examples/tax/` are in [Start here](#start-here).
 
 ## Fifty-state corpus
 
-`examples/states/` has one full high-impact module per U.S. state:
-homestead, final pay, security deposit, paid leave, no-fault, community
-property, and similar rules people and lawyers actually hit. Each file
-is a complete instrument (sources, entities, propositions, observations,
-rules, duties, queries, scenarios, verification). These are research
-fixtures, not legal advice, and not a complete statement of any state's
-code.
+`examples/states/` has one module per U.S. state. Each encodes part of
+the state law named in its principal citation in the table below, on
+topics such as homestead, final pay, security deposits, paid leave,
+no-fault insurance and community property. These are research fixtures,
+not legal advice, and not a complete statement of any state's code.
 
 There is no companion JSON case file and no JSON source manifest. The
 `scenario` blocks in each `.fr` file write down example facts, but the
@@ -538,9 +536,11 @@ and the rule or duty after it is dropped, without a diagnostic; see
 ## Independent programs
 
 `tests/programs/` holds small modules that exercise the interpreter.
-They are not jurisdiction slices. They declare `outside_scope`, they
-have no `cases/` directory, and `fidryn run` cannot be aimed at them
-without a case JSON you write yourself. Check them:
+They are not jurisdiction slices. They declare `outside_scope`. The
+directory ships an empty case record, `tests/programs/cases/empty.json`,
+with no facts, evidence or completions. Every query in these programs
+runs against it and exits 0; a query that needs something the record
+does not hold is suspended. Check them:
 
 ```sh
 fidryn check tests/programs/eligibility-succession.fr
@@ -552,6 +552,16 @@ fidryn check tests/programs/late-payment-extended.fr
 fidryn check tests/programs/transaction-atomic.fr
 ```
 
+Run one against the empty case record:
+
+```sh
+fidryn run tests/programs/late-payment.fr \
+  --query obligation_status \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
+```
+
 | Path | Purpose |
 | --- | --- |
 | `tests/programs/eligibility-succession.fr` | `UniqueOccupant` for `TrusteeOf(BRT)` under competing `SuccessorEligibility` interpretations. Query `acting_trustee`. |
@@ -560,7 +570,7 @@ fidryn check tests/programs/transaction-atomic.fr
 | `tests/programs/require-gate.fr` | Query `q` is `require true; return 7`. Query `r` is `require false; return 7`. False require does not run the return. |
 | `tests/programs/late-payment.fr` | `PayInvoice` duty, `TimelyPayment` decision, and `DeadlineMeaning` (strict versus 15 counted days). Queries `due`, `paid_on_time`, `obligation_status`. |
 | `tests/programs/late-payment-extended.fr` | Same duty shape with `due 15 counted_days after invoice_date` and no competing deadline family. |
-| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` returns `Bool`. Partial surface — not a general transaction engine. |
+| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` is declared `-> DutyStatus`. Partial surface — not a general transaction engine. |
 
 ## Honesty
 

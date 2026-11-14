@@ -1,4 +1,4 @@
-//! Example modules repaired in 0.2.1 by typing-only edits.
+//! Example modules repaired by typing-only edits.
 //!
 //! The first test is the list. The others pin what the repaired constructs
 //! do at run time, so the guides can describe them.

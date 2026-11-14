@@ -35,7 +35,7 @@ enum Command {
     Test(test::TestArgs),
     /// Run `cargo bench --offline`
     Bench(bench::BenchArgs),
-    /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, site check, JS tests, bench build
+    /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, site check, example status and documentation checks, JS tests, bench build
     Ci(ci::CiArgs),
     /// Check or regenerate the recorded check status of every .fr file
     Examples(examples::ExamplesArgs),

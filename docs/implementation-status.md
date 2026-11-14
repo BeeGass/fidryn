@@ -24,11 +24,11 @@ with it.
 | --- | --- | --- | --- | --- |
 | `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1546`, `:1846` |
 | `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
-| `judgment` | Yes. An unrecognised clause is kept as text | Yes | Concurrence policies only. One with an unrecognised clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
-| `observation` | Yes. An unrecognised clause is kept as text | Yes | Yes. An unrecognised clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
+| `judgment` | Yes. An unrecognized clause is kept as text | Yes | Concurrence policies only. One with an unrecognized clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
+| `observation` | Yes. An unrecognized clause is kept as text | Yes | Yes. An unrecognized clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
 | `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3277` |
 | `effect` | Re-read from the declaration text | Name and its first operation, with parameters and result | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1806`, `:3370`; `crates/fidryn-eval/src/lib.rs:2346` |
-| `duty` | Re-read from the declaration text. Unknown fields are skipped | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialised path | `crates/fidryn-hir/src/body.rs:422`; `crates/fidryn-eval/src/duty.rs` |
+| `duty` | Re-read from the declaration text. Unknown fields are skipped | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialized path | `crates/fidryn-hir/src/body.rs:422`; `crates/fidryn-eval/src/duty.rs` |
 | `decision` | Binders are parsed. Record requirements and `returns` are re-read from the declaration text | Binders, record requirements, the first `returns` | Through `RunDecision` | `crates/fidryn-hir/src/body.rs:304`, `:315` |
 | `interpretation_family`, `nomination` | By splitting the text on keywords | Alternatives; candidate, office as text, rank. A nomination's `from` basis is dropped | Only by `UniqueOccupant` succession | `crates/fidryn-hir/src/lib.rs:914`, `:925`, `:940`; `crates/fidryn-eval/src/lib.rs:4130` |
 | `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3342`; test `an_office_keeps_none_of_its_declared_fields` |
@@ -45,16 +45,16 @@ block and inside the request of a judgment's `otherwise suspend NeedJudgment
 { ... }` (`crates/fidryn-syntax/src/parser.rs:1515`, `:1213`). In the other
 declarations whose body is a list of fields, an unknown field is skipped
 without a diagnostic, and so is an unknown line in a `rule`. In a `judgment`
-or an `observation`, an unrecognised clause is kept and refused at run time,
+or an `observation`, an unrecognized clause is kept and refused at run time,
 as the table says.
 
-Rule verbs. The parser recognises nine verbs after `then`: `establish`,
+Rule verbs. The parser recognizes nine verbs after `then`: `establish`,
 `constitute`, `terminate`, `suspend`, `create`, `derive`, `activate`,
 `defeat` and `make` (`crates/fidryn-syntax/src/parser.rs:46`). `establish`
 and `constitute` both establish, and the last four all derive. When a rule
-has at least one `then` with a recognised verb, a `then` followed by any
+has at least one `then` with a recognized verb, a `then` followed by any
 other word is dropped without a diagnostic. When it has none, the rule's
-text is read again and an unrecognised verb becomes a derive
+text is read again and an unrecognized verb becomes a derive
 (`crates/fidryn-hir/src/lib.rs:505`, `crates/fidryn-hir/src/body.rs:389`).
 
 Rule selection. The worklist does not fire a rule that has a `select`
@@ -109,10 +109,11 @@ in its text, which is the dropped declaration's body, and its own are lost
 (`crates/fidryn-hir/src/lib.rs:498`, `crates/fidryn-hir/src/body.rs:347`).
 So when the dropped declaration is a rule, that rule's guard and
 consequence still run, under the earlier rule's name, and what is lost is
-the earlier rule's own consequence. When the dropped declaration is a duty,
-the duty is gone and the earlier rule has the duty's `attaches when` line
-as its guard and no consequence. A basis written as a dotted name or a
-call, such as `from Instrument.clause("1.2")`, is not affected.
+the earlier rule's own guard and consequence. When the dropped declaration
+is a duty, the duty is gone and the earlier rule has the duty's
+`attaches when` line as its guard and no consequence. A basis written as
+a dotted name or a call, such as `from Instrument.clause("1.2")`, is not
+affected.
 
 Among the modules that pass, this hides one query: `encoding_is_bounded` in
 `examples/us-federal/catalog/usc-titles.fr`, which `run` reports as an
@@ -135,8 +136,8 @@ unknown query. It also affects these rules and duties:
 
 ## Names the evaluator knows
 
-Some behaviour is attached to particular names. A program that uses
-another name for the same idea does not get this behaviour.
+Some behavior is attached to particular names. A program that uses
+another name for the same idea does not get this behavior.
 
 - Office succession (`UniqueOccupant`): a `judgment` that decides
   `Incapacitated` turns on the declared succession path

@@ -578,6 +578,18 @@ mod tests {
         assert!(nav.contains(
             "<a href=\"https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md\"><span class=\"n\" aria-hidden=\"true\">&#8599;</span><span class=\"t\">Architecture</span>"
         ));
+        let implementers = between(&nav, "<p class=\"label\">Implementers</p>", "</ol>");
+        let titles: Vec<&str> = implementers
+            .match_indices("<span class=\"t\">")
+            .map(|(i, m)| between(&implementers[i..], m, "</span>"))
+            .collect();
+        assert_eq!(
+            titles,
+            ["Architecture", "Implementation status", "Internal ledgers"]
+        );
+        assert!(implementers.contains(
+            "<a href=\"https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md\">"
+        ));
         assert!(nav.starts_with("<nav id=\"drawer\" class=\"guides\" aria-label=\"Guides\">"));
     }
 

@@ -90,8 +90,7 @@
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Internal ledgers</span><span class="d">Working ledgers, partly out of date</span></a></li>
     </ol>
   </div>
 </nav>
@@ -132,7 +131,7 @@ Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted 
 <tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Body not interpreted; the text must name a declared clause after <code>defeat</code> (E511). Never consulted when staged effects disagree</td></tr>
 <tr><td><code>transaction</code></td><td><code>tests/programs/transaction-atomic.fr</code></td><td>Partial; not a full commit engine</td></tr>
 <tr><td><code>for_all</code> / <code>exists</code></td><td>status + grammar</td><td>Finite declared domains only; open domains suspend; no open-world proofs</td></tr>
-<tr><td><code>fn</code></td><td>grammar / status</td><td>Limited/partial; no current example declaration</td></tr>
+<tr><td><code>fn</code></td><td><code>packages/logic/true.fr</code></td><td>Parsed, checked and executed; a query can call a function</td></tr>
 <tr><td>Module type parameters</td><td>status</td><td>Type-name substitution only; no cross-file value-parameter calculus</td></tr>
 </tbody></table>
 </div>
@@ -222,6 +221,13 @@ proposition is not a Boolean.</p>
     <span class="tk-kw">lost_by</span> <span class="tk-pu">{</span>Death<span class="tk-pu">,</span> EffectiveResignation<span class="tk-pu">,</span> EffectiveRemoval<span class="tk-pu">}</span>
     <span class="tk-kw">competence</span> <span class="tk-pu">{</span>AdministerTrust<span class="tk-pu">,</span> DecideTrustDistributions<span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>Fidryn 0.2 reads only an office's name and parameters. The rest of the
+declaration, <code>occupied_by</code> and every field in the body, is discarded:
+every office reaches the intermediate representation with occupant type
+<code>LegalPerson</code>, at most one occupant and no competence, and nothing reads
+the declaration at run time (test
+<code>an_office_keeps_none_of_its_declared_fields</code>; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
 <p><code>Occupies(Bryan, TrusteeOf(BRT))</code> is a proposition about that office,
 not a <code>Bool</code>.</p>
 <h2 id="record-and-evidence-types"><span class="hn">2.6</span> Record and evidence types <a class="anchor" href="#record-and-evidence-types" aria-label="Link to this section">#</a></h2>
@@ -444,8 +450,10 @@ From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-pa
     <span class="tk-kw">due</span> <span class="tk-nu">0</span> <span class="tk-nu">counted_days</span> after invoice_date
 <span class="tk-pu">}</span>
 
-<span class="tk-kw">query</span> obligation_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">String</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> duty_status<span class="tk-pu">(</span>PayInvoice<span class="tk-pu">)</span> <span class="tk-pu">}</span>
+<span class="tk-kw">query</span> obligation_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">DutyState</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span>
+        duty_status<span class="tk-pu">(</span>PayInvoice<span class="tk-pu">)</span>
+    <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p><code>duty_status(Name)</code> looks up that duty declaration plus the case on the
 <strong>implemented specialized duty path</strong> (see late-payment fixtures and
@@ -491,13 +499,19 @@ mode when the pasted case has a nonempty <code>assumptions</code> list. A defaul
 <code>run</code> is operative and ignores <code>assumptions</code>. See
 <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property. Fidryn 0.2 discharges Boolean
-literals:</p>
-<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Trivial <span class="tk-pu">{</span>
+<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.2
+decides closed formulas only: literals, arithmetic, comparisons, Boolean
+connectives, and quantifiers over a literal set or bounded synthetic
+entities.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Arithmetic <span class="tk-pu">{</span>
     <span class="tk-kw">assert</span> <span class="tk-nu">true</span>
+    <span class="tk-kw">assert</span> <span class="tk-nu">1</span> <span class="tk-pu">+</span> <span class="tk-nu">1</span> <span class="tk-pu">==</span> <span class="tk-nu">2</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Unsupported
-formulas can parse without yielding a covering proof. For those properties,</p>
+<p>Both assertions hold, so the property is proved. A false assertion, such
+as <code>assert false</code> or <code>assert 1 + 1 == 3</code>, is a counterexample. An
+assertion that names a query or a proposition is unresolved, and the
+property is then <code>unknown</code> unless another assertion is false. For those
+properties,</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>

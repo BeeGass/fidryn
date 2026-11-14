@@ -40,7 +40,7 @@ Boolean.
 
 ```
 examples/
-  states/         one high-impact module per U.S. state (scenarios in .fr)
+  states/         one module per U.S. state (scenarios in .fr)
   us-federal/     bounded U.S. Code and CFR slices
   california/     high-volume California practice
   texas/          homestead
@@ -58,9 +58,9 @@ index is `states/README.md`.
 
 ## Fifty states
 
-`examples/states/` has one **full** high-impact module per state (homestead,
-final pay, security deposit, paid leave, no-fault, community property, and
-so on). They ship no JSON case records. Their in-file `scenario` blocks
+`examples/states/` has one module per state, on topics such as homestead,
+final pay, security deposits, paid leave, no-fault insurance and community
+property. They ship no JSON case records. Their in-file `scenario` blocks
 write down example facts, but the interpreter does not read them.
 See `examples/states/README.md`. Older federal and specialty fixtures still
 use `fidryn.case-record/v0.1` JSON for CLI case-record interchange.

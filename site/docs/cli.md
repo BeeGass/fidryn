@@ -38,7 +38,10 @@ That places `fidryn` on your Cargo bin path. Workspace `rust-version` is
 
 ## Exit status
 
-Success is exit 0. Failures are exit 1. Compiler diagnostics, engine
+Success is exit 0. A command line the argument parser rejects, such as an
+unknown subcommand or flag, a missing required argument, or `--budget abc`,
+is a usage error: the usage message goes to stderr and the exit status is
+2. Every other failure is exit 1. Compiler diagnostics, engine
 errors, adapter errors, and usage problems go to stderr. Successful
 payloads (formatted source, the word `ok`, evaluation-report JSON, rendered text,
 diff JSON, filing receipts) go to stdout.
@@ -215,10 +218,26 @@ not invent interpretations; it only examines the declared finite bounds.
 file that already carries that object is accepted. Entries are merged
 (extended), not replaced wholesale.
 
-If neither the case nor `--bounds` supplies a nonempty completion space,
-exploration yields an inconsistent outcome whose core includes
-`empty completion set`. That is still a successful CLI run (exit 0) with
-an outcome document on stdout.
+When neither the case nor `--bounds` supplies any completions, `explore`
+evaluates the case as it stands. A query that needs no completion is
+answered: with the empty case record `tests/programs/cases/empty.json`,
+query `q` of `tests/programs/require-gate.fr` is determinate `7`. A query
+that needs an interpretation, evidence or a choice that the case does not
+supply is `suspended`, with a request for it.
+
+```sh
+fidryn explore tests/programs/require-gate.fr \
+  --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
+```
+
+The outcome is `inconsistent`, with `empty completion set` in its core,
+when the case or `--bounds` lists an interpretation family or a choice
+with no alternatives, such as `"SuccessorEligibility": []`. That happens
+whatever the query asks. Each of these is a successful CLI run (exit 0)
+with an outcome document on stdout.
 
 **Example** (case already declares `admissibleCompletions`; `--bounds`
 merges another copy of the same family from a second record in the repo):
@@ -273,10 +292,12 @@ fidryn run examples/trust/bryan-revocable-trust.fr \
   --case examples/trust/cases/one-certificate.json \
   --valid-at 2026-08-23T12:00:00Z \
   --known-at 2026-08-23T12:00:00Z \
-  > /tmp/fidryn-outcome.json
+  > outcome.json
 
-fidryn explain /tmp/fidryn-outcome.json --format text
+fidryn explain outcome.json --format text
 ```
+
+The first command writes `outcome.json` in the working directory.
 
 Without a file, the id is hashed and the DAG is empty:
 
@@ -409,7 +430,7 @@ Live HTTP requires both `--live` and the environment variable
 
 | Name | Required | Type |
 | --- | --- | --- |
-| `PACKET.json` | yes | JSON file parsed as the packet body |
+| `PACKET.json` | yes | JSON file holding one Fidryn value in tagged form (see below) |
 | `--adapter NAME` | no | `dry-run` (default), `ma-corporations`, or `massachusetts` |
 | `--live` | no | flag; enable live HTTP when the adapter and env allow it |
 | `--endpoint URL` | no | live POST URL for the Massachusetts adapter |
@@ -419,18 +440,27 @@ adapter name uses dry-run. The dry-run adapter refuses `--live` even if
 the environment variable is set. The Massachusetts adapter’s default
 endpoint is `https://www.sec.state.ma.us/filing`.
 
-There is no dedicated packet fixture in-tree; any JSON value is accepted.
-The LLC case record is a realistic dry-run body:
+A packet is one Fidryn value in its tagged JSON form: an object whose
+`kind` names the kind of value, such as `string`, `int`, `bool` or `map`,
+and whose `data` holds it, as in `{"kind":"string","data":"x"}`. A `map`
+holds named values in the same form. Other JSON, a case record included,
+is refused with `invalid packet JSON` and exit 1.
+[`tests/programs/packets/dry-run.json`](https://github.com/BeeGass/fidryn/blob/main/tests/programs/packets/dry-run.json)
+is a small packet: a `map` of two strings.
 
-```text
-fidryn file examples/massachusetts-llc/cases/transmitted-without-official-record.json
+Without `--live`, every adapter answers as the dry-run adapter does: it
+prints the packet back as `{"kind":"dryRun","packet":...}`, makes no
+network request and writes no file.
+
+```sh
+fidryn file tests/programs/packets/dry-run.json
 ```
 
 Live shape (does not establish `Filed`):
 
-```
+```text
 FIDRYN_ALLOW_LIVE_FILING=1 fidryn file \
-  examples/massachusetts-llc/cases/transmitted-without-official-record.json \
+  tests/programs/packets/dry-run.json \
   --adapter ma-corporations \
   --live \
   --endpoint https://www.sec.state.ma.us/filing

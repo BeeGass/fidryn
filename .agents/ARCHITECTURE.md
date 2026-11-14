@@ -2,7 +2,7 @@
 
 Short map of this checkout, taken from [`README.md`](../README.md) and the top-level names. Human docs win if they disagree. Crate internals are not expanded here. The README points at [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) for the pipeline.
 
-Fidryn is a programming language for legal instruments. The README says this repository is the 0.2 reference interpreter, a research fixture, not legal advice and not an operative instrument. Source files use `.fr`. `run` does not choose a completion; open branches without a covering certificate stay `Suspended`.
+Fidryn is a programming language for legal instruments. The README says Fidryn 0.2 is a research interpreter that checks and runs modules (`.fr` files), that nothing in the repository is legal advice, and that the modules under `examples/` and the programs under `tests/` exist to exercise the interpreter. `run` does not choose a completion; open branches without a covering certificate stay `Suspended`.
 
 ## Crates named in the README
 
@@ -35,7 +35,7 @@ Those directories are under `crates/`.
 | `docs/` | Human handbook. Index: `docs/README.md` |
 | `site/` | Static site for fidryn.onlygass.dev. `cargo xtask site` generates the pages, mirrors, and search index from `docs/*.md`; `assets/`, `fonts/`, `favicon.svg`, and `vercel.json` are hand-written |
 | `web/` | The mill page (`index.html`, `mill.css`, `mill.js`), embedded in the `fidryn` binary by `crates/fidryn-cli/src/ui.rs` |
-| `xtask/` | Workspace task runner: `test`, `bench`, `ci`, and `site` (see `.agents/adr/0001-rust-site-generator.md`) |
+| `xtask/` | Workspace task runner: `test`, `bench`, `ci`, `examples`, `docs`, `site` (see `.agents/adr/0001-rust-site-generator.md`), `governance`, `package`, `release-check` and `release-notes` |
 | `grammar.ebnf` | Present. Not described in the README sections used here |
 | `benches/`, `conformance/`, `packages/`, `prelude/`, `schemas/`, `templates/` | Present. Not given a role in those README sections |
 | `Cargo.toml` | Workspace manifest |
@@ -44,4 +44,4 @@ Those directories are under `crates/`.
 | `README.md` | Overview and quick start |
 | `LICENSE` | License |
 
-Quick start from the README: `cargo test --workspace --offline`, then `cargo run -p fidryn-cli -- check tests/programs/require-gate.fr`. The local mill is `fidryn ui --no-open` on port 8751.
+Quick start from the README: `cargo install --path crates/fidryn-cli --locked`, then `fidryn check tests/programs/require-gate.fr` and `fidryn run` on the same file with `tests/programs/cases/empty.json`. The README runs the tests with `cargo test --workspace --locked` and lists the local mill as `fidryn ui [--port N] [--no-open]`.

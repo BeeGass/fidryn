@@ -90,8 +90,7 @@
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Internal ledgers</span><span class="d">Working ledgers, partly out of date</span></a></li>
     </ol>
   </div>
 </nav>
@@ -114,7 +113,10 @@ HTTP as described under <a href="#file"><code>file</code></a>.</p>
 <p>That places <code>fidryn</code> on your Cargo bin path. Workspace <code>rust-version</code> is
 1.98.</p>
 <h2 id="exit-status"><span class="hn">4.2</span> Exit status <a class="anchor" href="#exit-status" aria-label="Link to this section">#</a></h2>
-<p>Success is exit 0. Failures are exit 1. Compiler diagnostics, engine
+<p>Success is exit 0. A command line the argument parser rejects, such as an
+unknown subcommand or flag, a missing required argument, or <code>--budget abc</code>,
+is a usage error: the usage message goes to stderr and the exit status is
+2. Every other failure is exit 1. Compiler diagnostics, engine
 errors, adapter errors, and usage problems go to stderr. Successful
 payloads (formatted source, the word <code>ok</code>, evaluation-report JSON, rendered text,
 diff JSON, filing receipts) go to stdout.</p>
@@ -246,10 +248,22 @@ not invent interpretations; it only examines the declared finite bounds.</p>
 <code>admissibleCompletions</code> / <code>admissible_completions</code>. A case-record JSON
 file that already carries that object is accepted. Entries are merged
 (extended), not replaced wholesale.</p>
-<p>If neither the case nor <code>--bounds</code> supplies a nonempty completion space,
-exploration yields an inconsistent outcome whose core includes
-<code>empty completion set</code>. That is still a successful CLI run (exit 0) with
-an outcome document on stdout.</p>
+<p>When neither the case nor <code>--bounds</code> supplies any completions, <code>explore</code>
+evaluates the case as it stands. A query that needs no completion is
+answered: with the empty case record <code>tests/programs/cases/empty.json</code>,
+query <code>q</code> of <code>tests/programs/require-gate.fr</code> is determinate <code>7</code>. A query
+that needs an interpretation, evidence or a choice that the case does not
+supply is <code>suspended</code>, with a request for it.</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> explore tests/programs/require-gate.fr <span class="tk-pu">\</span>
+  <span class="tk-ty">--query</span> q <span class="tk-pu">\</span>
+  <span class="tk-ty">--case</span> tests/programs/cases/empty.json <span class="tk-pu">\</span>
+  <span class="tk-ty">--valid-at</span> 2026-09-17T12:00:00Z <span class="tk-pu">\</span>
+  <span class="tk-ty">--known-at</span> 2026-09-17T12:00:00Z</code></pre></figure>
+<p>The outcome is <code>inconsistent</code>, with <code>empty completion set</code> in its core,
+when the case or <code>--bounds</code> lists an interpretation family or a choice
+with no alternatives, such as <code>"SuccessorEligibility": []</code>. That happens
+whatever the query asks. Each of these is a successful CLI run (exit 0)
+with an outcome document on stdout.</p>
 <p><strong>Example</strong> (case already declares <code>admissibleCompletions</code>; <code>--bounds</code>
 merges another copy of the same family from a second record in the repo):</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> explore examples/trust/bryan-revocable-trust.fr <span class="tk-pu">\</span>
@@ -290,9 +304,10 @@ Unknown <code>--format</code> values are treated as <code>text</code>.</p>
   --case examples/trust/cases/one-certificate.json \
   --valid-at 2026-08-23T12:00:00Z \
   --known-at 2026-08-23T12:00:00Z \
-  &gt; /tmp/fidryn-outcome.json
+  &gt; outcome.json
 
-fidryn explain /tmp/fidryn-outcome.json --format text</code></pre></figure>
+fidryn explain outcome.json --format text</code></pre></figure>
+<p>The first command writes <code>outcome.json</code> in the working directory.</p>
 <p>Without a file, the id is hashed and the DAG is empty:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> explain 00000000000000000000000000000000 <span class="tk-ty">--format</span> json</code></pre></figure>
 <p><strong>Success.</strong> Formatted trace on stdout. Text with no nodes is
@@ -381,7 +396,7 @@ Live HTTP requires both <code>--live</code> and the environment variable
 <code>Filed</code> legal fact.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
-<tr><td><code>PACKET.json</code></td><td>yes</td><td>JSON file parsed as the packet body</td></tr>
+<tr><td><code>PACKET.json</code></td><td>yes</td><td>JSON file holding one Fidryn value in tagged form (see below)</td></tr>
 <tr><td><code>--adapter NAME</code></td><td>no</td><td><code>dry-run</code> (default), <code>ma-corporations</code>, or <code>massachusetts</code></td></tr>
 <tr><td><code>--live</code></td><td>no</td><td>flag; enable live HTTP when the adapter and env allow it</td></tr>
 <tr><td><code>--endpoint URL</code></td><td>no</td><td>live POST URL for the Massachusetts adapter</td></tr>
@@ -391,12 +406,20 @@ Live HTTP requires both <code>--live</code> and the environment variable
 adapter name uses dry-run. The dry-run adapter refuses <code>--live</code> even if
 the environment variable is set. The Massachusetts adapter’s default
 endpoint is <code>https://www.sec.state.ma.us/filing</code>.</p>
-<p>There is no dedicated packet fixture in-tree; any JSON value is accepted.
-The LLC case record is a realistic dry-run body:</p>
-<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn file examples/massachusetts-llc/cases/transmitted-without-official-record.json</code></pre></figure>
+<p>A packet is one Fidryn value in its tagged JSON form: an object whose
+<code>kind</code> names the kind of value, such as <code>string</code>, <code>int</code>, <code>bool</code> or <code>map</code>,
+and whose <code>data</code> holds it, as in <code>{"kind":"string","data":"x"}</code>. A <code>map</code>
+holds named values in the same form. Other JSON, a case record included,
+is refused with <code>invalid packet JSON</code> and exit 1.
+<a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/packets/dry-run.json"><code>tests/programs/packets/dry-run.json</code></a>
+is a small packet: a <code>map</code> of two strings.</p>
+<p>Without <code>--live</code>, every adapter answers as the dry-run adapter does: it
+prints the packet back as <code>{"kind":"dryRun","packet":...}</code>, makes no
+network request and writes no file.</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> file tests/programs/packets/dry-run.json</code></pre></figure>
 <p>Live shape (does not establish <code>Filed</code>):</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>FIDRYN_ALLOW_LIVE_FILING=1 fidryn file \
-  examples/massachusetts-llc/cases/transmitted-without-official-record.json \
+  tests/programs/packets/dry-run.json \
   --adapter ma-corporations \
   --live \
   --endpoint https://www.sec.state.ma.us/filing</code></pre></figure>

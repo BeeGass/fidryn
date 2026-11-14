@@ -224,20 +224,26 @@ Conservative precedence (first match wins):
 ```text
 fidryn fmt PATH
 fidryn check PATH
+fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
-    [--arg KEY=VALUE]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json
+    [--arg KEY=VALUE] [--scenario] [--budget N]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json]
     --valid-at TIME --known-at TIME
-fidryn explain TRACE_ID --format text|json|dot
+fidryn explain TRACE_ID [--format text|json|dot]
 fidryn verify PATH --property NAME
 fidryn diff OLD_SNAPSHOT NEW_SNAPSHOT --query NAME
-fidryn render PATH --template TEMPLATE
+fidryn render PATH --template TEMPLATE [--data DATA.json]
+fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
+    [--scenario] [--budget N] [--template TEMPLATE]
+fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
+fidryn ui [--port N] [--no-open]
 ```
 
-`run` never chooses a completion. `--arg provision=...` sets
-`case.facts["provision"]`. `TIME` is ISO 8601 / RFC 3339 (`Z` or a numeric
-offset). Compiler diagnostics print `Diagnostic`'s `Display` and exit 1.
-`explore` requires explicit bounds.
+Every subcommand also takes `--source-root PATH`. `run` never chooses a
+completion. `--arg provision=...` sets `case.facts["provision"]`. `TIME` is
+ISO 8601 / RFC 3339 (`Z` or a numeric offset). Compiler diagnostics print
+`Diagnostic`'s `Display` and exit 1. `explore` examines only the finite
+completion space on the case and in `--bounds`.
 
 ## Pipeline
 

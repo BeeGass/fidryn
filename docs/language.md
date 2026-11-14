@@ -39,7 +39,7 @@ Support in 0.2 is **parsed / checked / executed** only where noted — see
 | `conflict_doctrine` | prenup, minimum-wage | Body not interpreted; the text must name a declared clause after `defeat` (E511). Never consulted when staged effects disagree |
 | `transaction` | `tests/programs/transaction-atomic.fr` | Partial; not a full commit engine |
 | `for_all` / `exists` | status + grammar | Finite declared domains only; open domains suspend; no open-world proofs |
-| `fn` | grammar / status | Limited/partial; no current example declaration |
+| `fn` | `packages/logic/true.fr` | Parsed, checked and executed; a query can call a function |
 | Module type parameters | status | Type-name substitution only; no cross-file value-parameter calculus |
 
 ## Module header
@@ -161,6 +161,14 @@ office TrusteeOf(trust: Trust) occupied_by LegalPerson {
     competence {AdministerTrust, DecideTrustDistributions}
 }
 ```
+
+Fidryn 0.2 reads only an office's name and parameters. The rest of the
+declaration, `occupied_by` and every field in the body, is discarded:
+every office reaches the intermediate representation with occupant type
+`LegalPerson`, at most one occupant and no competence, and nothing reads
+the declaration at run time (test
+`an_office_keeps_none_of_its_declared_fields`; see
+[implementation status](implementation-status.md)).
 
 `Occupies(Bryan, TrusteeOf(BRT))` is a proposition about that office,
 not a `Bool`.
@@ -473,8 +481,10 @@ duty PayInvoice {
     due 0 counted_days after invoice_date
 }
 
-query obligation_status() -> String {
-    goal Evaluate { duty_status(PayInvoice) }
+query obligation_status() -> DutyState {
+    goal Evaluate {
+        duty_status(PayInvoice)
+    }
 }
 ```
 
@@ -536,17 +546,23 @@ mode when the pasted case has a nonempty `assumptions` list. A default
 
 ## Verify
 
-A `verify` block is a named property. Fidryn 0.2 discharges Boolean
-literals:
+A `verify` block is a named property made of `assert` lines. Fidryn 0.2
+decides closed formulas only: literals, arithmetic, comparisons, Boolean
+connectives, and quantifiers over a literal set or bounded synthetic
+entities.
 
 ```
-verify Trivial {
+verify Arithmetic {
     assert true
+    assert 1 + 1 == 2
 }
 ```
 
-`assert true` proves. `assert false` is a counterexample. Unsupported
-formulas can parse without yielding a covering proof. For those properties,
+Both assertions hold, so the property is proved. A false assertion, such
+as `assert false` or `assert 1 + 1 == 3`, is a counterexample. An
+assertion that names a query or a proposition is unresolved, and the
+property is then `unknown` unless another assertion is false. For those
+properties,
 
 ```text
 cargo run -p fidryn-cli -- verify PATH --property NAME

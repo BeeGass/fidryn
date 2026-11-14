@@ -16,9 +16,10 @@ This repository is the 0.2 research interpreter. The modules under
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
 
-From the repository root, every command below uses
-`cargo run -p fidryn-cli --` so it works before you install a `fidryn`
-binary. After you build, the same arguments follow `fidryn`.
+From the repository root, every `fidryn` command below is written as
+`cargo run -p fidryn-cli --` followed by its arguments, so it works
+before you install a `fidryn` binary. After you install one, the same
+arguments follow `fidryn`.
 
 ## Prerequisites
 
@@ -37,7 +38,7 @@ The first pass takes a bit: it builds every crate, then runs the
 suite.
 
 ```sh
-cargo test --workspace --offline
+cargo test --workspace --locked
 ```
 
 Confirm the CLI:
@@ -164,10 +165,10 @@ invocation identity.
 Save the complete report to retain its actual trace:
 
 ```text
-fidryn run tests/programs/require-gate.fr --query q \
+cargo run -p fidryn-cli -- run tests/programs/require-gate.fr --query q \
   --case tests/programs/cases/empty.json \
   --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
-fidryn explain report.json --format text
+cargo run -p fidryn-cli -- explain report.json --format text
 ```
 
 `--source-root PATH` explicitly grants the filesystem root for artifacts and

@@ -1,10 +1,8 @@
-# Fifty-state high-impact corpus
+# Fifty-state corpus
 
-One **full** Fidryn module per state: the statute or constitutional
-rule people and lawyers actually hit, encoded as a self-contained fixture module
-(sources, entities, propositions, observations, rules, duties, queries,
-scenarios, verification). These are research fixtures, not legal advice,
-and not a complete statement of any state's code.
+One Fidryn module per state. Each encodes part of the state law named in
+its principal citation in the table below. These are research fixtures,
+not legal advice, and not a complete statement of any state's code.
 
 There is no companion JSON case file and no JSON source manifest. The
 `scenario` blocks in each `.fr` file write down example facts, but the

@@ -38,8 +38,8 @@ Pass a JSON file to `fidryn run` or `fidryn explore`:
 
 ```text
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME \
-    [--arg KEY=VALUE] [--scenario]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
+    [--arg KEY=VALUE] [--scenario] [--budget N]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] \
     --valid-at TIME --known-at TIME
 ```
 

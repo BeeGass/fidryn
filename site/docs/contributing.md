@@ -19,9 +19,9 @@ Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
 
-Current licensing and contribution rights are described in
-[Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions require the separate rights
-agreement described there before acceptance.
+Fidryn is released under the MIT License. Licensing and contribution
+rights are described in [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions
+require the separate rights agreement described there before acceptance.
 
 ## Toolchain
 
@@ -47,8 +47,9 @@ cargo test --workspace --all-features --locked --offline
 
 `cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
 Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, required JavaScript tests, generated-site consistency, and
-benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
+and probe controls, required JavaScript tests, generated-site consistency, the
+example status and documentation checks described below, and benchmark
+compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
 qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
 
 GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
@@ -78,6 +79,49 @@ The stylesheet and script in `site/assets/` are written by hand. The
 mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
 `fidryn.css` and has its own script, `web/mill.js`. `cargo xtask ci` requires Node to run the JavaScript unit tests in
 `web/tests/`; Node is not needed to build or serve the interpreter.
+
+## Example status and documentation checks
+
+`cargo xtask examples` runs `fidryn check` on every `.fr` file under
+`examples/`, `packages/`, `prelude/` and `tests/programs/`, and fails when
+the recorded result is out of date. The record is `examples/status.json`
+and `examples/STATUS.md`; the status sentence between the
+`examples-status` markers in `README.md`, `examples/README.md`,
+`examples/states/README.md` and `docs/examples.md`; and the ` (draft)`
+mark after each path of a failing file that `README.md`,
+`examples/README.md`, `examples/states/README.md` or a Markdown file
+directly under `docs/` mentions outside a code block. Do not edit any of these by
+hand. `cargo xtask examples --update` rewrites the status files, the
+status sentences and the draft marks. Run `cargo xtask site` after it,
+because the site is generated from the guides it rewrites.
+
+`cargo xtask docs` reads the Markdown in `README.md`, `LICENSING.md`,
+`CHANGELOG.md`, `SECURITY.md`, `docs/`, `examples/`, `packages/`,
+`conformance/` and `site/README.md`. It checks that every relative link
+resolves, that every untagged or `fidryn`-tagged code block that starts
+with `module` passes the checker, and that the `fidryn` commands in
+blocks tagged `sh` behave as the tag says. `--skip-commands` leaves out
+the commands.
+
+A code block that shows a `fidryn` command takes one of these tags:
+
+- `sh`: the check runs each `fidryn` command in the block from the
+  repository root and expects exit status 0. A command is a line, with
+  lines ending in `\` joined, that starts with `fidryn` or with
+  `cargo run -p fidryn-cli --`; the check runs the built `fidryn` binary
+  with the words after that prefix. A line in an `sh` block that is not a
+  `fidryn` command, such as `cargo test --workspace --locked`, is not run.
+  A command with `ui` as one of its words is taken to start the mill, so
+  it is not run either. The check does not use a shell, so a command
+  must not use `>`, `>>`, `<`, `|`, `&&`, `||` or `;`. A command that has
+  not exited after 60 seconds is stopped and reported.
+- `sh exit=N`: the same, but each command must exit with status `N`. Any
+  other tag that starts with `sh` is reported.
+- `text`: the block is shown and not run. Use it for placeholders such as
+  `PATH`, for output redirection, and for commands that cannot run
+  unattended.
+
+A block with any other tag, or none, must not show a `fidryn` command.
 
 ## Pipeline
 
@@ -134,9 +178,12 @@ or outcome matches is not a passing test.
 
 ## Commits
 
-Use Conventional Commits (`feat(syntax): ...`, `fix(eval): ...`,
-`test(cli): ...`, `docs: ...`). Prefer atomic commits in pipeline order,
-then tests and docs. Do not dump unrelated crates into one commit.
+Write each commit subject as an imperative sentence with no type prefix,
+for example `Require code-scanning findings to pass before promotion`.
+Recent history follows this; older commits used Conventional Commits
+prefixes such as `feat(syntax):`, which are no longer used. Prefer atomic
+commits in pipeline order, then tests and docs. Do not dump unrelated
+crates into one commit.
 
 ## Grammar
 
@@ -153,9 +200,10 @@ tutorials.
 
 - [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
 - [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+
+The internal working ledgers are indexed in
+[internal/README.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md). They are not reader
+documentation, and parts of them describe earlier states of the code.
 
 Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
 ARCHITECTURE.md.

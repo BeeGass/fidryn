@@ -1,10 +1,10 @@
 # Internal ledgers
 
-These documents are working records of how the 0.2 interpreter was
-reviewed and repaired. They are kept for history. They are not user
-documentation, and several describe states of the code that no longer
-exist. For what the interpreter does today, read
-[Implementation status](../implementation-status.md).
+These documents are working ledgers for people changing the 0.2
+interpreter: records of how it was reviewed and repaired. They are not
+reader documentation, and parts of them describe earlier states of the
+code. [Implementation status](../implementation-status.md) is the
+current account of what the interpreter does.
 
 | Document | What it records |
 | --- | --- |

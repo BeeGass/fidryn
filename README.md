@@ -10,9 +10,13 @@ Fidryn is released under the MIT License: see [LICENSE](LICENSE). [Licensing](LI
 ## Status
 
 Fidryn 0.2 is a research interpreter. It checks and runs modules (`.fr`
-files) built from queries, functions, calculations, rules, observations,
-judgments that use a concurrence policy, and duties, which run only
-through the built-in calls `duty_status` and `duty_step`. Each run prints
+files) built from queries; functions; calculations; rules; observations;
+judgments that use a concurrence policy; decisions, which run through a
+query's `RunDecision` goal; duties, which run only through the built-in
+calls `duty_status` and `duty_step`; and `verify` properties, which
+`fidryn verify` decides only when their assertions are closed formulas:
+literals, arithmetic, comparisons, Boolean connectives, and quantifiers
+over a literal set or bounded synthetic entities. Each run prints
 a JSON report that records the query, the valid and known times, and
 digests of the program and the case record. Several kinds of declaration,
 such as `power`, `office` and `legal_act`, are accepted but not run;

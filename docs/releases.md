@@ -67,4 +67,4 @@ retaining its tested CI artifacts or prepared draft for inspection.
 Releases identify their source and executable bytes. They do not establish legal
 approval or close the general-language obligations in the implementation audit.
 
-`deny.toml` allows a fixed list of licences for dependencies. Workspace crates declare `MIT`, which is on that list, so a release needs no licence entries of its own.
+`deny.toml` allows a fixed list of licenses for dependencies. Workspace crates declare `MIT`, which is on that list, so a release needs no license entries of its own.

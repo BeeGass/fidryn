@@ -21,7 +21,11 @@ cargo xtask ci --fmt
 The canonical gate requires the pinned Rust toolchain, uv with its locked Python
 environment, and Node. It runs workspace tests, Clippy across targets/features,
 Rustdoc, schema assertions and controls, Python/JavaScript checks, generated-site
-consistency and benchmark compilation. Adapter tests require local mock listeners.
+consistency, the example status check (`cargo xtask examples`), the
+documentation check (`cargo xtask docs`) and benchmark compilation. Both checks
+are described in
+[Contributing](contributing.md#example-status-and-documentation-checks).
+Adapter tests require local mock listeners.
 GitHub also runs Linux/macOS/Windows tests, dependency/security checks, secret
 scanning, workflow linting and CodeQL. The required code-scanning summary also
 gates findings; successful analysis execution alone does not satisfy that check.
