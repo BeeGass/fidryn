@@ -1,4 +1,4 @@
-(* Fidryn v0.1 closed grammar. Unknown body fields are parse errors. *)
+(* Fidryn 0.2 grammar. The parser enforces closed field sets only for source blocks and judgment request blocks; see docs/implementation-status.md. *)
 
 File            ::= Module EOF
 

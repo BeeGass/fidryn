@@ -1,276 +1,199 @@
-# Capability matrix
+# Implementation status
 
 A `.fr` file is not an executable specification. Presence under `examples/`
 or `prelude/` does not mean the interpreter implements the feature.
 
 A feature counts as implemented only when syntax, name resolution, checking,
-evaluation, uncertainty, provenance, and tests agree
-([`REVIEW-FIX-CONTRACT.md`](internal/REVIEW-FIX-CONTRACT.md)).
+evaluation, uncertainty, provenance, and tests agree.
 
-**Determinate** only when every still-admissible resolution of the open
-issues agrees, or a competent authority has already made a determination
-that is operative in the relevant context. `run` never chooses a
-completion. Uncertified open issues are `Suspended`, never a silent
-`Determinate`.
+This page says what the 0.2 interpreter does today. Each statement below
+cites a test or a code location in this version. Tests are in
+`tests/integration/known_limits.rs` unless another file is named. The review
+records from earlier passes are listed in the
+[internal ledgers](internal/README.md); several describe code that has since
+changed.
 
-This table is the **evidence-backed status after the previous review-fix
-pass**. It is not a snapshot of the pre-pass tree, which still
-name-dispatched many queries. A later review (2026-09-17) is **open**;
-see [`OBLIGATIONS.md`](internal/OBLIGATIONS.md) and
-[`WORKSTREAM-CONTRACT.md`](internal/WORKSTREAM-CONTRACT.md). The 28 earlier
-review-kit regressions remain. The 16 tests in
-`adversarial_regressions.rs` pass as regressions for section-1 defects;
-they are not closure of the review. Green tests are regressions.
+## Declarations
 
-Covering: `fidryn-kernel` may accept or reject a covering claim. It
-does not generate proofs. Branch evaluation (`check_branches` /
-`accept_covering_eval`) is **in progress** until named kernel or
-domains tests exist. A claims digest is not covering. Artifact-byte
-authentication is landed in `fidryn-check` with an explicit
-`source_root`. CLI `Driver::check_path` passes the module parent directory
-into `check_cached` / `check_with_sources` so hex import digests are
-byte-authenticated against artifact files next to the module. Mill /
-`check_source` still uses `source_root = None` (unauthenticated paste).
+"Body parsed into structure" says whether the parser reads a declaration's
+body into fields. "Reaches the intermediate representation" says what the
+checker passes on to the evaluator. "Executed" says what the evaluator does
+with it.
 
-`fidryn-kernel` is the covering-check boundary. Proof search lives in
-`fidryn-verify` / `fidryn-solve`. A `fixture` digest is
-`TrustProfile::Fixture`, never `ByteVerified`.
+| Kind | Body parsed into structure | Reaches the intermediate representation | Executed | Evidence |
+| --- | --- | --- | --- | --- |
+| `query`, `fn`, `calc` | Yes | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:1546`, `:1846` |
+| `rule` | Yes | Guard, selection, consequences and `otherwise` fallback. The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive or are dropped (see Rule verbs below) | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-check/src/lib.rs:3634`; `crates/fidryn-eval/src/worklist.rs:248`; test `an_unrecognised_rule_verb_is_lowered_as_derive` |
+| `judgment` | Yes. An unrecognised clause is kept as text | Yes | Concurrence policies only. One with an unrecognised clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
+| `observation` | Yes. An unrecognised clause is kept as text | Yes | Yes. An unrecognised clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
+| `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3277` |
+| `effect` | Re-read from the declaration text | Name and its first operation, with parameters and result | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1806`, `:3370`; `crates/fidryn-eval/src/lib.rs:2346` |
+| `duty` | Re-read from the declaration text. Unknown fields are skipped | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialised path | `crates/fidryn-hir/src/body.rs:422`; `crates/fidryn-eval/src/duty.rs` |
+| `decision` | Binders are parsed. Record requirements and `returns` are re-read from the declaration text | Binders, record requirements, the first `returns` | Through `RunDecision` | `crates/fidryn-hir/src/body.rs:304`, `:315` |
+| `interpretation_family`, `nomination` | By splitting the text on keywords | Alternatives; candidate, office as text, rank. A nomination's `from` basis is dropped | Only by `UniqueOccupant` succession | `crates/fidryn-hir/src/lib.rs:914`, `:925`, `:940`; `crates/fidryn-eval/src/lib.rs:4130` |
+| `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3342`; test `an_office_keeps_none_of_its_declared_fields` |
+| `clause` | Name and parameters only | Body kept as text | Only through `EvaluateClause`, which knows two clause names (see below) | `crates/fidryn-eval/src/lib.rs:4791`, `:4986` |
+| `legal_act` | Name and parameters only. Unknown fields are accepted | Nothing. The checker types a call of its name as a `LegalAction` | Nothing | `crates/fidryn-hir/src/lib.rs:663`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:882`; `crates/fidryn-hir/src/lib.rs:707`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2190` |
+| `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:376`; `crates/fidryn-check/src/lib.rs:3239`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
+| `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2232`, `:2587`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
+| `verify` | Assertions kept | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that names a query or a proposition is unresolved, and the property is `unknown` unless another assertion is false | `crates/fidryn-verify/src/property.rs:123`, `:172` |
 
-Cells are `Yes` / `Partial` / `No`.
+Unknown fields. The parser rejects an unknown field only inside a `source`
+block and inside the request of a judgment's `otherwise suspend NeedJudgment
+{ ... }` (`crates/fidryn-syntax/src/parser.rs:1515`, `:1213`). In the other
+declarations whose body is a list of fields, an unknown field is skipped
+without a diagnostic, and so is an unknown line in a `rule`. In a `judgment`
+or an `observation`, an unrecognised clause is kept and refused at run time,
+as the table says.
 
-- **Parsed** — grammar and parser produce a structured form (not only a
-  source slice that happens to contain the keyword).
-- **Resolved** — names, imports, and binders bind against the
-  authenticated manifest.
-- **Checked** — types, effects, authority, or the relevant diagnostic
-  actually fire (not a substring heuristic).
-- **Executed** — the evaluator or handler runs Core terms, plans, or
-  rules. Selecting a fixture by query name or `Term::Ident(query_name)`
-  is **not** execution.
-- **Traceable** — a proof-relevant DAG records the step with parent
-  edges, not only a content-hashed `TraceId`.
-- **Conformance tests** — shared tests under `conformance/` and/or
-  `tests/integration/semantic_regressions.rs` (crate unit tests
-  alone are `Partial`).
-- **This pass** — `In progress` if a crate-owned agent is changing the
-  row under the review-fix contract; `Not this pass` if the language
-  still requires it but this review does not ship it.
+Rule verbs. The parser recognises nine verbs after `then`: `establish`,
+`constitute`, `terminate`, `suspend`, `create`, `derive`, `activate`,
+`defeat` and `make` (`crates/fidryn-syntax/src/parser.rs:46`). `establish`
+and `constitute` both establish, and the last four all derive. When a rule
+has at least one `then` with a recognised verb, a `then` followed by any
+other word is dropped without a diagnostic. When it has none, the rule's
+text is read again and an unrecognised verb becomes a derive
+(`crates/fidryn-hir/src/lib.rs:505`, `crates/fidryn-hir/src/body.rs:389`).
 
-Language ambition is unchanged. `No` and `Partial` are evidence, not
-deferrals of the requirement. See
-[`FULL-IMPLEMENTATION.md`](internal/FULL-IMPLEMENTATION.md) and
-[`ARCHITECTURE.md`](ARCHITECTURE.md).
+Rule selection. The worklist does not fire a rule that has a `select`
+clause. Only `UniqueOccupant` succession reads the selection
+(`crates/fidryn-eval/src/worklist.rs:210`).
 
-## Matrix
+## Expressions and types
 
-| Feature | Parsed | Resolved | Checked | Executed | Traceable | Conformance tests | This pass |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Expression literals (`true`/`false`) | Yes | Yes | Yes | Yes | Partial | Yes | Done |
-| Function/calc bodies | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Rule guards and consequences | Yes | Partial | Partial | Yes | Partial | Partial | Done |
-| Query Evaluate plan | Yes | Yes | Yes | Yes | Partial | Yes | Done |
-| UniqueOccupant | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| StatusOf / closed-world absence | Yes | Yes | Partial | Partial | Partial | Yes | Done |
-| RunDecision (not always FOIA) | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Observe matching (schema+subject+time) | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Determine matching (protocol+issue) | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Aggregation (full values) | Yes | Yes | Yes | Yes | Partial | Yes | Done |
-| Exploration coverage (all domains) | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Convergence certificates (checked handles) | Yes | Yes | Yes | Partial | Partial | Yes | Done |
-| Source manifest loading and import digests | Yes | Yes | Yes | Yes | Partial | Yes | Done |
-| Tax bracket arithmetic | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Conflict oracle | Yes | Partial | Partial | Partial | Partial | Partial | Done |
-| SelectApplicableLaw | Yes | Partial | Partial | Partial | Partial | Partial | Done |
-| Fuel / recursion SCC | Yes | Partial | Partial | Partial | Partial | Partial | Done |
-| Prop vs Bool (E310) | Yes | Yes | Yes | Yes | Partial | Yes | Done |
-| JSON schema (`weight`) | Yes | Yes | Partial | Partial | No | Yes | Done |
-| Mill outcome envelope | Yes | Yes | Partial | Partial | Partial | Partial | Done |
-| Filing adapter states | Yes | Yes | Yes | Yes | Partial | Partial | Done |
-| Trace DAG parent edges | Yes | Yes | Partial | Partial | Partial | Partial | Done |
-| Rowan CST | Yes | Yes | Partial | Yes | Partial | Yes | Done |
-| Resumable suspensions | Yes | Yes | Partial | Yes | Partial | Partial | Done |
-| Incremental compilation / Salsa | Yes | Yes | Partial | Yes | Partial | Partial | Done |
-| SMT counterexample to determinacy | Yes | Yes | Partial | Yes | Partial | Partial | Done |
-| Parameterized modules | Yes | Yes | Yes | Partial | Partial | Partial | Done |
-| Finite quantification (`for_all`/`exists`) | Yes | Partial | Partial | Yes | Partial | Partial | Done |
+- Integer, decimal and same-currency money arithmetic work. Integer
+  division truncates. Adding amounts in two currencies is `E210`
+  (`crates/fidryn-check/src/lib.rs:1285`, `crates/fidryn-eval/src/money.rs:7`).
+- A duration cannot be added to a time: `start + 30 days` is `E210` (test
+  `a_duration_cannot_be_added_to_a_time_in_an_expression`). A date literal
+  such as `2026-12-31` has no type in an expression (test
+  `a_date_literal_is_untyped_in_an_expression`). Two durations of the same
+  kind pass the checker when added, but the evaluator refuses the sum
+  (`crates/fidryn-eval/src/lib.rs:3067`).
+- The duration units are `days`, `calendar_days`, `counted_days`,
+  `working_days`, `hours`, `minutes` and `seconds`. There are no month or
+  year units (`crates/fidryn-check/src/lib.rs:1672`). A duty's deadline
+  counts `days`, `calendar_days` and `counted_days` alike, as 24 hours each.
+  `working_days` needs a closed `working_days` closure and a
+  `working_days_holidays` fact on the case (`crates/fidryn-eval/src/duty.rs:858`).
+- Every instant is converted to UTC when it is read. The offset is not kept
+  (`crates/fidryn-core/src/time.rs:20`).
+- There are no lists, no aggregation, no string operations and no matching
+  on variants. Strings can be compared for equality. An ordered comparison
+  of two strings passes the checker and fails at run time
+  (`crates/fidryn-core/src/types.rs:93`, `crates/fidryn-eval/src/lib.rs:3132`).
+- A misspelled type name creates a new sort without a diagnostic (test
+  `a_misspelled_type_name_becomes_a_new_sort_without_a_diagnostic`;
+  `crates/fidryn-hir/src/body.rs:561`).
+- A query that declares a result type must end in a typed value, so one
+  that ends in `require` is rejected with `E210` (test
+  `a_query_that_ends_in_a_require_has_an_untyped_result`).
+- In `require determined P using Determine`, the `using` clause is parsed
+  and discarded (`crates/fidryn-syntax/src/parser.rs:1657`). Any
+  determination of `P` on the case that names a protocol and a decider
+  answers it (`crates/fidryn-eval/src/worklist.rs:908`).
+- A module that does not pass the checker cannot be run (test
+  `a_module_that_fails_the_checker_cannot_be_run` in
+  `tests/integration/repaired_examples.rs`).
 
-## What “Executed = Yes” means this pass
+## Declarations that are lost
 
-`QueryPlan::Evaluate` runs a Core `Term`. `Term::Bool(true)` is the
-`Evaluate { true }` body. It is never encoded as `Term::Ident(query_name)`.
-Unknown queries, exhausted fuel, and unsupported operations are
-`EngineError`, never `Outcome::Inconsistent`.
+A rule whose `from` basis is a bare name, as in `from Basis`, is not
+checked, and the declaration that follows it is dropped without a
+diagnostic (test
+`a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration`).
+The rule keeps the `when` and `then` lines of the dropped declaration's
+body, and its own are lost (`crates/fidryn-hir/src/lib.rs:498`,
+`crates/fidryn-hir/src/body.rs:347`). A basis written as a dotted name or a
+call, such as `from Instrument.clause("1.2")`, is not affected. Among the
+modules that pass, this hides one query: `encoding_is_bounded` in
+`examples/us-federal/catalog/usc-titles.fr`, which `run` reports as an
+unknown query. It also drops these rules and duties:
 
-Observe matches **schema**, issue/arguments (subject), and
-`observed_at <= known_at`. Determine matches **protocol and issue**.
-`established: false` from a competent authority is a negative
-determination, not `OutsideCompetence`. Aggregation compares full
-`Value` with `PartialEq`, not `display_label()`. A determinate branch
-plus a contingent branch is not determinate. Explore enumerates declared
-interpretation, evidence, and choice domains; assignment identity is the
-full binding.
+| Module | Dropped |
+| --- | --- |
+| `examples/states/arkansas/homestead.fr` | rule `ForcedSaleProtection`, duty `RespectHomestead` |
+| `examples/states/colorado/famli.fr` | duty `RespectFamliLeave` |
+| `examples/states/florida/homestead.fr` | rule `ForcedSaleProtection` |
+| `examples/states/idaho/noncompete.fr` | duty `RefrainFromDirectCompetition` |
+| `examples/states/kansas/homestead.fr` | rule `FamilyOccupancyConstitutes`, duty `RespectHomestead` |
+| `examples/states/louisiana/community-property.fr` | rule `EqualShares` |
+| `examples/states/michigan/no-fault-pip.fr` | duty `PayPIPBenefits` |
+| `examples/states/south-dakota/wage-payment.fr` | rule `FinalPayOnEmployerSeparation`, duty `PayAllWagesDue` |
 
-## Partial and No (honest limits after this pass)
+## Names the evaluator knows
 
-**Function/calc bodies.** Signatures and `CoreFunction.body` are
-populated. `If` / `else` / `else if` parse in calc blocks; `{ amount * 0.10 }`
-is a mul. The interpreter runs `Binary`, `Call`, `If`, `Field`, and
-decimals. Effectful `fn` bodies are not a general algebraic-effect
-worklist. UniqueOccupant / StatusOf / some decisions remain specialized
-plans.
+Some behaviour is attached to particular names. A program that uses
+another name for the same idea does not get this behaviour.
 
-**Rule guards and consequences.** `evaluate` of `QueryPlan::Evaluate`
-runs a bounded (64) staged worklist over `CoreDecl::Rule`.
-`Guard::Operative` / `Derived` hold only when the proposition is in the
-staged set; missing is Unknown (may Suspend), not closed-world false.
-`operative P in Context` stores `Context` on the guard and still tests
-`P`.
-`operative ExemptFromBOI` is not a date heuristic. Prescriptive duties
-and full transaction commit are not this worklist.
+- Office succession (`UniqueOccupant`): a `judgment` that decides
+  `Incapacitated` turns on the declared succession path
+  (`crates/fidryn-eval/src/lib.rs:3613`). The successor rule's selection
+  must test `operative Eligible(candidate, office)`
+  (`crates/fidryn-eval/src/lib.rs:4088`) over `nominations_for(office)`
+  ordered by `nomination_rank` (`:4075`, `:4118`). Acceptance is an
+  `AcceptOffice` evidence record (`:4458`). The current occupant comes from
+  `OccupancyRecord` evidence (`:5221`).
+- `StatusOf`: only `OfficialFilingRecord` evidence counts as a filing
+  (`crates/fidryn-eval/src/lib.rs:4504`). `FormedLLC` is the status name used
+  when neither `status` nor `when_present` names one (`:4548`).
+- `EvaluateClause`: `SpousalSupportWaiver` asks the case for a
+  `PrenupEnforceability` judgment (`crates/fidryn-eval/src/lib.rs:4791`).
+  `ChildSupportWaiver` is always prevented by
+  `ChildSupportCannotBeAdverselyAffected` (`:4986`). Any other clause
+  suspends with a `PrenupEnforceability` request that the case cannot
+  answer.
+- Duties: payment is performance only as a `PaymentRecord` evidence record
+  (`crates/fidryn-eval/src/duty.rs:701`). When `due` names no anchor, the
+  deadline counts from the case fact `invoice_date`, then `due_at`
+  (`crates/fidryn-eval/src/duty.rs:944`).
+- Tax: a function named `ordinary_income_tax` with no body runs a built-in
+  four-bracket table (10, 12, 22 and 24 percent, with brackets ending at
+  11,925, 48,475 and 103,350) (`crates/fidryn-eval/src/lib.rs:3174`,
+  `:1515`). Any other function with no body is an engine error.
+- `EligibleForOpenTexturedCredit` always asks the case for an
+  `OpenTexturedCredit` judgment (`crates/fidryn-eval/src/lib.rs:1129`).
+- A term named `judgment` or `Adjudicated` answers from a
+  `JudgmentOnTheMerits` determination and the `judgment_entry` fact
+  (`crates/fidryn-eval/src/lib.rs:1124`, `:3205`).
+- A term named `ResolveNormConflict` or `SelectApplicableLaw` runs a
+  built-in conflict or law-selection request
+  (`crates/fidryn-eval/src/lib.rs:1078`, `:1082`).
 
-**UniqueOccupant.** Unique occupancy from the authority ledger or
-`OccupancyRecord`. A parameterized office matches its bare head and that
-same application. It does not match the same head with different
-arguments. Succession when `Incapacitated` is derived/determined
-or concurring evidence meets `required_concurring` (default 2). Schema
-comes from the case/module, not a `"Filing"` substring. Ranked accepted
-nominations are filtered by the recorded alternative's *declared*
-`Eligible` definitions, then acceptance, then rank. `I1`/`I2` are not
-nominee aliases. Families are selected by the office named in those
-definitions so two offices can declare different protocols. Unrelated
-interpretation families do not steal that choice. No default occupant
-named Bryan.
+## Known limits pinned by tests
 
-**StatusOf / closed-world.** Only schema identity `OfficialFilingRecord`
-counts as filing. Substring `"Filing"` must not. Closed-world absence
-requires `ClosureRecord { closed: true }` for that domain; otherwise
-`Suspended`. This is still a StatusOf evaluator, not a full status
-ledger interpreter.
+| Test | What it shows |
+| --- | --- |
+| `a_duration_cannot_be_added_to_a_time_in_an_expression` | `start + 30 days`, with `start: Time`, is rejected with `E210`. |
+| `a_date_literal_is_untyped_in_an_expression` | `d <= 2026-12-31`, with `d: Date`, is rejected with `E210`, because the date literal has no type. |
+| `an_unrecognised_rule_verb_is_lowered_as_derive` | `then activate Flagged(Acme)` becomes a derive consequence. |
+| `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` | An import of a module that does not exist, with an `alias`, passes the checker. |
+| `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` | A `power` and a `legal_act` with made-up fields pass the checker, and neither reaches the intermediate representation. |
+| `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` | A `source` block that names an artifact file that does not exist passes the checker, and no source declaration reaches the intermediate representation. |
+| `an_office_keeps_none_of_its_declared_fields` | An office declared with `cardinality 3..9` and a competence reaches the intermediate representation with cardinality 0 to 1 and no competence. |
+| `a_misspelled_type_name_becomes_a_new_sort_without_a_diagnostic` | A parameter of type `NaturalPersn` passes the checker. |
+| `a_query_that_ends_in_a_require_has_an_untyped_result` | A query declared `-> Bool` whose goal ends in `require determined ...` is rejected with `E210`. |
+| `a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration` | A rule written `from Basis` with an undeclared name in its guard passes the checker, and the query after it is missing. |
 
-**RunDecision.** Resolve the named `CoreDecision`, check argument arity
-against binders, then evaluate declared `requirements` with temporal
-evidence filters and the declared result expression. An unknown name is
-`EngineError::Unsupported`, not a FOIA-by-name fallback. There is no
-name-based domain helper.
+## Budgets
 
-**Convergence certificates.** `CheckedCertificate` has private fields;
-only `CheckedCertificate::verified(...)` constructs it today.
-`CompletionProofId::of(b"P11")` is never a certificate. Ignored open
-issues without a checked handle are `Suspended`. `verified` is a
-claims-digest binder, not covering proof. Ignoring open issues requires
-`verified_covering` with a complete `CoverageWitness` (`examined == total`,
-`examined > 0`, `incomplete: false`, answer equals the claim). Those
-APIs are not in `fidryn-core`. `fidryn-kernel` is the covering-check
-boundary, not a proof generator. A hash of the open issues is not
-covering.
+Every run is bounded. Reaching a run limit stops the run with the engine
+error `fuel exhausted`.
 
-**Tax bracket arithmetic.** `examples/tax/federal-tax.fr` and
-`prelude/tax.fr` define `ordinary_income_tax_formula` as an if/else calc
-on 11925 / 48475 / 103350 and 10/12/22/24%. The fourth bracket includes
-the completed 22% slab. Missing money is `EngineError::InvalidInput`.
-The only missing-body arithmetic helper allowed by the workstream
-contract is the explicit builtin name `ordinary_income_tax`. Eval still
-selects the helper with `is_tax_function` (name/source substring `tax`
-or `ordinary_income`). That substring fallback remains until eval lands
-the exact builtin. Any other function with no body must be
-`EngineError::Unsupported`.
-
-**Conflict oracle / SelectApplicableLaw.** Unique ranked results resume;
-ties suspend or explore; list order is never a tie-break. Matching is
-name-level (doctrine graph labels; weight then later-in-time). Full
-argument-graph reasoning and specific-over-general doctrines are not
-done.
-
-**Fuel / recursion SCC.** `fuel = N` parses. `calc` must not recurse
-(E530). `fn` recursion without fuel is E530. The checker is ident-in-body,
-not a call-graph SCC. The evaluator decrements fuel; exhaustion is
-`EngineError::FuelExhausted`. That is not structural termination.
-
-**Prop vs Bool (E310).** `Prop` has no conversion to `Bool`. Guards must
-use `operative`, `assumed`, `determined`, or `necessarily`. E310 is a
-type/effect check, not `src.contains("if Incapacitated(")`. Runtime
-values stay disjoint (`Value::Prop` ≠ `Value::Bool`).
-
-**JSON schema (`weight`).** Manifest schema and `SourceWeight` include
-`binding | controlling | persuasive | explanatory`. The JSON checker
-validates document shape. It does not authenticate artifacts.
-
-**Mill / CLI evaluation-report envelope.** Mill stays on `127.0.0.1`.
-`/api/run` and `/api/explore` return
-`{ok: true, report: <evaluation-report>, opinion: [<sentence>, …]}`
-(or an error wrapper). CLI `run` / `explore` print the same report via
-the invocation-checked exporter: top-level `fidryn.evaluation-report/v0.2` with nested
-`outcomeDocument` of schema `fidryn.outcome/v0.1` (camelCase fields, hex
-trace/certificate ids, internally tagged `Value`, including
-`modelBoundary`).
-
-**Filing adapter states.** `DryRun` / `Submitted` / `Rejected`. Live HTTP
-requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`. A transport receipt
-does not establish `Filed`. No live filing from the mill.
-
-**Trace DAG parent edges.** `TraceNode` gains parent edges this pass.
-Evaluator sessions retain actual parented records for foundation admission,
-rule application, authority/time checks, judgments, transactions and the final
-invocation. CLI and mill v0.2 reports embed this graph, and exploration includes
-executed branch evidence. A report identifies inputs by digest; a separate
-review bundle is needed to carry the input bytes for independent rerun.
-`explain` of a bare hashed id may still have an empty `nodes` array;
-emptiness means no persisted DAG, not an omitted field.
-
-**Rowan CST.** `Parse.green` is a lossless `rowan::GreenNode`. Trivia is
-leaves. `syntax().text()` equals the source. Typed `ast::Module` is
-still built alongside. Not every Pratt subexpression is its own node.
-
-**Resumable suspensions.** `evaluate_session` stores a `Continuation`
-(residual term/plan, bindings, derived worklist, fuel). `resume`
-continues that residual on the same case snapshot; a changed snapshot
-recomputes. JSON outcomes still omit the continuation (not a wire
-value).
-
-**Incremental compilation.** `fidryn-driver::Driver` memos parse/check
-by blake3(source)+manifest and run by program+query+case+times.
-The `salsa` crate owns dependency tracking. A `CompilationArtifact` retains
-its immutable module, root text, observed dependency/lock bytes and source bundle;
-its trust does not depend on the order of other compilations in the same driver.
-Comment-only edits miss the check cache (byte identity).
-
-**Counterexample to determinacy.** `check_determinacy` evaluates one
-admissible assignment to `v` then searches for `≠ v` over **declared**
-domains only (`fidryn-solve` enumerate/DPLL, no Z3). Two values are
-`Counterexample`, never silent Determinate. Engine errors are `Unknown`.
-
-**Parameterized modules.** `module Name<T>` and `import Name<Arg>` parse.
-`fidryn_check::instantiate` substitutes `Nominal(T)`. Arity mismatch is
-E210. Cross-file module instantiation and value parameters are not done.
-
-**Finite quantification.** `for_all` / `exists` parse and execute over
-a `Value::Set`, a named set fact, or a `ClosureRecord { closed: true }`.
-An open domain without closure is `Suspended` (`NeedEvidence`
-`ClosureRecord`), not determinate false. Nested quantifiers and
-open-world proofs are not done.
-
-## Remaining honest limits
-
-- Pratt still sits beside the Rowan tree; not every expr is a CST node.
-- `resume` is in-process, not a serialized rest-of-computation on the wire.
-- Nested seq under Binary/Call/If is not a continuation frame stack;
-  resume of a non-seq residual still uses `RememberingHandler`.
-- Incremental compilation is a memo table, not the `salsa` crate.
-- Determinacy search is exhaustive on **declared** finite domains, not a
-  general SMT encoding of evaluation. `fidryn-solve` materializes the
-  product; it does not yield assignments lazily under a generation cap.
-- Module parameters are type-name substitution, not a module calculus
-  with exports and override points.
-- Covering proof is not closed. `fidryn-kernel` is the check boundary,
-  not proof generation. `check_branches` re-evaluates claimed worlds;
-  named tests for that path are not landed. A digest is not covering.
-- Import `"fixture"` is `TrustProfile::Fixture`, never byte-verified.
-  CLI `check_path` does pass the module parent as `source_root` into
-  `check_with_sources` for hex digests; mill paste does not.
-- Surface duty: `duty PayInvoice` lowers to `CoreDuty`; query
-  `obligation_status` is `duty_status(PayInvoice)` in
-  `tests/programs/late-payment.fr` and `late-payment-extended.fr`
-  (named domains tests). Eval of declaration+due may still fail until
-  that path lands. `duty_step` in source is not the surface language.
-- `require true; return 7` and `require false; return 7` have named
-  tests. An independent unresolved-require program is not added.
+- Operations: 100,000 evaluator operations, unless `--budget N` sets another
+  limit (`crates/fidryn-eval/src/lib.rs:22`).
+- Worklist rounds: the rule worklist runs at most 64 rounds to reach a fixed
+  point (`crates/fidryn-eval/src/worklist.rs:9`).
+- Depth: evaluation nests at most 256 terms deep
+  (`crates/fidryn-eval/src/lib.rs:1028`). The parser rejects an expression
+  more than 128 levels deep or of more than 10,000 nodes, and a source file
+  over 8 MiB or 262,144 tokens (`crates/fidryn-syntax/src/parser.rs:59`).
+- Trace size: a run keeps at most 99,999 evaluation records and the worklist
+  at most 100,000. One record holds at most 1 MiB and a run's records at
+  most 16 MiB in all (`crates/fidryn-eval/src/lib.rs:1027`,
+  `crates/fidryn-eval/src/worklist.rs:290`,
+  `crates/fidryn-eval/src/trace.rs:40`).
+- `verify` stops after 65,536 steps, a domain of 4,096 values or a depth of
+  128, and reports `unknown` (`crates/fidryn-verify/src/property.rs:18`).

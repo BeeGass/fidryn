@@ -108,16 +108,20 @@ law is mechanical, explicit where judgment enters. This repository is
 the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
-<p>The grammar is closed: unknown body fields are parse errors. Copy from
-an existing <code>.fr</code> file when you are unsure a spelling parses. The
-reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
+<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
+that only inside <code>source</code> blocks and the request block of a judgment's
+<code>otherwise suspend NeedJudgment</code>. In most other declarations an unknown
+field is skipped without a diagnostic; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>. Copy from an existing
+<code>.fr</code> file when you are unsure a spelling parses. The reference is
+<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
 <h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
 Support in 0.2.0 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
-<tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed/checked; hex digests authenticate under CLI <code>check_path</code></td></tr>
+<tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
 <tr><td><code>record_type</code> / <code>evidence_type</code></td><td>FOIA / trust fixtures</td><td>Parsed/checked; used as named evidence schemas</td></tr>
 <tr><td><code>observation</code></td><td>LLC / state homestead modules</td><td>Parsed/checked; Observe matches schema + known-at</td></tr>
 <tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>In-module overlay fixtures; not JSON cases; not silent <code>run</code> defaults</td></tr>
@@ -175,12 +179,12 @@ unauthenticated; digest-required imports fail with E200. Hex without
 readable bytes is not a fixture profile. The source-manifest JSON uses
 the same <code>"digest": "fixture"</code> versus hex distinction.</p>
 <h2 id="imports"><span class="hn">2.4</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
-<p>Modules may import another module by name and version. Digests and aliases
-match the source-trust story above.</p>
+<p>Modules may import another module by name and version. Digests match the
+source-trust story above. An <code>alias</code> line in an import is accepted and
+ignored in 0.2.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture
-    <span class="tk-kw">alias</span> FOIARegs
 <span class="tk-pu">}</span></code></pre></figure>
 <p>CLI <code>check</code> / <code>run</code> of a path can byte-authenticate hex digests against
 artifacts under the module directory. <code>"digest": "fixture"</code> (or
@@ -272,8 +276,15 @@ effect row is empty.</p>
     <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span>
         <span class="tk-kw">require</span> determined WillfulFailureToPay<span class="tk-pu">(</span>Employer<span class="tk-pu">)</span>
             <span class="tk-kw">using</span> Determine
+        <span class="tk-kw">return</span> <span class="tk-nu">true</span>
     <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>The waiting-time query answers <code>true</code> once the case records a
+determination that establishes <code>WillfulFailureToPay(Employer)</code>. It
+suspends otherwise, including when the determination is negative (tests
+<code>an_established_determination_makes_the_judgment_query_true</code> and
+<code>a_negative_determination_suspends_and_never_answers_false</code> in
+<code>tests/integration/repaired_examples.rs</code>).</p>
 <p>An automatic query that reaches <code>Determine</code>, <code>Observe</code>, or <code>Interpret</code>
 is E420. Willful failure is a judgment, not a Bool you compute in the
 module. The waiting-time query is allowed to suspend.</p>
@@ -303,15 +314,14 @@ determination instead of treating <code>P</code> as a Bool.</p>
 
 <span class="tk-kw">calc</span> federal_hourly_floor<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Money</span><span class="tk-pu">&lt;</span><span class="tk-ty">USD</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> USD<span class="tk-pu">(</span><span class="tk-nu">7.25</span><span class="tk-pu">)</span>
-<span class="tk-pu">}</span>
-
-<span class="tk-kw">query</span> <span class="tk-kw">automatic</span> deadline_running<span class="tk-pu">(</span>end<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">,</span> as_of<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">return</span> as_of <span class="tk-pu">&lt;=</span> end <span class="tk-pu">+</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>Fidryn 0.2 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
+only by a duty's <code>due</code> clause; see <a href="#duties">Duties</a>.</p>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
 calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
-<code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> is not
-<code>21 days</code>.</p>
+<code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> and <code>21 days</code>
+have different types, but a duty's <code>due</code> clause counts each of them as
+21 days of 24 hours.</p>
 <p><code>if</code> / <code>else</code> is Boolean control flow. The condition must be a <code>Bool</code>,
 not a proposition. <a href="https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr"><code>prelude/tax.fr</code></a> uses it on
 amounts:</p>
@@ -392,16 +402,18 @@ eligibility stays <code>suspended</code>, or becomes <code>contingent</code> und
 <a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
 the first name on the list.</p>
 <h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.15</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
-<p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
-They are <strong>status-qualified</strong>: parsed and checked, with specialized
-evaluation paths — not a general operational law engine. See
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
+<p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">conflict_doctrine</span> ChildSupportCannotBeAdverselyAffected <span class="tk-pu">..</span><span class="tk-pu">.</span></code></pre></figure>
-<p>When staged effects disagree and no unique doctrine applies, the outcome
-kind is <code>normConflict</code> (or a <code>needConflict</code> request). List order is never
-a silent tie-break.</p>
+<p>Fidryn 0.2 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
+<code>conflict_doctrine</code> or <code>scenario</code> declarations, so an unknown field in
+one of them passes without a diagnostic. A <code>clause</code> body is kept as text.
+The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
+<code>ChildSupportWaiver</code>; see <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>.</p>
+<p>When the rules' staged effects both add and withdraw the same
+proposition, the outcome kind is <code>normConflict</code>. No <code>conflict_doctrine</code>
+is consulted, and list order is never a silent tie-break.</p>
 <h2 id="duties"><span class="hn">2.16</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
 <p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
 From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr"><code>tests/programs/late-payment.fr</code></a>:</p>

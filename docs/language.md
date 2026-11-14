@@ -10,9 +10,13 @@ the 0.2.0 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
-The grammar is closed: unknown body fields are parse errors. Copy from
-an existing `.fr` file when you are unsure a spelling parses. The
-reference is [`grammar.ebnf`](../grammar.ebnf).
+The grammar in `grammar.ebnf` is closed, but the 0.2 parser enforces
+that only inside `source` blocks and the request block of a judgment's
+`otherwise suspend NeedJudgment`. In most other declarations an unknown
+field is skipped without a diagnostic; see
+[implementation status](implementation-status.md). Copy from an existing
+`.fr` file when you are unsure a spelling parses. The reference is
+[`grammar.ebnf`](../grammar.ebnf).
 
 
 ## Surface inventory (status-qualified)
@@ -24,7 +28,7 @@ Support in 0.2.0 is **parsed / checked / executed** only where noted — see
 
 | Construct | Fixture example | Status note |
 | --- | --- | --- |
-| `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed/checked; hex digests authenticate under CLI `check_path` |
+| `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed. `alias` is accepted and ignored. An import with no digest and no matching package does nothing. |
 | `record_type` / `evidence_type` | FOIA / trust fixtures | Parsed/checked; used as named evidence schemas |
 | `observation` | LLC / state homestead modules | Parsed/checked; Observe matches schema + known-at |
 | `scenario` | all 50 `examples/states/` modules | In-module overlay fixtures; not JSON cases; not silent `run` defaults |
@@ -100,14 +104,14 @@ the same `"digest": "fixture"` versus hex distinction.
 
 ## Imports
 
-Modules may import another module by name and version. Digests and aliases
-match the source-trust story above.
+Modules may import another module by name and version. Digests match the
+source-trust story above. An `alias` line in an import is accepted and
+ignored in 0.2.
 
 ```
 import MA.TrustLaw.Fixture version "2026-08-23"
 import Agency.FOIARegulations version "fixture-2026-08-23" {
     digest fixture
-    alias FOIARegs
 }
 ```
 
@@ -239,9 +243,17 @@ query waiting_time_penalty() -> Bool ! {Determine} {
     goal Evaluate {
         require determined WillfulFailureToPay(Employer)
             using Determine
+        return true
     }
 }
 ```
+
+The waiting-time query answers `true` once the case records a
+determination that establishes `WillfulFailureToPay(Employer)`. It
+suspends otherwise, including when the determination is negative (tests
+`an_established_determination_makes_the_judgment_query_true` and
+`a_negative_determination_suspends_and_never_answers_false` in
+`tests/integration/repaired_examples.rs`).
 
 An automatic query that reaches `Determine`, `Observe`, or `Interpret`
 is E420. Willful failure is a judgment, not a Bool you compute in the
@@ -285,16 +297,17 @@ calc return_deadline() -> Duration<counted_days> {
 calc federal_hourly_floor() -> Money<USD> {
     return USD(7.25)
 }
-
-query automatic deadline_running(end: Time, as_of: Time) -> Bool {
-    return as_of <= end + return_deadline()
-}
 ```
+
+Fidryn 0.2 cannot add a duration to a time in an expression: `end +
+return_deadline()`, with `end: Time`, is `E210`. A deadline is computed
+only by a duty's `due` clause; see [Duties](#duties).
 
 Money is `USD(100.00)`, never an untyped decimal. Durations carry a
 calendar kind (`counted_days`, `calendar_days`, `working_days`,
-`days`, `hours`, `minutes`, `seconds`). `21 counted_days` is not
-`21 days`.
+`days`, `hours`, `minutes`, `seconds`). `21 counted_days` and `21 days`
+have different types, but a duty's `due` clause counts each of them as
+21 days of 24 hours.
 
 `if` / `else` is Boolean control flow. The condition must be a `Bool`,
 not a proposition. [`prelude/tax.fr`](../prelude/tax.fr) uses it on
@@ -409,9 +422,6 @@ the first name on the list.
 ## Powers, legal acts, clauses, and conflict doctrines
 
 These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
-They are **status-qualified**: parsed and checked, with specialized
-evaluation paths — not a general operational law engine. See
-[implementation-status](implementation-status.md).
 
 ```
 power SettlorAmendmentPower { ... }
@@ -419,9 +429,15 @@ legal_act AcceptOffice(candidate: LegalPerson, office: Office) { ... }
 conflict_doctrine ChildSupportCannotBeAdverselyAffected ...
 ```
 
-When staged effects disagree and no unique doctrine applies, the outcome
-kind is `normConflict` (or a `needConflict` request). List order is never
-a silent tie-break.
+Fidryn 0.2 does not interpret the bodies of `power`, `legal_act`,
+`conflict_doctrine` or `scenario` declarations, so an unknown field in
+one of them passes without a diagnostic. A `clause` body is kept as text.
+The evaluator knows two clause names, `SpousalSupportWaiver` and
+`ChildSupportWaiver`; see [implementation status](implementation-status.md).
+
+When the rules' staged effects both add and withdraw the same
+proposition, the outcome kind is `normConflict`. No `conflict_doctrine`
+is consulted, and list order is never a silent tie-break.
 
 ## Duties
 
