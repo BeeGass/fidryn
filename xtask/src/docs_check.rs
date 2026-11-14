@@ -25,7 +25,7 @@ pub const MARKDOWN_ROOTS: [&str; 9] = [
 pub const COMMAND_RULE_PENDING: &[&str] = &["docs/examples.md"];
 
 /// Tokens that mean the shell would do something the check does not.
-const SHELL_OPERATORS: [&str; 6] = [">", ">>", "<", "|", "&&", "||"];
+const SHELL_OPERATORS: [&str; 7] = [">", ">>", "<", "|", "&&", "||", ";"];
 
 #[derive(Debug, clap::Args)]
 pub struct DocsArgs {
@@ -490,5 +490,16 @@ mod tests {
             ]
         );
         assert!(command_block_problems("docs/examples.md", md).is_empty());
+    }
+
+    #[test]
+    fn a_semicolon_between_commands_is_a_shell_operator() {
+        let md = "```sh\nfidryn check a.fr ; fidryn check b.fr\n```\n";
+        assert_eq!(
+            command_block_problems("docs/x.md", md),
+            [
+                "docs/x.md:1: `fidryn check a.fr ; fidryn check b.fr` uses the shell operator `;`; the check runs `fidryn` directly, so split the block or tag it `text`"
+            ]
+        );
     }
 }
