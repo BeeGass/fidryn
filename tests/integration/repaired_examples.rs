@@ -7,7 +7,7 @@ use fidryn_cli::{CaseInput, RunRequest, compile_module, run_report_text};
 use serde_json::Value;
 use std::path::PathBuf;
 
-const REPAIRED: [&str; 34] = [
+const REPAIRED: [&str; 35] = [
     "examples/california/abc-test/abc-test.fr",
     "examples/california/final-pay/final-pay.fr",
     "examples/california/lemon/lemon.fr",
@@ -28,6 +28,7 @@ const REPAIRED: [&str; 34] = [
     "examples/us-federal/accredited-investor/accredited-investor.fr",
     "examples/us-federal/ada-service-animal/ada-service-animal.fr",
     "examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr",
+    "examples/us-federal/catalog/usc-titles.fr",
     "examples/us-federal/diversity/diversity.fr",
     "examples/us-federal/dmca/dmca.fr",
     "examples/us-federal/fair-housing/fair-housing.fr",

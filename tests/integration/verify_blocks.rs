@@ -143,6 +143,26 @@ fn an_assertion_cut_off_by_the_next_assertion_is_e100() {
 }
 
 #[test]
+fn an_else_with_no_branch_is_e100_whatever_the_line_below_it_holds() {
+    for below in [
+        "for_all x in {1, 2}: x == 3",
+        "exists x in {1, 2}: x == 3",
+        "assert true",
+        "assert false",
+        "asert false",
+        FOR_EVERY,
+        "",
+    ] {
+        let lines = ["assert if true { true } else", below];
+        assert_eq!(
+            rejected(&lines),
+            [(DiagnosticCode::E100, "expected `{` after `else`".to_owned())],
+            "{lines:?}"
+        );
+    }
+}
+
+#[test]
 fn tokens_that_are_not_a_word_below_an_assertion_are_e100() {
     assert_eq!(
         rejected(&["assert true", "1 == 2"]),

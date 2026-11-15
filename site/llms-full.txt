@@ -426,6 +426,14 @@ the dated slice this file encodes. `effective_at` is a date.
 `outside_scope` is a set of named exclusions; those names reappear on
 the outcome's `modelBoundary`.
 
+A comment begins with `//` and runs to the end of its line. There is no
+block comment: `/* ... */` is read as ordinary tokens, not skipped. The
+text kept for a declaration holds the comments inside it, and a part that
+is read from that text can take one in: in an `effect`, a comment after
+the result type of an operation is read into the type, and a query that
+uses the operation is rejected with `E210` (see
+[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+
 The trust fixture also declares a source manifest, resolved relative
 to the module file:
 
@@ -603,7 +611,9 @@ form when the domain is closed
 
 ```
 query provision_result() -> ... ! {Observe, Determine, Interpret} {
-    goal EvaluateClause { /* clause plan */ }
+    goal EvaluateClause {
+        // clause plan
+    }
 }
 ```
 
@@ -708,10 +718,12 @@ The guard of that rule is `operative A and operative B`. Each of the
 other continuations, such as `then`, `for` or `(`, can begin a statement
 of its own, so below a blank line or a comment line it does not continue
 the statement above. That holds where the parser tests whether a
-statement has ended. Where it expects the next part of a form it does not
-test, and reads on across blank and comment lines: an `else` after the
-block of an `if`, for example, and the `{ ... }` block that follows the
-domain of a quantifier or the word `transaction`.
+statement has ended, as it does after the condition of an `if` and after
+the word `else`: the block of a branch does not stand below a blank line
+or a comment line. In some places where it expects the next part of a form
+it does not test, and reads on across blank and comment lines: an `else`
+after the block of an `if`, for example, and the `{ ... }` block that
+follows the domain of a quantifier or the word `transaction`.
 
 Parentheses, brackets and braces do not change the rule: a line break
 inside them ends the expression before it in the same cases. `(1`
@@ -769,6 +781,16 @@ if amount <= 11925.00 {
 }
 ```
 
+The `{` after the condition opens the branch. In the condition of an
+`if`, in the domain of a quantifier, and in the header of a rule, a
+judgment or an observation, a name followed by `{` is therefore the name
+alone and is not applied to the block: `if flag { 1 } else { 2 }` tests
+`flag`. A record constructor written with its name needs parentheses
+there, as in `if (R { x: 1 }) == r { 1 } else { 2 }`.
+
+An `if` or an `else` needs its branch in the same statement. With none,
+the module is rejected with `E100`.
+
 This is a rejected guard (E310):
 
 ```
@@ -796,6 +818,10 @@ rule InitialTrustee : constitutive
     then establish Occupies(Bryan, TrusteeOf(BRT))
 }
 ```
+
+The `from` basis can also be a bare name, as in `from Instrument`: the `{`
+after it opens the rule's body. A rule needs that body. A rule header
+with no `{ ... }` after it is rejected with `E100`.
 
 `when operative P` tests legal status. `in TrustCreation(BRT)` names the
 legal context of that test. The guard still turns on the proposition
@@ -923,7 +949,9 @@ explicit `assumption`. That gate is in
 full atomic commit engine for arbitrary legal acts.
 
 `for_all` / `exists` quantify over **finite declared domains** (and
-closures where required). Open domains suspend. Nested / open-world
+closures where required). The body follows the domain after a `:` or as a
+block: `for_all x in Scores: x > 0` and `for_all x in Scores { x > 0 }`
+are the same quantifier. Open domains suspend. Nested / open-world
 theorem proving is not implemented. Prefer reading
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) before treating a
 quantified `verify` as a proved theorem.
@@ -1055,13 +1083,12 @@ included, and the whole is one assertion that cannot be decided.
 An expression that is complete where the next field begins is an
 assertion. One that is cut off there gets the diagnostic it would get
 before a `;`: `assert true or 1 +` followed by the line `assert false` is
-rejected with `E100`, "expected expression after operator". Where the
-parser has no diagnostic before a `;`, there is none here either. The
-parser accepts an `else` with nothing after it, so
+rejected with `E100`, "expected expression after operator", and
 `assert if true { true } else` followed by the line `assert true` is
-proved, and `not` with nothing after it gives no expression. An `assert`
-with no expression, `assert not` included, is an assertion that cannot be
-decided.
+rejected with `E100`, "expected `{` after `else`". Where the parser has no
+diagnostic before a `;`, there is none here either: `not` with nothing
+after it gives no expression. An `assert` with no expression, `assert not`
+included, is an assertion that cannot be decided.
 
 Text that follows the expression of an `assert`, `for_all` or `exists`
 field is read as the next field when it begins with one of the nine
@@ -3172,18 +3199,12 @@ file is read from it.
 
 The quality bar for writing a state module is
 `examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
-Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted. Its `AcreageLimit` rule loses its own derivation of
-`HomesteadCharacter(Home, Owner)`. The `ForcedSaleProtection` rule after
-it is dropped as a declaration, but its guard and consequence run under
-`AcreageLimit`'s name. There is no diagnostic (see
-[Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost)).
-Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
-cap are `automatic`. Homestead character and excepted-creditor status stay in
-`Determine` / `Observe`. Scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` sit in the same file. Fixture
-excerpts live next to each module under `sources/` and are not official
-editions.
+Fla. Const. art. X, § 4). It passes the checker. Urban acreage 0.5, rural
+acreage 160, and the $1,000 personal-property cap are `automatic`.
+Homestead character and excepted-creditor status stay in `Determine` /
+`Observe`. Scenarios `InsideCityHalfAcre`, `RuralHundredSixty`, and
+`TaxCreditor` sit in the same file. Fixture excerpts live next to each
+module under `sources/` and are not official editions.
 
 ```sh
 fidryn check examples/states/florida/homestead.fr
@@ -3256,11 +3277,6 @@ fidryn check examples/states/louisiana/community-property.fr
 fidryn check examples/states/michigan/no-fault-pip.fr
 fidryn check examples/states/south-dakota/wage-payment.fr
 ```
-
-Passing the checker does not mean every declaration was read. In each of
-these eight modules at least one rule loses its own `when` and `then`,
-and the rule or duty after it is dropped, without a diagnostic; see
-[Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost).
 
 ## Independent programs
 

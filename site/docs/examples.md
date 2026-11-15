@@ -454,18 +454,12 @@ file is read from it.
 
 The quality bar for writing a state module is
 `examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
-Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted. Its `AcreageLimit` rule loses its own derivation of
-`HomesteadCharacter(Home, Owner)`. The `ForcedSaleProtection` rule after
-it is dropped as a declaration, but its guard and consequence run under
-`AcreageLimit`'s name. There is no diagnostic (see
-[Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost)).
-Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
-cap are `automatic`. Homestead character and excepted-creditor status stay in
-`Determine` / `Observe`. Scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` sit in the same file. Fixture
-excerpts live next to each module under `sources/` and are not official
-editions.
+Fla. Const. art. X, § 4). It passes the checker. Urban acreage 0.5, rural
+acreage 160, and the $1,000 personal-property cap are `automatic`.
+Homestead character and excepted-creditor status stay in `Determine` /
+`Observe`. Scenarios `InsideCityHalfAcre`, `RuralHundredSixty`, and
+`TaxCreditor` sit in the same file. Fixture excerpts live next to each
+module under `sources/` and are not official editions.
 
 ```sh
 fidryn check examples/states/florida/homestead.fr
@@ -538,11 +532,6 @@ fidryn check examples/states/louisiana/community-property.fr
 fidryn check examples/states/michigan/no-fault-pip.fr
 fidryn check examples/states/south-dakota/wage-payment.fr
 ```
-
-Passing the checker does not mean every declaration was read. In each of
-these eight modules at least one rule loses its own `when` and `then`,
-and the rule or duty after it is dropped, without a diagnostic; see
-[Declarations that are lost](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost).
 
 ## Independent programs
 

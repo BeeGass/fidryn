@@ -22,7 +22,7 @@ Passing `fidryn check`: 54 of 114.
 | `examples/new-york/foil/foil.fr` | fails | E210 (2) |
 | `examples/prenup/ava-noah.fr` | ok | |
 | `examples/procedure/civil-complaint.fr` | ok | |
-| `examples/states/alabama/final-wages.fr` | fails | E210 (8) |
+| `examples/states/alabama/final-wages.fr` | fails | E210 (5) |
 | `examples/states/alaska/security-deposit.fr` | fails | E200 (1) |
 | `examples/states/arizona/material-noncompliance.fr` | fails | E210 (7) |
 | `examples/states/arkansas/homestead.fr` | ok | |
@@ -46,7 +46,7 @@ Passing `fidryn check`: 54 of 114.
 | `examples/states/michigan/no-fault-pip.fr` | ok | |
 | `examples/states/minnesota/security-deposit.fr` | fails | E210 (6) |
 | `examples/states/mississippi/eviction.fr` | fails | E210 (8) |
-| `examples/states/missouri/security-deposit.fr` | fails | E210 (7) |
+| `examples/states/missouri/security-deposit.fr` | fails | E210 (8) |
 | `examples/states/montana/wrongful-discharge.fr` | fails | E210 (4) |
 | `examples/states/nebraska/wage-payment.fr` | fails | E210 (10) |
 | `examples/states/nevada/security-deposit.fr` | fails | E210 (4) |
@@ -63,14 +63,14 @@ Passing `fidryn check`: 54 of 114.
 | `examples/states/rhode-island/security-deposit.fr` | fails | E210 (4) |
 | `examples/states/south-carolina/residential-landlord.fr` | fails | E210 (7) |
 | `examples/states/south-dakota/wage-payment.fr` | ok | |
-| `examples/states/tennessee/urlta.fr` | fails | E210 (5) |
+| `examples/states/tennessee/urlta.fr` | fails | E210 (4) |
 | `examples/states/texas/payday.fr` | fails | E210 (5) |
 | `examples/states/utah/eviction.fr` | fails | E210 (8) |
 | `examples/states/vermont/security-deposit.fr` | fails | E210 (4) |
 | `examples/states/virginia/vrlta-deposit.fr` | fails | E210 (9) |
 | `examples/states/washington/paid-sick-leave.fr` | fails | E210 (3) |
 | `examples/states/west-virginia/final-wages.fr` | fails | E210 (6) |
-| `examples/states/wisconsin/security-deposit.fr` | fails | E210 (9) |
+| `examples/states/wisconsin/security-deposit.fr` | fails | E210 (10) |
 | `examples/states/wyoming/wage-payment.fr` | fails | E210 (3) |
 | `examples/tax/federal-tax.fr` | ok | |
 | `examples/texas/homestead/homestead.fr` | ok | |

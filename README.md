@@ -22,9 +22,7 @@ digests of the program and the case record. Several kinds of declaration,
 such as `power`, `office` and `legal_act`, are accepted but not run;
 expressions have no date arithmetic; and an `import` brings in
 declarations only from a package under `packages/`. A module that does
-not pass the checker cannot be run, and in some modules that do pass, the
-interpreter
-[drops a declaration without a diagnostic](docs/implementation-status.md#declarations-that-are-lost).
+not pass the checker cannot be run.
 [Implementation status](docs/implementation-status.md) lists what works
 and what does not, with the test or code that shows each one.
 

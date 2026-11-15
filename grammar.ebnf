@@ -305,9 +305,28 @@ Primary         ::= literal
                   | MoneyLiteral
                   | QuantifierExpr
                   | TransactionExpr
+                  | IfExpr
 ArgList         ::= Arg ("," Arg)*
 Arg             ::= (Ident "=")? Expr
                   | "..." Expr
+
+IfExpr          ::= "if" Expr Block ("else" (IfExpr | Block))?
+
+(* In the condition of an if, in the domain of a quantifier and in the
+   header of a rule, a judgment or an observation, a name followed by "{"
+   is the name alone. It is not applied to the block: the "{" opens the
+   block of the if, the quantifier or the declaration. A record constructor
+   written with its name, as in R { x: 1 }, therefore needs parentheses in
+   such an expression. Between parentheses, brackets or braces a name
+   followed by "{" takes its block as it does elsewhere.
+
+   The parser also accepts a branch written without braces. After else it
+   is an expression in the same statement, as in if c { 1 } else 2. After
+   the condition of an if it is an expression that begins with a word the
+   condition does not take, such as not or operative, as in
+   if c not a else not b. In if c 1 else 2 the 1 is read as part of the
+   condition, and the if is rejected because no branch is left. An if or
+   an else with no branch is rejected. *)
 
 SetExpr         ::= "{" ExprList? "}"
 ExprList        ::= Expr ("," Expr)*
@@ -361,10 +380,12 @@ End             ::= inserted-newline | ";"
    rejected, and inside brackets it must be a comma or the closing
    delimiter.
 
-   The parser does not test for End everywhere. Where it expects the next
-   part of a form it reads on across any newlines: for example before else
-   after the block of an if, before the block that follows the domain of a
-   quantifier, and before the block that follows the word transaction.
+   The parser does not test for End everywhere. In some places where it
+   expects the next part of a form it reads on across any newlines: for
+   example before else after the block of an if, before the block that
+   follows the domain of a quantifier, and before the block that follows the
+   word transaction. It does test after the condition of an if and after the
+   word else: a branch does not follow an End.
 
    Text the parser steps over without reading it (the body of a
    declaration it does not interpret, a verify field it does not read, a

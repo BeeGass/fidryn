@@ -84,7 +84,7 @@
       "path": "examples/states/alabama/final-wages.fr",
       "check": "fails",
       "codes": {
-        "E210": 8
+        "E210": 5
       }
     },
     {
@@ -231,7 +231,7 @@
       "path": "examples/states/missouri/security-deposit.fr",
       "check": "fails",
       "codes": {
-        "E210": 7
+        "E210": 8
       }
     },
     {
@@ -347,7 +347,7 @@
       "path": "examples/states/tennessee/urlta.fr",
       "check": "fails",
       "codes": {
-        "E210": 5
+        "E210": 4
       }
     },
     {
@@ -396,7 +396,7 @@
       "path": "examples/states/wisconsin/security-deposit.fr",
       "check": "fails",
       "codes": {
-        "E210": 9
+        "E210": 10
       }
     },
     {

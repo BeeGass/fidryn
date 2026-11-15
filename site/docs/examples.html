@@ -378,18 +378,12 @@ artifact, and <code>digest fixture</code>, does not take the manifest's place: n
 file is read from it.</p>
 <p>The quality bar for writing a state module is
 <code>examples/states/florida/homestead.fr</code> (<code>Florida.Property.Homestead</code>,
-Fla. Const. art. X, § 4). It passes the checker but is not fully
-interpreted. Its <code>AcreageLimit</code> rule loses its own derivation of
-<code>HomesteadCharacter(Home, Owner)</code>. The <code>ForcedSaleProtection</code> rule after
-it is dropped as a declaration, but its guard and consequence run under
-<code>AcreageLimit</code>'s name. There is no diagnostic (see
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost">Declarations that are lost</a>).
-Urban acreage 0.5, rural acreage 160, and the $1,000 personal-property
-cap are <code>automatic</code>. Homestead character and excepted-creditor status stay in
-<code>Determine</code> / <code>Observe</code>. Scenarios <code>InsideCityHalfAcre</code>,
-<code>RuralHundredSixty</code>, and <code>TaxCreditor</code> sit in the same file. Fixture
-excerpts live next to each module under <code>sources/</code> and are not official
-editions.</p>
+Fla. Const. art. X, § 4). It passes the checker. Urban acreage 0.5, rural
+acreage 160, and the $1,000 personal-property cap are <code>automatic</code>.
+Homestead character and excepted-creditor status stay in <code>Determine</code> /
+<code>Observe</code>. Scenarios <code>InsideCityHalfAcre</code>, <code>RuralHundredSixty</code>, and
+<code>TaxCreditor</code> sit in the same file. Fixture excerpts live next to each
+module under <code>sources/</code> and are not official editions.</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/states/florida/homestead.fr</code></pre></figure>
 <p>District of Columbia and the territories are outside this corpus.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>State</th><th>File</th><th>Module</th><th>Principal citation</th></tr></thead><tbody>
@@ -454,10 +448,6 @@ editions.</p>
 <span class="tk-kw">fidryn</span> check examples/states/louisiana/community-property.fr
 <span class="tk-kw">fidryn</span> check examples/states/michigan/no-fault-pip.fr
 <span class="tk-kw">fidryn</span> check examples/states/south-dakota/wage-payment.fr</code></pre></figure>
-<p>Passing the checker does not mean every declaration was read. In each of
-these eight modules at least one rule loses its own <code>when</code> and <code>then</code>,
-and the rule or duty after it is dropped, without a diagnostic; see
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#declarations-that-are-lost">Declarations that are lost</a>.</p>
 <h2 id="independent-programs"><span class="hn">7.6</span> Independent programs <a class="anchor" href="#independent-programs" aria-label="Link to this section">#</a></h2>
 <p><code>tests/programs/</code> holds small modules that exercise the interpreter.
 They are not jurisdiction slices. They declare <code>outside_scope</code>. The

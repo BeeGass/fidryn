@@ -150,17 +150,57 @@ fn a_query_that_ends_in_a_require_has_an_untyped_result() {
 }
 
 #[test]
-fn a_rule_whose_basis_is_a_bare_name_is_not_checked_and_swallows_the_next_declaration() {
+fn a_rule_basis_that_names_nothing_is_accepted() {
     let module = compile(
-        "Limits.BareBasis",
-        "    proposition P(name: String)\n    proposition Q(name: String)\n    rule R : constitutive from Basis {\n        when operative P(undeclared)\n        then derive Q(\"x\")\n    }\n    query a() -> Int { return 1 }\n    query b() -> Int { return 2 }",
+        "Limits.RuleBasis",
+        "    proposition P()\n    proposition Q()\n    rule R : derive from NoSuchSource {\n        when operative P()\n        then derive Q()\n    }\n    query q() -> Int { return 7 }",
     );
-    let names: Vec<&str> = module
-        .queries
+    let rule = module
+        .declarations
         .iter()
-        .map(|query| query.name.as_str())
-        .collect();
-    assert_eq!(names, ["b"]);
+        .find_map(|decl| match decl {
+            CoreDecl::Rule(rule) if rule.name == "R" => Some(rule),
+            _ => None,
+        })
+        .expect("rule R");
+    assert!(matches!(
+        &rule.consequences[0].consequence,
+        Consequence::Derive(prop) if prop.predicate == "Q"
+    ));
+    // Nothing of the basis reaches the intermediate representation.
+    assert!(!format!("{module:?}").contains("NoSuchSource"));
+}
+
+#[test]
+fn a_comment_at_the_end_of_a_line_inside_an_effect_is_read_into_its_result_type() {
+    let reviewed = |operation: &str| {
+        format!(
+            "    effect Review {{\n{operation}\n    }}\n    query q() -> Bool ! {{Review}} {{\n        require Review(\"x\")\n        return true\n    }}"
+        )
+    };
+    // On a line of its own the comment changes nothing.
+    compile(
+        "Limits.EffectComment",
+        &reviewed("        // asks a clerk\n        request(name: String) -> Bool"),
+    );
+    let diagnostics: Vec<(DiagnosticCode, String)> = compile_source(
+        &source(
+            "Limits.EffectComment",
+            &reviewed("        request(name: String) -> Bool // asks a clerk"),
+        ),
+        &SourceManifest::default(),
+    )
+    .expect_err("limit program is rejected")
+    .into_iter()
+    .map(|diagnostic| (diagnostic.code, diagnostic.message))
+    .collect();
+    assert_eq!(
+        diagnostics,
+        [(
+            DiagnosticCode::E210,
+            "require in `q` has type Nominal(\"Bool // asks a clerk\") but must be Bool".to_owned()
+        )]
+    );
 }
 
 #[test]

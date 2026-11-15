@@ -5,9 +5,11 @@
 
 mod adversarial_regressions;
 mod boundary_review_20260917;
+mod declaration_text;
 mod integration_suite;
 mod known_limits;
 mod repaired_examples;
 mod review_regressions;
+mod rule_basis;
 mod semantic_regressions;
 mod verify_blocks;

@@ -11,7 +11,7 @@ interchange schema versions are maintained independently of the interpreter.
 
 - The project is licensed under the MIT License again. `LICENSE` holds the
   MIT text and every workspace package declares `MIT`.
-- Thirty-four example modules and seven case records were repaired with
+- Thirty-five example modules and seven case records were repaired with
   typing-only edits. 54 of the 114 modules under `examples/`, `packages/`,
   `prelude/` and `tests/programs/` now pass `fidryn check`. Documents mark
   the rest as drafts where they name them by path.
@@ -65,9 +65,58 @@ interchange schema versions are maintained independently of the interpreter.
   and a comment that held it was read as the assertion. The bounds of a
   block are read only from the tokens of its `bounds` field. A comment no
   longer sets them, wherever it stands, and neither do the contents of a
-  string or another field that holds the word `bounds`. A number is an
-  integer token that follows its word directly or after one `:`, so
-  `persons: 2.5` gives zero.
+  string or another field that holds the word `bounds`. Each number is read
+  at the first place where its word, `persons`, `events` or `time_points`,
+  stands as a token in the field: it is the integer token that follows the
+  word directly or after one `:`. Otherwise it is zero, as it is when the
+  integer does not fit in 32 bits. So `persons: 2.5` gives zero, and so
+  does `bounds persons x persons 2`.
+- A name directly before a `{` is no longer applied to the block where the
+  block belongs to the construct around it: in the condition of an `if`,
+  in the domain of a quantifier, and in the header of a rule, a judgment or
+  an observation. A rule whose `from` basis is a bare name, as in
+  `from Basis`, keeps its own `when` and `then` lines and no longer removes
+  the declaration after it. `if a < b { 1 } else { 2 }` tests `a < b` and
+  keeps its branch; the checker rejected it before with "local binding `b`
+  is not a callable function". A record constructor written with its name
+  needs parentheses in those places, as in
+  `if (R { x: 1 }) == r { 1 } else { 2 }`.
+- A declaration such as `proposition P` with no parentheses or `entity E`
+  with no type, a header keyword such as `jurisdiction` with no value, and
+  a `query`, `calc` or `fn` with no body each took the declaration after it
+  as part of itself, with no diagnostic from the parser. That declaration
+  is now read. `proposition P`, `entity E` and `jurisdiction` written so
+  pass the checker as before. A `calc` or `fn` with no body used the body
+  of the declaration it took: `calc f(a: Int) -> Int` followed by
+  `query q() -> Int { return 7 }` passed the checker, and `f(1)` was 7. It
+  is now rejected with `E210`, and a `query` with no body is rejected with
+  `E430`. Inside a body the same holds for a word that stands alone on its
+  line: `then` or `otherwise` in a rule, a field name in a `source` block,
+  and `record`, `otherwise`, `on` or `review` in a `judgment` no longer
+  take the line below them. A comment below a `query`, `calc` or `fn` with
+  no body is not read as its body either: `query Q() -> Int` followed by
+  the line `// { return 7 }` passed the checker and answered 7, and is now
+  rejected with `E430`.
+- A comment at the end of a line is no longer kept as part of the header
+  value, the type or the `source` field value before it.
+  `jurisdiction Test // where` gave the jurisdiction the value
+  `Test // where`. `entity Pat : NaturalPerson // the tenant` gave `Pat`
+  the type `NaturalPerson // the tenant`, and a rule that used `Pat` as a
+  `NaturalPerson` was rejected with `E210`. Inside an `effect` such a
+  comment is still read into the result type of the operation.
+- A rule with no `{ ... }` body is rejected with `E100`, and so is a
+  `verify` whose name is not followed by `{`:
+  `verify Checked extra { assert false }` stepped over its block without a
+  diagnostic before.
+- An `if` or an `else` with no branch is rejected with `E100`. The line
+  below an `else` that ends its statement is no longer read as its branch,
+  so `assert if true { true } else` followed by the line
+  `for_all x in {1, 2}: x == 3` is rejected and no longer `proved`.
+- A word that cannot begin an expression, such as `return` or `when`, is no
+  longer kept as a name when it begins an item in the braces of an
+  expression, such as the branch of an `if`.
+  `if c > 0 { return 1 } else { return 2 }` is rejected with `E100`; it
+  passed the checker before and failed when run.
 
 ## [0.2.0] - 2026-10-29
 
