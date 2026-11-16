@@ -16,8 +16,17 @@ archives omit their license files. Release archives also carry
 locked dependency graph. Do not remove an attribution or present upstream
 material as this project's own.
 
+## Legal source fixtures
+
+The files under `sources/` directories in `examples/` are fixtures written
+for this project: summaries of, and excerpts from, statutes, rules and
+other legal materials. Each is labeled as a fixture or as not an official
+edition. Where a fixture quotes official legal text, the project claims no
+rights in that text.
+
 ## Contributions
 
-Contributions require an appropriate separate rights agreement before
-acceptance. Repository access or a contribution does not automatically
-grant equity or management.
+Contributions are accepted under the MIT License, the same license as the
+project. By submitting a contribution you agree that it is licensed under
+those terms and that you have the right to submit it. No separate
+agreement is required.

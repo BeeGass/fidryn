@@ -2,6 +2,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 const MIT: &str = "MIT License
 
@@ -77,4 +78,59 @@ fn nothing_still_states_the_proprietary_terms() {
         }
     }
     assert!(!root().join("LICENSES/prior-project-LICENSE.txt").exists());
+}
+
+/// The document's text with every run of whitespace, line breaks included,
+/// collapsed to one space, so a phrase matches however the paragraph wraps.
+fn words(file: &str) -> String {
+    let text = fs::read_to_string(root().join(file)).expect(file);
+    text.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+#[test]
+fn contributions_are_accepted_under_the_project_license() {
+    let licensing = words("LICENSING.md");
+    let contributing = words("docs/contributing.md");
+    for (file, text) in [
+        ("LICENSING.md", &licensing),
+        ("docs/contributing.md", &contributing),
+    ] {
+        assert!(
+            !text.contains("rights agreement"),
+            "{file} still asks for a rights agreement"
+        );
+    }
+    assert!(
+        licensing.contains("Contributions are accepted under the MIT License"),
+        "LICENSING.md does not state the contribution terms"
+    );
+}
+
+#[test]
+fn every_source_fixture_labels_itself() {
+    let output = Command::new("git")
+        .current_dir(root())
+        .args(["ls-files", "-z", "--", ":(glob)examples/**/sources/**"])
+        .output()
+        .expect("run git ls-files");
+    assert!(
+        output.status.success(),
+        "git ls-files failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let listing = String::from_utf8(output.stdout).expect("UTF-8 paths");
+    let mut checked = 0;
+    for file in listing.split('\0').filter(|file| !file.is_empty()) {
+        if Path::new(file).extension().is_some_and(|ext| ext == "json") {
+            continue;
+        }
+        let text = fs::read_to_string(root().join(file)).expect(file);
+        let text = text.to_lowercase();
+        assert!(
+            text.contains("fixture") || text.contains("not an official edition"),
+            "{file} does not label itself as a fixture or as not an official edition"
+        );
+        checked += 1;
+    }
+    assert!(checked > 0, "no source fixture found under examples/");
 }

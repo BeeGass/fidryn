@@ -1,5 +1,11 @@
 # 0.2.0 licensing content and notice implementation audit
 
+> Superseded. This audit was written for the tree at commit `b0f8930`.
+> The project terms it reviewed were replaced by the MIT License before
+> any release carried them, and the `LICENSE` text and
+> `LICENSES/prior-project-LICENSE.txt` it describes are no longer in the
+> tree. `LICENSING.md` states the terms in force.
+
 Scope: concrete repository text retention, metadata consistency, existing asset notices and native package contents. This is not an opinion about ownership, enforceability, permissions under a particular grant or legal sufficiency. Root owns the licensing decision, documentation, metadata, font records and final release qualification. This reviewer changed only the newly delegated `xtask/src/licenses.rs` implementation during this task; no Git mutation or remote mutation occurred.
 
 ## Prior project text

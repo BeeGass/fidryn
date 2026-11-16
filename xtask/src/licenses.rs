@@ -560,7 +560,7 @@ fn relative_path(path: &str) -> Result<PathBuf> {
 
 fn render_index(notices: &[Notices]) -> Result<String> {
     let mut text = String::from(
-        "# Third-party dependency notices\n\nThis inventory retains documents from all non-workspace packages in the locked, offline, all-features Cargo workspace graph. It is a superset that includes development and other-target dependencies; it does not assert exact executable linkage or provide legal approval. Upstream license metadata and documents retain their own terms. No dependency is relicensed by the project's current original-material terms.\n\nDocuments come from resolved Cargo package sources, except explicitly identified exact-version upstream fallbacks whose pinned provenance and SHA256 hashes were verified. This inventory does not cover fonts, other non-Cargo assets, or toolchain/runtime components; their separate notices remain applicable.\n\n",
+        "# Third-party dependency notices\n\nThis inventory retains documents from all non-workspace packages in the locked, offline, all-features Cargo workspace graph. It is a superset that includes development and other-target dependencies; it does not assert exact executable linkage or provide legal approval. Upstream license metadata and documents retain their own terms. No dependency is relicensed by the project's own license.\n\nDocuments come from resolved Cargo package sources, except explicitly identified exact-version upstream fallbacks whose pinned provenance and SHA256 hashes were verified. This inventory does not cover fonts, other non-Cargo assets, or toolchain/runtime components; their separate notices remain applicable.\n\n",
     );
     for notice in notices {
         text.push_str(&format!(

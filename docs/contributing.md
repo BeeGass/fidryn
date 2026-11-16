@@ -9,8 +9,8 @@ records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
 
 Fidryn is released under the MIT License. Licensing and contribution
-rights are described in [Licensing](../LICENSING.md). Contributions
-require the separate rights agreement described there before acceptance.
+rights are described in [Licensing](../LICENSING.md). Contributions are
+accepted under the same license; no separate agreement is required.
 
 ## Toolchain
 
