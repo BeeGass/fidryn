@@ -182,13 +182,12 @@ ConsequenceOp   ::= "establish" | "terminate" | "suspend"
                   | "constitute" | "create" | "derive" | "activate"
                   | "defeat" | "make"
 
-(* The Expr of a consequence names a proposition, and it is checked alike
-   after each ConsequenceOp. A consequence whose Expr is a number, a
-   string, a sum or a date, for example, is rejected with E210, and so is
-   one whose Expr is the name of an entity, unless the type of the entity
-   is Prop or an alias of Prop. The one consequence that is not checked
-   as a proposition is a Duty after create, with or without arguments,
-   which needs the fields bearer, claimant and content. *)
+(* The Expr of a consequence names a proposition. A consequence whose
+   Expr is a number, a string, a sum or a date, for example, is rejected
+   with E210 after each ConsequenceOp, and so is one whose Expr is the
+   name of an entity whose type is neither Prop nor an alias of Prop.
+   After create, Duty with arguments is not checked as a proposition: it
+   needs the fields bearer, claimant and content. *)
 
 (* ----- judgments and decisions ----- *)
 

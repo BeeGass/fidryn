@@ -503,8 +503,8 @@ with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
 a <code>then</code> or an <code>otherwise</code> that no consequence follows, and a <code>when</code>, a
 <code>require</code> or a <code>source</code> with no expression after it. A consequence names
 a proposition: <code>then establish 5</code> is rejected with <code>E210</code>, and so is a
-consequence that is the name of an entity, unless the type of the entity
-is <code>Prop</code> or an alias of <code>Prop</code>. Two more lines are accepted:
+consequence that is the name of an entity whose type is neither <code>Prop</code>
+nor an alias of <code>Prop</code>. Two more lines are accepted:
 <code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
 its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever

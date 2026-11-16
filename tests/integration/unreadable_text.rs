@@ -443,3 +443,30 @@ fn a_header_that_is_not_finished_does_not_take_the_declaration_below_it() {
     let refused = run_is_refused(observation_above_a_verify_block, "q");
     assert!(refused.contains("E100"), "{refused}");
 }
+
+#[test]
+fn a_bracket_among_type_arguments_is_e100_and_nothing_is_answered() {
+    // Type arguments were read as text, a parenthesis among them too. The
+    // header of the rule is not finished at the end of its line, and the
+    // `(` in the type of its parameter counted as a bracket the header had
+    // left open. So the rule took the clause below it for its own text, the
+    // module passed the checker, and the clause was gone.
+    let rule_above_a_clause = "    proposition Witness()\n    rule R(x: Int<(>) : derive from Basis +\n    clause C {\n        then establish Witness()\n    }\n    query q() -> Bool { goal Evaluate { operative Witness() } }";
+    assert_eq!(
+        rejected(rule_above_a_clause),
+        one(DiagnosticCode::E100, "unexpected bracket in type arguments")
+    );
+    let refused = run_is_refused(rule_above_a_clause, "q");
+    assert!(refused.contains("E100"), "{refused}");
+
+    // The same in the type of the record of an observation above a `verify`
+    // block: the module passed, and the property `V`, which has a
+    // counterexample, no longer existed.
+    let observation_above_a_verify_block = "    proposition P()\n    record_type Rec {\n        a: Int\n    }\n    observation O(r: Rec<(>) establishes P() from Src +\n    verify V {\n        assert false\n    }\n    query q() -> Bool { goal Evaluate { operative P() } }";
+    assert_eq!(
+        rejected(observation_above_a_verify_block),
+        one(DiagnosticCode::E100, "unexpected bracket in type arguments")
+    );
+    let refused = run_is_refused(observation_above_a_verify_block, "q");
+    assert!(refused.contains("E100"), "{refused}");
+}

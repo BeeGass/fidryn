@@ -147,6 +147,10 @@ interchange schema versions are maintained independently of the interpreter.
   that `!` begins and type arguments that `<` opens and no `>` closes end
   in the same way: each is rejected with `E100` when it is not finished
   above a declaration, and that declaration is read.
+- A parenthesis or a square bracket among the type arguments of a type
+  that the parser reads, such as the type of a parameter of a `calc`, the
+  type of an entity or the type of a field of a `record_type`, is rejected
+  with `E100`. `calc f(x: Int<(>) -> Int { return 1 }` passed the checker.
 - A declaration keyword that takes a name and has something else after it
   is rejected with `E100`. `power { holder A }`, `proposition (x: Int)`
   and `entity : NaturalPerson` passed the checker, each as a declaration
@@ -174,15 +178,16 @@ interchange schema versions are maintained independently of the interpreter.
   set or a proposition under `operative` is rejected with `E210`, in a
   diagnostic that names the rule and the consequence. `then establish 5`
   passed the checker, and the rule established nothing. A consequence that
-  is the name of an entity, as in `then establish Acme`, passed the checker
-  too, and is rejected with `E210` as well, unless the type of the entity
-  is `Prop` or an alias of `Prop`.
+  is the name of an entity whose type is neither `Prop` nor an alias of
+  `Prop` is rejected with `E210` as well: `then establish Acme`, with
+  `entity Acme : LegalPerson`, passed the checker too.
 - A consequence after `create` is checked as it is after the other eight
-  verbs. The checker looked at nothing after `create` but the fields of a
-  `Duty`, so `then create Acme(1)`, where `Acme` is an entity, and
-  `then create 2026-01-01` passed it. Each is now rejected with `E210`, as
-  it is after `establish`. A `Duty` after `create` is still checked for its
-  fields `bearer`, `claimant` and `content`, and not as a proposition.
+  verbs, unless its name is `Duty`. The checker looked at nothing after
+  `create` but the fields of a `Duty`, so `then create Acme(1)`, where
+  `Acme` is an entity, and `then create 2026-01-01` passed it. Each is now
+  rejected with `E210`, as it is after `establish`. `Duty` with arguments
+  after `create` is still checked for its fields `bearer`, `claimant` and
+  `content`, and not as a proposition.
 - A statement that a query body, a `goal Evaluate` block, the body of a
   `calc` or an `fn`, or a `transaction` block cannot read is rejected with
   `E100`, wherever it stands in the block. In a goal it was stepped over

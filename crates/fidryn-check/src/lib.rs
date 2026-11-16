@@ -5877,6 +5877,39 @@ module Examples.UseEff version "0.1.0" {
                 "{verb}"
             );
         }
+        // Without its fields `Duty` is told after `create` which of them it
+        // lacks. After the other eight verbs it is a name that this module
+        // does not declare: alone and with `()` it passes, and with an
+        // argument it is no proposition.
+        let lacking: Vec<(DiagnosticCode, String)> = [
+            "Duty creation requires `bearer`",
+            "Duty creation requires `claimant`",
+            "Duty creation requires content",
+        ]
+        .map(|message| (DiagnosticCode::E210, message.to_owned()))
+        .to_vec();
+        let no_proposition = vec![(
+            DiagnosticCode::E210,
+            "`operative` in `Exemption` requires a proposition, not Nominal(\"Duty\")".to_owned(),
+        )];
+        for verb in other_verbs.into_iter().chain(["establish"]) {
+            for (form, after_the_other_verbs) in [
+                ("Duty", Vec::new()),
+                ("Duty()", Vec::new()),
+                ("Duty(1)", no_proposition.clone()),
+            ] {
+                let expected = if verb == "create" {
+                    lacking.clone()
+                } else {
+                    after_the_other_verbs
+                };
+                assert_eq!(
+                    both_lists(verb, form),
+                    [expected.clone(), expected],
+                    "{verb} {form}"
+                );
+            }
+        }
     }
 
     #[test]
@@ -5901,12 +5934,19 @@ module Examples.UseEff version "0.1.0" {
                 check_src(&module).expect(name);
             }
         }
-        // Two kinds of name are read otherwise: three or four capital
-        // letters are a currency, and twelve words are read as the same
-        // words in lowercase.
+        // Some names are read otherwise and are no propositions. `Final`
+        // is a variant and `Distribution` a record type of the standard
+        // types, which every module has. Three or four capital letters are
+        // a currency. And some words are read as the same word in
+        // lowercase, whatever their capitals.
         for name in [
+            "Final",
+            "Distribution",
             "ABC",
             "FLAG",
+            "IF",
+            "APPLY",
+            "For_All",
             "Seq",
             "Transaction",
             "If",

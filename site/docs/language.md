@@ -537,8 +537,8 @@ The body holds `when`, `then`, `otherwise`, `require`, `select` and
 a `then` or an `otherwise` that no consequence follows, and a `when`, a
 `require` or a `source` with no expression after it. A consequence names
 a proposition: `then establish 5` is rejected with `E210`, and so is a
-consequence that is the name of an entity, unless the type of the entity
-is `Prop` or an alias of `Prop`. Two more lines are accepted:
+consequence that is the name of an entity whose type is neither `Prop`
+nor an alias of `Prop`. Two more lines are accepted:
 `valid_time` and `record_time`, each followed by an interval with both of
 its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever

@@ -344,8 +344,9 @@ impl LineIndex {
     /// Brackets are counted from the keyword of each declaration, not once
     /// for the module. A bracket that a declaration above has left open
     /// says nothing about the header of the one below it, and the parser
-    /// reads some declarations that leave one open with no diagnostic: the
-    /// `(` of `type T = A<(>` is one.
+    /// reads on past some declarations that leave one open: the `(` of
+    /// `type T = A<(>` is reported and stepped over, and the declaration
+    /// ends on its line.
     ///
     /// One scan for each declaration would read the rest of the module
     /// again for each declaration that leaves a bracket open. This is one
@@ -2091,6 +2092,16 @@ impl<'a> Parser<'a> {
                     | TokenKind::Bang
                     | TokenKind::Arrow
                     | TokenKind::LBrace => break,
+                    // Type arguments hold names. A parenthesis or a square
+                    // bracket among them is reported where it stands, and
+                    // then stepped over like the tokens around it.
+                    TokenKind::LParen
+                    | TokenKind::RParen
+                    | TokenKind::LBracket
+                    | TokenKind::RBracket => {
+                        self.error_here("unexpected bracket in type arguments");
+                        self.bump();
+                    }
                     _ => {
                         self.bump();
                     }
@@ -9862,18 +9873,31 @@ module M version "0.1.0" {
         let unfinished = "rule R : derive from Basis +";
         let clause = "clause C {\n    then establish Witness()\n}";
         let ends_at_the_clause = ["expected expression after operator", RULE_NEEDS_A_BODY];
-        // The declaration above leaves a `(` or a `[` open, and the parser
-        // reads it with no diagnostic. That bracket is not one the header
-        // of the rule stands in.
+        // The declaration above leaves a `(` or a `[` open among its type
+        // arguments. The parser reports the bracket and steps over it, and
+        // the declaration ends on its line. That bracket is not one the
+        // header of the rule stands in.
         for (above, keyword) in [
             ("type T = A<(>", "type"),
             ("entity E : Map<[>", "entity"),
             ("calc f(x: Int<(>) -> Int { return 1 }", "calc"),
             ("record_type Rec {\n    a: Int<(>\n}", "record_type"),
         ] {
-            parse_body(above);
+            assert_eq!(
+                messages(&parse_file(&wrap_module(above))),
+                [BRACKET_IN_TYPE_ARGUMENTS],
+                "{above}"
+            );
             let parsed = parse_file(&wrap_module(&format!("{above}\n{unfinished}\n{clause}")));
-            assert_eq!(messages(&parsed), ends_at_the_clause, "{above}");
+            assert_eq!(
+                messages(&parsed),
+                [
+                    BRACKET_IN_TYPE_ARGUMENTS,
+                    ends_at_the_clause[0],
+                    ends_at_the_clause[1]
+                ],
+                "{above}"
+            );
             let items = item_names(&parsed);
             assert_eq!(
                 (items[0].0, &items[1..]),
@@ -10109,16 +10133,22 @@ module M version "0.1.0" {
     #[test]
     fn a_module_of_declarations_that_leave_a_bracket_open_is_read_in_time() {
         // As many declarations as the token budget holds, each leaving a
-        // bracket open. The parser reads a `(` or a `[` among type
-        // arguments with no diagnostic, so each of these lines is a
-        // declaration of its own, and no line below it stands outside the
-        // bracket it opened. A scan from the keyword of each of them would
-        // read on to the end of the module each time.
+        // bracket open. The parser reports a `(` or a `[` among type
+        // arguments and steps over it, so each of these lines is a
+        // declaration of its own with one diagnostic, and no line below it
+        // stands outside the bracket it opened. A scan from the keyword of
+        // each of them would read on to the end of the module each time.
         for line in ["type T = A<(>", "type T = A<[>"] {
             let (count, module) = longest_module_of(line);
             assert!(count > 23_000, "{count}");
             let (diagnostics, declarations) = read_in_time(module);
-            assert_eq!(diagnostics, Vec::<String>::new(), "{line}");
+            assert_eq!(diagnostics.len(), count, "{line}");
+            assert!(
+                diagnostics
+                    .iter()
+                    .all(|message| message == BRACKET_IN_TYPE_ARGUMENTS),
+                "{line}"
+            );
             assert_eq!(declarations.len(), count, "{line}");
             assert!(
                 declarations
@@ -10142,6 +10172,132 @@ module M version "0.1.0" {
             ]
         );
         assert_eq!(declarations.len(), 1);
+    }
+
+    const BRACKET_IN_TYPE_ARGUMENTS: &str = "unexpected bracket in type arguments";
+
+    /// A declaration for each place where a type with arguments is read,
+    /// with `TYPE` where the type stands: the type of a parameter, of a
+    /// field and of an entity, a result, the right side of a `type` and its
+    /// parameters, and the arguments of an `import`.
+    const TYPE_PLACES: &[&str] = &[
+        // The type of a parameter.
+        "proposition P(x: TYPE)",
+        "proposition P(x: Int, y: TYPE)",
+        "decision D(x: TYPE) -> Int",
+        "clause C(x: TYPE) {\n    then establish Witness()\n}",
+        "office O(x: TYPE) occupied_by LegalPerson",
+        "legal_act L(x: TYPE) {\n    performer Acme\n}",
+        "duty D(x: TYPE) {\n    bearer Acme\n}",
+        "power W(x: TYPE) {\n    holder Acme\n}",
+        "observation O(r: TYPE) establishes Witness() from Src {\n    require true\n}",
+        "judgment J(x: TYPE) decides Witness() from Src {\n    authority concurrence(2 distinct LegalPerson)\n    record requires c: Cert\n    record requires d: Cert\n    establish when true\n}",
+        "query p(x: TYPE) -> Bool { return true }",
+        "fn f(x: TYPE) -> Int { return 1 }",
+        "calc c(x: TYPE) -> Int { return 1 }",
+        "rule R(x: TYPE) : derive {\n    when true\n    then derive Witness()\n}",
+        // The type of a field.
+        "record_type Rec {\n    a: TYPE\n}",
+        "record_type Rec {\n    a: Int | TYPE\n}",
+        "evidence_type Ev {\n    a: TYPE\n}",
+        "type V = A { f: TYPE } | B",
+        "judgment J(x: Int) decides Witness() from Src {\n    authority concurrence(2 distinct LegalPerson)\n    record requires c: TYPE\n    record requires d: Cert\n    establish when true\n}",
+        "judgment J(x: Int) decides Witness() from Src {\n    authority concurrence(2 distinct TYPE)\n    record requires c: Cert\n    record requires d: Cert\n    establish when true\n}",
+        // The type of an entity.
+        "entity E : TYPE",
+        // A result.
+        "query p() -> TYPE { return 1 }",
+        "fn f() -> TYPE { return 1 }",
+        "calc c() -> TYPE { return 1 }",
+        "decision D(x: Int) -> TYPE",
+        // The right side of a type, and its parameters.
+        "type X = TYPE",
+        "type X = A | TYPE",
+        "type X = A(TYPE) | B",
+        "type X<TYPE> = A",
+        // The arguments of an import.
+        "import M<TYPE> version \"0.1.0\"",
+    ];
+
+    #[test]
+    fn a_bracket_among_type_arguments_is_e100() {
+        // Type arguments are read as text, and a parenthesis or a square
+        // bracket among them was stepped over like a name. The count of
+        // brackets that ends a declaration then saw a bracket the parser
+        // had neither opened nor closed. Each of the four tokens is
+        // reported where it stands. It is stepped over as before, so the
+        // module has the declarations it has with `Map<A>` in that place.
+        let inside_the_arguments = [
+            "(",
+            ")",
+            "[",
+            "]",
+            "()",
+            "[]",
+            "[)",
+            "A, (",
+            "(, B",
+            "Map<(>",
+            "(A)",
+            "A,\n    (",
+        ];
+        for place in TYPE_PLACES {
+            let control = parse_file(&wrap_module(&place.replace("TYPE", "Map<A>")));
+            assert_eq!(messages(&control), Vec::<&str>::new(), "{place}");
+            for inside in inside_the_arguments {
+                let source = wrap_module(&place.replace("TYPE", &format!("Map<{inside}>")));
+                let parsed = parse_file(&source);
+                // One diagnostic for each bracket, at the bracket, in the
+                // order of the source, and no other diagnostic.
+                let reported: Vec<(DiagnosticCode, &str, &str)> = parsed
+                    .diagnostics
+                    .iter()
+                    .map(|diagnostic| {
+                        let span = diagnostic.primary_span.expect("a place");
+                        (
+                            diagnostic.code,
+                            diagnostic.message.as_str(),
+                            &source[span.start as usize..span.end as usize],
+                        )
+                    })
+                    .collect();
+                let expected: Vec<(DiagnosticCode, &str, &str)> = inside
+                    .matches(['(', ')', '[', ']'])
+                    .map(|bracket| (DiagnosticCode::E100, BRACKET_IN_TYPE_ARGUMENTS, bracket))
+                    .collect();
+                assert_eq!(reported, expected, "{place} with {inside:?}");
+                assert_eq!(
+                    item_names(&parsed),
+                    item_names(&control),
+                    "{place} with {inside:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn type_arguments_without_a_bracket_are_read_as_before() {
+        // Names, commas and nested arguments, on one line and across a line
+        // end, and arguments nested as deep as the limit allows.
+        let deepest = format!("{}A{}", "A<".repeat(128), ">".repeat(128));
+        for place in TYPE_PLACES {
+            for ty in [
+                "Map",
+                "Map<A>",
+                "Map<String, FiniteSet<Int>>",
+                "Map<String,\n    FiniteSet<Int>>",
+                "Org.Map<Org.Key, Money<USD>>",
+                deepest.as_str(),
+            ] {
+                let parsed = parse_file(&wrap_module(&place.replace("TYPE", ty)));
+                assert_eq!(messages(&parsed), Vec::<&str>::new(), "{place} with {ty}");
+            }
+        }
+        // One level deeper is the limit of the nesting, as before, and not
+        // a bracket.
+        let too_deep = format!("{}A{}", "A<".repeat(129), ">".repeat(129));
+        let parsed = parse_file(&wrap_module(&format!("entity E : {too_deep}")));
+        assert_eq!(messages(&parsed), [TOO_DEEP]);
     }
 }
 
