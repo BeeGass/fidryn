@@ -86,7 +86,7 @@ the source, not taken from the status documents:
 | `source` declarations are parsed and then dropped. Citation, authority, digest and effective interval never reach the intermediate representation. | no `CoreDecl::Source` is constructed in `crates/fidryn-check/src/lib.rs` |
 | 94 of the 114 `.fr` files in the repository fail `fidryn check`, including all fifty state modules. No test covers them. Two READMEs say they all pass. | run of the 0.2.0 binary over `examples/`, `prelude/`, `packages/`, `tests/programs/` |
 
-The three survey maps that produced the wider picture are summarised in
+The three survey maps that produced the wider picture are summarized in
 section 12; their unverified claims are to be re-checked before anyone
 relies on them.
 
@@ -147,7 +147,7 @@ that changes with each release.
 
 The publisher currently offers 27 dated release points for 2026
 (119-73 of 2026-01-23 through 119-142), each a complete edition, each
-labelled with the titles it changed. That is a ready-made commit history.
+labeled with the titles it changed. That is a ready-made commit history.
 
 How often provision text uses each drafting construct (provisions
 containing the pattern, out of 671,684):
@@ -221,7 +221,7 @@ reproduces the structural numbers in Rust as an independent cross-check.
   necessarily stored or published.
 - **Jurisdictions do not stop at federal and state.** The District of
   Columbia, the territories, tribal nations and thousands of local
-  governments make law too. Business licences, zoning and local wage
+  governments make law too. Business licenses, zoning and local wage
   rules are local.
 - **Official text is free to use.** Works of the federal government have
   no copyright (17 U.S.C. § 105). Statutes and judicial opinions of any
@@ -408,7 +408,7 @@ and they are never merged:
 
 An estimate never removes a suspension and never yields a determinate
 result. It always shows its evidence: the forum, the period, the number
-of rulings, how each was labelled, the version of the law those rulings
+of rulings, how each was labeled, the version of the law those rulings
 applied, and the method. Below a stated minimum sample there is no
 estimate, as in the Sentencing Commission's own tool.
 
@@ -438,7 +438,7 @@ Two things in the rest of this design exist to make that possible:
 
 **What makes it hard.** Section 3.3 gives the legal side: published
 rulings are a biased sample, and statistics carry the past's biases
-forward. The practical bottleneck is labelling. Most rulings are prose,
+forward. The practical bottleneck is labeling. Most rulings are prose,
 not coded outcomes, and official coded data exists for few areas.
 
 **Mechanism (Call).** Open questions are already answered by
@@ -564,7 +564,7 @@ into private law and private documents. What each area leans on:
 | Corporations and other entities | Governing documents as sources of rules; statutory defaults those documents may vary and mandatory rules they may not; boards and share classes with quorum and voting; authority to act for an entity; a standard of judicial review that depends on context |
 | Marriage and family | A status with formation requirements, defects and recognition across states; relationships between persons; property characterized by when and how it was acquired; guideline computations a judge may depart from on stated findings; multi-factor discretion |
 | Trusts and estates | Instruments; offices and succession; discretionary powers bounded by a standard; interests that vest on conditions; shares computed over a family tree; principal and income accounting |
-| Small business | One set of facts asked against many regimes at once ("which duties attach to this employer?"); thresholds by headcount and revenue over time; licences from several levels of government; tables keyed by industry code |
+| Small business | One set of facts asked against many regimes at once ("which duties attach to this employer?"); thresholds by headcount and revenue over time; licenses from several levels of government; tables keyed by industry code |
 
 Every entry maps to a concept in the table above. None needs a concept
 the core lacks, which is the point of condition 6 in section 4.2. Two
@@ -585,7 +585,7 @@ consequences follow for the design:
 | Approach | Trade-off | Verdict |
 | --- | --- | --- |
 | A. Import official text for everything; make the language express real provisions; add executable meaning by domain with visible review status | Slower to show executable breadth. Every claim is checkable. | **Chosen (Owner):** "This seems solid," then the monorepo framing. |
-| B. Have a model draft encodings for every provision up front | Fast breadth. Fills the repository with law nobody can vouch for, which is the failure the language exists to prevent. Useful later as labelled drafts on top of A. | Rejected as the lead |
+| B. Have a model draft encodings for every provision up front | Fast breadth. Fills the repository with law nobody can vouch for, which is the failure the language exists to prevent. Useful later as labeled drafts on top of A. | Rejected as the lead |
 | C. Encode a few practice areas by hand, deeply | Credible but never reaches "all". | Kept as the ordering rule for depth inside A |
 
 ### 6.2 How to change the implementation (Call)
@@ -608,7 +608,7 @@ consequences follow for the design:
 
 | Approach | Trade-off | Verdict |
 | --- | --- | --- |
-| Attach ruling statistics to each named open question and let the encoded structure carry them to the result | Needs rulings labelled against specific questions. Every estimate is explainable, comparable across changes in the law, and separate from the legal answer. | **Chosen** |
+| Attach ruling statistics to each named open question and let the encoded structure carry them to the result | Needs rulings labeled against specific questions. Every estimate is explainable, comparable across changes in the law, and separate from the legal answer. | **Chosen** |
 | Train a model to predict a case's outcome from its facts or its text | Needs no encoding. Cannot say which legal question drove the prediction, cannot separate what the law requires from what courts tend to do, and inherits every bias in its training data invisibly. | Rejected |
 | Fold likelihoods into the legal answer, so a probable result counts as the result | Simplest to present. Breaks the governing rule: a likely answer is not a determined one. | Rejected |
 
@@ -619,13 +619,13 @@ suggestions.
 
 | Stage | Outcome | Release |
 | --- | --- | --- |
-| 0. Presentable and truthful | Documentation matches behaviour; every example, code sample and shown command is checked in CI; the examples that fail on typing alone are repaired; the project returns to the MIT License | 0.2.1 |
+| 0. Presentable and truthful | Documentation matches behavior; every example, code sample and shown command is checked in CI; the examples that fail on typing alone are repaired; the front-end defects found on the way are fixed; the license is MIT | 0.2.0 |
 | 1. The Code as a checked program | New front end and module system; provisions, citations and definitions as declarations; the whole United States Code imported and checked at D1, with definitions at D2; provision-level change sets between releases | 0.3 |
 | 2. The semantic core on real provisions | Definitions, defeasible rules, legal time, quantities, typed facts, named and addressed open questions, refinement, evaluation as of a date, cited explanations; the start of a standard library that holds all legal vocabulary; first half of the conformance set at D3 with tests | 0.4 |
 | 3. Positions, acts, instruments and organizations | Duties, powers, entitlements and processes on the same core; private instruments and the statutory defaults they may displace; bodies, voting and statuses; existing examples ported; the old path deleted; rest of the conformance set | 0.5 |
 | 4. Authority and interpretation | Regulations imported and attached as refinements; source hierarchy and preemption; precedential rulings as changes to the law, scoped by court | 0.6 |
 | 5. Rulings as data | Ruling records, the empirical handler and estimates kept apart from legal answers; a pilot on federal sentencing that reproduces the Sentencing Commission's published figures | 0.7 |
-| 6. Scale-out | State ingesters; machine drafting of labelled encodings; attorney review workflow; an update job that commits each official release and each new ruling record | 0.8 – 0.9 |
+| 6. Scale-out | State ingesters; machine drafting of labeled encodings; attorney review workflow; an update job that commits each official release and each new ruling record | 0.8 – 0.9 |
 | 7. A stable language | Frozen specification, editor support, documentation for lawyers, public coverage figures | 1.0 |
 
 Stage 2's design starts while Stage 1 is being built, because it needs
@@ -633,10 +633,26 @@ the owner's eye on syntax and Stage 1 does not.
 
 ## 8. Stage 0 — presentable and truthful
 
-No change to evaluation semantics. The first version of this section put
-the work on `dev` before PR #3 was merged. On 2026-11-13 the owner decided
-otherwise: PR #3 is merged as 0.2.0 without this work, and Stage 0 follows
-as release 0.2.1. The owner's other decisions of that day are marked below
+The first version of this section put the work on `dev` before PR #3 was
+merged. On 2026-11-13 the owner decided that PR #3 would merge first as
+0.2.0 and Stage 0 would follow as 0.2.1. On 2026-11-14 the owner reversed
+that: PR #3 is held, Stage 0 lands on `dev` first, and the two are
+released together as 0.2.0, so no release carries the proprietary license
+text. The same day the owner decided that the two front-end defects
+Stage 0 had found and documented are fixed before the release. Fixing
+them turned up more of the same kind, and those were fixed too. So
+Stage 0 does change what the front end reads and rejects, in the parser,
+the lowering and the checker: where a statement ends, how a `verify`
+block is read, which block belongs to the header of a declaration, what
+becomes of text that cannot be read (it is an error where it was stepped
+over), how deeply text may nest, and comments, which are no longer read
+as code. `CHANGELOG.md` lists each change, and
+`docs/implementation-status.md` says what is still not read. No rule of
+evaluation is changed: in the evaluator and the verifier, behavior
+changed only in two readers of text, one that has a limit on nesting now,
+and one that no longer splits inside a string and that reads the word
+`assert` before a formula when a tab or a line end follows it, as it did
+when a space followed it. The owner's other decisions are marked below
 and listed in section 13.
 
 ### 8.1 Scope
@@ -651,12 +667,14 @@ and listed in section 13.
   declares a result type and returns nothing; 9 show other typing errors.
   All are hand-typed slices that Stage 1 and Stage 2 replace with
   encodings bound to official text. The first version of this section
-  recommended labelling all of them. The owner decided to label them and
+  recommended labeling all of them. The owner decided to label them and
   also to repair by hand those that fail for other reasons. Planning
   found that 34 can be repaired by typing-only edits, with no change to
-  any rule, threshold or citation. Of the 38 candidates, three hide date
-  arithmetic behind another error and one declares a money result it
-  never states; those stay labelled with the rest, 60 in all.
+  any rule, threshold or citation. A thirty-fifth, the United States Code
+  catalog module, was repaired the same way once the parser fix exposed
+  an unbound name in one of its rules. Of the 38 candidates, three hide
+  date arithmetic behind another error and one declares a money result it
+  never states; those stay labeled with the rest, 60 in all.
 - State the status of every example plainly in `README.md`,
   `examples/README.md`, `examples/states/README.md` and
   `docs/examples.md`, generated from the status file. Wherever a reader
@@ -702,13 +720,13 @@ and listed in section 13.
   `WORKSTREAM-CONTRACT.md`, `REVIEW-FIX-CONTRACT.md`,
   `INTEGRATION-CONTRACT.md`, `INTEGRATION-SUITE.md`,
   `FULL-IMPLEMENTATION.md` and `OBLIGATIONS.md` under one clearly
-  labelled directory and fix every link.
+  labeled directory and fix every link.
 - Rewrite the top of `README.md` for an outside reader: what Fidryn is,
   what works today, a five-minute run that works as written, where it is
   going.
 - Add a `SECURITY.md`.
 
-**Licence**
+**License**
 
 - Return the project to the MIT License, as the owner decided. `main`
   still carries the original MIT text; the proprietary text exists only
@@ -788,7 +806,7 @@ and listed in section 13.
 | Address scheme (Call) | For the Code, the publisher's own identifier, verbatim: `/us/usc/t29/s2611/2/B/ii`. First segment is the jurisdiction, second the corpus. Other corpora get a mapping when their ingester is written. The scheme must leave room for territories, tribal nations, localities, private standard-setters and instruments local to a workspace; Stage 1 implements only the Code. |
 | Unit of compilation (Call) | One section is one module. It is the unit lawyers cite and Congress amends. |
 | Hash (Call) | BLAKE3, as elsewhere in the project. Text is normalized before hashing by a rule the specification states exactly (Unicode form and whitespace). |
-| Where generated output lives | In the separate law repository (**Owner**). Until the owner decides its name, visibility and licence it is a local git repository and is not pushed (**Call**). Official downloads are cached under `/library/corpora/uscode/<release>/` (**Call**). |
+| Where generated output lives | In the separate law repository (**Owner**). Until the owner decides its name, visibility and license it is a local git repository and is not pushed (**Call**). Official downloads are cached under `/library/corpora/uscode/<release>/` (**Call**). |
 | New crates (Call) | Provision model and addresses in one crate; the ingester in another; workspace support in the driver. |
 | Sample in this repository (Call) | Title 1 and a handful of sections chosen to cover tables, continuation text, court rules, notes containing quoted provisions, and an unresolved reference. |
 
@@ -978,13 +996,13 @@ which is a substantial corpus of its own. The Commission removes
 identifiers from its records, so the pilot has no judge field;
 estimates by judge first become possible with records built from
 dockets and opinions. The second target is chosen from areas with
-official coded outcomes before any area that needs rulings labelled from
+official coded outcomes before any area that needs rulings labeled from
 prose.
 
 **Stage 6** begins with a survey of all fifty state publishers (format,
 bulk access, official status, terms) before any state ingester is
-written. Machine drafting is introduced here, labelled, on top of the
-review workflow. Labelling rulings from prose, by people or by models,
+written. Machine drafting is introduced here, labeled, on top of the
+review workflow. Labeling rulings from prose, by people or by models,
 also belongs here, with the label's origin always shown.
 
 **Stage 7** freezes the specification and ships editor support and
@@ -1010,7 +1028,7 @@ ran:
 - An estimate of how courts tend to rule presented as what the law
   requires, or allowed to turn a suspended result into a determinate one.
 - An estimate shown without its sample: which courts, which period, how
-  many rulings, how they were labelled.
+  many rulings, how they were labeled.
 - Law text in the repository that did not come from a pinned official
   artifact.
 - Coverage numbers that count a provision as encoded when its operative
@@ -1024,8 +1042,8 @@ ran:
 ## 12. Constraints
 
 - **Branches.** `dev` is the head of PR #3. Stage 0 is built on a branch
-  off `dev` and reaches `dev` after the owner merges PR #3. Later stages
-  use feature branches off `dev`.
+  off `dev` and reaches `dev` before PR #3 is merged (owner decision of
+  2026-11-14). Later stages use feature branches off `dev`.
 - **Promotion.** `main` accepts only a pull request from `dev` with all
   required checks green. Each promotion raises the workspace version and
   adds a changelog entry.
@@ -1048,15 +1066,16 @@ ran:
 
 ## 13. Decisions that are the owner's
 
-1. **Licence.** Decided on 2026-11-13: the MIT License. `LICENSE` on
+1. **License.** Decided on 2026-11-13: the MIT License. `LICENSE` on
    `dev` forbade any use by anyone; Stage 0 restores the MIT text the
-   project began with. Whether contributions still need a separate rights
-   agreement is open.
-2. **The law repository's name, visibility and licence**, before anything
+   project began with. Decided on 2026-11-14: contributions are accepted
+   under the same license, with no separate agreement.
+2. **The law repository's name, visibility and license**, before anything
    is pushed.
-3. **When to merge PR #3.** Decided on 2026-11-13: now, as 0.2.0. Stage 0
-   follows as 0.2.1.
-4. **Whether to repair the 94 legacy examples** instead of labelling them.
+3. **When to merge PR #3.** Decided on 2026-11-14, replacing the decision
+   of 2026-11-13: PR #3 is held until Stage 0 is on `dev`, and both are
+   released as 0.2.0.
+4. **Whether to repair the 94 legacy examples** instead of labeling them.
    Decided on 2026-11-13: label them, and repair those that fail for
    reasons other than date arithmetic (section 8.1).
 5. **Budget for machine drafting** in Stage 6.
@@ -1072,10 +1091,11 @@ None of the decisions in section 13 blocks Stage 0 or Stage 1. Approving
 this document settles the following Calls for planning. Overruling any of
 them restructures the plan, so each is listed here to be checked:
 
-1. Stage 0 changes no evaluation behaviour. It is released as 0.2.1 after
-   PR #3 is merged as 0.2.0, and it publishes no roadmap (owner decisions
-   of 2026-11-13, replacing the first version of this item).
-2. The failing examples are labelled, and the 34 that fail on typing
+1. Stage 0 fixes the front-end defects it found (section 8) and changes no
+   rule of evaluation. It is released as 0.2.0 together with PR #3, and it
+   publishes no roadmap (owner decisions of 2026-11-13 and 2026-11-14,
+   replacing earlier versions of this item).
+2. The failing examples are labeled, and the 35 that fail on typing
    alone are repaired (owner decision of 2026-11-13, replacing the first
    version of this item).
 3. The implementation changes by adding a new front end and semantic
@@ -1086,7 +1106,7 @@ them restructures the plan, so each is listed here to be checked:
 5. One section is one module, addressed by the publisher's identifier
    (section 9.3).
 6. The law repository, which the owner decided is separate, stays local
-   until the owner decides its name, visibility and licence. The
+   until the owner decides its name, visibility and license. The
    integration test works as section 4.3 describes (sections 4.3, 9.3).
 7. Enacted notes are inside staleness and editorial matter is outside it
    (section 9.4).

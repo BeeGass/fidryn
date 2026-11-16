@@ -552,7 +552,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-adapt"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "serde",
@@ -563,7 +563,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-check"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
@@ -576,7 +576,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-cli"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -605,7 +605,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-core"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "indexmap",
@@ -620,7 +620,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-driver"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-check",
@@ -636,7 +636,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-eval"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-check",
  "fidryn-core",
@@ -650,7 +650,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-handlers"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "fidryn-eval",
@@ -660,7 +660,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-hir"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "fidryn-syntax",
@@ -672,7 +672,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-integration-benches"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "criterion",
  "fidryn-cli",
@@ -683,7 +683,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-integration-tests"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "axum",
  "fidryn-cli",
@@ -703,7 +703,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-kernel"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-check",
  "fidryn-core",
@@ -715,7 +715,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-render"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
@@ -725,7 +725,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-solve"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "indexmap",
@@ -734,7 +734,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-syntax"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-core",
  "rowan",
@@ -745,7 +745,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-trace"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "fidryn-core",
@@ -759,7 +759,7 @@ dependencies = [
 
 [[package]]
 name = "fidryn-verify"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "fidryn-check",
  "fidryn-core",
@@ -2393,7 +2393,7 @@ checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
 name = "xtask"
-version = "0.2.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "blake3",
