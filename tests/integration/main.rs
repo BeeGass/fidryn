@@ -12,4 +12,5 @@ mod repaired_examples;
 mod review_regressions;
 mod rule_basis;
 mod semantic_regressions;
+mod unreadable_text;
 mod verify_blocks;

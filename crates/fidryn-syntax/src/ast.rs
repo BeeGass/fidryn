@@ -217,6 +217,9 @@ pub struct GoalAst {
 pub struct ConsequenceAst {
     pub verb: String,
     pub expr: Expr,
+    /// The consequence as it is written, from its verb to the end of its
+    /// statement, without the `;` that may end it.
+    pub text: String,
 }
 
 impl Decl {

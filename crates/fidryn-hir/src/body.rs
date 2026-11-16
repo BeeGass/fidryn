@@ -143,13 +143,20 @@ pub fn expr_to_guard(expr: &Expr) -> Guard {
     term_to_guard(&expr_to_term(expr))
 }
 
-pub fn consequences_from_ast(items: &[ConsequenceAst]) -> Vec<(String, PropTerm)> {
-    items
-        .iter()
-        .filter_map(|item| {
-            term_as_prop(&expr_to_term(&item.expr)).map(|prop| (item.verb.clone(), prop))
-        })
-        .collect()
+/// The consequences of one list of a rule, `then` or `otherwise`: each one
+/// whose expression is a proposition, and the text of each one whose
+/// expression is not. The second list is for a diagnostic: such a
+/// consequence is not dropped without one.
+pub fn consequences_from_ast(items: &[ConsequenceAst]) -> (Vec<(String, PropTerm)>, Vec<String>) {
+    let mut propositions = Vec::new();
+    let mut not_propositions = Vec::new();
+    for item in items {
+        match term_as_prop(&expr_to_term(&item.expr)) {
+            Some(prop) => propositions.push((item.verb.clone(), prop)),
+            None => not_propositions.push(item.text.clone()),
+        }
+    }
+    (propositions, not_propositions)
 }
 
 fn goal_ast_to_body(goal: &GoalAst) -> HirQueryBody {
@@ -346,6 +353,11 @@ pub struct RuleParts {
     pub consequences: Vec<(String, PropTerm)>,
     pub fallback: Vec<(String, PropTerm)>,
     pub require: Option<Guard>,
+    /// The text of each `then` consequence whose expression is not a
+    /// proposition. Such a consequence is in neither list above.
+    pub consequences_not_propositions: Vec<String>,
+    /// The same for the `otherwise` consequences.
+    pub fallback_not_propositions: Vec<String>,
 }
 
 pub fn parse_rule_parts(src: &str) -> RuleParts {
@@ -355,6 +367,8 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
     let mut consequences = Vec::new();
     let mut fallback = Vec::new();
     let mut require = None;
+    let mut consequences_not_propositions = Vec::new();
+    let mut fallback_not_propositions = Vec::new();
     while !p.is_eof() {
         if p.eat_ident("when") {
             if let Some(term) = p.parse_expr() {
@@ -363,14 +377,18 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
             continue;
         }
         if p.eat_ident("then") {
-            if let Some(item) = parse_rule_consequence_pair(&mut p) {
-                consequences.push(item);
+            match parse_rule_consequence_pair(&mut p) {
+                Some(Ok(item)) => consequences.push(item),
+                Some(Err(text)) => consequences_not_propositions.push(text),
+                None => {}
             }
             continue;
         }
         if p.eat_ident("otherwise") {
-            if let Some(item) = parse_rule_consequence_pair(&mut p) {
-                fallback.push(item);
+            match parse_rule_consequence_pair(&mut p) {
+                Some(Ok(item)) => fallback.push(item),
+                Some(Err(text)) => fallback_not_propositions.push(text),
+                None => {}
             }
             continue;
         }
@@ -387,17 +405,29 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
         consequences,
         fallback,
         require,
+        consequences_not_propositions,
+        fallback_not_propositions,
     }
 }
 
-fn parse_rule_consequence_pair(p: &mut SliceParser<'_>) -> Option<(String, PropTerm)> {
+/// A consequence read from the text of a rule: its verb and proposition.
+/// When an expression stands there that is not a proposition, the text of
+/// the consequence, for a diagnostic. `None` when no expression stands
+/// there.
+fn parse_rule_consequence_pair(
+    p: &mut SliceParser<'_>,
+) -> Option<Result<(String, PropTerm), String>> {
+    let first = p.idx;
     let op = if p.at_kind(TokenKind::Ident) {
         p.bump_text()
     } else {
         "derive".into()
     };
     let term = p.parse_expr()?;
-    term_as_prop(&term).map(|prop| (op, prop))
+    Some(match term_as_prop(&term) {
+        Some(prop) => Ok((op, prop)),
+        None => Err(p.text_from(first)),
+    })
 }
 
 pub fn and_opt_guard(left: Option<Guard>, right: Guard) -> Guard {
@@ -1337,6 +1367,21 @@ impl<'a> SliceParser<'a> {
         self.bump()
             .map(|t| self.text(t).to_owned())
             .unwrap_or_default()
+    }
+
+    /// The source text from the token at index `first` to the end of the
+    /// last token consumed.
+    fn text_from(&self, first: usize) -> String {
+        let start = self
+            .tokens
+            .get(first)
+            .map_or(self.src.len(), |token| token.start as usize);
+        let end = self
+            .idx
+            .checked_sub(1)
+            .and_then(|last| self.tokens.get(last))
+            .map_or(start, |token| token.end as usize);
+        self.src.get(start..end.max(start)).unwrap_or("").to_owned()
     }
 
     fn eat_kind(&mut self, kind: TokenKind) -> bool {
@@ -2457,5 +2502,30 @@ duty PayInvoice {
             parse_duty_parts("duty D {\nbearer Payer\ncontent \"pay } now\"\nclaimant Payee\n}");
         assert_eq!(quoted.claimant.as_deref(), Some("Payee"));
         assert_eq!(quoted.content, [Term::String("pay } now".into())]);
+    }
+
+    #[test]
+    fn a_consequence_read_from_the_text_that_is_not_a_proposition_is_kept_as_its_text() {
+        // The path that reads the consequences of a rule from its text
+        // dropped an expression that is not a proposition, as the path that
+        // reads them from the tree did. Both now keep its text for a
+        // diagnostic.
+        let parts = parse_rule_parts(
+            "rule R : derive {\nthen derive 5\nthen derive P()\notherwise establish \"x\"\notherwise derive Q()\n}",
+        );
+        let predicates = |list: &[(String, PropTerm)]| -> Vec<String> {
+            list.iter()
+                .map(|(_, prop)| prop.predicate.clone())
+                .collect()
+        };
+        assert_eq!(predicates(&parts.consequences), ["P"]);
+        assert_eq!(parts.consequences_not_propositions, ["derive 5"]);
+        assert_eq!(predicates(&parts.fallback), ["Q"]);
+        assert_eq!(parts.fallback_not_propositions, ["establish \"x\""]);
+        // With no expression after the word there is no consequence, as
+        // before, and nothing to report.
+        let parts = parse_rule_parts("rule R : derive { when true then }");
+        assert!(parts.consequences.is_empty());
+        assert!(parts.consequences_not_propositions.is_empty());
     }
 }

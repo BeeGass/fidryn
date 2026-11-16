@@ -85,8 +85,11 @@ interchange schema versions are maintained independently of the interpreter.
   with no type, a header keyword such as `jurisdiction` with no value, and
   a `query`, `calc` or `fn` with no body each took the declaration after it
   as part of itself, with no diagnostic from the parser. That declaration
-  is now read. `proposition P`, `entity E` and `jurisdiction` written so
-  pass the checker as before. A `calc` or `fn` with no body used the body
+  is now read. `proposition P` and `entity E` written so pass the checker
+  as before. `jurisdiction`, `effective_at`, `recorded_at` or
+  `outside_scope` with no value in its statement, as when it stands alone
+  on its line, is rejected with `E100`, and the value is not read from the
+  next line. A `calc` or `fn` with no body used the body
   of the declaration it took: `calc f(a: Int) -> Int` followed by
   `query q() -> Int { return 7 }` passed the checker, and `f(1)` was 7. A
   `calc` or `fn` with no `{ ... }` body is now rejected with `E100`, and a
@@ -120,7 +123,18 @@ interchange schema versions are maintained independently of the interpreter.
   ends in `.` and type arguments that `<` opens and no `>` closes are
   rejected with `E100` too: `entity N .` above a `query` line named the
   entity `N.query`, and `entity E : Map <` above one passed the checker,
-  and each lost the query.
+  and each lost the query. The header of a `record_type`, an
+  `evidence_type`, an `observation` or a `judgment` that stops at `:` or
+  `->` above another declaration was rejected with `E100` before, and read
+  the declarations below it as its own fields or clauses. Those are now
+  read as declarations. One line below a header that ends in `:` is not a
+  declaration: under the header of a `for_all` or an `exists`, a line that
+  begins with `for_all` or `exists` is the body of the quantifier, as
+  before.
+- A declaration keyword that takes a name and has something else after it
+  is rejected with `E100`. `power { holder A }`, `proposition (x: Int)`
+  and `entity : NaturalPerson` passed the checker, each as a declaration
+  with no name.
 - The parser stops on every input. `fidryn check` did not return on a
   `type` declaration that has `{` where its `=` belongs, as in `type N {`
   above another declaration, or on a token that begins no field inside the
@@ -132,13 +146,28 @@ interchange schema versions are maintained independently of the interpreter.
   `E100`, and so is a `then` or an `otherwise` that no consequence
   follows. Such text was stepped over without a diagnostic: with `whne`
   written for `when`, a rule lost its guard and fired whatever the case
-  held. A `valid_time` or `record_time` line with an interval is still
-  accepted and still not applied: the consequences of a rule hold at every
-  time, which the implementation status guide now says and a test pins.
-- A statement that a `goal Evaluate` block cannot read is rejected with
-  `E100`. It was stepped over without a diagnostic, and the statement
-  below it with it: a goal that held the lines `true`, `return` and
-  `require false` answered `true`.
+  held. A `when`, a `require` or a `source` with no expression after it is
+  rejected with `E100` as well. It had no diagnostic: with
+  `when // operative A()` as the last line of a rule, the condition was in
+  a comment, and the rule fired whatever the case held. A `valid_time` or
+  `record_time` line with an interval is still accepted and still not
+  applied: the consequences of a rule hold at every time, which the
+  implementation status guide now says and a test pins. The interval needs
+  both of its bounds: `valid_time [, +inf)` is rejected with `E100`.
+- A consequence of a rule whose expression is not a proposition is
+  rejected with `E210`, in a diagnostic that names the rule and the
+  consequence. `then establish 5` passed the checker, and the rule
+  established nothing. A consequence that names an entity, as in
+  `then establish Acme`, passed the checker too, and is rejected with
+  `E210` as well.
+- A statement that a query body, a `goal Evaluate` block, the body of a
+  `calc` or an `fn`, or a `transaction` block cannot read is rejected with
+  `E100`, wherever it stands in the block. In a goal it was stepped over
+  without a diagnostic, and the statement below it with it: a goal that
+  held the lines `true`, `return` and `require false` answered `true`. In
+  the other blocks it had no diagnostic when it was the last statement: a
+  query whose body held the lines `true` and `return` answered `true`, and
+  a `calc` whose body held the lines `7` and `return` returned 7.
 - `require ... using` with no protocol name in the statement of `using` is
   rejected with `E100`. A `using` at the end of a line took the first word
   of the next line as the name: `require true using` followed by the lines
@@ -166,6 +195,20 @@ interchange schema versions are maintained independently of the interpreter.
   expression, such as the branch of an `if`.
   `if c > 0 { return 1 } else { return 2 }` is rejected with `E100`; it
   passed the checker before and failed when run.
+- The type arguments of a call nested 80,000 deep ended the process with
+  a stack overflow, and so did an `if` with 20,000 `else if` links in the
+  body of a `calc`. Type arguments of a call nested more than 128 deep
+  are now rejected with `E100`, as those in the type of a parameter
+  already were. In the body of a `calc`, each `else if` of a chain counts
+  as a level of the expression, and a chain that passes the limit of 128
+  levels is rejected with `E100` however long it is.
+- The time `fidryn check` takes no longer grows with the square of the
+  length of a run of blank lines. A module with 20,000 blank lines between
+  two declarations took about ten seconds to check; it is now checked in
+  a fraction of a second.
+- Where a type is missing after the `:` of a parameter or of a record
+  field, or after the `->` of a result, the message is "expected a type",
+  as it is after the `:` of an entity. It read "expected type" there.
 
 ## [0.2.0] - 2026-10-29
 

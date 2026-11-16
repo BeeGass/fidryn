@@ -348,8 +348,10 @@ on `P`. The protocol name stands in the statement of `using`: a `using`
 that ends its statement, with no name after it, is rejected with `E100`,
 and the line below it is not read as the name.
 
-A statement that a query body or a `goal Evaluate` block cannot read is
-rejected with `E100`. A `return` with no expression is one.
+A statement that a query body, a `goal Evaluate` block, the body of a
+`calc` or an `fn`, or a `transaction` block cannot read is rejected with
+`E100`, wherever it stands in the block. A `return` with no expression is
+one.
 
 ## Where a statement ends
 
@@ -408,14 +410,23 @@ outermost brace, unless a continuation follows.
 A declaration does not go on into the declaration below it. A keyword
 that takes a name, such as `entity`, `rule` or `query`, is rejected with
 `E100` when its statement ends with it: the name is not read from the
-next line. And the header of a declaration whose line ends in `:`, `->`
-or `=`, outside parentheses, brackets and braces, is rejected with `E100`
+next line. It is rejected as well when the token after it is not a name,
+as in `power { holder A }` or `entity : NaturalPerson`. The header
+keywords `jurisdiction`, `effective_at`, `recorded_at` and
+`outside_scope` are rejected with `E100` in the same way when the
+statement ends with the keyword: the value is not read from the next
+line. `source_snapshot` and `source_manifest` do read a string that
+stands on the next line, and are rejected with `E100` when none stands
+there. And the header of a declaration whose line ends in `:`, `->` or
+`=`, outside parentheses, brackets and braces, is rejected with `E100`
 when the next line that has a token begins with a declaration keyword,
-although the first case above would carry the header into that line. A
-type on the next line that is no such keyword is read: `entity Pat :`
-followed by the line `NaturalPerson` declares `Pat`. A name that ends in
-`.` above such a line is rejected with `E100` as well, and so are type
-arguments that `<` opens and no `>` closes.
+although the first case above would carry the header into that line.
+There is one exception: below the header of a `for_all` or an `exists`
+that ends in `:`, a line that begins with `for_all` or `exists` is the
+body of the quantifier. A type on the next line that is no such keyword
+is read: `entity Pat :` followed by the line `NaturalPerson` declares
+`Pat`. A name that ends in `.` above such a line is rejected with `E100`
+as well, and so are type arguments that `<` opens and no `>` closes.
 
 ## Calc, conditionals, money, and durations
 
@@ -508,11 +519,14 @@ with no `{ ... }` after it is rejected with `E100`.
 
 The body holds `when`, `then`, `otherwise`, `require`, `select` and
 `source` statements. Other text in it is rejected with `E100`, and so is
-a `then` or an `otherwise` that no consequence follows. Two more lines
-are accepted: `valid_time` and `record_time`, each followed by an
-interval such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does not
-apply them: the consequences of the rule hold at every time, whatever the
-interval says (see
+a `then` or an `otherwise` that no consequence follows, and a `when`, a
+`require` or a `source` with no expression after it. A consequence names
+a proposition: `then establish 5` is rejected with `E210`, and so is a
+consequence that names an entity. Two more lines are accepted:
+`valid_time` and `record_time`, each followed by an interval with both of
+its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
+not apply them: the consequences of the rule hold at every time, whatever
+the interval says (see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
 
 `when operative P` tests legal status. `in TrustCreation(BRT)` names the

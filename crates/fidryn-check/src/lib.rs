@@ -491,6 +491,23 @@ fn check_queries(
                 }
                 continue;
             }
+            // A consequence with no arguments is a bare name, and any
+            // capitalized name with no arguments is read as a proposition.
+            // One that is declared as something else, an entity for
+            // example, is not a proposition.
+            if prop.arguments.is_empty()
+                && let Some(ty) = cx.infer_ident(&prop.predicate)
+                && !ty.is_prop()
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "`{operation} {}` in rule `{}` requires a proposition, not {ty}",
+                        prop.predicate, rule.name
+                    ),
+                ));
+                continue;
+            }
             cx.check_modal_proposition(
                 "operative",
                 &[Term::Apply {
@@ -5640,5 +5657,42 @@ module Examples.UseEff version "0.1.0" {
             err.iter().any(|d| d.code == DiagnosticCode::E420),
             "{err:?}"
         );
+    }
+
+    #[test]
+    fn a_consequence_that_names_an_entity_is_e210() {
+        // `Acme` is an entity. A name with no arguments has the shape of a
+        // proposition, so the rule established a proposition called `Acme`
+        // that nothing declares, and the module passed.
+        let module = |consequences: &str| {
+            format!(
+                "module Review version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    proposition Exempt(who: LegalPerson)\n    proposition Flag()\n    rule Exemption : constitutive {{\n        when true\n        {consequences}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+            )
+        };
+        for written in ["Acme", "(Acme)", "Acme()"] {
+            for consequences in [
+                format!("then establish {written}"),
+                format!("then establish Exempt(Acme)\n        otherwise establish {written}"),
+            ] {
+                let rejected: Vec<(DiagnosticCode, String)> = check_src(&module(&consequences))
+                    .expect_err("the module is rejected")
+                    .into_iter()
+                    .map(|diagnostic| (diagnostic.code, diagnostic.message))
+                    .collect();
+                assert_eq!(
+                    rejected,
+                    [(
+                        DiagnosticCode::E210,
+                        "`establish Acme` in rule `Exemption` requires a proposition, not LegalPerson"
+                            .to_owned()
+                    )],
+                    "{consequences}"
+                );
+            }
+        }
+        // A declared proposition with no arguments is a consequence as
+        // before, with and without its parentheses.
+        check_src(&module("then establish Flag\n        then derive Flag()"))
+            .expect("a proposition with no arguments");
     }
 }

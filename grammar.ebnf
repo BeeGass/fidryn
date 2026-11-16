@@ -1,4 +1,4 @@
-(* Fidryn 0.2 grammar. The parser enforces closed field sets only for source blocks and judgment request blocks; see docs/implementation-status.md. *)
+(* Fidryn 0.2 grammar. The parser enforces closed field sets only for source blocks, rule bodies and judgment request blocks; see docs/implementation-status.md. *)
 
 File            ::= Module EOF
 
@@ -166,9 +166,11 @@ RuleStatement   ::= "when" Expr End
                   | "valid_time" IntervalExpr End
                   | "record_time" IntervalExpr End
 
-(* The parser rejects text in a rule that is none of these statements. It
-   accepts the valid_time and record_time statements, and the interpreter
-   does not apply them: the consequences of a rule hold at every time. *)
+(* The parser rejects text in a rule that is none of these statements, and
+   a when, a require or a source with no Expr after it. It accepts the
+   valid_time and record_time statements, each with an interval that has
+   both of its bounds, and the interpreter does not apply them: the
+   consequences of a rule hold at every time. *)
 
 Selection       ::= "unique"? Ident "from" Expr
                     ("where" Expr)?
@@ -179,6 +181,10 @@ ConsequenceStmt ::= ConsequenceOp Expr ("as_to" Expr)? End
 ConsequenceOp   ::= "establish" | "terminate" | "suspend"
                   | "constitute" | "create" | "derive" | "activate"
                   | "defeat" | "make"
+
+(* The Expr of a consequence names a proposition. A consequence whose Expr
+   is a number, a string, a sum or the name of an entity, for example, is
+   rejected with E210. *)
 
 (* ----- judgments and decisions ----- *)
 
@@ -405,10 +411,18 @@ End             ::= inserted-newline | ";"
 
    A declaration does not go on into the declaration below it. A keyword
    that takes a name is rejected when its statement ends with it: the name
-   is not read from the next line. And the header of a declaration whose
-   line ends in ":", "->" or "=", outside parentheses, brackets and braces,
-   is rejected when the first token after the newline is a declaration
-   keyword, although no End is inserted there by the rule above. *)
+   is not read from the next line. It is rejected as well when the token
+   after it is not a name. The header keywords jurisdiction, effective_at,
+   recorded_at and outside_scope are rejected when the statement ends with
+   the keyword: the value is not read from the next line. source_snapshot
+   and source_manifest do read a String that stands on the next line, and
+   are rejected when none stands there. And the header of a declaration
+   whose line ends in ":", "->" or "=", outside parentheses, brackets
+   and braces, is rejected when the first token after the newline is a
+   declaration keyword, although no End is inserted there by the rule
+   above. There is one exception: below the header of a for_all or an
+   exists that ends in ":", a line that begins with for_all or exists is
+   the body of the quantifier. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.

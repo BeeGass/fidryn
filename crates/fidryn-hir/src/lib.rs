@@ -502,16 +502,37 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 } else if let Some(req) = parsed.require {
                     guard = Some(body::and_opt_guard(guard, req));
                 }
-                let consequences = if d.consequences.is_empty() {
-                    parsed.consequences
+                let (consequences, consequences_not_propositions) = if d.consequences.is_empty() {
+                    (parsed.consequences, parsed.consequences_not_propositions)
                 } else {
                     body::consequences_from_ast(&d.consequences)
                 };
-                let fallback = if d.fallback.is_empty() {
-                    parsed.fallback
+                let (fallback, fallback_not_propositions) = if d.fallback.is_empty() {
+                    (parsed.fallback, parsed.fallback_not_propositions)
                 } else {
                     body::consequences_from_ast(&d.fallback)
                 };
+                // A consequence whose expression is not a proposition is in
+                // neither list. It is reported: a rule that lost it would
+                // establish less than its text says.
+                let rule_name = d.name.as_deref().unwrap_or_default();
+                for (word, texts) in [
+                    ("then", &consequences_not_propositions),
+                    ("otherwise", &fallback_not_propositions),
+                ] {
+                    for text in texts {
+                        let text = text.split_whitespace().collect::<Vec<_>>().join(" ");
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E210,
+                                format!(
+                                    "`{word} {text}` in rule `{rule_name}` requires a proposition"
+                                ),
+                            )
+                            .with_span(d.span),
+                        );
+                    }
+                }
                 hir.rules.push(HirRule {
                     name: d.name.clone().unwrap_or_default(),
                     kind: d
@@ -2255,6 +2276,121 @@ module Examples.Retain version "0.1.0" {
                 .any(|d| d.kind == "scenario" && d.name == "HappyPath"),
             "{:?}",
             hir.retained
+        );
+    }
+
+    /// The codes and messages the lowering rejects a module with. The
+    /// module has no parse error.
+    fn rejected(src: &str) -> Vec<(DiagnosticCode, String)> {
+        let parsed = parse_file(src);
+        assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
+        elaborate(&parsed, &SourceManifest::default())
+            .expect_err("the module is rejected")
+            .into_iter()
+            .map(|diagnostic| (diagnostic.code, diagnostic.message))
+            .collect()
+    }
+
+    /// A module with one rule, `Exemption`, that has these statements.
+    fn rule_module(statements: &str) -> String {
+        format!(
+            "module Examples.Consequence version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    proposition Exempt(who: LegalPerson)\n    rule Exemption : constitutive {{\n        when true\n        {statements}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_consequence_that_is_not_a_proposition_is_e210_and_names_the_rule_and_the_consequence() {
+        // The expression of the consequence is a number, a string, a sum, a
+        // proposition under a modal word, a set, a field of a name, or a
+        // number in parentheses. None of these is a proposition. Such a
+        // consequence was dropped without a diagnostic, and the rule
+        // established less than its text says.
+        for written in [
+            "5",
+            "\"x\"",
+            "1 + 2",
+            "operative Exempt(Acme)",
+            "{Acme}",
+            "Acme.name",
+            "(5)",
+        ] {
+            // In the `then` list and in the `otherwise` list.
+            for (word, statements) in [
+                ("then", format!("then establish {written}")),
+                (
+                    "otherwise",
+                    format!("then establish Exempt(Acme)\n        otherwise establish {written}"),
+                ),
+            ] {
+                assert_eq!(
+                    rejected(&rule_module(&statements)),
+                    [(
+                        DiagnosticCode::E210,
+                        format!(
+                            "`{word} establish {written}` in rule `Exemption` requires a proposition"
+                        )
+                    )],
+                    "{word} establish {written}"
+                );
+            }
+        }
+        // Each such consequence of a rule is reported, in the order of the
+        // rule's text within its list.
+        assert_eq!(
+            rejected(&rule_module(
+                "then establish 5\n        then derive Exempt(Acme)\n        then derive \"x\"\n        otherwise derive 7"
+            )),
+            [
+                (
+                    DiagnosticCode::E210,
+                    "`then establish 5` in rule `Exemption` requires a proposition".to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`then derive \"x\"` in rule `Exemption` requires a proposition".to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`otherwise derive 7` in rule `Exemption` requires a proposition".to_owned()
+                ),
+            ]
+        );
+        // The consequence is quoted as it is written, on one line, with its
+        // `as_to` part and without the `;` that ends it.
+        assert_eq!(
+            rejected(&rule_module(
+                "then establish 1 +\n            2 as_to Acme;"
+            )),
+            [(
+                DiagnosticCode::E210,
+                "`then establish 1 + 2 as_to Acme` in rule `Exemption` requires a proposition"
+                    .to_owned()
+            )]
+        );
+    }
+
+    #[test]
+    fn a_consequence_that_is_a_proposition_is_kept_with_no_diagnostic() {
+        let parsed = parse_file(&rule_module(
+            "then establish Exempt(Acme)\n        then derive Flag\n        otherwise derive (Exempt(Acme))",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        let rule = &hir.rules[0];
+        let predicates = |list: &[(String, PropTerm)]| -> Vec<(String, String)> {
+            list.iter()
+                .map(|(verb, prop)| (verb.clone(), prop.predicate.clone()))
+                .collect()
+        };
+        assert_eq!(
+            predicates(&rule.consequences),
+            [
+                ("establish".to_owned(), "Exempt".to_owned()),
+                ("derive".to_owned(), "Flag".to_owned())
+            ]
+        );
+        assert_eq!(
+            predicates(&rule.fallback),
+            [("derive".to_owned(), "Exempt".to_owned())]
         );
     }
 }

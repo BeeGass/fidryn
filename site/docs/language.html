@@ -353,8 +353,10 @@ fails it, and with none the query suspends with a request for a judgment
 on <code>P</code>. The protocol name stands in the statement of <code>using</code>: a <code>using</code>
 that ends its statement, with no name after it, is rejected with <code>E100</code>,
 and the line below it is not read as the name.</p>
-<p>A statement that a query body or a <code>goal Evaluate</code> block cannot read is
-rejected with <code>E100</code>. A <code>return</code> with no expression is one.</p>
+<p>A statement that a query body, a <code>goal Evaluate</code> block, the body of a
+<code>calc</code> or an <code>fn</code>, or a <code>transaction</code> block cannot read is rejected with
+<code>E100</code>, wherever it stands in the block. A <code>return</code> with no expression is
+one.</p>
 <h2 id="where-a-statement-ends"><span class="hn">2.11</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
 <p>A statement ends at a <code>;</code> or at the end of its line. It goes on into the
 next line in two cases.</p>
@@ -404,14 +406,23 @@ outermost brace, unless a continuation follows.</p>
 <p>A declaration does not go on into the declaration below it. A keyword
 that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is rejected with
 <code>E100</code> when its statement ends with it: the name is not read from the
-next line. And the header of a declaration whose line ends in <code>:</code>, <code>-&gt;</code>
-or <code>=</code>, outside parentheses, brackets and braces, is rejected with <code>E100</code>
+next line. It is rejected as well when the token after it is not a name,
+as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>. The header
+keywords <code>jurisdiction</code>, <code>effective_at</code>, <code>recorded_at</code> and
+<code>outside_scope</code> are rejected with <code>E100</code> in the same way when the
+statement ends with the keyword: the value is not read from the next
+line. <code>source_snapshot</code> and <code>source_manifest</code> do read a string that
+stands on the next line, and are rejected with <code>E100</code> when none stands
+there. And the header of a declaration whose line ends in <code>:</code>, <code>-&gt;</code> or
+<code>=</code>, outside parentheses, brackets and braces, is rejected with <code>E100</code>
 when the next line that has a token begins with a declaration keyword,
-although the first case above would carry the header into that line. A
-type on the next line that is no such keyword is read: <code>entity Pat :</code>
-followed by the line <code>NaturalPerson</code> declares <code>Pat</code>. A name that ends in
-<code>.</code> above such a line is rejected with <code>E100</code> as well, and so are type
-arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes.</p>
+although the first case above would carry the header into that line.
+There is one exception: below the header of a <code>for_all</code> or an <code>exists</code>
+that ends in <code>:</code>, a line that begins with <code>for_all</code> or <code>exists</code> is the
+body of the quantifier. A type on the next line that is no such keyword
+is read: <code>entity Pat :</code> followed by the line <code>NaturalPerson</code> declares
+<code>Pat</code>. A name that ends in <code>.</code> above such a line is rejected with <code>E100</code>
+as well, and so are type arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes.</p>
 <h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
@@ -476,11 +487,14 @@ after it opens the rule's body. A rule needs that body. A rule header
 with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
 <p>The body holds <code>when</code>, <code>then</code>, <code>otherwise</code>, <code>require</code>, <code>select</code> and
 <code>source</code> statements. Other text in it is rejected with <code>E100</code>, and so is
-a <code>then</code> or an <code>otherwise</code> that no consequence follows. Two more lines
-are accepted: <code>valid_time</code> and <code>record_time</code>, each followed by an
-interval such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does not
-apply them: the consequences of the rule hold at every time, whatever the
-interval says (see
+a <code>then</code> or an <code>otherwise</code> that no consequence follows, and a <code>when</code>, a
+<code>require</code> or a <code>source</code> with no expression after it. A consequence names
+a proposition: <code>then establish 5</code> is rejected with <code>E210</code>, and so is a
+consequence that names an entity. Two more lines are accepted:
+<code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
+its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
+not apply them: the consequences of the rule hold at every time, whatever
+the interval says (see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests">implementation-status</a>).</p>
 <p><code>when operative P</code> tests legal status. <code>in TrustCreation(BRT)</code> names the
 legal context of that test. The guard still turns on the proposition
