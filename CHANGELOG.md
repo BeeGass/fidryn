@@ -86,10 +86,10 @@ interchange schema versions are maintained independently of the interpreter.
   a `query`, `calc` or `fn` with no body each took the declaration after it
   as part of itself, with no diagnostic from the parser. That declaration
   is now read. `proposition P` and `entity E` written so pass the checker
-  as before. `jurisdiction`, `effective_at`, `recorded_at` or
-  `outside_scope` with no value in its statement, as when it stands alone
-  on its line, is rejected with `E100`, and the value is not read from the
-  next line. A `calc` or `fn` with no body used the body
+  as before. `jurisdiction`, `source_snapshot`, `source_manifest`,
+  `effective_at`, `recorded_at` or `outside_scope` is rejected with `E100`
+  when its statement ends with the keyword, and the value is not read from
+  the next line. A `calc` or `fn` with no body used the body
   of the declaration it took: `calc f(a: Int) -> Int` followed by
   `query q() -> Int { return 7 }` passed the checker, and `f(1)` was 7. A
   `calc` or `fn` with no `{ ... }` body is now rejected with `E100`, and a
@@ -154,12 +154,12 @@ interchange schema versions are maintained independently of the interpreter.
   applied: the consequences of a rule hold at every time, which the
   implementation status guide now says and a test pins. The interval needs
   both of its bounds: `valid_time [, +inf)` is rejected with `E100`.
-- A consequence of a rule whose expression is not a proposition is
-  rejected with `E210`, in a diagnostic that names the rule and the
-  consequence. `then establish 5` passed the checker, and the rule
-  established nothing. A consequence that names an entity, as in
-  `then establish Acme`, passed the checker too, and is rejected with
-  `E210` as well.
+- A consequence of a rule whose expression is a number, a string, a sum, a
+  set or a proposition under `operative` is rejected with `E210`, in a
+  diagnostic that names the rule and the consequence. `then establish 5`
+  passed the checker, and the rule established nothing. A consequence that
+  is the name of an entity, as in `then establish Acme`, passed the checker
+  too, and is rejected with `E210` as well.
 - A statement that a query body, a `goal Evaluate` block, the body of a
   `calc` or an `fn`, or a `transaction` block cannot read is rejected with
   `E100`, wherever it stands in the block. In a goal it was stepped over
@@ -206,6 +206,11 @@ interchange schema versions are maintained independently of the interpreter.
   length of a run of blank lines. A module with 20,000 blank lines between
   two declarations took about ten seconds to check; it is now checked in
   a fraction of a second.
+- `fidryn check` reads a long set literal of comparisons such as
+  `{x < y, x < y}` faster, and such a literal no longer uses the stack up.
+  A `calc` that returns 3,000 of them took about five seconds to check; it
+  now takes about a third of a second. One of 65,000 ended the process
+  with a stack overflow; it is now rejected with `E100`.
 - Where a type is missing after the `:` of a parameter or of a record
   field, or after the `->` of a result, the message is "expected a type",
   as it is after the `:` of an entity. It read "expected type" there.

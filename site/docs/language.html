@@ -403,20 +403,24 @@ three differences. A line break inside its parentheses, brackets or
 braces does not end it. A prefix word at the end of a line does not carry
 it into the next line. And it ends after the <code>}</code> that closes its
 outermost brace, unless a continuation follows.</p>
-<p>A declaration does not go on into the declaration below it. A keyword
+<p>A declaration does not go on into the declaration below it. That does
+not hold where the header of a <code>query</code>, an <code>fn</code> or a <code>calc</code> ends in <code>!</code>
+after the keyword, the name, the parameters or the result type, or where
+the header of an <code>import</code> or a <code>type</code> ends in <code>&lt;</code> after the keyword or
+the name: the declaration on the next line that has a token is read as
+part of the header, and the module is rejected with <code>E100</code>. A keyword
 that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is rejected with
 <code>E100</code> when its statement ends with it: the name is not read from the
 next line. It is rejected as well when the token after it is not a name,
-as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>. The header
-keywords <code>jurisdiction</code>, <code>effective_at</code>, <code>recorded_at</code> and
-<code>outside_scope</code> are rejected with <code>E100</code> in the same way when the
-statement ends with the keyword: the value is not read from the next
-line. <code>source_snapshot</code> and <code>source_manifest</code> do read a string that
-stands on the next line, and are rejected with <code>E100</code> when none stands
-there. And the header of a declaration whose line ends in <code>:</code>, <code>-&gt;</code> or
-<code>=</code>, outside parentheses, brackets and braces, is rejected with <code>E100</code>
-when the next line that has a token begins with a declaration keyword,
-although the first case above would carry the header into that line.
+as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>. The six header
+keywords, <code>jurisdiction</code>, <code>source_snapshot</code>, <code>source_manifest</code>,
+<code>effective_at</code>, <code>recorded_at</code> and <code>outside_scope</code>, are rejected with
+<code>E100</code> in the same way when the statement ends with the keyword: the
+value is not read from the next line. And the header of a declaration
+whose line ends in <code>:</code>, <code>-&gt;</code> or <code>=</code>, outside parentheses, brackets and
+braces, is rejected with <code>E100</code> when the next line that has a token
+begins with a declaration keyword, although the first case above would
+carry the header into that line.
 There is one exception: below the header of a <code>for_all</code> or an <code>exists</code>
 that ends in <code>:</code>, a line that begins with <code>for_all</code> or <code>exists</code> is the
 body of the quantifier. A type on the next line that is no such keyword
@@ -490,7 +494,7 @@ with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
 a <code>then</code> or an <code>otherwise</code> that no consequence follows, and a <code>when</code>, a
 <code>require</code> or a <code>source</code> with no expression after it. A consequence names
 a proposition: <code>then establish 5</code> is rejected with <code>E210</code>, and so is a
-consequence that names an entity. Two more lines are accepted:
+consequence that is the name of an entity. Two more lines are accepted:
 <code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
 its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever

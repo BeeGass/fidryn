@@ -22,29 +22,29 @@ with it.
 
 | Kind | Body parsed into structure | Reaches the intermediate representation | Executed | Evidence |
 | --- | --- | --- | --- | --- |
-| `query`, `fn`, `calc` | Yes. A `calc` or an `fn` with no `{ ... }` body is `E100`. A `query` with none is `E430` from the checker. A statement that a query body, a `goal Evaluate` block, the body of a `calc` or an `fn`, or a `transaction` block cannot read is `E100`, wherever it stands in the block | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:2036`, `:2490`, `:2554`, `:2148`; in `tests/integration/declaration_text.rs`, tests `a_function_with_no_body_is_e100_whatever_stands_beside_or_below_it` and `a_query_with_no_body_is_e430_whatever_stands_beside_or_below_it`; in `tests/integration/unreadable_text.rs`, test `a_statement_that_cannot_be_read_is_e100_when_it_is_the_last_of_its_block` |
-| `rule` | Yes. The body holds `when`, `then`, `otherwise`, `require`, `select` and `source` statements. Other text in it is `E100`, and so is a `then` or an `otherwise` that none of the nine verbs follows, and a `when`, a `require` or a `source` with no expression after it. A `valid_time` or `record_time` line with an interval is read, and nothing of it is kept. An interval that lacks a bound is `E100` | Guard, selection, consequences and `otherwise` fallback. A consequence whose expression is not a proposition is `E210` (see Rule verbs below). The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive (see Rule verbs below). Every consequence is given the interval of all time, whatever a `valid_time` or `record_time` line says | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-syntax/src/parser.rs:2739`, `:2795`, `:2804`, `:2813`; `crates/fidryn-check/src/lib.rs:3289`, `:3651`; `crates/fidryn-eval/src/worklist.rs:248`; in `crates/fidryn-syntax/src/parser.rs`, tests `text_in_a_rule_that_is_no_rule_statement_is_e100_and_only_it_is_stepped_over`, `a_when_a_require_or_a_source_with_nothing_after_it_is_e100`, `an_interval_of_a_rule_that_lacks_a_bound_is_e100` and `a_valid_time_or_record_time_line_of_a_rule_is_read_and_nothing_of_it_is_kept`; in `tests/integration/known_limits.rs`, tests `the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` (the two interval lines), `a_rule_basis_that_names_nothing_is_accepted` (the basis) and `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
+| `query`, `fn`, `calc` | Yes. A `calc` or an `fn` with no `{ ... }` body is `E100`. A `query` with none is `E430` from the checker. A statement that a query body, a `goal Evaluate` block, the body of a `calc` or an `fn`, or a `transaction` block cannot read is `E100`, wherever it stands in the block | Yes | Yes | `crates/fidryn-syntax/src/parser.rs:2049`, `:2503`, `:2567`, `:2161`; in `tests/integration/declaration_text.rs`, tests `a_function_with_no_body_is_e100_whatever_stands_beside_or_below_it` and `a_query_with_no_body_is_e430_whatever_stands_beside_or_below_it`; in `tests/integration/unreadable_text.rs`, test `a_statement_that_cannot_be_read_is_e100_when_it_is_the_last_of_its_block` |
+| `rule` | Yes. The body holds `when`, `then`, `otherwise`, `require`, `select` and `source` statements. Other text in it is `E100`, and so is a `then` or an `otherwise` that none of the nine verbs follows, and a `when`, a `require` or a `source` with no expression after it. A `valid_time` or `record_time` line with an interval is read, and nothing of it is kept. An interval that lacks a bound is `E100` | Guard, selection, consequences and `otherwise` fallback. A consequence whose expression does not have the form of a proposition is `E210`, and so is one that is the name of an entity (see Rule verbs below). The `from` basis is not checked and not kept. Verbs other than `establish`, `constitute`, `terminate`, `suspend` and `create` become derive (see Rule verbs below). Every consequence is given the interval of all time, whatever a `valid_time` or `record_time` line says | Derive, establish, terminate and suspend. `create` is refused with an engine error when the rule fires | `crates/fidryn-syntax/src/parser.rs:2752`, `:2808`, `:2817`, `:2826`; `crates/fidryn-check/src/lib.rs:3291`, `:3653`; `crates/fidryn-eval/src/worklist.rs:248`; in `crates/fidryn-syntax/src/parser.rs`, tests `text_in_a_rule_that_is_no_rule_statement_is_e100_and_only_it_is_stepped_over`, `a_when_a_require_or_a_source_with_nothing_after_it_is_e100`, `an_interval_of_a_rule_that_lacks_a_bound_is_e100` and `a_valid_time_or_record_time_line_of_a_rule_is_read_and_nothing_of_it_is_kept`; in `tests/integration/known_limits.rs`, tests `the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` (the two interval lines), `a_rule_basis_that_names_nothing_is_accepted` (the basis) and `the_activate_verb_is_lowered_as_derive` (`activate` is a verb the parser accepts and the checker lowers as a derive) |
 | `judgment` | Yes. An unrecognized clause is kept as text | Yes | Concurrence policies only. One with an unrecognized clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
 | `observation` | Yes. An unrecognized clause is kept as text | Yes | Yes. An unrecognized clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
-| `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3294` |
-| `effect` | Re-read from the declaration text | Name and its first operation, with parameters and result | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1823`, `:3387`; `crates/fidryn-eval/src/lib.rs:2346` |
+| `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3296` |
+| `effect` | Re-read from the declaration text | Name and its first operation, with parameters and result | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1825`, `:3389`; `crates/fidryn-eval/src/lib.rs:2346` |
 | `duty` | Re-read from the declaration text. Unknown fields are skipped | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialized path | `crates/fidryn-hir/src/body.rs:456`; `crates/fidryn-eval/src/duty.rs` |
 | `decision` | Binders are parsed. Record requirements and `returns` are re-read from the declaration text | Binders, record requirements, the first `returns` | Through `RunDecision` | `crates/fidryn-hir/src/body.rs:315`, `:326` |
 | `interpretation_family`, `nomination` | By splitting the text on keywords | Alternatives; candidate, office as text, rank. A nomination's `from` basis is dropped | Only by `UniqueOccupant` succession | `crates/fidryn-hir/src/lib.rs:935`, `:946`, `:961`; `crates/fidryn-eval/src/lib.rs:4130` |
-| `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3359`; test `an_office_keeps_none_of_its_declared_fields` |
+| `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3361`; test `an_office_keeps_none_of_its_declared_fields` |
 | `clause` | Name and parameters only | Body kept as text | Only through `EvaluateClause`, which knows two clause names (see below) | `crates/fidryn-eval/src/lib.rs:4791`, `:4986` |
 | `legal_act` | Name and parameters only. Unknown fields are accepted | Nothing. The checker types a call of its name as a `LegalAction` | Nothing | `crates/fidryn-hir/src/lib.rs:684`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
-| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:1187`; `crates/fidryn-hir/src/lib.rs:728`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
-| `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2207` |
-| `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:376`; `crates/fidryn-check/src/lib.rs:3256`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
-| `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2249`, `:2604`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
-| `verify` | The block is read as a list of fields, and nine words begin one. The expression after `assert`, and the expression of a field that begins with `for_all` or `exists`, is an assertion, in the order written. A `bounds` field is read for three numbers, and nothing but a `bounds` field sets them. `interpretations`, `judgments`, `choices` and `assuming` fields are recognized and not read. A field that begins with `for`, which is a `for every` line, and an `assert` with no expression are kept as text, in an assertion that cannot be decided. "Where a verify field ends", below, says where a field ends, what becomes of a line the block does not recognize, and which two limits remain | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that cannot be decided is unresolved, and the property is `unknown` unless another assertion is false. That holds for an assertion that needs a query or a proposition, and for one kept as text. A block with no assertion is `unknown` | `crates/fidryn-syntax/src/parser.rs:391`, `:2266`; `crates/fidryn-verify/src/property.rs:62`, `:123`, `:172`, `:206`; in `tests/integration/verify_blocks.rs`, tests `two_comparisons_on_consecutive_lines_are_two_assertions`, `a_false_quantifier_line_is_a_counterexample`, `a_top_level_exists_line_is_checked_as_an_assertion`, `an_assuming_line_is_recognized_and_not_read`, `a_for_every_line_leaves_the_property_unknown`, `a_block_with_no_assertion_is_unknown_whatever_its_comments_say` and `the_bounds_come_only_from_a_bounds_field` |
+| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:1200`; `crates/fidryn-hir/src/lib.rs:728`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2209` |
+| `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:376`; `crates/fidryn-check/src/lib.rs:3258`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
+| `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2251`, `:2606`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
+| `verify` | The block is read as a list of fields, and nine words begin one. The expression after `assert`, and the expression of a field that begins with `for_all` or `exists`, is an assertion, in the order written. A `bounds` field is read for three numbers, and nothing but a `bounds` field sets them. `interpretations`, `judgments`, `choices` and `assuming` fields are recognized and not read. A field that begins with `for`, which is a `for every` line, and an `assert` with no expression are kept as text, in an assertion that cannot be decided. "Where a verify field ends", below, says where a field ends, what becomes of a line the block does not recognize, and which two limits remain | Yes | Closed formulas only: literals, arithmetic, comparisons, Boolean connectives, and quantifiers over a literal set or bounded synthetic entities. An assertion that cannot be decided is unresolved, and the property is `unknown` unless another assertion is false. That holds for an assertion that needs a query or a proposition, and for one kept as text. A block with no assertion is `unknown` | `crates/fidryn-syntax/src/parser.rs:411`, `:2279`; `crates/fidryn-verify/src/property.rs:62`, `:123`, `:172`, `:206`; in `tests/integration/verify_blocks.rs`, tests `two_comparisons_on_consecutive_lines_are_two_assertions`, `a_false_quantifier_line_is_a_counterexample`, `a_top_level_exists_line_is_checked_as_an_assertion`, `an_assuming_line_is_recognized_and_not_read`, `a_for_every_line_leaves_the_property_unknown`, `a_block_with_no_assertion_is_unknown_whatever_its_comments_say` and `the_bounds_come_only_from_a_bounds_field` |
 
 Unknown fields. The parser rejects an unknown field inside a `source`
 block and inside the request of a judgment's `otherwise suspend NeedJudgment
-{ ... }` (`crates/fidryn-syntax/src/parser.rs:2005`, `:1605`). In a `rule` it
+{ ... }` (`crates/fidryn-syntax/src/parser.rs:2018`, `:1618`). In a `rule` it
 rejects text that is none of the statements the table lists for a rule
-(`crates/fidryn-syntax/src/parser.rs:2739`). In the other declarations whose
+(`crates/fidryn-syntax/src/parser.rs:2752`). In the other declarations whose
 body is a list of fields, an unknown field is skipped without a diagnostic.
 In a `judgment` or an `observation`, an unrecognized clause is kept and
 refused at run time, as the table says. In a `verify` block, a line the
@@ -59,7 +59,7 @@ Where a verify field ends. The tests named here are in
 - A field ends where its statement ends. An `assert`, `for_all`, `exists`
   or `bounds` field, and a field that is not read, ends earlier where the
   next field begins: it is read or stepped over as if a `;` stood there
-  (`crates/fidryn-syntax/src/parser.rs:2412`, `:2433`; parser test
+  (`crates/fidryn-syntax/src/parser.rs:2425`, `:2446`; parser test
   `a_verify_field_is_read_as_if_a_semicolon_stood_where_the_next_field_begins`).
 - The word `assert` begins a field wherever it stands
   (`two_assertions_on_one_line_are_two_assertions`,
@@ -128,8 +128,8 @@ Where a verify field ends. The tests named here are in
 - The bounds come from a `bounds` field and from nowhere else. The parser
   records the field as the text of its tokens and leaves out every
   comment, wherever it stands: inside the field, after it on its line, or
-  on the lines below it (`crates/fidryn-syntax/src/parser.rs:2308`,
-  `:2376`; parser test
+  on the lines below it (`crates/fidryn-syntax/src/parser.rs:2321`,
+  `:2389`; parser test
   `a_bounds_field_is_recorded_as_the_text_of_its_tokens`). The numbers are
   read from those tokens, so no comment sets a number and the contents of
   a string are not read (`crates/fidryn-hir/src/lib.rs:1066`). Each number
@@ -162,7 +162,7 @@ Rule verbs. The parser recognizes nine verbs after `then`: `establish`,
 `defeat` and `make` (`crates/fidryn-syntax/src/parser.rs:46`). `establish`
 and `constitute` both establish, and the last four all derive. A `then` or
 an `otherwise` that none of these verbs follows is rejected with `E100`
-(`crates/fidryn-syntax/src/parser.rs:2666`, `:2674`; test
+(`crates/fidryn-syntax/src/parser.rs:2679`, `:2687`; test
 `a_then_or_an_otherwise_with_no_consequence_is_e100` in that file).
 
 The expression after the verb names a proposition. A consequence whose
@@ -171,14 +171,14 @@ a proposition under `operative`, is rejected with `E210` in a diagnostic
 that names the rule and the consequence
 (`crates/fidryn-hir/src/lib.rs:519`; test
 `a_consequence_that_is_not_a_proposition_is_e210_and_names_the_rule_and_the_consequence`
-in that file). So is a consequence that names an entity
-(`crates/fidryn-check/src/lib.rs:498`; test
+in that file). So is a consequence that is the name of an entity
+(`crates/fidryn-check/src/lib.rs:461`; test
 `a_consequence_that_names_an_entity_is_e210` in that file). The test
 `a_consequence_that_is_not_a_proposition_is_e210_and_names_the_rule_and_the_consequence`
 in `tests/integration/unreadable_text.rs` takes a number, a string and
 the name of an entity through the whole compiler. A capitalized name with
 no arguments that the module does not declare is a proposition to the
-checker (`crates/fidryn-check/src/lib.rs:1234`): `then establish Flag`
+checker (`crates/fidryn-check/src/lib.rs:1236`): `then establish Flag`
 passes with no `Flag` declared, and so does `operative Flag()` in a
 query.
 
@@ -190,7 +190,7 @@ clause. Only `UniqueOccupant` succession reads the selection
 
 - Integer, decimal and same-currency money arithmetic work. Integer
   division truncates. Adding amounts in two currencies is `E210`
-  (`crates/fidryn-check/src/lib.rs:1302`, `crates/fidryn-eval/src/money.rs:7`).
+  (`crates/fidryn-check/src/lib.rs:1304`, `crates/fidryn-eval/src/money.rs:7`).
 - A duration cannot be added to a time: `start + 30 days` is `E210` (test
   `a_duration_cannot_be_added_to_a_time_in_an_expression`). A date literal
   such as `2026-12-31` has no type in an expression (test
@@ -199,7 +199,7 @@ clause. Only `UniqueOccupant` succession reads the selection
   (`crates/fidryn-eval/src/lib.rs:3067`).
 - The duration units are `days`, `calendar_days`, `counted_days`,
   `working_days`, `hours`, `minutes` and `seconds`. There are no month or
-  year units (`crates/fidryn-check/src/lib.rs:1689`). A duty's deadline
+  year units (`crates/fidryn-check/src/lib.rs:1691`). A duty's deadline
   counts `days`, `calendar_days` and `counted_days` alike, as 24 hours each.
   `working_days` needs a closed `working_days` closure and a
   `working_days_holidays` fact on the case (`crates/fidryn-eval/src/duty.rs:858`).
@@ -216,7 +216,7 @@ clause. Only `UniqueOccupant` succession reads the selection
   that ends in `require` is rejected with `E210` (test
   `a_query_that_ends_in_a_require_has_an_untyped_result`).
 - In `require determined P using Determine`, the `using` clause is parsed
-  and discarded (`crates/fidryn-syntax/src/parser.rs:2184`). Any
+  and discarded (`crates/fidryn-syntax/src/parser.rs:2197`). Any
   determination of `P` on the case that names a protocol and a decider
   answers it (`crates/fidryn-eval/src/worklist.rs:908`). A `using` with no
   protocol name in its statement is `E100` (test
@@ -300,7 +300,7 @@ error `fuel exhausted`.
   more than 128 levels deep or of more than 10,000 nodes, type arguments
   nested more than 128 deep, in a type that it reads and in a call, and a
   source file over 8 MiB or 262,144 tokens
-  (`crates/fidryn-syntax/src/parser.rs:59`, `:1875`, `:3674`; parser
+  (`crates/fidryn-syntax/src/parser.rs:59`, `:1888`, `:3669`; parser
   tests `type_arguments_of_a_call_nested_deeper_than_the_limit_are_e100`
   and `a_chain_of_else_if_longer_than_the_limit_is_e100`). Each `else if`
   of a chain counts as a level.

@@ -122,15 +122,41 @@ fn a_consequence_that_is_not_a_proposition_is_e210_and_names_the_rule_and_the_co
     // The name of an entity where the proposition should stand. A name with
     // no arguments has the shape of a proposition, so the checker reports
     // it, by its type.
-    for written in ["(Acme)", "Acme"] {
-        assert_eq!(
-            rejected(&rule(&format!("then establish {written}"))),
-            one(
-                DiagnosticCode::E210,
-                "`establish Acme` in rule `Exemption` requires a proposition, not LegalPerson"
-            ),
-            "{written}"
-        );
+    assert_eq!(
+        rejected(&rule("then establish (Acme)")),
+        one(
+            DiagnosticCode::E210,
+            "`establish Acme` in rule `Exemption` requires a proposition, not LegalPerson"
+        )
+    );
+    // That holds after each of the nine verbs, `create` among them, in the
+    // `then` list and in the `otherwise` list.
+    for verb in [
+        "establish",
+        "constitute",
+        "terminate",
+        "suspend",
+        "create",
+        "derive",
+        "activate",
+        "defeat",
+        "make",
+    ] {
+        for consequences in [
+            format!("then {verb} Acme"),
+            format!("then establish Exempt(Acme)\n        otherwise {verb} Acme"),
+        ] {
+            assert_eq!(
+                rejected(&rule(&consequences)),
+                one(
+                    DiagnosticCode::E210,
+                    &format!(
+                        "`{verb} Acme` in rule `Exemption` requires a proposition, not LegalPerson"
+                    )
+                ),
+                "{consequences}"
+            );
+        }
     }
     // The same rule with a proposition compiles.
     let source = format!(

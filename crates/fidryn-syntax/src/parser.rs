@@ -9,7 +9,7 @@ use crate::syntax::{FidrynLanguage, SyntaxKind};
 use fidryn_core::Span;
 use fidryn_core::{Diagnostic, DiagnosticCode};
 use rowan::GreenNodeBuilder;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 const CONTINUATION: &[&str] = &[
     "and",
@@ -185,6 +185,7 @@ pub fn parse_file(source: &str) -> Parse {
         judgment_body: false,
         brace_opens_enclosing_block: false,
         observation_body: false,
+        angle_scans: HashMap::new(),
     };
     let module = p.parse_module();
     let green = p.take_green();
@@ -335,6 +336,11 @@ struct Parser<'a> {
     /// to the block.
     brace_opens_enclosing_block: bool,
     observation_body: bool,
+    /// What `scan_type_arguments` has found for a `<`, by the number of
+    /// tokens the parser could see and the index of the `<` token.
+    /// `with_tokens_until` changes what the parser can see, and what a scan
+    /// found under one view of the tokens does not hold under another.
+    angle_scans: HashMap<(usize, usize), AngleScan>,
 }
 
 #[derive(Clone, Copy)]
@@ -358,14 +364,28 @@ enum Skip {
 }
 
 /// What stands where type arguments may begin.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum TypeArgs {
     /// Type arguments, from `<` to the `>` that closes them.
     Read,
-    /// Type arguments nested deeper than the limit of 128.
+    /// Type arguments that a `>` closes and that are nested deeper than the
+    /// limit of 128.
     TooDeep,
     /// Something else. A `<` there is a comparison.
     Absent,
+}
+
+/// What a scan for type arguments found at one `<`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum AngleScan {
+    /// No `>` closes what the `<` opens: before one came, the scan met a
+    /// token that a list of type arguments does not hold, or the end of the
+    /// tokens the parser can see.
+    Open,
+    /// A `>` closes it. `after` is the index of the token after that `>`,
+    /// and `depth` says how deep the arguments nest: 1 when none of them has
+    /// arguments of its own.
+    Closed { after: usize, depth: usize },
 }
 
 /// What a verify block does with a field, by the word the field begins with.
@@ -788,15 +808,6 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn checkpoint(&self) -> (usize, usize) {
-        (self.idx, self.diagnostics.len())
-    }
-
-    fn restore(&mut self, cp: (usize, usize)) {
-        self.idx = cp.0;
-        self.diagnostics.truncate(cp.1);
-    }
-
     fn start_node(&mut self, kind: SyntaxKind) {
         if kind != SyntaxKind::MODULE {
             self.flush_to_idx();
@@ -1139,7 +1150,16 @@ impl<'a> Parser<'a> {
         self.start_node(SyntaxKind::HEADER);
         let start = self.bump();
         let value_start = self.peek().start;
-        let value = if matches!(
+        let value = if self.keyword_stands_alone() {
+            // The keyword has no value in its statement. The line below is
+            // not read as one: it stays a declaration of its own. That holds
+            // for a keyword that takes a string as well: a string does not
+            // continue a line.
+            let message = format!("expected a value after `{}`", self.text(start));
+            self.error_at_last_read(&message);
+            self.eat_semi();
+            String::new()
+        } else if matches!(
             kind,
             HeaderKind::SourceSnapshot | HeaderKind::SourceManifest
         ) {
@@ -1157,13 +1177,6 @@ impl<'a> Parser<'a> {
             }
             self.eat_semi();
             value
-        } else if self.keyword_stands_alone() {
-            // The keyword has no value in its statement. The line below is
-            // not read as one: it stays a declaration of its own.
-            let message = format!("expected a value after `{}`", self.text(start));
-            self.error_at_last_read(&message);
-            self.eat_semi();
-            String::new()
         } else {
             self.finish_header();
             self.src_slice(value_start, self.last_end(start.end))
@@ -3638,78 +3651,149 @@ impl<'a> Parser<'a> {
 
     /// What follows a name where the type arguments of a call may stand:
     /// `Read` when type arguments stand there with `(` or `{` after them,
-    /// `TooDeep` when they are nested deeper than the limit. The cursor is
-    /// left where it was.
+    /// and `TooDeep` when such arguments are nested deeper than the limit.
+    /// A `<` that no `>` closes begins no type arguments, however far the
+    /// scan for one runs: it is a comparison. The cursor is left where it
+    /// was.
     fn call_generics_ahead(&mut self) -> TypeArgs {
         if self.peek().kind != TokenKind::Lt {
             return TypeArgs::Absent;
         }
-        let cp = self.checkpoint();
-        let found = match self.try_generic_args(1) {
-            TypeArgs::Read if matches!(self.peek().kind, TokenKind::LParen | TokenKind::LBrace) => {
-                TypeArgs::Read
+        // `peek` has left the cursor at the `<`.
+        match self.scan_type_arguments(self.idx) {
+            AngleScan::Closed { after, depth }
+                if self.significant_from(after).is_some_and(|next| {
+                    matches!(next.kind, TokenKind::LParen | TokenKind::LBrace)
+                }) =>
+            {
+                if depth > MAX_EXPRESSION_DEPTH {
+                    TypeArgs::TooDeep
+                } else {
+                    TypeArgs::Read
+                }
             }
-            TypeArgs::TooDeep => TypeArgs::TooDeep,
             _ => TypeArgs::Absent,
-        };
-        self.restore(cp);
-        found
+        }
     }
 
+    /// Steps over the type arguments at the cursor, which
+    /// `call_generics_ahead` has found there, and returns their text.
     fn consume_generic_args_text(&mut self) -> String {
         let start = self.peek().start;
-        let _ = self.try_generic_args(1);
+        if let AngleScan::Closed { after, .. } = self.scan_type_arguments(self.idx) {
+            self.idx = after;
+            while Self::is_trivia(self.peek_raw().kind) {
+                self.idx += 1;
+            }
+        }
         self.src_slice(start, self.last_end(start))
     }
 
-    /// Steps over type arguments when they stand at the cursor. `depth` is
-    /// 1 for arguments that stand in no others. This function and
-    /// `try_skip_type` call each other once for each level of nesting, so
-    /// the depth has the limit that expressions and types have elsewhere:
-    /// with none, deeply nested arguments used the stack up.
-    fn try_generic_args(&mut self, depth: usize) -> TypeArgs {
-        if self.peek().kind != TokenKind::Lt {
-            return TypeArgs::Absent;
-        }
-        if depth > MAX_EXPRESSION_DEPTH {
-            return TypeArgs::TooDeep;
-        }
-        self.bump();
-        loop {
-            match self.try_skip_type(depth) {
-                TypeArgs::Read => {}
-                other => return other,
-            }
-            if self.peek().kind == TokenKind::Comma {
-                self.bump();
-                continue;
-            }
-            if self.peek().kind == TokenKind::Gt {
-                self.bump();
-                return TypeArgs::Read;
-            }
-            return TypeArgs::Absent;
-        }
+    /// The index of the first token at or after `index` that is no white
+    /// space, comment or newline, when the parser can see it and it is of
+    /// `kind`.
+    fn index_of_kind_from(&self, index: usize, kind: TokenKind) -> Option<usize> {
+        let at = *self.lines.significant_from.get(index)? as usize;
+        (self.tokens.get(at)?.kind == kind).then_some(at)
     }
 
-    /// Steps over one type among type arguments at nesting `depth`: a name,
-    /// which may have type arguments of its own.
-    fn try_skip_type(&mut self, depth: usize) -> TypeArgs {
-        if !self.at_name() {
-            return TypeArgs::Absent;
+    /// The same for a token that can be a name or a part of one.
+    fn index_of_name_from(&self, index: usize) -> Option<usize> {
+        self.index_of_kind_from(index, TokenKind::Ident)
+            .or_else(|| self.index_of_kind_from(index, TokenKind::DurationUnit))
+    }
+
+    /// What the `<` at token index `open` begins: type arguments that a `>`
+    /// closes, or not.
+    ///
+    /// Type arguments are `<`, one or more types separated by commas, and
+    /// `>`. A type is a name, which may have parts after `.` and type
+    /// arguments of its own. Line ends do not count.
+    ///
+    /// The scan does not call itself for the arguments of a type. It keeps
+    /// the `<` that are open in a list, so no depth of nesting uses the
+    /// stack up, and it reads on to the `>` that closes `open` before
+    /// anything is said about depth.
+    ///
+    /// What the scan finds for each `<` it passes is kept, so that the
+    /// parser, which asks at each `<` in the order of the source, does not
+    /// scan the same stretch of tokens again for each of them. In
+    /// `g(x < y, x < y)` the scan that begins at the first `<` passes the
+    /// second one, because `x <` after a comma looks like a type with
+    /// arguments, and it ends at the `)` with both open. A scan from the
+    /// second `<` would pass the same tokens in the same way and end at the
+    /// same `)`, so its answer is known. Without that, each comparison of
+    /// such a list scanned on to the end of the list, and the time grew
+    /// with the square of its length.
+    ///
+    /// What is kept is kept for the tokens the parser can see now. A scan
+    /// ends where they end, so under another view of the tokens the same `<`
+    /// can have another answer.
+    fn scan_type_arguments(&mut self, open: usize) -> AngleScan {
+        let view = self.tokens.len();
+        if let Some(&known) = self.angle_scans.get(&(view, open)) {
+            return known;
         }
-        self.bump();
-        while self.peek().kind == TokenKind::Dot {
-            self.bump();
-            if !self.at_name() {
-                return TypeArgs::Absent;
+        // Each `<` that is open, with the depth of the deepest arguments
+        // that have closed inside it.
+        let mut opened = vec![(open, 0usize)];
+        let mut at = open + 1;
+        // True where a type must stand: after `<` and after `,`.
+        let mut type_expected = true;
+        loop {
+            if type_expected {
+                let Some(name) = self.index_of_name_from(at) else {
+                    break;
+                };
+                at = name + 1;
+                let mut whole = true;
+                while let Some(dot) = self.index_of_kind_from(at, TokenKind::Dot) {
+                    match self.index_of_name_from(dot + 1) {
+                        Some(part) => at = part + 1,
+                        None => {
+                            whole = false;
+                            break;
+                        }
+                    }
+                }
+                if !whole {
+                    break;
+                }
+                match self.index_of_kind_from(at, TokenKind::Lt) {
+                    Some(nested) => {
+                        opened.push((nested, 0));
+                        at = nested + 1;
+                    }
+                    None => type_expected = false,
+                }
+            } else if let Some(comma) = self.index_of_kind_from(at, TokenKind::Comma) {
+                at = comma + 1;
+                type_expected = true;
+            } else if let Some(close) = self.index_of_kind_from(at, TokenKind::Gt) {
+                let Some((closed, inner)) = opened.pop() else {
+                    break;
+                };
+                at = close + 1;
+                let found = AngleScan::Closed {
+                    after: at,
+                    depth: inner + 1,
+                };
+                self.angle_scans.insert((view, closed), found);
+                match opened.last_mut() {
+                    Some(outer) => outer.1 = outer.1.max(inner + 1),
+                    None => return found,
+                }
+            } else {
+                break;
             }
-            self.bump();
         }
-        if self.peek().kind == TokenKind::Lt {
-            return self.try_generic_args(depth + 1);
+        // The scan met a token that no type arguments hold, or the end of the
+        // tokens. Each `<` that is still open stays open: a scan from it
+        // ends at the same place.
+        for (unclosed, _) in opened {
+            self.angle_scans.insert((view, unclosed), AngleScan::Open);
         }
-        TypeArgs::Read
+        AngleScan::Open
     }
 
     /// Steps over what is left of the current statement. Call this only after
@@ -5538,7 +5622,7 @@ module M version "0.1.0" {
             .iter()
             .map(|diagnostic| diagnostic.message.as_str())
             .collect();
-        assert_eq!(messages, ["expected a JSON string"]);
+        assert_eq!(messages, ["expected a value after `source_snapshot`"]);
         let kinds: Vec<&str> = parsed
             .module()
             .expect("a module")
@@ -7135,6 +7219,16 @@ module M version "0.1.0" {
             None,
             &["expected a value after `outside_scope`"],
         ),
+        (
+            "source_snapshot",
+            None,
+            &["expected a value after `source_snapshot`"],
+        ),
+        (
+            "source_manifest",
+            None,
+            &["expected a value after `source_manifest`"],
+        ),
         ("import M version \"1\"", Some("M"), &[]),
         ("import M", Some("M"), &[]),
         ("type T = Int", Some("T"), &[]),
@@ -8379,32 +8473,93 @@ module M version "0.1.0" {
 
     #[test]
     fn a_header_keyword_reads_no_value_from_the_line_below_it() {
-        // The statement of the keyword ends with it, so the word on the
-        // line below is not its value.
-        let parsed = parse_file(&wrap_module("jurisdiction\nTest\nproposition Witness()"));
-        assert_eq!(
-            messages(&parsed),
-            [
-                "expected a value after `jurisdiction`",
-                "unknown declaration `Test`"
-            ]
-        );
-        assert_eq!(
-            item_names(&parsed),
-            [("jurisdiction", None), ("proposition", Some("Witness"))]
-        );
-        // A `{` continues the line above it, so a block on the next line is
-        // the value.
-        let parsed = parse_body("outside_scope\n{ everything_else }\nproposition Witness()");
-        let module = parsed.module().expect("a module");
-        match module.items.first() {
-            Some(Item::Header(header)) => assert_eq!(header.value, "{ everything_else }"),
+        let value_of = |parsed: &Parse| match parsed.module().expect("a module").items.first() {
+            Some(Item::Header(header)) => header.value.clone(),
             other => panic!("{other:?}"),
+        };
+        // The statement of the keyword ends with it, so what stands on a
+        // line below is not its value: directly below it, below a blank
+        // line or below a comment line. That holds for each of the six
+        // header keywords, the two that take a string among them: a string
+        // does not continue a line. The keyword is rejected, and the line
+        // below is read on its own: a word as a declaration that is not
+        // known, anything else as no declaration.
+        for (keyword, below, stray) in [
+            ("jurisdiction", "Test", "unknown declaration `Test`"),
+            ("source_snapshot", "\"p\"", "expected declaration"),
+            ("source_manifest", "\"p\"", "expected declaration"),
+            ("effective_at", "2026-09-17", "expected declaration"),
+            (
+                "recorded_at",
+                "2026-09-17T12:00:00Z",
+                "expected declaration",
+            ),
+            (
+                "outside_scope",
+                "everything_else",
+                "unknown declaration `everything_else`",
+            ),
+        ] {
+            let alone = format!("expected a value after `{keyword}`");
+            for gap in ["\n", "\n\n", "\n// the value\n"] {
+                let parsed = parse_file(&wrap_module(&format!(
+                    "{keyword}{gap}{below}\nproposition Witness()"
+                )));
+                assert_eq!(
+                    messages(&parsed),
+                    [alone.as_str(), stray],
+                    "{keyword}{gap:?}"
+                );
+                assert_eq!(
+                    item_names(&parsed),
+                    [(keyword, None), ("proposition", Some("Witness"))],
+                    "{keyword}{gap:?}"
+                );
+                assert_eq!(value_of(&parsed), "", "{keyword}{gap:?}");
+            }
         }
+        // A `{` continues the line above it, so a block on the next line is
+        // the value. Below a blank line or a comment line it continues
+        // nothing, and the keyword has no value.
+        let parsed = parse_body("outside_scope\n{ everything_else }\nproposition Witness()");
+        assert_eq!(value_of(&parsed), "{ everything_else }");
         assert_eq!(
             item_names(&parsed),
             [("outside_scope", None), ("proposition", Some("Witness"))]
         );
+        for gap in ["\n\n", "\n// the value\n"] {
+            let parsed = parse_file(&wrap_module(&format!(
+                "outside_scope{gap}{{ everything_else }}\nproposition Witness()"
+            )));
+            assert_eq!(
+                messages(&parsed),
+                [
+                    "expected a value after `outside_scope`",
+                    "expected declaration"
+                ],
+                "{gap:?}"
+            );
+            assert_eq!(value_of(&parsed), "", "{gap:?}");
+        }
+        for keyword in ["source_snapshot", "source_manifest"] {
+            // A string in the statement of the keyword is its value, as
+            // before.
+            let parsed = parse_body(&format!("{keyword} \"p\"\nproposition Witness()"));
+            assert_eq!(value_of(&parsed), "\"p\"", "{keyword}");
+            // Text in the statement that is no string is reported as before,
+            // at the place where the string should stand.
+            let parsed = parse_file(&wrap_module(&format!(
+                "{keyword} Test\nproposition Witness()"
+            )));
+            assert_eq!(
+                messages(&parsed),
+                [
+                    "expected a JSON string",
+                    "unexpected value after header string"
+                ],
+                "{keyword}"
+            );
+        }
     }
 
     #[test]
@@ -8835,6 +8990,182 @@ module M version "0.1.0" {
         assert_eq!(short.1.len(), 2);
         assert_eq!(long, short);
     }
+
+    /// The three places that hold a list of expressions separated by
+    /// commas: the arguments of a call, the elements of a set literal and
+    /// the steps of a transaction block.
+    const LIST_PLACES: [&str; 3] = ["call", "set", "transaction"];
+    const TOO_DEEP: &str = "type nesting exceeds the limit of 128";
+    const TREE_TOO_LARGE: &str = "expression tree exceeds depth or node budget";
+
+    /// A `return` of `count` times `x`, `operator`, `y`, separated by commas,
+    /// in one of `LIST_PLACES`. `last` is one more element after them.
+    fn comparison_list(place: &str, operator: &str, count: usize, last: Option<&str>) -> String {
+        let mut items = vec![format!("x {operator} y"); count];
+        items.extend(last.map(str::to_owned));
+        let items = items.join(", ");
+        match place {
+            "call" => format!("return g({items})"),
+            "set" => format!("return {{{items}}}"),
+            "transaction" => format!("return transaction {{ {items} }}"),
+            other => panic!("{other}"),
+        }
+    }
+
+    /// The tree of `comparison_list` when each element is read as the
+    /// comparison `op` of `x` and `y`.
+    fn comparison_tree(place: &str, op: BinOp, count: usize, last: Option<Expr>) -> Expr {
+        let mut items = vec![binary(op, ident("x"), ident("y")); count];
+        items.extend(last);
+        match place {
+            "call" => call("g", items),
+            "set" => Expr::Set(items),
+            "transaction" => Expr::Apply {
+                callee: Box::new(ident("transaction")),
+                args: items,
+            },
+            other => panic!("{other}"),
+        }
+    }
+
+    #[test]
+    fn a_long_list_of_comparisons_is_read_as_comparisons() {
+        // In `g(x < y, x < y)` the scan for type arguments that begins at the
+        // first `<` goes on over each `x <` after a comma, as if arguments
+        // nested there. No `>` closes them, so the list holds comparisons,
+        // however long it is. A scan that gave up at 128 levels rejected a
+        // list of 129.
+        for place in LIST_PLACES {
+            for count in [129, 300] {
+                let read = calc_body(&comparison_list(place, "<", count, None));
+                let tree = comparison_tree(place, BinOp::Lt, count, None);
+                assert!(
+                    read == (Vec::new(), Some(tree)),
+                    "{place}, {count} comparisons: {:?}",
+                    read.0
+                );
+            }
+            // 5,000 comparisons are more than the tree of one expression may
+            // hold. They get the diagnostics of the same list written with
+            // `<=`, which no scan for type arguments reads, and none of them
+            // names type nesting.
+            let read = calc_body(&comparison_list(place, "<", 5_000, None)).0;
+            let control = calc_body(&comparison_list(place, "<=", 5_000, None)).0;
+            assert!(
+                control.iter().any(|message| message == TREE_TOO_LARGE),
+                "{place}: {control:?}"
+            );
+            assert_eq!(read, control, "{place}, 5,000 comparisons");
+        }
+    }
+
+    #[test]
+    fn type_arguments_after_a_list_of_comparisons_are_read_on_their_own() {
+        for (place, after_too_deep) in [
+            // After type arguments that are too deep the rest of the
+            // statement is stepped over, and in a call that takes the `)`
+            // of the call with it.
+            ("call", vec!["expected `)`"]),
+            ("set", Vec::new()),
+            ("transaction", Vec::new()),
+        ] {
+            // A call with type arguments is the last element, after 200
+            // comparisons. Its arguments close and `(` follows them, so they
+            // are type arguments, and the comparisons before it stay
+            // comparisons.
+            let read = calc_body(&comparison_list(place, "<", 200, Some("h<A>(1)")));
+            let last = call("h<A>", vec![Expr::Int(1)]);
+            let tree = comparison_tree(place, BinOp::Lt, 200, Some(last));
+            assert!(read == (Vec::new(), Some(tree)), "{place}: {:?}", read.0);
+            // The same call with type arguments nested 129 deep. They close
+            // too, so they are type arguments that are deeper than the
+            // limit: one diagnostic, at that call and at none of the
+            // comparisons.
+            let deep = format!("h<{}A{}(1)", "A<".repeat(128), ">".repeat(129));
+            let read = calc_body(&comparison_list(place, "<", 200, Some(&deep))).0;
+            let mut expected = vec![TOO_DEEP];
+            expected.extend(after_too_deep);
+            assert_eq!(read, expected, "{place}");
+        }
+        // One comparison before type arguments nested as deep as the limit
+        // allows does not make them too deep.
+        let deepest = format!("h<{}A{}(1)", "A<".repeat(127), ">".repeat(128));
+        let read = calc_body(&comparison_list("call", "<", 1, Some(&deepest))).0;
+        assert_eq!(read, Vec::<String>::new());
+    }
+
+    #[test]
+    fn a_list_of_comparisons_as_long_as_the_budgets_allow_is_read_in_time() {
+        // A set literal of `count` comparisons written with no white space,
+        // which is four tokens for each element, and a declaration below it.
+        fn module(count: usize) -> String {
+            let list = vec!["x<y"; count].join(",");
+            format!(
+                "module X version \"0.1.0\" {{\ncalc f() -> Int {{ return {{{list}}} }}\nproposition Witness()\n}}\n"
+            )
+        }
+        fn read(count: usize) -> (Vec<String>, Vec<(String, Option<String>)>) {
+            let parsed = parse_file(&module(count));
+            let diagnostics = messages(&parsed).into_iter().map(str::to_owned).collect();
+            let items = item_names(&parsed)
+                .into_iter()
+                .map(|(keyword, name)| (keyword.to_owned(), name.map(str::to_owned)))
+                .collect();
+            (diagnostics, items)
+        }
+        let both = vec![
+            ("calc".to_owned(), Some("f".to_owned())),
+            ("proposition".to_owned(), Some("Witness".to_owned())),
+        ];
+
+        // The tree of one expression holds 10,000 nodes: the set and 3,333
+        // comparisons of three nodes each. That list is read with no
+        // diagnostic.
+        let parsed = parse_file(&module(3_333));
+        assert_eq!(messages(&parsed), Vec::<&str>::new());
+        assert!(
+            first_decl(&parsed).expr == Some(comparison_tree("set", BinOp::Lt, 3_333, None)),
+            "the tree of 3,333 comparisons"
+        );
+        // One comparison more is too many for the tree, and is rejected for
+        // that. The declaration below is read.
+        let too_large = read(3_334);
+        assert!(
+            too_large.0.iter().any(|message| message == TREE_TOO_LARGE),
+            "{:?}",
+            too_large.0
+        );
+        assert!(!too_large.0.iter().any(|message| message == TOO_DEEP));
+        assert_eq!(too_large.1, both);
+
+        // The longest list the token budget holds: one element more, and the
+        // source is refused before it is parsed.
+        let wrapper = lex_bounded(&module(0), MAX_SOURCE_TOKENS)
+            .expect("the module with an empty set")
+            .len();
+        let longest = (MAX_SOURCE_TOKENS - wrapper + 1) / 4;
+        assert!(longest > 65_000, "{longest}");
+        assert!(lex_bounded(&module(longest), MAX_SOURCE_TOKENS).is_ok());
+        assert!(lex_bounded(&module(longest + 1), MAX_SOURCE_TOKENS).is_err());
+        // Its parse runs on a thread, and the test fails when it has not
+        // returned after 20 seconds. The bound is there to catch a return of
+        // the scan that began again at each `<` of the list and ran to the
+        // end of it. That scan called itself once for each comparison, which
+        // used the stack up for a list of 65,000, and it took time that
+        // grows with the square of the length of the list: more than two
+        // minutes for a list of 32,000.
+        let (sender, receiver) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = sender.send(read(longest));
+        });
+        let long = receiver
+            .recv_timeout(std::time::Duration::from_secs(20))
+            .expect("the parse of the longest list returns within 20 seconds");
+        // It is read as the list of 3,334 is: too large for the tree, with
+        // no diagnostic that names type nesting, and the declaration below
+        // it is read.
+        assert_eq!(long, too_large);
+    }
 }
 
 /// The line rule asks about the tokens around a newline, and `LineIndex`
@@ -9019,6 +9350,7 @@ mod line_index_tests {
                             judgment_body: false,
                             brace_opens_enclosing_block: false,
                             observation_body: false,
+                            angle_scans: HashMap::new(),
                         };
                         for idx in 0..=visible {
                             compare_at(&mut p, idx, &source, &mut failures);
@@ -9032,6 +9364,283 @@ mod line_index_tests {
         assert!(
             failures.is_empty(),
             "{} answers of the index differ from a walk over the tokens:\n{}",
+            failures.len(),
+            failures
+                .iter()
+                .take(20)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+    }
+}
+
+/// `call_generics_ahead` decides whether a `<` after a name begins the type
+/// arguments of a call. It answers from a scan that calls itself for no
+/// nesting and keeps what it found for each `<` it passed. These tests hold
+/// the question as it is defined, by a function that calls itself, and
+/// compare the two for every `<`, in each order of asking and under views of
+/// the tokens that end at different places.
+#[cfg(test)]
+mod type_argument_scan_tests {
+    use super::*;
+
+    fn parser<'a>(source: &'a str, tokens: &'a [Token], visible: usize) -> Parser<'a> {
+        Parser {
+            source,
+            tokens: &tokens[..visible],
+            lines: LineIndex::new(tokens),
+            idx: 0,
+            diagnostics: Vec::new(),
+            builder: GreenNodeBuilder::new(),
+            node_depth: 0,
+            token_cursor: 0,
+            expression_depth: 0,
+            judgment_body: false,
+            brace_opens_enclosing_block: false,
+            observation_body: false,
+            angle_scans: HashMap::new(),
+        }
+    }
+
+    /// The tokens that are no white space, comment or newline, each with its
+    /// index.
+    fn significant(tokens: &[Token]) -> Vec<(usize, TokenKind)> {
+        tokens
+            .iter()
+            .enumerate()
+            .filter(|(_, token)| !Parser::is_trivia(token.kind) && token.kind != TokenKind::Newline)
+            .map(|(index, token)| (index, token.kind))
+            .collect()
+    }
+
+    fn kind_at(tokens: &[(usize, TokenKind)], at: usize) -> Option<TokenKind> {
+        tokens.get(at).map(|(_, kind)| *kind)
+    }
+
+    fn is_name(kind: Option<TokenKind>) -> bool {
+        matches!(kind, Some(TokenKind::Ident | TokenKind::DurationUnit))
+    }
+
+    /// Type arguments by their definition: `<`, types separated by commas,
+    /// `>`. `at` is the place of the `<` among the significant tokens. The
+    /// answer is the place after the `>` and the depth of the nesting, or
+    /// nothing when the arguments do not close.
+    fn arguments(tokens: &[(usize, TokenKind)], at: usize) -> Option<(usize, usize)> {
+        let mut at = at + 1;
+        let mut deepest = 0;
+        loop {
+            let (after, depth) = one_type(tokens, at)?;
+            deepest = deepest.max(depth);
+            match kind_at(tokens, after) {
+                Some(TokenKind::Comma) => at = after + 1,
+                Some(TokenKind::Gt) => return Some((after + 1, deepest + 1)),
+                _ => return None,
+            }
+        }
+    }
+
+    /// A type by its definition: a name, parts after `.`, and type arguments
+    /// of its own when a `<` follows. The answer is the place after it and
+    /// the depth of its arguments, 0 when it has none.
+    fn one_type(tokens: &[(usize, TokenKind)], at: usize) -> Option<(usize, usize)> {
+        if !is_name(kind_at(tokens, at)) {
+            return None;
+        }
+        let mut at = at + 1;
+        while kind_at(tokens, at) == Some(TokenKind::Dot) {
+            if !is_name(kind_at(tokens, at + 1)) {
+                return None;
+            }
+            at += 2;
+        }
+        if kind_at(tokens, at) == Some(TokenKind::Lt) {
+            return arguments(tokens, at);
+        }
+        Some((at, 0))
+    }
+
+    /// What `call_generics_ahead` must answer at the `<` in place `at` of
+    /// the significant tokens `list`, and the index the cursor must stand at
+    /// after the arguments are stepped over, when they are read.
+    fn defined(
+        tokens: &[Token],
+        list: &[(usize, TokenKind)],
+        at: usize,
+    ) -> (TypeArgs, Option<usize>) {
+        let Some((after, depth)) = arguments(list, at) else {
+            return (TypeArgs::Absent, None);
+        };
+        if !matches!(
+            kind_at(list, after),
+            Some(TokenKind::LParen | TokenKind::LBrace)
+        ) {
+            return (TypeArgs::Absent, None);
+        }
+        if depth > MAX_EXPRESSION_DEPTH {
+            return (TypeArgs::TooDeep, None);
+        }
+        // The cursor stands after the `>` and the white space and comments
+        // that follow it.
+        let mut cursor = list[after - 1].0 + 1;
+        while tokens
+            .get(cursor)
+            .is_some_and(|token| Parser::is_trivia(token.kind))
+        {
+            cursor += 1;
+        }
+        (TypeArgs::Read, Some(cursor))
+    }
+
+    /// The views a source of `count` tokens is compared under, each a number
+    /// of tokens that are visible. A short source is compared under every
+    /// view. A long one is compared whole, under each view that ends within
+    /// its last eight tokens, where its arguments lose their end, and under
+    /// the views that end at its quarter and at its half.
+    fn views(count: usize) -> Vec<usize> {
+        if count <= 64 {
+            return (0..=count).collect();
+        }
+        let mut views = vec![count / 4, count / 2];
+        views.extend(count - 8..=count);
+        views
+    }
+
+    /// Fails the comparison for every `<` of `source` that
+    /// `call_generics_ahead` does not answer as defined: asked from the
+    /// first to the last, from the last to the first, and under each view of
+    /// the tokens in turn on one parser.
+    fn compare(source: &str, failures: &mut Vec<String>) {
+        let tokens = lex_bounded(source, MAX_SOURCE_TOKENS).expect("tokens");
+        let views = views(tokens.len());
+        let mut check = |p: &mut Parser<'_>,
+                         list: &[(usize, TokenKind)],
+                         at: usize,
+                         order: &str| {
+            let visible = p.tokens.len();
+            let index = list[at].0;
+            let expected = defined(&tokens[..visible], list, at);
+            p.idx = index;
+            let answered = p.call_generics_ahead();
+            let mut stands_at = None;
+            if p.idx != index {
+                failures.push(format!(
+                    "{order}: the cursor moved, at {index} of {source:?}"
+                ));
+            } else if answered == TypeArgs::Read {
+                let _ = p.consume_generic_args_text();
+                stands_at = Some(p.idx);
+            }
+            if (answered, stands_at) != expected {
+                failures.push(format!(
+                    "{order}, {visible} tokens visible, `<` at {index} of {source:?}: {:?}, defined {expected:?}",
+                    (answered, stands_at)
+                ));
+            }
+        };
+        // The places of each `<` among the significant tokens.
+        let angles = |list: &[(usize, TokenKind)]| -> Vec<usize> {
+            (0..list.len())
+                .filter(|at| list[*at].1 == TokenKind::Lt)
+                .collect()
+        };
+        // One parser for all the views, from the widest to the narrowest and
+        // back: what was kept under one view must not answer under another.
+        let mut shared = parser(source, &tokens, tokens.len());
+        for &visible in views.iter().rev().chain(&views) {
+            let list = significant(&tokens[..visible]);
+            shared.tokens = &tokens[..visible];
+            for at in angles(&list) {
+                check(&mut shared, &list, at, "views in turn");
+            }
+        }
+        for &visible in &views {
+            let list = significant(&tokens[..visible]);
+            let mut forward = parser(source, &tokens, visible);
+            for at in angles(&list) {
+                check(&mut forward, &list, at, "first to last");
+            }
+            let mut backward = parser(source, &tokens, visible);
+            for at in angles(&list).into_iter().rev() {
+                check(&mut backward, &list, at, "last to first");
+            }
+        }
+    }
+
+    #[test]
+    fn the_scan_answers_as_the_definition_of_type_arguments_does() {
+        let mut failures = Vec::new();
+        // Written cases: lists of comparisons, type arguments, the two
+        // mixed, parts after `.`, unit words as names, line ends and
+        // comments between the tokens, and arguments that stop short.
+        for source in [
+            "g(x < y, x < y, x < y)",
+            "{x < y, x < y}",
+            "f<A>(1)",
+            "f<A, B>(1)",
+            "f<A<B>, C<D<E>>>(1)",
+            "f<A> {1}",
+            "f<A> + 1",
+            "f<A>",
+            "f<A",
+            "f<A,>(1)",
+            "f<>(1)",
+            "f<A.B.C<D.E>>(1)",
+            "f<A.>(1)",
+            "f<A.<B>>(1)",
+            "f<days, hours<minutes>>(1)",
+            "g(x < y, h<A>(1), x < y)",
+            "g(x < y, h<A<B>>(1))",
+            "g(x < h<A>(1), y)",
+            "a < b<c>(1), d",
+            "a < b, c > (1)",
+            "a < b, c > d",
+            "f<A\n>(1)",
+            "f<A // why\n, B>\n(1)",
+            "f\n<A>(1)",
+            "x < y\nassert f<A>(1)",
+            "a < b < c > > (1)",
+            "a < b < c > , d > (1)",
+            "a << b >> (1)",
+            "f<A>> (1)",
+        ] {
+            compare(source, &mut failures);
+        }
+        // Type arguments at the limit and past it, alone and behind a
+        // comparison, and a list of comparisons longer than the limit.
+        for depth in [127, 128, 129, 130] {
+            let nested = format!("{}A{}", "A<".repeat(depth - 1), ">".repeat(depth));
+            compare(&format!("f<{nested}(1)"), &mut failures);
+            compare(&format!("g(x < y, h<{nested}(1))"), &mut failures);
+            compare(&format!("f<{nested} + 1"), &mut failures);
+        }
+        compare(
+            &format!("g({})", vec!["x < y"; 140].join(", ")),
+            &mut failures,
+        );
+        // Every sequence of up to six of these tokens.
+        let alphabet = ["a", "<", ">", ",", ".", "(", "{", "1"];
+        let mut sequences = 0;
+        for length in 1..=6 {
+            for code in 0..alphabet.len().pow(length) {
+                let mut code = code;
+                let mut parts = Vec::new();
+                for _ in 0..length {
+                    parts.push(alphabet[code % alphabet.len()]);
+                    code /= alphabet.len();
+                }
+                // Without a `<` after a name there is nothing to ask.
+                if !parts.windows(2).any(|pair| pair == ["a", "<"]) {
+                    continue;
+                }
+                compare(&parts.join(" "), &mut failures);
+                sequences += 1;
+            }
+        }
+        assert_eq!(sequences, 22_329);
+        assert!(
+            failures.is_empty(),
+            "{} answers differ from the definition:\n{}",
             failures.len(),
             failures
                 .iter()

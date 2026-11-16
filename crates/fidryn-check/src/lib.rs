@@ -452,6 +452,25 @@ fn check_queries(
             cx.check_bool_condition("selection predicate", &selection.predicate, diagnostics);
         }
         for (operation, prop) in rule.consequences.iter().chain(&rule.fallback) {
+            // A consequence with no arguments is a bare name, and any
+            // capitalized name with no arguments is read as a proposition.
+            // One that is declared as something else, an entity for
+            // example, is not a proposition. That holds for each of the
+            // verbs, so the test stands before the one for `create`, which
+            // looks at nothing but the fields of a `Duty`.
+            if prop.arguments.is_empty()
+                && let Some(ty) = cx.infer_ident(&prop.predicate)
+                && !ty.is_prop()
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "`{operation} {}` in rule `{}` requires a proposition, not {ty}",
+                        prop.predicate, rule.name
+                    ),
+                ));
+                continue;
+            }
             if operation == "create" {
                 if prop.predicate == "Duty" {
                     let fields = prop
@@ -489,23 +508,6 @@ fn check_queries(
                         ));
                     }
                 }
-                continue;
-            }
-            // A consequence with no arguments is a bare name, and any
-            // capitalized name with no arguments is read as a proposition.
-            // One that is declared as something else, an entity for
-            // example, is not a proposition.
-            if prop.arguments.is_empty()
-                && let Some(ty) = cx.infer_ident(&prop.predicate)
-                && !ty.is_prop()
-            {
-                diagnostics.push(Diagnostic::new(
-                    DiagnosticCode::E210,
-                    format!(
-                        "`{operation} {}` in rule `{}` requires a proposition, not {ty}",
-                        prop.predicate, rule.name
-                    ),
-                ));
                 continue;
             }
             cx.check_modal_proposition(
@@ -5669,30 +5671,63 @@ module Examples.UseEff version "0.1.0" {
                 "module Review version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    proposition Exempt(who: LegalPerson)\n    proposition Flag()\n    rule Exemption : constitutive {{\n        when true\n        {consequences}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
             )
         };
-        for written in ["Acme", "(Acme)", "Acme()"] {
-            for consequences in [
-                format!("then establish {written}"),
-                format!("then establish Exempt(Acme)\n        otherwise establish {written}"),
-            ] {
-                let rejected: Vec<(DiagnosticCode, String)> = check_src(&module(&consequences))
-                    .expect_err("the module is rejected")
-                    .into_iter()
-                    .map(|diagnostic| (diagnostic.code, diagnostic.message))
-                    .collect();
-                assert_eq!(
-                    rejected,
-                    [(
-                        DiagnosticCode::E210,
-                        "`establish Acme` in rule `Exemption` requires a proposition, not LegalPerson"
-                            .to_owned()
-                    )],
-                    "{consequences}"
-                );
+        let rejected = |consequences: &str| -> Vec<(DiagnosticCode, String)> {
+            check_src(&module(consequences))
+                .expect_err(consequences)
+                .into_iter()
+                .map(|diagnostic| (diagnostic.code, diagnostic.message))
+                .collect()
+        };
+        // Each of the nine verbs, `create` among them, in the `then` list
+        // and in the `otherwise` list.
+        for verb in [
+            "establish",
+            "constitute",
+            "terminate",
+            "suspend",
+            "create",
+            "derive",
+            "activate",
+            "defeat",
+            "make",
+        ] {
+            for written in ["Acme", "(Acme)", "Acme()"] {
+                for consequences in [
+                    format!("then {verb} {written}"),
+                    format!("then establish Exempt(Acme)\n        otherwise {verb} {written}"),
+                ] {
+                    assert_eq!(
+                        rejected(&consequences),
+                        [(
+                            DiagnosticCode::E210,
+                            format!(
+                                "`{verb} Acme` in rule `Exemption` requires a proposition, not LegalPerson"
+                            )
+                        )],
+                        "{consequences}"
+                    );
+                }
             }
         }
         // A declared proposition with no arguments is a consequence as
         // before, with and without its parentheses.
         check_src(&module("then establish Flag\n        then derive Flag()"))
             .expect("a proposition with no arguments");
+        // What `create` took before, it still takes: a proposition, a name
+        // nothing declares with and without arguments, an entity with
+        // arguments, and a duty with its three fields.
+        check_src(&module(
+            "then create Exempt(Acme)\n        then create Flag\n        then create Position\n        then create Position(Acme)\n        then create Acme(1)\n        then create Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))",
+        ))
+        .expect("the consequences `create` took before");
+        // And a duty with no fields is told what it lacks, as before.
+        let lacking = [
+            "Duty creation requires `bearer`",
+            "Duty creation requires `claimant`",
+            "Duty creation requires content",
+        ]
+        .map(|message| (DiagnosticCode::E210, message.to_owned()));
+        assert_eq!(rejected("then create Duty()"), lacking);
+        assert_eq!(rejected("then create Duty"), lacking);
     }
 }

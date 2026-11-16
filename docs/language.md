@@ -396,20 +396,24 @@ braces does not end it. A prefix word at the end of a line does not carry
 it into the next line. And it ends after the `}` that closes its
 outermost brace, unless a continuation follows.
 
-A declaration does not go on into the declaration below it. A keyword
+A declaration does not go on into the declaration below it. That does
+not hold where the header of a `query`, an `fn` or a `calc` ends in `!`
+after the keyword, the name, the parameters or the result type, or where
+the header of an `import` or a `type` ends in `<` after the keyword or
+the name: the declaration on the next line that has a token is read as
+part of the header, and the module is rejected with `E100`. A keyword
 that takes a name, such as `entity`, `rule` or `query`, is rejected with
 `E100` when its statement ends with it: the name is not read from the
 next line. It is rejected as well when the token after it is not a name,
-as in `power { holder A }` or `entity : NaturalPerson`. The header
-keywords `jurisdiction`, `effective_at`, `recorded_at` and
-`outside_scope` are rejected with `E100` in the same way when the
-statement ends with the keyword: the value is not read from the next
-line. `source_snapshot` and `source_manifest` do read a string that
-stands on the next line, and are rejected with `E100` when none stands
-there. And the header of a declaration whose line ends in `:`, `->` or
-`=`, outside parentheses, brackets and braces, is rejected with `E100`
-when the next line that has a token begins with a declaration keyword,
-although the first case above would carry the header into that line.
+as in `power { holder A }` or `entity : NaturalPerson`. The six header
+keywords, `jurisdiction`, `source_snapshot`, `source_manifest`,
+`effective_at`, `recorded_at` and `outside_scope`, are rejected with
+`E100` in the same way when the statement ends with the keyword: the
+value is not read from the next line. And the header of a declaration
+whose line ends in `:`, `->` or `=`, outside parentheses, brackets and
+braces, is rejected with `E100` when the next line that has a token
+begins with a declaration keyword, although the first case above would
+carry the header into that line.
 There is one exception: below the header of a `for_all` or an `exists`
 that ends in `:`, a line that begins with `for_all` or `exists` is the
 body of the quantifier. A type on the next line that is no such keyword
@@ -511,7 +515,7 @@ The body holds `when`, `then`, `otherwise`, `require`, `select` and
 a `then` or an `otherwise` that no consequence follows, and a `when`, a
 `require` or a `source` with no expression after it. A consequence names
 a proposition: `then establish 5` is rejected with `E210`, and so is a
-consequence that names an entity. Two more lines are accepted:
+consequence that is the name of an entity. Two more lines are accepted:
 `valid_time` and `record_time`, each followed by an interval with both of
 its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever

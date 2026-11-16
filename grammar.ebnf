@@ -95,7 +95,7 @@ ObservationField::= "authenticate" Expr End
                   | "valid_time" IntervalExpr End
                   | "record_time" IntervalExpr End
 
-NominationDecl  ::= "nomination" Expr "for" Expr "rank" Int SourceRef? End
+NominationDecl  ::= "nomination" QName "for" Expr "rank" Int SourceRef? End
 
 FunctionDecl    ::= ("fn" | "calc") Signature "->" Type EffectRow? FuelClause? Block
 FuelClause      ::= "fuel" "=" Int
@@ -350,6 +350,17 @@ MoneyLiteral    ::= Ident "(" Decimal ")"   (* currency constructor, e.g. USD(50
 
 QName           ::= Ident ("." Ident)*
 Ident           ::= [A-Za-z_] [A-Za-z0-9_]*
+
+(* A word of DurationUnit is not always read as a name where a declaration
+   takes its name. After calc, evidence_type, fn, import, judgment,
+   observation, query, record_type, rule, source, type and verify it is
+   read as the name. After clause, conflict_doctrine, decision, duty,
+   effect, entity, exists, for_all, interpretation_family, legal_act,
+   nomination, office, power, proposition and scenario it is rejected with
+   E100, as the whole name and as the first part of a dotted name; as a
+   later part of a dotted name, as in entity Org.days : NaturalPerson, it
+   is read. *)
+
 String          ::= JSON-string
 Int             ::= "-"? [0-9]+
 Decimal         ::= "-"? [0-9]+ "." [0-9]+
@@ -409,20 +420,24 @@ End             ::= inserted-newline | ";"
    after a ";" outside them, and after the "}" that closes its outermost
    brace unless a continuation follows that brace.
 
-   A declaration does not go on into the declaration below it. A keyword
-   that takes a name is rejected when its statement ends with it: the name
-   is not read from the next line. It is rejected as well when the token
-   after it is not a name. The header keywords jurisdiction, effective_at,
-   recorded_at and outside_scope are rejected when the statement ends with
-   the keyword: the value is not read from the next line. source_snapshot
-   and source_manifest do read a String that stands on the next line, and
-   are rejected when none stands there. And the header of a declaration
-   whose line ends in ":", "->" or "=", outside parentheses, brackets
-   and braces, is rejected when the first token after the newline is a
-   declaration keyword, although no End is inserted there by the rule
-   above. There is one exception: below the header of a for_all or an
-   exists that ends in ":", a line that begins with for_all or exists is
-   the body of the quantifier. *)
+   A declaration does not go on into the declaration below it. That does
+   not hold where the header of a query, an fn or a calc ends in "!"
+   after the keyword, the name, the parameters or the result type, or
+   where the header of an import or a type ends in "<" after the keyword
+   or the name: the declaration on the next line that has a token is read
+   as part of the header, and the module is rejected. A keyword that
+   takes a name is rejected when its statement ends with it: the name is
+   not read from the next line. It is rejected as well when the token
+   after it is not a name. The six header keywords, jurisdiction,
+   source_snapshot, source_manifest, effective_at, recorded_at and
+   outside_scope, are rejected when the statement ends with the keyword:
+   the value is not read from the next line. And the header of a
+   declaration whose line ends in ":", "->" or "=", outside parentheses,
+   brackets and braces, is rejected when the first token after the
+   newline is a declaration keyword, although no End is inserted there by
+   the rule above. There is one exception: below the header of a for_all
+   or an exists that ends in ":", a line that begins with for_all or
+   exists is the body of the quantifier. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.
