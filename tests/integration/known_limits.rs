@@ -7,8 +7,14 @@
 
 use fidryn_cli::compile_source;
 use fidryn_core::ir::Consequence;
-use fidryn_core::{CoreDecl, CoreModule, DiagnosticCode, SourceManifest};
+use fidryn_core::{
+    CaseRecord, CoreDecl, CoreModule, DiagnosticCode, Instant, Outcome, QueryName, RunContext,
+    SourceManifest, Value,
+};
+use fidryn_eval::evaluate;
+use fidryn_handlers::CaseFile;
 use fidryn_verify::verify_property;
+use std::collections::BTreeMap;
 
 fn source(name: &str, body: &str) -> String {
     format!(
@@ -169,6 +175,49 @@ fn a_rule_basis_that_names_nothing_is_accepted() {
     ));
     // Nothing of the basis reaches the intermediate representation.
     assert!(!format!("{module:?}").contains("NoSuchSource"));
+}
+
+#[test]
+fn the_valid_time_and_record_time_lines_of_a_rule_are_not_applied() {
+    let module = compile(
+        "Limits.RuleTimes",
+        "    proposition Exempt()\n    rule Exemption : constitutive {\n        when true\n        then establish Exempt()\n            valid_time [2026-08-14, +inf)\n            record_time [2026-08-14T00:00:00-04:00, +inf)\n    }\n    query exempt() -> Bool { goal Evaluate { operative Exempt() } }",
+    );
+    // The first time lies inside both intervals. The other two lie before
+    // them, and the consequence holds there all the same.
+    for at in [
+        "2026-09-01T00:00:00Z",
+        "2026-08-01T00:00:00Z",
+        "2020-01-01T00:00:00Z",
+    ] {
+        let at = Instant::parse(at).expect("timestamp");
+        let case = CaseRecord::default();
+        let state = case.into_state();
+        let mut handler = CaseFile {
+            record: case.clone(),
+            known_at: Some(at),
+        };
+        let outcome = evaluate(
+            &module,
+            &QueryName::from("exempt"),
+            &BTreeMap::new(),
+            &state,
+            &RunContext::new(at, at),
+            &mut handler,
+            &case,
+        )
+        .expect("the query runs");
+        assert!(
+            matches!(
+                outcome,
+                Outcome::Determinate {
+                    value: Value::Bool(true),
+                    ..
+                }
+            ),
+            "{at:?}: {outcome:?}"
+        );
+    }
 }
 
 #[test]

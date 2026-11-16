@@ -124,6 +124,14 @@ fidryn run examples/tax/federal-tax.fr \
   --known-at 2026-09-01T00:00:00-04:00
 ```
 
+Under its consequence, the exemption rule of `federal-tax.fr` writes
+`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.2 reads
+such lines and does not apply them (see
+`the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` under
+[Known limits pinned by tests](implementation-status.md#known-limits-pinned-by-tests)).
+So the answer, `false`, is the same for
+`--valid-at 2020-01-01T00:00:00Z`, long before the interval begins.
+
 ```sh
 fidryn run examples/foia/foia-request.fr \
   --query disposition \
@@ -143,6 +151,14 @@ fidryn run examples/massachusetts-llc/harbor-robotics.fr \
 `examples/massachusetts-llc/cases/transmitted-without-official-record.json`
 is the contrast case: transmission without an `OfficialFilingRecord`
 suspends.
+
+Under its consequence, the formation rule of `harbor-robotics.fr` writes
+`valid_time [effective_at, +inf)` and a `record_time` line, and they are
+not applied either. The answer, `FormedLLC`, is the same for
+`--valid-at 2020-01-01T00:00:00Z`, long before the filing. It does depend
+on `--known-at`, through the filing record of the case: with a
+`--known-at` before 14:12 that day the record is not yet known, and the
+answer is `NotFormedLLC`.
 
 ```sh
 fidryn run examples/prenup/ava-noah.fr \

@@ -22,9 +22,9 @@ not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
 The grammar in `grammar.ebnf` is closed, but the 0.2 parser enforces
-that only inside `source` blocks and the request block of a judgment's
-`otherwise suspend NeedJudgment`. In most other declarations an unknown
-field is skipped without a diagnostic; see
+that only inside `source` blocks, the bodies of rules and the request
+block of a judgment's `otherwise suspend NeedJudgment`. In most other
+declarations an unknown field is skipped without a diagnostic; see
 [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md). Copy from an existing
 `.fr` file when you are unsure a spelling parses. The reference is
 [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf).
@@ -78,12 +78,13 @@ the dated slice this file encodes. `effective_at` is a date.
 the outcome's `modelBoundary`.
 
 A comment begins with `//` and runs to the end of its line. There is no
-block comment: `/* ... */` is read as ordinary tokens, not skipped. The
-text kept for a declaration holds the comments inside it, and a part that
-is read from that text can take one in: in an `effect`, a comment after
-the result type of an operation is read into the type, and a query that
-uses the operation is rejected with `E210` (see
-[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+block comment: `/* ... */` is read as ordinary tokens, not skipped. A
+brace inside a comment or a string is not a brace: it neither opens nor
+closes the body of a declaration. The text kept for a declaration holds
+the comments inside it, and a part that is read from that text can take
+one in: in an `effect`, a comment after the result type of an operation
+is read into the type, and a query that uses the operation is rejected
+with `E210` (see [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
 
 The trust fixture also declares a source manifest, resolved relative
 to the module file:
@@ -213,11 +214,22 @@ an existing fixture rather than inventing spellings.
 ## Observations
 
 An `observation` names an evidence-shaped fact the evaluator may Observe.
+Its header binds one record and, after `establishes`, gives the
+proposition that the record establishes. Its body holds the conditions
+the record must meet. This one is from
+[`examples/tax/federal-tax.fr`](https://github.com/BeeGass/fidryn/blob/main/examples/tax/federal-tax.fr):
 
 ```
-observation OfficialFilingObservation(record: OfficialFilingRecord)
-observation EndOfTenancy(record: TenancyRecord)
+observation DomesticFormationRecord(record: BeneficialOwnershipReport)
+establishes DomesticCompany(record.company)
+    from FinCENBOIFinalRule.section("domestic-entity")
+{
+    require record.company == AcmeLLC
+}
 ```
+
+A header with no `establishes` or with no `{ ... }` body is rejected with
+`E100`.
 
 Observe still requires a matching case evidence row with `observedAt` at
 or before `--known-at`. Declaring an observation does not invent the
@@ -332,7 +344,12 @@ instead of treating `P` as a Bool. In 0.2 the `using` clause is parsed
 and discarded. Any determination of `P` on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
-on `P`.
+on `P`. The protocol name stands in the statement of `using`: a `using`
+that ends its statement, with no name after it, is rejected with `E100`,
+and the line below it is not read as the name.
+
+A statement that a query body or a `goal Evaluate` block cannot read is
+rejected with `E100`. A `return` with no expression is one.
 
 ## Where a statement ends
 
@@ -388,6 +405,18 @@ braces does not end it. A prefix word at the end of a line does not carry
 it into the next line. And it ends after the `}` that closes its
 outermost brace, unless a continuation follows.
 
+A declaration does not go on into the declaration below it. A keyword
+that takes a name, such as `entity`, `rule` or `query`, is rejected with
+`E100` when its statement ends with it: the name is not read from the
+next line. And the header of a declaration whose line ends in `:`, `->`
+or `=`, outside parentheses, brackets and braces, is rejected with `E100`
+when the next line that has a token begins with a declaration keyword,
+although the first case above would carry the header into that line. A
+type on the next line that is no such keyword is read: `entity Pat :`
+followed by the line `NaturalPerson` declares `Pat`. A name that ends in
+`.` above such a line is rejected with `E100` as well, and so are type
+arguments that `<` opens and no `>` closes.
+
 ## Calc, conditionals, money, and durations
 
 `calc` is a total, effect-free function. It must not recurse (E530).
@@ -401,6 +430,9 @@ calc federal_hourly_floor() -> Money<USD> {
     return USD(7.25)
 }
 ```
+
+A `calc` or an `fn` needs its `{ ... }` body. A header with none is
+rejected with `E100`.
 
 Fidryn 0.2 cannot add a duration to a time in an expression: `end +
 return_deadline()`, with `end: Time`, is `E210`. A deadline is computed
@@ -473,6 +505,15 @@ rule InitialTrustee : constitutive
 The `from` basis can also be a bare name, as in `from Instrument`: the `{`
 after it opens the rule's body. A rule needs that body. A rule header
 with no `{ ... }` after it is rejected with `E100`.
+
+The body holds `when`, `then`, `otherwise`, `require`, `select` and
+`source` statements. Other text in it is rejected with `E100`, and so is
+a `then` or an `otherwise` that no consequence follows. Two more lines
+are accepted: `valid_time` and `record_time`, each followed by an
+interval such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does not
+apply them: the consequences of the rule hold at every time, whatever the
+interval says (see
+[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
 
 `when operative P` tests legal status. `in TrustCreation(BRT)` names the
 legal context of that test. The guard still turns on the proposition

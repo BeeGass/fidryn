@@ -88,15 +88,64 @@ interchange schema versions are maintained independently of the interpreter.
   is now read. `proposition P`, `entity E` and `jurisdiction` written so
   pass the checker as before. A `calc` or `fn` with no body used the body
   of the declaration it took: `calc f(a: Int) -> Int` followed by
-  `query q() -> Int { return 7 }` passed the checker, and `f(1)` was 7. It
-  is now rejected with `E210`, and a `query` with no body is rejected with
-  `E430`. Inside a body the same holds for a word that stands alone on its
-  line: `then` or `otherwise` in a rule, a field name in a `source` block,
-  and `record`, `otherwise`, `on` or `review` in a `judgment` no longer
-  take the line below them. A comment below a `query`, `calc` or `fn` with
-  no body is not read as its body either: `query Q() -> Int` followed by
-  the line `// { return 7 }` passed the checker and answered 7, and is now
-  rejected with `E430`.
+  `query q() -> Int { return 7 }` passed the checker, and `f(1)` was 7. A
+  `calc` or `fn` with no `{ ... }` body is now rejected with `E100`, and a
+  `query` with no body is rejected with `E430`. Inside a body the same
+  holds for a word whose statement ends with it: a field name in a `source`
+  block, and `record`, `otherwise`, `on` or `review` in a `judgment`, no
+  longer take the line below them. The `source` field `effective` still
+  does: it is a prefix word, so its line goes on into the next one.
+- Nothing but its own `{ ... }` block is read as the body of a `query`,
+  `calc` or `fn`. A comment was read as one, beside the header, below it or
+  between its lines: `query Q() -> Int` followed by the line
+  `// { return 7 }` passed the checker and answered 7, and is now rejected
+  with `E430`. So was the effect row of a query with no body:
+  `query Q() -> LegalPerson ! {Acme}`, where `Acme` is an entity, answered
+  `Acme`, and is now rejected with `E430`. And the header itself was read
+  as the body of a `calc` or `fn` that had none, so
+  `calc f(a: Int) -> Int fuel = 100` at the end of a module passed the
+  checker, and a query that called `f` failed when run.
+- A brace inside a comment or a string is not a brace where the body of a
+  declaration is read from its text. Inside a rule, the comment line
+  `// } { when false`, or a string that holds those characters, gave the
+  rule the guard `false`, and it never fired.
+- A declaration keyword that takes a name, with nothing after it on its
+  line, took the first word of the line below as its name: `proposition`
+  above the line `proposition Witness()` declared a proposition named
+  `proposition`, and `Witness` was lost with no diagnostic. It is now
+  rejected with `E100`. So is a header that stops at `:`, `->` or `=`
+  above another declaration: `entity Pat :` followed by a `query` line
+  read `query` as the type of `Pat`, and the query was lost. A type on the
+  next line that is no declaration keyword is read as before. A name that
+  ends in `.` and type arguments that `<` opens and no `>` closes are
+  rejected with `E100` too: `entity N .` above a `query` line named the
+  entity `N.query`, and `entity E : Map <` above one passed the checker,
+  and each lost the query.
+- The parser stops on every input. `fidryn check` did not return on a
+  `type` declaration that has `{` where its `=` belongs, as in `type N {`
+  above another declaration, or on a token that begins no field inside the
+  braces of a type variant or of an `otherwise suspend NeedJudgment`
+  request, as in `type T = A { ) }`: it reported the same error again and
+  again until memory ran out. Each is now rejected with `E100`, and the
+  declarations below it are read.
+- In the body of a rule, text that is no rule statement is rejected with
+  `E100`, and so is a `then` or an `otherwise` that no consequence
+  follows. Such text was stepped over without a diagnostic: with `whne`
+  written for `when`, a rule lost its guard and fired whatever the case
+  held. A `valid_time` or `record_time` line with an interval is still
+  accepted and still not applied: the consequences of a rule hold at every
+  time, which the implementation status guide now says and a test pins.
+- A statement that a `goal Evaluate` block cannot read is rejected with
+  `E100`. It was stepped over without a diagnostic, and the statement
+  below it with it: a goal that held the lines `true`, `return` and
+  `require false` answered `true`.
+- `require ... using` with no protocol name in the statement of `using` is
+  rejected with `E100`. A `using` at the end of a line took the first word
+  of the next line as the name: `require true using` followed by the lines
+  `require false` and `true` answered `true`.
+- The `observation` sample of the language guide is a complete
+  declaration. The two header lines it showed before are rejected with
+  `E100`.
 - A comment at the end of a line is no longer kept as part of the header
   value, the type or the `source` field value before it.
   `jurisdiction Test // where` gave the jurisdiction the value

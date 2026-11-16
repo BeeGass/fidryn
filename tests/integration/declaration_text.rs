@@ -3,26 +3,34 @@
 //! a comment at the end of that line.
 //!
 //! The lowering crate reads the body of some declarations, and the value of
-//! a header, from that text. So a `calc`, `fn` or `query` whose header is
-//! not followed by a body has none: it takes neither the body of the
-//! declaration after it nor one from a comment beside or below it. And a
-//! comment at the end of a header line or of an `entity` line is not part of
-//! the value or the type before it.
+//! a header, from that text, and it finds a body by its braces. A brace
+//! inside a comment or a string literal is not one of them, and neither are
+//! the braces of an effect row. So a `query` whose header is not followed
+//! by a body is rejected as a query with no body, whatever stands beside
+//! it, below it or between the lines of its header. A `calc` or `fn` in the
+//! same place is rejected by the parser, which requires its body. A brace in
+//! a comment or a string inside the body of a `rule` or a `duty` does not
+//! end that body. And a comment at the end of a header line or of an
+//! `entity` line is not part of the value or the type before it.
 
 use fidryn_cli::compile_source;
-use fidryn_core::{CoreModule, DiagnosticCode, SourceManifest};
+use fidryn_core::ir::Guard;
+use fidryn_core::{
+    CaseRecord, CoreDecl, CoreModule, DiagnosticCode, Instant, Outcome, QueryName, RunContext,
+    SourceManifest, Term, Value,
+};
+use fidryn_eval::evaluate;
+use fidryn_handlers::CaseFile;
+use std::collections::BTreeMap;
 
-const UNTYPED_FUNCTION: &str = "function `f` has an untyped result but is declared to return Int";
-const QUERY_WITHOUT_A_BODY: [(DiagnosticCode, &str); 2] = [
-    (
-        DiagnosticCode::E430,
-        "query `Q` is missing a body or explicit goal",
-    ),
-    (
-        DiagnosticCode::E210,
-        "query `Q` has an untyped result but is declared to return Int",
-    ),
-];
+const FUNCTION_WITHOUT_A_BODY: [(DiagnosticCode, &str); 1] = [(
+    DiagnosticCode::E100,
+    "expected `{` to begin the function body",
+)];
+const QUERY_WITHOUT_A_BODY: [(DiagnosticCode, &str); 1] = [(
+    DiagnosticCode::E430,
+    "query `Q` is missing a body or explicit goal",
+)];
 
 /// A module with the usual header lines, each followed by `after_header`,
 /// and these declarations.
@@ -52,39 +60,93 @@ fn owned(expected: &[(DiagnosticCode, &str)]) -> Vec<(DiagnosticCode, String)> {
         .collect()
 }
 
+/// The outcome of a query against a case record that holds nothing.
+fn run(module: &CoreModule, query: &str) -> Outcome<Value> {
+    let at = Instant::parse("2026-09-17T12:00:00Z").expect("timestamp");
+    let case = CaseRecord::default();
+    let state = case.into_state();
+    let mut handler = CaseFile {
+        record: case.clone(),
+        known_at: Some(at),
+    };
+    evaluate(
+        module,
+        &QueryName::from(query),
+        &BTreeMap::new(),
+        &state,
+        &RunContext::new(at, at),
+        &mut handler,
+        &case,
+    )
+    .expect("the query runs")
+}
+
 #[test]
-fn a_function_with_no_body_does_not_use_the_body_of_the_declaration_after_it() {
+fn a_function_with_no_body_is_e100_whatever_stands_beside_or_below_it() {
     for keyword in ["calc", "fn"] {
-        let declarations = format!(
-            "    {keyword} f(a: Int) -> Int\n    query q() -> Int {{ return 7 }}\n    query automatic r() -> Int {{ return f(1) }}"
-        );
-        assert_eq!(
-            rejected(&declarations),
-            owned(&[(DiagnosticCode::E210, UNTYPED_FUNCTION)]),
-            "{keyword}"
-        );
+        // After the header stands a query with a body, or a comment that
+        // holds braces: on the line of the header, on the next line, or
+        // between two blank lines. Or the header goes on with a `fuel`
+        // clause, a number, the name of a parameter or an effect row, none
+        // of which is a body. Or it has no type.
+        for rest in [
+            " -> Int\n    query q() -> Int { return 7 }\n",
+            " -> Int // { return 7 }\n",
+            " -> Int\n    // { return 7 }\n",
+            " -> Int\n\n    // { return 7 }\n\n",
+            " -> Int fuel = 100\n",
+            " -> Int 42\n",
+            " -> Int a\n",
+            " -> Int ! {a}\n",
+            "\n",
+        ] {
+            let declarations = format!(
+                "    {keyword} f(a: Int){rest}    query automatic r() -> Int {{ return f(1) }}"
+            );
+            assert_eq!(
+                rejected(&declarations),
+                owned(&FUNCTION_WITHOUT_A_BODY),
+                "{keyword} then {rest:?}"
+            );
+        }
     }
 }
 
 #[test]
-fn a_comment_beside_or_below_a_function_with_no_body_is_not_its_body() {
+fn a_comment_between_the_lines_of_a_header_is_not_the_body() {
+    // The comment holds braces and stands inside the header, so it is part
+    // of the text the parser keeps for the declaration.
     for keyword in ["calc", "fn"] {
-        // The comment stands on the line of the header, on the next line, or
-        // between two blank lines.
-        for comment in [
-            " // { return 7 }\n",
-            "\n    // { return 7 }\n",
-            "\n\n    // { return 7 }\n\n",
-        ] {
-            let declarations = format!(
-                "    {keyword} f(a: Int) -> Int{comment}    query automatic r() -> Int {{ return f(1) }}"
-            );
-            assert_eq!(
-                rejected(&declarations),
-                owned(&[(DiagnosticCode::E210, UNTYPED_FUNCTION)]),
-                "{keyword} then {comment:?}"
-            );
-        }
+        let declarations = format!(
+            "    {keyword} f(a: Int)\n    // {{ return 7 }}\n    -> Int\n    query automatic r() -> Int {{ return f(1) }}"
+        );
+        assert_eq!(
+            rejected(&declarations),
+            owned(&FUNCTION_WITHOUT_A_BODY),
+            "{keyword}"
+        );
+    }
+    assert_eq!(
+        rejected("    query Q()\n    // { return 7 }\n    -> Int\n    proposition Witness()"),
+        owned(&QUERY_WITHOUT_A_BODY)
+    );
+}
+
+#[test]
+fn the_effect_row_of_a_query_with_no_body_is_not_its_body() {
+    // `Acme` is a name the query could return. It stands between the
+    // braces of the effect row, which are the only braces of the query.
+    for rest in [
+        "\n    proposition Witness()",
+        " // { return Acme }\n    proposition Witness()",
+    ] {
+        let declarations =
+            format!("    entity Acme : LegalPerson\n    query Q() -> LegalPerson ! {{Acme}}{rest}");
+        assert_eq!(
+            rejected(&declarations),
+            owned(&QUERY_WITHOUT_A_BODY),
+            "{rest:?}"
+        );
     }
 }
 
@@ -103,6 +165,81 @@ fn a_query_with_no_body_is_e430_whatever_stands_beside_or_below_it() {
             "{rest:?}"
         );
     }
+}
+
+#[test]
+fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_rule() {
+    // Counted as braces, the comment and the string would each end the body
+    // and begin a second one that holds `when false`, and the rule would
+    // never fire.
+    for consequences in [
+        "        then derive Own()\n        // } { when false",
+        "        then derive Tagged(\"} { when false\")\n        then derive Own()",
+    ] {
+        let module = compile(&source(
+            "",
+            &format!(
+                "    proposition Own()\n    proposition Tagged(note: String)\n    rule R : derive {{\n{consequences}\n    }}\n    query own() -> Bool {{ goal Evaluate {{ operative Own() }} }}"
+            ),
+        ));
+        let rule = module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::Rule(rule) => Some(rule),
+                _ => None,
+            })
+            .expect("rule R");
+        assert_eq!(rule.guard, Guard::Satisfied, "{consequences:?}");
+        let own = run(&module, "own");
+        assert!(
+            matches!(
+                own,
+                Outcome::Determinate {
+                    value: Value::Bool(true),
+                    ..
+                }
+            ),
+            "{consequences:?}: {own:?}"
+        );
+    }
+}
+
+#[test]
+fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_duty() {
+    let duty = |bearer_line: &str, content: &str| {
+        let module = compile(&source(
+            "",
+            &format!(
+                "    entity Payer : LegalPerson\n    entity Payee : LegalPerson\n    proposition Issued(who: LegalPerson)\n    duty Pay {{\n        bearer Payer{bearer_line}\n        content {content}\n        claimant Payee\n        attaches when operative Issued(Payer)\n    }}\n    query q() -> Int {{ return 7 }}"
+            ),
+        ));
+        module
+            .declarations
+            .iter()
+            .find_map(|decl| match decl {
+                CoreDecl::Duty(duty) => Some((
+                    duty.bearer.clone(),
+                    duty.claimant.clone(),
+                    duty.attaches.clone(),
+                    duty.content.clone(),
+                )),
+                _ => None,
+            })
+            .expect("duty Pay")
+    };
+    let plain = duty("", "USD(100.00)");
+    assert!(plain.1.is_some(), "{plain:?}");
+    assert!(
+        matches!(&plain.2, Guard::Operative(prop, _) if prop.predicate == "Issued"),
+        "{plain:?}"
+    );
+    // A `}` in a comment: every field below it is still read.
+    assert_eq!(duty(" // } not the end", "USD(100.00)"), plain);
+    // A `}` in a string: the fields below the string are still read.
+    let (bearer, claimant, attaches, content) = duty("", "\"pay } now\"");
+    assert_eq!((bearer, claimant, attaches), (plain.0, plain.1, plain.2));
+    assert_eq!(content, [Term::String("pay } now".to_owned())]);
 }
 
 #[test]

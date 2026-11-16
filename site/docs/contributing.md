@@ -193,8 +193,8 @@ crates into one commit.
 
 The grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the repository root.
 It is closed, but the 0.2 parser enforces closed field sets only in
-`source` blocks and judgment request blocks. In most other declarations
-an unknown field is skipped without a diagnostic; see
+`source` blocks, rule bodies and judgment request blocks. In most other
+declarations an unknown field is skipped without a diagnostic; see
 [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 ## Implementer documents

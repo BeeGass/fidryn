@@ -163,6 +163,13 @@ RuleStatement   ::= "when" Expr End
                   | "require" Expr End
                   | "select" Selection
                   | "source" Expr End
+                  | "valid_time" IntervalExpr End
+                  | "record_time" IntervalExpr End
+
+(* The parser rejects text in a rule that is none of these statements. It
+   accepts the valid_time and record_time statements, and the interpreter
+   does not apply them: the consequences of a rule hold at every time. *)
+
 Selection       ::= "unique"? Ident "from" Expr
                     ("where" Expr)?
                     ("order_by" OrderKey ("," OrderKey)*)? End
@@ -394,7 +401,14 @@ End             ::= inserted-newline | ";"
    text. Outside them a newline ends it by the rule above, except that a
    prefix word ends a line as any other word does. The text also ends
    after a ";" outside them, and after the "}" that closes its outermost
-   brace unless a continuation follows that brace. *)
+   brace unless a continuation follows that brace.
+
+   A declaration does not go on into the declaration below it. A keyword
+   that takes a name is rejected when its statement ends with it: the name
+   is not read from the next line. And the header of a declaration whose
+   line ends in ":", "->" or "=", outside parentheses, brackets and braces,
+   is rejected when the first token after the newline is a declaration
+   keyword, although no End is inserted there by the rule above. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.

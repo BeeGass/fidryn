@@ -108,9 +108,9 @@ the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
 <p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
-that only inside <code>source</code> blocks and the request block of a judgment's
-<code>otherwise suspend NeedJudgment</code>. In most other declarations an unknown
-field is skipped without a diagnostic; see
+that only inside <code>source</code> blocks, the bodies of rules and the request
+block of a judgment's <code>otherwise suspend NeedJudgment</code>. In most other
+declarations an unknown field is skipped without a diagnostic; see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>. Copy from an existing
 <code>.fr</code> file when you are unsure a spelling parses. The reference is
 <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
@@ -154,12 +154,13 @@ the dated slice this file encodes. <code>effective_at</code> is a date.
 <code>outside_scope</code> is a set of named exclusions; those names reappear on
 the outcome's <code>modelBoundary</code>.</p>
 <p>A comment begins with <code>//</code> and runs to the end of its line. There is no
-block comment: <code>/* ... */</code> is read as ordinary tokens, not skipped. The
-text kept for a declaration holds the comments inside it, and a part that
-is read from that text can take one in: in an <code>effect</code>, a comment after
-the result type of an operation is read into the type, and a query that
-uses the operation is rejected with <code>E210</code> (see
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>).</p>
+block comment: <code>/* ... */</code> is read as ordinary tokens, not skipped. A
+brace inside a comment or a string is not a brace: it neither opens nor
+closes the body of a declaration. The text kept for a declaration holds
+the comments inside it, and a part that is read from that text can take
+one in: in an <code>effect</code>, a comment after the result type of an operation
+is read into the type, and a query that uses the operation is rejected
+with <code>E210</code> (see <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>).</p>
 <p>The trust fixture also declares a source manifest, resolved relative
 to the module file:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source_manifest</span> <span class="tk-st">&quot;sources/ma-trust-fixture.manifest.json&quot;</span></code></pre></figure>
@@ -249,9 +250,19 @@ not a <code>Bool</code>.</p>
 <p>These declarations are part of the closed grammar. Copy field shapes from
 an existing fixture rather than inventing spellings.</p>
 <h2 id="observations"><span class="hn">2.7</span> Observations <a class="anchor" href="#observations" aria-label="Link to this section">#</a></h2>
-<p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.</p>
-<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">observation</span> OfficialFilingObservation<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">OfficialFilingRecord</span><span class="tk-pu">)</span>
-<span class="tk-kw">observation</span> EndOfTenancy<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">TenancyRecord</span><span class="tk-pu">)</span></code></pre></figure>
+<p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.
+Its header binds one record and, after <code>establishes</code>, gives the
+proposition that the record establishes. Its body holds the conditions
+the record must meet. This one is from
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/tax/federal-tax.fr"><code>examples/tax/federal-tax.fr</code></a>:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">observation</span> DomesticFormationRecord<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">BeneficialOwnershipReport</span><span class="tk-pu">)</span>
+<span class="tk-kw">establishes</span> DomesticCompany<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">.</span>company<span class="tk-pu">)</span>
+    <span class="tk-kw">from</span> FinCENBOIFinalRule<span class="tk-pu">.</span>section<span class="tk-pu">(</span><span class="tk-st">&quot;domestic-entity&quot;</span><span class="tk-pu">)</span>
+<span class="tk-pu">{</span>
+    <span class="tk-kw">require</span> <span class="tk-kw">record</span><span class="tk-pu">.</span>company <span class="tk-pu">==</span> AcmeLLC
+<span class="tk-pu">}</span></code></pre></figure>
+<p>A header with no <code>establishes</code> or with no <code>{ ... }</code> body is rejected with
+<code>E100</code>.</p>
 <p>Observe still requires a matching case evidence row with <code>observedAt</code> at
 or before <code>--known-at</code>. Declaring an observation does not invent the
 record.</p>
@@ -339,7 +350,11 @@ instead of treating <code>P</code> as a Bool. In 0.2 the <code>using</code> clau
 and discarded. Any determination of <code>P</code> on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
-on <code>P</code>.</p>
+on <code>P</code>. The protocol name stands in the statement of <code>using</code>: a <code>using</code>
+that ends its statement, with no name after it, is rejected with <code>E100</code>,
+and the line below it is not read as the name.</p>
+<p>A statement that a query body or a <code>goal Evaluate</code> block cannot read is
+rejected with <code>E100</code>. A <code>return</code> with no expression is one.</p>
 <h2 id="where-a-statement-ends"><span class="hn">2.11</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
 <p>A statement ends at a <code>;</code> or at the end of its line. It goes on into the
 next line in two cases.</p>
@@ -386,6 +401,17 @@ three differences. A line break inside its parentheses, brackets or
 braces does not end it. A prefix word at the end of a line does not carry
 it into the next line. And it ends after the <code>}</code> that closes its
 outermost brace, unless a continuation follows.</p>
+<p>A declaration does not go on into the declaration below it. A keyword
+that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is rejected with
+<code>E100</code> when its statement ends with it: the name is not read from the
+next line. And the header of a declaration whose line ends in <code>:</code>, <code>-&gt;</code>
+or <code>=</code>, outside parentheses, brackets and braces, is rejected with <code>E100</code>
+when the next line that has a token begins with a declaration keyword,
+although the first case above would carry the header into that line. A
+type on the next line that is no such keyword is read: <code>entity Pat :</code>
+followed by the line <code>NaturalPerson</code> declares <code>Pat</code>. A name that ends in
+<code>.</code> above such a line is rejected with <code>E100</code> as well, and so are type
+arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes.</p>
 <h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
@@ -395,6 +421,8 @@ outermost brace, unless a continuation follows.</p>
 <span class="tk-kw">calc</span> federal_hourly_floor<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Money</span><span class="tk-pu">&lt;</span><span class="tk-ty">USD</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> USD<span class="tk-pu">(</span><span class="tk-nu">7.25</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>A <code>calc</code> or an <code>fn</code> needs its <code>{ ... }</code> body. A header with none is
+rejected with <code>E100</code>.</p>
 <p>Fidryn 0.2 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
 only by a duty's <code>due</code> clause; see <a href="#duties">Duties</a>.</p>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
@@ -446,6 +474,14 @@ are not that worklist. The kind is <code>derive</code>, <code>constitutive</code
 <p>The <code>from</code> basis can also be a bare name, as in <code>from Instrument</code>: the <code>{</code>
 after it opens the rule's body. A rule needs that body. A rule header
 with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
+<p>The body holds <code>when</code>, <code>then</code>, <code>otherwise</code>, <code>require</code>, <code>select</code> and
+<code>source</code> statements. Other text in it is rejected with <code>E100</code>, and so is
+a <code>then</code> or an <code>otherwise</code> that no consequence follows. Two more lines
+are accepted: <code>valid_time</code> and <code>record_time</code>, each followed by an
+interval such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does not
+apply them: the consequences of the rule hold at every time, whatever the
+interval says (see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests">implementation-status</a>).</p>
 <p><code>when operative P</code> tests legal status. <code>in TrustCreation(BRT)</code> names the
 legal context of that test. The guard still turns on the proposition
 <code>TrustInstrumentExecuted(BRT)</code>. It is not a proposition named <code>in</code>.

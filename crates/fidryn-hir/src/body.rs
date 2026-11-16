@@ -224,7 +224,11 @@ fn map_binop(op: SynBinOp) -> BinOp {
 }
 
 pub fn parse_query_body(src: &str) -> HirQueryBody {
-    let inner = last_brace_inner(src).unwrap_or(src);
+    // A declaration with no block has no body. The tokens of its header
+    // are not read as one.
+    let Some(inner) = last_brace_inner(src) else {
+        return HirQueryBody::None;
+    };
     let mut p = SliceParser::new(inner);
     let mut items = Vec::new();
     let mut goal = None;
@@ -584,28 +588,43 @@ pub fn extract_params(src: &str) -> Vec<(String, String)> {
         .collect()
 }
 
+/// The text between the braces of the last block of a declaration that
+/// stands inside no other block.
+///
+/// Braces are counted as tokens, so a brace inside a comment or a string
+/// literal is not one. The braces of an effect row, which follow `!`, are
+/// part of the header and are not a block.
 pub fn last_brace_inner(src: &str) -> Option<&str> {
     let mut depth = 0i32;
     let mut start = None;
     let mut last = None;
-    for (i, c) in src.char_indices() {
-        match c {
-            '{' => {
+    let mut before = None;
+    let mut effect_row = false;
+    for token in lex(src) {
+        match token.kind {
+            TokenKind::Whitespace
+            | TokenKind::Comment
+            | TokenKind::DocComment
+            | TokenKind::Newline => continue,
+            TokenKind::LBrace => {
                 if depth == 0 {
-                    start = Some(i);
+                    start = Some(token.end as usize);
+                    effect_row = before == Some(TokenKind::Bang);
                 }
                 depth += 1;
             }
-            '}' => {
+            TokenKind::RBrace => {
                 depth -= 1;
                 if depth == 0
-                    && let Some(s) = start
+                    && !effect_row
+                    && let Some(inner_start) = start
                 {
-                    last = Some(&src[s + 1..i]);
+                    last = src.get(inner_start..token.start as usize);
                 }
             }
             _ => {}
         }
+        before = Some(token.kind);
     }
     last
 }
@@ -2321,5 +2340,122 @@ duty PayInvoice {
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_is_not_a_brace() {
+        // The only braces stand in a comment or in a string, so there is no
+        // block.
+        assert_eq!(last_brace_inner("query Q()\n// { return 7 }\n-> Int"), None);
+        assert_eq!(
+            last_brace_inner("query Q() -> String \"{ return 7 }\""),
+            None
+        );
+        // The block is the one made of brace tokens, whatever the comments
+        // and strings beside it and inside it hold.
+        assert_eq!(
+            last_brace_inner("query Q() // { 1 }\n{ return 2 } // { 3 }"),
+            Some(" return 2 ")
+        );
+        assert_eq!(
+            last_brace_inner("rule R : derive {\nthen derive P()\n// } { when false\n}"),
+            Some("\nthen derive P()\n// } { when false\n")
+        );
+        assert_eq!(
+            last_brace_inner("duty D { content \"} {\" bearer A }"),
+            Some(" content \"} {\" bearer A ")
+        );
+        // Blocks inside the block belong to it, and of two blocks side by
+        // side the last one is taken.
+        assert_eq!(
+            last_brace_inner("{ a { b } c } { d { e } }"),
+            Some(" d { e } ")
+        );
+    }
+
+    #[test]
+    fn the_braces_of_an_effect_row_are_not_a_block() {
+        assert_eq!(last_brace_inner("query Q() -> Int ! {Observe}"), None);
+        assert_eq!(
+            last_brace_inner("query Q() -> Int\n! // why\n{Observe}"),
+            None
+        );
+        assert_eq!(
+            last_brace_inner("query Q() -> Int ! {Observe} { return 7 }"),
+            Some(" return 7 ")
+        );
+    }
+
+    #[test]
+    fn a_declaration_with_no_block_has_no_body() {
+        // Neither the tokens of the header nor a comment between its lines
+        // nor its effect row is read as a body.
+        for src in [
+            "query Q() -> Int",
+            "query Q() -> Int 5",
+            "query Q()\n// { return 7 }\n-> Int",
+            "query Q() -> LegalPerson ! {Acme}",
+        ] {
+            assert_eq!(parse_query_body(src), HirQueryBody::None, "{src:?}");
+        }
+        for header in [
+            "calc f(a: Int) -> Int",
+            "calc f(a: Int) -> Int fuel = 100",
+            "calc f(a: Int) -> Int a",
+            "fn f(a: Int)\n// { return 7 }\n-> Int",
+            "fn f(a: Int) -> LegalPerson ! {Acme}",
+        ] {
+            assert_eq!(parse_function_parts(header).1, None, "{header:?}");
+            let parsed = fidryn_syntax::parse_file(&format!(
+                "module M version \"0.1.0\" {{\n{header}\n}}\n"
+            ));
+            let function = parsed
+                .module()
+                .and_then(|module| module.items.first())
+                .and_then(|item| item.decl())
+                .expect("a function");
+            assert_eq!(function.name.as_deref(), Some("f"), "{header:?}");
+            assert_eq!(term_from_decl(function), None, "{header:?}");
+        }
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_rule() {
+        // Counted as braces, each of these would end the body and begin a
+        // second one that holds `when false`.
+        let commented =
+            parse_rule_parts("rule R : derive {\nthen derive P()\n// } { when false\n}");
+        assert_eq!(
+            commented,
+            parse_rule_parts("rule R : derive {\nthen derive P()\n}")
+        );
+        let quoted = parse_rule_parts(
+            "rule R : derive {\nthen derive T(\"} { when false\")\nthen derive P()\n}",
+        );
+        assert_eq!(quoted.guard, None, "{quoted:?}");
+        let derived: Vec<&str> = quoted
+            .consequences
+            .iter()
+            .map(|(_, prop)| prop.predicate.as_str())
+            .collect();
+        assert_eq!(derived, ["T", "P"]);
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_duty() {
+        let plain =
+            parse_duty_parts("duty D {\nbearer Payer\nclaimant Payee\ncontent USD(100.00)\n}");
+        assert_eq!(plain.claimant.as_deref(), Some("Payee"));
+        assert_eq!(plain.content.len(), 1);
+        assert_eq!(
+            parse_duty_parts(
+                "duty D {\nbearer Payer // } not the end\nclaimant Payee\ncontent USD(100.00)\n}"
+            ),
+            plain
+        );
+        let quoted =
+            parse_duty_parts("duty D {\nbearer Payer\ncontent \"pay } now\"\nclaimant Payee\n}");
+        assert_eq!(quoted.claimant.as_deref(), Some("Payee"));
+        assert_eq!(quoted.content, [Term::String("pay } now".into())]);
     }
 }

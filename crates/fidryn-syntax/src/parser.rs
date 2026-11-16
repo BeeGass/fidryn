@@ -563,6 +563,49 @@ impl<'a> Parser<'a> {
         self.error(t, msg);
     }
 
+    /// The last token the parser has read that is not white space, a
+    /// comment or a line end.
+    fn last_read(&self) -> Option<Token> {
+        self.tokens[..self.idx.min(self.tokens.len())]
+            .iter()
+            .rev()
+            .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline)
+            .copied()
+    }
+
+    /// Reports `msg` at the last token read.
+    fn error_at_last_read(&mut self, msg: &str) {
+        match self.last_read() {
+            Some(last) => self.error(last, msg),
+            None => self.error_here(msg),
+        }
+    }
+
+    /// True when the last diagnostic points at the last token read.
+    fn last_read_is_reported(&self) -> bool {
+        let reported = self
+            .diagnostics
+            .last()
+            .and_then(|diagnostic| diagnostic.primary_span);
+        match (self.last_read(), reported) {
+            (Some(token), Some(span)) => span.start == token.start && span.end == token.end,
+            _ => false,
+        }
+    }
+
+    /// Reports `msg` for something that is missing where the parser stands.
+    /// When the statement has ended there, or a declaration begins on the
+    /// line below, the next token belongs to what follows, so the
+    /// diagnostic points at the last token read. Otherwise it points at the
+    /// next token.
+    fn error_where_statement_stops(&mut self, msg: &str) {
+        if self.at_stmt_break() || self.declaration_begins_below() {
+            self.error_at_last_read(msg);
+        } else {
+            self.error_here(msg);
+        }
+    }
+
     fn eat_semi(&mut self) {
         if self.peek().kind == TokenKind::Semicolon {
             self.bump();
@@ -599,6 +642,40 @@ impl<'a> Parser<'a> {
     /// instead.
     fn at_stmt_break(&mut self) -> bool {
         self.next_token_ends_statement() || self.passed_statement_end()
+    }
+
+    /// True when the next token is a keyword that begins a declaration and
+    /// stands on a later line than the last token read. The line rule reads
+    /// on to that line when the line above it ends in a token that cannot
+    /// end a statement, such as `:`. A header that did so would take the
+    /// declaration below it for its own text.
+    fn declaration_begins_below(&mut self) -> bool {
+        let next = self.peek();
+        next.kind == TokenKind::Ident
+            && is_declaration_keyword(self.text(next))
+            && self.line_end_passed()
+    }
+
+    /// True when the end of a line lies between the last token read and the
+    /// cursor, whether or not it ended a statement.
+    fn line_end_passed(&self) -> bool {
+        self.tokens[..self.idx.min(self.tokens.len())]
+            .iter()
+            .rev()
+            .take_while(|token| Self::is_trivia(token.kind) || token.kind == TokenKind::Newline)
+            .any(|token| token.kind == TokenKind::Newline)
+    }
+
+    /// True when the first token after the newline token at `index` is a
+    /// keyword that begins a declaration. Blank lines and comment lines in
+    /// between have no token.
+    fn declaration_begins_after(&self, index: usize) -> bool {
+        self.tokens[index + 1..]
+            .iter()
+            .find(|token| !Self::is_trivia(token.kind) && token.kind != TokenKind::Newline)
+            .is_some_and(|token| {
+                token.kind == TokenKind::Ident && is_declaration_keyword(self.text(*token))
+            })
     }
 
     fn checkpoint(&self) -> (usize, usize) {
@@ -836,6 +913,13 @@ impl<'a> Parser<'a> {
             }
             if !self.at_stmt_break() && self.peek().kind == TokenKind::Dot {
                 self.bump();
+                // The line rule reads on after the `.`. A declaration
+                // keyword on the line below is not the next part of this
+                // name: it begins a declaration of its own.
+                if self.declaration_begins_below() {
+                    self.error_at_last_read("expected identifier");
+                    break;
+                }
             } else {
                 break;
             }
@@ -959,12 +1043,12 @@ impl<'a> Parser<'a> {
                 )
             {
                 self.error_here("unexpected value after header string");
-                self.skip_rest_of_statement();
+                self.skip_rest_of_header();
             }
             self.eat_semi();
             value
         } else {
-            self.skip_rest_of_statement();
+            self.finish_header();
             self.src_slice(value_start, self.last_end(start.end))
                 .trim()
                 .trim_end_matches(';')
@@ -986,6 +1070,9 @@ impl<'a> Parser<'a> {
     fn parse_decl(&mut self, keyword: &str) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, keyword, "expected a name");
+        }
         let mut name = None;
         let t = self.peek();
         if t.kind == TokenKind::Ident {
@@ -1001,14 +1088,18 @@ impl<'a> Parser<'a> {
         } else {
             Vec::new()
         };
-        let result_type = if keyword == "entity" && self.eat_kind(TokenKind::Colon)
-            || keyword == "decision" && self.eat_kind(TokenKind::Arrow)
-        {
-            Some(self.parse_type_string())
+        let names_type = keyword == "entity" && self.eat_kind(TokenKind::Colon)
+            || keyword == "decision" && self.eat_kind(TokenKind::Arrow);
+        let result_type = if names_type {
+            self.parse_header_type()
         } else {
             None
         };
-        self.skip_rest_of_statement();
+        // A header that stopped short where its type should stand has been
+        // reported, and nothing of it is left to step over.
+        if !names_type || result_type.is_some() {
+            self.finish_header();
+        }
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
             Span {
@@ -1045,6 +1136,9 @@ impl<'a> Parser<'a> {
     fn parse_observation_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "observation", "expected a name");
+        }
         let name = Some(self.parse_ident_name());
         let params = if self.peek().kind == TokenKind::LParen {
             self.parse_paren_params()
@@ -1109,13 +1203,25 @@ impl<'a> Parser<'a> {
     fn parse_type_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "type", "expected a name");
+        }
         let name = Some(self.parse_ident_name());
         let parameters = self.parse_type_args_opt();
-        self.expect_kind(TokenKind::Eq, "expected `=` in type declaration");
-        let first = self.parse_type_string();
+        // The definition is `=` and a type. With either one missing, that
+        // is reported once and the declaration ends there: no variant is
+        // read from what follows.
+        let mut next = if self.peek().kind == TokenKind::Eq {
+            self.bump();
+            self.parse_defining_type()
+        } else {
+            self.error_where_statement_stops("expected `=` in type declaration");
+            self.skip_rest_of_line();
+            None
+        };
+        let first = next.clone().unwrap_or_default();
         let mut variants = Vec::new();
-        let mut current = first.clone();
-        loop {
+        while let Some(current) = next.take() {
             let mut arguments = Vec::new();
             let mut fields = Vec::new();
             if !self.at_stmt_break() && self.eat_kind(TokenKind::LParen) {
@@ -1133,6 +1239,13 @@ impl<'a> Parser<'a> {
                         continue;
                     }
                     let field = self.parse_ident_name();
+                    if field.is_empty() {
+                        // The token begins no field, which has been
+                        // reported. It is stepped over, so that the loop
+                        // moves on.
+                        self.skip_balanced_until_end();
+                        continue;
+                    }
                     self.expect_kind(TokenKind::Colon, "expected `:`");
                     let ty = self.parse_type_string();
                     if fields.iter().any(|(name, _)| name == &field) {
@@ -1147,14 +1260,14 @@ impl<'a> Parser<'a> {
                 arguments,
                 fields,
             });
-            if !self.eat_kind(TokenKind::Pipe) {
-                break;
+            if self.eat_kind(TokenKind::Pipe) {
+                next = self.parse_defining_type();
             }
-            current = self.parse_type_string();
         }
-        let definition = if variants.len() == 1
-            && variants[0].arguments.is_empty()
-            && variants[0].fields.is_empty()
+        let definition = if variants.len() <= 1
+            && variants
+                .iter()
+                .all(|variant| variant.arguments.is_empty() && variant.fields.is_empty())
         {
             crate::ast::TypeDefinitionAst::Alias(first)
         } else {
@@ -1187,6 +1300,9 @@ impl<'a> Parser<'a> {
     fn parse_judgment_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "judgment", "expected a name");
+        }
         let name = Some(self.parse_ident_name());
         let sig_start = self.peek().start;
         let params = if self.peek().kind == TokenKind::LParen {
@@ -1312,6 +1428,13 @@ impl<'a> Parser<'a> {
                         continue;
                     }
                     let field = self.parse_ident_name();
+                    if field.is_empty() {
+                        // The token begins no field, which has been
+                        // reported. It is stepped over, so that the loop
+                        // moves on.
+                        self.skip_balanced_until_end();
+                        continue;
+                    }
                     self.expect_kind(TokenKind::Colon, "expected `:`");
                     let value = self.judgment_expr("expected request field");
                     match field.as_str() {
@@ -1398,6 +1521,9 @@ impl<'a> Parser<'a> {
     fn parse_import_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "import", "expected import name");
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_qname())
         } else {
@@ -1406,7 +1532,7 @@ impl<'a> Parser<'a> {
         };
         let type_args = self.parse_type_args_opt();
         let sig_start = self.peek().start;
-        self.skip_rest_of_statement();
+        self.finish_header();
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
             Span {
@@ -1426,6 +1552,9 @@ impl<'a> Parser<'a> {
     fn parse_record_decl(&mut self, keyword: &str) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, keyword, "expected a name");
+        }
         let name = Some(self.parse_ident_name());
         let mut fields = BTreeMap::new();
         self.expect_kind(TokenKind::LBrace, "expected `{`");
@@ -1470,6 +1599,50 @@ impl<'a> Parser<'a> {
         )
     }
 
+    /// True when nothing follows the keyword of a declaration: its statement
+    /// has ended, or the block the declaration stands in closes. A name on
+    /// the line below is not the name of this declaration.
+    fn keyword_stands_alone(&mut self) -> bool {
+        self.at_stmt_break() || matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof)
+    }
+
+    /// The declaration of a keyword that stands alone: `E100` with
+    /// `message` at the keyword, and no name. The line below is not read,
+    /// so it stays a declaration of its own.
+    fn keyword_alone(&mut self, start: Token, keyword: &str, message: &str) -> Decl {
+        self.error_at_last_read(message);
+        // A `;` after the keyword ends its statement. Looking for it also
+        // steps over the end of the line, so that the text kept for the
+        // declaration ends with its line.
+        self.eat_semi();
+        let decl = self.finish_decl(start, keyword, None);
+        self.finish_node();
+        decl
+    }
+
+    /// The type a header names after `:`, `->`, `=` or `|`. The line rule
+    /// reads on to the next line after such a token. When that line begins
+    /// a declaration, the header has stopped short: that is `E100` at the
+    /// token, and the line is left to the declaration it begins.
+    fn parse_header_type(&mut self) -> Option<String> {
+        if self.declaration_begins_below() {
+            self.error_at_last_read("expected a type");
+            return None;
+        }
+        Some(self.parse_type_string())
+    }
+
+    /// The type that defines a `type` declaration or one of its variants.
+    /// With none, that has been reported, and what is left of the line is
+    /// stepped over: the declaration ends there.
+    fn parse_defining_type(&mut self) -> Option<String> {
+        let defining = self.parse_header_type().filter(|ty| !ty.is_empty());
+        if defining.is_none() {
+            self.skip_rest_of_line();
+        }
+        defining
+    }
+
     /// The end of the text the parser keeps for what it has read: a
     /// declaration, a clause or a value. The text runs to the cursor, but no
     /// further than the end of the line of the last token consumed. So it
@@ -1512,6 +1685,12 @@ impl<'a> Parser<'a> {
             let mut depth = 1u32;
             self.bump();
             while depth > 0 {
+                // The line rule reads on after `<`. A declaration keyword
+                // on a line below is not a type argument: it begins a
+                // declaration of its own.
+                if self.declaration_begins_below() {
+                    break;
+                }
                 match self.peek().kind {
                     TokenKind::Lt => {
                         depth += 1;
@@ -1534,6 +1713,9 @@ impl<'a> Parser<'a> {
                         self.bump();
                     }
                 }
+            }
+            if depth > 0 {
+                self.error_where_statement_stops("expected `>`");
             }
         }
         self.src_slice(start, self.last_end(start))
@@ -1620,6 +1802,9 @@ impl<'a> Parser<'a> {
     fn parse_source_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "source", "expected source name");
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_qname())
         } else {
@@ -1662,7 +1847,7 @@ impl<'a> Parser<'a> {
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
         } else {
-            self.skip_rest_of_statement();
+            self.finish_header();
         }
         let mut decl = self.finish_decl(start, "source", name);
         decl.fields = fields;
@@ -1673,7 +1858,12 @@ impl<'a> Parser<'a> {
     fn parse_query_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
-        let automatic = self.eat_ident("automatic");
+        let automatic = !self.keyword_stands_alone() && self.eat_ident("automatic");
+        if self.keyword_stands_alone() {
+            let mut decl = self.keyword_alone(start, "query", "expected query name");
+            decl.automatic = automatic;
+            return decl;
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_ident_name())
         } else {
@@ -1688,12 +1878,20 @@ impl<'a> Parser<'a> {
             Vec::new()
         };
         let mut result_type = None;
+        let mut stopped_short = false;
         if self.peek().kind == TokenKind::Arrow {
             self.bump();
-            result_type = Some(self.parse_type_string());
+            result_type = self.parse_header_type();
+            stopped_short = result_type.is_none();
         }
         let effects = self.parse_effect_row_opt();
-        let (expr, goal) = self.parse_query_block();
+        // A header that stopped short where its type should stand has been
+        // reported. What follows it is the declaration below, not a block.
+        let (expr, goal) = if stopped_short {
+            (None, None)
+        } else {
+            self.parse_query_block()
+        };
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
             Span {
@@ -1717,7 +1915,7 @@ impl<'a> Parser<'a> {
 
     fn parse_query_block(&mut self) -> (Option<Expr>, Option<GoalAst>) {
         if self.peek().kind != TokenKind::LBrace {
-            self.skip_rest_of_statement();
+            self.finish_header();
             return (None, None);
         }
         self.bump();
@@ -1781,8 +1979,15 @@ impl<'a> Parser<'a> {
         if expr.is_none() {
             self.error_here("require expects a Boolean expression");
         }
-        if self.eat_ident("using") && self.at_name() {
-            let _ = self.parse_ident_name();
+        if self.eat_ident("using") {
+            // The protocol name stands in the statement of `using`. When
+            // that statement has ended, the word on the line below begins
+            // the next statement and is not read as the name.
+            if !self.at_stmt_break() && self.at_name() {
+                let _ = self.parse_ident_name();
+            } else {
+                self.error_where_statement_stops("expected a protocol name after `using`");
+            }
         }
         self.eat_semi();
         expr.map(|inner| Expr::Require(Box::new(inner)))
@@ -1813,10 +2018,20 @@ impl<'a> Parser<'a> {
                     self.error_here("evaluation statement follows `return`");
                 }
                 returned |= self.at_ident("return");
+                let first = self.peek();
+                let before = self.idx;
                 if let Some(e) = self.parse_eval_stmt() {
                     stmts.push(e);
-                } else if !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-                    self.skip_balanced_until_end();
+                } else {
+                    self.error(first, "expected evaluation statement");
+                    // When a token of the statement was consumed, only what
+                    // is left of it is stepped over: it may have ended, and
+                    // then the cursor stands at the next statement.
+                    if self.idx > before {
+                        self.skip_rest_of_statement();
+                    } else {
+                        self.skip_balanced_until_end();
+                    }
                 }
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
@@ -1857,6 +2072,9 @@ impl<'a> Parser<'a> {
     fn parse_verify_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "verify", "expected verification name");
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_ident_name())
         } else {
@@ -1927,8 +2145,8 @@ impl<'a> Parser<'a> {
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
         } else {
-            self.error_here("expected `{` to begin the verify block");
-            self.skip_rest_of_statement();
+            self.error_where_statement_stops("expected `{` to begin the verify block");
+            self.skip_rest_of_header();
         }
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
@@ -2078,6 +2296,9 @@ impl<'a> Parser<'a> {
     fn parse_function_decl(&mut self, keyword: &str) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, keyword, "expected function name");
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_ident_name())
         } else {
@@ -2092,9 +2313,11 @@ impl<'a> Parser<'a> {
             Vec::new()
         };
         let mut result_type = None;
+        let mut stopped_short = false;
         if self.peek().kind == TokenKind::Arrow {
             self.bump();
-            result_type = Some(self.parse_type_string());
+            result_type = self.parse_header_type();
+            stopped_short = result_type.is_none();
         }
         let effects = self.parse_effect_row_opt();
         let mut fuel = if self.at_ident("fuel") {
@@ -2102,7 +2325,13 @@ impl<'a> Parser<'a> {
         } else {
             None
         };
-        let (expr, body_fuel) = self.parse_fn_block();
+        // A header that stopped short where its type should stand has been
+        // reported. What follows it is the declaration below, not a body.
+        let (expr, body_fuel) = if stopped_short {
+            (None, None)
+        } else {
+            self.parse_fn_block()
+        };
         if fuel.is_none() {
             fuel = body_fuel;
         }
@@ -2128,7 +2357,8 @@ impl<'a> Parser<'a> {
 
     fn parse_fn_block(&mut self) -> (Option<Expr>, Option<u32>) {
         if self.peek().kind != TokenKind::LBrace {
-            self.skip_rest_of_statement();
+            self.error_where_statement_stops("expected `{` to begin the function body");
+            self.skip_rest_of_header();
             return (None, None);
         }
         self.bump();
@@ -2188,6 +2418,9 @@ impl<'a> Parser<'a> {
     fn parse_rule_decl(&mut self) -> Decl {
         self.start_node(SyntaxKind::DECL);
         let start = self.bump();
+        if self.keyword_stands_alone() {
+            return self.keyword_alone(start, "rule", "expected rule name");
+        }
         let name = if self.at_name() || self.peek().kind == TokenKind::Error {
             Some(self.parse_ident_name())
         } else {
@@ -2201,9 +2434,15 @@ impl<'a> Parser<'a> {
             Vec::new()
         };
         let mut rule_kind = None;
+        let mut stopped_short = false;
         if self.peek().kind == TokenKind::Colon {
             self.bump();
-            if self.at_name() {
+            if self.declaration_begins_below() {
+                // The header stopped at `:`, and the line below is not its
+                // kind: it begins a declaration of its own.
+                self.error_at_last_read("expected rule kind");
+                stopped_short = true;
+            } else if self.at_name() {
                 rule_kind = Some(self.parse_ident_name());
             } else {
                 self.error_here("expected rule kind");
@@ -2218,7 +2457,10 @@ impl<'a> Parser<'a> {
         let mut consequences = Vec::new();
         let mut fallback = Vec::new();
         let mut require = None;
-        if self.peek().kind == TokenKind::LBrace {
+        // A header that stopped short where its kind should stand has been
+        // reported. What follows it is the declaration below, not a body.
+        let has_body = !stopped_short && self.peek().kind == TokenKind::LBrace;
+        if has_body {
             self.bump();
             while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
                 if self.eat_ident("when") {
@@ -2229,15 +2471,17 @@ impl<'a> Parser<'a> {
                 } else if self.eat_ident("then") {
                     if let Some(item) = self.parse_rule_consequence() {
                         consequences.push(item);
-                        self.finish_rule_stmt();
                     } else {
+                        self.error_where_statement_stops("expected a consequence after `then`");
                         self.skip_rest_of_statement();
                     }
                 } else if self.eat_ident("otherwise") {
                     if let Some(item) = self.parse_rule_consequence() {
                         fallback.push(item);
-                        self.finish_rule_stmt();
                     } else {
+                        self.error_where_statement_stops(
+                            "expected a consequence after `otherwise`",
+                        );
                         self.skip_rest_of_statement();
                     }
                 } else if self.eat_ident("require") {
@@ -2287,14 +2531,20 @@ impl<'a> Parser<'a> {
                         source_basis = Some(e);
                     }
                     self.eat_semi();
+                } else if self.at_ident("valid_time") || self.at_ident("record_time") {
+                    self.parse_rule_interval();
                 } else {
+                    // Text that is no statement of a rule: a line the rule
+                    // does not recognize, or what follows a statement on
+                    // its line.
+                    self.error_here("expected a rule statement");
                     self.skip_balanced_until_end();
                 }
             }
             self.expect_kind(TokenKind::RBrace, "expected `}`");
-        } else {
-            self.error_here("expected `{` to begin the rule body");
-            self.skip_rest_of_statement();
+        } else if !stopped_short {
+            self.error_where_statement_stops("expected `{` to begin the rule body");
+            self.skip_rest_of_header();
         }
         let end = self.last_end(start.end);
         let mut decl = Decl::new(
@@ -2332,8 +2582,18 @@ impl<'a> Parser<'a> {
         Some(ConsequenceAst { verb, expr })
     }
 
-    fn finish_rule_stmt(&mut self) {
-        if !self.at_rule_stmt() && !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
+    /// A `valid_time` or `record_time` line of a rule: the word and an
+    /// interval. The interval is read so that the line is one statement.
+    /// Nothing of it is kept, because the interpreter does not apply these
+    /// lines.
+    fn parse_rule_interval(&mut self) {
+        let word = self.bump();
+        if !self.at_stmt_break() && self.peek().kind == TokenKind::LBracket {
+            let _ = self.inside_delimiters(Self::parse_interval_expr);
+            self.eat_semi();
+        } else {
+            let message = format!("expected an interval after `{}`", self.text(word));
+            self.error_where_statement_stops(&message);
             self.skip_rest_of_statement();
         }
     }
@@ -2341,15 +2601,6 @@ impl<'a> Parser<'a> {
     fn at_consequence_op(&mut self) -> bool {
         let t = self.peek();
         t.kind == TokenKind::Ident && CONSEQUENCE_OPS.contains(&self.text(t))
-    }
-
-    fn at_rule_stmt(&mut self) -> bool {
-        let t = self.peek();
-        t.kind == TokenKind::Ident
-            && matches!(
-                self.text(t),
-                "when" | "then" | "otherwise" | "require" | "select" | "source"
-            )
     }
 
     fn parse_expr(&mut self) -> Option<Expr> {
@@ -2701,8 +2952,8 @@ impl<'a> Parser<'a> {
             .parse_expr_before_block()
             .unwrap_or(Expr::Ident(String::new()));
         // When the statement has ended after the condition, what follows is
-        // not the branch. A branch without braces is an expression on the
-        // same line.
+        // not the branch. A branch without braces is an expression in the
+        // same statement.
         let branch = if self.at_stmt_break() {
             None
         } else if self.peek().kind == TokenKind::LBrace {
@@ -2729,8 +2980,8 @@ impl<'a> Parser<'a> {
             return None;
         }
         // When the statement has ended after the word `else`, what follows
-        // is not the branch. A branch without braces is an expression on the
-        // same line.
+        // is not the branch. A branch without braces is an expression in the
+        // same statement: `else`, then `(2)` on the next line, is one.
         let branch = if self.at_stmt_break() {
             None
         } else if self.at_ident("if") {
@@ -3198,9 +3449,64 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Steps over what is left of the header of a declaration, as
+    /// `skip_rest_of_statement` does, with one difference: outside brackets,
+    /// a line that begins with a declaration keyword is never part of the
+    /// header above it. The line rule would join the two when the header's
+    /// line ends in a token that cannot end a statement, such as `:`.
+    /// Returns true when the header stops short in that way.
+    fn skip_rest_of_header(&mut self) -> bool {
+        if self.passed_statement_end() {
+            return false;
+        }
+        if !self.next_token_ends_statement() && self.declaration_begins_below() {
+            return true;
+        }
+        self.skip_statement(true)
+    }
+
+    /// Steps over what is left of a header the parser does not read, and
+    /// reports `E100` when the header stops short of the declaration below,
+    /// unless the token it stops at has just been reported.
+    fn finish_header(&mut self) {
+        if self.skip_rest_of_header() && !self.last_read_is_reported() {
+            self.error_at_last_read("expected the rest of the declaration");
+        }
+    }
+
+    /// Steps over the tokens that are left on the line of the last token
+    /// read, up to a `}` that closes no `{` of that line. A header that
+    /// cannot be read is stepped over like this, so that a bracket it
+    /// leaves open does not take the lines below. When the cursor has
+    /// passed the end of that line, nothing is left.
+    fn skip_rest_of_line(&mut self) {
+        if self.line_end_passed() {
+            return;
+        }
+        let mut depth = 0u32;
+        loop {
+            match self.peek_raw().kind {
+                TokenKind::Newline | TokenKind::Eof => return,
+                TokenKind::RBrace if depth == 0 => return,
+                TokenKind::LBrace => depth += 1,
+                TokenKind::RBrace => depth -= 1,
+                _ => {}
+            }
+            self.idx += 1;
+        }
+    }
+
     /// Steps over one statement that begins at the cursor, or over what is
     /// left of the current one, without reading it.
     fn skip_balanced_until_end(&mut self) {
+        self.skip_statement(false);
+    }
+
+    /// Steps over a statement as `skip_balanced_until_end` describes. For
+    /// the header of a declaration it also stops, and returns true, at the
+    /// end of a line outside brackets that does not end the statement when
+    /// the next line that has a token begins with a declaration keyword.
+    fn skip_statement(&mut self, header: bool) -> bool {
         let mut depth_brace = 0u32;
         let mut depth_paren = 0u32;
         let mut depth_brack = 0u32;
@@ -3216,7 +3522,7 @@ impl<'a> Parser<'a> {
                 continue;
             }
             match t.kind {
-                TokenKind::Eof => return,
+                TokenKind::Eof => return false,
                 TokenKind::LBrace => {
                     depth_brace += 1;
                     last_sig = t.kind;
@@ -3224,7 +3530,7 @@ impl<'a> Parser<'a> {
                 }
                 TokenKind::RBrace => {
                     if depth_brace == 0 && depth_paren == 0 && depth_brack == 0 {
-                        return;
+                        return false;
                     }
                     depth_brace = depth_brace.saturating_sub(1);
                     last_sig = t.kind;
@@ -3233,7 +3539,7 @@ impl<'a> Parser<'a> {
                         if self.is_continuation(self.peek_significant()) {
                             continue;
                         }
-                        return;
+                        return false;
                     }
                 }
                 TokenKind::LParen => {
@@ -3264,18 +3570,21 @@ impl<'a> Parser<'a> {
                     last_sig = t.kind;
                     self.idx += 1;
                     if depth_brace == 0 && depth_paren == 0 && depth_brack == 0 {
-                        return;
+                        return false;
                     }
                 }
                 TokenKind::Newline => {
-                    if depth_brace == 0
-                        && depth_paren == 0
-                        && depth_brack == 0
+                    let outside_brackets = depth_brace == 0 && depth_paren == 0 && depth_brack == 0;
+                    if outside_brackets
                         && Self::can_end_statement(last_sig)
                         && !self.next_line_continues(self.idx)
                     {
                         self.idx += 1;
-                        return;
+                        return false;
+                    }
+                    if header && outside_brackets && self.declaration_begins_after(self.idx) {
+                        self.idx += 1;
+                        return true;
                     }
                     self.idx += 1;
                 }
@@ -6443,9 +6752,19 @@ module M version "0.1.0" {
 
     const RULE_NEEDS_A_BODY: &str = "expected `{` to begin the rule body";
     const VERIFY_NEEDS_A_BLOCK: &str = "expected `{` to begin the verify block";
+    const FUNCTION_NEEDS_A_BODY: &str = "expected `{` to begin the function body";
+    const NEEDS_A_NAME: &str = "expected a name";
+    const NEEDS_A_TYPE: &str = "expected a type";
+    const NEEDS_A_RULE_KIND: &str = "expected rule kind";
+    const NEEDS_A_NAME_PART: &str = "expected identifier";
+    const TYPE_NEEDS_AN_EQUALS_SIGN: &str = "expected `=` in type declaration";
+    const STOPS_SHORT: &str = "expected the rest of the declaration";
 
-    /// Declarations cut short after their header: the line, the name the
-    /// parser gives the declaration, and its diagnostics.
+    /// Declarations cut short: the line, the name the parser gives the
+    /// declaration, and its diagnostics. The first rows end after a header,
+    /// the next ones hold a keyword and nothing else, and the ones after
+    /// those end in `:`, `->`, `=` or `.`, after which the line rule reads
+    /// on. The last rows are type declarations with no definition.
     const TRUNCATED_HEADERS: &[(&str, Option<&str>, &[&str])] = &[
         ("proposition P", Some("P"), &[]),
         ("entity E", Some("E"), &[]),
@@ -6470,8 +6789,8 @@ module M version "0.1.0" {
         ("verify V", Some("V"), &[VERIFY_NEEDS_A_BLOCK]),
         ("query Q() -> Bool", Some("Q"), &[]),
         ("query Q()", Some("Q"), &[]),
-        ("calc f(a: Int) -> Int", Some("f"), &[]),
-        ("fn g(a: Int) -> Int", Some("g"), &[]),
+        ("calc f(a: Int) -> Int", Some("f"), &[FUNCTION_NEEDS_A_BODY]),
+        ("fn g(a: Int) -> Int", Some("g"), &[FUNCTION_NEEDS_A_BODY]),
         ("for_all x", Some("x"), &[]),
         ("exists y", Some("y"), &[]),
         ("jurisdiction", None, &[]),
@@ -6482,6 +6801,120 @@ module M version "0.1.0" {
         ("import M", Some("M"), &[]),
         ("type T = Int", Some("T"), &[]),
         ("nomination A for B rank 1", Some("A"), &[]),
+        // A keyword that reads a name, with nothing after it on its line.
+        ("proposition", None, &[NEEDS_A_NAME]),
+        ("entity", None, &[NEEDS_A_NAME]),
+        ("office", None, &[NEEDS_A_NAME]),
+        ("duty", None, &[NEEDS_A_NAME]),
+        ("power", None, &[NEEDS_A_NAME]),
+        ("scenario", None, &[NEEDS_A_NAME]),
+        ("clause", None, &[NEEDS_A_NAME]),
+        ("decision", None, &[NEEDS_A_NAME]),
+        ("legal_act", None, &[NEEDS_A_NAME]),
+        ("effect", None, &[NEEDS_A_NAME]),
+        ("interpretation_family", None, &[NEEDS_A_NAME]),
+        ("conflict_doctrine", None, &[NEEDS_A_NAME]),
+        ("for_all", None, &[NEEDS_A_NAME]),
+        ("exists", None, &[NEEDS_A_NAME]),
+        ("nomination", None, &[NEEDS_A_NAME]),
+        ("type", None, &[NEEDS_A_NAME]),
+        ("record_type", None, &[NEEDS_A_NAME]),
+        ("evidence_type", None, &[NEEDS_A_NAME]),
+        ("observation", None, &[NEEDS_A_NAME]),
+        ("judgment", None, &[NEEDS_A_NAME]),
+        ("source", None, &["expected source name"]),
+        ("import", None, &["expected import name"]),
+        ("rule", None, &["expected rule name"]),
+        ("verify", None, &["expected verification name"]),
+        ("query", None, &["expected query name"]),
+        ("query automatic", None, &["expected query name"]),
+        ("calc", None, &["expected function name"]),
+        ("fn", None, &["expected function name"]),
+        // A header that ends in `:`.
+        ("entity E :", Some("E"), &[NEEDS_A_TYPE]),
+        ("rule R :", Some("R"), &[NEEDS_A_RULE_KIND]),
+        ("rule R(x: T) :", Some("R"), &[NEEDS_A_RULE_KIND]),
+        ("proposition P :", Some("P"), &[STOPS_SHORT]),
+        ("office O :", Some("O"), &[STOPS_SHORT]),
+        ("duty D :", Some("D"), &[STOPS_SHORT]),
+        ("power W :", Some("W"), &[STOPS_SHORT]),
+        ("scenario S :", Some("S"), &[STOPS_SHORT]),
+        ("clause C :", Some("C"), &[STOPS_SHORT]),
+        ("decision D2 :", Some("D2"), &[STOPS_SHORT]),
+        ("legal_act L :", Some("L"), &[STOPS_SHORT]),
+        ("effect F :", Some("F"), &[STOPS_SHORT]),
+        ("interpretation_family I :", Some("I"), &[STOPS_SHORT]),
+        ("conflict_doctrine X :", Some("X"), &[STOPS_SHORT]),
+        ("source S2 :", Some("S2"), &[STOPS_SHORT]),
+        ("verify V :", Some("V"), &[VERIFY_NEEDS_A_BLOCK]),
+        ("query Q() :", Some("Q"), &[STOPS_SHORT]),
+        ("calc f(a: Int) :", Some("f"), &[FUNCTION_NEEDS_A_BODY]),
+        ("fn g(a: Int) :", Some("g"), &[FUNCTION_NEEDS_A_BODY]),
+        ("for_all x in D :", Some("x"), &[STOPS_SHORT]),
+        ("exists y in D :", Some("y"), &[STOPS_SHORT]),
+        ("jurisdiction Test :", None, &[STOPS_SHORT]),
+        ("effective_at 2026-01-01 :", None, &[STOPS_SHORT]),
+        ("recorded_at 2026-01-01T00:00:00Z :", None, &[STOPS_SHORT]),
+        ("outside_scope { everything_else } :", None, &[STOPS_SHORT]),
+        ("import M :", Some("M"), &[STOPS_SHORT]),
+        ("nomination A for B rank 1 :", Some("A"), &[STOPS_SHORT]),
+        // A header that ends in `->`.
+        ("decision D2(x: Int) ->", Some("D2"), &[NEEDS_A_TYPE]),
+        ("query Q() ->", Some("Q"), &[NEEDS_A_TYPE]),
+        ("query automatic Q() ->", Some("Q"), &[NEEDS_A_TYPE]),
+        ("calc f(a: Int) ->", Some("f"), &[NEEDS_A_TYPE]),
+        ("fn g(a: Int) ->", Some("g"), &[NEEDS_A_TYPE]),
+        ("proposition P(x: Int) ->", Some("P"), &[STOPS_SHORT]),
+        ("entity E ->", Some("E"), &[STOPS_SHORT]),
+        ("office O ->", Some("O"), &[STOPS_SHORT]),
+        ("duty D ->", Some("D"), &[STOPS_SHORT]),
+        ("power W ->", Some("W"), &[STOPS_SHORT]),
+        ("scenario S ->", Some("S"), &[STOPS_SHORT]),
+        ("clause C ->", Some("C"), &[STOPS_SHORT]),
+        ("legal_act L ->", Some("L"), &[STOPS_SHORT]),
+        ("effect F ->", Some("F"), &[STOPS_SHORT]),
+        ("interpretation_family I ->", Some("I"), &[STOPS_SHORT]),
+        ("conflict_doctrine X ->", Some("X"), &[STOPS_SHORT]),
+        ("source S2 ->", Some("S2"), &[STOPS_SHORT]),
+        ("rule R ->", Some("R"), &[RULE_NEEDS_A_BODY]),
+        ("verify V ->", Some("V"), &[VERIFY_NEEDS_A_BLOCK]),
+        ("for_all x in D ->", Some("x"), &[STOPS_SHORT]),
+        ("exists y in D ->", Some("y"), &[STOPS_SHORT]),
+        ("jurisdiction Test ->", None, &[STOPS_SHORT]),
+        ("effective_at 2026-01-01 ->", None, &[STOPS_SHORT]),
+        ("recorded_at 2026-01-01T00:00:00Z ->", None, &[STOPS_SHORT]),
+        ("outside_scope { everything_else } ->", None, &[STOPS_SHORT]),
+        ("import M ->", Some("M"), &[STOPS_SHORT]),
+        ("nomination A for B rank 1 ->", Some("A"), &[STOPS_SHORT]),
+        // A header that ends in `=`, and a sum type that ends in `|`.
+        ("type T =", Some("T"), &[NEEDS_A_TYPE]),
+        ("type T = A |", Some("T"), &[NEEDS_A_TYPE]),
+        ("power W =", Some("W"), &[STOPS_SHORT]),
+        ("jurisdiction Test =", None, &[STOPS_SHORT]),
+        // A header that ends in the `.` of a qualified name.
+        ("entity E .", Some("E"), &[NEEDS_A_NAME_PART]),
+        ("proposition P .", Some("P"), &[NEEDS_A_NAME_PART]),
+        ("power W .", Some("W"), &[NEEDS_A_NAME_PART]),
+        ("import M .", Some("M"), &[NEEDS_A_NAME_PART]),
+        ("source S2 .", Some("S2"), &[NEEDS_A_NAME_PART]),
+        ("entity E : A .", Some("E"), &[NEEDS_A_NAME_PART]),
+        ("type T = A .", Some("T"), &[NEEDS_A_NAME_PART]),
+        ("query Q() -> A .", Some("Q"), &[NEEDS_A_NAME_PART]),
+        (
+            "calc f(a: Int) -> A .",
+            Some("f"),
+            &[NEEDS_A_NAME_PART, FUNCTION_NEEDS_A_BODY],
+        ),
+        ("rule R .", Some("R"), &[RULE_NEEDS_A_BODY]),
+        ("jurisdiction Test .", None, &[STOPS_SHORT]),
+        // A type declaration with no `=`, or with no type after it, and a
+        // bracket that the line leaves open.
+        ("type T", Some("T"), &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("type T {", Some("T"), &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("type T (", Some("T"), &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("type T { a: Int }", Some("T"), &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("type T = {", Some("T"), &["expected type"]),
+        ("type T = 5", Some("T"), &["expected type"]),
     ];
 
     #[test]
@@ -6497,10 +6930,14 @@ module M version "0.1.0" {
                 let keyword = line.split(' ').next().unwrap_or(line);
                 // The text the parser keeps for the first item is its own
                 // line with its line end, and nothing of the lines below it.
-                // A header keyword with no value has the empty text.
+                // For a header keyword it is what follows the keyword on its
+                // line.
                 let (first_text, own_text) =
                     match parsed.module().and_then(|module| module.items.first()) {
-                        Some(Item::Header(header)) => (header.value.as_str(), String::new()),
+                        Some(Item::Header(header)) => (
+                            header.value.as_str(),
+                            line[keyword.len()..].trim().to_owned(),
+                        ),
                         Some(item) => (
                             item.decl().map_or("", |decl| decl.source.as_str()),
                             format!("{line}\n"),
@@ -6645,28 +7082,470 @@ module M version "0.1.0" {
     }
 
     #[test]
-    fn a_then_alone_on_its_line_does_not_take_the_statement_below_it() {
-        for word in ["then", "otherwise"] {
-            let parsed = parse_body(&format!(
-                "rule R : derive {{\n{word}\nwhen true\nthen derive Q()\n}}"
-            ));
-            let rule = first_decl(&parsed);
-            assert_eq!(rule.guard, Some(Expr::Bool(true)), "below `{word}`");
-            assert_eq!(rule.consequences.len(), 1, "below `{word}`");
-            assert!(rule.fallback.is_empty(), "below `{word}`");
+    fn a_function_without_a_body_is_e100_and_keeps_its_header() {
+        for keyword in ["calc", "fn"] {
+            // The header ends with its type, with a `fuel` clause, with an
+            // effect row or with its parameters.
+            for header in [
+                "f(a: Int) -> Int",
+                "f(a: Int) -> Int fuel = 100",
+                "f(a: Int) -> Int ! {Observe}",
+                "f(a: Int)",
+            ] {
+                let parsed = parse_file(&wrap_module(&format!(
+                    "{keyword} {header}\nproposition Witness()"
+                )));
+                let diagnostics: Vec<(DiagnosticCode, &str)> = parsed
+                    .diagnostics
+                    .iter()
+                    .map(|diagnostic| (diagnostic.code, diagnostic.message.as_str()))
+                    .collect();
+                assert_eq!(
+                    diagnostics,
+                    [(DiagnosticCode::E100, FUNCTION_NEEDS_A_BODY)],
+                    "{keyword} {header}"
+                );
+                assert_eq!(
+                    item_names(&parsed),
+                    [(keyword, Some("f")), ("proposition", Some("Witness"))],
+                    "{keyword} {header}"
+                );
+                let function = first_decl(&parsed);
+                assert_eq!(function.params, [("a".to_owned(), "Int".to_owned())]);
+                assert_eq!(function.expr, None, "{keyword} {header}");
+            }
+            // Text between the header and a block is stepped over together
+            // with the block, which is not read as the body.
+            let parsed = parse_file(&wrap_module(&format!(
+                "{keyword} f(a: Int) -> Int extra {{ return 7 }}\nproposition Witness()"
+            )));
+            assert_eq!(messages(&parsed), [FUNCTION_NEEDS_A_BODY], "{keyword}");
+            assert_eq!(
+                item_names(&parsed),
+                [(keyword, Some("f")), ("proposition", Some("Witness"))],
+                "{keyword}"
+            );
+            assert_eq!(first_decl(&parsed).expr, None, "{keyword}");
         }
     }
 
     #[test]
-    fn text_a_rule_does_not_read_is_stepped_over_and_takes_no_statement_with_it() {
-        // `using Protocol` is left over after the consequence on its line,
-        // and `nonsense here` is a line the rule does not recognize.
-        for lines in [
-            "then derive Q() using Protocol\nwhen true",
-            "then derive Q()\nnonsense here\nwhen true",
-            "nonsense here\nwhen true\nthen derive Q()",
+    fn a_header_that_stops_short_is_reported_at_its_last_token() {
+        // The line, the diagnostic and the token of the line it points at.
+        let rows = [
+            ("rule R : derive", RULE_NEEDS_A_BODY, "derive"),
+            ("rule R : derive from \"c\"", RULE_NEEDS_A_BODY, "\"c\""),
+            ("verify V", VERIFY_NEEDS_A_BLOCK, "V"),
+            ("calc f(a: Int) -> Int", FUNCTION_NEEDS_A_BODY, "Int"),
+            ("proposition", NEEDS_A_NAME, "proposition"),
+            ("rule", "expected rule name", "rule"),
+            ("query automatic", "expected query name", "automatic"),
+            ("entity E :", NEEDS_A_TYPE, ":"),
+            ("decision D2(x: Int) ->", NEEDS_A_TYPE, "->"),
+            ("type T =", NEEDS_A_TYPE, "="),
+            ("rule R :", NEEDS_A_RULE_KIND, ":"),
+            ("power W =", STOPS_SHORT, "="),
+            ("jurisdiction Test :", STOPS_SHORT, ":"),
+            // Text that stands where the block would begin is part of the
+            // statement, so the diagnostic points at it.
+            ("rule R : derive extra { }", RULE_NEEDS_A_BODY, "extra"),
+            ("verify V extra { }", VERIFY_NEEDS_A_BLOCK, "extra"),
+            ("calc f() -> Int extra { }", FUNCTION_NEEDS_A_BODY, "extra"),
+        ];
+        let mut failures = Vec::new();
+        for (line, message, token) in rows {
+            // The declaration after it stands on the next line or below a
+            // blank line.
+            for between in ["", "\n"] {
+                let module = wrap_module(&format!("{line}\n{between}proposition Witness()"));
+                let parsed = parse_file(&module);
+                let line_start = module.find(line).expect("the line");
+                let token_start = line_start + line.rfind(token).expect("the token");
+                let pointed_at: Vec<(&str, Option<(usize, usize)>)> = parsed
+                    .diagnostics
+                    .iter()
+                    .map(|diagnostic| {
+                        let span = diagnostic
+                            .primary_span
+                            .map(|span| (span.start as usize, span.end as usize));
+                        (diagnostic.message.as_str(), span)
+                    })
+                    .collect();
+                let expected = vec![(message, Some((token_start, token_start + token.len())))];
+                if pointed_at != expected {
+                    failures.push(format!(
+                        "`{line}` then {between:?}\n    read:     {pointed_at:?}\n    expected: {expected:?}"
+                    ));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "{} diagnostics do not point at the header they are about:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn a_keyword_alone_before_the_end_of_the_module_is_e100() {
+        // Nothing follows the keyword: not on its line, and not in the
+        // module.
+        for (keyword, message) in [
+            ("proposition", NEEDS_A_NAME),
+            ("entity", NEEDS_A_NAME),
+            ("rule", "expected rule name"),
+            ("query", "expected query name"),
         ] {
-            let parsed = parse_body(&format!("rule R : derive {{\n{lines}\n}}"));
+            for end in ["\n}\n", " }\n", ";\n}\n"] {
+                let parsed = parse_file(&format!(
+                    "module X version \"0.1.0\" {{\nproposition Witness()\n{keyword}{end}"
+                ));
+                assert_eq!(messages(&parsed), [message], "{keyword} then {end:?}");
+                assert_eq!(
+                    item_names(&parsed),
+                    [("proposition", Some("Witness")), (keyword, None)],
+                    "{keyword} then {end:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_type_with_an_open_brace_and_no_definition_is_e100_and_the_parse_ends() {
+        // The parser did not stop on this module: with no `=` it read the
+        // `{` as the fields of a variant, and the loop over the fields
+        // consumed nothing at the `(` of the line below.
+        let parsed = parse_file(
+            "module Probe.Shape version \"0.1.0\" {\ntype N {\nproposition Witness()\n}\n",
+        );
+        let diagnostics: Vec<(DiagnosticCode, &str)> = parsed
+            .diagnostics
+            .iter()
+            .map(|diagnostic| (diagnostic.code, diagnostic.message.as_str()))
+            .collect();
+        assert_eq!(
+            diagnostics,
+            [(DiagnosticCode::E100, TYPE_NEEDS_AN_EQUALS_SIGN)]
+        );
+        assert_eq!(
+            item_names(&parsed),
+            [("type", Some("N")), ("proposition", Some("Witness"))]
+        );
+    }
+
+    #[test]
+    fn a_loop_over_fields_moves_on_at_a_token_that_begins_no_field() {
+        // Each loop here reads a name, a `:` and a type or a value. At a
+        // token that is none of those it consumed nothing, so the parse did
+        // not end. The token is now reported and stepped over.
+        // Beside each module: whether the declaration after it is kept. An
+        // opening bracket that nothing closes takes the rest of the module.
+        for (body, kept) in [
+            // The fields of a variant.
+            ("type T = A { ) }\nproposition Witness()", true),
+            ("type T = A { ( }\nproposition Witness()", false),
+            (
+                "type T = A { ) : Int, b: Int }\nproposition Witness()",
+                true,
+            ),
+            (
+                "type T = A {\n\"s\"\nb: Int\n}\nproposition Witness()",
+                true,
+            ),
+            ("type T = A {\nproposition Witness()", false),
+            // The fields of a judgment's request.
+            (
+                "judgment J(x: T) decides P(x) {\nauthority A\notherwise suspend NeedJudgment { ) }\n}\nproposition Witness()",
+                true,
+            ),
+            (
+                "judgment J(x: T) decides P(x) {\nauthority A\notherwise suspend NeedJudgment {\nissue: P(x)\n-> stray\nprotocol: Determine\n}\n}\nproposition Witness()",
+                true,
+            ),
+            (
+                "judgment J(x: T) decides P(x) {\nauthority A\notherwise suspend NeedJudgment {\n(\nproposition Witness()",
+                false,
+            ),
+        ] {
+            let parsed = parse_file(&wrap_module(body));
+            assert!(
+                messages(&parsed).contains(&"expected identifier"),
+                "{body:?}: {:?}",
+                messages(&parsed)
+            );
+            let witness = item_names(&parsed).contains(&("proposition", Some("Witness")));
+            assert_eq!(witness, kept, "{body:?}");
+        }
+    }
+
+    /// Every keyword that begins a declaration.
+    const DECLARATION_KEYWORDS: &[&str] = &[
+        "jurisdiction",
+        "source_snapshot",
+        "source_manifest",
+        "effective_at",
+        "recorded_at",
+        "outside_scope",
+        "source",
+        "import",
+        "entity",
+        "type",
+        "record_type",
+        "evidence_type",
+        "office",
+        "proposition",
+        "observation",
+        "nomination",
+        "fn",
+        "calc",
+        "effect",
+        "for_all",
+        "exists",
+        "rule",
+        "power",
+        "duty",
+        "judgment",
+        "decision",
+        "legal_act",
+        "clause",
+        "interpretation_family",
+        "conflict_doctrine",
+        "query",
+        "scenario",
+        "verify",
+    ];
+
+    #[test]
+    fn every_header_that_stops_early_is_parsed_to_the_end() {
+        // This test exists to catch a parse that does not end: it passes
+        // when every parse returns. One that does not end hangs the test and
+        // allocates until the test process is stopped, so run it under a
+        // memory limit after a change to a loop of the parser.
+        //
+        // Each header is a keyword in one of five forms, followed by one of
+        // these tokens on its line or on a line of its own, above another
+        // declaration.
+        let stems = [
+            "{k} N",
+            "{k} N(x: Int)",
+            "{k} N : T",
+            "{k} N(x: Int) -> T",
+            "{k}",
+        ];
+        let tails = [
+            ":",
+            "->",
+            "=",
+            ",",
+            ".",
+            "+",
+            "-",
+            "*",
+            "/",
+            "|",
+            "<",
+            ">",
+            "!",
+            "=>",
+            "==",
+            "<=",
+            "(",
+            "[",
+            "{",
+            "not",
+            "effective",
+            "operative",
+            "and",
+            "or",
+            "in",
+            "from",
+            "for",
+            "rank",
+            "version",
+            "using",
+            "as",
+            "to",
+            "where",
+            "then",
+            "else",
+            "fuel",
+            "decides",
+            "occupied_by",
+            "establishes",
+        ];
+        let mut parses = 0;
+        let mut silent = Vec::new();
+        for keyword in DECLARATION_KEYWORDS {
+            assert!(is_declaration_keyword(keyword), "{keyword}");
+            for stem in stems {
+                let header = stem.replace("{k}", keyword);
+                for tail in tails {
+                    for line in [format!("{header} {tail}"), format!("{header}\n{tail}")] {
+                        let parsed =
+                            parse_file(&wrap_module(&format!("{line}\nproposition Witness()")));
+                        parses += 1;
+                        // A header the parser accepts without a diagnostic
+                        // has not taken the declaration below it.
+                        let kept = item_names(&parsed).contains(&("proposition", Some("Witness")));
+                        if !parsed.has_errors() && !kept {
+                            silent.push(line);
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(parses, 33 * 5 * 39 * 2);
+        assert!(
+            silent.is_empty(),
+            "{} headers take the declaration below them without a diagnostic: {silent:?}",
+            silent.len()
+        );
+    }
+
+    #[test]
+    fn type_arguments_that_are_not_closed_are_e100_and_take_no_declaration() {
+        // After `<` the parser reads on to the `>`. The declaration below
+        // is not a type argument.
+        for (header, keyword, diagnostics) in [
+            ("entity E : A <", "entity", vec!["expected `>`"]),
+            ("entity E : A <\nB,", "entity", vec!["expected `>`"]),
+            (
+                "decision D(x: Int) -> A <",
+                "decision",
+                vec!["expected `>`"],
+            ),
+            ("query Q() -> A<B, C", "query", vec!["expected `>`"]),
+            ("type T = A <", "type", vec!["expected `>`"]),
+            (
+                "calc f(a: Int) -> A <",
+                "calc",
+                vec!["expected `>`", FUNCTION_NEEDS_A_BODY],
+            ),
+        ] {
+            let parsed = parse_file(&wrap_module(&format!("{header}\nproposition Witness()")));
+            assert_eq!(messages(&parsed), diagnostics, "{header:?}");
+            let items = item_names(&parsed);
+            assert_eq!(
+                (items.first().map(|item| item.0), items.get(1)),
+                (Some(keyword), Some(&("proposition", Some("Witness")))),
+                "{header:?}"
+            );
+        }
+        // Arguments that are closed on a later line are read as before.
+        let parsed = parse_body("entity E : Map<\nK,\nV\n>\nproposition Witness()");
+        assert_eq!(
+            item_names(&parsed),
+            [("entity", Some("E")), ("proposition", Some("Witness"))]
+        );
+        assert_eq!(
+            first_decl(&parsed).result_type.as_deref(),
+            Some("Map<\nK,\nV\n>")
+        );
+    }
+
+    #[test]
+    fn a_type_or_a_rule_kind_on_the_line_below_is_read_when_it_begins_no_declaration() {
+        // The line rule reads on after `:`, `->` and `=`, and a line that
+        // begins with `->` or `{` continues the header above it.
+        let parsed = parse_body(
+            "entity Pat :\nNaturalPerson\ndecision D(x: Int) ->\nBool\nrule R :\nderive {\nwhen true\nthen derive P()\n}\nquery q()\n-> Int\n{ return 7 }\ntype T =\nInt",
+        );
+        assert_eq!(
+            item_names(&parsed),
+            [
+                ("entity", Some("Pat")),
+                ("decision", Some("D")),
+                ("rule", Some("R")),
+                ("query", Some("q")),
+                ("type", Some("T")),
+            ]
+        );
+        let module = parsed.module().expect("a module");
+        let decls: Vec<&Decl> = module.items.iter().filter_map(Item::decl).collect();
+        assert_eq!(decls[0].result_type.as_deref(), Some("NaturalPerson"));
+        assert_eq!(decls[1].result_type.as_deref(), Some("Bool"));
+        assert_eq!(decls[2].rule_kind.as_deref(), Some("derive"));
+        assert_eq!(decls[3].result_type.as_deref(), Some("Int"));
+        assert_eq!(decls[3].expr, Some(Expr::Int(7)));
+    }
+
+    #[test]
+    fn a_then_or_an_otherwise_with_no_consequence_is_e100() {
+        for word in ["then", "otherwise"] {
+            let message = format!("expected a consequence after `{word}`");
+            // The word stands alone on its line, or what follows it is not
+            // a consequence. Either way the statement below it is kept.
+            for line in [word.to_owned(), format!("{word} Q()")] {
+                let module = wrap_module(&format!(
+                    "rule R : derive {{\n{line}\nwhen true\nthen derive Q()\n}}"
+                ));
+                let parsed = parse_file(&module);
+                assert_eq!(messages(&parsed), [message.as_str()], "`{line}`");
+                let rule = first_decl(&parsed);
+                assert_eq!(rule.guard, Some(Expr::Bool(true)), "below `{line}`");
+                assert_eq!(rule.consequences.len(), 1, "below `{line}`");
+                assert!(rule.fallback.is_empty(), "below `{line}`");
+                // The diagnostic points at the word when it stands alone,
+                // and at what follows it otherwise.
+                let span = parsed.diagnostics[0].primary_span.expect("a span");
+                let line_start = module.find(&format!("{line}\nwhen")).expect("the line");
+                let expected = if line == word {
+                    (line_start, line_start + word.len())
+                } else {
+                    (line_start + word.len() + 1, line_start + word.len() + 2)
+                };
+                assert_eq!(
+                    (span.start as usize, span.end as usize),
+                    expected,
+                    "`{line}`"
+                );
+            }
+        }
+        // A consequence on the line below the word belongs to it.
+        let parsed = parse_body("rule R : derive {\nthen\nderive Q()\notherwise\nderive P()\n}");
+        let rule = first_decl(&parsed);
+        assert_eq!((rule.consequences.len(), rule.fallback.len()), (1, 1));
+        // A line that begins with `then` continues the line above it. Below
+        // a word that stands alone it is what is left of that statement, so
+        // it is stepped over with it.
+        for word in ["then", "otherwise"] {
+            let parsed = parse_file(&wrap_module(&format!(
+                "rule R : derive {{\n{word}\nthen derive Q()\nwhen true\n}}"
+            )));
+            assert_eq!(
+                messages(&parsed),
+                [format!("expected a consequence after `{word}`")],
+                "`{word}`"
+            );
+            let rule = first_decl(&parsed);
+            assert_eq!(rule.guard, Some(Expr::Bool(true)), "below `{word}`");
+            assert!(rule.consequences.is_empty(), "below `{word}`");
+        }
+    }
+
+    #[test]
+    fn text_in_a_rule_that_is_no_rule_statement_is_e100_and_only_it_is_stepped_over() {
+        // A line stands before, between and after the statements of the
+        // rule. `whne` is `when` misspelled: without the diagnostic the rule
+        // would lose its guard. In the last two rows the text follows a
+        // consequence on its line.
+        for lines in [
+            "nonsense here\nwhen true\nthen derive Q()",
+            "then derive Q()\nnonsense here\nwhen true",
+            "when true\nthen derive Q()\nnonsense here",
+            "when true\nthen derive Q()\nnonsense { here }\n",
+            "whne false\nwhen true\nthen derive Q()",
+            "then derive Q()\n) stray\nwhen true",
+            "then derive Q() using Protocol\nwhen true",
+            "then derive Q() where x > 0\nwhen true",
+        ] {
+            let parsed = parse_file(&wrap_module(&format!("rule R : derive {{\n{lines}\n}}")));
+            assert_eq!(
+                messages(&parsed),
+                ["expected a rule statement"],
+                "{lines:?}"
+            );
             assert_eq!(
                 rule_statements(&parsed),
                 [
@@ -6676,6 +7555,210 @@ module M version "0.1.0" {
                 "{lines:?}"
             );
         }
+        // The diagnostic points at the first token of the line.
+        let module = wrap_module("rule R : derive {\nwhen true\nwhne false\nthen derive Q()\n}");
+        let parsed = parse_file(&module);
+        let span = parsed.diagnostics[0].primary_span.expect("a span");
+        assert_eq!(&module[span.start as usize..span.end as usize], "whne");
+        let module = wrap_module("rule R : derive {\nthen derive Q() using Protocol\n}");
+        let parsed = parse_file(&module);
+        let span = parsed.diagnostics[0].primary_span.expect("a span");
+        assert_eq!(&module[span.start as usize..span.end as usize], "using");
+        // A line that begins with `then` continues the line above it. Below
+        // a line the rule does not recognize it is what is left of that
+        // statement, so it is stepped over with it.
+        let parsed = parse_file(&wrap_module(
+            "rule R : derive {\nwhne false\nthen derive Q()\nwhen true\n}",
+        ));
+        assert_eq!(messages(&parsed), ["expected a rule statement"]);
+        assert_eq!(rule_statements(&parsed), ["when Bool(true)"]);
+    }
+
+    #[test]
+    fn a_valid_time_or_record_time_line_of_a_rule_is_read_and_nothing_of_it_is_kept() {
+        let plain = parse_body("rule R : derive {\nwhen true\nthen establish Q()\n}");
+        // The four lines of the corpus that say when a consequence holds,
+        // and both words on one line.
+        for lines in [
+            "valid_time [effective_at, +inf)\nrecord_time [max_record_time(guard_trace), +inf)",
+            "valid_time [2026-08-14, +inf)\nrecord_time [2026-08-14T00:00:00-04:00, +inf)",
+            "valid_time [2026-08-14, 2027-01-01]",
+            "valid_time [a, b) record_time [c, d)",
+            "valid_time\n[a, b)",
+        ] {
+            // Below the consequence, on its line, and above the guard.
+            for body in [
+                format!("when true\nthen establish Q()\n{lines}"),
+                format!("when true\nthen establish Q() {lines}"),
+                format!("{lines}\nwhen true\nthen establish Q()"),
+            ] {
+                let parsed = parse_file(&wrap_module(&format!("rule R : derive {{\n{body}\n}}")));
+                assert_eq!(messages(&parsed), Vec::<&str>::new(), "{body:?}");
+                let (rule, expected) = (first_decl(&parsed), first_decl(&plain));
+                assert_eq!(rule.guard, expected.guard, "{body:?}");
+                assert_eq!(rule.consequences, expected.consequences, "{body:?}");
+                assert_eq!(rule.fallback, expected.fallback, "{body:?}");
+                assert_eq!(rule.require, expected.require, "{body:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_valid_time_or_record_time_line_with_no_interval_is_e100() {
+        for word in ["valid_time", "record_time"] {
+            let message = format!("expected an interval after `{word}`");
+            // The word stands alone, or what follows it is not an interval.
+            for line in [
+                word.to_owned(),
+                format!("{word} 2026-08-14"),
+                format!("{word} (a, b)"),
+            ] {
+                let parsed = parse_file(&wrap_module(&format!(
+                    "rule R : derive {{\n{line}\nwhen true\nthen derive Q()\n}}"
+                )));
+                assert_eq!(messages(&parsed), [message.as_str()], "`{line}`");
+                assert_eq!(
+                    rule_statements(&parsed),
+                    [
+                        "when Bool(true)".to_owned(),
+                        format!("then derive {:?}", call("Q", Vec::new())),
+                    ],
+                    "`{line}`"
+                );
+            }
+        }
+        // An interval that does not close is `E100` as it is in an
+        // expression.
+        let parsed = parse_file(&wrap_module(
+            "rule R : derive {\nvalid_time [a\nwhen true\nthen derive Q()\n}",
+        ));
+        assert!(
+            messages(&parsed).contains(&"expected `,`"),
+            "{:?}",
+            parsed.diagnostics
+        );
+    }
+
+    #[test]
+    fn a_statement_goal_evaluate_cannot_read_is_e100_and_only_it_is_stepped_over() {
+        let unreadable = "expected evaluation statement";
+        let after_return = "evaluation statement follows `return`";
+        // The lines of the goal, the diagnostics, and the statements kept.
+        let required_false = format!("{:?}", Expr::Require(Box::new(Expr::Bool(false))));
+        let rows: [(&str, &[&str], Vec<String>); 5] = [
+            // `return` with no expression: a token of the statement is
+            // consumed, and the statement has ended.
+            (
+                "true\nreturn\nrequire false",
+                &[unreadable, after_return],
+                vec!["Bool(true)".to_owned(), required_false.clone()],
+            ),
+            // `not` with no operand goes on to the next line by the line
+            // rule, so that line is what is left of the statement.
+            (
+                "true\nnot\nrequire false",
+                &[unreadable],
+                vec!["Bool(true)".to_owned()],
+            ),
+            // A token no statement begins with: nothing is consumed, and
+            // the line is stepped over.
+            (
+                "true\n) stray\nrequire false",
+                &[unreadable],
+                vec!["Bool(true)".to_owned(), required_false.clone()],
+            ),
+            // The statement that cannot be read is the last one.
+            ("true\nreturn", &[unreadable], vec!["Bool(true)".to_owned()]),
+            (
+                "require false\n) stray",
+                &[unreadable],
+                vec![required_false.clone()],
+            ),
+        ];
+        let mut failures = Vec::new();
+        for (lines, diagnostics, statements) in rows {
+            let parsed = parse_file(&wrap_module(&format!(
+                "query q() -> Bool {{\ngoal Evaluate {{\n{lines}\n}}\n}}"
+            )));
+            let read = (messages(&parsed), goal_statements(&parsed));
+            let expected = (diagnostics.to_vec(), statements);
+            if read != expected {
+                failures.push(format!(
+                    "{lines:?}\n    read:     {read:?}\n    expected: {expected:?}"
+                ));
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "{} goals are not read as they should be:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+        // The diagnostic points at the first token of the statement.
+        let module =
+            wrap_module("query q() -> Bool {\ngoal Evaluate {\ntrue\nreturn\nrequire false\n}\n}");
+        let parsed = parse_file(&module);
+        let span = parsed.diagnostics[0].primary_span.expect("a span");
+        assert_eq!(
+            (span.start as usize, span.end as usize),
+            (
+                module.find("return").expect("the word"),
+                module.find("return").expect("the word") + 6
+            )
+        );
+    }
+
+    #[test]
+    fn using_at_the_end_of_a_line_is_e100_and_does_not_take_the_statement_below_it() {
+        let message = "expected a protocol name after `using`";
+        let required = |name: &str| format!("{:?}", Expr::Require(Box::new(ident(name))));
+        // Every place a `require` statement can stand: its name, the lines
+        // before and after the statements, and how to list them.
+        type Statements = fn(&Parse) -> Vec<String>;
+        let places: [(&str, &str, &str, Statements); 4] = [
+            ("a query body", "query q() -> Bool {", "}", body_statements),
+            (
+                "goal Evaluate",
+                "query q() -> Bool {\ngoal Evaluate {",
+                "}\n}",
+                goal_statements,
+            ),
+            ("a calc body", "calc f() -> Bool {", "}", body_statements),
+            (
+                "a transaction",
+                "query q() -> Bool {\ntransaction {",
+                "}\n}",
+                transaction_steps,
+            ),
+        ];
+        for (place, open, close, statements) in places {
+            // `using` ends its line, or what follows it is not a name.
+            for line in ["require a using", "require a\nusing", "require a using 5"] {
+                let parsed =
+                    parse_file(&wrap_module(&format!("{open}\n{line}\nrequire b\n{close}")));
+                assert_eq!(messages(&parsed), [message], "{place}: {line:?}");
+                let read = statements(&parsed);
+                assert_eq!(read.first(), Some(&required("a")), "{place}: {line:?}");
+                assert_eq!(read.last(), Some(&required("b")), "{place}: {line:?}");
+            }
+            // A protocol name after `using`, on its line or with `using` on
+            // the line below the condition, is read as before.
+            for line in ["require a using Determine", "require a\nusing Determine"] {
+                let parsed =
+                    parse_file(&wrap_module(&format!("{open}\n{line}\nrequire b\n{close}")));
+                assert_eq!(messages(&parsed), Vec::<&str>::new(), "{place}: {line:?}");
+                assert_eq!(
+                    statements(&parsed),
+                    [required("a"), required("b")],
+                    "{place}: {line:?}"
+                );
+            }
+        }
+        // The diagnostic points at `using` when the line ends there.
+        let module = wrap_module("query q() -> Bool {\nrequire a using\nrequire b\n}");
+        let parsed = parse_file(&module);
+        let span = parsed.diagnostics[0].primary_span.expect("a span");
+        assert_eq!(&module[span.start as usize..span.end as usize], "using");
     }
 
     #[test]

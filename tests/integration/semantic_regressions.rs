@@ -133,6 +133,22 @@ fn renaming_query_does_not_change_its_computation() {
 }
 
 #[test]
+fn an_if_whose_condition_ends_in_a_name_runs_the_branch_the_condition_selects() {
+    // In `a < b { 1 }` the name `b` stands directly before the `{`. The
+    // block is the branch of the `if`, not an argument of `b`.
+    let module = compile(
+        r#"module Regression version "0.1.0" {
+        calc pick(a: Int, b: Int) -> Int { if a < b { 1 } else { 2 } }
+        query automatic less() -> Int { return pick(1, 2) }
+        query automatic more() -> Int { return pick(2, 1) }
+    }"#,
+    );
+    let case = CaseRecord::default();
+    assert_eq!(answer(run(&module, "less", &case)), Value::Int(1));
+    assert_eq!(answer(run(&module, "more", &case)), Value::Int(2));
+}
+
+#[test]
 fn declared_result_type_survives_lowering() {
     let module = constant_query("q", "true");
     assert_eq!(module.query("q").expect("q").result_type, Type::bool());
