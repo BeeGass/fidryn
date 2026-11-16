@@ -316,13 +316,31 @@ fn the_links_of_chains_that_stand_inside_one_another_are_counted_together() {
 
 #[test]
 fn an_alternative_whose_definitions_are_read_whole_keeps_them() {
-    // The diagnostic is for a definition the reader gives up on, and for
-    // nothing else: a family with a definition that is no proposition is
-    // lowered as before, without that definition.
-    let hir = lowered(
-        "    interpretation_family Reading {\n        alternative Wide {\n            defines Eligible(Alice) as established\n            defines 5 as established\n            defines Eligible(Bob) as not_established\n        }\n    }",
-    )
-    .expect("the family is lowered");
+    // The diagnostic of the limit is for a definition the reader gives up
+    // on, and for nothing else. A family whose definitions are read whole
+    // keeps them all. One with a definition that is no proposition is
+    // rejected for that definition, with `E210`, and not for the limit.
+    let family = |second: &str| {
+        format!(
+            "    interpretation_family Reading {{\n        alternative Wide {{\n            defines Eligible(Alice) as established\n{second}            defines Eligible(Bob) as not_established\n        }}\n    }}"
+        )
+    };
+    let parsed = parse_file(&module(&family("            defines 5 as established\n")));
+    assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
+    let rejected: Vec<(DiagnosticCode, String)> = elaborate(&parsed, &SourceManifest::default())
+        .expect_err("the family is rejected")
+        .into_iter()
+        .map(|diagnostic| (diagnostic.code, diagnostic.message))
+        .collect();
+    assert_eq!(
+        rejected,
+        [(
+            DiagnosticCode::E210,
+            "`defines 5 as established` in interpretation family `Reading` requires a proposition"
+                .to_owned()
+        )]
+    );
+    let hir = lowered(&family("")).expect("the family is lowered");
     let alternatives = &hir.interpretation_families["Reading"];
     assert_eq!(alternatives.len(), 1);
     assert_eq!(alternatives[0].0, "Wide");

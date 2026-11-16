@@ -4,7 +4,8 @@
 //! The lowering hands the text of an `effect` and of a `conflict_doctrine`
 //! on as it is written, and the checker reads the operation of the effect
 //! and the clauses the doctrine defeats out of that text. Each test here
-//! puts a comment, or a string, in the place one of those readers looks.
+//! puts a comment, or a string, in the place one of those readers looks,
+//! but one, which puts the word `defeat` inside a longer name.
 
 use super::*;
 use fidryn_hir::elaborate;
@@ -138,6 +139,42 @@ fn a_clause_is_defeated_by_the_word_in_the_text_not_by_one_in_a_comment_or_a_str
         ),
         (
             "conflict_doctrine D {\n    note \"defeat Nothing\" // defeat Nothing\n    then defeat Residual\n}",
+            vec!["Residual"],
+        ),
+    ] {
+        assert_eq!(
+            expand_conflict_clause_ids(doctrine, &clauses),
+            expected,
+            "{doctrine}"
+        );
+    }
+}
+
+#[test]
+fn a_clause_is_defeated_by_the_word_defeat_and_not_by_a_name_that_holds_it() {
+    // The word is found only where no letter, digit, `_` or `.` stands
+    // beside it. After the `.` of a dotted name it is part of that name,
+    // and it named the clause after it.
+    let clauses = BTreeMap::from([("Residual".to_owned(), String::new())]);
+    for (doctrine, expected) in [
+        (
+            "conflict_doctrine D {\n    when Org.defeat Residual\n}",
+            vec![],
+        ),
+        (
+            "conflict_doctrine D {\n    when defeat.x Residual\n}",
+            vec![],
+        ),
+        (
+            "conflict_doctrine D {\n    when undefeated Residual or defeat_all Residual\n}",
+            vec![],
+        ),
+        (
+            "conflict_doctrine D {\n    then\tdefeat\tResidual\n}",
+            vec!["Residual"],
+        ),
+        (
+            "conflict_doctrine D {\n    when Org.defeat Other\n    then defeat Residual\n}",
             vec!["Residual"],
         ),
     ] {

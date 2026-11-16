@@ -427,7 +427,13 @@ fn legacy_term(source: &str, depth: usize) -> Option<Term> {
     if depth > 128 {
         return None;
     }
-    let source = source.strip_prefix("assert ").unwrap_or(source).trim();
+    // The word `assert` before an assertion is part of none: it is followed
+    // by white space, a space, a tab or a line end.
+    let source = source
+        .strip_prefix("assert")
+        .and_then(|rest| rest.strip_prefix(char::is_whitespace))
+        .unwrap_or(source)
+        .trim();
     let structure = structure_of(source);
     for quantifier in ["for_all", "exists"] {
         if let Some(rest) = source

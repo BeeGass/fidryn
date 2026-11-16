@@ -239,6 +239,44 @@ interchange schema versions are maintained independently of the interpreter.
   field passed the checker when the text of another field held that word,
   and is now rejected with `E540`. A string in a query that held
   `for_all w in People: true` declared a property; it declares none now.
+- Where a part of a declaration is read back out of its text by a word,
+  such as the `rank` of a nomination, the word is found only as a word of
+  its own, and not inside a longer name. The rank of
+  `nomination Frank for TrusteeOf(BRT) rank 2` was read from the `rank` in
+  `Frank`, as 0. With `nomination Bob for TrusteeOf(BRT) rank 1` beside it,
+  on a case in which the office needs a successor and both candidates are
+  eligible and have accepted it, a query whose goal is `UniqueOccupant`
+  for that office answered `Frank`, and it answers `Bob` now. With `Bob`
+  at rank 0 instead, the module was rejected with `E410`, as a tie at that
+  rank. The query answered in the same way for a candidate named
+  `Franklin`, `rank_holder` or `ranked` at rank 2. A `source` with a
+  longer name that holds the word `artifact`, such as `artifact_registry`,
+  `my_artifact` or `artifacts`, passed the checker with no `artifact`
+  field, and is now rejected with `E540`. Where the grammar puts white
+  space beside such a word, a tab now serves as well as a space, and so
+  does a line end where the parser does not end the statement at it. A
+  nomination with tabs between its words, or with `for` or `rank` at the
+  start of a line that no space begins, did not count for its office: the
+  query above passed its candidate over and answered with the candidate of
+  the next rank. In the `interpretation_family` that makes the candidates
+  eligible, an `alternative` with a tab after the word was lost, and one
+  whose name ends in `alternative`, such as `both_alternative`, lost its
+  definitions. A `defines` with a tab after the word, or with `as` at the
+  start of a line that a tab begins, was lost as well. The query was
+  `suspended` for want of them, and it answers now.
+- A definition in an `interpretation_family` whose expression is no
+  proposition is rejected with `E210`, in a diagnostic that names the
+  family and quotes the definition, such as "`defines 5 as established` in
+  interpretation family `Reading` requires a proposition". Such a
+  definition, for example `defines 1 + 2 as established`,
+  `defines not Eligible(Alice) as not_established` or
+  `defines Alice == Alice as established`, was dropped without a
+  diagnostic, and the module passed the checker. A definition with no
+  `as established` or `as not_established` after its expression, such as
+  `defines Eligible(Alice)` or `defines Eligible(Alice) as suspended`, was
+  dropped in the same way, and is now rejected with `E100`. So is one
+  marked with a longer word: `as established_later` was read as
+  `as established`, and `as not_established_yet` as `as not_established`.
 - A rule with no `{ ... }` body is rejected with `E100`, and so is a
   `verify` whose name is not followed by `{`:
   `verify Checked extra { assert false }` stepped over its block without a

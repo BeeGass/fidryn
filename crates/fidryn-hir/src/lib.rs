@@ -594,18 +594,44 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Interpretation(d) => {
                 let name = d.name.clone().unwrap_or_default();
-                let alts = extract_alternative_defs(&d.source).unwrap_or_else(|()| {
-                    hir.diagnostics.push(
-                        Diagnostic::new(
-                            DiagnosticCode::E100,
-                            format!(
-                                "interpretation family `{name}` contains a definition that exceeds resource limits"
-                            ),
-                        )
-                        .with_span(d.span),
-                    );
-                    Vec::new()
-                });
+                let alts = match extract_alternative_defs(&d.source) {
+                    Ok((alts, unread)) => {
+                        // A definition that is not read is reported: an
+                        // alternative that lost it would define less than
+                        // its text says.
+                        for definition in unread {
+                            let (code, message) = match definition {
+                                UnreadDefinition::NotAProposition(text) => (
+                                    DiagnosticCode::E210,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` requires a proposition"
+                                    ),
+                                ),
+                                UnreadDefinition::NoStatus(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` has no `as established` or `as not_established` after its expression"
+                                    ),
+                                ),
+                            };
+                            hir.diagnostics
+                                .push(Diagnostic::new(code, message).with_span(d.span));
+                        }
+                        alts
+                    }
+                    Err(()) => {
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E100,
+                                format!(
+                                    "interpretation family `{name}` contains a definition that exceeds resource limits"
+                                ),
+                            )
+                            .with_span(d.span),
+                        );
+                        Vec::new()
+                    }
+                };
                 hir.interpretation_families.insert(name, alts);
             }
             fidryn_syntax::ast::Item::Decision(d) => {
@@ -938,12 +964,76 @@ fn after_first(structure: &str, word: &str) -> Option<Range<usize>> {
     Some(start..end)
 }
 
+/// The stretch of `structure` after the first keyword `word` in it, up to
+/// the next one or the end. The keyword is found only as a word of its own
+/// (`find_word`).
+fn after_first_word(structure: &str, word: &str) -> Option<Range<usize>> {
+    let start = find_word(structure, word, 0, Spaced::No)? + word.len();
+    let end = find_word(structure, word, start, Spaced::No).unwrap_or(structure.len());
+    Some(start..end)
+}
+
+/// The sides of a keyword on which white space must stand, beyond the
+/// keyword being a word of its own. A reader asks for white space where
+/// the grammar puts it beside the keyword.
+#[derive(Clone, Copy)]
+enum Spaced {
+    No,
+    Before,
+    After,
+    Around,
+}
+
+/// True for a character that can be part of a name: a letter, a digit, `_`,
+/// and the `.` between the parts of a dotted name.
+fn is_name_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '_' || c == '.'
+}
+
+/// White space as the lexer reads it: a space, a tab, a carriage return and
+/// a line end. A comment is white space in the views of a text.
+fn is_space(c: char) -> bool {
+    matches!(c, ' ' | '\t' | '\r' | '\n')
+}
+
+/// The position of the first `word` in `structure` at or after `from` that
+/// stands as a word of its own: no character of a name directly before it
+/// or after it, so that it is not a part of a longer name, and white space
+/// on the sides that `spaced` names.
+fn find_word(structure: &str, word: &str, from: usize, spaced: Spaced) -> Option<usize> {
+    let (space_before, space_after) = match spaced {
+        Spaced::No => (false, false),
+        Spaced::Before => (true, false),
+        Spaced::After => (false, true),
+        Spaced::Around => (true, true),
+    };
+    let fits = |beside: Option<char>, space: bool| {
+        if space {
+            beside.is_some_and(is_space)
+        } else {
+            beside.is_none_or(|c| !is_name_char(c))
+        }
+    };
+    let mut start = from;
+    while let Some(found) = structure.get(start..)?.find(word) {
+        let at = start + found;
+        let before = structure[..at].chars().next_back();
+        let after = structure[at + word.len()..].chars().next();
+        if fits(before, space_before) && fits(after, space_after) {
+            return Some(at);
+        }
+        start = at + word.len();
+    }
+    None
+}
+
 /// The value of the `artifact` field of a `source`: what stands after the
 /// word, from the quote that follows it to the next quote. The word is not
-/// found in a comment or inside a string literal.
+/// found in a comment, inside a string literal or as a part of a longer
+/// name, such as the name `artifact_registry` of the source.
 fn source_artifact(src: &str) -> Option<String> {
     let (code, structure) = views(src);
-    let value = code[after_first(&structure, "artifact")?]
+    let value = code[after_first_word(&structure, "artifact")?]
         .trim()
         .trim_start_matches('"');
     let end = value.find('"')?;
@@ -981,9 +1071,11 @@ fn extract_return_type(src: &str) -> String {
         .to_owned()
 }
 
+/// The rank of a nomination: the integer after the word `rank`, or 0. The
+/// word is not found as a part of a longer name, such as `Frank`.
 fn extract_rank(src: &str) -> i64 {
     let (code, structure) = views(src);
-    after_first(&structure, "rank")
+    after_first_word(&structure, "rank")
         .and_then(|after_rank| {
             code[after_rank]
                 .split_whitespace()
@@ -993,43 +1085,68 @@ fn extract_rank(src: &str) -> i64 {
         .unwrap_or(0)
 }
 
+/// The office of a nomination: the text after the word `for`, up to the
+/// word `rank`, the next `for` or the end. The grammar puts white space
+/// around `for` and before `rank`, and a tab or a line end serves there as
+/// well as a space.
 fn extract_office(src: &str) -> String {
     let (code, structure) = views(src);
-    let Some(after_for) = after_first(&structure, " for ") else {
+    let Some(word) = find_word(&structure, "for", 0, Spaced::Around) else {
         return String::new();
     };
-    let end = structure[after_for.clone()]
-        .find(" rank")
-        .map_or(after_for.end, |rank| after_for.start + rank);
-    code[after_for.start..end].trim().to_owned()
+    let start = word + "for".len();
+    let stretch_end =
+        find_word(&structure, "for", start, Spaced::Around).unwrap_or(structure.len());
+    let end =
+        find_word(&structure[..stretch_end], "rank", start, Spaced::Before).unwrap_or(stretch_end);
+    code[start..end].trim().to_owned()
 }
 
 #[allow(dead_code)]
 fn extract_alternatives(src: &str) -> Vec<String> {
     extract_alternative_defs(src)
+        .map(|(alternatives, _)| alternatives)
         .unwrap_or_default()
         .into_iter()
         .map(|(name, _)| name)
         .collect()
 }
 
+/// A definition of an interpretation family that is not read, with its
+/// text as `definition_text` gives it, for a diagnostic.
+enum UnreadDefinition {
+    /// The expression of the definition is no proposition.
+    NotAProposition(String),
+    /// No `as established` or `as not_established` follows the expression.
+    NoStatus(String),
+}
+
 /// The alternatives of an `interpretation_family`, each with what it
-/// defines. `Err` when the expression of a definition nests deeper than the
-/// reader of expressions goes: the definition would be lost, or cut short.
-fn extract_alternative_defs(src: &str) -> Result<InterpretationAlts, ()> {
-    const ALTERNATIVE: &str = "alternative ";
-    const DEFINES: &str = "defines ";
+/// defines, and each definition that is not read, in the order of the text.
+/// The words `alternative`, `defines` and `as` are found only as words of
+/// their own, with white space after them, and `as` with white space before
+/// it as well: a tab or a line end serves there as well as a space. `Err`
+/// when the expression of a definition nests deeper than the reader of
+/// expressions goes: the definition would be lost, or cut short.
+fn extract_alternative_defs(src: &str) -> Result<(InterpretationAlts, Vec<UnreadDefinition>), ()> {
+    const ALTERNATIVE: &str = "alternative";
+    const DEFINES: &str = "defines";
     let (code, structure) = views(src);
     let mut out = Vec::new();
+    let mut unread = Vec::new();
     // An alternative is the text after the word, up to the next one.
-    let starts: Vec<usize> = structure
-        .match_indices(ALTERNATIVE)
-        .map(|(word, _)| word + ALTERNATIVE.len())
-        .collect();
-    for (index, &start) in starts.iter().enumerate() {
-        let end = starts
-            .get(index + 1)
-            .map_or(structure.len(), |next| next - ALTERNATIVE.len());
+    let mut words = Vec::new();
+    while let Some(word) = find_word(
+        &structure,
+        ALTERNATIVE,
+        words.last().map_or(0, |last| last + ALTERNATIVE.len()),
+        Spaced::After,
+    ) {
+        words.push(word);
+    }
+    for (index, &word) in words.iter().enumerate() {
+        let start = word + ALTERNATIVE.len();
+        let end = words.get(index + 1).copied().unwrap_or(structure.len());
         let name = code[start..end]
             .split_whitespace()
             .next()
@@ -1039,34 +1156,72 @@ fn extract_alternative_defs(src: &str) -> Result<InterpretationAlts, ()> {
         if name.is_empty() {
             continue;
         }
+        let alternative = &structure[..end];
         let mut defs = Vec::new();
         let mut rest = start;
-        while let Some(idx) = structure[rest..end].find(DEFINES) {
+        while let Some(definition) = find_word(alternative, DEFINES, rest, Spaced::After) {
             // A definition is the text after the word, up to the next one.
-            let stmt_start = rest + idx + DEFINES.len();
-            let stmt_end = structure[stmt_start..end]
-                .find(DEFINES)
-                .map_or(end, |next| stmt_start + next);
-            let stmt = &structure[stmt_start..stmt_end];
-            let defined = match stmt.find(" as not_established") {
-                Some(expr_end) => Some((expr_end, false)),
-                None => stmt
-                    .find(" as established")
-                    .map(|expr_end| (expr_end, true)),
+            let stmt_start = definition + DEFINES.len();
+            let stmt_end =
+                find_word(alternative, DEFINES, stmt_start, Spaced::After).unwrap_or(end);
+            let text = || {
+                definition_text(
+                    &code[definition..stmt_end],
+                    &structure[definition..stmt_end],
+                )
             };
-            if let Some((expr_end, established)) = defined {
-                let expr = code[stmt_start..stmt_start + expr_end].trim();
-                if let Some(prop) =
-                    body::parse_expr_within_limits(expr)?.and_then(|t| body::term_as_prop(&t))
-                {
-                    defs.push((prop, established));
+            match definition_status(&structure[..stmt_end], stmt_start) {
+                Some((expr_end, established)) => {
+                    let expr = code[stmt_start..expr_end].trim();
+                    match body::parse_expr_within_limits(expr)?.and_then(|t| body::term_as_prop(&t))
+                    {
+                        Some(prop) => defs.push((prop, established)),
+                        None => unread.push(UnreadDefinition::NotAProposition(text())),
+                    }
                 }
+                None => unread.push(UnreadDefinition::NoStatus(text())),
             }
             rest = stmt_end;
         }
         out.push((name, defs));
     }
-    Ok(out)
+    Ok((out, unread))
+}
+
+/// Where the expression of a definition that begins at `from` ends, and
+/// whether the definition establishes it: the `as` of the first
+/// `as not_established` in `structure` after `from`, and when there is none,
+/// the `as` of the first `as established`. White space stands before `as`
+/// and between it and the word after it, which is a word of its own.
+fn definition_status(structure: &str, from: usize) -> Option<(usize, bool)> {
+    let mut established = None;
+    let mut rest = from;
+    while let Some(word) = find_word(structure, "as", rest, Spaced::Around) {
+        let after = structure[word + "as".len()..].trim_start_matches(is_space);
+        let status = structure.len() - after.len();
+        let stands = |status_word: &str| {
+            after.starts_with(status_word)
+                && is_ident_boundary(structure, status, status_word.len())
+        };
+        if stands("not_established") {
+            return Some((word, false));
+        }
+        if established.is_none() && stands("established") {
+            established = Some((word, true));
+        }
+        rest = word + "as".len();
+    }
+    established
+}
+
+/// The text of a definition for a diagnostic: `code` from the word
+/// `defines` to the end of the definition, a `;` or a `}` that closes
+/// nothing, on one line, where `structure` is the structure of `code`.
+fn definition_text(code: &str, structure: &str) -> String {
+    take_clause_to_end(code, structure)
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 fn extract_record_requires(src: &str) -> Vec<String> {
@@ -1363,22 +1518,15 @@ fn contains_ident(src: &str, name: &str) -> bool {
 }
 
 fn find_ident(src: &str, name: &str) -> Option<usize> {
-    let mut start = 0;
-    while let Some(rel) = src[start..].find(name) {
-        let i = start + rel;
-        if is_ident_boundary(src, i, name.len()) {
-            return Some(i);
-        }
-        start = i + 1;
-    }
-    None
+    find_word(src, name, 0, Spaced::No)
 }
 
+/// True when no character of a name stands directly before the text of
+/// `len` bytes at `start` of `src`, or directly after it.
 fn is_ident_boundary(src: &str, start: usize, len: usize) -> bool {
     let before = src[..start].chars().next_back();
     let after = src[start + len..].chars().next();
-    let ident_char = |c: char| c.is_ascii_alphanumeric() || c == '_';
-    before.is_none_or(|c| !ident_char(c)) && after.is_none_or(|c| !ident_char(c))
+    before.is_none_or(|c| !is_name_char(c)) && after.is_none_or(|c| !is_name_char(c))
 }
 
 /// Split `QName` / `QName<A, B>` into the base name and angle-bracket arguments.
@@ -1592,6 +1740,9 @@ mod comment_tests;
 
 #[cfg(test)]
 mod depth_tests;
+
+#[cfg(test)]
+mod word_tests;
 
 #[cfg(test)]
 mod tests {
@@ -2514,6 +2665,152 @@ module Examples.Retain version "0.1.0" {
         assert_eq!(
             predicates(&rule.fallback),
             [("derive".to_owned(), "Exempt".to_owned())]
+        );
+    }
+
+    /// A module with one interpretation family, `Reading`, whose one
+    /// alternative, `Wide`, has these statements.
+    fn family_module(statements: &str) -> String {
+        format!(
+            "module Examples.Definition version \"0.1.0\" {{\n    entity Alice : NaturalPerson\n    proposition Eligible(person: NaturalPerson)\n    interpretation_family Reading {{\n        alternative Wide {{\n            {statements}\n        }}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_definition_that_is_no_proposition_is_e210_and_names_the_family_and_the_definition() {
+        // The expression of the definition is a number, a string, a sum, a
+        // set, a negation, a comparison, a proposition under a modal word, a
+        // field of a name, or a number in parentheses. None of these is a
+        // proposition. Such a definition was dropped without a diagnostic,
+        // and the alternative defined less than its text says.
+        for written in [
+            "5",
+            "\"x\"",
+            "1 + 2",
+            "{Eligible(Alice)}",
+            "not Eligible(Alice)",
+            "Alice == Alice",
+            "operative Eligible(Alice)",
+            "Alice.name",
+            "(5)",
+        ] {
+            for status in ["established", "not_established"] {
+                assert_eq!(
+                    rejected(&family_module(&format!("defines {written} as {status}"))),
+                    [(
+                        DiagnosticCode::E210,
+                        format!(
+                            "`defines {written} as {status}` in interpretation family `Reading` requires a proposition"
+                        )
+                    )],
+                    "defines {written} as {status}"
+                );
+            }
+        }
+        // A definition with no expression defines no proposition either.
+        assert_eq!(
+            rejected(&family_module("defines as established")),
+            [(
+                DiagnosticCode::E210,
+                "`defines as established` in interpretation family `Reading` requires a proposition"
+                    .to_owned()
+            )]
+        );
+        // Each such definition is reported, in the order of the text, and the
+        // definition is quoted on one line, without the `;` that ends it and
+        // without a comment.
+        assert_eq!(
+            rejected(&family_module(
+                "defines 5 as established\n            defines Eligible(Alice) as established\n            defines 1 + // one more\n                2 as not_established;\n            defines \"x\" as established"
+            )),
+            [
+                (
+                    DiagnosticCode::E210,
+                    "`defines 5 as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines 1 + 2 as not_established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines \"x\" as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_definition_with_no_status_after_its_expression_is_e100() {
+        // With no `as established` or `as not_established` after its
+        // expression, a definition was dropped without a diagnostic. A word
+        // that only begins with `established` or `not_established` is no
+        // status either.
+        for written in [
+            "defines Eligible(Alice)",
+            "defines Eligible(Alice) as suspended",
+            "defines Eligible(Alice) as established_later",
+            "defines Eligible(Alice) as not_established_yet",
+            "defines Eligible(Alice) has established",
+            "defines 5",
+            "defines",
+        ] {
+            assert_eq!(
+                rejected(&family_module(written)),
+                [(
+                    DiagnosticCode::E100,
+                    format!(
+                        "`{written}` in interpretation family `Reading` has no `as established` or `as not_established` after its expression"
+                    )
+                )],
+                "{written}"
+            );
+        }
+        // Each definition is reported for itself, and one that is read is kept.
+        assert_eq!(
+            rejected(&family_module(
+                "defines Eligible(Alice)\n            defines Eligible(Alice) as established\n            defines 5 as established"
+            )),
+            [
+                (
+                    DiagnosticCode::E100,
+                    "`defines Eligible(Alice)` in interpretation family `Reading` has no `as established` or `as not_established` after its expression"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines 5 as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_definition_that_is_a_proposition_is_kept_with_no_diagnostic() {
+        // A proposition with arguments, with an empty list of arguments, and
+        // with none, each established and not established.
+        let parsed = parse_file(&family_module(
+            "defines Eligible(Alice) as established\n            defines Eligible(Alice) as not_established\n            defines Flag() as established\n            defines Flag as not_established",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert!(hir.diagnostics.is_empty(), "{:?}", hir.diagnostics);
+        let definitions: Vec<(String, usize, bool)> = hir.interpretation_families["Reading"][0]
+            .1
+            .iter()
+            .map(|(prop, established)| (prop.predicate.clone(), prop.arguments.len(), *established))
+            .collect();
+        assert_eq!(
+            definitions,
+            [
+                ("Eligible".to_owned(), 1, true),
+                ("Eligible".to_owned(), 1, false),
+                ("Flag".to_owned(), 0, true),
+                ("Flag".to_owned(), 0, false),
+            ]
         );
     }
 }

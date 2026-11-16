@@ -1434,6 +1434,28 @@ mod tests {
     }
 
     #[test]
+    fn the_word_assert_before_a_formula_is_read_with_a_tab_or_a_line_end_after_it() {
+        // A formula read from its text may begin with the word `assert`,
+        // which is not part of the assertion. A tab or a line end after the
+        // word serves as a space; the formula was not read before.
+        for (formula, proved) in [
+            ("assert 1 == 1", true),
+            ("assert\t1 == 2", false),
+            ("assert\n1 == 1", true),
+            ("for_all x in People: assert\tx == x", true),
+        ] {
+            let mut module = bool_module();
+            push_property(&mut module, "Asserted", formula, people_bounds(2));
+            let verdict = verify_property(&module, "Asserted");
+            match (&verdict, proved) {
+                (PropertyVerdict::Proved { .. }, true)
+                | (PropertyVerdict::Counterexample { .. }, false) => {}
+                _ => panic!("{formula:?}: {verdict:?}"),
+            }
+        }
+    }
+
+    #[test]
     fn a_formula_is_read_128_quantifiers_deep_and_no_deeper() {
         // The reader of a formula calls itself for the body of each
         // quantifier, and counts how deep it is.

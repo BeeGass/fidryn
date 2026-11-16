@@ -2320,23 +2320,22 @@ fn check_doctrines(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 /// Resolve `defeat <Clause>` targets against known clauses.
 ///
 /// The word `defeat` is looked for in the structure of the text, so it is
-/// not found in a comment or inside a string literal. The name is the first
-/// word after it in the text with its comments blank.
+/// not found in a comment or inside a string literal. It is found only as a
+/// word of its own: no letter, digit, `_` or `.` of a dotted name stands
+/// beside it. The name is the first word after it in the text with its
+/// comments blank.
 fn expand_conflict_clause_ids(source: &str, clauses: &BTreeMap<String, String>) -> Vec<String> {
     let structure = structure_of(source);
     let source = without_comments(source);
+    let name_char = |c: char| c.is_ascii_alphanumeric() || c == '_' || c == '.';
     let mut found = Vec::new();
     for (i, _) in structure.match_indices("defeat") {
         let before = source[..i].chars().next_back();
-        if before.is_some_and(|c| c.is_ascii_alphanumeric() || c == '_') {
+        if before.is_some_and(name_char) {
             continue;
         }
         let rest = &source[i + "defeat".len()..];
-        if rest
-            .chars()
-            .next()
-            .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
-        {
+        if rest.chars().next().is_some_and(name_char) {
             continue;
         }
         let name: String = rest

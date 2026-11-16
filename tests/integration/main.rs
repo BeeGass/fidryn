@@ -16,3 +16,4 @@ mod rule_basis;
 mod semantic_regressions;
 mod unreadable_text;
 mod verify_blocks;
+mod whole_words;
