@@ -98,6 +98,84 @@ fn a_type_read_from_text_nests_128_deep_and_no_deeper() {
     }
 }
 
+/// A place where a reader cuts a type short: its name, and the declarations
+/// of a module with a type of the given number of levels in the place.
+type CutPlace = (&'static str, fn(usize) -> String);
+
+/// Places in the text of an `effect` where a reader keeps less of a type
+/// than the text holds: the parameter list is split at every comma, also
+/// inside `<...>`, a part with no `:` is left out, and the result is taken
+/// after the last `->` and cut at the end of its first line. Each takes the
+/// text of a type of the given number of levels whose outer level stands
+/// where the reader cuts.
+const CUT_BY_A_READER: [CutPlace; 6] = [
+    // The result is taken after the last `->` only.
+    (
+        "the result of an operation that another follows",
+        |levels| {
+            format!(
+                "    effect Ask {{\n        a(n: String) -> {}\n        b(m: Int) -> Bool\n    }}",
+                nested_type(levels)
+            )
+        },
+    ),
+    ("a parameter whose type has two arguments", |levels| {
+        format!(
+            "    effect Ask {{\n        request(n: String, m: Map<String, {}>) -> Bool\n    }}",
+            nested_type(levels - 1)
+        )
+    }),
+    ("a parameter with no name", |levels| {
+        format!(
+            "    effect Ask {{\n        request(n: String, {}) -> Bool\n    }}",
+            nested_type(levels)
+        )
+    }),
+    ("an operation with no `->`", |levels| {
+        format!(
+            "    effect Ask {{\n        request(n: String, m: Map<String, {}>)\n    }}",
+            nested_type(levels - 1)
+        )
+    }),
+    ("a result over two lines", |levels| {
+        format!(
+            "    effect Ask {{\n        request(n: String) -> Box<\n            {}>\n    }}",
+            nested_type(levels - 1)
+        )
+    }),
+    ("a result over three lines", |levels| {
+        format!(
+            "    effect Ask {{\n        request(n: String) -> Box<\n            Box<\n                {}>>\n    }}",
+            nested_type(levels - 2)
+        )
+    }),
+];
+
+#[test]
+fn a_type_that_a_reader_of_an_effect_cuts_short_is_counted_whole() {
+    // The levels are counted over the whole parameter list of the
+    // operation and over all that follows its `->`, to the end of the
+    // operation, before a reader cuts the type. Each of these passed the
+    // checker with 129 levels and with 5,000.
+    for (place, declarations) in CUT_BY_A_READER {
+        for levels in [3, 127, 128] {
+            let result = compiled(&declarations(levels));
+            assert!(
+                result.is_ok(),
+                "{place}, {levels} levels: {:?}",
+                result.err()
+            );
+        }
+        for levels in [129, 130, 5_000] {
+            assert_eq!(
+                compiled(&declarations(levels)).err(),
+                Some(vec![(DiagnosticCode::E100, TOO_DEEP.to_owned())]),
+                "{place}, {levels} levels"
+            );
+        }
+    }
+}
+
 #[test]
 fn the_levels_of_a_type_are_counted_in_its_text() {
     // The parser counts every `<` of a type it reads. A type read from

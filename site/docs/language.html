@@ -168,15 +168,29 @@ would otherwise continue. See
 nothing else. <code>artifact "files/a}1.txt"</code> closes no block, a citation
 such as <code>from "Stat. 12(a"</code> opens no parenthesis, and a string that holds
 <code>defeat Residual</code> defeats no clause.</p>
-<p>What a comment can change is how a report identifies the program (see
-<a href="/docs/outcomes">outcomes</a>). <code>sourceBundle</code> covers the text of the module
-byte for byte, so any comment changes it. <code>invocation.program.fingerprint</code>
-is taken over the compiled program. That keeps some text as it is
-written, with the comments inside it: the body of a <code>clause</code>, for
-example, and the first <code>assert</code> of a <code>verify</code> block. A comment inside
+<p>A comment can change text that is kept or shown as it is written, and
+how a report identifies the program (see <a href="/docs/outcomes">outcomes</a>), in
+places such as these. <code>sourceBundle</code> covers the text of the module byte
+for byte, so any comment changes it, and <code>fidryn review</code> shows the text
+of each declaration with its comments. <code>invocation.program.fingerprint</code>,
+and with it <code>invocationId</code> and the trace ids, is taken over the compiled
+program. That keeps some text as it is written: the body of a <code>clause</code>,
+the first <code>assert</code> of a <code>verify</code> block, a line of a <code>verify</code> block that
+is kept as an assertion that cannot be decided, and a clause of a
+<code>judgment</code> or an <code>observation</code> that is kept as text. A comment inside
 such text changes the fingerprint, as a change of the white space there
-does. A comment at the end of a line of a query, a rule or a duty does
-not.</p>
+does. So does a comment at the end of the last line of such a kept
+assertion or kept clause: the kept text then ends with the last token
+before the comment, and with as many spaces in the comment's place it
+ends with the spaces and the line end. The kept clauses of a judgment
+are also quoted in the payload of its <code>JudgmentPolicy</code> request, in the
+outcome of a run and in its trace. Those of an observation are quoted in
+the error a run ends with when a record of the observed schema is on the
+case, and in the output of <code>fidryn inputs</code>. A comment in such a clause,
+or at the end of its last line, changes what these show. A comment at
+the end of a line of a query, a rule or a duty, or at the end of the last
+line of the first <code>assert</code> of a <code>verify</code> block, changes neither the
+fingerprint nor the outcome of a run.</p>
 <p>The trust fixture also declares a source manifest, resolved relative
 to the module file:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source_manifest</span> <span class="tk-st">&quot;sources/ma-trust-fixture.manifest.json&quot;</span></code></pre></figure>

@@ -444,15 +444,29 @@ nothing else. `artifact "files/a}1.txt"` closes no block, a citation
 such as `from "Stat. 12(a"` opens no parenthesis, and a string that holds
 `defeat Residual` defeats no clause.
 
-What a comment can change is how a report identifies the program (see
-[outcomes](https://fidryn.onlygass.dev/docs/outcomes.md)). `sourceBundle` covers the text of the module
-byte for byte, so any comment changes it. `invocation.program.fingerprint`
-is taken over the compiled program. That keeps some text as it is
-written, with the comments inside it: the body of a `clause`, for
-example, and the first `assert` of a `verify` block. A comment inside
+A comment can change text that is kept or shown as it is written, and
+how a report identifies the program (see [outcomes](https://fidryn.onlygass.dev/docs/outcomes.md)), in
+places such as these. `sourceBundle` covers the text of the module byte
+for byte, so any comment changes it, and `fidryn review` shows the text
+of each declaration with its comments. `invocation.program.fingerprint`,
+and with it `invocationId` and the trace ids, is taken over the compiled
+program. That keeps some text as it is written: the body of a `clause`,
+the first `assert` of a `verify` block, a line of a `verify` block that
+is kept as an assertion that cannot be decided, and a clause of a
+`judgment` or an `observation` that is kept as text. A comment inside
 such text changes the fingerprint, as a change of the white space there
-does. A comment at the end of a line of a query, a rule or a duty does
-not.
+does. So does a comment at the end of the last line of such a kept
+assertion or kept clause: the kept text then ends with the last token
+before the comment, and with as many spaces in the comment's place it
+ends with the spaces and the line end. The kept clauses of a judgment
+are also quoted in the payload of its `JudgmentPolicy` request, in the
+outcome of a run and in its trace. Those of an observation are quoted in
+the error a run ends with when a record of the observed schema is on the
+case, and in the output of `fidryn inputs`. A comment in such a clause,
+or at the end of its last line, changes what these show. A comment at
+the end of a line of a query, a rule or a duty, or at the end of the last
+line of the first `assert` of a `verify` block, changes neither the
+fingerprint nor the outcome of a run.
 
 The trust fixture also declares a source manifest, resolved relative
 to the module file:

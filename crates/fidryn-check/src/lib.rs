@@ -17,8 +17,8 @@ use fidryn_core::{
 };
 use fidryn_hir::{
     HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, HirRecordTypes,
-    collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
-    source_has_bare_prop_if, split_qname_type_args, structure_of, term_as_name,
+    angles_nest_too_deep, collect_term_callees, flatten_term_list, last_brace_inner,
+    parse_type_name, source_has_bare_prop_if, split_qname_type_args, structure_of, term_as_name,
     term_has_bare_prop_guard, type_nests_too_deep, without_comments,
 };
 use fidryn_syntax::ast::Item;
@@ -179,8 +179,18 @@ fn types_of(params: &[(String, String)]) -> impl Iterator<Item = &str> {
 /// The parser refuses such a type where it reads one. The lowering takes
 /// other types out of text the parser has stepped over, the operation of an
 /// `effect` among them, and hands every type on as its text. All of them
-/// are looked at here, before the checker reads any.
+/// are looked at here, before the checker reads any. The levels of the
+/// types of an effect are also counted over the whole texts its readers
+/// take them out of, because the readers cut some types short.
 fn types_nest_too_deep(hir: &HirModule) -> bool {
+    if hir
+        .effects
+        .values()
+        .flat_map(|effect| effect_operation_texts(&effect.source))
+        .any(angles_nest_too_deep)
+    {
+        return true;
+    }
     let effect_params: Vec<(String, String)> = hir
         .effects
         .values()
@@ -1875,25 +1885,7 @@ fn source_typed_params(src: &str) -> Vec<(String, Type)> {
 fn source_param_texts(src: &str) -> Vec<(String, String)> {
     let code = without_comments(src);
     let structure = structure_of(src);
-    let Some(start) = structure.find('(') else {
-        return Vec::new();
-    };
-    let mut depth = 0i32;
-    let mut end = None;
-    for (i, b) in structure.as_bytes()[start..].iter().enumerate() {
-        match b {
-            b'(' => depth += 1,
-            b')' => {
-                depth -= 1;
-                if depth == 0 {
-                    end = Some(start + i);
-                    break;
-                }
-            }
-            _ => {}
-        }
-    }
-    let Some(end) = end else {
+    let Some((start, end)) = effect_parameter_list(&structure) else {
         return Vec::new();
     };
     let mut params = Vec::new();
@@ -1914,6 +1906,73 @@ fn source_param_texts(src: &str) -> Vec<(String, String)> {
         }
     }
     params
+}
+
+/// Where the parameter list of the operation of an `effect` opens and
+/// closes: the first `(` of `structure`, the structure of the text of the
+/// effect, and the `)` that closes it.
+fn effect_parameter_list(structure: &str) -> Option<(usize, usize)> {
+    let start = structure.find('(')?;
+    let mut depth = 0i32;
+    for (i, b) in structure.as_bytes()[start..].iter().enumerate() {
+        match b {
+            b'(' => depth += 1,
+            b')' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some((start, start + i));
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The texts of an `effect` that its readers take types out of, whole:
+/// the parameter list of its operation, and all that follows each `->` to
+/// the end of that operation. The readers keep less of them: the list is
+/// split at every comma, also inside `<...>`, a part with no `:` is left
+/// out, and the result is taken after the last `->` alone and cut at the
+/// end of its first line. The levels of the types are counted over these
+/// texts, so that a type is counted before a reader cuts it.
+fn effect_operation_texts(src: &str) -> Vec<&str> {
+    let structure = structure_of(src);
+    let mut texts = Vec::new();
+    if let Some((start, end)) = effect_parameter_list(&structure) {
+        texts.push(&src[start..=end]);
+    }
+    // A type holds no `->`, so the text after one arrow is looked at up to
+    // the next at most, and each part of the text once.
+    let arrows: Vec<usize> = structure.match_indices("->").map(|(at, _)| at).collect();
+    for (index, &arrow) in arrows.iter().enumerate() {
+        let start = arrow + "->".len();
+        let limit = arrows.get(index + 1).copied().unwrap_or(structure.len());
+        texts.push(&src[start..start + operation_end(&structure[start..limit])]);
+    }
+    texts
+}
+
+/// The length of the rest of an operation, where `structure` is the
+/// structure of the text after its `->`: up to a `;` or a line end that no
+/// `<` and no bracket stands open across, or up to the `}` that ends the
+/// block of the effect.
+fn operation_end(structure: &str) -> usize {
+    let mut angles = 0usize;
+    let mut brackets = 0usize;
+    for (i, b) in structure.bytes().enumerate() {
+        match b {
+            b'<' => angles += 1,
+            b'>' => angles = angles.saturating_sub(1),
+            b'(' | b'[' | b'{' => brackets += 1,
+            b')' | b']' => brackets = brackets.saturating_sub(1),
+            b'}' if brackets == 0 => return i,
+            b'}' => brackets -= 1,
+            b';' | b'\n' if angles == 0 && brackets == 0 => return i,
+            _ => {}
+        }
+    }
+    structure.len()
 }
 
 /// The name of the operation of an `effect`: the first word in its block.

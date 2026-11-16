@@ -12,9 +12,9 @@ use std::collections::BTreeMap;
 use std::ops::Range;
 
 pub use body::{
-    collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
-    parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
-    term_from_decl, term_has_bare_prop_guard, term_to_guard, type_nests_too_deep,
+    angles_nest_too_deep, collect_source_callees, collect_term_callees, flatten_term_list,
+    last_brace_inner, parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name,
+    term_as_prop, term_from_decl, term_has_bare_prop_guard, term_to_guard, type_nests_too_deep,
 };
 pub use text::{structure_of, without_comments};
 
@@ -2812,5 +2812,91 @@ module Examples.Retain version "0.1.0" {
                 ("Flag".to_owned(), 0, false),
             ]
         );
+    }
+
+    /// A module with one duty, `Keep`, borne by `Acme`, with these
+    /// statements below its `bearer`.
+    fn duty_module(statements: &str) -> String {
+        format!(
+            "module Examples.Content version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    duty Keep {{\n        bearer Acme\n        {statements}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_duty_whose_content_cannot_be_read_is_e100() {
+        // The reader of the duty's text gives no expression for any of
+        // these. The content was dropped without a diagnostic, and the duty
+        // passed the checker with no content.
+        let deep = format!("{}a{}", "[".repeat(5_000), "]".repeat(5_000));
+        for written in [
+            "[a, b)",
+            "[a, b]",
+            deep.as_str(),
+            "days",
+            "days(3)",
+            "a +",
+            "a <",
+            "not",
+            "operative",
+            "if c",
+            "!a",
+            "= Pay(Acme)",
+            ": Pay(Acme)",
+            "",
+        ] {
+            assert_eq!(
+                rejected(&duty_module(&format!("content {written}"))),
+                [(
+                    DiagnosticCode::E100,
+                    "duty `Keep` contains an invalid or over-budget attachment/deadline expression"
+                        .to_owned()
+                )],
+                "content {}",
+                &written[..written.len().min(40)]
+            );
+        }
+    }
+
+    #[test]
+    fn a_duty_whose_content_is_read_keeps_it_as_before() {
+        let content = |statements: &str| -> String {
+            let parsed = parse_file(&duty_module(statements));
+            let hir =
+                elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+            format!("{:?}", hir.duties[0].content)
+        };
+        for (statements, read) in [
+            (
+                "content Pay(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }]"#,
+            ),
+            (
+                "content { Pay(Acme), File(Acme) }",
+                r#"[Set([Apply { ctor: "Pay", args: [Ident("Acme")] }, Apply { ctor: "File", args: [Ident("Acme")] }])]"#,
+            ),
+            ("content \"pay now\"", r#"[String("pay now")]"#),
+            (
+                "content if c { a } else { b }",
+                r#"[Apply { ctor: "if", args: [Ident("c"), Ident("a"), Ident("b")] }]"#,
+            ),
+            (
+                "content USD(100.00)",
+                r#"[Apply { ctor: "USD", args: [Decimal(100.00)] }]"#,
+            ),
+            (
+                "content 30 days",
+                r#"[Apply { ctor: "days", args: [Int(30)] }]"#,
+            ),
+            (
+                "content Pay(Acme)\n        content File(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }, Apply { ctor: "File", args: [Ident("Acme")] }]"#,
+            ),
+            (
+                "content\n            Pay(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }]"#,
+            ),
+        ] {
+            assert_eq!(content(statements), read, "{statements}");
+        }
     }
 }

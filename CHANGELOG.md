@@ -236,8 +236,9 @@ interchange schema versions are maintained independently of the interpreter.
   rejected with `E210`. A `conflict_doctrine` that named a clause only
   inside a string, as in `note "we defeat Residual here"`, passed the
   checker, and is now rejected with `E511`. A `source` with no `artifact`
-  field passed the checker when the text of another field held that word,
-  and is now rejected with `E540`. A string in a query that held
+  field passed the checker when a string in another field held that word,
+  as in `citation "the artifact of 1990"`, and is now rejected with
+  `E540`. A string in a query that held
   `for_all w in People: true` declared a property; it declares none now.
 - Where a part of a declaration is read back out of its text by a word,
   such as the `rank` of a nomination, the word is found only as a word of
@@ -251,14 +252,16 @@ interchange schema versions are maintained independently of the interpreter.
   rank. The query answered in the same way for a candidate named
   `Franklin`, `rank_holder` or `ranked` at rank 2. A `source` with a
   longer name that holds the word `artifact`, such as `artifact_registry`,
-  `my_artifact` or `artifacts`, passed the checker with no `artifact`
-  field, and is now rejected with `E540`. Where the grammar puts white
-  space beside such a word, a tab now serves as well as a space, and so
-  does a line end where the parser does not end the statement at it. A
-  nomination with tabs between its words, or with `for` or `rank` at the
-  start of a line that no space begins, did not count for its office: the
-  query above passed its candidate over and answered with the candidate of
-  the next rank. In the `interpretation_family` that makes the candidates
+  `my_artifact` or `artifacts`, or with such a name as the value of
+  another field, as in `kind artifact_set`, passed the checker with no
+  `artifact` field, and is now rejected with `E540`. Where the grammar
+  puts white space beside such a word, a tab now serves as well as a
+  space, and so does a line end where the parser does not end the
+  statement at it. A nomination with tabs between its words, or with
+  `for` or `rank` at the start of a line that no space begins, did not
+  count for its office: the query above passed its candidate over and
+  answered with the candidate of the next rank. In the
+  `interpretation_family` that makes the candidates
   eligible, an `alternative` with a tab after the word was lost, and one
   whose name ends in `alternative`, such as `both_alternative`, lost its
   definitions. A `defines` with a tab after the word, or with `as` at the
@@ -277,6 +280,15 @@ interchange schema versions are maintained independently of the interpreter.
   dropped in the same way, and is now rejected with `E100`. So is one
   marked with a longer word: `as established_later` was read as
   `as established`, and `as not_established_yet` as `as not_established`.
+- A `duty` whose `content` cannot be read is rejected with `E100`, in the
+  diagnostic a duty already had for a `bearer`, `claimant`, `attaches` or
+  `due` that cannot be read: "duty `Keep` contains an invalid or
+  over-budget attachment/deadline expression". `content [a, b)` passed
+  the checker, and the duty had no content; so did a content of 5,000
+  nested brackets, `content days`, `content a +` and a `content` with
+  nothing after it. A duty that holds the word `content` inside another
+  field, as in `discharge_by Delivered(content)`, is rejected in the same
+  way now, as one that holds `due` there already was.
 - A rule with no `{ ... }` body is rejected with `E100`, and so is a
   `verify` whose name is not followed by `{`:
   `verify Checked extra { assert false }` stepped over its block without a

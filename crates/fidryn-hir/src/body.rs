@@ -505,8 +505,13 @@ pub fn parse_duty_parts(src: &str) -> DutyParts {
             continue;
         }
         if p.eat_ident("content") {
+            // A content that cannot be read makes the duty invalid, as the
+            // other fields do: dropped, it would leave the duty with less
+            // content than its text says.
             if let Some(term) = p.parse_expr() {
                 content.push(term);
+            } else {
+                invalid = true;
             }
             continue;
         }
@@ -589,8 +594,18 @@ pub fn type_nests_too_deep(raw: &str) -> bool {
     most_angles_open(&code) > MAX_TYPE_NESTING || type_from_text(&code, 0).is_none()
 }
 
-/// The most `<` that stand open at one place of `text`, outside its string
-/// literals.
+/// True when more than 128 `<` stand open at one place of `text`, outside
+/// its comments and its string literals: the levels of the types in it are
+/// more than the parser lets a type have.
+///
+/// This counts the levels of a text that holds types but is no type
+/// itself, such as a parameter list, without reading it.
+pub fn angles_nest_too_deep(text: &str) -> bool {
+    most_angles_open(text) > MAX_TYPE_NESTING
+}
+
+/// The most `<` that stand open at one place of `text`, outside its
+/// comments and its string literals.
 fn most_angles_open(text: &str) -> usize {
     let mut open = 0usize;
     let mut most = 0;

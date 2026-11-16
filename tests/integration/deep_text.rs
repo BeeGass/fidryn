@@ -71,6 +71,58 @@ fn an_effect_whose_result_type_nests_5_000_deep_is_rejected() {
     assert_eq!(diagnostics(&effect_with_a_result(5_000)), rejected);
 }
 
+/// `Int` under `levels` levels of `Box<...>`.
+fn boxes(levels: usize) -> String {
+    format!("{}Int{}", "Box<".repeat(levels), ">".repeat(levels))
+}
+
+#[test]
+fn an_effect_type_that_its_reader_cuts_short_is_counted_whole() {
+    let rejected = e100("type nesting exceeds the limit of 128");
+    // A parameter whose type has two arguments: the parameter list is
+    // split at the comma inside `Map<...>`, and the deep part was left out.
+    let parameter = |levels: usize| {
+        format!(
+            "    effect Ask {{\n        request(n: String, m: Map<String, {}>) -> Bool\n    }}",
+            boxes(levels - 1)
+        )
+    };
+    // A result over two lines: the result is cut at the end of its first
+    // line, and the second was left out.
+    let result = |levels: usize| {
+        format!(
+            "    effect Ask {{\n        request(n: String) -> Box<\n            {}>\n    }}",
+            boxes(levels - 1)
+        )
+    };
+    let forms: [fn(usize) -> String; 2] = [parameter, result];
+    for declarations in forms {
+        assert_eq!(diagnostics(&declarations(128)), NONE);
+        assert_eq!(diagnostics(&declarations(129)), rejected);
+        assert_eq!(diagnostics(&declarations(5_000)), rejected);
+    }
+}
+
+#[test]
+fn a_duty_whose_content_cannot_be_read_is_rejected() {
+    let rejected =
+        e100("duty `Keep` contains an invalid or over-budget attachment/deadline expression");
+    let duty = |content: &str| {
+        format!("    duty Keep {{\n        bearer Acme\n        content {content}\n    }}")
+    };
+    // The content was dropped, and the duty passed with none.
+    assert_eq!(diagnostics(&duty("[a, b)")), rejected);
+    assert_eq!(
+        diagnostics(&duty(&format!(
+            "{}a{}",
+            "[".repeat(5_000),
+            "]".repeat(5_000)
+        ))),
+        rejected
+    );
+    assert_eq!(diagnostics(&duty("Pay(Acme)")), NONE);
+}
+
 #[test]
 fn a_decision_that_returns_a_set_with_an_element_nested_too_deep_is_rejected() {
     let returns = |depth: usize| {
