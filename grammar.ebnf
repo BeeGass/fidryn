@@ -182,9 +182,13 @@ ConsequenceOp   ::= "establish" | "terminate" | "suspend"
                   | "constitute" | "create" | "derive" | "activate"
                   | "defeat" | "make"
 
-(* The Expr of a consequence names a proposition. A consequence whose Expr
-   is a number, a string, a sum or the name of an entity, for example, is
-   rejected with E210. *)
+(* The Expr of a consequence names a proposition, and it is checked alike
+   after each ConsequenceOp. A consequence whose Expr is a number, a
+   string, a sum or a date, for example, is rejected with E210, and so is
+   one whose Expr is the name of an entity, unless the type of the entity
+   is Prop or an alias of Prop. The one consequence that is not checked
+   as a proposition is a Duty after create, with or without arguments,
+   which needs the fields bearer, claimant and content. *)
 
 (* ----- judgments and decisions ----- *)
 
@@ -358,7 +362,7 @@ Ident           ::= [A-Za-z_] [A-Za-z0-9_]*
    effect, entity, exists, for_all, interpretation_family, legal_act,
    nomination, office, power, proposition and scenario it is rejected with
    E100, as the whole name and as the first part of a dotted name; as a
-   later part of a dotted name, as in entity Org.days : NaturalPerson, it
+   later part of a dotted name, as in nomination Org.days for B rank 1, it
    is read. *)
 
 String          ::= JSON-string
@@ -420,24 +424,36 @@ End             ::= inserted-newline | ";"
    after a ";" outside them, and after the "}" that closes its outermost
    brace unless a continuation follows that brace.
 
-   A declaration does not go on into the declaration below it. That does
-   not hold where the header of a query, an fn or a calc ends in "!"
-   after the keyword, the name, the parameters or the result type, or
-   where the header of an import or a type ends in "<" after the keyword
-   or the name: the declaration on the next line that has a token is read
-   as part of the header, and the module is rejected. A keyword that
-   takes a name is rejected when its statement ends with it: the name is
-   not read from the next line. It is rejected as well when the token
-   after it is not a name. The six header keywords, jurisdiction,
-   source_snapshot, source_manifest, effective_at, recorded_at and
-   outside_scope, are rejected when the statement ends with the keyword:
-   the value is not read from the next line. And the header of a
-   declaration whose line ends in ":", "->" or "=", outside parentheses,
-   brackets and braces, is rejected when the first token after the
-   newline is a declaration keyword, although no End is inserted there by
-   the rule above. There is one exception: below the header of a for_all
-   or an exists that ends in ":", a line that begins with for_all or
-   exists is the body of the quantifier. *)
+   A declaration does not go on into the declaration below it. Outside
+   the parentheses, brackets and braces that a declaration has opened and
+   not closed, a line whose first token is a declaration keyword is no
+   part of that declaration, whatever token the line above it ends in.
+   Blank lines and comment lines between the two change nothing. There is
+   one exception: below the header of a for_all or an exists that ends in
+   ":", a line that begins with for_all or exists is the body of the
+   quantifier.
+
+   So a header that leaves no bracket open and whose line ends in ",",
+   ".", ":", "!", "->", "=>", "=", "==", "!=", "<", "<=", ">=", "+", "-",
+   "/", "|" or ".." is not finished above such a line, although no End is
+   inserted there by the rule above, and the module is rejected with E100:
+   rule R : derive from Basis + above the line clause C { is rejected,
+   and clause C is a declaration with its own block. That holds wherever
+   in a header the token stands: after an operator that lacks its operand,
+   after a name that ends in ".", after the "!" of an effect row, among
+   type arguments that "<" opens and no ">" closes, and after the ":",
+   "->" or "=" that a type follows. A prefix word at the end of the from
+   basis of a rule, or of an expression in the header of a judgment or an
+   observation, lacks its operand in the same way. Inside a bracket that
+   the declaration has left open, the lines below can still be read as
+   what the bracket holds.
+
+   A keyword that takes a name is rejected when its statement ends with
+   it: the name is not read from the next line. It is rejected as well
+   when the token after it is not a name. The six header keywords,
+   jurisdiction, source_snapshot, source_manifest, effective_at,
+   recorded_at and outside_scope, are rejected when the statement ends
+   with the keyword: the value is not read from the next line. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.

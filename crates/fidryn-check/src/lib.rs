@@ -456,8 +456,7 @@ fn check_queries(
             // capitalized name with no arguments is read as a proposition.
             // One that is declared as something else, an entity for
             // example, is not a proposition. That holds for each of the
-            // verbs, so the test stands before the one for `create`, which
-            // looks at nothing but the fields of a `Duty`.
+            // verbs, so the test stands before the one for `create Duty`.
             if prop.arguments.is_empty()
                 && let Some(ty) = cx.infer_ident(&prop.predicate)
                 && !ty.is_prop()
@@ -471,42 +470,43 @@ fn check_queries(
                 ));
                 continue;
             }
-            if operation == "create" {
-                if prop.predicate == "Duty" {
-                    let fields = prop
-                        .arguments
-                        .iter()
-                        .filter_map(|argument| match argument {
-                            Term::Apply { ctor, args } if ctor == "$named" => match args.as_slice()
-                            {
-                                [Term::String(name), value] => Some((name.as_str(), value)),
-                                _ => None,
-                            },
+            // `create Duty` is the one consequence that is checked as
+            // something else than a proposition: it needs the three fields
+            // of a duty. Every other consequence of `create` is checked as
+            // the consequences of the other eight verbs are.
+            if operation == "create" && prop.predicate == "Duty" {
+                let fields = prop
+                    .arguments
+                    .iter()
+                    .filter_map(|argument| match argument {
+                        Term::Apply { ctor, args } if ctor == "$named" => match args.as_slice() {
+                            [Term::String(name), value] => Some((name.as_str(), value)),
                             _ => None,
-                        })
-                        .collect::<BTreeMap<_, _>>();
-                    for name in ["bearer", "claimant"] {
-                        if let Some(value) = fields.get(name) {
-                            cx.check_result(
-                                value,
-                                &Type::Sort(Sort::LegalPerson),
-                                "position role",
-                                false,
-                                diagnostics,
-                            );
-                        } else {
-                            diagnostics.push(Diagnostic::new(
-                                DiagnosticCode::E210,
-                                format!("Duty creation requires `{name}`"),
-                            ));
-                        }
-                    }
-                    if !fields.contains_key("content") {
+                        },
+                        _ => None,
+                    })
+                    .collect::<BTreeMap<_, _>>();
+                for name in ["bearer", "claimant"] {
+                    if let Some(value) = fields.get(name) {
+                        cx.check_result(
+                            value,
+                            &Type::Sort(Sort::LegalPerson),
+                            "position role",
+                            false,
+                            diagnostics,
+                        );
+                    } else {
                         diagnostics.push(Diagnostic::new(
                             DiagnosticCode::E210,
-                            "Duty creation requires content",
+                            format!("Duty creation requires `{name}`"),
                         ));
                     }
+                }
+                if !fields.contains_key("content") {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "Duty creation requires content",
+                    ));
                 }
                 continue;
             }
@@ -5713,13 +5713,14 @@ module Examples.UseEff version "0.1.0" {
         // before, with and without its parentheses.
         check_src(&module("then establish Flag\n        then derive Flag()"))
             .expect("a proposition with no arguments");
-        // What `create` took before, it still takes: a proposition, a name
-        // nothing declares with and without arguments, an entity with
-        // arguments, and a duty with its three fields.
+        // `create` takes what the other verbs take: a proposition with its
+        // arguments, and a name with no arguments that is a proposition or
+        // that nothing declares. Beside those it takes a duty with its
+        // three fields.
         check_src(&module(
-            "then create Exempt(Acme)\n        then create Flag\n        then create Position\n        then create Position(Acme)\n        then create Acme(1)\n        then create Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))",
+            "then create Exempt(Acme)\n        then create Flag\n        then create Position\n        then create Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))",
         ))
-        .expect("the consequences `create` took before");
+        .expect("the consequences `create` takes");
         // And a duty with no fields is told what it lacks, as before.
         let lacking = [
             "Duty creation requires `bearer`",
@@ -5729,5 +5730,205 @@ module Examples.UseEff version "0.1.0" {
         .map(|message| (DiagnosticCode::E210, message.to_owned()));
         assert_eq!(rejected("then create Duty()"), lacking);
         assert_eq!(rejected("then create Duty"), lacking);
+    }
+
+    #[test]
+    fn create_is_checked_as_the_other_eight_verbs_are() {
+        // After `create` the checker looked at nothing but the fields of a
+        // `Duty`. So a name with arguments, whatever it names, a date, a
+        // duration, an interval and a quantifier passed after `create`
+        // alone, and each is `E210` after the other eight verbs.
+        let module = |consequences: &str| {
+            format!(
+                "module Review version \"0.1.0\" {{\n    type Color = Red | Green\n    type Truth = Prop\n    entity Acme : LegalPerson\n    entity Pr : Prop\n    entity Al : Truth\n    office Chair\n    office Seat(n: Int)\n    record_type Paper {{\n        a: Int\n    }}\n    effect reads {{ request(a: Int) -> Bool }}\n    calc seven() -> Int {{ return 7 }}\n    fn eight() -> Int {{ return 8 }}\n    query nine() -> Int {{ return 9 }}\n    proposition Exempt(who: LegalPerson)\n    proposition Flag()\n    rule Exemption(who: LegalPerson) : constitutive {{\n        when true\n        {consequences}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+            )
+        };
+        // The diagnostics of a module, from the lowering or from the
+        // checker, with `verb` written as VERB. None when it passes.
+        let diagnostics = |verb: &str, consequences: &str| -> Vec<(DiagnosticCode, String)> {
+            let parsed = parse_file(&module(consequences));
+            assert!(!parsed.has_errors(), "{consequences}");
+            elaborate(&parsed, &SourceManifest::default())
+                .and_then(|hir| check(&hir, &SourceManifest::default()).map(|_| ()))
+                .err()
+                .unwrap_or_default()
+                .into_iter()
+                .map(|diagnostic| (diagnostic.code, diagnostic.message.replace(verb, "VERB")))
+                .collect()
+        };
+        let both_lists = |verb: &str, form: &str| {
+            [
+                diagnostics(verb, &format!("then {verb} {form}")),
+                diagnostics(
+                    verb,
+                    &format!("then establish Exempt(Acme)\n        otherwise {verb} {form}"),
+                ),
+            ]
+        };
+        // Expressions that are no name, each also in parentheses, and names
+        // alone, with `()` and with arguments.
+        let mut forms: Vec<String> = Vec::new();
+        for expression in [
+            "5",
+            "2.5",
+            "\"none\"",
+            "true",
+            "1 + 2",
+            "1 < 2",
+            "{1, 2}",
+            "{ a: 1 }",
+            "2026-01-01",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T09:30:00-05:00",
+            "5 days",
+            "USD(500.00)",
+            "[1, 2]",
+            "[1, 2)",
+            "[2026-08-14, +inf)",
+            "for_all x in {1, 2} : x > 0",
+            "exists x in {1, 2} : x > 0",
+            "_",
+            "+inf",
+            "-inf",
+            "if true { Flag() } else { Flag() }",
+            "who.name",
+            "\"a\"(1)",
+            "operative Exempt(Acme)",
+        ] {
+            forms.push(expression.to_owned());
+            forms.push(format!("({expression})"));
+        }
+        for (name, arguments) in [
+            ("Exempt", "Acme"),
+            ("Exempt", "5"),
+            ("Exempt", "Acme, Acme"),
+            ("Flag", "1"),
+            ("Acme", "1"),
+            ("Pr", "1"),
+            ("Al", "1"),
+            ("Chair", "1"),
+            ("Seat", "1"),
+            ("reads", "1"),
+            ("Red", "1"),
+            ("who", "1"),
+            ("Paper", "1"),
+            ("seven", "1"),
+            ("eight", "1"),
+            ("nine", "1"),
+            ("Unknown", "Acme"),
+            ("unknown", "1"),
+        ] {
+            forms.push(name.to_owned());
+            forms.push(format!("{name}()"));
+            forms.push(format!("{name}({arguments})"));
+        }
+        let other_verbs = [
+            "constitute",
+            "terminate",
+            "suspend",
+            "create",
+            "derive",
+            "activate",
+            "defeat",
+            "make",
+        ];
+        let mut accepted = Vec::new();
+        for form in &forms {
+            let after_establish = both_lists("establish", form);
+            for verb in other_verbs {
+                assert_eq!(both_lists(verb, form), after_establish, "{verb} {form}");
+            }
+            if after_establish.iter().all(Vec::is_empty) {
+                accepted.push(form.as_str());
+            }
+        }
+        // What a consequence can be: a proposition with its arguments, a
+        // name of type `Prop`, which an entity can have, and a capitalized
+        // name with no arguments that nothing declares.
+        assert_eq!(
+            accepted,
+            [
+                "Exempt(Acme)",
+                "Flag",
+                "Flag()",
+                "Pr",
+                "Pr()",
+                "Al",
+                "Al()",
+                "Unknown",
+                "Unknown()"
+            ]
+        );
+        // `Duty` is the exception, and only after `create`: its three
+        // fields are checked, and nothing declares it as a proposition.
+        let duty = "Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))";
+        for verb in other_verbs.into_iter().chain(["establish"]) {
+            if verb == "create" {
+                assert_eq!(both_lists(verb, duty), [Vec::new(), Vec::new()]);
+                continue;
+            }
+            assert_eq!(
+                both_lists(verb, duty),
+                [(); 2].map(|()| vec![(
+                    DiagnosticCode::E210,
+                    "`operative` in `Exemption` requires a proposition, not Nominal(\"Duty\")"
+                        .to_owned()
+                )]),
+                "{verb}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_capitalized_name_the_checker_reads_otherwise_is_no_proposition() {
+        // A capitalized name with no arguments that nothing declares is a
+        // proposition to the checker: as a consequence, after `create` too,
+        // and as the operand of `operative`.
+        let uses = |name: &str| {
+            [
+                format!("when true\n        then establish {name}"),
+                format!("when true\n        then create {name}"),
+                format!("when operative {name}()\n        then establish Flag()"),
+            ]
+            .map(|statements| {
+                format!(
+                    "module Review version \"0.1.0\" {{\n    proposition Flag()\n    rule R : constitutive {{\n        {statements}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+                )
+            })
+        };
+        for name in ["Unknown", "Abc", "A1", "AB", "FLAGS"] {
+            for module in uses(name) {
+                check_src(&module).expect(name);
+            }
+        }
+        // Two kinds of name are read otherwise: three or four capital
+        // letters are a currency, and twelve words are read as the same
+        // words in lowercase.
+        for name in [
+            "ABC",
+            "FLAG",
+            "Seq",
+            "Transaction",
+            "If",
+            "Not",
+            "Call",
+            "Apply",
+            "Require",
+            "Exists",
+            "For_all",
+            "Duty_status",
+            "Duty_step",
+            "Require_authority",
+        ] {
+            for module in uses(name) {
+                let diagnostics = check_src(&module).expect_err(name);
+                assert!(
+                    diagnostics
+                        .iter()
+                        .all(|diagnostic| diagnostic.code == DiagnosticCode::E210),
+                    "{name}: {diagnostics:?}"
+                );
+            }
+        }
     }
 }

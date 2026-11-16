@@ -9,7 +9,7 @@ use crate::syntax::{FidrynLanguage, SyntaxKind};
 use fidryn_core::Span;
 use fidryn_core::{Diagnostic, DiagnosticCode};
 use rowan::GreenNodeBuilder;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BinaryHeap, HashMap};
 
 const CONTINUATION: &[&str] = &[
     "and",
@@ -175,7 +175,7 @@ pub fn parse_file(source: &str) -> Parse {
     let mut p = Parser {
         source,
         tokens: &tokens,
-        lines: LineIndex::new(&tokens),
+        lines: LineIndex::new(source, &tokens),
         idx: 0,
         diagnostics,
         builder: GreenNodeBuilder::new(),
@@ -186,6 +186,7 @@ pub fn parse_file(source: &str) -> Parse {
         brace_opens_enclosing_block: false,
         observation_body: false,
         angle_scans: HashMap::new(),
+        next_declaration: usize::MAX,
     };
     let module = p.parse_module();
     let green = p.take_green();
@@ -264,13 +265,17 @@ struct LineIndex {
     /// The first token at or after the index that is no white space,
     /// comment or newline, or the number of tokens.
     significant_from: Vec<u32>,
+    /// For a token that is a declaration keyword: the token at which the
+    /// declaration it begins ends because the next declaration begins
+    /// there, or `NO_TOKEN`. See `LineIndex::declaration_ends`.
+    declaration_end: Vec<u32>,
 }
 
 /// The entry of a `LineIndex` list that stands for "no such token".
 const NO_TOKEN: u32 = u32::MAX;
 
 impl LineIndex {
-    fn new(tokens: &[Token]) -> Self {
+    fn new(source: &str, tokens: &[Token]) -> Self {
         let len = tokens.len();
         let mut significant_before = vec![NO_TOKEN; len + 1];
         let mut newline_before = vec![NO_TOKEN; len + 1];
@@ -308,12 +313,139 @@ impl LineIndex {
                 }
             }
         }
+        let declaration_end =
+            Self::declaration_ends(source, tokens, &significant_before, &significant_from);
         Self {
             significant_before,
             newline_before,
             non_trivia_from,
             significant_from,
+            declaration_end,
         }
+    }
+
+    /// Where each declaration ends because the next one begins.
+    ///
+    /// Outside parentheses, brackets and braces, a line that begins with a
+    /// declaration keyword is no part of the declaration above it. The
+    /// place is found by a scan from the keyword of a declaration that
+    /// counts the brackets it passes as `skip_statement` counts them: each
+    /// kind for itself, a `)` closing a `[` when no `(` is open, and a
+    /// closing bracket that closes nothing counting for nothing. The scan
+    /// ends at the first line end at which no bracket is open and after
+    /// which the next line that has a token begins with a declaration
+    /// keyword. The declaration ends at that keyword. A `}` at which no
+    /// bracket is open ends the scan with no such place: it closes the
+    /// module. There is one exception: below a line of a `for_all` or an
+    /// `exists` declaration that ends in `:`, a line that begins with one
+    /// of those two words is the body of the quantifier and does not end
+    /// the scan.
+    ///
+    /// Brackets are counted from the keyword of each declaration, not once
+    /// for the module. A bracket that a declaration above has left open
+    /// says nothing about the header of the one below it, and the parser
+    /// reads some declarations that leave one open with no diagnostic: the
+    /// `(` of `type T = A<(>` is one.
+    ///
+    /// One scan for each declaration would read the rest of the module
+    /// again for each declaration that leaves a bracket open. This is one
+    /// pass for all of them. A scan that begins after the last bracket that
+    /// is still open has none open. So the pass keeps, for each kind of
+    /// bracket, the places of the ones that are open, and the keywords
+    /// whose scans have not ended. At a line end that a declaration keyword
+    /// follows, and at a `}`, the scans of the keywords that stand after
+    /// the last open bracket end.
+    ///
+    /// The place of an open bracket is the index of the token that opened
+    /// it, with one adjustment. A `)` closes the last open `(`. A scan that
+    /// began after that `(` has no `(` open, so for it the `)` closes its
+    /// last `[`, if it has one. That `[` then stays open only for the scans
+    /// that began at or before the `(`, which is what moving it to the
+    /// place of the `(` says.
+    fn declaration_ends(
+        source: &str,
+        tokens: &[Token],
+        significant_before: &[u32],
+        significant_from: &[u32],
+    ) -> Vec<u32> {
+        let word = |index: usize| {
+            tokens
+                .get(index)
+                .filter(|token| token.kind == TokenKind::Ident)
+                .and_then(|token| source.get(token.start as usize..token.end as usize))
+                .unwrap_or("")
+        };
+        let is_quantifier = |word: &str| matches!(word, "for_all" | "exists");
+        let mut ends = vec![NO_TOKEN; tokens.len() + 1];
+        // The keywords whose scans have not ended, in the order of the
+        // source. The quantifiers are kept apart, because the line that is
+        // the body of a quantifier ends the scans of the others only.
+        let mut waiting: Vec<usize> = Vec::new();
+        let mut waiting_quantifiers: Vec<usize> = Vec::new();
+        let mut braces: Vec<usize> = Vec::new();
+        let mut parens: Vec<usize> = Vec::new();
+        let mut brackets: BinaryHeap<usize> = BinaryHeap::new();
+        for (index, token) in tokens.iter().enumerate() {
+            match token.kind {
+                TokenKind::Ident if is_quantifier(word(index)) => waiting_quantifiers.push(index),
+                TokenKind::Ident if is_declaration_keyword(word(index)) => waiting.push(index),
+                TokenKind::LBrace => braces.push(index),
+                TokenKind::LParen => parens.push(index),
+                TokenKind::LBracket => brackets.push(index),
+                TokenKind::RParen => match parens.pop() {
+                    Some(open) => {
+                        if brackets.peek().is_some_and(|&last| last > open) {
+                            brackets.pop();
+                            brackets.push(open);
+                        }
+                    }
+                    None => {
+                        brackets.pop();
+                    }
+                },
+                TokenKind::RBracket => {
+                    brackets.pop();
+                }
+                TokenKind::RBrace | TokenKind::Newline => {
+                    let last_open = [braces.last(), parens.last(), brackets.peek()]
+                        .into_iter()
+                        .flatten()
+                        .max()
+                        .copied();
+                    // Ends the scans of the keywords in `waiting` that have
+                    // no bracket open here, with `end` as their answer.
+                    let mut end_scans = |waiting: &mut Vec<usize>, end: u32| {
+                        while let Some(&keyword) = waiting.last() {
+                            if last_open.is_some_and(|open| keyword < open) {
+                                break;
+                            }
+                            ends[keyword] = end;
+                            waiting.pop();
+                        }
+                    };
+                    if token.kind == TokenKind::RBrace {
+                        end_scans(&mut waiting, NO_TOKEN);
+                        end_scans(&mut waiting_quantifiers, NO_TOKEN);
+                        braces.pop();
+                        continue;
+                    }
+                    let next = significant_from[index + 1];
+                    let begins = word(next as usize);
+                    if !is_declaration_keyword(begins) {
+                        continue;
+                    }
+                    end_scans(&mut waiting, next);
+                    let ends_in_colon = tokens
+                        .get(significant_before[index] as usize)
+                        .is_some_and(|last| last.kind == TokenKind::Colon);
+                    if !(ends_in_colon && is_quantifier(begins)) {
+                        end_scans(&mut waiting_quantifiers, next);
+                    }
+                }
+                _ => {}
+            }
+        }
+        ends
     }
 }
 
@@ -341,6 +473,11 @@ struct Parser<'a> {
     /// `with_tokens_until` changes what the parser can see, and what a scan
     /// found under one view of the tokens does not hold under another.
     angle_scans: HashMap<(usize, usize), AngleScan>,
+    /// While a declaration is read that ends where the next one begins: the
+    /// index of the keyword of that next declaration, which is hidden with
+    /// the tokens after it. `usize::MAX` otherwise. See
+    /// `until_next_declaration`.
+    next_declaration: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -456,6 +593,42 @@ impl<'a> Parser<'a> {
         let result = read(self);
         self.tokens = all;
         result
+    }
+
+    /// Reads the declaration whose keyword is at the cursor with `read`.
+    ///
+    /// Outside the brackets the declaration opens, a line that begins with a
+    /// declaration keyword is no part of it (`LineIndex::declaration_ends`).
+    /// So `read` runs with that keyword and the tokens after it hidden, and
+    /// no reader of a header can take the declaration below for its own
+    /// text, whether it tests for one or not: the operand of an operator,
+    /// the name after a `.`, an effect row, type arguments. A reader that
+    /// needs more than the header holds finds the end of the input there
+    /// and reports what it lacks.
+    ///
+    /// At that place `next_token_ends_statement`, `declaration_begins_below`
+    /// and `declaration_begins_after` answer as they do when the keyword is
+    /// in view: a keyword ends no statement, and a declaration begins below.
+    fn until_next_declaration<R>(&mut self, read: impl FnOnce(&mut Self) -> R) -> R {
+        let end = self
+            .lines
+            .declaration_end
+            .get(self.idx)
+            .copied()
+            .unwrap_or(NO_TOKEN);
+        if end == NO_TOKEN {
+            return read(self);
+        }
+        self.next_declaration = end as usize;
+        let result = self.with_tokens_until(end as usize, read);
+        self.next_declaration = usize::MAX;
+        result
+    }
+
+    /// True when the cursor stands where the declaration below the one
+    /// being read begins. Its keyword is the next token, and it is hidden.
+    fn at_next_declaration(&self) -> bool {
+        self.idx == self.next_declaration
     }
 
     fn is_trivia(kind: TokenKind) -> bool {
@@ -691,6 +864,14 @@ impl<'a> Parser<'a> {
     }
 
     fn error(&mut self, at: Token, msg: &str) {
+        // Where the declaration below begins, what is missing is missing
+        // from the header above it, so the diagnostic points at the last
+        // token of that header and not at the place where the header's
+        // tokens end.
+        let at = match self.last_read() {
+            Some(last) if at.kind == TokenKind::Eof && self.at_next_declaration() => last,
+            _ => at,
+        };
         self.diagnostics
             .push(Diagnostic::new(DiagnosticCode::E100, msg).with_span(Span {
                 start: at.start,
@@ -758,13 +939,15 @@ impl<'a> Parser<'a> {
     }
 
     /// True when the next token ends the statement: a newline that does not
-    /// continue it, `;` or the end of the input.
+    /// continue it, `;` or the end of the input. Where the declaration below
+    /// is hidden, the next token is its keyword, which ends no statement.
     fn next_token_ends_statement(&mut self) -> bool {
         self.apply_asi();
-        matches!(
-            self.peek_raw().kind,
-            TokenKind::Newline | TokenKind::Semicolon | TokenKind::Eof
-        )
+        match self.peek_raw().kind {
+            TokenKind::Newline | TokenKind::Semicolon => true,
+            TokenKind::Eof => !self.at_next_declaration(),
+            _ => false,
+        }
     }
 
     /// True when the statement has ended: the next token ends it, or a
@@ -784,12 +967,13 @@ impl<'a> Parser<'a> {
     /// stands on a later line than the last token read. The line rule reads
     /// on to that line when the line above it ends in a token that cannot
     /// end a statement, such as `:`. A header that did so would take the
-    /// declaration below it for its own text.
+    /// declaration below it for its own text. The keyword is hidden where
+    /// the declaration being read ends at it, and it is the next token all
+    /// the same.
     fn declaration_begins_below(&mut self) -> bool {
         let next = self.peek();
-        next.kind == TokenKind::Ident
-            && is_declaration_keyword(self.text(next))
-            && self.line_end_passed()
+        let keyword = next.kind == TokenKind::Ident && is_declaration_keyword(self.text(next));
+        (keyword || self.at_next_declaration()) && self.line_end_passed()
     }
 
     /// True when the end of a line lies between the last token read and the
@@ -801,11 +985,18 @@ impl<'a> Parser<'a> {
 
     /// True when the first token after the newline token at `index` is a
     /// keyword that begins a declaration. Blank lines and comment lines in
-    /// between have no token.
+    /// between have no token. The keyword at which the declaration being
+    /// read ends is hidden, and it is that first token all the same.
     fn declaration_begins_after(&self, index: usize) -> bool {
-        self.significant_from(index + 1).is_some_and(|token| {
-            token.kind == TokenKind::Ident && is_declaration_keyword(self.text(token))
-        })
+        let hidden = self
+            .lines
+            .significant_from
+            .get(index + 1)
+            .is_some_and(|&next| next as usize == self.next_declaration);
+        hidden
+            || self.significant_from(index + 1).is_some_and(|token| {
+                token.kind == TokenKind::Ident && is_declaration_keyword(self.text(token))
+            })
     }
 
     fn start_node(&mut self, kind: SyntaxKind) {
@@ -976,7 +1167,7 @@ impl<'a> Parser<'a> {
         self.expect_kind(TokenKind::LBrace, "expected `{`");
         let mut items = Vec::new();
         while !matches!(self.peek().kind, TokenKind::RBrace | TokenKind::Eof) {
-            if let Some(item) = self.parse_item() {
+            if let Some(item) = self.until_next_declaration(Self::parse_item) {
                 items.push(item);
             } else {
                 self.start_node(SyntaxKind::ERROR);
@@ -9166,6 +9357,983 @@ module M version "0.1.0" {
         // it is read.
         assert_eq!(long, too_large);
     }
+
+    /// Headers, and beginnings of headers, of every kind of declaration:
+    /// the kinds the parser reads and the kinds it steps over. Beside each
+    /// are the diagnostics it gets when nothing follows it on its line and
+    /// a declaration stands below it.
+    const HEADER_STEMS: &[(&str, &[&str])] = &[
+        // Rules. The last two end where an operand is expected.
+        ("rule R : derive from Basis", &[RULE_NEEDS_A_BODY]),
+        ("rule R : derive from \"c\"", &[RULE_NEEDS_A_BODY]),
+        (
+            "rule R(x: Int) : constitutive from Basis.Sub",
+            &[RULE_NEEDS_A_BODY],
+        ),
+        ("rule R : derive from Basis(x)", &[RULE_NEEDS_A_BODY]),
+        ("rule R : derive", &[RULE_NEEDS_A_BODY]),
+        ("rule R(x: Int)", &[RULE_NEEDS_A_BODY]),
+        ("rule R : derive from", &[RULE_NEEDS_A_BODY]),
+        (
+            "rule R : derive from Basis and",
+            &["expected expression after operator", RULE_NEEDS_A_BODY],
+        ),
+        // Judgments and observations.
+        ("judgment J(x: Int) decides P()", &[NEEDS_A_BLOCK]),
+        ("judgment J(x: Int) decides P() from Src", &[NEEDS_A_BLOCK]),
+        ("judgment J(x: Int) decides Liable", &[NEEDS_A_BLOCK]),
+        (
+            "judgment J(x: Int) decides",
+            &["expected the proposition decided by the judgment"],
+        ),
+        (
+            "judgment J(x: Int) decides P() from",
+            &["expected judgment source"],
+        ),
+        ("observation O(r: Rec) establishes P()", &[NEEDS_A_BLOCK]),
+        (
+            "observation O(r: Rec) establishes P() from Src",
+            &[NEEDS_A_BLOCK],
+        ),
+        ("observation O(r: Rec) establishes Seen", &[NEEDS_A_BLOCK]),
+        (
+            "observation O(r: Rec) establishes",
+            &["expected observation proposition"],
+        ),
+        (
+            "observation O(r: Rec) establishes P() from",
+            &["expected observation source"],
+        ),
+        // Nominations and imports.
+        ("nomination A for B rank 1", &[]),
+        ("nomination A for B", &[]),
+        ("nomination A for B rank 1 from Src", &[]),
+        ("nomination A", &[]),
+        ("import M version \"1\"", &[]),
+        ("import M as", &[]),
+        ("import M version \"1\" digest \"x\"", &[]),
+        ("import M alias K", &[]),
+        ("import M", &[]),
+        ("import M.N", &[]),
+        // Types, entities, offices and propositions.
+        ("type T = A", &[]),
+        ("type T = A | B", &[]),
+        ("type T<X> = A", &[]),
+        ("type T = Map<A, B>", &[]),
+        ("type T", &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("type T<X>", &[TYPE_NEEDS_AN_EQUALS_SIGN]),
+        ("entity E : Map<A>", &[]),
+        ("entity E : T occupied_by X", &[]),
+        ("entity E : T", &[]),
+        ("entity E", &[]),
+        ("office O(x: Int) occupied_by X", &[]),
+        ("office O", &[]),
+        ("proposition P(x: Int)", &[]),
+        ("proposition P", &[]),
+        // Functions and queries.
+        ("fn f(x: Int) -> Int fuel = 100", &[FUNCTION_NEEDS_A_BODY]),
+        ("fn f(x: Int) -> Map<A>", &[FUNCTION_NEEDS_A_BODY]),
+        ("fn f(x: Int) -> Int", &[FUNCTION_NEEDS_A_BODY]),
+        ("fn f(x: Int)", &[FUNCTION_NEEDS_A_BODY]),
+        ("fn f", &["expected `(`", FUNCTION_NEEDS_A_BODY]),
+        ("calc c(x: Int) -> Int", &[FUNCTION_NEEDS_A_BODY]),
+        ("calc c(x: Int) -> Int fuel = 100", &[FUNCTION_NEEDS_A_BODY]),
+        ("calc c", &["expected `(`", FUNCTION_NEEDS_A_BODY]),
+        ("query automatic q() -> Bool", &[]),
+        ("query q() -> Bool", &[]),
+        ("query q()", &[]),
+        ("query q", &["expected `(`"]),
+        ("query automatic", &["expected query name"]),
+        // The other kinds.
+        ("decision D(x: Int) -> Int", &[]),
+        ("decision D(x: Int)", &[]),
+        ("effect F", &[]),
+        ("duty D", &[]),
+        ("power W", &[]),
+        ("clause K", &[]),
+        ("scenario S", &[]),
+        ("verify U", &[VERIFY_NEEDS_A_BLOCK]),
+        ("legal_act L(x: Int)", &[]),
+        ("record_type R", &[NEEDS_A_BLOCK]),
+        ("evidence_type E", &[NEEDS_A_BLOCK]),
+        ("source S", &[]),
+        ("interpretation_family F", &[]),
+        ("conflict_doctrine D", &[]),
+        ("for_all x in {1, 2}", &[]),
+        ("exists x in Dom", &[]),
+        ("for_all x in {1, 2} : x >", &[]),
+        ("for_all x in {1, 2} : x", &[]),
+        ("for_all x", &[]),
+        // Header keywords with a value.
+        ("jurisdiction Test", &[]),
+        ("effective_at 2026-01-01", &[]),
+        ("recorded_at 2026-01-01T00:00:00Z", &[]),
+        ("source_snapshot \"p\"", &[]),
+        ("outside_scope { everything_else }", &[]),
+        // Keywords alone.
+        ("rule", &["expected rule name"]),
+        ("judgment", &[NEEDS_A_NAME]),
+        ("observation", &[NEEDS_A_NAME]),
+        ("nomination", &[NEEDS_A_NAME]),
+        ("import", &["expected import name"]),
+        ("type", &[NEEDS_A_NAME]),
+        ("entity", &[NEEDS_A_NAME]),
+        ("fn", &["expected function name"]),
+        ("calc", &["expected function name"]),
+        ("query", &["expected query name"]),
+        ("verify", &["expected verification name"]),
+        ("decision", &[NEEDS_A_NAME]),
+    ];
+
+    /// What the line of a header can end in: each binary operator, the `.`
+    /// of a name, each prefix word, an effect row with no braces, type
+    /// arguments that no `>` closes, the tokens after which a header names
+    /// something, the `..` of a range, and the words a header can end in.
+    /// After a header that ends where an operand is expected, `-` is the
+    /// unary minus. Among these are all the tokens that cannot end a
+    /// statement, but for `;`, the three opening brackets and an invalid
+    /// token.
+    const HEADER_ENDINGS: &[&str] = &[
+        "=>",
+        "==",
+        "!=",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "+",
+        "-",
+        "*",
+        "/",
+        "or",
+        "and",
+        "in",
+        "as",
+        "is",
+        ".",
+        "A.",
+        "not",
+        "operative",
+        "effective",
+        "established",
+        "determined",
+        "always",
+        "active",
+        "every",
+        "unique",
+        "closed",
+        "!",
+        "! Eff",
+        "! Eff,",
+        "-> A !",
+        "A <",
+        "A<B",
+        "A<B,",
+        "! A <",
+        ": A <",
+        "-> A <",
+        ":",
+        "->",
+        "=",
+        ",",
+        "|",
+        "= A |",
+        "..",
+        "from",
+        "decides",
+        "establishes",
+        "for",
+        "rank",
+        "version",
+        "fuel",
+        "fuel =",
+    ];
+
+    /// The declarations that stand below a header: one with no block, and
+    /// declarations with a block that the parser reads or keeps as text.
+    const DECLARATIONS_BELOW: &[&str] = &[
+        "proposition Witness()",
+        "clause C {\n    then establish Witness()\n}",
+        "rule S : derive {\n    when operative Never()\n    then derive Witness()\n}",
+        "rule S {\n    when operative Never()\n    then derive Witness()\n}",
+        "verify V {\n    assert false\n}",
+        "query r() -> Bool {\n    return true\n}",
+        "interpretation_family I {\n}",
+        "conflict_doctrine X {\n}",
+    ];
+
+    #[test]
+    fn a_header_ends_where_the_next_declaration_begins() {
+        // A module holds a header, a declaration below it and a last
+        // query. The declaration stands directly below the header, below a
+        // blank line or below a comment line. No header of the sweep leaves
+        // a parenthesis, a bracket or a brace open.
+        //
+        // Each header stands above each declaration once, and the three
+        // gaps are taken in turn: each header meets each gap, and each
+        // ending meets each declaration across each gap. That is a third of
+        // the modules the four lists give.
+        let gaps = ["", "\n", "// a note\n"];
+        let last = "query last() -> Int { return 7 }";
+        // What stands below a header is read as it is read below a line of
+        // spaces as long as the header. Each item then has the same place.
+        let mut below_spaces: HashMap<(usize, usize, usize), Vec<Item>> = HashMap::new();
+        let mut failures = Vec::new();
+        let mut modules = 0;
+        for (stem_index, &(stem, stem_diagnostics)) in HEADER_STEMS.iter().enumerate() {
+            let endings = std::iter::once("").chain(HEADER_ENDINGS.iter().copied());
+            for (ending_index, ending) in endings.enumerate() {
+                let header = format!("{stem} {ending}");
+                let header = header.trim_end();
+                // A header whose last token cannot end a statement is not
+                // finished: its line goes on into the line below, whether
+                // the parser reads the header or steps over it. A prefix
+                // word at the end of the line is not counted here, because
+                // it carries on an expression and not text the parser
+                // steps over: such a word ends the header of a nomination
+                // and does not end the basis of a rule.
+                let unfinished = lex_bounded(header, MAX_SOURCE_TOKENS)
+                    .expect("the tokens of the header")
+                    .into_iter()
+                    .rfind(|token| {
+                        !Parser::is_trivia(token.kind)
+                            && !matches!(token.kind, TokenKind::Newline | TokenKind::Eof)
+                    })
+                    .is_some_and(|last| !Parser::can_end_statement(last.kind));
+                for (below_index, below) in DECLARATIONS_BELOW.iter().enumerate() {
+                    let gap_index = (stem_index + ending_index + below_index) % gaps.len();
+                    let gap = gaps[gap_index];
+                    modules += 1;
+                    let rest = format!("{gap}{below}\n{last}");
+                    let expected = below_spaces
+                        .entry((header.len(), below_index, gap_index))
+                        .or_insert_with(|| {
+                            let spaces = " ".repeat(header.len());
+                            let parsed = parse_body(&format!("{spaces}\n{rest}"));
+                            parsed.module().expect("a module").items.clone()
+                        });
+                    let parsed = parse_file(&wrap_module(&format!("{header}\n{rest}")));
+                    let items = &parsed.module().expect("a module").items;
+                    let mut wrong = Vec::new();
+                    // The first item is the declaration of the header. The
+                    // items after it are the declaration below and the last
+                    // query, each with its name and its block.
+                    if items.get(1..) != Some(expected.as_slice()) {
+                        wrong.push("what stands below the header is not read as it stands");
+                    }
+                    if unfinished && parsed.diagnostics.is_empty() {
+                        wrong.push("the header is not finished and has no diagnostic");
+                    }
+                    if parsed
+                        .diagnostics
+                        .iter()
+                        .any(|diagnostic| diagnostic.code != DiagnosticCode::E100)
+                    {
+                        wrong.push("a diagnostic is not E100");
+                    }
+                    if ending.is_empty() && messages(&parsed) != stem_diagnostics {
+                        wrong.push("the header with no ending is not diagnosed as before");
+                    }
+                    if !wrong.is_empty() {
+                        failures.push(format!(
+                            "`{header}` then {gap:?} then `{}`: {wrong:?}\n    diagnostics: {:?}\n    items: {:?}",
+                            below.lines().next().unwrap_or(below),
+                            messages(&parsed),
+                            item_names(&parsed)
+                        ));
+                    }
+                }
+            }
+        }
+        assert_eq!(modules, 91 * 54 * 8);
+        assert!(
+            failures.is_empty(),
+            "{} of {modules} headers take the declaration below them or are not diagnosed as they should be; the first of them:\n{}",
+            failures.len(),
+            failures
+                .iter()
+                .take(40)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+    }
+
+    #[test]
+    fn what_a_header_lacks_where_the_next_declaration_begins_is_reported_at_its_last_token() {
+        // The header, and its diagnostics with the token of the header each
+        // points at. The header stands above a declaration that has a
+        // block.
+        let rows: &[(&str, &[(&str, &str)])] = &[
+            // The operand of an operator.
+            (
+                "rule R : derive from Basis +",
+                &[
+                    ("expected expression after operator", "+"),
+                    (RULE_NEEDS_A_BODY, "+"),
+                ],
+            ),
+            (
+                "rule R : derive from Basis ==",
+                &[
+                    ("expected expression after operator", "=="),
+                    (RULE_NEEDS_A_BODY, "=="),
+                ],
+            ),
+            (
+                "judgment J(x: Int) decides P() from Src /",
+                &[
+                    ("expected expression after operator", "/"),
+                    (NEEDS_A_BLOCK, "/"),
+                ],
+            ),
+            (
+                "observation O(r: Rec) establishes P() <=",
+                &[
+                    ("expected expression after operator", "<="),
+                    (NEEDS_A_BLOCK, "<="),
+                ],
+            ),
+            (
+                "observation O(r: Rec) establishes P() from Src +",
+                &[
+                    ("expected expression after operator", "+"),
+                    (NEEDS_A_BLOCK, "+"),
+                ],
+            ),
+            // The operand of a prefix word and of a unary minus.
+            ("rule R : derive from not", &[(RULE_NEEDS_A_BODY, "not")]),
+            ("rule R : derive from -", &[(RULE_NEEDS_A_BODY, "-")]),
+            (
+                "judgment J(x: Int) decides operative",
+                &[(
+                    "expected the proposition decided by the judgment",
+                    "operative",
+                )],
+            ),
+            (
+                "judgment J(x: Int) decides P() from -",
+                &[("expected judgment source", "-")],
+            ),
+            (
+                "observation O(r: Rec) establishes every",
+                &[("expected observation proposition", "every")],
+            ),
+            // The name after a `.`.
+            (
+                "rule R : derive from Basis.",
+                &[(NEEDS_A_NAME_PART, "."), (RULE_NEEDS_A_BODY, ".")],
+            ),
+            (
+                "judgment J(x: Int) decides P().",
+                &[(NEEDS_A_NAME_PART, "."), (NEEDS_A_BLOCK, ".")],
+            ),
+            (
+                "observation O(r: Rec) establishes P() from Src.",
+                &[(NEEDS_A_NAME_PART, "."), (NEEDS_A_BLOCK, ".")],
+            ),
+            // An effect row: the names after `!` stand between braces.
+            (
+                "query q() -> Bool !",
+                &[("expected `{`", "!"), ("expected `}`", "!")],
+            ),
+            (
+                "query q() -> Bool ! Read",
+                &[("expected `{`", "Read"), ("expected `}`", "Read")],
+            ),
+            (
+                "query q() -> Bool ! Read,",
+                &[("expected `{`", "Read"), ("expected `}`", ",")],
+            ),
+            (
+                "fn f(x: Int) -> Int !",
+                &[
+                    ("expected `{`", "!"),
+                    ("expected `}`", "!"),
+                    (FUNCTION_NEEDS_A_BODY, "!"),
+                ],
+            ),
+            (
+                "calc c(x: Int) -> Int ! Read, Write",
+                &[
+                    ("expected `{`", "Read"),
+                    ("expected `}`", "Write"),
+                    (FUNCTION_NEEDS_A_BODY, "Write"),
+                ],
+            ),
+            (
+                "calc c(x: Int) -> Int fuel =",
+                &[("expected integer fuel", "="), (FUNCTION_NEEDS_A_BODY, "=")],
+            ),
+            // Type parameters and type arguments.
+            ("import M <", &[("expected `>`", "<")]),
+            ("import M <A,", &[("expected `>`", ",")]),
+            (
+                "type T <",
+                &[("expected `>`", "<"), (TYPE_NEEDS_AN_EQUALS_SIGN, "<")],
+            ),
+            (
+                "type T <X,",
+                &[("expected `>`", ","), (TYPE_NEEDS_AN_EQUALS_SIGN, ",")],
+            ),
+            // A header the parser steps over.
+            ("proposition P(x: Int) +", &[(STOPS_SHORT, "+")]),
+            ("nomination A for B rank 1 +", &[(STOPS_SHORT, "+")]),
+            ("for_all x in {1, 2} : x >=", &[(STOPS_SHORT, ">=")]),
+        ];
+        let below = "clause C {\n    then establish Witness()\n}";
+        let mut failures = Vec::new();
+        for &(header, diagnostics) in rows {
+            // The declaration stands on the next line or below a blank line.
+            for between in ["", "\n"] {
+                let module = wrap_module(&format!("{header}\n{between}{below}"));
+                let parsed = parse_file(&module);
+                let header_start = module.find(header).expect("the header");
+                let pointed_at: Vec<(&str, Option<(usize, usize)>)> = parsed
+                    .diagnostics
+                    .iter()
+                    .map(|diagnostic| {
+                        let span = diagnostic
+                            .primary_span
+                            .map(|span| (span.start as usize, span.end as usize));
+                        (diagnostic.message.as_str(), span)
+                    })
+                    .collect();
+                let expected: Vec<(&str, Option<(usize, usize)>)> = diagnostics
+                    .iter()
+                    .map(|&(message, token)| {
+                        let start = header_start + header.rfind(token).expect("the token");
+                        (message, Some((start, start + token.len())))
+                    })
+                    .collect();
+                let clause = parsed
+                    .module()
+                    .and_then(|module| module.items.get(1))
+                    .and_then(Item::decl)
+                    .map(|decl| decl.source.as_str());
+                if pointed_at != expected || clause != Some(below) {
+                    failures.push(format!(
+                        "`{header}` then {between:?}\n    read:     {pointed_at:?}\n    expected: {expected:?}\n    below it: {clause:?}"
+                    ));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "{} headers are not reported at their last token, or take the declaration below them:\n{}",
+            failures.len(),
+            failures.join("\n")
+        );
+
+        // After type arguments that are nested too deep the parser steps
+        // over the rest of the statement without counting brackets. It
+        // stops where the next declaration begins all the same.
+        let deep = format!("f<{}A{}(1)", "A<".repeat(128), ">".repeat(129));
+        for (header, lacks, keyword) in [
+            (
+                format!("rule R : derive from {deep}"),
+                RULE_NEEDS_A_BODY,
+                "rule",
+            ),
+            (
+                format!("judgment J(x: Int) decides {deep}"),
+                NEEDS_A_BLOCK,
+                "judgment",
+            ),
+            (
+                format!("observation O(r: Rec) establishes {deep}"),
+                NEEDS_A_BLOCK,
+                "observation",
+            ),
+        ] {
+            let parsed = parse_file(&wrap_module(&format!("{header}\n{below}")));
+            assert_eq!(messages(&parsed), [TOO_DEEP, lacks], "{keyword}");
+            let items = item_names(&parsed);
+            assert_eq!(
+                (items.first().map(|item| item.0), items.get(1)),
+                (Some(keyword), Some(&("clause", Some("C")))),
+                "{keyword}"
+            );
+        }
+    }
+
+    #[test]
+    fn brackets_are_counted_from_the_keyword_of_each_declaration() {
+        let unfinished = "rule R : derive from Basis +";
+        let clause = "clause C {\n    then establish Witness()\n}";
+        let ends_at_the_clause = ["expected expression after operator", RULE_NEEDS_A_BODY];
+        // The declaration above leaves a `(` or a `[` open, and the parser
+        // reads it with no diagnostic. That bracket is not one the header
+        // of the rule stands in.
+        for (above, keyword) in [
+            ("type T = A<(>", "type"),
+            ("entity E : Map<[>", "entity"),
+            ("calc f(x: Int<(>) -> Int { return 1 }", "calc"),
+            ("record_type Rec {\n    a: Int<(>\n}", "record_type"),
+        ] {
+            parse_body(above);
+            let parsed = parse_file(&wrap_module(&format!("{above}\n{unfinished}\n{clause}")));
+            assert_eq!(messages(&parsed), ends_at_the_clause, "{above}");
+            let items = item_names(&parsed);
+            assert_eq!(
+                (items[0].0, &items[1..]),
+                (keyword, &[("rule", Some("R")), ("clause", Some("C"))][..]),
+                "{above}"
+            );
+            assert_eq!(
+                parsed.module().expect("a module").items[2]
+                    .decl()
+                    .map(|decl| decl.source.as_str()),
+                Some(clause),
+                "{above}"
+            );
+        }
+        // A bracket of the header that has closed is not open: an interval
+        // that `)` closes, and a closing bracket that closes nothing.
+        for header in [
+            "rule R : derive from [1, 2) +",
+            "rule R : derive from f([1, 2)) +",
+            "rule R : derive from f(x) ) ] +",
+        ] {
+            let parsed = parse_file(&wrap_module(&format!("{header}\n{clause}")));
+            assert!(parsed.has_errors(), "{header}");
+            assert_eq!(
+                item_names(&parsed),
+                [("rule", Some("R")), ("clause", Some("C"))],
+                "{header}"
+            );
+        }
+        // A declaration that begins in the middle of a line has a header
+        // of its own, which ends where the next declaration begins.
+        let parsed = parse_file(&wrap_module(&format!(
+            "proposition P(); {unfinished}\n{clause}"
+        )));
+        assert_eq!(messages(&parsed), ends_at_the_clause);
+        assert_eq!(
+            item_names(&parsed),
+            [
+                ("proposition", Some("P")),
+                ("rule", Some("R")),
+                ("clause", Some("C"))
+            ]
+        );
+        // And a quantifier that begins there keeps the body on the line
+        // below it.
+        let parsed = parse_body(
+            "proposition P(); for_all x in {1, 2} :\nexists y in {1, 2} : x == y\nproposition Witness()",
+        );
+        assert_eq!(
+            item_names(&parsed),
+            [
+                ("proposition", Some("P")),
+                ("for_all", Some("x")),
+                ("proposition", Some("Witness"))
+            ]
+        );
+        assert_eq!(
+            parsed.module().expect("a module").items[1]
+                .decl()
+                .map(|decl| decl.source.as_str()),
+            Some("for_all x in {1, 2} :\nexists y in {1, 2} : x == y\n")
+        );
+    }
+
+    #[test]
+    fn inside_an_open_bracket_a_header_reads_the_lines_below_it_as_before() {
+        // The header leaves a parenthesis, a bracket or a brace open above
+        // a declaration that has a block. What the bracket holds is read on
+        // through the lines below, so the clause is no item of the module.
+        let clause = "clause C {\n    then establish Witness()\n}";
+        let last = "query last() -> Int { return 7 }";
+        let end_of_module = "expected end of file after module";
+        // A header, its diagnostics, and the keyword and the name of each
+        // item of the module.
+        type Items<'a> = &'a [(&'a str, Option<&'a str>)];
+        let rows: &[(&str, &[&str], Items<'_>)] = &[
+            (
+                "proposition P(",
+                &["expected `:`", "expected parameter", "expected `)`"],
+                &[("proposition", Some("P")), ("query", Some("last"))],
+            ),
+            (
+                "rule R : derive from Basis(",
+                &[
+                    "expected `}`",
+                    "expected `)`",
+                    RULE_NEEDS_A_BODY,
+                    end_of_module,
+                ],
+                &[("rule", Some("R"))],
+            ),
+            (
+                "rule R : derive from [",
+                &[
+                    "expected `}`",
+                    "expected `,`",
+                    "expected `]` or `)`",
+                    RULE_NEEDS_A_BODY,
+                    end_of_module,
+                ],
+                &[("rule", Some("R"))],
+            ),
+            (
+                "rule R : derive from {",
+                &[
+                    "expected `}`",
+                    "expected `}`",
+                    RULE_NEEDS_A_BODY,
+                    end_of_module,
+                ],
+                &[("rule", Some("R"))],
+            ),
+            (
+                "rule R : derive from (Basis +",
+                &[
+                    "expected `}`",
+                    "expected `)`",
+                    RULE_NEEDS_A_BODY,
+                    end_of_module,
+                ],
+                &[("rule", Some("R"))],
+            ),
+            (
+                "judgment J(x: Int) decides P(",
+                &["expected `}`", "expected `)`", NEEDS_A_BLOCK, end_of_module],
+                &[("judgment", Some("J"))],
+            ),
+            (
+                "query q() -> Bool ! {",
+                &[
+                    "expected effect name",
+                    "expected `}`",
+                    "expected query statement",
+                ],
+                &[("query", Some("q")), ("query", Some("last"))],
+            ),
+            ("power W {", &["expected `}`"], &[("power", Some("W"))]),
+            ("import M (", &["expected `}`"], &[("import", Some("M"))]),
+            (
+                "nomination A for B rank [",
+                &["expected `}`"],
+                &[("nomination", Some("A"))],
+            ),
+        ];
+        for &(header, diagnostics, items) in rows {
+            let parsed = parse_file(&wrap_module(&format!("{header}\n{clause}\n{last}")));
+            assert_eq!(messages(&parsed), diagnostics, "{header}");
+            assert_eq!(item_names(&parsed), items, "{header}");
+        }
+        // A bracket that closes below the clause holds it as text.
+        let parsed = parse_body(&format!("power W [\n{clause}\n]\n{last}"));
+        assert_eq!(
+            item_names(&parsed),
+            [("power", Some("W")), ("query", Some("last"))]
+        );
+    }
+
+    /// The longest module of `line` repeated that the token budget holds:
+    /// the number of lines and the module.
+    fn longest_module_of(line: &str) -> (usize, String) {
+        let module = |count: usize| {
+            format!(
+                "module X version \"0.1.0\" {{\n{}}}\n",
+                format!("{line}\n").repeat(count)
+            )
+        };
+        let tokens = |count: usize| {
+            lex_bounded(&module(count), MAX_SOURCE_TOKENS)
+                .expect("a short module")
+                .len()
+        };
+        let count = (MAX_SOURCE_TOKENS - tokens(0)) / (tokens(1) - tokens(0));
+        assert!(lex_bounded(&module(count), MAX_SOURCE_TOKENS).is_ok());
+        assert!(lex_bounded(&module(count + 1), MAX_SOURCE_TOKENS).is_err());
+        (count, module(count))
+    }
+
+    /// Parses `source` on a thread and returns the diagnostics and the
+    /// declarations. The test fails when the parse has not returned after
+    /// five seconds.
+    ///
+    /// The bound is there to catch a search for the end of each declaration
+    /// that reads on to the end of the module, once for each declaration.
+    /// For a module as long as the token budget allows, of declarations of
+    /// one line, that is more than two thousand million steps. One such
+    /// search took 20 seconds for the longest module of `type T = A<(>`,
+    /// which is parsed in less than a second.
+    fn read_in_time(source: String) -> (Vec<String>, Vec<Decl>) {
+        let (sender, receiver) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let parsed = parse_file(&source);
+            let diagnostics = messages(&parsed).into_iter().map(str::to_owned).collect();
+            let declarations = parsed
+                .module()
+                .expect("a module")
+                .items
+                .iter()
+                .filter_map(Item::decl)
+                .cloned()
+                .collect();
+            let _ = sender.send((diagnostics, declarations));
+        });
+        receiver
+            .recv_timeout(std::time::Duration::from_secs(5))
+            .expect("the parse returns within five seconds")
+    }
+
+    #[test]
+    fn a_module_of_unfinished_headers_is_read_in_time() {
+        // As many rules as the token budget holds, each with a header that
+        // ends in an operator. The line below each is the next of them.
+        // Each rule ends where the next begins, so each is read: with the
+        // basis it names, and with the two diagnostics of a header that
+        // lacks an operand and a body.
+        let line = "rule R : derive from Basis +";
+        let (count, module) = longest_module_of(line);
+        assert!(count > 18_000, "{count}");
+        let (diagnostics, declarations) = read_in_time(module);
+        assert_eq!(diagnostics.len(), 2 * count);
+        assert!(diagnostics.chunks(2).all(|pair| pair
+            == [
+                "expected expression after operator".to_owned(),
+                RULE_NEEDS_A_BODY.to_owned()
+            ]));
+        assert_eq!(declarations.len(), count);
+        assert!(declarations.iter().all(|rule| {
+            rule.keyword == "rule"
+                && rule.source == format!("{line}\n")
+                && rule.source_basis == Some(ident("Basis"))
+        }));
+    }
+
+    #[test]
+    fn a_module_of_declarations_that_leave_a_bracket_open_is_read_in_time() {
+        // As many declarations as the token budget holds, each leaving a
+        // bracket open. The parser reads a `(` or a `[` among type
+        // arguments with no diagnostic, so each of these lines is a
+        // declaration of its own, and no line below it stands outside the
+        // bracket it opened. A scan from the keyword of each of them would
+        // read on to the end of the module each time.
+        for line in ["type T = A<(>", "type T = A<[>"] {
+            let (count, module) = longest_module_of(line);
+            assert!(count > 23_000, "{count}");
+            let (diagnostics, declarations) = read_in_time(module);
+            assert_eq!(diagnostics, Vec::<String>::new(), "{line}");
+            assert_eq!(declarations.len(), count, "{line}");
+            assert!(
+                declarations
+                    .iter()
+                    .all(|decl| decl.source == format!("{line}\n")),
+                "{line}"
+            );
+        }
+        // The `(` of a parameter list that nothing closes takes the lines
+        // below it, as before: the module holds one declaration.
+        let (count, module) = longest_module_of("proposition P(");
+        assert!(count > 40_000, "{count}");
+        let (diagnostics, declarations) = read_in_time(module);
+        assert_eq!(
+            diagnostics,
+            [
+                "expected `:`",
+                "expected parameter",
+                "expected `)`",
+                "expected `}`"
+            ]
+        );
+        assert_eq!(declarations.len(), 1);
+    }
+}
+
+/// `LineIndex::declaration_ends` finds in one pass where each declaration
+/// ends because the next one begins. These tests hold that place as it is
+/// defined, by a scan from the keyword of one declaration that counts
+/// brackets as `skip_statement` does, and compare the two for every
+/// declaration keyword of each source.
+#[cfg(test)]
+mod declaration_end_tests {
+    use super::*;
+
+    /// The end of the declaration whose keyword is the token at `keyword`,
+    /// by its definition.
+    fn defined(source: &str, tokens: &[Token], keyword: usize) -> u32 {
+        let word = |index: usize| {
+            tokens
+                .get(index)
+                .filter(|token| token.kind == TokenKind::Ident)
+                .and_then(|token| source.get(token.start as usize..token.end as usize))
+                .unwrap_or("")
+        };
+        let is_quantifier = |word: &str| matches!(word, "for_all" | "exists");
+        let (mut braces, mut parens, mut brackets) = (0usize, 0usize, 0usize);
+        let mut last = TokenKind::Eof;
+        for (index, token) in tokens.iter().enumerate().skip(keyword) {
+            let outside = braces == 0 && parens == 0 && brackets == 0;
+            match token.kind {
+                TokenKind::Whitespace | TokenKind::Comment | TokenKind::DocComment => continue,
+                TokenKind::Newline => {
+                    // The first token below that is no white space, comment
+                    // or line end.
+                    let next = (index + 1..tokens.len())
+                        .find(|&at| {
+                            !Parser::is_trivia(tokens[at].kind)
+                                && tokens[at].kind != TokenKind::Newline
+                        })
+                        .unwrap_or(tokens.len());
+                    let body = is_quantifier(word(keyword))
+                        && last == TokenKind::Colon
+                        && is_quantifier(word(next));
+                    if outside && is_declaration_keyword(word(next)) && !body {
+                        return next as u32;
+                    }
+                    continue;
+                }
+                TokenKind::LBrace => braces += 1,
+                TokenKind::RBrace if outside => return NO_TOKEN,
+                TokenKind::RBrace => braces = braces.saturating_sub(1),
+                TokenKind::LParen => parens += 1,
+                TokenKind::RParen if parens > 0 => parens -= 1,
+                TokenKind::RParen => brackets = brackets.saturating_sub(1),
+                TokenKind::LBracket => brackets += 1,
+                TokenKind::RBracket => brackets = brackets.saturating_sub(1),
+                _ => {}
+            }
+            last = token.kind;
+        }
+        NO_TOKEN
+    }
+
+    /// Compares the index with the definition at each declaration keyword
+    /// of `source`, and returns how many there are.
+    fn compare(source: &str, failures: &mut Vec<String>) -> usize {
+        let tokens = lex_bounded(source, MAX_SOURCE_TOKENS).expect("tokens");
+        let lines = LineIndex::new(source, &tokens);
+        let mut keywords = 0;
+        for (index, token) in tokens.iter().enumerate() {
+            let text = &source[token.start as usize..token.end as usize];
+            if token.kind != TokenKind::Ident || !is_declaration_keyword(text) {
+                continue;
+            }
+            keywords += 1;
+            let (found, expected) = (
+                lines.declaration_end[index],
+                defined(source, &tokens, index),
+            );
+            if found != expected && failures.len() < 20 {
+                failures.push(format!(
+                    "{source:?}: the declaration at token {index} ends at {found}, and by the definition at {expected}"
+                ));
+            }
+        }
+        keywords
+    }
+
+    /// The `.fr` files under `dir`.
+    fn modules_under(dir: &std::path::Path, files: &mut Vec<std::path::PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                modules_under(&path, files);
+            } else if path.extension().is_some_and(|extension| extension == "fr") {
+                files.push(path);
+            }
+        }
+    }
+
+    #[test]
+    fn the_index_answers_as_a_scan_from_each_keyword_does() {
+        let mut failures = Vec::new();
+        let mut keywords = 0;
+
+        // Written sources: a header above a declaration, a block between
+        // the two, each kind of bracket left open, closed, and closed by
+        // the other kind, a body of a quantifier, and declarations on one
+        // line.
+        for source in [
+            "rule R : derive from Basis +\nclause C {\nthen establish W()\n}\nquery q() -> Bool { true }\n",
+            "rule R : derive {\nsource \"c\"\nthen derive W()\n}\n\n// a note\nproposition W()\n",
+            "proposition P(\nentity E : T\n)\nentity F : T\n",
+            "power W [\nentity E : T\n]\nentity F : T\n",
+            "type T = A<(>\nrule R : derive from Basis +\nclause C { }\n",
+            "rule R : derive from [1, 2) +\nclause C { }\n",
+            "rule R : derive from f([1, 2)) +\nclause C { }\n",
+            "rule R : derive from (a, b] +\nclause C { }\n)\nclause D { }\n",
+            "power W ) ] }\nclause C { }\n",
+            "for_all x in A :\nfor_all y in B :\nexists z in C : p(x, y, z)\nproposition W()\n",
+            "for_all x in A :\n\n// why\nexists y in B : p(x, y)\nproposition W()\n",
+            "for_all x in A :\nproposition W()\n",
+            "for_all x in A ->\nexists y in B : true\n",
+            "entity E :\nfor_all y in B : true\n",
+            "proposition P(); for_all x in A :\nexists y in B : true\nproposition W()\n",
+            "proposition A(); proposition B(); rule R : derive from Basis +\nclause C { }\n",
+            "module M version \"1\" {\nrule R : derive from Basis +\n}\nproposition After()\n",
+        ] {
+            keywords += compare(source, &mut failures);
+        }
+
+        // Every sequence of one to six of these pieces, for two sets of
+        // pieces: one with the parentheses and the brackets, where a `)`
+        // can close a `[`, and one with the braces and the quantifiers.
+        for pieces in [
+            ["rule ", "( ", ") ", "[ ", "] ", "\n"],
+            ["rule ", "for_all ", ": ", "{ ", "} ", "\n"],
+        ] {
+            for length in 1..=6u32 {
+                for mut number in 0..6usize.pow(length) {
+                    let mut source = String::new();
+                    for _ in 0..length {
+                        source.push_str(pieces[number % 6]);
+                        number /= 6;
+                    }
+                    keywords += compare(&source, &mut failures);
+                }
+            }
+        }
+
+        // Longer sequences of all the pieces, drawn by a fixed rule.
+        let pieces = [
+            "rule ", "for_all ", "exists ", "( ", ") ", "[ ", "] ", "{ ", "} ", ": ", "x ", "\n",
+            "\n", "// c\n",
+        ];
+        let mut state = 20_261_116u64;
+        let mut draw = |below: usize| {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            (state >> 33) as usize % below
+        };
+        for _ in 0..40_000 {
+            let mut source = String::new();
+            for _ in 0..7 + draw(24) {
+                source.push_str(pieces[draw(pieces.len())]);
+            }
+            keywords += compare(&source, &mut failures);
+        }
+
+        // The example modules.
+        let examples = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+        let mut files = Vec::new();
+        modules_under(&examples, &mut files);
+        assert!(
+            files.len() >= 8,
+            "expected a corpus of .fr modules, found {}",
+            files.len()
+        );
+        for file in files {
+            let source = std::fs::read_to_string(&file).expect("an example module");
+            keywords += compare(&source, &mut failures);
+        }
+
+        assert!(
+            failures.is_empty(),
+            "the index and the definition differ:\n{}",
+            failures.join("\n")
+        );
+        assert!(keywords > 300_000, "{keywords} declaration keywords");
+    }
 }
 
 /// The line rule asks about the tokens around a newline, and `LineIndex`
@@ -9340,7 +10508,7 @@ mod line_index_tests {
                         let mut p = Parser {
                             source: &source,
                             tokens: &tokens[..visible],
-                            lines: LineIndex::new(&tokens),
+                            lines: LineIndex::new(&source, &tokens),
                             idx: 0,
                             diagnostics: Vec::new(),
                             builder: GreenNodeBuilder::new(),
@@ -9351,6 +10519,7 @@ mod line_index_tests {
                             brace_opens_enclosing_block: false,
                             observation_body: false,
                             angle_scans: HashMap::new(),
+                            next_declaration: usize::MAX,
                         };
                         for idx in 0..=visible {
                             compare_at(&mut p, idx, &source, &mut failures);
@@ -9389,7 +10558,7 @@ mod type_argument_scan_tests {
         Parser {
             source,
             tokens: &tokens[..visible],
-            lines: LineIndex::new(tokens),
+            lines: LineIndex::new(source, tokens),
             idx: 0,
             diagnostics: Vec::new(),
             builder: GreenNodeBuilder::new(),
@@ -9400,6 +10569,7 @@ mod type_argument_scan_tests {
             brace_opens_enclosing_block: false,
             observation_body: false,
             angle_scans: HashMap::new(),
+            next_declaration: usize::MAX,
         }
     }
 

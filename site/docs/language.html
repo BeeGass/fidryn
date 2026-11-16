@@ -403,30 +403,39 @@ three differences. A line break inside its parentheses, brackets or
 braces does not end it. A prefix word at the end of a line does not carry
 it into the next line. And it ends after the <code>}</code> that closes its
 outermost brace, unless a continuation follows.</p>
-<p>A declaration does not go on into the declaration below it. That does
-not hold where the header of a <code>query</code>, an <code>fn</code> or a <code>calc</code> ends in <code>!</code>
-after the keyword, the name, the parameters or the result type, or where
-the header of an <code>import</code> or a <code>type</code> ends in <code>&lt;</code> after the keyword or
-the name: the declaration on the next line that has a token is read as
-part of the header, and the module is rejected with <code>E100</code>. A keyword
-that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is rejected with
-<code>E100</code> when its statement ends with it: the name is not read from the
-next line. It is rejected as well when the token after it is not a name,
-as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>. The six header
-keywords, <code>jurisdiction</code>, <code>source_snapshot</code>, <code>source_manifest</code>,
-<code>effective_at</code>, <code>recorded_at</code> and <code>outside_scope</code>, are rejected with
-<code>E100</code> in the same way when the statement ends with the keyword: the
-value is not read from the next line. And the header of a declaration
-whose line ends in <code>:</code>, <code>-&gt;</code> or <code>=</code>, outside parentheses, brackets and
-braces, is rejected with <code>E100</code> when the next line that has a token
-begins with a declaration keyword, although the first case above would
-carry the header into that line.
-There is one exception: below the header of a <code>for_all</code> or an <code>exists</code>
-that ends in <code>:</code>, a line that begins with <code>for_all</code> or <code>exists</code> is the
-body of the quantifier. A type on the next line that is no such keyword
-is read: <code>entity Pat :</code> followed by the line <code>NaturalPerson</code> declares
-<code>Pat</code>. A name that ends in <code>.</code> above such a line is rejected with <code>E100</code>
-as well, and so are type arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes.</p>
+<p>A declaration does not go on into the declaration below it. Outside the
+parentheses, brackets and braces that a declaration has opened and not
+closed, a line that begins with a declaration keyword is no part of that
+declaration, whatever the line above it ends in. Blank lines and comment
+lines between the two change nothing. There is one exception: below the
+header of a <code>for_all</code> or an <code>exists</code> that ends in <code>:</code>, a line that begins
+with <code>for_all</code> or <code>exists</code> is the body of the quantifier.</p>
+<p>So the first case above does not carry a header into such a line. A
+header that leaves no bracket open and whose line ends in <code>,</code>, <code>.</code>, <code>:</code>,
+<code>!</code>, <code>-&gt;</code>, <code>=&gt;</code>, <code>=</code>, <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>+</code>, <code>-</code>, <code>/</code>, <code>|</code> or
+<code>..</code> is not finished above such a line, and the module is rejected with
+<code>E100</code>: <code>rule R : derive from Basis +</code> above the line <code>clause C {</code> is
+rejected, and <code>clause C</code> is a declaration with its own block. That holds
+wherever in a header the token stands: after an operator that lacks its
+operand, after a name that ends in <code>.</code>, after the <code>!</code> of an effect row,
+among type arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes, and after the <code>:</code>,
+<code>-&gt;</code> or <code>=</code> that a type follows. A prefix word at the end of the <code>from</code>
+basis of a rule, or of an expression in the header of a judgment or an
+observation, lacks its operand in the same way: the module is rejected
+with <code>E100</code>, and the declaration below is read. A type on the next line
+that is no declaration keyword is read: <code>entity Pat :</code> followed by the
+line <code>NaturalPerson</code> declares <code>Pat</code>. Inside a bracket that the
+declaration has left open, the lines below can still be read as what the
+bracket holds: below <code>proposition P(</code>, the line <code>clause C {</code> is read as a
+parameter, and the module is rejected with no clause declared.</p>
+<p>A keyword that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is
+rejected with <code>E100</code> when its statement ends with it: the name is not
+read from the next line. It is rejected as well when the token after it
+is not a name, as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>.
+The six header keywords, <code>jurisdiction</code>, <code>source_snapshot</code>,
+<code>source_manifest</code>, <code>effective_at</code>, <code>recorded_at</code> and <code>outside_scope</code>, are
+rejected with <code>E100</code> in the same way when the statement ends with the
+keyword: the value is not read from the next line.</p>
 <h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
@@ -494,7 +503,8 @@ with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
 a <code>then</code> or an <code>otherwise</code> that no consequence follows, and a <code>when</code>, a
 <code>require</code> or a <code>source</code> with no expression after it. A consequence names
 a proposition: <code>then establish 5</code> is rejected with <code>E210</code>, and so is a
-consequence that is the name of an entity. Two more lines are accepted:
+consequence that is the name of an entity, unless the type of the entity
+is <code>Prop</code> or an alias of <code>Prop</code>. Two more lines are accepted:
 <code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
 its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever

@@ -131,6 +131,22 @@ interchange schema versions are maintained independently of the interpreter.
   declaration: under the header of a `for_all` or an `exists`, a line that
   begins with `for_all` or `exists` is the body of the quantifier, as
   before.
+- The header of a declaration ends where the next declaration begins.
+  Outside the parentheses, brackets and braces that a declaration has
+  opened and not closed, a line that begins with a declaration keyword is
+  not read as part of that declaration, whatever the line above it ends
+  in. The body of a quantifier, in the note above, is the one exception.
+  A rule whose `from` basis ended in `+`, in `not` or in a `.`, for
+  example, was not rejected: with the lines `rule R : derive from Basis +`
+  and `clause C { then establish Witness() }` above a query `q`, a module
+  passed the checker, and `fidryn run` reported `q` as an unknown query.
+  An observation whose `from` source ended in `+` above a `verify` block
+  passed the checker too, and `fidryn verify` did not know the property
+  of the block. Such a header is now rejected with `E100`, and the
+  declarations below it are read. The header of a judgment, an effect row
+  that `!` begins and type arguments that `<` opens and no `>` closes end
+  in the same way: each is rejected with `E100` when it is not finished
+  above a declaration, and that declaration is read.
 - A declaration keyword that takes a name and has something else after it
   is rejected with `E100`. `power { holder A }`, `proposition (x: Int)`
   and `entity : NaturalPerson` passed the checker, each as a declaration
@@ -159,7 +175,14 @@ interchange schema versions are maintained independently of the interpreter.
   diagnostic that names the rule and the consequence. `then establish 5`
   passed the checker, and the rule established nothing. A consequence that
   is the name of an entity, as in `then establish Acme`, passed the checker
-  too, and is rejected with `E210` as well.
+  too, and is rejected with `E210` as well, unless the type of the entity
+  is `Prop` or an alias of `Prop`.
+- A consequence after `create` is checked as it is after the other eight
+  verbs. The checker looked at nothing after `create` but the fields of a
+  `Duty`, so `then create Acme(1)`, where `Acme` is an entity, and
+  `then create 2026-01-01` passed it. Each is now rejected with `E210`, as
+  it is after `establish`. A `Duty` after `create` is still checked for its
+  fields `bearer`, `claimant` and `content`, and not as a proposition.
 - A statement that a query body, a `goal Evaluate` block, the body of a
   `calc` or an `fn`, or a `transaction` block cannot read is rejected with
   `E100`, wherever it stands in the block. In a goal it was stepped over
