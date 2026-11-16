@@ -375,15 +375,52 @@ fn bounded_sort(name: &str, bounds: &VerificationBounds) -> Option<(u32, &'stati
     }
 }
 
+/// `source` with what stands between the quotes of each string literal
+/// replaced by spaces, one for each byte.
+///
+/// The readers below look in this text for the `;`, the `:` and the
+/// operators at which they split a formula, and split the formula itself at
+/// the same positions, so that none of these splits anything inside a
+/// string. A formula holds no comment: the lowering cuts it out of the text
+/// of a declaration with the comments read as white space.
+fn structure_of(source: &str) -> String {
+    let mut structure = String::with_capacity(source.len());
+    let mut quoted = false;
+    let mut escaped = false;
+    for c in source.chars() {
+        if !quoted {
+            quoted = c == '"';
+            structure.push(c);
+        } else if !escaped && c == '"' {
+            quoted = false;
+            structure.push(c);
+        } else {
+            escaped = !escaped && c == '\\';
+            structure.extend(std::iter::repeat_n(' ', c.len_utf8()));
+        }
+    }
+    structure
+}
+
 fn legacy_assertions(source: &str) -> Option<Vec<Term>> {
     if source.len() > 16_384 {
         return None;
     }
-    source
-        .split(';')
-        .filter(|part| !part.trim().is_empty())
-        .map(|part| legacy_term(part.trim(), 0))
-        .collect()
+    let structure = structure_of(source);
+    let ends = structure
+        .match_indices(';')
+        .map(|(end, _)| end)
+        .chain([source.len()]);
+    let mut assertions = Vec::new();
+    let mut start = 0;
+    for end in ends {
+        let part = source[start..end].trim();
+        start = end + 1;
+        if !part.is_empty() {
+            assertions.push(legacy_term(part, 0)?);
+        }
+    }
+    Some(assertions)
 }
 
 fn legacy_term(source: &str, depth: usize) -> Option<Term> {
@@ -391,12 +428,15 @@ fn legacy_term(source: &str, depth: usize) -> Option<Term> {
         return None;
     }
     let source = source.strip_prefix("assert ").unwrap_or(source).trim();
+    let structure = structure_of(source);
     for quantifier in ["for_all", "exists"] {
         if let Some(rest) = source
             .strip_prefix(quantifier)
             .and_then(|rest| rest.strip_prefix(char::is_whitespace))
         {
-            let (prefix, body) = rest.split_once(':')?;
+            let after_keyword = source.len() - rest.len();
+            let colon = after_keyword + structure[after_keyword..].find(':')?;
+            let (prefix, body) = (&source[after_keyword..colon], &source[colon + 1..]);
             let mut words = prefix.split_whitespace();
             let binder = words.next()?;
             if words.next()? != "in" {
@@ -422,7 +462,8 @@ fn legacy_term(source: &str, depth: usize) -> Option<Term> {
         ("==", BinOp::Eq),
         ("=", BinOp::Eq),
     ] {
-        if let Some((left, right)) = source.split_once(spelling) {
+        if let Some(at) = structure.find(spelling) {
+            let (left, right) = (&source[..at], &source[at + spelling.len()..]);
             return Some(Term::Binary {
                 op,
                 left: Box::new(legacy_atom(left.trim())?),

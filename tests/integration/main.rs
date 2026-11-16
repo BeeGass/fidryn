@@ -5,6 +5,7 @@
 
 mod adversarial_regressions;
 mod boundary_review_20260917;
+mod comments;
 mod declaration_text;
 mod integration_suite;
 mod known_limits;

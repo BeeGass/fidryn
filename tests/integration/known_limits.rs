@@ -221,38 +221,6 @@ fn the_valid_time_and_record_time_lines_of_a_rule_are_not_applied() {
 }
 
 #[test]
-fn a_comment_at_the_end_of_a_line_inside_an_effect_is_read_into_its_result_type() {
-    let reviewed = |operation: &str| {
-        format!(
-            "    effect Review {{\n{operation}\n    }}\n    query q() -> Bool ! {{Review}} {{\n        require Review(\"x\")\n        return true\n    }}"
-        )
-    };
-    // On a line of its own the comment changes nothing.
-    compile(
-        "Limits.EffectComment",
-        &reviewed("        // asks a clerk\n        request(name: String) -> Bool"),
-    );
-    let diagnostics: Vec<(DiagnosticCode, String)> = compile_source(
-        &source(
-            "Limits.EffectComment",
-            &reviewed("        request(name: String) -> Bool // asks a clerk"),
-        ),
-        &SourceManifest::default(),
-    )
-    .expect_err("limit program is rejected")
-    .into_iter()
-    .map(|diagnostic| (diagnostic.code, diagnostic.message))
-    .collect();
-    assert_eq!(
-        diagnostics,
-        [(
-            DiagnosticCode::E210,
-            "require in `q` has type Nominal(\"Bool // asks a clerk\") but must be Bool".to_owned()
-        )]
-    );
-}
-
-#[test]
 fn a_claim_inside_the_brackets_of_a_field_that_is_not_read_is_not_read() {
     let module = compile(
         "Limits.VerifyBrackets",

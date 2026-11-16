@@ -18,7 +18,8 @@ use fidryn_core::{
 use fidryn_hir::{
     HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, HirRecordTypes,
     collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
-    source_has_bare_prop_if, split_qname_type_args, term_as_name, term_has_bare_prop_guard,
+    source_has_bare_prop_if, split_qname_type_args, structure_of, term_as_name,
+    term_has_bare_prop_guard, without_comments,
 };
 use fidryn_syntax::ast::Item;
 use fidryn_syntax::parse_file;
@@ -1781,13 +1782,21 @@ fn params_as_types(params: &[(String, String)]) -> Vec<(String, Type)> {
         .collect()
 }
 
+/// The parameters in the first parenthesized list of the text of an
+/// `effect`: each `name: type` between two of its commas.
+///
+/// The text is read with its comments blank. The parentheses, the commas
+/// and the colons are looked for in its structure, so none of them is found
+/// inside a string literal.
 fn source_typed_params(src: &str) -> Vec<(String, Type)> {
-    let Some(start) = src.find('(') else {
+    let code = without_comments(src);
+    let structure = structure_of(src);
+    let Some(start) = structure.find('(') else {
         return Vec::new();
     };
     let mut depth = 0i32;
     let mut end = None;
-    for (i, b) in src.as_bytes()[start..].iter().enumerate() {
+    for (i, b) in structure.as_bytes()[start..].iter().enumerate() {
         match b {
             b'(' => depth += 1,
             b')' => {
@@ -1803,27 +1812,31 @@ fn source_typed_params(src: &str) -> Vec<(String, Type)> {
     let Some(end) = end else {
         return Vec::new();
     };
-    let inner = src[start + 1..end].trim();
-    if inner.is_empty() {
-        return Vec::new();
+    let mut params = Vec::new();
+    let mut part_start = start + 1;
+    let commas = structure[start + 1..end]
+        .match_indices(',')
+        .map(|(comma, _)| start + 1 + comma);
+    for part_end in commas.chain([end]) {
+        let part = part_start..part_end;
+        part_start = part_end + 1;
+        let Some(colon) = structure[part.clone()].find(':') else {
+            continue;
+        };
+        let name = code[part.start..part.start + colon].trim();
+        let ty = code[part.start + colon + 1..part.end].trim();
+        if !name.is_empty() && !ty.is_empty() {
+            params.push((name.to_owned(), parse_type_name(ty)));
+        }
     }
-    inner
-        .split(',')
-        .filter_map(|part| {
-            let (name, ty) = part.split_once(':')?;
-            let name = name.trim();
-            let ty = ty.trim();
-            if name.is_empty() || ty.is_empty() {
-                None
-            } else {
-                Some((name.to_owned(), parse_type_name(ty)))
-            }
-        })
-        .collect()
+    params
 }
 
+/// The name of the operation of an `effect`: the first word in its block.
+/// A comment there is read as white space.
 fn effect_op_name(src: &str) -> String {
-    let inner = last_brace_inner(src).unwrap_or(src).trim();
+    let src = without_comments(src);
+    let inner = last_brace_inner(&src).unwrap_or(&src).trim();
     let ident: String = inner
         .chars()
         .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
@@ -2221,9 +2234,15 @@ fn check_doctrines(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 }
 
 /// Resolve `defeat <Clause>` targets against known clauses.
+///
+/// The word `defeat` is looked for in the structure of the text, so it is
+/// not found in a comment or inside a string literal. The name is the first
+/// word after it in the text with its comments blank.
 fn expand_conflict_clause_ids(source: &str, clauses: &BTreeMap<String, String>) -> Vec<String> {
+    let structure = structure_of(source);
+    let source = without_comments(source);
     let mut found = Vec::new();
-    for (i, _) in source.match_indices("defeat") {
+    for (i, _) in structure.match_indices("defeat") {
         let before = source[..i].chars().next_back();
         if before.is_some_and(|c| c.is_ascii_alphanumeric() || c == '_') {
             continue;
@@ -3283,7 +3302,9 @@ fn lower(
     imported_functions: &BTreeMap<String, HirFunction>,
 ) -> CoreModule {
     let inferred = infer_module_effects(hir, imported_functions);
-    let jid = JurisdictionId::of(hir.jurisdiction.as_bytes());
+    // The value of the header is kept as it is written. A comment between
+    // two lines of it is read as white space.
+    let jid = JurisdictionId::of(without_comments(&hir.jurisdiction).as_bytes());
     let meta = |node: &str| NodeMeta {
         span: None,
         source: Some(node.to_owned()),
@@ -3823,6 +3844,9 @@ fn lower_status_of(fields: &BTreeMap<String, Term>) -> QueryPlan {
         when_closed_absent,
     }
 }
+
+#[cfg(test)]
+mod comment_tests;
 
 #[cfg(test)]
 mod tests {

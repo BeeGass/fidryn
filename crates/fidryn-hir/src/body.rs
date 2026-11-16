@@ -5,6 +5,7 @@
 //! slices. Semantic decisions are made from tokens, not `str::contains`.
 
 use crate::HirQueryBody;
+use crate::text::{structure_of, without_comments};
 use fidryn_core::ir::{CompareOp, Guard};
 use fidryn_core::types::{PrimitiveType, Sort, Type};
 use fidryn_core::value::{BinOp, PropTerm, Term};
@@ -91,7 +92,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
         Expr::Int(value) => Term::Int(*value),
         Expr::Decimal(text) => decimal_term(text),
         Expr::String(text) => Term::String(text.clone()),
-        Expr::Ident(name) => Term::Ident(name.clone()),
+        Expr::Ident(name) => Term::Ident(name_text(name)),
         Expr::Apply { callee, args } => apply_expr_to_term(callee, args),
         Expr::Binary { op, left, right } => Term::Binary {
             op: map_binop(*op),
@@ -106,7 +107,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             transaction_term(flatten_transaction_expr_args(args))
         }
         Expr::Call { callee, args } => Term::Call {
-            callee: callee.clone(),
+            callee: name_text(callee),
             args: args.iter().map(expr_to_term).collect(),
         },
         Expr::If { cond, then, else_ } => Term::If {
@@ -115,7 +116,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             else_: Box::new(else_.as_deref().map(expr_to_term).unwrap_or(Term::Wildcard)),
         },
         Expr::Money { amount, currency } => Term::Apply {
-            ctor: currency.clone(),
+            ctor: name_text(currency),
             args: vec![decimal_term(amount)],
         },
         Expr::Duration { n, unit } => Term::Apply {
@@ -137,6 +138,13 @@ pub fn expr_to_term(expr: &Expr) -> Term {
         Expr::Grouped(inner) => expr_to_term(inner),
         Expr::Block(items) => seq_term(items.iter().map(expr_to_term).collect()),
     }
+}
+
+/// A name as the parser hands it over. The type arguments of a call are
+/// part of its name, as the text from `<` to `>`, and a comment between two
+/// lines of them is in that text. It is read as white space.
+fn name_text(name: &str) -> String {
+    without_comments(name).into_owned()
 }
 
 pub fn expr_to_guard(expr: &Expr) -> Guard {
@@ -545,7 +553,16 @@ pub fn parse_rule_kind(src: &str) -> String {
     "prescriptive".into()
 }
 
+/// The type that the text of a type names.
+///
+/// A comment in the text is read as white space, and a `|`, a `,` or a `<`
+/// inside a string literal is no part of the type's structure.
 pub fn parse_type_name(raw: &str) -> Type {
+    type_from_text(&without_comments(raw))
+}
+
+/// The type that `raw` names, where `raw` holds no comment.
+fn type_from_text(raw: &str) -> Type {
     let s = raw.trim();
     if s.is_empty() {
         return Type::Sort(Sort::Nominal(String::new()));
@@ -554,10 +571,10 @@ pub fn parse_type_name(raw: &str) -> Type {
     if members.len() > 1 {
         return Type::Applied {
             ctor: "Union".into(),
-            args: members.into_iter().map(parse_type_name).collect(),
+            args: members.into_iter().map(type_from_text).collect(),
         };
     }
-    if let Some(open) = s.find('<')
+    if let Some(open) = structure_of(s).find('<')
         && s.ends_with('>')
         && open > 0
     {
@@ -596,8 +613,15 @@ pub fn parse_type_name(raw: &str) -> Type {
     }
 }
 
+/// The parameters in the first parenthesized list of a declaration's text:
+/// each `name: type` of it.
+///
+/// A comment in the text is read as white space. A parenthesis, a comma or a
+/// colon inside a string literal neither begins or ends the list nor
+/// separates anything in it.
 pub fn extract_params(src: &str) -> Vec<(String, String)> {
-    let Some((start, end)) = first_paren_group(src) else {
+    let src = without_comments(src);
+    let Some((start, end)) = first_paren_group(&src) else {
         return Vec::new();
     };
     let inner = src[start + 1..end].trim();
@@ -606,9 +630,9 @@ pub fn extract_params(src: &str) -> Vec<(String, String)> {
     }
     split_top_level(inner, ',')
         .filter_map(|part| {
-            let (name, ty) = part.split_once(':')?;
-            let name = name.trim();
-            let ty = ty.trim();
+            let colon = structure_of(part).find(':')?;
+            let name = part[..colon].trim();
+            let ty = part[colon + 1..].trim();
             if name.is_empty() || ty.is_empty() {
                 None
             } else {
@@ -1009,28 +1033,28 @@ fn parse_applied_type(ctor: &str, inner: &str) -> Type {
             calendar: inner.trim().to_owned(),
         }),
         "Option" => Type::Primitive(PrimitiveType::Option {
-            inner: Box::new(parse_type_name(inner)),
+            inner: Box::new(type_from_text(inner)),
         }),
         "Interval" => Type::Primitive(PrimitiveType::Interval {
-            inner: Box::new(parse_type_name(inner)),
+            inner: Box::new(type_from_text(inner)),
         }),
         "FiniteSet" => Type::Primitive(PrimitiveType::FiniteSet {
-            inner: Box::new(parse_type_name(inner)),
+            inner: Box::new(type_from_text(inner)),
         }),
         "NonEmptySet" => Type::Primitive(PrimitiveType::NonEmptySet {
-            inner: Box::new(parse_type_name(inner)),
+            inner: Box::new(type_from_text(inner)),
         }),
         "Map" => {
             let mut args = split_top_level(inner, ',');
             let key = args.next().unwrap_or("");
             let value = args.next().unwrap_or("");
             Type::Primitive(PrimitiveType::Map {
-                key: Box::new(parse_type_name(key)),
-                value: Box::new(parse_type_name(value)),
+                key: Box::new(type_from_text(key)),
+                value: Box::new(type_from_text(value)),
             })
         }
         ctor => {
-            let args = split_top_level(inner, ',').map(parse_type_name).collect();
+            let args = split_top_level(inner, ',').map(type_from_text).collect();
             Type::Applied {
                 ctor: ctor.to_owned(),
                 args,
@@ -1039,10 +1063,13 @@ fn parse_applied_type(ctor: &str, inner: &str) -> Type {
     }
 }
 
+/// Where the first parenthesized group of `src` opens and closes. A
+/// parenthesis inside a string literal is not counted.
 fn first_paren_group(src: &str) -> Option<(usize, usize)> {
-    let start = src.find('(')?;
+    let structure = structure_of(src);
+    let start = structure.find('(')?;
     let mut depth = 0i32;
-    for (i, c) in src[start..].char_indices() {
+    for (i, c) in structure[start..].char_indices() {
         match c {
             '(' => depth += 1,
             ')' => {
@@ -1057,14 +1084,17 @@ fn first_paren_group(src: &str) -> Option<(usize, usize)> {
     None
 }
 
+/// The parts of `src` between the `sep` that stand inside no bracket. A
+/// bracket or a `sep` inside a string literal is not counted.
 fn split_top_level(src: &str, sep: char) -> impl Iterator<Item = &str> {
+    let structure = structure_of(src);
     let mut parts = Vec::new();
     let mut start = 0;
     let mut depth_paren = 0i32;
     let mut depth_angle = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in src.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,

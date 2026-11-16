@@ -208,8 +208,37 @@ interchange schema versions are maintained independently of the interpreter.
   `jurisdiction Test // where` gave the jurisdiction the value
   `Test // where`. `entity Pat : NaturalPerson // the tenant` gave `Pat`
   the type `NaturalPerson // the tenant`, and a rule that used `Pat` as a
-  `NaturalPerson` was rejected with `E210`. Inside an `effect` such a
-  comment is still read into the result type of the operation.
+  `NaturalPerson` was rejected with `E210`. In an `effect`,
+  `request(name: String) -> Bool // asks a clerk` gave the operation the
+  result type `Bool // asks a clerk`, and a query that required the effect
+  was rejected with `E210`. The result type is now `Bool`.
+- A comment is never read as code. Some parts of a declaration are read
+  back out of its text, and they are now read with every comment taken as
+  white space. Before, a comment could set them. In an `effect`, a comment
+  line above the operation, such as
+  `// asks a clerk (see the rules) -> Clerk`, left the operation with no
+  parameters, and a query that called it with an argument was rejected
+  with `E210`. `entity Pat :` with a comment after the colon and the type
+  on the next line gave `Pat` a type that held the comment. Two
+  nominations for one office, each with a comment that held `rank 9`, were
+  rejected with `E410` as a tie at rank 9. A `conflict_doctrine` that named
+  its clause only in a comment, as in `// then defeat Residual`, passed the
+  checker, and is now rejected with `E511`. A `source` whose only
+  `artifact` stood in a comment passed the checker, and is now rejected
+  with `E540`. And a comment in a query that held
+  `for_all x in People: true` declared the property `for_all:x:0`, which
+  `fidryn verify` no longer knows.
+- A bracket or a word inside a string literal is not read as structure
+  where a declaration is read back out of its text. An `effect` with the
+  citation `from "Stat. 12(a"` in its header lost the parameters of its
+  operation, and one with a string that held `->` below its operation took
+  its result type from the string; a query that required either effect was
+  rejected with `E210`. A `conflict_doctrine` that named a clause only
+  inside a string, as in `note "we defeat Residual here"`, passed the
+  checker, and is now rejected with `E511`. A `source` with no `artifact`
+  field passed the checker when the text of another field held that word,
+  and is now rejected with `E540`. A string in a query that held
+  `for_all w in People: true` declared a property; it declares none now.
 - A rule with no `{ ... }` body is rejected with `E100`, and so is a
   `verify` whose name is not followed by `{`:
   `verify Checked extra { assert false }` stepped over its block without a

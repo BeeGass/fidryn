@@ -1404,6 +1404,36 @@ mod tests {
     }
 
     #[test]
+    fn a_formula_is_not_split_inside_a_string() {
+        // These properties have a formula and no structured assertion, so
+        // the formula is read from its text. A `;`, a `:` or an operator
+        // inside a string splits nothing.
+        for (formula, proved) in [
+            ("\"a; b\" == \"a; b\"", true),
+            ("\"a != b\" == \"a != b\"", true),
+            ("\"a = b: c\" != \"a = b: c\"", false),
+            ("for_all x in People: \"x; y = z\" == \"x; y = z\"", true),
+            ("true; \"a \\\" ; b\" == \"a \\\" ; b\"", true),
+        ] {
+            let mut module = bool_module();
+            push_property(&mut module, "Quoted", formula, people_bounds(2));
+            let verdict = verify_property(&module, "Quoted");
+            match (&verdict, proved) {
+                (PropertyVerdict::Proved { .. }, true)
+                | (PropertyVerdict::Counterexample { .. }, false) => {}
+                _ => panic!("{formula}: {verdict:?}"),
+            }
+        }
+        // Outside a string each of them splits as before.
+        let mut module = bool_module();
+        push_property(&mut module, "Two", "true; 1 == 2", people_bounds(2));
+        assert!(matches!(
+            verify_property(&module, "Two"),
+            PropertyVerdict::Counterexample { .. }
+        ));
+    }
+
+    #[test]
     fn verify_property_exists_false_over_people_is_counterexample() {
         let mut module = bool_module();
         push_property(

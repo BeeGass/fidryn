@@ -1,18 +1,24 @@
 //! Name resolution, import authentication, and surface-to-HIR elaboration.
 
 mod body;
+#[cfg(test)]
+mod comment_tests;
+mod text;
 
 use fidryn_core::ir::Guard;
 use fidryn_core::value::{PropTerm, Term};
 use fidryn_core::{Diagnostic, DiagnosticCode, SourceManifest};
 use fidryn_syntax::{Parse, TokenKind, lex};
+use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::ops::Range;
 
 pub use body::{
     collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
     parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
     term_from_decl, term_has_bare_prop_guard, term_to_guard,
 };
+pub use text::{structure_of, without_comments};
 
 pub type HirRecordTypes = BTreeMap<String, (bool, Vec<(String, String)>)>;
 pub type HirTypes = fidryn_core::types::TypeEnvironment;
@@ -374,22 +380,14 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 });
             }
             fidryn_syntax::ast::Item::Source(d) => {
-                let artifact = d.source.split("artifact").nth(1).and_then(|s| {
-                    let t = s.trim().trim_start_matches('"');
-                    let end = t.find('"')?;
-                    Some(t[..end].to_owned())
-                });
                 hir.sources.push(HirSource {
                     name: d.name.clone().unwrap_or_default(),
-                    artifact,
+                    artifact: source_artifact(&d.source),
                 });
             }
             fidryn_syntax::ast::Item::Entity(d) => {
                 if let Some(name) = &d.name {
-                    let ty = d
-                        .signature
-                        .as_deref()
-                        .unwrap_or("")
+                    let ty = without_comments(d.signature.as_deref().unwrap_or(""))
                         .trim_start_matches(':')
                         .trim()
                         .trim_end_matches(';')
@@ -521,7 +519,10 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     ("otherwise", &fallback_not_propositions),
                 ] {
                     for text in texts {
-                        let text = text.split_whitespace().collect::<Vec<_>>().join(" ");
+                        let text = without_comments(text)
+                            .split_whitespace()
+                            .collect::<Vec<_>>()
+                            .join(" ");
                         hir.diagnostics.push(
                             Diagnostic::new(
                                 DiagnosticCode::E210,
@@ -662,8 +663,12 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 let name = d.name.clone().unwrap_or_default();
                 hir.record_types.remove(&name);
                 if let Some(definition) = type_definition_from_decl(d) {
-                    hir.types
-                        .insert(name.clone(), (d.type_args.clone(), definition));
+                    let parameters = d
+                        .type_args
+                        .iter()
+                        .map(|parameter| without_comments(parameter).into_owned())
+                        .collect();
+                    hir.types.insert(name.clone(), (parameters, definition));
                 }
                 if let Some(fidryn_syntax::ast::TypeDefinitionAst::Sum(variants)) =
                     &d.type_definition
@@ -905,21 +910,54 @@ fn decl_params(d: &fidryn_syntax::ast::Decl) -> Vec<(String, String)> {
     }
 }
 
+/// The text of a declaration as its readers take it: the text with its
+/// comments blank, which they cut what they read out of, and its structure,
+/// which they search for the place. A position in one is the same position
+/// in the other.
+fn views(src: &str) -> (Cow<'_, str>, Cow<'_, str>) {
+    (without_comments(src), structure_of(src))
+}
+
+/// The stretch of `structure` after the first `word` in it, up to the next
+/// `word` or the end. Splitting the text on the word gives this stretch as
+/// its second piece.
+fn after_first(structure: &str, word: &str) -> Option<Range<usize>> {
+    let start = structure.find(word)? + word.len();
+    let end = structure[start..]
+        .find(word)
+        .map_or(structure.len(), |next| start + next);
+    Some(start..end)
+}
+
+/// The value of the `artifact` field of a `source`: what stands after the
+/// word, from the quote that follows it to the next quote. The word is not
+/// found in a comment or inside a string literal.
+fn source_artifact(src: &str) -> Option<String> {
+    let (code, structure) = views(src);
+    let value = code[after_first(&structure, "artifact")?]
+        .trim()
+        .trim_start_matches('"');
+    let end = value.find('"')?;
+    Some(value[..end].to_owned())
+}
+
 fn query_body_has_quantifier_or_require(src: &str) -> bool {
     let inner = last_brace_inner(src).unwrap_or("");
+    let structure = structure_of(inner);
     !inner.is_empty()
-        && (contains_ident(inner, "require")
-            || contains_ident(inner, "for_all")
-            || contains_ident(inner, "exists")
-            || contains_ident(inner, "goal")
-            || contains_ident(inner, "return"))
+        && (contains_ident(&structure, "require")
+            || contains_ident(&structure, "for_all")
+            || contains_ident(&structure, "exists")
+            || contains_ident(&structure, "goal")
+            || contains_ident(&structure, "return"))
 }
 
 fn extract_return_type(src: &str) -> String {
-    let Some(after_arrow) = src.split("->").nth(1) else {
+    let (code, structure) = views(src);
+    let Some(after_arrow) = after_first(&structure, "->") else {
         return String::new();
     };
-    let mut ty = after_arrow;
+    let mut ty = &structure[after_arrow.clone()];
     if let Some(i) = ty.find('!') {
         ty = &ty[..i];
     }
@@ -929,14 +967,17 @@ fn extract_return_type(src: &str) -> String {
     if let Some(i) = find_ident(ty, "fuel") {
         ty = &ty[..i];
     }
-    ty.trim().to_owned()
+    code[after_arrow.start..after_arrow.start + ty.len()]
+        .trim()
+        .to_owned()
 }
 
 fn extract_rank(src: &str) -> i64 {
-    src.split("rank")
-        .nth(1)
-        .and_then(|s| {
-            s.split_whitespace()
+    let (code, structure) = views(src);
+    after_first(&structure, "rank")
+        .and_then(|after_rank| {
+            code[after_rank]
+                .split_whitespace()
                 .next()
                 .and_then(|n| n.trim_matches(';').parse().ok())
         })
@@ -944,10 +985,14 @@ fn extract_rank(src: &str) -> i64 {
 }
 
 fn extract_office(src: &str) -> String {
-    src.split(" for ")
-        .nth(1)
-        .map(|s| s.split(" rank").next().unwrap_or(s).trim().to_owned())
-        .unwrap_or_default()
+    let (code, structure) = views(src);
+    let Some(after_for) = after_first(&structure, " for ") else {
+        return String::new();
+    };
+    let end = structure[after_for.clone()]
+        .find(" rank")
+        .map_or(after_for.end, |rank| after_for.start + rank);
+    code[after_for.start..end].trim().to_owned()
 }
 
 #[allow(dead_code)]
@@ -959,12 +1004,20 @@ fn extract_alternatives(src: &str) -> Vec<String> {
 }
 
 fn extract_alternative_defs(src: &str) -> InterpretationAlts {
+    const ALTERNATIVE: &str = "alternative ";
+    const DEFINES: &str = "defines ";
+    let (code, structure) = views(src);
     let mut out = Vec::new();
-    for (i, part) in src.split("alternative ").enumerate() {
-        if i == 0 {
-            continue;
-        }
-        let name = part
+    // An alternative is the text after the word, up to the next one.
+    let starts: Vec<usize> = structure
+        .match_indices(ALTERNATIVE)
+        .map(|(word, _)| word + ALTERNATIVE.len())
+        .collect();
+    for (index, &start) in starts.iter().enumerate() {
+        let end = starts
+            .get(index + 1)
+            .map_or(structure.len(), |next| next - ALTERNATIVE.len());
+        let name = code[start..end]
             .split_whitespace()
             .next()
             .unwrap_or("")
@@ -974,25 +1027,28 @@ fn extract_alternative_defs(src: &str) -> InterpretationAlts {
             continue;
         }
         let mut defs = Vec::new();
-        let mut rest = part;
-        while let Some(idx) = rest.find("defines ") {
-            rest = &rest[idx + "defines ".len()..];
-            let stmt_end = rest.find("defines ").unwrap_or(rest.len());
-            let stmt = &rest[..stmt_end];
-            if let Some(end) = stmt.find(" as not_established") {
-                let expr = stmt[..end].trim();
+        let mut rest = start;
+        while let Some(idx) = structure[rest..end].find(DEFINES) {
+            // A definition is the text after the word, up to the next one.
+            let stmt_start = rest + idx + DEFINES.len();
+            let stmt_end = structure[stmt_start..end]
+                .find(DEFINES)
+                .map_or(end, |next| stmt_start + next);
+            let stmt = &structure[stmt_start..stmt_end];
+            let defined = match stmt.find(" as not_established") {
+                Some(expr_end) => Some((expr_end, false)),
+                None => stmt
+                    .find(" as established")
+                    .map(|expr_end| (expr_end, true)),
+            };
+            if let Some((expr_end, established)) = defined {
+                let expr = code[stmt_start..stmt_start + expr_end].trim();
                 if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
                 {
-                    defs.push((prop, false));
-                }
-            } else if let Some(end) = stmt.find(" as established") {
-                let expr = stmt[..end].trim();
-                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
-                {
-                    defs.push((prop, true));
+                    defs.push((prop, established));
                 }
             }
-            rest = &rest[stmt_end..];
+            rest = stmt_end;
         }
         out.push((name, defs));
     }
@@ -1008,19 +1064,17 @@ fn extract_returns(src: &str) -> Result<Option<Term>, ()> {
 }
 
 fn extract_effect_result(src: &str) -> String {
-    src.split("->")
-        .last()
-        .map(|s| {
-            s.trim()
-                .trim_end_matches('}')
-                .trim()
-                .lines()
-                .next()
-                .unwrap_or("")
-                .trim()
-                .to_owned()
-        })
-        .unwrap_or_default()
+    let (code, structure) = views(src);
+    let after_arrow = structure.rfind("->").map_or(0, |arrow| arrow + "->".len());
+    code[after_arrow..]
+        .trim()
+        .trim_end_matches('}')
+        .trim()
+        .lines()
+        .next()
+        .unwrap_or("")
+        .trim()
+        .to_owned()
 }
 
 fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerification> {
@@ -1106,16 +1160,24 @@ fn bound_in(tokens: &[(TokenKind, &str)], word: &str) -> u32 {
     }
 }
 
+/// The text of a declaration from the word `assert` to the end of that
+/// clause, as it is written. The word and the end of the clause are looked
+/// for in the structure of the text, so neither is found in a comment or
+/// inside a string literal.
 fn extract_assert_clause(src: &str) -> Option<String> {
-    let i = find_ident(src, "assert")?;
-    Some(take_clause_to_end(&src[i..]))
+    let structure = structure_of(src);
+    let i = find_ident(&structure, "assert")?;
+    Some(take_clause_to_end(&src[i..], &structure[i..]))
 }
 
-fn take_clause_to_end(s: &str) -> String {
+/// `s` up to the end of its first clause: a `;` or a `}` that closes
+/// nothing, outside every bracket of `structure`, which is the structure of
+/// `s`.
+fn take_clause_to_end(s: &str, structure: &str) -> String {
     let mut depth_paren = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -1137,17 +1199,25 @@ fn take_clause_to_end(s: &str) -> String {
     s.trim().trim_end_matches(';').trim().to_owned()
 }
 
+/// The quantifiers written in the text of a declaration. A quantifier in a
+/// comment or inside a string literal is none.
 fn extract_quantifiers(src: &str) -> Vec<HirQuantifier> {
+    let (code, structure) = views(src);
     let mut out = Vec::new();
     let mut i = 0;
-    while i < src.len() {
-        if let Some((kind, kw_len)) = quantifier_at(src, i) {
-            if let Some(q) = parse_quantifier_tail(kind, &src[i + kw_len..]) {
+    while i < structure.len() {
+        if let Some((kind, kw_len)) = quantifier_at(&structure, i) {
+            let after = i + kw_len;
+            if let Some(q) = parse_quantifier_tail(kind, &code[after..], &structure[after..]) {
                 out.push(q);
             }
             i += kw_len;
         } else {
-            i += src[i..].chars().next().map(char::len_utf8).unwrap_or(1);
+            i += structure[i..]
+                .chars()
+                .next()
+                .map(char::len_utf8)
+                .unwrap_or(1);
         }
     }
     out
@@ -1165,8 +1235,16 @@ fn quantifier_at(src: &str, i: usize) -> Option<(QuantifierKind, usize)> {
     None
 }
 
-fn parse_quantifier_tail(kind: QuantifierKind, rest: &str) -> Option<HirQuantifier> {
-    let rest = rest.trim_start();
+/// The quantifier whose text after its keyword is `code`, with the
+/// structure of that text beside it. The variable and the word `in` hold no
+/// string, so they are read from the structure, where they stand as they
+/// are written.
+fn parse_quantifier_tail(
+    kind: QuantifierKind,
+    code: &str,
+    structure: &str,
+) -> Option<HirQuantifier> {
+    let rest = structure.trim_start();
     let binder_len = ident_len(rest)?;
     let binder = rest[..binder_len].to_owned();
     let after_binder = rest[binder_len..].trim_start();
@@ -1174,7 +1252,8 @@ fn parse_quantifier_tail(kind: QuantifierKind, rest: &str) -> Option<HirQuantifi
         return None;
     }
     let after_in = after_binder[2..].trim_start();
-    let (domain, formula) = split_domain_formula(after_in)?;
+    let (domain, formula) =
+        split_domain_formula(&code[structure.len() - after_in.len()..], after_in)?;
     Some(HirQuantifier {
         kind,
         binder,
@@ -1200,11 +1279,14 @@ fn ident_len(s: &str) -> Option<usize> {
     Some(end)
 }
 
-fn split_domain_formula(s: &str) -> Option<(String, String)> {
+/// The domain and the formula of a quantifier, cut out of `s`, the text
+/// after its word `in`. The `:` or the `{` between the two is looked for in
+/// `structure`, the structure of `s`.
+fn split_domain_formula(s: &str, structure: &str) -> Option<(String, String)> {
     let mut depth_paren = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -1213,7 +1295,10 @@ fn split_domain_formula(s: &str) -> Option<(String, String)> {
             '{' => {
                 if depth_paren == 0 && depth_brack == 0 && depth_brace == 0 {
                     let domain = s[..i].trim().to_owned();
-                    let inner = brace_inner(&s[i..]).unwrap_or("").trim().to_owned();
+                    let inner = brace_inner(&s[i..], &structure[i..])
+                        .unwrap_or("")
+                        .trim()
+                        .to_owned();
                     return Some((domain, inner));
                 }
                 depth_brace += 1;
@@ -1237,12 +1322,14 @@ fn split_domain_formula(s: &str) -> Option<(String, String)> {
     None
 }
 
-fn brace_inner(s: &str) -> Option<&str> {
-    if !s.starts_with('{') {
+/// What stands between the first `{` of `s` and the `}` that closes it,
+/// where `structure` is the structure of `s`.
+fn brace_inner<'a>(s: &'a str, structure: &str) -> Option<&'a str> {
+    if !structure.starts_with('{') {
         return None;
     }
     let mut depth = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '{' => depth += 1,
             '}' => {
@@ -1281,9 +1368,13 @@ fn is_ident_boundary(src: &str, start: usize, len: usize) -> bool {
 }
 
 /// Split `QName` / `QName<A, B>` into the base name and angle-bracket arguments.
+///
+/// A comment in the text is read as white space, and a `<`, a `>` or a `,`
+/// inside a string literal is not counted.
 pub fn split_qname_type_args(s: &str) -> (String, Vec<String>) {
-    let s = s.trim();
-    let Some(open) = s.find('<') else {
+    let code = without_comments(s);
+    let s = code.trim();
+    let Some(open) = structure_of(s).find('<') else {
         return (s.to_owned(), Vec::new());
     };
     let name = s[..open].trim().to_owned();
@@ -1291,11 +1382,15 @@ pub fn split_qname_type_args(s: &str) -> (String, Vec<String>) {
 }
 
 /// Parse the first `<...>` argument list in `s`, respecting nested angles.
+///
+/// A comment in the text is read as white space, and a `<`, a `>` or a `,`
+/// inside a string literal is not counted.
 pub fn parse_angle_args(s: &str) -> Vec<String> {
-    let Some(open) = s.find('<') else {
+    let code = without_comments(s);
+    let Some(open) = structure_of(&code).find('<') else {
         return Vec::new();
     };
-    parse_leading_angle_args(&s[open..])
+    parse_leading_angle_args(&code[open..])
 }
 
 /// Type parameters written on a `module Name<T>` header, used when the AST
@@ -1369,6 +1464,7 @@ fn parse_module_header(source: &str) -> (String, Vec<String>) {
 }
 
 fn type_args_from_import_text(source: &str) -> Vec<String> {
+    let source = without_comments(source);
     let s = source.trim();
     let rest = s.strip_prefix("import").unwrap_or(s);
     let mut i = 0usize;
@@ -1386,14 +1482,18 @@ fn type_args_from_import_text(source: &str) -> Vec<String> {
     parse_leading_angle_args(&rest[i..])
 }
 
+/// The arguments between the `<` that `s` begins with and the `>` that
+/// closes it. A comment in between is read as white space, and a `<`, a `>`
+/// or a `,` inside a string literal is not counted.
 fn parse_leading_angle_args(s: &str) -> Vec<String> {
     let s = s.trim_start();
     if !s.starts_with('<') {
         return Vec::new();
     }
+    let (code, structure) = views(s);
     let mut depth = 0i32;
     let mut end = None;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '<' => depth += 1,
             '>' => {
@@ -1409,17 +1509,20 @@ fn parse_leading_angle_args(s: &str) -> Vec<String> {
     let Some(end) = end else {
         return Vec::new();
     };
-    split_top_level_commas(&s[1..end])
+    split_top_level_commas(&code[1..end])
 }
 
+/// The parts of `inner` between the commas that stand inside no bracket. A
+/// bracket or a comma inside a string literal is not counted.
 fn split_top_level_commas(inner: &str) -> Vec<String> {
+    let structure = structure_of(inner);
     let mut parts = Vec::new();
     let mut start = 0;
     let mut depth_paren = 0i32;
     let mut depth_angle = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in inner.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,

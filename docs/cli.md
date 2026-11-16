@@ -302,15 +302,20 @@ fidryn explain 00000000000000000000000000000000 --format json
 
 ## `verify`
 
-Check a declared `verify` property on a module. Query names are not
-properties. The name must appear in the module’s `verify` blocks.
+Check a property of a module. A `verify` block declares one under its
+name. A `for_all` or an `exists` written in a query, in a `verify` block
+or as a declaration of its own is a property as well. It is named after
+its kind, its variable and its number among the quantifiers written in
+those places, counted from 0 in the order of the text: `for_all:x:0`.
+Such a property has no bounds, and its verdict is `unknown`. Query names
+are not properties.
 
 **Arguments**
 
 | Name | Required | Type |
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file |
-| `--property NAME` | yes | declared verification name |
+| `--property NAME` | yes | property name |
 
 **Example**
 

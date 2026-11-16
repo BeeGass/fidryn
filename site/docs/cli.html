@@ -315,12 +315,17 @@ fidryn explain outcome.json --format text</code></pre></figure>
 <code>trace &lt;hex&gt;</code>. JSON is a canonical <code>TraceDocument</code>. DOT is a <code>digraph</code>.</p>
 <p><strong>Failure.</strong> Exit 1. <code>cannot read PATH: ...</code> or <code>invalid trace JSON PATH: ...</code>.</p>
 <h2 id="verify"><span class="hn">4.9</span> <code>verify</code> <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>Check a declared <code>verify</code> property on a module. Query names are not
-properties. The name must appear in the module’s <code>verify</code> blocks.</p>
+<p>Check a property of a module. A <code>verify</code> block declares one under its
+name. A <code>for_all</code> or an <code>exists</code> written in a query, in a <code>verify</code> block
+or as a declaration of its own is a property as well. It is named after
+its kind, its variable and its number among the quantifiers written in
+those places, counted from 0 in the order of the text: <code>for_all:x:0</code>.
+Such a property has no bounds, and its verdict is <code>unknown</code>. Query names
+are not properties.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
-<tr><td><code>--property NAME</code></td><td>yes</td><td>declared verification name</td></tr>
+<tr><td><code>--property NAME</code></td><td>yes</td><td>property name</td></tr>
 </tbody></table>
 </div>
 <p><strong>Example</strong></p>

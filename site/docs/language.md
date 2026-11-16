@@ -78,13 +78,32 @@ the dated slice this file encodes. `effective_at` is a date.
 the outcome's `modelBoundary`.
 
 A comment begins with `//` and runs to the end of its line. There is no
-block comment: `/* ... */` is read as ordinary tokens, not skipped. A
-brace inside a comment or a string is not a brace: it neither opens nor
-closes the body of a declaration. The text kept for a declaration holds
-the comments inside it, and a part that is read from that text can take
-one in: in an `effect`, a comment after the result type of an operation
-is read into the type, and a query that uses the operation is rejected
-with `E210` (see [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+block comment: `/* ... */` is read as ordinary tokens, not skipped.
+
+A comment is never read as code. Whatever it holds, nothing is taken
+from it: a `}` in a comment closes no block, a `->` begins no type, and
+`assert false`, `defeat Residual` or `for_all x in People: true` in a
+comment asserts nothing, defeats no clause and declares no property. A
+comment at the end of a line of code does not change what that code
+means. A line that holds only a comment is a blank line, and a blank
+line is not always nothing: it can end a statement that the line below
+would otherwise continue. See
+[Where a statement ends](#where-a-statement-ends).
+
+A bracket or a word inside a string literal is text of the string and
+nothing else. `artifact "files/a}1.txt"` closes no block, a citation
+such as `from "Stat. 12(a"` opens no parenthesis, and a string that holds
+`defeat Residual` defeats no clause.
+
+What a comment can change is how a report identifies the program (see
+[outcomes](https://fidryn.onlygass.dev/docs/outcomes.md)). `sourceBundle` covers the text of the module
+byte for byte, so any comment changes it. `invocation.program.fingerprint`
+is taken over the compiled program. That keeps some text as it is
+written, with the comments inside it: the body of a `clause`, for
+example, and the first `assert` of a `verify` block. A comment inside
+such text changes the fingerprint, as a change of the white space there
+does. A comment at the end of a line of a query, a rule or a duty does
+not.
 
 The trust fixture also declares a source manifest, resolved relative
 to the module file:

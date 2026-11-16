@@ -154,13 +154,29 @@ the dated slice this file encodes. <code>effective_at</code> is a date.
 <code>outside_scope</code> is a set of named exclusions; those names reappear on
 the outcome's <code>modelBoundary</code>.</p>
 <p>A comment begins with <code>//</code> and runs to the end of its line. There is no
-block comment: <code>/* ... */</code> is read as ordinary tokens, not skipped. A
-brace inside a comment or a string is not a brace: it neither opens nor
-closes the body of a declaration. The text kept for a declaration holds
-the comments inside it, and a part that is read from that text can take
-one in: in an <code>effect</code>, a comment after the result type of an operation
-is read into the type, and a query that uses the operation is rejected
-with <code>E210</code> (see <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>).</p>
+block comment: <code>/* ... */</code> is read as ordinary tokens, not skipped.</p>
+<p>A comment is never read as code. Whatever it holds, nothing is taken
+from it: a <code>}</code> in a comment closes no block, a <code>-&gt;</code> begins no type, and
+<code>assert false</code>, <code>defeat Residual</code> or <code>for_all x in People: true</code> in a
+comment asserts nothing, defeats no clause and declares no property. A
+comment at the end of a line of code does not change what that code
+means. A line that holds only a comment is a blank line, and a blank
+line is not always nothing: it can end a statement that the line below
+would otherwise continue. See
+<a href="#where-a-statement-ends">Where a statement ends</a>.</p>
+<p>A bracket or a word inside a string literal is text of the string and
+nothing else. <code>artifact "files/a}1.txt"</code> closes no block, a citation
+such as <code>from "Stat. 12(a"</code> opens no parenthesis, and a string that holds
+<code>defeat Residual</code> defeats no clause.</p>
+<p>What a comment can change is how a report identifies the program (see
+<a href="/docs/outcomes">outcomes</a>). <code>sourceBundle</code> covers the text of the module
+byte for byte, so any comment changes it. <code>invocation.program.fingerprint</code>
+is taken over the compiled program. That keeps some text as it is
+written, with the comments inside it: the body of a <code>clause</code>, for
+example, and the first <code>assert</code> of a <code>verify</code> block. A comment inside
+such text changes the fingerprint, as a change of the white space there
+does. A comment at the end of a line of a query, a rule or a duty does
+not.</p>
 <p>The trust fixture also declares a source manifest, resolved relative
 to the module file:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source_manifest</span> <span class="tk-st">&quot;sources/ma-trust-fixture.manifest.json&quot;</span></code></pre></figure>
