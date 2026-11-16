@@ -259,6 +259,22 @@ interchange schema versions are maintained independently of the interpreter.
   already were. In the body of a `calc`, each `else if` of a chain counts
   as a level of the expression, and a chain that passes the limit of 128
   levels is rejected with `E100` however long it is.
+- Deeply nested text that the parser steps over, and that is read later
+  from the text, no longer ends the process and no longer loses a part
+  without a diagnostic. A `duty` whose `content` was an `if` with 30,000
+  `else if` links ended `fidryn check` with a stack overflow, and so did an
+  `effect` whose operation had a result type nested 5,000 deep. The duty is
+  now rejected with `E100`, as one with 127 links already was; a chain of
+  126 links is the longest that is read. The effect is rejected with
+  `E100`, "type nesting exceeds the limit of 128", which is the limit and
+  the message the parser has for a type it reads. That holds wherever a
+  type is read from the text of a declaration: one of 128 levels of `<` is
+  accepted there, and one of 129 is rejected. A result type nested 200
+  deep in an `effect` passed the checker before. A `decision` whose
+  `returns` held a part nested deeper than its reader goes, such as an
+  element of a set under 63 pairs of parentheses, passed the checker with
+  that part left out, and an `interpretation_family` lost a definition
+  that held such a part. Each is now rejected with `E100`.
 - The time `fidryn check` takes no longer grows with the square of the
   length of a run of blank lines. A module with 20,000 blank lines between
   two declarations took about ten seconds to check; it is now checked in

@@ -320,11 +320,16 @@ pub fn parse_function_parts(src: &str) -> (Vec<(String, String)>, Option<Term>) 
     (extract_params(src), parse_fn_body_from_source(src))
 }
 
+/// The expression after the first `returns` of a declaration's text.
+/// `Ok(None)` when the text has no `returns`. `Err` when no expression can
+/// be read there, and when the expression nests deeper than the reader
+/// goes: what the reader returns then lacks the part below its limit.
 pub fn parse_decl_result(src: &str) -> Result<Option<Term>, ()> {
     let mut parser = SliceParser::new(src);
     while !parser.is_eof() {
         if parser.eat_ident("returns") {
-            return parser.parse_expr().map(Some).ok_or(());
+            let result = parser.parse_expr();
+            return result.filter(|_| !parser.exhausted).map(Some).ok_or(());
         }
         parser.bump();
     }
@@ -553,26 +558,74 @@ pub fn parse_rule_kind(src: &str) -> String {
     "prescriptive".into()
 }
 
+/// How many levels of `<` a type may have. The parser has the same limit
+/// for a type it reads.
+const MAX_TYPE_NESTING: usize = 128;
+
 /// The type that the text of a type names.
 ///
 /// A comment in the text is read as white space, and a `|`, a `,` or a `<`
 /// inside a string literal is no part of the type's structure.
+///
+/// The reader goes down no more levels of `<` than the parser lets a type
+/// have. For a text it would have to go deeper into, it gives the whole
+/// text as the name of a sort, which is not the type the text names:
+/// `type_nests_too_deep` tells, and a caller that takes a type out of text
+/// the parser has not read asks it.
 pub fn parse_type_name(raw: &str) -> Type {
-    type_from_text(&without_comments(raw))
+    let code = without_comments(raw);
+    type_from_text(&code, 0).unwrap_or_else(|| Type::Sort(Sort::Nominal(code.trim().to_owned())))
 }
 
-/// The type that `raw` names, where `raw` holds no comment.
-fn type_from_text(raw: &str) -> Type {
+/// True when the text of a type has more than 128 levels of `<`, which is
+/// more than the parser lets a type have, or when `parse_type_name` gives
+/// up on it for another reason.
+///
+/// The levels are counted in the text, as the parser counts them. So a
+/// text is refused for them also where the reader would not go down into
+/// it, as in the argument of `Money`, which it takes for a name.
+pub fn type_nests_too_deep(raw: &str) -> bool {
+    let code = without_comments(raw);
+    most_angles_open(&code) > MAX_TYPE_NESTING || type_from_text(&code, 0).is_none()
+}
+
+/// The most `<` that stand open at one place of `text`, outside its string
+/// literals.
+fn most_angles_open(text: &str) -> usize {
+    let mut open = 0usize;
+    let mut most = 0;
+    for byte in structure_of(text).bytes() {
+        match byte {
+            b'<' => {
+                open += 1;
+                most = most.max(open);
+            }
+            b'>' => open = open.saturating_sub(1),
+            _ => {}
+        }
+    }
+    most
+}
+
+/// The type that `raw` names, where `raw` holds no comment and stands
+/// inside `level` pairs of `<` and `>`. `None` when it nests its arguments
+/// deeper than the limit.
+fn type_from_text(raw: &str, level: usize) -> Option<Type> {
     let s = raw.trim();
     if s.is_empty() {
-        return Type::Sort(Sort::Nominal(String::new()));
+        return Some(Type::Sort(Sort::Nominal(String::new())));
     }
     let members = split_top_level(s, '|').collect::<Vec<_>>();
     if members.len() > 1 {
-        return Type::Applied {
+        // A member holds no `|` outside its brackets, so it is not split
+        // again before a `<` is passed.
+        return Some(Type::Applied {
             ctor: "Union".into(),
-            args: members.into_iter().map(type_from_text).collect(),
-        };
+            args: members
+                .into_iter()
+                .map(|member| type_from_text(member, level))
+                .collect::<Option<_>>()?,
+        });
     }
     if let Some(open) = structure_of(s).find('<')
         && s.ends_with('>')
@@ -580,9 +633,9 @@ fn type_from_text(raw: &str) -> Type {
     {
         let ctor = s[..open].trim();
         let inner = &s[open + 1..s.len() - 1];
-        return parse_applied_type(ctor, inner);
+        return parse_applied_type(ctor, inner, level + 1);
     }
-    match s {
+    Some(match s {
         "Bool" => Type::bool(),
         "Int" => Type::Primitive(PrimitiveType::Int),
         "Decimal" => Type::Primitive(PrimitiveType::Decimal),
@@ -610,7 +663,7 @@ fn type_from_text(raw: &str) -> Type {
         "Interpretation" => Type::Sort(Sort::Interpretation),
         "ClauseRef" => Type::Sort(Sort::ClauseRef),
         other => Type::Sort(Sort::Nominal(other.to_owned())),
-    }
+    })
 }
 
 /// The parameters in the first parenthesized list of a declaration's text:
@@ -687,6 +740,16 @@ pub fn parse_expr_src(src: &str) -> Option<Term> {
     let mut p = SliceParser::new(src);
     let term = p.parse_expr()?;
     Some(term)
+}
+
+/// The expression at the start of `src`, as `parse_expr_src` reads it, or
+/// `Err` when the text nests deeper than the reader goes. The reader then
+/// returns nothing, or an expression that lacks the part below its limit,
+/// and neither is what the text says.
+pub(crate) fn parse_expr_within_limits(src: &str) -> Result<Option<Term>, ()> {
+    let mut p = SliceParser::new(src);
+    let term = p.parse_expr();
+    if p.exhausted { Err(()) } else { Ok(term) }
 }
 
 pub fn term_as_name(term: &Term) -> Option<String> {
@@ -1024,8 +1087,15 @@ fn parse_goal_fields(p: &mut SliceParser<'_>) -> BTreeMap<String, Term> {
     fields
 }
 
-fn parse_applied_type(ctor: &str, inner: &str) -> Type {
-    match ctor {
+/// The type `ctor<inner>`, where `inner` stands inside `level` pairs of `<`
+/// and `>`. `None` when that is deeper than a type may nest, or when an
+/// argument nests deeper.
+fn parse_applied_type(ctor: &str, inner: &str, level: usize) -> Option<Type> {
+    if level > MAX_TYPE_NESTING {
+        return None;
+    }
+    let argument = |text: &str| type_from_text(text, level).map(Box::new);
+    Some(match ctor {
         "Money" => Type::Primitive(PrimitiveType::Money {
             currency: inner.trim().to_owned(),
         }),
@@ -1033,34 +1103,36 @@ fn parse_applied_type(ctor: &str, inner: &str) -> Type {
             calendar: inner.trim().to_owned(),
         }),
         "Option" => Type::Primitive(PrimitiveType::Option {
-            inner: Box::new(type_from_text(inner)),
+            inner: argument(inner)?,
         }),
         "Interval" => Type::Primitive(PrimitiveType::Interval {
-            inner: Box::new(type_from_text(inner)),
+            inner: argument(inner)?,
         }),
         "FiniteSet" => Type::Primitive(PrimitiveType::FiniteSet {
-            inner: Box::new(type_from_text(inner)),
+            inner: argument(inner)?,
         }),
         "NonEmptySet" => Type::Primitive(PrimitiveType::NonEmptySet {
-            inner: Box::new(type_from_text(inner)),
+            inner: argument(inner)?,
         }),
         "Map" => {
             let mut args = split_top_level(inner, ',');
             let key = args.next().unwrap_or("");
             let value = args.next().unwrap_or("");
             Type::Primitive(PrimitiveType::Map {
-                key: Box::new(type_from_text(key)),
-                value: Box::new(type_from_text(value)),
+                key: argument(key)?,
+                value: argument(value)?,
             })
         }
         ctor => {
-            let args = split_top_level(inner, ',').map(type_from_text).collect();
+            let args = split_top_level(inner, ',')
+                .map(|text| type_from_text(text, level))
+                .collect::<Option<_>>()?;
             Type::Applied {
                 ctor: ctor.to_owned(),
                 args,
             }
         }
-    }
+    })
 }
 
 /// Where the first parenthesized group of `src` opens and closes. A
@@ -1336,6 +1408,8 @@ struct SliceParser<'a> {
     tokens: Vec<Token>,
     idx: usize,
     depth: usize,
+    /// How many links of `else if` the reader is inside of.
+    links: usize,
     exhausted: bool,
 }
 
@@ -1359,6 +1433,7 @@ impl<'a> SliceParser<'a> {
             tokens,
             idx: 0,
             depth: 0,
+            links: 0,
             exhausted: false,
         }
     }
@@ -1699,7 +1774,7 @@ impl<'a> SliceParser<'a> {
         let mut args = vec![cond, then_branch];
         if self.eat_ident("else") {
             let else_branch = if self.at_ident("if") {
-                self.parse_if()?
+                self.parse_else_if()?
             } else if self.at_kind(TokenKind::LBrace) {
                 self.parse_block()?
             } else {
@@ -1711,6 +1786,26 @@ impl<'a> SliceParser<'a> {
             ctor: "if".into(),
             args,
         })
+    }
+
+    /// The `if` that follows an `else`.
+    ///
+    /// `parse_if` reads it by calling itself, without passing `parse_expr`
+    /// or `parse_unary`, so the links of a chain are counted here, as
+    /// `parse_unary` counts a level. They have a count of their own. A link
+    /// is one level of the term and takes none of the levels its condition
+    /// and its branch are read with, so the reader refuses no chain whose
+    /// term `bounded_term` accepts: that is one of 126 links at most.
+    fn parse_else_if(&mut self) -> Option<Term> {
+        if self.links >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.links += 1;
+        let result = self.parse_if();
+        self.links -= 1;
+        result
     }
 
     fn parse_block(&mut self) -> Option<Term> {

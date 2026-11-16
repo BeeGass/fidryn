@@ -19,7 +19,7 @@ use fidryn_hir::{
     HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, HirRecordTypes,
     collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
     source_has_bare_prop_if, split_qname_type_args, structure_of, term_as_name,
-    term_has_bare_prop_guard, without_comments,
+    term_has_bare_prop_guard, type_nests_too_deep, without_comments,
 };
 use fidryn_syntax::ast::Item;
 use fidryn_syntax::parse_file;
@@ -132,6 +132,14 @@ fn check_module(
 ) -> Result<(CoreModule, LinkedImports), Vec<Diagnostic>> {
     validate_manifest_paths(manifest, source_root)?;
     let mut diagnostics = hir.diagnostics.clone();
+    if types_nest_too_deep(hir) {
+        // The checks below read these types, so they are not run.
+        diagnostics.push(Diagnostic::new(
+            DiagnosticCode::E100,
+            "type nesting exceeds the limit of 128",
+        ));
+        return Err(diagnostics);
+    }
     check_nominations(hir, &mut diagnostics);
     check_imports(hir, manifest, source_root, &mut diagnostics);
     let linked = if link_imports {
@@ -158,6 +166,72 @@ fn check_module(
         None => core,
     };
     Ok((core, linked))
+}
+
+/// The types of a list of parameters or fields, as their text.
+fn types_of(params: &[(String, String)]) -> impl Iterator<Item = &str> {
+    params.iter().map(|(_, ty)| ty.as_str())
+}
+
+/// True when a type of the module nests its arguments deeper than the
+/// parser lets a type nest.
+///
+/// The parser refuses such a type where it reads one. The lowering takes
+/// other types out of text the parser has stepped over, the operation of an
+/// `effect` among them, and hands every type on as its text. All of them
+/// are looked at here, before the checker reads any.
+fn types_nest_too_deep(hir: &HirModule) -> bool {
+    let effect_params: Vec<(String, String)> = hir
+        .effects
+        .values()
+        .flat_map(|effect| source_param_texts(&effect.source))
+        .collect();
+    let queries = hir
+        .queries
+        .values()
+        .flat_map(|query| types_of(&query.params).chain([query.result_type.as_str()]));
+    let functions = hir
+        .functions
+        .values()
+        .flat_map(|function| types_of(&function.params).chain([function.result_type.as_str()]));
+    let decisions = hir
+        .decisions
+        .iter()
+        .flat_map(|decision| types_of(&decision.params).chain(decision.result_type.as_deref()));
+    let judgments = hir
+        .judgments
+        .iter()
+        .flat_map(|judgment| types_of(&judgment.params).chain(types_of(&judgment.records)));
+    let effects = hir
+        .effects
+        .values()
+        .map(|effect| effect.result_type.as_str())
+        .chain(types_of(&effect_params));
+    let lists = hir
+        .propositions
+        .values()
+        .chain(hir.record_types.values().map(|(_, fields)| fields))
+        .chain(hir.callable_signatures.values().map(|(params, _)| params))
+        .chain(hir.rules.iter().map(|rule| &rule.typed_binders))
+        .chain(hir.duties.iter().map(|duty| &duty.params))
+        .chain(
+            hir.observations
+                .iter()
+                .map(|observation| &observation.params),
+        )
+        .flat_map(|list| types_of(list));
+    let imports = hir.imports.iter().flat_map(|import| &import.type_args);
+    hir.entities
+        .values()
+        .chain(imports)
+        .map(String::as_str)
+        .chain(lists)
+        .chain(queries)
+        .chain(functions)
+        .chain(decisions)
+        .chain(judgments)
+        .chain(effects)
+        .any(type_nests_too_deep)
 }
 
 fn has_errors(diagnostics: &[Diagnostic]) -> bool {
@@ -1783,12 +1857,22 @@ fn params_as_types(params: &[(String, String)]) -> Vec<(String, Type)> {
 }
 
 /// The parameters in the first parenthesized list of the text of an
-/// `effect`: each `name: type` between two of its commas.
+/// `effect`, each with its type.
+fn source_typed_params(src: &str) -> Vec<(String, Type)> {
+    source_param_texts(src)
+        .into_iter()
+        .map(|(name, ty)| (name, parse_type_name(&ty)))
+        .collect()
+}
+
+/// The parameters in the first parenthesized list of the text of an
+/// `effect`: each `name: type` between two of its commas, the type as its
+/// text.
 ///
 /// The text is read with its comments blank. The parentheses, the commas
 /// and the colons are looked for in its structure, so none of them is found
 /// inside a string literal.
-fn source_typed_params(src: &str) -> Vec<(String, Type)> {
+fn source_param_texts(src: &str) -> Vec<(String, String)> {
     let code = without_comments(src);
     let structure = structure_of(src);
     let Some(start) = structure.find('(') else {
@@ -1826,7 +1910,7 @@ fn source_typed_params(src: &str) -> Vec<(String, Type)> {
         let name = code[part.start..part.start + colon].trim();
         let ty = code[part.start + colon + 1..part.end].trim();
         if !name.is_empty() && !ty.is_empty() {
-            params.push((name.to_owned(), parse_type_name(ty)));
+            params.push((name.to_owned(), ty.to_owned()));
         }
     }
     params
@@ -3847,6 +3931,9 @@ fn lower_status_of(fields: &BTreeMap<String, Term>) -> QueryPlan {
 
 #[cfg(test)]
 mod comment_tests;
+
+#[cfg(test)]
+mod depth_tests;
 
 #[cfg(test)]
 mod tests {

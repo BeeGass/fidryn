@@ -1434,6 +1434,29 @@ mod tests {
     }
 
     #[test]
+    fn a_formula_is_read_128_quantifiers_deep_and_no_deeper() {
+        // The reader of a formula calls itself for the body of each
+        // quantifier, and counts how deep it is.
+        let verdict = |depth: usize| {
+            let formula = format!("{}true", "for_all x in People: ".repeat(depth));
+            let mut module = bool_module();
+            push_property(&mut module, "Deep", &formula, people_bounds(1));
+            verify_property(&module, "Deep").to_string()
+        };
+        let not_read = "unknown Deep: no supported structured verification assertion (persons=1, events=1, time_points=1)";
+        for depth in [1, 127, 128] {
+            assert_eq!(
+                verdict(depth),
+                "proved Deep (persons=1, events=1, time_points=1)",
+                "{depth}"
+            );
+        }
+        for depth in [129, 130, 5_000] {
+            assert_eq!(verdict(depth), not_read, "{depth}");
+        }
+    }
+
+    #[test]
     fn verify_property_exists_false_over_people_is_counterexample() {
         let mut module = bool_module();
         push_property(

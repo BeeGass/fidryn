@@ -1,8 +1,6 @@
 //! Name resolution, import authentication, and surface-to-HIR elaboration.
 
 mod body;
-#[cfg(test)]
-mod comment_tests;
 mod text;
 
 use fidryn_core::ir::Guard;
@@ -16,7 +14,7 @@ use std::ops::Range;
 pub use body::{
     collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
     parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
-    term_from_decl, term_has_bare_prop_guard, term_to_guard,
+    term_from_decl, term_has_bare_prop_guard, term_to_guard, type_nests_too_deep,
 };
 pub use text::{structure_of, without_comments};
 
@@ -596,7 +594,18 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Interpretation(d) => {
                 let name = d.name.clone().unwrap_or_default();
-                let alts = extract_alternative_defs(&d.source);
+                let alts = extract_alternative_defs(&d.source).unwrap_or_else(|()| {
+                    hir.diagnostics.push(
+                        Diagnostic::new(
+                            DiagnosticCode::E100,
+                            format!(
+                                "interpretation family `{name}` contains a definition that exceeds resource limits"
+                            ),
+                        )
+                        .with_span(d.span),
+                    );
+                    Vec::new()
+                });
                 hir.interpretation_families.insert(name, alts);
             }
             fidryn_syntax::ast::Item::Decision(d) => {
@@ -998,12 +1007,16 @@ fn extract_office(src: &str) -> String {
 #[allow(dead_code)]
 fn extract_alternatives(src: &str) -> Vec<String> {
     extract_alternative_defs(src)
+        .unwrap_or_default()
         .into_iter()
         .map(|(name, _)| name)
         .collect()
 }
 
-fn extract_alternative_defs(src: &str) -> InterpretationAlts {
+/// The alternatives of an `interpretation_family`, each with what it
+/// defines. `Err` when the expression of a definition nests deeper than the
+/// reader of expressions goes: the definition would be lost, or cut short.
+fn extract_alternative_defs(src: &str) -> Result<InterpretationAlts, ()> {
     const ALTERNATIVE: &str = "alternative ";
     const DEFINES: &str = "defines ";
     let (code, structure) = views(src);
@@ -1043,7 +1056,8 @@ fn extract_alternative_defs(src: &str) -> InterpretationAlts {
             };
             if let Some((expr_end, established)) = defined {
                 let expr = code[stmt_start..stmt_start + expr_end].trim();
-                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
+                if let Some(prop) =
+                    body::parse_expr_within_limits(expr)?.and_then(|t| body::term_as_prop(&t))
                 {
                     defs.push((prop, established));
                 }
@@ -1052,7 +1066,7 @@ fn extract_alternative_defs(src: &str) -> InterpretationAlts {
         }
         out.push((name, defs));
     }
-    out
+    Ok(out)
 }
 
 fn extract_record_requires(src: &str) -> Vec<String> {
@@ -1572,6 +1586,12 @@ fn skip_ws_and_comments(s: &str, i: &mut usize) {
         return;
     }
 }
+
+#[cfg(test)]
+mod comment_tests;
+
+#[cfg(test)]
+mod depth_tests;
 
 #[cfg(test)]
 mod tests {

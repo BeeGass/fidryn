@@ -415,7 +415,22 @@ fn term_value(term: &Term) -> Option<Value> {
     }
 }
 
+/// The type that the type arguments of a `case_input` call name.
+///
+/// The text comes from a call the parser has read, which nests its type
+/// arguments 128 levels deep at most. The reader has that limit of its own:
+/// below it, what is left of the text is the name of a sort, and no value
+/// is admitted as one.
 pub(crate) fn parse_type(text: &str) -> Type {
+    type_at(text, 0)
+}
+
+/// How many levels of `<` the reader of a `case_input` type goes down.
+const MAX_TYPE_NESTING: usize = 128;
+
+/// The type `text` names, where `text` stands inside `level` pairs of `<`
+/// and `>`.
+fn type_at(text: &str, level: usize) -> Type {
     let text = text.trim();
     match text {
         "Bool" => Type::Primitive(P::Bool),
@@ -428,31 +443,74 @@ pub(crate) fn parse_type(text: &str) -> Type {
         "LegalPerson" => Type::Sort(Sort::LegalPerson),
         "Trust" => Type::Sort(Sort::Trust),
         _ => {
-            if let Some(open) = text.find('<')
+            if level < MAX_TYPE_NESTING
+                && let Some(open) = text.find('<')
                 && text.ends_with('>')
             {
                 let head = &text[..open];
                 let inside = &text[open + 1..text.len() - 1];
+                let argument = |text: &str| Box::new(type_at(text, level + 1));
                 return match head {
                     "Money" => Type::Primitive(P::Money {
                         currency: inside.into(),
                     }),
                     "FiniteSet" => Type::Primitive(P::FiniteSet {
-                        inner: Box::new(parse_type(inside)),
+                        inner: argument(inside),
                     }),
                     "NonEmptySet" => Type::Primitive(P::NonEmptySet {
-                        inner: Box::new(parse_type(inside)),
+                        inner: argument(inside),
                     }),
                     "Option" => Type::Primitive(P::Option {
-                        inner: Box::new(parse_type(inside)),
+                        inner: argument(inside),
                     }),
                     _ => Type::Applied {
                         ctor: head.into(),
-                        args: inside.split(',').map(parse_type).collect(),
+                        args: inside
+                            .split(',')
+                            .map(|text| type_at(text, level + 1))
+                            .collect(),
                     },
                 };
             }
             Type::Sort(Sort::Nominal(text.into()))
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `Int` under `n` levels of `ctor<...>`.
+    fn nested(ctor: &str, n: usize) -> String {
+        format!("{}Int{}", format!("{ctor}<").repeat(n), ">".repeat(n))
+    }
+
+    fn levels(ty: &Type) -> usize {
+        let mut levels = 0;
+        let mut ty = ty;
+        loop {
+            ty = match ty {
+                Type::Primitive(P::Option { inner } | P::FiniteSet { inner }) => inner,
+                Type::Applied { args, .. } if args.len() == 1 => &args[0],
+                _ => return levels,
+            };
+            levels += 1;
+        }
+    }
+
+    #[test]
+    fn the_type_of_a_case_input_is_read_128_levels_deep_and_no_deeper() {
+        // The text is the type arguments of a call, which the parser reads
+        // no deeper than 128 levels. The reader here has the same limit of
+        // its own, and stops at it.
+        for ctor in ["Option", "FiniteSet", "Box"] {
+            for depth in [1, 127, 128] {
+                assert_eq!(levels(&parse_type(&nested(ctor, depth))), depth, "{ctor}");
+            }
+            for depth in [129, 5_000] {
+                assert_eq!(levels(&parse_type(&nested(ctor, depth))), 128, "{ctor}");
+            }
         }
     }
 }
