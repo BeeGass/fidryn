@@ -363,6 +363,8 @@ Encodings (`‖` is concatenation, `F(t, v)` a frame with tag `t`):
 | editorial layer | BLAKE3 of `F(0x00, "fidryn.layer.editorial/v1") ‖ credit as text or absent text`, then the editorial notes as in the enacted layer, then for each footnote in ordinal order `F(0x74, UTF-8 of shown) ‖ blocks`, then for each `Mark` run of the module in document order `F(0x75, UTF-8 of the address of the provision or note it stands in) ‖ F(0x76, UTF-8 of shown) ‖ F(0x77, footnote as four bytes little-endian)` |
 | operative layer | of a unit, the tree hash of its root; of a container, its container hash |
 
+The document order of the `Mark` runs of a module is: the root provision's tree depth first, taking for each provision its number, its heading and then its items in order; then the credit; then each note in the order of the module's list, its heading before its blocks; then each footnote in ordinal order. A container has its number, its heading, its notes and its footnotes. A marker in a provision or a note is recorded with that provision's or note's address, one in quoted content with the address of the note that holds the quotation, and one in a credit or a footnote with the module's address.
+
 Consequences the tests pin: a change to any word, number, heading, status, link target, superscript, table cell or span of a provision changes its tree hash and the tree hash of every ancestor and of nothing else (goal 3); a footnote, a marker, and the provision a marker stands in change only the editorial layer (where exactly in that provision a marker stands is in no hash); the order of notes in the file does not change a layer hash; moving a note to a new address changes the layer hash and not the note's hash.
 
 ### S6. Edition-2 syntax
@@ -624,6 +626,7 @@ A workspace is a directory with a file `workspace.json` at its top.
 ```
 
 - `kind` is `generated` or `curated`. Every module of a workspace has an address below `prefix` and stands at the path S2 gives for it.
+- `release` is the release of a generated workspace. A curated workspace has none, and its manifest has no such key.
 - A **generated** workspace has a lock, `law.lock.json`, written by an ingester. Every `.fr` file in it is listed in the lock with the BLAKE3 of its bytes, and every listed file is present. It has no dependencies in Stage 1.
 - A **curated** workspace has no lock. Each of its dependencies names a generated workspace:
 
@@ -672,7 +675,7 @@ The lock:
 }
 ```
 
-The ingester recomputes the size and both digests of every archive and refuses one that differs from its record, an archive with no record, and a directory with no `retrieval.json`. All three JSON files are written with keys in the order shown, two spaces of indentation, `modules` sorted by path, and a final line end.
+The ingester recomputes the size and both digests of every archive and refuses one that differs from its record, an archive with no record, and a directory with no `retrieval.json`. All three JSON files are written with keys in the order shown, two spaces of indentation, `modules` sorted by path, and a final line end. The examples show the keys and their order, not the line breaks: a file has one member to a line, every object and array that is not empty is spread over lines, and an empty one is written `[]` or `{}`.
 
 ### S12. What the checker checks
 
@@ -926,8 +929,8 @@ Everything that more than one lane would otherwise edit is done here, once.
 - Modify: `docs/ARCHITECTURE.md` (the crate list and its direction rule, the code list)
 
 **Interfaces:**
-- Produces: workspace members `fidryn-provision` (depends on `blake3`, `serde`, `serde_json`, `unicode-normalization`; on no other crate of the workspace) and `fidryn-ingest-uscode` (depends on `fidryn-provision`, `zip`, `roxmltree`, `blake3`, `serde`, `serde_json`, `thiserror`). Both inherit version, edition, license and authors from the workspace.
-- Produces: workspace dependencies `unicode-normalization`, `zip` (`default-features = false`, feature `deflate` only) and `roxmltree`, each written with its full version number as the others are; Python dependencies `defusedxml` and `blake3`, and `types-defusedxml` in the `dev` group.
+- Produces: workspace members `fidryn-provision` (depends on `blake3`, `serde`, `serde_json`, `unicode-normalization`; on no other crate of the workspace) and `fidryn-ingest-uscode` (depends on `fidryn-provision`, `zip`, `flate2`, `roxmltree`, `blake3`, `sha2`, `serde`, `serde_json`, `thiserror`). Both inherit version, edition, license and authors from the workspace.
+- Produces: workspace dependencies `unicode-normalization`, `roxmltree`, and `zip` with `default-features = false` and the one feature that reads and writes deflated archives through `flate2`, whose pure-Rust backend a workspace entry for `flate2` selects, each written with its full version number as the others are; `sha2`, which `xtask` already used and which the ingester needs for the SHA-256 of an archive (S11), becomes a workspace dependency; Python dependencies `defusedxml` and `blake3`, and `types-defusedxml` in the `dev` group.
 - Produces: `DiagnosticCode::{E700, E710, E720, E730, E740, W750, W760}` with the titles `InvalidAddress`, `IntegrityMismatch`, `UnresolvedModule`, `WorkspaceViolation`, `PinMismatch`, `StaleBinding`, `ToolchainMismatch`; the two `W` codes have `Severity::Warning`.
 - Produces: `.gitattributes` line `*.zip binary`.
 
@@ -956,7 +959,7 @@ This lane is Python only and touches nothing outside `conformance/`.
 **Interfaces:**
 - Produces: `uv run --locked python conformance/usc_profile.py ARCHIVE_DIR_OR_XML [--out FILE]`, which prints the profile of S16 as JSON with sorted keys. Both scripts read every archive of a directory whether or not it holds a retrieval record, and refuse a member name that two archives share.
 - Produces: `uv run --locked python conformance/uslm_text.py ARCHIVE_DIR_OR_XML`, which prints one text record of S15 to a line for every provision and every note, in the byte order of their addresses, reading the XML by the rules of S7 and S8 and normalizing by S3. It shares no code with the Rust ingester and is written from this plan alone.
-- Produces: the fixtures. Each is one invented document in the publisher's XML, in the invented title 99, whose first line is a comment that says it is invented. Together they hold one case of every rule of S7 and S8; the list is in the Tests below. The expected records and profile of each fixture are written by hand from S7, S8 and S16, not by running the scripts, and Tasks 8 and 9 hold the ingester to the same files. One value cannot be written by hand: the hash that names a note with neither a law nor a heading (S8). The test computes it from the frames of S5 written out in the test, byte by byte, and not by the script's own function; Task 9 computes the same value in Rust.
+- Produces: the fixtures. Each is one invented document in the publisher's XML, in the invented title 99 and the invented release `999-1`, whose first line is a comment that says it is invented. Together they hold one case of every rule of S7 and S8; the list is in the Tests below. The expected records and profile of each fixture are written by hand from S7, S8 and S16, not by running the scripts, and Tasks 8 and 9 hold the ingester to the same files. One value cannot be written by hand: the hash that names a note with neither a law nor a heading (S8). The test computes it from the frames of S5 written out in the test, byte by byte, and not by the script's own function; Task 9 computes the same value in Rust.
 - Produces: `conformance/usc-counting-rules.md`: the rules of S16, and the profile of release 119-142 as measured by this script, with the command that produced it.
 - Both scripts read archives with `zipfile` and XML with `defusedxml`, refuse what S7 says the ingester refuses, pass `mypy --strict` and `ruff`, and never write beside their input.
 
