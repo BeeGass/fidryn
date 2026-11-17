@@ -86,6 +86,12 @@ pub struct WorkspaceReport {
     /// rest of the report does not depend on it, and neither the summary
     /// line nor the check report holds it.
     pub cache_failure: Option<String>,
+    /// Why the cache of `CheckOptions::cache_dir` was not used at all: its
+    /// directory lies inside the directory of a dependency, where nothing is
+    /// written. The check then reads and writes no entry, and the rest of
+    /// the report is that of a check without a cache; neither the summary
+    /// line nor the check report holds this.
+    pub cache_unused: Option<String>,
 }
 
 impl WorkspaceReport {
@@ -155,6 +161,10 @@ impl WorkspaceReport {
 /// them. With a cache, `options.cache_dir`, the result of phase one of a
 /// file whose bytes were checked before is read from it, and the report is
 /// the same as without one, but for the count of the modules read from it.
+/// A cache whose directory lies inside the directory of a dependency the
+/// manifest names is not used at all, since nothing is written inside a
+/// dependency: the report is that of a check without a cache, and says why
+/// in [`WorkspaceReport::cache_unused`].
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
@@ -168,6 +178,7 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
             citations: no_citations(),
             unresolved_citations: Vec::new(),
             cache_failure: None,
+            cache_unused: None,
         };
     };
     let lock = read_lock(root, &manifest, &mut diagnostics);
@@ -175,10 +186,15 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
 
     // Phase one: each module file of the workspace and of its dependencies
     // by itself, or its result from the cache; then the entries of the
-    // files the cache did not hold.
+    // files the cache did not hold. A cache inside a dependency is not used.
+    let cache_unused = options
+        .cache_dir
+        .as_deref()
+        .and_then(|dir| deps::cache_inside(root, &manifest, dir));
     let cache = options
         .cache_dir
         .as_deref()
+        .filter(|_| cache_unused.is_none())
         .map(|dir| Cache::new(dir, &options.toolchain, &options.executable));
     let files = read_files(root, jobs, cache.as_ref());
     let opened = deps::open(root, &manifest, jobs, cache.as_ref());
@@ -216,6 +232,7 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
         citations: phase_two.citations,
         unresolved_citations: phase_two.unresolved_citations,
         cache_failure: cache.and_then(Cache::failure),
+        cache_unused,
     }
 }
 

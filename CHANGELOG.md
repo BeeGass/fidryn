@@ -99,12 +99,14 @@ interchange schema versions are maintained independently of the interpreter.
   with an error of its own is `E740`, and an absolute path, a name listed
   twice and a prefix that overlaps another are `E730`. Each dependency is
   checked by itself through the cache of the depending workspace, and
-  nothing is written into its directory. The target of every citation gets
-  an outcome from the modules of the workspace and of its dependencies:
-  the check report gains `citations`, the count of each outcome, and the
-  unresolved list a line for each citation that is not `exact`.
-  `check_interfaces` takes the prefix and the interfaces of each
-  dependency (`fidryn_driver::workspace::DependencyInterfaces`).
+  nothing is written into its directory: a cache whose directory lies
+  inside a dependency is not used, and the check says so once. The target
+  of every citation gets an outcome from the modules of the workspace and
+  of its dependencies: the check report gains `citations`, the count of
+  each outcome, and the unresolved list a line for each citation that is
+  not `exact`; what a dependency that failed hides is left out of both.
+  `check_interfaces` takes what is known of each dependency
+  (`fidryn_driver::workspace::DependencyInterfaces`).
 
 ## [0.2.0] - 2026-11-16
 

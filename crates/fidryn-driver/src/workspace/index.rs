@@ -41,16 +41,22 @@ pub struct UnresolvedCitation {
 
 /// A workspace that the checked one depends on, as phase two knows it.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DependencyInterfaces {
-    pub prefix: Address,
-    /// The interfaces of its modules; `None` when the dependency failed its
-    /// checks. Then nothing is known below its prefix but what lies below
-    /// the prefix of the workspace or of a dependency that did not fail: a
-    /// citation or a reference whose target lies elsewhere below it is left
-    /// out of the counts and of the unresolved lists, and an import of a
-    /// module there is not reported, since the diagnostic of the dependency
-    /// says what is wrong.
-    pub interfaces: Option<Vec<Interface>>,
+pub enum DependencyInterfaces {
+    /// A dependency that passed its checks: its prefix, and the interfaces
+    /// of its modules.
+    Loaded {
+        prefix: Address,
+        interfaces: Vec<Interface>,
+    },
+    /// A dependency that failed its checks, with its prefix when the check
+    /// learned it. Then nothing is known below that prefix but what lies
+    /// below the prefix of the workspace or of a loaded dependency; and when
+    /// the prefix is not known, nothing is known below no such prefix. A
+    /// citation or a reference whose target lies where nothing is known is
+    /// left out of the counts and of the unresolved lists, and an import of
+    /// a module there is not reported, since the diagnostic of the
+    /// dependency says what is wrong.
+    Failed { prefix: Option<Address> },
 }
 
 /// What phase two gives.
@@ -121,11 +127,13 @@ pub(crate) fn no_citations() -> BTreeMap<String, u64> {
 ///   `interfaces` and of the dependencies, below the manifest's prefix and
 ///   theirs.
 ///
-/// What lies below the prefix of a dependency that failed, and below no
-/// prefix of the workspace or of a dependency that did not, is not known: a
-/// reference or a citation whose target lies there is left out of the
-/// counts and of the unresolved lists, and an import of a module there that
-/// is not found is not reported.
+/// What is not known is what lies below no prefix of the workspace or of a
+/// loaded dependency and, when every dependency that failed has a known
+/// prefix, below the prefix of one of them: a reference or a citation whose
+/// target is an address that lies there is left out of the counts and of
+/// the unresolved lists, and an import of a module there that is not found
+/// is not reported. A target that is no address is `malformed` wherever it
+/// would lie.
 ///
 /// Each module is taken to stand at the path of its address, which names
 /// its file in a diagnostic. The result is the same for any order of
@@ -165,22 +173,26 @@ pub(crate) fn across(
     unread: &BTreeSet<String>,
     jobs: usize,
 ) -> PhaseTwo {
-    let loaded: Vec<&Interface> = dependencies
-        .iter()
-        .filter_map(|dependency| dependency.interfaces.as_deref())
-        .flatten()
-        .collect();
+    let mut loaded: Vec<&Interface> = Vec::new();
     let mut known = vec![manifest.prefix.clone()];
     let mut failed = Vec::new();
+    let mut unplaced = false;
     for dependency in dependencies {
-        match dependency.interfaces {
-            Some(_) => known.push(dependency.prefix.clone()),
-            None => failed.push(&dependency.prefix),
+        match dependency {
+            DependencyInterfaces::Loaded { prefix, interfaces } => {
+                loaded.extend(interfaces);
+                known.push(prefix.clone());
+            }
+            DependencyInterfaces::Failed {
+                prefix: Some(prefix),
+            } => failed.push(prefix),
+            DependencyInterfaces::Failed { prefix: None } => unplaced = true,
         }
     }
     let unknown = Unknown {
         known: &known,
         failed,
+        unplaced,
     };
     let index = AddressIndex::build(interfaces.iter().chain(loaded.iter().copied()), &known);
     let mut diagnostics = checks(
@@ -224,6 +236,7 @@ pub(crate) fn own_checks(
     let unknown = Unknown {
         known: &[],
         failed: Vec::new(),
+        unplaced: false,
     };
     checks(
         interfaces,
@@ -255,22 +268,26 @@ fn checks(
     diagnostics
 }
 
-/// Where nothing is known: below the prefix of a dependency that failed,
-/// and below no prefix of the workspace or of a dependency that did not.
+/// Where nothing is known: below no prefix of the workspace or of a loaded
+/// dependency, and either below the prefix of a dependency that failed or
+/// anywhere at all when a dependency failed whose prefix is not known.
 struct Unknown<'a> {
-    /// The prefixes of the workspace and of the dependencies that did not
-    /// fail.
+    /// The prefixes of the workspace and of the loaded dependencies.
     known: &'a [Address],
-    /// The prefixes of the dependencies that failed.
+    /// The prefixes of the dependencies that failed, where they are known.
     failed: Vec<&'a Address>,
+    /// Whether a dependency failed whose prefix is not known.
+    unplaced: bool,
 }
 
 impl Unknown<'_> {
     /// Whether `target` lies where nothing is known.
     fn holds(&self, target: &str) -> bool {
-        !self.failed.is_empty()
-            && self.failed.iter().any(|prefix| lies_below(target, prefix))
-            && !self.known.iter().any(|prefix| lies_below(target, prefix))
+        if self.failed.is_empty() && !self.unplaced {
+            return false;
+        }
+        !self.known.iter().any(|prefix| lies_below(target, prefix))
+            && (self.unplaced || self.failed.iter().any(|prefix| lies_below(target, prefix)))
     }
 }
 
@@ -597,13 +614,14 @@ impl Counted {
     }
 
     /// Counts the references and the citations of `interface`, but for
-    /// those whose target lies where nothing is known.
+    /// those whose target is an address that lies where nothing is known; a
+    /// target that is no address is `malformed` wherever it would lie.
     fn of(&mut self, interface: &Interface, index: &AddressIndex, unknown: &Unknown<'_>) {
         for reference in &interface.references {
-            if unknown.holds(&reference.target) {
+            let outcome = index.outcome(&reference.target);
+            if outcome != Outcome::Malformed && unknown.holds(&reference.target) {
                 continue;
             }
-            let outcome = index.outcome(&reference.target);
             let layer = LAYERS
                 .iter()
                 .position(|layer| *layer == reference.layer)
@@ -623,10 +641,10 @@ impl Counted {
         }
         for citation in &interface.citations {
             let target = &citation.item.target;
-            if unknown.holds(target.as_str()) {
+            let outcome = index.outcome(target.as_str());
+            if outcome != Outcome::Malformed && unknown.holds(target.as_str()) {
                 continue;
             }
-            let outcome = index.outcome(target.as_str());
             self.citations[place_of(&outcome)] += 1;
             if outcome != Outcome::Exact {
                 self.unresolved_citations.push(UnresolvedCitation {

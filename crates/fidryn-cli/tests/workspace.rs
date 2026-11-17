@@ -345,3 +345,55 @@ fn a_cache_that_cannot_be_written_is_said_once_and_the_check_goes_on() {
     );
     assert!(message.starts_with(&expected), "{message}");
 }
+
+#[test]
+fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
+    // An invented curated workspace that depends on a copy of the demo
+    // workspace, with its cache's directory inside that copy.
+    let scratch = Scratch::new("cache-in-dependency");
+    let demo = scratch.path().join("demo");
+    copy_tree(&demo_workspace(), &demo);
+    let lock = fs::read(demo.join("law.lock.json")).expect("read the lock");
+    let notes = scratch.path().join("notes");
+    fs::create_dir_all(notes.join("zz/notes")).expect("create a directory");
+    let manifest = format!(
+        "{{\n  \"schema\": \"fidryn.workspace/v0.1\",\n  \"name\": \"notes\",\n  \"kind\": \
+         \"curated\",\n  \"prefix\": \"/zz/notes\",\n  \"toolchain\": \"{}\",\n  \
+         \"dependencies\": [\n    {{\n      \"name\": \"demo\",\n      \"path\": \"../demo\",\n      \
+         \"release\": \"42-7\",\n      \"lock_digest\": \"{}\"\n    }}\n  ]\n}}\n",
+        env!("CARGO_PKG_VERSION"),
+        blake3::hash(&lock).to_hex()
+    );
+    fs::write(notes.join("workspace.json"), manifest).expect("write");
+    fs::write(
+        notes.join("zz/notes/a.fr"),
+        "edition 2\nmodule \"/zz/notes/a\" {\n  citation sizes -> \"/zz/demo/t1/s2\"\n}\n",
+    )
+    .expect("write");
+    let cache = demo.join(".fidryn-cache");
+    let before = entries_below(&demo);
+    for _ in 0..2 {
+        let checked = check_in(
+            &[
+                notes.as_os_str(),
+                OsStr::new("--cache-dir"),
+                cache.as_os_str(),
+            ],
+            None,
+        );
+        assert!(checked.status.success(), "{}", stderr(&checked));
+        assert_eq!(
+            stdout(&checked),
+            "modules: 1; from cache: 0; errors: 0; warnings: 0\nok\n"
+        );
+        let message = stderr(&checked);
+        assert_eq!(message.lines().count(), 1, "{message}");
+        let expected = format!(
+            "the cache could not be used, and the check went on without it: {}: the directory \
+             lies inside the directory of the dependency `demo`, `../demo`",
+            cache.display()
+        );
+        assert!(message.starts_with(&expected), "{message}");
+        assert_eq!(entries_below(&demo), before);
+    }
+}

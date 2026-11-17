@@ -523,9 +523,10 @@ fn executable_digest() -> Result<String, String> {
 /// `fidryn check DIR`: the check of the workspace in the directory `dir`, on
 /// `--jobs` threads, by default as many as are available, with the cache of
 /// [`cache_dir`], keyed also by the identity of the running executable. When
-/// that identity cannot be read, the check keeps no cache. Prints each
-/// diagnostic, naming its file under `dir`, then says once when the cache
-/// could not be used or written, which fails nothing; then prints the
+/// that identity cannot be read, or the cache's directory lies inside the
+/// directory of a dependency of the workspace, the check keeps no cache.
+/// Prints each diagnostic, naming its file under `dir`, then says once when
+/// the cache could not be used or written, which fails nothing; then prints the
 /// summary line; writes the check report to `--report` and the unresolved
 /// list to `--unresolved` when they are given; then prints `ok` when there
 /// is no error. Exit 1 on an error, and when a file cannot be written.
@@ -561,7 +562,7 @@ fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
             .map(|file| dir.join(file).display().to_string());
         eprintln!("{shown}");
     }
-    if let Some(error) = &unused {
+    if let Some(error) = unused.as_ref().or(report.cache_unused.as_ref()) {
         eprintln!("the cache could not be used, and the check went on without it: {error}");
     }
     if let Some(failure) = &report.cache_failure {

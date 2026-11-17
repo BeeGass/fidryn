@@ -842,7 +842,8 @@ checked again. The module files of a dependency are counted in neither.
 The check of a workspace runs in two phases.
 
 1. **Phase one**, for each module file by itself, of the workspace and of
-   each of its [dependencies](#depending-on-another-workspace): the BLAKE3
+   each of its [dependencies](#depending-on-another-workspace) that passes
+   the checks of its entry, its manifest and its lock: the BLAKE3
    of its bytes, its edition, the grammar, lowering, the checks of
    [one module](#what-the-checker-verifies-in-one-module), and the
    module's [interface](#interfaces). What it gives of a file depends on
@@ -858,9 +859,10 @@ The check of a workspace runs in two phases.
    and the [outcome](#references) of every reference and of every
    citation. Phase two reads no module again.
    `fidryn_driver::workspace::check_interfaces` is that last part as a
-   function of the interfaces of the workspace, the prefix and the
-   interfaces of each of its dependencies, the manifest and the
-   toolchain's version.
+   function of the interfaces of the workspace, what is known of each of
+   its dependencies (the prefix and the interfaces of one that passed its
+   checks, the prefix, when it is known, of one that failed), the manifest
+   and the toolchain's version.
 
 Phase one runs on `--jobs` worker threads, by default as many as the
 system reports as available, each module file being read and checked on
@@ -1100,8 +1102,12 @@ by outcome, and those of outcome `outside` by body; the unresolved list
 names each one whose outcome is not `exact`. The target of every citation
 of a curated module gets its outcome by the same rules; the report counts
 the citations by outcome, and the unresolved list names each one whose
-outcome is not `exact`. A reference or a citation whose target lies below
-the prefix of a dependency that failed its checks is left out of both, as
+outcome is not `exact`. A reference or a citation whose target is an
+address that lies below the prefix of a dependency that failed its checks,
+and below no prefix of the workspace or of a dependency that passed them,
+is left out of both; when a dependency failed whose prefix the check did
+not learn, so is every one whose target is an address below no prefix of
+the workspace or of a dependency that passed, as
 [Depending on another workspace](#depending-on-another-workspace)
 describes.
 `fidryn_provision::AddressIndex` gives the outcome of a target, and also
@@ -1140,7 +1146,8 @@ of the executable is the BLAKE3 of the file of the running `fidryn`, as 64
 hexadecimal digits: two builds of one version can differ in what phase one
 does, and an entry that another build wrote is never read. When that
 identity cannot be read, the check keeps no cache, and `fidryn check` says
-so once on stderr. A file larger than the largest source of edition 2 is
+so once on stderr; so it does when the cache's directory lies inside the
+directory of a dependency. A file larger than the largest source of edition 2 is
 not kept; the check refuses it in any case.
 
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
@@ -1154,7 +1161,10 @@ workspace leaves it alone; the check writes nothing else into the
 workspace. The module files of the dependencies of a curated workspace are
 read through the same cache, so their entries go into the cache's
 directory of the workspace that is checked, and nothing is written into a
-dependency's directory.
+dependency's directory: when the cache's directory lies inside the
+directory of a dependency the manifest names, the check keeps no cache, as
+[Depending on another workspace](#depending-on-another-workspace)
+describes.
 
 An entry is one line of compact JSON with these keys, in this order:
 `schema`, which is `fidryn.cache/v1`; `key`; `digest`, the BLAKE3 of the
@@ -1365,20 +1375,36 @@ names a module of the dependency, `widget` is `exact`, and `part` is
 ```
 
 A dependency that fails a check gives phase two no interface, only its
-prefix when its manifest could be read. What lies below that prefix, and
-below no prefix of the workspace or of a dependency that passed, is then
-not known: a reference or a citation whose target lies there is left out
-of the counts of the check report and of the unresolved list, and an
-import of a module there is not reported, since the one diagnostic of the
-dependency is the report. The check exits 1. Of a dependency whose
-manifest could not be read nothing is known, not even its prefix, and a
-target that would lie below it is `outside`.
+prefix when the check read the manifest of its directory; the manifest of
+an entry refused for its `path` or its `name` is not read. What lies below
+the prefix of a dependency that failed, and below no prefix of the
+workspace or of a dependency that passed, is then not known; and when a
+dependency failed whose prefix is not known (no directory, no manifest, a
+manifest that cannot be read, or an entry refused for its `path` or its
+`name`), nothing is known below no prefix of the workspace or of a
+dependency that passed, since the prefix could be any of it. A reference
+or a citation whose target is an address that lies where nothing is known
+is left out of the counts of the check report and of the unresolved list,
+and an import of a module there is not reported, since the one diagnostic
+of the dependency is the report; a target that is no address is
+`malformed` all the same. The check exits 1.
 
 The check writes nothing inside the directory of a dependency, with any
 cache or with none: the entries of the module files of a dependency go
 into the cache of the workspace that is checked, by default
 `.fidryn-cache` inside it, under the keys of their bytes as every entry is,
-so that the next check reads them from there.
+so that the next check reads them from there. When the cache's directory
+lies inside the directory of a dependency that the manifest names,
+whatever the checks of the entry find, as the dependency's own
+`.fidryn-cache` does, or the default one of a workspace that stands in a
+directory of its dependency, the check keeps no cache at all: it reads
+and writes no entry, says so once on stderr, as
+`the cache could not be used, and the check went on without it: DIR: ...`
+with the cache's directory and the dependency it lies in, and goes on. Its
+diagnostics, its report and its exit status are then those of a check with
+`--no-cache`. The paths are compared with every link and every `..`
+resolved, and of a directory that does not exist yet, the part that
+exists is resolved and the rest taken as written.
 
 The summary line and the check report are about the workspace that is
 checked. `modules` and `from cache` count its own module files, and the

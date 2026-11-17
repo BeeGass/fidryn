@@ -18,8 +18,10 @@
 //!
 //! Every diagnostic about a dependency names the manifest of the depending
 //! workspace, and none has a span. A dependency that fails gives phase two
-//! no interface, only its prefix when its manifest could be read. Nothing is
-//! written inside a dependency's directory.
+//! no interface, only its prefix when the manifest of its directory was
+//! read; the manifest of an entry refused for its path or its name is not
+//! read. Nothing is written inside a dependency's directory: a check whose
+//! cache's directory lies inside one keeps no cache ([`cache_inside`]).
 
 use super::cache::Cache;
 use super::check::{Cached, Files, PhaseOne, lock_disagrees, read_files, settle as settle_files};
@@ -31,7 +33,7 @@ use fidryn_provision::{Address, Hash32};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io;
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 
 /// A dependency that passed the checks of its entry, its manifest and its
 /// lock, with its files read.
@@ -45,16 +47,15 @@ struct Opened {
 /// What [`open`] gave of one entry of the manifest.
 enum Opening {
     Opened(Box<Opened>),
-    /// The entry failed after the manifest of its directory was read; this
-    /// is the manifest's prefix.
-    Failed(Address),
+    /// The entry failed; this is the prefix of the manifest of its
+    /// directory when that was read, and `None` when it was not.
+    Failed(Option<Address>),
 }
 
 /// The dependencies of a workspace, opened, and the diagnostics about them
 /// so far.
 pub(super) struct Dependencies {
-    /// In the order of the manifest's entries; an entry that failed before
-    /// the manifest of its directory was read is not here.
+    /// One for each entry of the manifest, in their order.
     entries: Vec<Opening>,
     diagnostics: Vec<Diagnostic>,
 }
@@ -101,6 +102,11 @@ pub(super) fn open(
     // with whose it is.
     let mut prefixes = vec![(manifest.prefix.clone(), "this workspace".to_owned())];
     for entry in &manifest.dependencies {
+        // An entry refused for its path still has its name.
+        let first = names.get(entry.name.as_str()).copied();
+        if first.is_none() {
+            names.insert(&entry.name, &entry.path);
+        }
         if is_absolute(&entry.path) {
             diagnostics.push(about(
                 DiagnosticCode::E730,
@@ -110,9 +116,10 @@ pub(super) fn open(
                     entry.name, entry.path
                 ),
             ));
+            entries.push(Opening::Failed(None));
             continue;
         }
-        if let Some(first) = names.get(entry.name.as_str()) {
+        if let Some(first) = first {
             diagnostics.push(about(
                 DiagnosticCode::E730,
                 format!(
@@ -121,15 +128,15 @@ pub(super) fn open(
                     entry.name, entry.path
                 ),
             ));
+            entries.push(Opening::Failed(None));
             continue;
         }
-        names.insert(&entry.name, &entry.path);
         let dir = root.join(&entry.path);
         let (found, lock, digest) = match generated(&dir, entry) {
             Ok(found) => found,
             Err((message, prefix)) => {
                 diagnostics.push(about(DiagnosticCode::E740, message));
-                entries.extend(prefix.map(Opening::Failed));
+                entries.push(Opening::Failed(prefix));
                 continue;
             }
         };
@@ -143,7 +150,7 @@ pub(super) fn open(
                     entry.name, entry.path, entry.release, entry.lock_digest, lock.release
                 ),
             ));
-            entries.push(Opening::Failed(found.prefix));
+            entries.push(Opening::Failed(Some(found.prefix)));
             continue;
         }
         if let Some(relation) = overlap(&found.prefix, &prefixes) {
@@ -155,7 +162,7 @@ pub(super) fn open(
                     entry.name, found.prefix
                 ),
             ));
-            entries.push(Opening::Failed(found.prefix));
+            entries.push(Opening::Failed(Some(found.prefix)));
             continue;
         }
         prefixes.push((
@@ -293,10 +300,7 @@ pub(super) fn settle(
     for entry in dependencies.entries {
         let opened = match entry {
             Opening::Failed(prefix) => {
-                out.push(DependencyInterfaces {
-                    prefix,
-                    interfaces: None,
-                });
+                out.push(DependencyInterfaces::Failed { prefix });
                 continue;
             }
             Opening::Opened(opened) => *opened,
@@ -315,9 +319,9 @@ pub(super) fn settle(
             .filter(|diagnostic| diagnostic.code.severity() == Severity::Error)
             .count();
         if errors == 0 {
-            out.push(DependencyInterfaces {
+            out.push(DependencyInterfaces::Loaded {
                 prefix: manifest.prefix,
-                interfaces: Some(interfaces),
+                interfaces,
             });
             continue;
         }
@@ -334,10 +338,56 @@ pub(super) fn settle(
                 entry.name, entry.path
             ),
         ));
-        out.push(DependencyInterfaces {
-            prefix: manifest.prefix,
-            interfaces: None,
+        out.push(DependencyInterfaces::Failed {
+            prefix: Some(manifest.prefix),
         });
     }
     out
+}
+
+/// Why the cache's directory `cache` must not be used in the check of the
+/// workspace at `root`, whose manifest is `manifest`: it lies inside the
+/// directory of one of the dependencies the manifest names, where nothing
+/// is written. `None` when it lies inside none. The paths are compared with
+/// every link and `..` resolved, as far as each exists ([`resolved`]); the
+/// directory of every entry is compared, whatever its checks find.
+pub(super) fn cache_inside(root: &Path, manifest: &Manifest, cache: &Path) -> Option<String> {
+    let (existing, at) = resolved(cache)?;
+    manifest.dependencies.iter().find_map(|entry| {
+        let (_, dir) = resolved(&root.join(&entry.path))?;
+        (at.starts_with(&dir) || existing.starts_with(&dir)).then(|| {
+            format!(
+                "{}: the directory lies inside the directory of the dependency `{}`, `{}`, and \
+                 nothing is written inside a dependency",
+                cache.display(),
+                entry.name,
+                entry.path
+            )
+        })
+    })
+}
+
+/// The longest part of `path` that exists, made canonical, and `path` with
+/// that part so resolved and the rest of it taken as written, a `..` there
+/// removing the segment before it; `None` when no part of it exists, which
+/// cannot be of an absolute path. A directory made at `path` is made below
+/// the first, so that both say where a write would be.
+fn resolved(path: &Path) -> Option<(PathBuf, PathBuf)> {
+    let absolute = std::path::absolute(path).ok()?;
+    let (existing, rest) = absolute.ancestors().find_map(|part| {
+        let existing = fs::canonicalize(part).ok()?;
+        let rest = absolute.strip_prefix(part).ok()?;
+        Some((existing, rest))
+    })?;
+    let mut at = existing.clone();
+    for component in rest.components() {
+        match component {
+            Component::ParentDir => {
+                at.pop();
+            }
+            Component::Normal(name) => at.push(name),
+            Component::CurDir | Component::RootDir | Component::Prefix(_) => {}
+        }
+    }
+    Some((existing, at))
 }

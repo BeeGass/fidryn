@@ -3215,8 +3215,10 @@ fn a_missing_directory_and_a_dependency_without_a_lock_are_E740() {
         "{\n  \"schema\": \"fidryn.law-lock/v0.1\"\n}\n",
     );
     // Each directory, what the message says of it, and whether its prefix
-    // is known: a citation below the prefix of a dependency that failed is
-    // left out, and one below no known prefix is `outside`.
+    // is known. A citation below the prefix of a dependency that failed is
+    // left out; when that prefix is not known, so is every citation below no
+    // known prefix. A citation of the workspace's own module is counted, and
+    // the import into the dependency is reported in neither case.
     let cases = [
         ("nothing", "and there is no directory there", false),
         ("a-file", "and there is no directory there", false),
@@ -3238,7 +3240,15 @@ fn a_missing_directory_and_a_dependency_without_a_lock_are_E740() {
         ),
         ("bad-lock", "whose `law.lock.json` is no lock", true),
     ];
-    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/demo/t1/s99\" as gone",
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+            "citation other -> \"/zz/other/x\"",
+            "citation mine -> \"/zz/notes/a\"",
+        ],
+    );
     for (dir, words, known) in cases {
         let notes = scratch.join(&format!("notes-{dir}"));
         let path = format!("../{dir}");
@@ -3258,9 +3268,9 @@ fn a_missing_directory_and_a_dependency_without_a_lock_are_E740() {
         );
         let counts = citation_counts(&report.citations);
         if known {
-            assert_eq!(counts, [], "{dir}");
+            assert_eq!(counts, [("exact", 1), ("outside", 1)], "{dir}");
         } else {
-            assert_eq!(counts, [("outside", 1)], "{dir}");
+            assert_eq!(counts, [("exact", 1)], "{dir}");
         }
     }
 }
@@ -3401,6 +3411,71 @@ fn two_dependencies_of_one_name_are_E730() {
     );
     // The first is looked up as before.
     assert_eq!(citation_counts(&report.citations), [("exact", 1)]);
+
+    // An entry refused for its absolute path still has its name, and a
+    // later entry of that name is listed twice.
+    let absolute = scratch.join("copy").display().to_string();
+    depending(
+        &notes,
+        vec![
+            dependency("demo", &absolute, "42-7", copy),
+            dependency("demo", "../demo", "42-7", digest),
+        ],
+        &[("a", &a)],
+    );
+    let report = check(&notes);
+    match report.diagnostics.as_slice() {
+        [first, second] => {
+            assert_eq!(
+                (first.code, second.code),
+                (DiagnosticCode::E730, DiagnosticCode::E730),
+                "{report:#?}"
+            );
+            let messages = [first.message.as_str(), second.message.as_str()];
+            assert!(
+                messages
+                    .iter()
+                    .any(|message| message.contains("which is absolute")),
+                "{messages:#?}"
+            );
+            assert!(
+                messages.iter().any(|message| message.contains(&format!(
+                    "the dependency `demo` is listed twice, at `{absolute}` and at `../demo`"
+                ))),
+                "{messages:#?}"
+            );
+        }
+        other => panic!("expected two diagnostics, found {other:#?}"),
+    }
+}
+
+#[test]
+fn a_target_that_is_no_address_is_malformed_beside_a_failed_dependency() {
+    // A unit of the workspace links to a target that is no address and
+    // begins with the prefix of the dependency, and to one that begins
+    // with no prefix; both are `malformed` whether or not the prefix of the
+    // dependency that failed is known.
+    let scratch = Scratch::new("deps-malformed");
+    let digest = write_release(&scratch.join("demo"), "42-7", &dependency_models());
+    let mut s1 = unit("/zz/notes/s1", None, "1", "Notes", "Invented notes.");
+    s1.root.items.push(Item::Part {
+        role: PartRole::Content,
+        blocks: vec![linking(&["/zz/demo/t1/s1/a ", "not an address"])],
+    });
+    let s1_text = render(&Module::Unit(s1));
+    let entries = [
+        dependency("demo", "../demo", "r9", digest),
+        dependency("demo", "../nothing", "42-7", digest),
+    ];
+    for (n, entry) in entries.into_iter().enumerate() {
+        let notes = scratch.join(&format!("notes-{n}"));
+        depending(&notes, vec![entry], &[("s1", &s1_text)]);
+        let report = check(&notes);
+        assert_eq!(report.errors(), 1, "{report:#?}");
+        let operative = &report.references[&Layer::Operative];
+        assert_eq!(operative["malformed"], 2, "{report:#?}");
+        assert_eq!(operative.values().sum::<u64>(), 2, "{report:#?}");
+    }
 }
 
 #[test]
@@ -3458,20 +3533,29 @@ fn a_dependency_with_an_error_is_reported_once() {
     assert_eq!(report.unresolved_lines(), "");
 
     // Phase two leaves out what lies below the prefix of a dependency that
-    // failed, and reports no import into it.
-    let failed = DependencyInterfaces {
-        prefix: address("/zz/demo"),
-        interfaces: None,
-    };
-    let phase_two = check_interfaces(
-        &[interface_of_text(&a)],
-        &[failed],
-        &notes_manifest(),
-        TOOLCHAIN,
+    // failed, and reports no import into it; when that prefix is not known,
+    // it leaves out what lies below no known prefix.
+    let b = note_module(
+        "b",
+        &[
+            "citation mine -> \"/zz/notes/b\"",
+            "citation other -> \"/zz/other/x\"",
+        ],
     );
-    assert_eq!(phase_two.diagnostics, []);
-    assert_eq!(citation_counts(&phase_two.citations), []);
-    assert_eq!(phase_two.unresolved_citations, []);
+    let interfaces = [interface_of_text(&a), interface_of_text(&b)];
+    let failures = [
+        (
+            Some(address("/zz/demo")),
+            vec![("exact", 1), ("outside", 1)],
+        ),
+        (None, vec![("exact", 1)]),
+    ];
+    for (prefix, counts) in failures {
+        let failed = DependencyInterfaces::Failed { prefix };
+        let phase_two = check_interfaces(&interfaces, &[failed], &notes_manifest(), TOOLCHAIN);
+        assert_eq!(phase_two.diagnostics, []);
+        assert_eq!(citation_counts(&phase_two.citations), counts);
+    }
 }
 
 #[test]
@@ -3593,9 +3677,9 @@ fn references_into_a_dependency_get_outcomes() {
         .map(interface_in_memory)
         .collect();
     let more: Vec<Interface> = more_models.iter().map(interface_in_memory).collect();
-    let given = |interfaces: &[Interface], prefix: &str| DependencyInterfaces {
+    let given = |interfaces: &[Interface], prefix: &str| DependencyInterfaces::Loaded {
         prefix: address(prefix),
-        interfaces: Some(interfaces.to_vec()),
+        interfaces: interfaces.to_vec(),
     };
     let reversed = |interfaces: &[Interface]| interfaces.iter().rev().cloned().collect::<Vec<_>>();
     let manifest = Manifest {
@@ -3658,4 +3742,114 @@ fn checking_writes_nothing_into_the_dependency() {
         let (_, key) = digest_and_key(&keys, &demo, rel);
         assert!(keys.entry_path(&key).is_file(), "{rel}");
     }
+}
+
+/// `report` as a check without a cache gives it, which says nothing of a
+/// cache it did not use.
+fn without_cache_note(report: &WorkspaceReport) -> WorkspaceReport {
+    WorkspaceReport {
+        cache_unused: None,
+        ..report.clone()
+    }
+}
+
+#[test]
+fn a_cache_inside_a_dependency_is_not_used() {
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    let scratch = with_dependency("deps-cache-inside", &[("a", &a)]);
+    let demo = scratch.join("demo");
+    let notes = scratch.join("notes");
+    put(&demo, ".fidryn-cache/README", "An invented file.\n");
+    let uncached = check_workspace(&notes, &with_jobs(2));
+    assert_eq!(uncached.diagnostics, []);
+    assert_eq!(uncached.cache_unused, None);
+    let mut caches = vec![
+        // The dependency's own cache, which a check of its directory keeps.
+        demo.join(".fidryn-cache"),
+        // A directory below one that does not exist yet.
+        demo.join("new/cache"),
+        // The dependency's directory itself, named through `..`.
+        notes.join("../demo"),
+        // A directory that does not exist, whose `..` leads into it.
+        scratch.join("new/../demo/cache"),
+    ];
+    #[cfg(unix)]
+    {
+        // A link beside the dependency that leads into it.
+        std::os::unix::fs::symlink(&demo, scratch.join("link")).expect("link");
+        caches.push(scratch.join("link/cache"));
+    }
+    let before = tree(&demo);
+    for cache in &caches {
+        for _ in 0..2 {
+            let report = check_workspace(&notes, &cached(cache, 2));
+            let why = report.cache_unused.as_deref().unwrap_or_default();
+            assert!(
+                why.starts_with(&format!(
+                    "{}: the directory lies inside the directory of the dependency `demo`, \
+                     `../demo`, and nothing is written inside a dependency",
+                    cache.display()
+                )),
+                "{}: {why:?}",
+                cache.display()
+            );
+            assert_eq!(without_cache_note(&report), uncached, "{}", cache.display());
+        }
+        assert_eq!(tree(&demo), before, "{}", cache.display());
+    }
+    assert!(!scratch.join("new").exists());
+}
+
+#[test]
+fn a_workspace_inside_its_dependency_keeps_no_cache() {
+    // The depending workspace stands in a directory of its dependency and
+    // names it as `..`, so that its default cache would be inside it.
+    let scratch = Scratch::new("deps-nested");
+    let demo = scratch.join("demo");
+    let digest = write_release(&demo, "42-7", &dependency_models());
+    let notes = demo.join("notes");
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    depending(
+        &notes,
+        vec![dependency("demo", "..", "42-7", digest)],
+        &[("a", &a)],
+    );
+    let before = tree(&demo);
+    let uncached = check_workspace(&notes, &with_jobs(2));
+    let report = check_workspace(&notes, &cached(&notes.join(".fidryn-cache"), 2));
+    assert_eq!(tree(&demo), before);
+    assert!(report.cache_unused.is_some(), "{report:#?}");
+    assert_eq!(without_cache_note(&report), uncached);
+    // The files of the depending workspace are files of the dependency, which
+    // fails its own check.
+    assert!(
+        uncached
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == DiagnosticCode::E740
+                && diagnostic.message.contains("of its own")),
+        "{uncached:#?}"
+    );
+}
+
+#[test]
+fn a_cache_beside_a_dependency_is_used() {
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    let scratch = with_dependency("deps-cache-beside", &[("a", &a)]);
+    let demo = scratch.join("demo");
+    let notes = scratch.join("notes");
+    // Beside the dependency, with a name that begins with the dependency's.
+    let cache = scratch.join("demo-cache");
+    let before = tree(&demo);
+    let first = check_workspace(&notes, &cached(&cache, 2));
+    let second = check_workspace(&notes, &cached(&cache, 2));
+    assert_eq!(
+        (first.cache_unused.as_ref(), second.cache_unused.as_ref()),
+        (None, None)
+    );
+    assert_eq!(first.diagnostics, []);
+    assert_eq!((second.modules, second.from_cache), (1, 1));
+    assert_eq!(uncounted(&second), first);
+    assert!(cache.join("v1").is_dir());
+    assert_eq!(tree(&demo), before);
 }
