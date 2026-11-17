@@ -12,6 +12,7 @@ pub mod layout;
 pub mod model;
 pub mod normalize;
 pub mod records;
+pub mod workspace;
 
 pub use address::{Address, AddressError};
 pub use hash::{Hash32, HashError, LayerHashes};
