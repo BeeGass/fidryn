@@ -637,7 +637,7 @@ A workspace is a directory with a file `workspace.json` at its top.
 
 - `toolchain` is the version of the toolchain the workspace was last checked with (design 4.3). A different running version is the warning `W760`.
 - Unknown fields are refused. Paths in a manifest use `/` and are relative to the manifest's directory.
-- A `.fr` file of the first edition anywhere in a workspace is an error (`E730`), so that nothing in the directory goes unchecked without a word. Directories whose name begins with a dot are not read.
+- A `.fr` file of the first edition anywhere in a workspace is an error (`E730`), so that nothing in the directory goes unchecked without a word. An entry whose name begins with a dot, whether a file, a directory or a symbolic link, is not the workspace's: a check does not read it and a writer leaves it alone. No symbolic link is followed, and one whose name does not begin with a dot is an error (`E730`).
 
 The lock:
 
@@ -726,7 +726,7 @@ New diagnostic codes: `E700 InvalidAddress`, `E710 IntegrityMismatch`, `E720 Unr
 | `fidryn coverage DIR` | prints the coverage ledger of a workspace as JSON |
 | `fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json]` | the change set between two generated workspaces of one prefix, and the bindings of the given curated workspaces that are stale against `NEW_DIR`. A binding is judged against `NEW_DIR` whatever release its workspace is pinned to: the command answers what would go stale if the pin moved there. |
 
-`ingest` refuses to write into a directory that holds anything other than a previous output of itself with the same prefix. It writes every file to a temporary name and renames it, removes modules that the new output does not have, and writes the lock last.
+`ingest` refuses to write into a directory that holds anything other than a previous output of itself with the same prefix. It writes the manifest first, so that a run that is interrupted leaves a directory the next run accepts; it writes every file to a temporary name and renames it, removes modules that the new output does not have, and writes the lock last.
 
 ### S15. Records: text, coverage, change sets
 
@@ -1346,7 +1346,7 @@ impl GeneratedWriter {
 }
 ```
 
-  `create` refuses a directory that holds anything but a generated workspace of the same prefix. `write` renders a unit or a container and writes it to its path through a temporary name, and fails when the run has already written a module to that path, so that no module silently replaces another. `finish` removes every `.fr` file the run did not write, then writes `workspace.json`, then `law.lock.json`.
+  `create` accepts a directory that does not exist or holds nothing but entries whose name begins with a dot, and a generated workspace of the same prefix; it refuses any other, changes nothing in a directory it refuses, and writes the manifest at once. `write` renders a unit or a container and writes it to its path through a temporary name, and fails when the run has already written a module to that path, so that no module silently replaces another. `finish` removes every `.fr` file the run did not write, then writes `law.lock.json`.
 - In this task the check is: discovery, the one-module check of every file, and the `E730`, `E720` (hierarchy) and `W760` checks of S12. References, imports and bindings come in Tasks 12 and 17 to 19.
 
 **Tests** (every workspace is built in a temporary directory by a helper that makes demo models and calls `GeneratedWriter`):
