@@ -54,6 +54,8 @@ CASES = {
     "notes-content": "a quoted section with a bracketed note, a table, a signature, a second "
     "heading, a proviso directly in a note",
     "notes-addresses": "the law and heading that name a note, ordinals, a note named by its hash",
+    "notes-group-headings": "group headings that hold text: one with a link to a law, one with "
+    "neither a law nor a heading",
     "source-credit": "a source credit with links and a date, and a container's credit",
     "characters": "U+00A0 in a number, U+202F, U+2000, a composing sequence, U+200B, [sic]",
 }
@@ -170,6 +172,9 @@ class TextFixtures(unittest.TestCase):
     def test_notes_addresses(self) -> None:
         self.check("notes-addresses")
 
+    def test_notes_group_headings(self) -> None:
+        self.check("notes-group-headings")
+
     def test_source_credit(self) -> None:
         self.check("source-credit")
 
@@ -221,6 +226,35 @@ class TextFixtures(unittest.TestCase):
         self.assertEqual(len(named), 1, address)
         self.assertIsNone(named[0]["heading"])
         self.assertEqual(named[0]["blocks"][0]["p"], "Neither a law nor a heading.")
+
+    def test_the_text_a_group_heading_holds_is_a_note_named_by_its_hash(self) -> None:
+        # The statutory group heading of the fixture holds one paragraph and gives a
+        # note with no heading and no topics:
+        #   00 | 0e 00 00 00 00 00 00 00 | "fidryn.note/v1"        domain
+        #   70 | 0e 00 00 00 00 00 00 00 | "statutoryNotes"        group
+        #   71 | 00 00 00 00 00 00 00 00 |                         no topics
+        #   1f | 00 00 00 00 00 00 00 00 |                         no heading
+        #   20 | 22 00 00 00 00 00 00 00 | the text below          a paragraph
+        #        10 | 19 00 00 00 00 00 00 00 | "These notes are invented."
+        frames = (
+            bytes([0x00, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"fidryn.note/v1"
+            + bytes([0x70, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"statutoryNotes"
+            + bytes([0x71, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x1F, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x20, 0x22, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x10, 0x19, 0, 0, 0, 0, 0, 0, 0])
+            + b"These notes are invented."
+        )
+        address = (
+            "/us/usc/t99/s1/note/statutoryNotes/nolaw/h." + blake3.blake3(frames).hexdigest()[:16]
+        )
+        records = [json.loads(line) for line in expected_lines("notes-group-headings")]
+        named = [r for r in records if r["address"] == address]
+        self.assertEqual(len(named), 1, address)
+        self.assertEqual(named[0]["topics"], [])
+        self.assertIsNone(named[0]["heading"])
 
     def test_text_records_are_sorted_and_match_the_schema_shape(self) -> None:
         for name in [*CASES, TWO_FILES]:

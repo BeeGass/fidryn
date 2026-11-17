@@ -540,6 +540,7 @@ class DocumentCounts:
     links_in_tables_of_contents: int = 0
     release_notes: int = 0
     links_without_words: int = 0
+    note_group_headings: int = 0
     disambiguated: int = 0
     assigned: int = 0
 
@@ -941,7 +942,7 @@ class MemberReader:
         heading: Text | None = None
         members: list[str] = []
         credit: Text | None = None
-        notes: list[tuple[Element, str]] = []
+        notes: list[tuple[Element, str, bool]] = []
         place: Counter[str] = Counter()
         for child in element:
             tag = tag_of(child)
@@ -959,7 +960,7 @@ class MemberReader:
                 if self.is_release_note(child, element):
                     self.counts.release_notes += 1
                     continue
-                notes.append((child, "ungrouped"))
+                notes.append((child, "ungrouped", False))
             elif tag == "sourceCredit":
                 if credit is not None:
                     self.refuse("a second source credit of one container", child)
@@ -1035,7 +1036,7 @@ class MemberReader:
         num: Num | None = None
         heading: Text | None = None
         items: list[Part | Provision] = []
-        notes: list[tuple[Element, str]] = []
+        notes: list[tuple[Element, str, bool]] = []
         siblings: Counter[str] = Counter()
         place: Counter[str] = Counter()
         operative = Context()
@@ -1060,7 +1061,7 @@ class MemberReader:
                 notes += self.notes_of(child)
             elif tag == "note":
                 if not is_footnote(child):
-                    notes.append((child, "ungrouped"))
+                    notes.append((child, "ungrouped", False))
             elif tag == "sourceCredit":
                 if address != unit.scope.address:
                     self.refuse("a source credit that is not the direct child of its unit", child)
@@ -1269,11 +1270,16 @@ class MemberReader:
 
     # Notes.
 
-    def notes_of(self, element: Element) -> list[tuple[Element, str]]:
-        """The notes of a `notes` element, each with the group of the cross heading before it."""
+    def notes_of(self, element: Element) -> list[tuple[Element, str, bool]]:
+        """The notes of a `notes` element, each with the group of the cross heading before it.
+
+        A cross heading opens a group and is no note; its label is not imported and is
+        counted. What it holds after its label is a note of the group it opens, marked
+        True here.
+        """
         self.check_blank(element)
         group = "ungrouped"
-        found: list[tuple[Element, str]] = []
+        found: list[tuple[Element, str, bool]] = []
         for child in element:
             if tag_of(child) != "note":
                 self.refuse("an element of notes that is not a note", child)
@@ -1281,22 +1287,54 @@ class MemberReader:
                 group = child.get("topic") or ""
                 if not is_segment(group):
                     self.refuse(f"a cross heading whose topic {group!r} is no group word", child)
+                self.counts.note_group_headings += 1
+                found.append((child, group, True))
             elif not is_footnote(child):
-                found.append((child, group))
+                found.append((child, group, False))
         return found
 
-    def read_notes(self, notes: list[tuple[Element, str]], anchor: str, scope: Scope) -> list[Note]:
+    def after_label(self, element: Element, scope: Scope) -> list[Block]:
+        """The blocks a cross heading holds after its first heading, its label."""
+        label = next((c for c in element if tag_of(c) == "heading"), None)
+        context = Context(True, False, True, note_flow=True)
+        if label is None:
+            return self.read_flow(element, context, scope)
+        out: list[QuotedItem] = []
+        flow = Flow(self, scope, context, out)
+        if not is_blank(element.text):
+            self.refuse("text of a cross heading before its heading", element)
+        before = True
+        for child in element:
+            if before:
+                if child is not label:
+                    self.refuse("an element of a cross heading before its heading", child)
+                before = False
+            else:
+                flow.child(child)
+            flow.text(child.tail)
+        flow.close()
+        return blocks_only(out)
+
+    def read_notes(
+        self, notes: list[tuple[Element, str, bool]], anchor: str, scope: Scope
+    ) -> list[Note]:
         """The notes of one anchor, each named by its group, law and heading."""
         read: list[Note] = []
         named: Counter[str] = Counter()
-        for element, group in notes:
-            topics = (element.get("topic") or "").split()
-            heading_element = next((c for c in element if tag_of(c) == "heading"), None)
-            heading = None
-            if heading_element is not None:
-                heading = self.read_text(heading_element, scope)
-            context = Context(True, False, heading_element is not None, note_flow=True)
-            blocks = self.read_flow(element, context, scope, skip=heading_element)
+        for element, group, labelled in notes:
+            heading: Text | None = None
+            if labelled:
+                topics: list[str] = []
+                blocks = self.after_label(element, scope)
+                if not blocks:
+                    continue
+            else:
+                topics = (element.get("topic") or "").split()
+                heading_element = next((c for c in element if tag_of(c) == "heading"), None)
+                if heading_element is not None:
+                    heading = self.read_text(heading_element, scope)
+                context = Context(True, False, heading_element is not None, note_flow=True)
+                blocks = self.read_flow(element, context, scope, skip=heading_element)
             law = self.law_of(heading, blocks, element, anchor)
             segment = heading_segment(heading.plain) if heading is not None else ""
             if not segment:
