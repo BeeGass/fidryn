@@ -820,7 +820,7 @@ Records are sorted by the bytes of their address; for one address, the provision
 
 ### S16. Counting rules
 
-`conformance/usc_profile.py` prints two profiles.
+`conformance/usc_profile.py` prints two profiles as one JSON object. Its key `baseline` holds the profile of the design and its key `import` the profile of this plan; tracked files call them by those two names and mention neither document.
 
 **The profile of the design** (the rules of the script of 2026-11-13, which design 3.1 and 9.6 quote):
 
