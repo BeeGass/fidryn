@@ -77,6 +77,7 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
+| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, and the normalization of its text |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
@@ -3634,7 +3635,7 @@ fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
-fidryn-provision       empty (no workspace crate)
+fidryn-provision       provision model: addresses, normalization, file paths (no workspace crate)
 fidryn-ingest-uscode   empty (provision)
 fidryn-cli             fidryn binary and localhost mill
 ```
