@@ -67,8 +67,10 @@ impl Run {
 
 impl Text {
     /// The text of `runs`, with adjacent `Words` runs merged into one and
-    /// every run whose words are empty dropped. A footnote marker has no words
-    /// of its own and is always kept.
+    /// every run whose words are empty dropped. A link with no words is
+    /// dropped together with its target, so a caller that must count such
+    /// links counts them before it calls. A footnote marker has no words of
+    /// its own and is always kept.
     pub fn from_runs(runs: Vec<Run>) -> Text {
         let mut merged: Vec<Run> = Vec::with_capacity(runs.len());
         for run in runs {

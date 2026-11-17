@@ -2,12 +2,31 @@
 
 from __future__ import annotations
 
+import contextlib
 import copy
+import io
 import json
+import tempfile
 import unittest
+from pathlib import Path
+from typing import Any
 
 import blake3
 import hash_vectors
+
+
+def objects_in(value: Any) -> list[dict[str, Any]]:
+    """Every object inside `value`, `value` included, depth first."""
+    if isinstance(value, dict):
+        return [value, *(found for child in value.values() for found in objects_in(child))]
+    if isinstance(value, list):
+        return [found for child in value for found in objects_in(child)]
+    return []
+
+
+def first_object_with(value: Any, key: str) -> dict[str, Any]:
+    """The first object, depth first, inside `value` that holds `key`."""
+    return next(found for found in objects_in(value) if key in found)
 
 
 class HashVectors(unittest.TestCase):
@@ -16,7 +35,7 @@ class HashVectors(unittest.TestCase):
         self.assertEqual(hash_vectors.mismatches(vectors), [])
         self.assertEqual(
             {section: len(vectors[section]) for section in hash_vectors.SECTIONS},
-            {"provisions": 4, "notes": 2, "units": 2, "containers": 2},
+            {"provisions": 4, "notes": 2, "units": 3, "containers": 2},
         )
 
     def test_the_file_is_in_the_layout_that_write_gives_it(self) -> None:
@@ -34,6 +53,28 @@ class HashVectors(unittest.TestCase):
         self.assertEqual(len(problems), 2, problems)
         self.assertTrue(problems[0].startswith("provisions[0] (a provision with text only): hash"))
         self.assertTrue(problems[1].startswith("units[0] "), problems[1])
+
+    def test_a_number_out_of_range_is_refused_with_its_model_and_field_named(self) -> None:
+        vectors = hash_vectors.load(hash_vectors.VECTORS)
+        # The unit has a table cell and footnote markers, which its layers read.
+        name = vectors["units"][2]["name"]
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "vectors.json"
+            for key in ("colspan", "rowspan", "footnote"):
+                for number in (-1, 2**32):
+                    changed = copy.deepcopy(vectors)
+                    first_object_with(changed["units"][2], key)[key] = number
+                    text = hash_vectors.dump(changed)
+                    target.write_text(text, encoding="utf-8")
+                    for argv in ([str(target)], [str(target), "--write"]):
+                        errors = io.StringIO()
+                        with contextlib.redirect_stderr(errors):
+                            status = hash_vectors.main(argv)
+                        message = errors.getvalue()
+                        self.assertEqual(status, 2, (key, number, argv, message))
+                        self.assertIn(f"units[2] ({name}): ", message)
+                        self.assertIn(f"the field {key!r} is {number}", message)
+                        self.assertEqual(target.read_text(encoding="utf-8"), text)
 
     def test_the_order_of_notes_changes_no_layer(self) -> None:
         vectors = hash_vectors.load(hash_vectors.VECTORS)

@@ -684,7 +684,7 @@ mod tests {
             );
             compared += 1;
         }
-        assert_eq!(compared, 10, "the file holds ten models");
+        assert_eq!(compared, 11, "the file holds eleven models");
     }
 
     /// A root with two children, and two grandchildren under the first child.

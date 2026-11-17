@@ -1070,6 +1070,411 @@
         "enacted": "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff",
         "editorial": "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
       }
+    },
+    {
+      "name": "a unit with footnote markers in a provision's number, a provision's heading, a table cell, the headings of two notes listed out of address order, quoted content inside a note and a block of a footnote",
+      "unit": {
+        "address": "/zz/demo/t1/s6",
+        "aliases": [],
+        "within": "/zz/demo/t1/ch1",
+        "source": "demo01.xml",
+        "positive_law": false,
+        "root": {
+          "address": "/zz/demo/t1/s6",
+          "kind": "section",
+          "num": {
+            "value": "6",
+            "shown": {
+              "runs": [
+                {
+                  "words": "§ 6."
+                },
+                {
+                  "mark": {
+                    "shown": "1",
+                    "footnote": 1
+                  }
+                }
+              ]
+            }
+          },
+          "heading": {
+            "runs": [
+              {
+                "words": "Gauges of widgets"
+              },
+              {
+                "mark": {
+                  "shown": "2",
+                  "footnote": 2
+                }
+              }
+            ]
+          },
+          "status": null,
+          "items": [
+            {
+              "part": {
+                "role": "chapeau",
+                "blocks": [
+                  {
+                    "para": {
+                      "runs": [
+                        {
+                          "words": "An invented maker shall mark the gauge of each widget—"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s6/a",
+                "kind": "paragraph",
+                "num": {
+                  "value": "a",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(a)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "on its packaging, as the following table shows; and"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "table": {
+                            "rows": [
+                              {
+                                "group": "head",
+                                "cells": [
+                                  {
+                                    "header": true,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Widget"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "header": true,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Gauge"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "group": "body",
+                                "cells": [
+                                  {
+                                    "header": false,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Small widget"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "header": false,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Gauge 3"
+                                            },
+                                            {
+                                              "mark": {
+                                                "shown": "3",
+                                                "footnote": 3
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s6/b",
+                "kind": "paragraph",
+                "num": {
+                  "value": "b",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(b)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "on the widget itself."
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "credit": {
+          "runs": [
+            {
+              "words": "(Added by an invented act.)"
+            }
+          ]
+        },
+        "notes": [
+          {
+            "address": "/zz/demo/t1/s6/note/ungrouped/nolaw/codification",
+            "layer": "editorial",
+            "group": "ungrouped",
+            "topics": [
+              "codification"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Codification"
+                },
+                {
+                  "mark": {
+                    "shown": "3",
+                    "footnote": 3
+                  }
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "This invented section was enacted as part of an invented gauge act."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "address": "/zz/demo/t1/s6/note/demoNotes/nolaw/amendments",
+            "layer": "enacted",
+            "group": "demoNotes",
+            "topics": [
+              "amendments"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Amendments"
+                },
+                {
+                  "mark": {
+                    "shown": "1",
+                    "footnote": 1
+                  }
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented act amended subsection (a) to read as follows:"
+                    }
+                  ]
+                }
+              },
+              {
+                "quoted": {
+                  "origin": "/zz/demo/act/2002-02-02",
+                  "items": [
+                    {
+                      "level": {
+                        "kind": "paragraph",
+                        "num": {
+                          "value": "a",
+                          "shown": {
+                            "runs": [
+                              {
+                                "words": "(a)"
+                              }
+                            ]
+                          }
+                        },
+                        "heading": null,
+                        "items": [
+                          {
+                            "part": {
+                              "role": "content",
+                              "blocks": [
+                                {
+                                  "para": {
+                                    "runs": [
+                                      {
+                                        "words": "on its packaging, as the gauge table of the invented act shows"
+                                      },
+                                      {
+                                        "mark": {
+                                          "shown": "2",
+                                          "footnote": 2
+                                        }
+                                      },
+                                      {
+                                        "words": "; and"
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "footnotes": [
+          {
+            "ordinal": 1,
+            "shown": "1",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "So in the invented original"
+                    },
+                    {
+                      "mark": {
+                        "shown": "2",
+                        "footnote": 2
+                      }
+                    },
+                    {
+                      "words": "."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ordinal": 2,
+            "shown": "2",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented remark on a heading."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ordinal": 3,
+            "shown": "3",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented remark on a gauge."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "definitions": []
+      },
+      "layers": {
+        "operative": "8a3394f95af3c809738c34890778e72b4dfd789bb3c138f2cb59f644bf27210c",
+        "enacted": "6c38d9d436df0d3e96ae1fc140bf2540e2d971fb04e0291f4a396d037e4703a3",
+        "editorial": "260ed4b6df40d2f3e9948074a2a34b2f507ae9763cfdd376a5c790d707d230f5"
+      }
     }
   ],
   "containers": [

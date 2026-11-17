@@ -28,6 +28,7 @@ ROLES = {"chapeau": 0, "content": 1, "continuation": 2, "proviso": 3}
 GROUPS = {"head": 0, "body": 1, "foot": 2}
 SECTIONS = ("provisions", "notes", "units", "containers")
 FIRST_KEY = "invented"
+U32_MAX = 2**32 - 1
 
 
 class ModelError(ValueError):
@@ -68,6 +69,14 @@ def field(value: Json, key: str) -> Any:
     if key not in value:
         raise ModelError(f"the field {key!r} is missing")
     return value[key]
+
+
+def u32_field(value: Json, key: str) -> int:
+    """The field `key` of `value`, a number that four bytes hold, as in the model."""
+    number = as_int(field(value, key), f"the field {key!r}")
+    if not 0 <= number <= U32_MAX:
+        raise ModelError(f"the field {key!r} is {number}, not a number from 0 to {U32_MAX}")
+    return number
 
 
 def variant(value: Any, what: str) -> tuple[str, Any]:
@@ -178,8 +187,8 @@ def encode_table(table: Any) -> bytes:
         for cell in as_list(field(row, "cells"), "the cells of a row"):
             cell = as_object(cell, "a cell")
             tag = 0x35 if as_bool(field(cell, "header"), "header") else 0x34
-            colspan = as_int(field(cell, "colspan"), "colspan")
-            rowspan = as_int(field(cell, "rowspan"), "rowspan")
+            colspan = u32_field(cell, "colspan")
+            rowspan = u32_field(cell, "rowspan")
             blocks = encode_blocks(field(cell, "blocks"))
             cells.append(frame(tag, u32(colspan) + u32(rowspan) + blocks))
         out.append(frame(0x30 + GROUPS[group], b"".join(cells)))
@@ -290,7 +299,7 @@ def notes_of_layer(notes: list[Json], layer: str) -> bytes:
 
 
 def in_ordinal_order(footnotes: list[Json]) -> list[Json]:
-    return sorted(footnotes, key=lambda footnote: as_int(field(footnote, "ordinal"), "ordinal"))
+    return sorted(footnotes, key=lambda footnote: u32_field(footnote, "ordinal"))
 
 
 def enacted_layer(notes: list[Json]) -> bytes:
@@ -325,7 +334,7 @@ def marks_of_text(text: Any, address: str, out: list[Mark]) -> None:
         if kind == "mark":
             mark = as_object(content, "a footnote marker")
             shown = as_str(field(mark, "shown"), "the shown text of a marker")
-            out.append((address, shown, as_int(field(mark, "footnote"), "a footnote number")))
+            out.append((address, shown, u32_field(mark, "footnote")))
 
 
 def marks_of_num(num: Any, address: str, out: list[Mark]) -> None:
@@ -447,16 +456,28 @@ def entries(vectors: Json) -> list[tuple[str, int, Json]]:
     return found
 
 
+def label(section: str, index: int, entry: Json) -> str:
+    """How messages name an entry: its section, its index and its name."""
+    return f"{section}[{index}] ({as_str(field(entry, 'name'), 'a name')})"
+
+
+def named_digests(section: str, index: int, entry: Json) -> Json:
+    """The digest fields of one entry; the error of a malformed model names the entry."""
+    try:
+        return digests(section, entry)
+    except ModelError as error:
+        raise ModelError(f"{label(section, index, entry)}: {error}") from error
+
+
 def mismatches(vectors: Json) -> list[str]:
     """One line for each digest of the file that differs from the value computed here."""
     problems = []
     for section, index, entry in entries(vectors):
-        name = as_str(field(entry, "name"), "a name")
-        for key, computed in digests(section, entry).items():
+        for key, computed in named_digests(section, index, entry).items():
             recorded = entry.get(key)
             if recorded != computed:
                 problems.append(
-                    f"{section}[{index}] ({name}): {key} is {json.dumps(recorded)}, "
+                    f"{label(section, index, entry)}: {key} is {json.dumps(recorded)}, "
                     f"computed {json.dumps(computed)}"
                 )
     return problems
@@ -464,8 +485,8 @@ def mismatches(vectors: Json) -> list[str]:
 
 def filled(vectors: Json) -> Json:
     """The file's content with every digest computed."""
-    for section, _, entry in entries(vectors):
-        entry.update(digests(section, entry))
+    for section, index, entry in entries(vectors):
+        entry.update(named_digests(section, index, entry))
     return vectors
 
 
