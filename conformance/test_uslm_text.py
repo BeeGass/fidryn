@@ -52,7 +52,7 @@ CASES = {
     "notes-anchors": "a note directly under a section, under a paragraph, under a chapter",
     "not-imported": "the release note under a title, a table of contents with a footnote and a link",
     "notes-content": "a quoted section with a bracketed note, a table, a signature, a second "
-    "heading, a proviso directly in a note",
+    "heading, a proviso and a chapeau directly in a note, a content directly in a quoted note",
     "notes-addresses": "the law and heading that name a note, ordinals, a note named by its hash",
     "notes-group-headings": "group headings that hold text: one with a link to a law, one with "
     "neither a law nor a heading",
@@ -62,9 +62,11 @@ CASES = {
     "an empty heading, an empty source credit",
     "notes-unknown-group": "a group heading with a group word the rules do not know",
     "marker-labels": "a number, a heading and a source credit that hold only a footnote marker",
-    "subheadings": "a subheading in a note with no heading, a heading directly in quoted content",
+    "subheadings": "a subheading and a heading inside a p in a note with no heading, a heading "
+    "directly in quoted content, a heading inside a p of a quoted note with no heading",
     "quoted-operative": "quoted content in operative text with an origin, a paragraph, a quoted "
-    "section with a number and a heading, and a note with a heading and a subheading",
+    "section with a number and a heading, a note with no heading that holds a content and a "
+    "heading inside a p, and a note with a heading and a subheading",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"

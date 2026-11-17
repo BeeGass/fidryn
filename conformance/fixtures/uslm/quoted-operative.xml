@@ -7,7 +7,7 @@
 <main>
 <title identifier="/us/usc/t99"><num value="99">Title 99</num><heading>Invented</heading>
 <section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Invented form</heading>
-<content>The invented form reads as follows: <quotedContent origin="/us/pl/999/15/s3"><p>“An invented preamble.</p><section><num value="7">“SEC. 7.</num><heading>INVENTED FORM.</heading><content>The form is invented.</content></section><note topic="miscellaneous"><heading>Invented Instructions</heading><subheading>Invented Steps</subheading><p>Fill in the form.</p><p>Sign below.”</p></note></quotedContent></content>
+<content>The invented form reads as follows: <quotedContent origin="/us/pl/999/15/s3"><p>“An invented preamble.</p><section><num value="7">“SEC. 7.</num><heading>INVENTED FORM.</heading><content>The form is invented.</content></section><note topic="miscellaneous"><content>[Invented words in brackets.]</content><p>Read the steps.<heading>Invented Steps Below</heading>Then fill them in.</p></note><note topic="miscellaneous"><heading>Invented Instructions</heading><subheading>Invented Steps</subheading><p>Fill in the form.</p><p>Sign below.”</p></note></quotedContent></content>
 </section>
 </title>
 </main>

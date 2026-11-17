@@ -529,20 +529,20 @@ class Scope:
 
 @dataclass(frozen=True, slots=True)
 class Context:
-    """Where a flow stands: in a note, in quoted content, whether a heading after the
-    note's first is read as a subheading, whether it is the note's own flow (where a
+    """Where a flow stands: in a note (where a signature, any subheading and any heading
+    other than the note's own are blocks, at any depth, whether or not the note has a
+    heading of its own), in quoted content, whether it is the note's own flow (where a
     text part is read as a block), and whether it is quoted content's own flow (where a
     heading or subheading is a subheading)."""
 
     in_note: bool = False
     in_quoted: bool = False
-    subheadings: bool = False
     note_flow: bool = False
     quoted_top: bool = False
 
     def inner(self) -> Context:
         """The context of a flow inside this one."""
-        return Context(self.in_note, self.in_quoted, self.subheadings)
+        return Context(self.in_note, self.in_quoted)
 
 
 @dataclass(slots=True)
@@ -717,11 +717,7 @@ class Flow:
             self.add([reader.read_image(child)])
         elif tag == "signature" and context.in_note:
             self.add(reader.read_signature(child, scope))
-        elif (
-            (tag == "subheading" and context.in_note)
-            or (tag == "heading" and context.subheadings)
-            or (tag in ("heading", "subheading") and context.quoted_top)
-        ):
+        elif tag in ("heading", "subheading") and (context.in_note or context.quoted_top):
             self.add([Subheading(reader.read_text(child, scope))])
         elif tag == "note" and context.in_quoted:
             self.add(reader.read_quoted_note(child, context.inner(), scope))
@@ -1283,7 +1279,7 @@ class MemberReader:
         return int(value)
 
     def read_quoted(self, element: Element, context: Context, scope: Scope) -> Quoted:
-        quoted = Context(context.in_note, True, context.subheadings, quoted_top=True)
+        quoted = Context(context.in_note, True, quoted_top=True)
         return Quoted(element.get("origin"), self.read_items(element, quoted, scope, None))
 
     def read_items(
@@ -1331,14 +1327,15 @@ class MemberReader:
 
     def read_quoted_note(self, element: Element, context: Context, scope: Scope) -> list[Block]:
         """A note inside quoted content, wherever the quotation stands: its heading first
-        as a subheading, then the flow of the rest, read as the flow of a note."""
+        as a subheading, then the flow of the rest, read as the flow of a note, where a
+        text part that stands directly in it is read as a block."""
         heading = next((c for c in element if tag_of(c) == "heading"), None)
         blocks: list[Block] = []
         if heading is not None:
             text = self.read_optional_text(heading, scope)
             if text is not None:
                 blocks.append(Subheading(text))
-        inner = Context(True, context.in_quoted, context.subheadings or heading is not None)
+        inner = Context(True, context.in_quoted, note_flow=True)
         return blocks + self.read_flow(element, inner, scope, skip=heading)
 
     # Notes.
@@ -1373,7 +1370,7 @@ class MemberReader:
     def after_label(self, element: Element, scope: Scope) -> list[Block]:
         """The blocks a cross heading holds after its first heading, its label."""
         label = next((c for c in element if tag_of(c) == "heading"), None)
-        context = Context(True, False, True, note_flow=True)
+        context = Context(True, False, note_flow=True)
         if label is None:
             return self.read_flow(element, context, scope)
         out: list[QuotedItem] = []
@@ -1410,7 +1407,7 @@ class MemberReader:
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
                 if heading_element is not None:
                     heading = self.read_optional_text(heading_element, scope)
-                context = Context(True, False, heading_element is not None, note_flow=True)
+                context = Context(True, False, note_flow=True)
                 blocks = self.read_flow(element, context, scope, skip=heading_element)
             law = self.law_of(heading, blocks, element, anchor)
             segment = heading_segment(heading.plain) if heading is not None else ""
