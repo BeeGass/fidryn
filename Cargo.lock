@@ -598,7 +598,9 @@ dependencies = [
  "fidryn-driver",
  "fidryn-eval",
  "fidryn-hir",
+ "fidryn-ingest-uscode",
  "fidryn-kernel",
+ "fidryn-provision",
  "fidryn-render",
  "fidryn-solve",
  "fidryn-syntax",
@@ -607,10 +609,12 @@ dependencies = [
  "http-body-util",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror",
  "time",
  "tokio",
  "tower",
+ "zip",
 ]
 
 [[package]]

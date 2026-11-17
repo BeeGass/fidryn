@@ -2,6 +2,7 @@
 
 mod engine;
 pub mod inputs;
+pub mod law;
 pub mod opinion;
 pub mod review;
 pub mod ui;
@@ -73,6 +74,11 @@ pub enum Command {
         /// object to a line.
         #[arg(long, value_name = "FILE")]
         unresolved: Option<PathBuf>,
+    },
+    /// Write a generated workspace of law modules from the archives of one release.
+    Ingest {
+        #[command(subcommand)]
+        corpus: law::Corpus,
     },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
@@ -209,6 +215,7 @@ pub fn run(cli: Cli) -> ExitCode {
                 unresolved,
             },
         ),
+        Command::Ingest { corpus } => law::run(corpus),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -316,10 +323,10 @@ pub fn run(cli: Cli) -> ExitCode {
 
 /// The files a command reads as its input. `check` chooses its front end by
 /// what it is given, a workspace's directory or a file of either edition,
-/// and `ui` reads none.
+/// `ingest` reads archives, and `ui` reads none.
 fn inputs_of(command: &Command) -> Vec<PathBuf> {
     match command {
-        Command::Check { .. } | Command::Ui { .. } => Vec::new(),
+        Command::Check { .. } | Command::Ingest { .. } | Command::Ui { .. } => Vec::new(),
         Command::Fmt { path }
         | Command::Inputs { path, .. }
         | Command::Run { path, .. }

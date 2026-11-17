@@ -30,6 +30,15 @@ interchange schema versions are maintained independently of the interpreter.
   value is not the value they write back, and have the JSON Schemas
   `schemas/workspace-v0.1.json`, `law-lock-v0.1.json` and
   `retrieval-v0.1.json`.
+- `fidryn ingest uscode ARCHIVE_DIR --out DIR` imports the United States
+  Code from the archives of one release of the official XML release point
+  published by the Office of the Law Revision Counsel, each verified
+  against its retrieval record, and writes a generated workspace that
+  `fidryn check` accepts, the same bytes on every run and on every host.
+  `--title T` writes only the titles named, `--jobs N` sets the number of
+  workers, and `--verify` writes nothing and reports each file that is
+  missing, extra or different. `GeneratedWriter::compare` makes a writer
+  that compares instead of writing.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,

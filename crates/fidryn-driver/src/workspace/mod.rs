@@ -38,7 +38,7 @@ mod tests;
 pub use check::{CheckOptions, WorkspaceReport, check_workspace};
 pub use index::{PhaseTwo, Unresolved, check_interfaces};
 pub use report::CHECK_REPORT_SCHEMA;
-pub use writer::{GeneratedWriter, WriteError};
+pub use writer::{Difference, GeneratedWriter, WriteError};
 
 /// The file name of the manifest, at the top of a workspace.
 const MANIFEST_FILE: &str = "workspace.json";

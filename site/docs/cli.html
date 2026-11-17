@@ -97,7 +97,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.17</span> See also</a></li></ol></details>
     <div class="prose">
 <p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
@@ -545,7 +545,54 @@ and actual trace, source spans, executable digest and rerun arguments. Optional
 <code>--scenario</code>, <code>--budget N</code> and <code>--template FILE</code> select the disclosed evaluation
 or retain reviewer material. Reviewer status is <code>not_assessed</code>; the archive does
 not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>.</p>
-<h2 id="see-also"><span class="hn">4.16</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="ingest"><span class="hn">4.16</span> <code>ingest</code> <a class="anchor" href="#ingest" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn ingest uscode ARCHIVE_DIR --out DIR</code> imports the United States
+Code from the archives of one release of the official XML release point
+published by the Office of the Law Revision Counsel, each verified against
+the retrieval record beside them, and writes a generated workspace that
+<code>fidryn check DIR</code> accepts
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-ingester-for-the-united-states-code">The ingester for the United States Code</a>).
+The same archives give the same bytes on every run and on every host, for
+any number of workers.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>ARCHIVE_DIR</code></td><td>yes</td><td>path to the directory of the archives of one release and their retrieval record, <code>retrieval.json</code></td></tr>
+<tr><td><code>--out DIR</code></td><td>yes</td><td>path to the directory of the workspace: one that does not exist, one that holds nothing but entries whose name begins with a dot, or an earlier output of the command</td></tr>
+<tr><td><code>--title T</code></td><td>no</td><td>a title to write, by the publisher's designation, such as <code>1</code> or <code>5a</code>, its letter in either case; may be given more than once; by default every title of the release</td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--verify</code></td><td>no</td><td>flag; write nothing, and report every file under <code>DIR</code> that differs from what the run would write</td></tr>
+</tbody></table>
+</div>
+<p>A run writes <code>workspace.json</code> first, then each module, each file through
+a temporary file that is renamed; it removes the modules of an earlier
+output that it does not write, and writes <code>law.lock.json</code> last, so a run
+that is stopped leaves a directory the next run accepts. With <code>--title</code>,
+only the modules of those titles are written, and the lock lists only the
+archives that hold them, each with the members read. <code>--verify</code> compares
+<code>workspace.json</code>, <code>law.lock.json</code> and every module file of <code>DIR</code> with what
+the run would write, and looks at nothing else; it writes nothing, <code>DIR</code>
+included.</p>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn ingest uscode samples/uscode/archives --out DIR
+fidryn ingest uscode samples/uscode/archives --out DIR --title 1 --jobs 4
+fidryn check DIR
+fidryn ingest uscode samples/uscode/archives --out DIR --verify</code></pre></figure>
+<p><strong>Success.</strong> Prints one line and exits 0:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>ingested: U units, C containers from A archives (release R)</code></pre></figure>
+<p>With <code>--verify</code>, prints <code>ok</code> when <code>DIR</code> holds what the run would write.</p>
+<p><strong>Failure.</strong> Exit 1. A release that is refused, by its retrieval record or
+by a reading rule, is reported with the archive, the member and, for a
+document, the element, the line it starts on and the nearest identifier.
+A title that no member holds is reported, by the designation given,
+before anything is written. A directory that holds anything other than an
+earlier output of the command is refused with what it holds, and nothing
+in it is changed. With <code>--verify</code>, each path under <code>DIR</code> that differs is
+printed to stdout, relative to <code>DIR</code>, in the byte order of the paths,
+after the word that says how, and the exit status is 1:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>different us/usc/t99/s1.fr
+extra us/usc/t99/s7.fr
+missing us/usc/t99a.fr</code></pre></figure>
+<h2 id="see-also"><span class="hn">4.17</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
@@ -556,7 +603,7 @@ not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/bl
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.17</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

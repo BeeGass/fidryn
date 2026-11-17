@@ -36,13 +36,22 @@ mod testing;
 pub use archive::{ReleaseArchives, open};
 
 use fidryn_provision::Module;
-use fidryn_provision::workspace::{AddressCounts, NotImported};
+use fidryn_provision::workspace::{AddressCounts, Generator, NotImported};
 use std::fmt;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// The prefix of every address of the Code.
-pub(crate) const PREFIX: &str = "/us/usc";
+pub const PREFIX: &str = "/us/usc";
+
+/// The generator that the lock of an ingest names: this crate, at its
+/// version.
+pub fn generator() -> Generator {
+    Generator {
+        name: env!("CARGO_PKG_NAME").to_owned(),
+        version: env!("CARGO_PKG_VERSION").to_owned(),
+    }
+}
 
 /// Why a release, an archive or a document is refused. It names the archive,
 /// the member, and, where the refusal concerns one element, the element, the
@@ -71,8 +80,9 @@ struct Place {
 }
 
 impl IngestError {
-    /// A refusal that concerns no one element.
-    pub(crate) fn new(message: impl Into<String>) -> Self {
+    /// A refusal that concerns no one element. The sink of [`ingest`] gives
+    /// one when it cannot take a module, and the ingest then fails.
+    pub fn new(message: impl Into<String>) -> Self {
         Self(Box::new(Refusal {
             archive: None,
             member: None,

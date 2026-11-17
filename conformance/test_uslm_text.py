@@ -70,6 +70,11 @@ TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
 # Fixtures of several members, each a directory that the test packs into one archive.
 MEMBER_SETS = (TWO_FILES, UNNAMED)
+# Two documents of the releases 999-1 and 999-2 that differ in every element id, in the
+# publication name, in the creation time of the metadata and in the release note, and in
+# nothing else.
+REISSUE = "reissue"
+REISSUE_DOCUMENTS = ("old.xml", "new.xml")
 
 
 def run_script(script: Path, path: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -227,9 +232,29 @@ class TextFixtures(unittest.TestCase):
             self.assertTrue((FIXTURES / f"{name}.records.jsonl").is_file(), name)
             self.assertTrue((FIXTURES / f"{name}.profile.json").is_file(), name)
         members = [path for name in MEMBER_SETS for path in (FIXTURES / name).glob("*.xml")]
+        self.assertEqual(
+            sorted(path.name for path in (FIXTURES / REISSUE).iterdir()), sorted(REISSUE_DOCUMENTS)
+        )
+        members += [FIXTURES / REISSUE / name for name in REISSUE_DOCUMENTS]
         for path in [*FIXTURES.glob("*.xml"), *members]:
             first = path.read_text(encoding="utf-8").split("\n", 1)[0]
             self.assertIn("Invented for tests", first, path.name)
+
+    def test_a_reissue_that_changes_only_ids_and_the_release_reads_to_the_same_records(
+        self,
+    ) -> None:
+        printed = []
+        for name in REISSUE_DOCUMENTS:
+            with tempfile.TemporaryDirectory(prefix="fidryn-uslm-reissue-") as directory:
+                target = Path(directory) / MEMBER
+                shutil.copyfile(FIXTURES / REISSUE / name, target)
+                result = run_script(TEXT_SCRIPT, target)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stderr, "")
+            printed.append(result.stdout)
+        old, new = printed
+        self.assertGreaterEqual(len(old.splitlines()), 4, old)
+        self.assertEqual(old, new)
 
     def test_a_note_with_neither_law_nor_heading_is_named_by_its_hash(self) -> None:
         # The note hash, written out frame by frame: one tag byte, the length of the

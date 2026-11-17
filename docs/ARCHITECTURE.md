@@ -108,14 +108,15 @@ fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and mill UI
+fidryn-cli             fidryn binary and mill UI; ingest command (driver + ingest-uscode)
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
 Do not put parser logic in `core`. `fidryn-provision` depends on no other
 crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
-depends on `fidryn-provision` only, and no crate depends on
-`fidryn-ingest-uscode`. `fidryn-check` depends on `fidryn-provision` for
+depends on `fidryn-provision` only, and `fidryn-cli` alone depends on
+`fidryn-ingest-uscode`, for its `ingest` command; neither `fidryn-driver`
+nor `fidryn-provision` may. `fidryn-check` depends on `fidryn-provision` for
 the model into which it lowers modules of edition 2. `fidryn-driver`
 depends on `fidryn-provision` for the files of a workspace and the
 interfaces of its modules: it holds the check of a workspace of edition 2
@@ -128,8 +129,10 @@ addresses that gives each reference its outcome. `fidryn-ingest-uscode`
 reads the archives of the official XML release point published by the
 Office of the Law Revision Counsel, each checked against its retrieval
 record, and the documents in them into the units and containers of that
-model. It is the one crate of the workspace that names the Code, its
-titles and the publisher's elements.
+model. It is the one crate of the workspace that knows the Code's titles
+and the publisher's elements. `fidryn-cli` names the Code only in
+`fidryn ingest uscode`, which writes what the ingester reads with the
+writer of `fidryn-driver`.
 
 ## Public APIs
 
@@ -261,6 +264,7 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
     [--scenario] [--budget N] [--template TEMPLATE]
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
+fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
 ```
 
 Every subcommand also takes `--source-root PATH`. `run` never chooses a

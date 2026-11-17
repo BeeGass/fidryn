@@ -365,6 +365,35 @@ impl ReleaseArchives {
         self.artifacts.clone()
     }
 
+    /// The archives as the lock of an ingest of `titles` lists them: in the
+    /// order of the record, each archive that holds a member of those
+    /// titles, with those of its members alone. When `titles` is empty,
+    /// every archive that holds a member, with all of them. A title that no
+    /// member holds is refused, as by [`crate::ingest`].
+    pub fn artifacts_of(&self, titles: &[String]) -> Result<Vec<Artifact>, IngestError> {
+        let read: BTreeSet<&str> = self
+            .select(titles)?
+            .into_iter()
+            .map(|index| self.members[index].name.as_str())
+            .collect();
+        Ok(self
+            .artifacts
+            .iter()
+            .filter_map(|artifact| {
+                let members: Vec<Member> = artifact
+                    .members
+                    .iter()
+                    .filter(|member| read.contains(member.name.as_str()))
+                    .cloned()
+                    .collect();
+                (!members.is_empty()).then(|| Artifact {
+                    members,
+                    ..artifact.clone()
+                })
+            })
+            .collect())
+    }
+
     /// The file names of every member of the release, sorted.
     pub fn members(&self) -> Vec<String> {
         self.members
@@ -535,6 +564,57 @@ mod tests {
             .collect();
         names.sort();
         assert_eq!(names, ["a.zip", "b.zip", "retrieval.json"]);
+    }
+
+    #[test]
+    fn the_artifacts_of_titles_are_the_archives_and_members_that_hold_them() {
+        let scratch = Scratch::new("artifacts-of");
+        pack(
+            scratch.path(),
+            "b.zip",
+            &[("usc02.xml", b"two"), ("usc05A.xml", b"five")],
+        );
+        pack(scratch.path(), "a.zip", &[("usc01.xml", DOCUMENT)]);
+        pack(scratch.path(), "c.zip", &[]);
+        record_all(scratch.path(), RELEASE);
+        let archives = open(scratch.path()).unwrap_or_else(|error| panic!("{error}"));
+        let all = archives.artifacts();
+        assert_eq!(all.len(), 3);
+        // Every title: every archive of the record that holds a member, with
+        // all of its members.
+        assert_eq!(archives.artifacts_of(&[]), Ok(all[..2].to_vec()));
+        // One title: its archive, with that member alone.
+        assert_eq!(
+            archives.artifacts_of(&["5a".to_owned()]),
+            Ok(vec![Artifact {
+                members: vec![all[1].members[1].clone()],
+                ..all[1].clone()
+            }])
+        );
+        // Two titles of two archives, in the order of the record.
+        let named = |artifacts: Vec<Artifact>| -> Vec<(String, Vec<String>)> {
+            artifacts
+                .into_iter()
+                .map(|artifact| {
+                    let members = artifact.members.into_iter().map(|m| m.name).collect();
+                    (artifact.file, members)
+                })
+                .collect()
+        };
+        let two = archives
+            .artifacts_of(&["2".to_owned(), "01".to_owned()])
+            .expect("titles 2 and 1");
+        assert_eq!(
+            named(two),
+            [
+                ("a.zip".to_owned(), vec!["usc01.xml".to_owned()]),
+                ("b.zip".to_owned(), vec!["usc02.xml".to_owned()]),
+            ]
+        );
+        let error = archives
+            .artifacts_of(&["3".to_owned()])
+            .expect_err("no title 3");
+        assert!(error.message().contains("holds no title 3"), "{error}");
     }
 
     #[test]

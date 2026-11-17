@@ -5,12 +5,13 @@ and note in it, is named, where the file of a module stands in its
 workspace, how the text of a module is normalized, what a module holds, how
 its provisions, notes and layers are hashed, how a module is written, what
 the checker verifies of one module, how modules form a workspace and what
-the checker verifies of one, how a workspace is checked, and what outcome
-each reference has. The crate `fidryn-provision` implements the model and
+the checker verifies of one, how a workspace is checked, what outcome
+each reference has, and how the ingester for the United States Code reads
+the publisher's XML. The crate `fidryn-provision` implements the model and
 the rules over it, `fidryn-syntax` reads the text of a module,
-`fidryn-check` lowers it into the model and checks it, and `fidryn-driver`
-checks a workspace and writes a generated one. In the examples, `/zz/demo`
-is an invented corpus.
+`fidryn-check` lowers it into the model and checks it, `fidryn-driver`
+checks a workspace and writes a generated one, and `fidryn-ingest-uscode`
+imports the Code. In the examples, `/zz/demo` is an invented corpus.
 
 ## Addresses
 
@@ -734,6 +735,15 @@ An importer writes a generated workspace with
 - `finish(generator, artifacts, addresses, not_imported)` removes every
   `.fr` file the run did not write, and each directory that leaves empty,
   then writes `law.lock.json` last, and returns the lock.
+- `compare(out, manifest)` makes a writer that writes nothing. It compares
+  the manifest with `workspace.json` at once, `write` compares each module
+  with the file at its path, and `finish` compares the lock with
+  `law.lock.json` and counts every `.fr` file of `out` that the run did not
+  write as extra. `finish` returns the lock when nothing differs, and
+  otherwise `WriteError::Differs`, which lists every path that is
+  `missing`, `extra` or `different`, in the byte order of the paths.
+  Nothing else in `out` is looked at, and no entry whose name begins with
+  a dot. A directory that does not exist lacks every file and is not made.
 
 What a run writes depends only on its modules, its manifest and what
 `finish` is given: neither the order of the calls nor the number of
@@ -1122,3 +1132,192 @@ ok
 modules: 5; from cache: 5; errors: 0; warnings: 0
 ok
 ```
+
+## The ingester for the United States Code
+
+`fidryn-ingest-uscode` imports the United States Code from the official
+XML release point published by the Office of the Law Revision Counsel. It
+reads the archives of one release, each verified against its retrieval
+record, into the units and containers of the model, which
+[`fidryn ingest uscode`](cli.md#ingest) writes as a generated workspace
+with the prefix `/us/usc`. It is the one crate that knows the Code's
+titles, the publisher's elements and their status values; the command
+line names the Code only to choose it, and the checker and the writer of a
+workspace know none of them. Its rules follow four principles: no
+operative word is dropped; nothing is invented; an element the rules do
+not name is refused, not skipped; and what is by rule not imported is
+counted.
+
+### What it reads
+
+A release is a directory that holds the publisher's zip archives and,
+beside them, nothing but their [retrieval record](#workspaces),
+`retrieval.json`. Before it reads a document, the ingester:
+
+- reads the record, and refuses a directory that has none;
+- recomputes the size, the SHA-256 and the BLAKE3 of every archive, and
+  refuses one that differs from its record, an archive the record does not
+  list, and one it lists that the directory does not hold;
+- refuses a member whose name is not `usc`, two digits, an optional `a` or
+  `A`, and `.xml`, a member larger than 512 MiB, whatever its header
+  declares, and a release in which two archives hold a member of the same
+  name.
+
+Each member holds one title, or the appendix of one: `usc05A.xml` holds
+the title the publisher designates `5a`. Nothing is written beside the
+archives.
+
+A document is refused when:
+
+- it has a document type declaration or an entity declaration;
+- its root is not `uscDoc` in the namespace
+  `http://xml.house.gov/schemas/uslm/1.0`, or its schema location names a
+  file other than `USLM-1.0.15.xsd`;
+- its `docPublicationName` is not `Online@` followed by the release of the
+  retrieval record, or its property `is-positive-law` is neither `yes` nor
+  `no`;
+- an element stands where its class does not allow it, or is in no class
+  below; or text stands where only elements may;
+- a `ref` has neither an `href` nor the class `footnoteRef`; a link, a
+  superscript or a subscript stands inside another, or a footnote marker
+  inside one; a footnote marker holds an element; a marker names no
+  footnote of its module, or two footnotes of one module have one `id`;
+  or a footnote holds a `signature`, a `subheading` or a `heading`;
+- normalization composes one character out of characters on both sides of
+  the boundary of a link, a superscript, a subscript or a marker;
+- an identifier holds `~`, or gives no [address](#addresses);
+- a level has a second `num` or a second `heading`;
+- a span of a table cell is not a whole number written in ASCII digits;
+- a `br`, an `img` or a column holds content, or an `img` has an attribute
+  other than `src`;
+- a `signature` holds anything but `name` and `role`;
+- a unit or a container has a second source credit, or a source credit
+  stands anywhere but directly in one;
+- a cross heading has no topic, or one that is not one word of ASCII
+  letters and digits beginning with a letter;
+- the law a note cites first is a reference of fewer than four segments,
+  or one whose second, third or fourth segment holds a character that an
+  address segment cannot hold;
+- a `status` is not one of the 19 values of the publisher's schema:
+  `proposed`, `withdrawn`, `cancelled`, `pending`, `operational`,
+  `suspended`, `renumbered`, `repealed`, `expired`, `terminated`,
+  `hadItsEffect`, `omitted`, `notAdopted`, `transferred`, `redesignated`,
+  `reserved`, `vacant`, `crossReference`, `unknown`.
+
+A refusal names the archive, the member, the element, the line it starts
+on, and the identifier of the element or of its nearest ancestor that has
+one.
+
+### The classes of elements
+
+| Class | Elements |
+| --- | --- |
+| Document | `uscDoc`; `meta`, read for the release name and the positive-law flag alone; `main`. The top container of a file is the `title` in `main`, or the `appendix` directly under `uscDoc` |
+| Container | `title`, `appendix`, `subtitle`, `chapter`, `subchapter`, `part`, `subpart`, `division`, `subdivision`, `article`, `courtRules`, `compiledAct`, `reorganizationPlans`; and a `level` with no unit above it and no text part or `p` among its children |
+| Unit | `section`, `courtRule`, `reorganizationPlan`; and a `level` with no unit above it and a text part or a `p` among its children |
+| Provision inside a unit | any element of the two classes above, and `subsection`, `paragraph`, `subparagraph`, `clause`, `subclause`, `item`, `subitem`, `subsubitem` and `level`, inside a unit. Its kind is its tag |
+| Label | `num` and `heading` of a level |
+| Text part | `chapeau`, `content`, `continuation`, `proviso` |
+| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, `signature`, any `subheading`, any `heading` after the note's first, and a text part directly in the note; in quoted content, `note`, and a `heading` or `subheading` directly in it |
+| Inline, kept as structure | `ref` with an `href` (a link); `ref` of the class `footnoteRef` (a footnote marker); `sup` and `xhtml:sup`; `sub` and `xhtml:sub` |
+| Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
+| Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col`, which hold no text, are dropped |
+| Note | `notes`, `note`, `sourceCredit` |
+| Not imported, counted | `toc` and everything in it; release notes; the label of a note group |
+
+The unit of a text is the outermost unit that holds it: a section that
+stands inside another section is a provision of kind `section` of the
+outer one. A footnote (a `note` of the type `footnote`) is taken out of
+the text where it stands, without closing its paragraph, and becomes a
+footnote of its module, numbered in document order; its marker is a run of
+the text that gives no words. An `img` is imported as the source it names,
+normalized; the picture is not in the archive.
+
+### Notes and their layers
+
+Each `note` in a `notes` element is a note, except a cross heading
+(`role="crossHeading"`), which opens a group named by its topic and is not
+itself a note. So is each `note` that stands directly in a level and is
+neither a footnote nor a release note. A note belongs to the unit or the
+container it is anchored in. Its group is the topic of the nearest cross
+heading before it in its `notes` element, and `ungrouped` when there is
+none:
+
+| Group | Layer |
+| --- | --- |
+| `editorialNotes` | editorial |
+| `ungrouped`, with one of the topics `removalDescription` and `historicalAndRevision` | editorial |
+| any other: `statutoryNotes`, `execDoc`, `courtRules`, any other `ungrouped` note, and any group word a release introduces | enacted |
+
+Its address is the address of its anchor followed by
+`/note/<group>/<law>/<heading>`. `<law>` is the law the note cites first,
+by the origin of its quoted content or else by its first link to a public
+law or an act, written as `pl.999.2`, or `nolaw` when it cites none.
+`<heading>` is its heading with the letters `A` to `Z` in lower case and
+every run of characters other than ASCII letters and digits written `-`,
+cut to 60 characters, or `noheading` when it has none. A note with neither
+a law nor a heading is named `h.` followed by the first 16 hexadecimal
+digits of its hash. When several notes of one anchor agree in all three,
+the second gets `/2`, the third `/3`.
+
+### Addresses
+
+The address of a unit or a container is the publisher's identifier, with
+these exceptions, each counted in the lock's `addresses`:
+
+- A unit or a container whose identifier a unit or a container before it
+  in the release already has, taking the members in the order of their
+  names and the elements in document order, gets `~2`, `~3` and so on.
+  The count runs over the release, so the addresses are the same for any
+  number of workers (`disambiguated`).
+- An element that has no identifier gets the segment `~<tag>.<n>` below
+  the container it stands in, or below the prefix for the top element of
+  a file (`assigned`).
+- An identifier that lists several, separated by spaces, gives its first
+  as the address and the others as aliases; one that names a range, as
+  `s44...46` does, is the address, and its two ends and the whole numbers
+  between them are aliases. An alias that is the address of another
+  element is dropped (`aliases`).
+
+The address of a provision inside a unit is its parent's followed by the
+last segment of its identifier, or by `~<tag>.<n>` when it has none, and
+by `~2`, `~3` when a sibling before it has that address already.
+
+### What it does not import
+
+Some of what a document holds is by rule not imported, and the lock's
+`not_imported` counts it:
+
+| Not imported | Counted as |
+| --- | --- |
+| a table of contents, `toc`, and everything in it | `tables_of_contents`; and the footnotes and links in it, as `footnotes_in_tables_of_contents` and `links_in_tables_of_contents` |
+| a release note: a note directly under a `title` or an `appendix` whose text begins `Current through ` | `release_notes` |
+| a link that has no words, or white space alone | `links_without_words` |
+| the label of a note group, the heading of a cross heading | `note_group_headings` |
+
+What a cross heading holds after its heading is imported, as a note of the
+group it opens.
+
+### What the command writes
+
+`fidryn ingest uscode ARCHIVE_DIR --out DIR` writes the workspace with
+`GeneratedWriter` ([Writing a generated workspace](#writing-a-generated-workspace)):
+the manifest, of the name `uscode`, the kind `generated`, the prefix
+`/us/usc`, the release of the record and the running toolchain's version;
+a module for each unit and container of the titles read; and the lock,
+whose generator is `fidryn-ingest-uscode` at the same version, whose
+artifacts are the archives read, each with the members read, as the record
+gives them, and whose counts are those above.
+
+```text
+fidryn ingest uscode ARCHIVE_DIR --out DIR
+ingested: U units, C containers from A archives (release R)
+```
+
+The bytes it writes depend on the archives alone. No time is written but
+the retrieval times the record gives, and no path but the paths of the
+files inside the workspace; neither the host, its user, its time zone,
+the working directory nor the number of workers changes a byte. Two
+documents that differ only in their element ids, their publication name,
+the creation time of their metadata and their release note give the same
+modules, and locks that differ only in `release` and `artifacts`.

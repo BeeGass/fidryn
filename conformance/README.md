@@ -136,7 +136,11 @@ invented release `999-1`. Each `<name>.xml` is read as the member
 which the test packs into one archive. Beside each, `<name>.records.jsonl`
 holds the expected records, written by hand from the reading rules.
 `test_uslm_text.py` compares the script's output with them and checks
-that the script refuses what the rules refuse.
+that the script refuses what the rules refuse. `reissue/` holds two
+documents, `old.xml` of the release `999-1` and `new.xml` of the release
+`999-2`, which differ in every element id, in the publication name, in the
+creation time of the metadata and in the release note, and in nothing
+else; the test checks that the script prints the same records for both.
 
 `usc_profile.py` reads the same inputs and prints the counts of two sets of
 counting rules as one JSON object with sorted keys: `baseline`, the counting

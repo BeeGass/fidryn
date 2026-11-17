@@ -1,0 +1,27 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<dc:title>Title 99</dc:title>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">yes</property>
+<dcterms:created>2099-01-04T10:00:02</dcterms:created>
+</meta>
+<main>
+<title id="id0a1b2c01-ac5f-11f1-b305-0d0e0f000001" identifier="/us/usc/t99"><num value="99">Title 99—</num><heading>Invented Reissues</heading>
+<note topic="miscellaneous" id="id0a1b2c02-ac5f-11f1-b305-0d0e0f000002"><p>Current through 999-1</p></note>
+<chapter id="id0a1b2c03-ac5f-11f1-b305-0d0e0f000003" identifier="/us/usc/t99/ch1"><num value="1">Chapter 1—</num><heading>Widgets</heading>
+<section id="id0a1b2c04-ac5f-11f1-b305-0d0e0f000004" identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Definitions</heading>
+<chapeau id="id0a1b2c05-ac5f-11f1-b305-0d0e0f000005">In this invented chapter—</chapeau>
+<paragraph id="id0a1b2c06-ac5f-11f1-b305-0d0e0f000006" identifier="/us/usc/t99/s1/1"><num value="1">(1)</num><content id="id0a1b2c07-ac5f-11f1-b305-0d0e0f000007">the term “widget” means a small device<ref class="footnoteRef" idref="id0a1b2c08-ac5f-11f1-b305-0d0e0f000008">1</ref><note type="footnote" id="id0a1b2c08-ac5f-11f1-b305-0d0e0f000008"><num>1</num> So in original.</note>; and</content></paragraph>
+<paragraph id="id0a1b2c09-ac5f-11f1-b305-0d0e0f000009" identifier="/us/usc/t99/s1/2"><num value="2">(2)</num><content id="id0a1b2c0a-ac5f-11f1-b305-0d0e0f00000a">the term “gadget” has the meaning given in <ref href="/us/usc/t99/s2">section 2 of this title</ref>.</content></paragraph>
+<sourceCredit id="id0a1b2c0b-ac5f-11f1-b305-0d0e0f00000b">(Invented act, § 1.)</sourceCredit>
+<notes type="uscNote" id="id0a1b2c0c-ac5f-11f1-b305-0d0e0f00000c">
+<note role="crossHeading" topic="editorialNotes" id="id0a1b2c0d-ac5f-11f1-b305-0d0e0f00000d"><heading><b>Editorial Notes</b></heading></note>
+<note topic="amendments" id="id0a1b2c0e-ac5f-11f1-b305-0d0e0f00000e"><heading>Amendments</heading><p id="id0a1b2c0f-ac5f-11f1-b305-0d0e0f00000f">2099—Par. (2) added.</p></note>
+</notes>
+</section>
+<section id="id0a1b2c10-ac5f-11f1-b305-0d0e0f000010" identifier="/us/usc/t99/s2"><num value="2">§ 2.</num><heading>Gadgets</heading><content id="id0a1b2c11-ac5f-11f1-b305-0d0e0f000011">A gadget is a widget of any size.</content></section>
+</chapter>
+</title>
+</main>
+</uscDoc>
