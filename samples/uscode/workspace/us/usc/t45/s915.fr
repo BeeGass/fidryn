@@ -1,0 +1,183 @@
+edition 2
+module "/us/usc/t45/s915" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s915" section {
+    num "915" "§ 915."
+    heading "Court approved abandonment and sales in pending cases"
+    provision "/us/usc/t45/s915/a" subsection {
+      num "a" "(a)"
+      heading "Abandonment of lines of railroad under Bankruptcy Act"
+      content "Notwithstanding any other provision of law, in any case pending under section 77 of the Bankruptcy Act on November 4, 1979, the court may authorize the abandonment of lines of railroad pursuant to " ["section 1170 of title 11" -> "/us/usc/t11/s1170"] ". Pending the expiration of the time for appeal of an abandonment order or the determination of any such appeal, the court may authorize the termination of service on a line to be abandoned, and the order authorizing such termination may not be stayed. In authorizing any abandonment pursuant to this section, the court shall require the carrier to provide a fair arrangement at least as protective of the interests of employees as that required under section 11347" mark "1" 1 " of title 49."
+      hash "dc4917e195b342f04406fa1cc0e3871e167444f4b481a336372a895762bcbc52"
+    }
+    provision "/us/usc/t45/s915/b" subsection {
+      num "b" "(b)"
+      heading "Sale or transfer of lines of railroad under Bankruptcy Act"
+      provision "/us/usc/t45/s915/b/1" paragraph {
+        num "1" "(1)"
+        content "Notwithstanding any other provision of law, in any case pending under section 77 of the Bankruptcy Act on November 4, 1979, the court may authorize the sale or transfer of a line of railroad to be used in continued rail operations, subject to the approval of the Commission under paragraph (2) of this subsection, if the application with respect to such sale or transfer is filed with the Commission on or after November 1, 1979. In authorizing any such sale or transfer, the court shall provide a fair arrangement at least as protective of the interests of employees as that required under section 11347 " sup "1" " of title 49."
+        hash "2f0c95ddf0112d4fc7fbfc59cdc2d41ff6daceb1c7a8718b45c26311c9eb0953"
+      }
+      provision "/us/usc/t45/s915/b/2" paragraph {
+        num "2" "(2)"
+        content "The court described in paragraph (1) may not authorize a sale or transfer pursuant to such paragraph unless an appropriate application with respect to such sale or transfer is initiated with the Commission and, within such time as the court may fix, not exceeding 180 days, the Commission, with or without a hearing, as the Commission may determine, and with or without modification or condition, approves such application, or does not act on such application. Any action or order of the Commission approving, modifying, conditioning, or disapproving such application is subject to review by the court only under sections 706(2)(A), 706(2)(B), 706(2)(C), and 706(2)(D) of title 5."
+        hash "f236e6ca2813dd96e1a023fb76673e398aa9a9c56c501763f9bbc1598141db86"
+      }
+      provision "/us/usc/t45/s915/b/3" paragraph {
+        num "3" "(3)"
+        provision "/us/usc/t45/s915/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "If a person has made or makes an offer to acquire from a carrier subject to liquidation a rail line or lines over which no service is provided by that carrier, and that offer has been or is rejected by the trustee in bankruptcy of such carrier, such person may submit an application to the Commission seeking approval of such person’s acquisition of such line or lines. A copy of any such application shall be filed simultaneously with the court."
+          hash "abbe522c8aeeef4fbb809bb8ecfc78726ba6faeb9fb67afc0981d46891357b9c"
+        }
+        provision "/us/usc/t45/s915/b/3/B" subparagraph {
+          num "B" "(B)"
+          chapeau "The Commission shall, within 15 days after the filing of an application under subparagraph (A) of this paragraph, determine whether the applicant—"
+          provision "/us/usc/t45/s915/b/3/B/i" clause {
+            num "i" "(i)"
+            content "is a financially responsible person; and"
+            hash "7c1886a5efa79e0dfdd549f82ce46c2831351682d043166e80412eecfe83998d"
+          }
+          provision "/us/usc/t45/s915/b/3/B/ii" clause {
+            num "ii" "(ii)"
+            content "has made a bona fide offer to acquire the line or lines under reasonable terms."
+            hash "d6b915eebd471873d3719400404f342a164b8ffed58193ec5d17df6afa156015"
+          }
+          hash "2985307e7e2411510fd9c17a7bf7ab3a9432385cf067763e232b12ed07422753"
+        }
+        provision "/us/usc/t45/s915/b/3/C" subparagraph {
+          num "C" "(C)"
+          provision "/us/usc/t45/s915/b/3/C/i" clause {
+            num "i" "(i)"
+            content "If the Commission’s determination under subparagraph (B) of this paragraph is affirmative with respect to the matters referred to in clauses (i) and (ii) of such subparagraph, the applicant and the trustee in bankruptcy (hereafter in this paragraph referred to collectively as the “parties”) shall enter into negotiations with respect to terms for the acquisition of the line or lines applied for. If the parties at any time agree on such terms, a request for approval of the acquisition shall be filed with the Commission and the court. If the parties are unable to agree to such terms within 30 days after the date of the Commission’s determination under subparagraph (B) of this paragraph, either party may, within 60 days after the expiration of such 30-day period, request the Commission to prescribe terms for such acquisition, including compensation for the line or lines to be acquired. The Commission shall prescribe such terms within 60 days after any such request is made. The terms prescribed by the Commission shall be binding upon both parties, subject to court review as provided in subparagraph (D) of this paragraph, except that the applicant may withdraw its offer within 10 days after the Commission prescribes such terms."
+            hash "7ac7dfd8dfde4d1710f4bd179895cfbc06506ab0bb47e0bb0a1cada9fb4d37cb"
+          }
+          provision "/us/usc/t45/s915/b/3/C/ii" clause {
+            num "ii" "(ii)"
+            content "If more than one applicant has requested under this subparagraph that the Commission prescribe the terms of acquisition for the same or overlapping lines or portions of such lines, the Commission shall prescribe terms for such acquisition which it determines best serve the public interest."
+            hash "99a75bf8c060aa2a1f7a413cbf238867d59d2ade43c3eb4b648691b74510ee86"
+          }
+          hash "4b3fe4b899ae410062c04935516dd9eb5c5fb0ef8604cd831c58fd1b09b2f684"
+        }
+        provision "/us/usc/t45/s915/b/3/D" subparagraph {
+          num "D" "(D)"
+          provision "/us/usc/t45/s915/b/3/D/i" clause {
+            num "i" "(i)"
+            content "Within 15 days after the Commission prescribes terms under subparagraph (C) of this paragraph, the Commission shall transmit such terms to the court, unless the offer is withdrawn under such subparagraph. Notwithstanding any other provision of law, the court shall, within 60 days after such transmittal, approve the acquisition under terms prescribed by the Commission if the compensation for the line or lines is not less than that required as a constitutional minimum."
+            hash "c4abdb9b86ae6a0c5abd27e0653bc4352f7343a61dbf65a9eebb44eacb25a1cc"
+          }
+          provision "/us/usc/t45/s915/b/3/D/ii" clause {
+            num "ii" "(ii)"
+            content "Except as provided in this subparagraph, no action shall be taken by the court which would prejudice the acquisition which is the subject of an application under this paragraph."
+            hash "df9a37f4d9467cb1afcc519a97b225358cdf75538093a12737a5014cbea9dcab"
+          }
+          hash "92c17fa2cdb070086dc79717f0c20f9514a19686047c28de2773c0074c09ff30"
+        }
+        provision "/us/usc/t45/s915/b/3/E" subparagraph {
+          num "E" "(E)"
+          content "The Commission shall require that any person acquiring a line or lines under this paragraph use, to the maximum extent practicable, employees or former employees of the carrier subject to liquidation in the operation of service on such line or lines."
+          hash "4b44023fa10be9dec444846f5d851749bce011d1a18bfb3a3aaef8f39e098b83"
+        }
+        provision "/us/usc/t45/s915/b/3/F" subparagraph {
+          num "F" "(F)"
+          content "No person acquiring a line under this paragraph may transfer or discontinue service on such line prior to the expiration of 4 years after such acquisition."
+          hash "085b57f5b55b32569d4dd8841eb43a428421d78b225ba05bfbe7c05e9136ddc9"
+        }
+        provision "/us/usc/t45/s915/b/3/G" subparagraph {
+          num "G" "(G)"
+          content "The Commission shall, within 45 days after January 14, 1983, prescribe such regulations and procedures as are necessary to carry out the provisions of this paragraph."
+          hash "cca7206f0154383ef01ec961ae315a060b7218e6b1b88bff12fc8ce58b88db61"
+        }
+        provision "/us/usc/t45/s915/b/3/H" subparagraph {
+          num "H" "(H)"
+          chapeau "As used in this paragraph, the term—"
+          provision "/us/usc/t45/s915/b/3/H/i" clause {
+            num "i" "(i)"
+            content "“carrier subject to liquidation” means a carrier which, on January 14, 1983, was the subject of a proceeding pending under section 77 of the Bankruptcy Act or under subchapter IV of chapter 11 of title 11 and which has been ordered by the court to liquidate its properties;"
+            hash "2197cc13eca376923e63610cb7c3767e99c60ce98b4d72658ccb55fa724046be"
+          }
+          provision "/us/usc/t45/s915/b/3/H/ii" clause {
+            num "ii" "(ii)"
+            content "“the court” means the court having bankruptcy jurisdiction over the carrier subject to liquidation; and"
+            hash "37bd73e681b2e38f5308877b28724d91871723075e2d7b09bdbd66538d51b318"
+          }
+          provision "/us/usc/t45/s915/b/3/H/iii" clause {
+            num "iii" "(iii)"
+            content "“financially responsible person” means a person capable of compensating the carrier subject to liquidation for the acquisition of the line or lines proposed to be acquired and able to cover expenses associated with providing service over such line or lines for a period of not less than 4 years."
+            hash "667895551d6fbe5aaf81660887d59747c20136e05415bb0c87d8366251eba3eb"
+          }
+          hash "2e98404e99aaf7fe3f1bfaf8e910831118a78a837501957a5f03fe05243075f2"
+        }
+        hash "5d8008f2bd2d541c85f4a6698744dc0d8a79f1254a9c67d8a1816bce60da1b8e"
+      }
+      provision "/us/usc/t45/s915/b/4" paragraph {
+        num "4" "(4)"
+        content "Pending review of an application by the Commission pursuant to paragraph (2) of this subsection, the court described in paragraph (1) may, on a preliminary basis, authorize the sale or transfer proposed in such application. The court may permit the purchasing carrier to operate interim service over the lines to be purchased, and in operating such service it shall use employees of the carrier subject to the bankruptcy proceeding to the extent such purchasing carrier deems necessary for the operation of such service."
+        hash "0b85449a368caf4a9a56917548e937c94cf18e7dd6abe88c6590759d9e69e007"
+      }
+      hash "5bf6f6e493affb93acdb12499cdac03993cdf2c72dbdc9d3ac04327edefde13f"
+    }
+    provision "/us/usc/t45/s915/c" subsection {
+      num "c" "(c)"
+      heading "Judicial review"
+      chapeau "Any action or order of the Commission approving, modifying, conditioning, or disapproving an application for the sale or transfer of rail property that is filed with the Commission before November 1, 1979, in connection with a case pending under section 77 of the Bankruptcy Act on November 4, 1979—"
+      provision "/us/usc/t45/s915/c/1" paragraph {
+        num "1" "(1)"
+        content "is subject to review by the court only under sections 706(2)(A), 706(2)(B), 706(2)(C), and 706(2)(D) of title 5; and"
+        hash "9f7cfc341af692383a5bf9e28449b4a1ec7920b1f20324ee6da1ba41e34955d5"
+      }
+      provision "/us/usc/t45/s915/c/2" paragraph {
+        num "2" "(2)"
+        content "may not be stayed by the Commission."
+        hash "305a7356428988455c45ba9caf7e80aabfdf808cd9a0645fc058cf233c2fa465"
+      }
+      hash "0e82cb87d9aae07f0331f821f28bcdc68424badbaf62231bec0dcf9f05f8397d"
+    }
+    provision "/us/usc/t45/s915/d" subsection {
+      num "d" "(d)"
+      heading "Authority of bankruptcy court"
+      content "The authority of the bankruptcy court to authorize abandonments, sales, and transfers of lines of the Milwaukee Railroad shall be governed by the provisions of " ["section 904 of this title" -> "/us/usc/t45/s904"] ", rather than the provisions of this section."
+      hash "68a6a74ce28f34bb508827f20f442b48cc6ad9cb3b5f9202343e2f9e484b1ff1"
+    }
+    provision "/us/usc/t45/s915/e" subsection {
+      num "e" "(e)"
+      heading "Effect on priorities and timing of employee protection payments"
+      content "Nothing in this section shall be deemed to affect the priorities or timing of payment of employee protection which might have existed in the absence of this chapter."
+      hash "28fc4853a4f772bdc72c5d92bf508f34325aee0633da0177e669f3f0032898cb"
+    }
+    hash "b3bbaf3bb6cb5c8554b80e9182b3f8def25ff3e8e8181ef97899e8c83fe1196f"
+  }
+  credit "(" ["Pub. L. 96–101, § 17" -> "/us/pl/96/101/s17"] ", Nov. 4, 1979, " ["93 Stat. 744" -> "/us/stat/93/744"] "; " ["Pub. L. 97–468, title II, § 213" -> "/us/pl/97/468/tII/s213"] ", Jan. 14, 1983, " ["96 Stat. 2544" -> "/us/stat/96/2544"] ".)"
+  note "/us/usc/t45/s915/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77 of the Bankruptcy Act, referred to in subsecs. (a), (b)(1), (3)(H)(i), and (c), was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", as amended) was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p ["Section 11347 of title 49" -> "/us/usc/t49/s11347"] ", referred to in subsecs. (a) and (b)(1), was omitted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] ". Provisions similar to those in section 11347 are contained in " ["section 11326(a) of Title 49" -> "/us/usc/t49/s11326/a"] "."
+    hash "1f6fea4f46bad40b16d3a5412acc02a2508d26761b0088942e8ac086106ab390"
+  }
+  note "/us/usc/t45/s915/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (b)(3), (4). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " added par. (3) and redesignated former par. (3) as (4)."
+    hash "63bfc693f868f1b80e07e50382959c1fe701ec7d8412fc2f4ccadb287bc0431a"
+  }
+  note "/us/usc/t45/s915/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "b3bbaf3bb6cb5c8554b80e9182b3f8def25ff3e8e8181ef97899e8c83fe1196f"
+    enacted "e175611b7d6b52a4386c25ad66c38f39b79771e7f0b3fad08eedd7198f534e63"
+    editorial "e51b05e1204c103e5252ff3cb4d533ea1c3ce5f6cbb69917d8b9fc8db4e3338b"
+  }
+}

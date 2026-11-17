@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7028" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7028" courtRule {
+    num "7028" "Rule 7028."
+    heading "Persons Before Whom Depositions May Be Taken"
+    content "Fed. R. Civ. P. 28 applies in an adversary proceeding."
+    hash "888a49da369f7e6b1801a4891b923c45384b647b870341f9ae1b033ed4db2bcd"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7028/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7028 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b144717f389f085685eb151f22031e11f773ffb65d61e576ec749f3567228a3d"
+  }
+  note "/us/usc/ptVII/rule7028/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "888a49da369f7e6b1801a4891b923c45384b647b870341f9ae1b033ed4db2bcd"
+    enacted "4836fc6a2005746b78d84ba0b453d3c4e10987bf9d49c9ccdc50c7b609af70b9"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

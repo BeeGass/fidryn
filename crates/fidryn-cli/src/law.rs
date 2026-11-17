@@ -1,17 +1,25 @@
-//! `fidryn ingest`: a generated workspace of law modules, written from the
-//! archives of one release of a corpus.
+//! The commands of law modules: `fidryn ingest`, a generated workspace
+//! written from the archives of one release of a corpus, and `fidryn text`,
+//! the text of the provisions and notes a workspace holds.
 //!
-//! This is the one place of the command line that names the corpus it
+//! `ingest` is the one place of the command line that names the corpus it
 //! imports, the United States Code, read from the official XML release point
 //! published by the Office of the Law Revision Counsel by
 //! `fidryn-ingest-uscode`. What it writes, `fidryn-driver` writes: the
-//! command joins the two.
+//! command joins the two. `text` names no corpus: it prints the text records
+//! of `fidryn_provision::records` of the modules `fidryn-driver` reads, or
+//! the same text laid out for a person.
 
 use clap::Subcommand;
-use fidryn_driver::workspace::{GeneratedWriter, WriteError};
+use fidryn_core::Diagnostic;
+use fidryn_driver::workspace::{GeneratedWriter, WriteError, read_modules};
 use fidryn_ingest_uscode::{IngestError, IngestOptions, generator, ingest, open};
-use fidryn_provision::Address;
+use fidryn_provision::records::text_records;
 use fidryn_provision::workspace::{Manifest, WorkspaceKind};
+use fidryn_provision::{
+    Address, Block, Footnote, Item, Layer, Module, Note, Num, Provision, QuotedItem, Run, Text,
+};
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -144,4 +152,357 @@ fn uscode(
         }
         Err(error) => super::fail(error.to_string()),
     }
+}
+
+/// `fidryn text DIR [ADDRESS] [--json]`: prints to stdout what
+/// [`write_text`] writes. Exit 1, with the reason on stderr and nothing on
+/// stdout, when the workspace cannot be read or `address` is not in it.
+pub(crate) fn text(dir: &Path, address: Option<&str>, json: bool) -> ExitCode {
+    let stdout = io::stdout();
+    let mut out = io::BufWriter::new(stdout.lock());
+    match write_text(dir, address, json, &mut out) {
+        Ok(()) => match out.flush() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => super::fail(format!("cannot write the text: {error}")),
+        },
+        Err(message) => super::fail(message),
+    }
+}
+
+/// Writes to `out` the text of the provisions and notes of the workspace in
+/// `dir`, or, with `address`, of the provision, container or note at it and
+/// of what lies below it: every record whose address is `address` or
+/// continues it at a segment boundary.
+///
+/// With `json`, each record that [`text_records`] gives of a module, one
+/// compact line of JSON, `fidryn.text-record/v0.1`, to a line, sorted by the
+/// bytes of their addresses across the whole workspace; for one address in
+/// the order of its module's records. Without it, the same text laid out for
+/// a person, module by module in the order of their addresses, with a blank
+/// line between two modules. Everything is read and chosen before anything
+/// is written, so an error writes nothing: a workspace that cannot be read,
+/// a text that is no address, and an address at which the workspace holds
+/// no provision, container or note.
+pub fn write_text(
+    dir: &Path,
+    address: Option<&str>,
+    json: bool,
+    out: &mut dyn Write,
+) -> Result<(), String> {
+    let jobs = std::thread::available_parallelism().map_or(1, std::num::NonZero::get);
+    let mut modules =
+        read_modules(dir, jobs).map_err(|diagnostics| diagnostics_under(dir, &diagnostics))?;
+    let at = match address {
+        None => None,
+        Some(text) => {
+            let at =
+                Address::parse(text).map_err(|error| format!("`{text}` is no address: {error}"))?;
+            if !modules.iter().any(|module| holds(module, &at)) {
+                return Err(format!(
+                    "the workspace holds no provision, container or note at `{at}`"
+                ));
+            }
+            Some(at)
+        }
+    };
+    let written = if json {
+        // Each module is dropped once its records are written as lines.
+        let mut lines: Vec<(Address, String)> = Vec::new();
+        for module in modules {
+            for record in text_records(&module) {
+                if below(record.address(), at.as_ref()) {
+                    lines.push((record.address().clone(), record.to_json()));
+                }
+            }
+        }
+        // A stable sort: the records of one address keep their module's order.
+        lines.sort_by(|a, b| a.0.cmp(&b.0));
+        lines
+            .iter()
+            .try_for_each(|(_, line)| writeln!(out, "{line}"))
+    } else {
+        modules.sort_by(|a, b| module_address(a).cmp(module_address(b)));
+        let mut first = true;
+        modules.iter().try_for_each(|module| {
+            let page = for_a_person(module, at.as_ref());
+            if page.is_empty() {
+                return Ok(());
+            }
+            if !std::mem::replace(&mut first, false) {
+                writeln!(out)?;
+            }
+            out.write_all(page.as_bytes())
+        })
+    };
+    written.map_err(|error| format!("cannot write the text: {error}"))
+}
+
+/// The diagnostics of a workspace, one to a line, each naming its file under
+/// `dir`.
+fn diagnostics_under(dir: &Path, diagnostics: &[Diagnostic]) -> String {
+    diagnostics
+        .iter()
+        .map(|diagnostic| {
+            let mut shown = diagnostic.clone();
+            shown.source_file = diagnostic
+                .source_file
+                .as_ref()
+                .map(|file| dir.join(file).display().to_string());
+            shown.to_string()
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// Whether `address` is `at`, or lies below it at a segment boundary; any
+/// address when there is no `at`.
+fn below(address: &Address, at: Option<&Address>) -> bool {
+    at.is_none_or(|at| address.is_within(at))
+}
+
+fn module_address(module: &Module) -> &Address {
+    match module {
+        Module::Unit(unit) => &unit.address,
+        Module::Container(container) => &container.address,
+        Module::Curated(curated) => &curated.address,
+    }
+}
+
+/// Whether `module` holds a provision, a container or a note at `at`.
+fn holds(module: &Module, at: &Address) -> bool {
+    fn in_tree(provision: &Provision, at: &Address) -> bool {
+        provision.address == *at
+            || provision.items.iter().any(|item| match item {
+                Item::Child(child) => in_tree(child, at),
+                Item::Part { .. } => false,
+            })
+    }
+    let noted = |notes: &[Note]| notes.iter().any(|note| note.address == *at);
+    match module {
+        Module::Unit(unit) => in_tree(&unit.root, at) || noted(&unit.notes),
+        Module::Container(container) => container.address == *at || noted(&container.notes),
+        Module::Curated(_) => false,
+    }
+}
+
+/// The text of `module` for a person, or of what of it lies below `at`; empty
+/// when nothing does. Each provision is its address on a line of its own,
+/// then its number and heading on one line, the blocks of its text parts and
+/// its children, each indented by two spaces for each level of depth; the
+/// provision printed first is at depth 0. After the provisions come the
+/// source credit and the footnotes, at depth 1, when the module itself is
+/// printed, and then the notes, each its address with its layer, its heading
+/// and its blocks. A container is its address, its number and heading,
+/// credit, footnotes and notes. A status follows its address in
+/// parentheses, a footnote marker is its shown text in brackets, a table is
+/// one line for each row with its cells separated by ` | `, the items of
+/// quoted content are indented one level further, and an image is
+/// `[image SOURCE]`.
+fn for_a_person(module: &Module, at: Option<&Address>) -> String {
+    let mut page = Page::default();
+    let (whole, credit, footnotes, notes) = match module {
+        Module::Unit(unit) => {
+            page.chosen(&unit.root, at);
+            (
+                below(&unit.address, at),
+                unit.credit.as_ref(),
+                &unit.footnotes[..],
+                &unit.notes[..],
+            )
+        }
+        Module::Container(container) => {
+            let whole = below(&container.address, at);
+            if whole {
+                page.line(
+                    0,
+                    &with_status(&container.address, container.status.as_deref()),
+                );
+                page.label(1, container.num.as_ref(), container.heading.as_ref());
+            }
+            (
+                whole,
+                container.credit.as_ref(),
+                &container.footnotes[..],
+                &container.notes[..],
+            )
+        }
+        Module::Curated(_) => return String::new(),
+    };
+    if whole {
+        if let Some(credit) = credit {
+            page.line(1, &shown(credit));
+        }
+        for footnote in footnotes {
+            page.footnote(footnote, 1);
+        }
+    }
+    for note in notes.iter().filter(|note| below(&note.address, at)) {
+        let layer = match note.layer {
+            Layer::Operative => "operative",
+            Layer::Enacted => "enacted",
+            Layer::Editorial => "editorial",
+        };
+        page.line(0, &format!("{} ({layer})", note.address));
+        if let Some(heading) = &note.heading {
+            page.line(1, &shown(heading));
+        }
+        page.blocks(&note.blocks, 1);
+    }
+    page.text()
+}
+
+/// The lines of a text for a person, each with its depth.
+#[derive(Default)]
+struct Page {
+    lines: Vec<(usize, String)>,
+}
+
+impl Page {
+    /// Adds `text` at `depth`; a text with nothing but white space adds no
+    /// line.
+    fn line(&mut self, depth: usize, text: &str) {
+        let text = text.trim_end();
+        if !text.trim_start().is_empty() {
+            self.lines.push((depth, text.to_owned()));
+        }
+    }
+
+    /// Every line, indented, each with its line end.
+    fn text(&self) -> String {
+        let mut text = String::new();
+        for (depth, line) in &self.lines {
+            for _ in 0..*depth {
+                text.push_str("  ");
+            }
+            text.push_str(line);
+            text.push('\n');
+        }
+        text
+    }
+
+    /// The provisions of the tree of `provision` that lie below `at`, each
+    /// from depth 0 with what lies below it.
+    fn chosen(&mut self, provision: &Provision, at: Option<&Address>) {
+        if below(&provision.address, at) {
+            self.provision(provision, 0);
+            return;
+        }
+        for item in &provision.items {
+            if let Item::Child(child) = item {
+                self.chosen(child, at);
+            }
+        }
+    }
+
+    fn provision(&mut self, provision: &Provision, depth: usize) {
+        self.line(
+            depth,
+            &with_status(&provision.address, provision.status.as_deref()),
+        );
+        self.label(
+            depth + 1,
+            provision.num.as_ref(),
+            provision.heading.as_ref(),
+        );
+        for item in &provision.items {
+            match item {
+                Item::Part { blocks, .. } => self.blocks(blocks, depth + 1),
+                Item::Child(child) => self.provision(child, depth + 1),
+            }
+        }
+    }
+
+    /// The number and the heading, on one line.
+    fn label(&mut self, depth: usize, num: Option<&Num>, heading: Option<&Text>) {
+        let parts: Vec<String> = num
+            .map(|num| shown(&num.shown))
+            .into_iter()
+            .chain(heading.map(shown))
+            .filter(|part| !part.is_empty())
+            .collect();
+        self.line(depth, &parts.join(" "));
+    }
+
+    fn blocks(&mut self, blocks: &[Block], depth: usize) {
+        for block in blocks {
+            self.block(block, depth);
+        }
+    }
+
+    fn block(&mut self, block: &Block, depth: usize) {
+        match block {
+            Block::Para(text) | Block::Subheading(text) => self.line(depth, &shown(text)),
+            Block::Table(table) => {
+                for row in &table.rows {
+                    let cells: Vec<String> =
+                        row.cells.iter().map(|cell| flat(&cell.blocks)).collect();
+                    self.line(depth, &cells.join(" | "));
+                }
+            }
+            Block::Quoted(quoted) => self.quoted(&quoted.items, depth + 1),
+            Block::Image { source } => self.line(depth, &format!("[image {source}]")),
+        }
+    }
+
+    fn quoted(&mut self, items: &[QuotedItem], depth: usize) {
+        for item in items {
+            match item {
+                QuotedItem::Block(block) => self.block(block, depth),
+                QuotedItem::Part { blocks, .. } => self.blocks(blocks, depth),
+                QuotedItem::Level(level) => {
+                    self.label(depth, level.num.as_ref(), level.heading.as_ref());
+                    self.quoted(&level.items, depth + 1);
+                }
+            }
+        }
+    }
+
+    /// A footnote: its blocks, the first preceded by its marker in brackets.
+    fn footnote(&mut self, footnote: &Footnote, depth: usize) {
+        let marker = format!("[{}]", footnote.shown);
+        let first = self.lines.len();
+        self.blocks(&footnote.blocks, depth);
+        match self.lines.get_mut(first) {
+            Some((_, line)) => *line = format!("{marker} {line}"),
+            None => self.line(depth, &marker),
+        }
+    }
+}
+
+/// The blocks of a table cell on one line.
+fn flat(blocks: &[Block]) -> String {
+    let mut page = Page::default();
+    page.blocks(blocks, 0);
+    page.lines
+        .into_iter()
+        .map(|(_, line)| line)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// An address, followed by its status in parentheses when it has one.
+fn with_status(address: &Address, status: Option<&str>) -> String {
+    match status {
+        Some(status) => format!("{address} ({status})"),
+        None => address.to_string(),
+    }
+}
+
+/// A text for a person: its words, each footnote marker as its shown text in
+/// brackets.
+fn shown(text: &Text) -> String {
+    let mut shown = String::new();
+    for run in &text.runs {
+        match run {
+            Run::Words(words) | Run::Sup(words) | Run::Sub(words) | Run::Ref { words, .. } => {
+                shown.push_str(words);
+            }
+            Run::Mark { shown: marker, .. } => {
+                shown.push('[');
+                shown.push_str(marker);
+                shown.push(']');
+            }
+        }
+    }
+    shown
 }

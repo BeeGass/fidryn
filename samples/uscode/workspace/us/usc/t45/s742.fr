@@ -1,0 +1,46 @@
+edition 2
+module "/us/usc/t45/s742" {
+  within "/us/usc/t45/ch16/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s742" section {
+    num "742" "§ 742."
+    heading "Powers and duties of Corporation"
+    chapeau "The Corporation shall have all of the powers and is subject to all of the duties vested in it under this chapter, in addition to the powers conferred upon it under the laws of the State or States in which it is incorporated and the powers of a railroad in any State in which it operates. The Corporation is authorized and directed to—"
+    provision "/us/usc/t45/s742/a" subsection {
+      num "a" "(a)"
+      content "acquire rail properties designated in the final system plan to be transferred or conveyed to it;"
+      hash "288bd34f4b077150b89e437814c0623125fb3bea3ec2bb4b3bf0923f4921745a"
+    }
+    provision "/us/usc/t45/s742/b" subsection {
+      num "b" "(b)"
+      content "operate rail service over such rail properties except as provided under sections 744(e) and 791(d)(3) of this title;"
+      hash "10e8184dc1b91f228ad41138632a3e3cf532768fca5879e6cecfb5bc9a3e5c62"
+    }
+    provision "/us/usc/t45/s742/c" subsection {
+      num "c" "(c)"
+      content "rehabilitate, improve, and modernize such rail properties; and"
+      hash "20d40c3c9337a6c9e8426de222d03bafdfb3c5f82bb6dda701c162c2209864e8"
+    }
+    provision "/us/usc/t45/s742/d" subsection {
+      num "d" "(d)"
+      content "maintain adequate and efficient rail services."
+      hash "327a5d3335492cf58c6beb7e5ac3a3f91df1486b09c6c8e39956d1ed23554721"
+    }
+    continuation "So long as 50 per centum or more, as determined by the Secretary of the Treasury, of the outstanding indebtedness of the Corporation consists of obligations of the Association or other debts owing to or guaranteed by the United States, the Corporation shall not engage in activities which are not related to transportation."
+    hash "f177eddacc14a3229edc50a03ded7bfc2d80d36e001506d7258dec2798a169e8"
+  }
+  credit "(" ["Pub. L. 93–236, title III, § 302" -> "/us/pl/93/236/tIII/s302"] ", Jan. 2, 1974, " ["87 Stat. 1005" -> "/us/stat/87/1005"] ".)"
+  note "/us/usc/t45/s742/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  layers {
+    operative "f177eddacc14a3229edc50a03ded7bfc2d80d36e001506d7258dec2798a169e8"
+    enacted "e9603a5d8b787b60caba22f9a752b0ab1bb6bd9c4f92ba7d18ae5882eb0bec74"
+    editorial "2fee14c9e0ef0c228b89549ba962188460e7c989045eb3d34480bbde64f0f51c"
+  }
+}

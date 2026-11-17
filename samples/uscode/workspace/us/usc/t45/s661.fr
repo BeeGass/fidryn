@@ -1,0 +1,70 @@
+edition 2
+module "/us/usc/t45/s661" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s661" section {
+    num "661" "§ 661."
+    heading "Definitions"
+    chapeau "For the purposes of this chapter—"
+    provision "/us/usc/t45/s661/1" paragraph {
+      num "1" "(1)"
+      content "“Secretary” means the Secretary of Transportation."
+      hash "36db9e15dcad963909c2d48146b8317437a569e08d894e14cba1a04919e50456"
+    }
+    provision "/us/usc/t45/s661/2" paragraph {
+      num "2" "(2)"
+      content "“Board” means the Surface Transportation Board."
+      hash "3a0ee27c3d86b3c3d60ad546742d5633977b118f4812cbe5075b4a87b4c825a9"
+    }
+    provision "/us/usc/t45/s661/3" paragraph {
+      num "3" "(3)"
+      content "“Railroad” means any rail carrier subject to part A of subtitle IV of title 49."
+      hash "ef389b5df2af21fe01d6beb1b215055678c2af27d3a7c5185d510945009faab6"
+    }
+    provision "/us/usc/t45/s661/4" paragraph {
+      num "4" "(4)"
+      content "“Certificate” means certificates issued by trustees of a railroad pursuant to subsection 77(c)(3) of the Bankruptcy Act, as amended."
+      hash "afc06ffe237f6621d12c2fa85f9446a92fc827a90ca220b171c0b6e532f9f5aa"
+    }
+    hash "d1b01c56e31dbd0564a8b8e0f37e22b101a61e9e043b58b5a86507ca75654b08"
+  }
+  credit "(" ["Pub. L. 91–663, § 2" -> "/us/pl/91/663/s2"] ", Jan. 8, 1971, " ["84 Stat. 1975" -> "/us/stat/84/1975"] "; " ["Pub. L. 104–88, title III, § 325(1)" -> "/us/pl/104/88/tIII/s325/1"] ", Dec. 29, 1995, " ["109 Stat. 951" -> "/us/stat/109/951"] ".)"
+  note "/us/usc/t45/s661/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77(c)(3) of the Bankruptcy Act, referred to in par. (4), was classified to section 205(c)(3) of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ") was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "8624bdc772c36f8b8c8760d35f05c03f8a11fe122ac59ac48e86a7c0a3bb376e"
+  }
+  note "/us/usc/t45/s661/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—Par. (2). " ["Pub. L. 104–88, § 325(1)(A)" -> "/us/pl/104/88/s325/1/A"] ", added par. (2) and struck out former par. (2) which read as follows: “ ‘Commission’ means the Interstate Commerce Commission.”"
+    p "Par. (3). " ["Pub. L. 104–88, § 325(1)(B)" -> "/us/pl/104/88/s325/1/B"] ", substituted “rail carrier subject to part A of subtitle IV of title 49” for “common carrier by railroad subject to part I of the Interstate Commerce Act (" ["49 U.S.C. 1–27" -> "/us/usc/t49/s1–27"] ")”."
+    hash "f38e5de7fe393af1751cbed75336f8da8144b6121600d2e042048ae04b668bf6"
+  }
+  note "/us/usc/t45/s661/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  note "/us/usc/t45/s661/note/statutoryNotes/pl.91.663/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 91–663, § 1" -> "/us/pl/91/663/s1"] ", Jan. 8, 1971, " ["84 Stat. 1975" -> "/us/stat/84/1975"] ", provided:"
+    quoted "/us/pl/91/663/s1" {
+      p "“That this Act [enacting this chapter] may be cited as the ‘Emergency Rail Services Act of 1970’.”"
+    }
+    hash "11088c7a079b81ed1e64571bb7889754a23bfef2650d374b0699aea537d281c7"
+  }
+  layers {
+    operative "d1b01c56e31dbd0564a8b8e0f37e22b101a61e9e043b58b5a86507ca75654b08"
+    enacted "9c5907d18c28c58c66fa6a4f45695c9733986886118a8e3184649f77c6233830"
+    editorial "2b1e48482acd480d0fefcfc3bce41e253a33e777df59f0f734825c68193db8eb"
+  }
+}

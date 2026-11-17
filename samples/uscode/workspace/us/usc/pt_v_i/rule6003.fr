@@ -1,0 +1,94 @@
+edition 2
+module "/us/usc/ptVI/rule6003" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6003" courtRule {
+    num "6003" "Rule 6003."
+    heading "Prohibition on Granting Certain Applications and Motions Made Immediately After the Petition Is Filed"
+    provision "/us/usc/ptVI/rule6003/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "Unless relief is needed to avoid immediate and irreparable harm, the court must not, within 21 days after the petition is filed, grant an application or motion to:"
+      provision "/us/usc/ptVI/rule6003/a/1" paragraph {
+        num "1" "(1)"
+        content "employ a professional person under Rule 2014;"
+        hash "5d6a609df0966b93e8e1d5a49b687add189049cffb0fca4e88f7c99a153c4cb6"
+      }
+      provision "/us/usc/ptVI/rule6003/a/2" paragraph {
+        num "2" "(2)"
+        content "use, sell, or lease property of the estate, including a motion to pay all or a part of a claim that arose before the petition was filed;"
+        hash "bde21c2dd9364f04b414ec1cd8c847bf26aa64f73f987d851dd4f5fe0e85bc2c"
+      }
+      provision "/us/usc/ptVI/rule6003/a/3" paragraph {
+        num "3" "(3)"
+        content "incur any other obligation regarding the property of the estate; or"
+        hash "5fad42ac4a60490eedb1cf6ff02297557f886607ef682e0d450b65b5bb3c05b9"
+      }
+      provision "/us/usc/ptVI/rule6003/a/4" paragraph {
+        num "4" "(4)"
+        content "assume or assign an executory contract or unexpired lease under § 365."
+        hash "1f9f35ad6368729737a184ad3b13cc1f7d8ad623615955010c89482c6f53721d"
+      }
+      hash "d99e3b1dd76e9bfa25cd8763e7f2d354a103af40386f3e1a17a906768022cfa3"
+    }
+    provision "/us/usc/ptVI/rule6003/b" subsection {
+      num "b" "(b)"
+      heading "Exception."
+      content "This rule does not apply to a motion under Rule 4001."
+      hash "da34053b71d5ce74cce29cd67c883a80b225bb76a211194e0396d539b8c6cf3b"
+    }
+    hash "c055335a38ada7c639e6c381379e3359a83a2335b39e7bc666dff7faf15b6673"
+  }
+  credit "(Added Apr. 30, 2007, eff. Dec. 1, 2007; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "This rule [Former Rule 6003—Disbursement of Money of the Estate (Abrogated Apr. 30, 1991, eff. Aug. 1, 1991)] is abrogated in view of the role of the United States trustee in supervising trustees. Use of estate funds by a trustee or debtor in possession is governed by § 363 of the Code."
+    hash "c2fdc7c0da1e3f938291d139d5d42cc57992ef9082432693d718d704006d921c"
+  }
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2007" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007"
+    p "There can be a flurry of activity during the first days of a bankruptcy case. This activity frequently takes place prior to the formation of a creditors’ committee, and it also can include substantial amounts of materials for the court and parties in interest to review and evaluate. This rule is intended to alleviate some of the time pressures present at the start of a case so that full and close consideration can be given to matters that may have a fundamental impact on the case."
+    p "The rule provides that the court cannot grant relief on applications for the employment of professional persons, motions for the use, sale, or lease of property of the estate other than such a motion under Rule 4001, and motions to assume or assign executory contracts and unexpired leases for the first 20 days of the case, unless granting relief is necessary to avoid immediate and irreparable harm. This standard is taken from Rule 4001(b)(2) and (c)(2), and decisions under those provisions should provide guidance for the application of this provision."
+    p "This rule does not govern motions and applications made more than 20 days after the filing of the petition."
+    p "Changes After Publication. Subdivision (c) was amended by deleting the reference to the rejection of executory contracts or unexpired leases. The rule, as revised, now limits only the assumption or assignment of executory contracts or unexpired leases in that subdivision."
+    hash "c6aa4e24ff699b8bd50a3a71f2095fc0058502bf54ec4d37e18b98420c2812e7"
+  }
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011 Amendment"
+    p "The rule is amended to clarify that it limits the timing of the entry of certain orders, but does not prevent the court from providing an effective date for such an order that may relate back to the time of the filing of the application or motion, or to some other date. For example, while the rule prohibits, absent immediate and irreparable harm, the court from authorizing the employment of counsel during the first 21 days of a case, it does not prevent the court from providing in an order entered after expiration of the 21-day period that the relief requested in the motion or application is effective as of a date earlier than the issuance of the order. Nor does it prohibit the filing of an application or motion for relief prior to expiration of the 21-day period. Nothing in the rule prevents a professional from representing the trustee or a debtor in possession pending the approval of an application for the approval of the employment under Rule 2014."
+    p "The amendment also clarifies that the scope of the rule is limited to granting the specifically identified relief set out in the subdivisions of the rule. Deleting “regarding” from the rule clarifies that the rule does not prohibit the court from entering orders in the first 21 days of the case that may relate to the motions and applications set out in (a), (b), and (c); it is only prohibited from granting the relief requested by those motions or applications. For example, in the first 21 days of the case, the court could grant the relief requested in a motion to establish bidding procedures for the sale of property of the estate, but it could not, absent immediate and irreparable harm, grant a motion to approve the sale of property."
+    p "Changes Made After Publication. Minor stylistic changes were made to the Committee Note following publication."
+    hash "5f8d5ee7adecc64125746480135d4028329e222c72258fc272281c83e22220f5"
+  }
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a2d67f0c3e9a99b59deaa332e33e16c2e55075659cdd0132b11d66a7a39affb6"
+  }
+  layers {
+    operative "c055335a38ada7c639e6c381379e3359a83a2335b39e7bc666dff7faf15b6673"
+    enacted "a43c4c51b2107266131fdc060203cd9aa97afa68e87bddf1ba42c265665d6a56"
+    editorial "d2af5f188b6f0dbf22a49e9e6fbe8dac8eb7db84b945abe7ac53dba76942a542"
+  }
+}

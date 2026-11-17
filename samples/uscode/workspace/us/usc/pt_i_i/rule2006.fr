@@ -1,0 +1,324 @@
+edition 2
+module "/us/usc/ptII/rule2006" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2006" courtRule {
+    num "2006" "Rule 2006."
+    heading "Soliciting and Voting Proxies in a Chapter 7 Case"
+    provision "/us/usc/ptII/rule2006/a" subsection {
+      num "a" "(a)"
+      heading "Applicability."
+      content "This Rule 2006 applies only in a Chapter 7 case."
+      hash "b33b705f193413ed891734af9321b0a990dea566a2297c4058114722a3ae15ea"
+    }
+    provision "/us/usc/ptII/rule2006/b" subsection {
+      num "b" "(b)"
+      heading "Definitions."
+      provision "/us/usc/ptII/rule2006/b/1" paragraph {
+        num "1" "(1)"
+        content "Proxy. A “proxy” is a written power of attorney that authorizes an entity to vote the claim or otherwise act as the holder’s attorney-in-fact in connection with the administration of the estate."
+        hash "86f057166a7094c9058d70d7a4b0ade5df3bf3bdc027ed924f6fc23ddd969265"
+      }
+      provision "/us/usc/ptII/rule2006/b/2" paragraph {
+        num "2" "(2)"
+        content "Soliciting a Proxy. “Soliciting a proxy” means any communication by which a creditor is asked, directly or indirectly, to give a proxy after or in contemplation of a Chapter 7 petition filed by or against the debtor. But such a communication is not considered soliciting a proxy if it comes from an attorney to a claim owner who is a regular client or who has requested the attorney’s representation."
+        hash "13f872cb244fcc50b1c3bc99d9d2dc963d7932357284219f9f2b9df7e35fc9cc"
+      }
+      hash "ef6743a35f59d79a978695d675b9e9bbebc3d0987fb90b28bc0124e5bf4e620d"
+    }
+    provision "/us/usc/ptII/rule2006/c" subsection {
+      num "c" "(c)"
+      heading "Who May Solicit a Proxy."
+      chapeau "A proxy may be solicited only in writing and only by:"
+      provision "/us/usc/ptII/rule2006/c/1" paragraph {
+        num "1" "(1)"
+        content "a creditor that, on the date the petition was filed, held an allowable unsecured claim against the estate;"
+        hash "5c1f8cbd74c59b56a1ac851cb5e6d533ef08e4ba3852e3cf1a92e563a2ca88db"
+      }
+      provision "/us/usc/ptII/rule2006/c/2" paragraph {
+        num "2" "(2)"
+        content "a committee elected under § 705;"
+        hash "83d0b92116cf7aa1fe58ef62a9d07a5797020f2281e36b4da7a18ac82d22877f"
+      }
+      provision "/us/usc/ptII/rule2006/c/3" paragraph {
+        num "3" "(3)"
+        chapeau "a committee elected by creditors that hold a majority of claims in number and in total amount and that:"
+        provision "/us/usc/ptII/rule2006/c/3/A" subparagraph {
+          num "A" "(A)"
+          content "have claims that are not contingent or unliquidated;"
+          hash "e70ef14d6e465e31d8cf90363ad03f5df3a91dce6c015a48bad6fd95d4fbf9e1"
+        }
+        provision "/us/usc/ptII/rule2006/c/3/B" subparagraph {
+          num "B" "(B)"
+          content "are not disqualified from voting under § 702(a); and"
+          hash "01d81b376c50ca1cd4e5b899871b7c94f0fc48e0616bea86e23f578a231fe29a"
+        }
+        provision "/us/usc/ptII/rule2006/c/3/C" subparagraph {
+          num "C" "(C)"
+          chapeau "were present or represented at a creditors’ meeting where:"
+          provision "/us/usc/ptII/rule2006/c/3/C/i" clause {
+            num "i" "(i)"
+            content "all creditors with claims over $500—or the 100 creditors with the largest claims—had at least 7 days’ written notice; and"
+            hash "8d7b3179670216ec37205682d46a64f7d4ea977fcef1a54d90ba083edc7ab09f"
+          }
+          provision "/us/usc/ptII/rule2006/c/3/C/ii" clause {
+            num "ii" "(ii)"
+            content "written minutes are available that report the voting creditors’ names and the amounts of their claims; or"
+            hash "119affdea86d3bbde8976e86173a7d2f8df9a2277f90d03acfe902589418f87d"
+          }
+          hash "374bdcdaf5be3ed46a370e1abd1ffde30edf9a7b67db598b5646c185639d735e"
+        }
+        hash "52e47e0a9c347b3ff7e6f493dc470939af28e999a981bf756411d02f455f710d"
+      }
+      provision "/us/usc/ptII/rule2006/c/4" paragraph {
+        num "4" "(4)"
+        chapeau "a bona fide trade or credit association, which may solicit only creditors who, on the petition date:"
+        provision "/us/usc/ptII/rule2006/c/4/A" subparagraph {
+          num "A" "(A)"
+          content "were its members or subscribers in good standing; and"
+          hash "e9eac69d976b82cc60de14ab17eb1521fcc59c74476b22b0e47083caae9e0f05"
+        }
+        provision "/us/usc/ptII/rule2006/c/4/B" subparagraph {
+          num "B" "(B)"
+          content "held allowable unsecured claims."
+          hash "153d55c0cd0b29ebd374256764446ea8d965ce3e06c20f6eb97f91626905a56a"
+        }
+        hash "e0185842b9b05f44386f691cc2e8b0bc31fb0b6f12c44c4ab9563a34c793f880"
+      }
+      hash "9c8f1cee73f600c87e63460a52e65c774708384e4ed66f8bd75179c6863eeb8e"
+    }
+    provision "/us/usc/ptII/rule2006/d" subsection {
+      num "d" "(d)"
+      heading "When Soliciting a Proxy Is Not Permitted."
+      chapeau "This Rule 2006 does not permit soliciting a proxy:"
+      provision "/us/usc/ptII/rule2006/d/1" paragraph {
+        num "1" "(1)"
+        content "for any interest except that of a general creditor;"
+        hash "b8c8888434305921a9016aff9521def90488e30479ab4a12df957897db0903ef"
+      }
+      provision "/us/usc/ptII/rule2006/d/2" paragraph {
+        num "2" "(2)"
+        content "by the interim trustee; or"
+        hash "a67ffdd765db8512496cca899651a77ef09f64ef4d70475d3a8eae96cfb0a6c1"
+      }
+      provision "/us/usc/ptII/rule2006/d/3" paragraph {
+        num "3" "(3)"
+        chapeau "by or on behalf of:"
+        provision "/us/usc/ptII/rule2006/d/3/A" subparagraph {
+          num "A" "(A)"
+          content "a custodian;"
+          hash "f74805458f78b12741509ad8ca348443e8c088c2d4ff2eb6afaa2e85abf2f2c1"
+        }
+        provision "/us/usc/ptII/rule2006/d/3/B" subparagraph {
+          num "B" "(B)"
+          content "any entity not qualified to vote under § 702(a);"
+          hash "f7cccc44759e1469e23f66fba29a44a4b59d5324cc2f1b6e82750e014e52b4d7"
+        }
+        provision "/us/usc/ptII/rule2006/d/3/C" subparagraph {
+          num "C" "(C)"
+          content "an attorney-at-law; or"
+          hash "850875237aaabe36e56b4b260af065582f06db79325cce6c638624585a332e89"
+        }
+        provision "/us/usc/ptII/rule2006/d/3/D" subparagraph {
+          num "D" "(D)"
+          content "a transferee holding a claim for collection purposes only."
+          hash "af13d50f15e7f30ad1eb8835ee12091cd6e948d8044f276c487f46836e272f76"
+        }
+        hash "bdccea82b0b37af6ed6ef5fa4ebd70cef8b91df146b9efa5f0f8645ecd9e4b01"
+      }
+      hash "87170dc9eaec0a4a0b9993c34e8a0bf0035c122f716bdd80a9046a19b1fc701f"
+    }
+    provision "/us/usc/ptII/rule2006/e" subsection {
+      num "e" "(e)"
+      heading "Duties of Holders of Multiple Proxies."
+      chapeau "Before voting begins at any meeting of creditors under § 341(a)—or at any other time the court orders—a holder of 2 or more proxies must file and send to the United States trustee a verified list of the proxies to be voted and a verified statement of the pertinent facts and circumstances regarding each proxy’s execution and delivery. The statement must include:"
+      provision "/us/usc/ptII/rule2006/e/1" paragraph {
+        num "1" "(1)"
+        content "a copy of the solicitation;"
+        hash "ff4501765158d171f8fdfc8f2035e71882f0688a829b1c77b9c3cdd18cf500dd"
+      }
+      provision "/us/usc/ptII/rule2006/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "an identification of the solicitor, the forwarder (if the forwarder is neither the solicitor nor the claim owner), and the proxyholder—including their connections with the debtor and with each other—together with:"
+        provision "/us/usc/ptII/rule2006/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "if the solicitor, forwarder, or proxyholder is an association, a statement that the creditors whose claims have been solicited and the creditors whose claims are to be voted were, on the petition date, members or subscribers in good standing with allowable unsecured claims; and"
+          hash "80fa73cc3720c721b8fe418b2ccfeb4efc4ea5ce4de3f85eba86d68acbfcf524"
+        }
+        provision "/us/usc/ptII/rule2006/e/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "if the solicitor, forwarder, or proxyholder is a committee of creditors, a list stating:"
+          provision "/us/usc/ptII/rule2006/e/2/B/i" clause {
+            num "i" "(i)"
+            content "the date and place the committee was organized;"
+            hash "830253055d8835551ceb5824141c395e2efa5265a9fcdd60219707cb5275ddf4"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "that the committee was organized under (c)(2) or (c)(3);"
+            hash "ff3d4bc94cb096e38d883b32801c01c2f04e5bf184c1ca5b51106e113f4068b7"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/iii" clause {
+            num "iii" "(iii)"
+            content "the committee’s members;"
+            hash "fabe6e38eb1fd4e507367e93a50cea36879ff4e124aceb20a3537aba430a361a"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/iv" clause {
+            num "iv" "(iv)"
+            content "the amounts of their claims;"
+            hash "3309c3664488ae63a064b03aee07875e361ef5909a17d2d643e192b4a85de240"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/v" clause {
+            num "v" "(v)"
+            content "when the claims were acquired;"
+            hash "7604f61c3eb20ea81c65b19d9c1bcd9d1eed6f559d403cd25af581019e163b5d"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/vi" clause {
+            num "vi" "(vi)"
+            content "the amounts paid for the claims; and"
+            hash "1245c1d75e1f05e77a5af0f3733db43d9808818b26347a0729c7dbd9240cd870"
+          }
+          provision "/us/usc/ptII/rule2006/e/2/B/vii" clause {
+            num "vii" "(vii)"
+            content "the extent to which the committee members’ claims are secured or entitled to priority;"
+            hash "75c366bf81f04bcaf52f2b7d330ba99ae3c90322cddd5d7a607d9a7100059a84"
+          }
+          hash "06ffb50782c06712d28847f6ae3ba10d29f0a88f8e7b43897b1c561db9776d14"
+        }
+        hash "27da4532eccacba67fa5bcdb970a6ddc8ce2ddd07609a9e6da74aa16d17cb202"
+      }
+      provision "/us/usc/ptII/rule2006/e/3" paragraph {
+        num "3" "(3)"
+        content "a statement that the proxyholder has neither paid nor promised any consideration for the proxy;"
+        hash "b534af9f2340ebde0246d4eb87bf7882c7890137f8c5f39bbe7ab28fe69e470b"
+      }
+      provision "/us/usc/ptII/rule2006/e/4" paragraph {
+        num "4" "(4)"
+        chapeau "a statement addressing whether there is any agreement—and, if so, giving its particulars—between the proxyholder and any other entity to:"
+        provision "/us/usc/ptII/rule2006/e/4/A" subparagraph {
+          num "A" "(A)"
+          content "pay any consideration related to voting the proxy; or"
+          hash "8eb30a629aa54e6936ed5e1302bf17de34f38c04b146df3e3bcde79705de772f"
+        }
+        provision "/us/usc/ptII/rule2006/e/4/B" subparagraph {
+          num "B" "(B)"
+          chapeau "share with any entity (except a member or regular associate of the proxyholder’s law firm) compensation that may be allowed to:"
+          provision "/us/usc/ptII/rule2006/e/4/B/i" clause {
+            num "i" "(i)"
+            content "the trustee or any entity for services rendered in the case; or"
+            hash "dfff03fb4aeb830e77ef529dcde247615cb06f5e15db77fab93b5d88aa6c7d17"
+          }
+          provision "/us/usc/ptII/rule2006/e/4/B/ii" clause {
+            num "ii" "(ii)"
+            content "any person employed by the estate;"
+            hash "224bb0b4641c600922f6eed916e2fbf5b480211cf6691a201875b1f0ebd442a8"
+          }
+          hash "943d2498e57e9a2e00f62a5ff91f71a7fda77a3c94a9a1dbc0440151d4cd1f6d"
+        }
+        hash "de0699dab3f7988469348111a6bc666be2682287ca8dca102348082c0d2ee5f3"
+      }
+      provision "/us/usc/ptII/rule2006/e/5" paragraph {
+        num "5" "(5)"
+        chapeau "if the proxy was solicited by an entity other than the proxyholder—or forwarded to the holder by an entity who is neither a solicitor of the proxy nor the claim owner—a statement signed and verified by the solicitor or forwarder:"
+        provision "/us/usc/ptII/rule2006/e/5/A" subparagraph {
+          num "A" "(A)"
+          content "confirming that no consideration has been paid or promised for the proxy;"
+          hash "b2a6b1d605b4aabe3a776b6589e9f415b59d5cbf93a1d4b65a3cf1fbbd48e385"
+        }
+        provision "/us/usc/ptII/rule2006/e/5/B" subparagraph {
+          num "B" "(B)"
+          chapeau "addressing whether there is any agreement—and, if so, giving its particulars—between the solicitor or forwarder and any other entity to pay any consideration related to voting the proxy or to share with any entity (except a member or regular associate of the solicitor’s or forwarder’s law firm) compensation that may be allowed to:"
+          provision "/us/usc/ptII/rule2006/e/5/B/i" clause {
+            num "i" "(i)"
+            content "the trustee or any entity for services rendered in the case; or"
+            hash "dfff03fb4aeb830e77ef529dcde247615cb06f5e15db77fab93b5d88aa6c7d17"
+          }
+          provision "/us/usc/ptII/rule2006/e/5/B/ii" clause {
+            num "ii" "(ii)"
+            content "any person employed by the estate; and"
+            hash "c4014d88678ba81493d90cc6cc66356517b1d0a6ddbd233a15c005c574aef9a1"
+          }
+          hash "184d9e42475099e7b1cc0818dc037f3af241a9b74cdf8b4896d837b0fbba4177"
+        }
+        hash "a17e4dcfbbdba5654f4ca22c608f33a37d223eaac48a8be8e362084d885adae5"
+      }
+      provision "/us/usc/ptII/rule2006/e/6" paragraph {
+        num "6" "(6)"
+        content "if the solicitor, forwarder, or proxyholder is a committee, a statement signed and verified by each member disclosing the amount and source of any consideration paid or to be paid to the member in connection with the case, except a dividend on the member’s claim."
+        hash "8788ca818228a6962f5e576b1fba3211b499423e4241e6eee413f4e3816e84eb"
+      }
+      hash "42b01ab0f91ca7e61c0f6302d5ae886335fb595b48c2de3ebebb8db440ebf866"
+    }
+    provision "/us/usc/ptII/rule2006/f" subsection {
+      num "f" "(f)"
+      heading "Enforcing Restrictions on Soliciting Proxies."
+      chapeau "On a party in interest’s motion or on its own, the court may determine whether there has been a failure to comply with this Rule 2006 or any other impropriety related to soliciting or voting a proxy. After notice and a hearing, the court may:"
+      provision "/us/usc/ptII/rule2006/f/1" paragraph {
+        num "1" "(1)"
+        content "reject a proxy for cause;"
+        hash "3b4cb8ef24be72e6ba136005ac57a06f3e7ca47cc9d5a20f91e44a3ac74aad4a"
+      }
+      provision "/us/usc/ptII/rule2006/f/2" paragraph {
+        num "2" "(2)"
+        content "vacate an order entered because a proxy was voted that should have been rejected; or"
+        hash "fa7bfec635f496cebecd8585a3eae646da604763a9af560aaa84e5a63c1af6e9"
+      }
+      provision "/us/usc/ptII/rule2006/f/3" paragraph {
+        num "3" "(3)"
+        content "take other appropriate action."
+        hash "7cbbe54762fc679fe20e6f96fe8e5defddfad0cc66f04b602937849dea89b76d"
+      }
+      hash "e9d761b783e9264adf46f202d118dfbcb8702d02d1f7d6b66e287c3d0835d14a"
+    }
+    hash "532e69c50b18025a870ab22b2cdfb4ef2d7ff5694688278d480de2b1c1dc03f0"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is a comprehensive regulation of solicitation and voting of proxies in liquidation cases. It is derived from former Bankruptcy Rule 208. The rule applies only in chapter 7 cases because no voting occurs, other than on a plan, in a chapter 11 case. Former Bankruptcy Rule 208 did not apply to solicitations of acceptances of plans."
+    p "Creditor control was a basic feature of the Act and is continued, in part, by the Code. Creditor democracy is perverted and the congressional objective frustrated, however, if control of administration falls into the hands of persons whose principal interest is not in what the estate can be made to yield to the unsecured creditors but in what it can yield to those involved in its administration or in other ulterior objectives."
+    p "Subdivision (b). The definition of proxy in the first paragraph of subdivision (b) is derived from former Bankruptcy Rule 208."
+    p "Subdivision (c). The purpose of the rule is to protect creditors against loss of control of administration of their debtors’ estates to holders of proxies having interests that differ from those of the creditors. The rule does not prohibit solicitation but restricts it to those who were creditors at the commencement of the case or their freely and fairly selected representatives. The special role occupied by credit and trade associations is recognized in the last clause of subdivision (c)(1). On the assumption that members or subscribers may have affiliated with an association in part for the purpose of obtaining its services as a representative in liquidation proceedings, an established association is authorized to solicit its own members, or its regular customers or clients, who were creditors on the date of the filing of the petition. Although the association may not solicit nonmembers or nonsubscribers for proxies, it may sponsor a meeting of creditors at which a committee entitled to solicit proxies may be selected in accordance with clause (C) of subdivision (c)(1)."
+    p "Under certain circumstances, the relationship of a creditor, creditors’ committee, or association to the estate or the case may be such as to warrant rejection of any proxy solicited by such a person or group. Thus a person who is forbidden by the Code to vote his own claim should be equally disabled to solicit proxies from creditors. Solicitation by or on behalf of the debtor has been uniformly condemned, e.g., In re White, 15 F.2d 371 (9th Cir. 1926), as has solicitation on behalf of a preferred creditor, Matter of Law, 13 Am.B.R. 650 (S.D. Ill. 1905). The prohibition on solicitation by a receiver or his attorney made explicit by General Order 39 has been collaterally supported by rulings rejecting proxies solicited by a receiver in equity, In re Western States Bldg.-Loan Ass’n, 54 F.2d 415 (S.D. Cal. 1931), and by an assignee for the benefit of creditors, Lines v. Falstaff Brewing Co., 233 F.2d 927 (9th Cir. 1956)."
+    p "Subdivision (d) prohibits solicitation by any person or group having a relationship described in the preceding paragraph. It also makes no exception for attorneys or transferees of claims for collection. The rule does not undertake to regulate communications between an attorney and his regular client or between an attorney and a creditor who has asked the attorney to represent him in a proceeding under the Code, but any other communication by an attorney or any other person or group requesting a proxy from the owner of a claim constitutes a regulated solicitation. Solicitation by an attorney of a proxy from a creditor who was not a client prior to the solicitation is objectionable not only as unethical conduct as recognized by such cases as In the Matter of Darland Company, 184 F. Supp. 760 (S.D. Iowa 1960) but also and more importantly because the practice carries a substantial risk that administration will fall into the hands of those whose interest is in obtaining fees from the estate rather than securing dividends for creditors. The same risk attaches to solicitation by the holder of a claim for collection only."
+    p "Subdivision (e). The regulation of solicitation and voting of proxies is achieved by the rule principally through the imposition of requirements of disclosure on the holders of two or more proxies. The disclosures must be made to the clerk before the meeting at which the proxies are to be voted to afford the clerk or a party in interest an opportunity to examine the circumstances accompanying the acquisition of the proxies in advance of any exercise of the proxies. In the light of the examination the clerk or a party in interest should bring to the attention of the judge any question that arises and the judge may permit the proxies that comply with the rule to be voted and reject those that do not unless the holders can effect or establish compliance in such manner as the court shall prescribe. The holders of single proxies are excused from the disclosure requirements because of the insubstantiality of the risk that such proxies have been solicited, or will be voted, in an interest other than that of general creditors."
+    p "Every holder of two or more proxies must include in the submission a verified statement that no consideration has been paid or promised for the proxy, either by the proxyholder or the solicitor or any forwarder of the proxy. Any payment or promise of consideration for a proxy would be conclusive evidence of a purpose to acquire control of the administration of an estate for an ulterior purpose. The holder of multiple proxies must also include in the submission a verified statement as to whether there is any agreement by the holder, the solicitor, or any forwarder of the proxy for the employment of any person in the administration of an estate or for the sharing of any compensation allowed in connection with the administration of the estate. The provisions requiring these statements implement the policy of the Code expressed in § 504 as well as the policy of this rule to deter the acquisition of proxies for the purpose of obtaining a share in the outlays for administration. Finally the facts as to any consideration moving or promised to any member of a committee which functions as a solicitor, forwarder, or proxyholder must be disclosed by the proxyholder. Such information would be of significance to the court in evaluating the purpose of the committee in obtaining, transmitting, or voting proxies."
+    p "Subdivision (f) has counterparts in the local rules referred to in the Advisory Committee’s Note to former Bankruptcy Rule 208. Courts have been accorded a wide range of discretion in the handling of disputes involving proxies. Thus the referee was allowed to reject proxies and to proceed forthwith to hold a scheduled election at the same meeting. E.g., In re Portage Wholesale Co., 183 F.2d 959 (7th Cir. 1950); In re McGill, 106 Fed. 57 (6th Cir. 1901); In re Deena Woolen Mills, Inc., 114 F. Supp. 260, 273 (D. Me. 1953); In re Finlay, 3 Am.B.R. 738 (S.D.N.Y. 1900). The bankruptcy judge may postpone an election to permit a determination of issues presented by a dispute as to proxies and to afford those creditors whose proxies are rejected an opportunity to give new proxies or to attend an adjourned meeting to vote their own claims. Cf. In the Matter of Lenrick Sales, Inc., 369 F.2d 439, 442–43 (3d Cir.), cert. denied, 389 U.S. 822 (1967); In the Matter of Construction Supply Corp. 221 F. Supp. 124, 128 (E.D. Va. 1963). This rule is not intended to restrict the scope of the court’s discretion in the handling of disputes as to proxies."
+    hash "fb1e8bc2ef2c84342b575928fe822c79c956ebdc218c15e0c8f61249b30b579d"
+  }
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to give the United States trustee information in connection with proxies so that the United States trustee may perform responsibilities as presiding officer at the § 341 meeting of creditors. See Rule 2003."
+    p "The words “with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "305197eb5c2f30f2079f78cee27b5937e298adb08e361e394fe7cafed8e7a04d"
+  }
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "d54dcbb803c338dae3dc5541dd4e7023774a9571ecae353808c5fd823612046f"
+  }
+  layers {
+    operative "532e69c50b18025a870ab22b2cdfb4ef2d7ff5694688278d480de2b1c1dc03f0"
+    enacted "4ba29caa1d5fdfba8fa04f54e0238a536c0ed56acaa5ff499f4f48b92a9f8c39"
+    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+  }
+}

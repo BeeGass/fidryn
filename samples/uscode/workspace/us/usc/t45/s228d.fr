@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s228d" {
+  within "/us/usc/t45/ch9/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s228d" section {
+    num "228d" "§ 228d."
+    heading "Repealed. " ["July 31, 1946, ch. 709, § 212" -> "/us/act/1946-07-31/ch709/s212"] ", " ["60 Stat. 729" -> "/us/stat/60/729"]
+    status repealed
+    hash "aaf961161e3763ee95cd036b9f669eea221543bd8d887cb0d09a0ffc99a153cd"
+  }
+  note "/us/usc/t45/s228d/note/ungrouped/act.1935-08-29.ch812/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["act Aug. 29, 1935, ch. 812, § 4" -> "/us/act/1935-08-29/ch812/s4"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, § 1, " ["50 Stat. 311" -> "/us/stat/50/311"] ", related to joint and survivor annuity."
+    hash "4710df0582f97d0e228a8d44c9238c57741fe598c0daa300c6eb65ce0f64f947"
+  }
+  layers {
+    operative "aaf961161e3763ee95cd036b9f669eea221543bd8d887cb0d09a0ffc99a153cd"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "780cdcc14f63badf3b86310aaa2059a44f2076d1ea0179d5e167dc32160ce307"
+  }
+}

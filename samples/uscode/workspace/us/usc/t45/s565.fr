@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s565" {
+  alias "/us/usc/t45/s566"
+  within "/us/usc/t45/ch14/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s565" section {
+    num "565, 566" "§§ 565, 566."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "9f08d914699ee7df6558c159792f822e377ff399ede3d08a23216e3fe5822e1d"
+  }
+  note "/us/usc/t45/s565/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 565, " ["Pub. L. 91–518, title IV, § 405" -> "/us/pl/91/518/tIV/s405"] ", Oct. 30, 1970, " ["84 Stat. 1337" -> "/us/stat/84/1337"] "; " ["Pub. L. 92–316" -> "/us/pl/92/316"] ", §§ 7, 8, June 22, 1972, " ["86 Stat. 230" -> "/us/stat/86/230"] "; " ["Pub. L. 96–73, title I, § 120(a)" -> "/us/pl/96/73/tI/s120/a"] ", Sept. 29, 1979, " ["93 Stat. 547" -> "/us/stat/93/547"] "; " ["Pub. L. 97–35, title XI" -> "/us/pl/97/35/tXI"] ", §§ 1177(b), 1184, 1188(d), Aug. 13, 1981, " ["95 Stat. 692" -> "/us/stat/95/692"] ", 697, 699; " ["Pub. L. 99–272, title IV, § 4016" -> "/us/pl/99/272/tIV/s4016"] ", Apr. 7, 1986, " ["100 Stat. 110" -> "/us/stat/100/110"] ", related to protective arrangements for railroad employees. See sections 24307, 24312, and 24706 of Title 49, Transportation."
+    hash "11530cbe09b6a14add04aac76a0f1158d1391e541d39286365484c60696680db"
+  }
+  note "/us/usc/t45/s565/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 566, " ["Pub. L. 91–518, title IV, § 406" -> "/us/pl/91/518/tIV/s406"] ", as added " ["Pub. L. 96–73, title I, § 121" -> "/us/pl/96/73/tI/s121"] ", Sept. 29, 1979, " ["93 Stat. 548" -> "/us/stat/93/548"] ", related to retention and maintenance of facilities. See " ["section 24309 of Title 49" -> "/us/usc/t49/s24309"] "."
+    hash "0fc79a104ba0b4bd8a660414c5e2b5afc131f7bdb00d0a3fec559f39d03256a3"
+  }
+  layers {
+    operative "9f08d914699ee7df6558c159792f822e377ff399ede3d08a23216e3fe5822e1d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "76b527b73f8d78a65db6b085c06b91837a2f59c0ea4f818aa07b25bf286bdb80"
+  }
+}

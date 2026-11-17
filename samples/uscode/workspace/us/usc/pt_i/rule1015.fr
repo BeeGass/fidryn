@@ -1,0 +1,128 @@
+edition 2
+module "/us/usc/ptI/rule1015" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1015" courtRule {
+    num "1015" "Rule 1015."
+    heading "Consolidating or Jointly Administering Cases Pending in the Same District"
+    provision "/us/usc/ptI/rule1015/a" subsection {
+      num "a" "(a)"
+      heading "Consolidating Cases Involving the Same Debtor."
+      content "The court may consolidate two or more cases that are regarding or brought by or against the same debtor and that are pending in its district."
+      hash "0866fa7c33c6e8dd6330c637f6643a39a0b5958bde17ae82e218c96353e3e044"
+    }
+    provision "/us/usc/ptI/rule1015/b" subsection {
+      num "b" "(b)"
+      heading "Jointly Administering Cases Involving Related Debtors; Exemptions of Spouses; Protective Orders to Avoid Conflicts of Interest."
+      provision "/us/usc/ptI/rule1015/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. The court may order joint administration of the estates in a joint case or in two or more cases pending in the court if they are brought by or against:"
+        provision "/us/usc/ptI/rule1015/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "spouses;"
+          hash "733eee0cdae607a0394860efd6ab4a4380b9cfb721717e014c57e9706f050ca2"
+        }
+        provision "/us/usc/ptI/rule1015/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "a partnership and one or more of its general partners;"
+          hash "7408f039fd5090d3b442645ce71aa6be00314a1ba2f2aa521602f03303623484"
+        }
+        provision "/us/usc/ptI/rule1015/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "two or more general partners; or"
+          hash "9d50fd834e8efcdd0e5db2e7669884c8f08738797e2ca1987cb56bccdc9bde3f"
+        }
+        provision "/us/usc/ptI/rule1015/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "a debtor and an affiliate."
+          hash "71f4b858bd74c86ff4e8c03382c6936d2ea8055aa1bc349743ec871009eb0454"
+        }
+        hash "5f207c37f701e9afa74656918f9ef0c543a2f1adb8bba1902deb3a65ef9df4f9"
+      }
+      provision "/us/usc/ptI/rule1015/b/2" paragraph {
+        num "2" "(2)"
+        content "Potential Conflicts of Interest. Before issuing a joint-administration order, the court must consider how to protect the creditors of different estates against potential conflicts of interest."
+        hash "dfa8d8971f238d8ab57bd1bcd55c006bdbb300fe47c8605f4df662123d5f550a"
+      }
+      provision "/us/usc/ptI/rule1015/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Exemptions in Cases Involving Spouses. If spouses have filed separate petitions—with one electing exemptions under § 522(b)(2) and the other under § 522(b)(3)—and the court orders joint administration, that order must:"
+        provision "/us/usc/ptI/rule1015/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "set a reasonable time for the debtors to elect the same exemptions; and"
+          hash "d7cdc96e9214ef42c3ed0f02080ef0280bf1365850128bb5e9c53e7958f10579"
+        }
+        provision "/us/usc/ptI/rule1015/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "advise the debtors that if they fail to do so, they will be considered to have elected exemptions under § 522(b)(2)."
+          hash "4bf78d3486b8ff805e2bdd6efac7bf3a4292075717feeee5917df01d25c44c99"
+        }
+        hash "134bd085563ca47a9dc761841a903b91027f227c0ad3f70d3ef11bdd6cdad82c"
+      }
+      hash "278cc34bef898563c3681af7335d1dd35c8aeab2af2d6af3c5cad34ff0c4dcd9"
+    }
+    provision "/us/usc/ptI/rule1015/c" subsection {
+      num "c" "(c)"
+      heading "Protective Orders to Avoid Unnecessary Costs and Delay."
+      content "When cases are consolidated or jointly administered, the court may issue orders to avoid unnecessary costs and delay while still protecting the parties’ rights under the Code."
+      hash "0ffb25e06bf0919f3cc29610c576106c6039d0846261ca5e14490e59403e7969"
+    }
+    hash "09d4728ae02bf5aba9e3ce3e445f93c43e6fd69bf011861f1ce14cfdc0fed600"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) of this rule is derived from former Bankruptcy Rule 117(a). It applies to cases when the same debtor is named in both voluntary and involuntary petitions, when husband and wife have filed a joint petition pursuant to § 302 of the Code, and when two or more involuntary petitions are filed against the same debtor. It also applies when cases are pending in the same court by virtue of a transfer of one or more petitions from another court. Subdivision (c) allows the court discretion regarding the order of trial of issues raised by two or more involuntary petitions against the same debtor."
+    p "Subdivision (b) recognizes the propriety of joint administration of estates in certain kinds of cases. The election or appointment of one trustee for two or more jointly administered estates is authorized by Rule 2009. The authority of the court to order joint administration under subdivision (b) extends equally to the situation when the petitions are filed under different sections, e.g., when one petition is voluntary and the other involuntary, and when all of the petitions are filed under the same section of the Code."
+    p "Consolidation of cases implies a unitary administration of the estate and will ordinarily be indicated under the circumstances to which subdivision (a) applies. This rule does not deal with the consolidation of cases involving two or more separate debtors. Consolidation of the estates of separate debtors may sometimes be appropriate, as when the affairs of an individual and a corporation owned or controlled by that individual are so intermingled that the court cannot separate their assets and liabilities. Consolidation, as distinguished from joint administration, is neither authorized nor prohibited by this rule since the propriety of consolidation depends on substantive considerations and affects the substantive rights of the creditors of the different estates. For illustrations of the substantive consolidation of separate estates, see Sampsell v. Imperial Paper & Color Corp., 313 U.S. 215 (1941). See also Chemical Bank N.Y. Trust Co. v. Kheel, 369 F.2d 845 (2d Cir. 1966); Seligson & Mandell, Multi-Debtor Petition—Consolidation of Debtors and Due Process of Law, 73 Com.L.J. 341 (1968); Kennedy, Insolvency and the Corporate Veil in the United States in Proceedings of the 8th International Symposium on Comparative Law 232, 248–55 (1971)."
+    p "Joint administration as distinguished from consolidation may include combining the estates by using a single docket for the matters occurring in the administration, including the listing of filed claims, the combining of notices to creditors of the different estates, and the joint handling of other purely administrative matters that may aid in expediting the cases and rendering the process less costly."
+    p "Subdivision (c) is an adaptation of the provisions of Rule 42(a) F.R.Civ.P. for the purposes of administration of estates under this rule. The rule does not deal with filing fees when an order for the consolidation of cases or joint administration of estates is made."
+    p "A joint petition of husband and wife, requiring the payment of a single filing fee, is permitted by § 302 of the Code. Consolidation of such a case, however, rests in the discretion of the court; see § 302(b) of the Code."
+    hash "193bb0e7ac168ccf391529121b0533248e44bf45260c296598ac6945edea2fc8"
+  }
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The amendment to subdivision (b) implements the provisions of § 522(b) of the Code, as enacted by the 1984 amendments."
+    hash "6b22c46466959f5c827d4740f735bf3cc6ba98e034c82929da2dcf4788accded"
+  }
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to conform to the change in the numbering of § 522(b) of the Code that was made as a part of the 2005 amendments. Former subsections (b)(1) and (b)(2) of § 522 were renumbered as subsections (b)(2) and (b)(3), respectively. The rule is amended to make the parallel change."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "2a5507a056a634323fa2f0a37e6b1debf79826177f6a26ec19b30c7cc3fe5012"
+  }
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (a). By amending subdivision (a) to include cases regarding the same debtor, the rule explicitly recognizes that the court’s authority to consolidate cases when more than one petition is filed includes the authority to consolidate cases when one or more of the petitions is filed under chapter 15. This amendment is made in conjunction with the amendment to Rule 1014(b), which also governs petitions filed under chapter 15 regarding the same debtor as well as those filed by or against the debtor."
+    p "Changes Made After Publication. No changes since publication."
+    hash "d0757c345199048ffb483327b21269ba9bf8cc71d47a5dc109fcea40536dc525"
+  }
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (b) is amended to replace “a husband and wife” with “spouses” in light of the Supreme Court’s decision in Obergefell v. Hodges, 135 S. Ct. 2584 (2015)."
+    hash "259052424eeff8a26f0b01e939208292f1a9fe08752d609a92ef5a3148ab44bd"
+  }
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "5d8026ba0475d4c301125ff75a01b64279936bd9fe19b9e2b35ee9104069a287"
+  }
+  layers {
+    operative "09d4728ae02bf5aba9e3ce3e445f93c43e6fd69bf011861f1ce14cfdc0fed600"
+    enacted "70d4aae151bf57af9bea4d1e88c3e3f89cbf26b0ffc77a93438ae3caeac4ec69"
+    editorial "9fec48c6c8f016d63a104d5c772f3f97936cd310c8fb96477e9fdd329745049e"
+  }
+}

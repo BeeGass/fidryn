@@ -1,0 +1,75 @@
+edition 2
+module "/us/usc/t45/s914" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s914" section {
+    num "914" "§ 914."
+    heading "Obligation guarantees"
+    provision "/us/usc/t45/s914/a" subsection {
+      num "a" "(a)"
+      heading "Authorization"
+      content "The Secretary of Transportation, under the authority of " ["section 831 of this title" -> "/us/usc/t45/s831"] ", shall guarantee obligations of the Milwaukee Railroad for purposes of providing employee protection in accordance with the terms of the employee protection agreement entered into under " ["section 908 of this title" -> "/us/usc/t45/s908"] ". Guarantees under this section shall be entered into without regard to the requirements of subsection (g) of " ["section 831 of this title" -> "/us/usc/t45/s831"] "."
+      hash "e6dcc86d5ace8361fa97a081a5c4ee112594258c6f5a6b2dcda297429e76a24c"
+    }
+    provision "/us/usc/t45/s914/b" subsection {
+      num "b" "(b)"
+      heading "Obligations as administrative expense"
+      content "Any obligation guaranteed pursuant to this section shall be treated as an administrative expense of the estate of the Milwaukee Railroad."
+      hash "141ebfbb5c3e6bafc66c44ba2f26fd2e4a6448be0924de43cdb1cd0eccf8a073"
+    }
+    provision "/us/usc/t45/s914/c" subsection {
+      num "c" "(c)"
+      heading "Limit on aggregate unpaid principal amount"
+      content "The aggregate unpaid principal amount of obligations which may be guaranteed by the Secretary pursuant to this section shall not exceed $75,000,000."
+      hash "10166a5fb4912cc3ab52d935754f8498e4bd95474cf1aefd1eea2e186d1ff4ec"
+    }
+    provision "/us/usc/t45/s914/d" subsection {
+      num "d" "(d)"
+      heading "Limit on total liability"
+      content "The total liability of the Milwaukee Railroad in connection with benefits and allowances provided under an employee protection agreement entered into under " ["section 908 of this title" -> "/us/usc/t45/s908"] " shall not exceed $75,000,000."
+      hash "5a2562ae3c31963a5464f814c45518266e9a6894439c9d22be286bda6a7d9d81"
+    }
+    provision "/us/usc/t45/s914/e" subsection {
+      num "e" "(e)"
+      heading "Liability of United States respecting section 908 agreements"
+      content "Except in connection with obligations guaranteed under this section, the United States shall incur no liability to employees in connection with any employee protection agreement entered into under " ["section 908 of this title" -> "/us/usc/t45/s908"] "."
+      hash "0c1eb1d3eda72ef69be41ecf325c93dd726bd986bac65d511b17fe83be1267d9"
+    }
+    provision "/us/usc/t45/s914/f" subsection {
+      num "f" "(f)"
+      heading "Applicability of " ["section 22404 of title 49" -> "/us/usc/t49/s22404"]
+      content ["Section 22404 of title 49" -> "/us/usc/t49/s22404"] " shall not apply to any obligation guaranteed under this section."
+      hash "6c6b6e160b8eacb03d692f98dffb84dc5a139f695d42ebd96943135d3c09f5c3"
+    }
+    hash "197b4dc3488a070cf6f9e0164110c6b8e1b373180144c36a8933341eb2e15162"
+  }
+  credit "(" ["Pub. L. 96–101, § 15" -> "/us/pl/96/101/s15"] ", Nov. 4, 1979, " ["93 Stat. 743" -> "/us/stat/93/743"] "; " ["Pub. L. 96–448, title VII, § 701(a)(3)" -> "/us/pl/96/448/tVII/s701/a/3"] ", Oct. 14, 1980, " ["94 Stat. 1959" -> "/us/stat/94/1959"] "; " ["Pub. L. 117–58, div. B, title I, § 21301(j)(3)(E)" -> "/us/pl/117/58/dB/tI/s21301/j/3/E"] ", Nov. 15, 2021, " ["135 Stat. 692" -> "/us/stat/135/692"] ".)"
+  note "/us/usc/t45/s914/note/editorialNotes/pl.105.178/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 831 of this title" -> "/us/usc/t45/s831"] ", referred to in subsec. (a), was repealed by " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"] ", except for subsec. (c) of that section, which was renumbered and transferred to " ["section 823(b) of this title" -> "/us/usc/t45/s823/b"] " by " ["section 7203(a)(4) of Pub. L. 105–178" -> "/us/pl/105/178/s7203/a/4"] ". " ["Section 823(b) of this title" -> "/us/usc/t45/s823/b"] " was subsequently repealed by " ["Pub. L. 117–58, div. B, title I, § 21301(b)(1)(A)" -> "/us/pl/117/58/dB/tI/s21301/b/1/A"] ", Nov. 15, 2021, " ["135 Stat. 683" -> "/us/stat/135/683"] "."
+    hash "0423aff03011c9537dfaf7d80f62722199e924de93adfdcffe4589d636cda335"
+  }
+  note "/us/usc/t45/s914/note/editorialNotes/pl.117.58/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2021—Subsec. (f). " ["Pub. L. 117–58" -> "/us/pl/117/58"] " substituted “" ["Section 22404 of title 49" -> "/us/usc/t49/s22404"] "” for “" ["Section 836 of this title" -> "/us/usc/t45/s836"] "”."
+    p "1980—Subsec. (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted “to employees” after “no liability”."
+    hash "952a23f8b98df6bec76dd0ee66b033682e8307d51f9a3822106252d6642c6dab"
+  }
+  note "/us/usc/t45/s914/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
+  }
+  layers {
+    operative "197b4dc3488a070cf6f9e0164110c6b8e1b373180144c36a8933341eb2e15162"
+    enacted "36dd9becc6748e25853af8213e205980ab38d86368942ac1f87be119524edcae"
+    editorial "e07b00a5f526d2cbc0642fd008ca771ae9f72e1b7e346c374dc44c1e3e747e18"
+  }
+}

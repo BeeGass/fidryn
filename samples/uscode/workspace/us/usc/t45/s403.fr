@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/t45/s403" {
+  within "/us/usc/t45/ch12"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s403" section {
+    num "403" "§ 403."
+    heading "Appropriation to railroad unemployment insurance account; transfer and repayment of funds; interest"
+    content "There are authorized to be appropriated to the railroad unemployment insurance account, without fiscal year limitation, such amounts as may be necessary to carry out the provisions of this chapter. The amounts so appropriated shall be transferred from time to time to the railroad unemployment insurance account on the basis of estimates by the Secretary of the Treasury after consultation with the Railroad Retirement Board of the amounts required from time to time to carry out the provisions of this chapter. Amounts so transferred shall be repayable advances without interest."
+    hash "a1715c4e2d714e78647cd3fd9636be844a7fcb1e8cdbe55ffe261dcaddec31e5"
+  }
+  credit "(" ["Pub. L. 87–7, § 4" -> "/us/pl/87/7/s4"] ", Mar. 24, 1961, " ["75 Stat. 17" -> "/us/stat/75/17"] "; " ["Pub. L. 88–133, title III, § 303(c)" -> "/us/pl/88/133/tIII/s303/c"] ", Oct. 5, 1963, " ["77 Stat. 222" -> "/us/stat/77/222"] ".)"
+  note "/us/usc/t45/s403/note/editorialNotes/pl.88.133/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1963—" ["Pub. L. 88–133" -> "/us/pl/88/133"] " repealed provision for repayment of advances by transfers from account to general fund of Treasury when funds of account derived from increase in employers’ contribution rate are adequate for such purpose, which is now covered by " ["section 303(b) of Pub. L. 88–133" -> "/us/pl/88/133/s303/b"] ", set out as a note below."
+    hash "866c2200f4eff51f92f8211e17aa071526b9b8f826642658651078bcee56569c"
+  }
+  note "/us/usc/t45/s403/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1963 Amendment"
+    p ["Pub. L. 88–133, title III, § 303(c)" -> "/us/pl/88/133/tIII/s303/c"] ", Oct. 5, 1963, " ["77 Stat. 222" -> "/us/stat/77/222"] ", provided that the amendment made by such section 303(c) is effective with respect to contributions collected on compensation paid after Dec. 31, 1963."
+    hash "63b42ee5070cf991c6db38f9ce28e310636072bdd279479c9ddc54705050a2a7"
+  }
+  note "/us/usc/t45/s403/note/statutoryNotes/pl.88.133/repayment-by-account-of-advances-from-general-fund-of-treasu" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Repayment by Account of Advances From General Fund of Treasury From Contributions Collected on Compensation Paid After December 31, 1963"
+    p ["Pub. L. 88–133, title III, § 303(b)" -> "/us/pl/88/133/tIII/s303/b"] ", Oct. 5, 1963, " ["77 Stat. 222" -> "/us/stat/77/222"] ", provided that:"
+    quoted "/us/pl/88/133/tIII/s303/b" {
+      p "“Effective with respect to contributions collected by the Railroad Retirement Board pursuant to section 8(f) of the Railroad Unemployment Insurance Act [" ["section 358(f) of this title" -> "/us/usc/t45/s358/f"] "] on compensation paid after December 31, 1963, that part of such contributions equal to one-fourth of 1 per centum of the compensation on which such contributions are based shall, notwithstanding the provisions of section 10(b) of such Act [" ["section 360(b) of this title" -> "/us/usc/t45/s360/b"] "], be applied by the Board exclusively for transfers from the railroad unemployment insurance account to the general fund of the Treasury until the full amount advanced from the general fund of the Treasury to the railroad unemployment insurance account pursuant to section 4 of the Temporary Extended Railroad Unemployment Insurance Benefits Act of 1961 [this section] has been repaid.”"
+    }
+    hash "b73f36f7393ff09da086bc50aceb487727c56d1acacbafe33485ec08a5d0e6a4"
+  }
+  layers {
+    operative "a1715c4e2d714e78647cd3fd9636be844a7fcb1e8cdbe55ffe261dcaddec31e5"
+    enacted "b66d4ba630d0b650719de6a8e43426f74ae6094718eb49ab429d830fdf34fe4f"
+    editorial "28afedfd507b4e8bea163a3e65220da0d705f2605f1bd2da8dfc91ffd3b0056c"
+  }
+}

@@ -1,0 +1,27 @@
+edition 2
+module "/us/usc/t45/s918" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s918" section {
+    num "918" "§ 918."
+    heading "Authority of Railroad Retirement Board"
+    provision "/us/usc/t45/s918/a" subsection {
+      num "a" "(a)"
+      content "The Board may prescribe such regulations as may be necessary to carry out its duties under this chapter."
+      hash "9b9de5bb527f52326ee92a247a52d7cd53e4f4568bbf0a98e875d140b353ab6c"
+    }
+    provision "/us/usc/t45/s918/b" subsection {
+      num "b" "(b)"
+      content "In carrying out its duties under this chapter, the Board may exercise such of the powers, duties, and remedies provided in subsections (a), (b), and (d) of " ["section 362 of this title" -> "/us/usc/t45/s362"] " as are not inconsistent with the provisions of this chapter."
+      hash "bb5da65d6a75432dcd42912355752f0514a3e07e8f0dc279f1b7455862e5740b"
+    }
+    hash "d4261fa9e8797548f00894bf0eabe025483cf937d1fec3c4c0aff2817e78b147"
+  }
+  credit "(" ["Pub. L. 96–101, § 20" -> "/us/pl/96/101/s20"] ", Nov. 4, 1979, " ["93 Stat. 746" -> "/us/stat/93/746"] ".)"
+  layers {
+    operative "d4261fa9e8797548f00894bf0eabe025483cf937d1fec3c4c0aff2817e78b147"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2cc846870dc242a3b4d6998113de4fe0954272019a7e2725ace3a3e37ebfff24"
+  }
+}

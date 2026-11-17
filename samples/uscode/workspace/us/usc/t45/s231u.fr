@@ -1,0 +1,103 @@
+edition 2
+module "/us/usc/t45/s231u" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231u" section {
+    num "231u" "§ 231u."
+    heading "Benefit preservation"
+    provision "/us/usc/t45/s231u/a" subsection {
+      num "a" "(a)"
+      provision "/us/usc/t45/s231u/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "On or before May 1 of each year beginning in 1984, the Railroad Retirement Board shall prepare a five-year projection of anticipated revenues to and payments from the Railroad Retirement Account to determine the ability of such Account to pay benefits in each of the next succeeding five calendar years. On or before May 1 of each year beginning in 2003, the Railroad Retirement Board shall compute its projection of the account benefits ratio and the average account benefits ratio (as defined by section 3241(c) of the Internal Revenue Code of 1986 [" ["26 U.S.C. 3241(c)" -> "/us/usc/t26/s3241/c"] "]) for each of the next succeeding five fiscal years. No later than July 1 of each year, the Board shall submit a written report to the President, the Speaker of the House, and the President of the Senate setting forth the results of the projections prepared pursuant to the preceding two sentences. If the projection indicates that the funds in the Railroad Retirement Account will be insufficient to pay the full amount of the benefits under this subchapter which are payable from that Account at any time during the five-year period, the Board’s report shall include—"
+        provision "/us/usc/t45/s231u/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "the first fiscal year during which benefits under this subchapter must be reduced, in the absence of any adjustments, because insufficient funds (including any general revenue borrowing authority under this subchapter) would preclude payment of full benefits (other than benfits" mark "1" 1 " payable from the Dual Benefits Payments Account) for every month in such fiscal year;"
+          hash "e37c79e5534f528fb1ee328f05abdb42321de326b75d24414377ebc5dfa40b0c"
+        }
+        provision "/us/usc/t45/s231u/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "the first fiscal year during which the Board would recommend suspension of the authority to borrow contained in " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] ", in order to prevent depletion of the Railroad Retirement Account; and"
+          hash "9df5a0040f1a83344a31629c48fd49a9d8d1521f8bd4c2649d8278d5e49df433"
+        }
+        provision "/us/usc/t45/s231u/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "the amount, if any, of adjustments (stated in terms of percentage of taxable payroll), and any other changes such as cash flow adjustments, necessary to preserve the financial solvency of the Railroad Retirement Account, if such adjustments were effective at the beginning of the next succeeding fiscal year."
+          hash "15ce50979838fe8c734aaa785292d46a3393266bdebf77131ffdd889ae58320b"
+        }
+        hash "9b83e76bdbb8b72606496b8561905e73b58799db9ba1adbd9ef66748746c8f10"
+      }
+      provision "/us/usc/t45/s231u/a/2" paragraph {
+        num "2" "(2)"
+        content "Not less than 20 nor more than 30 days after the submission of a written report under this subsection which indicates that, in the absence of any adjustments, the Railroad Retirement Account will contain insufficient funds to pay the full amount of the benefits under this subchapter which are payable from that Account at some time during the five-year period covered by the report, the Board shall publish such report in the Federal Register."
+        hash "71d3aec46d83bd2d10e700661fca8fa5b3ee755d787a079e1ff4780ccfd4c68b"
+      }
+      hash "b5f953a88afc51e6db3cd4c1b8c9e7b10c91745824f7b374e06be23609f2862f"
+    }
+    provision "/us/usc/t45/s231u/b" subsection {
+      num "b" "(b)"
+      chapeau "Not later than 180 days after the publication in the Federal Register of any Board report referred to in subsection (a) of this section which states an amount of adjustments (in terms of percentage of taxable payroll) necessary to preserve the financial solvency of the railroad retirement account—"
+      provision "/us/usc/t45/s231u/b/1" paragraph {
+        num "1" "(1)"
+        content "representatives of railroad employees and carriers shall, jointly or separately, submit to the President, the Speaker of the House, and the President of the Senate, funding proposals designed to preserve the financial solvency of the Railroad Retirement Account; and"
+        hash "dc0ce4762f58dd3a424bbaf8555112b5036a6879b28b2ff1b0f6cd9759327ebb"
+      }
+      provision "/us/usc/t45/s231u/b/2" paragraph {
+        num "2" "(2)"
+        content "the President shall submit to the Speaker of the House and the President of the Senate such recommendations as he may deem appropriate with respect to the preservation of the Railroad Retirement Account, including a specific proposal to assure continuous payments of social security equivalent benefits by separating the social security equivalent benefits from industry pension equivalent benefits payable under this subchapter."
+        hash "d945370c1285f35eb1511201300f9af545cf5acb33b76e3c0c68ca5c878349ac"
+      }
+      hash "5ba3dc02deae01244e6d93e97124c4836a36a07dfa3799901a6c27229a310658"
+    }
+    provision "/us/usc/t45/s231u/c" subsection {
+      num "c" "(c)"
+      chapeau "Not later than 180 days after the submission of a written report under subsection (a) of this section which states the first fiscal year during which benefits under this subchapter must be reduced because insufficient funds would preclude payment of full benefits for every month of that year, the Board shall issue and publish in the Federal Register such regulations as may be necessary which shall be designed to—"
+      provision "/us/usc/t45/s231u/c/1" paragraph {
+        num "1" "(1)"
+        content "provide a constant level of benefits at the maximum level possible for every month of that fiscal year; and"
+        hash "984a6be1caeecc526916497ee28cbe7de1b0044096e2b1f3750000a25807cbac"
+      }
+      provision "/us/usc/t45/s231u/c/2" paragraph {
+        num "2" "(2)"
+        content "provide that no individual shall receive less during that fiscal year than the amount otherwise payable if the employee’s service as an employee after December 31, 1936, had been covered under the Social Security Act [" ["42 U.S.C. 301" -> "/us/usc/t42/s301"] " et seq.], minus the amount of any reduction required under section 231b(m) or 231c(i) of this title."
+        hash "9904388c9514ed9868b99a47d44d9b461afeb98475f49ffec50f4efdffed1c3e"
+      }
+      continuation "Unless otherwise provided by law enacted after August 13, 1981, or by a later report filed by the Board under subsection (a) of this section, regulations issued by the Board under this subsection shall apply beginning with the fiscal year designated by the Board in its written report under subsection (a) of this section. Any Board regulation which becomes effective under this subsection may be modified, rescinded, or superseded in the same manner and to the same extent as in the case of any other Board regulation issued under authority of this subchapter."
+      hash "7c0ff0bfd8c929297f6d9ed2c144e104fbdcfe664f1647872bf91e47f280b68f"
+    }
+    hash "5fde765cac37bc485997a9be6d4bab5039f66f32f7050c47007e6612ce1bd763"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 22" -> "/us/act/1935-08-29/ch812/s22"] ", as added " ["Pub. L. 97–35, title XI, § 1126(b)" -> "/us/pl/97/35/tXI/s1126/b"] ", Aug. 13, 1981, " ["95 Stat. 639" -> "/us/stat/95/639"] "; amended " ["Pub. L. 98–76, title I, § 105" -> "/us/pl/98/76/tI/s105"] ", Aug. 12, 1983, " ["97 Stat. 416" -> "/us/stat/97/416"] "; " ["Pub. L. 104–66, title II, § 2221(b)" -> "/us/pl/104/66/tII/s2221/b"] ", Dec. 21, 1995, " ["109 Stat. 733" -> "/us/stat/109/733"] "; " ["Pub. L. 107–90, title I, § 108(a)" -> "/us/pl/107/90/tI/s108/a"] ", Dec. 21, 2001, " ["115 Stat. 890" -> "/us/stat/115/890"] ".)"
+  note "/us/usc/t45/s231u/note/editorialNotes/act.1935-08-14.ch531/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Social Security Act, referred to in subsec. (c)(2), is " ["act Aug. 14, 1935, ch. 531" -> "/us/act/1935-08-14/ch531"] ", " ["49 Stat. 620" -> "/us/stat/49/620"] ", which is classified generally to chapter 7 (§ 301 et seq.) of Title 42, The Public Health and Welfare. For complete classification of this Act to the Code, see " ["section 1305 of Title 42" -> "/us/usc/t42/s1305"] " and Tables."
+    hash "9404331c2b74a236bedef810b22e0fa3759a9b9323cf9d2b49bdddbadb9df8a1"
+  }
+  note "/us/usc/t45/s231u/note/editorialNotes/pl.107.90/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2001—Subsec. (a)(1). " ["Pub. L. 107–90" -> "/us/pl/107/90"] " in introductory provisions, inserted after first sentence “On or before May 1 of each year beginning in 2003, the Railroad Retirement Board shall compute its projection of the account benefits ratio and the average account benefits ratio (as defined by section 3241(c) of the Internal Revenue Code of 1986) for each of the next succeeding five fiscal years.” and substituted “the projections prepared pursuant to the preceding two sentences” for “the projection prepared pursuant to the preceding sentence”."
+    p "1995—Subsec. (a)(1). " ["Pub. L. 104–66" -> "/us/pl/104/66"] " substituted “May 1” and “July 1” for “February 1” and “April 1”, respectively, in introductory provisions."
+    p "1983—Subsec. (a). " ["Pub. L. 98–76" -> "/us/pl/98/76"] " amended subsec. (a) generally, substituting provisions requiring Railroad Retirement Board to annually prepare and report on a five-year projection of ability of Railroad Retirement Account to pay benefits during five-year period for provisions which required Board to prepare a report in any fiscal year in which it determined that more than 50 percent of borrowing authority under this subchapter would be used."
+    hash "e1ad8cedbd694aa182af15aca0b8670a46456ba6d2d857d2953574749ba3e2b4"
+  }
+  note "/us/usc/t45/s231u/note/statutoryNotes/pl.97.35/effective-date" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date"
+    p "Section effective Oct. 1, 1981, see " ["section 1129(g) of Pub. L. 97–35" -> "/us/pl/97/35/s1129/g"] ", set out as an Effective Date of 1981 Amendment note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
+    hash "46e36f00e8a89b9c7cf3758169ced3c12cb1274cb2e926b5a1ed81118eeaf8ad"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be “benefits”."
+  }
+  layers {
+    operative "5fde765cac37bc485997a9be6d4bab5039f66f32f7050c47007e6612ce1bd763"
+    enacted "cf53790ddd1d3d4436f90c1ce75ee101a8e85ed00fb1205a7731486f5cb2fe88"
+    editorial "11d82d7a47922b1414b1e07fa31e0cdbb447f3fc3e3fd5b0bb5965496313e1c5"
+  }
+}

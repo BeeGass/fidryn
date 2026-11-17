@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/t45/ch8/schII" {
+  within "/us/usc/t45/ch8"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch8/schII" subchapter {
+    num "II" "SUBCHAPTER II—"
+    heading "CARRIERS BY AIR"
+    member "/us/usc/t45/s181"
+    member "/us/usc/t45/s182"
+    member "/us/usc/t45/s183"
+    member "/us/usc/t45/s184"
+    member "/us/usc/t45/s185"
+    member "/us/usc/t45/s186"
+    member "/us/usc/t45/s187"
+    member "/us/usc/t45/s188"
+    hash "4398ca1ad5b80adaeaf8ef1f216b1b7eaae0703ea75f1892d2b328233174cc27"
+  }
+  layers {
+    operative "4398ca1ad5b80adaeaf8ef1f216b1b7eaae0703ea75f1892d2b328233174cc27"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

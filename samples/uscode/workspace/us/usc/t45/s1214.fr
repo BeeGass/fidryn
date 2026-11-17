@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s1214" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1214" section {
+    num "1214" "§ 1214."
+    heading "Separability"
+    content "If any provision of this chapter or the application thereof to any person or circumstance is held invalid, the remainder of this chapter and the application of such provision to other persons or circumstances shall not be affected thereby."
+    hash "5e7e6d86e69f9ab6effe63bf5a9d882f3e896519dbab5c856533a73bfea1e009"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 616" -> "/us/pl/97/468/tVI/s616"] ", Jan. 14, 1983, " ["96 Stat. 2578" -> "/us/stat/96/2578"] ".)"
+  layers {
+    operative "5e7e6d86e69f9ab6effe63bf5a9d882f3e896519dbab5c856533a73bfea1e009"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e66255b94e44bf5a4b6e160650dcc52434d481e2aaea17514f3d204dedea6fb6"
+  }
+}

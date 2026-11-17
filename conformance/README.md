@@ -2,8 +2,9 @@
 
 JSON Schema checks for case records and source manifests under `examples/`
 and `prelude/`, for the three files of a workspace of law modules
-under `fixtures/workspace/`, and for the report of the check of a
-workspace under `fixtures/check-report/`. This is a document-shape check. It does not
+under `fixtures/workspace/` and under `samples/uscode/`, for the report of
+the check of a workspace under `fixtures/check-report/`, and for every text
+record of `fixtures/`. This is a document-shape check. It does not
 authenticate artifacts, execute Rust, or review legal content. A second
 implementation of the hashes of law modules is described at the end.
 
@@ -15,9 +16,19 @@ uv run python conformance/check_json_contracts.py /path/to/fidryn --output valid
 The checker looks for `"schema": "fidryn.case-record/v0.1"`,
 `"fidryn.source-manifest/v0.1"`, `"fidryn.workspace/v0.1"`,
 `"fidryn.law-lock/v0.1"`, `"fidryn.retrieval/v0.1"` and
-`"fidryn.check-report/v0.1"`. Exit `0` if every
-checked document is valid, `1` on validation failures, `2` on setup or
-read errors.
+`"fidryn.check-report/v0.1"`, and holds every line of every
+`*.records.jsonl` under `fixtures/` to `schemas/text-record-v0.1.json`,
+the schema of `fidryn.text-record/v0.1`, whose records hold no `schema`
+key. Exit `0` if every checked document is valid, `1` on validation
+failures, `2` on setup or read errors.
+
+`fixtures/text/demo.records.jsonl` holds what `fidryn text --json` prints
+of the demo workspace. The Rust test
+`text_prints_one_record_for_each_provision_and_note_in_address_order` of
+`fidryn-cli` holds it, byte for byte, to what the command prints.
+`test_text_record_schema.py` checks that it and every record the fixtures
+of the publisher's XML expect match the schema, and that the schema
+refuses what is no text record.
 
 `fixtures/workspace/` holds a generated workspace, `demo/`, in the
 invented corpus `/zz/demo`, and in `archives/` the retrieval record of its

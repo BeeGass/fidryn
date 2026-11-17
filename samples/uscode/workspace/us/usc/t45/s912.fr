@@ -1,0 +1,26 @@
+edition 2
+module "/us/usc/t45/s912" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s912" section {
+    num "912" "§ 912."
+    heading "Election"
+    content "Any employee who receives any assistance under section 909 or " ["section 911 of this title" -> "/us/usc/t45/s911"] " or under an employee protection agreement entered into under " ["section 908 of this title" -> "/us/usc/t45/s908"] " shall be deemed to waive any employee protection benefits otherwise available to such employee under the Bankruptcy Act, subtitle IV of title 49, or any applicable contract or agreement."
+    hash "1f91a53be5614d7c92fdecbed75b7158405e17ef16dee5e1730a90dc59ca7518"
+  }
+  credit "(" ["Pub. L. 96–101, § 13" -> "/us/pl/96/101/s13"] ", Nov. 4, 1979, " ["93 Stat. 743" -> "/us/stat/93/743"] ".)"
+  note "/us/usc/t45/s912/note/editorialNotes/pl.96.101/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 909 of this title" -> "/us/usc/t45/s909"] ", referred to in text, was in the original “section 10”, meaning " ["section 10 of Pub. L. 96–101" -> "/us/pl/96/101/s10"] ", Nov. 4, 1979, " ["93 Stat. 741" -> "/us/stat/93/741"] ". Subsecs. (a) to (g) of section 10 are classified to " ["section 909 of this title" -> "/us/usc/t45/s909"] ". Subsec. (h) of section 10 amended " ["section 231f(b)(7) of this title" -> "/us/usc/t45/s231f/b/7"] "."
+    p "The Bankruptcy Act, referred to in text, is " ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", which was classified generally to former Title 11, Bankruptcy. The Act was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "05764165f1c96495cbf4815ca532b24250d530146b8e11032a59d49a3595b4cf"
+  }
+  layers {
+    operative "1f91a53be5614d7c92fdecbed75b7158405e17ef16dee5e1730a90dc59ca7518"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "05d82c463b18b2d7e7942e8e1c7b92566fb2624ff05ccfc7c87ff11e87318cc1"
+  }
+}

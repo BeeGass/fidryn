@@ -97,7 +97,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.17</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.18</span> See also</a></li></ol></details>
     <div class="prose">
 <p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
@@ -604,7 +604,104 @@ extra us/usc/link
 different us/usc/t99/s1.fr
 extra us/usc/t99/s7.fr
 missing us/usc/t99a.fr</code></pre></figure>
-<h2 id="see-also"><span class="hn">4.17</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="text"><span class="hn">4.17</span> <code>text</code> <a class="anchor" href="#text" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn text DIR</code> prints the text of the provisions and notes of the
+workspace in <code>DIR</code>: of every provision, container, note, source credit and
+footnote of its modules, read from its module files
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>). With <code>ADDRESS</code> it prints the
+provision, container or note at that address and what lies below it: every
+one whose address is <code>ADDRESS</code> or continues it at a segment boundary. It
+reads the modules and checks nothing else of the workspace, which
+<code>fidryn check DIR</code> does.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>DIR</code></td><td>yes</td><td>path to the directory of a workspace</td></tr>
+<tr><td><code>ADDRESS</code></td><td>no</td><td>the address of a provision, a container or a note of the workspace</td></tr>
+<tr><td><code>--json</code></td><td>no</td><td>flag; print one text record to a line</td></tr>
+</tbody></table>
+</div>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s2
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo <span class="tk-ty">--json</span>
+<span class="tk-kw">fidryn</span> text samples/uscode/workspace /us/usc/t1/s1</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. Without <code>--json</code> it prints the text for a person,
+module by module in the order of their addresses, with a blank line
+between two modules:</p>
+<ul>
+<li>A provision is its address on a line of its own, followed by its status
+in parentheses when it has one; then its number and heading on one line,
+the blocks of its text parts and its children, each indented by two
+spaces for each level of depth. The provision printed first is at depth
+0.</li>
+<li>A table is one line for each row, its cells separated by <code>|</code>. The items
+of quoted content are indented one level further. A footnote marker is
+its shown text in brackets, and an image is <code>[image SOURCE]</code>.</li>
+<li>After the provisions of a unit come its source credit and its footnotes,
+each footnote after its marker in brackets, and then its notes, each its
+address with its layer in parentheses, its heading and its blocks. A
+container is its address, its number and heading, its credit, its
+footnotes and its notes.</li>
+</ul>
+<p>Of the demo workspace, <code>fidryn text conformance/fixtures/workspace/demo /zz/demo/t1</code>
+prints:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>/zz/demo/t1
+  Title 1— Invented Things
+
+/zz/demo/t1/ch1
+  Chapter 1— Widgets
+
+/zz/demo/t1/s1
+  § 1. Definitions
+  In this invented chapter, a widget is a small device.
+
+/zz/demo/t1/s2
+  § 2. Sizes
+  A widget is small or large.
+
+/zz/demo/t1/s3
+  § 3. Colors
+  A widget may be of any color.</code></pre></figure>
+<p>With <code>--json</code> it prints one text record, <code>fidryn.text-record/v0.1</code>, to a
+line, the JSON Schema of which is
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/text-record-v0.1.json">schemas/text-record-v0.1.json</a>. The
+records are those of every module, sorted by the bytes of their addresses
+across the whole workspace; for one address the provision or container
+comes first, then the source credit, then the footnotes by ordinal. Each
+is one line of compact JSON with its keys in this order:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Record</th><th>Keys</th></tr></thead><tbody>
+<tr><td>a provision</td><td><code>address</code>, <code>layer</code> (<code>"operative"</code>), <code>kind</code>, <code>status</code> (the word, or <code>null</code>), <code>num</code>, <code>heading</code>, <code>items</code>, where an item is a text part <code>{"part": role, "blocks": [...]}</code> or a child <code>{"child": address}</code>; the top provision of a unit also <code>aliases</code>, <code>within</code>, <code>source</code> and <code>positive_law</code></td></tr>
+<tr><td>a container</td><td><code>address</code>, <code>layer</code> (<code>"operative"</code>), <code>kind</code>, <code>status</code>, <code>num</code>, <code>heading</code>, <code>aliases</code>, <code>within</code>, <code>members</code></td></tr>
+<tr><td>a note</td><td><code>address</code>, <code>layer</code> (<code>"enacted"</code> or <code>"editorial"</code>), <code>group</code>, <code>topics</code>, <code>heading</code>, <code>blocks</code></td></tr>
+<tr><td>a source credit</td><td>the address of its module, <code>record</code> (<code>"credit"</code>), and the keys of a paragraph</td></tr>
+<tr><td>a footnote</td><td>the address of its module, <code>record</code> (<code>"footnote"</code>), <code>ordinal</code>, <code>shown</code>, <code>blocks</code></td></tr>
+</tbody></table>
+</div>
+<p>A text is <code>{"text": plain, "refs": [[start, end, target], ...], "sup": [[start, end], ...], "sub": [[start, end], ...]}</code>, followed by <code>"marks": [[offset, shown, footnote], ...]</code> when it holds a footnote marker. Offsets
+count the Unicode scalar values of the plain text, an end is exclusive, and
+the offset of a marker is the length of the plain text before it. A
+paragraph is a text with the key <code>p</code> in place of <code>text</code>, a subheading one
+with the key <code>subheading</code>. A heading is <code>null</code> or a text, and a number is
+<code>null</code> or <code>[value, shown]</code>, <code>shown</code> the plain string when it is words only
+and a text otherwise. A table is <code>{"table": [[group, [[header, colspan, rowspan, [blocks]], ...]], ...]}</code>, an image <code>{"image": source}</code>, and
+quoted content <code>{"quoted": {"origin": origin, "items": [...]}}</code>, whose
+items are blocks, text parts and levels <code>{"level": kind, "num": ..., "heading": ..., "items": [...]}</code>. The record of <code>/zz/demo/t1/s2</code>:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>{&quot;address&quot;:&quot;/zz/demo/t1/s2&quot;,&quot;layer&quot;:&quot;operative&quot;,&quot;kind&quot;:&quot;section&quot;,&quot;status&quot;:null,&quot;num&quot;:[&quot;2&quot;,&quot;§ 2.&quot;],&quot;heading&quot;:{&quot;text&quot;:&quot;Sizes&quot;,&quot;refs&quot;:[],&quot;sup&quot;:[],&quot;sub&quot;:[]},&quot;items&quot;:[{&quot;part&quot;:&quot;content&quot;,&quot;blocks&quot;:[{&quot;p&quot;:&quot;A widget is small or large.&quot;,&quot;refs&quot;:[],&quot;sup&quot;:[],&quot;sub&quot;:[]}]}],&quot;aliases&quot;:[],&quot;within&quot;:&quot;/zz/demo/t1/ch1&quot;,&quot;source&quot;:&quot;demo01.xml&quot;,&quot;positive_law&quot;:true}</code></pre></figure>
+<p>Both forms depend on the module files alone: neither the host, the
+working directory nor the number of threads the system offers changes a
+byte. <code>conformance/uslm_text.py</code> prints the same records from the
+publisher's XML, independently of the ingester, and the check of the
+sample of the Code compares the two line for line
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-sample">The sample</a>).</p>
+<p><strong>Failure.</strong> Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a directory that holds no workspace (<code>E730</code>), an entry
+that cannot be read or is neither a file nor a directory (<code>E730</code>), a
+module file that is not a module of edition 2 that lowers, each with its
+diagnostics; a text that is no address; and an address at which the
+workspace holds no provision, container or note, as
+<code>the workspace holds no provision, container or note at `/zz/demo/t1/s9` </code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s9</code></pre></figure>
+<h2 id="see-also"><span class="hn">4.18</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
@@ -615,7 +712,7 @@ missing us/usc/t99a.fr</code></pre></figure>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.17</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.18</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

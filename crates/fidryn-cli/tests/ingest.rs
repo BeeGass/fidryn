@@ -307,8 +307,10 @@ fn times(text: &str) -> Vec<String> {
         .collect()
 }
 
-#[test]
-fn ingest_writes_a_workspace_that_checks() {
+/// Every fixture, each as the members of one release: a fixture of one
+/// document as the member `usc99.xml`, and a fixture of several members as
+/// those members.
+fn fixture_releases() -> Vec<(String, Members)> {
     let mut releases: Vec<(String, Members)> = document_fixtures()
         .into_iter()
         .map(|name| {
@@ -322,7 +324,12 @@ fn ingest_writes_a_workspace_that_checks() {
             .map(|name| ((*name).to_owned(), fixture_members(name))),
     );
     assert!(releases.len() >= 34, "{} fixtures", releases.len());
-    for (name, members) in releases {
+    releases
+}
+
+#[test]
+fn ingest_writes_a_workspace_that_checks() {
+    for (name, members) in fixture_releases() {
         let scratch = Scratch::new(&format!("checks-{name}"));
         let archives = scratch.join("archives");
         one_archive(&archives, members);
@@ -350,6 +357,30 @@ fn ingest_writes_a_workspace_that_checks() {
             succeeded(&checked, &format!("check of {rel} of {name}"));
             assert_eq!(stdout(&checked), "ok\n", "{name}: {rel}");
         }
+    }
+}
+
+/// The text that `fidryn text --json` reads back from the workspace written
+/// of each fixture is, line for line, the records written by hand for the
+/// fixture, which the independent reading of the publisher's XML prints: the
+/// modules lose nothing of the text, and the records of all of them are in
+/// the order of their addresses.
+#[test]
+fn the_text_of_the_workspace_of_a_fixture_is_its_expected_records() {
+    for (name, members) in fixture_releases() {
+        let scratch = Scratch::new(&format!("text-{name}"));
+        let archives = scratch.join("archives");
+        one_archive(&archives, members);
+        let out = scratch.join("out");
+        succeeded(&ingest(&archives, &out, &[]), &name);
+        let printed = fidryn()
+            .args([OsStr::new("text"), out.as_os_str(), OsStr::new("--json")])
+            .output()
+            .expect("run fidryn");
+        succeeded(&printed, &format!("text of {name}"));
+        assert_eq!(stderr(&printed), "", "{name}");
+        let expected = read(&fixtures().join(format!("{name}.records.jsonl")));
+        assert_eq!(stdout(&printed), expected, "{name}");
     }
 }
 

@@ -1,0 +1,65 @@
+edition 2
+module "/us/usc/ptVII/rule7016" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7016" courtRule {
+    num "7016" "Rule 7016."
+    heading "Pretrial Procedures"
+    provision "/us/usc/ptVII/rule7016/a" subsection {
+      num "a" "(a)"
+      heading "Pretrial Conferences; Scheduling; Management."
+      content "Fed. R. Civ. P. 16 applies in an adversary proceeding."
+      hash "e921564faf398b977f8b300a6656bcb145481d768be983c5e16201bb17f0ed00"
+    }
+    provision "/us/usc/ptVII/rule7016/b" subsection {
+      num "b" "(b)"
+      heading "Determining Procedure."
+      chapeau "On its own or a party’s timely motion, the court must decide whether:"
+      provision "/us/usc/ptVII/rule7016/b/1" paragraph {
+        num "1" "(1)"
+        content "to hear and determine the proceeding;"
+        hash "9a9d370147dde825ab5297fa80300c2b48287775107245db1c9e9e7606e08719"
+      }
+      provision "/us/usc/ptVII/rule7016/b/2" paragraph {
+        num "2" "(2)"
+        content "to hear it and issue proposed findings of fact and conclusions of law; or"
+        hash "bd09acace19762345a58faed181ae3cadc198ff7849904d5810c89f3468c3526"
+      }
+      provision "/us/usc/ptVII/rule7016/b/3" paragraph {
+        num "3" "(3)"
+        content "to take other action."
+        hash "0328cd1583883e8972b308736079104784f8c4abea03a1a41d229ad61c4bb6c5"
+      }
+      hash "63047de815082df3333ddf6883dee1c74002c183f5b9045f849a96bfd8fb4058"
+    }
+    hash "46ba275bfbda9c82885dea2c41d4311ea19d5a1721735d9184b185dae88c4ad2"
+  }
+  credit "(As amended Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "This rule is amended to create a new subdivision (b) that provides for the bankruptcy court to enter final orders and judgment, issue proposed findings and conclusions, or take some other action in a proceeding. The rule leaves the decision as to the appropriate course of proceedings to the bankruptcy court. The court’s decision will be informed by the parties’ statements, required under Rules 7008(a), 7012(b), and 9027(a) and (e), regarding consent to the entry of final orders and judgment. If the bankruptcy court chooses to issue proposed findings of fact and conclusions of law, Rule 9033 applies."
+    hash "aed29d9722324290361cd28da457f44b4501a7b92fbec436b8f4f3f618b424d3"
+  }
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "7ef882bacf23426c96a71459a37495ba9adab9e96c03c15f78105d64f664d7f5"
+  }
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "deb4c0aa4ee80b33fd9101f209f848844329e50da3c46e96b8b0c3857dca9936"
+  }
+  layers {
+    operative "46ba275bfbda9c82885dea2c41d4311ea19d5a1721735d9184b185dae88c4ad2"
+    enacted "4debf542adab47a0312fd4a450b1eec276280c3351c04ec41be0a75ac73347bd"
+    editorial "3f28957698fc193c9199b1b9f7d704229a16f062083008ac2b17eccd53d9db61"
+  }
+}

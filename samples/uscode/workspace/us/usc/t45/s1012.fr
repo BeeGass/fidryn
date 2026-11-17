@@ -1,0 +1,28 @@
+edition 2
+module "/us/usc/t45/s1012" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1012" section {
+    num "1012" "§ 1012."
+    heading "Publications and reports"
+    content "Within 45 days after May 30, 1980, the Board shall publish, and make available for distribution by the Rock Island Railroad to all eligible employees, a document which describes in detail the rights of such employees under sections 1005, 1006," mark "1" 1 " 1007, and 1014 of this title."
+    hash "54443b82918bef64bc9c1b71eca1b05776703ff1551cbdc7752e8a280071c839"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 115" -> "/us/pl/96/254/tI/s115"] ", May 30, 1980, " ["94 Stat. 405" -> "/us/stat/94/405"] ".)"
+  note "/us/usc/t45/s1012/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 1006 of this title" -> "/us/usc/t45/s1006"] ", referred to in text, was repealed by " ["Pub. L. 97–35, title XI, § 1144(b)" -> "/us/pl/97/35/tXI/s1144/b"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] "."
+    hash "bffb4128558a2aece7e40d455c01addfa30479091006b688a7816fb2f702702f"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "54443b82918bef64bc9c1b71eca1b05776703ff1551cbdc7752e8a280071c839"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5a05d52ee77555bd9083f05f1a1fa8ca99557b0838575f6252ec9173c95bf120"
+  }
+}

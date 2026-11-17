@@ -1,0 +1,26 @@
+edition 2
+module "/us/usc/t45/ch9/schIII" {
+  within "/us/usc/t45/ch9"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch9/schIII" subchapter {
+    num "III" "SUBCHAPTER III—"
+    heading "RAILROAD RETIREMENT ACT OF 1937"
+    member "/us/usc/t45/s228a...228c–1"
+    member "/us/usc/t45/s228d"
+    member "/us/usc/t45/s228e...228z–1"
+    hash "d462fe52c7b750e7a482dddfb795204ab3e6e08c8a1f486c8134d648f6fd32d7"
+  }
+  note "/us/usc/t45/ch9/schIII/note/editorialNotes/act.1935-08-29.ch812/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "This subchapter was comprised of " ["act Aug. 29, 1935, ch. 812" -> "/us/act/1935-08-29/ch812"] ", as restated by " ["act June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", " ["50 Stat. 307" -> "/us/stat/50/307"] ", known as the Railroad Retirement Act of 1937. The Railroad Retirement Act of 1937 was amended in its entirety and completely revised by " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1305" -> "/us/stat/88/1305"] ", effective Jan. 1, 1975. The act, as amended and revised by " ["Pub. L. 93–445" -> "/us/pl/93/445"] ", was redesignated the Railroad Retirement Act of 1974 and is classified to subchapter IV of this chapter."
+    hash "e3a3684a66424c1ba6dce34e72a2cd25d1865b49f36b8f8a8b2c80612005e674"
+  }
+  layers {
+    operative "d462fe52c7b750e7a482dddfb795204ab3e6e08c8a1f486c8134d648f6fd32d7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d0aec00244e8e6afb24484acbe5bed1cfde55160b3e336425baa0e94aeb3b434"
+  }
+}

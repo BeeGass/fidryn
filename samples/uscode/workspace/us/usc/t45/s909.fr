@@ -1,0 +1,129 @@
+edition 2
+module "/us/usc/t45/s909" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s909" section {
+    num "909" "§ 909."
+    heading "Supplementary unemployment insurance"
+    provision "/us/usc/t45/s909/a" subsection {
+      num "a" "(a)"
+      heading "Eligible employees"
+      chapeau "Any employee of the Milwaukee Railroad—"
+      provision "/us/usc/t45/s909/a/1" paragraph {
+        num "1" "(1)"
+        content "who (A) is employed by the restructured Milwaukee Railroad, and (B) is separated from that employment by reason of any reduction in service by such railroad prior to April 1, 1984; or"
+        hash "6e9c3387f3816cb4605fbdea15cbfd88d9a8c5e72776e5810cb3d477ded1073a"
+      }
+      provision "/us/usc/t45/s909/a/2" paragraph {
+        num "2" "(2)"
+        content "who (A) is separated from his employment with the Milwaukee Railroad in connection with a restructuring transaction carried out by such railroad, and obtains employment, prior to April 1, 1981, with another rail carrier, and (B) is separated from employment with such other carrier prior to April 1, 1984,"
+        hash "278f565d2b547dcf81ba80255f324944df7fd9646f3fcb6156e748736ee4a5b3"
+      }
+      continuation "shall be entitled to receive monthly supplementary unemployment insurance in accordance with the provisions of this section."
+      hash "e800a4bd14d7d123232b101c1134632964cc8be8e104d364ba7edfe2b352327f"
+    }
+    provision "/us/usc/t45/s909/b" subsection {
+      num "b" "(b)"
+      heading "Period of payment"
+      chapeau "Each employee described in subsection (a) of this section shall be entitled to receive supplementary unemployment insurance during each month in which such employee is not employed, for all or a portion of such month, by the Milwaukee Railroad or another rail carrier. Each such employee shall be entitled to receive such insurance for a total of not more than 36 months, except that—"
+      provision "/us/usc/t45/s909/b/1" paragraph {
+        num "1" "(1)"
+        content "the period of entitlement for assistance under this section shall not exceed the employee’s total months of service with the Milwaukee Railroad; and"
+        hash "a7f57fd5247bfbd0a0145032206c3d36c3e163726e9e53c0775f0dc8d2d252cc"
+      }
+      provision "/us/usc/t45/s909/b/2" paragraph {
+        num "2" "(2)"
+        content "no compensation shall be provided under this section after April 1, 1984, unless it is necessary in order to provide an employee with at least 8 months of such insurance, but after such date, such employee only shall receive such 8-month minimum if such employee is not employed continuously after such date."
+        hash "6d54f0002ed6b6ef3fd045fdc3d9caeb2d6499fc7cf258d3985874698010d9c1"
+      }
+      hash "1362f978f79de64f8560ff7caab166f697075d83286b596a016ff6f5434e28ec"
+    }
+    provision "/us/usc/t45/s909/c" subsection {
+      num "c" "(c)"
+      heading "Amount of payment"
+      chapeau "Supplementary unemployment insurance under this section shall be payable to an employee on a monthly basis in an amount equal to—"
+      provision "/us/usc/t45/s909/c/1" paragraph {
+        num "1" "(1)"
+        content "eighty percent of such employee’s average monthly normal compensation from employment with the Milwaukee Railroad during the period beginning June 1, 1977, and ending on November 4, 1979, less"
+        hash "ab625d8fe296709f6ad79810176c1a7821f573dd68e159fcbfc7ce4132cf265f"
+      }
+      provision "/us/usc/t45/s909/c/2" paragraph {
+        num "2" "(2)"
+        content "the sum of (A) the amount of any benefits payable to such employee for such month under the Railroad Unemployment Insurance Act [" ["45 U.S.C. 351" -> "/us/usc/t45/s351"] " et seq.] or under any State unemployment insurance program, and (B) the amount of any earnings of such employee for such month from employment or self-employment of any kind."
+        hash "6e3f96e18f1ef9b93c21955595b2f8dc4f7b9c224232397665c59cf1f59ca6f7"
+      }
+      hash "a58c1406d595646277e5ae3ffab6491da6250be3b01672ae59413b2b3652be84"
+    }
+    provision "/us/usc/t45/s909/d" subsection {
+      num "d" "(d)"
+      heading "Filing of application"
+      content "An application for supplementary unemployment insurance shall be filed with the Board in such time and manner as the Board by regulation shall prescribe."
+      hash "075e08f58a6d9115487bb07a68f0edb0abac3d876c4264443711297b949091b2"
+    }
+    provision "/us/usc/t45/s909/e" subsection {
+      num "e" "(e)"
+      heading "Insurance as compensation"
+      chapeau "Any supplementary unemployment insurance received by any employee pursuant to this section shall be considered to be compensation solely—"
+      provision "/us/usc/t45/s909/e/1" paragraph {
+        num "1" "(1)"
+        content "for purposes of the Railroad Retirement Act of 1974 (" ["45 U.S.C. 231" -> "/us/usc/t45/s231"] " et seq.); and"
+        hash "a57e2518b6e9c8ed4e022eac42913c5a1685f5bd5e7b172bc7b157f57c10c99c"
+      }
+      provision "/us/usc/t45/s909/e/2" paragraph {
+        num "2" "(2)"
+        content "for purposes of determining the compensation received by such employee in any base year under the Railroad Unemployment Insurance Act [" ["45 U.S.C. 351" -> "/us/usc/t45/s351"] " et seq.]."
+        hash "a26647e6ca9b07295e2720ab6979ab0e40839e98f8969cd2dfdd0b2a45aa32ae"
+      }
+      hash "9198bf9066fa9b060f01680372a0ff8419d01cdb69e5251757e6006aa0480b7b"
+    }
+    provision "/us/usc/t45/s909/f" subsection {
+      num "f" "(f)"
+      heading "Employees not covered"
+      provision "/us/usc/t45/s909/f/1" paragraph {
+        num "1" "(1)"
+        content "The provisions of this section shall not apply to an employee in the event of his resignation, retirement, or discharge for cause from the employment of any rail carrier."
+        hash "41b15220b6bca6e6f227277040e26be6c8ac7ec596451b40d79c6bef01f27f24"
+      }
+      provision "/us/usc/t45/s909/f/2" paragraph {
+        num "2" "(2)"
+        content "An employee shall not be entitled to receive supplementary unemployment insurance under this section if he has failed to exhaust all seniority rights or other employment rights under applicable collective bargaining agreements."
+        hash "689a4f5b2f4de12ce96066979e36531cb7a5d689daf081ca9dfefdf4fffabab8"
+      }
+      provision "/us/usc/t45/s909/f/3" paragraph {
+        num "3" "(3)"
+        content "An employee shall not be entitled to receive supplementary unemployment insurance under this section for any month or portion of a month in which such employee is unemployed due to normal seasonal unemployment patterns in the railroad industry."
+        hash "c5bcf23251771387625be9284662954903496ad82a44096331d6d8564a213107"
+      }
+      hash "bdb5fdfcdb3fe16391fc2783916d2ee1a649c1b27c8a11502c413c66e65e3094"
+    }
+    provision "/us/usc/t45/s909/g" subsection {
+      num "g" "(g)"
+      heading "Furloughed employees"
+      content "For purposes of this section, any employee of the Milwaukee Railroad who is furloughed shall be considered to be separated from his employment."
+      hash "ec550ec1f363239a5273adda101e71f0d568fa7a2d8c575f5fa3bc1344bf6325"
+    }
+    hash "984b2ef6aa2af9e9c61251540f04d832d21ac64e20fbedf32a635fb075547685"
+  }
+  credit "(" ["Pub. L. 96–101, § 10(a)" -> "/us/pl/96/101/s10/a"] "–(g), Nov. 4, 1979, " ["93 Stat. 741" -> "/us/stat/93/741"] ", 742.)"
+  note "/us/usc/t45/s909/note/editorialNotes/act.1938-06-25.ch680/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Railroad Unemployment Insurance Act, referred to in subsecs. (c)(2) and (e)(2), is " ["act June 25, 1938, ch. 680" -> "/us/act/1938-06-25/ch680"] ", " ["52 Stat. 1094" -> "/us/stat/52/1094"] ", which is classified principally to chapter 11 (§ 351 et seq.) of this title. For complete classification of this Act to the Code, see " ["section 367 of this title" -> "/us/usc/t45/s367"] " and Tables."
+    p "The Railroad Retirement Act of 1974, referred to in subsec. (e)(1), is " ["act Aug. 29, 1935, ch. 812" -> "/us/act/1935-08-29/ch812"] ", as amended generally by " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1305" -> "/us/stat/88/1305"] ", which is classified generally to subchapter IV (§ 231 et seq.) of chapter 9 of this title. For further details and complete classification of this Act to the Code, see Codification note set out preceding " ["section 231 of this title" -> "/us/usc/t45/s231"] ", " ["section 231t of this title" -> "/us/usc/t45/s231t"] ", and Tables."
+    hash "a55a4b226f87834eaeb89f41fbd149863af740f4b1a7d69ab7116448a5537814"
+  }
+  note "/us/usc/t45/s909/note/editorialNotes/pl.96.101/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section is comprised of subsecs. (a) to (g) of " ["section 10 of Pub. L. 96–101" -> "/us/pl/96/101/s10"] ". Subsec. (h) of section 10 amended " ["section 231f(b)(7) of this title" -> "/us/usc/t45/s231f/b/7"] "."
+    hash "78435871119ae8de9217711904ad8304ce3dd28a16bd70a6e101ca975a950d15"
+  }
+  layers {
+    operative "984b2ef6aa2af9e9c61251540f04d832d21ac64e20fbedf32a635fb075547685"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1af6b915c82fa4a2c89283647862d8d4746c6f18d75ac3aa75f8c3ac041c5588"
+  }
+}

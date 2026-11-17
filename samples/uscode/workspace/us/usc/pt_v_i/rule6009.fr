@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/ptVI/rule6009" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6009" courtRule {
+    num "6009" "Rule 6009."
+    heading "Right of the Trustee or Debtor in Possession to Prosecute and Defend Proceedings"
+    chapeau "With or without court approval, the trustee or debtor in possession may:"
+    provision "/us/usc/ptVI/rule6009/a" subsection {
+      num "a" "(a)"
+      content "prosecute—or appear in and defend—any pending action or proceeding by or against the debtor; or"
+      hash "b0d92bc4c91e545c67cda7b35ce31d5447fc2c8ad34ce00a61bc7bc24fc8cf61"
+    }
+    provision "/us/usc/ptVI/rule6009/b" subsection {
+      num "b" "(b)"
+      content "commence and prosecute in any tribunal an action or proceeding on the estate’s behalf."
+      hash "f348f142d8225f9f06d1270ec2e7449ecc04a66d698fd6b3d522c4c6213a9424"
+    }
+    hash "3bd262debb61eb00d07492da98a664e55955537140b13d44fec8b962daa197af"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 610."
+    hash "a24c73b740dcdc066f707098303425047be90ddd7defa7fff9d8053da8ef11f8"
+  }
+  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8d970300e00a411dc2ff8539e73391ab3e4f6d5418ce79331267ac938785c87b"
+  }
+  layers {
+    operative "3bd262debb61eb00d07492da98a664e55955537140b13d44fec8b962daa197af"
+    enacted "11c8e68822c54a1ab4f60a391ae117bccda8b27acdc431ef163fef68cbeb3e41"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

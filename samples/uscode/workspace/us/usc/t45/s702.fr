@@ -1,0 +1,225 @@
+edition 2
+module "/us/usc/t45/s702" {
+  within "/us/usc/t45/ch16/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s702" section {
+    num "702" "§ 702."
+    heading "Definitions"
+    chapeau "As used in this chapter, unless the context otherwise requires—"
+    provision "/us/usc/t45/s702/1" paragraph {
+      num "1" "(1)"
+      content "“Association” means the United States Railway Association, established under " ["section 711 of this title" -> "/us/usc/t45/s711"] ";"
+      hash "818523955cdfb48f2092679c1798a6d28907aeff1513862498a7712185f38332"
+    }
+    provision "/us/usc/t45/s702/2" paragraph {
+      num "2" "(2)"
+      content "“Commission” means the Interstate Commerce Commission;"
+      hash "c56111dfa3a2bc6d8b19f8f87df64caf5b72035aa82b8692ac281dc0d8595164"
+    }
+    provision "/us/usc/t45/s702/3" paragraph {
+      num "3" "(3)"
+      content "“Commuter authority” means any State, local, or regional authority, corporation, or other entity established for purposes of providing commuter service, and includes the Metropolitan Transportation Authority, the Connecticut Department of Transportation, the Maryland Department of Transportation, the Southeastern Pennsylvania Transportation Authority, the New Jersey Transit Corporation, the Massachusetts Bay Transportation Authority, the Port Authority Trans-Hudson Corporation, any successor agencies, and any entity created by one or more such agencies for the purpose of operating, or contracting for the operation of, commuter service;"
+      hash "972e351bef633070f4c9ed54e9a2ec0092f0789866219767cd2e7963ccaffd98"
+    }
+    provision "/us/usc/t45/s702/4" paragraph {
+      num "4" "(4)"
+      content "“Commuter service” means short-haul rail passenger service operated in metropolitan and suburban areas, whether within or across the geographical boundaries of a State, usually characterized by reduced fare, multiple-ride, and commutation tickets, and by morning and evening peak period operations;"
+      hash "46a818988f24437888d9b02b39ba569a9ef03a02419380b4048ddf91cb64f9d7"
+    }
+    provision "/us/usc/t45/s702/5" paragraph {
+      num "5" "(5)"
+      content "“Corporation” means the Consolidated Rail Corporation required to be established under " ["section 741 of this title" -> "/us/usc/t45/s741"] " or its successor by merger, consolidation or other form of succession carried out under applicable law for the purpose of changing the State of its incorporation;"
+      hash "c533c55a329deca903e7a20f2d3332d3d8f8903d7e990bc71f5742a14a0d9e93"
+    }
+    provision "/us/usc/t45/s702/6" paragraph {
+      num "6" "(6)"
+      content "“effective date of the final system plan” means the date on which the final system plan or any revised final system plan is deemed approved by Congress, in accordance with " ["section 718 of this title" -> "/us/usc/t45/s718"] ";"
+      hash "0232b608697fc75017643b9f72798a1760a3012f479a5be874c31a6f0738e434"
+    }
+    provision "/us/usc/t45/s702/7" paragraph {
+      num "7" "(7)"
+      content "“employee stock ownership plan” means a technique of corporate finance that uses a stock bonus trust or a company stock money purchase pension trust which qualifies under " ["section 401(a) of title 26" -> "/us/usc/t26/s401/a"] " in connection with the financing of corporate improvements, transfers in the ownership of corporate assets, and other capital requirements of a corporation and which is designed to build beneficial equity ownership of shares in the employer corporation into its employees substantially in proportion to their relative incomes, without requiring any cash outlay, any reduction in pay or other employee benefits, or the surrender of any other rights on the part of such employees;"
+      hash "307ae130deb23e9aba2c903c4f6fe4611f626993cfbdfc5af9bde0bc2f3a86b3"
+    }
+    provision "/us/usc/t45/s702/8" paragraph {
+      num "8" "(8)"
+      content "“final system plan” means the plan of reorganization for the restructure, rehabilitation, and modernization of railroads in reorganization prepared pursuant to " ["section 716 of this title" -> "/us/usc/t45/s716"] " and approved pursuant to " ["section 718 of this title" -> "/us/usc/t45/s718"] ";"
+      hash "05a70435891e39bdd93d271dc992768dc2c9e5e15bfcc1c15f403e9682edc02b"
+    }
+    provision "/us/usc/t45/s702/9" paragraph {
+      num "9" "(9)"
+      content "“Finance Committee” means the Finance Committee of the Board of Directors of the Association established under section 711(i)" mark "1" 1 " of this title;"
+      hash "7df55bbe9d7871b8c31017324b863b18dccb99f9b6e507edc91e264b6b13d706"
+    }
+    provision "/us/usc/t45/s702/10" paragraph {
+      num "10" "(10)"
+      content "“includes” and variants thereof should be read as if the phrase “but is not limited to” were also set forth;"
+      hash "1888edce674d432baaee7a90717060d3233df1bd0216e8c725d62e0aade236be"
+    }
+    provision "/us/usc/t45/s702/11" paragraph {
+      num "11" "(11)"
+      content "“local or regional transportation authority” includes a political subdivision of a State." mark "2" 2
+      hash "293834ec30ccb1283b6cc2c3c892fb9c02716c9d1b10f70294769125fcbe6c98"
+    }
+    provision "/us/usc/t45/s702/12" paragraph {
+      num "12" "(12)"
+      content "“Office” means the Rail Services Planning Office established under section 10361 " sup "1" " of title 49;"
+      hash "8ab0ae1a415052c9bf8a95f11e740f5698b7791efae7c981f44fad7532e02761"
+    }
+    provision "/us/usc/t45/s702/13" paragraph {
+      num "13" "(13)"
+      content "“profitable railroad” means a railroad which is not a railroad in reorganization. The term does not include the Corporation, the National Railroad Passenger Corporation, or a railroad leased, operated, or controlled by a railroad in reorganization in the region;"
+      hash "2104de864513c94bb84908e4501b59e5676cf79412bbaaf010901df3a3b61dd8"
+    }
+    provision "/us/usc/t45/s702/14" paragraph {
+      num "14" "(14)"
+      content "“rail properties” means assets or rights owned, leased, or otherwise controlled by a railroad (or a person owned, leased, or otherwise controlled by a railroad) which are used or useful in rail transportation service; except that the term, when used in conjunction with the phrase “railroads leased, operated, or controlled by a railroad in reorganization”, shall not include assets or rights owned, leased, or otherwise controlled by a Class I railroad which is not wholly owned, operated, or leased by a railroad in reorganization but is controlled by a railroad in reorganization;"
+      hash "25f3f38abab9ef88591c55c28fd1f29a7f283d5e4527931598f23cb6fcce96cb"
+    }
+    provision "/us/usc/t45/s702/15" paragraph {
+      num "15" "(15)"
+      content "“railroad” means a rail carrier subject to part A of subtitle IV of title 49. The term includes the Corporation and the National Railroad Passenger Corporation;"
+      hash "e58e156c4e9c7ab444f62a4b9b363563ddc8dc9d609e30f2294a8cb4fec70f4e"
+    }
+    provision "/us/usc/t45/s702/16" paragraph {
+      num "16" "(16)"
+      content "“railroad in reorganization” means a railroad which is subject to a bankruptcy proceeding and which has not been determined by a court to be reorganizable or not subject to reorganization pursuant to this chapter as prescribed in " ["section 717(b) of this title" -> "/us/usc/t45/s717/b"] ". A “bankruptcy proceeding” includes a proceeding pursuant to section 77 of the Bankruptcy Act and an equity receivership or equivalent proceeding;"
+      hash "38d35f2cb6c3fc81eb57494175f379f400c3375ad8e67f54cda62c9fa8f48a59"
+    }
+    provision "/us/usc/t45/s702/17" paragraph {
+      num "17" "(17)"
+      content "“Region” means the States of Maine, New Hampshire, Vermont, Massachusetts, Connecticut, Rhode Island, New York, New Jersey, Pennsylvania, Delaware, Maryland, Virginia, West Virginia, Ohio, Indiana, Michigan, and Illinois; the District of Columbia; and those portions of contiguous States in which are located rail properties owned or operated by railroads doing business primarily in the aforementioned jurisdictions (as determined by the Commission by order);"
+      hash "1bc4a67f65565378b382c08ea673c9b3dc45b6b65f455f44a6437db23531af92"
+    }
+    provision "/us/usc/t45/s702/17A" paragraph {
+      num "17A" "(17A)"
+      content "“sale date” means the date on which the initial public offering of the securities of the Corporation is closed under the Conrail Privatization Act [" ["45 U.S.C. 1301" -> "/us/usc/t45/s1301"] " et seq.];"
+      hash "077361c9343e708365cb473e014ecdde2f04819a015746396f2fc2ee6b6451ed"
+    }
+    provision "/us/usc/t45/s702/18" paragraph {
+      num "18" "(18)"
+      content "“Secretary” means the Secretary of Transportation or the designated representative of the Secretary;"
+      hash "577732afd6c2e4339e8da02df65502a564e21774ac661ed389ca73ac3d54298f"
+    }
+    provision "/us/usc/t45/s702/19" paragraph {
+      num "19" "(19)"
+      content "“State” means any State or the District of Columbia;"
+      hash "b36a7652912c7eaa8b8e3ae0780d2e6e4b0eb9eeb9604d53cb1df8dec3b34a23"
+    }
+    provision "/us/usc/t45/s702/20" paragraph {
+      num "20" "(20)"
+      content "“subsidiary” means any corporation 100 percent of whose total combined voting shares are, directly or indirectly, owned or controlled by the Corporation; and"
+      hash "1e537829a94b1360e0a1a9008b145b73e94ae7c9ca415af1f8eba8e0618f41e1"
+    }
+    provision "/us/usc/t45/s702/21" paragraph {
+      num "21" "(21)"
+      content "“supplemental transaction” means any transaction set forth in a proposal under " ["section 745 of this title" -> "/us/usc/t45/s745"] " under which the Corporation or a subsidiary thereof would (A) acquire rail properties not designated for transfer or conveyance to it under the final system plan, (B) convey rail properties to a profitable railroad, a subsidiary of the Corporation or, other than as designated in the final system plan, to the National Railroad Passenger Corporation or to a State or a local or regional transportation authority, or to any other responsible person for use in providing rail service, or (C) enter into contractual or other arrangements with any person for the joint use of rail properties or the coordination or separation of rail operations or services."
+      hash "99fdf130bcc8969a339225befcbc53962db6a2f99ed6b0fc3d6086426ddd3c1a"
+    }
+    hash "408111882a1196d1bb7510dfe203d35819ac4b6909b974c4e9f38ed166cd99c2"
+  }
+  credit "(" ["Pub. L. 93–236, title I, § 102" -> "/us/pl/93/236/tI/s102"] ", Jan. 2, 1974, " ["87 Stat. 986" -> "/us/stat/87/986"] "; " ["Pub. L. 94–210, title VI" -> "/us/pl/94/210/tVI"] ", §§ 601(f), (g), 603(c), 607(t), 610(a), Feb. 5, 1976, " ["90 Stat. 86" -> "/us/stat/90/86"] ", 88, 98, 100; " ["Pub. L. 94–248, § 1" -> "/us/pl/94/248/s1"] ", Mar. 25, 1976, " ["90 Stat. 286" -> "/us/stat/90/286"] "; " ["Pub. L. 94–555, title II, § 211(a)" -> "/us/pl/94/555/tII/s211/a"] ", Oct. 19, 1976, " ["90 Stat. 2624" -> "/us/stat/90/2624"] "; " ["Pub. L. 96–448, title V, § 508(b)" -> "/us/pl/96/448/tV/s508/b"] ", title VI, § 601(b), Oct. 14, 1980, " ["94 Stat. 1957" -> "/us/stat/94/1957"] ", 1958; " ["Pub. L. 97–35, title XI, § 1135(b)" -> "/us/pl/97/35/tXI/s1135/b"] ", Aug. 13, 1981, " ["95 Stat. 646" -> "/us/stat/95/646"] "; " ["Pub. L. 99–509, title IV, § 4033(b)(1)" -> "/us/pl/99/509/tIV/s4033/b/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "; " ["Pub. L. 99–514, § 2" -> "/us/pl/99/514/s2"] ", Oct. 22, 1986, " ["100 Stat. 2095" -> "/us/stat/100/2095"] "; " ["Pub. L. 104–88, title III, § 327(1)" -> "/us/pl/104/88/tIII/s327/1"] ", Dec. 29, 1995, " ["109 Stat. 951" -> "/us/stat/109/951"] ".)"
+  note "/us/usc/t45/s702/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 711(i) of this title" -> "/us/usc/t45/s711/i"] ", referred to in par. (9), which related to the Finance Committee of the Board of Directors of the Association, was repealed by " ["Pub. L. 97–35, title XI, § 1147" -> "/us/pl/97/35/tXI/s1147"] ", Aug. 13, 1981, " ["95 Stat. 673" -> "/us/stat/95/673"] "."
+    p ["Section 10361 of title 49" -> "/us/usc/t49/s10361"] ", referred to in par. (12), was omitted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] ". Previously, in par. (12) “" ["section 10361 of title 49" -> "/us/usc/t49/s10361"] "” was substituted for “section 205 of this Act”, meaning " ["section 205 of Pub. L. 93–236" -> "/us/pl/93/236/s205"] ", on authority of " ["Pub. L. 95–473, § 3(b)" -> "/us/pl/95/473/s3/b"] ", Oct. 17, 1978, " ["92 Stat. 1466" -> "/us/stat/92/1466"] ", the first section of which enacted subtitle IV (§ 10101 et seq.) of Title 49."
+    p "Section 77 of the Bankruptcy Act, referred to in par. (16), was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", as amended) was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p "The Conrail Privatization Act, referred to in par. (17A), is subtitle A (§§ 4001–4052) of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1892" -> "/us/stat/100/1892"] ", which is classified principally to chapter 22 (§ 1301 et seq.) of this title. For complete classification of this Act to the Code see Short Title note set out under " ["section 1301 of this title" -> "/us/usc/t45/s1301"] " and Tables. The date on which the initial public offering of the securities of the corporation is closed under this Act was Apr. 2, 1987."
+    hash "e5a034ba7c01988770ef72ec6ebaf94a20755c09fef74e3660605e3d5f065139"
+  }
+  note "/us/usc/t45/s702/note/editorialNotes/pl.96.448/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In par. (21), formerly (19), “under " ["section 743(b) of this title" -> "/us/usc/t45/s743/b"] ",” was struck out as the probable intent of Congress, in view of the amendment to par. (19) by " ["section 601(b) of Pub. L. 96–448" -> "/us/pl/96/448/s601/b"] ", which struck out the 6 year limitation within which the special court orders conveyances of rail properties to the Corporation, which conveyances were to be made under " ["section 743(b) of this title" -> "/us/usc/t45/s743/b"] ". See 1980 Amendment note set out below."
+    hash "4dd0d5bc025883f43d8f4ed759ed984082c5ceba53be6b354544a0b1f57c2b77"
+  }
+  note "/us/usc/t45/s702/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—Par. (15). " ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “rail carrier subject to part A of subtitle IV of title 49” for “common carrier by railroad as defined in section 1(3) of part I of the Interstate Commerce Act (" ["49 U.S.C. 1(3)" -> "/us/usc/t49/s1/3"] ")”."
+    p "1986—Par. (7). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”, which for purposes of codification was translated as “title 26” thus requiring no change in text."
+    p "Par. (17A). " ["Pub. L. 99–509" -> "/us/pl/99/509"] " added par. (17A)."
+    p "1981—" ["Pub. L. 97–35" -> "/us/pl/97/35"] " added pars. (3) and (4). Former pars. (3) to (19) redesignated (5) to (21), respectively."
+    p "1980—Par. (16). " ["Pub. L. 96–448, § 508(b)" -> "/us/pl/96/448/s508/b"] ", substituted “or the designated representative of the Secretary” for “or the person at the time performing the duties of the Office of the Secretary of Transportation in accordance with law, or, in his absence, the Deputy Secretary of Transportation”."
+    p "Par. (19). " ["Pub. L. 96–448, § 601(b)" -> "/us/pl/96/448/s601/b"] ", struck out “, within 6 years after the date on which the special court orders conveyances of rail properties to the Corporation” after “" ["section 745 of this title" -> "/us/usc/t45/s745"] "”. See Codification note above."
+    p "1976—Par. (3). " ["Pub. L. 94–248" -> "/us/pl/94/248"] " inserted provision relating to successor by merger, consolidation, etc., of the Corporation"
+    p "Par. (7). " ["Pub. L. 94–210, § 603(c)" -> "/us/pl/94/210/s603/c"] ", added par. (7). Former par. (7) redesignated (8)."
+    p "Par. (8). " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", §§ 601(g), 603(c), redesignated former par. (7) as (8). Former par. (8) redesignated (10)."
+    p "Pars. (9) to (11). " ["Pub. L. 94–210, § 601(g)" -> "/us/pl/94/210/s601/g"] ", added par. (9) and redesignated former pars. (8) and (9) as (10) and (11), respectively. Former pars. (10) and (11) redesignated (12) and (13), respectively."
+    p "Par. (12). " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", §§ 601(g), 607(t), redesignated former par. (10) as (12), inserted “(or a person owned, leased, or otherwise controlled by a railroad)” before “which are used or useful”, and substituted “phrase” for “phase”. Former par. (12) redesignated (14)."
+    p "Pars. (13) to (15). " ["Pub. L. 94–210, § 601(g)" -> "/us/pl/94/210/s601/g"] ", redesignated former pars. (11) to (13) as (13) to (15) respectively. Former pars. (13) to (15) redesignated (15) to (17) respectively."
+    p "Par. (16). " ["Pub. L. 94–555" -> "/us/pl/94/555"] " substituted “, in his absence, the Deputy Secretary of Transportation” for “the duly authorized representative of either of them” after “accordance with law, or”."
+    p ["Pub. L. 94–210" -> "/us/pl/94/210"] ", §§ 601(f), (g), 610(a)(1), redesignated former par. (14) as (16) and substituted provisions relating to the person at the time performing the duties of the Office in accordance with the law, or the duly authorized representative of such person or the Secretary, for provisions relating to the delegate of the Secretary, unless the context indicated otherwise."
+    p "Par. (17). " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", §§ 601(g), 610(a)(2), redesignated former par. (15) as (17) and substituted a semicolon for a period."
+    p "Pars. (18), (19). " ["Pub. L. 94–210, § 610(a)(3)" -> "/us/pl/94/210/s610/a/3"] ", added pars. (18) and (19)."
+    hash "5f9eb4436163b99fa5a5b6cef3938c0daf5949f2c07f409f21a3b7e09f8eb296"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1981 Amendment"
+    p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1976 Amendment"
+    p ["Pub. L. 94–555, title III, § 303" -> "/us/pl/94/555/tIII/s303"] ", Oct. 19, 1976, " ["90 Stat. 2631" -> "/us/stat/90/2631"] ", provided that:"
+    quoted "/us/pl/94/555/tIII/s303" {
+      p "“The provisions of this Act and the amendments made by this Act [amending this section, sections 543, 545, 546, 563, 601, 602, 641, 711, 716, 720, 721, 743, 744, 771, 774, 775, 779, 823, 824, 825, 826, 829, 831, and 854 of this title, " ["section 960 of Title 20" -> "/us/usc/t20/s960"] ", Education, and sections 1a, 5, 5c, 13, 15, 17, 22, 26c, and 1653 of former Title 49, Transportation, and enacting provisions set out as notes under sections 501, 641, 701, and 714 of this title, " ["section 80a–3 of Title 15" -> "/us/usc/t15/s80a–3"] ", Commerce and Trade, and sections 1a and 1654 of former Title 49] shall take effect on October 1, 1976.”"
+    }
+    hash "c0db68622d622174a65e2ac57520b8664f210d01001e9522d3bb6818afdea20b"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  footnote 2 "2" {
+    p "So in original. The period probably should be a semicolon."
+  }
+  layers {
+    operative "408111882a1196d1bb7510dfe203d35819ac4b6909b974c4e9f38ed166cd99c2"
+    enacted "4f4c3fbe8a64c21467213d38fa86f076e758bf245adc7fce061f6c49d3cdd7da"
+    editorial "c2c873826bb040fc290d97c562d02bd68cb34c1594c6a0849eec5cb4633078f8"
+  }
+}

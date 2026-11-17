@@ -1,0 +1,73 @@
+edition 2
+module "/us/usc/t45/s651...658" {
+  alias "/us/usc/t45/s651"
+  alias "/us/usc/t45/s652"
+  alias "/us/usc/t45/s653"
+  alias "/us/usc/t45/s654"
+  alias "/us/usc/t45/s655"
+  alias "/us/usc/t45/s656"
+  alias "/us/usc/t45/s657"
+  alias "/us/usc/t45/s658"
+  within "/us/usc/t45/ch14/schIX"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s651...658" section {
+    num "651 to 658" "§§ 651 to 658."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "1ce949022ae12b7b0ca6adf346857f941f52f07b30a7b14a81d6ec29bfc7ba9a"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 651, " ["Pub. L. 91–518, title X, § 1001" -> "/us/pl/91/518/tX/s1001"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 415" -> "/us/stat/94/415"] "; amended H. Res. 549, Mar. 25, 1980, required Secretary to develop and submit to Congress a proposed method for evaluating rail passenger corridors, ranking those with greatest potential."
+    hash "aa3bdbc1d2bd9c96aaf9fb906399395dfa830347cfcffa2e23029c7e5bb4059c"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 652, " ["Pub. L. 91–518, title X, § 1002" -> "/us/pl/91/518/tX/s1002"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 415" -> "/us/stat/94/415"] ", directed National Railroad Passenger Corporation to develop design and engineering plans for rail corridors in consultation with Secretary and rail carriers owning facilities to be used in the corridors."
+    hash "8e65a4cade1b4ec94ff899b9f3eefd27332fe8ab74e868c299c52a2b0b264a37"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 653, " ["Pub. L. 91–518, title X, § 1003" -> "/us/pl/91/518/tX/s1003"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 416" -> "/us/stat/94/416"] "; amended H. Res. 549, Mar. 25, 1980, provided for submission of final corridor evaluation to Congress."
+    hash "da425cd0c477436bc68415aa79ce309074525e29823a46322f596806ec3cda37"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 654, " ["Pub. L. 91–518, title X, § 1004" -> "/us/pl/91/518/tX/s1004"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 416" -> "/us/stat/94/416"] ", directed National Railroad Passenger Corporation to acquire equipment necessary to provide service in rail passenger corridors."
+    hash "cfbb4f97379b11d42f5de2fc5537ff651e4473b300319117b8a1fd425af4a9ce"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 655, " ["Pub. L. 91–518, title X, § 1005" -> "/us/pl/91/518/tX/s1005"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 416" -> "/us/stat/94/416"] ", directed Secretary to encourage private sector development of potential rail passenger corridors by removing institutional barriers and coordinating funding."
+    hash "4f0936c8f3cc6eac121473c06c7d29b2a002c4ae394f954d0f7f2a42d75fe02e"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 656, " ["Pub. L. 91–518, title X, § 1006" -> "/us/pl/91/518/tX/s1006"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 417" -> "/us/stat/94/417"] ", related to speed restrictions imposed on Amtrak trains by State or local governments."
+    hash "688ea27fbb76f5a3ce1b6c7f7c24d7ac6dee6df3a8b6eb5eedf256f6c2423026"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 657, " ["Pub. L. 91–518, title X, § 1007" -> "/us/pl/91/518/tX/s1007"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 417" -> "/us/stat/94/417"] ", related to provision of service between corridors to increase ridership."
+    hash "a929e9bc1990555964f139aaf8fc39b50892f76cf3a954d39de85dd65ca80277"
+  }
+  note "/us/usc/t45/s651...658/note/ungrouped/pl.91.518/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 658, " ["Pub. L. 91–518, title X, § 1008" -> "/us/pl/91/518/tX/s1008"] ", as added " ["Pub. L. 96–254, title II, § 212" -> "/us/pl/96/254/tII/s212"] ", May 30, 1980, " ["94 Stat. 417" -> "/us/stat/94/417"] ", authorized appropriations for evaluation of corridors, acquisition of equipment, and private sector development."
+    hash "cbe44ac842347573dd5753b4fd73691df664d7a31c75fe863dc6b48636d8721c"
+  }
+  layers {
+    operative "1ce949022ae12b7b0ca6adf346857f941f52f07b30a7b14a81d6ec29bfc7ba9a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5ca1c188cec554c7d9b92362019dfb6e2e37e2ff5358b85fcb1520cc39c794db"
+  }
+}

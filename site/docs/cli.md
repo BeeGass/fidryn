@@ -704,6 +704,128 @@ extra us/usc/t99/s7.fr
 missing us/usc/t99a.fr
 ```
 
+## `text`
+
+`fidryn text DIR` prints the text of the provisions and notes of the
+workspace in `DIR`: of every provision, container, note, source credit and
+footnote of its modules, read from its module files
+([Workspaces](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces)). With `ADDRESS` it prints the
+provision, container or note at that address and what lies below it: every
+one whose address is `ADDRESS` or continues it at a segment boundary. It
+reads the modules and checks nothing else of the workspace, which
+`fidryn check DIR` does.
+
+**Arguments**
+
+| Name | Required | Type |
+| --- | --- | --- |
+| `DIR` | yes | path to the directory of a workspace |
+| `ADDRESS` | no | the address of a provision, a container or a note of the workspace |
+| `--json` | no | flag; print one text record to a line |
+
+**Example**
+
+```sh
+fidryn text conformance/fixtures/workspace/demo
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2
+fidryn text conformance/fixtures/workspace/demo --json
+fidryn text samples/uscode/workspace /us/usc/t1/s1
+```
+
+**Success.** Exit 0. Without `--json` it prints the text for a person,
+module by module in the order of their addresses, with a blank line
+between two modules:
+
+- A provision is its address on a line of its own, followed by its status
+  in parentheses when it has one; then its number and heading on one line,
+  the blocks of its text parts and its children, each indented by two
+  spaces for each level of depth. The provision printed first is at depth
+  0.
+- A table is one line for each row, its cells separated by ` | `. The items
+  of quoted content are indented one level further. A footnote marker is
+  its shown text in brackets, and an image is `[image SOURCE]`.
+- After the provisions of a unit come its source credit and its footnotes,
+  each footnote after its marker in brackets, and then its notes, each its
+  address with its layer in parentheses, its heading and its blocks. A
+  container is its address, its number and heading, its credit, its
+  footnotes and its notes.
+
+Of the demo workspace, `fidryn text conformance/fixtures/workspace/demo /zz/demo/t1`
+prints:
+
+```text
+/zz/demo/t1
+  Title 1— Invented Things
+
+/zz/demo/t1/ch1
+  Chapter 1— Widgets
+
+/zz/demo/t1/s1
+  § 1. Definitions
+  In this invented chapter, a widget is a small device.
+
+/zz/demo/t1/s2
+  § 2. Sizes
+  A widget is small or large.
+
+/zz/demo/t1/s3
+  § 3. Colors
+  A widget may be of any color.
+```
+
+With `--json` it prints one text record, `fidryn.text-record/v0.1`, to a
+line, the JSON Schema of which is
+[schemas/text-record-v0.1.json](https://github.com/BeeGass/fidryn/blob/main/schemas/text-record-v0.1.json). The
+records are those of every module, sorted by the bytes of their addresses
+across the whole workspace; for one address the provision or container
+comes first, then the source credit, then the footnotes by ordinal. Each
+is one line of compact JSON with its keys in this order:
+
+| Record | Keys |
+| --- | --- |
+| a provision | `address`, `layer` (`"operative"`), `kind`, `status` (the word, or `null`), `num`, `heading`, `items`, where an item is a text part `{"part": role, "blocks": [...]}` or a child `{"child": address}`; the top provision of a unit also `aliases`, `within`, `source` and `positive_law` |
+| a container | `address`, `layer` (`"operative"`), `kind`, `status`, `num`, `heading`, `aliases`, `within`, `members` |
+| a note | `address`, `layer` (`"enacted"` or `"editorial"`), `group`, `topics`, `heading`, `blocks` |
+| a source credit | the address of its module, `record` (`"credit"`), and the keys of a paragraph |
+| a footnote | the address of its module, `record` (`"footnote"`), `ordinal`, `shown`, `blocks` |
+
+A text is `{"text": plain, "refs": [[start, end, target], ...], "sup":
+[[start, end], ...], "sub": [[start, end], ...]}`, followed by `"marks":
+[[offset, shown, footnote], ...]` when it holds a footnote marker. Offsets
+count the Unicode scalar values of the plain text, an end is exclusive, and
+the offset of a marker is the length of the plain text before it. A
+paragraph is a text with the key `p` in place of `text`, a subheading one
+with the key `subheading`. A heading is `null` or a text, and a number is
+`null` or `[value, shown]`, `shown` the plain string when it is words only
+and a text otherwise. A table is `{"table": [[group, [[header, colspan,
+rowspan, [blocks]], ...]], ...]}`, an image `{"image": source}`, and
+quoted content `{"quoted": {"origin": origin, "items": [...]}}`, whose
+items are blocks, text parts and levels `{"level": kind, "num": ...,
+"heading": ..., "items": [...]}`. The record of `/zz/demo/t1/s2`:
+
+```text
+{"address":"/zz/demo/t1/s2","layer":"operative","kind":"section","status":null,"num":["2","§ 2."],"heading":{"text":"Sizes","refs":[],"sup":[],"sub":[]},"items":[{"part":"content","blocks":[{"p":"A widget is small or large.","refs":[],"sup":[],"sub":[]}]}],"aliases":[],"within":"/zz/demo/t1/ch1","source":"demo01.xml","positive_law":true}
+```
+
+Both forms depend on the module files alone: neither the host, the
+working directory nor the number of threads the system offers changes a
+byte. `conformance/uslm_text.py` prints the same records from the
+publisher's XML, independently of the ingester, and the check of the
+sample of the Code compares the two line for line
+([The sample](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-sample)).
+
+**Failure.** Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a directory that holds no workspace (`E730`), an entry
+that cannot be read or is neither a file nor a directory (`E730`), a
+module file that is not a module of edition 2 that lowers, each with its
+diagnostics; a text that is no address; and an address at which the
+workspace holds no provision, container or note, as
+``the workspace holds no provision, container or note at `/zz/demo/t1/s9` ``:
+
+```sh exit=1
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s9
+```
+
 ## See also
 
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)

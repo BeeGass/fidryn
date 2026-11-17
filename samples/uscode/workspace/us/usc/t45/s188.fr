@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s188" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s188" section {
+    num "188" "§ 188."
+    heading "Authorization of appropriations"
+    content "There is authorized to be appropriated such sums as may be necessary for expenditure by the Mediation Board in carrying out the provisions of this chapter."
+    hash "e4b810a1d1e4c409d5d68e0e3abf820036695b00e6540dc8234240b9cb1fa0b1"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 208" -> "/us/act/1926-05-20/ch347/s208"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1191" -> "/us/stat/49/1191"] ".)"
+  layers {
+    operative "e4b810a1d1e4c409d5d68e0e3abf820036695b00e6540dc8234240b9cb1fa0b1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "15f9ed87e5559cc023d42930f118e874866ee1b0fa09c93a3de726ae45baac00"
+  }
+}

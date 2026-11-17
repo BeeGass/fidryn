@@ -1,0 +1,37 @@
+edition 2
+module "/us/usc/t45/s1342" {
+  within "/us/usc/t45/ch22/schII/ptC"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1342" section {
+    num "1342" "§ 1342."
+    heading "Exemption from liability"
+    provision "/us/usc/t45/s1342/a" subsection {
+      num "a" "(a)"
+      heading "In general"
+      content "No person referred to in section 726(f)(8)(C)(i), (ii), or (iii) of this title shall be liable, for money damages or otherwise, to any party if, with respect to the subject matter of the action, suit, or proceeding, such person was fulfilling a duty, in connection with any action taken under this subchapter, which such person in good faith reasonably believed to be required by law or vested in such person."
+      hash "49de41bd23e1faf7f3beb33100cdcdf1d129cc91f39de7c5786c7e85782e50fe"
+    }
+    provision "/us/usc/t45/s1342/b" subsection {
+      num "b" "(b)"
+      heading "Exception"
+      content "This section shall not apply to claims arising out of the Securities Act of 1933 [" ["15 U.S.C. 77a" -> "/us/usc/t15/s77a"] " et seq.], the Securities Exchange Act of 1934 [" ["15 U.S.C. 78a" -> "/us/usc/t15/s78a"] " et seq.], or the Constitution or laws of any State, territory, or possession of the United States relating to transactions in securities, which claims are in connection with a public offering under " ["section 1312 of this title" -> "/us/usc/t45/s1312"] "."
+      hash "8d54391d460579930780941ffdc41ded877767cad17293747a01cd0f346a761f"
+    }
+    hash "dcabecdd88b74d429c80bc57602eba708cbc97839cc920658ca4c9f2329786b8"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4034" -> "/us/pl/99/509/tIV/s4034"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"] ".)"
+  note "/us/usc/t45/s1342/note/editorialNotes/act.1933-05-27.ch38/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Securities Act of 1933, referred to in subsec. (b), is " ["act May 27, 1933, ch. 38, title I" -> "/us/act/1933-05-27/ch38/tI"] ", " ["48 Stat. 74" -> "/us/stat/48/74"] ", which is classified generally to subchapter I (§ 77a et seq.) of chapter 2A of Title 15, Commerce and Trade. For complete classification of this Act to the Code, see " ["section 77a of Title 15" -> "/us/usc/t15/s77a"] " and Tables."
+    p "The Securities Exchange Act of 1934, referred to in subsec. (b), is " ["act June 6, 1934, ch. 404" -> "/us/act/1934-06-06/ch404"] ", " ["48 Stat. 881" -> "/us/stat/48/881"] ", which is classified principally to chapter 2B (§ 78a et seq.) of Title 15. For complete classification of this Act to the Code, see " ["section 78a of Title 15" -> "/us/usc/t15/s78a"] " and Tables."
+    hash "720bfd5b0c633f01240af54fe583a5b4300d84bc1ba257a3ba1abb2eb683ac15"
+  }
+  layers {
+    operative "dcabecdd88b74d429c80bc57602eba708cbc97839cc920658ca4c9f2329786b8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "084c363503f7516830ddae25d07b888a1917b8f00ab14c74f914405b909384cf"
+  }
+}

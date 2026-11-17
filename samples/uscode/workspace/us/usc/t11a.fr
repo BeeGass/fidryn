@@ -1,0 +1,16 @@
+edition 2
+module "/us/usc/t11a" {
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/t11a" appendix {
+    num "11a" "Title 11—APPENDIX"
+    heading "BANKRUPTCY RULES"
+    member "/us/usc/t11a/~courtRules.1"
+    hash "a05c585c0ad0e0ac3203e06c948bbc6f3e513fbb1f1839e9796193b518b0e02e"
+  }
+  layers {
+    operative "a05c585c0ad0e0ac3203e06c948bbc6f3e513fbb1f1839e9796193b518b0e02e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

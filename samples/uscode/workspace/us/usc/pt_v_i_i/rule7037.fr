@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7037" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7037" courtRule {
+    num "7037" "Rule 7037."
+    heading "Failure to Make Disclosures or to Cooperate in Discovery; Sanctions"
+    content "Fed. R. Civ. P. 37 applies in an adversary proceeding."
+    hash "c2f8a57759ff814e9141129b01073c45f015cb78c5f3b26af6df9f6ab27eb5e2"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7037/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7037 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "6c3db2d6175495eee6787a36cc28112215589f9d756ddc7954d0c96d818279a5"
+  }
+  note "/us/usc/ptVII/rule7037/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "c2f8a57759ff814e9141129b01073c45f015cb78c5f3b26af6df9f6ab27eb5e2"
+    enacted "574ec0da318d02f5f423df7f930290cc5bc807b5190b30da46f2225555ef540a"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

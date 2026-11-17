@@ -1,0 +1,27 @@
+edition 2
+module "/us/usc/t45/s794" {
+  within "/us/usc/t45/ch16/schVI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s794" section {
+    num "794" "§ 794."
+    heading "Tax payments to States"
+    provision "/us/usc/t45/s794/a" subsection {
+      num "a" "(a)"
+      content "Notwithstanding any other provision of law, no railroad in reorganization shall withhold from any State, or any political subdivision thereof, the payment of the portion of any tax owed by such railroad to such State or subdivision, which portion has been collected by such railroad from any tenant thereof."
+      hash "787814ed200057a5c7f115f514f8d0fbaad0050bda529883e21272bc6e85a50c"
+    }
+    provision "/us/usc/t45/s794/b" subsection {
+      num "b" "(b)"
+      content "Any railroad which violates the provisions of subsection (a) of this section by withholding any portion of a tax referred to in such subsection shall be fined not more than $10,000 for each such violation."
+      hash "ef6285bdfa3c3cf16c9808f8e0bb73fc1f4b1f99e877af498ae486ecb9b0de9d"
+    }
+    hash "c48bdc867c4a64c01db1c6aa6b244cffc83667a4cc8610345578e6576ca8f4bb"
+  }
+  credit "(" ["Pub. L. 93–236, title VI, § 605" -> "/us/pl/93/236/tVI/s605"] ", as added " ["Pub. L. 94–5, § 9" -> "/us/pl/94/5/s9"] ", Feb. 28, 1975, " ["89 Stat. 9" -> "/us/stat/89/9"] ".)"
+  layers {
+    operative "c48bdc867c4a64c01db1c6aa6b244cffc83667a4cc8610345578e6576ca8f4bb"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7323e468193f682442a92b57667a488fad92433a08ddc5cb1e7d01235dc7f4e6"
+  }
+}

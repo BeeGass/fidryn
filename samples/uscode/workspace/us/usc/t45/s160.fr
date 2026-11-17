@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s160" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s160" section {
+    num "160" "§ 160."
+    heading "Emergency board"
+    content {
+      p "If a dispute between a carrier and its employees be not adjusted under the foregoing provisions of this chapter and should, in the judgment of the Mediation Board, threaten substantially to interrupt interstate commerce to a degree such as to deprive any section of the country of essential transportation service, the Mediation Board shall notify the President, who may thereupon, in his discretion, create a board to investigate and report respecting such dispute. Such board shall be composed of such number of persons as to the President may seem desirable: Provided, however, That no member appointed shall be pecuniarily or otherwise interested in any organization of employees or any carrier. The compensation of the members of any such board shall be fixed by the President. Such board shall be created separately in each instance and it shall investigate promptly the facts as to the dispute and make a report thereon to the President within thirty days from the date of its creation."
+      p "There is authorized to be appropriated such sums as may be necessary for the expenses of such board, including the compensation and the necessary traveling expenses and expenses actually incurred for subsistence, of the members of the board. All expenditures of the board shall be allowed and paid on the presentation of itemized vouchers therefor approved by the chairman."
+      p "After the creation of such board and for thirty days after such board has made its report to the President, no change, except by agreement, shall be made by the parties to the controversy in the conditions out of which the dispute arose."
+    }
+    hash "4c1342e35db1ff16f799bdff72c185e505c886796f7ab2a1d468c91d3ffb4ae9"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 10" -> "/us/act/1926-05-20/ch347/s10"] ", " ["44 Stat. 586" -> "/us/stat/44/586"] "; " ["June 21, 1934, ch. 691, § 7" -> "/us/act/1934-06-21/ch691/s7"] ", " ["48 Stat. 1197" -> "/us/stat/48/1197"] ".)"
+  note "/us/usc/t45/s160/note/editorialNotes/nolaw/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1934—Act June 21, 1934, substituted “Mediation Board” for “Board of Mediation” wherever appearing."
+    hash "f2dcf9fc23e23ef0bfc116c78708616e52119619cbf3707686c934bb6ca639eb"
+  }
+  layers {
+    operative "4c1342e35db1ff16f799bdff72c185e505c886796f7ab2a1d468c91d3ffb4ae9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "69771d44908b353e7223858863d9084bea4c5ddba1bedfc8d3f25829e45bf3d2"
+  }
+}

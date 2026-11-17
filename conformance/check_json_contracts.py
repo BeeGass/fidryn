@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Validate Fidryn case records, source manifests and the files of workspaces.
+"""Validate Fidryn case records, source manifests, the files of workspaces and text records.
 
 The files of a workspace are its manifest, its lock and the retrieval record of
-its archives; the demo workspace under conformance/fixtures/workspace is checked,
-and so is the check report under conformance/fixtures/check-report.
+its archives; the demo workspace under conformance/fixtures/workspace and the
+workspace of the sample under samples/uscode are checked, and so is the check
+report under conformance/fixtures/check-report. Every line of every
+`*.records.jsonl` under conformance/fixtures is a text record.
 
 Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
@@ -27,6 +29,7 @@ SCHEMA_FILES = {
     "fidryn.law-lock/v0.1": "law-lock-v0.1.json",
     "fidryn.retrieval/v0.1": "retrieval-v0.1.json",
     "fidryn.check-report/v0.1": "check-report-v0.1.json",
+    "fidryn.text-record/v0.1": "text-record-v0.1.json",
 }
 
 # The directories, relative to the repository root, whose JSON documents are
@@ -36,7 +39,15 @@ DOCUMENT_DIRS = (
     "prelude",
     "conformance/fixtures/workspace",
     "conformance/fixtures/check-report",
+    "samples/uscode",
 )
+
+# The files of JSON Lines, by a directory relative to the repository root and a
+# pattern of their names below it, each line of which is a document of the schema
+# named, though it holds no `schema` key: the text records written by hand for the
+# fixtures of the publisher's XML, and those `fidryn text --json` prints of the demo
+# workspace.
+LINE_DOCUMENTS = (("conformance/fixtures", "*.records.jsonl", "fidryn.text-record/v0.1"),)
 
 JSON_TYPE_NAMES = {
     type(None): "null",
@@ -220,6 +231,25 @@ def main() -> int:
                         "errors": errors,
                     }
                 )
+        for directory, pattern, schema in LINE_DOCUMENTS:
+            base = root / directory
+            if not base.is_dir():
+                continue
+            for path in sorted(base.rglob(pattern)):
+                lines = path.read_text(encoding="utf-8").splitlines()
+                for number, line in enumerate(lines, start=1):
+                    errors = document_errors(
+                        validators[schema],
+                        json.loads(line),
+                        jsonschema_ok=jsonschema_ok,
+                    )
+                    results.append(
+                        {
+                            "path": f"{path.relative_to(root)}:{number}",
+                            "valid": not errors,
+                            "errors": errors,
+                        }
+                    )
         report = {
             "checked": len(results),
             "failed": sum(not row["valid"] for row in results),

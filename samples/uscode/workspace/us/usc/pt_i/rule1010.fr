@@ -1,0 +1,105 @@
+edition 2
+module "/us/usc/ptI/rule1010" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1010" courtRule {
+    num "1010" "Rule 1010."
+    heading "Serving an Involuntary Petition and Summons"
+    provision "/us/usc/ptI/rule1010/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "After an involuntary petition has been filed, the clerk must promptly issue a summons for service on the debtor. The summons must be served with a copy of the petition in the manner that Rule 7004(a) and (b) provide for service of a summons and complaint. If service cannot be so made, the court may order service by mail to the debtor’s last known address, and by at least one publication as the court orders. Service may be made anywhere. Rule 7004(e) and Fed. R. Civ. P. 4(l) govern service under this rule."
+      hash "1041c4fdc29683ca20406878e232c425ea32b40ee7778f91dd6dcc6f39d761f5"
+    }
+    provision "/us/usc/ptI/rule1010/b" subsection {
+      num "b" "(b)"
+      heading "Corporate-Ownership Statement."
+      content "A corporation that files an involuntary petition must file and serve with the petition a corporate-ownership statement containing the information described in Rule 7007.1."
+      hash "8e5123f33bd7055f946c8d2a29df20a8002dcfcfb5ca5b8ce3c72d1c47cf9ace"
+    }
+    hash "f05adc206dade84d7120595220ec65a7c7a195ab81258c9d8a58894a641b9c9a"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule provides the procedure for service of the involuntary petition and summons. It does not deal with service of a summons and complaint instituting an adversary proceeding pursuant to Part VII."
+    p "While this rule is similar to former Bankruptcy Rule 111, it substitutes the clerk of the bankruptcy court for the clerk of the district court as the person who is to issue the summons."
+    p "The modes of service prescribed by the rule are personal or by mail, when service can be effected in one of these ways in the United States. Such service is to be made in the manner prescribed in adversary proceedings by Rule 7004(a) and (b). If service must be made in a foreign country, the mode of service is one of that set forth in Rule 4(i) F.R.Civ.P."
+    p "When the methods set out in Rule 7004(a) and (b) cannot be utilized, service by publication coupled with mailing to the last known address is authorized. Cf. Rule 7004(c). The court determines the form and manner of publication as provided in Rule 9007. The publication need not set out the petition or the order directing service by publication. In order to apprise the debtor fairly, however, the publication should include all the information required to be in the summons by Official Form No. 13 and a notice indicating how service is being effected and how a copy of the petition may be obtained."
+    p "There are no territorial limits on the service authorized by this rule, which continues the practice under the former rules and Act. There must, however, be a basis for jurisdiction pursuant to § 109(a) of the Code for the court to order relief. Venue provisions are set forth in [former] 28 U.S.C. § 1472."
+    p "Subdivision (f) of Rule 7004 and subdivisions (g) and (h) of Rule 4 F.R.Civ.P. govern time and proof of service and amendment of process or of proof of service."
+    p "Rule 1004 provides for transmission to nonpetitioning partners of a petition filed against the partnership by fewer than all the general partners."
+    hash "bd9274081d035c0cd4a0f2fa6a3bf705eb1e32ae928dc465e0b5e0fdbea34202"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule has been broadened to include service of a petition commencing a case ancillary to a foreign proceeding, previously included in Rule 1003(e)(2)."
+    hash "c4a71df06c8780315aa07e6446d27b183ad21211b6fea5e4be860cfd98f43845"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
+    p "Rule 4(g) and (h) F.R.Civ.P. made applicable by this rule refers to Rule 4(g) and (h) F.R.Civ.P. in effect on January 1, 1990, notwithstanding any subsequent amendment thereto. See Rule 7004(g)."
+    hash "728e1b57f6b32a27cfeb184c16b0ac4706bfb02cc5d14958f761cbdc221a066b"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to delete the reference to the Official Form. The Official Form for the summons was abrogated in 1991. Other amendments are stylistic and make no substantive change."
+    hash "a0fca1e4a51d83910a5975f769420c581a0c120478f54ecc22a47f09ecbdbcdb"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "The amendments to this rule are technical, are promulgated solely to conform to changes in subdivision designations in Rule 4, F.R.Civ.P., and in Rule 7004, and are not intended to effectuate any material change in substance."
+    p "In 1996, the letter designation of subdivision (f) of Rule 7004 (Summons; Time Limit for Service) was changed to subdivision (e). In 1993, the provisions of Rule 4, F.R.Civ.P., relating to proof of service contained in Rule 4(g) (Return) and Rule 4(h) (Amendments), were placed in the new subdivision (l) of Rule 4 (Proof of Service). The technical amendments to Rule 1010 are designed solely to conform to these new subdivision designations."
+    p "The 1996 amendments to Rule 7004 and the 1993 amendments to Rule 4, F.R.Civ.P., have not affected the availability of service by first class mail in accordance with Rule 7004(b) for the service of a summons and petition in an involuntary case commenced under § 303 or an ancillary case commenced under [former] § 304 of the Code."
+    p "GAP Report on Rule 1010. These amendments, which are technical and conforming, were not published for comment."
+    hash "ef7a149ed54d5848aab4e6c2522b6e4d9bf613f19f08ba51035893fad85c303e"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "This rule is amended to implement the 2005 amendments to the Code, which repealed § 304 and replaced it with chapter 15 governing ancillary and other cross-border cases. Under chapter 15, a foreign representative commences a case by filing a petition for recognition of a pending foreign nonmain proceeding. The amendment requires service of the summons and petition on the debtor and any entity against whom the representative is seeking provisional relief. Until the court enters a recognition order under § 1517, no stay is in effect unless the court enters some form of provisional relief under § 1519. Thus, only those entities against whom specific provisional relief is sought need to be served. The court may, however, direct that service be made on additional entities as appropriate."
+    p "This rule does not apply to a petition for recognition of a foreign main proceeding."
+    p "The rule is also amended by renumbering the prior rule as subdivision (a) and adding a new subdivision (b) requiring any corporate creditor that files or joins an involuntary petition to file a corporate ownership statement."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "d6cebbc7d3375df5d8864d458f9b2122829594968468ba1e09cacce28edcf0b2"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (a) of this rule is amended to remove provisions regarding the issuance of a summons for service in certain chapter 15 proceedings. The requirements for notice and service in chapter 15 proceedings are found in Rule 2002(q)."
+    hash "4f51209bffbc458022a2a48002bcd4e9e74a80b739f825aad0436e3e74184f34"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "651daacb26f34e020fe82048422b8a11607638baff5d88458ae01bcd188a04d4"
+  }
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "deb4c0aa4ee80b33fd9101f209f848844329e50da3c46e96b8b0c3857dca9936"
+  }
+  layers {
+    operative "f05adc206dade84d7120595220ec65a7c7a195ab81258c9d8a58894a641b9c9a"
+    enacted "c58c9d9b937ca03472059f2b03c6c1e6cdf60102d95cc929164e53c556a6eb87"
+    editorial "2b876b6a425f1bf305bad85d5fdf0cef2c7bbae94d5131db8da79ddaddf109fe"
+  }
+}

@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s94" {
+  alias "/us/usc/t45/s95"
+  within "/us/usc/t45/ch5"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s94" section {
+    num "94, 95" "§§ 94, 95."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "b214003a5a1a666dd0c3ce2b39d266e26ee9d29418ee4e15b95ef0fdf1a802c1"
+  }
+  note "/us/usc/t45/s94/note/ungrouped/act.1887-03-03.ch345/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 94, " ["act Mar. 3, 1887, ch. 345, § 4" -> "/us/act/1887-03-03/ch345/s4"] ", " ["24 Stat. 491" -> "/us/stat/24/491"] ", authorized Secretary of the Treasury, whenever deemed necessary by President, to redeem liens, mortgages, or other incumbrances paramount to right, title, or interest of United States in railroad property."
+    hash "40b22390f5901fa412181c3991ef1a2aa23e7f39ff6054ea4279ed38e4277583"
+  }
+  note "/us/usc/t45/s94/note/ungrouped/act.1887-03-03.ch345/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 95, " ["act Mar. 3, 1887, ch. 345, § 5" -> "/us/act/1887-03-03/ch345/s5"] ", " ["24 Stat. 492" -> "/us/stat/24/492"] ", related to permissible investments of sinking funds held to secure debts of railroad companies to United States."
+    hash "d8372904cf102b2115e644e32bd2da0e68b345bfb58f3d108fad6c6592a2195b"
+  }
+  layers {
+    operative "b214003a5a1a666dd0c3ce2b39d266e26ee9d29418ee4e15b95ef0fdf1a802c1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "900a9bb78f16beab0f04734eab0853ee300d4738bc9bbce1f58ab2196f477a97"
+  }
+}

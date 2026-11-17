@@ -1,0 +1,294 @@
+edition 2
+module "/us/usc/ptI/rule1019" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1019" courtRule {
+    num "1019" "Rule 1019."
+    heading "Converting or Reconverting a Chapter 11, 12, or 13 Case to Chapter 7"
+    provision "/us/usc/ptI/rule1019/a" subsection {
+      num "a" "(a)"
+      heading "Filing Various Documents; Filing a Statement of Intention."
+      provision "/us/usc/ptI/rule1019/a/1" paragraph {
+        num "1" "(1)"
+        content "Lists, Inventories, Schedules, Statements of Financial Affairs. Unless the court orders otherwise, when a Chapter 11, 12, or 13 case is converted or reconverted to Chapter 7, the lists, inventories, schedules, and statements of financial affairs previously filed are considered filed in the Chapter 7 case. If they have not been previously filed, the debtor must comply with Rule 1007 as if an order for relief had been entered on an involuntary petition on the same date as the order directing that the case continue under Chapter 7."
+        hash "48a4dea1f7c6d5c65cd8843f6718fd7d20c57cbc411e9f90bc260023d38be744"
+      }
+      provision "/us/usc/ptI/rule1019/a/2" paragraph {
+        num "2" "(2)"
+        content "Statement of Intention. A statement of intention, if required, must be filed within 30 days after the conversion order is entered or before the first date set for the meeting of creditors, whichever is earlier. The court may, for cause, extend the time to file only on motion filed—or on oral request made during a hearing—before the time has expired. Notice of an extension must be given to the United States trustee and to any committee, trustee, or other party as the court orders."
+        hash "69f2f00323acc081d6c992a360dfd1425abb1c8beb0f8fb0f9a99e05c998f480"
+      }
+      hash "04db3616e58fe9e4dd6905fa5d9518a6c446be1e0fe94c388d21f597729ba60c"
+    }
+    provision "/us/usc/ptI/rule1019/b" subsection {
+      num "b" "(b)"
+      heading "New Time to File a § 707(b) or (c) Motion, a Proof of Claim, a Complaint Objecting to Discharge, or a Complaint to Determine Dischargeability."
+      provision "/us/usc/ptI/rule1019/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "When a New Time Begins. When a case is converted to Chapter 7, a new time begins under Rule 1017, 3002, 4004, or 4007 to file:"
+        provision "/us/usc/ptI/rule1019/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "a motion under § 707(b) or (c);"
+          hash "c07a1374200296276ed77bcf04cab93116606047d2e8cd9b8e638ea211ae9eb0"
+        }
+        provision "/us/usc/ptI/rule1019/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "a proof of claim;"
+          hash "4411c39fc864d9608fee1344387215770ac2cb0e457747ff3bcea45bc989bc48"
+        }
+        provision "/us/usc/ptI/rule1019/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "a complaint objecting to discharge; or"
+          hash "e7c58a8b7ac5a3751a346533f387815fbe0ac39899649773481cd0dee68e9ea6"
+        }
+        provision "/us/usc/ptI/rule1019/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "a complaint to determine whether a specific debt may be discharged."
+          hash "820a4c54e10465162f0543fbc1b9bb795206b4e565a61c1257c925892ba0e540"
+        }
+        hash "b4cf35d10ba949c989c723293db5c93e25f00ce6f48aca03d3191d78e750cd6f"
+      }
+      provision "/us/usc/ptI/rule1019/b/2" paragraph {
+        num "2" "(2)"
+        content "When a New Time Does Not Begin. No new time to file begins when a case is reconverted to Chapter 7 after a previous conversion to Chapter 11, 12, or 13 if the time to file in the original Chapter 7 case has expired."
+        hash "20f682d719fb8ee8146c3a7cea1a4d43849a02236a8662781d0d6bd5c79eef10"
+      }
+      provision "/us/usc/ptI/rule1019/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "New Time to Object to a Claimed Exemption. When a case is converted to Chapter 7, a new time begins under Rule 4003(b) to object to a claimed exemption unless:"
+        provision "/us/usc/ptI/rule1019/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "more than 1 year has elapsed since the court issued the first order confirming a plan under Chapter 11, 12, or 13; or"
+          hash "67fa0d18edbca0b5f8fc546e2232f019295d0a0384fd9259a5bab355124eda2c"
+        }
+        provision "/us/usc/ptI/rule1019/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "the case was previously pending in Chapter 7 and time has expired to object to a claimed exemption in the original Chapter 7 case."
+          hash "5a99b544a0c53f574a02a0179bd9c5e741609b4532b392a82d7b6f1d9e229331"
+        }
+        hash "03c8c34170e4fe2e65e698c94b49a4d7aa445e5636e863eb4703495ee8f25929"
+      }
+      hash "b873a35f10efe5c5d35334b49e4b924cdd343cfa86bbff1afc4c04479c809e2c"
+    }
+    provision "/us/usc/ptI/rule1019/c" subsection {
+      num "c" "(c)"
+      heading "Proof of Claim Filed Before Conversion."
+      content "A proof of claim filed by a creditor before conversion is considered filed in the Chapter 7 case."
+      hash "84a561719585954d3870af0222a3e303a720c8ea3d635b60adfb924a928ce4f7"
+    }
+    provision "/us/usc/ptI/rule1019/d" subsection {
+      num "d" "(d)"
+      heading "Turning Over Documents and Property."
+      content "Unless the court orders otherwise, after a trustee in the Chapter 7 case qualifies or assumes duties, the debtor in possession—or the previously acting trustee—must promptly turn over to the Chapter 7 trustee all documents and property of the estate that are in its possession or control."
+      hash "7cb1d5ceaf846b6e5864b3ab0fb125d278345eed2d2a137caaca0b4739a9843f"
+    }
+    provision "/us/usc/ptI/rule1019/e" subsection {
+      num "e" "(e)"
+      heading "Final Report and Account; Schedule of Unpaid Postpetition Debts."
+      provision "/us/usc/ptI/rule1019/e/1" paragraph {
+        num "1" "(1)"
+        chapeau "In a Chapter 11 or Chapter 12 Case. Unless the court orders otherwise, when a Chapter 11 or 12 case is converted to Chapter 7, the debtor in possession or, if the debtor is not a debtor in possession, the trustee serving at the time of conversion must:"
+        provision "/us/usc/ptI/rule1019/e/1/A" subparagraph {
+          num "A" "(A)"
+          content "within 14 days after conversion, file a schedule of unpaid debts incurred after the petition was filed but before conversion and include the name and address of each claim holder; and"
+          hash "0cf2a45b9718ff45852bbe3be0502184ee6b2cfa5d9a2efdcad2c712f4d0db92"
+        }
+        provision "/us/usc/ptI/rule1019/e/1/B" subparagraph {
+          num "B" "(B)"
+          content "within 30 days after conversion, file and send to the United States trustee a final report and account."
+          hash "99f5116c3ae8cd0426e9db8b101a35bdad9478b05c23594d46172d385a097019"
+        }
+        hash "21f3c8c4eb17920f4a0f2420e36624e1a733e7e93c0e5dcf436f2a543fdf59a9"
+      }
+      provision "/us/usc/ptI/rule1019/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "In a Chapter 13 Case. Unless the court orders otherwise, when a Chapter 13 case is converted to Chapter 7:"
+        provision "/us/usc/ptI/rule1019/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "within 14 days after conversion, the debtor must file a schedule of unpaid debts incurred after the petition was filed but before conversion and include the name and address of each claim holder; and"
+          hash "ad688baaff761ddb52156f650ed89c1eec386d2e6428d26dde86f01f99e5ed58"
+        }
+        provision "/us/usc/ptI/rule1019/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "within 30 days after conversion, the trustee must file and send to the United States trustee a final report and account."
+          hash "d89e6d22faf4275f7561bce2b2b9b4ec017b0d8bd96404b9ca473cfa2e9d78a8"
+        }
+        hash "884a398033509678d196f1bae3dcc314fda320936ed8210be3c4e1545376935b"
+      }
+      provision "/us/usc/ptI/rule1019/e/3" paragraph {
+        num "3" "(3)"
+        chapeau "Converting a Case to Chapter 7 After a Plan Has Been Confirmed. Unless the court orders otherwise, if a case under Chapter 11, 12, or 13 is converted to a case under Chapter 7 after a plan is confirmed, the debtor must file:"
+        provision "/us/usc/ptI/rule1019/e/3/A" subparagraph {
+          num "A" "(A)"
+          content "a schedule of property that was acquired after the petition was filed but before conversion and was not listed in the final report and account, except when a Chapter 13 case is converted to Chapter 7 and § 348(f)(2) does not apply;"
+          hash "717e09f8af105f979c480866d1213ef22d8b1c87a167390af534fbca6a8fe944"
+        }
+        provision "/us/usc/ptI/rule1019/e/3/B" subparagraph {
+          num "B" "(B)"
+          content "a schedule of unpaid debts that were incurred after confirmation but before conversion and were not listed in the final report and account; and"
+          hash "a0e5403e0afd7c277af4e333c22e4f35daf7a83c82a3c01f099f948e80a0f82d"
+        }
+        provision "/us/usc/ptI/rule1019/e/3/C" subparagraph {
+          num "C" "(C)"
+          content "a schedule of executory contracts and unexpired leases that were entered into or assumed after the petition was filed but before conversion."
+          hash "655c13de284442e305b068095110108590c04e20540e975698c4228df43b79f2"
+        }
+        hash "74263b667b15620c046198406681dd1187ca3e3c62236582a28de8d1386832e1"
+      }
+      provision "/us/usc/ptI/rule1019/e/4" paragraph {
+        num "4" "(4)"
+        content "Copy to the United States Trustee. The clerk must promptly send to the United States trustee a copy of any schedule filed under this Rule 1019(e)."
+        hash "590e42eee3babdd249176ef7a0e4db9c0f382a03962707a3d202eb5ff176bae2"
+      }
+      hash "41aab0900eddefea2bfa77f0106192015c1a2f42ec889c4991e1471b7cff0959"
+    }
+    provision "/us/usc/ptI/rule1019/f" subsection {
+      num "f" "(f)"
+      heading "Preconversion Administrative Expenses; Postpetition Claims."
+      provision "/us/usc/ptI/rule1019/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "Request to Pay an Administrative Expense; Time to File. A request to pay an administrative expense incurred before conversion is timely filed under § 503(a) if it is filed before conversion or within a time set by the court. Such a request by a governmental unit is timely if it is filed:"
+        provision "/us/usc/ptI/rule1019/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "before conversion; or"
+          hash "1948cf8a3f5e445fd49be724bc16e79a479e33d252fa76d798476fb850a2bcf9"
+        }
+        provision "/us/usc/ptI/rule1019/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "within 180 days after conversion or within a time set by the court, whichever is later."
+          hash "ad09d37ba48ee3fafd93b94d04c04fe304e5ebab1ed7e97d770a5809409d2fc9"
+        }
+        hash "a5bfe675871678e1e233e3f4bb3fad3de24491567badfde925fc57558a8c377b"
+      }
+      provision "/us/usc/ptI/rule1019/f/2" paragraph {
+        num "2" "(2)"
+        content "Proof of Claim Against the Debtor or the Estate. A proof of claim under § 348(d) against either the debtor or the estate may be filed as specified in Rules 3001(a)–(d) and 3002."
+        hash "acaca6aa3a87ab38471ec5b526c79b4b74ea5f0b7241516206da10fa51cd702c"
+      }
+      provision "/us/usc/ptI/rule1019/f/3" paragraph {
+        num "3" "(3)"
+        chapeau "Giving Notice of Certain Time Limits. After the filing of a schedule of debts incurred after the case was commenced but before conversion, the clerk, or the court’s designee, must notify the entities listed on the schedule of:"
+        provision "/us/usc/ptI/rule1019/f/3/A" subparagraph {
+          num "A" "(A)"
+          content "the time to request payment of an administrative expense; and"
+          hash "5c77df1a399a83d3356e045abf8177fe48f848e2d0ce4d33d4190130b4b2d383"
+        }
+        provision "/us/usc/ptI/rule1019/f/3/B" subparagraph {
+          num "B" "(B)"
+          content "the time to file a proof of claim under § 348(d), unless a notice of insufficient assets to pay a dividend has been mailed under Rule 2002(e)."
+          hash "570e50cc0aa9d5234c4809ea81ff407c8a333f110ab59c902637c696a185edaf"
+        }
+        hash "e62981114295993761bff093bae605d2c4b99964cb8e50bfc37c54995eb1229a"
+      }
+      hash "09fe728403cf9f38e8e955b7916bf72df0431be29e6fc8e3a6c512ffd1ca2e28"
+    }
+    hash "69c5f10c460e43a5e09aef9be1b16504d741707c5b86245aac1ff3446c76775a"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 122 and implements § 348 of the Code. The rule applies to proceedings in a chapter 7 case following supersession of a case commenced under chapter 11 or 13, whether the latter was initiated by an original petition or was converted from a pending chapter 7 or another chapter case. The rule is not intended to invalidate any action taken in the superseded case before its conversion to chapter 7."
+    p "Paragraph (1): If requirements applicable in the superseded case respecting the filing of schedules of debts and property, or lists of creditors and inventory, and of statements of financial affairs have been complied with before the order directing conversion to liquidation, these documents will ordinarily provide all the information about the debts, property, financial affairs, and contracts of the debtor needed for the administration of the estate. If the information submitted in the superseded case is inadequate for the purposes of administration, however, the court may direct the preparation of further informational material and the manner and time of its submission pursuant to paragraph (1). If no schedules, lists, inventories, or statements were filed in the superseded case, this paragraph imposes the duty on the debtor to file schedules and a statement of affairs pursuant to Rule 1007 as if an involuntary petition had been filed on the date when the court directed the conversion of the case to a liquidation case."
+    p "Paragraphs (2) and (3). Paragraph (2) requires notice to be given to all creditors of the order of conversion. The notice is to be included in the notice of the meeting of creditors and Official Form No. 16 may be adapted for use. A meeting of creditors may have been held in the superseded case as required by § 341(a) of the Code but that would not dispense with the need to hold one in the ensuing liquidation case. Section 701(a) of the Code permits the court to appoint the trustee acting in the chapter 11 or 13 case as interim trustee in the chapter 7 case. Section 702(a) of the Code allows creditors to elect a trustee but only at the meeting of creditors held under § 341. The right to elect a trustee is not lost because the chapter 7 case follows a chapter 11 or 13 case. Thus a meeting of creditors is necessary. The date fixed for the meeting of creditors will control at least the time for filing claims pursuant to Rule 3002(c). That time will remain applicable in the ensuing chapter 7 case except as paragraph (3) provides, if that time had expired in an earlier chapter 7 case which was converted to the chapter 11 or 13 case, it is not revived in the subsequent chapter 7 case. The same is true if the time for filing a complaint objecting to discharge or to determine nondischargeability of a debt had expired. Paragraph (3), however, recognizes that such time may be extended by the court under Rule 4004 or 4007 on motion made within the original prescribed time."
+    p "Paragraph (4) renders it unnecessary to file anew claims that had been filed in the chapter 11 or 13 case before conversion to chapter 7."
+    p "Paragraph (5) contemplates that typically, after the court orders conversion of a chapter case to liquidation, a trustee under chapter 7 will forthwith take charge of the property of the estate and proceed expeditiously to liquidate it. The court may appoint the interim trustee in the chapter 7 case pursuant to § 701(a) of the Code. If creditors do not elect a trustee under § 702, the interim trustee becomes the trustee."
+    p "Paragraph (6) requires the trustee or debtor in possession acting in the chapter 11 or 13 case to file a final report and schedule of debts incurred in that case. This schedule will provide the information necessary for giving the notice required by paragraph (7) of the rule."
+    p "Paragraph (7) requires that claims that arose in the chapter 11 or 13 case be filed within 60 days after entry of the order converting the case to one under chapter 7. Claims not scheduled pursuant to paragraph (6) of the rule or arising from the rejection of an executory contract entered into during the chapter case may be filed within a time fixed by the court. Pursuant to § 348(c) of the Code, the conversion order is treated as the order for relief to fix the time for the trustee to assume or reject executory contracts under § 365(d)."
+    p "Paragraph (8) permits the extension of the time for filing claims when claims are not timely filed but only with respect to any surplus that may remain in the estate. See also § 726(a)(2)(C) and (3) of the Code."
+    hash "75d5330de61e844647ba9f5d59d14aa8826d866a47dbfc1a97077f00c4fd675d"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Paragraph (1) is amended to provide for the filing of a statement of intention in a case converted to chapter 7. Paragraph (1)(B) is added to provide for the filing of the statement of intention when a case is converted to chapter 7. The time for filing the statement of intention and for an extension of that time is governed by § 521(2)(A) [now 521(a)(2)(A)] of the Code. An extension of time for other required filings is governed by Rule 1007(c), which paragraph (1)(A) incorporates by reference. Because of the amendment to Rule 1007(c), the filing of new lists, schedules, and statements is now governed exclusively by Rule 1019(1)."
+    p "Paragraph (3) of the rule is expanded to include the effect of conversion of a chapter 11 or 13 case to a chapter 7 case. On conversion of a case from chapter 11 or 13 to a chapter 7 case, parties have a new period within which to file claims or complaints relating to the granting of the discharge or the dischargeability of a debt. This amendment is consistent with the holding and reasoning of the court in F & M Marquette Nat’l Bank v. Richards, 780 F.2d 24 (8th Cir. 1985)."
+    p "Paragraph (4) is amended to deal directly with the status of claims which are properly listed on the schedules filed in a chapter 11 case and deemed filed pursuant to § 1111(a) of the Code. Section 1111(a) is only applicable to the chapter 11 case. On conversion of the chapter 11 case to a chapter 7 case, paragraph (4) governs the status of claims filed in the chapter 11 case. The Third Circuit properly construed paragraph (4) as applicable to claims deemed filed in the superseded chapter 11 case. In re Crouthamel Potato Chip Co., 786 F.2d 141 (3d Cir. 1986)."
+    p "The amendment to paragraph (4) changes that result by providing that only claims that are actually filed in the chapter 11 case are treated as filed in the superseding chapter 7 case. When chapter 11 cases are converted to chapter 7 cases, difficulties in obtaining and verifying the debtors’ records are common. It is unfair to the chapter 7 trustee and creditors to require that they be bound by schedules which may not be subject to verification."
+    p "Paragraph (6) is amended to place the obligation on the chapter 13 debtor to file a schedule of unpaid debts incurred during the superseded chapter 13 case."
+    hash "1d425826378425c3dcb3ee0d14f2848ed900a36c61ab4e7f92f06b4b7740dd81"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to include conversion of a case from chapter 12 to chapter 7 and to implement the United States trustee system."
+    p "The amendments to paragraph (1)(A) are stylistic. Reference to the statement of executory contracts is deleted to conform to the amendment to Rule 1007(b)(1) which changes the statement to a schedule of executory contracts and unexpired leases."
+    p "Paragraph (1)(B) is amended to enable the United States trustee to monitor the progress of the case and to take appropriate action to enforce the debtor’s obligation to perform the statement of intention in a timely manner."
+    p "Paragraph (2) is deleted because notice of conversion of the case is required by Rules 1017(d), 2002(f)(2), and 9022. The United States trustee, who supervises trustees pursuant to 28 U.S.C. § 586(a), may give notice of the conversion to the trustee in the superseded case."
+    p "Paragraph (6), renumbered as paragraph (5), is amended to reduce to 15 days the time for filing a schedule of postpetition debts and requires inclusion of the name and address of each creditor in connection with the postpetition debt. These changes will enable the clerk to send postpetition creditors a timely notice of the meeting of creditors held pursuant to § 341(a) of the Code. The amendments to this paragraph also provide the United States trustee with the final report and account of the superseded case, and with a copy of every schedule filed after conversion of the case. Conversion to chapter 7 terminates the service of the trustee in the superseded case pursuant to § 348(e) of the Code. Sections 704(a)(9), 1106(a)(1), 1107(a), 1202(b)(1), 1203 and 1302(b)(1) of the Code require the trustee or debtor in possession to file a final report and account with the court and the United States trustee. The words “with the court” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    p "Paragraph (7), renumbered as paragraph (6), is amended to conform the time for filing postpetition claims to the time for filing prepetition claims pursuant to paragraph (3) (renumbered as paragraph (2)) of this rule and Rule 3002(c). This paragraph is also amended to eliminate the need for a court order to provide notice of the time for filing claims. It is anticipated that this notice will be given together with the notice of the meeting of creditors. It is amended further to avoid the need to fix a time for filing claims arising under § 365(d) if it is a no asset case upon conversion. If assets become available for distribution, the court may fix a time for filing such claims pursuant to Rule 3002(c)(4)."
+    p "The additions of references to unexpired leases in paragraph (1)(A) and in paragraphs (6) and (7) (renumbered as paragraphs (5) and (6)) are technical amendments to clarify that unexpired leases are included as well as other executory contracts."
+    hash "35abb62c63c77721eec07df812264ba0be2a7a180239b7b39c314771ed71c73c"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Subdivision (7) is abrogated to conform to the abrogation of Rule 3002(c)(6)."
+    p "GAP Report on Rule 1019. No changes were made to the text of the rule. The Committee Note was changed to conform to the proposed changes to Rule 3002 (see GAP Report on Rule 3002 below)."
+    hash "5a1042ba5bc86d24142bb23280ca01f25033a940648c15548817b822d126c0f4"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "The amendments to subdivisions (3) and (5) are technical corrections and stylistic changes. The phrase “superseded case” is deleted because it creates the erroneous impression that conversion of a case results in a new case that is distinct from the original case. Similarly, the phrase “original petition” is deleted because it erroneously implies that there is a second petition with respect to a converted case. See § 348 of the Code."
+    p "GAP Report on Rule 1019. No changes to the published draft."
+    hash "abdb65ac1536eee861c8003699b6a87a87043fe61af31559dee1809ea21c58bc"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Paragraph (1)(B) is amended to clarify that a motion for an extension of time to file a statement of intention must be made by written motion filed before the time expires, or by oral request made at a hearing before the time expires."
+    p "Subdivision (6) is amended to provide that a holder of an administrative expense claim incurred after the commencement of the case, but before conversion to chapter 7, is required to file a request for payment under § 503(a) within a time fixed by the court, rather than a proof of claim under § 501 and Rules 3001(a)–(d) and 3002. The 180-day period applicable to governmental units is intended to conform to § 502(b)(9) of the Code and Rule 3002(c)(1). It is unnecessary for the court to fix a time for filing requests for payment if it appears that there are not sufficient assets to pay preconversion administrative expenses. If a time for filing a request for payment of an administrative expense is fixed by the court, it may be enlarged as provided in Rule 9006(b). If an administrative expense claimant fails to timely file the request, it may be tardily filed under § 503(a) if permitted by the court for cause."
+    p "The final sentence of Rule 1019(6) is deleted because it is unnecessary in view of the other amendments to this paragraph. If a party has entered into a postpetition contract or lease with the trustee or debtor that constitutes an administrative expense, a timely request for payment must be filed in accordance with this paragraph and § 503(b) of the Code. The time for filing a proof of claim in connection with the rejection of any other executory contract or unexpired lease is governed by Rule 3002(c)(4)."
+    p "The phrase “including the United States, any state, or any subdivision thereof” is deleted as unnecessary. Other amendments to this rule are stylistic."
+    p "GAP Report on Rule 1019. The proposed amendments to Rule 1019(6) were changed to delete the deadline for filing requests for payment of preconversion administrative expenses that would be applicable in all cases, and to provide instead that the court may fix such a deadline. The committee note was revised to clarify that it is not necessary for the court to fix a deadline where there are insufficient assets to pay preconversion administrative expenses."
+    hash "6a9bd08da63fd6b3bf1a716fd0f6bc742475c8506415d7fe45f32d91f47d9ba5"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (2) is amended to include a new filing period for motions under § 707(b) and (c) of the Code when a case is converted to chapter 7. The establishment of a deadline for filing such motions is not intended to express a position as to whether such motions are permitted under the Code."
+    p "Changes Made After Publication. The Committee Note was amended by adding the second sentence to the Note stating explicitly that the rule was not intended to take a position on whether motions to dismiss a case under § 707(b) and (c) are proper in a case that is converted from another chapter."
+    hash "3571d184f49cd6c6d78fcd22899aec8453df0368951365a95c0221e46672cd9e"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (2). Subdivision (2) is redesignated as subdivision (2)(A), and a new subdivision (2)(B) is added to the rule. Subdivision (2)(B) provides that a new time period to object to a claim of exemption arises when a case is converted to chapter 7 from chapter 11, 12, or 13. The new time period does not arise, however, if the conversion occurs more than one year after the first order confirming a plan, even if the plan was subsequently modified. A new objection period also does not arise if the case was previously pending under chapter 7 and the objection period had expired in the prior chapter 7 case."
+    p "Changes Made After Publication. No changes since publication."
+    hash "45c989e44e263e75c0695694a932187029f686ccdc8ba0537a959fb051b50737"
+  }
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a2192563f65b6c27d62e2446cb28a97449863d53834f7b3e71f2518f67482191"
+  }
+  layers {
+    operative "69c5f10c460e43a5e09aef9be1b16504d741707c5b86245aac1ff3446c76775a"
+    enacted "5ab5a41d63372cf7949b1c903ddc4831600ba65cb7fd1420c6af5824f319e209"
+    editorial "43f1530fd67be00d4adb93476062c19cdd7b4e13182eed0451272cb52607e22e"
+  }
+}

@@ -1,0 +1,19 @@
+edition 2
+module "/us/usc/t45/ch22/schII/ptA" {
+  within "/us/usc/t45/ch22/schII"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch22/schII/ptA" part {
+    num "A" "Part A—"
+    heading "Sale of Conrail"
+    member "/us/usc/t45/s1311"
+    member "/us/usc/t45/s1312"
+    member "/us/usc/t45/s1313"
+    hash "cce4887e7dd3057f4bb8f65120f6fa213b3397fc9a2ff2a03ddc7de84de943a7"
+  }
+  layers {
+    operative "cce4887e7dd3057f4bb8f65120f6fa213b3397fc9a2ff2a03ddc7de84de943a7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

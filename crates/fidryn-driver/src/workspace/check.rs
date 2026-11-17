@@ -16,7 +16,7 @@ use super::cache::Cache;
 use super::discover::walk;
 use super::index::{Unresolved, across, no_references, order, span};
 use super::{LOCK_FILE, MANIFEST_FILE};
-use fidryn_check::e2::{check_module, lower};
+use fidryn_check::e2::{Lowered, check_module, lower};
 use fidryn_core::{Diagnostic, DiagnosticCode, Severity};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::workspace::{Lock, Manifest, WorkspaceKind};
@@ -242,13 +242,13 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
 }
 
 /// A diagnostic about the file `rel` as a whole, which has no span.
-fn of_file(code: DiagnosticCode, rel: &str, message: impl Into<String>) -> Diagnostic {
+pub(super) fn of_file(code: DiagnosticCode, rel: &str, message: impl Into<String>) -> Diagnostic {
     Diagnostic::new(code, message).with_source(rel)
 }
 
 /// The manifest of the workspace at `root`; `None`, with the reason in
 /// `diagnostics`, when it is missing or cannot be read.
-fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> Option<Manifest> {
+pub(super) fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> Option<Manifest> {
     let text = match fs::read_to_string(root.join(MANIFEST_FILE)) {
         Ok(text) => text,
         Err(error) => {
@@ -457,43 +457,41 @@ fn write_missed(cache: &Cache, read: &[(PhaseOne, Cached)], jobs: usize) {
 /// begin with `head`: its edition, and the checks of one module.
 fn check_file(digest: Hash32, head: Vec<u8>) -> PhaseOne {
     let mut diagnostics = Vec::new();
-    let interface = match edition_of(utf8_prefix(&head)) {
-        Err(diagnostic) => {
-            diagnostics.push(diagnostic);
+    let interface = match lower_file(head) {
+        Err(found) => {
+            diagnostics.extend(found);
             None
         }
-        Ok(Edition::One) => {
-            diagnostics.push(Diagnostic::new(
-                DiagnosticCode::E730,
-                "this file is of the first edition, and every `.fr` file of a workspace is a \
-                 module of edition 2",
-            ));
-            None
+        Ok(lowered) => {
+            diagnostics.extend(check_module(&lowered));
+            Some(interface_of(&lowered.module, &lowered.decl_spans()))
         }
-        Ok(Edition::Two) => match source_text(head) {
-            Err(error) => {
-                diagnostics.push(Diagnostic::new(
-                    DiagnosticCode::E100,
-                    format!("this file is not UTF-8: {error}"),
-                ));
-                None
-            }
-            Ok(source) => match lower(&parse(&source)) {
-                Err(found) => {
-                    diagnostics.extend(found);
-                    None
-                }
-                Ok(lowered) => {
-                    diagnostics.extend(check_module(&lowered));
-                    Some(interface_of(&lowered.module, &lowered.decl_spans()))
-                }
-            },
-        },
     };
     PhaseOne {
         digest: Some(digest),
         diagnostics,
         interface,
+    }
+}
+
+/// The module of the file whose bytes begin with `head`, lowered into the
+/// model: its edition, its text, and the grammar and lowering of edition 2.
+/// No diagnostic names the file.
+pub(super) fn lower_file(head: Vec<u8>) -> Result<Lowered, Vec<Diagnostic>> {
+    match edition_of(utf8_prefix(&head)) {
+        Err(diagnostic) => Err(vec![diagnostic]),
+        Ok(Edition::One) => Err(vec![Diagnostic::new(
+            DiagnosticCode::E730,
+            "this file is of the first edition, and every `.fr` file of a workspace is a \
+             module of edition 2",
+        )]),
+        Ok(Edition::Two) => match source_text(head) {
+            Err(error) => Err(vec![Diagnostic::new(
+                DiagnosticCode::E100,
+                format!("this file is not UTF-8: {error}"),
+            )]),
+            Ok(source) => lower(&parse(&source)),
+        },
     }
 }
 
@@ -547,7 +545,7 @@ fn stands(rel: &str, interface: &Interface, prefix: &Address) -> Vec<Diagnostic>
 /// The BLAKE3 of the bytes of the file at `path`, and its first bytes: all
 /// of them, or one more than the largest source of edition 2, so that what
 /// is held does not grow with a larger file.
-fn read_module(path: &Path) -> io::Result<(Hash32, Vec<u8>)> {
+pub(super) fn read_module(path: &Path) -> io::Result<(Hash32, Vec<u8>)> {
     let mut file = fs::File::open(path)?;
     let mut head = Vec::new();
     file.by_ref()

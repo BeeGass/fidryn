@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s163" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s163" section {
+    num "163" "§ 163."
+    heading "Repeal of prior legislation; exception"
+    content "Chapters 6 and 7 of this title, providing for mediation, conciliation, and arbitration, and all Acts and parts of Acts in conflict with the provisions of this chapter are repealed, except that the members, secretary, officers, employees, and agents of the Railroad Labor Board, in office on May 20, 1926, shall receive their salaries for a period of 30 days from such date, in the same manner as though this chapter had not been passed."
+    hash "8ba62d3b4dec36eaec16e20068bc7310cf43aa43a083bf5dd1365d3546725c63"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 14" -> "/us/act/1926-05-20/ch347/s14"] ", " ["44 Stat. 587" -> "/us/stat/44/587"] ".)"
+  note "/us/usc/t45/s163/note/editorialNotes/nolaw/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Chapters 6 and 7 of this title, referred to in text, were in the original references to the act of July 15, 1913, and title III of the Transportation Act, 1920, respectively."
+    hash "9ec3d6c5e5c63da530cb4dedb9ba225c21452659ed139c571d2ba8b9a69decf4"
+  }
+  layers {
+    operative "8ba62d3b4dec36eaec16e20068bc7310cf43aa43a083bf5dd1365d3546725c63"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1f57c7951d5654da3f0d535c7b18fbd01beebb19e4821e204bf5cc73136225eb"
+  }
+}

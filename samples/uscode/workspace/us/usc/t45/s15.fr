@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s15" {
+  within "/us/usc/t45/ch1"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s15" section {
+    num "15" "§ 15."
+    heading "Repealed. " ["Pub. L. 97–449, § 7(b)" -> "/us/pl/97/449/s7/b"] ", Jan. 12, 1983, " ["96 Stat. 2444" -> "/us/stat/96/2444"]
+    status repealed
+    hash "0e9bd4db005849778017a82864b123d6697425bcc18868248328d2f87c0b0502"
+  }
+  note "/us/usc/t45/s15/note/ungrouped/act.1910-04-14.ch160/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, acts " ["Apr. 14, 1910, ch. 160, § 6" -> "/us/act/1910-04-14/ch160/s6"] ", " ["36 Stat. 299" -> "/us/stat/36/299"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(C)" -> "/us/pl/89/670/s6/e/1/C"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] ", provided that it was the duty of the Secretary of Transportation to enforce the provisions of sections 11 to 16 of this title as to equipment of each car with safety appliances and that all powers theretofore granted to the Interstate Commerce Commission were extended to the Secretary for the purpose of such enforcement. See " ["section 501(b) of Title 49" -> "/us/usc/t49/s501/b"] ", Transportation."
+    hash "6eefe11ee2d4b565c671dec1b5933b11ae37cd72225ebdd0caa63adbae95b831"
+  }
+  layers {
+    operative "0e9bd4db005849778017a82864b123d6697425bcc18868248328d2f87c0b0502"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5cce51122c6b2acbe4f3953d386fbb6b213b3a80c9b84d7da3db8fdbd2a18ee5"
+  }
+}

@@ -1,0 +1,187 @@
+edition 2
+module "/us/usc/ptIX/rule9011" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9011" courtRule {
+    num "9011" "Rule 9011."
+    heading "Signing Documents; Representations to the Court; Sanctions; Verifying and Providing Copies"
+    provision "/us/usc/ptIX/rule9011/a" subsection {
+      num "a" "(a)"
+      heading "Signature."
+      content "Every petition, pleading, written motion, and other document—except a list, schedule, or statement, or an amendment to one of them—must be signed by at least one attorney of record in the attorney’s individual name. A party not represented by an attorney must sign all documents. Each document must state the signer’s address and telephone number, if any. The court must strike an unsigned document unless the omission is promptly corrected after being called to the attorney’s or party’s attention."
+      hash "56e7e01a4853cc4456304b5ee977c01a10525a2d84402a2f8bbb1884bc785e36"
+    }
+    provision "/us/usc/ptIX/rule9011/b" subsection {
+      num "b" "(b)"
+      heading "Representations to the Court."
+      chapeau "By presenting to the court a petition, pleading, written motion, or other document—whether by signing, filing, submitting, or later advocating it—an attorney or unrepresented party certifies that, to the best of the person’s knowledge, information, and belief formed after an inquiry reasonable under the circumstances:"
+      provision "/us/usc/ptIX/rule9011/b/1" paragraph {
+        num "1" "(1)"
+        content "it is not presented for any improper purpose, such as to harass, cause unnecessary delay, or needlessly increase litigation costs;"
+        hash "ae696853acdbd73783ebca766f9368b4bd2ab4a47d4fbc059d3d927ebd91874a"
+      }
+      provision "/us/usc/ptIX/rule9011/b/2" paragraph {
+        num "2" "(2)"
+        content "the claims, defenses, and other legal contentions are warranted by existing law or by a nonfrivolous argument to extend, modify, or reverse existing law, or to establish new law;"
+        hash "693aaf42179ac82ba3353d54d768bf20e7a87bfa6051b01ebb00fce5f964dd03"
+      }
+      provision "/us/usc/ptIX/rule9011/b/3" paragraph {
+        num "3" "(3)"
+        content "the allegations and factual contentions have evidentiary support—or if specifically so identified, are likely to have evidentiary support after a reasonable opportunity for further investigation or discovery; and"
+        hash "13a8b1ce3183a172a9baca4d2c5f3a6445da807d0f8257933fdf5078b946721b"
+      }
+      provision "/us/usc/ptIX/rule9011/b/4" paragraph {
+        num "4" "(4)"
+        content "the denials of factual contentions are warranted on the evidence—or if specifically so identified, are reasonably based on a lack of information or belief."
+        hash "fcd66f1cb26e22442078de02d09b7d291e43876eb039e527309da16807580328"
+      }
+      hash "4d91e79b5eb35c5b1bc11a8a52404327d8b99686cf1af0438f245ca005121627"
+    }
+    provision "/us/usc/ptIX/rule9011/c" subsection {
+      num "c" "(c)"
+      heading "Sanctions."
+      provision "/us/usc/ptIX/rule9011/c/1" paragraph {
+        num "1" "(1)"
+        content "In General. If, after notice and a reasonable opportunity to respond, the court determines that (b) has been violated, the court may, subject to the conditions in this subdivision (c), impose an appropriate sanction on any attorney, law firm, or party that committed the violation or is responsible for it. Absent exceptional circumstances, a law firm must be held jointly responsible for a violation committed by its partner, associate, or employee."
+        hash "f8e8b7b40e5a733d1ce91f3245678d2fb36acf1e637e664a951e16da635571b7"
+      }
+      provision "/us/usc/ptIX/rule9011/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "By Motion."
+        provision "/us/usc/ptIX/rule9011/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "In General. A motion for sanctions must be made separately from any other motion or request, describe the specific conduct alleged to violate (b), and be served under Rule 7004."
+          hash "2c2db6872b2570533e9a39dc215cf46195dca1eff56681ada542da0f43691ae7"
+        }
+        provision "/us/usc/ptIX/rule9011/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "When to File. The motion for sanctions must not be filed or presented to the court if the challenged document, claim, defense, contention, allegation, or denial is withdrawn or appropriately corrected within 21 days after the motion was served (or within another period as the court may order). This limitation does not apply if the conduct alleged is filing a petition in violation of (b)."
+          hash "33eec92c5ef5df8f0549131b0ba3baa94017abddc50d5d66d00f96956a38203e"
+        }
+        provision "/us/usc/ptIX/rule9011/c/2/C" subparagraph {
+          num "C" "(C)"
+          content "Awarding Damages. If warranted, the court may award to the prevailing party the reasonable expenses and attorney’s fees incurred in presenting or opposing the motion."
+          hash "b88ea8fca326878e453ce0dc65dec26faaffdee870a08e16c84812b5b999f1e8"
+        }
+        hash "fb40d75c26dd71248327abca77a933c8268eb5a18fe33ab7b57d0f18d0e49c3a"
+      }
+      provision "/us/usc/ptIX/rule9011/c/3" paragraph {
+        num "3" "(3)"
+        content "By the Court. On its own, the court may enter an order describing the specific conduct that appears to violate (b) and directing an attorney, law firm, or party to show cause why it has not violated (b)."
+        hash "60741faa0b24fd15b032810716960401bafbcb0c262c0fa33df121e8ac16f255"
+      }
+      provision "/us/usc/ptIX/rule9011/c/4" paragraph {
+        num "4" "(4)"
+        chapeau "Nature of a Sanction; Limitations."
+        provision "/us/usc/ptIX/rule9011/c/4/A" subparagraph {
+          num "A" "(A)"
+          chapeau "In General. A sanction imposed under this rule must be limited to what suffices to deter repetition of the conduct or deter comparable conduct by others similarly situated. The sanction may include:"
+          provision "/us/usc/ptIX/rule9011/c/4/A/i" clause {
+            num "i" "(i)"
+            content "a nonmonetary directive;"
+            hash "d93ead7923153585c276ba30e89aeea92c94c75cb2502da76518ce1b8f368440"
+          }
+          provision "/us/usc/ptIX/rule9011/c/4/A/ii" clause {
+            num "ii" "(ii)"
+            content "an order to pay a penalty into court; or"
+            hash "ceafd83babbc66c7e3517c3f151cb9530910fc6d187aaddab1854d9994a56872"
+          }
+          provision "/us/usc/ptIX/rule9011/c/4/A/iii" clause {
+            num "iii" "(iii)"
+            content "if imposed on motion and warranted for effective deterrence, an order directing payment to the movant of all or part of the reasonable attorney’s fees and other expenses directly resulting from the violation."
+            hash "46f71b509577b93aa64e4ca789fbf36c00493a62822835717e834c329ee88785"
+          }
+          hash "42a00af6591ac5cdd685d1a098a65d0f038c5ee3f3adc5b8d00a91a49ae08888"
+        }
+        provision "/us/usc/ptIX/rule9011/c/4/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Limitations on a Monetary Sanction. The court must not impose a monetary sanction:"
+          provision "/us/usc/ptIX/rule9011/c/4/B/i" clause {
+            num "i" "(i)"
+            content "against a represented party for violating (b)(2); or"
+            hash "b6d40f0c755df3bf51bf78ed3236ea09d94df2dce218d459a5bbb0c10dd23e36"
+          }
+          provision "/us/usc/ptIX/rule9011/c/4/B/ii" clause {
+            num "ii" "(ii)"
+            content "on its own, unless it issued the show-cause order under (c)(3) before voluntary dismissal or settlement of the claims made by or against the party that is, or whose attorneys are, to be sanctioned."
+            hash "f184f7f20f60f5723b907131ca5ab0411356cc65bc562795917881dd954aaf34"
+          }
+          hash "d60102c5643f685f4aa1f546851f6c52fcf691334257e9625a95ffa8bafe170a"
+        }
+        hash "5bb22ddbb57ac2a13503b01b8f0c1e1db2d632548158d4eb4113d5dc6232824a"
+      }
+      provision "/us/usc/ptIX/rule9011/c/5" paragraph {
+        num "5" "(5)"
+        content "Content of a Court Order. An order imposing a sanction must describe the sanctioned conduct and explain the basis for the sanction."
+        hash "49931e6bada032a3f66603f3c69788fda7d9c6c95b7f8a669efe740f312030c0"
+      }
+      hash "dee9c7dec2c7b3bbde0233f021050075c82ba43aade6268b5fba7089eea4d24b"
+    }
+    provision "/us/usc/ptIX/rule9011/d" subsection {
+      num "d" "(d)"
+      heading "Inapplicability to Discovery."
+      content "Subdivisions (a)–(c) do not apply to disclosures and discovery requests, responses, objections, and motions that are subject to Rules 7026–7037."
+      hash "a154f4c91bb655564b30861a2c295e5e2d4d916f3ae73e57395b0f352cf6c5ed"
+    }
+    provision "/us/usc/ptIX/rule9011/e" subsection {
+      num "e" "(e)"
+      heading "Verifying a Document."
+      content "A document filed in a bankruptcy case need not be verified unless these rules provide otherwise. When these rules require verification, an unsworn declaration under 28 U.S.C. § 1746 suffices."
+      hash "8928a58de6ac49ecf328ce4fd434d45f783dd9ca4c6dc99c5dace916840e8a50"
+    }
+    provision "/us/usc/ptIX/rule9011/f" subsection {
+      num "f" "(f)"
+      heading "Copies of Signed or Verified Documents."
+      content "When these rules require copies of a signed or verified document, if the original is signed or verified, a copy that conforms to the original suffices."
+      hash "083688715ad2f8b7889b775c98baaa5c15cd6d013c66bb13424eff6e04d24713"
+    }
+    hash "bd3a01038043fec59a10fdf9668158d45fe18ba32e6a6ce5ed5926b5a4e6b750"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). Excepted from the papers which an attorney for a debtor must sign are lists, schedules, statements of financial affairs, statements of executory contracts, Chapter 13 Statements and amendments thereto. Rule 1008 requires that these documents be verified by the debtor. Although the petition must also be verified, counsel for the debtor must sign the petition. See Official Form No. 1. An unrepresented party must sign all papers."
+    p "The last sentence of this subdivision authorizes a broad range of sanctions."
+    p "The word “document” is used in this subdivision to refer to all papers which the attorney or party is required to sign."
+    p "Subdivision (b) extends to all papers filed in cases under the Code the policy of minimizing reliance on the formalities of verification which is reflected in the third sentence of Rule 11 F.R.Civ.P. The second sentence of subdivision (b) permits the substitution of an unsworn declaration for the verification. See 28 U.S.C. § 1746. Rules requiring verification or an affidavit are as follows: Rule 1008, petitions, schedules, statements of financial affairs, Chapter 13 Statements and amendments; Rule 2006(e), list of multiple proxies and statement of facts and circumstances regarding their acquisition; Rule 4001(c), motion for ex parte relief from stay; Rule 7065, incorporating Rule 65(b) F.R.Civ.P. governing issuance of temporary restraining order; Rule 8011(d), affidavit in support of emergency motion on appeal."
+    hash "0fe2cbfbdec99c8f93617f8c503d643d60e44f628e7158c2a40b5b2fb37c128a"
+  }
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The statement of intention of the debtor under § 521(2) [now 521(a)(2)] of the Code is added to the documents which counsel is not required to sign."
+    hash "db3e1ee2a168762c0c8f565c8d4dbb54d8bca9c75968185319db2d3f6d58f31d"
+  }
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to conform to Rule 11 F.R.Civ.P. where appropriate, but also to clarify that it applies to the unnecessary delay or needless increase in the cost of the administration of the case. Deletion of the references to specific statements that are excluded from the scope of this subdivision is stylistic. As used in subdivision (a) of this rule, “statement” is limited to the statement of financial affairs and the statement of intention required to be filed under Rule 1007. Deletion of the reference to the Chapter 13 Statement is consistent with the amendment to Rule 1007(b)."
+    hash "7f018433e86a173329e761cda630aa0f3da4bac14d3241b383a2a7f0d32df946"
+  }
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "This rule is amended to conform to the 1993 changes to F.R.Civ.P. 11. For an explanation of these amendments, see the advisory committee note to the 1993 amendments to F.R.Civ.P. 11."
+    p "The “safe harbor” provision contained in subdivision (c)(1)(A), which prohibits the filing of a motion for sanctions unless the challenged paper is not withdrawn or corrected within a prescribed time after service of the motion, does not apply if the challenged paper is a petition. The filing of a petition has immediate serious consequences, including the imposition of the automatic stay under § 362 of the Code, which may not be avoided by the subsequent withdrawal of the petition. In addition, a petition for relief under chapter 7 or chapter 11 may not be withdrawn unless the court orders dismissal of the case for cause after notice and a hearing."
+    p "GAP Report on Rule 9011. The proposed amendments to subdivision (a) were revised to clarify that a party not represented by an attorney must sign lists, schedules, and statements, as well as other papers that are filed."
+    hash "73d6c96cfc9876642c7b8c0d47561b953a0ade167b8dec371825923e7a01e33b"
+  }
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "40572aa33f8ba0a59ebb095b52e4a3f377c44920dde6ab7c7d8e0b4749a07df6"
+  }
+  layers {
+    operative "bd3a01038043fec59a10fdf9668158d45fe18ba32e6a6ce5ed5926b5a4e6b750"
+    enacted "46f98809c972ad5b032ee01a17338ca4683f3a85a0571c023eae3847d2a74182"
+    editorial "097a2e6b61ed76c740f27ace07dd7834d858bfed9bb1f018ef8f99655c21173a"
+  }
+}

@@ -1,0 +1,283 @@
+edition 2
+module "/us/usc/ptII/rule2003" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2003" courtRule {
+    num "2003" "Rule 2003."
+    heading "Meeting of Creditors or Equity Security Holders"
+    provision "/us/usc/ptII/rule2003/a" subsection {
+      num "a" "(a)"
+      heading "Date and Place of the Meeting."
+      provision "/us/usc/ptII/rule2003/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Date. Except as provided in § 341(e), the United States trustee must call a meeting of creditors to be held:"
+        provision "/us/usc/ptII/rule2003/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "in a Chapter 7 or 11 case, no fewer than 21 days and no more than 40 days after the order for relief;"
+          hash "7b0a7c00334f53c2b6b4a8c6d61f559893f847bffbcccc54c9443c6b032a4681"
+        }
+        provision "/us/usc/ptII/rule2003/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "in a Chapter 12 case, no fewer than 21 days and no more than 35 days after the order for relief; or"
+          hash "df2f6b3b0f66e933e1a9a32c5b48a49ec3c812e29db0629831fc8d8baa81cd7a"
+        }
+        provision "/us/usc/ptII/rule2003/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "in a Chapter 13 case, no fewer than 21 days and no more than 50 days after the order for relief."
+          hash "b6042d928a41ff67aa8b8dd0de2da57932e2bfc340326807a0db98e28efb699c"
+        }
+        hash "deb5d839dafbc1427b6a1e10c1e76cff689011bea38d40a6d2d459de734e57a0"
+      }
+      provision "/us/usc/ptII/rule2003/a/2" paragraph {
+        num "2" "(2)"
+        content "Effect of a Motion or an Appeal. The United States trustee may set a later date for the meeting if there is a motion to vacate the order for relief, an appeal from such an order, or a motion to dismiss the case."
+        hash "5d0cb1394090b7622d8d0989d6907f2bbba594249eb514161aa38a5f581ae33b"
+      }
+      provision "/us/usc/ptII/rule2003/a/3" paragraph {
+        num "3" "(3)"
+        content "Place; Possible Change in the Meeting Date. The meeting may be held at a regular place for holding court. Or the United States trustee may designate any other place in the district that is convenient for the parties in interest. If the designated meeting place is not regularly staffed by the United States trustee or an assistant who may preside, the meeting may be held no more than 60 days after the order for relief."
+        hash "133b3c6796b5d9d454c511dc7b3083e6088a644ba827b0509140f2daed51c7be"
+      }
+      hash "57ec76e85973a94c78dca53d746f2aa0d873be949bd24ef19f8391997e42c88e"
+    }
+    provision "/us/usc/ptII/rule2003/b" subsection {
+      num "b" "(b)"
+      heading "Conducting the Meeting; Agenda; Who May Vote."
+      provision "/us/usc/ptII/rule2003/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "At a Meeting of Creditors."
+        provision "/us/usc/ptII/rule2003/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "Generally. The United States trustee must preside at the meeting of creditors. The meeting must include an examination of the debtor under oath. The presiding officer has the authority to administer oaths."
+          hash "c7417384ef832661acd1ee4a2cbe4dd5c765ca72f0b38559077b431c29f3cae5"
+        }
+        provision "/us/usc/ptII/rule2003/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "Chapter 7 Cases. In a Chapter 7 case, the meeting may include the election of a creditors’ committee; and if the case is not under Subchapter V, the meeting may include electing a trustee."
+          hash "4927f93aab758975b9601dbb79f4b5baec76e4879f4d8e236dbe670e9becf517"
+        }
+        hash "2ddc183dd7983cce87d98d580439cc3b559c8f710b5dea1d37a71bbf569b469e"
+      }
+      provision "/us/usc/ptII/rule2003/b/2" paragraph {
+        num "2" "(2)"
+        content "At a Meeting of Equity Security Holders. If the United States trustee convenes a meeting of equity security holders under § 341(b), the United States trustee must set a date for the meeting and preside over it."
+        hash "07b674603f5df4d138b7d070579a649181190673b37dda9dd0ffa613dd963f4a"
+      }
+      provision "/us/usc/ptII/rule2003/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Who Has a Right to Vote; Objecting to the Right to Vote."
+        provision "/us/usc/ptII/rule2003/b/3/A" subparagraph {
+          num "A" "(A)"
+          chapeau "In a Chapter 7 Case. A creditor in a Chapter 7 case may vote if, at or before the meeting:"
+          provision "/us/usc/ptII/rule2003/b/3/A/i" clause {
+            num "i" "(i)"
+            content "the creditor has filed a proof of claim or a writing setting forth facts evidencing a right to vote under § 702(a);"
+            hash "de4c5b6f9e3ba2af8572830a32ac8c4ff6b28f3ca1fcafe7bf28ba5d338e1347"
+          }
+          provision "/us/usc/ptII/rule2003/b/3/A/ii" clause {
+            num "ii" "(ii)"
+            content "the proof of claim is not insufficient on its face; and"
+            hash "48377c9bdef87fbe8e55e4b492c0f239c8605f74d8833bae66bbdd1907fd26fb"
+          }
+          provision "/us/usc/ptII/rule2003/b/3/A/iii" clause {
+            num "iii" "(iii)"
+            content "no objection is made to the claim."
+            hash "5b2fecf022e18ae39ffe73e076c5cbc909f4acdfbb33a5f5f21ca04ef30862a9"
+          }
+          hash "eba16d435aebba9cafe3611ece437c87aaadc2b91bf71fae061d20ddeb55fd27"
+        }
+        provision "/us/usc/ptII/rule2003/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "In a Partnership Case. A creditor in a partnership case may file a proof of claim or a writing evidencing a right to vote for a trustee for the general partner’s estate even if a trustee for the partnership’s estate has previously qualified."
+          hash "03e499828062a2230b91355bad391649bbfa18fd6ed1dc6f7740161567bdc390"
+        }
+        provision "/us/usc/ptII/rule2003/b/3/C" subparagraph {
+          num "C" "(C)"
+          content "Objecting to the Amount or Allowability of a Claim for Voting Purposes. Unless the court orders otherwise, if there is an objection to the amount or allowability of a claim for voting purposes, the United States trustee must tabulate the votes for each alternative presented by the dispute. If resolving the dispute is necessary to determine the election’s result, the United States trustee must report to the court the tabulations for each alternative."
+          hash "530ab40986d0350b469dfcf922f4ffd32f8215d53cc5c71709b08770da2d06bc"
+        }
+        hash "085cd7522de03ee214552cefba98792a0d865fcf8ebf6526f72183daed28e9dd"
+      }
+      hash "531d64de797242b8443c8597ed46a5326f4d31cd1d68d464fa7a4217008d2528"
+    }
+    provision "/us/usc/ptII/rule2003/c" subsection {
+      num "c" "(c)"
+      heading "Recording the Proceedings."
+      chapeau "At the meeting of creditors under § 341(a), the United States trustee must:"
+      provision "/us/usc/ptII/rule2003/c/1" paragraph {
+        num "1" "(1)"
+        content "record verbatim—using electronic sound-recording equipment or other means of recording—all examinations under oath;"
+        hash "976092f90e8ae59f2af47010b2332716c98af3784cd3936a06afd3140da0c78a"
+      }
+      provision "/us/usc/ptII/rule2003/c/2" paragraph {
+        num "2" "(2)"
+        content "preserve the recording and make it available for public access for 2 years after the meeting concludes; and"
+        hash "e4de43e5a66d3529eb3a80c9d5d9cec16889632eb0882b45a136b28a8541cb7c"
+      }
+      provision "/us/usc/ptII/rule2003/c/3" paragraph {
+        num "3" "(3)"
+        content "upon request, certify and provide a copy or transcript of the recording to any entity at that entity’s expense."
+        hash "d3454a5fec30217e69a0f437a1e39c7f99c3d74acf5895dfb70980143d7319d8"
+      }
+      hash "ee7f398f6bdb5455fbf7a76fab2757096a928467d0eeabac683f65ab0b47e235"
+    }
+    provision "/us/usc/ptII/rule2003/d" subsection {
+      num "d" "(d)"
+      heading "Reporting Election Results in a Chapter 7 Case."
+      provision "/us/usc/ptII/rule2003/d/1" paragraph {
+        num "1" "(1)"
+        content "Undisputed Election. In a Chapter 7 case, if the election of a trustee or a member of a creditors’ committee is undisputed, the United States trustee must promptly file a report of the election. The report must include the name and address of the person or entity elected and a statement that the election was undisputed."
+        hash "4d25b70468b6d7c8563f2625b388a3efc45f3921f794e581f757f0c2f8178a9f"
+      }
+      provision "/us/usc/ptII/rule2003/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Disputed Election."
+        provision "/us/usc/ptII/rule2003/d/2/A" subparagraph {
+          num "A" "(A)"
+          chapeau "United States Trustee’s Report. If the election is disputed, the United States trustee must:"
+          provision "/us/usc/ptII/rule2003/d/2/A/i" clause {
+            num "i" "(i)"
+            content "promptly file a report informing the court of the nature of the dispute and listing the name and address of any candidate elected under any alternative presented by the dispute; and"
+            hash "28653855a488043e290b325df41471a2ce160fec43d09b455059b9a5b4330048"
+          }
+          provision "/us/usc/ptII/rule2003/d/2/A/ii" clause {
+            num "ii" "(ii)"
+            content "no later than the date on which the report is filed, mail a copy to any party in interest that has requested one."
+            hash "9b286f348a7e62cf18c1fd1fa70ab088957aa5142e23e9996014ab705b31860a"
+          }
+          hash "d9cac9c57f3d9b2e8e1c0ac2ca465680bf24cad32d66ef28148ee68d5d6663a1"
+        }
+        provision "/us/usc/ptII/rule2003/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "Interim Trustee. Until the court resolves the dispute, the interim trustee continues in office. Unless a motion to resolve the dispute is filed within 14 days after the report is filed, the interim trustee serves as trustee in the case."
+          hash "574054f1f0619a8a97cada5776dc284035fc73984506fc349b8e278dbc18c3fb"
+        }
+        hash "08c3f038f895f89f813832a17ff3ed5b26ec81f7f273258cc4ecb8dff7613cda"
+      }
+      hash "bc7a770e0121919254c041ffd4fa2bae453332c310db860d53298acd16834fe4"
+    }
+    provision "/us/usc/ptII/rule2003/e" subsection {
+      num "e" "(e)"
+      heading "Adjournment."
+      content "The presiding official may adjourn the meeting from time to time by announcing at the meeting the date and time to reconvene. The presiding official must promptly file a statement showing the adjournment and the date and time to reconvene."
+      hash "686cd2d79d1493a3ca69bbd03496000183dc0411116a6c536893e75c12b799b2"
+    }
+    provision "/us/usc/ptII/rule2003/f" subsection {
+      num "f" "(f)"
+      heading "Special Meetings of Creditors."
+      content "The United States trustee may call a special meeting of creditors or may do so on request of a party in interest."
+      hash "8b790be3c18d9451d2e2ddadb1948f1a442358212dc15b4b92f3fba27f45911f"
+    }
+    provision "/us/usc/ptII/rule2003/g" subsection {
+      num "g" "(g)"
+      heading "Final Meeting of Creditors."
+      content "If the United States trustee calls a final meeting of creditors in a case in which the net proceeds realized exceed $1,500, the clerk must give notice of the meeting to the creditors. The notice must include a summary of the trustee’s final account and a statement of the amount of the claims allowed. The trustee must attend the meeting and, if requested, report on the estate’s administration."
+      hash "2c0e8381ee67968f0b9c1140fc3d3936ebc52f614564f99a399f8f5d9b51e47f"
+    }
+    hash "6e297cefe7a740e2182d2295c386e807fc2d16df453e156b29ffb77e8a403fe6"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 341(a) of the Code requires a meeting of creditors in a chapter 7, 11 or 13 case, and § 341(b) permits the court to order a meeting of equity security holders. A major change from prior law, however, prohibits the judge from attending or presiding over the meeting. Section 341(c)."
+    p "This rule does not apply either in a case for the reorganization of a railroad or for the adjustment of debts of a municipality. Sections 1161 and 901 render §§ 341 and 343 inapplicable in these types of cases. Section 341 sets the requirement for a meeting of creditors and § 343 provides for the examination of the debtor."
+    p "Subdivision (a). The meeting is to be held between 20 and 40 days after the date of the order for relief. In a voluntary case, the date of the order for relief is the date of the filing of the petition (§ 301 of the Code); in an involuntary case, it is the date of an actual order (§ 303(i) of the Code)."
+    p "Subdivision (b) provides flexibility as to who will preside at the meeting of creditors. The court may designate a person to serve as presiding officer, such as the interim trustee appointed under § 701 of the Code. If the court does not designate anyone, the clerk will preside. In either case, creditors may elect a person of their own choosing. In any event, the clerk may remain to record the proceedings and take appearances. Use of the clerk is not contrary to the legislative policy of § 341(c). The judge remains insulated from any information coming forth at the meeting and any information obtained by the clerk must not be relayed to the judge."
+    p "Although the clerk may preside at the meeting, the clerk is not performing any kind of judicial role, nor should the clerk give any semblance of performing such a role. It would be pretentious for the clerk to ascend the bench, don a robe or be addressed as “your honor”. The clerk should not appear to parties or others as any type of judicial officer."
+    p "In a chapter 11 case, if a committee of unsecured creditors has been appointed pursuant to § 1102(a)(1) of the Code and a chairman has been selected, the chairman will preside or a person, such as the attorney for the committee, may be designated to preside by the chairman."
+    p "Since the judge must fix the bond of the trustee but cannot be present at the meeting, the rule allows the creditors to recommend the amount of the bond. They should be able to obtain relevant information concerning the extent of assets of the debtor at the meeting."
+    p "Paragraph (1) authorizes the presiding officer to administer oaths. This is important because the debtor’s examination must be under oath."
+    p "Paragraph (3) of subdivision (b) has application only in a chapter 7 case. That is the only type of case under the Code that permits election of a trustee or committee. In all other cases, no vote is taken at the meeting of creditors. If it is necessary for the court to make a determination with respect to a claim, the meeting may be adjourned until the objection or dispute is resolved."
+    p "The second sentence recognizes that partnership creditors may vote for a trustee of a partner’s estate along with the separate creditors of the partner. Although § 723(c) gives the trustee of a partnership a claim against a partner’s estate for the full amount of partnership creditors’ claims allowed, the purpose and function of this provision are to simplify distribution and prevent double proof, not to disfranchise partnership creditors in electing a trustee of an estate against which they hold allowable claims."
+    p "Subdivision (c) requires minutes and a record of the meeting to be maintained by the presiding officer. A verbatim record must be made of the debtor’s examination but the rule is flexible as to the means used to record the examination."
+    p "Subdivision (d) recognizes that the court must be informed immediately about the election or nonelection of a trustee in a chapter 7 case. Pursuant to Rule 2008, the clerk officially informs the trustee of his election or appointment and how he is to qualify. The presiding person has no authority to resolve a disputed election."
+    p "For purposes of expediency, the results of the election should be obtained for each alternative presented by the dispute and immediately reported to the court. Thus, when an interested party presents the dispute to the court, its prompt resolution by the court will determine the dispute and a new or adjourned meeting to conduct the election may be avoided. The clerk is not an interested party."
+    p "A creditors’ committee may be elected only in a chapter 7 case. In chapter 11 cases, a creditors’ committee is appointed pursuant to § 1102."
+    p "While a final meeting is not required, Rule 2002(f)(10) provides for the trustee’s final account to be sent to creditors."
+    hash "dac2937263aa8eaae91a538c34ed951e88e248f2f35324184d6202165511a83f"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a). Many courts schedule meetings of creditors at various locations in the district. Because the clerk must schedule meetings at those locations, an additional 20 days for scheduling the meetings is provided under the amended rule."
+    hash "c98d0e0afcd587e10f1f82438b8e1da2088674306d1c7d8cdd7f185311f92049"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The amendment to subdivision (a) relating to the calling of the meeting of creditors in a chapter 12 case is consistent with the expedited procedures of chapter 12. Subdivision (a) is also amended to clarify that the United States trustee does not call a meeting of creditors in a chapter 9 case. Pursuant to § 901(a) of the Code, § 341 is inapplicable in chapter 9 cases. The other amendments to subdivisions (a), (b)(1), and (b)(2) and the additions of subdivisions (f) and (g) are derived from Rule X–1006 and conform to the 1986 amendments to § 341 of the Code. The second sentence of subdivision (b)(3) is amended because Rule 2009(e) is abrogated. Although the United States trustee fixes the date for the meeting, the clerk of the bankruptcy court transmits the notice of the meeting unless the court orders otherwise, as prescribed in Rule 2002(a)(1)."
+    p "Pursuant to § 702 and § 705 of the Code, creditors may elect a trustee and a committee in a chapter 7 case. Subdivision (b) of this rule provides that the United States trustee shall preside over any election that is held under those sections. The deletion of the last sentence of subdivision (b)(1) does not preclude creditors from recommending to the United States trustee the amount of the trustee’s bond when a trustee is elected. Trustees and committees are not elected in chapter 11, 12, and 13 cases."
+    p "If an election is disputed, the United States trustee shall not resolve the dispute. For purposes of expediency, the United States trustee shall tabulate the results of the election for each alternative presented by the dispute. However, if the court finds that such tabulation is not feasible under the circumstances, the United States trustee need not tabulate the votes. If such tabulation is feasible and if the disputed vote or votes would affect the result of the election, the tabulations of votes for each alternative presented by the dispute shall be reported to the court. If a motion is made for resolution of the dispute in accordance with subdivision (d) of this rule, the court will determine the issue and another meeting to conduct the election may not be necessary."
+    p "Subdivisions (f) and (g) are derived from Rule X–1006(d) and (e), except that the amount is increased to $1,500 to conform to the amendment to Rule 2002(f)."
+    hash "9f8281765966bb79ce8ffbd68a4e3ee06bdfd0e12c7b00dbff50f7645686a781"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (a) is amended to extend by ten days the time for holding the meeting of creditors in a chapter 13 case. This extension will provide more flexibility for scheduling the meeting of creditors. Other amendments are stylistic and make no substantive change."
+    hash "81c209c0110081812af963bb43ceb04c8f4db0a984f93865b1b7026421b7d777"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Subdivision (d) is amended to require the United States trustee to mail a copy of a report of a disputed election to any party in interest that has requested a copy of it. Also, if the election is for a trustee, the rule as amended will give a party in interest ten days from the filing of the report, rather than from the date of the meeting of creditors, to file a motion to resolve the dispute."
+    p "The substitution of “United States trustee” for “presiding officer” is stylistic. Section 341(a) of the Code provides that the United States trustee shall preside at the meeting of creditors. Other amendments are designed to conform to the style of Rule 2007.1(b)(3) regarding the election of a trustee in a chapter 11 case."
+    p "GAP Report on Rule 2003. No changes since publication."
+    hash "7021584ba7bd97a373e21320c298d99f4e2ae2ec9878f386da5e6123fe88ea9f"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003 Amendment"
+    p "The rule is amended to reflect the enactment of subchapter V of chapter 7 of the Code governing multilateral clearing organization liquidations. Section 782 of the Code provides that the designation of a trustee or alternative trustee for the case is made by the Federal Reserve Board. Therefore, the meeting of creditors in those cases cannot include the election of a trustee."
+    p "Changes Made After Publication and Comments. No changes since publication."
+    hash "d74be233ffb95eb3f3a52d199bc8d148df20b8401df6b738b0b78a2c59b68fc6"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "If the debtor has solicited acceptances to a plan before commencement of the case, § 341(e), which was added to the Code by the 2005 amendments, authorizes the court, on request of a party in interest and after notice and a hearing, to order that a meeting of creditors not be convened. The rule is amended to recognize that a meeting of creditors might not be held in those cases."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "166b97a5fecba5e044717bd30cb836b3b99f98376e0a7d0a8cedf3b1f71f763f"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011 Amendment"
+    p "Subdivision (e). Subdivision (e) is amended to require the presiding official to file a statement after the adjournment of a meeting of creditors or equity security holders designating the period of the adjournment. The presiding official is the United States trustee or the United States trustee’s designee. This requirement will provide notice to parties in interest not present at the initial meeting of the date and time to which the meeting has been continued. An adjourned meeting is “held open” as permitted by § 1308(b)(1) of the Code. The filing of this statement will also discourage premature motions to dismiss or convert the case under § 1307(e)."
+    p "Changes Made After Publication. No changes were made to the language of the rule following publication. The Committee Note was revised to state more explicitly that adjournment of a meeting of creditors to a specific date constitutes holding it open for purposes of § 1308(b) of the Bankruptcy Code."
+    hash "bc87c0105ab23e88e99e61fdf962c0504b8b837e3240015e1f6136f2ea173ea3"
+  }
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8756e55612c9649a79b9a452f60d295e952a19c50e816e8337a3652c9ae55729"
+  }
+  layers {
+    operative "6e297cefe7a740e2182d2295c386e807fc2d16df453e156b29ffb77e8a403fe6"
+    enacted "5e3515c69cc78b330cba1f9c87cf72f28eb2108d2965ea3c4769b9385ef8a46f"
+    editorial "06277b7d9d99aa5ea13c1b2752009d106d8034c7ebcf99e0c5a5ae6611af101d"
+  }
+}

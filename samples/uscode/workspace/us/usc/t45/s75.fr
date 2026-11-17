@@ -1,0 +1,26 @@
+edition 2
+module "/us/usc/t45/s75" {
+  alias "/us/usc/t45/s76"
+  within "/us/usc/t45/ch4"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s75" section {
+    num "75, 76" "§§ 75, 76."
+    heading "Transferred"
+    status transferred
+    hash "0078bea5563b7e80419cc6e8892f5502a10579b28a5003c862b2726cfbdd3baa"
+  }
+  note "/us/usc/t45/s75/note/editorialNotes/act.1891-03-03.ch521/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section 75, acts " ["Mar. 3, 1891, ch. 521, § 1" -> "/us/act/1891-03-03/ch521/s1"] ", " ["26 Stat. 833" -> "/us/stat/26/833"] "; " ["May 28, 1928, ch. 824" -> "/us/act/1928-05-28/ch824"] ", " ["45 Stat. 789" -> "/us/stat/45/789"] ", relating to rules as to accommodations for export animals, was transferred to " ["section 466a of Title 46" -> "/us/usc/t46/s466a"] ", Shipping, and subsequently repealed and reenacted as " ["section 3901 of Title 46" -> "/us/usc/t46/s3901"] " by " ["Pub. L. 98–89" -> "/us/pl/98/89"] ", Aug. 26, 1983, " ["97 Stat. 500" -> "/us/stat/97/500"] ". " ["Section 3901 of Title 46" -> "/us/usc/t46/s3901"] " was subsequently repealed by " ["Pub. L. 107–171, title X, § 10418(a)(20)" -> "/us/pl/107/171/tX/s10418/a/20"] ", May 13, 2002, " ["116 Stat. 508" -> "/us/stat/116/508"] "."
+    p "Section 76, acts " ["Mar. 3, 1891, ch. 521, § 2" -> "/us/act/1891-03-03/ch521/s2"] ", " ["26 Stat. 833" -> "/us/stat/26/833"] "; " ["May 28, 1928, ch. 824" -> "/us/act/1928-05-28/ch824"] ", " ["45 Stat. 790" -> "/us/stat/45/790"] ", relating to penalties for rule violations, was transferred to " ["section 466b of Title 46" -> "/us/usc/t46/s466b"] ", and subsequently repealed and reenacted as " ["section 3902 of Title 46" -> "/us/usc/t46/s3902"] " by " ["Pub. L. 98–89" -> "/us/pl/98/89"] ", Aug. 26, 1983, " ["97 Stat. 500" -> "/us/stat/97/500"] ". " ["Section 3902 of Title 46" -> "/us/usc/t46/s3902"] " was subsequently repealed by " ["Pub. L. 107–171, title X, § 10418(a)(20)" -> "/us/pl/107/171/tX/s10418/a/20"] ", May 13, 2002, " ["116 Stat. 508" -> "/us/stat/116/508"] "."
+    hash "bbf2a30fc5811c22fbb51dd440586bec2a7670b8045886f5f526d42d69a240a0"
+  }
+  layers {
+    operative "0078bea5563b7e80419cc6e8892f5502a10579b28a5003c862b2726cfbdd3baa"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3984b1d3f33eccf22c9aa035b682f4e3e2be24aad598cbb8862552fefbccc51f"
+  }
+}

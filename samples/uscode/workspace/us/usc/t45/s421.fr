@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s421" {
+  within "/us/usc/t45/ch13/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s421" section {
+    num "421" "§ 421."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "c17445c6886c93f5eeb0fc46d675e670ba4519b278e72a0171c0e6d54ac0a311"
+  }
+  note "/us/usc/t45/s421/note/ungrouped/pl.91.458/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 91–458, title I, § 101" -> "/us/pl/91/458/tI/s101"] ", Oct. 16, 1970, " ["84 Stat. 971" -> "/us/stat/84/971"] ", stated congressional declaration of purpose for this chapter. See " ["section 20101 of Title 49" -> "/us/usc/t49/s20101"] ", Transportation."
+    hash "36070c8043a10ce3b4bb21d7a31c8d8cf69b67e155939d06329547d72761c1e4"
+  }
+  layers {
+    operative "c17445c6886c93f5eeb0fc46d675e670ba4519b278e72a0171c0e6d54ac0a311"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "57e509b2c2efbe9e5e8acfd3b690b8e54b995aaf2931573ba72a82f6b0549d43"
+  }
+}

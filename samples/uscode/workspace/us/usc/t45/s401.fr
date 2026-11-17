@@ -1,0 +1,36 @@
+edition 2
+module "/us/usc/t45/s401" {
+  within "/us/usc/t45/ch12"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s401" section {
+    num "401" "§ 401."
+    heading "Payment of compensation; eligibility; duration; maximum aggregate amount payable; duplication of benefits; application of railroad unemployment insurance provisions"
+    content "An employee as defined in the Railroad Unemployment Insurance Act [" ["45 U.S.C. 351" -> "/us/usc/t45/s351"] " et seq.] who has, after June 30, 1960, and before April 1, 1962, exhausted (within the meaning prescribed by the Railroad Retirement Board by regulation) his right to unemployment benefits under the Railroad Unemployment Insurance Act, shall be paid unemployment benefits in accordance otherwise with the provisions of such Act for days of unemployment, not exceeding sixty-five, and not exceeding in the aggregate, an amount equal to 50 per centum of the total amount of unemployment benefits which were payable to him in the benefit year in which he last exhausted his rights before making his first claim under this chapter, which occur in registration periods, as defined in the Railroad Unemployment Insurance Act, beginning on or after the fifteenth day after the date of enactment of the Temporary Extended Unemployment Compensation Act of 1961 [March 24, 1961], and before April 1, 1962, and which would not be days with respect to which he would be held entitled otherwise to receive unemployment benefits under the Railroad Unemployment Insurance Act: Provided, That an employee entitled under this section to benefits for a day before April 1, 1962, may receive such benefits for days in registration periods which begin before July 1, 1962: Provided further, That payment of benefits otherwise provided for in this chapter shall not be made with respect to any individual for any day of unemployment to the extent that such payment, when added to the sum of the benefits under the Railroad Unemployment Insurance Act and under this chapter paid such individual with respect to prior days in the benefit year, would exceed one hundred and ninety-five times such individual’s daily benefit rate for such benefit year. An employee who has filed, and established, a first claim for benefits under the provisions of the Temporary Extended Unemployment Compensation Act of 1961, may not thereafter establish a claim under this section, and an employee who has registered for, and established, a claim under this section may not thereafter establish a claim under the provisions of the Temporary Extended Unemployment Compensation Act of 1961. Except to the extent inconsistent with this section, the provisions of the Railroad Unemployment Insurance Act shall be applicable in the administration of this section."
+    hash "b5a30ce26e3d5a236694bfa79cac2ba1d9e7d965e22bf02113b46fea1421b07b"
+  }
+  credit "(" ["Pub. L. 87–7, § 2" -> "/us/pl/87/7/s2"] ", Mar. 24, 1961, " ["75 Stat. 16" -> "/us/stat/75/16"] ".)"
+  note "/us/usc/t45/s401/note/editorialNotes/act.1938-06-25.ch680/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Railroad Unemployment Insurance Act, referred to in text, is " ["act June 25, 1938, ch. 680" -> "/us/act/1938-06-25/ch680"] ", " ["52 Stat. 1094" -> "/us/stat/52/1094"] ", which is classified principally to chapter 11 (§ 351 et seq.) of this title. For complete classification of this Act to the Code, see " ["section 367 of this title" -> "/us/usc/t45/s367"] " and Tables."
+    p "The Temporary Extended Unemployment Compensation Act of 1961, referred to in text, is " ["Pub. L. 87–6" -> "/us/pl/87/6"] ", Mar. 24, 1961, " ["75 Stat. 8" -> "/us/stat/75/8"] ", which enacted sections 1105 and 1400l to 1400v of Title 42, The Public Health and Welfare, amended sections 3301 and 3302 of Title 26, Internal Revenue Code, and enacted provisions set out as notes under sections 1101 and 1400l of Title 42. For complete classification of this Act to the Code, see Tables."
+    hash "7f89d6c057ad84fdb44727732c52918748f58d493b29adc4818abdb78c2fd85d"
+  }
+  note "/us/usc/t45/s401/note/statutoryNotes/pl.87.7/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 87–7, § 1" -> "/us/pl/87/7/s1"] ", Mar. 24, 1961, " ["75 Stat. 16" -> "/us/stat/75/16"] ", provided:"
+    quoted "/us/pl/87/7/s1" {
+      p "“That this Act [enacting this chapter] may be cited as the ‘Temporary Extended Railroad Unemployment Insurance Benefits Act of 1961’.”"
+    }
+    hash "e4940211c1f2f27a1648d242f787a9375fdaaf79c63df063b01a27f431630d58"
+  }
+  layers {
+    operative "b5a30ce26e3d5a236694bfa79cac2ba1d9e7d965e22bf02113b46fea1421b07b"
+    enacted "f3ded5c506622dc6241a53a06a1ecce24fc6fc685d3250d00f8c62e39b46f02f"
+    editorial "8671d3419efcfb1b393f78d4b7037c09f1abe20c071089439e51070788b05a43"
+  }
+}

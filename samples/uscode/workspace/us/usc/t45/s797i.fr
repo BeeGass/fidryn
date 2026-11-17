@@ -1,0 +1,56 @@
+edition 2
+module "/us/usc/t45/s797i" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797i" section {
+    num "797i" "§ 797i."
+    heading "Limitations on liability"
+    provision "/us/usc/t45/s797i/a" subsection {
+      num "a" "(a)"
+      heading "Federal Government"
+      content "The liability of the United States under an agreement entered into or benefit schedule prescribed under section 797" mark "1" 1 " of this title or for payment of a termination allowance under " ["section 797a of this title" -> "/us/usc/t45/s797a"] " shall be limited to amounts appropriated under section 797l" mark "1" 1 " of this title."
+      hash "e312ea66a234537955fdab36864ab2fd7c18ef361c6c92cbb0ff667cbb1c3c68"
+    }
+    provision "/us/usc/t45/s797i/b" subsection {
+      num "b" "(b)"
+      heading "The Corporation"
+      provision "/us/usc/t45/s797i/b/1" paragraph {
+        num "1" "(1)"
+        content "The Corporation, Amtrak Commuter, and commuter authorities shall incur no liability under an agreement entered into or benefit schedule prescribed under section 797 " sup "1" " of this title or for the payment of a termination allowance under " ["section 797a of this title" -> "/us/usc/t45/s797a"] "."
+        hash "a75c028669cc8fdb8c52738036831e6c17805b6c7c939a055fdb5934f79c3ef5"
+      }
+      provision "/us/usc/t45/s797i/b/2" paragraph {
+        num "2" "(2)"
+        content "Notwithstanding any other provision of law, until April 1, 1984, the Corporation shall have no liability for employee protection in the event of a sale of any asset to a purchaser, and such purchaser shall assume the liability for the application of employee protection conditions imposed by the Commission for all employees adversely affected by such sale."
+        hash "b2b85adbc757bad545bd32f4851d3527ba75fa115420c0b88eaba8fa36c5821c"
+      }
+      hash "e61bcfc33910aa1617470fc6d57b5e6549dfbdc01635e92776235cc99a9d770e"
+    }
+    hash "682c8a6f850e5ddbead3908be1b6c7f41906fbc1d8532e101419a643f2e28fae"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 710" -> "/us/pl/93/236/tVII/s710"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 667" -> "/us/stat/95/667"] ".)"
+  note "/us/usc/t45/s797i/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 797 of this title" -> "/us/usc/t45/s797"] ", referred to in subsecs. (a) and (b)(1), was repealed by " ["Pub. L. 99–509, title IV, § 4024(c)" -> "/us/pl/99/509/tIV/s4024/c"] ", Oct. 21, 1986, " ["100 Stat. 1904" -> "/us/stat/100/1904"] ", effective on the sale date (Apr. 2, 1987)."
+    p "Section 797l of this title, referred to in subsec. (a), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(2)" -> "/us/pl/99/509/tIV/s4033/a/2"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] ", and a new section 797l of this title was subsequently added by " ["Pub. L. 104–88, § 327(5)" -> "/us/pl/104/88/s327/5"] "."
+    hash "2fed793a999bc1c550113a2075b67ea6f92866194140eae327b8711132b0afe2"
+  }
+  note "/us/usc/t45/s797i/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "682c8a6f850e5ddbead3908be1b6c7f41906fbc1d8532e101419a643f2e28fae"
+    enacted "10581fdc4141e11b6bd92aa6d6c12226ea3c48a5fcf100c51a91f7cd24e92a49"
+    editorial "180152fe474dd99a2869b6b8f1bb1cfd3e1e8e91f4f15553e5b02c69aa5e31c8"
+  }
+}

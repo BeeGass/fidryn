@@ -1,0 +1,83 @@
+edition 2
+module "/us/usc/ptIX/rule9010" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9010" courtRule {
+    num "9010" "Rule 9010."
+    heading "Authority to Act Personally or by an Attorney; Power of Attorney"
+    provision "/us/usc/ptIX/rule9010/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "A debtor, creditor, equity security holder, indenture trustee, committee, or other party may:"
+      provision "/us/usc/ptIX/rule9010/a/1" paragraph {
+        num "1" "(1)"
+        content "appear in a case and act either on the entity’s own behalf or through an attorney authorized to practice in the court; and"
+        hash "f24693a7f778b729de606fcd8db47c5aa62906f882d3155183b75df18b1bd02e"
+      }
+      provision "/us/usc/ptIX/rule9010/a/2" paragraph {
+        num "2" "(2)"
+        content "perform any act not constituting the practice of law, by an authorized agent, attorney-in-fact, or proxy."
+        hash "a1aa0eff46bab04672e866284c527e4a4ab444af1a0d92d4be3b914aaa65002a"
+      }
+      hash "e36892f3be5fa930e5a662848fd9f76f36de84b67e8eec294f92f878cd676588"
+    }
+    provision "/us/usc/ptIX/rule9010/b" subsection {
+      num "b" "(b)"
+      heading "Attorney’s Notice of Appearance."
+      content "An attorney appearing for a party in a case must file a notice of appearance containing the attorney’s name, office address, and telephone number—unless the appearance is already noted in the record."
+      hash "05f700e875329b605c8c13cd35f7a3e31b850b1a499217bd5da98df94b05f9c2"
+    }
+    provision "/us/usc/ptIX/rule9010/c" subsection {
+      num "c" "(c)"
+      heading "Power of Attorney to Represent a Creditor."
+      chapeau "The authority of an agent, attorney-in-fact, or proxy to represent a creditor—for any purpose other than executing and filing a proof of claim or accepting or rejecting a plan—must be evidenced by a power of attorney that substantially conforms to the appropriate version of Form 411. A power of attorney must be acknowledged before:"
+      provision "/us/usc/ptIX/rule9010/c/1" paragraph {
+        num "1" "(1)"
+        content "an officer listed in 28 U.S.C. § 459 or § 953 or in Rule 9012; or"
+        hash "f51ca12cf9329b4f3e6d0abb4d70026e013e273b7650b811815b8f70552fffa5"
+      }
+      provision "/us/usc/ptIX/rule9010/c/2" paragraph {
+        num "2" "(2)"
+        content "a person authorized to administer oaths under the state law where the oath is administered."
+        hash "ce17b48a745a86743ac76e5195430413359fdae0bbccb1c8690fb71f5e1afd11"
+      }
+      hash "e9331a732e300f54ec9d523ba4716aa94f8906ac2d32b6089f8d44d244d771ab"
+    }
+    hash "d50906a7a40ff8b8388a8da314557bee53dea9bdd38d868b2098dcb101398386"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is substantially the same as former Bankruptcy Rule 910 and does not purport to change prior holdings prohibiting a corporation from appearing pro se. See In re Las Colinas Development Corp., 585 F.2d 7 (1st Cir. 1978)."
+    hash "07f88562752f8cd1028b709a2e1cfc5875b7f66a6562aa5e0b370197043c621a"
+  }
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (c) is amended to include a reference to Rule 9012 which is amended to authorize a bankruptcy judge or clerk to administer oaths."
+    hash "3ce7df7cb02caabf5d968f7074c4e5327faed8ce245da6d80d73754fc0532fe0"
+  }
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "References to Official Form numbers in subdivision (c) are deleted in anticipation of future revision and renumbering of the Official Forms."
+    hash "a4af48f13315a585ba2cc8c40fa03110e42f1f6306045fd225d7c5b18b9e840e"
+  }
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8ae1dfacbd6bf02f4c3a66d18bd7f957005d247fa0ae0c0bcef4aa81db6ebbe7"
+  }
+  layers {
+    operative "d50906a7a40ff8b8388a8da314557bee53dea9bdd38d868b2098dcb101398386"
+    enacted "dd1a45d20b7696cdf51676f8a494bcf905356482bf7e799683c5c032325b22c7"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

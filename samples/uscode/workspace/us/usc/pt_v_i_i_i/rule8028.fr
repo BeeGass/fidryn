@@ -1,0 +1,46 @@
+edition 2
+module "/us/usc/ptVIII/rule8028" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8028" courtRule {
+    num "8028" "Rule 8028."
+    heading "Suspending These Part VIII Rules"
+    content "To expedite a decision or for other cause, a district court or BAP—or when appropriate, the court of appeals—may, in a particular case, suspend the requirements of these Part VIII rules, except Rules 8001–8007, 8012, 8020, 8024–8026, and 8028."
+    hash "83106051af4bfeab29bb2aacdf741ced005fbba7a6485fb2db14f6b820264a16"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8028/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8019 and F.R.App.P. 2. To promote uniformity of practice and compliance with statutory authority, the rule includes a more extensive list of requirements that may not be suspended than either the former rule or the Federal Rules of Appellate Procedure provide. Rules governing the following matters may not be suspended:"
+    p "• scope of the rules; definition of “BAP”; method of transmission;"
+    p "• time for filing a notice of appeal;"
+    p "• taking an appeal as of right;"
+    p "• taking an appeal by leave;"
+    p "• election to have an appeal heard by a district court instead of a BAP;"
+    p "• certification of direct appeal to a court of appeals;"
+    p "• stay pending appeal;"
+    p "• corporate disclosure statement;"
+    p "• sanctions for frivolous appeals and other misconduct;"
+    p "• clerk’s duties on disposition of an appeal;"
+    p "• stay of a district court’s or BAP’s judgment;"
+    p "• local rules; and"
+    p "• suspension of the Part VIII rules."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "310c4e86478bdee6515b737a1c1d71abe5e42d6b039049352519e391a87abdb5"
+  }
+  note "/us/usc/ptVIII/rule8028/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8028 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ed63abdf9794ce2e1adf59a7044d06689866c69e286455c1ae3183bccd3d82d0"
+  }
+  layers {
+    operative "83106051af4bfeab29bb2aacdf741ced005fbba7a6485fb2db14f6b820264a16"
+    enacted "6da9a1347cacbc193a4f0d12a34f9d78d1316ad6a6091cc5091225c751c74986"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

@@ -22,13 +22,15 @@
 //! their members and the outcome of every reference. The report
 //! ([`WorkspaceReport::to_json`]) and the list of the references that are
 //! not `exact` ([`WorkspaceReport::unresolved_lines`]) are written on
-//! request. This crate names no corpus; `xtask/tests/corpus_neutrality.rs`
-//! checks it for this directory.
+//! request. [`read_modules`] reads the modules of a workspace into the
+//! model, for what prints their text. This crate names no corpus;
+//! `xtask/tests/corpus_neutrality.rs` checks it for this directory.
 
 mod cache;
 mod check;
 mod discover;
 mod index;
+mod read;
 mod report;
 mod writer;
 
@@ -37,6 +39,7 @@ mod tests;
 
 pub use check::{CheckOptions, WorkspaceReport, check_workspace};
 pub use index::{PhaseTwo, Unresolved, check_interfaces};
+pub use read::read_modules;
 pub use report::CHECK_REPORT_SCHEMA;
 pub use writer::{Difference, GeneratedWriter, WriteError};
 

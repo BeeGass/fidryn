@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s1302" {
+  within "/us/usc/t45/ch22/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1302" section {
+    num "1302" "§ 1302."
+    heading "Purposes"
+    content "The purposes of this chapter are to transfer the interest of the United States in the common stock of the Corporation to the private sector in a manner that provides for the long-term viability of the Corporation, provides for the continuation by the Corporation of its rail service in the Northeast and Midwest, provides for the protection of the public interest in a sound rail transportation system, and, to the extent not inconsistent with such purposes, secures the maximum proceeds to the United States."
+    hash "16719a4d74fa2e31773c28527b8b142cc0a9776685aa6b4d8e493a3d8add74d0"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4003" -> "/us/pl/99/509/tIV/s4003"] ", Oct. 21, 1986, " ["100 Stat. 1893" -> "/us/stat/100/1893"] ".)"
+  layers {
+    operative "16719a4d74fa2e31773c28527b8b142cc0a9776685aa6b4d8e493a3d8add74d0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "20343bd846d74f8026141b895f1a0e912b445ee98318b47621887438a7cf5da9"
+  }
+}

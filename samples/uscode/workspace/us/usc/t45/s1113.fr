@@ -1,0 +1,63 @@
+edition 2
+module "/us/usc/t45/s1113" {
+  within "/us/usc/t45/ch20"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1113" section {
+    num "1113" "§ 1113."
+    heading "Intercity passenger service"
+    provision "/us/usc/t45/s1113/a" subsection {
+      num "a" "(a)"
+      heading "Responsibility of Conrail to provide crews terminated; negotiations for employee transfers"
+      content "After January 1, 1983, Conrail shall be relieved of the responsibility to provide crews for intercity passenger service on the Northeast Corridor. Amtrak, Amtrak Commuter, and Conrail, and the employees with seniority in both freight and passenger service shall commence negotiations not later than 120 days after August 13, 1981, for the right of such employees to move from one service to the other once each six-month period. Such agreement shall ensure that Conrail, Amtrak, and Amtrak Commuter have the right to furlough one employee in the same class or craft for each employee who returns through the exercise of seniority rights. If agreement is not reached within 360 days, such matter shall be submitted to binding arbitration."
+      hash "e609fef8e345fa484c6807068964ecc433d39b9504d39c33ada6e8d7c3b039ef"
+    }
+    provision "/us/usc/t45/s1113/b" subsection {
+      num "b" "(b)"
+      heading "Eligibility of employees for employee protection benefits"
+      content "Conrail employees who are deprived of employment by an assumption or discontinuance of intercity passenger service by Amtrak shall be eligible for employee protection benefits under section 797" mark "1" 1 " of this title, notwithstanding any other provision of law, agreement, or arrangement, and notwithstanding the inability of such employees otherwise to meet the eligibility requirements of such section. Such protection shall be the exclusive protection applicable to Conrail employees deprived of employment or adversely affected by any such assumption or discontinuance."
+      hash "cad8e6c1e7925ef4a7a5a3905f3ae2fb2c0bf59c506a16572284e6665f9370da"
+    }
+    hash "68298753414550b14a8d430ce1aaeee6b916d8f7e750fc15d13347b95e548eb8"
+  }
+  credit "(" ["Pub. L. 97–35, title XI, § 1165" -> "/us/pl/97/35/tXI/s1165"] ", Aug. 13, 1981, " ["95 Stat. 686" -> "/us/stat/95/686"] "; " ["Pub. L. 97–468, title V, § 505(a)" -> "/us/pl/97/468/tV/s505/a"] ", Jan. 14, 1983, " ["96 Stat. 2553" -> "/us/stat/96/2553"] ".)"
+  note "/us/usc/t45/s1113/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 797 of this title" -> "/us/usc/t45/s797"] ", referred to in subsec. (b), was repealed by " ["Pub. L. 99–509, title IV, § 4024(c)" -> "/us/pl/99/509/tIV/s4024/c"] ", Oct. 21, 1986, " ["100 Stat. 1904" -> "/us/stat/100/1904"] ", effective on the sale date (Apr. 2, 1987)."
+    hash "de53438368e092474b71105ee2a6d5068ac7e0774a2178690f54092afcf9a1e1"
+  }
+  note "/us/usc/t45/s1113/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "“August 13, 1981”, referred to in subsec. (a), was in the original “the date of the enactment”, which was editorially translated as the date of the enactment of this section, as the probable intent of Congress."
+    hash "488f116ad71135000ec3c8a7164b07b7e4ee9f98f4521cbd3dc09b6872a2c685"
+  }
+  note "/us/usc/t45/s1113/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—" ["Pub. L. 97–468, § 505(a)" -> "/us/pl/97/468/s505/a"] ", designated existing provisions as subsec. (a) and added subsec. (b)."
+    hash "a1934b7d27a48dc9a1bbf937bc44412950adbad8b1cbbecbd1f4eb9fe0e42058"
+  }
+  note "/us/usc/t45/s1113/note/statutoryNotes/pl.97.377/conrail-employees-eligible-for-employee-protection-benefits" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Conrail Employees Eligible for Employee Protection Benefits Under Regional Rail Reorganization Act of 1973"
+    p ["Pub. L. 97–377, title I, § 137" -> "/us/pl/97/377/tI/s137"] ", Dec. 21, 1982, " ["96 Stat. 1915" -> "/us/stat/96/1915"] ", provided that:"
+    quoted "/us/pl/97/377/tI/s137" {
+      p "“Conrail employees who are deprived of employment by assumption or discontinuance of intercity passenger service by Amtrak shall hereafter be eligible for employee protection benefits under section 701 of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 797" -> "/us/usc/t45/s797"] "), notwithstanding any other provision of law, agreement, or arrangement, and notwithstanding the inability of such employees otherwise to meet the eligibility requirements of such section. Such protection shall be the exclusive protection applicable to Conrail employees deprived of employment or adversely affected by any such assumption or discontinuance.”"
+    }
+    hash "8f720543763e212b542d99e83d6f7c3e4f6d5d7556e5b88d9998d5e908e4fbbc"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "68298753414550b14a8d430ce1aaeee6b916d8f7e750fc15d13347b95e548eb8"
+    enacted "bed16cec0ffee2951135faa04affdd01eaba81444822f1ea19fb4b4e83909543"
+    editorial "bd896eae9e4fd4ea007ad2d33415f412afd6c2b0d090d1692ac4a93d3a50adfb"
+  }
+}

@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s1006" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1006" section {
+    num "1006" "§ 1006."
+    heading "Repealed. " ["Pub. L. 97–35, title XI, § 1144(b)" -> "/us/pl/97/35/tXI/s1144/b"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"]
+    status repealed
+    hash "1a8b9bbd8dc3e8b75a0c8bd8bc1930a19ee9359c3d4f2dbfac8b76b976bf933b"
+  }
+  note "/us/usc/t45/s1006/note/ungrouped/pl.96.254/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 96–254, title I, § 107" -> "/us/pl/96/254/tI/s107"] ", May 30, 1980, " ["94 Stat. 402" -> "/us/stat/94/402"] ", set forth provisions respecting employment of Rock Island Railroad employees. See " ["section 797c of this title" -> "/us/usc/t45/s797c"] "."
+    hash "304c4649aad9541371e6e13c8fd3f4ff5b8c8defaca1c8ae18919a98f0b84d38"
+  }
+  note "/us/usc/t45/s1006/note/statutoryNotes/pl.97.35/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "c0ef60c1a1f1ec4ebf79dec55de5fac5ff5616a2870219aa662a8252d5276d31"
+  }
+  layers {
+    operative "1a8b9bbd8dc3e8b75a0c8bd8bc1930a19ee9359c3d4f2dbfac8b76b976bf933b"
+    enacted "8e8aea54d055a16faef9244d06b2d84c29d2801570ed911635fc4eb575904090"
+    editorial "3f6dd0cdb06e5450b0d07087ad080b2da1044c2936cd42e914cad42882857bb5"
+  }
+}

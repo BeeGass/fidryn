@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s641" {
+  within "/us/usc/t45/ch14/schVIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s641" section {
+    num "641" "§ 641."
+    heading "Repealed. " ["Pub. L. 96–73, title I, § 111(b)" -> "/us/pl/96/73/tI/s111/b"] ", Sept. 29, 1979, " ["93 Stat. 541" -> "/us/stat/93/541"]
+    status repealed
+    hash "02f3093f786f550e8a8b0c20e80275f69d5a8008f7daf5477b46e529559bc3f3"
+  }
+  note "/us/usc/t45/s641/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 91–518, title VIII, § 801" -> "/us/pl/91/518/tVIII/s801"] ", Oct. 30, 1970, " ["84 Stat. 1339" -> "/us/stat/84/1339"] "; " ["Pub. L. 93–146, § 14" -> "/us/pl/93/146/s14"] ", Nov. 3, 1973, " ["87 Stat. 554" -> "/us/stat/87/554"] "; " ["Pub. L. 93–496, § 10" -> "/us/pl/93/496/s10"] ", Oct. 28, 1974, " ["88 Stat. 1531" -> "/us/stat/88/1531"] "; " ["Pub. L. 94–555, title I, § 108" -> "/us/pl/94/555/tI/s108"] ", Oct. 19, 1976, " ["90 Stat. 2616" -> "/us/stat/90/2616"] ", provided for promulgation and revision of regulations for adequacy of service and for maintenance of civil actions for enforcement of provisions."
+    hash "9025d72a47a36a07b1e575955be1c46b3011dcb49dc0cf4d88c940c852a48857"
+  }
+  note "/us/usc/t45/s641/note/statutoryNotes/pl.96.73/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal effective Oct. 1, 1979, see " ["section 501(a) of Pub. L. 96–73" -> "/us/pl/96/73/s501/a"] "."
+    hash "81792e12ba80b9666acf7760c1bdaa1f6541617d3c67dd3278a895e98357feaf"
+  }
+  layers {
+    operative "02f3093f786f550e8a8b0c20e80275f69d5a8008f7daf5477b46e529559bc3f3"
+    enacted "9647b0497f4bfa0006dc9efaee56cc26ef5c5cdf52de36523cfe51d8e933fa37"
+    editorial "d5a010b40f6d47f70dfb0060514121b97b1465b8fe28e33d0455e30e5b61e35d"
+  }
+}

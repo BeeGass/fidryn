@@ -108,7 +108,7 @@ fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and mill UI; ingest command (driver + provision + ingest-uscode)
+fidryn-cli             fidryn binary and mill UI; ingest and text commands (driver + provision + ingest-uscode)
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
@@ -265,6 +265,7 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
+fidryn text DIR [ADDRESS] [--json]
 ```
 
 Every subcommand also takes `--source-root PATH`. `run` never chooses a

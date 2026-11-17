@@ -1,0 +1,350 @@
+edition 2
+module "/us/usc/ptVIII/rule8013" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8013" courtRule {
+    num "8013" "Rule 8013."
+    heading "Motions; Interventions"
+    provision "/us/usc/ptVIII/rule8013/a" subsection {
+      num "a" "(a)"
+      heading "Content of a Motion; Response; Reply."
+      provision "/us/usc/ptVIII/rule8013/a/1" paragraph {
+        num "1" "(1)"
+        content "Request for Relief. A request for an order or other relief is made by filing a motion with the district or BAP clerk."
+        hash "51a8af61251060908ecc74ab71b8d69f0ddce23c1d4e25ab52cd7023c26ba68f"
+      }
+      provision "/us/usc/ptVIII/rule8013/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content of a Motion."
+        provision "/us/usc/ptVIII/rule8013/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "Grounds, Relief Sought, and Supporting Argument. A motion must state with particularity the grounds for the motion, the relief sought, and the legal argument supporting it."
+          hash "cd31e8e17f3a5eb7d63df27e8b1c9779b708289b4f11c222c71d92ce27826777"
+        }
+        provision "/us/usc/ptVIII/rule8013/a/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Motion to Expedite an Appeal. A motion to expedite an appeal must explain what justifies considering the appeal ahead of other matters. The motion may be filed as an emergency motion under (d). If it is granted, the district court or BAP may accelerate the time to:"
+          provision "/us/usc/ptVIII/rule8013/a/2/B/i" clause {
+            num "i" "(i)"
+            content "send the record;"
+            hash "b531b51d2bcdcf6dc3781bae9ef5f5ccb69e2c6fc9197c83a82981fd5fd93cef"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "file briefs and other documents;"
+            hash "ad2db6623b74883675d41ea91d33eb45174ed459202a5f1dd6e201ae83c5cd83"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/B/iii" clause {
+            num "iii" "(iii)"
+            content "conduct oral argument; and"
+            hash "b250eaa5c8a0c8576ef6988ef731730bccb2f1aada753793c1ec5119d3283dcf"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/B/iv" clause {
+            num "iv" "(iv)"
+            content "resolve the appeal."
+            hash "d80f8086604fd5bc018f700e5993d1ff1c3f5c46e8cef404363284ff17a63109"
+          }
+          hash "1bb7bac5ebf55e643366b1abf908e3ce9eb32e461d6bf3cf30586ab733212dd0"
+        }
+        provision "/us/usc/ptVIII/rule8013/a/2/C" subparagraph {
+          num "C" "(C)"
+          chapeau "Accompanying Documents."
+          provision "/us/usc/ptVIII/rule8013/a/2/C/i" clause {
+            num "i" "(i)"
+            content "Supporting Document. Any affidavit or other document necessary to support a motion must be served and filed with the motion."
+            hash "e3f0a496c8d33a09757cc4d47c730a6e6eb779c31c2d4dfa5a732561017917df"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/C/ii" clause {
+            num "ii" "(ii)"
+            content "Content of Affidavit. An affidavit must contain only factual information, not legal argument."
+            hash "8a2de726c2a25568fd2cf010e3c128569a1dc8f5d27df42c6bdc6f9cb46a2622"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/C/iii" clause {
+            num "iii" "(iii)"
+            content "Motion Seeking Substantive Relief. A motion seeking substantive relief must include a copy of the bankruptcy court’s judgment, order, or decree, and any accompanying opinion as a separate exhibit."
+            hash "1913e3c8ee859d13bff1410633c7f52986e44a786b5adc7635116473197ba6f6"
+          }
+          hash "2a14d803f157136b02d30ea9a6178d836640d42a45b03545bf6451897abd28e9"
+        }
+        provision "/us/usc/ptVIII/rule8013/a/2/D" subparagraph {
+          num "D" "(D)"
+          chapeau "Documents Barred or Not Required."
+          provision "/us/usc/ptVIII/rule8013/a/2/D/i" clause {
+            num "i" "(i)"
+            content "No Separate Brief. A separate brief supporting or responding to a motion must not be filed."
+            hash "247fd8c99c4446d0dde5d722e85231237aa02e71352a77bd7b56e07bb4b08c87"
+          }
+          provision "/us/usc/ptVIII/rule8013/a/2/D/ii" clause {
+            num "ii" "(ii)"
+            content "Notice and Proposed Order Not Required. Unless the court orders otherwise, a notice of motion or a proposed order is not required."
+            hash "86fd02529ce00acaeceeba422874a6568e79e64058f4cf865d2cf1aac67d17af"
+          }
+          hash "198a6e527af42b34618f50714488641901487a3750111d5144b2a52131e682a7"
+        }
+        hash "e50531a1d94bb2c212f7b6a204aad5a44d52ece6f0d49d0b432da1e353126e1d"
+      }
+      provision "/us/usc/ptVIII/rule8013/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "Response and Reply; Time to File. Unless the district court or BAP orders otherwise:"
+        provision "/us/usc/ptVIII/rule8013/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "any party to the appeal may—within 7 days after the motion is served—file a response to the motion; and"
+          hash "5365ede319a14dae643b08ec8dd7f40b3d4bc8a5836b25a281be8e9a7ec67d3b"
+        }
+        provision "/us/usc/ptVIII/rule8013/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "the movant may—within 7 days after the response is served—file a reply that addresses only matters raised in the response."
+          hash "867da00d6a5bce01cff839fd0a3d51a27e2d5201bb6c0ef8b8410575b8f7fea7"
+        }
+        hash "4948a562b1ae8b92e8e54bca387bdb054b79ddd6aa14e8017bac8b86a672a0e8"
+      }
+      hash "8535f2407ca026e474d5da532ecfa60936315ee972f309c45d933a0a0fbb7d45"
+    }
+    provision "/us/usc/ptVIII/rule8013/b" subsection {
+      num "b" "(b)"
+      heading "Disposition of a Motion for a Procedural Order."
+      content "The district court or BAP may rule on a motion for a procedural order—including a motion under Rule 9006(b) or (c)—at any time, without awaiting a response. A party adversely affected by the ruling may move to reconsider, vacate, or modify it within 7 days after the order is served."
+      hash "e5a8bcfa83c1a8c6c1716c8d870d858537e2b4380d7aa8b994db6aa0e94099ce"
+    }
+    provision "/us/usc/ptVIII/rule8013/c" subsection {
+      num "c" "(c)"
+      heading "Oral Argument."
+      content "A motion will be decided without oral argument unless the district court or BAP orders otherwise."
+      hash "7c76c435431359414894ab1e66b412889b874cde1d03a2dfddab5806c5e4a8a3"
+    }
+    provision "/us/usc/ptVIII/rule8013/d" subsection {
+      num "d" "(d)"
+      heading "Emergency Motion."
+      provision "/us/usc/ptVIII/rule8013/d/1" paragraph {
+        num "1" "(1)"
+        content "Noting the Emergency. A movant who requests expedited action—because irreparable harm would occur during the time needed to consider a response—must insert “Emergency” before the motion’s title."
+        hash "fafc8c84ce851d4822a62617a3f0ef8df77ba8f8b9b79c648f530f3510c6dffe"
+      }
+      provision "/us/usc/ptVIII/rule8013/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content. An emergency motion must:"
+        provision "/us/usc/ptVIII/rule8013/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "be accompanied by an affidavit setting forth the nature of the emergency;"
+          hash "8b4f008a0294e6482f0e1ecba184136723de9dc30ad9375c26111caa18f33fe1"
+        }
+        provision "/us/usc/ptVIII/rule8013/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "state whether all grounds for it were previously submitted to the bankruptcy court and, if not, why the motion should not be remanded;"
+          hash "16911fa191041c1d440f57f663f31ff257522be01f3a6c06065adbbe5825dec5"
+        }
+        provision "/us/usc/ptVIII/rule8013/d/2/C" subparagraph {
+          num "C" "(C)"
+          chapeau "include:"
+          provision "/us/usc/ptVIII/rule8013/d/2/C/i" clause {
+            num "i" "(i)"
+            content "the email address, office address, and telephone number of the moving counsel; and"
+            hash "b4780beb7b1f77d2ebb6e7ab29aba18cfa138484bf44a81859d6303e80f3cbae"
+          }
+          provision "/us/usc/ptVIII/rule8013/d/2/C/ii" clause {
+            num "ii" "(ii)"
+            content "when known, the same information as in (i) for opposing counsel and any unrepresented party to the appeal; and"
+            hash "6f354b9a288fea40cf4a8cef48de58fd38148054769627b13f2817dfec3a900a"
+          }
+          hash "ca8b63671843feb3930fc4c3d3fcef0dbb5eed66bb43b9d11ec9d80d2f084dc2"
+        }
+        provision "/us/usc/ptVIII/rule8013/d/2/D" subparagraph {
+          num "D" "(D)"
+          content "be served as Rule 8011 prescribes."
+          hash "cab3c4b430f5e143840783071772916016a9016a46f1cde474f47da634db628b"
+        }
+        hash "5133afd8de83b6babebe25de123285be7442f7d7d7e8152719139f1d7a84f0cd"
+      }
+      provision "/us/usc/ptVIII/rule8013/d/3" paragraph {
+        num "3" "(3)"
+        chapeau "Notifying Opposing Parties. Before filing an emergency motion, the movant must make every practicable effort to notify opposing counsel and any unrepresented party in time for them to respond. The affidavit accompanying the motion must state:"
+        provision "/us/usc/ptVIII/rule8013/d/3/A" subparagraph {
+          num "A" "(A)"
+          content "when and how notice was given; or"
+          hash "b59eaa753151c43de5d081de09ac446f6a19db96756b63cb40401597ff11112c"
+        }
+        provision "/us/usc/ptVIII/rule8013/d/3/B" subparagraph {
+          num "B" "(B)"
+          content "why giving it was impracticable."
+          hash "f1b4a4723d4f47ade153ddf979aaffe9a9d9329c968baa04a108b7a7e484eb77"
+        }
+        hash "f9295b014ecfee8e888ea36512bf0523326f7bc30bf0dda78ce94d6aa7ccfbba"
+      }
+      hash "720888c80fecde858a4190e66d2262e369d83e6fa1b018174a5c1bd3c85edc5d"
+    }
+    provision "/us/usc/ptVIII/rule8013/e" subsection {
+      num "e" "(e)"
+      heading "Motion Considered by a Single BAP Judge."
+      provision "/us/usc/ptVIII/rule8013/e/1" paragraph {
+        num "1" "(1)"
+        chapeau "Judge’s Authority. A BAP judge may act alone on any motion but may not:"
+        provision "/us/usc/ptVIII/rule8013/e/1/A" subparagraph {
+          num "A" "(A)"
+          content "dismiss or otherwise determine an appeal;"
+          hash "78008b4204b2773e27b3832a109e189572fd6adfd879701e5352a619fde88e5f"
+        }
+        provision "/us/usc/ptVIII/rule8013/e/1/B" subparagraph {
+          num "B" "(B)"
+          content "deny a motion for leave to appeal; or"
+          hash "caccfae671662cf79f71c01134e32852d11b42d0c5c880cb1a6871a5de321808"
+        }
+        provision "/us/usc/ptVIII/rule8013/e/1/C" subparagraph {
+          num "C" "(C)"
+          content "deny a motion for a stay pending appeal if denial would make the appeal moot."
+          hash "2e4d5cdd8ae6cb8f0028e140652c724eb75a2abb311665d781ed6451dc8cf810"
+        }
+        hash "0458774582e130af07a51128dc0887cb724b8740505c0ccaefd5d307fe4dc293"
+      }
+      provision "/us/usc/ptVIII/rule8013/e/2" paragraph {
+        num "2" "(2)"
+        content "Reviewing a Single Judge’s Action. The BAP, on its own or on a party’s motion, may review a single judge’s action."
+        hash "bf489fedb4940d85152bdddd1365709ba6a0446c71e40b6ea664f1b9867107cb"
+      }
+      hash "460e6ea676b204942d2ee9055375e3a1e4385f568a6896df81c2b30941c0d6bf"
+    }
+    provision "/us/usc/ptVIII/rule8013/f" subsection {
+      num "f" "(f)"
+      heading "Form of Documents; Length Limits; Number of Copies."
+      provision "/us/usc/ptVIII/rule8013/f/1" paragraph {
+        num "1" "(1)"
+        content "Document Filed in Paper Form. Fed. R. App. P. 27(d)(1) applies to a motion, response, or reply filed in paper form in the district court or BAP."
+        hash "ce6be9f37370fd74da5f678d702c2bf445af87356b06249eeeeb85ec23c1b24d"
+      }
+      provision "/us/usc/ptVIII/rule8013/f/2" paragraph {
+        num "2" "(2)"
+        content "Document Filed Electronically. A motion, response, or reply filed electronically must comply with the requirements in (1) for covers, line spacing, margins, typeface, and type style. It must also comply with the length limits in (3)."
+        hash "0568f907ad28914635753063887108044def9e58cf9d8dda9ab29562a52b470b"
+      }
+      provision "/us/usc/ptVIII/rule8013/f/3" paragraph {
+        num "3" "(3)"
+        chapeau "Length Limits. Except by the district court’s or BAP’s permission, and excluding the accompanying documents authorized by (a)(2)(C):"
+        provision "/us/usc/ptVIII/rule8013/f/3/A" subparagraph {
+          num "A" "(A)"
+          content "a motion or a response to a motion produced using a computer must include a certificate under Rule 8015(h) and not exceed 5,200 words;"
+          hash "0b9c3b17fe52fc4219660e3952875aa905b5ba8e3d10f40b7ff53bfa7f28b416"
+        }
+        provision "/us/usc/ptVIII/rule8013/f/3/B" subparagraph {
+          num "B" "(B)"
+          content "a handwritten or typewritten motion or a response to a motion must not exceed 20 pages;"
+          hash "60e5c2f97628408395de0bd6eed1db25bf1958b0f23f3174d82aed07a2a0760d"
+        }
+        provision "/us/usc/ptVIII/rule8013/f/3/C" subparagraph {
+          num "C" "(C)"
+          content "a reply produced using a computer must include a certificate under Rule 8015(h) and not exceed 2,600 words; and"
+          hash "4e79d3390a641aa0bbeec5826a5857a33a74af425cd66e6bfec539bd35b08555"
+        }
+        provision "/us/usc/ptVIII/rule8013/f/3/D" subparagraph {
+          num "D" "(D)"
+          content "a handwritten or typewritten reply must not exceed 10 pages."
+          hash "80306cd12c930111e19c02b8c4099b2bf1a6bc7abf1fd7b90e2282d1e50eeb3b"
+        }
+        hash "4c050285371375e8f0c50f66202fb96eda66f22e05d39527ba15a3e3a700cfaa"
+      }
+      provision "/us/usc/ptVIII/rule8013/f/4" paragraph {
+        num "4" "(4)"
+        content "Providing Paper Copies. Paper copies must be provided only if required by a local rule or by an order in a particular case."
+        hash "a55206502e934d2ea6b6cd3293546046bb4288b1d7c4f6476dff19abe6361488"
+      }
+      hash "3ed446134da9d77b935b3e6258b9109af07b568aed6181c93151fdcffcc4a8b7"
+    }
+    provision "/us/usc/ptVIII/rule8013/g" subsection {
+      num "g" "(g)"
+      heading "Motion for Leave to Intervene."
+      provision "/us/usc/ptVIII/rule8013/g/1" paragraph {
+        num "1" "(1)"
+        content "Time to File. Unless a statute provides otherwise, an entity seeking to intervene in an appeal in the district court or BAP must move for leave to intervene and serve a copy of the motion on all parties to the appeal. The motion—or other notice of intervention authorized by statute—must be filed within 30 days after the appeal is docketed."
+        hash "74a6758a76a159477f8347a453eabe6834639277bb169a4e95ebd4fe18cf4cc3"
+      }
+      provision "/us/usc/ptVIII/rule8013/g/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content. The motion must concisely state:"
+        provision "/us/usc/ptVIII/rule8013/g/2/A" subparagraph {
+          num "A" "(A)"
+          content "the movant’s interest;"
+          hash "75e710646dd30fbf50a193aa585b3227c57e406ab4d3f2d551df6a889cb4bb3b"
+        }
+        provision "/us/usc/ptVIII/rule8013/g/2/B" subparagraph {
+          num "B" "(B)"
+          content "the grounds for intervention;"
+          hash "08d192d47743c2766dd010133d95fef7bf00a0e9f2b8c6a35834e8034fd2f50f"
+        }
+        provision "/us/usc/ptVIII/rule8013/g/2/C" subparagraph {
+          num "C" "(C)"
+          content "whether intervention was sought in the bankruptcy court;"
+          hash "5dd7df0b336820faea993df056721fd0e597779e1786289a2e13203b2bedcf81"
+        }
+        provision "/us/usc/ptVIII/rule8013/g/2/D" subparagraph {
+          num "D" "(D)"
+          content "why intervention is being sought at this stage of the proceedings; and"
+          hash "6beef77a250b8a96bb2a083e220ff6822daf962dff8c188d723d19f9219804e6"
+        }
+        provision "/us/usc/ptVIII/rule8013/g/2/E" subparagraph {
+          num "E" "(E)"
+          content "why participating as an amicus curiae—rather than intervening—would not be adequate."
+          hash "995d80b78474dc96886430e4d68161cf0ac1f2674a1915acf7af8a45d52bf2b0"
+        }
+        hash "44da1d954dc504554cfcf6e418d24e2fbb67105f605adee37c317c13c81a37d6"
+      }
+      hash "fe3a43413dfbb57936883fac41d02690e5e4a8f26e8094c27a4bfe1c329f4117"
+    }
+    hash "d977f61e1c80a0bcf9e975907f32b9d5968f33cc3ab3582d015554d10d8f115e"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8013, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to disposition of appeal and weight accorded bankruptcy judge’s findings of fact, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "9276f7e7368f8a3e394040f8ac3a525f0eeeb2be93a6d3946e20d285a0dd299e"
+  }
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8011 and F.R.App.P. 15(d) and 27. It adopts many of the provisions of the appellate rules that specify the form and page limits of motions and accompanying documents, while also adjusting those requirements for electronic filing. In addition, it prescribes the procedure for seeking to intervene in the district court or BAP."
+    p "Subdivision (a) retains much of the content of former Rule 8011(a) regarding the contents of a motion, response, and reply. It also specifies the documents that may accompany a motion. Unlike the former rule, which allowed the filing of separate briefs supporting a motion, subdivision (a) now adopts the practice of F.R.App.P. 27(a) of prohibiting the filing of briefs supporting or responding to a motion. The motion or response itself must include the party’s legal arguments."
+    p "Subdivision (a)(2)(B) clarifies the procedure for seeking to expedite an appeal. A motion under this provision seeks to expedite the time for the disposition of the appeal as a whole, whereas an emergency motion—which is addressed by subdivision (d)—typically involves an urgent request for relief short of disposing of the entire appeal (for example, an emergency request for a stay pending appeal to prevent imminent mootness). In appropriate cases—such as when there is an urgent need to resolve the appeal quickly to prevent harm—a party may file a motion to expedite the appeal as an emergency motion."
+    p "Subdivision (b) retains the substance of former Rule 8011(b). It authorizes the district court or BAP to act on a motion for a procedural order without awaiting a response to the motion. It specifies that a party seeking reconsideration, vacation, or modification of the order must file a motion within 7 days after service of the order."
+    p "Subdivision (c) continues the practice of former Rule 8011(c) and F.R.App.P. 27(e) of dispensing with oral argument of motions in the district court or BAP unless the court orders otherwise."
+    p "Subdivision (d), which carries forward the content of former Rule 8011(d), governs emergency motions that the district court or BAP may rule on without awaiting a response when necessary to prevent irreparable harm. A party seeking expedited action on a motion in the district court or BAP must explain the nature of the emergency, whether all grounds in support of the motion were first presented to the bankruptcy court, and, if not, why the district court or BAP should not remand for reconsideration. The moving party must also explain the steps taken to notify opposing counsel and any unrepresented parties in advance of filing the emergency motion and, if they were not notified, why it was impracticable to do so."
+    p "Subdivision (e), like former Rule 8011(e) and similar to F.R.App.P. 27(c), authorizes a single BAP judge to rule on certain motions. This authority, however, does not extend to issuing rulings that would dispose of the appeal. For that reason, the rule now prohibits a single BAP judge from denying a motion for a stay pending appeal when the effect of that ruling would be to require dismissal of the appeal as moot. A ruling by a single judge is subject to review by the BAP."
+    p "Subdivision (f) incorporates by reference the formatting and appearance requirements of F.R.App.P. 27(d)(1). When paper versions of the listed documents are filed, they must comply with the requirements of the specified rules regarding reproduction, covers, binding, appearance, and format. When these documents are filed electronically, they must comply with the relevant requirements of the specified rules regarding covers and format. Subdivision (f) also specifies page limits for motions, responses, and replies, which is a matter that former Rule 8011 did not address."
+    p "Subdivision (g) clarifies the procedure for seeking to intervene in a proceeding that has been appealed. It is based on F.R.App.P. 15(d), but it also requires the moving party to explain why intervention is being sought at the appellate stage. The former Part VIII rules did not address intervention."
+    p "Changes Made After Publication and Comment. Subdivision (a)(2)(D) was changed to allow the court to require a notice of motion or proposed order. A stylistic change was made to subdivision (d)(2)(B)."
+    hash "6ff91c9b91b3031163e1a045900ebedbcbfa8c837a45f2ed34a3868150eac3c5"
+  }
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Subdivision (f)(3) is amended to conform to F.R.App.P. 27(d)(2), which was recently amended to replace page limits with word limits for motions and responses produced using a computer. The word limits were derived from the current page limits, using the assumption that one page is equivalent to 260 words. Documents produced using a computer must include the certificate of compliance required by Rule 8015(h); Official Form 417C suffices to meet that requirement. Page limits are retained for papers prepared without the aid of a computer (i.e., handwritten or typewritten papers). For both the word limit and the page limit, the calculation excludes the accompanying documents required by Rule 8013(a)(2)(C) and any items listed in Rule 8015(h)."
+    hash "adb134e0a49909fdcd0836eeee290d6f8639d354b6333ccfb90a2b6574f152aa"
+  }
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2020 Amendment"
+    p "Subdivision (a)(1) is amended to delete the reference to proof of service. This change reflects the recent amendment to Rule 8011(d) that eliminated the requirement of proof of service when filing and service are completed using a court’s electronic-filing system."
+    hash "8944abf7bb5e2e26fbcb622907a6fc81f6d77380496794eee40446dc006e85c4"
+  }
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "97d9db28ef94911ece70b527bf1887c36053fd8b48d8d88b2d7d564d004c5005"
+  }
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Appellate Procedure, referred to in subd. (f)(1), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "db9103e9d3ca3dd2e3ad8a2cf49c60cd634858e64622d1d7dce33aefe2bb36d2"
+  }
+  layers {
+    operative "d977f61e1c80a0bcf9e975907f32b9d5968f33cc3ab3582d015554d10d8f115e"
+    enacted "a00164c5bd10389aa134338271712aeb570867070026262a449448934d2db36c"
+    editorial "9bd3e91f90a7aba65330077820eaec12523711029e53abd6638d77c2dfe5e86a"
+  }
+}

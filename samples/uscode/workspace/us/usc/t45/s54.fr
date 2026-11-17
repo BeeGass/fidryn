@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s54" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s54" section {
+    num "54" "§ 54."
+    heading "Assumption of risks of employment"
+    content "In any action brought against any common carrier under or by virtue of any of the provisions of this chapter to recover damages for injuries to, or the death of, any of its employees, such employee shall not be held to have assumed the risks of his employment in any case where such injury or death resulted in whole or in part from the negligence of any of the officers, agents, or employees of such carrier; and no employee shall be held to have assumed the risks of his employment in any case where the violation by such common carrier of any statute enacted for the safety of employees contributed to the injury or death of such employee."
+    hash "3446f58705b3679f7afcd6d73a481bd9c4dc48bf7cb4315cfb9346ebe0046e96"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 4" -> "/us/act/1908-04-22/ch149/s4"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] "; " ["Aug. 11, 1939, ch. 685, § 1" -> "/us/act/1939-08-11/ch685/s1"] ", " ["53 Stat. 1404" -> "/us/stat/53/1404"] ".)"
+  note "/us/usc/t45/s54/note/editorialNotes/nolaw/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1939—Act Aug. 11, 1939, inserted “where such injury or death resulted in whole or in part from the negligence of any of the officers, agents, or employees of such carrier; and no employee shall be held to have assumed the risks of his employment in any case” after “of his employment in any case”."
+    hash "51f64d6f3915ef663f2569096a335f6f16dd020907e79bb563fd532320c2070b"
+  }
+  layers {
+    operative "3446f58705b3679f7afcd6d73a481bd9c4dc48bf7cb4315cfb9346ebe0046e96"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d6c9e83200d36b1a0705451921b04490cfbf79697e3fa334380e572d2cbfdd29"
+  }
+}

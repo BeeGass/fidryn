@@ -1,0 +1,119 @@
+edition 2
+module "/us/usc/ptII/rule2007.2" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2007.2" courtRule {
+    num "2007.2" "Rule 2007.2."
+    heading "Appointing a Patient-Care Ombudsman in a Health Care Business Case"
+    provision "/us/usc/ptII/rule2007.2/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "In a Chapter 7, 9, or 11 case in which the debtor is a health care business, the court must order the appointment of a patient-care ombudsman under § 333—unless the court, on motion of the United States trustee or a party in interest, finds that appointing one is not necessary to protect patients. The motion must be filed within 21 days after the case was commenced or at another time set by the court."
+      hash "35a3bb47b54481b1fa51d7b25288229f6abb87fc0a43538a272782a55a3246f9"
+    }
+    provision "/us/usc/ptII/rule2007.2/b" subsection {
+      num "b" "(b)"
+      heading "Deferring the Appointment."
+      content "If the court has found that appointing an ombudsman is unnecessary, or has terminated the appointment, the court may, on motion of the United States trustee or a party in interest, order an appointment later if it finds that an appointment has become necessary to protect patients."
+      hash "ea0712f342cb1f7dcbcb190bd139352e8a191cd8ede4489b4655c7d077eaf5c0"
+    }
+    provision "/us/usc/ptII/rule2007.2/c" subsection {
+      num "c" "(c)"
+      heading "Giving Notice."
+      chapeau "When a patient-care ombudsman is appointed under § 333, the United States trustee must promptly file a notice of the appointment, including the name and address of the person appointed. Unless that person is a State Long-Term-Care Ombudsman, the notice must be accompanied by a verified statement of the person appointed setting forth that person’s connections with:"
+      provision "/us/usc/ptII/rule2007.2/c/1" paragraph {
+        num "1" "(1)"
+        content "the debtor;"
+        hash "909900c3cf17a3c37ac40eeadedfdcbf4330ab17857f9c8086498df72c137c1a"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/2" paragraph {
+        num "2" "(2)"
+        content "creditors;"
+        hash "685626cdcc2a9e391a383870e2dcb9523cf1f7e230c716a53de7d9c4cb87360e"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/3" paragraph {
+        num "3" "(3)"
+        content "patients;"
+        hash "e881f214e0e31cb57693be4efec83b8d67416acbb8636411f792cc5d3a33094c"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/4" paragraph {
+        num "4" "(4)"
+        content "any other party in interest;"
+        hash "48dd37bb63374cecca4d587ed153fb9868a8cc869c6040f1390d993b18c0b5f2"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/5" paragraph {
+        num "5" "(5)"
+        content "the attorneys and accountants of those in (1)–(4);"
+        hash "ca0f7c4cd949d144a57341ef6001934c8896890674c18eec6bdae3141c188167"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/6" paragraph {
+        num "6" "(6)"
+        content "the United States trustee; or"
+        hash "8022f001271ecc65ac7aa8c60ec57fca58e115c50404c46111008ba1a5b713f1"
+      }
+      provision "/us/usc/ptII/rule2007.2/c/7" paragraph {
+        num "7" "(7)"
+        content "any person employed in the United States trustee’s office."
+        hash "9a93212e5512e309c671bab6fb35228397d428751bcfa3a9de004308c3a97a1e"
+      }
+      hash "de03bbfbd6fbfadf74744eb56215a4a7100ebe667e507206ef3b31d1bde92ac0"
+    }
+    provision "/us/usc/ptII/rule2007.2/d" subsection {
+      num "d" "(d)"
+      heading "Terminating an Appointment."
+      content "On motion of the United States trustee or a party in interest, the court may terminate a patient-care ombudsman’s appointment that it finds to be unnecessary to protect patients."
+      hash "f44d5241ffad0ca30ffd19d9537015b26b55687bb38a0cce78600d18304335f0"
+    }
+    provision "/us/usc/ptII/rule2007.2/e" subsection {
+      num "e" "(e)"
+      heading "Procedure."
+      content {
+        p "Rule 9014 governs any motion under this Rule 2007.2. The motion must be sent to the United States trustee and served on:"
+        p "• the debtor;"
+        p "• the trustee;"
+        p "• any committee elected under § 705 or appointed under § 1102, or its authorized agent; and"
+        p "• any other entity as the court orders."
+      }
+      continuation "In a Chapter 9 or 11 case, if no committee of unsecured creditors has been appointed under § 1102, the motion must also be served on the creditors included on the list filed under Rule 1007(d)."
+      hash "c38926ff6f7e18b181def289c031ed6947382a60bf41a21e2264693aa55147dd"
+    }
+    hash "b756e36206a67641dff6a781f8a41f854da62a2b377315f0f8b48d55e11e641a"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "Section 333 of the Code, added by the 2005 amendments, requires the court to order the appointment of a health care ombudsman within the first 30 days of a health care business case, unless the court finds that the appointment is not necessary for the protection of patients. The rule recognizes this requirement and provides a procedure by which a party may obtain a court order finding that the appointment of a patient care ombudsman is unnecessary. In the absence of a timely motion under subdivision (a) of this rule, the court will enter an order directing the United States trustee to appoint the ombudsman."
+    p "Subdivision (b) recognizes that, despite a previous order finding that a patient care ombudsman is not necessary, circumstances of the case may change or newly discovered evidence may demonstrate the necessity of an ombudsman to protect the interests of patients. In that event, a party may move the court for an order directing the appointment of an ombudsman."
+    p "When the appointment of a patient care ombudsman is ordered, the United States trustee is required to appoint a disinterested person to serve in that capacity. Court approval of the appointment is not required, but subdivision (c) requires the person appointed, if not a State Long-Term Care Ombudsman, to file a verified statement similar to the statement filed by professional persons under Rule 2014 so that parties in interest will have information relevant to disinterestedness. If a party believes that the person appointed is not disinterested, it may file a motion asking the court to find that the person is not eligible to serve."
+    p "Subdivision (d) permits parties in interest to move for the termination of the appointment of a patient care ombudsman. If the movant can show that there no longer is any need for the ombudsman, the court may order the termination of the appointment."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "013647b7fbcf339d01b52149b660b676b1e490c58e30457eff6c98247f16c2ec"
+  }
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2007.2 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "560be1276b47f050c429bec0a566b8bfe86323c2c6d4878ab332f8b44a9b575a"
+  }
+  layers {
+    operative "b756e36206a67641dff6a781f8a41f854da62a2b377315f0f8b48d55e11e641a"
+    enacted "219a9e05c0e72b1e81e3b18e809a951fb4f0c1e6ca7af807fb11cbd45d3abb19"
+    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+  }
+}

@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7087" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7087" courtRule {
+    num "7087" "Rule 7087."
+    heading "Transferring an Adversary Proceeding"
+    content "On motion and after a hearing, the court may transfer an adversary proceeding, or any part of it, to another district under 28 U.S.C. § 1412—except as provided in Rule 7019(b)."
+    hash "5bcdada6fa6b2dd45a0915d8b8735e44b8c3eefdb329b739c38ce572d1549cd7"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The reference to the venue section of title 28 is amended to conform to the 1984 amendments to title 28."
+    hash "e011bc2c3e5d023fdd275e07eb35e620cd5cb951f3a605a90920b0f823793e35"
+  }
+  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7087 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "6012700654d2d0658d1054d63b92f22e913bf789031b462cf8ccf1e7668b2a29"
+  }
+  layers {
+    operative "5bcdada6fa6b2dd45a0915d8b8735e44b8c3eefdb329b739c38ce572d1549cd7"
+    enacted "9595c5efbfbfb18e9f755b61610df51d2a1ce374a8c2f13e9a4aa09e4847a51b"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

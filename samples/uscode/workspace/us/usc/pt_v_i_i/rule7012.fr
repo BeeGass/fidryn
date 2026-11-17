@@ -1,0 +1,143 @@
+edition 2
+module "/us/usc/ptVII/rule7012" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7012" courtRule {
+    num "7012" "Rule 7012."
+    heading "Defenses; Effect of a Motion; Motion for Judgment on the Pleadings and Other Procedural Matters"
+    provision "/us/usc/ptVII/rule7012/a" subsection {
+      num "a" "(a)"
+      heading "Time to Serve."
+      chapeau "The time to serve a responsive pleading is as follows:"
+      provision "/us/usc/ptVII/rule7012/a/1" paragraph {
+        num "1" "(1)"
+        content "Answer to a Complaint in General. A defendant must serve an answer to a complaint within 30 days after the summons was issued, unless the court sets a different time."
+        hash "a3948b1f68690e17767d1b5c649b6372bc7a2e40dfb0de738b9ef74b1c6043eb"
+      }
+      provision "/us/usc/ptVII/rule7012/a/2" paragraph {
+        num "2" "(2)"
+        content "Answer to a Complaint Served by Publication or on a Party in a Foreign Country. The court must set the time to serve an answer to a complaint served by publication or served on a party in a foreign country."
+        hash "41d076ce1e59176a98c874e7d926743743b5cb589bf2d882ab20bf75d5ceb958"
+      }
+      provision "/us/usc/ptVII/rule7012/a/3" paragraph {
+        num "3" "(3)"
+        content "Answer to a Crossclaim. A party served with a pleading that states a crossclaim must serve an answer to the crossclaim within 21 days after being served."
+        hash "e3706569098b3977e7bd27dc6497688a5d9bee3b871ce7412cb5bc86eda8a676"
+      }
+      provision "/us/usc/ptVII/rule7012/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "Answer to a Counterclaim. A plaintiff served with an answer that contains a counterclaim must serve an answer to the counterclaim within 21 days after service of:"
+        provision "/us/usc/ptVII/rule7012/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "the answer; or"
+          hash "0184213639e8d095feb20c982acbd2f2551608322563b3433c4fa57308d1885c"
+        }
+        provision "/us/usc/ptVII/rule7012/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "a court order requiring an answer, unless the order states otherwise."
+          hash "79058513b54b21f145a9345967adcc36ece7f7bac6ab1393c1508f615b969f30"
+        }
+        hash "c4f5d50018ba658994a3daba2cc66ef6b2bbcec1febd4fc98c7bd82530b508e9"
+      }
+      provision "/us/usc/ptVII/rule7012/a/5" paragraph {
+        num "5" "(5)"
+        chapeau "Answer to a Complaint or Crossclaim—or Answer to a Counterclaim—Served on the United States or an Officer or Agency. The United States or its officer or agency must serve:"
+        provision "/us/usc/ptVII/rule7012/a/5/A" subparagraph {
+          num "A" "(A)"
+          content "an answer to a complaint within 35 days after the summons was issued; and"
+          hash "936f40de0a90cc31a4d53bb2a4944117940f9f339d779dc540af6defd176cec0"
+        }
+        provision "/us/usc/ptVII/rule7012/a/5/B" subparagraph {
+          num "B" "(B)"
+          content "an answer to a crossclaim or a counterclaim within 35 days after the United States attorney is served with the pleading that asserts the claim."
+          hash "36a751d656e3f50a4ffcce09c960309d72d6a62c909d815bfc066bc481960094"
+        }
+        hash "ec6ec1c18eb7f8089f9ec97c2780416e0c394c679d073689fd97ca1b40fe4f78"
+      }
+      provision "/us/usc/ptVII/rule7012/a/6" paragraph {
+        num "6" "(6)"
+        chapeau "Effect of a Motion. Unless the court sets a different time, serving a motion under this rule alters these times as follows:"
+        provision "/us/usc/ptVII/rule7012/a/6/A" subparagraph {
+          num "A" "(A)"
+          content "if the court denies the motion or postpones disposition until trial, the responsive pleading must be served within 14 days after notice of the court’s action; or"
+          hash "6749125c57169af10143a552d542a6916f874e590a5a444f5d8cafcfa46220f4"
+        }
+        provision "/us/usc/ptVII/rule7012/a/6/B" subparagraph {
+          num "B" "(B)"
+          content "if the court grants a motion for a more definite statement, the responsive pleading must be served within 14 days after the statement is served."
+          hash "f2b5d138fc31b23c89dde04988ff02c4b73493f37291018c089f5abeeae100f3"
+        }
+        hash "ab187bd8f8a426cc6f39c64ca01f0d009eadc229775c68fa6814a73e5ec3692b"
+      }
+      hash "2355766f25a51f3bfbfb795f5789d943cb0b28c9046ac6f4c7168d10e80e1272"
+    }
+    provision "/us/usc/ptVII/rule7012/b" subsection {
+      num "b" "(b)"
+      heading "Applicability of Civil Rule 12(b)–(i). Fed. R. Civ. P. 12(b)–(i) applies in an adversary proceeding. A responsive pleading must state whether the party does or does not consent to the entry of final orders or judgment by the bankruptcy court."
+      hash "33a03ed33de08fc9f6c179160ca34a3627eaa22ed5745972756cd63f8e758df2"
+    }
+    hash "f370164ee8d63849f25282f6d0b60e94cda2a39309b657de55b9c85fa7a85072"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) continues the practice of former Bankruptcy Rule 712(a) by requiring that the answer to a complaint be filed within 30 days after the issuance of the summons. Under Rule 7004(f), the summons must be served within 10 days of issuance. The other pleading periods in adversary proceedings are the same as those in civil actions before the district courts, except that the United States is allowed 35 rather than 60 days to respond."
+    p "Rule 12(b)(7) and (h)(2) F.R.Civ.P. refers to Rule 19 F.R.Civ.P. Pursuant to Rule 7002 these references are to Rule 19 F.R.Civ.P. as incorporated and modified by Rule 7019."
+    hash "026bcfc5bfcead1a0631b7ed42cdc288aab30e9b614aa9406f7c8de458cb40c0"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The amendment to subdivision (b) requires a response to the allegation that the proceeding is core or non-core. A final order of judgment may not be entered in a non-core proceeding heard by a bankruptcy judge unless all parties expressly consent. 28 U.S.C. § 157(c)."
+    hash "007ac823d7a1d7e3f9014e5eab1723a4da40dc73454f1141fa81d95560d0839e"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to conform to the changes made to the Federal Rules of Civil Procedure through the restyling of those rules effective on December 1, 2007."
+    hash "76923e497c4b9c61312745ce5d68065b9395b228da2fec808e60203abfbd5cf5"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (b) is amended to remove the requirement that the pleader state whether the proceeding is core or non-core and to require in all proceedings that the pleader state whether the party does or does not consent to the entry of final orders or judgment by the bankruptcy court. The amended rule also removes the provision requiring express consent before the entry of final orders and judgments in non-core proceedings. Some proceedings that satisfy the statutory definition of core proceedings, 28 U.S.C. § 157(b)(2), may remain beyond the constitutional power of a bankruptcy judge to adjudicate finally. The amended rule calls for the pleader to make a statement regarding consent, whether or not a proceeding is termed non-core. This amendment complements the requirements of amended Rule 7008(a). The bankruptcy judge’s subsequent determination of the appropriate course of proceedings, including whether to enter final orders and judgments or to issue proposed findings of fact and conclusions of law, is a pretrial matter now provided for in amended Rule 7016."
+    hash "6eee6e9f66b0127d1b0d3113518145906f011391736303b38b769a73d474bedb"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "7ed9e8efef15a1d08f102a59b73bed25b3566f60f665c97d7b61bb93bc224ccb"
+  }
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (b), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "8aeb3e8af8a92d3e5c37c59d840285ec7e7ccffda0ed0bcc2fbfcd8e94c1fd5c"
+  }
+  layers {
+    operative "f370164ee8d63849f25282f6d0b60e94cda2a39309b657de55b9c85fa7a85072"
+    enacted "4b9187fe5e8da028f6276c4b067513e4cde9d2c3dd258f91e225c7be60ba9a6e"
+    editorial "b37024fa45915616cb3602e464f2c111a6d10045d32d7d70abca37ddd1c880bc"
+  }
+}

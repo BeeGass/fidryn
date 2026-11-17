@@ -1,0 +1,198 @@
+edition 2
+module "/us/usc/ptIII/rule3015" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3015" courtRule {
+    num "3015" "Rule 3015."
+    heading "Chapter 12 or 13—Time to File a Plan; Nonstandard Provisions; Objection to Confirmation; Effect of Confirmation; Modifying a Plan"
+    provision "/us/usc/ptIII/rule3015/a" subsection {
+      num "a" "(a)"
+      heading "Time to File a Chapter 12 Plan."
+      chapeau "The debtor must file a Chapter 12 plan:"
+      provision "/us/usc/ptIII/rule3015/a/1" paragraph {
+        num "1" "(1)"
+        content "with the petition; or"
+        hash "5d9d54941672343060411442dd4dc4d51386bde528d0e2cc435dac4b16c7b8a2"
+      }
+      provision "/us/usc/ptIII/rule3015/a/2" paragraph {
+        num "2" "(2)"
+        content "within the time prescribed by § 1221."
+        hash "bceb05d82c2167db6a6fd0d4b47632a4dea3b7629b487ed1ef4aadd7ed0dea36"
+      }
+      hash "12a254c41d93082d0c2daedfba24df47d6292e74a0a5c11e6c40cf3da1b35c16"
+    }
+    provision "/us/usc/ptIII/rule3015/b" subsection {
+      num "b" "(b)"
+      heading "Time to File a Chapter 13 Plan."
+      provision "/us/usc/ptIII/rule3015/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. The debtor must file a Chapter 13 plan with the petition or within 14 days after the petition is filed. The time to file must not be extended except for cause and on notice as the court orders."
+        hash "f6cbbe885db0d813d2a421b6aa8ee444fd84792ad5f09f09b035b525b565ff61"
+      }
+      provision "/us/usc/ptIII/rule3015/b/2" paragraph {
+        num "2" "(2)"
+        content "Case Converted to Chapter 13. If a case is converted to Chapter 13, the plan must be filed within 14 days after conversion. The time must not be extended except for cause and on notice as the court orders."
+        hash "9ddf7da078b1431d1e82fb4921a9b559ec133801c1cce45e4b7c049a76f418f4"
+      }
+      hash "07e24e59220381d2aba47053d064b62cf8ef1a0143deec1bf19b1d951928d7ed"
+    }
+    provision "/us/usc/ptIII/rule3015/c" subsection {
+      num "c" "(c)"
+      heading "Form of a Chapter 13 Plan."
+      provision "/us/usc/ptIII/rule3015/c/1" paragraph {
+        num "1" "(1)"
+        content "In General. In filing a Chapter 13 plan, the debtor must use Form 113, unless the court has adopted a local form under Rule 3015.1."
+        hash "32f65301dffb4695f26069b635c91a6413fe95572424f0be49ac802816edcac4"
+      }
+      provision "/us/usc/ptIII/rule3015/c/2" paragraph {
+        num "2" "(2)"
+        content "Nonstandard Provision. With either form, a nonstandard provision is effective only if it is included in the section of the form that is designated for nonstandard provisions and is identified in accordance with any other requirements of the form. A nonstandard provision is one that is not included in the form or deviates from it."
+        hash "44f65515aea628ab4fc00eb0178f8dd31c41e211758b647eb837ffddc7460955"
+      }
+      hash "f71d13aba8777e37d10c8a311e29fdd19c2a16ffbfe5cb7bc370756cd5e1df80"
+    }
+    provision "/us/usc/ptIII/rule3015/d" subsection {
+      num "d" "(d)"
+      heading "Serving a Copy of the Plan."
+      content "If the plan was not included with the notice of a confirmation hearing mailed under Rule 2002, the debtor must serve the plan on the trustee and creditors when it is filed."
+      hash "80cb7cb8cf20ea52b45771e9fb62141d119530ea3f58d3d116a9dea40c648b37"
+    }
+    provision "/us/usc/ptIII/rule3015/e" subsection {
+      num "e" "(e)"
+      heading "Copy to the United States Trustee."
+      content "The clerk must promptly send to the United States trustee a copy of any plan filed under (a) or (b) or any modification of it."
+      hash "57706e622fb7ac4e4d0584d9610ef92a22e21220a69dbe3e4c8e01cdae397e1c"
+    }
+    provision "/us/usc/ptIII/rule3015/f" subsection {
+      num "f" "(f)"
+      heading "Objection to Confirmation; Determining Good Faith When No Objection is Filed."
+      provision "/us/usc/ptIII/rule3015/f/1" paragraph {
+        num "1" "(1)"
+        content "Serving an Objection. An entity that objects to a plan’s confirmation must file and serve the objection on the debtor, trustee, and any other entity the court designates, and must send a copy to the United States trustee. Unless the court orders otherwise, the objection must be filed, served, and sent at least 7 days before the date set for the confirmation hearing. The objection is governed by Rule 9014."
+        hash "3755c3a948b25ebc121e587080f4004b4eaf7438ed8efc9bb7003709059f9564"
+      }
+      provision "/us/usc/ptIII/rule3015/f/2" paragraph {
+        num "2" "(2)"
+        content "When No Objection Is Filed. If no objection is timely filed, the court may, without receiving evidence, determine that the plan has been proposed in good faith and not by any means forbidden by law."
+        hash "a6304ed0bc54d0518093a21db8f9070a6a610b98d8a6d3498bd78cf6312d4d9a"
+      }
+      hash "31745e536d20fe28522bfc545bf9aa10ae3e9aff47fb18b7de99fe96169a7276"
+    }
+    provision "/us/usc/ptIII/rule3015/g" subsection {
+      num "g" "(g)"
+      heading "Effect of Confirmation of a Chapter 12 or 13 Plan on the Amount of a Secured Claim; Terminating the Stay."
+      provision "/us/usc/ptIII/rule3015/g/1" paragraph {
+        num "1" "(1)"
+        content "Secured Claim. When a plan is confirmed, the amount of a secured claim—determined in the plan under Rule 3012—becomes binding on the claim holder. That is the effect even if the holder files a contrary proof of claim, the debtor schedules that claim, or an objection to the claim is filed."
+        hash "66874907e5c4d5b36a39c1224fb7a230e49c74b4f2fc75d7d0f82e9458d72190"
+      }
+      provision "/us/usc/ptIII/rule3015/g/2" paragraph {
+        num "2" "(2)"
+        content "Terminating the Stay. When a plan is confirmed, a request in the plan to terminate the stay imposed under § 362(a), § 1201(a), or § 1301(a) is granted."
+        hash "36c720a60e4a815195036b13bce598fa8e45c9dde98dae2f069f552c0815b9f4"
+      }
+      hash "cb965bdb68c4446a291cf07d57aae3b26441787e3f95ec79fe0572abc29add10"
+    }
+    provision "/us/usc/ptIII/rule3015/h" subsection {
+      num "h" "(h)"
+      heading "Modifying a Plan After It Is Confirmed."
+      provision "/us/usc/ptIII/rule3015/h/1" paragraph {
+        num "1" "(1)"
+        chapeau "Request to Modify a Plan After It Is Confirmed. A request to modify a confirmed plan under § 1229 or § 1329 must identify the proponent and include the proposed modification. Unless the court orders otherwise for creditors not affected by the modification, the clerk or the court’s designee must:"
+        provision "/us/usc/ptIII/rule3015/h/1/A" subparagraph {
+          num "A" "(A)"
+          content "give the debtor, trustee, and creditors at least 21 days’ notice, by mail, of the time to file objections and the date of any hearing;"
+          hash "157ec8752b060aed02f6863e130f08fdc413347970388ee8223e106e1a4f237f"
+        }
+        provision "/us/usc/ptIII/rule3015/h/1/B" subparagraph {
+          num "B" "(B)"
+          content "send a copy of the notice to the United States trustee; and"
+          hash "438ece22deb52b3e2ec5f300a33b09a4cfd9b1ac20b88e5ac8482042834d9ed4"
+        }
+        provision "/us/usc/ptIII/rule3015/h/1/C" subparagraph {
+          num "C" "(C)"
+          content "include a copy or summary of the modification."
+          hash "1118833b8186adb1bbb8b8e9803c6e188a7c8d01a27e50fdd138952453cca3b9"
+        }
+        hash "1826da1fef30603c6d8a96587956edba88f797df35721fc1611c9177f8ea69b2"
+      }
+      provision "/us/usc/ptIII/rule3015/h/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Objecting to a Modification. Rule 9014 governs an objection to a proposed modification. An objection must be filed and served on:"
+          p "• the debtor;"
+          p "• the trustee; and"
+          p "• any other entity the court designates."
+        }
+        continuation "A copy must also be sent to the United States trustee."
+        hash "e9cd0c93ccff60e2d4cde65de3bfe0229bedafebeb0c1d53af4854ed876eaf1f"
+      }
+      hash "be61ee4f45ec3695f53a18330443f3dba04d3204e6564e995023f7b016c67a99"
+    }
+    hash "6cc5ff20fc5b034858a971a4f73ea0600a465e7e7ca7ec028225ba518677304e"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 1321 provides only that the “debtor shall file a plan.” No time periods are specified, nor is any other detail provided. The rule requires a chapter 13 plan to be filed either with the petition or within 15 days thereafter. The court may, for cause, extend the time. The rule permits a summary of the plan to be transmitted with the notice of the hearing on confirmation. The court may, however, require the plan itself to be transmitted and the debtor to supply enough copies for this purpose. In the former rules under Chapter XIII the plan would accompany the notice of the first meeting of creditors. It is more important for the plan or a summary of its terms to be sent with the notice of the confirmation hearing. At that hearing objections to the plan will be heard by the court."
+    hash "f6678899316e06e18f0d149bd74cca360ea071f1269d1d0b47fa218b5af59114"
+  }
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to include chapter 12 plans. Section 1221 of the Code requires the debtor to file a chapter 12 plan not later than 90 days after the order for relief, except that the court may extend the period if an extension is “substantially justified.”"
+    p "Subdivision (e) enables the United States trustee to monitor chapter 12 and chapter 13 plans pursuant to 28 U.S.C. § 586(a)(3)(C)."
+    hash "3725a860425fe27d6416cc274ba0c8127c6ea8d2c86da55a8db2c0ba0bdea97c"
+  }
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (b) is amended to provide a time limit for filing a plan after a case has been converted to chapter 13. The substitution of “may” for “shall” is stylistic and makes no substantive change."
+    p "Subdivision (d) is amended to clarify that the plan or a summary of the plan must be included with each notice of the confirmation hearing in a chapter 12 case pursuant to Rule 2002(a)."
+    p "Subdivision (f) is added to expand the scope of the rule to govern objections to confirmation in chapter 12 and chapter 13 cases. The subdivision also is amended to include a provision that permits the court, in the absence of an objection, to determine that the plan has been proposed in good faith and not by any means forbidden by law without the need to receive evidence on these issues. These matters are now governed by Rule 3020."
+    p "Subdivision (g) is added to provide a procedure for post-confirmation modification of chapter 12 and chapter 13 plans. These procedures are designed to be similar to the procedures for confirmation of plans. However, if no objection is filed with respect to a proposed modification of a plan after confirmation, the court is not required to hold a hearing. See § 1229(b)(2) and § 1329(b)(2) which provide that the plan as modified becomes the plan unless, after notice and a hearing, such modification is disapproved. See § 102(1). The notice of the time fixed for filing objections to the proposed modification should set a date for a hearing to be held in the event that an objection is filed."
+    p "Amendments to the title of this rule are stylistic and make no substantive change."
+    hash "e5ee2caeb53189cfddea2f2044baacc735c1bb0970ae3367062f019ed1d9a847"
+  }
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "This rule is amended and reorganized."
+    p "Subdivision (c) is amended to require use of an Official Form if one is adopted for chapter 13 plans unless a Local Form has been adopted consistent with Rule 3015.1. Subdivision (c) also provides that nonstandard provisions in a chapter 13 plan must be set out in the section of the Official or Local Form specifically designated for such provisions and must be identified in the manner required by the Official or Local Form."
+    p "Subdivision (d) is amended to ensure that the trustee and creditors are served with the plan before confirmation. Service may be made either at the time the plan is filed or with the notice under Rule 2002 of the hearing to consider confirmation of the plan."
+    p "Subdivision (f) is amended to require service of an objection to confirmation at least seven days before the hearing to consider confirmation of a plan, unless the court orders otherwise."
+    p "Subdivision (g) is amended to set out two effects of confirmation. Subdivision (g)(1) provides that the amount of a secured claim under § 506(a) may be determined through a chapter 12 or chapter 13 plan in accordance with Rule 3012. That determination, unlike the amount of any current installment payments or arrearages, controls over a contrary proof of claim, without the need for a claim objection under Rule 3007, and over the schedule submitted by the debtor under § 521(a). The amount of a secured claim of a governmental unit, however, may not be determined through a chapter 12 or chapter 13 plan under Rule 3012. Subdivision (g)(2) provides for termination of the automatic stay under §§ 362, 1201, and 1301 as requested in the plan."
+    p "Subdivision (h) was formerly subdivision (g). It is redesignated and is amended to reflect that often the party proposing a plan modification is responsible for serving the proposed modification on other parties. The option to serve a summary of the proposed modification has been retained. Unless required by another rule, service under this subdivision does not need to be made in the manner provided for service of a summons and complaint by Rule 7004."
+    hash "3e3a927c5ee3ba617f41378bd85e5be985f458bc8434993ae153d42294d808a4"
+  }
+  note "/us/usc/ptIII/rule3015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "04e45df8981de7704b42379fb475ac56d33fd0de1e244890377a48793ec8874b"
+  }
+  layers {
+    operative "6cc5ff20fc5b034858a971a4f73ea0600a465e7e7ca7ec028225ba518677304e"
+    enacted "ba800aa7ffcb7a1867566b21ce1856a8243f60f63f6cd78157b8e4ea5e6f6191"
+    editorial "42062380b81e40f37d14086c01284e284041cd0d8d03540af166f5445a58a52a"
+  }
+}

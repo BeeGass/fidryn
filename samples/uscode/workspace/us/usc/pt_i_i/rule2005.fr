@@ -1,0 +1,111 @@
+edition 2
+module "/us/usc/ptII/rule2005" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2005" courtRule {
+    num "2005" "Rule 2005."
+    heading "Apprehending and Removing a Debtor for Examination"
+    provision "/us/usc/ptII/rule2005/a" subsection {
+      num "a" "(a)"
+      heading "Compelling the Debtor’s Attendance."
+      provision "/us/usc/ptII/rule2005/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Order to Apprehend the Debtor. On a party in interest’s motion supported by an affidavit, the court may order a marshal, or other official authorized by law, to bring the debtor before the court without unnecessary delay. The affidavit must allege that:"
+        provision "/us/usc/ptII/rule2005/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "the examination is necessary to properly administer the estate, and there is reasonable cause to believe that the debtor is about to leave or has left the debtor’s residence or principal place of business to avoid the examination;"
+          hash "dc59fd8b4b9b2cafcb06058ef1d780d5399ef645886dbb835f4e016ec1552fb4"
+        }
+        provision "/us/usc/ptII/rule2005/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "the debtor has evaded service of a subpoena or an order to attend the examination; or"
+          hash "85d7b10bf96ef065e86945015f9f8189ee440c43c728f19221ff0a41fe423e33"
+        }
+        provision "/us/usc/ptII/rule2005/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "the debtor has willfully disobeyed a duly served subpoena or order to attend the examination."
+          hash "6a85d883ed7cf2967cb7b1e83717dbb20ffdb15f327dc5990f356cec6985718a"
+        }
+        hash "bf2e3cc89e7920db696cfcf2a34bf98f1ecf5a33cc6e8d529e494bf57c43dd04"
+      }
+      provision "/us/usc/ptII/rule2005/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Ordering an Immediate Examination. If, after hearing, the court finds the allegations to be true, it must:"
+        provision "/us/usc/ptII/rule2005/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "order the immediate examination of the debtor; and"
+          hash "ad44dafddfaa0f7a09aee84d13fc381b213e257c8305c7fd06a90cf1c23b4dfe"
+        }
+        provision "/us/usc/ptII/rule2005/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "if necessary, set conditions for further examination and for the debtor’s obedience to any further order regarding it."
+          hash "27d370ef027d00ab554f15649aece9ffd6da7ef494326d6cb05d192bbf2e8ed6"
+        }
+        hash "7ffc4373399f1b2f3540a6eff8aca590b8bfd59889a39ad9c6c154d8946e1702"
+      }
+      hash "a5ec781e506ad98cac794e181d467b88e7c8ed4cb53502d823586beb77515113"
+    }
+    provision "/us/usc/ptII/rule2005/b" subsection {
+      num "b" "(b)"
+      heading "Removing a Debtor to Another District for Examination."
+      provision "/us/usc/ptII/rule2005/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. When an order is issued under (a)(1) and the debtor is found in another district, the debtor may be taken into custody and removed as provided in (2) and (3)."
+        hash "7a7023335a9b5679c409c3888a481dfa96fc3e175aa777504af85442bfd00ce7"
+      }
+      provision "/us/usc/ptII/rule2005/b/2" paragraph {
+        num "2" "(2)"
+        content "Within 100 Miles. A debtor who is taken into custody less than 100 miles from where the order was issued must be brought promptly before the court that issued the order."
+        hash "26289471b20f6d98601615f72325e6a466c88cfffe346058ebbbe91f6b6d80a4"
+      }
+      provision "/us/usc/ptII/rule2005/b/3" paragraph {
+        num "3" "(3)"
+        content "At 100 Miles or More. A debtor who is taken into custody 100 miles or more from where the order was issued must be brought without unnecessary delay for a hearing before the nearest available United States magistrate judge, bankruptcy judge, or district judge. If, after hearing, the judge finds that the person in custody is the debtor and is subject to an order under (a)(1), or if the person waives a hearing, the judge must order removal, and must release the person in custody on conditions ensuring prompt appearance before the court that issued the order compelling attendance."
+        hash "a6a0c8d96cb39276b5fd4d6662958d50269dda27c04648e468ccabba0b75a395"
+      }
+      provision "/us/usc/ptII/rule2005/b/4" paragraph {
+        num "4" "(4)"
+        content "Conditions of Release. The relevant provisions and policies of 18 U.S.C. § 3142 govern the court’s determination of what conditions will reasonably assure attendance and obedience under this Rule 2005."
+        hash "6a2763effa31d5929395828194c4bea5395f45cfb93f634ad64e8665652e5154"
+      }
+      hash "7495c7d55edfa919045599576f88473578799adfe09fb119853edbbeefaecd37"
+    }
+    hash "0db90827c6abfee582c151b40006fb0f1ecdae869c780faa9a9bfc2d1b6759f1"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 206. The rule requires the debtor to be examined as soon as possible if allegations of the movant for compulsory examination under this rule are found to be true after a hearing. Subdivision (b) includes in paragraphs (1) and (2) provisions adapted from subdivisions (a) and (b) of Rule 40 of the Federal Rules of Criminal Procedure, which governs the handling of a person arrested in one district on a warrant issued in another. Subdivision (c) incorporates by reference the features of subdivisions (a) and (b) of [former] 18 U.S.C. § 3146, which prescribe standards, procedures and factors to be considered in determining conditions of release of accused persons in noncapital cases prior to trial. The word “debtor” as used in this rule includes the persons named in Rule 9001(5)."
+    p "The affidavit required to be submitted in support of the motion may be subscribed by the unsworn declaration provided for in 28 U.S.C. § 1746."
+    hash "7f07b36b40a295c0ea0ee88f76ccbeda84a89164462e8d8fda3612169dc293bb"
+  }
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (b)(2) is amended to conform to § 321 of the Judicial Improvements Act of 1990, Pub. L. No. 101–650, which changed the title of “United States magistrate” to “United States magistrate judge.” Other amendments are stylistic and make no substantive change."
+    hash "efbde1a72642a8cedbe7631a95581f476a6257daf1208a83689db16a8a2cbcb3"
+  }
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2021 Amendment"
+    p "The rule is amended to replace the reference to 18 U.S.C. § 3146(a) and (b) with a reference to 18 U.S.C. § 3142. Sections 3141 through 3151 of Title 18 were repealed by the Bail Reform Act of 1984, Pub. L. No. 98–473, Title II, § 203(a), " ["98 Stat. 1976" -> "/us/stat/98/1976"] " (1984), and replaced by new provisions dealing with bail. The current version of 18 U.S.C. § 3146 deals not with conditions to assure attendance or appearance, but with penalties for failure to appear. The topic of conditions is in 18 U.S.C. § 3142. Because 18 U.S.C. § 3142 contains provisions bearing on topics not included in former 18 U.S.C. § 3146(a) and (b), the rule is also amended to limit the reference to the “relevant” provisions and policies of § 3142."
+    hash "4482115af058b55f135d47b5cde603dfb280484fe5a1ed56e75d7cae3f8269ed"
+  }
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fa17558b27d8ac55a34acc80e422157da1a902090a342e0890b6218d0d28d2fd"
+  }
+  layers {
+    operative "0db90827c6abfee582c151b40006fb0f1ecdae869c780faa9a9bfc2d1b6759f1"
+    enacted "8983d16e1605758ec870adce99921678469e4f921097d9b3384c4cefb719ffa7"
+    editorial "581c6700113c108d9c0421352908ca13f56995018ea0de2035b66dd52e8e41d0"
+  }
+}

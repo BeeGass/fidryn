@@ -52,8 +52,8 @@ enum Command {
     ReleaseCheck(release::ReleaseCheckArgs),
     /// Print the changelog entry for the current workspace version
     ReleaseNotes(release::ReleaseNotesArgs),
-    /// Check the archives of the sample of the Code against their retrieval record, and its profile against the script that counts it
-    UscodeSample,
+    /// Check the sample of the Code: its archives against their retrieval record, its workspace against what the ingester writes from them on one worker and on eight, its check, its profile and its counts of references, and its text against the independent script (--update writes the workspace first)
+    UscodeSample(uscode_sample::UscodeSampleArgs),
 }
 
 fn main() -> Result<()> {
@@ -68,6 +68,6 @@ fn main() -> Result<()> {
         Command::Package(args) => package::run(args),
         Command::ReleaseCheck(args) => release::run_check(args),
         Command::ReleaseNotes(args) => release::run_notes(args),
-        Command::UscodeSample => uscode_sample::run(),
+        Command::UscodeSample(args) => uscode_sample::run(args),
     }
 }

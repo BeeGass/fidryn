@@ -1,0 +1,154 @@
+edition 2
+module "/us/usc/t45/s1206" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1206" section {
+    num "1206" "§ 1206."
+    heading "Employees of Alaska Railroad"
+    provision "/us/usc/t45/s1206/a" subsection {
+      num "a" "(a)"
+      heading "Coverage under Federal civil service retirement laws; election, funding, nature of benefits, etc., for employees transferring to State-owned railroad; voluntary separation incentives"
+      provision "/us/usc/t45/s1206/a/1" paragraph {
+        num "1" "(1)"
+        content "Any employees who elect to transfer to the State-owned railroad and who on the day before the date of transfer are subject to the civil service retirement law (subchapter III of chapter 83 of title 5) shall, so long as continually employed by the State-owned railroad without a break in service, continue to be subject to such law, except that the State-owned railroad shall have the option of providing benefits in accordance with the provisions of paragraph (2) of this subsection. Employment by the State-owned railroad without a break in continuity of service shall be considered to be employment by the United States Government for purposes of subchapter III of chapter 83 of title 5. The State-owned railroad shall be the employing agency for purposes of " ["section 8334(a) of title 5" -> "/us/usc/t5/s8334/a"] " and shall contribute to the Civil Service Retirement and Disability Fund a sum as provided by such section, except that such sum shall be determined by applying to the total basic pay (as defined in " ["section 8331(3) of title 5" -> "/us/usc/t5/s8331/3"] ") paid to the employees of the State-owned railroad who are covered by the civil service retirement law, the per centum rate determined annually by the Director of the Office of Personnel Management to be the excess of the total normal cost per centum rate of the civil service retirement system over the employee deduction rate specified in " ["section 8334(a) of title 5" -> "/us/usc/t5/s8334/a"] ". The State-owned railroad shall pay into the Federal Civil Service Retirement and Disability Fund that portion of the cost of administration of such Fund which is demonstrated by the Director of the Office of Personnel Management to be attributable to its employees."
+        hash "d112243a4dfaf98fd7b5cbcc73228eae45ab72e24b568692a6cd0ddc179b4638"
+      }
+      provision "/us/usc/t45/s1206/a/2" paragraph {
+        num "2" "(2)"
+        content "At any time during the two-year period commencing on the date of transfer, the State-owned railroad shall have the option of providing to transferred employees retirement benefits, reflecting prior Federal service, in or substantially equivalent to benefits under the retirement program maintained by the State for State employees. If the State decides to provide benefits under this paragraph, the State shall provide such benefits to all transferred employees, except those employees who will meet the age and service requirements for retirement under section 8336(a), (b), (c) or (f) of title 5 within five years after the date of transfer and who elect to remain participants in the Federal retirement program."
+        hash "5262a3cc18a0b9fc4832b747f2dfa2119b4d78bd2dbd1cd7767d31189cf9b210"
+      }
+      provision "/us/usc/t45/s1206/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "If the State provides benefits under paragraph (2) of this subsection—"
+        provision "/us/usc/t45/s1206/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "the provisions of paragraph (1) of this subsection regarding payments into the Civil Service Retirement and Disability Fund for those employees who are transferred to the State program shall have no further force and effect (other than for employees who will meet the age and service requirements for retirement under section 8336(a), (b), (c) or (f) of title 5 within five years after the date of transfer and who elect to remain participants in the Federal retirement program); and"
+          hash "6167bbee21fdc61b74fe1ba1d79123b7b837e260b4344067978995f21318f077"
+        }
+        provision "/us/usc/t45/s1206/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "all of the accrued employee and employer contributions and accrued interest on such contributions made by and on behalf of the transferred employees during their prior Federal service (other than amounts for employees who will meet the age and service requirements for retirement under section 8336(a), (b), (c) or (f) of title 5 within five years after the date of transfer and who elect to remain participants in the Federal retirement program) shall be withdrawn from the Federal Civil Service Retirement and Disability Fund and shall be paid into the retirement fund utilized by the State-owned railroad for the transferred employees, in accordance with the provisions of paragraph (2) of this subsection. Upon such payment, credit for prior Federal service under the Federal civil service retirement system shall be forever barred, notwithstanding the provisions of " ["section 8334 of title 5" -> "/us/usc/t5/s8334"] "."
+          hash "be8d8595f6aade4c4913f09042f04e8d1b279ef4b352c2afadd2600a813ce776"
+        }
+        hash "83bc26bd90c79835c3a8628007b55d51790d13cb05833210cad4d18ada0e098d"
+      }
+      provision "/us/usc/t45/s1206/a/4" paragraph {
+        num "4" "(4)"
+        provision "/us/usc/t45/s1206/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "The State-owned railroad shall be included in the definition of “agency” for purposes of section 3(a), (b), (c), and (e) of the Federal Workforce Restructuring Act of 1994 and may elect to participate in the voluntary separation incentive program established under such Act. Any employee of the State-owned railroad who meets the qualifications as described under the first sentence of paragraph (1) shall be deemed an employee under such Act."
+          hash "2d234914eeb83896684f241b5c333ee7eabebb9bd61f600c8cb2e7c17e12f523"
+        }
+        provision "/us/usc/t45/s1206/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "An employee who has received a voluntary separation incentive payment under this paragraph and accepts employment with the State-owned railroad within 5 years after the date of separation on which payment of the incentive is based shall be required to repay the entire amount of the incentive payment unless the head of the State-owned railroad determines that the individual involved possesses unique abilities and is the only qualified applicant available for the position."
+          hash "9c174627f5aebad34bf29caa84e03fb3628043dafe4396394a9ef6a1ca7958ab"
+        }
+        hash "8db46c9133ee3030e469410587cc370082f6605dea4a643d000208b75446cfd5"
+      }
+      hash "e8726d3010100fda1a91802c496879ed61546e2bd4e9b5eed9f3c69174843d5b"
+    }
+    provision "/us/usc/t45/s1206/b" subsection {
+      num "b" "(b)"
+      heading "Coverage for employees not transferring to State-owned railroad"
+      content "Employees of the Alaska Railroad who do not transfer to the State-owned railroad shall be entitled to all of the rights and benefits available to them under Federal law for discontinued employees."
+      hash "fdc639b90fbada70d601773b12e4e68b16fc35ca80517161312b145a5caac74e"
+    }
+    provision "/us/usc/t45/s1206/c" subsection {
+      num "c" "(c)"
+      heading "Rights and benefits of transferred employees whose employment with State-owned railroad is terminated"
+      content "Transferred employees whose employment with the State-owned railroad is terminated during the two-year period commencing on the date of transfer shall be entitled to all of the rights and benefits of discontinued employees that such employees would have had under Federal law if their termination had occurred immediately before the date of the transfer, except that financial compensation paid to officers of the Alaska Railroad shall be limited to that compensation provided pursuant to " ["section 1203(d)(3)(E) of this title" -> "/us/usc/t45/s1203/d/3/E"] ". Such employees shall also be entitled to seniority and other benefits accrued under Federal law while they were employed by the State-owned railroad on the same basis as if such employment had been Federal service."
+      hash "f1a3362ee24661bba92a016c1cd400bcf5750bb9bf56e0e4f4d071480d598873"
+    }
+    provision "/us/usc/t45/s1206/d" subsection {
+      num "d" "(d)"
+      heading "Lump-sum payment for unused annual leave for employees transferring to State-owned railroad"
+      content "Any employee who transfers to the State-owned railroad under this chapter shall not be entitled to lump-sum payment for unused annual leave under " ["section 5551 of title 5" -> "/us/usc/t5/s5551"] ", but shall be credited by the State with the unused annual leave balance at the time of transfer."
+      hash "577a03876458037b58f235adf268ea31257b954acbd769cfe79f866b262a3f76"
+    }
+    provision "/us/usc/t45/s1206/e" subsection {
+      num "e" "(e)"
+      heading "Continued coverage for certain employees and annuitants in Federal health benefits plans and life insurance plans"
+      provision "/us/usc/t45/s1206/e/1" paragraph {
+        num "1" "(1)"
+        content "Any person described under the provisions of paragraph (2) may elect life insurance coverage under chapter 87 of title 5 and enroll in a health benefits plan under chapter 89 of title 5 in accordance with the provisions of this subsection."
+        hash "1cc1ddc118aaeaf3c21870cb04dc3e50a6f16f1897dc889dcc941cf987a92bcc"
+      }
+      provision "/us/usc/t45/s1206/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "The provisions of paragraph (1) shall apply to any person who—"
+        provision "/us/usc/t45/s1206/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "on March 30, 1994, is an employee of the State-owned railroad;"
+          hash "63cf357644494ab5ed88d608ac6bec34691be707fd467e0f20075f10f240a187"
+        }
+        provision "/us/usc/t45/s1206/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "has 20 years or more of service (in the civil service as a Federal employee or as an employee of the State-owned railroad, combined) on the date of retirement from the State-owned railroad; and"
+          hash "6d84023330ea0e0f5d3660fbe52a609e1d5c71d0afa4028407327146ee543d02"
+        }
+        provision "/us/usc/t45/s1206/e/2/C" subparagraph {
+          num "C" "(C)"
+          provision "/us/usc/t45/s1206/e/2/C/i" clause {
+            num "i" "(i)"
+            content "was covered under a life insurance policy pursuant to chapter 87 of title 5 on January 4, 1985, for the purpose of electing life insurance coverage under the provisions of paragraph (1); or"
+            hash "4bc9e4151c96f9e4a648d7d9ffa57b80c92074fb7b7d69e0db5a827e9f46bb27"
+          }
+          provision "/us/usc/t45/s1206/e/2/C/ii" clause {
+            num "ii" "(ii)"
+            content "was enrolled in a health benefits plan pursuant to chapter 89 of title 5 on January 4, 1985, for the purpose of enrolling in a health benefits plan under the provisions of paragraph (1)."
+            hash "d35417bdf94eaf4ba79ff6be39c97c50836c0c29c9ed2a959671ce8644b2bf19"
+          }
+          hash "c2365da862f5b795e7e05b52430395e9f77189afe1f7a1ac21d8241b1c82cbc8"
+        }
+        hash "1c92638495891567df5f712924834a11b93cdae2970ab933443ee59991337a97"
+      }
+      provision "/us/usc/t45/s1206/e/3" paragraph {
+        num "3" "(3)"
+        content "For purposes of this section, any person described under the provisions of paragraph (2) shall be deemed to have been covered under a life insurance policy under chapter 87 of title 5 and to have been enrolled in a health benefits plan under chapter 89 of title 5 during the period beginning on January 5, 1985, through the date of retirement of any such person."
+        hash "7c4a1c41c8ac9e7efa62f4e0a9987945858315d2eff448e7a9614b15847416ae"
+      }
+      provision "/us/usc/t45/s1206/e/4" paragraph {
+        num "4" "(4)"
+        content "The provisions of paragraph (1) shall not apply to any person described under paragraph (2) until the date such person retires from the State-owned railroad."
+        hash "48b0f14e8c9fe1fd558ce5ab01707ff93a047f758745716adbd8f9ad757dd4d0"
+      }
+      hash "d91f1bf6f691433bd24b00411af08fcc71b81de95bfc2b9e1cde2b31834421cf"
+    }
+    hash "4c86b7eb5ff31cdd7c1d7227873f8130f75d9f5930c86240ef383fec39cd2df6"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 607" -> "/us/pl/97/468/tVI/s607"] ", Jan. 14, 1983, " ["96 Stat. 2571" -> "/us/stat/96/2571"] "; " ["Pub. L. 100–238, title I, § 136(a)" -> "/us/pl/100/238/tI/s136/a"] ", Jan. 8, 1988, " ["101 Stat. 1766" -> "/us/stat/101/1766"] "; " ["Pub. L. 103–226, § 10" -> "/us/pl/103/226/s10"] ", Mar. 30, 1994, " ["108 Stat. 122" -> "/us/stat/108/122"] ".)"
+  note "/us/usc/t45/s1206/note/editorialNotes/pl.103.226/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Workforce Restructuring Act of 1994, referred to in subsec. (a)(4)(A), is " ["Pub. L. 103–226" -> "/us/pl/103/226"] ", Mar. 30, 1994, " ["108 Stat. 111" -> "/us/stat/108/111"] ". Section 3 of the Act is set out as a note under " ["section 5597 of Title 5" -> "/us/usc/t5/s5597"] ", Government Organization and Employees. For complete classification of this Act to the Code, see Short Title of 1994 Amendment note set out under " ["section 2101 of Title 5" -> "/us/usc/t5/s2101"] " and Tables."
+    hash "3a86c6ea5bf5624ebb6b87cc6472c9211f84910a7bd98e633ca31812d9e4f123"
+  }
+  note "/us/usc/t45/s1206/note/editorialNotes/pl.103.226/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1994—Subsec. (a)(4). " ["Pub. L. 103–226, § 10(a)" -> "/us/pl/103/226/s10/a"] ", added par. (4)."
+    p "Subsec. (e). " ["Pub. L. 103–226, § 10(b)" -> "/us/pl/103/226/s10/b"] ", added subsec. (e) and struck out former subsec. (e) which related to continued coverage for certain employees and annuitants in Federal health benefits and life insurance plans."
+    p "1988—Subsec. (e). " ["Pub. L. 100–238" -> "/us/pl/100/238"] " added subsec. (e)."
+    hash "3f562d9d03baafed3a83fcb4eb6a9b96159089a70b715c70768f18acce720c09"
+  }
+  note "/us/usc/t45/s1206/note/statutoryNotes/pl.100.238/administrative-provision" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Administrative Provision"
+    p ["Pub. L. 100–238, title I, § 136(b)" -> "/us/pl/100/238/tI/s136/b"] ", Jan. 8, 1988, " ["101 Stat. 1767" -> "/us/stat/101/1767"] ", provided that:"
+    quoted "/us/pl/100/238/tI/s136/b" {
+      p "“Within 180 days after the date of enactment of this section [Jan. 8, 1988], the Director of the Office of Personnel Management shall notify any person described under the provisions of section 607(e)(2)(A) of such Act [" ["45 U.S.C. 1206(e)(2)(A)" -> "/us/usc/t45/s1206/e/2/A"] "], for the purpose of the election of a life insurance policy or the enrollment in a health benefits plan pursuant to the provisions of section 607(e)(1) of the Alaska Railroad Transfer Act of 1982 [" ["45 U.S.C. 1206(e)(1)" -> "/us/usc/t45/s1206/e/1"] "] (as amended by subsection (a) of this section).”"
+    }
+    hash "03ff31d421df58b9d3772041655cff67bafa9556a624ea3cb1af7b1f455db1e2"
+  }
+  layers {
+    operative "4c86b7eb5ff31cdd7c1d7227873f8130f75d9f5930c86240ef383fec39cd2df6"
+    enacted "c354d18205f8334313127b8e7a1a28a478f74e650466ccd1d0986113cfff0ec2"
+    editorial "5f2f7819859b5d59538f7e55972f61bc511ceb4ecec7899eb43b301e141aed88"
+  }
+}

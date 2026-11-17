@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s1114" {
+  within "/us/usc/t45/ch20"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1114" section {
+    num "1114" "§ 1114."
+    heading "Repealed. " ["Pub. L. 99–509, title IV, § 4033(c)(1)(C)(i)(III)" -> "/us/pl/99/509/tIV/s4033/c/1/C/i/III"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"]
+    status repealed
+    hash "dd10900a960938c2012c07013cfaa1196bcb9039c989288425213bdd83572de6"
+  }
+  note "/us/usc/t45/s1114/note/ungrouped/pl.97.35/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 97–35, title XI, § 1166" -> "/us/pl/97/35/tXI/s1166"] ", Aug. 13, 1981, " ["95 Stat. 686" -> "/us/stat/95/686"] ", related to grant of trackage rights to any terminal railroad operating primarily in Philadelphia."
+    hash "49236366e61009067e927a5b165d427202b89f6b2d51967de47e481d6890d964"
+  }
+  layers {
+    operative "dd10900a960938c2012c07013cfaa1196bcb9039c989288425213bdd83572de6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "085d374bd357debb0a3d7ac353c50d6041de1a1c54a9ae53c4d454bfb1b277e6"
+  }
+}

@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s1211" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1211" section {
+    num "1211" "§ 1211."
+    heading "Denali National Park and Preserve lands"
+    content "On the date of transfer to the State (pursuant to " ["section 1203 of this title" -> "/us/usc/t45/s1203"] ") or other disposition (pursuant to " ["section 1210 of this title" -> "/us/usc/t45/s1210"] "), that portion of rail properties of the Alaska Railroad within the Denali National Park and Preserve shall, subject to the exclusive-use easement granted pursuant to " ["section 1203(b)(1)(D) of this title" -> "/us/usc/t45/s1203/b/1/D"] ", be transferred to the Secretary of the Interior for administration as part of the Denali National Park and Preserve, except that a transferee under " ["section 1210 of this title" -> "/us/usc/t45/s1210"] " shall receive the same interest as the State under " ["section 1203(b)(1)(D) of this title" -> "/us/usc/t45/s1203/b/1/D"] "."
+    hash "800d109dfa6f2d901c1013a141f35feefadda87f292944fced52531e8fd0b285"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 612" -> "/us/pl/97/468/tVI/s612"] ", Jan. 14, 1983, " ["96 Stat. 2576" -> "/us/stat/96/2576"] ".)"
+  layers {
+    operative "800d109dfa6f2d901c1013a141f35feefadda87f292944fced52531e8fd0b285"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7f93b982f3141b9ea3e3413271ffe8b8e3ebd65b018972ee7feb9580d9221906"
+  }
+}

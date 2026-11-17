@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s1213" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1213" section {
+    num "1213" "§ 1213."
+    heading "Conflict with other laws"
+    content "The provisions of this chapter shall govern if there is any conflict between this chapter and any other law."
+    hash "ad7eea5cee73af3deef367ab8c873ed8b92820158430b1e0691746bc64e60429"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 614" -> "/us/pl/97/468/tVI/s614"] ", Jan. 14, 1983, " ["96 Stat. 2577" -> "/us/stat/96/2577"] ".)"
+  layers {
+    operative "ad7eea5cee73af3deef367ab8c873ed8b92820158430b1e0691746bc64e60429"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e9ef653646c1dc71d966f739287c76c33ac7c99f1bbcd3d058c0d28d0d236a8b"
+  }
+}

@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t1/s213" {
+  within "/us/usc/t1/ch3"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s213" section {
+    num "213" "§ 213."
+    heading "Appropriation for preparing and editing supplements"
+    content "For preparation and editing an annual appropriation of $6,500 is authorized to carry out the purposes of sections 202 and 203 of this title."
+    hash "c48fcd23b8718dd4c89dbaf55eeba6c9170cb2c4d01ad8b3fbe97fbcceb7847d"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 640" -> "/us/stat/61/640"] ".)"
+  layers {
+    operative "c48fcd23b8718dd4c89dbaf55eeba6c9170cb2c4d01ad8b3fbe97fbcceb7847d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e1585c608dc3e65eaa50b07b345ca87d98fd4bee399ed00e9e511e20f35c44ed"
+  }
+}

@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/ptIX/rule9007" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9007" courtRule {
+    num "9007" "Rule 9007."
+    heading "Authority to Regulate Notices"
+    provision "/us/usc/ptIX/rule9007/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "Unless these rules provide otherwise, when notice is to be given, the court must designate:"
+      provision "/us/usc/ptIX/rule9007/a/1" paragraph {
+        num "1" "(1)"
+        content "the deadline for giving it;"
+        hash "a60c3ef2d3258393939997649b18a7ec8bb8a94e62e1770381ed73d94b97f7fd"
+      }
+      provision "/us/usc/ptIX/rule9007/a/2" paragraph {
+        num "2" "(2)"
+        content "the entities to whom it must be given; and"
+        hash "aa645ed5593ce6ca5676a936c4ef4494d6ea435c9ee1b3263db4197729958372"
+      }
+      provision "/us/usc/ptIX/rule9007/a/3" paragraph {
+        num "3" "(3)"
+        content "the form and manner of giving it."
+        hash "68d0b7ac6bab6e2fc5e537626b70276c893e75ed3c63c26d612d5419c140fb6e"
+      }
+      hash "e080b2a0bc993ff5883ef02c65214b68f90e36ad548aaca95dc87f4635d0b98a"
+    }
+    provision "/us/usc/ptIX/rule9007/b" subsection {
+      num "b" "(b)"
+      heading "Combined Notices."
+      content "When feasible, the court may order notices under these rules to be combined."
+      hash "2a7dba16f800d36c8d4338e06d232ff45d689a1a9c9eda4795a4d4025077fb09"
+    }
+    hash "30ff75dab038835a2345cc863001a5c892f664084dacf219081af5f249ac3517"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "aa977d896f414e099a40744a7918306c6787d3e9b2a7fd45a0139466aa19fae5"
+  }
+  layers {
+    operative "30ff75dab038835a2345cc863001a5c892f664084dacf219081af5f249ac3517"
+    enacted "de07bc795b893ab108be564c1ace411df97ac55d2eb063056a019e41e2aa3575"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

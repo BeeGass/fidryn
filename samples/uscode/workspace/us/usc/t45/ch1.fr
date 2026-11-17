@@ -1,0 +1,22 @@
+edition 2
+module "/us/usc/t45/ch1" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch1" chapter {
+    num "1" "CHAPTER 1—"
+    heading "SAFETY APPLIANCES AND EQUIPMENT ON RAILROAD ENGINES AND CARS, AND PROTECTION OF EMPLOYEES AND TRAVELERS"
+    member "/us/usc/t45/s1...14"
+    member "/us/usc/t45/s15"
+    member "/us/usc/t45/s16"
+    member "/us/usc/t45/s17...21"
+    member "/us/usc/t45/s22...43a"
+    member "/us/usc/t45/s44...46"
+    hash "3f0a20aad508128780d300f44c50d4b947087cc30bd4e3de9e3af3efdfdd5ffd"
+  }
+  layers {
+    operative "3f0a20aad508128780d300f44c50d4b947087cc30bd4e3de9e3af3efdfdd5ffd"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -1,0 +1,109 @@
+edition 2
+module "/us/usc/t1/s7" {
+  within "/us/usc/t1/ch1"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s7" section {
+    num "7" "§ 7."
+    heading "Marriage"
+    provision "/us/usc/t1/s7/a" subsection {
+      num "a" "(a)"
+      content "For the purposes of any Federal law, rule, or regulation in which marital status is a factor, an individual shall be considered married if that individual’s marriage is between 2 individuals and is valid in the State where the marriage was entered into or, in the case of a marriage entered into outside any State, if the marriage is between 2 individuals and is valid in the place where entered into and the marriage could have been entered into in a State."
+      hash "e900420ef8d3ae70109dc0494bc71e55921b775c0c56fd5a05c1dda44f71e9fe"
+    }
+    provision "/us/usc/t1/s7/b" subsection {
+      num "b" "(b)"
+      content "In this section, the term “State” means a State, the District of Columbia, the Commonwealth of Puerto Rico, or any other territory or possession of the United States."
+      hash "ef6a8785277e4ea917f4dad34e18dc3b41b6af6a3cf640556d2840c2c1025ede"
+    }
+    provision "/us/usc/t1/s7/c" subsection {
+      num "c" "(c)"
+      content "For purposes of subsection (a), in determining whether a marriage is valid in a State or the place where entered into, if outside of any State, only the law of the jurisdiction applicable at the time the marriage was entered into may be considered."
+      hash "1247c61bd4f9e6dffd2fd90c720a9c1e702764b53614fe3364305ca3fb6323c8"
+    }
+    hash "4e049aeb576594d2ce24f38e66efb157fb21f784e97a55b394336929fbbdf84e"
+  }
+  credit "(Added " ["Pub. L. 104–199, § 3(a)" -> "/us/pl/104/199/s3/a"] ", Sept. 21, 1996, " ["110 Stat. 2419" -> "/us/stat/110/2419"] "; amended " ["Pub. L. 117–228, § 5" -> "/us/pl/117/228/s5"] ", Dec. 13, 2022, " ["136 Stat. 2306" -> "/us/stat/136/2306"] ".)"
+  note "/us/usc/t1/s7/note/editorialNotes/pl.117.228/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2022—" ["Pub. L. 117–228" -> "/us/pl/117/228"] " amended section generally. Prior to amendment, text read as follows: “In determining the meaning of any Act of Congress, or of any ruling, regulation, or interpretation of the various administrative bureaus and agencies of the United States, the word ‘marriage’ means only a legal union between one man and one woman as husband and wife, and the word ‘spouse’ refers only to a person of the opposite sex who is a husband or a wife.”"
+    hash "87c9f35f5cb102fd1a6d647c8d7c044a6def433f5341d2b14bea333ae643e576"
+  }
+  note "/us/usc/t1/s7/note/statutoryNotes/pl.117.228/severability" enacted {
+    group statutoryNotes
+    topic "separability"
+    heading "Severability"
+    p ["Pub. L. 117–228, § 8" -> "/us/pl/117/228/s8"] ", Dec. 13, 2022, " ["136 Stat. 2307" -> "/us/stat/136/2307"] ", provided that:"
+    quoted "/us/pl/117/228/s8" {
+      p "“If any provision of this Act [see Short Title of 2022 Amendment note set out under " ["section 1 of this title" -> "/us/usc/t1/s1"] "], or any amendment made by this Act, or the application of such provision to any person, entity, government, or circumstance, is held to be unconstitutional, the remainder of this Act, or any amendment made thereby, or the application of such provision to all other persons, entities, governments, or circumstances, shall not be affected thereby.”"
+    }
+    hash "07de633d6a50c6eba2b1c31bb959b485272952db727d9f8294ae4181fd7495f6"
+  }
+  note "/us/usc/t1/s7/note/statutoryNotes/pl.117.228/findings" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Findings"
+    p ["Pub. L. 117–228, § 2" -> "/us/pl/117/228/s2"] ", Dec. 13, 2022, " ["136 Stat. 2305" -> "/us/stat/136/2305"] ", provided that:"
+    quoted "/us/pl/117/228/s2" {
+      p "“Congress finds the following:"
+      level paragraph {
+        num "1" "“(1)"
+        content "No union is more profound than marriage, for it embodies the highest ideals of love, fidelity, devotion, sacrifice, and family."
+      }
+      level paragraph {
+        num "2" "“(2)"
+        content "Diverse beliefs about the role of gender in marriage are held by reasonable and sincere people based on decent and honorable religious or philosophical premises. Therefore, Congress affirms that such people and their diverse beliefs are due proper respect."
+      }
+      level paragraph {
+        num "3" "“(3)"
+        content "Millions of people, including interracial and same-sex couples, have entered into marriages and have enjoyed the rights and privileges associated with marriage. Couples joining in marriage deserve to have the dignity, stability, and ongoing protection that marriage affords to families and children.”"
+      }
+    }
+    hash "a98d7309394ec1fb38b6f78a369e94de0043bdf31793195b7d101556191c95da"
+  }
+  note "/us/usc/t1/s7/note/statutoryNotes/pl.117.228/no-impact-on-religious-liberty-and-conscience" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "No Impact on Religious Liberty and Conscience"
+    p ["Pub. L. 117–228, § 6" -> "/us/pl/117/228/s6"] ", Dec. 13, 2022, " ["136 Stat. 2306" -> "/us/stat/136/2306"] ", provided that:"
+    quoted "/us/pl/117/228/s6" {
+      level subsection {
+        num "a" "“(a)"
+        heading "In General.—"
+        content "Nothing in this Act [see Short Title of 2022 Amendment note set out under " ["section 1 of this title" -> "/us/usc/t1/s1"] "], or any amendment made by this Act, shall be construed to diminish or abrogate a religious liberty or conscience protection otherwise available to an individual or organization under the Constitution of the United States or Federal law."
+      }
+      level subsection {
+        num "b" "“(b)"
+        heading "Goods or Services.—"
+        content "Consistent with the First Amendment to the Constitution, nonprofit religious organizations, including churches, mosques, synagogues, temples, nondenominational ministries, interdenominational and ecumenical organizations, mission organizations, faith-based social agencies, religious educational institutions, and nonprofit entities whose principal purpose is the study, practice, or advancement of religion, and any employee of such an organization, shall not be required to provide services, accommodations, advantages, facilities, goods, or privileges for the solemnization or celebration of a marriage. Any refusal under this subsection to provide such services, accommodations, advantages, facilities, goods, or privileges shall not create any civil claim or cause of action.”"
+      }
+    }
+    hash "31199ac5392116e037a0e34e67f711755831938ef42413d90273b39c0dab8206"
+  }
+  note "/us/usc/t1/s7/note/statutoryNotes/pl.117.228/statutory-prohibition" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Statutory Prohibition"
+    p ["Pub. L. 117–228, § 7" -> "/us/pl/117/228/s7"] ", Dec. 13, 2022, " ["136 Stat. 2306" -> "/us/stat/136/2306"] ", provided that:"
+    quoted "/us/pl/117/228/s7" {
+      level subsection {
+        num "a" "“(a)"
+        heading "No Impact on Status and Benefits Not Arising From a Marriage.—"
+        content "Nothing in this Act [see Short Title of 2022 Amendment note set out under " ["section 1 of this title" -> "/us/usc/t1/s1"] "], or any amendment made by this Act, shall be construed to deny or alter any benefit, status, or right of an otherwise eligible entity or person which does not arise from a marriage, including tax-exempt status, tax treatment, educational funding, or a grant, contract, agreement, guarantee, loan, scholarship, license, certification, accreditation, claim, or defense."
+      }
+      level subsection {
+        num "b" "“(b)"
+        heading "No Federal Recognition of Polygamous Marriages.—"
+        content "Nothing in this Act, or any amendment made by this Act, shall be construed to require or authorize Federal recognition of marriages between more than 2 individuals.”"
+      }
+    }
+    hash "fd549721ddf874d3cd7e5d95fb9383ab9b9bae57f2abc09c436840b33abe8615"
+  }
+  layers {
+    operative "4e049aeb576594d2ce24f38e66efb157fb21f784e97a55b394336929fbbdf84e"
+    enacted "7e6aa1d41afa01d45400b480c484d70f5b4a7ad0b9eb30fbf852e4d07f427427"
+    editorial "037f294e3eaa889c1f439ea92bfac3b46bb8771ee81ab25ed9358cc4b2c613d1"
+  }
+}

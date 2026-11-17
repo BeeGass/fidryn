@@ -1,0 +1,159 @@
+edition 2
+module "/us/usc/t45/s1202" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1202" section {
+    num "1202" "§ 1202."
+    heading "Definitions"
+    chapeau "As used in this chapter, the term—"
+    provision "/us/usc/t45/s1202/1" paragraph {
+      num "1" "(1)"
+      content "“Alaska Railroad” means the agency of the United States Government that is operated by the Department of Transportation as a rail carrier in Alaska under authority of the Act of March 12, 1914 (" ["43 U.S.C. 975" -> "/us/usc/t43/s975"] " et seq.) (popularly referred to as the “Alaska Railroad Act”) and section 6(i)" mark "1" 1 " of the Department of Transportation Act, or, as the context requires, the railroad operated by that agency;"
+      hash "f02b05fa395eec9879db3b1c8138d695a39ee2275dfbfa04abe32d5325ba786a"
+    }
+    provision "/us/usc/t45/s1202/2" paragraph {
+      num "2" "(2)"
+      content "“Alaska Railroad Revolving Fund” means the public enterprise fund maintained by the Department of the Treasury into which revenues of the Alaska Railroad and appropriations for the Alaska Railroad are deposited, and from which funds are expended for Alaska Railroad operation, maintenance and construction work authorized by law;"
+      hash "d94060aa1a8e5b84a449688a6b4098617263dfa98dd59b1e0e65c1cfa096c388"
+    }
+    provision "/us/usc/t45/s1202/3" paragraph {
+      num "3" "(3)"
+      content "“claim of valid existing rights” means any claim to the rail properties of the Alaska Railroad on record in the Department of the Interior as of January 13, 1983;"
+      hash "cd6c85ea84920a071c6b3124280729ad0cc068646800e0d6e938ffb1fcf1df3e"
+    }
+    provision "/us/usc/t45/s1202/4" paragraph {
+      num "4" "(4)"
+      content "“date of transfer” means the date on which the Secretary delivers to the State the four documents referred to in " ["section 1203(b)(1) of this title" -> "/us/usc/t45/s1203/b/1"] ";"
+      hash "36c8d472e2375c95abbfbedb8df11b7ddf2387bf15534919db8cf03ab7eb9352"
+    }
+    provision "/us/usc/t45/s1202/5" paragraph {
+      num "5" "(5)"
+      content "“employees” means all permanent personnel employed by the Alaska Railroad on the date of transfer, including the officers of the Alaska Railroad, unless otherwise indicated in this chapter;"
+      hash "763bf91df4ea459a13645e79d15bf467a0e293df79a70692dd266cd8ae7d1e86"
+    }
+    provision "/us/usc/t45/s1202/6" paragraph {
+      num "6" "(6)"
+      chapeau "“exclusive-use easement” means an easement which affords to the easement holder the following:"
+      provision "/us/usc/t45/s1202/6/A" subparagraph {
+        num "A" "(A)"
+        content "the exclusive right to use, possess, and enjoy the surface estate of the land subject to this easement for transportation, communication, and transmission purposes and for support functions associated with such purposes;"
+        hash "af13d9ed417e95856b7328a7918ba85af5ac9ef942284efaade64f733f36cb8c"
+      }
+      provision "/us/usc/t45/s1202/6/B" subparagraph {
+        num "B" "(B)"
+        content "the right to use so much of the subsurface estate of the lands subject to this easement as is necessary for the transportation, communication, and transmission purposes and associated support functions for which the surface of such lands is used;"
+        hash "f63f5a1bb62dee99b7e41c86eeb537ebdac9e8228680ea1d34b9c710409cd72c"
+      }
+      provision "/us/usc/t45/s1202/6/C" subparagraph {
+        num "C" "(C)"
+        content "subjacent and lateral support of the lands subject to the easement; and"
+        hash "214d164ac3245967b036a087f266d908280c537881a75929d9dfa55d9c96dc1a"
+      }
+      provision "/us/usc/t45/s1202/6/D" subparagraph {
+        num "D" "(D)"
+        content "the right (in the easement holder’s discretion) to fence all or part of the lands subject to this easement and to affix track, fixtures, and structures to such lands and to exclude other persons from all or part of such lands;"
+        hash "8f2349e9582e0873c79d5c36ecf658030464d11662267ceaf8372137116b6976"
+      }
+      hash "d98feed0256e8466dc5e920ccf4596d5c864c26a0e881c4182d24f5f82ce83d5"
+    }
+    provision "/us/usc/t45/s1202/7" paragraph {
+      num "7" "(7)"
+      content "“Native Corporation” has the same meaning as such term has under section 102(6) of the Alaska National Interest Lands Conservation Act (" ["16 U.S.C. 3102(6)" -> "/us/usc/t16/s3102/6"] ");"
+      hash "f6daf15954ef541218e5c4504bf410cf8b976cfadf9f74c3a23387f2e2bb6dcc"
+    }
+    provision "/us/usc/t45/s1202/8" paragraph {
+      num "8" "(8)"
+      content "“officers of the Alaska Railroad” means the employees occupying the following positions at the Alaska Railroad as of the day before the date of transfer: General Manager; Assistant General Manager; Assistant to the General Manager; Chief of Administration; and Chief Counsel;"
+      hash "7045946ddb5fe7e543ac05550e7f45788791db717ddb5877e5ea46c75daf1adb"
+    }
+    provision "/us/usc/t45/s1202/9" paragraph {
+      num "9" "(9)"
+      content "“public lands” has the same meaning as such term has under section 3(e) of the Alaska Native Claims Settlement Act (" ["43 U.S.C. 1602(e)" -> "/us/usc/t43/s1602/e"] ");"
+      hash "61f1a23c6958c721f8142bb63ab3f23a063e08fb36675ad2790b1c3ff87d78a3"
+    }
+    provision "/us/usc/t45/s1202/10" paragraph {
+      num "10" "(10)"
+      chapeau "“rail properties of the Alaska Railroad” means all right, title, and interest of the United States to lands, buildings, facilities, machinery, equipment, supplies, records, rolling stock, trade names, accounts receivable, goodwill, and other real and personal property, both tangible and intangible, in which there is an interest reserved, withdrawn, appropriated, owned, administered or otherwise held or validly claimed for the Alaska Railroad by the United States or any agency or instrumentality thereof as of January 14, 1983, but excluding any such properties disposed of, and including any such properties acquired, in the ordinary course of business after that date but before the date of transfer, and also including the exclusive-use easement within the Denali National Park and Preserve conveyed to the State pursuant to this chapter and also excluding the following:"
+      provision "/us/usc/t45/s1202/10/A" subparagraph {
+        num "A" "(A)"
+        content "the unexercised reservation to the United States for future rights-of-way required in all patents for land taken up, entered, or located in Alaska, as provided by the Act of March 12, 1914 (" ["43 U.S.C. 975" -> "/us/usc/t43/s975"] " et seq.);"
+        hash "153a00e1fd35598c9f127e02482c726ff8c1cdf65d566e0b729c495a218f9349"
+      }
+      provision "/us/usc/t45/s1202/10/B" subparagraph {
+        num "B" "(B)"
+        content "the right of the United States to exercise the power of eminent domain;"
+        hash "989fd07bad2b49ef4e4077b04f64f37340f5a8cb28b9f69d1f30b3d85399f646"
+      }
+      provision "/us/usc/t45/s1202/10/C" subparagraph {
+        num "C" "(C)"
+        content "any moneys in the Alaska Railroad Revolving Fund which the Secretary demonstrates, in consultation with the State, are unobligated funds appropriated from general tax revenues or are needed to satisfy obligations incurred by the United States in connection with the operation of the Alaska Railroad which would have been paid from such Fund but for this chapter and which are not assumed by the State pursuant to this chapter;"
+        hash "263d18fc6b54475673d209d1641814a38a3e5d3e7fe9ec4268c5e2267efca234"
+      }
+      provision "/us/usc/t45/s1202/10/D" subparagraph {
+        num "D" "(D)"
+        content "any personal property which the Secretary demonstrates, in consultation with the State, prior to the date of transfer under " ["section 1203 of this title" -> "/us/usc/t45/s1203"] ", to be necessary to carry out functions of the United States after the date of transfer; and"
+        hash "c6faea33f363dbfd1597684e1d6276554f457be45ba77dc6cb26525c52e01054"
+      }
+      provision "/us/usc/t45/s1202/10/E" subparagraph {
+        num "E" "(E)"
+        content "any lands or interest therein (except as specified in this chapter) within the boundaries of the Denali National Park and Preserve;"
+        hash "35560e6590d139e6acbd97deac01fef3016b417ddddbb0f86770e7ecabd74d17"
+      }
+      hash "f0010577fde5b86398450b3956fa004a3f14641314f0d173d71fe345429403ab"
+    }
+    provision "/us/usc/t45/s1202/11" paragraph {
+      num "11" "(11)"
+      chapeau "“right-of-way” means, except as used in " ["section 1208 of this title" -> "/us/usc/t45/s1208"] "—"
+      provision "/us/usc/t45/s1202/11/A" subparagraph {
+        num "A" "(A)"
+        content "an area extending not less than one hundred feet on both sides of the center line of any main line or branch line of the Alaska Railroad; or"
+        hash "5e6216612f8c928440eca956111fdd6ebc2a2c00584f92f36af20bfd31e9c474"
+      }
+      provision "/us/usc/t45/s1202/11/B" subparagraph {
+        num "B" "(B)"
+        content "an area extending on both sides of the center line of any main line or branch line of the Alaska Railroad appropriated or retained by or for the Alaska Railroad that, as a result of military jurisdiction over, or non-Federal ownership of, lands abutting the main line or branch line, is of a width less than that described in subparagraph (A) of this paragraph;"
+        hash "5fc73fd26f2d101032162ea260b716b46e7a50a5fa9f8bf3d7ee876004052db6"
+      }
+      hash "36019b1125079b97e85a74d1cbefb4e929b13f598d202449338c041b0663f1df"
+    }
+    provision "/us/usc/t45/s1202/12" paragraph {
+      num "12" "(12)"
+      content "“Secretary” means the Secretary of Transportation;"
+      hash "d7707108522b828068ed0034e3fac8d53cee67e0caa48b0e6befbd81867841ad"
+    }
+    provision "/us/usc/t45/s1202/13" paragraph {
+      num "13" "(13)"
+      content "“State” means the State of Alaska or the State-owned railroad, as the context requires;"
+      hash "3b640f1101611e8e1489534f699e76115e45071dec513a9f682175e6c9c88489"
+    }
+    provision "/us/usc/t45/s1202/14" paragraph {
+      num "14" "(14)"
+      content "“State-owned railroad” means the authority, agency, corporation or other entity which the State of Alaska designates or contracts with to own, operate or manage the rail properties of the Alaska Railroad or, as the context requires, the railroad owned, operated, or managed by such authority, agency, corporation, or other entity; and"
+      hash "e8eb65a80f4b272477e667715d9aaf6d06213a5a0b0070c3bf217ca708bf55d4"
+    }
+    provision "/us/usc/t45/s1202/15" paragraph {
+      num "15" "(15)"
+      content "“Village Corporation” has the same meaning as such term has under section 3(j) of the Alaska Native Claims Settlement Act (" ["43 U.S.C. 1602(j)" -> "/us/usc/t43/s1602/j"] ")."
+      hash "0db597d6b769714b356988dce6a729d8c22ce07016bc9b42ad44638f9a196fcb"
+    }
+    hash "833f7553da0bcb1478026199f6e95a7a443e41abea5ffba17dc3a07ccfee8aab"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 603" -> "/us/pl/97/468/tVI/s603"] ", Jan. 14, 1983, " ["96 Stat. 2556" -> "/us/stat/96/2556"] ".)"
+  note "/us/usc/t45/s1202/note/editorialNotes/act.1914-03-12.ch37/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Act of March 12, 1914 (" ["43 U.S.C. 975" -> "/us/usc/t43/s975"] " et seq.) (popularly referred to as the “Alaska Railroad Act”), referred to in pars. (1) and (10)(A), is " ["act Mar. 12, 1914, ch. 37" -> "/us/act/1914-03-12/ch37"] ", " ["38 Stat. 305" -> "/us/stat/38/305"] ", which enacted " ["section 353a of Title 16" -> "/us/usc/t16/s353a"] ", Conservation, and sections 975 to 975g of Title 43, Public Lands, and which was repealed by " ["section 615(a)(1) of Pub. L. 97–468" -> "/us/pl/97/468/s615/a/1"] " effective on the date of transfer of Alaska Railroad to the State [Jan. 5, 1985], pursuant to " ["section 1203 of this title" -> "/us/usc/t45/s1203"] "."
+    p "Section 6(i) of the Department of Transportation Act, referred to in par. (1), is " ["section 6(i) of Pub. L. 89–670" -> "/us/pl/89/670/s6/i"] ", which was classified to section 1655(i) of former Title 49, Transportation, prior to repeal by " ["Pub. L. 97–468, title VI, § 615(a)(4)" -> "/us/pl/97/468/tVI/s615/a/4"] ", Jan. 14, 1983, " ["96 Stat. 2578" -> "/us/stat/96/2578"] "."
+    hash "fa18fc31e3076208753f0b5abf2ede7b017c78b5154e59e47fca7905357f5cf8"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "833f7553da0bcb1478026199f6e95a7a443e41abea5ffba17dc3a07ccfee8aab"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f342f7d6824f98e0a536946d4b797ddcc10cf287970f186755d982f72b263254"
+  }
+}

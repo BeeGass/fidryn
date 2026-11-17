@@ -1,0 +1,66 @@
+edition 2
+module "/us/usc/t45/s215...228" {
+  alias "/us/usc/t45/s215"
+  alias "/us/usc/t45/s216"
+  alias "/us/usc/t45/s217"
+  alias "/us/usc/t45/s218"
+  alias "/us/usc/t45/s219"
+  alias "/us/usc/t45/s220"
+  alias "/us/usc/t45/s221"
+  alias "/us/usc/t45/s222"
+  alias "/us/usc/t45/s223"
+  alias "/us/usc/t45/s224"
+  alias "/us/usc/t45/s225"
+  alias "/us/usc/t45/s226"
+  alias "/us/usc/t45/s227"
+  alias "/us/usc/t45/s228"
+  within "/us/usc/t45/ch9/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s215...228" section {
+    num "215 to 228" "§§ 215 to 228."
+    heading "Omitted"
+    status omitted
+    hash "04a4bcd48dbf841278d2849de392286a5ab64c00c8bbc412aae600909e4feb3c"
+  }
+  note "/us/usc/t45/s215...228/note/editorialNotes/act.1935-08-29.ch812/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Sections 215 to 228 were omitted pursuant to the amendment and revision of " ["act Aug. 29, 1935, ch. 812" -> "/us/act/1935-08-29/ch812"] " by " ["act June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", " ["50 Stat. 307" -> "/us/stat/50/307"] ", known as the Railroad Retirement Act of 1937."
+    p "Section 215, acts " ["Aug. 29, 1935, ch. 812, § 1" -> "/us/act/1935-08-29/ch812/s1"] ", " ["49 Stat. 967" -> "/us/stat/49/967"] "; " ["June 11, 1940, ch. 307, § 2" -> "/us/act/1940-06-11/ch307/s2"] ", " ["54 Stat. 264" -> "/us/stat/54/264"] "; " ["Aug. 13, 1940, ch. 664" -> "/us/act/1940-08-13/ch664"] ", §§ 2, 3, " ["54 Stat. 780" -> "/us/stat/54/780"] ", defined terms for purposes of this subchapter."
+    p "Section 216, " ["act Aug. 29, 1935, ch. 812, § 2" -> "/us/act/1935-08-29/ch812/s2"] ", " ["49 Stat. 968" -> "/us/stat/49/968"] ", related to reductions in annuities of employees working beyond age sixty-five."
+    p "Section 217, " ["act Aug. 29, 1935, ch. 812, § 3" -> "/us/act/1935-08-29/ch812/s3"] ", " ["49 Stat. 969" -> "/us/stat/49/969"] ", related to employees eligible for annuities under this subchapter."
+    p "Section 218, " ["act Aug. 29, 1935, ch. 812, § 4" -> "/us/act/1935-08-29/ch812/s4"] ", " ["49 Stat. 969" -> "/us/stat/49/969"] ", related to annuities to representatives under this subchapter."
+    p "Section 219, " ["act Aug. 29, 1935, ch. 812, § 5" -> "/us/act/1935-08-29/ch812/s5"] ", " ["49 Stat. 970" -> "/us/stat/49/970"] ", related to death payments under this subchapter."
+    p "Section 220, " ["act Aug. 29, 1935, ch. 812, § 6" -> "/us/act/1935-08-29/ch812/s6"] ", " ["49 Stat. 970" -> "/us/stat/49/970"] ", related to establishment of Railroad Retirement Board."
+    p "Section 221, " ["act Aug. 29, 1935, ch. 812, § 7" -> "/us/act/1935-08-29/ch812/s7"] ", " ["49 Stat. 971" -> "/us/stat/49/971"] ", related to issuance of a special report on retirement system by Board."
+    p "Section 222, " ["act Aug. 29, 1935, ch. 812, § 8" -> "/us/act/1935-08-29/ch812/s8"] ", " ["49 Stat. 972" -> "/us/stat/49/972"] ", related to establishment of Investigation Commission."
+    p "Section 223, " ["act Aug. 29, 1935, ch. 812, § 9" -> "/us/act/1935-08-29/ch812/s9"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to court jurisdiction under this subchapter."
+    p "Section 224, " ["act Aug. 29, 1935, ch. 812, § 10" -> "/us/act/1935-08-29/ch812/s10"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to assignability of annuity payments."
+    p "Section 225, " ["act Aug. 29, 1935, ch. 812, § 11" -> "/us/act/1935-08-29/ch812/s11"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to penalties under this subchapter."
+    p "Section 226, " ["act Aug. 29, 1935, ch. 812, § 12" -> "/us/act/1935-08-29/ch812/s12"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to separability of provisions."
+    p "Section 227, " ["act Aug. 29, 1935, ch. 812, § 13" -> "/us/act/1935-08-29/ch812/s13"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to authorization of appropriations under this subchapter."
+    p "Section 228, " ["act Aug. 29, 1935, ch. 812, § 14" -> "/us/act/1935-08-29/ch812/s14"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to short title of this subchapter."
+    hash "335e49cd564961f08371a2754176d00adce484025d6e4e8c09aafd91785e4969"
+  }
+  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1940-06-11.ch307/effect-of-amendments-to-section-215-of-this-title" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Effect of Amendments to Section 215 of This Title"
+    p ["Act June 11, 1940, ch. 307, § 2" -> "/us/act/1940-06-11/ch307/s2"] ", " ["54 Stat. 264" -> "/us/stat/54/264"] ", provided that the amendment of " ["section 215 of this title" -> "/us/usc/t45/s215"] " by act June 11, 1940, was to have the same effect as if it had been part of the Railroad Retirement Act of 1935 from its enactment on Aug. 29, 1935."
+    hash "a8c463784a8595d4dd526570adb012e542959e039d19655586bd3dfd9b3d10ac"
+  }
+  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1937-06-24.ch382/short-title-continuation-and-effect-of-railroad-retirement-a" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Short Title; Continuation and Effect of Railroad Retirement Act of 1935"
+    p ["Act June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", §§ 201–205, " ["50 Stat. 318" -> "/us/stat/50/318"] ", 319, as amended by acts " ["Oct. 8, 1940, ch. 757" -> "/us/act/1940-10-08/ch757"] ", title VI, pt. II, " ["54 Stat. 1014" -> "/us/stat/54/1014"] "; " ["Apr. 8, 1942, ch. 227, § 10" -> "/us/act/1942-04-08/ch227/s10"] ", " ["56 Stat. 207" -> "/us/stat/56/207"] "; Oct. 30, 1966, " ["Pub. L. 89–700, title I, § 111" -> "/us/pl/89/700/tI/s111"] ", " ["80 Stat. 1085" -> "/us/stat/80/1085"] ", provided that " ["act Aug. 29, 1935, ch. 812" -> "/us/act/1935-08-29/ch812"] ", §§ 1 to 14, " ["49 Stat. 967" -> "/us/stat/49/967"] " to 973, comprising subchapter II of this chapter, as in effect prior to amendment by act June 24, 1937, was to be known as the Railroad Retirement Act of 1935 and that such act, as amended by act June 24, 1937, was to be known as the Railroad Retirement Act of 1937, set out transitional provisions for adjudication of claims under both the Railroad Retirement Acts of 1935 and 1937, and provided that the enactment of act June 24, 1937 was to have no effect on members of the Railroad Retirement Board in office on June 24, 1937, except that persons experienced in railroad service were to be retained in the employ of the Board, even if unqualified for service under the civil service law and rules, where the Board determined that they possessed the necessary qualifications."
+    hash "e9ed4d8daf6851562a469a988b92286d1ed748c14f3b8a9c2c898ef5057c03e9"
+  }
+  layers {
+    operative "04a4bcd48dbf841278d2849de392286a5ab64c00c8bbc412aae600909e4feb3c"
+    enacted "fce951fe179bca3d1d8f6e08d0e6155ea890b6e23dc04f0fd0cee808d3ea1e53"
+    editorial "a998561e6621db2cb2adc23fb942076e53168abbeb19c5dfa46d09725579ee27"
+  }
+}

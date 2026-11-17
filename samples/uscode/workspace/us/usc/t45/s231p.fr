@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s231p" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231p" section {
+    num "231p" "§ 231p."
+    heading "Free transportation"
+    content "It shall not be unlawful for carriers by railroad subject to this subchapter to furnish free transportation to individuals receiving annuities under this subchapter in the same manner as such transportation is furnished to employees in their service."
+    hash "8f8f5257089655f303ea60d5016004aba6ccc7a42a4424086bf5dc370a56ecf9"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 17" -> "/us/act/1935-08-29/ch812/s17"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1349" -> "/us/stat/88/1349"] ".)"
+  layers {
+    operative "8f8f5257089655f303ea60d5016004aba6ccc7a42a4424086bf5dc370a56ecf9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c553451517b239ff12adddd493a9717afd45c2937b72fa485f70d59dcc1fe0de"
+  }
+}

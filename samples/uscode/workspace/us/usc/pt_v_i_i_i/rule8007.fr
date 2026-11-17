@@ -1,0 +1,173 @@
+edition 2
+module "/us/usc/ptVIII/rule8007" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8007" courtRule {
+    num "8007" "Rule 8007."
+    heading "Stay Pending Appeal; Bond; Suspending Proceedings"
+    provision "/us/usc/ptVIII/rule8007/a" subsection {
+      num "a" "(a)"
+      heading "Initial Motion in the Bankruptcy Court."
+      provision "/us/usc/ptVIII/rule8007/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. Ordinarily, a party must move first in the bankruptcy court for the following relief:"
+        provision "/us/usc/ptVIII/rule8007/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "a stay of the bankruptcy court’s judgment, order, or decree pending appeal;"
+          hash "732b146459d95a107c73400f07e5750b1c9fc742e2d5db9f1cb6a51006b68b35"
+        }
+        provision "/us/usc/ptVIII/rule8007/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "the approval of a bond or other security provided to obtain a stay of judgment;"
+          hash "96a5c8eaea5b00440074025965de513677d2bb391e92af39387700f58b241e73"
+        }
+        provision "/us/usc/ptVIII/rule8007/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "an order suspending, modifying, restoring, or granting an injunction while an appeal is pending; or"
+          hash "f4b71e949ea0870572bb17b995aea62315d2147939e25977a29996323c6d9006"
+        }
+        provision "/us/usc/ptVIII/rule8007/a/1/D" subparagraph {
+          num "D" "(D)"
+          content "an order suspending or continuing proceedings or granting other relief permitted by (e)."
+          hash "a7ef9c28ba814fe5c49b88d1ca485c86c72909c286a2d82d8420f37e1308d72d"
+        }
+        hash "92b152ca4c2da14534d426ec7af3c830b0bd0599970b8b722d55f8a7a11ee335"
+      }
+      provision "/us/usc/ptVIII/rule8007/a/2" paragraph {
+        num "2" "(2)"
+        content "Time to File. The motion may be filed either before or after the notice of appeal is filed."
+        hash "c4491502b21a465ecafd5f8da5feba3cc7bba7a3949b7dab6415670b3127218c"
+      }
+      hash "66a0c1885ede240c18923451816ee89a61c9309d4136b4dfad9ae56f4975a74c"
+    }
+    provision "/us/usc/ptVIII/rule8007/b" subsection {
+      num "b" "(b)"
+      heading "Motion in the District Court, BAP, or Court of Appeals on Direct Appeal."
+      provision "/us/usc/ptVIII/rule8007/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. A motion for the relief specified in (a)(1)—or to vacate or modify a bankruptcy court’s order granting such relief—may be filed in the court where the appeal is pending."
+        hash "4ec87b23437ccb2865311f76dadda104ea7aa957dd0fa39e3ed883fa662b8abd"
+      }
+      provision "/us/usc/ptVIII/rule8007/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Required Showing. The motion must:"
+        provision "/us/usc/ptVIII/rule8007/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "show that moving first in the bankruptcy court would be impracticable; or"
+          hash "065f535fcfd48a58a3b1533de2aba9391d627b07435d78a477a2b7c2874047fc"
+        }
+        provision "/us/usc/ptVIII/rule8007/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "if a motion has already been made in the bankruptcy court, state whether the court has ruled on it, and if so, state any reasons given for the ruling."
+          hash "d6e766343683a7519a44dd280a1408129c1c840553101418f2619d40034865f9"
+        }
+        hash "b52325dee99a9f91af42f1e1ce5930e40e1231847a2359addd182fba354fd07b"
+      }
+      provision "/us/usc/ptVIII/rule8007/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Additional Requirements. The motion must also include:"
+        provision "/us/usc/ptVIII/rule8007/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "the reasons for granting the relief requested and the facts relied on;"
+          hash "f622c70e43ab105f97cc914aaf22bcd698b663739ca679956b7bb23565d55b8e"
+        }
+        provision "/us/usc/ptVIII/rule8007/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "affidavits or other sworn statements supporting facts subject to dispute; and"
+          hash "fdf4f9b0395ca4406be44f5d511e3d04d3ca7d78a82309bff1b43b0b3eafd51c"
+        }
+        provision "/us/usc/ptVIII/rule8007/b/3/C" subparagraph {
+          num "C" "(C)"
+          content "relevant parts of the record."
+          hash "407b02640c429c9d75f35232b943d845bb06affd306cbbc79c25412c373b3698"
+        }
+        hash "897097d2646358f67dbb796ee190aaa46b4cffcfc82fc2a06cb0e5a7b51c4efb"
+      }
+      provision "/us/usc/ptVIII/rule8007/b/4" paragraph {
+        num "4" "(4)"
+        content "Serving Notice. The movant must give reasonable notice of the motion to all parties."
+        hash "898084548af527dfd63c0fd83a8e088d94049813bf280f7f0eaac2759e1f7477"
+      }
+      hash "e6945b5ca177ffb693f5162fed5e88fe7c0a98ca053cd12e8e59d611bf9ed3df"
+    }
+    provision "/us/usc/ptVIII/rule8007/c" subsection {
+      num "c" "(c)"
+      content "Filing a Bond or Other Security as a Condition of Relief." mark "1" 1 " The district court, BAP, or court of appeals may condition relief on filing a bond or other security with the bankruptcy court."
+      hash "5b9cdc581649e23b470352d725433cd80a147502e60d6620dc930344f6c461e7"
+    }
+    provision "/us/usc/ptVIII/rule8007/d" subsection {
+      num "d" "(d)"
+      chapeau "Bond or Other Security for a Trustee; Not for the United States." sup "1" " The court may require a trustee who appeals to file a bond or other security. No bond or security is required when:"
+      provision "/us/usc/ptVIII/rule8007/d/1" paragraph {
+        num "1" "(1)"
+        content "the United States, its officer, or its agency appeals; or"
+        hash "39577b8e7d183abc6897d24e82e9118df5ace2981ab7e92274ffdc7abb508e33"
+      }
+      provision "/us/usc/ptVIII/rule8007/d/2" paragraph {
+        num "2" "(2)"
+        content "an appeal is taken by direction of any federal governmental department."
+        hash "c0b72c7adcf7f9da7a47abf5fcd5f5aa36b299c7fa82f4237b32dfab6ee41cb1"
+      }
+      hash "f8ff72236ef996f8e2c3c27b0093e629c76ecce200e4cf39d3ea141e6a8d6c1e"
+    }
+    provision "/us/usc/ptVIII/rule8007/e" subsection {
+      num "e" "(e)"
+      chapeau "Continuing Proceedings in the Bankruptcy Court." sup "1" " Despite Rule 7062—but subject to the authority of the district court, BAP, or court of appeals—while the appeal is pending, the bankruptcy court may:"
+      provision "/us/usc/ptVIII/rule8007/e/1" paragraph {
+        num "1" "(1)"
+        content "suspend or order the continuation of other proceedings in the case, or"
+        hash "a59f2f97b40fa41cf130a198c5318bd8a3e23a9a6576b2c2adf807b68bce9e8e"
+      }
+      provision "/us/usc/ptVIII/rule8007/e/2" paragraph {
+        num "2" "(2)"
+        content "issue any appropriate order to protect the rights of all parties in interest."
+        hash "616d1cf96df0c64467fa41a8e0e89d4be3f18ab3eb8bc66e17905034c7b36853"
+      }
+      hash "7cefddca80522bf0be860e2c7a64e771ff21171561adb30abe88ab4cfcec7d32"
+    }
+    hash "918d9e7b44b5529ea0f02ba513a20dd20843726e3a11d7d765a32405b8d8c1c6"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8007, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to completion and transmission of the record and docketing of the appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "8129d1a623612918cd3146515b51274d132f7ec45e73dd6a5c3fbcd0d8a6105c"
+  }
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8005 and F.R.App.P. 8. It now applies to direct appeals in courts of appeals."
+    p "Subdivision (a), like the former rule, requires a party ordinarily to seek relief pending an appeal in the bankruptcy court. Subdivision (a)(1) expands the list of relief enumerated in F.R.App.P. 8(a)(1) to reflect bankruptcy practice. It includes the suspension or continuation of other proceedings in the bankruptcy case, as authorized by subdivision (e). Subdivision (a)(2) clarifies that a motion for a stay pending appeal, approval of a supersedeas bond, or any other relief specified in paragraph (1) may be made in the bankruptcy court before or after the filing of a notice of appeal."
+    p "Subdivision (b) authorizes a party to seek the relief specified in (a)(1), or the vacation or modification of the granting of such relief, by means of a motion filed in the court where the appeal is pending—district court, BAP, or the court of appeals on direct appeal. Accordingly, a notice of appeal need not be filed with respect to a bankruptcy court’s order granting or denying such a motion. The motion for relief in the district court, BAP, or court of appeals must state why it was impracticable to seek relief initially in the bankruptcy court, if a motion was not filed there, or why the bankruptcy court denied the relief sought."
+    p "Subdivisions (c) and (d) retain the provisions of the former rule that permit the district court or BAP—and now the court of appeals—to condition the granting of relief on the posting of a bond by the appellant, except when that party is a federal government entity. Rule 9025 governs proceedings against sureties."
+    p "Subdivision (e) retains the provision of the former rule that authorizes the bankruptcy court to decide whether to suspend or allow the continuation of other proceedings in the bankruptcy case while the matter for which a stay has been sought is pending on appeal."
+    p "Changes Made After Publication and Comment. The clause “or where it will be taken” was deleted in subdivision (b)(1). Stylistic changes were made to the titles of subdivisions (b) and (e) and in subdivision (e)(1). A discussion of subdivision (e) was added to the Committee Note."
+    hash "0f954f6ce1fcfd0f0fa29b252ca9aa3a3f947093338a79e9b203f86a8f05ab7b"
+  }
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "The amendments to subdivisions (a)(1)(B), (c), and (d) conform this rule with the amendment of Rule 62 F.R.Civ.P., which is made applicable to adversary proceedings by Rule 7062. Rule 62 formerly required a party to provide a “supersedeas bond” to obtain a stay of the judgment and proceedings to enforce the judgment. As amended, Rule 62(b) allows a party to obtain a stay by providing a “bond or other security.”"
+    hash "07b3786a10ca3a07dfee4d21b2bb8c16535968d9cb5c52699ec06bbfe441759e"
+  }
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "56f8c56be84ffdc840fa055724d030659104ec25ea71ce93f6931182a9f63e6f"
+  }
+  footnote 1 "1" {
+    p "So in original. The heading probably should not be italicized."
+  }
+  layers {
+    operative "918d9e7b44b5529ea0f02ba513a20dd20843726e3a11d7d765a32405b8d8c1c6"
+    enacted "17e9169d41b1cac5a75616676c1224d94018ad820eff3fed54c6fe4142fe8756"
+    editorial "ce66e2271e5b94b4874e8efc46a3862f9f95a5f70519ab6a5937287412302ba4"
+  }
+}

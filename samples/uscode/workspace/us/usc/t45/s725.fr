@@ -1,0 +1,88 @@
+edition 2
+module "/us/usc/t45/s725" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s725" section {
+    num "725" "§ 725."
+    heading "Interim agreements"
+    provision "/us/usc/t45/s725/a" subsection {
+      num "a" "(a)"
+      heading "Purposes"
+      chapeau "Prior to the date upon which rail properties are conveyed to the Corporation under this chapter, the Secretary, with the approval of the Association, is authorized to enter into agreements with the trustees of the railroads in reorganization in the region (or railroads leased, operated, or controlled by railroads in reorganization)—"
+      provision "/us/usc/t45/s725/a/1" paragraph {
+        num "1" "(1)"
+        content "to perform the program maintenance on designated rail properties of such railroads until the date rail properties are conveyed under this chapter;"
+        hash "bdc79a4a7c2e0cfbb4bc0c8abae6b01703e55264011b822c901e61361430629f"
+      }
+      provision "/us/usc/t45/s725/a/2" paragraph {
+        num "2" "(2)"
+        content "to improve rail properties of such railroads; and"
+        hash "4e702047c4798e1ffb97dc797cfd23bf92c9d869c1864460e0f8105e9d7c5a8e"
+      }
+      provision "/us/usc/t45/s725/a/3" paragraph {
+        num "3" "(3)"
+        content "to acquire rail properties for lease or loan to any such railroads until the date such rail properties are conveyed under this chapter, and subsequently for conveyance pursuant to the final system plan, or to acquire interests in such rail properties owned by or leased to any such railroads or in purchase money obligations therefor."
+        hash "997bef4f5f82fe3f8af372c0600aaa2b18996bca162e5167a6c5de9ba9a06c97"
+      }
+      hash "fef3a3088c08a8917352f5591587215b3cdca4643217f0bafacc9691f899e822"
+    }
+    provision "/us/usc/t45/s725/b" subsection {
+      num "b" "(b)"
+      heading "Conditions"
+      chapeau "Agreements pursuant to subsection (a) of this section shall contain such reasonable terms and conditions as the Secretary may prescribe. In addition, agreements under paragraphs (1) and (2) of subsection (a) of this section shall provide that—"
+      provision "/us/usc/t45/s725/b/1" paragraph {
+        num "1" "(1)"
+        content "to the extent that physical condition is used as a basis for determining, under section 716(f) or 743(c) of this title, the value of properties subject to such an agreement and designated for transfer to the Corporation under the final system plan, the physical condition of the properties on the effective date of the agreement shall be used; and"
+        hash "6e3e718318d67f0ed9d022fafb34bdf882597db62b32055f48c71a1a38605045"
+      }
+      provision "/us/usc/t45/s725/b/2" paragraph {
+        num "2" "(2)"
+        content "in the event that property subject to the agreement is sold, leased, or transferred to an entity other than the Corporation, the trustees or railroad shall pay or assign to the Secretary that portion of the proceeds of such sale, lease, or transfer which reflects value attributable to the maintenance and improvement provided pursuant to the agreement."
+        hash "2ce0da78d06fd28f5a3bb2bed44c23814d710591535c98fcd82df995dc49c3bb"
+      }
+      hash "5bd08955174c07f115c9af718e7f0ccabcc4a99161b15e2016c56dd9f893d5ff"
+    }
+    provision "/us/usc/t45/s725/c" subsection {
+      num "c" "(c)"
+      heading "Obligations"
+      content "Notwithstanding " ["section 720(b) of this title" -> "/us/usc/t45/s720/b"] ", the Association shall issue obligations under " ["section 720(a) of this title" -> "/us/usc/t45/s720/a"] " in an amount sufficient to finance such agreements and shall require the Corporation to assume any such obligations. The aggregate amount of obligations issued under this section and outstanding at any one time shall not exceed $300,000,000. The Association, with the approval of the Secretary, shall designate in the final system plan that portion of such obligations issued or to be issued which shall be refinanced and the terms thereof, and that portion from which the Corporation shall be released of its obligations."
+      hash "334d3b6785d891e1dea06722fca0e03bcce5d03811c1ad4f187ab7f035e34824"
+    }
+    provision "/us/usc/t45/s725/d" subsection {
+      num "d" "(d)"
+      heading "Conveyance"
+      content "The Secretary may convey to the Corporation or any subsidiary thereof, with or without receipt of consideration, any property or interests acquired by, transferred to, or otherwise held by the Secretary pursuant to this section or " ["section 723 of this title" -> "/us/usc/t45/s723"] "."
+      hash "049b40229e2045de6668b558e39ca430109357fa2b38fae8724d5afda0e414a5"
+    }
+    hash "3b5d5526c01ec29748afbd00af4f9e01271ecf243f47451c83e4635b8a392da3"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 215" -> "/us/pl/93/236/tII/s215"] ", Jan. 2, 1974, " ["87 Stat. 1004" -> "/us/stat/87/1004"] "; " ["Pub. L. 94–5, § 7" -> "/us/pl/94/5/s7"] ", Feb. 28, 1975, " ["89 Stat. 8" -> "/us/stat/89/8"] "; " ["Pub. L. 94–210, title VI, § 607(i)" -> "/us/pl/94/210/tVI/s607/i"] ", Feb. 5, 1976, " ["90 Stat. 97" -> "/us/stat/90/97"] ".)"
+  note "/us/usc/t45/s725/note/editorialNotes/pl.94.210/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1976—Subsec. (d). " ["Pub. L. 94–210" -> "/us/pl/94/210"] " inserted “or any subsidiary thereof” after “Corporation”."
+    p "1975—" ["Pub. L. 94–5" -> "/us/pl/94/5"] " expanded provisions covering interim agreements for the acquisition, maintenance, and improvement of railroad properties, substituted provisions setting out the requisite conditions of such agreements for provisions making only a general requirement that such agreements identify the type and quality of improvements to be made, raised from $150,000,000 to $300,000,000 the maximum amount of outstanding obligations, and substituted provisions directing the Association in the final system plan to designate that portion of the obligations which shall be refinanced and that portion from which the Corporation shall be released of its obligations for provisions prohibiting the Secretary’s entry into agreements unless he issues regulations setting forth procedures and guidelines for the administration of this section, substituted provisions authorizing the Secretary to convey to the Corporation property or interests held by the Secretary pursuant to this section or " ["section 723 of this title" -> "/us/usc/t45/s723"] " for provisions relieving the Corporation of the duty of compensating railroads in reorganization for that portion of transferred properties attributable to the acquisition, maintenance, or improvement of such properties under this section."
+    hash "d6e01629eedf675d68ccf0dbbf9ab33fd53e7d3a8e2516f09d2a158a0ab776b0"
+  }
+  note "/us/usc/t45/s725/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s725/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  layers {
+    operative "3b5d5526c01ec29748afbd00af4f9e01271ecf243f47451c83e4635b8a392da3"
+    enacted "e447f89ed658063d7f9a7fe63fb154b0b63d816a9b823f168f9f5c3366b29e65"
+    editorial "77731436e52d35a4614598834af293e92bea47c8d680cd2d6660405b65a31149"
+  }
+}

@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s209" {
+  within "/us/usc/t45/ch9/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s209" section {
+    num "209" "§ 209."
+    heading "Repealed. " ["Pub. L. 89–554, § 8(a)" -> "/us/pl/89/554/s8/a"] ", Sept. 6, 1966, " ["80 Stat. 649" -> "/us/stat/80/649"]
+    status repealed
+    hash "4cc5a7c9b825337f973ff7c2577aee882e8afd7076b2aca1d9361e3d0b25a1af"
+  }
+  note "/us/usc/t45/s209/note/ungrouped/act.1934-06-27.ch868/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["act June 27, 1934, ch. 868, § 9" -> "/us/act/1934-06-27/ch868/s9"] ", " ["48 Stat. 1287" -> "/us/stat/48/1287"] ", established a Railroad Retirement Board and set out its functions."
+    hash "9a7f0b6f81c590aca0daadda13cd4d7a10b432f23a6cb886b70536e083783b53"
+  }
+  layers {
+    operative "4cc5a7c9b825337f973ff7c2577aee882e8afd7076b2aca1d9361e3d0b25a1af"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ee4fe142b1c470c040a8deefbadee4d2916564690232c38f52c7349d942e6135"
+  }
+}

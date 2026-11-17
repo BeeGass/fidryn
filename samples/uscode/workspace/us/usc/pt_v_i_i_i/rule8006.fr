@@ -1,0 +1,203 @@
+edition 2
+module "/us/usc/ptVIII/rule8006" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8006" courtRule {
+    num "8006" "Rule 8006."
+    heading "Certifying a Direct Appeal to the" mark "1" 1 " Court of Appeals"
+    provision "/us/usc/ptVIII/rule8006/a" subsection {
+      num "a" "(a)"
+      heading "Effective Date of a Certification."
+      chapeau "A certification of a bankruptcy court’s judgment, order, or decree to a court of appeals for direct review under 28 U.S.C. § 158(d)(2) becomes effective when:"
+      provision "/us/usc/ptVIII/rule8006/a/1" paragraph {
+        num "1" "(1)"
+        content "it is filed;"
+        hash "f8ae1301c9d020e62d98359ad4af5bc20f557b635bdc9f28ef970ecf62f66502"
+      }
+      provision "/us/usc/ptVIII/rule8006/a/2" paragraph {
+        num "2" "(2)"
+        content "a timely appeal is taken under Rule 8003 or Rule 8004; and"
+        hash "c3b676fedb9f3ad615ce6155a72ce97ba99c318cb79c298b4d0b463ed43fe4c4"
+      }
+      provision "/us/usc/ptVIII/rule8006/a/3" paragraph {
+        num "3" "(3)"
+        content "the notice of appeal becomes effective under Rule 8002."
+        hash "46be6d826dd7fdcf63a6dbe1ef2f6d12b89cab71ef788ccfc32c0127918648dc"
+      }
+      hash "bc41387e04313ac937e9317eae2ec3af9c952cd21aba4fb6ca0381fa4a04533f"
+    }
+    provision "/us/usc/ptVIII/rule8006/b" subsection {
+      num "b" "(b)"
+      heading "Filing the Certification."
+      content "The certification must be filed with the clerk of the court where the matter is pending. For purposes of this rule, a matter remains pending in the bankruptcy court for 30 days after the first notice of appeal concerning that matter becomes effective under Rule 8002. After that time, the matter is pending in the district court or BAP."
+      hash "a0ac3e6784df73fa5c7ad2f5f3e76a2cc129a67119c3799e6cf26ab9e6be005b"
+    }
+    provision "/us/usc/ptVIII/rule8006/c" subsection {
+      num "c" "(c)"
+      heading "Joint Certification by All Appellants and Appellees."
+      provision "/us/usc/ptVIII/rule8006/c/1" paragraph {
+        num "1" "(1)"
+        content "In General. A joint certification by all appellants and appellees under 28 U.S.C. § 158(d)(2)(A) must be made using Form 424. The parties may supplement the certification with a short statement about its basis. The statement may include the information required by (f)(2)."
+        hash "a7a7049188f1b83f9c24b10ebcdde25959baa1b7d8209e5dd077c9e4b7f614d4"
+      }
+      provision "/us/usc/ptVIII/rule8006/c/2" paragraph {
+        num "2" "(2)"
+        content "Supplemental Statement by the Court. Within 14 days after the parties file the certification, the bankruptcy court—or the court where the matter is pending—may file a short supplemental statement about the certification’s merits."
+        hash "e2ec966c57ce0ea727bd6f74ff5f8adce43e711c0502561d29589cf41225212c"
+      }
+      hash "8db6bca3fec676b3d7fb21ef639c77f602ba8f59a69e61263f92cde95e4bb3cc"
+    }
+    provision "/us/usc/ptVIII/rule8006/d" subsection {
+      num "d" "(d)"
+      heading "Court’s Authority to Certify a Direct Appeal."
+      content "Only the court where the matter is pending under (b) may certify a direct appeal to a court of appeals. The court may do so on a party’s request or on its own."
+      hash "bbbd810de045a157ef1b52cbe0b209cdcd6ff8aa26e9277c475ce3fd0a8358a4"
+    }
+    provision "/us/usc/ptVIII/rule8006/e" subsection {
+      num "e" "(e)"
+      heading "Certification by the Court Acting on Its Own."
+      provision "/us/usc/ptVIII/rule8006/e/1" paragraph {
+        num "1" "(1)"
+        content "Separate Document Required; Service; Content. A certification by a court acting on its own must be set forth in a separate document. The clerk of the certifying court must serve the document on the parties to the appeal in the manner required for serving a notice of appeal under Rule 8003(c)(1). It must be accompanied by an opinion or memorandum that contains the information required by (f)(2)(A)–(D)."
+        hash "fbe18e0308d78e2903d0b2966dee0759b5c52c9044ddab715de75d2be499ae56"
+      }
+      provision "/us/usc/ptVIII/rule8006/e/2" paragraph {
+        num "2" "(2)"
+        content "Supplemental Statement by a Party. Within 14 days after the court’s certification, a party may file with the clerk of the certifying court a short supplemental statement about the merits of certification."
+        hash "ad375cddb82da358185363fc4f3a4e01dabdd9c5d736557b507f5accf5454f55"
+      }
+      hash "ec27b516fdc5490f462d52a130391b570507b85475e7d6cb24b74f1401396e30"
+    }
+    provision "/us/usc/ptVIII/rule8006/f" subsection {
+      num "f" "(f)"
+      heading "Certification by the Court on Request."
+      provision "/us/usc/ptVIII/rule8006/f/1" paragraph {
+        num "1" "(1)"
+        content "How Requested. A party’s request for certification under 28 U.S.C. § 158(d)(2)(A)—or a request by a majority of the appellants and of the appellees—must be filed with the clerk of the court where the matter is pending. The request must be filed within 60 days after the judgment, order, or decree is entered."
+        hash "eaa8c53a130bfadbb7fdaed483fed8a2c0204319431157181b0169fdaf48d99a"
+      }
+      provision "/us/usc/ptVIII/rule8006/f/2" paragraph {
+        num "2" "(2)"
+        chapeau "Service; Content. The request must be served on all parties to the appeal in the manner required for serving a notice of appeal under Rule 8003(c)(1). The request must include:"
+        provision "/us/usc/ptVIII/rule8006/f/2/A" subparagraph {
+          num "A" "(A)"
+          content "the facts needed to understand the question presented;"
+          hash "4187efc5225b9ba422c8f23fd6b9d73dbacf2a63391dfa2862e4cb30ce7aac77"
+        }
+        provision "/us/usc/ptVIII/rule8006/f/2/B" subparagraph {
+          num "B" "(B)"
+          content "the question itself;"
+          hash "9a418dc18b191bd5ada88c6dcdb9befa80d50c8aae3f2d225554e52a13e19382"
+        }
+        provision "/us/usc/ptVIII/rule8006/f/2/C" subparagraph {
+          num "C" "(C)"
+          content "the relief sought;"
+          hash "e9770ed16b7aa86411ed3129a8ce049e94838c734b1737c103dca27e1d2c0ba3"
+        }
+        provision "/us/usc/ptVIII/rule8006/f/2/D" subparagraph {
+          num "D" "(D)"
+          content "the reasons why a direct appeal should be allowed, including which circumstance specified in 28 U.S.C. § 158(d)(2)(A)(i)–(iii) applies; and"
+          hash "d0ed6b4f316e2d08b008142b1733931431012b02a5ea34c7d6c3bf379794c69a"
+        }
+        provision "/us/usc/ptVIII/rule8006/f/2/E" subparagraph {
+          num "E" "(E)"
+          content "the judgment, order, or decree, and any related opinion or memorandum."
+          hash "5b05fb4fde70a24879b680026258e1f3508a352ea42c2d075c81159d909d6726"
+        }
+        hash "94a149c06bd22fb27b82327ff521fb014045b0ad70018f0f0e9570611694c5fd"
+      }
+      provision "/us/usc/ptVIII/rule8006/f/3" paragraph {
+        num "3" "(3)"
+        chapeau "Time to File a Response or a Cross-Request."
+        provision "/us/usc/ptVIII/rule8006/f/3/A" subparagraph {
+          num "A" "(A)"
+          content "Response. A party may file a response within 14 days after the request has been served, or within such other time as the court where the matter is pending allows."
+          hash "9e5716959496b5449a00a648a8936611c890041701c77c04c387ce8230b1bbcc"
+        }
+        provision "/us/usc/ptVIII/rule8006/f/3/B" subparagraph {
+          num "B" "(B)"
+          content "Cross-Request. A party may file a cross-request for certification within 14 days after the request has been served or within 60 days after the judgment, order, or decree has been entered—whichever occurs first."
+          hash "b35f284fab527550893442e2615cc02c61714f1619bf176046aa64e4322d6434"
+        }
+        hash "c43375ad85e958cc406147434f70f781eedad9778aaa319c5de219aa1bb9f346"
+      }
+      provision "/us/usc/ptVIII/rule8006/f/4" paragraph {
+        num "4" "(4)"
+        content "Oral Argument Not Required. Unless the court where the matter is pending orders otherwise, a request, a cross-request, and any response will be submitted without oral argument."
+        hash "e45c2e7e1d108d963f2f5cf3033e418261188c05184bc77891df33db88c9f7e8"
+      }
+      provision "/us/usc/ptVIII/rule8006/f/5" paragraph {
+        num "5" "(5)"
+        content "Form of a Certification; Service. The court that certifies a direct appeal in response to a request must do so in a separate document served on all parties to the appeal in the manner required for serving a notice of appeal under Rule 8003(c)(1)."
+        hash "9c0cb7f49eb3e71b902754bad1258f9c6d3a3917719000e5212ba5ef339896b9"
+      }
+      hash "677fb021d8e80a5a7a58a3ae4e31da2010a302b30930bc219827bc052e641aae"
+    }
+    provision "/us/usc/ptVIII/rule8006/g" subsection {
+      num "g" "(g)"
+      heading "Request After Certification for a Court of Appeals to Authorize a Direct Appeal."
+      content "Within 30 days after the certification has become effective under (a), any party to the appeal may ask the court of appeals to authorize a direct appeal by filing a petition with the circuit clerk in accordance with Fed. R. App. P. 6(c)."
+      hash "a4523e3a553670f19fc7255373066b431705508d529db9d527988514a0a56d7d"
+    }
+    hash "75b0d684b1f3bbd17a526b1bc6e50b5e0075c942b248ee0d0bf5b2f9828970ec"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024; Apr. 23, 2025, eff. Dec. 1, 2025.)"
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8006, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 1994, eff. Aug. 1, 1994; Mar. 26, 2009, eff. Dec. 1, 2009, related to record and issues on appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "e592bf23ae6610c560050de5ac5657e52931d34101d40684ddcd9b898c90e152"
+  }
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8001(f), and it provides the procedures for the certification of a direct appeal of a judgment, order, or decree of a bankruptcy court to the court of appeals under 28 U.S.C. § 158(d)(2). Once a case has been certified in the bankruptcy court, the district court, or the BAP for direct appeal and a request for permission to appeal has been timely filed with the circuit clerk, the Federal Rules of Appellate Procedure govern further proceedings in the court of appeals."
+    p "Subdivision (a), like the former rule, requires that an appeal be properly taken—now under Rule 8003 or 8004—before a certification for direct review in the court of appeals takes effect. This rule requires the timely filing of a notice of appeal under Rule 8002 and accounts for the delayed effectiveness of a notice of appeal under the circumstances specified in that rule. Ordinarily, a notice of appeal is effective when it is filed in the bankruptcy court. Rule 8002, however, delays the effectiveness of a notice of appeal when (1) it is filed after the announcement of a decision or order but prior to the entry of the judgment, order, or decree; or (2) it is filed after the announcement or entry of a judgment, order, or decree but before the bankruptcy court disposes of certain postjudgment motions."
+    p "When the bankruptcy court enters an interlocutory order or decree that is appealable under 28 U.S.C. § 158(a)(3), certification for direct review in the court of appeals may take effect before the district court or BAP grants leave to appeal. The certification is effective when the actions specified in subdivision (a) have occurred. Rule 8004(e) provides that if the court of appeals grants permission to take a direct appeal before leave to appeal an interlocutory ruling has been granted, the authorization by the court of appeals is treated as the granting of leave to appeal."
+    p "Subdivision (b) provides that a certification must be filed in the court where the matter is pending, as determined by this subdivision. This provision modifies the former rule. Because of the prompt docketing of appeals in the district court or BAP under Rules 8003 and 8004, a matter is deemed—for purposes of this rule only—to remain pending in the bankruptcy court for 30 days after the effective date of the notice of appeal. This provision will in appropriate cases give the bankruptcy judge, who will be familiar with the matter being appealed, an opportunity to decide whether certification for direct review is appropriate. Similarly, subdivision (d) provides that only the court where the matter is then pending according to subdivision (b) may make a certification on its own motion or on the request of one or more parties."
+    p "Section 158(d)(2) provides three different ways in which an appeal may be certified for direct review. Implementing these options, the rule provides in subdivision (c) for the joint certification by all appellants and appellees; in subdivision (e) for the bankruptcy court’s, district court’s, or BAP’s certification on its own motion; and in subdivision (f) for the bankruptcy court’s, district court’s, or BAP’s certification on request of a party or a majority of appellants and a majority of appellees."
+    p "Subdivision (g) requires that, once a certification for direct review is made, a request to the court of appeals for permission to take a direct appeal to that court must be filed with the clerk of the court of appeals no later than 30 days after the effective date of the certification. Federal Rule of Appellate Procedure 6(c), which incorporates all of F.R.App.P. 5 except subdivision (a)(3), prescribes the procedure for requesting the permission of the court of appeals and governs proceedings that take place thereafter in that court."
+    p "Changes Made After Publication and Comment. In subdivisions (b) and (g), cross-references were added. In subdivision (f)(4), the statement regarding the inapplicability of Rule 9014 was deleted as unnecessary. A clarifying change was made to the first paragraph of the Committee Note."
+    hash "5853391d4f95a2a0a6912caa75cbd1122187e283a6fc9a519013946c9ce0eeaf"
+  }
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Subdivision (c) is amended to provide authority for the court to file a statement on the merits of a certification for direct review by the court of appeals when the certification is made jointly by all of the parties to the appeal. It is a counterpart to subdivision (e)(2), which allows a party to file a similar statement when the court certifies direct review on the court’s own motion."
+    p "The bankruptcy court may file a supplemental statement within 14 days after the certification, even if the appeal is no longer pending before it according to subdivision (b). If the appeal is pending in the district court or BAP during that 14-day period, the appellate court is authorized to file a statement. In all cases, the filing of a statement by the court is discretionary."
+    hash "6580fedd52241869ddf9fac01d1c81147f89ca8c41577edb323c0edaa51bb62c"
+  }
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1d6af22295b895e3d7ad1349ecc0fa48a21c5fef2c2df08205c90a5f637846f0"
+  }
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2025 Amendment"
+    p "Rule 8006(g) is revised to clarify that any party to the appeal may file a request that a court of appeals authorize a direct appeal. There is no obligation to do so if no party wishes the court of appeals to authorize a direct appeal."
+    hash "68f144d17b492ab7602ca3f2d11087b5e043b563db810962e66d8032aa8ec04a"
+  }
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Appellate Procedure, referred to in subd. (g), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "a84078ba35f16c50abf3c1636c3c1a5a97ca04fb76e09f509073f74c36543385"
+  }
+  footnote 1 "1" {
+    p "So in House Document 119–46, which substituted “the” for “a” but did not explicitly amend catchline."
+  }
+  layers {
+    operative "75b0d684b1f3bbd17a526b1bc6e50b5e0075c942b248ee0d0bf5b2f9828970ec"
+    enacted "980d18573d3cdf9446e8bfb423bd410a97e9ee29d57490aed95967fb8fd807ef"
+    editorial "122aa1a6eaaa80a6ef96a86f02859185384727f6202874ce46979967a8295100"
+  }
+}

@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/ptVIII/rule8020" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8020" courtRule {
+    num "8020" "Rule 8020."
+    heading "Frivolous Appeal; Other Misconduct"
+    provision "/us/usc/ptVIII/rule8020/a" subsection {
+      num "a" "(a)"
+      heading "Frivolous Appeal; Damages and Costs."
+      content "If the district court or BAP determines that an appeal is frivolous, then after a separate motion is filed or the court gives notice and a reasonable opportunity to respond, it may award just damages and single or double costs to the appellee."
+      hash "7e9f42c8579cf6c47994031d73f093b9a143ed236c85c5eaa335f97a34765153"
+    }
+    provision "/us/usc/ptVIII/rule8020/b" subsection {
+      num "b" "(b)"
+      heading "Other Misconduct; Sanctions."
+      content "The district court or BAP may discipline or sanction an attorney or party appearing before it for other misconduct, including a failure to comply with a court order. But the court must first give the attorney or party reasonable notice and an opportunity to show cause to the contrary—and if requested, grant a hearing."
+      hash "a0a9b2ac92ddf1f11fd118f348316c2f35a55aeb2bf3d6681f4dbff17d0bd8e3"
+    }
+    hash "72f5f3fc9985a12a695c26ed80514af015bcad9afa910378072d5e537bdba8c6"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8020, Apr. 11, 1997, eff. Dec. 1, 1997, related to damages and costs for frivolous appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "191c50836a34998f43af5e215955a71c55547d6e042a83b697ea8cda76436dc8"
+  }
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8020 and F.R.App.P. 38 and 46(c). Subdivision (a) permits an award of damages and costs to an appellee for a frivolous appeal. Subdivision (b) permits the district court or BAP to impose on parties as well as their counsel sanctions for misconduct other than taking a frivolous appeal. Failure to comply with a court order, for which sanctions may be imposed, may include a failure to comply with a local court rule."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "e5afe0ad58c5f00f81cd0d548c2fe4688c024bf8c436b08c8be095f9ea068cc2"
+  }
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8020 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f4069ca8369b98b2d7a291225af52ef9a25da674c692fab9b0b036fbe915e08f"
+  }
+  layers {
+    operative "72f5f3fc9985a12a695c26ed80514af015bcad9afa910378072d5e537bdba8c6"
+    enacted "105792ff1fa435dac0f99da86a058757550039d8638690881b9a211a2ee1e915"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

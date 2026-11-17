@@ -1,0 +1,132 @@
+edition 2
+module "/us/usc/t45/s1312" {
+  within "/us/usc/t45/ch22/schII/ptA"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1312" section {
+    num "1312" "§ 1312."
+    heading "Public offering"
+    provision "/us/usc/t45/s1312/a" subsection {
+      num "a" "(a)"
+      heading "Structure of public offering"
+      provision "/us/usc/t45/s1312/a/1" paragraph {
+        num "1" "(1)"
+        content "After the registration statement referred to in " ["section 1311(c) of this title" -> "/us/usc/t45/s1311/c"] " is declared effective by the Securities and Exchange Commission, the Secretary of Transportation, in consultation with the Secretary of the Treasury, the Chairman of the Board of Directors of the Corporation, and the co-lead managers, shall offer the United States shares for sale in a public offering, except as provided in paragraphs (2) and (3)."
+        hash "981ea89c9401c9ad2dec190ecd6d19269e7008787340b936660898984916485c"
+      }
+      provision "/us/usc/t45/s1312/a/2" paragraph {
+        num "2" "(2)"
+        content "The Secretary of Transportation, after such consultation, may elect to offer less than all of the United States shares for sale at the time of the initial sale."
+        hash "7d0bbed5262a6ddc587c8b3461c6baf24e925b966c87f67b4ea84c999311cb39"
+      }
+      provision "/us/usc/t45/s1312/a/3" paragraph {
+        num "3" "(3)"
+        content "Under no circumstances shall the Secretary of Transportation offer any of the United States shares for sale unless, before the sale date, the Secretary determines, after such consultation, that the estimated sum of the gross proceeds from the sale of all the United States shares will be an adequate amount. A determination by the Secretary under this paragraph shall not be reviewable."
+        hash "92498ed79c4f7ac09ad3710156a7bebe820e24e3ca1024b96d2d9250b9377ac0"
+      }
+      provision "/us/usc/t45/s1312/a/4" paragraph {
+        num "4" "(4)"
+        content "In making a determination under paragraph (3), the Secretary shall have the goal of obtaining at least $2,000,000,000 in aggregate gross proceeds for the United States from the public offering and any payments made under " ["section 1311(b) of this title" -> "/us/usc/t45/s1311/b"] "."
+        hash "315ab80f8041583a578c902e1b0cbdc477538bc68b4aefa94cdcdc40de726386"
+      }
+      hash "f4fec62736e75d4051ce134cd66210d5edfd2213fc2656a0670a0785014beb3c"
+    }
+    provision "/us/usc/t45/s1312/b" subsection {
+      num "b" "(b)"
+      heading "Subsequent sales"
+      content "If the Secretary of Transportation elects to offer for sale less than all the United States shares, the Secretary shall sell the remaining United States shares in subsequent public offerings."
+      hash "f87b3f52de9a71406b9b0715ff42954a3771693ff4406cb384505aaa0905e14e"
+    }
+    provision "/us/usc/t45/s1312/c" subsection {
+      num "c" "(c)"
+      heading "Consent of Corporation not required"
+      content "Any public offering under this section may be made without the consent of the Corporation."
+      hash "378ba1ebf58c15d8b0df6cf6d477db29bb8a5046c7183dcbc72beddf3426dd79"
+    }
+    provision "/us/usc/t45/s1312/d" subsection {
+      num "d" "(d)"
+      heading "Authority to require stock splits"
+      provision "/us/usc/t45/s1312/d/1" paragraph {
+        num "1" "(1)"
+        content "The Secretary of Transportation, in consultation with the co-lead managers and the Chairman of the Board of Directors of the Corporation, may, in connection with the initial public offering described in subsection (a), before the filing of the registration statement referred to in " ["section 1311(c) of this title" -> "/us/usc/t45/s1311/c"] ", require the Corporation to declare a stock split or reverse stock split."
+        hash "d69f29c7170b3bf04602305cc8c4f4d2656a3d48c85b425f58ddde56adf481c1"
+      }
+      provision "/us/usc/t45/s1312/d/2" paragraph {
+        num "2" "(2)"
+        content "The Corporation shall take such action as may be necessary to comply with the Secretary’s requirements under this subsection."
+        hash "98dbb98f406cad11f52cde249218ea1d26269d905d75619947cf967996b1ba05"
+      }
+      hash "7fcc22b7ba75863afa8b48fad6a8bee91d3ac74b53cd10c584ad75d2ae20af80"
+    }
+    provision "/us/usc/t45/s1312/e" subsection {
+      num "e" "(e)"
+      heading "Cancellation of other securities held by United States"
+      provision "/us/usc/t45/s1312/e/1" paragraph {
+        num "1" "(1)"
+        content "In consideration for amounts transferred to the United States under " ["section 1311(b) of this title" -> "/us/usc/t45/s1311/b"] ", the Secretary of Transportation shall, concurrent with the initial public offering described in subsection (a), deliver to the Corporation all preferred stock, 7.5 percent debentures, and contingent interest notes of the Corporation. The Corporation shall immediately cancel such debentures, preferred stock, and contingent interest notes, and any interest of the United States in such debentures, preferred stock, and contingent interest notes shall be thereby extinguished."
+        hash "6941a23e5d7f95a250b6f4335842a21b11ec10559fe218475ca0d485c12f95c4"
+      }
+      provision "/us/usc/t45/s1312/e/2" paragraph {
+        num "2" "(2)"
+        content "For purposes of regulation by the Commission and State public utility regulation, the actions authorized by this subsection, the public offering, and the value of the consideration received therefor shall not change the value of the Corporation’s assets net of depreciation and shall not be used to alter the calculation of the Corporation’s stock or asset values, rate base, expenses, costs, returns, profits, or revenues, or otherwise affect or be the basis for a change in the regulation of any railroad service, rate, or practice provided or established by the Corporation, or any change in the financial reporting practice of the Corporation."
+        hash "cf60f85b380384af8a010fff4cbf98230de10e408cf331ecdcd38e9d35915a28"
+      }
+      hash "933f6363dd3c9aa063503508bd3dc5518164229e9a445dd719fb7fca23accf3a"
+    }
+    provision "/us/usc/t45/s1312/f" subsection {
+      num "f" "(f)"
+      heading "Minority investment banking firms"
+      content "The Secretary of Transportation shall ensure that minority owned or controlled investment banking firms shall have an opportunity to participate to a significant degree in any public offering under this subchapter."
+      hash "97a3b7b34d97d6d7e4d50e547d19061ccc0b6d8badbae54dc8d8bd66d6ed2bf6"
+    }
+    provision "/us/usc/t45/s1312/g" subsection {
+      num "g" "(g)"
+      heading "Investment banking firm requirements"
+      provision "/us/usc/t45/s1312/g/1" paragraph {
+        num "1" "(1)"
+        content "The level of any investment banking firm’s participation in the public offering shall be consistent with that firm’s financial capabilities."
+        hash "da03bada9343bf64dafe09465fb8f06890680e8c444e8c87faec80548a395bf4"
+      }
+      provision "/us/usc/t45/s1312/g/2" paragraph {
+        num "2" "(2)"
+        content "No investment banking firm which was not in existence on September 1, 1986, shall participate in the public offering."
+        hash "a891f7291db9e3e67842921d82ce006dd89341e4ce65dd14a473e58027cea9b8"
+      }
+      hash "00e0547396442e9ca626d72e657be6e3bb75e576643457072a08b48ffb32b2ea"
+    }
+    provision "/us/usc/t45/s1312/h" subsection {
+      num "h" "(h)"
+      heading "Government Accountability Office authority to conduct audits"
+      content "The Government Accountability Office may make such audits as may be deemed appropriate by the Comptroller General of the United States of all accounts, books, records, memoranda, correspondence, and other documents and transactions of the Corporation and the co-lead managers associated with the public offering. The co-lead managers shall agree, in writing, to allow the Government Accountability Office to make such audits. The Government Accountability Office shall report the results of all such audits to the Congress."
+      hash "e7bf26cea36878f0d79726617d8cbc92f0a8a1b39cfb5c4908a74add146e42dc"
+    }
+    hash "4268ad354fb16486d1f6ece029743592ea44a196afe84b3ecf7c04c21649df71"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4012" -> "/us/pl/99/509/tIV/s4012"] ", Oct. 21, 1986, " ["100 Stat. 1896" -> "/us/stat/100/1896"] "; " ["Pub. L. 108–271, § 8(b)" -> "/us/pl/108/271/s8/b"] ", July 7, 2004, " ["118 Stat. 814" -> "/us/stat/118/814"] ".)"
+  note "/us/usc/t45/s1312/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This subchapter, referred to in subsec. (f), was in the original “this part” meaning part 2 (§§ 4011–4038) of subtitle A of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1895" -> "/us/stat/100/1895"] ", which enacted this subchapter, amended sections 702, 726, 727, 741, 797, former section 821, and sections 825, 829, 831, 1105, 1115, and 1116 of this title and " ["section 10362 of Title 49" -> "/us/usc/t49/s10362"] ", Transportation, repealed sections 761 to 769c, 797l, 825a, 1107, 1110, and 1114 of this title, and enacted provisions set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] ". For complete classification of part 2 to the Code, see Tables."
+    hash "602e771693bf7dd0c93652887f7e8b98181cae186346e68e8860ea672077ca6d"
+  }
+  note "/us/usc/t45/s1312/note/editorialNotes/pl.108.271/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2004—Subsec. (h). " ["Pub. L. 108–271" -> "/us/pl/108/271"] " substituted “Government Accountability Office” for “General Accounting Office” in heading and wherever appearing in text."
+    hash "1b7b35d00f8b23f32f4423b8c49f9312b30da31c5e3849d5bf38b8a2c0052153"
+  }
+  note "/us/usc/t45/s1312/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "4268ad354fb16486d1f6ece029743592ea44a196afe84b3ecf7c04c21649df71"
+    enacted "a57eaffb6da0a15ebc9eefd3fc83fbd0dd6201dd556cc2a6b0e06eaefb8fc33a"
+    editorial "fa5c893afdff4cda3aa5aba32f3e316510f81ed788b4b2e80464a150cc9f9648"
+  }
+}

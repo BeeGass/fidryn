@@ -1,0 +1,128 @@
+edition 2
+module "/us/usc/t45/s360" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s360" section {
+    num "360" "§ 360."
+    heading "Railroad unemployment insurance account"
+    provision "/us/usc/t45/s360/a" subsection {
+      num "a" "(a)"
+      heading "Funds constituting account; availability for benefits or refunds"
+      content "The Secretary of the Treasury shall maintain in the unemployment trust fund established pursuant to " ["section 1104 of title 42" -> "/us/usc/t42/s1104"] " an account to be known as the railroad unemployment insurance account. This account shall consist of (i) such part of all contributions collected pursuant to " ["section 358 of this title" -> "/us/usc/t45/s358"] " as is in excess of 0.65 per centum of the total compensation on which such contributions are based, together with all interest collected pursuant to section 358(g)" mark "1" 1 " of this title; (ii) all amounts transferred or paid into the account pursuant to section 363 or " ["section 364 of this title" -> "/us/usc/t45/s364"] "; (iii) all additional amounts appropriated to the account in accordance with any provision of this chapter or with any provision of law now or hereafter adopted; (iv) a proportionate part of the earnings of the unemployment trust fund, computed in accordance with the provisions of " ["section 1104(e) of title 42" -> "/us/usc/t42/s1104/e"] "; (v) all amounts realized in recoveries for overpayments or erroneous payments of benefits; (vi) all amounts transferred thereto pursuant to " ["section 361 of this title" -> "/us/usc/t45/s361"] "; (vii) all fines or penalties collected pursuant to the provisions of this chapter; and (viii) all amounts credited thereto pursuant to section 352(f) or " ["section 362(g) of this title" -> "/us/usc/t45/s362/g"] ". Notwithstanding any other provision of law, all moneys credited to the account shall be mingled and undivided, and are permanently appropriated to the Board to be continuously available to the Board without further appropriation, for the payment of benefits and refunds under this chapter, and no part thereof shall lapse at any time, or be carried to the surplus fund or any other fund."
+      hash "b9d568fe8aa844c5eb2b561756c77ddfe3d47545423b9ec57b72d35b3c6c4b84"
+    }
+    provision "/us/usc/t45/s360/b" subsection {
+      num "b" "(b)"
+      heading "Payment of benefits or refunds"
+      content "All moneys in the account shall be used solely for the payment of the benefits and refunds provided for by this chapter. The Board shall, from time to time, certify to the Secretary of the Treasury the name and address of each person or company entitled to receive benefits or a refund payment under this chapter, the amount of such payment, and the time at which it shall be made. Prior to audit or settlement by the Government Accountability Office, the Secretary of the Treasury, through the Fiscal Service of the Treasury Department, shall make payments from the account directly to such person or company of the amount of benefits or refund so certified by the Board: Provided, however, That if the Board shall so request, the Secretary of the Treasury, through the Fiscal Service of the Treasury Department, shall transmit benefits payments to the Board for distribution by it through employment offices or in such other manner as the Board deems proper."
+      hash "462b26e46203259ff622892cebfb41e21a4493050e3793f55ea5d94c569e4472"
+    }
+    provision "/us/usc/t45/s360/c" subsection {
+      num "c" "(c)"
+      heading "Annual report to Congress"
+      content "The Board shall include in its annual report to Congress a statement with respect to the status and operation of the account."
+      hash "af818856b36aef7ba82fc42b579176d2fd0bf334bdd9311c147d75124719b562"
+    }
+    provision "/us/usc/t45/s360/d" subsection {
+      num "d" "(d)"
+      heading "Transfer and retransfer of funds; interest"
+      content "Whenever the Board finds at any time that the balance in the railroad unemployment insurance account will be insufficient to pay the benefits and refunds which it estimates are due, or will become due, under this chapter, it shall request the Secretary of the Treasury to transfer from the Railroad Retirement Account to the credit of the railroad unemployment insurance account such moneys as the Board estimates would be necessary for the payment of such benefits and refunds, and the Secretary shall make such transfer. Whenever the Board finds that the balance in the railroad unemployment insurance account, without regard to the amounts transferred pursuant to the next preceding sentence, is sufficient to pay such benefits and refunds, it shall request the Secretary of the Treasury to retransfer from the railroad unemployment insurance account to the credit of the Railroad Retirement Account such moneys as in its judgment are not needed for the payment of such benefits and refunds, plus interest at a rate for each fiscal year equal to the average rate of interest borne by all special obligations held by the Railroad Retirement Account on the last day of the preceding fiscal year, rounded to the nearest multiple of one-eighth of 1 per centum, and the Secretary shall make such retransfer. In determining the balance in the railroad unemployment insurance account as of September 30 of any year pursuant to " ["section 358(a) of this title" -> "/us/usc/t45/s358/a"] ", any moneys transferred from the Railroad Retirement Account to the credit of the railroad unemployment insurance account which have not been retransferred as of such date from the latter account to the credit of the former, plus the interest accrued thereon to that date, shall be disregarded."
+      hash "fdaf683f4b6f903c9b6c086b2ffa2383f8d7aeb64bddfa3a0ce130cafe32d7cf"
+    }
+    hash "a8cbbadfbe0a48ea023c582c9306ebff003c3bb6c3e22e623614575aa84cef1d"
+  }
+  credit "(" ["June 25, 1938, ch. 680, § 10" -> "/us/act/1938-06-25/ch680/s10"] " (less (e)–(g)), " ["52 Stat. 1104" -> "/us/stat/52/1104"] "; " ["June 20, 1939, ch. 227, § 13" -> "/us/act/1939-06-20/ch227/s13"] ", " ["53 Stat. 848" -> "/us/stat/53/848"] "; 1940 Reorg. Plan No. III, § 1(a)(1), eff. June 30, 1940, 5 F.R. 2107, " ["54 Stat. 1231" -> "/us/stat/54/1231"] "; " ["June 23, 1948, ch. 608, § 7" -> "/us/act/1948-06-23/ch608/s7"] ", " ["62 Stat. 578" -> "/us/stat/62/578"] "; " ["Pub. L. 86–28" -> "/us/pl/86/28"] ", pt. III, § 308(a), May 19, 1959, " ["73 Stat. 32" -> "/us/stat/73/32"] "; " ["Pub. L. 88–133, title III, § 305" -> "/us/pl/88/133/tIII/s305"] ", Oct. 5, 1963, " ["77 Stat. 223" -> "/us/stat/77/223"] "; " ["Pub. L. 89–700, title II, § 205" -> "/us/pl/89/700/tII/s205"] ", Oct. 30, 1966, " ["80 Stat. 1087" -> "/us/stat/80/1087"] "; " ["Pub. L. 90–257, title II, § 205" -> "/us/pl/90/257/tII/s205"] ", Feb. 15, 1968, " ["82 Stat. 24" -> "/us/stat/82/24"] "; " ["Pub. L. 93–445, title IV, § 403" -> "/us/pl/93/445/tIV/s403"] ", Oct. 16, 1974, " ["88 Stat. 1359" -> "/us/stat/88/1359"] "; " ["Pub. L. 94–92, title I, § 1(i)" -> "/us/pl/94/92/tI/s1/i"] ", Aug. 9, 1975, " ["89 Stat. 464" -> "/us/stat/89/464"] "; " ["Pub. L. 98–76, title III, § 302" -> "/us/pl/98/76/tIII/s302"] ", Aug. 12, 1983, " ["97 Stat. 432" -> "/us/stat/97/432"] "; " ["Pub. L. 99–107, § 4" -> "/us/pl/99/107/s4"] ", Sept. 30, 1985, " ["99 Stat. 479" -> "/us/stat/99/479"] "; " ["Pub. L. 99–155, § 2(c)" -> "/us/pl/99/155/s2/c"] ", Nov. 14, 1985, " ["99 Stat. 814" -> "/us/stat/99/814"] "; " ["Pub. L. 99–181, § 3" -> "/us/pl/99/181/s3"] ", Dec. 13, 1985, " ["99 Stat. 1172" -> "/us/stat/99/1172"] "; " ["Pub. L. 99–189, § 3" -> "/us/pl/99/189/s3"] ", Dec. 18, 1985, " ["99 Stat. 1184" -> "/us/stat/99/1184"] "; " ["Pub. L. 99–272, title XIII, § 13302" -> "/us/pl/99/272/tXIII/s13302"] ", Apr. 7, 1986, " ["100 Stat. 327" -> "/us/stat/100/327"] "; " ["Pub. L. 100–647, title VII, § 7103(b)(1)" -> "/us/pl/100/647/tVII/s7103/b/1"] ", Nov. 10, 1988, " ["102 Stat. 3770" -> "/us/stat/102/3770"] "; " ["Pub. L. 108–271, § 8(b)" -> "/us/pl/108/271/s8/b"] ", July 7, 2004, " ["118 Stat. 814" -> "/us/stat/118/814"] ".)"
+  note "/us/usc/t45/s360/note/editorialNotes/pl.100.647/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 358(g) of this title" -> "/us/usc/t45/s358/g"] ", referred to in subsec. (a), was redesignated " ["section 358(j) of this title" -> "/us/usc/t45/s358/j"] " by " ["Pub. L. 100–647, title VII, § 7102(d)(1)" -> "/us/pl/100/647/tVII/s7102/d/1"] ", Nov. 10, 1988, " ["102 Stat. 3769" -> "/us/stat/102/3769"] "."
+    p "This chapter, referred to in subsecs. (a), (b), and (d), was in the original “this Act”, meaning " ["act June 25, 1938, ch. 680" -> "/us/act/1938-06-25/ch680"] ", " ["52 Stat. 1094" -> "/us/stat/52/1094"] ", which enacted this chapter and amended sections 503 and 1104 and former " ["section 1107 of Title 42" -> "/us/usc/t42/s1107"] ", The Public Health and Welfare. For complete classification of this Act to the Code, see " ["section 367 of this title" -> "/us/usc/t45/s367"] " and Tables."
+    hash "48a879fc6759f4f8d4157df890e6410bdb9ef05f51aecd23a9d97e25827917b7"
+  }
+  note "/us/usc/t45/s360/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section 10(e)–(g) of act June 25, 1938, amended " ["section 1104 of Title 42" -> "/us/usc/t42/s1104"] ", The Public Health and Welfare."
+    hash "849cd02e6a9a808ab316c2182ee20969097016b82f5f9ad4bdd999acafef1b5e"
+  }
+  note "/us/usc/t45/s360/note/editorialNotes/pl.108.271/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2004—Subsec. (b). " ["Pub. L. 108–271" -> "/us/pl/108/271"] " substituted “Government Accountability Office” for “General Accounting Office”."
+    p "1988—Subsec. (a). " ["Pub. L. 100–647" -> "/us/pl/100/647"] " substituted “0.65” for “0.5”."
+    p "1986—Subsec. (d). " ["Pub. L. 99–272" -> "/us/pl/99/272"] " struck out at end “No transfer shall be made under this subsection from Railroad Retirement Account after December 19, 1985, and no such transfer shall be made on or before December 19, 1985, for purposes of paying benefits and refunds due after such date.”"
+    p "1985—Subsec. (d). " ["Pub. L. 99–189" -> "/us/pl/99/189"] " substituted “December 19, 1985” for “December 18, 1985” wherever appearing."
+    p ["Pub. L. 99–181" -> "/us/pl/99/181"] " substituted “December 18, 1985” for “December 14, 1985” wherever appearing."
+    p ["Pub. L. 99–155" -> "/us/pl/99/155"] " substituted “December 14, 1985” for “November 14, 1985” wherever appearing."
+    p ["Pub. L. 99–107" -> "/us/pl/99/107"] " substituted “November 14, 1985” for “September 30, 1985” wherever appearing."
+    p "1983—Subsec. (d). " ["Pub. L. 98–76" -> "/us/pl/98/76"] " inserted provisions that no transfer shall be made under this subsection from Railroad Retirement Account after September 30, 1985, and no such transfer shall be made on or before September 30, 1985, for purposes of paying benefits and refunds due after such date."
+    p "1975—Subsec. (a)(i). " ["Pub. L. 94–92, § 1(i)(1)" -> "/us/pl/94/92/s1/i/1"] ", substituted “0.5” for “0.25”."
+    p "Subsec. (a)(ii). " ["Pub. L. 94–92, § 1(i)(2)" -> "/us/pl/94/92/s1/i/2"] ", struck out “and pursuant to subsection (h)[e] of this section”. Congress probably intended to strike out internal reference to subsec. (e) of this section in view of repeal of subsection by " ["section 403 of Pub. L. 93–445" -> "/us/pl/93/445/s403"] " and it being last subsection of section."
+    p "1974—Subsec. (e). " ["Pub. L. 93–445" -> "/us/pl/93/445"] " repealed subsec. (e) which was added by " ["Pub. L. 90–257" -> "/us/pl/90/257"] " as subsec. (h) and redesignated (e) for purposes of codification, and which provided for annual adjustment of account and transfer of funds from Railroad Retirement Account."
+    p "1968—Subsec. (a)(ii). " ["Pub. L. 90–257" -> "/us/pl/90/257"] " inserted reference to amounts transferred or paid into account pursuant to subsec. (e) of this section."
+    p "Subsec. (e). " ["Pub. L. 90–257" -> "/us/pl/90/257"] " added subsec. (e) which was subsec. (h) in original and was redesignated (e) for purposes of codification."
+    p "1966—Subsec. (a). " ["Pub. L. 89–700" -> "/us/pl/89/700"] " substituted “0.25 per centum” for “0.2 per centum”."
+    p "1963—Subsec. (d). " ["Pub. L. 88–133" -> "/us/pl/88/133"] " substituted “a rate for each fiscal year equal to the average rate of interest borne by all special obligations held by the Railroad Retirement Account on the last day of the preceding fiscal year, rounded to the nearest multiple of one-eighth of 1 per centum” for “the rate of 3 per centum per annum.”"
+    p "1959—Subsec. (d). " ["Pub. L. 86–28" -> "/us/pl/86/28"] " substituted provisions authorizing Board to request transfer and retransfer of funds for provisions which directed Secretary of the Treasury to advance not more than $25,000,000 for purpose of paying benefits."
+    p "1948—Subsec. (a)(i). Act June 23, 1948, changed computation of insurance account."
+    p "1939—Subsec. (a). Act June 20, 1939, substituted “(f)” for “(g)”."
+    hash "7fe2428249c56033988f41a13f0d7190741362fdd1dc01c963bc57be71446417"
+  }
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1988 Amendment"
+    p "Amendment by " ["Pub. L. 100–647" -> "/us/pl/100/647"] " applicable with respect to compensation paid in months beginning after Sept. 30, 1988, see " ["section 7103(c) of Pub. L. 100–647" -> "/us/pl/100/647/s7103/c"] ", set out as a note under " ["section 358 of this title" -> "/us/usc/t45/s358"] "."
+    hash "2343e30d9292b4f4b26532f83ff55f6541d187c0d3094990304648bf78642850"
+  }
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1975 Amendment"
+    p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to compensation paid for services rendered after Dec. 31, 1975; and effective Aug. 9, 1975, respectively, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "03491219d9e0f6cb8d48c603f9f8b10a4ee58b638189eb8463395ecee8374390"
+  }
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1974 Amendment"
+    p "Amendment by " ["Pub. L. 93–445" -> "/us/pl/93/445"] " effective Jan. 1, 1975, see " ["section 603 of Pub. L. 93–445" -> "/us/pl/93/445/s603"] ", set out as a note under " ["section 402 of Title 42" -> "/us/usc/t42/s402"] ", The Public Health and Welfare."
+    hash "5fa55b4cf8ad1c4e9c627a6cb7ce22c58124f616c18c46e9c5b5749b769ab526"
+  }
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1963 Amendment"
+    p ["Pub. L. 88–133, title III, § 305" -> "/us/pl/88/133/tIII/s305"] ", Oct. 5, 1963, " ["77 Stat. 223" -> "/us/stat/77/223"] ", provided that the amendment made by section 305 is effective after June 30, 1964."
+    hash "b8e6b55f215f8e7e29a715510650ec606eec2693475b1aca8257e5f395f3ed96"
+  }
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1959 Amendment"
+    p ["Pub. L. 86–28" -> "/us/pl/86/28"] ", pt. III, § 308(b), May 19, 1959, " ["73 Stat. 33" -> "/us/stat/73/33"] ", provided that:"
+    quoted "/us/pl/86/28" {
+      p "“The amendment made by this section [amending this section] shall take effect on the date of enactment of this Act [May 19, 1959].”"
+    }
+    hash "a9bb4a2827aeab7a60cdd7b24f15974b2159b642da18bc120b97680927902a1f"
+  }
+  note "/us/usc/t45/s360/note/execDoc/nolaw/transfer-of-functions" enacted {
+    group execDoc
+    topic "transferOfFunctions"
+    heading "Transfer of Functions"
+    p "“Fiscal Service” substituted for “Division of Disbursements” in two places in subsec. (b) on authority of section 1(a)(1) of Reorg. Plan No. III of 1940, eff. June 30, 1940, 5 F.R. 2107, " ["54 Stat. 1231" -> "/us/stat/54/1231"] ", set out in the Appendix to Title 5, Government Organization and Employees, which consolidated such division into Fiscal Service of Treasury Department. See " ["section 306 of Title 31" -> "/us/usc/t31/s306"] ", Money and Finance."
+    hash "3c7c7039895fdef3a2c6939ea40a455b02d48a3ee0d215df2c3fb448eb778186"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "a8cbbadfbe0a48ea023c582c9306ebff003c3bb6c3e22e623614575aa84cef1d"
+    enacted "dc8030c0baa7da914f910f651cb61ae33f2aabd70f63985a563bc052529f1d61"
+    editorial "b1514f0c78a2d3b3eb65c557c7b6b707f1adea7b98d7a96ec7caf8d8c15e97c2"
+  }
+}

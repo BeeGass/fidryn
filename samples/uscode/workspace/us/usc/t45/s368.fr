@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s368" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s368" section {
+    num "368" "§ 368."
+    heading "Repealed. " ["Pub. L. 104–251, § 5(c)" -> "/us/pl/104/251/s5/c"] ", Oct. 9, 1996, " ["110 Stat. 3165" -> "/us/stat/110/3165"]
+    status repealed
+    hash "af3ad6756371e53b080843ae89766df8e6e0d393870de677d5cdfb160be0c4f6"
+  }
+  note "/us/usc/t45/s368/note/ungrouped/act.1938-06-25.ch680/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["act June 25, 1938, ch. 680, § 17" -> "/us/act/1938-06-25/ch680/s17"] ", as added Mar. 24, 1983, " ["Pub. L. 98–8, title I, § 102(a)" -> "/us/pl/98/8/tI/s102/a"] ", " ["97 Stat. 32" -> "/us/stat/97/32"] "; amended Nov. 30, 1983, " ["Pub. L. 98–181, title II, § 2005(a)" -> "/us/pl/98/181/tII/s2005/a"] ", " ["97 Stat. 1298" -> "/us/stat/97/1298"] ", related to payment of supplemental employment benefits."
+    hash "4b9231fdcd58ec97de68c37c113d2e2e2b2cf6413b3c3af10724ed00591ba5cc"
+  }
+  note "/us/usc/t45/s368/note/ungrouped/nolaw/h.f6f5af1bd24c575d" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Another section 17 of act June 25, 1938, is classified to " ["section 367 of this title" -> "/us/usc/t45/s367"] "."
+    hash "f6f5af1bd24c575d36e7642c4151fff58d30971e31f92b05a0d289caf1cb70a8"
+  }
+  layers {
+    operative "af3ad6756371e53b080843ae89766df8e6e0d393870de677d5cdfb160be0c4f6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5c6e8d45e27b09bdc2dd10038c886087b7791d0ae1251bea3c772faaa2bab22a"
+  }
+}

@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch22" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch22" chapter {
+    num "22" "CHAPTER 22—"
+    heading "CONRAIL PRIVATIZATION"
+    member "/us/usc/t45/ch22/schI"
+    member "/us/usc/t45/ch22/schII"
+    hash "fac3b63904eb806c02107d312b9dba3c412c6261e350e37f79ce666723071a0b"
+  }
+  layers {
+    operative "fac3b63904eb806c02107d312b9dba3c412c6261e350e37f79ce666723071a0b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

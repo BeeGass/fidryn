@@ -1,0 +1,19 @@
+edition 2
+module "/us/usc/t45/ch14/schIV" {
+  within "/us/usc/t45/ch14"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch14/schIV" subchapter {
+    num "IV" "SUBCHAPTER IV—"
+    heading "PROVISION OF RAIL PASSENGER SERVICES"
+    member "/us/usc/t45/s561...563"
+    member "/us/usc/t45/s564"
+    member "/us/usc/t45/s565"
+    hash "ff6ce5201d06ca2e4d7126dec4ffc505427aa49cd08ecb61f7b6e86b5a658a08"
+  }
+  layers {
+    operative "ff6ce5201d06ca2e4d7126dec4ffc505427aa49cd08ecb61f7b6e86b5a658a08"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

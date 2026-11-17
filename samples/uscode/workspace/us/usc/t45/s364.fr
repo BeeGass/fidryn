@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s364" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s364" section {
+    num "364" "§ 364."
+    heading "District of Columbia account, transfer of funds to railroad unemployment insurance account"
+    content "The Secretary of the Treasury is authorized and directed to transfer from the account of the District of Columbia in the unemployment trust fund to the railroad unemployment insurance account in the unemployment trust fund, an amount equal to the “preliminary amount” and an amount equal to the “liquidating amount”, whenever such amounts, respectively, have been determined, with respect to the District of Columbia, pursuant to " ["section 363 of this title" -> "/us/usc/t45/s363"] "."
+    hash "9fbf7239fe05645cad1207e1c008068bb8cf092c27bd214fc266abd6b6550c29"
+  }
+  credit "(" ["June 25, 1938, ch. 680, § 14(b)" -> "/us/act/1938-06-25/ch680/s14/b"] ", " ["52 Stat. 1113" -> "/us/stat/52/1113"] ".)"
+  layers {
+    operative "9fbf7239fe05645cad1207e1c008068bb8cf092c27bd214fc266abd6b6550c29"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d799e2dbef703eb0924102983b675f3cbcbbf24ec88044c4f60e51f9937a1142"
+  }
+}

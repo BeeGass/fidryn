@@ -1,0 +1,203 @@
+edition 2
+module "/us/usc/ptIX/rule9037" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9037" courtRule {
+    num "9037" "Rule 9037."
+    heading "Protecting Privacy for Filings"
+    provision "/us/usc/ptIX/rule9037/a" subsection {
+      num "a" "(a)"
+      heading "Redacted Filings."
+      chapeau "Unless the court orders otherwise, in an electronic or paper filing with the court that contains an individual’s social-security number, taxpayer-identification number, or birth date, the name of an individual other than the debtor known to be and identified as a minor, or a financial-account number, a party or nonparty making the filing may include only:"
+      provision "/us/usc/ptIX/rule9037/a/1" paragraph {
+        num "1" "(1)"
+        content "the last four digits of a social-security" mark "1" 1 " and taxpayer-identification number;"
+        hash "cac5cc7082ea126bab8c7ce25dbd735cc0d513d898be550f0cd9f59b49eaf6f2"
+      }
+      provision "/us/usc/ptIX/rule9037/a/2" paragraph {
+        num "2" "(2)"
+        content "the year of the individual’s birth;"
+        hash "a5ffbd6a85e3935b2200d9205507c3bcac85b18686d679e5c2ac5e1c24c2731d"
+      }
+      provision "/us/usc/ptIX/rule9037/a/3" paragraph {
+        num "3" "(3)"
+        content "the minor’s initials; and"
+        hash "2f32530d1effd67f998f1a0dd8dc2cf4b7065386edeb1098072ce69e581a9dbf"
+      }
+      provision "/us/usc/ptIX/rule9037/a/4" paragraph {
+        num "4" "(4)"
+        content "the last four digits of the financial-account number."
+        hash "e375ebfbdba200fac943c077ecf71d621e4f79bbc78617c5c4e94613ff66317b"
+      }
+      hash "9cb099c02a6dd712e73e6ed46b4b0dd1fdd3d54e8d0152c4dc35bc0d7c2bd48d"
+    }
+    provision "/us/usc/ptIX/rule9037/b" subsection {
+      num "b" "(b)"
+      heading "Exemptions from the Redaction Requirement."
+      chapeau "The redaction requirement does not apply to the following:"
+      provision "/us/usc/ptIX/rule9037/b/1" paragraph {
+        num "1" "(1)"
+        content "a financial-account number that identifies the property allegedly subject to forfeiture in a forfeiture proceeding;"
+        hash "d6261742a08a9eaf4c3205143d96f1cdc6726029b5d98112a9d0e550bb9d24d0"
+      }
+      provision "/us/usc/ptIX/rule9037/b/2" paragraph {
+        num "2" "(2)"
+        content "the record of an administrative or agency proceeding, unless filed with a proof of claim;"
+        hash "74ff722ae5530251ac3f6b6d0b06b01f0c5bfe9935a6f7f555119e7c8483813a"
+      }
+      provision "/us/usc/ptIX/rule9037/b/3" paragraph {
+        num "3" "(3)"
+        content "the official record of a state-court proceeding;"
+        hash "4d5c890d8489aade33895195e63a19c6d29b923d7788e27358f45bf97dcf29db"
+      }
+      provision "/us/usc/ptIX/rule9037/b/4" paragraph {
+        num "4" "(4)"
+        content "the record of a court or tribunal, if that record was not subject to the redaction requirement when originally filed;"
+        hash "9c4915c57a9c362a59329b6afd5c526173e26a2f837eab00d05bfe74e56fe4aa"
+      }
+      provision "/us/usc/ptIX/rule9037/b/5" paragraph {
+        num "5" "(5)"
+        content "a filing covered by (c); and"
+        hash "4f288afed6d10d59cec6d2997310df680e6b1f229f1b3de88d05c5894a39a8fd"
+      }
+      provision "/us/usc/ptIX/rule9037/b/6" paragraph {
+        num "6" "(6)"
+        content "a filing subject to § 110."
+        hash "7ecc43ec803109c13f227e2e5166fcba569eec931f290ec24f53711d25b56f62"
+      }
+      hash "fdf469abba76476d447a11ab91a48d768912d3563f3bd6cce3e5497492ab6ce2"
+    }
+    provision "/us/usc/ptIX/rule9037/c" subsection {
+      num "c" "(c)"
+      heading "Filings Made Under Seal."
+      content "The court may order that a filing be made under seal without redaction. The court may later unseal the filing or order the entity that made it to file a redacted version for the public record."
+      hash "7684fc6ad9d48bd61d13287e7ed9678e02848b3a10dca492772295f24d805c84"
+    }
+    provision "/us/usc/ptIX/rule9037/d" subsection {
+      num "d" "(d)"
+      heading "Protective Orders."
+      chapeau "For cause, the court may by order in a case:"
+      provision "/us/usc/ptIX/rule9037/d/1" paragraph {
+        num "1" "(1)"
+        content "require redaction of additional information; or"
+        hash "b16e0b469519f67eaae90616a1cca87a0283bf430df1b078d78540c0356e67a5"
+      }
+      provision "/us/usc/ptIX/rule9037/d/2" paragraph {
+        num "2" "(2)"
+        content "limit or prohibit a nonparty’s remote electronic access to a document filed with the court."
+        hash "d3ad4c6308a13509c4120a273f26769b9abc97f659fea89ac4f81a630be8da48"
+      }
+      hash "fa1c58c1d80f565e27987996d4ee77091bd8f29c5247e4aa623179ae77aa366b"
+    }
+    provision "/us/usc/ptIX/rule9037/e" subsection {
+      num "e" "(e)"
+      heading "Option for Additional Unredacted Document Under Seal."
+      content "An entity filing a redacted document may also file an unredacted copy under seal. The court must retain the unredacted copy as part of the record."
+      hash "180316064845168cc52d75ddef01a89c71444585e1f2dff5a70867f5c7d4c5aa"
+    }
+    provision "/us/usc/ptIX/rule9037/f" subsection {
+      num "f" "(f)"
+      heading "Option for Filing a Reference List."
+      content "A filing that contains redacted information may be filed together with a reference list that identifies each item of redacted information and specifies an appropriate identifier that uniquely corresponds to each item listed. The list must be filed under seal and may be amended as of right. A reference in the case to a listed identifier will be construed to refer to the corresponding item of information."
+      hash "abc633362ea3ab23d1939226b21b786d17f4180df91317642e8238dcadda2d4b"
+    }
+    provision "/us/usc/ptIX/rule9037/g" subsection {
+      num "g" "(g)"
+      heading "Waiver of Protection of Identifiers."
+      content "An entity waives the protection of (a) for the entity’s own information by filing it without redaction and not under seal."
+      hash "53df613deea70f66c0720c4ec99b6ccc76889f1a0019d60ea5153f830ebc7bd7"
+    }
+    provision "/us/usc/ptIX/rule9037/h" subsection {
+      num "h" "(h)"
+      heading "Motion to Redact a Previously Filed Document."
+      provision "/us/usc/ptIX/rule9037/h/1" paragraph {
+        num "1" "(1)"
+        chapeau "Content; Service. Unless the court orders otherwise, an entity seeking to redact from a previously filed document information that is protected under (a) must:"
+        provision "/us/usc/ptIX/rule9037/h/1/A" subparagraph {
+          num "A" "(A)"
+          content "file a motion that identifies the proposed redactions;"
+          hash "fca0a27b30b5a1b61c40a259c969fe1c8b893e8c9972802a592d4e2f5e4c5fc3"
+        }
+        provision "/us/usc/ptIX/rule9037/h/1/B" subparagraph {
+          num "B" "(B)"
+          content "attach to it the proposed redacted document;"
+          hash "bff246e6bb5ae41e762ea8a702f2466b4c1bf90c2f213adfff78da57b17e3182"
+        }
+        provision "/us/usc/ptIX/rule9037/h/1/C" subparagraph {
+          num "C" "(C)"
+          content "include the docket number—or proof-of-claim number—of the previously filed document; and"
+          hash "a59b4f6e2f83be992ca681c274b5f8b95c2eba250d6b6b0f7d326642fc0aca4c"
+        }
+        provision "/us/usc/ptIX/rule9037/h/1/D" subparagraph {
+          num "D" "(D)"
+          content {
+            p "serve the motion and attachment on:"
+            p "• the debtor;"
+            p "• the debtor’s attorney;"
+            p "• any trustee;"
+            p "• the United States trustee;"
+            p "• the entity that filed the unredacted document; and"
+            p "• any individual whose personal identifying information is to be redacted."
+          }
+          hash "ee8e26b76c683ce8335f6365bac9a89aab7efcf49bc910711f8a03951ce72a24"
+        }
+        hash "dcfcf446cca47f8d7734bf5a166e137d3ebfeed4de32db2686627cf21e9df199"
+      }
+      provision "/us/usc/ptIX/rule9037/h/2" paragraph {
+        num "2" "(2)"
+        content "Restricting Public Access to the Unredacted Document; Docketing the Redacted Document. Pending its ruling, the court must promptly restrict access to the motion and the unredacted document. If the court grants the motion, the clerk must docket the redacted document. The restrictions on public access to the motion and unredacted document remain in effect until a further court order. If the court denies the motion, the restrictions must be lifted, unless the court orders otherwise."
+        hash "dbbb55196c68e27dbca8e07edeafdd47911c0213fc1e05323b3d02eeeec88a2c"
+      }
+      hash "564f60d24d0d53ed85956b79692c21d893c1f2cd7fd72873a224b4e5861820a5"
+    }
+    hash "32d7fa3a79f77c98685dc0565518a56d3a72c0b0da067b76ec8edd69a728edad"
+  }
+  credit "(Added Apr. 30, 2007, eff. Dec. 1, 2007; amended Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2007" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007"
+    p "The rule is adopted in compliance with section 205(c)(3) of the E-Government Act of 2002, Public Law No. 107–347. Section 205(c)(3) requires the Supreme Court to prescribe rules “to protect privacy and security concerns relating to electronic filing of documents and the public availability . . . of documents filed electronically.” The rule goes further than the E-Government Act in regulating paper filings even when they are not converted to electronic form, but the number of filings that remain in paper form is certain to diminish over time. Most districts scan paper filings into the electronic case file, where they become available to the public in the same way as documents initially filed in electronic form. It is electronic availability, not the form of the initial filing, that raises the privacy and security concerns addressed in the E-Government Act."
+    p "The rule is derived from and implements the policy adopted by the Judicial Conference in September 2001 to address the privacy concerns resulting from public access to electronic case files. See http://www.privacy.uscourts.gov/Policy.htm. The Judicial Conference policy is that documents in case files generally should be made available electronically to the same extent they are available at the courthouse, provided that certain “personal data identifiers” are not included in the public file."
+    p "While providing for the public filing of some information, such as the last four digits of an account number, the rule does not intend to establish a presumption that this information never could or should be protected. For example, it may well be necessary in individual cases to prevent remote access by nonparties to any part of an account number or social-security number. It may also be necessary to protect information not covered by the redaction requirement—such as driver’s license numbers and alien registration numbers—in a particular case. In such cases, protection may be sought under subdivision (c) or (d). Moreover, the rule does not affect the protection available under other rules, such as Rules 16 and 26(c) of the Federal Rules of Civil Procedure, or under other sources of protective authority."
+    p "Any personal information not otherwise protected by sealing or redaction will be made available over the internet. Counsel should therefore notify clients of this fact so that an informed decision may be made on what information is to be included in a document filed with the court."
+    p "An individual debtor’s full social-security number or taxpayer-identification number is included on the notice of the § 341 meeting of creditors sent to creditors. Of course, that is not filed with the court, see Rule 1007(f) (the debtor “submits” this information), and the copy of the notice that is filed with the court does not include the full social-security number or taxpayer-identification number. Thus, since the full social-security number or taxpayer-identification number is not filed with the court, it is not available to a person searching that record."
+    p "The clerk is not required to review documents filed with the court for compliance with this rule. As subdivision (a) recognizes, the responsibility to redact filings rests with counsel, parties, and others who make filings with the court."
+    p "Subdivision (d) recognizes the court’s inherent authority to issue a protective order to prevent remote access to private or sensitive information and to require redaction of material in addition to that which would be redacted under subdivision (a) of the rule. These orders may be issued whenever necessary either by the court on its own motion, or on motion of a party in interest."
+    p "Subdivision (e) allows an entity that makes a redacted filing to file an unredacted document under seal. This provision is derived from section 205(c)(3)(iv) of the E-Government Act. Subdivision (f) allows the option to file a reference list of redacted information. This provision is derived from section 205(c)(3)(v) of the E-Government Act, as amended in 2004."
+    p "In accordance with the E-Government Act, subdivision (f) of the rule refers to “redacted” information. The term “redacted” is intended to govern a filing that is prepared with abbreviated identifiers in the first instance, as well as a filing in which a personal identifier is edited after its preparation."
+    p "Subdivision (g) allows an entity to waive the protections of the rule as to that entity’s own information by filing it in unredacted form. An entity may elect to waive the protection if, for example, it is determined that the costs of redaction outweigh the benefits to privacy. As to financial account numbers, the instructions to Schedules E and F of Official Form 6 note that the debtor may elect to include the complete account number on those schedules rather than limit the number to the final four digits. Including the complete number would operate as a waiver by the debtor under subdivision (g) as to the full information that the debtor set out on those schedules. The waiver operates only to the extent of the information that the entity filed without redaction. If an entity files an unredacted identifier by mistake, it may seek relief from the court."
+    p "Trial exhibits are subject to the redaction requirements of Rule 9037 to the extent they are filed with the court. Trial exhibits that are not initially filed with the court must be redacted in accordance with this rule if and when they are filed as part of an appeal or for other reasons."
+    p "Changes After Publication. Rule 9037 is intended to parallel as closely as possible Civil Rule 5.2 and Criminal Rule 49.1. The Advisory Committees have worked together to maintain as much consistency as possible in the three versions of the rule. The rule has been revised to implement the several style revisions suggested by the Style Subcommittee of the Standing Committee. Subdivision (b) was reorganized and renumbered. Subdivisions (b)(1) and (b)(3) were added in response to suggestions by the Department of Justice. Subdivision (b)(4), formerly subdivision (b)(2), was amended in response to the suggestion of the Committee on Court Administration and Case Management so that the subdivision now refers to court records that become a part of the record in the pending matter. The term “entity” has been substituted for “person” in subdivision (c) and for “party” in subdivisions (e) and (f) to conform the rule to the definitions provided in the Bankruptcy Code."
+    hash "f42395f5dc9e7d4f80f43ceddb73ed45a691e7e0ffc996cb7cb0757d21800464"
+  }
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2019 Amendment"
+    p "Subdivision (h) is new. It prescribes a procedure for the belated redaction of documents that were filed without complying with subdivision (a)."
+    p "Generally, whenever someone discovers that information entitled to privacy protection under subdivision (a) appears in a document on file with the court—regardless of whether the case in question remains open or has been closed—that entity may file a motion to redact the document. A single motion may relate to more than one unredacted document. The moving party may be, but is not limited to, the original filer of the document. The motion must identify by location on the case docket or claims register each document to be redacted. It should not, however, include the unredacted information itself."
+    p "Subsection (h)(1) authorizes the court to alter the prescribed procedure. This might be appropriate, for example, when the movant seeks to redact a large number of documents. In that situation the court by order or local rule might require the movant to file an omnibus motion, initiate a miscellaneous proceeding, or proceed in another manner directed by the court."
+    p "Unless the court orders otherwise, the motion must identify the proposed redactions, and the moving party must attach to the motion the proposed redacted document. The attached document must otherwise be identical to the one previously filed. The court, however, may relieve the movant of this requirement in appropriate circumstances, for example when the movant was not the filer of the unredacted document and does not have access to it. Service of the motion and the attachment must be made on all of the following individuals who are not the moving party: debtor, debtor’s attorney, trustee, United States trustee, the filer of the unredacted document, and any individual whose personal identifying information is to be redacted."
+    p "Because the filing of the motion to redact may call attention to the existence of the unredacted document as maintained in the court’s files or downloaded by third parties, courts should take immediate steps to protect the motion and the document from public access. This restriction may be accomplished electronically, simultaneous with the electronic filing of the motion to redact. For motions filed on paper, restriction should occur at the same time that the motion is docketed so that no one receiving electronic notice of the filing of the motion will be able to access the unredacted document in the court’s files."
+    p "If the court grants the motion to redact, the court must docket the redacted document, and public access to the motion and the unredacted document should remain restricted. If the court denies the motion, generally the restriction on public access to the motion and the document should be lifted."
+    p "This procedure does not affect the availability of any remedies that an individual whose personal identifiers are exposed may have against the entity that filed the unredacted document."
+    hash "2f7d9b3db187833f783248fff262cd6522221c564ddfd66f6cbbea9e69e54b2e"
+  }
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9037 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "39ef713dc0ddabbd5ac37a7ae23d5af8a5997b977cfa7f5718257e9c6de21768"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be followed by “number”."
+  }
+  layers {
+    operative "32d7fa3a79f77c98685dc0565518a56d3a72c0b0da067b76ec8edd69a728edad"
+    enacted "a468ad99fbc9b086e96b2fb4c87b3fdc40f019d709d48854ffda1100ec811b4f"
+    editorial "7931136bda3d65b2abaefe184e64d03cfa91aa8bed29c9fec653362eef8b8fb3"
+  }
+}

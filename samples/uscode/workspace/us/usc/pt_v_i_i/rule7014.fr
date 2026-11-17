@@ -1,0 +1,40 @@
+edition 2
+module "/us/usc/ptVII/rule7014" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7014" courtRule {
+    num "7014" "Rule 7014."
+    heading "Third-Party Practice"
+    content "Fed. R. Civ. P. 14 applies in an adversary proceeding."
+    hash "bd1f80e29ed50e12e939eb9146aba5c2a0165d102a6ce4c73900bc7305a72df0"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule does not purport to deal with questions of jurisdiction. The scope of the jurisdictional grant under [former] 28 U.S.C. § 1471 and whether the doctrines of pendent or ancillary jurisdiction are applicable to adversary proceedings will be determined by the courts."
+    p "Rule 14 F.R.Civ.P. refers to Rules 12 and 13 F.R.Civ.P. Pursuant to Rule 7002 those references are to Rules 12 and 13 as incorporated and modified by Rules 7012 and 7013."
+    hash "45ba8d7d3cf055de63d85f2d592a5af56a8c5f360f044c94a56e61d379931211"
+  }
+  note "/us/usc/ptVII/rule7014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "c3a943cd03be4f90fb02705793a508909c3d0732cf30ad0673425b1b122b6300"
+  }
+  note "/us/usc/ptVII/rule7014/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "bd1f80e29ed50e12e939eb9146aba5c2a0165d102a6ce4c73900bc7305a72df0"
+    enacted "b2fec2a5c7164f024806f2f04272f241a3e2657ece2c71c04b3290a5c61503d6"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

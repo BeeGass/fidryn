@@ -1,0 +1,88 @@
+edition 2
+module "/us/usc/ptIX/rule9024" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9024" courtRule {
+    num "9024" "Rule 9024."
+    heading "Relief from a Judgment or Order"
+    provision "/us/usc/ptIX/rule9024/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "Fed. R. Civ. P. 60 applies in a bankruptcy case—except that:"
+      provision "/us/usc/ptIX/rule9024/a/1" paragraph {
+        num "1" "(1)"
+        content "the one-year limitation in Fed. R. Civ. P. 60(c) does not apply to a motion to reopen a case or to reconsider an uncontested order allowing or disallowing a claim against the estate;"
+        hash "3968113958f2be64fdc77058c4f4fd1077ef095b8f5fa34debec835b9a22e56e"
+      }
+      provision "/us/usc/ptIX/rule9024/a/2" paragraph {
+        num "2" "(2)"
+        content "a complaint to revoke a discharge in a Chapter 7 case must be filed within the time allowed by § 727(e); and"
+        hash "9c1d5505e54c821e2ebde26513f4a553e663acbeb8fb1faeea51733dbdb2b5f9"
+      }
+      provision "/us/usc/ptIX/rule9024/a/3" paragraph {
+        num "3" "(3)"
+        content "a complaint to revoke an order confirming a plan must be filed within the time allowed by § 1144, 1230, or 1330."
+        hash "414bc70b2d7f2c3aec699eca3711b8246c18baf80fad58eebb44416d5f7e1b1b"
+      }
+      hash "c3a3094793b934623950786cfcbdbb7e5cd0c80a4ed18df85cc900004307259f"
+    }
+    provision "/us/usc/ptIX/rule9024/b" subsection {
+      num "b" "(b)"
+      heading "Indicative Ruling."
+      content "In some instances, Rule 8008 governs postjudgment motion practice after an appeal has been docketed and is pending."
+      hash "9504dc76f93d252b0713dcda98ac3fb19825c32813654efc7f89e6525623b0eb"
+    }
+    hash "bc076951a13345241b70a61d9d8ba2e23351fa3981217737155ca93ff51b44e7"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Motions to reopen cases are governed by Rule 5010. Reconsideration of orders allowing and disallowing claims is governed by Rule 3008. For the purpose of this rule all orders of the bankruptcy court are subject to Rule 60 F.R.Civ.P."
+    p "Pursuant to § 727(e) of the Code a complaint to revoke a discharge must be filed within one year of the entry of the discharge or, when certain grounds of revocation are asserted, the later of one year after the entry of the discharge or the date the case is closed. Under § 1144 and § 1330 of the Code a party must file a complaint to revoke an order confirming a chapter 11 or 13 plan within 180 days of its entry. Clauses (2) and (3) of this rule make it clear that the time periods established by §§ 727(e), 1144 and 1330 of the Code may not be circumvented by the invocation of F.R.Civ.P. 60(b)."
+    hash "110a3b6949b8de8cdb9b8b9a291cb04a3a20dc8c9b58cff55c8ee61fe654d4a3"
+  }
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Clause (3) is amended to include a reference to § 1230 of the Code which contains time limitations relating to revocation of confirmation of a chapter 12 plan. The time periods prescribed by § 1230 may not be circumvented by the invocation of F.R.Civ.P. 60(b)."
+    hash "2a584286c7b21bedad6bbf03d8b4e7c59e8d062c055f89065b7d57f5caa488b6"
+  }
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to conform to the changes made to the Federal Rules of Civil Procedure through the restyling of those rules effective on December 1, 2007."
+    hash "76923e497c4b9c61312745ce5d68065b9395b228da2fec808e60203abfbd5cf5"
+  }
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014 Amendment"
+    p "This rule is amended to include a cross-reference to Rule 8008. That rule governs the issuance of an indicative ruling when relief is sought that the court lacks authority to grant because of an appeal that has been docketed and is pending."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "ffdbc3bd94aeed87628ac76d3749f5187c991535c08283dcf815b20e8e57a63f"
+  }
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9024 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "d9d5f087f44814d5984f3b6b9d9868401e8ed1078d9e9a9b6d90e13c89c92aaa"
+  }
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "deb4c0aa4ee80b33fd9101f209f848844329e50da3c46e96b8b0c3857dca9936"
+  }
+  layers {
+    operative "bc076951a13345241b70a61d9d8ba2e23351fa3981217737155ca93ff51b44e7"
+    enacted "0879e5e3b1a412a7c34858eb151cf20be449f19064bb3034d8893545f4308f2c"
+    editorial "cfbbfc3b0a0831538c8fc4967a0184166469912f5fe232a983e8a39c9a2e4267"
+  }
+}

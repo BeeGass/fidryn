@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch10" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch10" chapter {
+    num "10" "CHAPTER 10—"
+    heading "TAX ON CARRIERS AND EMPLOYEES"
+    member "/us/usc/t45/s241...253"
+    member "/us/usc/t45/s261...273"
+    hash "c6640c214378201c0575e16f2c1a11cc97cfd7dd4b684e3e64950e1eb7277e96"
+  }
+  layers {
+    operative "c6640c214378201c0575e16f2c1a11cc97cfd7dd4b684e3e64950e1eb7277e96"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

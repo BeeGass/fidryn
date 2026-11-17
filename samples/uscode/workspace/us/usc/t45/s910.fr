@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s910" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s910" section {
+    num "910" "§ 910."
+    heading "Repealed. " ["Pub. L. 97–35, title XI, § 1144(b)" -> "/us/pl/97/35/tXI/s1144/b"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"]
+    status repealed
+    hash "f2a27d615779c30e62453b94a507264d1ff05cbafdcd54905cfe55f2b9bf12c0"
+  }
+  note "/us/usc/t45/s910/note/ungrouped/pl.96.101/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 96–101, § 11" -> "/us/pl/96/101/s11"] ", Nov. 4, 1979, " ["93 Stat. 742" -> "/us/stat/93/742"] ", set forth provisions respecting employment of Milwaukee Railroad employees. See " ["section 797c of this title" -> "/us/usc/t45/s797c"] "."
+    hash "edc95fc722a9e2fc72031b91f40bc91bd8700bae262525765bc4d1782b1ca94a"
+  }
+  note "/us/usc/t45/s910/note/statutoryNotes/pl.97.35/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "c0ef60c1a1f1ec4ebf79dec55de5fac5ff5616a2870219aa662a8252d5276d31"
+  }
+  layers {
+    operative "f2a27d615779c30e62453b94a507264d1ff05cbafdcd54905cfe55f2b9bf12c0"
+    enacted "6ac41a6a0976d2f9517f4990efe866c40892d641d32fa614aa036452f1b5aaa6"
+    editorial "ee24c98f693e2bd8c1606882d4058ec04fd0e98fa43362c515f45e988cbf390c"
+  }
+}

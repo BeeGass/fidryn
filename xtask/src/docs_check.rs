@@ -12,7 +12,7 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-pub const MARKDOWN_ROOTS: [&str; 9] = [
+pub const MARKDOWN_ROOTS: [&str; 10] = [
     "README.md",
     "LICENSING.md",
     "CHANGELOG.md",
@@ -21,6 +21,7 @@ pub const MARKDOWN_ROOTS: [&str; 9] = [
     "examples",
     "packages",
     "conformance",
+    "samples",
     "site/README.md",
 ];
 

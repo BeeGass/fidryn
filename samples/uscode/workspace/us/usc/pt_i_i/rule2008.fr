@@ -1,0 +1,80 @@
+edition 2
+module "/us/usc/ptII/rule2008" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2008" courtRule {
+    num "2008" "Rule 2008."
+    heading "Notice to the Person Selected as Trustee"
+    provision "/us/usc/ptII/rule2008/a" subsection {
+      num "a" "(a)"
+      heading "Giving Notice."
+      content "The United States trustee must immediately notify the person selected as trustee how to qualify and, if applicable, the amount of the trustee’s bond."
+      hash "738e3ec85533afdf8d28bd46fe10286b1329b0df49cac0713b99d53c25271f29"
+    }
+    provision "/us/usc/ptII/rule2008/b" subsection {
+      num "b" "(b)"
+      heading "Accepting the Position of Trustee."
+      provision "/us/usc/ptII/rule2008/b/1" paragraph {
+        num "1" "(1)"
+        content "Trustee Who Has Filed a Blanket Bond. A trustee selected in a Chapter 7, 12, or 13 case who has filed a blanket bond under Rule 2010 may reject the office by notifying the court and the United States trustee in writing within 7 days after receiving notice of selection. Otherwise, the trustee will be considered to have accepted the office."
+        hash "7a1a23e903a987e97c593afb38d75466034eabc1d9c3e107b60907626e3fc8cf"
+      }
+      provision "/us/usc/ptII/rule2008/b/2" paragraph {
+        num "2" "(2)"
+        content "Other Trustees. Any other person selected as trustee may accept the office by notifying the court and the United States trustee in writing within 7 days after receiving notice of selection. Otherwise, the person will be considered to have rejected the office."
+        hash "b225cbbc82f654769e43c8012f4ab300fe2ace85b862fd08e2fd025a069d30cc"
+      }
+      hash "6e8077d3ba5f392a1ffc4b6e3163da7d5dfef8b37186a569d6b347104ff511fa"
+    }
+    hash "df231dac7f6c33313037304625c4a8419728db968bd9ebece6dc8ccafe74dc5e"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 209(c). The remainder of that rule is inapplicable because its provisions are covered by §§ 701–703, 321 of the Code."
+    p "If the person selected as trustee accepts the office, he must qualify within five days after his selection, as required by § 322(a) of the Code."
+    p "In districts having a standing trustee for chapter 13 cases, a blanket acceptance of the appointment would be sufficient for compliance by the standing trustee with this rule."
+    hash "da772e491e44b3467d4b89d5e6db069ef24cc4e1003109c47071948fc180c02a"
+  }
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule is amended to eliminate the need for a standing chapter 13 trustee or member of the panel of chapter 7 trustees to accept or reject an appointment."
+    hash "1b0bf4e5b4f38b737059c8f7859d91a8c8e2dab8802f257ad49ddf27e0b69eb7"
+  }
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The amendments to this rule relating to the United States trustee are derived from Rule X–1004(a) and conform to the 1986 amendments to the Code and 28 U.S.C. § 586 which provide that the United States trustee appoints and supervises trustees, and in a chapter 7 case presides over any election of a trustee. This rule applies when a trustee is either appointed or elected. This rule is also amended to provide for chapter 12 cases."
+    hash "c58655575453c65eabac73c0ce4fda0deec890b611ed6c049b3f4826aaeaed67"
+  }
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f765654287d016f6d33399fcd25cb3b39bad66095338d2ae773afd2d57cabc1b"
+  }
+  layers {
+    operative "df231dac7f6c33313037304625c4a8419728db968bd9ebece6dc8ccafe74dc5e"
+    enacted "aacc05de3690002d9b49be2434fa63e525eebf9ae68d52b423b55868ab91036b"
+    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+  }
+}

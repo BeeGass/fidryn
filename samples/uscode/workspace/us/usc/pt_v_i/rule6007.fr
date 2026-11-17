@@ -1,0 +1,115 @@
+edition 2
+module "/us/usc/ptVI/rule6007" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6007" courtRule {
+    num "6007" "Rule 6007."
+    heading "Abandoning or Disposing of Property"
+    provision "/us/usc/ptVI/rule6007/a" subsection {
+      num "a" "(a)"
+      heading "Notice by the Trustee or Debtor in Possession."
+      provision "/us/usc/ptVI/rule6007/a/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "In General. Unless the court orders otherwise, the trustee or debtor in possession must give notice of a proposed abandonment or disposition of property to:"
+          p "• all creditors;"
+          p "• all indenture trustees;"
+          p "• any committees appointed or elected under the Code; and"
+          p "• the United States trustee."
+        }
+        hash "abd0d713358e33f01926be063d2396944119496dfbf37e14881c4f49633e3d5b"
+      }
+      provision "/us/usc/ptVI/rule6007/a/2" paragraph {
+        num "2" "(2)"
+        content "Objection. A party in interest may file and serve an objection within 14 days after the notice is mailed or within the time set by the court. If a timely objection is filed, the court must set a hearing on notice to the United States trustee and other entities as the court orders."
+        hash "9d0a0cc5e4ecf1b116cddb7abadbaf05253db3ae9a4055826fdf9e91c13cbd06"
+      }
+      hash "adb5b07ae77813e290d539c9e424b60184e554e193993412780a366159902fb3"
+    }
+    provision "/us/usc/ptVI/rule6007/b" subsection {
+      num "b" "(b)"
+      heading "Motion by a Party in Interest."
+      provision "/us/usc/ptVI/rule6007/b/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Service. A party in interest may file and serve a motion to require the trustee or debtor in possession to abandon property of the estate. Unless the court orders otherwise, the motion (and any notice of it) must be served on:"
+          p "• the trustee or debtor in possession;"
+          p "• all creditors;"
+          p "• all indenture trustees;"
+          p "• any committees appointed or elected under the Code; and"
+          p "• the United States trustee."
+        }
+        hash "8be663c98444677eed394614c8d353ecc8c40d020abd188e1af4353427a78e1a"
+      }
+      provision "/us/usc/ptVI/rule6007/b/2" paragraph {
+        num "2" "(2)"
+        content "Objection. A party in interest may file and serve an objection within 14 days after service or within the time set by the court. If a timely objection is filed, the court must set a hearing on notice to the United States trustee and other entities as the court orders."
+        hash "981216130513f401dfe5f092c0d6c08406a3274ca637c06781453e8694f07316"
+      }
+      provision "/us/usc/ptVI/rule6007/b/3" paragraph {
+        num "3" "(3)"
+        content "Order. Unless the court orders otherwise, an order granting the motion to abandon property effects the trustee’s or debtor in possession’s abandonment without further notice."
+        hash "80d5fcf641b30cffc2551d6a99316f78f412f6833eaa3f61ecf5f5570f2663c2"
+      }
+      hash "0338cc601e4733167e8e7bce2f307b24c1abc14e7782036d64fde04a73a1d158"
+    }
+    hash "2d3e3e1b46313b65d0d0b5698baa179df5b8d7734d5965023134d75fa3811667"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Sections 554 and 725 of the Code permit and require abandonment and disposition of property of the estate. Pursuant to § 554, the trustee may abandon property but only after notice and hearing. This section is applicable in chapter 7, 11 and 13 cases. Section 725 requires the trustee to dispose of property in which someone other than the estate has an interest, prior to final distribution. It applies only in chapter 7 cases. Notice and hearing are also required conditions. Section 102(1) provides that “notice and hearing” is construed to mean appropriate notice and an opportunity for a hearing. Neither § 554 nor § 725 specify to whom the notices are to be sent. This rule does not apply to § 554(c). Pursuant to that subsection, property is deemed abandoned if it is not administered. A hearing is not required by the statute."
+    p "Subdivision (a) requires the notices to be sent to all creditors, indenture trustees, and committees elected under § 705 or appointed under § 1102 of the Code. This may appear burdensome, expensive and inefficient but the subdivision is in keeping with the Code’s requirement for notice and the Code’s intent to remove the bankruptcy judge from undisputed matters. The burden, expense and inefficiency can be alleviated in large measure by incorporating the notice into or together with the notice of the meeting of creditors so that separate notices would not be required."
+    p "Subdivision (b) implements § 554(b) which specifies that a party in interest may request an order that the trustee abandon property. The rule specifies that the request be by motion and, pursuant to the Code, lists the parties who should receive notice."
+    p "Subdivision (c) requires a hearing when an objection under subdivision (a) is filed or a motion under subdivision (b) is made. Filing of an objection is sufficient to require a hearing; a separate or joined request for a hearing is unnecessary since the objection itself is tantamount to such a request."
+    hash "66a9a7de040b6792444b86b97d82c75077cce52eabb8fb674a34f04f8f18a00b"
+  }
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to the 1986 amendments to 28 U.S.C. § 586(a) and to the Code. The United States trustee monitors the progress of the case and has standing to raise, appear and be heard on the issues relating to the abandonment or other disposition of property. See §§ 307 and 554 of the Code. Committees of retired employees appointed under § 1114 are not entitled to notice under subdivision (a) of this rule."
+    hash "5fed3092672f045d918e844a47d7eeed314cbb28513bd1daa365b2c45080fade"
+  }
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to clarify that when a motion is made pursuant to subdivision (b), a hearing is not required if a hearing is not requested or if there is no opposition to the motion. See Rule 9014. Other amendments are stylistic and make no substantive change."
+    hash "8320567b47482ff3a295b927bf45cdb3a2b087f7042993f7202b6f0cffa0118f"
+  }
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2019 Amendment"
+    p "Subdivision (b) of the rule is amended to specify the parties to be served with the motion and any notice of the motion. The rule also establishes an objection deadline. Both of these changes align subdivision (b) more closely with the procedures set forth in subdivision (a). In addition, the rule clarifies that no further action is necessary to notice or effect the abandonment of property ordered by the court in connection with a motion filed under subdivision (b), unless the court directs otherwise."
+    hash "e51892268d024da7acafbb0a49d3f805f05eb42f88208f04dbb1d1ac5882b917"
+  }
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "132dc8bb1478d8166148cd05b807702feef14f32f24ac8935797f9305536276a"
+  }
+  layers {
+    operative "2d3e3e1b46313b65d0d0b5698baa179df5b8d7734d5965023134d75fa3811667"
+    enacted "ce9b5b666423664320b05a066e824ad8c2ff6a23b5a78a41650426fcafb6a023"
+    editorial "949e037b95351734e9c3648a180d74e4a28c357b30e639966c623805d0387aa5"
+  }
+}

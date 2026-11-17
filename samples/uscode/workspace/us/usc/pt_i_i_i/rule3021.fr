@@ -1,0 +1,75 @@
+edition 2
+module "/us/usc/ptIII/rule3021" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3021" courtRule {
+    num "3021" "Rule 3021."
+    heading "Distributing Funds Under a Plan"
+    provision "/us/usc/ptIII/rule3021/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content {
+        p "After confirmation and when any stay under Rule 3020(e) expires, payments under the plan must be distributed to:"
+        p "• creditors whose claims have been allowed;"
+        p "• interest holders whose interests have not been disallowed; and"
+        p "• indenture trustees whose claims under Rule 3003(c)(5) have been allowed."
+      }
+      hash "e018832123dd8d097fbdad6615eef5f18f8f15888b908072ae2eb29d69d41f00"
+    }
+    provision "/us/usc/ptIII/rule3021/b" subsection {
+      num "b" "(b)"
+      heading "Definition of “Creditors” and “Interest Holders.”"
+      chapeau "In this Rule 3021:"
+      provision "/us/usc/ptIII/rule3021/b/1" paragraph {
+        num "1" "(1)"
+        content "“creditors” include record holders of bonds, debentures, notes, and other debt securities as of the initial distribution date, unless the plan or confirmation order states a different date; and"
+        hash "b10f90f5aee9c4abafb09b47279823f0b3f4f84c2f9cc0a264074ffc0287b92d"
+      }
+      provision "/us/usc/ptIII/rule3021/b/2" paragraph {
+        num "2" "(2)"
+        content "“interest holders” include record holders of stock and other equity securities as of the initial distribution date, unless the plan or confirmation order states a different date."
+        hash "f4caf07055446d1cdce6e60fc65ca70b7bcba0621cccab46362218b0e6a3322c"
+      }
+      hash "49f835ac24897cd65fb88e787d0e0bb1bb3cf14bd1123d6653e2c350cda5f5b2"
+    }
+    hash "938a0988c21f8be96d86f4349c5bca9810a4fbec8114698bfb85ab737f957be7"
+  }
+  credit "(As amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Chapter X Rule 10–405(a). Subdivision (b) of that rule is covered by § 1143 of the Code."
+    hash "fdf4473b0be287989fe264448509ef7ad3e8d6d48b16408c64cf1103101b0d57"
+  }
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "This rule is amended to provide flexibility in fixing the record date for the purpose of making distributions to holders of securities of record. In a large case, it may be impractical for the debtor to determine the holders of record with respect to publicly held securities and also to make distributions to those holders at the same time. Under this amendment, the plan or the order confirming the plan may fix a record date for distributions that is earlier than the date on which distributions commence."
+    p "This rule also is amended to treat holders of bonds, debentures, notes, and other debt securities the same as any other creditors by providing that they shall receive a distribution only if their claims have been allowed. Finally, the amendments clarify that distributions are to be made to all interest holders—not only those that are within the definition of “equity security holders” under § 101 of the Code—whose interests have not been disallowed."
+    p "GAP Report on Rule 3021. No changes to the published draft."
+    hash "6d3f798bd44503ed572b1b032ef36535075db6a27469e0ab84f7ff8cf13eb2f4"
+  }
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "This amendment is to conform to the amendments to Rule 3020 regarding the ten-day stay of an order confirming a plan in a chapter 9 or chapter 11 case. The other amendments are stylistic."
+    p "GAP Report on Rule 3021. No changes since publication."
+    hash "9d258f79ec649cf39d08c431cddffec4359a48415f24a2ce26dbcf85a0605770"
+  }
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3021 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "61b64a92e755354206220d9c6c1f8308fcaacbcbc81818a94c57a140cc22552a"
+  }
+  layers {
+    operative "938a0988c21f8be96d86f4349c5bca9810a4fbec8114698bfb85ab737f957be7"
+    enacted "dba9fadbaba9287c8303ea3cf1a10ba4fb4b5fb1722d172d3c66aa4e70bbbd88"
+    editorial "74b68b0dd80dcb7fb9d01be4e93edc31626a7a6e4127fd6c1daf6f071045ab32"
+  }
+}

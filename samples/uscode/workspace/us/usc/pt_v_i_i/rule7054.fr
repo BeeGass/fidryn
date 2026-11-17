@@ -1,0 +1,87 @@
+edition 2
+module "/us/usc/ptVII/rule7054" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7054" courtRule {
+    num "7054" "Rule 7054."
+    heading "Judgments; Costs"
+    provision "/us/usc/ptVII/rule7054/a" subsection {
+      num "a" "(a)"
+      heading "Judgment."
+      content "Fed. R. Civ. P. 54(a)–(c) applies in an adversary proceeding."
+      hash "a46e885a9112259a9ec2f346863012b22fb5af619b019cbfa26cdbb9f7f5a6e6"
+    }
+    provision "/us/usc/ptVII/rule7054/b" subsection {
+      num "b" "(b)"
+      heading "Costs and Attorney’s Fees."
+      provision "/us/usc/ptVII/rule7054/b/1" paragraph {
+        num "1" "(1)"
+        content "Costs Other Than Attorney’s Fees. The court may allow costs to the prevailing party, unless a federal statute or these rules provide otherwise. Costs against the United States, its officers, and its agencies may be imposed only to the extent permitted by law. The clerk, on 14 days’ notice, may tax costs, and the court, on motion served within the next 7 days, may review the clerk’s action."
+        hash "5e0be79c83d83b36ee92590021ac4a06f087f1e962cc6df6fa2d2e6424839ef5"
+      }
+      provision "/us/usc/ptVII/rule7054/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Attorney’s Fees."
+        provision "/us/usc/ptVII/rule7054/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "In General. Fed. R. Civ. P. 54(d)(2)(A)–(C) and (E) applies in an adversary proceeding—except for the reference in 54(d)(2)(C) to Civil Rule 78."
+          hash "b5a751147d73397d150f433e9cb4dd51d719e6a2a856401bfcc14c961fae0d8a"
+        }
+        provision "/us/usc/ptVII/rule7054/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "Local Rules for Resolving Issues. By local rule, the court may establish special procedures to resolve fee-related issues without extensive evidentiary hearings."
+          hash "5d29f7df1cdfd7858a2f2caad3d807d3e4aad4d98c489bb96d2266873a4c2094"
+        }
+        hash "931a022950f7e1265bf7b98c2de5f310910e9dfeab1cf2ff66d45756ce7eef5a"
+      }
+      hash "bf6952d34f1a12ded7f7cb39737c7f95e4ecb773e39e82720ba43a28fe6a03fa"
+    }
+    hash "1f2175a7149ba9380338c6fe6a4f851500639e63143770405cee97d05aa98c07"
+  }
+  credit "(As amended Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2012 Amendment"
+    p "Subdivision (b). Subdivision (b) is amended to provide more time for a party to respond to the prevailing party’s bill of costs. The former rule’s provision of one day’s notice was unrealistically short. The change to 14 days conforms to the change made to Civil Rule 54(d). Extension from five to seven days of the time for serving a motion for court review of the clerk’s action implements changes in connection with the December 1, 2009, amendment to Rule 9006(a) and the manner by which time is computed under the rules. Throughout the rules, deadlines have been amended in the following manner:"
+    p "• 5-day periods became 7-day periods."
+    p "• 10-day periods became 14-day periods."
+    p "• 15-day periods became 14-day periods."
+    p "• 20-day periods became 21-day periods."
+    p "• 25-day periods became 28-day periods."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "518f0a63f5b361ad2b22e66eee83b18718db7b452ccd1ac0f25a90bbae94d0de"
+  }
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014 Amendment"
+    p "Subdivision (b) is amended to prescribe the procedure for seeking an award of attorney’s fees and related nontaxable expenses in adversary proceedings. It does so by adding new paragraph (2) that incorporates most of the provisions of Rule 54(d)(2) F.R.Civ.P. The title of subdivision (b) is amended to reflect the new content, and the previously existing provision governing costs is renumbered as paragraph (1) and re-titled."
+    p "As provided in Rule 54(d)(2)(A), new subsection (b)(2) does not apply to fees recoverable as an element of damages, as when sought under the terms of a contract providing for the recovery of fees incurred prior to the instant adversary proceeding. Such fees typically are required to be claimed in a pleading."
+    p "Rule 54(d)(2)(D) F.R.Civ.P. does not apply in adversary proceedings insofar as it authorizes the referral of fee matters to a master or a magistrate judge. The use of masters is not authorized in bankruptcy cases, see Rule 9031, and 28 U.S.C. § 636 does not authorize a magistrate judge to exercise jurisdiction upon referral by a bankruptcy judge. The remaining provision of Rule 54(d)(2)(D) is expressed in subdivision (b)(2)(B) of this rule."
+    p "Rule 54(d)(2)(C) refers to Rule 78 F.R.Civ.P., which is not applicable in adversary proceedings. Accordingly, that reference is not incorporated by this rule."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "ddb1b2b9c99c81f6ac8ef699d847bc3052c5f5a92d60eff009e308216d250954"
+  }
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7054 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "67a8f5b06057050b0389b0953368d5e48ec97a6ebc94e94c683ba8c8baaee553"
+  }
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (a) and (b)(2)(A), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    p "Civil Rule 78, referred to in subd. (b)(2)(A), probably means Rule 78 of the Federal Rules of Civil Procedure, which is set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "34ed2968a23bf6039c4e91d6a4ba68fe9b1094b8158760b5212dbbcc2f0cfc92"
+  }
+  layers {
+    operative "1f2175a7149ba9380338c6fe6a4f851500639e63143770405cee97d05aa98c07"
+    enacted "a610ef87478ceba76ea22ea2f4c91bb8e3025b9f4ca669158e39d9631804c78b"
+    editorial "d2771729de7676b6c1be1d9968221a845310fbab6ce7834472c943da1629be35"
+  }
+}

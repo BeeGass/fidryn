@@ -1,0 +1,65 @@
+edition 2
+module "/us/usc/ptVIII/rule8023.1" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8023.1" courtRule {
+    num "8023.1" "Rule 8023.1."
+    heading "Substitution of Parties"
+    provision "/us/usc/ptVIII/rule8023.1/a" subsection {
+      num "a" "(a)"
+      heading "Death of a Party."
+      provision "/us/usc/ptVIII/rule8023.1/a/1" paragraph {
+        num "1" "(1)"
+        content "After a Notice of Appeal Is Filed. If a party dies after a notice of appeal has been filed or while a proceeding is pending on appeal in the district court or BAP, the decedent’s personal representative may be substituted as a party on motion filed with that court’s clerk by the representative or by any party. A party’s motion must be served on the representative in accordance with Rule 8011. If the decedent has no representative, any party may suggest the death on the record, and the appellate court may then direct appropriate proceedings."
+        hash "fda15755402920c297b4e3bd32145f34734d4693f8bc05c30eb2e2b25e5f728e"
+      }
+      provision "/us/usc/ptVIII/rule8023.1/a/2" paragraph {
+        num "2" "(2)"
+        content "Before a Notice of Appeal Is Filed—Potential Appellant. If a party entitled to appeal dies before filing a notice of appeal, the decedent’s personal representative—or, if there is no personal representative, the decedent’s attorney of record—may file a notice of appeal within the time prescribed by these rules. After the notice of appeal is filed, substitution must be in accordance with (1)."
+        hash "a9eabd3e7962dbe16f263a23e44335370b2f39f7e3fc8983a2be6b2314fc40b3"
+      }
+      provision "/us/usc/ptVIII/rule8023.1/a/3" paragraph {
+        num "3" "(3)"
+        content "Before a Notice of Appeal Is Filed—Potential Appellee. If a party against whom an appeal may be taken dies after entry of a judgment or order in the bankruptcy court, but before a notice of appeal is filed, an appellant may proceed as if the death had not occurred. After the notice of appeal is filed, substitution must be in accordance with (1)."
+        hash "991989268604a337b85419aff6f07ffbc8778070ac2594755320a3efd5512f9a"
+      }
+      hash "5184443ee959b325026e2049d34a743231d80446c769c3187e444c7580207562"
+    }
+    provision "/us/usc/ptVIII/rule8023.1/b" subsection {
+      num "b" "(b)"
+      heading "Substitution for a Reason Other Than Death."
+      content "If a party needs to be substituted for any reason other than death, the procedure prescribed in (a) applies."
+      hash "2fd815afb74fa299fd7b628697e592dbe1452e879885f3b791ebdd591ffefcfd"
+    }
+    provision "/us/usc/ptVIII/rule8023.1/c" subsection {
+      num "c" "(c)"
+      heading "Public Officer: Identification; Substitution."
+      provision "/us/usc/ptVIII/rule8023.1/c/1" paragraph {
+        num "1" "(1)"
+        content "Identification of a Party. A public officer who is a party to an appeal or other proceeding in an official capacity may be described as a party by the public officer’s official title rather than by name. But the appellate court may require the public officer’s name to be added."
+        hash "5e2d6c9dc9dee230769cee70500d57227e19897adb2a4d9a88522d80437eba58"
+      }
+      provision "/us/usc/ptVIII/rule8023.1/c/2" paragraph {
+        num "2" "(2)"
+        content "Automatic Substitution of an Officeholder. When a public officer who is a party to an appeal or other proceeding in an official capacity dies, resigns, or otherwise ceases to hold office, the action does not abate. Subject to Rule 2012, the public officer’s successor is automatically substituted as a party. Proceedings after the substitution are to be in the name of the substituted party, but any misnomer that does not affect the parties’ substantial rights may be disregarded. An order of substitution may be entered at any time, but failure to enter an order does not affect the substitution."
+        hash "df364d3e77e2f4b4e78cd3bab7e81e7502b1d4f8577faf1a0fdf03eb16b0df74"
+      }
+      hash "d6a40bf7385e4def9a0e01cf32a4db55cff982df17d6773bb383a3dd581a9fdf"
+    }
+    hash "81e5c897ee038b522127809f036511518ba110b79b3d1a346722246b77ac45ca"
+  }
+  credit "(Added Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8023.1/note/ungrouped/nolaw/committee-notes-on-rules-2024" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024"
+    p "Rule 8023.1 is derived from Fed. R. App. P. 43 and governs substitution of parties upon death or for any other reason in appeals to the district court or bankruptcy appellate panel from a judgment, order[,] or decree of a bankruptcy court."
+    hash "f38adff44e5cf5877db1ff2d196528f26b2d83247140b7dec56532df0e95bcb2"
+  }
+  layers {
+    operative "81e5c897ee038b522127809f036511518ba110b79b3d1a346722246b77ac45ca"
+    enacted "e2eacff9b9cded086928d2af0b78c24f1adedce76579e87cf98067d5a72cb45f"
+    editorial "899abdf668904b99cf5cbc7968c7d24b16a5789dd7142af6348f35f22a779347"
+  }
+}

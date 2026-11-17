@@ -1,0 +1,58 @@
+edition 2
+module "/us/usc/ptIX/rule9018" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9018" courtRule {
+    num "9018" "Rule 9018."
+    heading "Secret, Confidential, Scandalous, or Defamatory Matter"
+    provision "/us/usc/ptIX/rule9018/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "On motion or on its own, the court may, with or without notice, issue any order that justice requires to:"
+      provision "/us/usc/ptIX/rule9018/a/1" paragraph {
+        num "1" "(1)"
+        content "protect the estate or any entity regarding a trade secret or other confidential research, development, or commercial information;"
+        hash "fe19d39d1132dc66537c9636ffeba72ec5b125519d309e19dec00b0f99c8649a"
+      }
+      provision "/us/usc/ptIX/rule9018/a/2" paragraph {
+        num "2" "(2)"
+        content "protect an entity from scandalous or defamatory matter in any document filed in a bankruptcy case; or"
+        hash "cf8552ebe8a35465bd5a0087c32eb05021bee8d410bdf446a934547824e3d147"
+      }
+      provision "/us/usc/ptIX/rule9018/a/3" paragraph {
+        num "3" "(3)"
+        content "protect governmental matters made confidential by statute or regulation."
+        hash "7af72796c27ec0e7614fbd961c6895fec20c3144c9e83a1295cce8a339b8b281"
+      }
+      hash "670d7cc6523a9d4dc89ebefa52b503b6cafb7b1668e214e7470ca3186eeb4173"
+    }
+    provision "/us/usc/ptIX/rule9018/b" subsection {
+      num "b" "(b)"
+      heading "Motion to Vacate or Modify an Order Issued Without Notice."
+      content "An entity affected by an order issued under (a) without notice may move to vacate or modify it. After notice and a hearing, the court must rule on the motion."
+      hash "c667961accc1e4b5797616f929c38b010149662bbaad955d0ab965d8f2562b60"
+    }
+    hash "da4de8e1af3eada68b236703dc81eaec6da0d47d6113eb0fae58f41e02120b2b"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule provides the procedure for invoking the court’s power under § 107 of the Code."
+    hash "1da445520bdceb0e43e214c26551c2ea17f3005839c5750b3a6a93cceedde0c7"
+  }
+  note "/us/usc/ptIX/rule9018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9018 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fa18329b35220519f568c109084669881d6dfa6bbc9ecc9ada077da31727e107"
+  }
+  layers {
+    operative "da4de8e1af3eada68b236703dc81eaec6da0d47d6113eb0fae58f41e02120b2b"
+    enacted "0f68d74641db469795ce7d31a89f7bec64dc436d2cbf992cb736cfa30af9e77a"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

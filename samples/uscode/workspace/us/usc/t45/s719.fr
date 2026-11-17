@@ -1,0 +1,264 @@
+edition 2
+module "/us/usc/t45/s719" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s719" section {
+    num "719" "§ 719."
+    heading "Judicial review"
+    provision "/us/usc/t45/s719/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      content "Notwithstanding any other provision of law, the final system plan which is adopted by the Association and which becomes effective after review by the Congress is not subject to review by any court except in accordance with this section. After the final system plan becomes effective under " ["section 718 of this title" -> "/us/usc/t45/s718"] ", it may be reviewed with respect to matters concerning the value of the rail properties to be conveyed under the plan and the value of the consideration to be received for such properties."
+      hash "00769d67239784f94a1f8c9b4c8d2acf3a95b67a2c17a4462683b54c39a504d2"
+    }
+    provision "/us/usc/t45/s719/b" subsection {
+      num "b" "(b)"
+      heading "Special court"
+      provision "/us/usc/t45/s719/b/1" paragraph {
+        num "1" "(1)"
+        content "Within 30 days after January 2, 1974, the Association shall make application to the judicial panel on multi-district litigation authorized by " ["section 1407 of title 28" -> "/us/usc/t28/s1407"] " for the consolidation in a single, three-judge district court of the United States of all judicial proceedings with respect to the final system plan. Within 30 days after such application is received, the panel shall make the consolidation in a district court (cited herein as the “special court”) which the panel determines to be convenient to the parties and the one most likely to be able to conduct any proceedings under this section with the least delay and the greatest possible fairness and ability. Such proceedings shall be conducted by the special court which shall be composed of three Federal judges who shall be selected by the panel, except that none of the judges selected may be a judge assigned to a proceeding involving any railroad in reorganization in the region under section 77 of the Bankruptcy Act. The special court is authorized to exercise the powers of a district judge in any judicial district with respect to such proceedings and such powers shall include those of a reorganization court. The special court shall have the power to order the conveyance of rail properties of railroads leased, operated, or controlled by a railroad in reorganization in the region. The special court may issue rules for the conduct of any proceedings under this section and under " ["section 745 of this title" -> "/us/usc/t45/s745"] ", including rules with respect to the time within which motions may be filed, and with respect to appropriate representation of interests not otherwise represented (including the Secretary with respect to a petition by the Association in the case of a proposal developed by the Secretary, under such " ["section 745 of this title" -> "/us/usc/t45/s745"] "). No determination by the panel under this subsection may be reviewed in any court."
+        hash "69148b839b19ad92dd34f0ee0cbb2aa8d977e65cb4f30f26eb91dc253b0c654f"
+      }
+      provision "/us/usc/t45/s719/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "The special court referred to in paragraph (1) of this subsection is abolished effective 90 days after October 19, 1996. On such effective date, all jurisdiction and other functions of the special court shall be assumed by the United States District Court for the District of Columbia. With respect to any proceedings that arise or continue after the date on which the special court is abolished, the references in the following provisions to the special court established under this subsection shall be deemed to refer to the United States District Court for the District of Columbia:"
+        provision "/us/usc/t45/s719/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "Subsections (c), (e)(1), (e)(2), (f) and (g) of this section."
+          hash "275feea128817f7f7bcbaf57a6e463a3a00b0bcc6c4cc5930da530e0738632fe"
+        }
+        provision "/us/usc/t45/s719/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "Sections 712(d)(3), (g), 717(a)(1), (b)(1), (b)(2), 718(d)(2), 741(e)(2), (g), (k)(3), (k)(15), 743(a)(1), (a)(2), (b)(1), (b)(6)(A), (c)(1), (c)(2), (c)(3), (c)(4), (c)(5), 744(a)(1)(B), (i)(3), 745(c), (d)(1), (d)(2), (d)(3), (d)(4), (d)(5), (d)(8), (e), (f)(1), (f)(2)(B), (f)(2)(D), (f)(2)(E), (f)(3), 746(a), (b), (c)(4), and 791(b)(3), (c) of this title)."
+          hash "3634d967a3e81ee2e75d508d5dbf617a0531d4df35d40f33ba4d749cee71f4f3"
+        }
+        provision "/us/usc/t45/s719/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "Sections 1105(a) and 1115 of this title."
+          hash "907c6cd2e494de14d2b87a64fe0608697467968f5ea415b7987c4426bc32e91a"
+        }
+        provision "/us/usc/t45/s719/b/2/D" subparagraph {
+          num "D" "(D)"
+          content "Sections 1323(2)(A)(iii), (2)(B), (2)(C), (3)(C), (3)(E), (4)(A) and 1324(b) of this title."
+          hash "e8495bf4c37f601dd510e56f4ab81c19b72523d5e839ecfad19274c6325a93eb"
+        }
+        provision "/us/usc/t45/s719/b/2/E" subparagraph {
+          num "E" "(E)"
+          content ["Section 24907(b) of title 49" -> "/us/usc/t49/s24907/b"] "."
+          hash "b82bd915f0729649bac71f01f59b75414c6d90105dc20bdd007cb2f2a5695275"
+        }
+        provision "/us/usc/t45/s719/b/2/F" subparagraph {
+          num "F" "(F)"
+          content "Any other Federal law (other than this subsection and section 605 of the Federal Courts Improvement Act of 1996), Executive order, rule, regulation, delegation of authority, or document of or relating to the special court as previously established under paragraph (1) of this subsection."
+          hash "250044cd82650803f2634f2a403f61e6236ebbd4beda6aefc2ba0f1aa6609757"
+        }
+        hash "e9af23418f51192370aaea5e7235dc2014a95afc138d41a89fa96e934caaa2e7"
+      }
+      hash "dfca8e0c77a46a3621b90fe24ee86dc676618c235b086bff9e7bee2b8dfa1529"
+    }
+    provision "/us/usc/t45/s719/c" subsection {
+      num "c" "(c)"
+      heading "Delivery of plan to special court"
+      chapeau "Within 90 days after its effective date, the Association shall deliver a certified copy of the final system plan to the special court and shall certify to the special court—"
+      provision "/us/usc/t45/s719/c/1" paragraph {
+        num "1" "(1)"
+        content "which rail properties of the respective railroads in reorganization in the region and of any person leased, operated, or controlled by such railroads in reorganization are to be transferred to the Corporation, or any subsidiary thereof, in accordance with the final system plan;"
+        hash "23e490dd1e6b098da50a7e09608b2a0058417a4b5930b29cca7e4a5397bc06b2"
+      }
+      provision "/us/usc/t45/s719/c/2" paragraph {
+        num "2" "(2)"
+        content "which rail properties of the respective railroads in reorganization in the region or person leased," mark "1" 1 " operated, or controlled by such railroads in reorganization are to be conveyed to profitable railroads, in accordance with the final system plan;"
+        hash "6a3a49579f24dc89a6a88a72f3aedd2ba10216ef184af5f0b8d80c4faa25d140"
+      }
+      provision "/us/usc/t45/s719/c/3" paragraph {
+        num "3" "(3)"
+        content "the amount, terms, and value of the securities of the Corporation or any subsidiary thereof (including any certificates of value of the Association) to be exchanged for those rail properties to be transferred to the Corporation or any subsidiary thereof pursuant to the final system plan, and as indicated in paragraph (1) of this subsection; and"
+        hash "a5f99dac9fe07598fcf0dd96ee7ed1d849b9fc4a2650a8d50aedd09035d7fcc4"
+      }
+      provision "/us/usc/t45/s719/c/4" paragraph {
+        num "4" "(4)"
+        content "that the transfer of rail properties in exchange for securities of the Corporation or any subsidiary thereof (including any certificates of value of the Association) and other benefits is fair and equitable and in the public interest."
+        hash "3860cc57eef2d2c80626d55c79b99f9a6c93b0533c5c2d91e4557f8884ad003b"
+      }
+      continuation "Notwithstanding any other provisions of this subsection and subsection (d) of this section, the time for the delivery of a certified copy of the final system plan shall be March 12, 1976, and may be extended to a date not more than 30 days thereafter, prescribed in a notice filed by the Association not later than February 17, 1976, with the special court, the Congress, and each court referred to in such subsection (d). Such notice shall contain the certification of the Association that an orderly conveyance of rail properties cannot reasonably be effected before the date for conveyance determined with respect to such notice. The time prescribed in " ["section 743(a) of this title" -> "/us/usc/t45/s743/a"] " shall be determined with respect to the date prescribed in such notice."
+      hash "d929b2ae49fa566074a9a8173cd83e20efbf68425b2755638cce06455f4a67d9"
+    }
+    provision "/us/usc/t45/s719/d" subsection {
+      num "d" "(d)"
+      heading "Bankruptcy courts"
+      chapeau "Within 90 days after its effective date, the Association shall deliver a certified copy of the final system plan to each district court of the United States or any other court having jurisdiction over a railroad in reorganization in the region and shall certify to each such court—"
+      provision "/us/usc/t45/s719/d/1" paragraph {
+        num "1" "(1)"
+        content "which rail properties of that railroad in reorganization are to be transferred to the Corporation or any subsidiary thereof under the final system plan; and"
+        hash "cc197f3fb1c5995bb28a89c3ae2bbdbe7f3eed03c627c23035cf10c070a6bc38"
+      }
+      provision "/us/usc/t45/s719/d/2" paragraph {
+        num "2" "(2)"
+        content "which rail properties of that railroad in reorganization, if any, are to be conveyed to profitable railroads operating in the region, under the final system plan."
+        hash "cbdb4464c40d8eba7039b903ac3018912778f81e4d09b0f988e3a739c28d330d"
+      }
+      hash "768d97b1de9c574d0c271f1eea7b36e922558e3e9aa5b6683c95d3c75c00a9e5"
+    }
+    provision "/us/usc/t45/s719/e" subsection {
+      num "e" "(e)"
+      heading "Original and exclusive jurisdiction"
+      provision "/us/usc/t45/s719/e/1" paragraph {
+        num "1" "(1)"
+        chapeau "Notwithstanding any other provision of law, any civil action—"
+        provision "/us/usc/t45/s719/e/1/A" subparagraph {
+          num "A" "(A)"
+          content "for injunctive or other relief against the Association from the enforcement, operation, or execution of this chapter or any provision thereof, or from any action taken by the Association pursuant to authority conferred or purportedly conferred under this chapter;"
+          hash "2aec5e06b4845263949fc5b9d5c3acaa018f0beeb6ba61d31eec5c5e79a74d7b"
+        }
+        provision "/us/usc/t45/s719/e/1/B" subparagraph {
+          num "B" "(B)"
+          content "challenging the constitutionality of this chapter or any provision thereof;"
+          hash "b579015c8096252ed937b86e76dead2719cbd1593de55c5ec7438219aac3c687"
+        }
+        provision "/us/usc/t45/s719/e/1/C" subparagraph {
+          num "C" "(C)"
+          content "challenging the legality of any action of the Association, or any failure of the Association to take any action, pursuant to authority conferred or purportedly conferred under this chapter;"
+          hash "208262217bc033dc9f3534f9c02e32cabbfc05ddb80051181aec6dc5ef778e34"
+        }
+        provision "/us/usc/t45/s719/e/1/D" subparagraph {
+          num "D" "(D)"
+          content "to obtain, inspect, copy, or review any document in the possession or control of the Association that would be discoverable in litigation pursuant to " ["section 743(c) of this title" -> "/us/usc/t45/s743/c"] ";"
+          hash "0945072ca6a711f18053b90d36639ebfd47eb2a60cb40ac4e39b28182933efca"
+        }
+        provision "/us/usc/t45/s719/e/1/E" subparagraph {
+          num "E" "(E)"
+          content "brought after a conveyance, pursuant to " ["section 743(b) of this title" -> "/us/usc/t45/s743/b"] ", to set aside or annul such conveyance or to secure in any way the reconveyance of any rail properties so conveyed; or"
+          hash "a79d416b25f3d2ba46759edf347711a9b32eb3e55e1ee41cc04ff29d0db96b4f"
+        }
+        provision "/us/usc/t45/s719/e/1/F" subparagraph {
+          num "F" "(F)"
+          content "with respect to continuing reorganization and supplemental transactions, in accordance with " ["section 745 of this title" -> "/us/usc/t45/s745"] ";"
+          hash "eefef24b9550cbb472f934325f4ebcd8a8e8a8bdd3a409a604211054c49f2d06"
+        }
+        continuation "shall be within the original and exclusive jurisdiction of the special court. The special court shall not hear or determine any such action prior to the date of conveyance, pursuant to " ["section 743(b)(1) of this title" -> "/us/usc/t45/s743/b/1"] ", except as the Constitution may require. Relief shall not be granted in any action referred to in subparagraph (A), (C), or (E) unless the person seeking such relief establishes that the Association acted in reckless or deliberate disregard of applicable law."
+        hash "efb2a18705d7bf2a0d21a5d8a75e381eeb6f89f91b392cd12d446e4b1b9cf7e2"
+      }
+      provision "/us/usc/t45/s719/e/2" paragraph {
+        num "2" "(2)"
+        content "The original and exclusive jurisdiction of the special court shall include any action, whether filed by any interested person or initiated by the special court itself, to interpret, alter, amend, modify, or implement any of the orders entered by such court pursuant to " ["section 743(b) of this title" -> "/us/usc/t45/s743/b"] " in order to effect the purposes of this chapter or the goals of the final system plan. During the pendency of any proceeding described in this paragraph, the special court may enter such orders as it determines to be appropriate, including orders enjoining, restraining, conditioning, or limiting any conveyance, transfer, or use of any asset or right which is subject to such an order or which is at issue in such a proceeding, or which involves the enforcement of any liens or encumbrances upon such assets or rights. Any orders pursuant to this paragraph which interpret, alter, amend, modify, or implement orders entered by the special court shall be final and shall not be restrained or enjoined by any court."
+        hash "50996e3435732b1f7ffa5d2f71f14a0f93d3cdf9b1e54289de2a79dd0886e89c"
+      }
+      provision "/us/usc/t45/s719/e/3" paragraph {
+        num "3" "(3)"
+        content "An order or judgment of the United States District Court for the District of Columbia in any action referred to in this section shall be reviewable in accordance with sections 1291, 1292, and 1294 of title 28."
+        hash "0c64174ea12fb37bb4787db5372387ac89403803a2d7593d8f557b1841ec0f1d"
+      }
+      hash "b7686e827dadba1bbc1f6d7fe885bef449f3d6074e7c0a4f4c33a2cce5ad50da"
+    }
+    provision "/us/usc/t45/s719/f" subsection {
+      num "f" "(f)"
+      heading "Disposition of cash deposits"
+      content "Whenever the compensation which is deposited with the special court under " ["section 743(a) of this title" -> "/us/usc/t45/s743/a"] " is in the form of cash, such cash shall be invested and reinvested upon such terms and conditions as the special court shall determine, pending the making of the findings referred to in paragraphs (1), (2), and (3) of " ["section 743(c) of this title" -> "/us/usc/t45/s743/c"] ". Notwithstanding " ["section 743(c)(4) of this title" -> "/us/usc/t45/s743/c/4"] ", the special court may order (1) the income from such investments, (2) the dividends or interest, if any, received on any securities or obligations deposited with the special court under such " ["section 743(a) of this title" -> "/us/usc/t45/s743/a"] ", and (3) the income, if any, received with respect to any other form of compensation so deposited, to be distributed to the trustee of each railroad in reorganization and to any person leased, operated or controlled by such a railroad which conveyed the right, title, and interest in the rail properties with respect to which such cash, securities, obligations, or other compensation have been so deposited with the special court. Notwithstanding " ["section 743(c)(4) of this title" -> "/us/usc/t45/s743/c/4"] ", the special court may, within 90 days after the date of conveyance of rail properties pursuant to " ["section 743(b) of this title" -> "/us/usc/t45/s743/b"] ", order up to 25 percent of any cash (including investments made with cash) and other compensation deposited with the special court to be distributed to such trustee or person. On petition of the applicable trustee or person, the special court may order such additional distributions as it finds reasonable and appropriate, prior to the making of the findings referred to in paragraphs (1), (2), and (3) of such " ["section 743(c) of this title" -> "/us/usc/t45/s743/c"] "."
+      hash "34b2a9939eae50067e85ac53bdd88d11b23fb866c8f44b313b447cf4182617b2"
+    }
+    provision "/us/usc/t45/s719/g" subsection {
+      num "g" "(g)"
+      heading "Stay of court proceedings"
+      content "The special court may stay or enjoin any action or proceeding in any State court or in any court of the United States other than the Supreme Court or Court of Appeals for the District of Columbia Circuit if such action or proceeding is contrary to any provision of this chapter, impairs the effective implementation of this chapter, or interferes with the execution of any order of the special court pursuant to this chapter."
+      hash "5b8281356b274ff7b065c8b455a84f82c9d9a00615feee384401a8f15a939516"
+    }
+    hash "515ff2e21332268fd321a00be317ae02b49b9591dbdd669ca21ca03ff67c4c97"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 209" -> "/us/pl/93/236/tII/s209"] ", Jan. 2, 1974, " ["87 Stat. 999" -> "/us/stat/87/999"] "; " ["Pub. L. 94–210, title VI" -> "/us/pl/94/210/tVI"] ", §§ 602(a), (b), 607(i), (l), (r), (s), Feb. 5, 1976, " ["90 Stat. 86" -> "/us/stat/90/86"] ", 97, 98; " ["Pub. L. 94–216, § 2" -> "/us/pl/94/216/s2"] ", Feb. 17, 1976, " ["90 Stat. 191" -> "/us/stat/90/191"] "; " ["Pub. L. 95–199, § 3" -> "/us/pl/95/199/s3"] ", Nov. 23, 1977, " ["91 Stat. 1423" -> "/us/stat/91/1423"] "; " ["Pub. L. 100–352, § 6(d)" -> "/us/pl/100/352/s6/d"] ", June 27, 1988, " ["102 Stat. 663" -> "/us/stat/102/663"] "; " ["Pub. L. 104–317, title VI, § 605(a)" -> "/us/pl/104/317/tVI/s605/a"] ", (b)(1), (c)(1), Oct. 19, 1996, " ["110 Stat. 3858" -> "/us/stat/110/3858"] ", 3859.)"
+  note "/us/usc/t45/s719/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77 of the Bankruptcy Act, referred to in subsec. (b)(1), was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ") was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p "Section 605 of the Federal Courts Improvement Act of 1996, referred to in subsec. (b)(2)(F), is " ["section 605 of Pub. L. 104–317" -> "/us/pl/104/317/s605"] ", title VI, Oct. 19, 1996, " ["110 Stat. 3858" -> "/us/stat/110/3858"] ", which amended this section and sections 743, 745, 1104, and 1105 of this title and enacted provisions set out as notes under this section."
+    hash "225e8902e36913ecb0956ba08631cef403f393dbb7c219ff15eb88a451a6e9ec"
+  }
+  note "/us/usc/t45/s719/note/editorialNotes/pl.94.210/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Amendment of subsec. (c)(2) by " ["section 607(s) of Pub. L. 94–210" -> "/us/pl/94/210/s607/s"] " was executed by substituting “person leased” for “railroads leased” to reflect the probable intent of Congress, notwithstanding such section 607(s) requiring substitution of “person leased” for “railroad leased”."
+    hash "91623f7607d5515ae13b9af03c4a65d4f0fb58621d5bfd4e9eea061a51450ae4"
+  }
+  note "/us/usc/t45/s719/note/editorialNotes/pl.104.317/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1996—Subsec. (b). " ["Pub. L. 104–317, § 605(a)" -> "/us/pl/104/317/s605/a"] ", designated existing provisions as par. (1) and added par. (2)."
+    p "Subsec. (e)(3). " ["Pub. L. 104–317, § 605(b)(1)" -> "/us/pl/104/317/s605/b/1"] ", added par. (3) and struck out former par. (3) which read as follows: “A final order or judgment of the special court in any action referred to in this section shall be reviewable only upon petition for a writ of certiorari to the Supreme Court of the United States. Such review is exclusive and any such petition shall be filed in the Supreme Court not more than 20 days after entry of such order or judgment.”"
+    p "Subsec. (g). " ["Pub. L. 104–317, § 605(c)(1)(A)" -> "/us/pl/104/317/s605/c/1/A"] ", inserted “or Court of Appeals for the District of Columbia Circuit” after “Supreme Court”."
+    p "Subsec. (h). " ["Pub. L. 104–317, § 605(c)(1)(B)" -> "/us/pl/104/317/s605/c/1/B"] ", struck out subsec. (h) relating to special masters."
+    p "1988—Subsec. (e)(3). " ["Pub. L. 100–352" -> "/us/pl/100/352"] " struck out “, except that any order or judgment enjoining the enforcement, or declaring or determining the unconstitutionality or invalidity, of this chapter, in whole or in part, or of any action taken under this chapter, shall be reviewable by direct appeal to the Supreme Court of the United States in the same manner that an injunctive order may be appealed under " ["section 1253 of title 28" -> "/us/usc/t28/s1253"] "” before the period at end of first sentence and substituted “such petition shall be filed in the Supreme Court” for “petition or appeal shall be filed” in second sentence."
+    p "1977—Subsec. (h). " ["Pub. L. 95–199" -> "/us/pl/95/199"] " added subsec. (h)."
+    p "1976—Subsec. (b). " ["Pub. L. 94–210, § 602(a)" -> "/us/pl/94/210/s602/a"] ", substituted provisions relating to issuance of rules by special court for conduct of proceedings under this section and " ["section 745 of this title" -> "/us/usc/t45/s745"] ", for provisions relating to issuance of rules by panel for conduct of its functions under this provision."
+    p "Subsec. (c). " ["Pub. L. 94–210, § 607(i)" -> "/us/pl/94/210/s607/i"] ", (l), (r), (s), inserted “or any subsidiary thereof” after “Corporation” wherever appearing, substituted “certificates of value” for “obligations” wherever appearing, inserted provisions at end relating to the time for the delivery of the final system plan on March 12, 1976, and conditions for extension of such date, and substituted references to person leased for references to railroad leased wherever appearing in pars. (1) and (2). See Codification note above."
+    p "Subsec. (d)(1). " ["Pub. L. 94–210, § 607(i)" -> "/us/pl/94/210/s607/i"] ", inserted “or any subsidiary thereof” after “Corporation”."
+    p "Subsecs. (e) to (g). " ["Pub. L. 94–210, § 602(b)" -> "/us/pl/94/210/s602/b"] ", added subsecs. (e) to (g)."
+    hash "3f47e16ec965ba61b7bf6b12fefaab3211cd10ae0e3a656f5c76ca75345d8043"
+  }
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1996 Amendment"
+    p ["Pub. L. 104–317, title VI, § 605(e)" -> "/us/pl/104/317/tVI/s605/e"] ", Oct. 19, 1996, " ["110 Stat. 3859" -> "/us/stat/110/3859"] ", provided that:"
+    quoted "/us/pl/104/317/tVI/s605/e" {
+      p "“The amendments made by subsections (b) and (c) of this section [amending this section and sections 743, 745, 1104, and 1105 of this title] shall take effect 90 days after the date of enactment of this Act [Oct. 19, 1996] and, except as provided in subsection (d) [enacting provisions set out as a note below], shall apply with respect to proceedings that arise or continue after such effective date.”"
+    }
+    hash "da8db91227e43c240e45b1ffa58862d52e6b74e3d0c3057182826f425a7649d7"
+  }
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1988 Amendment"
+    p "Amendment by " ["Pub. L. 100–352" -> "/us/pl/100/352"] " effective ninety days after June 27, 1988, except that such amendment not to apply to cases pending in Supreme Court on such effective date or affect right to review or manner of reviewing judgment or decree of court which was entered before such effective date, see " ["section 7 of Pub. L. 100–352" -> "/us/pl/100/352/s7"] ", set out as a note under " ["section 1254 of Title 28" -> "/us/usc/t28/s1254"] ", Judiciary and Judicial Procedure."
+    hash "feff9722fe583140dc628b7a0fa8adfc8defc8e4756e12aae08abbfdb687d079"
+  }
+  note "/us/usc/t45/s719/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.104.317/cases-pending-in-special-court" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Cases Pending in Special Court"
+    p ["Pub. L. 104–317, title VI, § 605(d)" -> "/us/pl/104/317/tVI/s605/d"] ", Oct. 19, 1996, " ["110 Stat. 3859" -> "/us/stat/110/3859"] ", provided that:"
+    quoted "/us/pl/104/317/tVI/s605/d" {
+      p "“Effective 90 days after the date of enactment of this Act [Oct. 19, 1996], any case pending in the special court established under section 209(b) of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 719(b)" -> "/us/usc/t45/s719/b"] ") shall be assigned to the United States District Court for the District of Columbia as though the case had originally been filed in that court. The amendments made by subsection (b) of this section [amending this section and sections 743 and 1105 of this title] shall not apply to any final order or judgment entered by the special court for which—"
+      level paragraph {
+        num "1" "“(1)"
+        content "a petition for writ of certiorari has been filed before the date on which the special court is abolished; or"
+      }
+      level paragraph {
+        num "2" "“(2)"
+        content "the time for filing a petition for writ of certiorari has not expired before that date.”"
+      }
+    }
+    hash "7a005731e30be411d9c1f270188bc69e2270e8993e399c276901327b3850ed4d"
+  }
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  note "/us/usc/t45/s719/note/courtRules/nolaw/rules-of-the-special-court-regional-rail-reorganization-act" enacted {
+    group courtRules
+    topic "miscellaneous"
+    heading "Rules of the Special Court, Regional Rail Reorganization Act of 1973"
+    p "Rules of the Special Court, Regional Rail Reorganization Act of 1973, formerly set out under this section, were omitted because the Special Court was abolished effective 90 days after Oct. 19, 1996. See subsec. (b)(2) of this section."
+    hash "de83f75bf7b831aec6a0212c0fc4af4d68217f879068aaa219bc7cadd708f42d"
+  }
+  footnote 1 "1" {
+    p "See Codification note below."
+  }
+  layers {
+    operative "515ff2e21332268fd321a00be317ae02b49b9591dbdd669ca21ca03ff67c4c97"
+    enacted "c131ff0ab4c97adc63710f13cc6ad7e259f6dddcb5be7c714d9aea664719addd"
+    editorial "3c51b248cbf2a714e1bad0c8e9162c4468240b9c6c0357c13e3ab49af128cac2"
+  }
+}

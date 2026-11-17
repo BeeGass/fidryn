@@ -1,0 +1,130 @@
+edition 2
+module "/us/usc/t45/s261...273" {
+  alias "/us/usc/t45/s261"
+  alias "/us/usc/t45/s262"
+  alias "/us/usc/t45/s263"
+  alias "/us/usc/t45/s264"
+  alias "/us/usc/t45/s265"
+  alias "/us/usc/t45/s266"
+  alias "/us/usc/t45/s267"
+  alias "/us/usc/t45/s268"
+  alias "/us/usc/t45/s269"
+  alias "/us/usc/t45/s270"
+  alias "/us/usc/t45/s271"
+  alias "/us/usc/t45/s272"
+  alias "/us/usc/t45/s273"
+  within "/us/usc/t45/ch10"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s261...273" section {
+    num "261 to 273" "§§ 261 to 273."
+    heading "Omitted"
+    status omitted
+    hash "d3616f37a16e9711a6eb281c05eab1ea95deb829a14668e93e86712648311442"
+  }
+  note "/us/usc/t45/s261...273/note/editorialNotes/act.1939-02-10.ch2/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Sections 261 to 273 were omitted pursuant to section 4 of " ["act Feb. 10, 1939, ch. 2" -> "/us/act/1939-02-10/ch2"] ", " ["53 Stat. 1" -> "/us/stat/53/1"] ", which provided that all laws or parts of laws codified into the Internal Revenue Code of 1939, enacted by act Feb. 10, 1939, to the extent they related exclusively to internal revenue laws, were repealed. The Internal Revenue Code of 1939 was generally repealed by section 7851 of " ["act Aug. 16, 1954, ch. 736" -> "/us/act/1954-08-16/ch736"] ", " ["68A Stat. 919" -> "/us/stat/68A/919"] " (" ["section 7851 of Title 26" -> "/us/usc/t26/s7851"] ", Internal Revenue Code), which act enacted the Internal Revenue Code of 1954 [now 1986]. See " ["section 7807 of Title 26" -> "/us/usc/t26/s7807"] ", relating to applicability of rules in effect upon the enactment of the Internal Revenue Code of 1986."
+    p "Section 261, acts " ["June 29, 1937, ch. 405, § 1" -> "/us/act/1937-06-29/ch405/s1"] ", " ["50 Stat. 435" -> "/us/stat/50/435"] "; " ["Aug. 13, 1940, ch. 664" -> "/us/act/1940-08-13/ch664"] ", §§ 1, 3, " ["54 Stat. 785" -> "/us/stat/54/785"] ", 786, defined terms for purposes of this subchapter."
+    p "Section 262, " ["act June 29, 1937, ch. 405, § 2" -> "/us/act/1937-06-29/ch405/s2"] ", " ["50 Stat. 437" -> "/us/stat/50/437"] ", related to income tax on employees."
+    p "Section 263, " ["act June 29, 1937, ch. 405, § 3" -> "/us/act/1937-06-29/ch405/s3"] ", " ["50 Stat. 437" -> "/us/stat/50/437"] ", related to excise tax on employers."
+    p "Section 264, " ["act June 29, 1937, ch. 405, § 4" -> "/us/act/1937-06-29/ch405/s4"] ", " ["50 Stat. 438" -> "/us/stat/50/438"] ", related to refunds and deficiencies."
+    p "Section 265, " ["act June 29, 1937, ch. 405, § 5" -> "/us/act/1937-06-29/ch405/s5"] ", " ["50 Stat. 438" -> "/us/stat/50/438"] ", related to income tax on employee representatives."
+    p "Section 266, " ["act June 29, 1937, ch. 405, § 6" -> "/us/act/1937-06-29/ch405/s6"] ", " ["50 Stat. 439" -> "/us/stat/50/439"] ", related to deductibility from regular income tax."
+    p "Section 267, " ["act June 29, 1937, ch. 405, § 7" -> "/us/act/1937-06-29/ch405/s7"] ", " ["50 Stat. 439" -> "/us/stat/50/439"] ", related to collection and payment of taxes."
+    p "Section 268, " ["act June 29, 1937, ch. 405, § 8" -> "/us/act/1937-06-29/ch405/s8"] ", " ["50 Stat. 439" -> "/us/stat/50/439"] ", related to court jurisdiction."
+    p "Section 269, " ["act June 29, 1937, ch. 405, § 9" -> "/us/act/1937-06-29/ch405/s9"] ", " ["50 Stat. 439" -> "/us/stat/50/439"] ", related to Social Security Act."
+    p "Section 270, " ["act June 29, 1937, ch. 405, § 10" -> "/us/act/1937-06-29/ch405/s10"] ", " ["50 Stat. 440" -> "/us/stat/50/440"] ", related to separability of provisions."
+    p "Section 271, " ["act June 29, 1937, ch. 405, § 11" -> "/us/act/1937-06-29/ch405/s11"] ", " ["50 Stat. 440" -> "/us/stat/50/440"] ", related to repeals."
+    p "Section 272, " ["act June 29, 1937, ch. 405, § 12" -> "/us/act/1937-06-29/ch405/s12"] ", " ["50 Stat. 440" -> "/us/stat/50/440"] ", related to rules and regulations."
+    p "Section 273, " ["act June 29, 1937, ch. 405, § 13" -> "/us/act/1937-06-29/ch405/s13"] ", " ["50 Stat. 440" -> "/us/stat/50/440"] ", related to short title of this subchapter."
+    p "For provisions formerly set out in this subchapter which were covered by sections of the Internal Revenue Code of 1939, see the sections of the Internal Revenue Code of 1986, Title 26, Internal Revenue Code, indicated in the following table:"
+    table {
+      head {
+        th "Omitted sections"
+        th "I.R.C. 1939"
+        th "I.R.C. 1986"
+      }
+      body {
+        td "261 (as amended Aug. 13, 1940, ch. 664, §§ 1, 3, 54 Stat. 785, 786)"
+        td "1532"
+        td "3231, 7701."
+      }
+      body {
+        td "262"
+        td "1500, 1501"
+        td "3201, 3202, 6205(a)(1), 6413(a)(1)."
+      }
+      body {
+        td "263"
+        td "1520, 1521"
+        td "3221, 6205(a)(1), 6413(a)(1)."
+      }
+      body {
+        td "264"
+        td "1502, 1522"
+        td "6205(b), 6413(b)."
+      }
+      body {
+        td "265"
+        td "1510, 1511"
+        td "3211, 3212."
+      }
+      body {
+        td "266"
+        td "1503, 1508, 1512"
+        td "3502."
+      }
+      body {
+        td "267"
+        td "1422, 1530, 1531, 1536"
+        td "3501, 3503, 6011(a), 6071, 6081(a), 6091(a), 6151(a), 6313, 6601(a), (f)(1)."
+      }
+      body {
+        td "268"
+        td "1534"
+        td "3232."
+      }
+      body {
+        td "269"
+        td "1426(b)(9), (10), 1428"
+        td "3121(b)(9), (10), 3124."
+      }
+      body {
+        td "270"
+        td "3802"
+        td "7511."
+      }
+      body {
+        td "271"
+        td ""
+        td ""
+      }
+      body {
+        td "272"
+        td "1535"
+        td "7805(a), (c)."
+      }
+      body {
+        td "273"
+        td ""
+        td ""
+      }
+    }
+    hash "89b6c3987f75363ac630873b2259e3bc2b11f70a6a9808e48998c6daa78ecf76"
+  }
+  note "/us/usc/t45/s261...273/note/statutoryNotes/act.1940-10-10.ch842/compensation-from-local-division-of-railway-labor-organizati" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Compensation From Local Division of Railway-Labor-Organization Employer Tax—Unpaid Before July 1, 1940"
+    p ["Act Oct. 10, 1940, ch. 842, § 27(b)" -> "/us/act/1940-10-10/ch842/s27/b"] ", " ["54 Stat. 1101" -> "/us/stat/54/1101"] ", provided that, for the purpose of determining the amount of taxes under sections 262(a) and 263(a) of this title, compensation earned in the service of a local lodge or division of a railway-labor-organization employer shall be disregarded with respect to any calendar month if the amount thereof is less than $3 and the taxes thereon under such sections are not paid before July 1, 1940."
+    hash "be9bc0ea78a925813e9371a17775ec2e0249d95c643352f6a4342ea2422887c5"
+  }
+  layers {
+    operative "d3616f37a16e9711a6eb281c05eab1ea95deb829a14668e93e86712648311442"
+    enacted "adbab5b210bc4791f17971a3af01c308d78465d381cca36ff4cdd55f84d66d1b"
+    editorial "4fee36fc328402586ed94895e0d5dd38c30b2c9dd18e4f29ee1a098e8d4860bb"
+  }
+}

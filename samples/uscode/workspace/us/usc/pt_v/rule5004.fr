@@ -1,0 +1,60 @@
+edition 2
+module "/us/usc/ptV/rule5004" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5004" courtRule {
+    num "5004" "Rule 5004."
+    heading "Disqualifying a Bankruptcy Judge"
+    provision "/us/usc/ptV/rule5004/a" subsection {
+      num "a" "(a)"
+      heading "From Presiding Over a Proceeding, Contested Matter, or Case."
+      content "A bankruptcy judge’s disqualification is governed by 28 U.S.C. § 455. The judge is disqualified from presiding over a proceeding or contested matter in which a disqualifying circumstance arises—and, when appropriate, from presiding over the entire case."
+      hash "99039924c58138f3763ecd36683eccf4867d946cbe114b8a05c6fe90a8087f59"
+    }
+    provision "/us/usc/ptV/rule5004/b" subsection {
+      num "b" "(b)"
+      heading "From Allowing Compensation."
+      content "The bankruptcy judge is disqualified from allowing compensation to a relative or to a person who is so connected with the judge as to make the judge’s allowing it improper."
+      hash "e0c5fb6ccc4c33e3be35157acf6e426ae4f2ccbf7d369eafa14765bf6099cfe7"
+    }
+    hash "cc59b6a5f6e767a5e03a80e0ecc14280a3860ad885712c2976675a7e3a7881c1"
+  }
+  credit "(As amended Apr. 29, 1985, eff. Aug. 1, 1985; Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). Disqualification of a bankruptcy judge is governed by 28 U.S.C. § 455. That section provides that the judge “shall disqualify himself in any proceeding in which his impartiality might reasonably be questioned” or under certain other circumstances. In a case under the Code it is possible that the disqualifying circumstance will be isolated to an adversary proceeding or contested matter. The rule makes it clear that when the disqualifying circumstance is limited in that way the judge need only disqualify himself from presiding over that adversary proceeding or contested matter."
+    p "It is possible, however, that even if the disqualifying circumstance arises in connection with an adversary proceeding, the effect will be so pervasive that disqualification from presiding over the case is appropriate. This distinction is consistent with the definition of “proceeding” in 28 U.S.C. § 455(d)(1)."
+    p "Subdivision (b) precludes a bankruptcy judge from allowing compensation from the estate to a relative or other person closely associated with the judge. The subdivision applies where the judge has not appointed or approved the employment of the person requesting compensation. Perhaps the most frequent application of the subdivision will be in the allowance of administrative expenses under § 503(b)(3)–(5) of the Code. For example, if an attorney or accountant is retained by an indenture trustee who thereafter makes a substantial contribution in a chapter 11 case, the attorney or accountant may seek compensation under § 503(b)(4). If the attorney or accountant is a relative of or associated with the bankruptcy judge, the judge may not allow compensation to the attorney or accountant. Section 101(34) [now 101(45)] defines relative and Rule 9001 incorporates the definitions of the Code. See the Advisory Committee’s Note to Rule 5002."
+    hash "2d24c5f247f65e36479de2279f7fe360b4bbf9f72959f681d7d970e996f29396"
+  }
+  note "/us/usc/ptV/rule5004/note/ungrouped/pl.98.353/notes-of-advisory-committee-on-rules-1985-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1985 Amendment"
+    p "Subdivision (a) was affected by the Bankruptcy Amendments and Federal Judgeship Act of 1984, " ["P.L. 98–353" -> "/us/pl/98/353"] ", " ["98 Stat. 333" -> "/us/stat/98/333"] ". The 1978 Bankruptcy Reform Act, " ["P.L. 95–598" -> "/us/pl/95/598"] ", included bankruptcy judges in the definition of United States judges in 28 U.S.C. § 451 and they were therefore subject to the provisions of 28 U.S.C. § 455. This was to become effective on April 1, 1984, " ["P.L. 95–598, § 404(b)" -> "/us/pl/95/598/s404/b"] ". " ["Section 113 of P.L. 98–353" -> "/us/pl/98/353/s113"] ", however, appears to have rendered the amendment to 28 U.S.C. § 451 ineffective. Subdivision (a) of the rule retains the substance and intent of the earlier draft by making bankruptcy judges subject to 28 U.S.C. § 455."
+    p "The word “associated” in subdivision (b) has been changed to “connected” in order to conform with Rule 5002(b)."
+    hash "407c9b03c7e01e0cc2d3314cc960925240ae8bcb2d3b5d5be9cfbadb63fbd267"
+  }
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule is amended to be gender neutral. The bankruptcy judge before whom the matter is pending determines whether disqualification is required."
+    hash "ed2a3cc377fbd0e8e927193957f513c537c42626df18e9cec4a6bde5f54293ea"
+  }
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b1cd94b1adb8d1d6dcd49a487a3ab1bc15251a61461035968961e399910d3586"
+  }
+  layers {
+    operative "cc59b6a5f6e767a5e03a80e0ecc14280a3860ad885712c2976675a7e3a7881c1"
+    enacted "797497a674988deaadfcc04794d9f2bf3328a911d21cc29e227a05cbbc891523"
+    editorial "7aec77214ef586b05385f44c7060097ad40eeb7f1c651a1e419f6b4997d7ae17"
+  }
+}

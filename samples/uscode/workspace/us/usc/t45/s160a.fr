@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s160a" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s160a" section {
+    num "160a" "§ 160a."
+    heading "Rules and regulations"
+    provision "/us/usc/t45/s160a/a" subsection {
+      num "a" "(a)"
+      heading "In general"
+      content "The Mediation Board shall have the authority from time to time to make, amend, and rescind, in the manner prescribed by " ["section 553 of title 5" -> "/us/usc/t5/s553"] ", and after opportunity for a public hearing, such rules and regulations as may be necessary to carry out the provisions of this chapter."
+      hash "46329858ad0c0d060fc0b30c32957ab12aaf71b55a77f586b989263aa9580acc"
+    }
+    provision "/us/usc/t45/s160a/b" subsection {
+      num "b" "(b)"
+      heading "Application"
+      content "The requirements of subsection (a) shall not apply to any rule or proposed rule to which the third sentence of " ["section 553(b) of title 5" -> "/us/usc/t5/s553/b"] " applies."
+      hash "04d662fc2a2114589282d725b065e9e85f8505e349190ace7c3d0c8410bf1c5a"
+    }
+    hash "1e37bb2f48a315da2eebd2a7e5c013918474b060bb12b8d0ee0e6ace0aba2d9f"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 10A" -> "/us/act/1926-05-20/ch347/s10A"] ", as added " ["Pub. L. 112–95, title X, § 1001" -> "/us/pl/112/95/tX/s1001"] ", Feb. 14, 2012, " ["126 Stat. 146" -> "/us/stat/126/146"] ".)"
+  layers {
+    operative "1e37bb2f48a315da2eebd2a7e5c013918474b060bb12b8d0ee0e6ace0aba2d9f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cd410cda38b5989b684b7b53be41b2b21456e1bde9ce0187a8b581d7898789c3"
+  }
+}

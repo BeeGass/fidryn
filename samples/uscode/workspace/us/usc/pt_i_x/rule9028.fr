@@ -1,0 +1,46 @@
+edition 2
+module "/us/usc/ptIX/rule9028" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9028" courtRule {
+    num "9028" "Rule 9028."
+    heading "Judge’s Disability"
+    content "Fed. R. Civ. P. 63 applies in a bankruptcy case."
+    hash "cb7ec2f0c8123c4aa1ffc2c356e12390ffadbea2df06934f58ac8769fdb6cec5"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9028/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is an adaptation of Rule 63 F.R.Civ.P."
+    hash "f972ac7eacd256dbb29da0506759293b9335762ef90cc248e7c4fdbeb251600c"
+  }
+  note "/us/usc/ptIX/rule9028/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Rule 9028 has been changed to adopt the procedures contained in Rule 63 of the Federal Rules of Civil Procedure for substituting a judge in the event of disability."
+    hash "29ddaa8552b309d3d0aebe4c3d1d79139f34cf8593009d085c0f2508f90b0d07"
+  }
+  note "/us/usc/ptIX/rule9028/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9028 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2c962c938e606c5a87d3db0f23a63bb11c754fc7685119bfbc6dcb83e1969fdb"
+  }
+  note "/us/usc/ptIX/rule9028/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "cb7ec2f0c8123c4aa1ffc2c356e12390ffadbea2df06934f58ac8769fdb6cec5"
+    enacted "2cb8e7ca1d26565391a51aff62eae11ff6d060e01fd4ce340ab36ce5f478ae77"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

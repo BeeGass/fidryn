@@ -1,0 +1,94 @@
+edition 2
+module "/us/usc/t45/s1322" {
+  within "/us/usc/t45/ch22/schII/ptB"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1322" section {
+    num "1322" "§ 1322."
+    heading "Ownership limitations"
+    provision "/us/usc/t45/s1322/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      provision "/us/usc/t45/s1322/a/1" paragraph {
+        num "1" "(1)"
+        content "During a period of 3 years beginning on the sale date, no person, directly or indirectly, may acquire or hold securities representing more than 10 percent of the total votes of all outstanding voting securities of the Corporation."
+        hash "277daa207f485d0c46059e6396025007bcf1394868caa68b39cdb4d7e3ff1d8e"
+      }
+      provision "/us/usc/t45/s1322/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "This subsection shall not apply—"
+        provision "/us/usc/t45/s1322/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "to the employee stock ownership plan (or successor plans) of the Corporation,"
+          hash "98424406c7632ef8befa643476be73be6de57d5e430dc40d98ac4abd53913db5"
+        }
+        provision "/us/usc/t45/s1322/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "to the Secretary of Transportation,"
+          hash "846abb43c18abe91b93060f5df1820f301c889b611a338dd8a45a0ea873f8f94"
+        }
+        provision "/us/usc/t45/s1322/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "to a railroad as described under subsection (b),"
+          hash "82a456e60018cef22098e35b73840ac0b644a1dc37520dd4ca61ddbb98091e31"
+        }
+        provision "/us/usc/t45/s1322/a/2/D" subparagraph {
+          num "D" "(D)"
+          content "to underwriting syndicates holding shares for resale, or"
+          hash "e0879522ce40ba86121f57b982e23a8557e682991f0f0033d0b12ebcb4622656"
+        }
+        provision "/us/usc/t45/s1322/a/2/E" subparagraph {
+          num "E" "(E)"
+          content "in the case of shares beneficially held for others, to commercial banks, broker-dealers, clearing corporations, or other nominees."
+          hash "d37cfda66c2b4af12945aee2867f79b2734d5f7fce805563bea995e45fdfc92e"
+        }
+        hash "5e3354f120b323721b3aaee2931aa6d4c59c4e846fd312642099c73635171363"
+      }
+      hash "806b796671f7a65b5da638fdb8a0920de9cec30b5e1df6c415bcc811ee05fd62"
+    }
+    provision "/us/usc/t45/s1322/b" subsection {
+      num "b" "(b)"
+      heading "Railroads"
+      provision "/us/usc/t45/s1322/b/1" paragraph {
+        num "1" "(1)"
+        content "During a period of 1 year beginning on the sale date, no railroad may purchase or hold, directly or indirectly, more than 10 percent of any class of stock of the Corporation. During such period, no railroad may file an application with the Commission for a merger or consolidation with the Corporation or the acquisition of control of the Corporation under section 11344" mark "1" 1 " of title 49."
+        hash "7585c01b268a1909f46b93f6e6a8d2ec16130781d143e828d49066a5a73e5594"
+      }
+      provision "/us/usc/t45/s1322/b/2" paragraph {
+        num "2" "(2)"
+        content "During a period of 3 years beginning on the sale date, any railroad which purchases or holds any stock of the Corporation shall vote such stock in the same proportion as all other common stock of the Corporation is voted. After the expiration of 1 year after the sale date, the preceding sentence shall not apply to any railroad with respect to which the Commission has approved an application for a merger or consolidation with the Corporation or the acquisition of control of the Corporation under section 11344 " sup "1" " of title 49."
+        hash "54e2c4d75be5542d440042cf6d59c641aef65ffe6148350f0526e7efbc02d334"
+      }
+      provision "/us/usc/t45/s1322/b/3" paragraph {
+        num "3" "(3)"
+        content "As used in this subsection, the term “railroad” means a class I railroad as determined by the Commission under the definition in effect on October 21, 1986, and includes any entity controlling, controlled by, or under common control with any railroad (other than the Corporation or its subsidiaries)."
+        hash "2443d89f106031a17379006c80482f252bde91063a97c9eb4151409a74edb85e"
+      }
+      hash "d04e889573fe64d395bd07aa1c6ac450870871288a3caee54e989087fd1a5fdb"
+    }
+    hash "d60cb2d57bbe175de988e6f013dfb0f34c8ed36d7e6a9a5e0abbf5e68583f5be"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4022" -> "/us/pl/99/509/tIV/s4022"] ", Oct. 21, 1986, " ["100 Stat. 1900" -> "/us/stat/100/1900"] ".)"
+  note "/us/usc/t45/s1322/note/editorialNotes/pl.104.88/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 11344 of title 49" -> "/us/usc/t49/s11344"] ", referred to in subsec. (b)(1), (2), was omitted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] ". Provisions similar to those in section 11344 are contained in sections 11324 and 14303 of Title 49."
+    hash "2c99057451e7921fc5fcd626c4486f9b85c204a589a5e85a1a2ffa0a5fd246b5"
+  }
+  note "/us/usc/t45/s1322/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "d60cb2d57bbe175de988e6f013dfb0f34c8ed36d7e6a9a5e0abbf5e68583f5be"
+    enacted "a717bee657abc14b91d3c694c5ec79464bba284d1a16b1c938b0942dbd84631c"
+    editorial "bd20c5277e13f7a39928ace75e1b3be3e77fd09483488167845323688f1e99ce"
+  }
+}

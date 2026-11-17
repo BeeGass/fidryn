@@ -1,0 +1,186 @@
+edition 2
+module "/us/usc/ptVIII/rule8016" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8016" courtRule {
+    num "8016" "Rule 8016."
+    heading "Cross-Appeals"
+    provision "/us/usc/ptVIII/rule8016/a" subsection {
+      num "a" "(a)"
+      heading "Applicability."
+      content "This rule applies to a case in which a cross-appeal is filed. Rules 8014(a)–(c), 8015(a)(7)(A)–(B), and 8018(a)(1)–(3) do not apply to such a case, unless this rule states otherwise."
+      hash "35ef9d7dc98cd2e85355a3d280f84901a5a27f0ea9f256526a2c87885cf8a90d"
+    }
+    provision "/us/usc/ptVIII/rule8016/b" subsection {
+      num "b" "(b)"
+      heading "Designation of Appellant."
+      content "The party who files a notice of appeal first is the appellant for purposes of this rule and Rule 8018(a)(4) and (b) and Rule 8019. If notices are filed on the same day, the plaintiff, petitioner, applicant, or movant in the proceeding below is the appellant. These designations may be modified by the parties’ agreement or by court order."
+      hash "2d5e91489cb8ebb90e58708c4f192aa506b9cbdd6a3435f9f8a03164025b5e9d"
+    }
+    provision "/us/usc/ptVIII/rule8016/c" subsection {
+      num "c" "(c)"
+      heading "Briefs."
+      chapeau "In a case involving a cross-appeal:"
+      provision "/us/usc/ptVIII/rule8016/c/1" paragraph {
+        num "1" "(1)"
+        content "Appellant’s Principal Brief. The appellant must file a principal brief in the appeal. That brief must comply with Rule 8014(a)."
+        hash "56df646d5dd91d67f6846e6c1e09ca6435a6f1e862686297f37e5e4c1ad38750"
+      }
+      provision "/us/usc/ptVIII/rule8016/c/2" paragraph {
+        num "2" "(2)"
+        content "Appellee’s Principal and Response Brief. The appellee must file a principal brief in the cross-appeal and must, in the same brief, respond to the principal brief in the appeal. That brief must comply with Rule 8014(a), but the brief need not include a statement of the case unless the appellee is dissatisfied with the appellant’s statement."
+        hash "0d211296bfc19a543f8a62efc6ba363b56dcaadae860fd1868a81d0dce043997"
+      }
+      provision "/us/usc/ptVIII/rule8016/c/3" paragraph {
+        num "3" "(3)"
+        chapeau "Appellant’s Response and Reply Brief. The appellant must file a brief that responds to the principal brief in the cross-appeal and may, in the same brief, reply to the response in the appeal. That brief must comply with Rule 8014(a)(2)–(8) and (10), but none of the following need appear unless the appellant is dissatisfied with the appellee’s statement in the cross-appeal:"
+        provision "/us/usc/ptVIII/rule8016/c/3/A" subparagraph {
+          num "A" "(A)"
+          content "the jurisdictional statement;"
+          hash "1c1046f9d4991a45e9d0bd002fe3beb874810083a0593080fc25be4a69d240fb"
+        }
+        provision "/us/usc/ptVIII/rule8016/c/3/B" subparagraph {
+          num "B" "(B)"
+          content "the statement of the issues;"
+          hash "79c2dc6691aa4537725b91b90353108dc75dadd08ed3f9c3e8b570b98222e652"
+        }
+        provision "/us/usc/ptVIII/rule8016/c/3/C" subparagraph {
+          num "C" "(C)"
+          content "the statement of the case; and"
+          hash "24317ee493dd6aeb68823af34276a5d8cd78e49a53df61ab20a4de126b4cf737"
+        }
+        provision "/us/usc/ptVIII/rule8016/c/3/D" subparagraph {
+          num "D" "(D)"
+          content "the statement of the applicable standard of appellate review."
+          hash "a5f74c205c4decfedfb9cc6f60523183ef975d71f3f91b206c0d98e86344fdf1"
+        }
+        hash "cdf8981cadd5be550e3446f82e3eaa09240c4509644e4fa7c1f0f4ddbd87fbcb"
+      }
+      provision "/us/usc/ptVIII/rule8016/c/4" paragraph {
+        num "4" "(4)"
+        content "Appellee’s Reply Brief. The appellee may file a brief in reply to the response in the cross-appeal. That brief must comply with Rule 8014(a)(2)–(3) and (10) and must be limited to the issues presented by the cross-appeal."
+        hash "6494337d2df539078a0941b8126d118358566777b1bac46c5550be136f59cb6a"
+      }
+      hash "8473fa252fa83de2c8a540080cac3c9fa758a3fc6c428288e2c7b0ef2c6a47c6"
+    }
+    provision "/us/usc/ptVIII/rule8016/d" subsection {
+      num "d" "(d)"
+      heading "Length."
+      provision "/us/usc/ptVIII/rule8016/d/1" paragraph {
+        num "1" "(1)"
+        content "Page Limitation. Unless it complies with (2), the appellant’s principal brief must not exceed 30 pages; the appellee’s principal and response brief, 35 pages; the appellant’s response and reply brief, 30 pages; and the appellee’s reply brief, 15 pages."
+        hash "f7d72978ddf5f34f442a2d8feed7e6f10d9ce76cbe862c7b9675b9c383b7c1d1"
+      }
+      provision "/us/usc/ptVIII/rule8016/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Type-Volume Limitation."
+        provision "/us/usc/ptVIII/rule8016/d/2/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Appellant’s Brief. The appellant’s principal brief or the appellant’s response and reply brief is acceptable if it includes a certificate under Rule 8015(h) and:"
+          provision "/us/usc/ptVIII/rule8016/d/2/A/i" clause {
+            num "i" "(i)"
+            content "contains no more than 13,000 words; or"
+            hash "6f58cb2f40cf01184461ca1ed378decd30ba4b2d455aea2f4de0ea0d1993043f"
+          }
+          provision "/us/usc/ptVIII/rule8016/d/2/A/ii" clause {
+            num "ii" "(ii)"
+            content "uses a monospaced face and contains no more than 1,300 lines of text."
+            hash "6b110585000f5ace3f97686c9292e173c1933cf6447870168d091d39ac04c3a3"
+          }
+          hash "0b75cdef03d23eaa8256781a765810f0edf74559b8666db99048daa907a84e05"
+        }
+        provision "/us/usc/ptVIII/rule8016/d/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Appellee’s Principal and Response Brief. The appellee’s principal and response brief is acceptable if it includes a certificate under Rule 8015(h) and:"
+          provision "/us/usc/ptVIII/rule8016/d/2/B/i" clause {
+            num "i" "(i)"
+            content "contains no more than 15,300 words; or"
+            hash "95d0a6c6fcf689b1392789d07f63b511e0882d0e3aad70cdd48bf5051b69036b"
+          }
+          provision "/us/usc/ptVIII/rule8016/d/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "uses a monospaced face and contains no more than 1,500 lines of text."
+            hash "64d824e54cb58bc6c3251c51fec6cd8bd09f6f62618d860e95e7ea668b9a1b38"
+          }
+          hash "58edc74f47f669e2e895b3f277304bba5058b1a52e6e492244aa5e791b288c21"
+        }
+        provision "/us/usc/ptVIII/rule8016/d/2/C" subparagraph {
+          num "C" "(C)"
+          content "Appellee’s Reply Brief. The appellee’s reply brief is acceptable if it includes a certificate under Rule 8015(h) and contains no more than half the type volume specified in (A)."
+          hash "8e0b1f7d4d91a729f9c2d09d15aef13c4d94e54c92e43e02fe88add76c12ab89"
+        }
+        hash "51cb80b34f618bcb91153e7baeec604698bd929437845438b51e71fc78e362fb"
+      }
+      hash "5ee2fe4127aba7d4b15c52518b47f508e40fd60d84c4c2238d7f4edaacea55da"
+    }
+    provision "/us/usc/ptVIII/rule8016/e" subsection {
+      num "e" "(e)"
+      heading "Time to Serve and File a Brief."
+      chapeau "Briefs must be served and filed as follows, unless the district court or BAP by order in a particular case excuses the filing of briefs or sets different time limits:"
+      provision "/us/usc/ptVIII/rule8016/e/1" paragraph {
+        num "1" "(1)"
+        content "the appellant’s principal brief, within 30 days after the docketing of a notice that the record has been sent or is available electronically;"
+        hash "8e9fbd4291e13c8a3dec6545c909b8d3755ee4b4db22777120b3385d13503798"
+      }
+      provision "/us/usc/ptVIII/rule8016/e/2" paragraph {
+        num "2" "(2)"
+        content "the appellee’s principal and response brief, within 30 days after the appellant’s principal brief is served;"
+        hash "35c64e2013d0f3e432ce013050b63813bf5b86a4908cbce636ffeea608eda50f"
+      }
+      provision "/us/usc/ptVIII/rule8016/e/3" paragraph {
+        num "3" "(3)"
+        content "the appellant’s response and reply brief, within 30 days after the appellee’s principal and response brief is served; and"
+        hash "1fb484aee633cf204c07b55ba7eca0bb57216cf069093965e9f9dd5f045f97c0"
+      }
+      provision "/us/usc/ptVIII/rule8016/e/4" paragraph {
+        num "4" "(4)"
+        content "the appellee’s reply brief, within 14 days after the appellant’s response and reply brief is served but at least 7 days before scheduled argument—unless the district court or BAP, for cause, allows a later filing."
+        hash "ca2c89800b46d7d42ae9df88a552fad9172ae56f3b2681703ce612f4ad27ec4d"
+      }
+      hash "56874bb65806363bd53c9a570e0396905b6fbb90da1fa50c15de0db4593d0c50"
+    }
+    hash "151fe1520d64f5c5a07db4db06d836c30f76da40c98e709c93a188efdba80a4d"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8016, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to duties of clerk of district court and bankruptcy appellate panel, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "b0750a889b21ca7c824cf3790461e6d504f528eb51b5e2b3178061d18b9e4119"
+  }
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from F.R.App.P. 28.1. It governs the timing, content, length, filing, and service of briefs in bankruptcy appeals in which there is a cross-appeal. The former Part VIII rules did not separately address the topic of cross-appeals."
+    p "Subdivision (b) prescribes which party is designated the appellant when there is a cross-appeal. Generally, the first to file a notice of appeal will be the appellant."
+    p "Subdivision (c) specifies the briefs that the appellant and the appellee may file. Because of the dual role of the parties to the appeal and cross-appeal, each party is permitted to file a principal brief and a response to the opposing party’s brief, as well as a reply brief. For the appellee, the principal brief in the cross-appeal and the response in the appeal are combined into a single brief. The appellant, on the other hand, initially files a principal brief in the appeal and later files a response to the appellee’s principal brief in the cross-appeal, along with a reply brief in the appeal. The final brief that may be filed is the appellee’s reply brief in the cross-appeal."
+    p "Subdivision (d), which prescribes page limits for briefs, is adopted from F.R.App.P. 28.1(e). It applies to briefs that are filed electronically, as well as to those filed in paper form. Like Rule 8015(a)(7), it imposes limits measured by either the number of pages or the number of words or lines of text."
+    p "Subdivision (e) governs the time for filing briefs in cases in which there is a cross-appeal. It adapts the provisions of F.R.App.P. 28.1(f)."
+    p "Changes Made After Publication and Comment. Subdivision (d)(2)(D) was added, and subdivision (f) was deleted. In subdivision (a), the statement that Rule 8018(a) does not apply was changed to refer to Rule 8018(a)(1)–(3). In subdivision (b), Rule 8018(a)(4) was added to the list of rules. Conforming changes were made to the Committee Note."
+    hash "fb08e700a1cda162cb25329f730827d7b66db28a44a8b0f4b60508ff58d64cdf"
+  }
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "The rule is amended to conform to recent amendments to F.R.App.P. 28.1, which reduced the word limits generally allowed for briefs in cross-appeals. When Rule 28.1 was adopted in 2005, it modeled its type-volume limits on those set forth in F.R.App.P. 32(a)(7) for briefs in cases that did not involve a cross-appeal. At that time, Rule 32(a)(7)(B) set word limits based on an estimate of 280 words per page. Amended F.R.App.P. 32 and 28.1 apply a conversion ratio of 260 words per page and reduce the word limits accordingly. Rule 8016(d)(2) adopts the same reduced word limits."
+    p "In a complex case, a party may need to file a brief that exceeds the type-volume limitations specified in these rules, such as to include unusually voluminous information explaining relevant background or legal provisions or to respond to multiple briefs by opposing parties or amici. The Committee expects that courts will accommodate those situations by granting leave to exceed the type-volume limitations as appropriate."
+    p "Subdivision (d) is amended to refer to new Rule 8015(h) (which now contains the certificate-of-compliance provision formerly in Rule 8015(a)(7)(C))."
+    hash "e4327ffb0eb690eb68039f6b55147a108d3b1e364004b66c6eb4c8a64aab5780"
+  }
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a20f5501fa63e738a577dea17ba7a1fcacf1cb82478059fca61554b19bd3a3d9"
+  }
+  layers {
+    operative "151fe1520d64f5c5a07db4db06d836c30f76da40c98e709c93a188efdba80a4d"
+    enacted "f3d8c6a15ba405ba19eb7ab53a6bfbcf83b23cbade6cba93f4390c8a45ea2e4e"
+    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+  }
+}

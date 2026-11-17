@@ -1,0 +1,58 @@
+edition 2
+module "/us/usc/ptVII/rule7041" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7041" courtRule {
+    num "7041" "Rule 7041."
+    heading "Dismissing Adversary Proceedings"
+    chapeau "Fed. R. Civ. P. 41 applies in an adversary proceeding. But a complaint objecting to the debtor’s discharge may be dismissed on the plaintiff’s motion only:"
+    provision "/us/usc/ptVII/rule7041/a" subsection {
+      num "a" "(a)"
+      content "by a court order setting out any terms and conditions for the dismissal; and"
+      hash "a8df098be3a02e1433dd99992d98b8c7f7ab2730215d45e1115c818e22b8e4d0"
+    }
+    provision "/us/usc/ptVII/rule7041/b" subsection {
+      num "b" "(b)"
+      content "with notice to the trustee, the United States trustee, and any other person the court designates."
+      hash "c54ba9d8c089cbfa7828b9ec95e089f009a250d079a64b89e9e65cbb1831bb5f"
+    }
+    hash "159a933ee903db907c260700b83eced4a08327a6d604137ab79055cb734e0933"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Dismissal of a complaint objecting to a discharge raises special concerns because the plaintiff may have been induced to dismiss by an advantage given or promised by the debtor or someone acting in his interest. Some courts by local rule or order have required the debtor and his attorney or the plaintiff to file an affidavit that nothing has been promised to the plaintiff in consideration of the withdrawal of the objection. By specifically authorizing the court to impose conditions in the order of dismissal this rule permits the continuation of this salutary practice."
+    p "Rule 41 F.R.Civ.P. refers to Rule 19 F.R.Civ.P. Pursuant to Rule 7002 that reference is to Rule 19 F.R.Civ.P. as incorporated and modified by Rule 7019."
+    hash "80524979f7e3d2140717df2eb0d74775946ae52b83004a2ea5d2805a0516c13a"
+  }
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The United States trustee has standing to object to the debtor’s discharge pursuant to § 727(c) and may have refrained from commencing an adversary proceeding objecting to discharge within the time limits provided in Rule 4004 only because another party commenced such a proceeding. The United States trustee may oppose dismissal of the original proceeding."
+    p "The rule is also amended to clarify that the court may direct that other persons receive notice of a plaintiff’s motion to dismiss a complaint objecting to discharge."
+    hash "2d6055e72b98eb568e7a886984ee6d2f3856a296420e31054d68ed468585a5e7"
+  }
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7041 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fc8e8e91d5f0a0cdfeaf93cd983d951ae4390d9eda7a507d684eb56d125cb495"
+  }
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "159a933ee903db907c260700b83eced4a08327a6d604137ab79055cb734e0933"
+    enacted "2c1e33441b2171d811117a6e30a79ed43e08f996bd7deaf551b030c07373432b"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

@@ -22,8 +22,12 @@ The canonical gate requires the pinned Rust toolchain, uv with its locked Python
 environment, and Node. It runs workspace tests, Clippy across targets/features,
 Rustdoc, schema assertions and controls, Python/JavaScript checks, the sample
 check (`cargo xtask uscode-sample`: the committed archives of the Code against
-their retrieval record, and the committed profile against what the profile
-script prints), generated-site consistency, the example status check
+their retrieval record, the committed workspace against what the importer
+writes from them on one worker and on eight, its check, the committed profile
+and its counts of references against the script that counts the archives and
+the check, and the text of every provision and note against what an
+independent script reads from the publisher's XML), generated-site
+consistency, the example status check
 (`cargo xtask examples`), the documentation check (`cargo xtask docs`) and
 benchmark compilation. The example status and documentation checks are
 described in

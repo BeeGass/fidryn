@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s1015" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1015" section {
+    num "1015" "§ 1015."
+    heading "Repealed. " ["Pub. L. 104–88, title III, § 329(2)" -> "/us/pl/104/88/tIII/s329/2"] ", Dec. 29, 1995, " ["109 Stat. 952" -> "/us/stat/109/952"]
+    status repealed
+    hash "784786907230908b12d4dff6642d201f823e7998c662e1ed568e9ccbbc202b0a"
+  }
+  note "/us/usc/t45/s1015/note/ungrouped/pl.96.254/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 96–254, title I, § 120" -> "/us/pl/96/254/tI/s120"] ", May 30, 1980, " ["94 Stat. 408" -> "/us/stat/94/408"] "; " ["Pub. L. 97–216, title I, § 101" -> "/us/pl/97/216/tI/s101"] ", July 18, 1982, " ["96 Stat. 188" -> "/us/stat/96/188"] ", related to Interstate Commerce Commission ordering directed service over passenger commuter railroad lines that were in operation on Mar. 1, 1980, and had ceased to be in operation."
+    hash "b1496ce30b7fccd9dc6a1cfeb97019f2fb9773fe827ed92fb2c1f46d1e745b9e"
+  }
+  note "/us/usc/t45/s1015/note/statutoryNotes/pl.104.88/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "1b83560ff1ad2a5bde8de47a94827ad311a0c76b20c59a7b93dded9115efee7f"
+  }
+  layers {
+    operative "784786907230908b12d4dff6642d201f823e7998c662e1ed568e9ccbbc202b0a"
+    enacted "e4ccc7bdf04d2c5054be263586e50b1baaaf4a57ae19073750d953c0b4decbbb"
+    editorial "f24e458b19f5cddfca2423e188e23da69055d25bb47116ab5cb2426d7dfea279"
+  }
+}

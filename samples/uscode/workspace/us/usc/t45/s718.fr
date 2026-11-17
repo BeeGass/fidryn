@@ -1,0 +1,146 @@
+edition 2
+module "/us/usc/t45/s718" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s718" section {
+    num "718" "§ 718."
+    heading "Review by Congress"
+    provision "/us/usc/t45/s718/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      content "The Board of Directors of the Association shall deliver the final system plan adopted by the Association to both Houses of Congress and to the Committee on Energy and Commerce of the House of Representatives and the Committee on Commerce, Science, and Transportation of the Senate. The final system plan shall be deemed approved at the end of the first period of 60 calendar days of continuous session of Congress after such date of transmittal unless either the House of Representatives or the Senate passes a resolution during such period stating that it does not favor the final system plan."
+      hash "0e804b9e6dd98db9c09db59db1f4ea3e0bdc2581272c70178bb3249dc8674a3c"
+    }
+    provision "/us/usc/t45/s718/b" subsection {
+      num "b" "(b)"
+      heading "Revised plan"
+      content "If either the House or the Senate passes a resolution of disapproval under subsection (a) of this section, the Association, with the cooperation and assistance of the Secretary and the Office, shall prepare, determine, and adopt a revised final system plan. Each such revised plan shall be submitted to Congress for review pursuant to subsection (a) of this section."
+      hash "bea255048298fa85ddbab5f7e6e65cc1d0316e59b71defe3e9c5454762121904"
+    }
+    provision "/us/usc/t45/s718/c" subsection {
+      num "c" "(c)"
+      heading "Computation"
+      chapeau "For purposes of this section—"
+      provision "/us/usc/t45/s718/c/1" paragraph {
+        num "1" "(1)"
+        content "continuity of session of Congress is broken only by an adjournment sine die; and"
+        hash "fdcf4513a6a85f1a850a0f1ec2fea773c71740bc38dc0fa29afaf029426f31a0"
+      }
+      provision "/us/usc/t45/s718/c/2" paragraph {
+        num "2" "(2)"
+        content "the days on which either House is not in session because of an adjournment of more than 3 days to a day certain are excluded in the computation of the 60-day period."
+        hash "70204fd74ab53a97e8d802c4e9e6acce26c4dfda99f0843c08195129190e2af8"
+      }
+      hash "7ddbadc5489a154cb052935e98a2e0441a37d35f53b8d940bb69bf198cef410d"
+    }
+    provision "/us/usc/t45/s718/d" subsection {
+      num "d" "(d)"
+      heading "Additions"
+      provision "/us/usc/t45/s718/d/1" paragraph {
+        num "1" "(1)"
+        content "The supplemental report, dated September 18, 1975, to the final system plan, and the provisions of the Association’s official errata supplement to the final system plan, dated December 1, 1975, including all designations made therein, shall be treated for all purposes as if they had been part of and included in the final system plan adopted by the Association and reviewed by the Congress. The final system plan shall, for all purposes, be deemed to be approved as modified and amended by such supplemental report and such supplement."
+        hash "c02932d21ff779e66422081ac455e23fe7bf6b4e3faf05fde68f2f622c01da35"
+      }
+      provision "/us/usc/t45/s718/d/2" paragraph {
+        num "2" "(2)"
+        content "The Association may, upon petition of any State, modify the final system plan to make further designations with respect to rail properties of railroads in reorganization in the region designated for transfer to the Corporation under such plan, if such designations (A) are likely to result in improved rail service on such rail properties and connecting rail properties, and (B) would not materially impair the profitability of the Corporation. Such designations, including designations of such rail properties to a State, a profitable railroad, or a responsible person, may be made at any time prior to delivery of the final system plan to the special court under " ["section 719(c) of this title" -> "/us/usc/t45/s719/c"] ". Such further designations shall be treated for all purposes as if they had been included in the final system plan adopted by the Association and reviewed by the Congress, and the final system plan shall for all purposes be deemed to be approved as modified by such designations. Any action of the Association with respect to any such petition shall not be subject to review by any court."
+        hash "0dd58e1a4d33bfd23b998ddad3b8373fa3235ee455c80cbd4d1956872e87c4ff"
+      }
+      provision "/us/usc/t45/s718/d/3" paragraph {
+        num "3" "(3)"
+        provision "/us/usc/t45/s718/d/3/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Within 20 days after February 5, 1976, the Association may, by notice to the Congress and by publication in the Federal Register, modify, supplement, or add to the designations of rail properties in the final system plan if the Association finds such actions are necessary to—"
+          provision "/us/usc/t45/s718/d/3/A/i" clause {
+            num "i" "(i)"
+            content "achieve the efficient implementation of the final system plan, or"
+            hash "ad19659a299933a2a6e7d20bff4cc188ece4477940f5f538755f750316d08a22"
+          }
+          provision "/us/usc/t45/s718/d/3/A/ii" clause {
+            num "ii" "(ii)"
+            content "provide for the offer to profitable railroads of rail properties designated in the final system plan to the Corporation, if such properties are not essential in the operation of other rail properties of the Corporation but are or would be integrally related to the operation of rail properties of (or which are offered pursuant to the final system plan to) such profitable railroad, or"
+            hash "9ae419395de2badcc60545f8d81540df70bf43dfadddecbef3f057070c0c8a23"
+          }
+          provision "/us/usc/t45/s718/d/3/A/iii" clause {
+            num "iii" "(iii)"
+            content "provide for the designation of additional rail properties to the Corporation or to a subsidiary thereof to enable the Corporation to serve efficiently a line of railroad designated to the Corporation in the final system plan if such line does not connect with any other line of railroad so designated to the Corporation or if such line would be served more efficiently as a consequence of such designation."
+            hash "cf7ce6ef3260f149c6b929491cc56e201bd7ba32cab8992a474697572ac7270d"
+          }
+          continuation "Any designation to a profitable railroad pursuant to this paragraph shall comply with the second sentence of " ["section 716(d)(4) of this title" -> "/us/usc/t45/s716/d/4"] ", and shall only be made upon a finding by the Association that such designation is integrally related to an offer of rail properties to a profitable railroad in the final system plan, that the goals of the final system plan require that the rail properties be operated as a part of the rail properties included in such offer, and that the implementation of such designation will not materially and adversely affect the impact of such offer on the profitability of the Corporation or any profitable railroad operating in the region. Any designation to a profitable railroad pursuant to this subsection, which amends any prior offer, shall terminate 30 days after February 5, 1976, unless, prior to such date, such profitable railroad has notified the Association in writing of its acceptance of such amendment to the prior offer."
+          hash "bf87db1d1df1f2e6320b69ac4fde11a1cd70441f9120678843b3ec111cb4be80"
+        }
+        provision "/us/usc/t45/s718/d/3/B" subparagraph {
+          num "B" "(B)"
+          content "If a line of railroad or any segment thereof is designated for rail service in the final system plan, no designation may be made by the Association pursuant to this paragraph which would result in such line or segment not being so designated. Any designations made pursuant to this paragraph shall be treated for all purposes as if they had been included in the final system plan adopted by the Association and reviewed by the Congress. The final system plan shall for all purposes be deemed to be approved as amended by such designations."
+          hash "afcac11941b7c657ca4683ce0b92b4bd027da9da42c4d0ca6d160cc1ec6dba4a"
+        }
+        provision "/us/usc/t45/s718/d/3/C" subparagraph {
+          num "C" "(C)"
+          content "Any designations made pursuant to this paragraph shall not be subject to review by any court."
+          hash "18448c7aff5c3a660fbab79b5b585bc2b79e0358b7b338e2c0b3841639699026"
+        }
+        provision "/us/usc/t45/s718/d/3/D" subparagraph {
+          num "D" "(D)"
+          content "Any labor agreements entered into under section 778" mark "1" 1 " of this title shall be subject to further negotiations for any modifications which may be necessary to implement designations made pursuant to this paragraph."
+          hash "93c280d911f7e08aaae2d668442cc0a037aa2a1868701d3c48f47eac19615f31"
+        }
+        hash "c52fb1426b7184f2bed502c66adc19501b9c4abe5f52dce5810e859520df965e"
+      }
+      hash "13ce0a471cd4b21d37db00f7af17b4a705a122de0c6216aac9d88b1dcd2aa31b"
+    }
+    hash "76d2f1319f4c442eff7a120d5607e0787fbb1028d863d8a0bcd1d5927025ab30"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 208" -> "/us/pl/93/236/tII/s208"] ", Jan. 2, 1974, " ["87 Stat. 999" -> "/us/stat/87/999"] "; " ["Pub. L. 94–210, title VI, § 601(e)" -> "/us/pl/94/210/tVI/s601/e"] ", Feb. 5, 1976, " ["90 Stat. 84" -> "/us/stat/90/84"] "; S. Res. 4, Feb. 4, 1977; H. Res. 549, Mar. 25, 1980.)"
+  note "/us/usc/t45/s718/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 778 of this title" -> "/us/usc/t45/s778"] ", referred to in subsec. (d)(3)(D), was repealed by " ["Pub. L. 97–35, title XI, § 1144(a)(1)" -> "/us/pl/97/35/tXI/s1144/a/1"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] "."
+    hash "2733b854ec95bdae7599d37e00ce483f64c0d2304ac7ab9764997fbc162a4533"
+  }
+  note "/us/usc/t45/s718/note/editorialNotes/pl.94.210/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1976—Subsec. (d). " ["Pub. L. 94–210" -> "/us/pl/94/210"] " added subsec. (d)."
+    hash "dba4281d29cb998d17f49d42b18715951d610293f2a2c0405bf1f5ad3f82b728"
+  }
+  note "/us/usc/t45/s718/note/statutoryNotes/pl.104.14/change-of-name" enacted {
+    group statutoryNotes
+    topic "changeOfName"
+    heading "Change of Name"
+    p "Committee on Interstate and Foreign Commerce of the House of Representatives changed to Committee on Energy and Commerce immediately prior to noon on Jan. 3, 1981, by House Resolution No. 549, Ninety-sixth Congress, Mar. 25, 1980. Committee on Energy and Commerce of House of Representatives treated as referring to Committee on Transportation and Infrastructure of House of Representatives, in case of provisions of law relating to railroads, railway labor, or railroad retirement and unemployment, by " ["section 1(c)(1) of Pub. L. 104–14" -> "/us/pl/104/14/s1/c/1"] ", set out as a note preceding " ["section 21 of Title 2" -> "/us/usc/t2/s21"] ", The Congress."
+    p "Committee on Commerce of the Senate abolished and replaced by Committee on Commerce, Science, and Transportation of the Senate, effective Feb. 11, 1977. See Rule XXV of Standing Rules of the Senate, as amended by Senate Resolution No. 4 (popularly cited as the “Committee System Reorganization Amendments of 1977”), approved Feb. 4, 1977."
+    hash "0c9d025435b12b8fa6c6e216e138e249c84aa4f319a6c89bdac64ac21bd533b4"
+  }
+  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s718/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "76d2f1319f4c442eff7a120d5607e0787fbb1028d863d8a0bcd1d5927025ab30"
+    enacted "ed950d3096627bcf9442b42edd9ab5d69f7a8aa57906de78c983cbbfdee7c375"
+    editorial "1572f5c13c8a9c1243fa8da56f20f8933e812e23e12e89f851089134e87ec9ca"
+  }
+}

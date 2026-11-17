@@ -74,7 +74,7 @@ pub fn run(args: CiArgs) -> Result<()> {
         "test_*.py",
     ]);
     run_command(probes)?;
-    crate::uscode_sample::check(&crate::workspace::workspace_root())?;
+    crate::uscode_sample::check(&crate::workspace::workspace_root(), false)?;
     crate::site::check(&crate::workspace::workspace_root())?;
     crate::examples::check(&crate::workspace::workspace_root())?;
     let root = crate::workspace::workspace_root();

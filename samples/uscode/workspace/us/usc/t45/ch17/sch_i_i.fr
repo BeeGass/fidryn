@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/ch17/schII" {
+  within "/us/usc/t45/ch17"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch17/schII" subchapter {
+    num "II" "SUBCHAPTER II—"
+    heading "RAILROAD REHABILITATION AND IMPROVEMENT FINANCING"
+    member "/us/usc/t45/s821...823"
+    member "/us/usc/t45/s824"
+    member "/us/usc/t45/s825a"
+    member "/us/usc/t45/s826...830"
+    member "/us/usc/t45/s831"
+    member "/us/usc/t45/s832...834"
+    member "/us/usc/t45/s835"
+    member "/us/usc/t45/s836"
+    member "/us/usc/t45/s837"
+    hash "11b6de99c9032d2442be719625cd889cc36feac18aa57b98d0fe8fe6b8984667"
+  }
+  layers {
+    operative "11b6de99c9032d2442be719625cd889cc36feac18aa57b98d0fe8fe6b8984667"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

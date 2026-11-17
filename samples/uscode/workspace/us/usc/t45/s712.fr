@@ -1,0 +1,209 @@
+edition 2
+module "/us/usc/t45/s712" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s712" section {
+    num "712" "§ 712."
+    heading "Functions of Association"
+    provision "/us/usc/t45/s712/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      chapeau "The Association is authorized to—"
+      provision "/us/usc/t45/s712/a/1" paragraph {
+        num "1" "(1)"
+        content "monitor the financial performance of the Corporation;"
+        hash "2ebdac6d3f9a7305277c2bb7f336e8ebf4ee6a604cbdd8a2516128a261f517e7"
+      }
+      provision "/us/usc/t45/s712/a/2" paragraph {
+        num "2" "(2)"
+        content "review whether the goals and requirements of this chapter are met;"
+        hash "10ab7f89ccbfb67916088cc74f4b57890b21b0f6f335a0f63b538ec4f11fc40d"
+      }
+      provision "/us/usc/t45/s712/a/3" paragraph {
+        num "3" "(3)"
+        content "purchase or otherwise acquire or receive, and hold and dispose of securities (whether debt or equity) of the Corporation under sections 726 and 727 of this title and exercise all of the rights, privileges, and powers of a holder of any such securities;"
+        hash "b26b42c0284b1fdd2c26d91f16ad74e236d48cd0c354c1e010266c6ea8f4d27f"
+      }
+      provision "/us/usc/t45/s712/a/4" paragraph {
+        num "4" "(4)"
+        content "purchase accounts receivable of the Corporation in accordance with " ["section 727 of this title" -> "/us/usc/t45/s727"] ";"
+        hash "12e655f30f078f58d06af110f51ee83ce7944ba541d84f769ac6dc0a7e81ffd0"
+      }
+      provision "/us/usc/t45/s712/a/5" paragraph {
+        num "5" "(5)"
+        content "appoint and fix the compensation of such personnel as the Association considers necessary and appropriate; and"
+        hash "783ff2030f1059d429fa8d583ad2a76ddaa4a2075a31bc807083543884ece1e4"
+      }
+      provision "/us/usc/t45/s712/a/11" paragraph {
+        num "11" "(11)"
+        content mark "1" 1 "determine the value of the Alaska Railroad, as required by " ["section 1204 of this title" -> "/us/usc/t45/s1204"] "."
+        hash "d6503557483a573643a765bf84a99a1513c3cfa71e6eb07e57d3c5fc20bcc518"
+      }
+      hash "2c9f7b7064ff163a9480504d044362c0ab1ea40c94f7b4135fa43a5547541e13"
+    }
+    provision "/us/usc/t45/s712/b" subsection {
+      num "b" "(b)"
+      heading "Investment of funds"
+      content "Uncommitted funds of the Association shall be kept in cash on hand or on deposit, or invested in obligations of the United States or guaranteed thereby, or in obligations, participations, or other investments which are lawful investments for fiduciary, trust, or public funds."
+      hash "18397c006f3986194e8afcef517a9c6985379d07e363fb9e218418d0a08b862d"
+    }
+    provision "/us/usc/t45/s712/c" subsection {
+      num "c" "(c)"
+      heading "Exemption from taxation"
+      content "The Association, including its franchise, capital reserves, surplus, security holdings, and income shall be exempt from all taxation now or hereafter imposed by the United States, any commonwealth, territory, dependency, or possession thereof, or by any State or political subdivision thereof, except that any real property of the Association shall be subject to taxation to the same extent according to its value as other real property is taxed."
+      hash "cfbef6c5511e59d2c8214a83046121394eebbc182482005a2490970407ecdea0"
+    }
+    provision "/us/usc/t45/s712/d" subsection {
+      num "d" "(d)"
+      heading "Reports"
+      provision "/us/usc/t45/s712/d/1" paragraph {
+        num "1" "(1)"
+        content mark "2" 2 "The Association shall transmit to the Congress and the President, not later than 90 days after the end of each fiscal year, a comprehensive and detailed report on all activities of the Association during the preceding fiscal year. Each such report shall include (A) the Association’s statement of specific and detailed objectives for the activities and programs conducted and assisted under this chapter; (B) statements of the Association’s conclusions as to the effectiveness of such activities and programs in meeting the stated objectives and the purposes of this chapter, measured through the end of the preceding fiscal year; (C) recommendations with respect to any legislation or administrative action which the Association deems necessary or desirable; (D) a statistical compilation of the obligations issued, certificates of value issued, securities purchased, and loans made under this chapter; (E) a summary of outstanding problems confronting the Association, in order of priority; (F) all other information required to be submitted to the Congress pursuant to any other provision of this chapter; and (G) the Association’s projections and plans for its activities and programs during the next fiscal year."
+        hash "49851eac990a0a4832278c87c4a0499811ebbdf4b9739a2a636d9927062c5a56"
+      }
+      provision "/us/usc/t45/s712/d/2" paragraph {
+        num "2" "(2)"
+        content "For the fiscal year beginning October 1, 1977, and ending September 30, 1978, the Association shall transmit to the Congress and the President, not later than 30 days after the end of each quarter of such fiscal year, a comprehensive and detailed report on all expenditures and use of funds during the preceding fiscal quarter, including an assessment of the status of projects for such preceding fiscal quarter and a projection of activities proposed for the next fiscal quarter."
+        hash "f03c9f5a5d26b911165c211649d841d7c54c0a1a473d0fe4faec1279d08f8a18"
+      }
+      provision "/us/usc/t45/s712/d/3" paragraph {
+        num "3" "(3)"
+        chapeau "The Association shall transmit to the Congress, no later than 30 days after the end of each fiscal quarter, a report with respect to the proceedings before the special court to determine the valuation of rail properties conveyed to the Corporation under " ["section 743 of this title" -> "/us/usc/t45/s743"] ". Each such report shall include—"
+        provision "/us/usc/t45/s712/d/3/A" subparagraph {
+          num "A" "(A)"
+          content "a detailed accounting of the Federal funds expended during such quarter in connection with such proceedings, and the purposes for which such funds were expended;"
+          hash "77e9d2fe8e3ddc60d96139ad6b62ba393209da9fb31153769678997ec48bf4e4"
+        }
+        provision "/us/usc/t45/s712/d/3/B" subparagraph {
+          num "B" "(B)"
+          content "an explanation of the status of such proceedings, including the prospects for settlement or conclusion; and"
+          hash "19db5cf99cf3793fb62c3cacf3f7b4f5a710f2bba6b363048205bb12706156b0"
+        }
+        provision "/us/usc/t45/s712/d/3/C" subparagraph {
+          num "C" "(C)"
+          content "an identification of which responsibilities in connection with such proceedings are being carried out directly by the Association, and which are being carried out by contract with private organizations."
+          hash "cede31629bce239139db7d737fb5fd83190a61faf8a17e3aa015c923a27a2171"
+        }
+        hash "554ccfc797c0d05338a6d79c724e2529815c45feaf93cb1761f1fffae4a9da75"
+      }
+      hash "f00c93e649c915ba426dd0d6aa095f11be99e27654527128fe3f1f19f6754bc4"
+    }
+    provision "/us/usc/t45/s712/e" subsection {
+      num "e" "(e)"
+      heading "Budget"
+      content "The receipts and disbursements of the Association (other than administrative expenses referred to in subsection (g)" mark "3" 3 " of this section and receipts and disbursements under " ["section 726 of this title" -> "/us/usc/t45/s726"] " and " ["section 746 of this title" -> "/us/usc/t45/s746"] ") in the discharge of its functions shall not be included in the totals of the budget of the United States Government, and shall be exempt from any annual expenditure and net lending (budget outlays) limitations imposed on a budget of the United States Government. The Chairman of the Association shall transmit annually to the Congress a budget for program activities and for administrative expenses of the Association. The Chairman shall report annually to the Congress the amount of net lending of the Association, which would be included in the totals of the budgets of the United States Government, if the Association’s activities were not excluded from those totals as a result of this section."
+      hash "6711c9a396c5ce137b487c0780fd2df0ec7e088208972052019cbc116aa19492"
+    }
+    provision "/us/usc/t45/s712/f" subsection {
+      num "f" "(f)"
+      heading "Accountability"
+      content "The Chairman of the Association shall transmit annually to the Office of Management and Budget a budget for administrative expenses of the Association. Whenever the Association submits any budget estimate or request to the Office of Management and Budget, it shall concurrently transmit a copy of the estimate or request to the Congress. Within budgetary constraints of the Congress, the maximum feasible and prudent budgetary flexibility shall be provided to the Association to permit effective operations."
+      hash "c3e7cc8d4ba1483cc81d46c6a5c2ce8578b2d917ab0042bd0b80d41f6a430f34"
+    }
+    provision "/us/usc/t45/s712/g" subsection {
+      num "g" "(g)"
+      heading "Transfer of litigation"
+      content "No later than March 1, 1980, the Association and the Attorney General of the United States shall develop and submit to the Congress a feasibility study for the transfer, to the appropriate department or agency of the Federal Government, of all responsibility for representing the United States in the proceedings before the special court to determine the valuation of rail properties conveyed to the Corporation under " ["section 743 of this title" -> "/us/usc/t45/s743"] "."
+      hash "a0d4f6ddfe91789c3861f377f535d38a383de9c554d9f2d9d40d5afba42032e6"
+    }
+    provision "/us/usc/t45/s712/h" subsection {
+      num "h" "(h)"
+      heading "Transfer of other functions"
+      content "No later than March 1, 1980, the Association and the Secretary of Transportation shall develop and submit to the Congress a feasibility study for the transfer of all functions of the Association, other than those referred to in subsection (h)" mark "4" 4 " of this section, to the appropriate department or agency of the Federal Government, including the abolition of those functions which will no longer be necessary."
+      hash "3b49786a51256e06e097833b8f372009b9132941f340d4c1b5e02809d1e535ad"
+    }
+    provision "/us/usc/t45/s712/i" subsection {
+      num "i" "(i)"
+      heading "Monitoring of contractors"
+      content "The Board of Directors of the Association shall adopt procedures to insure (1) that contractors, including law firms, provide reports containing written verification of tasks assigned, work performed, time worked, and costs incurred, including periodic status reports on work performed, (2) that such reports are audited by the Association, (3) that no funds are paid to contractors without written reports complying with the requirements of this subsection, and (4) that the Association applies such procedures uniformly to all contractors."
+      hash "c9e4174cdce6202378fdf3524d03f3e513eb8fc9d0efd7a138f29fcbd05e1005"
+    }
+    hash "ca6bac6611c36b5cf2d95622fb1e74bfef208a324ac84b2179f1815db2f488ce"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 202" -> "/us/pl/93/236/tII/s202"] ", Jan. 2, 1974, " ["87 Stat. 990" -> "/us/stat/87/990"] "; " ["Pub. L. 94–5, § 2(a)" -> "/us/pl/94/5/s2/a"] ", Feb. 28, 1975, " ["89 Stat. 7" -> "/us/stat/89/7"] "; " ["Pub. L. 94–210, title VI" -> "/us/pl/94/210/tVI"] ", §§ 601(c), 607(b), (c), Feb. 5, 1976, " ["90 Stat. 84" -> "/us/stat/90/84"] ", 96; " ["Pub. L. 95–199, § 2" -> "/us/pl/95/199/s2"] ", Nov. 23, 1977, " ["91 Stat. 1423" -> "/us/stat/91/1423"] "; " ["Pub. L. 96–73, title II" -> "/us/pl/96/73/tII"] ", §§ 202, 203, Sept. 29, 1979, " ["93 Stat. 555" -> "/us/stat/93/555"] "; " ["Pub. L. 97–35, title XI, § 1148(a)" -> "/us/pl/97/35/tXI/s1148/a"] ", (b), Aug. 13, 1981, " ["95 Stat. 674" -> "/us/stat/95/674"] "; " ["Pub. L. 97–468, title VI, § 605(e)" -> "/us/pl/97/468/tVI/s605/e"] ", Jan. 14, 1983, " ["96 Stat. 2564" -> "/us/stat/96/2564"] ".)"
+  note "/us/usc/t45/s712/note/editorialNotes/pl.97.258/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Subsec. (f), formerly (g), of this section as originally enacted consisted of pars. (1) and (2). Par. (1), which amended section 856 of former Title 31, Money and Finance, was repealed by " ["Pub. L. 97–258, § 5(b)" -> "/us/pl/97/258/s5/b"] ", Sept. 13, 1982, " ["96 Stat. 1068" -> "/us/stat/96/1068"] ", the first section of which enacted Title 31."
+    hash "f134590356ed670e6bcfa0ce334d5597382c20293cd43b57e73b15bf6f6680b9"
+  }
+  note "/us/usc/t45/s712/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (a)(11). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " added par. (11)."
+    p "1981—Subsec. (a). " ["Pub. L. 97–35, § 1148(a)(1)" -> "/us/pl/97/35/s1148/a/1"] ", substituted provisions respecting financial performance monitoring, goal review, etc., for provisions respecting plan preparation and implementation, issuance of obligations, etc."
+    p "Subsecs. (b) to (j). " ["Pub. L. 97–35, § 1148(a)" -> "/us/pl/97/35/s1148/a"] ", struck out subsec. (b) which related to additional duties of the Association, and redesignated subsecs. (c) to (j) as (b) to (i), respectively."
+    p "1979—Subsec. (e)(3). " ["Pub. L. 96–73, § 202" -> "/us/pl/96/73/s202"] ", added par. (3)."
+    p "Subsecs. (h) to (j). " ["Pub. L. 96–73, § 203" -> "/us/pl/96/73/s203"] ", added subsecs. (h) to (j)."
+    p "1977—Subsec. (e). " ["Pub. L. 95–199" -> "/us/pl/95/199"] " substituted “Reports” for “Annual report” in heading, redesignated cls. (1) through (7) as cls. (A) through (G) in first par., and added par. (2)."
+    p "1976—Subsec. (a)(2). " ["Pub. L. 94–210, § 601(c)" -> "/us/pl/94/210/s601/c"] ", inserted provisions relating to securities under " ["section 726 of this title" -> "/us/usc/t45/s726"] " and certificates of value under " ["section 746 of this title" -> "/us/usc/t45/s746"] "."
+    p "Subsec. (e). " ["Pub. L. 94–210, § 607(b)" -> "/us/pl/94/210/s607/b"] ", in cl. (4) inserted “, certificates of value issued, securities purchased,” after “obligations issued”."
+    p "Subsec. (f). " ["Pub. L. 94–210, § 607(c)" -> "/us/pl/94/210/s607/c"] ", inserted provisions relating to receipts and disbursements under sections 726 and 746 of this title."
+    p "1975—Subsec. (b)(2). " ["Pub. L. 94–5, § 2(a)(1)" -> "/us/pl/94/5/s2/a/1"] ", inserted “and express” after “rail” wherever appearing."
+    p "Subsec. (b)(7). " ["Pub. L. 94–5, § 2(a)(2)" -> "/us/pl/94/5/s2/a/2"] ", substituted “; and” for a period at end of par. (7)."
+    p "Subsec. (b)(8). " ["Pub. L. 94–5, § 2(a)(3)" -> "/us/pl/94/5/s2/a/3"] ", added par. (8)."
+    hash "6f0cbe5bed2af77a3f7d0e7c140350dd738fcb5560e211ce437c284b44e261fd"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1981 Amendment"
+    p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.96.73/effective-date-of-1979-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1979 Amendment"
+    p "Amendment by " ["Pub. L. 96–73" -> "/us/pl/96/73"] " effective Oct. 1, 1979, see " ["section 501(a) of Pub. L. 96–73" -> "/us/pl/96/73/s501/a"] "."
+    hash "96e603f5f2ac32b9f4f053b94bd7f23938f3cf5b5f71e987bb50f3460734de22"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Termination of Reporting Requirements"
+    p "For termination, effective May 15, 2000, of provisions of law requiring submittal to Congress of any annual, semiannual, or other regular periodic report listed in House Document No. 103–7 (in which reports required under subsecs. (d)(1), (3), (e), and (f) of this section are listed as the 3rd through 6th items on page 195), see " ["section 3003 of Pub. L. 104–66" -> "/us/pl/104/66/s3003"] ", as amended, and section 1(a)(4) [div. A, § 1402(1)] of " ["Pub. L. 106–554" -> "/us/pl/106/554"] ", set out as notes under " ["section 1113 of Title 31" -> "/us/usc/t31/s1113"] ", Money and Finance."
+    hash "b7b3bffa22eb538f84ffd657548744c333e13a724abe0cd125aa464c8206384d"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be “(6)”."
+  }
+  footnote 2 "2" {
+    p "Par. “(1)” designation supplied editorially."
+  }
+  footnote 3 "3" {
+    p "So in original. Subsec. (g) redesignated (f) by " ["Pub. L. 97–35" -> "/us/pl/97/35"] "."
+  }
+  footnote 4 "4" {
+    p "So in original. Subsec. (h) redesignated (g) by " ["Pub. L. 97–35" -> "/us/pl/97/35"] "."
+  }
+  layers {
+    operative "ca6bac6611c36b5cf2d95622fb1e74bfef208a324ac84b2179f1815db2f488ce"
+    enacted "31080528d1e61eb86282c68d2f469bab3c2becdad9edc6dbc8bff8c2da17ad0a"
+    editorial "4ff734bb8ed2b30cc2a60f29e6fc9685cb89341f4d60beed725a9c01605cc326"
+  }
+}

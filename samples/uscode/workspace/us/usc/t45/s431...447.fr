@@ -1,0 +1,142 @@
+edition 2
+module "/us/usc/t45/s431...447" {
+  alias "/us/usc/t45/s431"
+  alias "/us/usc/t45/s432"
+  alias "/us/usc/t45/s433"
+  alias "/us/usc/t45/s434"
+  alias "/us/usc/t45/s435"
+  alias "/us/usc/t45/s436"
+  alias "/us/usc/t45/s437"
+  alias "/us/usc/t45/s438"
+  alias "/us/usc/t45/s439"
+  alias "/us/usc/t45/s440"
+  alias "/us/usc/t45/s441"
+  alias "/us/usc/t45/s442"
+  alias "/us/usc/t45/s443"
+  alias "/us/usc/t45/s444"
+  alias "/us/usc/t45/s445"
+  alias "/us/usc/t45/s446"
+  alias "/us/usc/t45/s447"
+  within "/us/usc/t45/ch13/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s431...447" section {
+    num "431 to 447" "§§ 431 to 447."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "6c1288921dad9427fd765c1520c4cd05e5c9da87604c78f04e5a670f39877548"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 431, " ["Pub. L. 91–458, title II, § 202" -> "/us/pl/91/458/tII/s202"] ", Oct. 16, 1970, " ["84 Stat. 971" -> "/us/stat/84/971"] "; " ["Pub. L. 94–348, § 5" -> "/us/pl/94/348/s5"] ", July 8, 1976, " ["90 Stat. 819" -> "/us/stat/90/819"] "; " ["Pub. L. 96–423, § 14" -> "/us/pl/96/423/s14"] ", Oct. 10, 1980, " ["94 Stat. 1817" -> "/us/stat/94/1817"] "; " ["Pub. L. 97–468, title VII, § 702(a)" -> "/us/pl/97/468/tVII/s702/a"] ", (c), Jan. 14, 1983, " ["96 Stat. 2579" -> "/us/stat/96/2579"] "; " ["Pub. L. 100–342" -> "/us/pl/100/342"] ", §§ 4(a), 7, 9, 10, 19(a), 21–23, June 22, 1988, " ["102 Stat. 625" -> "/us/stat/102/625"] ", 628, 629, 637–639; " ["Pub. L. 102–143, title V, § 4" -> "/us/pl/102/143/tV/s4"] ", Oct. 28, 1991, " ["105 Stat. 957" -> "/us/stat/105/957"] "; " ["Pub. L. 102–365" -> "/us/pl/102/365"] ", §§ 2, 5(a)(1), 7, 8, 10, Sept. 3, 1992, " ["106 Stat. 972" -> "/us/stat/106/972"] ", 975, 976, 978; " ["Pub. L. 102–533, § 14" -> "/us/pl/102/533/s14"] ", Oct. 27, 1992, " ["106 Stat. 3522" -> "/us/stat/106/3522"] ", authorized Secretary of Transportation to promulgate rules, regulations, orders, and standards for all areas of railroad safety. See sections 20102, 20103, 20103 note, 20108, 20110, 20114, 20131 to 20143, and 24902 of Title 49, Transportation."
+    hash "93bff80c8f6b2e318cfaa53b5796e4201f794fe1d4acc6b162b1ceb3251001b9"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 432, " ["Pub. L. 91–458, title II, § 203" -> "/us/pl/91/458/tII/s203"] ", Oct. 16, 1970, " ["84 Stat. 972" -> "/us/stat/84/972"] "; " ["Pub. L. 96–423, § 3" -> "/us/pl/96/423/s3"] ", Oct. 10, 1980, " ["94 Stat. 1811" -> "/us/stat/94/1811"] ", related to emergency powers of Secretary of Transportation. See " ["section 20104 of Title 49" -> "/us/usc/t49/s20104"] "."
+    hash "613536ee7c0c247d242a1ec44370db59e64e911af51992def60f361e6f5703d7"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 433, " ["Pub. L. 91–458, title II, § 204" -> "/us/pl/91/458/tII/s204"] ", Oct. 16, 1970, " ["84 Stat. 972" -> "/us/stat/84/972"] ", required Secretary of Transportation to submit comprehensive study and recommendation of means of eliminating and protecting railroad grade crossings and protecting pedestrians. See " ["section 20134 of Title 49" -> "/us/usc/t49/s20134"] "."
+    hash "33ce507e9dacfa6452aa005ba250cd10d37162b2da111cb14e955daa2f78fc8d"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 434, " ["Pub. L. 91–458, title II, § 205" -> "/us/pl/91/458/tII/s205"] ", Oct. 16, 1970, " ["84 Stat. 972" -> "/us/stat/84/972"] ", declared that laws, rules, regulations, orders, and standards relating to railroad safety were to be nationally uniform, but permitted more stringent yet compatible State regulation. See " ["section 20106 of Title 49" -> "/us/usc/t49/s20106"] "."
+    hash "a2983312980f6c05a8098e268f14035357100cda10981f390ed4b04ae1076a22"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 435, " ["Pub. L. 91–458, title II, § 206" -> "/us/pl/91/458/tII/s206"] ", Oct. 16, 1970, " ["84 Stat. 972" -> "/us/stat/84/972"] "; " ["Pub. L. 96–423, § 4" -> "/us/pl/96/423/s4"] ", Oct. 10, 1980, " ["94 Stat. 1812" -> "/us/stat/94/1812"] "; " ["Pub. L. 101–615, § 28(a)" -> "/us/pl/101/615/s28/a"] "–(d), Nov. 16, 1990, " ["104 Stat. 3276" -> "/us/stat/104/3276"] ", 3277, related to investigative and surveillance activities by State in connection with any rule, regulation, order, or standard related to railroad safety prescribed by Secretary of Transportation. See sections 20105, 20111, and 20117 of Title 49."
+    hash "0b90c114823d380f72bbc64dd8bcea3a954f8d20893112b40eaf8cd6dcef0130"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 436, " ["Pub. L. 91–458, title II, § 207" -> "/us/pl/91/458/tII/s207"] ", Oct. 16, 1970, " ["84 Stat. 974" -> "/us/stat/84/974"] "; " ["Pub. L. 95–574, § 8" -> "/us/pl/95/574/s8"] ", Nov. 2, 1978, " ["92 Stat. 2461" -> "/us/stat/92/2461"] "; " ["Pub. L. 96–423, § 5" -> "/us/pl/96/423/s5"] ", Oct. 10, 1980, " ["94 Stat. 1812" -> "/us/stat/94/1812"] "; " ["Pub. L. 101–615, § 28(e)" -> "/us/pl/101/615/s28/e"] ", Nov. 16, 1990, " ["104 Stat. 3277" -> "/us/stat/104/3277"] ", related to actions by State agencies to enforce compliance with Federal railroad safety rules, regulations, orders, and standards. See " ["section 20113 of Title 49" -> "/us/usc/t49/s20113"] "."
+    hash "90406845a121c5bfc4d30ace4436f4c4a768c00fb9795d831b7a8a1922ad4f43"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 437, " ["Pub. L. 91–458, title II, § 208" -> "/us/pl/91/458/tII/s208"] ", Oct. 16, 1970, " ["84 Stat. 974" -> "/us/stat/84/974"] "; " ["Pub. L. 93–633, title II, § 206" -> "/us/pl/93/633/tII/s206"] ", Jan. 3, 1975, " ["88 Stat. 2166" -> "/us/stat/88/2166"] "; " ["Pub. L. 95–574, § 9" -> "/us/pl/95/574/s9"] ", Nov. 2, 1978, " ["92 Stat. 2462" -> "/us/stat/92/2462"] "; " ["Pub. L. 96–423, § 6" -> "/us/pl/96/423/s6"] ", Oct. 10, 1980, " ["94 Stat. 1813" -> "/us/stat/94/1813"] "; " ["Pub. L. 100–342, § 8" -> "/us/pl/100/342/s8"] ", June 22, 1988, " ["102 Stat. 628" -> "/us/stat/102/628"] ", related to general powers of Secretary of Transportation. See " ["section 54a of this title" -> "/us/usc/t45/s54a"] " and sections 20107, 20108, 20111, and 20112 of Title 49."
+    hash "098a97b0e20b52835591d3b0c785f559541974bea72d828ca6e2cd78da1dd2ea"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 438, " ["Pub. L. 91–458, title II, § 209" -> "/us/pl/91/458/tII/s209"] ", Oct. 16, 1970, " ["84 Stat. 975" -> "/us/stat/84/975"] "; " ["Pub. L. 93–633, title II, § 204(a)" -> "/us/pl/93/633/tII/s204/a"] ", Jan. 3, 1975, " ["88 Stat. 2165" -> "/us/stat/88/2165"] "; " ["Pub. L. 96–423" -> "/us/pl/96/423"] ", §§ 7, 8(a), Oct. 10, 1980, " ["94 Stat. 1814" -> "/us/stat/94/1814"] "; " ["Pub. L. 97–468, title VII, § 706" -> "/us/pl/97/468/tVII/s706"] ", Jan. 14, 1983, " ["96 Stat. 2581" -> "/us/stat/96/2581"] "; " ["Pub. L. 100–342, § 3(a)" -> "/us/pl/100/342/s3/a"] ", June 22, 1988, " ["102 Stat. 624" -> "/us/stat/102/624"] "; " ["Pub. L. 102–365" -> "/us/pl/102/365"] ", §§ 4(a)(1), (c)(1), 9(a)(1), Sept. 3, 1992, " ["106 Stat. 973" -> "/us/stat/106/973"] ", 974, 977, related to civil penalties for violations of any railroad safety rule, regulation, order, or standard issued under this subchapter or violations of " ["section 39 of this title" -> "/us/usc/t45/s39"] ". See sections 20111, 20112, 20114, 21301, 21302, 21304, and 21311 of Title 49."
+    hash "152e29154c7cb6676ba60ce7e327f5cdfc3699573f522188f9064bd714ab8b3a"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 439, " ["Pub. L. 91–458, title II, § 210" -> "/us/pl/91/458/tII/s210"] ", Oct. 16, 1970, " ["84 Stat. 975" -> "/us/stat/84/975"] "; " ["Pub. L. 96–423, § 9" -> "/us/pl/96/423/s9"] ", Oct. 10, 1980, " ["94 Stat. 1814" -> "/us/stat/94/1814"] "; " ["Pub. L. 101–615, § 28(f)" -> "/us/pl/101/615/s28/f"] ", Nov. 16, 1990, " ["104 Stat. 3277" -> "/us/stat/104/3277"] ", related to restraint of violations of this subchapter and certain other statutes and to enforcement of rules, etc., established under such subchapter or statutes. See sections 20112 to 20114 of Title 49."
+    hash "844bec6aac376537c5e141496b44847a932bdb45cc5bacc9dd0f18c37ca64b3a"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 440, " ["Pub. L. 91–458, title II, § 211" -> "/us/pl/91/458/tII/s211"] ", Oct. 16, 1970, " ["84 Stat. 976" -> "/us/stat/84/976"] "; " ["Pub. L. 93–633, title II, § 203" -> "/us/pl/93/633/tII/s203"] ", Jan. 3, 1975, " ["88 Stat. 2164" -> "/us/stat/88/2164"] "; " ["Pub. L. 94–56, § 2" -> "/us/pl/94/56/s2"] ", July 19, 1975, " ["89 Stat. 263" -> "/us/stat/89/263"] "; " ["Pub. L. 96–470, title II, § 209(a)" -> "/us/pl/96/470/tII/s209/a"] ", Oct. 19, 1980, " ["94 Stat. 2245" -> "/us/stat/94/2245"] "; " ["Pub. L. 100–342, § 12" -> "/us/pl/100/342/s12"] ", June 22, 1988, " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to annual report by Secretary of Transportation on administration of this subchapter. See " ["section 20116 of Title 49" -> "/us/usc/t49/s20116"] "."
+    hash "b28dac93574747b8c59b1c25ee49fcf2ada870fb2a90b19f69c147236ccc8798"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 441, " ["Pub. L. 91–458, title II, § 212" -> "/us/pl/91/458/tII/s212"] ", as added " ["Pub. L. 96–423, § 10" -> "/us/pl/96/423/s10"] ", Oct. 10, 1980, " ["94 Stat. 1815" -> "/us/stat/94/1815"] "; amended " ["Pub. L. 100–342, § 5" -> "/us/pl/100/342/s5"] ", June 22, 1988, " ["102 Stat. 627" -> "/us/stat/102/627"] "; " ["Pub. L. 102–365, § 5(b)" -> "/us/pl/102/365/s5/b"] ", Sept. 3, 1992, " ["106 Stat. 975" -> "/us/stat/106/975"] ", related to protection and rights of railroad employees. See " ["section 20109 of Title 49" -> "/us/usc/t49/s20109"] "."
+    hash "6d235b64dadc0d4518519e53b2c0a8c7a58c9445c6d08ebfbbcb73b06cd9b0eb"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 441, " ["Pub. L. 91–458, title II, § 212" -> "/us/pl/91/458/tII/s212"] ", Oct. 16, 1970, " ["84 Stat. 977" -> "/us/stat/84/977"] "; " ["Pub. L. 93–90, § 2" -> "/us/pl/93/90/s2"] ", Aug. 14, 1973, " ["87 Stat. 305" -> "/us/stat/87/305"] "; " ["Pub. L. 93–633, title II, § 205" -> "/us/pl/93/633/tII/s205"] ", Jan. 3, 1975, " ["88 Stat. 2166" -> "/us/stat/88/2166"] "; " ["Pub. L. 94–56, § 3" -> "/us/pl/94/56/s3"] ", July 19, 1975, " ["89 Stat. 263" -> "/us/stat/89/263"] "; " ["Pub. L. 94–348, § 2(a)" -> "/us/pl/94/348/s2/a"] ", July 8, 1976, " ["90 Stat. 817" -> "/us/stat/90/817"] "; " ["Pub. L. 95–574, § 2" -> "/us/pl/95/574/s2"] ", Nov. 2, 1978, " ["92 Stat. 2459" -> "/us/stat/92/2459"] ", authorized appropriations to carry out this chapter, prior to repeal by " ["Pub. L. 96–423, § 2" -> "/us/pl/96/423/s2"] ", Oct. 10, 1980, " ["94 Stat. 1811" -> "/us/stat/94/1811"] "."
+    hash "bac5d2a7aea3cf7b95b8358fa291b4f84fe27a765134815dcd5dabe141e01385"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.95.574/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 442, " ["Pub. L. 95–574, § 3" -> "/us/pl/95/574/s3"] ", Nov. 2, 1978, " ["92 Stat. 2459" -> "/us/stat/92/2459"] ", related to limitations on funding for railroad research and development programs. See " ["section 20117 of Title 49" -> "/us/usc/t49/s20117"] ", Transportation."
+    hash "06e8f770308d5d65e5f84e851896c3e89a545e358e0e4a97bef1098db0919c3f"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 443, " ["Pub. L. 91–458, title II, § 213" -> "/us/pl/91/458/tII/s213"] ", as added " ["Pub. L. 96–423, § 11" -> "/us/pl/96/423/s11"] ", Oct. 10, 1980, " ["94 Stat. 1816" -> "/us/stat/94/1816"] ", related to pay classifications of railroad safety inspectors and railroad safety specialists. See " ["section 5109(c) of Title 5" -> "/us/usc/t5/s5109/c"] ", Government Organization and Employees."
+    hash "664b9d10255c6548adc3188e7bfd1f812de822b80df0195eb12211baac99817c"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/14" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 444, " ["Pub. L. 91–458, title II, § 214" -> "/us/pl/91/458/tII/s214"] ", as added " ["Pub. L. 96–423, § 2" -> "/us/pl/96/423/s2"] ", Oct. 10, 1980, " ["94 Stat. 1811" -> "/us/stat/94/1811"] "; amended " ["Pub. L. 97–35, title XI, § 1195" -> "/us/pl/97/35/tXI/s1195"] ", Aug. 13, 1981, " ["95 Stat. 702" -> "/us/stat/95/702"] "; " ["Pub. L. 97–468, title VII, § 703" -> "/us/pl/97/468/tVII/s703"] ", Jan. 14, 1983, " ["96 Stat. 2580" -> "/us/stat/96/2580"] "; " ["Pub. L. 100–342, § 2" -> "/us/pl/100/342/s2"] ", June 22, 1988, " ["102 Stat. 624" -> "/us/stat/102/624"] "; " ["Pub. L. 101–508, title X, § 10501(b)" -> "/us/pl/101/508/tX/s10501/b"] ", Nov. 5, 1990, " ["104 Stat. 1388–400" -> "/us/stat/104/1388-400"] "; " ["Pub. L. 102–365, § 12" -> "/us/pl/102/365/s12"] ", Sept. 3, 1992, " ["106 Stat. 980" -> "/us/stat/106/980"] ", authorized appropriations to carry out this chapter. See sections 20108 and 20117 of Title 49, Transportation."
+    hash "4bf427181647cea343cfffd19a8b8bae07d43db369a2d1568097c31f48acc6b6"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/15" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 445, " ["Pub. L. 91–458, title II, § 215" -> "/us/pl/91/458/tII/s215"] ", as added " ["Pub. L. 100–342, § 20" -> "/us/pl/100/342/s20"] ", June 22, 1988, " ["102 Stat. 638" -> "/us/stat/102/638"] ", related to grade crossing demonstration projects to reduce accidents involving trains. See sections 20117 and 20134 of Title 49."
+    hash "751681916a95eaecd9c5adf6cdeaf0bad6c042091d47acf1568d4c60d85c68c9"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.101.647/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 446, " ["Pub. L. 101–647, title XVII, § 1704" -> "/us/pl/101/647/tXVII/s1704"] ", Nov. 29, 1990, " ["104 Stat. 4846" -> "/us/stat/104/4846"] ", related to railroad police officers. See " ["section 28101 of Title 49" -> "/us/usc/t49/s28101"] "."
+    hash "d4733aa7c58b325630f8f3b30348c4b080f999ea98a842508c0f7d368f4bd355"
+  }
+  note "/us/usc/t45/s431...447/note/ungrouped/pl.91.458/noheading/16" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 447, " ["Pub. L. 91–458, title II, § 216" -> "/us/pl/91/458/tII/s216"] ", as added " ["Pub. L. 101–508, title X, § 10501(a)" -> "/us/pl/101/508/tX/s10501/a"] ", Nov. 5, 1990, " ["104 Stat. 1388–399" -> "/us/stat/104/1388-399"] ", related to railroad user fees. See " ["section 20115 of Title 49" -> "/us/usc/t49/s20115"] "."
+    hash "a121f97915153c0a592477f446f56b4ccc4095823c7a0d16fea8bb243a967d45"
+  }
+  layers {
+    operative "6c1288921dad9427fd765c1520c4cd05e5c9da87604c78f04e5a670f39877548"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "edb45efb4e460fc32bb81e2db53fc456d6e0f0fa39f4c1888c95bab0afb40a65"
+  }
+}

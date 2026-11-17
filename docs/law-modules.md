@@ -6,8 +6,9 @@ workspace, how the text of a module is normalized, what a module holds, how
 its provisions, notes and layers are hashed, how a module is written, what
 the checker verifies of one module, how modules form a workspace and what
 the checker verifies of one, how a workspace is checked, what outcome
-each reference has, and how the ingester for the United States Code reads
-the publisher's XML. The crate `fidryn-provision` implements the model and
+each reference has, how the ingester for the United States Code reads
+the publisher's XML, and what the sample of the Code in the repository
+holds and how it is checked. The crate `fidryn-provision` implements the model and
 the rules over it, `fidryn-syntax` reads the text of a module,
 `fidryn-check` lowers it into the model and checks it, `fidryn-driver`
 checks a workspace and writes a generated one, and `fidryn-ingest-uscode`
@@ -1463,3 +1464,54 @@ number of workers changes a byte. Two documents that differ only in their
 element ids, their publication name, the creation time of their metadata
 and their release note give the same modules, and locks that differ only
 in `release` and `artifacts`.
+
+## The sample
+
+The repository holds a sample of the Code under `samples/uscode/`
+([its README](../samples/uscode/README.md)): the publisher's archives of
+three whole titles of the release `119-142` of the official XML release
+point published by the Office of the Law Revision Counsel, Title 1, Title
+11 Appendix and Title 45, and what is imported from them.
+
+- `archives/` holds the archives, exactly as served, and their retrieval
+  record, `retrieval.json`.
+- `profile.json` holds the counts of the archives that
+  `conformance/usc_profile.py` prints, by the counting rules of
+  [usc-counting-rules.md](../conformance/usc-counting-rules.md).
+- `workspace/` holds the generated workspace that
+  `fidryn ingest uscode samples/uscode/archives --out DIR` writes: its
+  manifest, its lock, and a module for each of the 563 units and 72
+  containers of the three titles, 637 files in all. It is written by
+  `cargo xtask uscode-sample --update` and never by hand.
+
+`cargo xtask uscode-sample`, which `cargo xtask ci` runs, holds the sample
+to six things, in this order, and fails with a message that names the
+first difference when one of them does not hold:
+
+1. every archive has the size, the SHA-256 and the BLAKE3 that its record
+   gives, and the record names every archive and no other;
+2. an ingest of the archives into a temporary directory writes, byte for
+   byte, every directory and file of the committed workspace, and nothing
+   else;
+3. an ingest on one worker writes the same bytes as an ingest on eight;
+4. `fidryn check samples/uscode/workspace --no-cache` finds no error;
+5. `profile.json` is, byte for byte, what the script prints for the
+   archives, and its counts of references by layer and outcome, which the
+   script works out by the rules of [References](#references) on its own,
+   are those of the check report;
+6. the text of every provision, container, note, source credit and
+   footnote that `fidryn text samples/uscode/workspace --json` reads back
+   from the modules equals, line for line, what `conformance/uslm_text.py`
+   reads from the publisher's XML by the [rules of the reading](#the-ingester-for-the-united-states-code),
+   which it implements on its own, sharing no code with the ingester.
+
+The `fidryn` commands run in the process of the step, as the binary runs
+them. The step makes its temporary directories under the system's
+directory for temporary files and removes them whether it passes or fails,
+and its check keeps no cache, so it leaves the repository as it found it:
+only `--update` writes, and only the workspace.
+
+```text
+cargo xtask uscode-sample
+cargo xtask uscode-sample --update
+```

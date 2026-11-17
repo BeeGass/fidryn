@@ -1,0 +1,56 @@
+edition 2
+module "/us/usc/ptVII/rule7019" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7019" courtRule {
+    num "7019" "Rule 7019."
+    heading "Required Joinder of Parties"
+    chapeau "Fed. R. Civ. P. 19 applies in an adversary proceeding. But these exceptions apply:"
+    provision "/us/usc/ptVII/rule7019/a" subsection {
+      num "a" "(a)"
+      content "if an entity joined as a party raises the defense that the court lacks subject-matter jurisdiction and the defense is sustained, the court must dismiss the party; and"
+      hash "d107b915046ca79f742bc78049dfac4f9ea0f5c469b9c9b96555a26205381153"
+    }
+    provision "/us/usc/ptVII/rule7019/b" subsection {
+      num "b" "(b)"
+      content "if an entity joined as a party properly and timely raises the defense of improper venue, the court must determine under 28 U.S.C. § 1412 whether to transfer to another district the entire adversary proceeding or just that part involving the joined party."
+      hash "0436b915f0ee4954bae9a7efa4c33e9cc8f6498b818b1848a26d996d6af5e130"
+    }
+    hash "4ff7d6d8875231c159a39f855e0712ac97973ed0a7312c8dd80ce80c54a24b87"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule addresses a situation different from that encountered by the district court when its jurisdiction is based on diversity of citizenship under 28 U.S.C. § 1332. Joining of a party whose citizenship is the same as that of an adversary destroys the district court’s jurisdiction over the entire civil action but under [former] 28 U.S.C. § 1471 the attempted joinder of such a person would not affect the bankruptcy court’s jurisdiction over the original adversary proceeding."
+    hash "f7bb6cc8ea4eb0495b2ce424711ba7708716ffa478f2a556cc9297ebeb16f8b8"
+  }
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule is amended to delete the reference to retention of the adversary proceeding if venue is improper. See 28 U.S.C. § 1412."
+    hash "abf22f29d4b233a5a81d861e93d5567cfac8aebe7bc3d670048c8e3469c4c695"
+  }
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3b84c8ae964bc8178623ef0ab96911443cfee1f3429572f65e75909974a69a10"
+  }
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "4ff7d6d8875231c159a39f855e0712ac97973ed0a7312c8dd80ce80c54a24b87"
+    enacted "cac3f7e54a86afc88c5155f9dbee1e8f7f4d83f816fc18737722a7aaf7b74b54"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

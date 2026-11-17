@@ -1,0 +1,48 @@
+edition 2
+module "/us/usc/ptV/rule5010" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5010" courtRule {
+    num "5010" "Rule 5010."
+    heading "Reopening a Case"
+    content "On the debtor’s or another party in interest’s motion, the court may, under § 350(b), reopen a case. In a reopened Chapter 7, 12, or 13 case, the United States trustee must not appoint a trustee unless the court determines that one is needed to protect the interests of the creditors and the debtor, or to ensure that the reopened case is efficiently administered."
+    hash "777953fdb247a311dead1b93a56be553f240f3c4d0b4020aa0cd2bce4a938899"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 350(b) of the Code provides: “A case may be reopened in the court in which such case was closed to administer assets, to accord relief to the debtor, or for other cause.”"
+    p "Rule 9024, which incorporates Rule 60 F.R.Civ.P., exempts motions to reopen cases under the Code from the one year limitation of Rule 60(b)."
+    p "Although a case has been closed the court may sometimes act without reopening the case. Under Rule 9024, clerical errors in judgments, orders, or other parts of the record or errors therein caused by oversight or omission may be corrected. A judgment determined to be non-dischargeable pursuant to Rule 4007 may be enforced after a case is closed by a writ of execution obtained pursuant to Rule 7069."
+    hash "a61a3c84c6edc8573229168ae80d725dbb6684b8e7528e66fb4b4142d77e45a0"
+  }
+  note "/us/usc/ptV/rule5010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "In order to avoid unnecessary cost and delay, the rule is amended to permit reopening of a case without the appointment of a trustee when the services of a trustee are not needed."
+    hash "c43839b018a596f660e429f3e3c4912b024d04e8509da312d6122b3be148d4d5"
+  }
+  note "/us/usc/ptV/rule5010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to the 1986 amendments to the Code that give the United States trustee the duty to appoint trustees in chapter 7, 12 and 13 cases. See §§ 701, 702(d), 1202(a), and 1302(a) of the Code. In most reopened cases, a trustee is not needed because there are no assets to be administered. Therefore, in the interest of judicial economy, this rule is amended so that a motion will not be necessary unless the United States trustee or a party in interest seeks the appointment of a trustee in the reopened case."
+    hash "02a99ca934f98f19834736d29a5c2d19044668e7fb646146f7104323cdb1cce6"
+  }
+  note "/us/usc/ptV/rule5010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "90dc7dfee1a08f6486b1844c3ed8995a8ac4fee2d40e58dfb4c1c4bcc94535d1"
+  }
+  layers {
+    operative "777953fdb247a311dead1b93a56be553f240f3c4d0b4020aa0cd2bce4a938899"
+    enacted "eb81c023d3e746c3c68b234c4fefc4daa691209af6e74b382c864b50856257d1"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

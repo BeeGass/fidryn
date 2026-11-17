@@ -1,0 +1,49 @@
+edition 2
+module "/us/usc/ptIX/rule9021" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9021" courtRule {
+    num "9021" "Rule 9021."
+    heading "When a Judgment or Order Becomes Effective"
+    content "A judgment or order becomes effective when it is entered under Rule 5003."
+    hash "d78002e4a91d0a9c66ffabf79b8748864169500ae8e37c1e8ee7129780651f1e"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). This rule is derived from Rule 58 F.R.Civ.P. The requirement that a judgment entered in an adversary proceeding or contested matter be set forth on a separate document is to eliminate uncertainty as to whether an opinion or memorandum of the court is a judgment. There is no sound reason to require that every order in a case under the Code be evidenced by a separate document."
+    p "Subdivision (b) establishes a procedure for entering a judgment of a bankruptcy court for the recovery of money or property in an index of judgments kept by the clerk of the district court. It clarifies the availability of the same remedies for the enforcement of a bankruptcy court judgment as those provided for the enforcement of a district court judgment. See 28 U.S.C. §§ 1961–63. When indexed in accordance with subdivision (b) of this rule a judgment of the bankruptcy court may be found by anyone searching for liens of record in the judgment records of the district court. Certification of a copy of the judgment to the clerk of the district court provides a basis for registration of the judgment pursuant to 28 U.S.C. § 1963 in any other district. When so registered, the judgment may be enforced by issuance of execution and orders for supplementary proceedings that may be served anywhere within the state where the registering court sits. See 7 Moore, Federal Practice 2409–11 (2d ed. 1971). The procedures available in the district court are not exclusive, however, and the holder of a judgment entered by the bankruptcy court may use the remedies under Rules 7069 and 7070 even if the judgment is indexed by the clerk of the district court."
+    p "Subdivision (c) makes it clear that when a district court hears a matter reserved to it by [former] 28 U.S.C. §§ 1471, 1481, its judgments are entered in the district court’s civil docket and in the docket of the bankruptcy court. When the district court acts as an appellate court, Rule 8016(a) governs the entry of judgments on appeal."
+    hash "f19646b6692aa50eb38fa85045e940a5faf6373d33df9faec842e47b154bf56c"
+  }
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Former subdivision (a) was derived from Rule 58 F.R.Civ.P. As amended, Rule 9021 adopts Rule 58. The reference in Rule 58 to Rule 79(a) F.R.Civ.P. is to be read as a reference to Rule 5003."
+    hash "bbae16a16a2acf10a09e15c17ac39b9bc9fdbbc45bcd2f44b482ca4307b08608"
+  }
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended in connection with the amendment that adds Rule 7058. The entry of judgment in adversary proceedings is governed by Rule 7058, and the entry of a judgment or order in all other proceedings is governed by this rule."
+    p "Changes Made After Publication. No changes since publication."
+    hash "873430a5582af3c914bb9764488714db72f9f1be9f09b9b6194f4b4cfbda4d6c"
+  }
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9021 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "4d390c399fc5e9abb78e6dab2de52357027da980f46cd7c4fe68b699a32f24ba"
+  }
+  layers {
+    operative "d78002e4a91d0a9c66ffabf79b8748864169500ae8e37c1e8ee7129780651f1e"
+    enacted "773e3895658ce7edd139b741f42d10d8ff2b880b3388c4181f756bed06286f04"
+    editorial "b0e754d2c123764d57a60fea19ed12116935d6735945cf2d6d1f29d5273c3663"
+  }
+}

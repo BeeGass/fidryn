@@ -1,0 +1,544 @@
+edition 2
+module "/us/usc/ptI/rule1007" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1007" courtRule {
+    num "1007" "Rule 1007."
+    heading "Lists, Schedules, Statements, and Other Documents; Time to File"
+    provision "/us/usc/ptI/rule1007/a" subsection {
+      num "a" "(a)"
+      heading "Lists of Names and Addresses."
+      provision "/us/usc/ptI/rule1007/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Voluntary Case. In a voluntary case, the debtor must file with the petition a list containing the name and address of each entity included or to be included on Schedules D, E/F, G, and H of the Official Forms. Unless it is a governmental unit, a corporate debtor must:"
+        provision "/us/usc/ptI/rule1007/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "include a corporate-ownership statement containing the information described in Rule 7007.1; and"
+          hash "a2f50078b2520bdbe5dc9ba64715a7aee4d1c34b7869ac802dd7b0ffcf6ca059"
+        }
+        provision "/us/usc/ptI/rule1007/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "promptly file a supplemental statement if changed circumstances make the original statement inaccurate."
+          hash "489fb83fefafe009db42c5c1c7c2377c4b34eeb1c5853a5ec58aa349479cd975"
+        }
+        hash "84eee19eabcc29e059b8907b81c82dd4cf9085f4141eb7337bb3d512d135e8a9"
+      }
+      provision "/us/usc/ptI/rule1007/a/2" paragraph {
+        num "2" "(2)"
+        content "Involuntary Case. Within 7 days after the order for relief has been entered in an involuntary case, the debtor must file a list containing the name and address of each entity included or to be included on Schedules D, E/F, G, and H of the Official Forms."
+        hash "2ca673853f55c3c6ae14444997c2fe1900aa00367d7e74365f6cafa9cfb10e41"
+      }
+      provision "/us/usc/ptI/rule1007/a/3" paragraph {
+        num "3" "(3)"
+        content "Chapter 11—List of Equity Security Holders. Unless the court orders otherwise, a Chapter 11 debtor must, within 14 days after the order for relief is entered, file a list of the debtor’s equity security holders by class. The list must show the number and type of interests registered in each holder’s name, along with the holder’s last known address or place of business."
+        hash "8c5d7c7186c40e873c2445bbe4ec58ac43f8e09d83615d1e8fa1eb493f6b400e"
+      }
+      provision "/us/usc/ptI/rule1007/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "Chapter 15—Information Required from a Foreign Representative. If a foreign representative files a petition under Chapter 15 for recognition of a foreign proceeding, the representative must—in addition to the documents required by § 1515—include with the petition:"
+        provision "/us/usc/ptI/rule1007/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "a corporate-ownership statement containing the information described in Rule 7007.1; and"
+          hash "eb99e0cccb34a035ee00cd1e5b5cf09fb97a0247627ff569a6d1b1558a450eae"
+        }
+        provision "/us/usc/ptI/rule1007/a/4/B" subparagraph {
+          num "B" "(B)"
+          chapeau "unless the court orders otherwise, a list containing the names and addresses of:"
+          provision "/us/usc/ptI/rule1007/a/4/B/i" clause {
+            num "i" "(i)"
+            content "all persons or bodies authorized to administer the debtor’s foreign proceedings;"
+            hash "2e30ffac80308c187f2edea9b24b650fdff47648793cc1a58e452a08f42fe2a6"
+          }
+          provision "/us/usc/ptI/rule1007/a/4/B/ii" clause {
+            num "ii" "(ii)"
+            content "all entities against whom provisional relief is sought under § 1519; and"
+            hash "50203c0bcada47e9a3dd6fed0c2af3a48e591f279cf316561636d40b01c54b78"
+          }
+          provision "/us/usc/ptI/rule1007/a/4/B/iii" clause {
+            num "iii" "(iii)"
+            content "all parties to litigation pending in the United States in which the debtor was a party when the petition was filed."
+            hash "a2fbb25742f6aab728eff918db18a66704759f54f095310df4330a3a55fbe5e8"
+          }
+          hash "91a0c171b1684d00c3454c2fac7b0c827408ef2c259f0741311e95e6d91e7d93"
+        }
+        hash "c9f03b84038185d57bc76e76f4813e91a79b3d0812a3a199159ddcf3800bd6c3"
+      }
+      provision "/us/usc/ptI/rule1007/a/5" paragraph {
+        num "5" "(5)"
+        content {
+          p "Extending the Time to File. On motion and for cause, the court may extend the time to file any list required by this Rule 1007(a). Notice of the motion must be given to:"
+          p "• the United States trustee;"
+          p "• any trustee;"
+          p "• any committee elected under § 705 or appointed under § 1102; and"
+          p "• any other party as the court orders."
+        }
+        hash "cc3552673139df354b0a5067192b97aa608c5b771d3a04d1595d1f0e091c2336"
+      }
+      hash "ee754b5fb01e52b28c9c63206142db4341622bd48b1aa063cefb37e15d5a63d2"
+    }
+    provision "/us/usc/ptI/rule1007/b" subsection {
+      num "b" "(b)"
+      heading "Schedules, Statements, and Other Documents."
+      provision "/us/usc/ptI/rule1007/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. Except in a Chapter 9 case or when the court orders otherwise, the debtor must file—prepared as prescribed by the appropriate Official Form, if any—"
+        provision "/us/usc/ptI/rule1007/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "schedules of assets and liabilities;"
+          hash "9550d81c01a04ae1095bad695fb299564919861fffbb65053e59e92767282ded"
+        }
+        provision "/us/usc/ptI/rule1007/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "a schedule of current income and expenditures;"
+          hash "bd13f155c23ca1b9ee01f083a0e1e1ab4435a61e2f2733d455a0684dec71ebb9"
+        }
+        provision "/us/usc/ptI/rule1007/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "a schedule of executory contracts and unexpired leases;"
+          hash "0615757fdb742dec45495e8abcca8ba41778132a8aeedf0881ff949edca247fa"
+        }
+        provision "/us/usc/ptI/rule1007/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "a statement of financial affairs;"
+          hash "b31e3d5ed3302e628a197f6b8a06b690436e59e8deb70308ac5127e5bd826ac9"
+        }
+        provision "/us/usc/ptI/rule1007/b/1/E" subparagraph {
+          num "E" "(E)"
+          content "copies of all payment advices or other evidence of payment that the debtor received from any employer within 60 days before the petition was filed—with all but the last 4 digits of the debtor’s social-security number or individual taxpayer-identification number deleted; and"
+          hash "a6313b21405294b483189fb1af9c451cfa2c0711895e19afac68b6d91f8f6969"
+        }
+        provision "/us/usc/ptI/rule1007/b/1/F" subparagraph {
+          num "F" "(F)"
+          content "a record of the debtor’s interest, if any, in an account or program of the type specified in § 521(c)."
+          hash "dbd44cd0706ae335e51f09e12d243029ef1a1cfa64fe22f0f280db5f20d36037"
+        }
+        hash "41e55d2c43a80d0ad15fb33d56fd488e8fbb335c815f10060b57d64b77983e82"
+      }
+      provision "/us/usc/ptI/rule1007/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Statement of Intention. In a Chapter 7 case, an individual debtor must:"
+        provision "/us/usc/ptI/rule1007/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "file the statement of intention required by § 521(a) (Form 108); and"
+          hash "19db2254895d01680b65fc7b926421551afb0b57e2275a4ed35bc7cc0469f0f3"
+        }
+        provision "/us/usc/ptI/rule1007/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "before or upon filing, serve a copy on the trustee and the creditors named in the statement."
+          hash "0f1b33316d9f15d368cd5600e3b111356cfcb5399698af1b8a37ca2dc09518ab"
+        }
+        hash "b7d3c4493d41f3a1a605022c81861df0cb392c0c0dcc39332befad95ae2170de"
+      }
+      provision "/us/usc/ptI/rule1007/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Credit-Counseling Statement. Unless the United States trustee has determined that the requirement to file a credit-counseling statement under § 109(h) does not apply in the district, an individual debtor must file a statement of compliance (included in Form 101). The debtor must include one of the following:"
+        provision "/us/usc/ptI/rule1007/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "a certificate and any debt-repayment plan required by § 521(b);"
+          hash "7a6762470d88d37811b8510d789aea1288bbafc1e36e96d47adde5878aaf17b6"
+        }
+        provision "/us/usc/ptI/rule1007/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "a statement that the debtor has received the credit-counseling briefing required by § 109(h)(1), but does not have a § 521(b) certificate;"
+          hash "95e978ac2cab47872126fbf1340a5939ed3d6bc45d3ec116490e5f10ffde63a8"
+        }
+        provision "/us/usc/ptI/rule1007/b/3/C" subparagraph {
+          num "C" "(C)"
+          content "a certification under § 109(h)(3); or"
+          hash "bd3167c26729a0eece00aed61ac3f7ebe8aac1c3c98f9acdaece6c37f8e12c06"
+        }
+        provision "/us/usc/ptI/rule1007/b/3/D" subparagraph {
+          num "D" "(D)"
+          content "a request for a court determination under § 109(h)(4)."
+          hash "06bbcbb5e9f6e7a15ec63447fd9ee1e61ac93303190d0c7f83c4a1f0826e791f"
+        }
+        hash "bc865c149d9d03f2f84b5112275a2fbd6fead8ab093a4d522d3bfd2c910e45cb"
+      }
+      provision "/us/usc/ptI/rule1007/b/4" paragraph {
+        num "4" "(4)"
+        chapeau "Current Monthly Income—Chapter 7. Unless § 707(b)(2)(D) applies, an individual debtor in a Chapter 7 case must:"
+        provision "/us/usc/ptI/rule1007/b/4/A" subparagraph {
+          num "A" "(A)"
+          content "file a statement of current monthly income (Form 122A–1); and"
+          hash "163bdeab4cbd896c377b7ae4f61566659e9734cbc27ca235d5487b702e5724fb"
+        }
+        provision "/us/usc/ptI/rule1007/b/4/B" subparagraph {
+          num "B" "(B)"
+          content "if that income exceeds the median family income for the debtor’s state and household size, file the Chapter 7 means-test calculation (Form 122A–2)."
+          hash "04e3dfd9a98a68e0efc218633956312997038bafa132090e0b578586e4c78264"
+        }
+        hash "4264f08ff9979697884c75a1b20d61d8d9fffd9e33ae4679dc56d9e3fe15fede"
+      }
+      provision "/us/usc/ptI/rule1007/b/5" paragraph {
+        num "5" "(5)"
+        content "Current Monthly Income—Chapter 11. An individual debtor in a Chapter 11 case (unless under Subchapter V) must file a statement of current monthly income (Form 122B)."
+        hash "fbd2704f315051884f88eacf76f674a65b33756fa08af12d8d96c934d0524a81"
+      }
+      provision "/us/usc/ptI/rule1007/b/6" paragraph {
+        num "6" "(6)"
+        chapeau "Current Monthly Income—Chapter 13. A debtor in a Chapter 13 case must:"
+        provision "/us/usc/ptI/rule1007/b/6/A" subparagraph {
+          num "A" "(A)"
+          content "file a statement of current monthly income (Form 122C–1); and"
+          hash "8a901a2d9ddc22315859ddce03017750950ee1a425e6066c5eb46cdcc0a6600d"
+        }
+        provision "/us/usc/ptI/rule1007/b/6/B" subparagraph {
+          num "B" "(B)"
+          content "if that income exceeds the median family income for the debtor’s state and household size, file the Chapter 13 calculation of disposable income (Form 122C-2)."
+          hash "a8dc50f7f33dcdc8c59d388a12a1c7b0176a8f0779c2642a610eab9f3637cefe"
+        }
+        hash "e1713ee4d36f74745fe73b6357b93c3d93cc2f5d29e186b9036dbbbae9277b0f"
+      }
+      provision "/us/usc/ptI/rule1007/b/7" paragraph {
+        num "7" "(7)"
+        content "Personal Financial-Management Course. Unless an approved provider has notified the court that the debtor has completed a course in personal financial management after filing the petition or the debtor is not required to complete one as a condition to discharge, an individual debtor in a Chapter 7 or Chapter 13 case—or in a Chapter 11 case in which § 1141(d)(3) applies—must file a certificate of course completion issued by the provider."
+        hash "d415d2e9c630c68aad17a854d3a571871d2adf8111823e667b7fb10e3731c5ee"
+      }
+      provision "/us/usc/ptI/rule1007/b/8" paragraph {
+        num "8" "(8)"
+        chapeau "Limitation on a Homestead Exemption. This Rule 1007(b)(8) applies if an individual debtor in a Chapter 11, 12, or 13 case claims an exemption under § 522(b)(3)(A) in property of the type described in § 522(p)(1) and the property value exceeds the amount specified in § 522(q)(1). The debtor must file a statement about any pending proceeding in which the debtor may be found:"
+        provision "/us/usc/ptI/rule1007/b/8/A" subparagraph {
+          num "A" "(A)"
+          content "guilty of the type of felony described in § 522(q)(1)(A); or"
+          hash "d99f2ca5954c76a2021d85948957164063304042962d241163339d44b2f7930d"
+        }
+        provision "/us/usc/ptI/rule1007/b/8/B" subparagraph {
+          num "B" "(B)"
+          content "liable for the type of debt described in § 522(q)(1)(B)."
+          hash "6d30a8ed86d8c96278dc698ad1323bb375c36a89481302eea7f28a7e0f4fde30"
+        }
+        hash "9096466ae6570be444fc4cc857c9c1812d03a0e597202d2b07c35040b62f6dc1"
+      }
+      hash "a7187fad51965cf33276c11b4f0911847000a1df3ad8efb793476ae796a887cc"
+    }
+    provision "/us/usc/ptI/rule1007/c" subsection {
+      num "c" "(c)"
+      heading "Time to File."
+      provision "/us/usc/ptI/rule1007/c/1" paragraph {
+        num "1" "(1)"
+        content "Voluntary Case—Various Documents. Unless (d), (e), (f), or (h) provides otherwise, the debtor in a voluntary case must file the documents required by (b)(1), (b)(4), (b)(5), and (b)(6) with the petition or within 14 days after it is filed."
+        hash "f4297516a67d6056db0011c1702b41eb3e48799dd360b42963a3c52d48bfbc46"
+      }
+      provision "/us/usc/ptI/rule1007/c/2" paragraph {
+        num "2" "(2)"
+        content "Involuntary Case—Various Documents. In an involuntary case, the debtor must file the documents required by (b)(1) within 14 days after the order for relief is entered."
+        hash "6f306045551dd7e5d07bc4bac6c221f623051b3e4d06d1a6a1bdeea04b3e7131"
+      }
+      provision "/us/usc/ptI/rule1007/c/3" paragraph {
+        num "3" "(3)"
+        content "Credit-Counseling Documents. In a voluntary case, the documents required by (b)(3)(A), (C), or (D) must be filed with the petition. Unless the court orders otherwise, a debtor who has filed a statement under (b)(3)(B) must file the documents required by (b)(3)(A) within 14 days after the order for relief is entered."
+        hash "bbc31d0ce1aed1a3732855ee775b4b0faabfc7d386042f6b7be6ddab743de894"
+      }
+      provision "/us/usc/ptI/rule1007/c/4" paragraph {
+        num "4" "(4)"
+        chapeau "Financial-Management Course. Unless the court extends the time to file, an individual debtor must file the certificate required by (b)(7) as follows:"
+        provision "/us/usc/ptI/rule1007/c/4/A" subparagraph {
+          num "A" "(A)"
+          content "in a Chapter 7 case, within 60 days after the first date set for the meeting of creditors under § 341; and"
+          hash "acded8a88b0048968487a062295ec42484e2301d7caa489121a80e864d4eefa2"
+        }
+        provision "/us/usc/ptI/rule1007/c/4/B" subparagraph {
+          num "B" "(B)"
+          content "in a Chapter 11 or Chapter 13 case, no later than the date the last payment is made under the plan or the date a motion for a discharge is filed under § 1141(d)(5)(B) or § 1328(b)."
+          hash "f62b15ad32b5a722d0c4775500b242aa011dfd8b7416471ac0f1c27b7a72d88e"
+        }
+        hash "ec2b5f6a058c599cf669261be322174e668b46189b2c6041c6e48d432cbc9af1"
+      }
+      provision "/us/usc/ptI/rule1007/c/5" paragraph {
+        num "5" "(5)"
+        content "Limitation on Homestead Exemption. The debtor must file the statement required by (b)(8) no earlier than the date of the last payment made under the plan or the date a motion for a discharge is filed under § 1141(d)(5)(B), 1228(b), or 1328(b)."
+        hash "5bea6cb7f66a5f873ced7d52613be8c33cd76dbcbcc429f1dc7ab523e5fc2103"
+      }
+      provision "/us/usc/ptI/rule1007/c/6" paragraph {
+        num "6" "(6)"
+        content "Documents in a Converted Case. Unless the court orders otherwise, a document filed before a case is converted to another chapter is considered filed in the converted case."
+        hash "264f1cf3975e877076c1c060ed7e309d85a7571a0b7f88d6536d8aa152ca432a"
+      }
+      provision "/us/usc/ptI/rule1007/c/7" paragraph {
+        num "7" "(7)"
+        content {
+          p "Extending the Time to File. Except as § 1116(3) provides otherwise, the court, on motion and for cause, may extend the time to file a document under this rule. The movant must give notice of the motion to:"
+          p "• the United States trustee;"
+          p "• any committee elected under § 705 or appointed under § 1102; and"
+          p "• any trustee, examiner, and other party as the court orders."
+        }
+        continuation "If the motion is granted, notice must be given to the United States trustee and to any committee, trustee, and other party as the court orders."
+        hash "acb8da4cb366a2ebcb508b2ad92fbc93fe7778b1d03341bc2d12787d15fd407a"
+      }
+      hash "c145f9b7ffa0c7ccb14abf23b18760653fda4dcdfdbd1a49942f0a22033ffa19"
+    }
+    provision "/us/usc/ptI/rule1007/d" subsection {
+      num "d" "(d)"
+      heading "List of the 20 Largest Unsecured Creditors in a Chapter 9 or Chapter 11 Case."
+      content "In addition to the lists required by (a), a debtor in a Chapter 9 case or in a voluntary Chapter 11 case must file with the petition a list containing the names, addresses, and claims of the creditors that hold the 20 largest unsecured claims, excluding insiders, as prescribed by the appropriate Official Form (Form 104 or 204). In an involuntary Chapter 11 case, the debtor must file the list within 2 days after the order for relief is entered under § 303(h)."
+      hash "3a1fbe786a1159792c9f0bd9d9aa2579d59cb93cc012789a9da3a97d07c6914a"
+    }
+    provision "/us/usc/ptI/rule1007/e" subsection {
+      num "e" "(e)"
+      heading "Chapter 9 Lists."
+      content "In a Chapter 9 case, the court must set the time for the debtor to file the list required by (a). If a proposed plan requires real estate assessments to be revised so that the proportion of special assessments or special taxes for some property will be different from the proportion in effect when the petition is filed, the debtor must also file a list that shows—for each adversely affected property—the name and address of each known holder of title, both legal and equitable. On motion and for cause, the court may modify the requirements of this Rule 1007(e) and those of (a)."
+      hash "63c4439ea226174a358007f1a562160f306b383615e3d60472bff60d2b465cb3"
+    }
+    provision "/us/usc/ptI/rule1007/f" subsection {
+      num "f" "(f)"
+      heading "Social-Security Number."
+      content "In a voluntary case, an individual debtor must submit with the petition a verified statement that gives the debtor’s social-security number or states that the debtor does not have one (Form 121). In an involuntary case, the debtor must submit the statement within 14 days after the order for relief is entered."
+      hash "78367aae5a616c0fe695884c67d6856fe808e51d82e229851ba4035108ece0b4"
+    }
+    provision "/us/usc/ptI/rule1007/g" subsection {
+      num "g" "(g)"
+      heading "Partnership Case."
+      content "The general partners of a debtor partnership must file for the partnership the list required by (a) and the documents required by (b)(1)(A)–(D). The court may order any general partner to file a statement of personal assets and liabilities and may set the deadline for doing so."
+      hash "dab8fad54828d5b770e41a9684bf281447e89760ee8238b7ef537b2f0e4009ec"
+    }
+    provision "/us/usc/ptI/rule1007/h" subsection {
+      num "h" "(h)"
+      heading "Interests in Property Acquired or Arising After a Petition Is Filed."
+      chapeau "After the petition is filed in a Chapter 7, 11, 12, or 13 case, if the debtor acquires—or becomes entitled to acquire—an interest in property described in § 541(a)(5), the debtor must file a supplemental schedule and include any claimed exemption. Unless the court allows additional time, the debtor must file the schedule within 14 days after learning about the property interest. This duty continues even after the case is closed but does not apply to property acquired after an order is entered:"
+      provision "/us/usc/ptI/rule1007/h/1" paragraph {
+        num "1" "(1)"
+        content "confirming a Chapter 11 plan (other than one confirmed under § 1191(b)); or"
+        hash "ffc1976bbcc71fbadc052cc1fa10cb8c0cb773013f6fa1f4b853d929fd9fa9ba"
+      }
+      provision "/us/usc/ptI/rule1007/h/2" paragraph {
+        num "2" "(2)"
+        content "discharging the debtor in a Chapter 12 case, a Chapter 13 case, or a case under Subchapter V of Chapter 11 in which the plan is confirmed under § 1191(b)."
+        hash "8c015cd05b3bc2aebe8c2c39e07807a471d1d017b7f6d9c4b3fc47821179c43a"
+      }
+      hash "76be36c2f3cdf9e18bc3d136901d1fb0b9b69da367a5c966117b202f4ae2c283"
+    }
+    provision "/us/usc/ptI/rule1007/i" subsection {
+      num "i" "(i)"
+      heading "Security Holders Known to Others."
+      chapeau "After notice and a hearing and for cause, the court may direct an entity other than the debtor or trustee to:"
+      provision "/us/usc/ptI/rule1007/i/1" paragraph {
+        num "1" "(1)"
+        chapeau "disclose any list of the debtor’s security holders in its possession or under its control by:"
+        provision "/us/usc/ptI/rule1007/i/1/A" subparagraph {
+          num "A" "(A)"
+          content "producing the list or a copy of it;"
+          hash "6c6e9aefb731cb1fdd345a4759b7209eeb36dcd890917fccfd22cf82db5eb71c"
+        }
+        provision "/us/usc/ptI/rule1007/i/1/B" subparagraph {
+          num "B" "(B)"
+          content "allowing inspection or copying; or"
+          hash "a2655179836b76b0dc54193f415055c94f96f141e81332996fe91ef29e4f6ca4"
+        }
+        provision "/us/usc/ptI/rule1007/i/1/C" subparagraph {
+          num "C" "(C)"
+          content "making any other disclosure; and"
+          hash "10191920b737b6d7b81d789d16cddf3aad8ba2f0dcb7636caeed64a5d7c70a78"
+        }
+        hash "2bc0c75a0497b6527d1a4fe9d677619405807186725057c9301a770700812574"
+      }
+      provision "/us/usc/ptI/rule1007/i/2" paragraph {
+        num "2" "(2)"
+        content "indicate the name, address, and security held by each listed holder."
+        hash "8e63c1855e1c22b3b5cbcf785a003e604e0d44bc78ed78337dbd20fab570bc7f"
+      }
+      hash "416b1674f56dea3d9e1189c5ddf13e0a0cab99d4969c98146032f15c1127a520"
+    }
+    provision "/us/usc/ptI/rule1007/j" subsection {
+      num "j" "(j)"
+      heading "Impounding Lists."
+      content "On a party in interest’s motion and for cause, the court may impound any list filed under this rule and may refuse inspection. But the court may permit a party in interest to inspect or use an impounded list on terms prescribed by the court."
+      hash "75bff4cef6f33a50723f71d1842cdb61afb3bd57371318954cbb94a650a708a8"
+    }
+    provision "/us/usc/ptI/rule1007/k" subsection {
+      num "k" "(k)"
+      heading "Debtor’s Failure to File a Required Document."
+      chapeau "If a debtor fails to properly prepare and file a list, schedule, or statement (other than a statement of intention) as required by this rule, the court may order:"
+      provision "/us/usc/ptI/rule1007/k/1" paragraph {
+        num "1" "(1)"
+        content "that the trustee, a petitioning creditor, a committee, or other party do so within the time set by the court; and"
+        hash "8006b1de21a476a72067b9e074629752d2978942d26203126b3c30397eecd2b7"
+      }
+      provision "/us/usc/ptI/rule1007/k/2" paragraph {
+        num "2" "(2)"
+        content "that the cost incurred be reimbursed as an administrative expense."
+        hash "e569ad9222c099b41c9d40a1a85d680cd6cc188b6c79751a48dfcd6432017b4a"
+      }
+      hash "61b1081eaa80220427c77bcf1052c84dd870b7459fec408776bb0403233cef66"
+    }
+    provision "/us/usc/ptI/rule1007/l" subsection {
+      num "l" "(l)"
+      heading "Copies to the United States Trustee."
+      content "The clerk must promptly send to the United States trustee a copy of every list, schedule, or statement filed under (a)(1), (a)(2), (b), (d), or (h)."
+      hash "56dba601d024af3eb971bb12b4f27fb823d456803c229757a7c664c7d9d00475"
+    }
+    provision "/us/usc/ptI/rule1007/m" subsection {
+      num "m" "(m)"
+      heading "Infant or Incompetent Person."
+      content "If a debtor knows that a person named in a list of creditors or in a schedule is an infant or is incompetent, the debtor must also include the name, address, and legal relationship of anyone on whom process would be served in an adversary proceeding against that person under Rule 7004(b)(2)."
+      hash "f49e7f76581b00691927b3ffc35d63a4dfdfff92fc0b85b6211e78d1c42ecf68"
+    }
+    hash "8105ee9b18f698ca0c84f940b7f89a287954ef3a303b7262dacfadda574b4f27"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 29, 2015, eff. Dec. 1, 2015; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is an adaptation of former Rules 108, 8–106, 10–108 and 11–11. As specified in the rule, it is applicable in all types of cases filed under the Code."
+    p "Subdivision (a) requires at least a list of creditors with their names and addresses to be filed with the petition. This list is needed for notice of the meeting of creditors (Rule 2002) and notice of the order for relief (§ 342 of the Code). The list will also serve to meet the requirements of § 521(1) of the Code. Subdivision (a) recognizes that it may be impossible to file the schedules required by § 521(1) and subdivision (b) of the rule at the time the petition is filed but in order for the case to proceed expeditiously and efficiently it is necessary that the clerk have the names and addresses of creditors. It should be noted that subdivision (d) of the rule requires a special list of the 20 largest unsecured creditors in chapter 9 and 11 cases. That list is for the purpose of selecting a committee of unsecured creditors."
+    p "Subdivision (b) is derived from former Rule 11–11 and conforms with § 521. This subdivision indicates the forms to be used. The court may dispense with the filing of schedules and the statement of affairs pursuant to § 521."
+    p "Subdivisions (c) and (f) specify the time periods for filing the papers required by the rule as well as the number of copies. The provisions dealing with an involuntary case are derived from former Bankruptcy Rule 108. Under the Code, a chapter 11 case may be commenced by an involuntary petition (§ 303(a)), whereas under the Act, a Chapter XI case could have been commenced only by a voluntary petition. A motion for an extension of time to file the schedules and statements is required to be made on notice to parties, as the court may direct, including a creditors’ committee if one has been appointed under § 1102 of the Code and a trustee or examiner if one has been appointed pursuant to § 1104 of the Code. Although written notice is preferable, it is not required by the rule; in proper circumstances the notice may be by telephone or otherwise."
+    p "Subdivision (d) is new and requires that a list of the 20 largest unsecured creditors, excluding insiders as defined in § 101(25) [now 101(31)] of the Code, be filed with the petition. The court, pursuant to § 1102 of the Code, is required to appoint a committee of unsecured creditors as soon as practicable after the order for relief. That committee generally is to consist of the seven largest unsecured creditors who are willing to serve. The list should, as indicated on Official Form No. 9, specify the nature and amount of the claim. It is important for the court to be aware of the different types of claims existing in the case and this form should supply such information."
+    p "Subdivision (e) applies only in chapter 9 municipality cases. It gives greater discretion to the court to determine the time for filing a list of creditors and any other matter related to the list. A list of creditors must at some point be filed since one is required by § 924 of the Code. When the plan affects special assessments, the definitions in § 902(2) and (3) [now 902(3), (4)] for “special tax payer” and “special tax payer affected by the plan” become relevant."
+    p "Subdivision (g) is derived from former Rules 108(c) and 11–11. Nondebtor general partners are liable to the partnership’s trustee for any deficiency in the partnership’s estate to pay creditors in full as provided by § 723 of the Code. Subdivision (g) authorizes the court to require a partner to file a statement of personal assets and liabilities to provide the trustee with the relevant information."
+    p "Subdivision (h) is derived from former Bankruptcy Rule 108(e) for chapter 7, 11 and 13 purposes. It implements the provisions in and language of § 541(a)(5) of the Code."
+    p "Subdivisions (i) and (j) are adapted from §§ 165 and 166 of the Act and former Rule 10–108(b) and (c) without change in substance. The term “party in interest” is not defined in the Code or the rules, but reference may be made to § 1109(b) of the Code. In the context of this subdivision, the term would include the debtor, the trustee, any indenture trustee, creditor, equity security holder or committee appointed pursuant to § 1102 of the Code."
+    p "Subdivision (k) is derived from former Rules 108(d) and 10–108(a)."
+    hash "aa76c7e3a9b64c08a1d7976f6043a206b974d3c031725239c2babcee1df88055"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivisions (b), (c), and (g) are amended to provide for the filing of a schedule of current income and current expenditures and the individual debtor’s statement of intention. These documents are required by the 1984 amendments to § 521 of the Code. Official Form No. 6A is prescribed for use by an individual debtor for filing a schedule of current income and current expenditures in a chapter 7 or chapter 11 case. Although a partnership or corporation is also required by § 521(1) to file a schedule of current income and current expenditures, no Official Form is prescribed therefor."
+    p "The time for filing the statement of intention is governed by § 521(2)(A). A copy of the statement of intention must be served on the trustee and the creditors named in the statement within the same time. The provisions of subdivision (c) governing the time for filing when a chapter 11 or chapter 13 case is converted to a chapter 7 case have been omitted from subdivision (c) as amended. Filing after conversion is now governed exclusively by Rule 1019."
+    p "Subdivision (f) has been abrogated. The number of copies of the documents required by this rule will be determined by local rule."
+    p "Subdivision (h) is amended to include a direct reference to § 541(a)(5)."
+    p "Subdivision (k) provides that the court may not order an entity other than the debtor to prepare and file the statement of intention."
+    hash "b766ca8766e2f888ba74da359baafba6d37154aac4fe58c14c3f483d762b6e27"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "References to Official Form numbers and to the Chapter 13 Statement are deleted and subdivision (b) is amended in anticipation of future revision and renumbering of the Official Forms. The debtor in a chapter 12 or chapter 13 case shall file the list, schedules and statements required in subdivisions (a)(1), (b)(1), and (h). It is expected that the information currently provided in the Chapter 13 Statement will be included in the schedules and statements as revised not later than the effective date of these rule amendments."
+    p "Subdivisions (a)(4) and (c) are amended to provide the United States trustee with notice of any motion to extend the time for the filing of any lists, schedules, or statements. Such notice enables the United States trustee to take appropriate steps to avoid undue delay in the administration of the case. See 28 U.S.C. § 586(a)(3)(G). Subdivisions (a)(4) and (c) are amended further to provide notice to committees elected under § 705 or appointed pursuant to § 1102 of the Code. Committees of retired employees appointed pursuant to § 1114 are not included."
+    p "The additions of references to unexpired leases in subdivisions (b)(1) and (g) indicate that the schedule requires the inclusion of unexpired leases as well as other executory contracts."
+    p "The words “with the court” in subdivisions (b)(1), (e), and (g) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    p "Subdivision (l), which is derived from Rule X–1002(a), provides the United States trustee with the information required to perform certain administrative duties such as the appointment of a committee of unsecured creditors. In a chapter 7 case, the United States trustee should be aware of the debtor’s intention with respect to collateral that secures a consumer debt so that the United States trustee may monitor the progress of the case. Pursuant to § 307 of the Code, the United States trustee has standing to raise, appear and be heard on issues and the lists, schedules and statements contain information that, when provided to the United States trustee, enable that office to participate effectively in the case. The United States trustee has standing to move to dismiss a chapter 7 or 13 case for failure to file timely the list, schedules or statement required by § 521(1) of the Code. See §§ 707(a)(3) and 1307(c)(9). It is therefore necessary for the United States trustee to receive notice of any extension of time to file such documents. Upon request, the United States trustee also may receive from the trustee or debtor in possession a list of equity security holders."
+    hash "4dd050533462d6ddc1a0671a9ded8c7048ef999b9f853328ac066b47bc235ffd"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Subdivision (c) is amended to provide that schedules and statements filed prior to the conversion of a case to another chapter shall be deemed filed in the converted case, whether or not the case was a chapter 7 case prior to conversion. This amendment is in recognition of the 1991 amendments to the Official Forms that abrogated the Chapter 13 Statement and made the same forms for schedules and statements applicable in all cases."
+    p "This subdivision also contains a technical correction. The phrase “superseded case” creates the erroneous impression that conversion of a case results in a new case that is distinct from the original case. The effect of conversion of a case is governed by § 348 of the Code."
+    p "GAP Report on Rule 1007(c). No changes since publication, except for stylistic changes."
+    hash "7358a7c2f756b0cd6b9b423b05c7641d9b07c1a3700a718f243835924e023059"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Subdivision (m) is added to enable the person required to mail notices under Rule 2002 to mail them to the appropriate guardian or other representative when the debtor knows that a creditor or other person listed is an infant or incompetent person."
+    p "The proper mailing address of the representative is determined in accordance with Rule 7004(b)(2), which requires mailing to the person’s dwelling house or usual place of abode or at the place where the person regularly conducts a business or profession."
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "fc6d25e10d50b003f5af64563c146302435036749318863d538c6d510761322c"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003 Amendment"
+    p "[Subdivision (a).] This rule is amended to require the debtor to file a corporate ownership statement setting out the information described in Rule 7007.1. Requiring debtors to file the statement provides the court with an opportunity to make judicial disqualification determinations at the outset of the case. This could reduce problems later in the case by preventing the initial assignment of the case to a judge who holds a financial interest in a parent company of the debtor or some other entity that holds a significant ownership interest in the debtor. Moreover, by including the disclosure statement filing requirement at the commencement of the case, the debtor does not have to make the same disclosure filing each time it is involved in an adversary proceeding throughout the case. The debtor also must file supplemental statements as changes in ownership might arise."
+    p "Changes Made After Publication and Comments. No changes since publication."
+    p "[Subdivisions (c) and (f).] The rule is amended to add a requirement that a debtor submit a statement setting out the debtor’s social security number. The addition is necessary because of the corresponding amendment to Rule 1005 which now provides that the caption of the petition includes only the final four digits of the debtor’s social security number. The debtor submits the statement, but it is not filed, nor is it included in the case file. The statement provides the information necessary to include on the service copy of the notice required under Rule 2002(a)(1). It will also provide the information to facilitate the ability of creditors to search the court record by a search of a social security number already in the creditor’s possession."
+    p "Changes Made After Publication and Comments. The rule amendment is made in response to the extensive commentary that urged the Advisory Committee to continue the obligation contained in current Rule 1005 that a debtor must include his or her social security number on the caption of the bankruptcy petition. Rule 1005 is amended to limit that disclosure to the final four digits of the social security number, and Rule 1007 is amended to reinstate the obligation in a manner that will provide more protection of the debtor’s privacy while continuing access to the information to those persons with legitimate need for that data. The debtor must disclose the information, but the method of disclosure is by a verified statement that is submitted to the clerk. The statement is not filed in the case and does not become a part of the court record. Therefore, it enables the clerk to deliver that information to the creditors and the trustee in the case, but it does not become a part of the court record governed by § 107 of the Bankruptcy Code and is not available to the public."
+    hash "5cf575be5fed57dec2dda5083c91cc37291ca4175dc90cbbd37f4da2d9acfba0"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "Notice to creditors and other parties in interest is essential to the operation of the bankruptcy system. Sending notice requires a convenient listing of the names and addresses of the entities to whom notice must be sent, and virtually all of the bankruptcy courts have adopted a local rule requiring the submission of a list of these entities with the petition and in a particular format. These lists are commonly called the “mailing matrix.”"
+    p "Given the universal adoption of these local rules, the need for such lists in all cases is apparent. Consequently, the rule is amended to require the debtor to submit such a list at the commencement of the case. This list may be amended when necessary. See Rule 1009(a)."
+    p "The content of the list is described by reference to Schedules D through H of the Official Forms rather than by reference to creditors or persons holding claims. The cross reference to the Schedules as the source of the names for inclusion in the list ensures that persons such as codebtors or nondebtor parties to executory contracts and unexpired leases will receive appropriate notices in the case."
+    p "While this rule renders unnecessary, in part, local rules on the subject, this rule does not direct any particular format or form for the list to take. Local rules still may govern those particulars of the list."
+    p "Subdivision (c) is amended to reflect that subdivision (a)(1) no longer requires the debtor to file a schedule of liabilities with the petition in lieu of a list of creditors. The filing of the list is mandatory, and subdivision (b) of the rule requires the filing of schedules. Thus, subdivision (c) no longer needs to account for the possibility that the debtor can delay filing a schedule of liabilities when the petition is accompanied by a list of creditors. Subdivision (c) simply addresses the situation in which the debtor does not file schedules or statements with the petition, and the procedure for seeking an extension of time for filing."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication and Comment. No changes since publication."
+    hash "41814a57e48d81d9ce0385e81f463267c335b2d66fc7a48a77368df56432a152"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The title of this rule is expanded to refer to “documents” in conformity with the 2005 amendments to § 521 and related provisions of the Bankruptcy Code that include a wider range of documentary requirements."
+    p "Subdivision (a) is amended to require that any foreign representative filing a petition for recognition to commence a case under chapter 15, which was added to the Code in 2005, file a list of entities with whom the debtor is engaged in litigation in the United States. The foreign representative filing the petition for recognition must also list any entities against whom provisional relief is being sought as well as all persons or bodies authorized to administer foreign proceedings of the debtor. This should ensure that entities most interested in the case, or their representatives, will receive notice of the petition under Rule 2002(q)."
+    p "Subdivision (a)(4) is amended to require the foreign representative who files a petition for recognition under chapter 15 to file the documents described in § 1515 of the Code as well as a corporate ownership statement. The subdivision is also amended to identify the foreign representative in language that more closely follows the text of the Code. Former subdivision (a)(4) is renumbered as subdivision (a)(5) and stylistic changes were made to the subdivision."
+    p "Subdivision (b)(1) addresses schedules, statements, and other documents that the debtor must file unless the court orders otherwise and other than in a case under chapter 9. This subdivision is amended to include documentary requirements added by the 2005 amendments to § 521 that apply to the same group of debtors and have the same time limits as the existing requirements of (b)(1). Consistent with the E-Government Act of 2002, Pub. L. No. 107–347, the payment advices should be redacted before they are filed."
+    p "Subdivision (b)(2) is amended to conform to the renumbering of the subsections of § 521."
+    p "Subdivisions (b)(3) through (b)(8) are new and implement the 2005 amendments to the Code. Subdivision (b)(3) provides for the filing of a document relating to the credit counseling requirement provided by the 2005 amendments to § 109 in the context of an Official Form that warns the debtor of the consequences of failing to comply with the credit counseling requirement."
+    p "Subdivision (b)(4) addresses the filing of information about current monthly income, as defined in § 101, for certain chapter 7 debtors and, if required, additional calculations of expenses required by the 2005 amendments to § 707(b)."
+    p "Subdivision (b)(5) addresses the filing of information about current monthly income, as defined in § 101, for individual chapter 11 debtors. The 2005 amendments to § 1129(a)(15) condition plan confirmation for individual debtors on the commitment of disposable income, as defined in § 1325(b)(2), which is based on current monthly income."
+    p "Subdivision (b)(6) addresses the filing of information about current monthly income, as defined in § 101, for chapter 13 debtors and, if required, additional calculations of expenses. These changes are necessary because the 2005 amendments to § 1325 require that the determination of disposable income begin with current monthly income."
+    p "Subdivision (b)(7) reflects the 2005 amendments to §§ 727 and 1328 of the Code that condition the receipt of a discharge on the completion of a personal financial management course, with certain exceptions. Certain individual chapter 11 debtors may also be required to complete a personal financial management course under § 727(a)(11) as incorporated by § 1141(d)(3)(C). To evidence compliance with that requirement, the subdivision requires the debtor to file the appropriate Official Form certifying that the debtor has completed the personal financial management course."
+    p "Subdivision (b)(8) requires an individual debtor in a case under chapter 11, 12, or 13 to file a statement that there are no reasonable grounds to believe that the restrictions on a homestead exemption as set out in § 522(q) of the Code are applicable. Sections 1141(d)(5)(C), 1228(f), and 1328(h) each provide that the court shall not enter a discharge order unless it finds that there is no reasonable cause to believe that § 522(q) applies. Requiring the debtor to submit a statement to that effect in cases under chapters 11, 12, and 13 in which an exemption is claimed in excess of the amount allowed under § 522(q)(1) provides the court with a basis to conclude, in the absence of any contrary information, that § 522(q) does not apply. Creditors receive notice under Rule 2002(f)(11) of the time to request postponement of the entry of the discharge to permit an opportunity to challenge the debtor’s assertions in the Rule 1007(b)(8) statement in appropriate cases."
+    p "Subdivision (c) is amended to include time limits for the filing requirements added to subdivision (b) due to the 2005 amendments to the Code, and to make conforming amendments. Separate time limits are provided for the documentation of credit counseling and for the statement of the completion of the financial management course. While most documents relating to credit counseling must be filed with the voluntary petition, the credit counseling certificate and debt repayment plan can be filed within 15 days of the filing of a voluntary petition if the debtor files a statement under subdivision (b)(3)(B) with the petition. Sections 727(a)(11), 1141(d)(3), and 1328(g) of the Code require individual debtors to complete a personal financial management course prior to the entry of a discharge. The amendment allows the court to enlarge the deadline for the debtor to file the statement of completion. Because no party is harmed by the enlargement, no specific restriction is placed on the court’s discretion to enlarge the deadline, even after its expiration."
+    p "Subdivision (c) of the rule is also amended to recognize the limitation on the extension of time to file schedules and statements when the debtor is a small business debtor. Section 1116(3), added to the Code in 2005, establishes a specific standard for courts to apply in the event that the debtor in possession or the trustee seeks an extension for filing these forms for a period beyond 30 days after the order for relief."
+    p "Changes Made After Publication. Subdivision (a)(4) was amended to insert the requirement that the foreign representative who files the chapter 15 petition must file the corporate ownership statement. Subdivision (b)(4) was amended to provide that all individual debtors rather than just those whose debts are primarily consumer debts must file the statement of current monthly income. Subdivisions (b)(7) and (c) were amended to make the obligation to file a statement of the completion of a personal financial management course applicable to certain individual chapter 11 debtors as well as to individual debtors in chapters 7 and 13. Subdivision (c) is also amended to provide the court with broad discretion to enlarge the time to file the statement of completion of a personal financial management course. The Committee Note was amended to explain these changes."
+    hash "d8e2d9167c036a48e0d7bd4e746b6dd13c24f624e30087d1a0251f76013a4840"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. Each deadline in the rule of fewer than 30 days is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "ed56754d9fed287ba489e19948bed42ae70789755787e26bb3ca8be44aed7079"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (a)(2). Subdivision (a)(2) is amended to shorten the time for a debtor to file a list of the creditors included on the various schedules filed or to be filed in the case. This list provides the information necessary for the clerk to provide notice of the § 341meeting of creditors in a timely manner."
+    p "Subdivision (c). Subdivision (c) is amended to provide additional time for individual debtors in chapter 7 to file the statement of completion of a course in personal financial management. This change is made in conjunction with an amendment to Rule 5009 requiring the clerk to provide notice to debtors of the consequences of not filing the statement in a timely manner."
+    p "Changes Made After Publication. No changes since publication."
+    hash "465aebd349ded049fb57fe5ccc6b3c0cf97809a7749fb5703c2cd2fbd2e073ce"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2012 Amendment"
+    p "Subdivision (c). In subdivision (c), the time limit for a debtor in an involuntary case to file the list required by subdivision (a)(2) is deleted as unnecessary. Subdivision (a)(2) provides that the list must be filed within seven days after the entry of the order for relief. The other change to subdivision (c) is stylistic."
+    hash "d4e186202f8b4417e259c083d77c19775eae5947a0980214855e69557faf8cf6"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "Subdivision (b)(7) is amended to relieve an individual debtor of the obligation to file a statement of completion of a personal financial management course if the course provider notifies the court that the debtor has completed the course. Course providers approved under § 111 of the Code may be permitted to file this notification electronically with the court immediately upon the debtor’s completion of the course. If the provider does not notify the court, the debtor must file the statement, prepared as prescribed by the appropriate Official Form, within the time period specified by subdivision (c)."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "7ef0350a2e2ce81cbd63cfd4e13dd5512788b1db58a9f5c0c133415f803672f0"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2015-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2015 Amendment"
+    p "In subdivisions (a)(1) and (a)(2), the references to Schedules are amended to reflect the new designations adopted as part of the Forms Modernization Project."
+    hash "c20531edaaba2593364fad61919e5ba058a08bf6b46057d2cf32310c8fe05c97"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. As amended, subdivision (b)(5) of the rule includes an exception for subchapter V cases. Because Code § 1129(a)(15) is inapplicable to such cases, there is no need for an individual debtor in a subchapter V case to file a statement of current monthly income."
+    p "Subdivision (h) is amended to provide that the duty to file a supplemental schedule under the rule terminates upon confirmation of the plan in a subchapter V case, unless the plan is confirmed under § 1191(b), in which case it terminates upon discharge as provided in § 1192."
+    hash "32f4f3cec3b1c20c9ef1a5f90c5f6e33d081a4a1c601f6b3438ba275c763b2dd"
+  }
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    p "Additionally, the following substantive changes have been made."
+    p "Rule 1007(b)(7) is amended in two ways. First, language is added to make the rule inapplicable to debtors who are not required to complete an instructional course concerning personal financial management as a condition to discharge. See 11 U.S.C. §§ 727(a)(11), 1328(g)(2), 1141(d)(3)(C). Second, the rule is amended to require an individual debtor who has completed an instructional course concerning personal financial management to file the certificate of course completion (often called a Certificate of Debtor Education) issued by the approved provider of that course in lieu of filing an Official Form, if the provider has not notified the court that the debtor has completed the course."
+    p "The amendment to Rule 1007(c)(4) reflects the amendment to Rule 1007(b)(7) described above."
+    hash "077beb1bec9948ef717741be5e4f75a298481def463b61cbbe60850c9f2e2c45"
+  }
+  layers {
+    operative "8105ee9b18f698ca0c84f940b7f89a287954ef3a303b7262dacfadda574b4f27"
+    enacted "42577c47b2611bb69c79cd9b23d8233e3de0b9b52fe19e3affc445962278a988"
+    editorial "010971225e0d46e4bd14c9216cd23777ea2f10fba7e007dc4633ef3b282e901c"
+  }
+}

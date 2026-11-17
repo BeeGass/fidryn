@@ -1,0 +1,112 @@
+edition 2
+module "/us/usc/t45/s581...591" {
+  alias "/us/usc/t45/s581"
+  alias "/us/usc/t45/s582"
+  alias "/us/usc/t45/s583"
+  alias "/us/usc/t45/s584"
+  alias "/us/usc/t45/s585"
+  alias "/us/usc/t45/s586"
+  alias "/us/usc/t45/s587"
+  alias "/us/usc/t45/s588"
+  alias "/us/usc/t45/s589"
+  alias "/us/usc/t45/s590"
+  alias "/us/usc/t45/s591"
+  within "/us/usc/t45/ch14/schV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s581...591" section {
+    num "581 to 591" "§§ 581 to 591."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "d2fef0afe053c156c23778afb3cd56757c1e6dbcf1be88cdfb1fd5f259a9338c"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 581, " ["Pub. L. 91–518, title V, § 501" -> "/us/pl/91/518/tV/s501"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 647" -> "/us/stat/95/647"] "; amended " ["Pub. L. 100–457, title III, § 336" -> "/us/pl/100/457/tIII/s336"] ", Sept. 30, 1988, " ["102 Stat. 2153" -> "/us/stat/102/2153"] ", related to establishment and incorporation of Amtrak Commuter Services Corporation. See " ["section 24501 of Title 49" -> "/us/usc/t49/s24501"] ", Transportation."
+    hash "b8d73446be89152928f61145b2fe2380c9577c8871cfeaed4ab80ac551f83cb8"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 581, " ["Pub. L. 91–518, title V, § 501" -> "/us/pl/91/518/tV/s501"] ", Oct. 30, 1970, " ["84 Stat. 1338" -> "/us/stat/84/1338"] ", provided for appointment of a fifteen-man financial advisory panel by President, prior to repeal by " ["Pub. L. 94–25, § 9" -> "/us/pl/94/25/s9"] ", May 26, 1975, " ["89 Stat. 92" -> "/us/stat/89/92"] "."
+    hash "f254c3af67c2b588b6256d32c8d0e9ef389f97fc4144fd8061fc21f7991df293"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 582, " ["Pub. L. 91–518, title V, § 502" -> "/us/pl/91/518/tV/s502"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 648" -> "/us/stat/95/648"] ", related to Board of Directors and officers of Amtrak Commuter Services Corporation. See sections 24502 and 24503 of Title 49, Transportation."
+    hash "c3b12c65f8f503a5e9427dc0cf9781defef48fc89bec1f8ea4502d95263deb25"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 582, " ["Pub. L. 91–518, title V, § 502" -> "/us/pl/91/518/tV/s502"] ", Oct. 30, 1970, " ["84 Stat. 1338" -> "/us/stat/84/1338"] ", directed advisory panel to advise directors of Corporation on ways and means of increasing capitalization of Corporation, prior to repeal by " ["Pub. L. 94–25, § 9" -> "/us/pl/94/25/s9"] ", May 26, 1975, " ["89 Stat. 92" -> "/us/stat/89/92"] "."
+    hash "e073e2bcdba2602e48a958678047481968c9164ae92dead8733e7022e7995447"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 583, " ["Pub. L. 91–518, title V, § 503" -> "/us/pl/91/518/tV/s503"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 648" -> "/us/stat/95/648"] ", enumerated general powers of Amtrak Commuter Services Corporation. See sections 24501 and 24504 of Title 49, Transportation."
+    hash "92f90af31923ffd52bbcca56b2f1746e66d346b1e35f1000420a50131501401a"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 583, " ["Pub. L. 91–518, title V, § 503" -> "/us/pl/91/518/tV/s503"] ", Oct. 30, 1970, " ["84 Stat. 1338" -> "/us/stat/84/1338"] ", provided for a report to Congress by advisory panel, evaluating initial capitalization of Corporation, and prospects for increasing its capitalization, prior to repeal by " ["Pub. L. 94–25, § 9" -> "/us/pl/94/25/s9"] ", May 26, 1975, " ["89 Stat. 92" -> "/us/stat/89/92"] "."
+    hash "616bc23935fb2795ce3590e94f8b4dffe0533941a1eaf5178d1817afa4eeeb81"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 584, " ["Pub. L. 91–518, title V, § 504" -> "/us/pl/91/518/tV/s504"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 648" -> "/us/stat/95/648"] ", related to commuter services provided by Amtrak Commuter Services Corporation. See sections 24501, 24504, and 24505 of Title 49, Transportation."
+    hash "f6706a4c9c730770b9cca40eeff95f2898bd2d5e342f4c6a49e0be63e73add4e"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 585, " ["Pub. L. 91–518, title V, § 505" -> "/us/pl/91/518/tV/s505"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 650" -> "/us/stat/95/650"] "; amended " ["Pub. L. 97–468, title V, § 508" -> "/us/pl/97/468/tV/s508"] ", Jan. 14, 1983, " ["96 Stat. 2554" -> "/us/stat/96/2554"] ", related to duties and composition of Northeast Corridor Coordination Board."
+    hash "8c69b7ec1bc38672ec906786d5e000035fd83e282385d7d7aa197006f6b79552"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 586, " ["Pub. L. 91–518, title V, § 506" -> "/us/pl/91/518/tV/s506"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 650" -> "/us/stat/95/650"] ", related to transfers of property and commuter service to Amtrak Commuter Services Corporation and commuter authorities. See " ["section 24506 of Title 49" -> "/us/usc/t49/s24506"] ", Transportation."
+    hash "7a8df053cda5a520738e9f6e12aafe9725b478bdb488b409ef87969e640f2d8e"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 587, " ["Pub. L. 91–518, title V, § 507" -> "/us/pl/91/518/tV/s507"] ", as added " ["Pub. L. 97–35, title XI, § 1137" -> "/us/pl/97/35/tXI/s1137"] ", Aug. 13, 1981, " ["95 Stat. 652" -> "/us/stat/95/652"] ", exempted transfers of property and assumptions of service responsibilities pursuant to " ["section 586 of this title" -> "/us/usc/t45/s586"] " from judicial review."
+    hash "f14a6cc9a5d1883252be35c22258cb653423919364641b243f1ec716c6010d4e"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 588, " ["Pub. L. 91–518, title V, § 508" -> "/us/pl/91/518/tV/s508"] ", as added " ["Pub. L. 97–35, title XI, § 1145" -> "/us/pl/97/35/tXI/s1145"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] ", related to negotiations for implementing agreement governing transfer of Conrail employees."
+    hash "b737360af50a55c9a5c6b2b14ce5f7b62edca25cb2ddac7f7e90f4e3dd2ebc25"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 589, " ["Pub. L. 91–518, title V, § 509" -> "/us/pl/91/518/tV/s509"] ", as added " ["Pub. L. 97–35, title XI, § 1145" -> "/us/pl/97/35/tXI/s1145"] ", Aug. 13, 1981, " ["95 Stat. 671" -> "/us/stat/95/671"] ", established factfinding panel to recommend changes in operating practices to maximize productivity."
+    hash "74ffde842586e4eae434d46f59b740725f8f763baf2a6f71d95f6cb67d3b0d3a"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 590, " ["Pub. L. 91–518, title V, § 510" -> "/us/pl/91/518/tV/s510"] ", as added " ["Pub. L. 97–35, title XI, § 1145" -> "/us/pl/97/35/tXI/s1145"] ", Aug. 13, 1981, " ["95 Stat. 671" -> "/us/stat/95/671"] ", related to collective bargaining agreements for Amtrak Commuter Services Corporation or commuter authorities, contingency emergency boards, and dispute resolution procedures."
+    hash "0e205a0b432e6b07c09db95174ee17907718c0e4149ad4bf0c899c0c413d0679"
+  }
+  note "/us/usc/t45/s581...591/note/ungrouped/pl.91.518/noheading/14" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 591, " ["Pub. L. 91–518, title V, § 511" -> "/us/pl/91/518/tV/s511"] ", as added " ["Pub. L. 97–468, title V, § 509" -> "/us/pl/97/468/tV/s509"] ", Jan. 14, 1983, " ["96 Stat. 2554" -> "/us/stat/96/2554"] ", provided for applicability of laws to commuter authorities operating commuter services under this subchapter. See " ["section 24505 of Title 49" -> "/us/usc/t49/s24505"] ", Transportation."
+    hash "e5e42def2b557bbbe4f96abf8e8b4f14bbcd73ab6753d070ec5e8b1e5dde508c"
+  }
+  layers {
+    operative "d2fef0afe053c156c23778afb3cd56757c1e6dbcf1be88cdfb1fd5f259a9338c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3f0d2b294a6aaeba0a6786f62272dda36cef8a271a89ad6cdcf97b114c483bd1"
+  }
+}

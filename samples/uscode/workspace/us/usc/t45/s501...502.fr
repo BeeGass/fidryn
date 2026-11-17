@@ -1,0 +1,50 @@
+edition 2
+module "/us/usc/t45/s501...502" {
+  alias "/us/usc/t45/s501"
+  alias "/us/usc/t45/s502"
+  within "/us/usc/t45/ch14/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s501...502" section {
+    num "501 to 502" "§§ 501 to 502."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "bebed6389a8e4e07354123c0753a1a3064ad43b3b722734b2e1f228fd6254cb1"
+  }
+  note "/us/usc/t45/s501...502/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 501, " ["Pub. L. 91–518, title I, § 101" -> "/us/pl/91/518/tI/s101"] ", Oct. 30, 1970, " ["84 Stat. 1328" -> "/us/stat/84/1328"] "; " ["Pub. L. 96–73, title I, § 102" -> "/us/pl/96/73/tI/s102"] ", Sept. 29, 1979, " ["93 Stat. 537" -> "/us/stat/93/537"] "; " ["Pub. L. 97–35, title XI, § 1171" -> "/us/pl/97/35/tXI/s1171"] ", Aug. 13, 1981, " ["95 Stat. 687" -> "/us/stat/95/687"] ", related to congressional findings on needs for cost- and energy-efficient intercity rail passenger service. See " ["section 24101 of Title 49" -> "/us/usc/t49/s24101"] ", Transportation."
+    hash "3cf447c772e6d3dbf160451303ee95bfb559ef25e08645b9ffe503411f664138"
+  }
+  note "/us/usc/t45/s501...502/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 501a, " ["Pub. L. 91–518, title I, § 102" -> "/us/pl/91/518/tI/s102"] ", as added " ["Pub. L. 96–73, title I, § 103(a)" -> "/us/pl/96/73/tI/s103/a"] ", Sept. 29, 1979, " ["93 Stat. 537" -> "/us/stat/93/537"] "; amended " ["Pub. L. 97–35, title XI, § 1172" -> "/us/pl/97/35/tXI/s1172"] ", Aug. 13, 1981, " ["95 Stat. 688" -> "/us/stat/95/688"] ", enumerated goals established by Congress for Amtrak. See " ["section 24101 of Title 49" -> "/us/usc/t49/s24101"] "."
+    hash "27907e4ccbff7617b824899aa26435e685cb31cd2272daa29f7f10c2df8c11c7"
+  }
+  note "/us/usc/t45/s501...502/note/ungrouped/pl.91.518/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior " ["section 102 of Pub. L. 91–518" -> "/us/pl/91/518/s102"] " was renumbered section 103 and classified to " ["section 502 of this title" -> "/us/usc/t45/s502"] ", prior to repeal by " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] "."
+    hash "f27f7ba9d1aa4e0e93a9904a0ebc08879175724d599be7c9a3d6db4020e52c43"
+  }
+  note "/us/usc/t45/s501...502/note/ungrouped/pl.91.518/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 502, " ["Pub. L. 91–518, title I, § 103" -> "/us/pl/91/518/tI/s103"] ", formerly § 102, Oct. 30, 1970, " ["84 Stat. 1328" -> "/us/stat/84/1328"] "; " ["Pub. L. 93–146, § 2" -> "/us/pl/93/146/s2"] ", Nov. 3, 1973, " ["87 Stat. 548" -> "/us/stat/87/548"] "; renumbered § 103 and amended " ["Pub. L. 96–73, title I" -> "/us/pl/96/73/tI"] ", §§ 103(a), 104, Sept. 29, 1979, " ["93 Stat. 537" -> "/us/stat/93/537"] ", 538; " ["Pub. L. 97–35, title XI, § 1173" -> "/us/pl/97/35/tXI/s1173"] ", Aug. 13, 1981, " ["95 Stat. 689" -> "/us/stat/95/689"] "; " ["Pub. L. 99–272, title IV, § 4012" -> "/us/pl/99/272/tIV/s4012"] ", Apr. 7, 1986, " ["100 Stat. 109" -> "/us/stat/100/109"] "; " ["Pub. L. 102–533, § 8" -> "/us/pl/102/533/s8"] ", Oct. 27, 1992, " ["106 Stat. 3519" -> "/us/stat/106/3519"] ", defined terms for purposes of this chapter. See " ["section 24102 of Title 49" -> "/us/usc/t49/s24102"] ", Transportation."
+    hash "e8228bbb6ad36bd2024ad54f882998ad375fc8e1f2cd85076494922a31b5d30f"
+  }
+  note "/us/usc/t45/s501...502/note/statutoryNotes/pl.91.518/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 91–518, § 1" -> "/us/pl/91/518/s1"] ", Oct. 30, 1970, " ["84 Stat. 1327" -> "/us/stat/84/1327"] ", as amended by " ["Pub. L. 93–496, § 12" -> "/us/pl/93/496/s12"] ", Oct. 28, 1974, " ["88 Stat. 1531" -> "/us/stat/88/1531"] ", provided that " ["Pub. L. 91–518" -> "/us/pl/91/518"] " (enacting this chapter and " ["section 250 of Title 26" -> "/us/usc/t26/s250"] ", Internal Revenue Code, amending section 856 of former Title 31, Money and Finance, and enacting provision set out as a note under " ["section 250 of Title 26" -> "/us/usc/t26/s250"] ") could be cited as the “Rail Passenger Service Act”, prior to repeal by " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"] "."
+    hash "33a37a573bf7f1ce8e75d96a6b0f9fc2b2a5b4a2bcd04118fa02947c92916c31"
+  }
+  layers {
+    operative "bebed6389a8e4e07354123c0753a1a3064ad43b3b722734b2e1f228fd6254cb1"
+    enacted "bef195d6f6ad102085329a9b4e619e01ddeb8210a63a16a6bdaed31f9a9f50a4"
+    editorial "6780c3eecde97edecc1e46496d0797dbab43ad8c898f5fc7ca23bd0b6aeaa15f"
+  }
+}

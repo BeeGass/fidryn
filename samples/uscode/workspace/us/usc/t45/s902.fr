@@ -1,0 +1,72 @@
+edition 2
+module "/us/usc/t45/s902" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s902" section {
+    num "902" "§ 902."
+    heading "Definitions"
+    chapeau "As used in this chapter—"
+    provision "/us/usc/t45/s902/1" paragraph {
+      num "1" "(1)"
+      content "the term “bankruptcy court” means the court having jurisdiction over the reorganization of the Milwaukee Railroad;"
+      hash "c50038127e4da9d4876db371080558b951bf7da18857cdeb8c461c0e2bfd4615"
+    }
+    provision "/us/usc/t45/s902/2" paragraph {
+      num "2" "(2)"
+      content "the term “Board” means the Railroad Retirement Board;"
+      hash "ca17a0ec7013a4c424c1c7d0c9e3d3efdfdd67cb1f19fa28272d101332e94ccd"
+    }
+    provision "/us/usc/t45/s902/3" paragraph {
+      num "3" "(3)"
+      content "the term “Commission” means the Interstate Commerce Commission;"
+      hash "029440fcd641dd7f48b33e79b2f07f881d47dbe79927388468d4919bca28aad3"
+    }
+    provision "/us/usc/t45/s902/4" paragraph {
+      num "4" "(4)"
+      chapeau "the term “employee”—"
+      provision "/us/usc/t45/s902/4/A" subparagraph {
+        num "A" "(A)"
+        content "includes any employee of the Milwaukee Railroad who worked on a line of such railroad the sale of which became effective on October 1, 1979; but"
+        hash "da59e650aa391b03e575f8b6b153dd5e7e3981baf2332853ab016b782c2913dc"
+      }
+      provision "/us/usc/t45/s902/4/B" subparagraph {
+        num "B" "(B)"
+        content "does not include any individual serving as president, vice-president, secretary, treasurer, comptroller, counsel, member of the board of directors, or any other person performing such functions;"
+        hash "35ccc3f75c30499d67d5cb8ea520acb630aa91f9471fdb55955b8cc038158107"
+      }
+      hash "00e0992ac9826339e4a03353561927c0498b50a0fed4158a079d58b669deefc6"
+    }
+    provision "/us/usc/t45/s902/5" paragraph {
+      num "5" "(5)"
+      content "the term “Milwaukee Railroad” means the Chicago, Milwaukee, St. Paul and Pacific Railroad Company; and"
+      hash "878653f829f03ac84ee995ef968ff28b2ef4dedf3b278f1fb6e4fc42cec6e45c"
+    }
+    provision "/us/usc/t45/s902/6" paragraph {
+      num "6" "(6)"
+      content "the term “restructured Milwaukee Railroad” means the entity that is designated as the reorganized railroad under the reorganization plan for the Milwaukee Railroad finally certified by the Commission."
+      hash "79d1dc7100da0505958491af9de84f9406b9dfe7946f8ce8f94daf8f74a35a11"
+    }
+    hash "7fa7186b62685bfb676e74ff61b0d296de2d5b5598a7695aa7c607eb5f187e3c"
+  }
+  credit "(" ["Pub. L. 96–101, § 3" -> "/us/pl/96/101/s3"] ", Nov. 4, 1979, " ["93 Stat. 736" -> "/us/stat/93/736"] "; " ["Pub. L. 96–254, title I, § 123" -> "/us/pl/96/254/tI/s123"] ", May 30, 1980, " ["94 Stat. 409" -> "/us/stat/94/409"] ".)"
+  note "/us/usc/t45/s902/note/editorialNotes/pl.96.254/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1980—Par. (6). " ["Pub. L. 96–254" -> "/us/pl/96/254"] " redefined “restructured Milwaukee Railroad” to mean the entity that is designated as the reorganized railroad under the reorganization plan for the Milwaukee Railroad finally certified by the Commission."
+    hash "7998937af1af20fbccb5e16c8ac13e9175a33a416502117d603a58e2a9fde71c"
+  }
+  note "/us/usc/t45/s902/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "7fa7186b62685bfb676e74ff61b0d296de2d5b5598a7695aa7c607eb5f187e3c"
+    enacted "77460fecd27a3d8c7a1409effc5b8609cf0e9d1092f53c08df757cda669be5b1"
+    editorial "e1012ab5a61d15657a48b82cae158fb4f50ad19b7b0561203d1f69a66287caa2"
+  }
+}

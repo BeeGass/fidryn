@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7065" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7065" courtRule {
+    num "7065" "Rule 7065."
+    heading "Injunctions"
+    content "Fed. R. Civ. P. 65 applies in an adversary proceeding. But on application of a debtor, trustee, or debtor in possession, the court may issue a temporary restraining order or preliminary injunction without complying with subdivision (c) of that rule."
+    hash "d8bdc6ece3c6c5aa9ef0e81f3206718c12494b8b6c94cf2c87fc9c42d00a6dbb"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7065/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7065 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f8f3ea9741f6bd75adbcfa706dcbb5ac1885d9724c1cb79543b042c24d55b795"
+  }
+  note "/us/usc/ptVII/rule7065/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "d8bdc6ece3c6c5aa9ef0e81f3206718c12494b8b6c94cf2c87fc9c42d00a6dbb"
+    enacted "9833d42667e9222350ceb99f5dad2cc0c6a0c64d1d785d7032943044ece7174c"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

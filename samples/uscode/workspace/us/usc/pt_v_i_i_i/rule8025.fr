@@ -1,0 +1,95 @@
+edition 2
+module "/us/usc/ptVIII/rule8025" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8025" courtRule {
+    num "8025" "Rule 8025."
+    heading "Staying a District Court or BAP Judgment"
+    provision "/us/usc/ptVIII/rule8025/a" subsection {
+      num "a" "(a)"
+      heading "Automatic Stay of a Judgment on Appeal."
+      content "Unless the district court or BAP orders otherwise, its judgment is stayed for 14 days after its entry."
+      hash "ebb54c44eab1b8ebf929dfe442cb27cbd8bf3841af8a8d34fbda37eea1568c9f"
+    }
+    provision "/us/usc/ptVIII/rule8025/b" subsection {
+      num "b" "(b)"
+      heading "Stay Pending an Appeal to the United States Court of Appeals."
+      provision "/us/usc/ptVIII/rule8025/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. On a party’s motion with notice to all other parties to the appeal, the district court or BAP may stay its judgment pending an appeal to the court of appeals."
+        hash "e40be148d5076b5f311caffcb06917315c93f7f3233c7e674a52a46c51825ac4"
+      }
+      provision "/us/usc/ptVIII/rule8025/b/2" paragraph {
+        num "2" "(2)"
+        content "Time Limit. Except for cause, the stay must not exceed 30 days after the judgment is entered."
+        hash "10cfd670b068318a8003ac258b53082201dbee6c7eee61ee1b2415c965aa8efb"
+      }
+      provision "/us/usc/ptVIII/rule8025/b/3" paragraph {
+        num "3" "(3)"
+        content "Stay Continued When an Appeal Is Filed. If, before a stay expires, the party who obtained it appeals to a court of appeals, the stay continues until final disposition by the court of appeals."
+        hash "d5866165aaddb7749b98c2bb257bcc4557caaf6147012535ef5974b59cf1f0e2"
+      }
+      provision "/us/usc/ptVIII/rule8025/b/4" paragraph {
+        num "4" "(4)"
+        content "Bond or Other Security. A bond or other security may be required as a condition for granting or continuing a stay. If a trustee obtains a stay, a bond or other security may be required. But neither is required if a stay is obtained by the United States or its officer or agency, or by direction of any department of the United States government."
+        hash "85047e365def7acb1541385c352caf336d00db801a0653123910ff1093c6d1c0"
+      }
+      hash "35bb2781dd7040b7437ae05675e7127dd9da275eb4733467ff8223f4ad2c9b9f"
+    }
+    provision "/us/usc/ptVIII/rule8025/c" subsection {
+      num "c" "(c)"
+      heading "Automatic Stay of the Bankruptcy Court’s Order, Judgment, or Decree."
+      content "If the district court or BAP enters a judgment affirming the bankruptcy court’s order, judgment, or decree, a stay of the district court’s or BAP’s judgment automatically stays the bankruptcy court’s order, judgment, or decree while the appellate stay is in effect."
+      hash "3ba55c586aa338c16bc4fbdc7f18be9b274f013d85881eb155236734056df24e"
+    }
+    provision "/us/usc/ptVIII/rule8025/d" subsection {
+      num "d" "(d)"
+      heading "Power of a Court of Appeals or Its Judges Not Limited."
+      chapeau "This rule does not limit the power of a court of appeals or any of its judges to:"
+      provision "/us/usc/ptVIII/rule8025/d/1" paragraph {
+        num "1" "(1)"
+        content "stay a judgment pending appeal;"
+        hash "2b2c6d7ac96dd0ef05ecdd4a497a023f925c4e8a9cea5ad9a212163d77c8bc2a"
+      }
+      provision "/us/usc/ptVIII/rule8025/d/2" paragraph {
+        num "2" "(2)"
+        content "stay proceedings while an appeal is pending;"
+        hash "af4c67b33a1f53a97774bf87c9e3b01a4d5820afdaaa8ac69732e03a2f4d7b61"
+      }
+      provision "/us/usc/ptVIII/rule8025/d/3" paragraph {
+        num "3" "(3)"
+        content "suspend, modify, restore, vacate, or grant a stay or injunction while an appeal is pending; or"
+        hash "953c826d5714c9aa508e25c848adab972753af60896afc91932cf4f124926a1a"
+      }
+      provision "/us/usc/ptVIII/rule8025/d/4" paragraph {
+        num "4" "(4)"
+        content "issue any order appropriate to preserve the status quo or the effectiveness of any judgment that might be entered."
+        hash "1ef1b9890adbaab374342e9b2c1f5f32ee565b2c87e3cbcb363fe29c3c3508d4"
+      }
+      hash "efdcdd29d6580bfc751ac33f17665c47340249fe7e7e4835dd6aead00043ea83"
+    }
+    hash "6646a4ba0e2cc0b38a1cf60409b4a63b96271625099491a47993c15cad7868e7"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8025/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8017. Most of the changes to the former rule are stylistic. Subdivision (c) is new. It provides that if a district court or BAP affirms the bankruptcy court ruling and the appellate judgment is stayed, the bankruptcy court’s order, judgment, or decree that is affirmed on appeal is automatically stayed to the same extent as the stay of the appellate judgment."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "beb1ca816ec6017fdd606787b414ae4e0f17454c3db44db41d136c2383b5da0e"
+  }
+  note "/us/usc/ptVIII/rule8025/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8025 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ded6a38f84e96176796ac5755afa57f30da56b13ca2cfd8dcbec95a7d253776f"
+  }
+  layers {
+    operative "6646a4ba0e2cc0b38a1cf60409b4a63b96271625099491a47993c15cad7868e7"
+    enacted "398ceac7fbbe6d5a51165ce99dd4060ee27ccf50bbe8b21f8763119302cb52bd"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

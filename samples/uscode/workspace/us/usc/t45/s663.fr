@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s663" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s663" section {
+    num "663" "§ 663."
+    heading "Inspection of accounts, books, etc., of railroad receiving financial assistance"
+    content "The Secretary is authorized to, and shall as necessary, inspect and copy all accounts, books, records, memorandums, correspondence, and other documents of any railroad which has received financial assistance under this chapter concerning any matter which may bear upon (1) the ability of such railroad to repay the loan within the time fixed therefor, (2) the interest of the United States in the property of such railroad, and (3) to insure that the purpose of this chapter is being carried out."
+    hash "9c360f5156ccd652b816e7b3941641cb46e5cafa7cdd60bff46712b9bdfbd7b4"
+  }
+  credit "(" ["Pub. L. 91–663, § 4" -> "/us/pl/91/663/s4"] ", Jan. 8, 1971, " ["84 Stat. 1976" -> "/us/stat/84/1976"] ".)"
+  layers {
+    operative "9c360f5156ccd652b816e7b3941641cb46e5cafa7cdd60bff46712b9bdfbd7b4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7914c17ed0c335254d373c93aac2dd97ca6de721ecb0485904ecf8d1d33baf9f"
+  }
+}

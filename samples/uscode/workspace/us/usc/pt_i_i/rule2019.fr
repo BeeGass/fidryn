@@ -1,0 +1,226 @@
+edition 2
+module "/us/usc/ptII/rule2019" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2019" courtRule {
+    num "2019" "Rule 2019."
+    heading "Disclosures by Groups, Committees, and Other Entities in a Chapter 9 or 11 Case"
+    provision "/us/usc/ptII/rule2019/a" subsection {
+      num "a" "(a)"
+      heading "Definitions."
+      chapeau "In this Rule 2019:"
+      provision "/us/usc/ptII/rule2019/a/1" paragraph {
+        num "1" "(1)"
+        content "“disclosable economic interest” means any claim, interest, pledge, lien, option, participation, derivative instrument, or other right or derivative right granting the holder an economic interest that is affected by the value, acquisition, or disposition of a claim or interest; and"
+        hash "1eb39989cbf0409a8ec5450d5dc32cca0f0587084f2d94464244738973df7d6c"
+      }
+      provision "/us/usc/ptII/rule2019/a/2" paragraph {
+        num "2" "(2)"
+        content "“represent” or “represents” means to take a position before the court or to solicit votes regarding a plan’s confirmation on another’s behalf."
+        hash "bd14cea65ae2a37049f547cdb7b21fdeca4121c41f5bf6f6f712ceb4f6dcde71"
+      }
+      hash "e6ed8cd6a6f6cff69d1fd13430bc50171591d0116d2e1e05d5fffd4bd5d984a7"
+    }
+    provision "/us/usc/ptII/rule2019/b" subsection {
+      num "b" "(b)"
+      heading "Who Must Disclose."
+      provision "/us/usc/ptII/rule2019/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. In a Chapter 9 or 11 case, a verified statement containing the information listed in (c) must be filed by every group or committee consisting of or representing—and every entity representing—multiple creditors or equity security holders that are:"
+        provision "/us/usc/ptII/rule2019/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "acting in concert to advance their common interests; and"
+          hash "6a2d26106c0f90a395efc0782d1ae2c14e1eed1efb70ebccb1862e77be52d07b"
+        }
+        provision "/us/usc/ptII/rule2019/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "not composed entirely of affiliates or insiders of one another."
+          hash "6242c9c80b99a6eb26862790cc191f04bf00e61326d1089717d912cc2294503b"
+        }
+        hash "a078b943ec5120229629ed7b368c8565822645d375af39420876f9e867271bfc"
+      }
+      provision "/us/usc/ptII/rule2019/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "When a Disclosure Statement Is Not Required. Unless the court orders otherwise, an entity need not file the statement described in (1) solely because it is:"
+        provision "/us/usc/ptII/rule2019/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "an indenture trustee;"
+          hash "989a6bf2e446380fe62e1db6d7fe69b3e94daae60bf8fbd1cec9c17b7f097ad6"
+        }
+        provision "/us/usc/ptII/rule2019/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "an agent for one or more other entities under an agreement to extend credit;"
+          hash "61bd08f94e6c2e0cc8a7b370e906ea0380dcbc2da40e7f77319afe55b45b7f81"
+        }
+        provision "/us/usc/ptII/rule2019/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "a class-action representative; or"
+          hash "5c1469bff7ffb5d42b1115889bd2d2824c827d24d059cafdcf22b6eb72341eef"
+        }
+        provision "/us/usc/ptII/rule2019/b/2/D" subparagraph {
+          num "D" "(D)"
+          content "a governmental unit that is not a person."
+          hash "3c648f8cf0baa93d0f30146d58cd3b81e6888776a7b1e8367461eab65454dfa5"
+        }
+        hash "8a6ebf4392e65584ba10840eb137cc52a42fe5992f358ac9f23454de3ed21ecf"
+      }
+      hash "77a940ceeab9eb722de078033374bd82cce05b18037dd20733f7583638297018"
+    }
+    provision "/us/usc/ptII/rule2019/c" subsection {
+      num "c" "(c)"
+      heading "Required Information."
+      chapeau "The verified statement must include:"
+      provision "/us/usc/ptII/rule2019/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "the pertinent facts and circumstances concerning:"
+        provision "/us/usc/ptII/rule2019/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "for a group or committee (except a committee appointed under § 1102 or § 1114), its formation, including the name of each entity at whose instance it was formed or for whom it has agreed to act; or"
+          hash "a73ccb1c8d96a7b2140621138acd1662f609e55f4402f69b189a3332195c401b"
+        }
+        provision "/us/usc/ptII/rule2019/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "for an entity, the entity’s employment, including the name of each creditor or equity security holder at whose instance the employment was arranged;"
+          hash "0362d2a2ff3ab6a9c9a95f7b67fd5994abc87c3b483d3c5e60027670d03a8fbe"
+        }
+        hash "337d93b7cf3c5eade2b61997816fe3ddd7d5d74cebd78528dacd735fd536d502"
+      }
+      provision "/us/usc/ptII/rule2019/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "if not disclosed under (1), for each member of a group or committee and for an entity:"
+        provision "/us/usc/ptII/rule2019/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "name and address;"
+          hash "6144acec6f73e027cf2c1f09329ae41ea20d17a8c0db31b08436ff7faf55185e"
+        }
+        provision "/us/usc/ptII/rule2019/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "the nature and amount of each disclosable economic interest held in relation to the debtor when the group or committee was formed or the entity was employed; and"
+          hash "4e70f54fa492283a28055a64511ad3937e9c6db19f2d491322a5f53109b03450"
+        }
+        provision "/us/usc/ptII/rule2019/c/2/C" subparagraph {
+          num "C" "(C)"
+          content "for each member of a group or committee claiming to represent any entity in addition to its own members (except a committee appointed under § 1102 or § 1114), the quarter and year in which each disclosable economic interest was acquired—unless it was acquired more than 1 year before the petition was filed;"
+          hash "a956d2b5f09b4c014029b2c568b6c1058092113d958f58d4ed1691fa3f892acc"
+        }
+        hash "a1ea24de35f0432659349e624fff0ed87a0dbd2db9a567fc424d4353064ce4c4"
+      }
+      provision "/us/usc/ptII/rule2019/c/3" paragraph {
+        num "3" "(3)"
+        chapeau "if not disclosed under (1) or (2), for each creditor or equity security holder represented by an entity, group, or committee (except a committee appointed under § 1102 or § 1114):"
+        provision "/us/usc/ptII/rule2019/c/3/A" subparagraph {
+          num "A" "(A)"
+          content "name and address; and"
+          hash "751ac42cc7a7892dcd9ebc94f02c8a8eb25c450cc8c3503d1d091c9e6d5d2925"
+        }
+        provision "/us/usc/ptII/rule2019/c/3/B" subparagraph {
+          num "B" "(B)"
+          content "the nature and amount of each disclosable economic interest held in relation to the debtor on the statement’s date; and"
+          hash "5723cf87cf0c2e60859c82a4945c2f7da99c90737cbfde57b172a0792a6540af"
+        }
+        hash "2722704c3620f3d7003554a7c06953cb75591a67460857197ff838ea3aa5b3b0"
+      }
+      provision "/us/usc/ptII/rule2019/c/4" paragraph {
+        num "4" "(4)"
+        content "a copy of any instrument authorizing the group, committee, or entity to act on behalf of creditors or equity security holders."
+        hash "6de2e0ec759a684e2dde1693dbea0df9660b9ff31b3f34f9d55e1fdaadfb6a99"
+      }
+      hash "2961001a16f1441f635d6b5f1592ba641a60dad88622605e94a0f2a4c3448207"
+    }
+    provision "/us/usc/ptII/rule2019/d" subsection {
+      num "d" "(d)"
+      heading "Supplemental Statement."
+      content "If a fact disclosed in its most recent statement has changed materially, a group, committee, or entity must file a verified supplemental statement whenever it takes a position before the court or solicits votes on a plan’s confirmation. The supplemental statement must set forth any material changes in the information specified in (c)."
+      hash "d6d4c2dc14472c84fc7f208b72f8309d57e5f4b36e00e12e075d558425bc557f"
+    }
+    provision "/us/usc/ptII/rule2019/e" subsection {
+      num "e" "(e)"
+      heading "Failure to Comply; Sanctions."
+      provision "/us/usc/ptII/rule2019/e/1" paragraph {
+        num "1" "(1)"
+        content "Failure to Comply. On a party in interest’s motion, or on its own, the court may determine whether there has been a failure to comply with this Rule 2019."
+        hash "658ebfc7657235b6ed7d2ea2de33c6cdcd459d6aebd8386fa06ff81d2398ad31"
+      }
+      provision "/us/usc/ptII/rule2019/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Sanctions. If the court finds a failure to comply, it may:"
+        provision "/us/usc/ptII/rule2019/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "refuse to permit the group, committee, or entity to be heard or to intervene in the case;"
+          hash "cd9e0c7bd14a9a68e331c3deb1dd48c09bbd9ce117855798f72d6c2d467b0dee"
+        }
+        provision "/us/usc/ptII/rule2019/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "hold invalid any authority, acceptance, rejection, or objection that the group, committee, or entity has given, procured, or received; or"
+          hash "3d4cc8df55e825ba18cfadf2e8e5a87c2e299735b108a3636d433ae4f6f099e6"
+        }
+        provision "/us/usc/ptII/rule2019/e/2/C" subparagraph {
+          num "C" "(C)"
+          content "grant other appropriate relief."
+          hash "1069c95a7ead5520f603667b75e3dba068266172c9c1c412a8a985698ec4554a"
+        }
+        hash "013e0c3a51ac378de58ac595167483af41de3e226335df44d3af1c99581219a9"
+      }
+      hash "5c0a6337b0fc26d24991546562b98595733537bfe63959748c266621d1df2353"
+    }
+    hash "a3ab44e013f5d0ab04f1cccc6502a7d07bc07c7f329a4b9ae7c344775d634633"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is a comprehensive regulation of representation in chapter 9 municipality and in chapter 11 reorganization cases. It is derived from §§ 209–213 of the Act and former Chapter X Rule 10–211."
+    p "Subdivision (b) is derived from §§ 212, 213 of the Act. As used in clause (2), “other authorization” would include a power or warrant of attorney which are specifically mentioned in § 212 of the Act. This rule deals with representation provisions in mortgages, trust deeds, etc. to protect the beneficiaries from unfair practices and the like. It does not deal with the validation or invalidation of security interests generally. If immediate compliance is not possible, the court may permit a representative to be heard on a specific matter, but there is no implicit waiver of compliance on a permanent basis."
+    hash "93b84afd4430ca923ae4e19a6ea08fb82b57832cdfe267ca1b22d194260b8ed9"
+  }
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to exclude from the requirements of this rule committees of retired employees appointed pursuant to § 1114 of the Code. The words “with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "6b7961a050b79cadfc0eacaf2c0e4dde1212e37883abb1843d472e47afdf3736"
+  }
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011 Amendment"
+    p "The rule is substantially amended to expand the scope of its coverage and the content of its disclosure requirements. Stylistic and organizational changes are also made in order to provide greater clarity. Because the rule no longer applies only to representatives of creditors and equity security holders, the title of the rule has been changed to reflect its broadened focus on disclosure of financial information in chapter 9 and chapter 11 cases."
+    p "Subdivision (a). The content of subdivision (a) is new. It sets forth two definitions. The first is the definition of the term “disclosable economic interest,” which is used in subdivisions (c)(2) and (c)(3). The definition of the term is intended to be sufficiently broad to cover any economic interest that could affect the legal and strategic positions a stakeholder takes in a chapter 9 or chapter 11 case. A disclosable economic interest extends beyond claims and interests owned by a stakeholder and includes, among other types of holdings, short positions, credit default swaps, and total return swaps."
+    p "The second definition is of “represent” or “represents.” The definition provides that representation requires active participation in the case or in a proceeding on behalf of another entity—either by taking a position on a matter before the court or by soliciting votes on the confirmation of a plan. Thus, for example, an attorney who is retained and consulted by a creditor or equity security holder to monitor the case, but who does not advocate any position before the court or engage in solicitation activities on behalf of that client, does not represent the creditor or equity security holder for purposes of this rule."
+    p "Subdivision (b). Subdivision (b)(1) specifies who is covered by the rule’s disclosure requirements. In addition to an entity, group, or committee that represents more than one creditor or equity security holder, the amendment extends the rule’s coverage to groups or committees that consist of more than one creditor or equity security holder. The rule no longer excludes official committees, except as specifically indicated. The rule applies to a group of creditors or equity security holders that act in concert to advance common interests (except when the group consists exclusively of affiliates or insiders of one another), even if the group does not call itself a committee."
+    p "Subdivision (b)(2) excludes certain entities from the rule’s coverage. Even though these entities may represent multiple creditors or equity security holders, they do so under formal legal arrangements of trust or contract law that preclude them from acting on the basis of conflicting economic interests. For example, an indenture trustee’s responsibilities are defined by the indenture, and individual interests of bondholders would not affect the trustee’s representation."
+    p "Subdivision (c). Subdivision (c) sets forth the information that must be included in a verified statement required to be filed under this rule. Subdivision (c)(1) continues to require disclosure concerning the formation of a committee or group, other than an official committee, and the employment of an entity."
+    p "Subdivision (c)(2) specifies information that must be disclosed with respect to the entity and each member of the committee and group filing the statement. In the case of a committee or group, the information about the nature and amount of a disclosable economic interest must be specifically provided on a member-by-member basis, and not in the aggregate. The quarter and year in which each disclosable economic interest was acquired by each member of a committee or group (other than an official committee) that claims to represent others must also be specifically provided, except for a disclosable economic interest acquired more than a year before the filing of the petition. Although the rule no longer requires the disclosure of the precise date of acquisition or the amount paid for disclosable economic interests, nothing in this rule precludes either the discovery of that information or its disclosure when ordered by the court pursuant to authority outside this rule."
+    p "Subdivision (c)(3) specifies information that must be disclosed with respect to creditors or equity security holders that are represented by an entity, group, or committee. This provision does not apply with respect to those represented by official committees. The information required to be disclosed under subdivision (c)(3) parallels that required to be disclosed under subdivision (c)(2)(A) and (B). The amendment also clarifies that under (c)(3) the nature and amount of each disclosable economic interest of represented creditors and shareholders must be stated as of the date of the verified statement."
+    p "Subdivision (c)(4) requires the attachment of any instrument authorizing the filer of the verified statement to act on behalf of creditors or equity security holders."
+    p "Subdivision (d). Subdivision (d) requires the filing of a supplemental statement at the time an entity, group, or committee takes a position before the court or solicits votes on a plan if there has been a material change in any of the information contained in its last filed statement. The supplemental verified statement must set forth the material changes that have occurred regarding the information required to be disclosed by subdivision (c) of this rule."
+    p "Subdivision (e). Subdivision (e) addresses the court’s authority to determine whether there has been a violation of this rule and to impose a sanction for any violation. It no longer addresses the court’s authority to determine violations of other applicable laws regulating the activities and personnel of an entity, group, or committee."
+    p "Changes Made After Publication."
+    p "Subdivision (a). A definition of “represent” or “represents” was added, and the subdivision was divided into paragraphs (1) and (2)."
+    p "Subdivision (b). The provision authorizing the court to require disclosure by an entity that seeks or opposes the granting of relief was deleted."
+    p "In the paragraph now designated as (1), language was added providing that groups, committees, and entities are covered by the rule only if they consist of or represent multiple creditors or equity security holders “that are (A) acting in concert to advance their common interests, and (B) not composed entirely of affiliates or insiders of one another.” The phrase “and, unless the court directs otherwise, every indenture trustee,” was deleted."
+    p "Subdivision (b)(2) was added to specify entities that are not required to file a verified statement merely because they act in one of the designated capacities."
+    p "Subdivision (c). The authorization in subdivision (c)(2)(B) and (c)(3)(B) for the court to require the disclosure of the amount paid for a disclosable economic interest was deleted."
+    p "The requirement in subdivision (c)(2)(C) and (c)(3)(C) for disclosure of the acquisition date of each disclosable economic interest was modified. The requirement was made applicable only to members of an unofficial group or committee that claims to represent any entity in addition to the members of the group or committee, and the date that must be disclosed was limited to the quarter and year of acquisition."
+    p "Subdivision (d). The requirement of monthly supplementation of a verified statement was modified to require supplementation whenever a covered group, committee, or entity takes a position before the court or solicits votes on the confirmation of a plan and there has been a material change in any fact disclosed in its most recently filed statement."
+    p "Subdivision (e). The provisions published as subdivision (e)(1)(B) and (C), which authorized the court to determine failures to comply with legal requirements other than those imposed by Rule 2019, were deleted."
+    p "Subdivision (e)(2), which enumerated the materials the court could examine in making a determination of noncompliance, was deleted."
+    p "Committee Note. In the discussion of the definition of “disclosable economic interest,” the specific examples of “short positions, credit default swaps, and total return swaps” were added to illustrate the breadth of the definition. A sentence was added to the discussion of subdivision (c)(2) that states that the rule does not affect the right of a party to obtain information by means of discovery or as ordered by the court under any authority outside the rule."
+    p "Other changes. Stylistic and organizational changes were made throughout the rule and Committee Note to reduce the length and clarify the meaning of the published proposal."
+    hash "e219d871eca3b524d29300070f331654f5e7f0b47b91cb8cbb9a21a58d1e08b2"
+  }
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "68456b1d2e82dd5ab9a070431399dc7d2a6633ac3c06bdc43a408e526457983f"
+  }
+  layers {
+    operative "a3ab44e013f5d0ab04f1cccc6502a7d07bc07c7f329a4b9ae7c344775d634633"
+    enacted "3e9a6ec4b3edcaeb4abe433e841184f70dd40e150db6624a61062f98065aae1e"
+    editorial "48a56cea9282c51d3df04d156badb198351ba51f814d9751c6475b9302c7b010"
+  }
+}

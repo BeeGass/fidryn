@@ -1,0 +1,197 @@
+edition 2
+module "/us/usc/ptIII/rule3018" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3018" courtRule {
+    num "3018" "Rule 3018."
+    heading "Chapter 9 or 11—Accepting or Rejecting a Plan"
+    provision "/us/usc/ptIII/rule3018/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      provision "/us/usc/ptIII/rule3018/a/1" paragraph {
+        num "1" "(1)"
+        content "Who May Accept or Reject a Plan. Within the time set by the court under Rule 3017, 3017.1, or 3017.2, a claim holder or equity security holder may accept or reject a Chapter 9 or Chapter 11 plan under § 1126."
+        hash "34eca2012ab1fcd35b476c7e4271b92857730402f6dd32d509fcc171bed77b56"
+      }
+      provision "/us/usc/ptIII/rule3018/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Claim Based on a Security of Record. Subject to (b), an equity security holder or creditor whose claim is based on a security of record may accept or reject a plan only if the equity security holder or creditor is the holder of record:"
+        provision "/us/usc/ptIII/rule3018/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "on the date the order approving the disclosure statement is entered; or"
+          hash "8b8087e4c31122a8caaddea53b23b2cc8b8aa44c2922e7535ba33877e662d51e"
+        }
+        provision "/us/usc/ptIII/rule3018/a/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "on another date the court sets:"
+          provision "/us/usc/ptIII/rule3018/a/2/B/i" clause {
+            num "i" "(i)"
+            content "under Rule 3017.2; or"
+            hash "6fb26d91b0cfa7826f57bdb592cb222cbe2b2a94c64aad9d4c15935939a9c151"
+          }
+          provision "/us/usc/ptIII/rule3018/a/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "after notice and a hearing and for cause."
+            hash "caa840b3cf0a0923f2b3b636d5d5ed8169e16c73c063ed8109ae10a3203b61c1"
+          }
+          hash "edaee0f7ec4959dce0f37658ed5ed75cd4b3af9fcad00a441e23730a3255f2ab"
+        }
+        hash "30c149ea5f609023c8f91c6c826103d4e4e22f563fe2d92a5ee8f4c8fbf91ad7"
+      }
+      provision "/us/usc/ptIII/rule3018/a/3" paragraph {
+        num "3" "(3)"
+        content "Changing or Withdrawing an Acceptance or Rejection. After notice and a hearing and for cause, the court may permit a creditor or equity security holder to change or withdraw an acceptance or rejection."
+        hash "3f1508396f1cfeeac4083d8a313863a3733817dfe116f4cb17ce5592eb5252b9"
+      }
+      provision "/us/usc/ptIII/rule3018/a/4" paragraph {
+        num "4" "(4)"
+        content "Temporarily Allowing a Claim or Interest. Even if an objection to a claim or interest has been filed, the court may, after notice and a hearing, temporarily allow a claim or interest in an amount that the court considers proper for voting to accept or reject a plan."
+        hash "0a12b190eefbd1ed3d14999b36719c6ce229034256e4b235156c3bc6edcaf65e"
+      }
+      hash "65652e750aa77b2dc3f2f1528d9b8ee1cbe696ecbfd501b88184c78f0e2a9d36"
+    }
+    provision "/us/usc/ptIII/rule3018/b" subsection {
+      num "b" "(b)"
+      heading "Treatment of Acceptances or Rejections Obtained Before the Petition Was Filed."
+      provision "/us/usc/ptIII/rule3018/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Acceptance or Rejection by a Nonholder of Record. An equity security holder or creditor who accepted or rejected a plan before the petition was filed will not be considered to have accepted or rejected the plan under § 1126(b) if the equity security holder or creditor:"
+        provision "/us/usc/ptIII/rule3018/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "has a claim or interest based on a security of record; and"
+          hash "cca11ebdf5e519f57152fff115446407620e53b7726d914f83e854813ef7ffbf"
+        }
+        provision "/us/usc/ptIII/rule3018/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "was not the security’s holder of record on the date specified in the solicitation of the acceptance or rejection."
+          hash "dd8288a181826a7210a2106e7035b037d84317f52c98068c5b39c97e0d458cad"
+        }
+        hash "f1429ecf742a5820fa3b2278cb726ebd68a799a022c304ce971fc5f717f52f6d"
+      }
+      provision "/us/usc/ptIII/rule3018/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Defective Solicitations. A holder of a claim or interest who accepted or rejected a plan before the petition was filed will not be considered to have accepted or rejected the plan if the court finds, after notice and a hearing, that:"
+        provision "/us/usc/ptIII/rule3018/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "the plan was not sent to substantially all creditors and equity security holders of the same class;"
+          hash "8e3e7315e0f5ab93be6cf7f72e18da69ddc4a76aea46b781f0ea1482203d01cf"
+        }
+        provision "/us/usc/ptIII/rule3018/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "an unreasonably short time was prescribed for those creditors and equity security holders to accept or reject the plan; or"
+          hash "78273f815cb3ea767810ce8c415a40c5d8866b910dcc1bea33ae96a2544ed2da"
+        }
+        provision "/us/usc/ptIII/rule3018/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "the solicitation did not comply with § 1126(b)."
+          hash "b3a75d0ff056ced8534ede9ac7a3a41bd0b7953f1ed463de1f24dab9718ed969"
+        }
+        hash "fe623c2e05faafe161dda7d389f1a4afdd6c839a8ab46918418f93c09a570e87"
+      }
+      hash "b3234143de02f3537571383b587c11ca0f3350df8b9ef6c54a0e356a95bc724c"
+    }
+    provision "/us/usc/ptIII/rule3018/c" subsection {
+      num "c" "(c)"
+      heading "Form for Accepting or Rejecting a Plan; Procedure When More Than One Plan Is Filed."
+      provision "/us/usc/ptIII/rule3018/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Form. An acceptance or rejection of a plan must:"
+        provision "/us/usc/ptIII/rule3018/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "be in writing;"
+          hash "c1ff8a84c785dc5c9745e55d07b38e897414aec68c7ea42ff7aae7f556c05dff"
+        }
+        provision "/us/usc/ptIII/rule3018/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "identify the plan or plans;"
+          hash "c76dc3e074b9a90c6644da850eb5a18a4f2ce18ed2b6e7988e802cbf03b8b227"
+        }
+        provision "/us/usc/ptIII/rule3018/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "be signed by the creditor or equity security holder—or an authorized agent; and"
+          hash "b93d352853d01eddbc202a5a67e3d4cd4f34542b9cd1d6915e59af8a396b3548"
+        }
+        provision "/us/usc/ptIII/rule3018/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "conform to Form 314."
+          hash "65ae980ff13d694ea1916b402f6da6f8abe39bfee5775141a98ae158bb9fdc97"
+        }
+        hash "481f394ecf1292eabbbebd67d8f43499d7c2d880974fe626b9744153e8404dae"
+      }
+      provision "/us/usc/ptIII/rule3018/c/2" paragraph {
+        num "2" "(2)"
+        content "When More Than One Plan Is Distributed. If more than one plan is sent under Rule 3017, a creditor or equity security holder may accept or reject one or more plans and may indicate preferences among those accepted."
+        hash "bc783586076a3c61118be826c266940f47ae439bde0e6fbbb02b8c4471cfce01"
+      }
+      hash "6410f19f58bc979df0fd89ac662001117a36ddb3e5ed99d7a10ddd609f979d18"
+    }
+    provision "/us/usc/ptIII/rule3018/d" subsection {
+      num "d" "(d)"
+      heading "Partially Secured Creditor."
+      content "If a creditor’s claim has been allowed in part as a secured claim and in part as an unsecured claim, the creditor may accept or reject a plan in both capacities."
+      hash "e9ad514c989f30cc55089b4d663360fb109f8c12a2968f79fe59007e79b32a11"
+    }
+    hash "19cd928c0ee6e0f7b58b40fdbcad25f2f125a843c56495dbd9545eff5d33f5ab"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule applies in chapter 9, 11 and 13 cases under the Code. The references in the rule to equity security holders will not, however, be relevant in chapter 9 or 13 cases. The rule will be of little utility in a chapter 13 case because only secured creditors may be requested to vote on a plan; unsecured creditors are not entitled to vote; see § 1325(a)(4), (5) of the Code."
+    p "Subdivision (a) is derived from former Rule 10–305(a). It substitutes, in a reorganization case, entry of the order approving the disclosure statement for the order approving a plan in conformity with the differences between Chapter X and chapter 11. In keeping with the underlying theory it continues to recognize that the lapse of time between the filing of the petition and entry of such order will normally be significant and, during that interim, bonds and equity interests can change ownership."
+    p "Subdivision (b) recognizes the former Chapter XI practice permitting a plan and acceptances to be filed with the petition, as does § 1126(b) of the Code. However, because a plan under chapter 11 may affect shareholder interests, there should be reference to a record date of ownership. In this instance the appropriate record date is that used in the prepetition solicitation materials because it is those acceptances or rejections which are being submitted to the court."
+    p "While § 1126(c), (d), and (e) prohibits use of an acceptance or rejection not procured in good faith, the added provision in subdivision (b) of the rule is somewhat more detailed. It would prohibit use of prepetition acceptances or rejections when some but not all impaired creditors or equity security holders are solicited or when they are not given a reasonable opportunity to submit their acceptances or rejections. This provision together with § 1126(e) gives the court the power to nullify abusive solicitation procedures."
+    p "Subdivision (c). It is possible that multiple plans may be before the court for confirmation. Pursuant to § 1129(c) of the Code, the court may confirm only one plan but is required to consider the preferences expressed by those accepting the plans in determining which one to confirm."
+    p "Subdivisions (d) and (e) of former Rule 10–305 are not continued since comparable provisions are contained in the statute; see § 1126(c), (d), (e)."
+    p "It should be noted that while the singular “plan” is used throughout, by construction the plural is included; see § 102(7)."
+    hash "5148a4362eea38e32c97d41d0031ffd1711069b78c4e2547d54f37f9cab50ebb"
+  }
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivisions (a) and (b) are amended to delete provisions that duplicate § 1126 of the Code. An entity who is not a record holder of a security, but who claims that it is entitled to be treated as a record holder, may file a statement pursuant to Rule 3003(d)."
+    p "Subdivision (a) is amended further to allow the court to permit a creditor or equity security holder to change or withdraw an acceptance or rejection for cause shown whether or not the time fixed for voting has expired."
+    p "Subdivision (b) is also amended to give effect to a prepetition acceptance or rejection if solicitation requirements were satisfied with respect to substantially all members of the same class, instead of requiring proper solicitation with respect to substantially all members of all classes."
+    p "Subdivision (c) is amended to delete the Official Form number in anticipation of future revision and renumbering of the Official Forms."
+    hash "00bb57179bb74ec0fadcbd32e8bdf62b98997f0bdea5a68c5d0b0f16f4b3c2e2"
+  }
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "The title of this rule is amended to indicate that it applies only in a chapter 9 or a chapter 11 case. The amendment of the word “Plans” to “Plan” is stylistic."
+    hash "361805e03d1595333215196eebf382a3b9bb8904148e1cc603e0de050b3c1478"
+  }
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "Subdivision (a) is amended to provide flexibility in fixing the record date for the purpose of determining the holders of securities who are entitled to vote on the plan. For example, if there may be a delay between the oral announcement of the judge’s decision approving the disclosure statement and entry of the order on the court docket, the court may fix the date on which the judge orally approves the disclosure statement as the record date for voting purposes so that the parties may expedite preparation of the lists necessary to facilitate the distribution of the plan, disclosure statement, ballots, and other related documents in connection with the solicitation of votes."
+    p "The court may set a record date pursuant to subdivision (a) only after notice and a hearing as provided in § 102(1) of the Code. Notice of a request for an order fixing the record date may be included in the notice of the hearing to consider approval of the disclosure statement mailed pursuant to Rule 2002(b)."
+    p "If the court fixes the record date for voting purposes, the judge also should order that the same record date shall apply for the purpose of distributing the documents required to be distributed pursuant to Rule 3017(d)."
+    p "GAP Report on Rule 3018. No changes to the published draft."
+    hash "f60da918152229cba8ac8bbc63006288197a31d240a8f99bd326a3c63988a314"
+  }
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "Subdivision (a) of the rule is amended to take account of the court’s authority to set times under Rules 3017.1 and 3017.2 in small business cases and cases under subchapter V of chapter 11."
+    hash "361b2d7dbeff6ce84fb316acce33d1f4b3da221122e3e87d7399f5834fdb58a2"
+  }
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3018 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "baf163eaf93aa40e4a81e2a9b221d9e799a34bec638f4d3257bed9654b2e1399"
+  }
+  layers {
+    operative "19cd928c0ee6e0f7b58b40fdbcad25f2f125a843c56495dbd9545eff5d33f5ab"
+    enacted "3ff9b7ed1dbb57747ad1142694af0757169c51b23344c02ed98cda5709db00e7"
+    editorial "540a5d6fb52625a6c4fb06fb0a2a01dee7323f84da73fb7db89fe70f9fdd66ea"
+  }
+}

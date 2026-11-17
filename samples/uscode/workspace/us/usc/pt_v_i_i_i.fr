@@ -1,0 +1,53 @@
+edition 2
+module "/us/usc/ptVIII" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptVIII" part {
+    num "VIII" "PART VIII—"
+    heading "APPEAL TO A DISTRICT COURT OR A BANKRUPTCY APPELLATE PANEL"
+    member "/us/usc/ptVIII/rule8001"
+    member "/us/usc/ptVIII/rule8002"
+    member "/us/usc/ptVIII/rule8003"
+    member "/us/usc/ptVIII/rule8004"
+    member "/us/usc/ptVIII/rule8005"
+    member "/us/usc/ptVIII/rule8006"
+    member "/us/usc/ptVIII/rule8007"
+    member "/us/usc/ptVIII/rule8008"
+    member "/us/usc/ptVIII/rule8009"
+    member "/us/usc/ptVIII/rule8010"
+    member "/us/usc/ptVIII/rule8011"
+    member "/us/usc/ptVIII/rule8012"
+    member "/us/usc/ptVIII/rule8013"
+    member "/us/usc/ptVIII/rule8014"
+    member "/us/usc/ptVIII/rule8015"
+    member "/us/usc/ptVIII/rule8016"
+    member "/us/usc/ptVIII/rule8017"
+    member "/us/usc/ptVIII/rule8018"
+    member "/us/usc/ptVIII/rule8018.1"
+    member "/us/usc/ptVIII/rule8019"
+    member "/us/usc/ptVIII/rule8020"
+    member "/us/usc/ptVIII/rule8021"
+    member "/us/usc/ptVIII/rule8022"
+    member "/us/usc/ptVIII/rule8023"
+    member "/us/usc/ptVIII/rule8023.1"
+    member "/us/usc/ptVIII/rule8024"
+    member "/us/usc/ptVIII/rule8025"
+    member "/us/usc/ptVIII/rule8026"
+    member "/us/usc/ptVIII/rule8027"
+    member "/us/usc/ptVIII/rule8028"
+    hash "6108e31ee6b22d6fae13c49e582fe2ceba3bc77b51159166529722183a6b9f69"
+  }
+  note "/us/usc/ptVIII/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Length Limits Stated in Part VIII of the Federal Rules of Bankruptcy Procedure"
+    p "For the length limits stated in this part, see the Appendix, set out following the Official Forms following Part X of these rules."
+    hash "841c0fd7a499b07a0b96a876245e79e755eaa4e1d2155096b473efc3881111c6"
+  }
+  layers {
+    operative "6108e31ee6b22d6fae13c49e582fe2ceba3bc77b51159166529722183a6b9f69"
+    enacted "ba329f6ff7b6330d218b8d68b48a2b1f47fef2fc9fee21556b5e9d1a44b8be41"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

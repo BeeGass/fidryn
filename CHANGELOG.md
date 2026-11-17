@@ -40,6 +40,21 @@ interchange schema versions are maintained independently of the interpreter.
   that is missing, extra or different, every entry a run would refuse
   among the extra. `GeneratedWriter::compare` makes a writer that compares
   instead of writing, by the rule by which `create` refuses a directory.
+- `fidryn text DIR [ADDRESS] [--json]` prints the text of the provisions
+  and notes of a workspace, or of one address and what lies below it: for
+  a person, each provision indented by its depth and the notes after the
+  provisions of their unit, or with `--json` one text record to a line in
+  the byte order of their addresses, whose JSON Schema is
+  `schemas/text-record-v0.1.json`. `fidryn_driver::workspace::read_modules`
+  reads the modules of a workspace. The repository holds the workspace
+  imported from the sample of the Code, `samples/uscode/workspace/`, and
+  `cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks that the
+  committed archives match their retrieval record, that the workspace is,
+  byte for byte, what the importer writes from them on one worker and on
+  eight, that it checks with no error, that its counts of references by
+  layer and outcome are those of the committed profile, and that its text
+  equals, line for line, what `conformance/uslm_text.py` reads from the
+  publisher's XML; `--update` writes the workspace.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,

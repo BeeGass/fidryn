@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/ptI/rule1021" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1021" courtRule {
+    num "1021" "Rule 1021."
+    heading "Designating a Chapter 7, 9, or 11 Case as a Health Care Business Case"
+    provision "/us/usc/ptI/rule1021/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "If a petition in a Chapter 7, 9, or 11 case designates the debtor as a health care business, the case must proceed in accordance with the designation unless the court orders otherwise."
+      hash "4034425b89ea9df3c979bae9c3e1f28d5709670df27481f7733f29dd020ab84d"
+    }
+    provision "/us/usc/ptI/rule1021/b" subsection {
+      num "b" "(b)"
+      heading "Seeking a Court Determination."
+      content {
+        p "The United States trustee or a party in interest may move the court to determine whether the debtor is a health care business. Proceedings on the motion are governed by Rule 9014. If the motion is filed by a party in interest, a copy must be sent to the United States trustee. The motion must be served on:"
+        p "• the debtor;"
+        p "• the trustee;"
+        p "• any committee elected under § 705 or appointed under § 1102, or its authorized agent;"
+        p "• in a Chapter 9 or Chapter 11 case in which an unsecured creditors’ committee has not been appointed under § 1102, the creditors on the list filed under Rule 1007(d); and"
+        p "• any other entity as the court orders."
+      }
+      hash "558caba374f8f9a906c897c4d50d12782225b36d5d6666b3fffdc9ce380799f4"
+    }
+    hash "212ebb394ea59bdbfef73eda63d2ec981b0510b1b44380cd88b490ff201693b7"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1021/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "Section 101(27A) of the Code, added by the 2005 amendments, defines a health care business. This rule provides procedures for designating the debtor as a health care business. The debtor in a voluntary case, or petitioning creditors in an involuntary case, make that designation by checking the appropriate box on the petition. The rule also provides procedures for resolving disputes regarding the status of the debtor as a health care business."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "0dd778f879db79239756a937502113fbf236c6fb57155d2e80d732037511ef41"
+  }
+  note "/us/usc/ptI/rule1021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1021 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8580700025fead122744eaa29b61b4cac8b44e5174851bf7b1168a0bc804cb2a"
+  }
+  layers {
+    operative "212ebb394ea59bdbfef73eda63d2ec981b0510b1b44380cd88b490ff201693b7"
+    enacted "509c7952d5b83f622e123b26d1ad767e2d0ee3236029f40191a494557b917c83"
+    editorial "0949f180af4af05827ca1df5a238939bcdd930e45d40b1501dfd1b481c2c0da7"
+  }
+}

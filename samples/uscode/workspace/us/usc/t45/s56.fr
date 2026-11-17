@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/t45/s56" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s56" section {
+    num "56" "§ 56."
+    heading "Actions; limitation; concurrent jurisdiction of courts"
+    content {
+      p "No action shall be maintained under this chapter unless commenced within three years from the day the cause of action accrued."
+      p "Under this chapter an action may be brought in a district court of the United States, in the district of the residence of the defendant, or in which the cause of action arose, or in which the defendant shall be doing business at the time of commencing such action. The jurisdiction of the courts of the United States under this chapter shall be concurrent with that of the courts of the several States."
+    }
+    hash "df8fd050ba66069377159304698fe7f49be679d841287ccc7e417b1cde3ff322"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 6" -> "/us/act/1908-04-22/ch149/s6"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] "; " ["Apr. 5, 1910, ch. 143, § 1" -> "/us/act/1910-04-05/ch143/s1"] ", " ["36 Stat. 291" -> "/us/stat/36/291"] "; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] "; " ["Aug. 11, 1939, ch. 685, § 2" -> "/us/act/1939-08-11/ch685/s2"] ", " ["53 Stat. 1404" -> "/us/stat/53/1404"] "; " ["June 25, 1948, ch. 646, § 18" -> "/us/act/1948-06-25/ch646/s18"] ", " ["62 Stat. 989" -> "/us/stat/62/989"] ".)"
+  note "/us/usc/t45/s56/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "The first par. of this section is from act Apr. 22, 1908."
+    p "The second par. of this section is from act Apr. 5, 1910."
+    hash "08c7791400be3083403d735222bc8e5726d06811622a5aeb734fa7af29f5585f"
+  }
+  note "/us/usc/t45/s56/note/editorialNotes/nolaw/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1948—Act June 25, 1948, struck out provision in last sentence relating to removal of actions."
+    p "1939—Act Aug. 11, 1939, changed limitation in first sentence from two to three years."
+    hash "67c11679b5000a9c53852a9c3620fc9d05aa64b37cb37933a6118545ef1ffca4"
+  }
+  note "/us/usc/t45/s56/note/statutoryNotes/nolaw/change-of-name" enacted {
+    group statutoryNotes
+    topic "changeOfName"
+    heading "Change of Name"
+    p "“District court” substituted in text for “circuit court” to conform to act Mar. 3, 1911, which transferred powers and duties of circuit courts to district courts."
+    hash "875e3373d90030d23169cbbeb6117d7bbeac768db86b61b9241fe32b532e46b0"
+  }
+  note "/us/usc/t45/s56/note/statutoryNotes/act.1948-06-25.ch646/effective-date-of-1948-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1948 Amendment"
+    p ["Act June 25, 1948, ch. 646, § 38" -> "/us/act/1948-06-25/ch646/s38"] ", " ["62 Stat. 992" -> "/us/stat/62/992"] ", provided that the amendment made by that act is effective Sept. 1, 1948."
+    hash "cb0a68b98d29afaebe0d58f120d4d6293e8fcb0a803eaf19aab4a786d66c3955"
+  }
+  layers {
+    operative "df8fd050ba66069377159304698fe7f49be679d841287ccc7e417b1cde3ff322"
+    enacted "87042b3c8e7637731e57b7b2bd4929b952c23e259a04dae21e0f5b2329f910b8"
+    editorial "d9e5a3ec04582b937bafab6d93b1bedefa3bfd1102b0fda5a58477a76a6bbb02"
+  }
+}

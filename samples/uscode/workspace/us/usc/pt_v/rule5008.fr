@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/ptV/rule5008" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5008" courtRule {
+    num "5008" "Rule 5008."
+    heading "Chapter 7—Notice That a Presumption of Abuse Has Arisen Under § 707(b)"
+    provision "/us/usc/ptV/rule5008/a" subsection {
+      num "a" "(a)"
+      heading "Notice to Creditors."
+      content "When a presumption of abuse under § 707(b) arises in a Chapter 7 case of an individual debtor with primarily consumer debts, the clerk must, within 10 days after the petition is filed, so notify the creditors in accordance with Rule 2002."
+      hash "f757ef23a252fe9b836714468789e3c7d264b8e7c672addc678619d21a9eddc0"
+    }
+    provision "/us/usc/ptV/rule5008/b" subsection {
+      num "b" "(b)"
+      heading "Debtor’s Statement."
+      content "If the debtor does not file a statement indicating whether a presumption has arisen, the clerk must, within 10 days after the petition is filed, so notify creditors and indicate that further notice will be given if a later-filed statement shows that the presumption has arisen. If the debtor later files such a statement, the clerk must promptly notify the creditors."
+      hash "8afb1f7722ccbd73e7b298bd85e38bc849887016af2e8429984775ea11da405d"
+    }
+    hash "2730d4fa8013dbc4e73673807655e665b2556054374c3ba6de5720a0c6ee6484"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "This rule [Rule 5008. Funds of the Estate; abrogated Apr. 30, 1991, eff. Aug. 1, 1991] is abrogated in view of the amendments to § 345(b) of the Code and the role of the United States trustee in approving bonds and supervising trustees."
+    hash "eeaca1e4bcf6e47b968abf9c583325eef2c7140c44353a0c0af1a3c3aeb200b8"
+  }
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "This rule is new. The 2005 amendments to § 342 of the Code require that clerks give written notice to all creditors not later than 10 days after the date of the filing of the petition that a presumption of abuse has arisen under § 707(b). A statement filed by the debtor will be the source of the clerk’s information about the presumption of abuse. This rule enables the clerk to meet its obligation to send the notice within the statutory time period set forth in § 342. In the event that the court receives the debtor’s statement after the clerk has sent the first notice, and the debtor’s statement indicates a presumption of abuse, the rule requires that the clerk send a second notice."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "12cec39b507bad644ff891c28748a0430eaffac4a6416228b962bd5315c18105"
+  }
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fee5c50400afa428b8fa33cefa5e4c6b3b3e0b8e94b58efe132fe07c3baa4e07"
+  }
+  layers {
+    operative "2730d4fa8013dbc4e73673807655e665b2556054374c3ba6de5720a0c6ee6484"
+    enacted "baf38420feb8187990fb0f7501f43841b023dbf89ab18142eaf1fee7ed905d25"
+    editorial "0949f180af4af05827ca1df5a238939bcdd930e45d40b1501dfd1b481c2c0da7"
+  }
+}

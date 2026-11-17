@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s836" {
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s836" section {
+    num "836" "§ 836."
+    heading "Repealed. " ["Pub. L. 117–58, div. B, title I, § 21301(b)(1)(A)" -> "/us/pl/117/58/dB/tI/s21301/b/1/A"] ", Nov. 15, 2021, " ["135 Stat. 683" -> "/us/stat/135/683"]
+    status repealed
+    hash "cd4fad72f9c8e5db5fd8c84f1487010ba7f44fe7eb0dc9ac2a69f9149dc647c9"
+  }
+  note "/us/usc/t45/s836/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 94–210, title V, § 504" -> "/us/pl/94/210/tV/s504"] ", formerly § 516, Feb. 5, 1976, " ["90 Stat. 82" -> "/us/stat/90/82"] "; renumbered § 504, " ["Pub. L. 105–178, title VII, § 7203(a)(5)" -> "/us/pl/105/178/tVII/s7203/a/5"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"] ", related to employee protection. See " ["section 22404 of Title 49" -> "/us/usc/t49/s22404"] ", Transportation."
+    hash "5d350714e67ef80153ce1919cb3bb1c685b126f3ab2a1598f0d6106ae2f53608"
+  }
+  note "/us/usc/t45/s836/note/ungrouped/pl.94.210/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior " ["section 504 of Pub. L. 94–210" -> "/us/pl/94/210/s504"] " was classified to " ["section 824 of this title" -> "/us/usc/t45/s824"] " prior to repeal by " ["Pub. L. 105–178" -> "/us/pl/105/178"] "."
+    hash "7a7db6882fc3bd13827835a6ff9a61c16a43dbaee8f0ef4d394a52d9eea5e4dd"
+  }
+  layers {
+    operative "cd4fad72f9c8e5db5fd8c84f1487010ba7f44fe7eb0dc9ac2a69f9149dc647c9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b265a0408d8eb081eaf7d39b959ac03660619436e00411b7e522d74a176959d9"
+  }
+}

@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s837" {
+  alias "/us/usc/t45/s838"
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s837" section {
+    num "837, 838" "§§ 837, 838."
+    heading "Repealed. " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"]
+    status repealed
+    hash "cf597d63cbcc82cffb8cccbe8dc2ec8282db090abe8ef8a88c5cb434ae79cc47"
+  }
+  note "/us/usc/t45/s837/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 837, " ["Pub. L. 94–210, title V, § 517" -> "/us/pl/94/210/tV/s517"] ", Feb. 5, 1976, " ["90 Stat. 83" -> "/us/stat/90/83"] ", related to intercity rail passenger service."
+    hash "d8064fc16d045956a519538d136a6b2c91ec689970097d78bb4c2c0e6428efeb"
+  }
+  note "/us/usc/t45/s837/note/ungrouped/pl.94.210/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 838, " ["Pub. L. 94–210, title V, § 518" -> "/us/pl/94/210/tV/s518"] ", as added " ["Pub. L. 102–533, § 12(a)" -> "/us/pl/102/533/s12/a"] ", Oct. 27, 1992, " ["106 Stat. 3521" -> "/us/stat/106/3521"] ", related to Columbus and Greenville Railway."
+    hash "347f78dc591c66de16026e00850dd1421131892843a3d16eec9a2843db6fa935"
+  }
+  layers {
+    operative "cf597d63cbcc82cffb8cccbe8dc2ec8282db090abe8ef8a88c5cb434ae79cc47"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "31f692d88cc786819c2cd14e18d71de0cfb0f7337ca2fe3ce6d4f93149fb4c4c"
+  }
+}

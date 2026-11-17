@@ -1,0 +1,65 @@
+edition 2
+module "/us/usc/t45/s1201" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1201" section {
+    num "1201" "§ 1201."
+    heading "Findings"
+    chapeau "The Congress finds that—"
+    provision "/us/usc/t45/s1201/1" paragraph {
+      num "1" "(1)"
+      content "the Alaska Railroad, which was built by the Federal Government to serve the transportation and development needs of the Territory of Alaska, presently is providing freight and passenger services that primarily benefit residents and businesses in the State of Alaska;"
+      hash "87cdb5f24f07703654c21dc04e79c5416bbde31e2d1c3fcd7373494861676c28"
+    }
+    provision "/us/usc/t45/s1201/2" paragraph {
+      num "2" "(2)"
+      content "many communities and individuals in Alaska are wholly or substantially dependent on the Alaska Railroad for freight and passenger service and provision of such service is an essential governmental function;"
+      hash "b08bb3b6470c200cfea41ec11363b7a72a8e9fc5245c8a372df9fb905554d29a"
+    }
+    provision "/us/usc/t45/s1201/3" paragraph {
+      num "3" "(3)"
+      content "continuation of services of the Alaska Railroad and the opportunity for future expansion of those services are necessary to achieve Federal, State, and private objectives; however, continued Federal control and financial support are no longer necessary to accomplish these objectives;"
+      hash "f50e8cbc0039f466de488f22188549444d80cafb726f525c556786d7561b4b7e"
+    }
+    provision "/us/usc/t45/s1201/4" paragraph {
+      num "4" "(4)"
+      content "the transfer of the Alaska Railroad and provision for its operation by the State in the manner contemplated by this chapter is made pursuant to the Federal goal and ongoing program of transferring appropriate activities to the States;"
+      hash "9a4350b461877f349e9f9f813e7b45447a93390faad3eb7c779b3d42d8b272c8"
+    }
+    provision "/us/usc/t45/s1201/5" paragraph {
+      num "5" "(5)"
+      content "the State’s continued operation of the Alaska Railroad following the transfer contemplated by this chapter, together with such expansion of the railroad as may be necessary or convenient in the future, will constitute an appropriate public use of the rail system and associated properties, will provide an essential governmental service, and will promote the general welfare of Alaska’s residents and visitors; and"
+      hash "ca5ec7df0cc3276205be0a4457fda6a2de05c5aad66aa667649ec649d027e146"
+    }
+    provision "/us/usc/t45/s1201/6" paragraph {
+      num "6" "(6)"
+      content "in order to give the State government the ability to determine the Alaska Railroad’s role in serving the State’s transportation needs in the future, including the opportunity to extend rail service, and to provide a savings to the Federal Government, the Federal Government should offer to transfer the railroad to the State, in accordance with the provisions of this chapter, in the same manner in which other Federal transportation functions (including highways and airports) have been transferred since Alaska became a State in 1959."
+      hash "227cc42288aa2a8816f495671b104ddc2d76da7dceaf82da44ed895cee13cb4b"
+    }
+    hash "d7372ea91cb55285568d184141f087cb33233cfb68fe2217615967b6430dd44b"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 602" -> "/us/pl/97/468/tVI/s602"] ", Jan. 14, 1983, " ["96 Stat. 2556" -> "/us/stat/96/2556"] ".)"
+  note "/us/usc/t45/s1201/note/editorialNotes/pl.97.468/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in pars. (4) to (6), was in the original “this title”, meaning title VI (§ 601 et seq.) of " ["Pub. L. 97–468" -> "/us/pl/97/468"] ", Jan. 14, 1983, " ["96 Stat. 2556" -> "/us/stat/96/2556"] ", known as the Alaska Railroad Transfer Act of 1982, which is classified principally to this chapter (§ 1201 et seq.). For complete classification of title VI to the Code, see Short Title note below and Tables."
+    hash "61f3ab7a05ced7570881b10536558803a15f160b24faa3a14d98ead6a713b99b"
+  }
+  note "/us/usc/t45/s1201/note/statutoryNotes/pl.97.468/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 97–468, title VI, § 601" -> "/us/pl/97/468/tVI/s601"] ", Jan. 14, 1983, " ["96 Stat. 2556" -> "/us/stat/96/2556"] ", provided that:"
+    quoted "/us/pl/97/468/tVI/s601" {
+      p "“This title [enacting this chapter, amending sections 231, 712, and 802 of this title, sections 305, 3401, 5102, 5342, and 7327 of Title 5, Government Organization and Employees, " ["section 410hh–1 of Title 16" -> "/us/usc/t16/s410hh–1"] ", Conservation, " ["section 251 of Title 42" -> "/us/usc/t42/s251"] ", The Public Health and Welfare, " ["section 10749 of Title 49" -> "/us/usc/t49/s10749"] ", Transportation, and section 1655 of the Appendix to Title 49, repealing " ["section 353a of Title 16" -> "/us/usc/t16/s353a"] ", " ["section 208a of Title 30" -> "/us/usc/t30/s208a"] ", Mineral Lands and Mining, sections 975, 975a, and 975c to 975g of Title 43, Public Lands, and " ["section 301a of Title 48" -> "/us/usc/t48/s301a"] ", Territories and Insular Possessions, and amending provisions set out as a note under " ["section 1611 of Title 43" -> "/us/usc/t43/s1611"] "] may be cited as the ‘Alaska Railroad Transfer Act of 1982’.”"
+    }
+    hash "00e3d5dbbcb82fcf88936dacd11ac29633235d9fd19fe57742eb86cdc2347026"
+  }
+  layers {
+    operative "d7372ea91cb55285568d184141f087cb33233cfb68fe2217615967b6430dd44b"
+    enacted "5e0d831e32a72e17028be6fbadc25d8e34d4ac4ae1c124b30966a17f59f69418"
+    editorial "96612803adff1f4b46ae6cac24ce4de1a4784db96efbfbc51ea01f7b9b15277c"
+  }
+}

@@ -1,0 +1,43 @@
+edition 2
+module "/us/usc/ptVIII/rule8027" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8027" courtRule {
+    num "8027" "Rule 8027."
+    heading "Notice of a Mediation Procedure"
+    chapeau "If the district court or BAP has a mediation procedure applicable to bankruptcy appeals, the clerk must, after docketing the appeal, promptly notify the parties of:"
+    provision "/us/usc/ptVIII/rule8027/a" subsection {
+      num "a" "(a)"
+      content "the requirements of the mediation procedure; and"
+      hash "e594f806add59ae3fb0e35a1f8022816df42304d58d5137cd474cec47354691d"
+    }
+    provision "/us/usc/ptVIII/rule8027/b" subsection {
+      num "b" "(b)"
+      content "any effect it has on the time to file briefs."
+      hash "a20a4d39b04a61abc6c708f5e26c8955d4492a70263b057e4886559831fc221e"
+    }
+    hash "83415b83d299cbb6603bfe45531fbacadba858830675f4943709816508e02692"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is new. It requires the district or BAP clerk to advise the parties promptly after an appeal is docketed of any court mediation procedure that is applicable to bankruptcy appeals. The notice must state what the mediation requirements are and how the procedure affects the time for filing briefs."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "c4099529171240a588b044e2aaed5307797f901899dbc87b8e2c0309c3f9d84c"
+  }
+  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8027 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "73955fdf208e21d282a82b53f0d63edb64a21ce980159446a6276134cb5fbd24"
+  }
+  layers {
+    operative "83415b83d299cbb6603bfe45531fbacadba858830675f4943709816508e02692"
+    enacted "70af5c46b7f3b93f34c2c9217edf246648b879e512ce6457fbd760ddc29cb5a8"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

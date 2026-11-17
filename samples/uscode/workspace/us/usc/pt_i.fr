@@ -1,0 +1,38 @@
+edition 2
+module "/us/usc/ptI" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptI" part {
+    num "I" "PART I—"
+    heading "COMMENCING A BANKRUPTCY CASE; THE PETITION, THE ORDER FOR RELIEF, AND RELATED MATTERS"
+    member "/us/usc/ptI/rule1002"
+    member "/us/usc/ptI/rule1003"
+    member "/us/usc/ptI/rule1004"
+    member "/us/usc/ptI/rule1004.1"
+    member "/us/usc/ptI/rule1004.2"
+    member "/us/usc/ptI/rule1005"
+    member "/us/usc/ptI/rule1006"
+    member "/us/usc/ptI/rule1007"
+    member "/us/usc/ptI/rule1008"
+    member "/us/usc/ptI/rule1009"
+    member "/us/usc/ptI/rule1010"
+    member "/us/usc/ptI/rule1011"
+    member "/us/usc/ptI/rule1012"
+    member "/us/usc/ptI/rule1013"
+    member "/us/usc/ptI/rule1014"
+    member "/us/usc/ptI/rule1015"
+    member "/us/usc/ptI/rule1016"
+    member "/us/usc/ptI/rule1017"
+    member "/us/usc/ptI/rule1018"
+    member "/us/usc/ptI/rule1019"
+    member "/us/usc/ptI/rule1020"
+    member "/us/usc/ptI/rule1021"
+    hash "6907bf8216224ae6737c2319bb1df8898c661ebdfb1f9e770454303678d9ddd7"
+  }
+  layers {
+    operative "6907bf8216224ae6737c2319bb1df8898c661ebdfb1f9e770454303678d9ddd7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

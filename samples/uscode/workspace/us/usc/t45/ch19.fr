@@ -1,0 +1,34 @@
+edition 2
+module "/us/usc/t45/ch19" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch19" chapter {
+    num "19" "CHAPTER 19—"
+    heading "ROCK ISLAND RAILROAD EMPLOYEE ASSISTANCE"
+    member "/us/usc/t45/s1001"
+    member "/us/usc/t45/s1002"
+    member "/us/usc/t45/s1003"
+    member "/us/usc/t45/s1004"
+    member "/us/usc/t45/s1005"
+    member "/us/usc/t45/s1006"
+    member "/us/usc/t45/s1007"
+    member "/us/usc/t45/s1008"
+    member "/us/usc/t45/s1009"
+    member "/us/usc/t45/s1010"
+    member "/us/usc/t45/s1011"
+    member "/us/usc/t45/s1012"
+    member "/us/usc/t45/s1013"
+    member "/us/usc/t45/s1014"
+    member "/us/usc/t45/s1015"
+    member "/us/usc/t45/s1016"
+    member "/us/usc/t45/s1017"
+    member "/us/usc/t45/s1018"
+    hash "ecce9e5657953120a395bda2a57a654e06594938f8e751e4d0480ad37352d61d"
+  }
+  layers {
+    operative "ecce9e5657953120a395bda2a57a654e06594938f8e751e4d0480ad37352d61d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/t45/s722" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s722" section {
+    num "722" "§ 722."
+    heading "Records, audit, and examination"
+    provision "/us/usc/t45/s722/a" subsection {
+      num "a" "(a)"
+      heading "Records"
+      content "Each recipient of financial assistance under this subchapter, whether in the form of loans, obligations, or other arrangements, shall keep such records as the Association or the Secretary shall prescribe, including records which fully disclose the amount and disposition by such recipient of the proceeds of such assistance and such other records as will facilitate an effective audit."
+      hash "8bcb61aec34de63cd199c4dd36a38d6ba747c334fca20acd611b7dcfba46c47e"
+    }
+    provision "/us/usc/t45/s722/b" subsection {
+      num "b" "(b)"
+      heading "Audit and examination"
+      chapeau "The Association, the Secretary, and the Comptroller General of the United States, or any of their duly authorized representatives shall, until the expiration of 3 years after the implementation of the final system plan, have access for the purpose of audit and examination to any books, documents, papers, and records of such recipients which in the opinion of the Association, the Secretary, or the Comptroller General may be related or pertinent to the loans, obligations or other arrangements referred to in subsection (a) of this section. The Association or any of its duly authorized representatives shall, until any financial assistance received under this subchapter has been repaid to the Association, have access to any such materials which concern any matter that may bear upon—"
+      provision "/us/usc/t45/s722/b/1" paragraph {
+        num "1" "(1)"
+        content "the ability of the recipient of such financial assistance to make repayment within the time fixed therefor;"
+        hash "331c3423ed1c232c60e3c4b06ffbd3cb9085951940eac39b12dea4fc12cfe18a"
+      }
+      provision "/us/usc/t45/s722/b/2" paragraph {
+        num "2" "(2)"
+        content "the effectiveness with which the proceeds of such assistance is used; and"
+        hash "3684f6ea514e8a35cfc092642a303e2d0012222110f1fffd3b2ab526a734ffdf"
+      }
+      provision "/us/usc/t45/s722/b/3" paragraph {
+        num "3" "(3)"
+        content "the implementation of the final system plan and the realization of the declaration of policy of this chapter."
+        hash "9f5e29a6ed2e13e7665487c7bfa39d8c7ba33d4cffa4fe6004c0489e649592c4"
+      }
+      hash "dcf088c74331f335f793ad631989824a3c3af35e63c47fce1025acde7f6c89ec"
+    }
+    hash "edc5c5bfada1d941914e37b5c3e55f206de6d1d46de9bf9ce114871ac93b1e50"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 212" -> "/us/pl/93/236/tII/s212"] ", Jan. 2, 1974, " ["87 Stat. 1002" -> "/us/stat/87/1002"] ".)"
+  note "/us/usc/t45/s722/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  layers {
+    operative "edc5c5bfada1d941914e37b5c3e55f206de6d1d46de9bf9ce114871ac93b1e50"
+    enacted "5b4fbd7af169fd3ccee14c9d698be1e7c21529b84f3cafd09f7fbecbc581bdb0"
+    editorial "23300313f1ada46ff78950c670a2d8e261907f7bf0cee36b969ed3b6f1129cdc"
+  }
+}

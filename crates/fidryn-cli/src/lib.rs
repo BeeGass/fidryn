@@ -80,6 +80,19 @@ pub enum Command {
         #[command(subcommand)]
         corpus: law::Corpus,
     },
+    /// Print the text of the provisions and notes of a workspace, or of one address and what
+    /// lies below it.
+    Text {
+        /// The directory of the workspace.
+        dir: PathBuf,
+        /// The address of a provision, a container or a note of the workspace: print it and
+        /// what lies below it alone.
+        address: Option<String>,
+        /// Print one text record (`fidryn.text-record/v0.1`) to a line, in the byte order of
+        /// their addresses.
+        #[arg(long)]
+        json: bool,
+    },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
         path: PathBuf,
@@ -216,6 +229,7 @@ pub fn run(cli: Cli) -> ExitCode {
             },
         ),
         Command::Ingest { corpus } => law::run(corpus),
+        Command::Text { dir, address, json } => law::text(&dir, address.as_deref(), json),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -323,10 +337,14 @@ pub fn run(cli: Cli) -> ExitCode {
 
 /// The files a command reads as its input. `check` chooses its front end by
 /// what it is given, a workspace's directory or a file of either edition,
-/// `ingest` reads archives, and `ui` reads none.
+/// `ingest` reads archives, `text` the modules of edition 2 of a workspace,
+/// and `ui` reads none.
 fn inputs_of(command: &Command) -> Vec<PathBuf> {
     match command {
-        Command::Check { .. } | Command::Ingest { .. } | Command::Ui { .. } => Vec::new(),
+        Command::Check { .. }
+        | Command::Ingest { .. }
+        | Command::Text { .. }
+        | Command::Ui { .. } => Vec::new(),
         Command::Fmt { path }
         | Command::Inputs { path, .. }
         | Command::Run { path, .. }

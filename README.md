@@ -98,6 +98,7 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
+fidryn text DIR [ADDRESS] [--json]
 ```
 
 Every subcommand also takes `--source-root PATH`, the root for source
@@ -149,7 +150,7 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-adapt` | Filing adapters |
 | `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records, the canonical text of a module, the interface of a module and the index of addresses that gives each reference its outcome. Depends on no other crate of the workspace |
 | `fidryn-ingest-uscode` | Reads the archives of the official XML release point published by the Office of the Law Revision Counsel, checked against their retrieval record, into law modules of the model of `fidryn-provision`. Of the workspace crates, depends on `fidryn-provision` only, and only `fidryn-cli` depends on it |
-| `fidryn-cli` | `fidryn` binary and mill, and `fidryn ingest uscode`, which writes a generated workspace from the archives of one release with the ingester and the writer of `fidryn-driver` |
+| `fidryn-cli` | `fidryn` binary and mill, `fidryn ingest uscode`, which writes a generated workspace from the archives of one release with the ingester and the writer of `fidryn-driver`, and `fidryn text`, which prints the text of the modules of a workspace |
 
 Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is
 actually implemented: [docs/implementation-status.md](docs/implementation-status.md).

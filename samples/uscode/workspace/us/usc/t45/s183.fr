@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/t45/s183" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s183" section {
+    num "183" "§ 183."
+    heading "Disputes within jurisdiction of Mediation Board"
+    chapeau "The parties or either party to a dispute between an employee or a group of employees and a carrier or carriers by air may invoke the services of the National Mediation Board and the jurisdiction of said Mediation Board is extended to any of the following cases:"
+    provision "/us/usc/t45/s183/a" subsection {
+      num "a" "(a)"
+      content "A dispute concerning changes in rates of pay, rules, or working conditions not adjusted by the parties in conference."
+      hash "a207f238ffa49f6250618e3e85167e8324bc027a0bf81b0cc89fc50c12aae327"
+    }
+    provision "/us/usc/t45/s183/b" subsection {
+      num "b" "(b)"
+      content {
+        p "Any other dispute not referable to an adjustment board, as hereinafter provided, and not adjusted in conference between the parties, or where conferences are refused."
+        p "The National Mediation Board may proffer its services in case any labor emergency is found by it to exist at any time."
+        p "The services of the Mediation Board may be invoked in a case under this subchapter in the same manner and to the same extent as are the disputes covered by " ["section 155 of this title" -> "/us/usc/t45/s155"] "."
+      }
+      hash "bbe69b7029b27d82fafd1f3f2edd2d5de16ba11de6eddc33cc96934bde1199c1"
+    }
+    hash "edd1ed42f021890faff1ac37d26058b637eae2f3e3553fa717e4d91cd962a32f"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 203" -> "/us/act/1926-05-20/ch347/s203"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1189" -> "/us/stat/49/1189"] ".)"
+  layers {
+    operative "edd1ed42f021890faff1ac37d26058b637eae2f3e3553fa717e4d91cd962a32f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fcc70bf24aec35f6ec46ab8c118f0987d91ecc96fe9129e4c99c8fba32bfbceb"
+  }
+}

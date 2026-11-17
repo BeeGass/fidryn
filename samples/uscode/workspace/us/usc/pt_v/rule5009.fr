@@ -1,0 +1,136 @@
+edition 2
+module "/us/usc/ptV/rule5009" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5009" courtRule {
+    num "5009" "Rule 5009."
+    heading "Closing a Chapter 7, 12, 13, or 15 Case; Declaring Liens Satisfied"
+    provision "/us/usc/ptV/rule5009/a" subsection {
+      num "a" "(a)"
+      heading "Closing a Chapter 7, 12, or 13 Case."
+      chapeau "The estate in a Chapter 7, 12, or 13 case is presumed to have been fully administered when:"
+      provision "/us/usc/ptV/rule5009/a/1" paragraph {
+        num "1" "(1)"
+        content "the trustee has filed a final report and final account and has certified that the estate has been fully administered; and"
+        hash "0ebef2604633409a8603cb35c970b6772f1e31a1e2585d6c1799e8ae692ff5f1"
+      }
+      provision "/us/usc/ptV/rule5009/a/2" paragraph {
+        num "2" "(2)"
+        content "within 30 days after the filing, no objection to the report has been filed by the United States trustee or a party in interest."
+        hash "98ef87bb7e299fc818b59b54acfc3ee3f19fc0d261804e2c5779a49972d258d5"
+      }
+      hash "e9ef46dd805f3a3847416342fe7d76f0b45966727912360433489545f91bbb20"
+    }
+    provision "/us/usc/ptV/rule5009/b" subsection {
+      num "b" "(b)"
+      heading "Chapter 7 or 13—Notice of a Failure to File a Certificate of Completion for a Course on Personal Financial Management."
+      content "This subdivision (b) applies if an individual debtor in a Chapter 7 or 13 case is required to file a certificate under Rule 1007(b)(7) and fails to do so within 45 days after the first date set for the meeting of creditors under § 341(a). The clerk must promptly notify the debtor that the case will be closed without entering a discharge if the certificate is not filed within the time prescribed by Rule 1007(c)."
+      hash "7f36cca9fe1fcc3ad9d316810925e0efa96434de88b25c160527148609ee112d"
+    }
+    provision "/us/usc/ptV/rule5009/c" subsection {
+      num "c" "(c)"
+      heading "Closing a Chapter 15 Case."
+      provision "/us/usc/ptV/rule5009/c/1" paragraph {
+        num "1" "(1)"
+        content "Foreign Representative’s Final Report. In a proceeding recognized under § 1517, when the purpose of a foreign representative’s appearance is completed, the representative must file a final report describing the nature and results of the representative’s activities in the court."
+        hash "67d3ff8e0e5252cc5b536c9089e7c004353c155a9882e3255a41a1e2ae634f76"
+      }
+      provision "/us/usc/ptV/rule5009/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "Giving Notice of the Report. The representative must send a copy of the report to the United States trustee, give notice of its filing, and file a certificate indicating that the notice has been given to:"
+        provision "/us/usc/ptV/rule5009/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "the debtor;"
+          hash "3d6a86fea1fbca599612ba33b371e427b8947bee43b573b47ce63ee2b756c269"
+        }
+        provision "/us/usc/ptV/rule5009/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "all persons or bodies authorized to administer the debtor’s foreign proceedings;"
+          hash "83f1025a466a7cc9ea65003cb44404472ca5675376be27afec033fc3227d44bf"
+        }
+        provision "/us/usc/ptV/rule5009/c/2/C" subparagraph {
+          num "C" "(C)"
+          content "all parties to litigation pending in the United States in which the debtor was a party when the petition was filed; and"
+          hash "8f2555133b6cb4ae620c37d9e39b6644b799271b288caf82ec04afbc62185884"
+        }
+        provision "/us/usc/ptV/rule5009/c/2/D" subparagraph {
+          num "D" "(D)"
+          content "any other entity the court designates."
+          hash "2b3c045b189e0efc956d2f572fe501043a7d04ad996da3de400f9eed9584d955"
+        }
+        hash "67489899cf107a8e8c514b9e3d9ee0d478166a2867cb65a40f6b754b78355c2e"
+      }
+      provision "/us/usc/ptV/rule5009/c/3" paragraph {
+        num "3" "(3)"
+        content "Presumption of Full Administration. If the United States trustee or a party in interest does not file an objection within 30 days after the certificate is filed, the case is presumed to have been fully administered."
+        hash "51216ca56c43377114fd71007bea0a0ff3351482f399cd866b1601522b8f908b"
+      }
+      hash "9c03fd137616a0b991abdac997054743a274fc1f9cb8109b83018d955e456963"
+    }
+    provision "/us/usc/ptV/rule5009/d" subsection {
+      num "d" "(d)"
+      content "Order Declaring a Lien Satisfied." mark "1" 1 " This subdivision (d) applies in a Chapter 12 or 13 case when a claim secured by property of the estate is subject to a lien under applicable nonbankruptcy law. The debtor may move for an order declaring that the secured claim has been satisfied and the lien has been released under the terms of the confirmed plan. The motion must be served—in the manner provided by Rule 7004 for serving a summons and complaint—on the claim holder and any other entity the court designates."
+      hash "123e71a797a3dcbb8fd5136df3e5618d9ab8bc9d42718152366fb279b51430db"
+    }
+    hash "f2462b01329e75c0bf498a18761b046437eb6622b0747a2404d71f5ced625991"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is the same as § 350(a) of the Code. An estate may be closed even though the period allowed by Rule 3002(c) for filing claims has not expired. The closing of a case may be expedited when a notice of no dividends is given under Rule 2002(e). Dismissal of a case for want of prosecution or failure to pay filing fees is governed by Rule 1017."
+    hash "e73749c0105f40b8c76d81fad52b047000906852b3b89122f07378cd577f1f08"
+  }
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The final report and account of the trustee is required to be filed with the court and the United States trustee under §§ 704(9) [now 704(a)(9)], 1202(b)(1), and 1302(b)(1) of the Code. This amendment facilitates the United States trustee’s performance of statutory duties to supervise trustees and administer cases under chapters 7, 12, and 13 pursuant to 28 U.S.C. § 586. In the absence of a timely objection by the United States trustee or a party in interest, the court may discharge the trustee and close the case pursuant to § 350(a) without the need to review the final report and account or to determine the merits of the trustee’s certification that the estate has been fully administered."
+    p "Rule 3022 governs the closing of chapter 11 cases."
+    hash "2beccbc4d98b792c556412bf424c642584eec22c7b42f09b4a7fa3b0b8b38215"
+  }
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivisions (a) and (b). The rule is amended to redesignate the former rule as subdivision (a) and to add new subdivisions (b) and (c) to the rule. Subdivision (b) requires the clerk to provide notice to an individual debtor in a chapter 7 or 13 case that the case may be closed without the entry of a discharge due to the failure of the debtor to file a timely statement of completion of a personal financial management course. The purpose of the notice is to provide the debtor with an opportunity to complete the course and file the appropriate document prior to the filing deadline. Timely filing of the document avoids the need for a motion to extend the time retroactively. It also avoids the potential for closing the case without discharge, and the possible need to pay an additional fee in connection with reopening. Timely filing also benefits the clerk’s office by reducing the number of instances in which cases must be reopened."
+    p "Subdivision (c). Subdivision (c) requires a foreign representative in a chapter 15 case to file a final report setting out the foreign representative’s actions and results obtained in the United States court. It also requires the foreign representative to give notice of the filing of the report, and provides interested parties with 30 days to object to the report after the foreign representative has certified that notice has been given. In the absence of a timely objection, a presumption arises that the case is fully administered, and the case may be closed."
+    p "Changes Made After Publication. No changes since publication."
+    hash "30bc5c442ced8229861f15c20f744441d74f300d2a16b1ede1d73307f27f46e4"
+  }
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "Subdivision (b) is amended to conform to the amendment of Rule 1007(b)(7). Rule 1007(b)(7) relieves an individual debtor of the obligation to file a statement of completion of a personal financial management course if the course provider notifies the court that the debtor has completed the course. The clerk’s duty under subdivision (b) to notify the debtor of the possible closure of the case without discharge if the statement is not timely filed therefore applies only if the course provider has not already notified the court of the debtor’s completion of the course."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "361ac4be452d56f97450a51f81769cb453e2fc4b8ab8e817d3eab2825a37b2b9"
+  }
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (d) is added to provide a procedure by which a debtor in a chapter 12 or chapter 13 case may request an order declaring a secured claim satisfied and a lien released under the terms of a confirmed plan. A debtor may need documentation for title purposes of the elimination of a second mortgage or other lien that was secured by property of the estate. Although requests for such orders are likely to be made at the time the case is being closed, the rule does not prohibit a request at another time if the lien has been released and any other requirements for entry of the order have been met."
+    p "Other changes to this rule are stylistic."
+    hash "36a48e1c01d8b2e0285fd62d180560e68df3f8df1d24b338f3cdfc6b8fae5052"
+  }
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    p "Additionally, the following substantive changes have been made."
+    p "The amendments to Rule 5009(b) reflect the amendment to Rule 1007(b)(7) that replaces the requirement for submission of a statement showing that the debtor has completed a course on personal financial management with the requirement that the debtor provide the certificate of course completion issued by the approved provider of that course."
+    hash "b3d485c07e8ccec995bf6efc0568d4969b4fa2b40b8f2ee19a2939842a9be5ec"
+  }
+  footnote 1 "1" {
+    p "So in original. The heading probably should not be italicized."
+  }
+  layers {
+    operative "f2462b01329e75c0bf498a18761b046437eb6622b0747a2404d71f5ced625991"
+    enacted "7c4e7c08aa113ee0c2168ca2d956c01b522349e3264627173ae4c131844ab390"
+    editorial "dc41a44be431e89eb16ae68ffa8ac3addd93cb1b1633c1e06b5333f16bbc985e"
+  }
+}

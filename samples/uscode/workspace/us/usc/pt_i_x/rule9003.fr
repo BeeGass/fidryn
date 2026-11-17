@@ -1,0 +1,65 @@
+edition 2
+module "/us/usc/ptIX/rule9003" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9003" courtRule {
+    num "9003" "Rule 9003."
+    heading "Ex Parte Contacts Prohibited"
+    provision "/us/usc/ptIX/rule9003/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content {
+        p "Unless permitted by applicable law, the following persons must refrain from ex parte meetings and communications with the court about matters affecting a particular case or proceeding:"
+        p "• an examiner;"
+        p "• a party in interest;"
+        p "• a party in interest’s attorney, accountant, or employee; and"
+        p "• the United States trustee and any of its assistants, agents, or employees."
+      }
+      hash "99914d981fc87510b47b40cac48db75adb6220933604d1012414ed489d27c0da"
+    }
+    provision "/us/usc/ptIX/rule9003/b" subsection {
+      num "b" "(b)"
+      heading "Exception for a United States Trustee."
+      content "A United States trustee and any of its assistants, agents, or employees are not prohibited from communicating with the court about general administrative problems and improving bankruptcy administration—including the operation of the United States trustee system."
+      hash "164c1690da103c51be88c030bd771d6d22e3cfc2a92eb48a328de7bd48b7fd60"
+    }
+    hash "4d31de01ca8545d92654f107979caab89bb83a61f8728dd081a06bc13cab6e85"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule regulates the actions of parties in interest and their attorneys or others employed by parties in interest. This regulation of the conduct of parties in interest and their representative is designed to insure that the bankruptcy system operates fairly and that no appearance of unfairness is created. See H. Rep. No. 95–595, 95th Cong., 1st Sess. 95 et seq. (1977)."
+    p "This rule is not a substitute for or limitation of any applicable canon of professional responsibility or judicial conduct. See, e.g., Canon 7, EC7–35, Disciplinary Rule 7–110(B) of the Code of Professional Responsibility: “Generally, in adversary proceedings a lawyer should not communicate with a judge relative to a matter pending before, or which is to be brought before, a tribunal over which he presides in circumstances which might have the effect or give the appearance of granting undue advantage to one party;” and Canon 3A(4) of the Code of Judicial Conduct: “A judge should . . . neither initiate nor consider ex parte or other communications concerning a pending or impending proceeding.”"
+    hash "46215711ebfe753590aeb39fe27e2ce1e6c10fcd5c23748d03d11c2f85dd1f6c"
+  }
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "This rule is amended to apply to both the bankruptcy judges and the district judges of the district."
+    hash "0392629cdd75921aa8d29539756721ed05a861c21982337328a74261d7ffdf3b"
+  }
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to extend to examiners the prohibition on ex parte meetings and communications with the court."
+    p "Subdivision (b) is derived from Rule X–1010."
+    hash "3bd1cea8932bc141c2cdf41855435658eb2704aaaa1c2037c25b7bb3d9351027"
+  }
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "32616912e2a9da24af0dee45e6329c1d861d4373444c46769af8d59f24a3989a"
+  }
+  layers {
+    operative "4d31de01ca8545d92654f107979caab89bb83a61f8728dd081a06bc13cab6e85"
+    enacted "77baf2dd6e2fd72bcac62b96baa308ff4ee705d3c702c74c82318ff92f19e48b"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

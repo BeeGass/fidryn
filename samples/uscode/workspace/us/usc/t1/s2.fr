@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t1/s2" {
+  within "/us/usc/t1/ch1"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s2" section {
+    num "2" "§ 2."
+    heading "“County” as including “parish”, and so forth"
+    content "The word “county” includes a parish, or any other equivalent subdivision of a State or Territory of the United States."
+    hash "09e503d52aa1099acd71e95003fb61c060081d2b2d8a24dda45cd78bd9da67cd"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 633" -> "/us/stat/61/633"] ".)"
+  layers {
+    operative "09e503d52aa1099acd71e95003fb61c060081d2b2d8a24dda45cd78bd9da67cd"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "528decc6ec45eb4c15b31985036163a9d6a9e2583aa467fd8deacfbef8ace771"
+  }
+}
