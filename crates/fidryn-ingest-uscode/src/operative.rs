@@ -82,6 +82,7 @@ pub(crate) fn child_segments<'a, 'i>(
     for child in level.children().filter(|child| is_provision(*child)) {
         let segment = match child.attribute("identifier") {
             Some(identifier) => {
+                crate::containers::no_tilde(child, identifier)?;
                 let first = identifier.split(' ').next().unwrap_or("");
                 let last = first.rsplit('/').next().unwrap_or("");
                 if let Err(error) = Address::parse(&format!("/{last}")) {

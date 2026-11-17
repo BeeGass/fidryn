@@ -200,7 +200,9 @@ pub fn ingest(
         let head = uslm::head(&document, release).map_err(|error| archives.locate(index, error))?;
         containers::outline(head.top).map_err(|error| archives.locate(index, error))
     })?;
-    let numbering = containers::number(&outlines, &names)?;
+    let numbering = containers::number(&outlines, &names, &|index, error| {
+        archives.locate(index, error)
+    })?;
 
     let read = in_parallel(selected.len(), jobs, |position| {
         let index = selected[position];
@@ -248,7 +250,11 @@ pub fn ingest_xml(
         let document = uslm::parse(xml)?;
         let head = uslm::head(&document, release)?;
         let outline = containers::outline(head.top)?;
-        let numbering = containers::number(std::slice::from_ref(&outline), &[name.to_owned()])?;
+        let numbering = containers::number(
+            std::slice::from_ref(&outline),
+            &[name.to_owned()],
+            &|_, error| error,
+        )?;
         let mut modules = Vec::new();
         let mut keep = |module: Module| {
             modules.push(module);

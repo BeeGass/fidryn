@@ -28,6 +28,10 @@
 //!    release.
 //! 3. An alias that is the address of a unit, a container or a provision is
 //!    dropped, and so is one the element already has.
+//!
+//! An identifier that holds `~`, the character only the reading adds, is
+//! refused, and so is a release in which two elements would end with one
+//! address.
 
 use crate::operative::{self, Made, UNIT_TAGS};
 use crate::uslm::{self, Head, Labels, Scope};
@@ -83,6 +87,7 @@ fn identifier(node: Node<'_, '_>) -> Result<Option<Identifier>, IngestError> {
     let Some(raw) = node.attribute("identifier") else {
         return Ok(None);
     };
+    no_tilde(node, raw)?;
     let refused = |member: &str, error| {
         IngestError::at(
             node,
@@ -105,6 +110,23 @@ fn identifier(node: Node<'_, '_>) -> Result<Option<Identifier>, IngestError> {
         address: first.to_owned(),
         aliases,
     }))
+}
+
+/// Refuses the identifier `raw` of `node` when it holds `~`, the character
+/// the reading alone may add to an address: an identifier such as
+/// `/us/usc/t99/s1~2` beside two holders of `/us/usc/t99/s1` would give two
+/// elements one address.
+pub(crate) fn no_tilde(node: Node<'_, '_>, raw: &str) -> Result<(), IngestError> {
+    if raw.contains('~') {
+        return Err(IngestError::at(
+            node,
+            format!(
+                "the identifier {raw:?} holds ~, the character the reading alone may add to an \
+                 address"
+            ),
+        ));
+    }
+    Ok(())
 }
 
 /// The aliases of `identifier` when its last segment holds three full stops
@@ -245,8 +267,17 @@ pub(crate) struct Numbering {
 }
 
 /// Numbers the outlines of a release, given in the order of the members'
-/// names `names`.
-pub(crate) fn number(outlines: &[Outline], names: &[String]) -> Result<Numbering, IngestError> {
+/// names `names`. `locate` names the member at an index, and its archive, in
+/// an error.
+///
+/// No two elements of the release end with one address: a unit or a
+/// container whose address is that of another, or that of a provision of a
+/// unit, is refused.
+pub(crate) fn number(
+    outlines: &[Outline],
+    names: &[String],
+    locate: &dyn Fn(usize, IngestError) -> IngestError,
+) -> Result<Numbering, IngestError> {
     let prefix = Address::parse(PREFIX).map_err(|error| IngestError::new(error.to_string()))?;
     let mut held: HashMap<&str, u32> = HashMap::new();
     let mut top_unnamed: HashMap<&str, u32> = HashMap::new();
@@ -257,8 +288,10 @@ pub(crate) fn number(outlines: &[Outline], names: &[String]) -> Result<Numbering
         let mut own: Vec<Address> = Vec::with_capacity(outline.entries.len());
         for entry in &outline.entries {
             let refused = |error: fidryn_provision::AddressError| {
-                IngestError::new(format!("an element of the outline has no address: {error}"))
-                    .in_member(&names[member])
+                locate(
+                    member,
+                    IngestError::new(format!("an element of the outline has no address: {error}")),
+                )
             };
             let address = match &entry.identifier {
                 Some(identifier) => {
@@ -294,26 +327,57 @@ pub(crate) fn number(outlines: &[Outline], names: &[String]) -> Result<Numbering
         addresses.push(own);
     }
 
-    // Every address of a unit or a container, and which unit it is.
-    let mut taken: HashMap<&str, Option<(usize, usize)>> = HashMap::new();
-    for (member, outline) in outlines.iter().enumerate() {
-        for (index, entry) in outline.entries.iter().enumerate() {
-            let unit = entry.unit.then_some((member, index));
-            taken.insert(addresses[member][index].as_str(), unit);
+    // Every address of a unit or a container, and the element that has it.
+    let mut taken: HashMap<&str, (usize, usize)> = HashMap::new();
+    let element = |member: usize, index: usize| {
+        let entry = &outlines[member].entries[index];
+        format!("a {} of {}", entry.tag, names[member])
+    };
+    for (member, own) in addresses.iter().enumerate() {
+        for (index, address) in own.iter().enumerate() {
+            let address = address.as_str();
+            if let Some(&(first, at)) = taken.get(address) {
+                return Err(locate(
+                    member,
+                    IngestError::new(format!(
+                        "{address} is the address of two elements: {} and {}",
+                        element(first, at),
+                        element(member, index)
+                    )),
+                ));
+            }
+            taken.insert(address, (member, index));
         }
     }
-    let is_address = |alias: &str| {
-        if taken.contains_key(alias) {
-            return true;
-        }
-        alias.match_indices('/').any(|(at, _)| {
-            matches!(taken.get(&alias[..at]), Some(Some((member, index)))
-                if outlines[*member].entries[*index]
+    // The unit whose provision is at `address`, when one is.
+    let provision_of = |address: &str| {
+        address.match_indices('/').find_map(|(at, _)| {
+            let &(member, index) = taken.get(&address[..at])?;
+            let entry = &outlines[member].entries[index];
+            (entry.unit
+                && entry
                     .provisions
-                    .binary_search_by(|path| path.as_str().cmp(&alias[at..]))
+                    .binary_search_by(|path| path.as_str().cmp(&address[at..]))
                     .is_ok())
+            .then_some((member, index))
         })
     };
+    for (member, own) in addresses.iter().enumerate() {
+        for (index, address) in own.iter().enumerate() {
+            let address = address.as_str();
+            if let Some((unit, at)) = provision_of(address) {
+                return Err(locate(
+                    member,
+                    IngestError::new(format!(
+                        "{address} is the address of two elements: a provision of {} and {}",
+                        element(unit, at),
+                        element(member, index)
+                    )),
+                ));
+            }
+        }
+    }
+    let is_address = |alias: &str| taken.contains_key(alias) || provision_of(alias).is_some();
 
     let mut members = Vec::with_capacity(outlines.len());
     for (member, outline) in outlines.iter().enumerate() {
@@ -333,8 +397,10 @@ pub(crate) fn number(outlines: &[Outline], names: &[String]) -> Result<Numbering
                     continue;
                 }
                 aliases.push(Address::parse(alias).map_err(|error| {
-                    IngestError::new(format!("the alias {alias:?} is not an address: {error}"))
-                        .in_member(&names[member])
+                    locate(
+                        member,
+                        IngestError::new(format!("the alias {alias:?} is not an address: {error}")),
+                    )
                 })?);
             }
             counts[member].aliases += aliases.len() as u64;
@@ -884,6 +950,76 @@ mod tests {
             [("/us/usc/t99/s1~2".to_owned(), Vec::new())]
         );
         assert_eq!((summary.units, summary.containers), (1, 1));
+    }
+
+    #[test]
+    fn an_identifier_that_holds_a_tilde_is_refused() {
+        // `~` is the character the reading adds: `/us/usc/t99/s1~2` beside two
+        // holders of `/us/usc/t99/s1` would give two elements one address.
+        let two = "<section identifier=\"/us/usc/t99/s1\"><content>A.</content></section>\
+                   <section identifier=\"/us/usc/t99/s1\"><content>B.</content></section>";
+        for body in [
+            format!(
+                "{two}<section identifier=\"/us/usc/t99/s1~2\"><content>C.</content></section>"
+            ),
+            "<chapter identifier=\"/us/usc/t99/~chapter.1\"></chapter>".to_owned(),
+            "<section identifier=\"/us/usc/t99/s5 /us/usc/t99/s6~2\"></section>".to_owned(),
+            "<section identifier=\"/us/usc/t99/s1\"><subsection identifier=\"/us/usc/t99/s1/a~2\">\
+             <content>A.</content></subsection></section>"
+                .to_owned(),
+        ] {
+            let error = refusal(&Document::with_body(body.clone()));
+            assert!(error.message().contains("holds ~"), "{body}: {error}");
+            assert!(
+                error
+                    .identifier()
+                    .is_some_and(|identifier| identifier.contains('~'))
+            );
+        }
+    }
+
+    #[test]
+    fn two_elements_of_a_release_never_share_an_address() {
+        // A section whose identifier is the address of a provision of
+        // another section, in the same member and in a later one.
+        let holder = "<section identifier=\"/us/usc/t99/s1\"><subsection \
+                      identifier=\"/us/usc/t99/s1/a\"><content>A.</content></subsection></section>";
+        let error = refusal(&Document::with_body(format!(
+            "{holder}<section identifier=\"/us/usc/t99/s1/a\"><content>B.</content></section>"
+        )));
+        assert!(
+            error
+                .message()
+                .contains("/us/usc/t99/s1/a is the address of two elements"),
+            "{error}"
+        );
+        assert_eq!(error.member(), Some(crate::testing::MEMBER), "{error}");
+
+        let scratch = Scratch::new("shared-address");
+        let first = Document::with_body(holder.to_owned()).text();
+        let second = Document::with_body(
+            "<section identifier=\"/us/usc/t99/s1/a\"><content>B.</content></section>".to_owned(),
+        )
+        .text()
+        .replace("/us/usc/t99\"", "/us/usc/t99a\"");
+        let archives = release_of(
+            &scratch,
+            &[
+                ("usc99.xml", first.as_bytes()),
+                ("usc99a.xml", second.as_bytes()),
+            ],
+        );
+        let error = ingest_all(&archives, &[], 2).expect_err("one address twice");
+        assert!(
+            error
+                .message()
+                .contains("/us/usc/t99/s1/a is the address of two elements"),
+            "{error}"
+        );
+        assert!(error.message().contains("usc99.xml"), "{error}");
+        // An error of the numbering names the member and its archive.
+        assert_eq!(error.member(), Some("usc99a.xml"), "{error}");
+        assert_eq!(error.archive(), Some("xml_usc99@999-1.zip"), "{error}");
     }
 
     #[test]

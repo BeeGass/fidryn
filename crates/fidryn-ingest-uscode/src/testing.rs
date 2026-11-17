@@ -13,6 +13,7 @@ use std::fs;
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// The release every fixture is read as.
 pub(crate) const RELEASE: &str = "999-1";
@@ -154,13 +155,19 @@ pub(crate) fn assert_fixture(name: &str) {
 }
 
 /// An empty directory under the system's directory for temporary files,
-/// removed when the value is dropped.
+/// removed when the value is dropped. Each one is named by the process, by a
+/// number no other directory of the process has, and by `name`, so that tests
+/// that run side by side never share one.
 pub(crate) struct Scratch(PathBuf);
+
+/// The number of the next scratch directory of the process.
+static NEXT_SCRATCH: AtomicUsize = AtomicUsize::new(0);
 
 impl Scratch {
     pub(crate) fn new(name: &str) -> Self {
+        let number = NEXT_SCRATCH.fetch_add(1, Ordering::SeqCst);
         let path = std::env::temp_dir().join(format!(
-            "fidryn-ingest-uscode-{}-{name}",
+            "fidryn-ingest-uscode-{}-{number}-{name}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&path);

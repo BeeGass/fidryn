@@ -1539,12 +1539,35 @@ mod tests {
     #[test]
     fn the_characters_of_the_text_are_normalized_and_kept() {
         assert_fixture("characters");
-        // A character that composes across the end of a link is refused, not
+        // A character that composes across the boundary of a link, a
+        // superscript, a subscript or a footnote marker is refused, not
         // divided.
-        let error = refusal(&Doc::with_section(
+        for inner in [
             "<content>cafe<ref href=\"/us/usc/t99/s2\">\u{301} owner</ref></content>",
-        ));
-        assert!(error.message().contains("cannot be divided"), "{error}");
+            "<content><ref href=\"/us/usc/t99/s2\">cafe</ref>\u{301} owner</content>",
+            "<content>cafe<sup>\u{301}</sup> owner</content>",
+            "<content>cafe<sub>\u{301}</sub> owner</content>",
+            "<content>cafe<ref class=\"footnoteRef\" idref=\"f\">1</ref>\u{301} owner\
+             <note type=\"footnote\" id=\"f\"><num>1</num> So in original.</note></content>",
+            "<heading>cafe<ref class=\"footnoteRef\" idref=\"f\">1</ref>\u{301}<note \
+             type=\"footnote\" id=\"f\"><num>1</num> So in original.</note></heading>",
+        ] {
+            let mut document = Doc::with_section(inner);
+            document.body = document.body.replacen("<heading>Invented</heading>", "", 1);
+            let error = refusal(&document);
+            assert!(
+                error.message().contains("cannot be divided"),
+                "{inner}: {error}"
+            );
+        }
+        // A footnote is no boundary: the character composes.
+        assert_eq!(
+            blocks_of(
+                "<content>cafe<note type=\"footnote\" id=\"f\"><num>1</num> X.</note>\u{301} \
+                 owner</content>"
+            ),
+            [para(vec![words("caf\u{e9} owner")])]
+        );
     }
 
     #[test]

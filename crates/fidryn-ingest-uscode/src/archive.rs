@@ -679,6 +679,18 @@ mod tests {
     }
 
     #[test]
+    fn two_scratch_directories_of_one_name_are_two_directories() {
+        // Tests that run side by side never remove or overwrite each other's
+        // archives.
+        let first = Scratch::new("same-name");
+        let second = Scratch::new("same-name");
+        assert_ne!(first.path(), second.path());
+        pack(first.path(), "a.zip", &[("usc01.xml", DOCUMENT)]);
+        drop(second);
+        assert!(first.path().join("a.zip").is_file());
+    }
+
+    #[test]
     fn a_member_that_changed_after_open_is_refused() {
         let scratch = Scratch::new("changed");
         pack(scratch.path(), "a.zip", &[("usc01.xml", DOCUMENT)]);
