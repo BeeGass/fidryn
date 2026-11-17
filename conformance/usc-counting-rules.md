@@ -64,13 +64,16 @@ What is counted is what the reading imports, element by element:
   on, counting over the files in the order of their names. A provision's address
   is its parent's followed by the last segment of its identifier, and `~2`, `~3`
   for a later sibling with the same address. An element without an identifier
-  gets the segment `~<tag>.<n>` below its parent. An alias that is the address of
-  another element is dropped.
+  gets the segment `~<tag>.<n>` below its parent. An alias is dropped when it is
+  the address of a unit, a container or a provision, or one the element already
+  has.
 - **Notes** are the `note` children of a `notes` element and the notes that
   stand directly in a level, footnotes and release notes left out. A note's group
   is the topic of the last group heading (`note role="crossHeading"`) before it
-  in its `notes` element, and `ungrouped` before any. A group heading is no note:
-  its label, its first heading, is not imported and is counted; what it holds
+  in its `notes` element, and `ungrouped` before any. The topic of a group
+  heading is one word of ASCII letters and digits that begins with a letter, and
+  a word these rules do not know is a group like any other. A group heading is no
+  note: its label, its first heading, is not imported and is counted; what it holds
   after that label is a note of the group it opens, with no heading and no
   topics. A note is editorial when its group is `editorialNotes`, or when it is
   ungrouped and its topic is `removalDescription` or `historicalAndRevision`;
@@ -111,7 +114,10 @@ as the blocks of its own flow; an element whose own segment is `~<tag>.<n>`
 counts as assigned, whether it is a unit, a container or a provision; the
 `appendix` of an appendix file stands directly under `uscDoc`, and a
 `signature` is a block in quoted content inside a note as in the note itself;
-the text a group heading holds after its label is a note of its group.
+the text a group heading holds after its label is a note of its group. A number
+with neither a value nor text is absent, as it is in 201 sections quoted in notes
+of release 119-142; a number with a value and no text keeps the value with an empty
+shown form; a heading and a source credit with no text are absent.
 
 | Key | Count |
 | --- | --- |

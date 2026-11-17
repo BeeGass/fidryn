@@ -58,6 +58,9 @@ CASES = {
     "neither a law nor a heading",
     "source-credit": "a source credit with links and a date, and a container's credit",
     "characters": "U+00A0 in a number, U+202F, U+2000, a composing sequence, U+200B, [sic]",
+    "empty-labels": "a quoted section with an empty number, a number with a value and no text, "
+    "an empty heading, an empty source credit",
+    "notes-unknown-group": "a group heading with a group word the rules do not know",
 }
 TWO_FILES = "two-files"
 
@@ -180,6 +183,12 @@ class TextFixtures(unittest.TestCase):
 
     def test_characters(self) -> None:
         self.check("characters")
+
+    def test_empty_labels(self) -> None:
+        self.check("empty-labels")
+
+    def test_notes_unknown_group(self) -> None:
+        self.check("notes-unknown-group")
 
     def test_two_files_are_numbered_over_the_release_for_any_number_of_workers(self) -> None:
         expected = expected_lines(TWO_FILES)
@@ -368,6 +377,20 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             '<p><ref href="/us/pl/999">Pub. L. 999</ref></p></note></notes>'
         ),
         "four segments",
+    ),
+    "cross heading with no topic": (
+        document(
+            inner='<notes type="uscNote"><note role="crossHeading"><heading>Notes</heading>'
+            "</note></notes>"
+        ),
+        "not one word of ASCII letters",
+    ),
+    "cross heading whose topic is not one word": (
+        document(
+            inner='<notes type="uscNote"><note role="crossHeading" topic="editorial-notes">'
+            "<heading>Notes</heading></note></notes>"
+        ),
+        "not one word of ASCII letters",
     ),
     "second source credit": (
         document(inner="<sourceCredit>(One.)</sourceCredit><sourceCredit>(Two.)</sourceCredit>"),

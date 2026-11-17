@@ -114,6 +114,8 @@ WHITE_SPACE = (
 WHITE_SET = frozenset(WHITE_SPACE)
 WHITE_RUN = re.compile("[" + re.escape(WHITE_SPACE) + "]+")
 SEGMENT = re.compile("[A-Za-z0-9.~\u2013-]+")
+GROUP_WORD = re.compile("[A-Za-z][A-Za-z0-9]*")
+LABEL_NAMES = {"num": "num", "heading": "heading", "sourceCredit": "source credit"}
 
 
 class RefusedError(Exception):
@@ -944,12 +946,15 @@ class MemberReader:
         credit: Text | None = None
         notes: list[tuple[Element, str, bool]] = []
         place: Counter[str] = Counter()
+        seen: set[str] = set()
         for child in element:
             tag = tag_of(child)
+            if tag in LABEL_NAMES:
+                self.check_once(child, seen)
             if tag == "num":
-                num = self.read_label_num(child, num, scope)
+                num = self.read_num(child, scope)
             elif tag == "heading":
-                heading = self.read_label_heading(child, heading, scope)
+                heading = self.read_optional_text(child, scope)
             elif tag == "toc":
                 self.count_toc(child)
             elif tag == "notes":
@@ -962,9 +967,7 @@ class MemberReader:
                     continue
                 notes.append((child, "ungrouped", False))
             elif tag == "sourceCredit":
-                if credit is not None:
-                    self.refuse("a second source credit of one container", child)
-                credit = self.read_text(child, scope)
+                credit = self.read_optional_text(child, scope)
             elif self.classify(child) is not None:
                 members.append(self.read_module(child, address, place))
             else:
@@ -1019,15 +1022,23 @@ class MemberReader:
             )
         )
 
-    def read_label_num(self, element: Element, seen: Num | None, scope: Scope) -> Num:
-        if seen is not None:
-            self.refuse("a second num of one level", element)
-        return Num(element.get("value") or "", self.read_text(element, scope))
+    def check_once(self, element: Element, seen: set[str]) -> None:
+        """A number, a heading and a source credit each stand once in one level."""
+        tag = tag_of(element)
+        if tag in seen:
+            self.refuse(f"a second {LABEL_NAMES[tag]} of one level", element)
+        seen.add(tag)
 
-    def read_label_heading(self, element: Element, seen: Text | None, scope: Scope) -> Text:
-        if seen is not None:
-            self.refuse("a second heading of one level", element)
-        return self.read_text(element, scope)
+    def read_num(self, element: Element, scope: Scope) -> Num | None:
+        """A number; absent when it has neither a value nor text."""
+        value = element.get("value") or ""
+        shown = self.read_text(element, scope)
+        return Num(value, shown) if value or shown.plain else None
+
+    def read_optional_text(self, element: Element, scope: Scope) -> Text | None:
+        """A heading or a source credit; absent when it has no text."""
+        text = self.read_text(element, scope)
+        return text if text.plain else None
 
     def read_provision(self, element: Element, address: str, unit: UnitState) -> Provision:
         scope = unit.scope
@@ -1039,13 +1050,16 @@ class MemberReader:
         notes: list[tuple[Element, str, bool]] = []
         siblings: Counter[str] = Counter()
         place: Counter[str] = Counter()
+        seen: set[str] = set()
         operative = Context()
         for child in element:
             tag = tag_of(child)
+            if tag in LABEL_NAMES:
+                self.check_once(child, seen)
             if tag == "num":
-                num = self.read_label_num(child, num, scope)
+                num = self.read_num(child, scope)
             elif tag == "heading":
-                heading = self.read_label_heading(child, heading, scope)
+                heading = self.read_optional_text(child, scope)
             elif tag in TEXT_PARTS:
                 items += self.read_parts(child, operative, scope)
             elif tag in P_TAGS:
@@ -1065,9 +1079,7 @@ class MemberReader:
             elif tag == "sourceCredit":
                 if address != unit.scope.address:
                     self.refuse("a source credit that is not the direct child of its unit", child)
-                if unit.credit is not None:
-                    self.refuse("a second source credit of one unit", child)
-                unit.credit = self.read_text(child, scope)
+                unit.credit = self.read_optional_text(child, scope)
             elif tag == "toc":
                 self.count_toc(child)
             else:
@@ -1226,18 +1238,17 @@ class MemberReader:
         items: list[QuotedItem] = []
         flow = Flow(self, scope, context, items)
         flow.text(element.text)
+        seen: set[str] = set()
         for child in element:
             tag = tag_of(child)
             if labels is not None and tag == "num":
                 flow.close()
-                if labels[0] is not None:
-                    self.refuse("a second num of one level", child)
-                labels[0] = Num(child.get("value") or "", self.read_text(child, scope))
+                self.check_once(child, seen)
+                labels[0] = self.read_num(child, scope)
             elif labels is not None and tag == "heading":
                 flow.close()
-                if labels[1] is not None:
-                    self.refuse("a second heading of one level", child)
-                labels[1] = self.read_text(child, scope)
+                self.check_once(child, seen)
+                labels[1] = self.read_optional_text(child, scope)
             elif tag in TEXT_PARTS:
                 flow.close()
                 items += self.read_parts(child, context, scope)
@@ -1264,7 +1275,9 @@ class MemberReader:
         blocks: list[Block] = []
         inner = context
         if heading is not None:
-            blocks.append(Subheading(self.read_text(heading, scope)))
+            text = self.read_optional_text(heading, scope)
+            if text is not None:
+                blocks.append(Subheading(text))
             inner = Context(context.in_note, context.in_quoted, True)
         return blocks + self.read_flow(element, inner, scope, skip=heading)
 
@@ -1285,8 +1298,12 @@ class MemberReader:
                 self.refuse("an element of notes that is not a note", child)
             if child.get("role") == "crossHeading":
                 group = child.get("topic") or ""
-                if not is_segment(group):
-                    self.refuse(f"a cross heading whose topic {group!r} is no group word", child)
+                if not GROUP_WORD.fullmatch(group):
+                    self.refuse(
+                        f"a cross heading whose topic {group!r} is not one word of ASCII letters "
+                        "and digits that begins with a letter",
+                        child,
+                    )
                 self.counts.note_group_headings += 1
                 found.append((child, group, True))
             elif not is_footnote(child):
@@ -1332,7 +1349,7 @@ class MemberReader:
                 topics = (element.get("topic") or "").split()
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
                 if heading_element is not None:
-                    heading = self.read_text(heading_element, scope)
+                    heading = self.read_optional_text(heading_element, scope)
                 context = Context(True, False, heading_element is not None, note_flow=True)
                 blocks = self.read_flow(element, context, scope, skip=heading_element)
             law = self.law_of(heading, blocks, element, anchor)

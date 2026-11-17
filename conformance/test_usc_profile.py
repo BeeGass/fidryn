@@ -167,6 +167,12 @@ class ProfileFixtures(unittest.TestCase):
     def test_characters(self) -> None:
         self.check("characters")
 
+    def test_empty_labels(self) -> None:
+        self.check("empty-labels")
+
+    def test_notes_unknown_group(self) -> None:
+        self.check("notes-unknown-group")
+
     def test_two_files_are_counted_the_same_for_any_number_of_workers(self) -> None:
         expected = json.loads((FIXTURES / f"{TWO_FILES}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):
