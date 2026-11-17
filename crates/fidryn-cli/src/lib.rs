@@ -18,6 +18,8 @@ use fidryn_core::{
 };
 use fidryn_hir::elaborate;
 use fidryn_render::{module_values, render_values};
+use fidryn_syntax::e2::E2_MAX_SOURCE_BYTES;
+use fidryn_syntax::edition::{Edition, edition_of};
 use fidryn_syntax::{format_module, parse_file};
 #[cfg(test)]
 use fidryn_trace::render_report;
@@ -165,6 +167,9 @@ pub enum Command {
 
 /// Dispatch a parsed CLI invocation.
 pub fn run(cli: Cli) -> ExitCode {
+    if let Some(refused) = refuse_edition_2(&cli.command) {
+        return refused;
+    }
     let source_root = cli.source_root.as_deref();
     match cli.command {
         Command::Fmt { path } => cmd_fmt(&path),
@@ -274,6 +279,126 @@ pub fn run(cli: Cli) -> ExitCode {
     }
 }
 
+/// The files a command reads as its input. `check` chooses its front end by
+/// the edition of its file, and `ui` reads none.
+fn inputs_of(command: &Command) -> Vec<PathBuf> {
+    match command {
+        Command::Check { .. } | Command::Ui { .. } => Vec::new(),
+        Command::Fmt { path }
+        | Command::Inputs { path, .. }
+        | Command::Run { path, .. }
+        | Command::Explore { path, .. }
+        | Command::Verify { path, .. }
+        | Command::Render { path, .. }
+        | Command::Review { path, .. } => vec![path.clone()],
+        Command::Explain { trace_id, .. } => {
+            let as_path = PathBuf::from(trace_id);
+            if as_path.exists() {
+                vec![as_path]
+            } else {
+                vec![PathBuf::from(format!("{trace_id}.json"))]
+            }
+        }
+        Command::Diff {
+            old_snapshot,
+            new_snapshot,
+            ..
+        } => vec![old_snapshot.clone(), new_snapshot.clone()],
+        Command::File { packet, .. } => vec![packet.clone()],
+    }
+}
+
+/// Exit 1 when a file `command` reads is a module of edition 2, or carries a
+/// marker that names no edition: only `fidryn check` reads edition 2.
+fn refuse_edition_2(command: &Command) -> Option<ExitCode> {
+    for path in inputs_of(command) {
+        if let Err(diagnostic) = first_edition_file(&path) {
+            eprintln!("{diagnostic}");
+            return Some(ExitCode::from(1));
+        }
+    }
+    None
+}
+
+/// `Err` with the `E100` that refuses `source` when it is a module of
+/// edition 2, or carries a marker that names no edition.
+fn first_edition(source: &str) -> Result<(), Diagnostic> {
+    match edition_of(source)? {
+        Edition::One => Ok(()),
+        Edition::Two => Err(fidryn_check::e2::not_compiled_for_evaluation()),
+    }
+}
+
+/// As [`first_edition`], of the file at `path`, naming the file. A file that
+/// cannot be read passes, so that the command reports why.
+fn first_edition_file(path: &Path) -> Result<(), Diagnostic> {
+    let Some(head) = read_head(path) else {
+        return Ok(());
+    };
+    first_edition(utf8_prefix(&head))
+        .map_err(|diagnostic| diagnostic.with_source(path.display().to_string()))
+}
+
+/// The bytes of the file at `path`, up to one more than the largest source
+/// of edition 2; `None` when it cannot be read.
+fn read_head(path: &Path) -> Option<Vec<u8>> {
+    let mut bytes = Vec::new();
+    fs::File::open(path)
+        .ok()?
+        .take((E2_MAX_SOURCE_BYTES + 1) as u64)
+        .read_to_end(&mut bytes)
+        .ok()?;
+    Some(bytes)
+}
+
+/// The longest prefix of `bytes` that is UTF-8.
+fn utf8_prefix(bytes: &[u8]) -> &str {
+    match std::str::from_utf8(bytes) {
+        Ok(text) => text,
+        Err(error) => std::str::from_utf8(&bytes[..error.valid_up_to()]).unwrap_or_default(),
+    }
+}
+
+/// `fidryn check` of a module of edition 2: the checks of one module, then
+/// `ok`. `None` when the file at `path` is no module of edition 2, or cannot
+/// be read; the check of the first edition then reads it.
+fn check_edition_2(path: &Path) -> Option<ExitCode> {
+    let head = read_head(path)?;
+    if !matches!(edition_of(utf8_prefix(&head)), Ok(Edition::Two)) {
+        return None;
+    }
+    let name = path.display().to_string();
+    let source = if head.len() > E2_MAX_SOURCE_BYTES {
+        String::from_utf8_lossy(&head).into_owned()
+    } else {
+        match String::from_utf8(head) {
+            Ok(source) => source,
+            Err(error) => {
+                eprintln!(
+                    "{}",
+                    Diagnostic::new(
+                        fidryn_core::DiagnosticCode::E100,
+                        format!("cannot read {name}: {error}"),
+                    )
+                );
+                return Some(ExitCode::from(1));
+            }
+        }
+    };
+    match fidryn_check::e2::check_source(&source) {
+        Ok(_) => {
+            println!("ok");
+            Some(ExitCode::SUCCESS)
+        }
+        Err(diagnostics) => {
+            for diagnostic in diagnostics {
+                eprintln!("{}", diagnostic.with_source(name.clone()));
+            }
+            Some(ExitCode::from(1))
+        }
+    }
+}
+
 /// Parse an ISO 8601 / RFC 3339 timestamp.
 ///
 /// `Instant::parse` uses `time::Rfc3339`. Both a `Z` suffix and a numeric
@@ -321,8 +446,10 @@ pub fn apply_run_args(case: &mut CaseRecord, args: &[String]) -> Result<(), Stri
     Ok(())
 }
 
-/// Parse, elaborate, and check a module from source text.
+/// Parse, elaborate, and check a module from source text. A module of
+/// edition 2 is refused with `E100`.
 pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule, Vec<Diagnostic>> {
+    first_edition(src).map_err(|diagnostic| vec![diagnostic])?;
     let parsed = parse_file(src);
     if parsed.has_errors() {
         return Err(parsed.diagnostics);
@@ -333,7 +460,8 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
 
 /// Compile a `.fr` path, loading the declared `source_manifest` or a
 /// `sources/` fallback. A declared path that is missing or malformed is a
-/// diagnostic. Modules that omit a manifest get an empty default.
+/// diagnostic. Modules that omit a manifest get an empty default. A module of
+/// edition 2 is refused with `E100`.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
     compile_module_with_root(path, None)
 }
@@ -342,6 +470,7 @@ fn compile_artifact(
     path: &Path,
     source_root: Option<&Path>,
 ) -> Result<(fidryn_driver::CompilationArtifact, SourceManifest), Vec<Diagnostic>> {
+    first_edition_file(path).map_err(|diagnostic| vec![diagnostic])?;
     DRIVER.with(|driver| match source_root {
         Some(root) => driver
             .borrow_mut()
@@ -668,6 +797,9 @@ fn cmd_fmt(path: &Path) -> ExitCode {
 }
 
 fn cmd_check(path: &Path, source_root: Option<&Path>) -> ExitCode {
+    if let Some(checked) = check_edition_2(path) {
+        return checked;
+    }
     match compile_or_exit(path, source_root) {
         Ok(_) => {
             println!("ok");

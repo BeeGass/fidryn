@@ -1,0 +1,29 @@
+edition 2
+module "/zz/demo/t1/ch1" {
+  within "/zz/demo/t1"
+  source "demo01.xml"
+  positive_law true
+  container "/zz/demo/t1/ch1" chapter {
+    num "1" "CHAPTER 1—" mark "1" 1
+    heading "Widgets"
+    member "/zz/demo/t1/s8"
+    member "/zz/demo/t1/s9"
+    hash "92e8a5dd75562d11c1b7aad60305545274b2244e4263f198b13492de70663caa"
+  }
+  credit "(Invented act, ch. 1.)"
+  note "/zz/demo/t1/ch1/note/statutoryNotes/nolaw/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p "This invented chapter may be cited as the Widget Act."
+    hash "635d7582d6eb86af92d00451c0c2b18bd2756706564046f45f1919399ded0d4d"
+  }
+  footnote 1 "1" {
+    p "An invented footnote of the chapter."
+  }
+  layers {
+    operative "92e8a5dd75562d11c1b7aad60305545274b2244e4263f198b13492de70663caa"
+    enacted "d46c32d256a10f7e289bab66132b99eae0f2a4ac1c71d2ea08a171aeaa66dcb0"
+    editorial "24646183e14b528d5c3f5ec30886df06910b43dbf46ec85689c609caef90008b"
+  }
+}

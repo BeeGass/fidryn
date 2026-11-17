@@ -1,7 +1,7 @@
 //! The model of law modules and the rules over it: addresses, the
 //! normalization of text, the file path of a module, the model of provisions,
-//! notes and modules ([`model`]), their hashes ([`hash`]) and their text
-//! records ([`records`]).
+//! notes and modules ([`model`]), their hashes ([`hash`]), their text
+//! records ([`records`]) and their canonical text ([`render`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.
@@ -12,6 +12,7 @@ pub mod layout;
 pub mod model;
 pub mod normalize;
 pub mod records;
+pub mod render;
 pub mod workspace;
 
 pub use address::{Address, AddressError};

@@ -1,0 +1,398 @@
+//! The checks of one module over its lowered model.
+
+use super::{Declared, Lowered, Spans, Value};
+use fidryn_core::{Diagnostic, DiagnosticCode, Span};
+use fidryn_provision::hash::{
+    hash_container, hash_note, layer_hashes_of_container, layer_hashes_of_unit, tree_hashes,
+};
+use fidryn_provision::{
+    Address, Block, ContainerModule, CuratedModule, DefinitionKind, Footnote, Hash32, Item,
+    LayerHashes, Module, Note, PartRole, Provision, QuotedItem, UnitModule,
+};
+use std::collections::{BTreeMap, BTreeSet};
+
+/// The checks of one module, in the order of the text they are about:
+///
+/// - the top provision of a unit has the module's address, every child
+///   provision's address is below its parent's, every note's address is
+///   below the module's, and no address is declared twice (`E700`);
+/// - every `hash` and every value of `layers` is the hash computed from what
+///   the module writes, every footnote marker names a footnote of the
+///   module, and every definition names a provision of the unit whose text
+///   holds each term, whose text or whose parent's chapeau holds the reach
+///   words when they are stated, and, when its kind is `borrowed`, says what
+///   it borrows from (`E710`);
+/// - no citation name and no binding name of a curated module is declared
+///   twice (`E200`).
+pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic> {
+    let mut check = Check {
+        spans: &lowered.spans,
+        diagnostics: Vec::new(),
+    };
+    match &lowered.module {
+        Module::Unit(unit) => check.unit(unit),
+        Module::Container(container) => check.container(container),
+        Module::Curated(curated) => check.curated(curated),
+    }
+    let mut diagnostics = check.diagnostics;
+    diagnostics
+        .sort_by_key(|diagnostic| diagnostic.primary_span.map(|span| (span.start, span.end)));
+    diagnostics
+}
+
+/// A provision of a unit and its parent.
+struct Placed<'a> {
+    provision: &'a Provision,
+    parent: Option<&'a Provision>,
+}
+
+/// Every provision of the tree below `root`, in document order.
+fn in_document_order(root: &Provision) -> Vec<Placed<'_>> {
+    fn walk<'a>(
+        provision: &'a Provision,
+        parent: Option<&'a Provision>,
+        out: &mut Vec<Placed<'a>>,
+    ) {
+        out.push(Placed { provision, parent });
+        for item in &provision.items {
+            if let Item::Child(child) = item {
+                walk(child, Some(provision), out);
+            }
+        }
+    }
+    let mut out = Vec::new();
+    walk(root, None, &mut out);
+    out
+}
+
+/// Whether `address` lies below `other`, and is not `other` itself.
+fn below(address: &Address, other: &Address) -> bool {
+    address != other && address.is_within(other)
+}
+
+/// The plain text of each paragraph and subheading of the text parts of
+/// `provision` whose role `wanted` accepts, those in its tables and quoted
+/// content included, and nothing of its children.
+fn texts_of(provision: &Provision, wanted: impl Fn(PartRole) -> bool) -> Vec<String> {
+    fn blocks(list: &[Block], out: &mut Vec<String>) {
+        for block in list {
+            match block {
+                Block::Para(text) | Block::Subheading(text) => out.push(text.plain()),
+                Block::Table(table) => {
+                    for cell in table.rows.iter().flat_map(|row| &row.cells) {
+                        blocks(&cell.blocks, out);
+                    }
+                }
+                Block::Quoted(quoted) => items(&quoted.items, out),
+                Block::Image { .. } => {}
+            }
+        }
+    }
+    fn items(list: &[QuotedItem], out: &mut Vec<String>) {
+        for item in list {
+            match item {
+                QuotedItem::Block(block) => blocks(std::slice::from_ref(block), out),
+                QuotedItem::Part { blocks: inner, .. } => blocks(inner, out),
+                QuotedItem::Level(level) => items(&level.items, out),
+            }
+        }
+    }
+    let mut out = Vec::new();
+    for item in &provision.items {
+        if let Item::Part {
+            role,
+            blocks: inner,
+        } = item
+            && wanted(*role)
+        {
+            blocks(inner, &mut out);
+        }
+    }
+    out
+}
+
+struct Check<'a> {
+    spans: &'a Spans,
+    diagnostics: Vec<Diagnostic>,
+}
+
+impl Check<'_> {
+    fn error(&mut self, code: DiagnosticCode, span: Span, message: impl Into<String>) {
+        self.diagnostics
+            .push(Diagnostic::new(code, message).with_span(span));
+    }
+
+    fn unit(&mut self, unit: &UnitModule) {
+        let spans = self.spans;
+        let provisions = in_document_order(&unit.root);
+        if unit.root.address != unit.address
+            && let Some(root) = spans.provisions.first()
+        {
+            self.error(
+                DiagnosticCode::E700,
+                root.address,
+                format!(
+                    "the top provision's address `{}` is not the module's address `{}`",
+                    unit.root.address, unit.address
+                ),
+            );
+        }
+        for (placed, declared) in provisions.iter().zip(&spans.provisions) {
+            if let Some(parent) = placed.parent
+                && !below(&placed.provision.address, &parent.address)
+            {
+                self.error(
+                    DiagnosticCode::E700,
+                    declared.address,
+                    format!(
+                        "the address `{}` is not below the address `{}` of its parent provision",
+                        placed.provision.address, parent.address
+                    ),
+                );
+            }
+        }
+        self.notes_below(&unit.address, &unit.notes);
+        let declared: Vec<(&Address, &Declared)> = provisions
+            .iter()
+            .map(|placed| &placed.provision.address)
+            .zip(&spans.provisions)
+            .chain(
+                unit.notes
+                    .iter()
+                    .map(|note| &note.address)
+                    .zip(&spans.notes),
+            )
+            .collect();
+        self.declared_once(&declared);
+
+        let hashes = tree_hashes(&unit.root);
+        for ((placed, declared), computed) in provisions.iter().zip(&spans.provisions).zip(hashes) {
+            self.hash(
+                declared.hash,
+                computed,
+                &format!("provision `{}`", placed.provision.address),
+            );
+        }
+        self.note_hashes(&unit.notes);
+        self.layers(&layer_hashes_of_unit(unit));
+        self.marks(&unit.footnotes);
+        self.definitions(unit, &provisions);
+    }
+
+    fn container(&mut self, container: &ContainerModule) {
+        let spans = self.spans;
+        self.notes_below(&container.address, &container.notes);
+        let declared: Vec<(&Address, &Declared)> = container
+            .notes
+            .iter()
+            .map(|note| &note.address)
+            .zip(&spans.notes)
+            .collect();
+        self.declared_once(&declared);
+        if let Some(declared) = &spans.container {
+            self.hash(
+                declared.hash,
+                hash_container(container),
+                &format!("container `{}`", container.address),
+            );
+        }
+        self.note_hashes(&container.notes);
+        self.layers(&layer_hashes_of_container(container));
+        self.marks(&container.footnotes);
+    }
+
+    fn curated(&mut self, curated: &CuratedModule) {
+        let spans = self.spans;
+        let citations: Vec<(&str, Span)> = curated
+            .citations
+            .iter()
+            .map(|citation| citation.name.as_str())
+            .zip(spans.citation_names.iter().copied())
+            .collect();
+        self.named_once("citation", &citations);
+        let bindings: Vec<(&str, Span)> = curated
+            .bindings
+            .iter()
+            .map(|binding| binding.name.as_str())
+            .zip(spans.binding_names.iter().copied())
+            .collect();
+        self.named_once("binding", &bindings);
+    }
+
+    fn notes_below(&mut self, module: &Address, notes: &[Note]) {
+        for (note, declared) in notes.iter().zip(&self.spans.notes) {
+            if !below(&note.address, module) {
+                self.error(
+                    DiagnosticCode::E700,
+                    declared.address,
+                    format!(
+                        "the note's address `{}` is not below the module's address `{module}`",
+                        note.address
+                    ),
+                );
+            }
+        }
+    }
+
+    /// Reports each address of `declared` that stands earlier in the source.
+    fn declared_once(&mut self, declared: &[(&Address, &Declared)]) {
+        let mut in_order: Vec<(&Address, Span)> = declared
+            .iter()
+            .map(|(address, declared)| (*address, declared.address))
+            .collect();
+        in_order.sort_by_key(|(_, span)| span.start);
+        let mut first: BTreeMap<&Address, Span> = BTreeMap::new();
+        for (address, span) in in_order {
+            match first.get(address) {
+                Some(earlier) => {
+                    let mut diagnostic = Diagnostic::new(
+                        DiagnosticCode::E700,
+                        format!("the address `{address}` is declared twice"),
+                    )
+                    .with_span(span);
+                    diagnostic.related_spans.push(*earlier);
+                    self.diagnostics.push(diagnostic);
+                }
+                None => {
+                    first.insert(address, span);
+                }
+            }
+        }
+    }
+
+    fn named_once(&mut self, what: &str, names: &[(&str, Span)]) {
+        let mut first: BTreeMap<&str, Span> = BTreeMap::new();
+        for &(name, span) in names {
+            match first.get(name) {
+                Some(earlier) => {
+                    let mut diagnostic = Diagnostic::new(
+                        DiagnosticCode::E200,
+                        format!("the {what} name `{name}` is declared twice"),
+                    )
+                    .with_span(span);
+                    diagnostic.related_spans.push(*earlier);
+                    self.diagnostics.push(diagnostic);
+                }
+                None => {
+                    first.insert(name, span);
+                }
+            }
+        }
+    }
+
+    fn hash(&mut self, declared: Value, computed: Hash32, what: &str) {
+        if declared.hash != computed {
+            self.error(
+                DiagnosticCode::E710,
+                declared.span,
+                format!(
+                    "the `hash` of {what} does not match what the module writes; the hash \
+                     computed from it is `{computed}`"
+                ),
+            );
+        }
+    }
+
+    fn note_hashes(&mut self, notes: &[Note]) {
+        for (note, declared) in notes.iter().zip(&self.spans.notes) {
+            self.hash(
+                declared.hash,
+                hash_note(note),
+                &format!("note `{}`", note.address),
+            );
+        }
+    }
+
+    fn layers(&mut self, computed: &LayerHashes) {
+        let Some([operative, enacted, editorial]) = self.spans.layers else {
+            return;
+        };
+        for (name, declared, computed) in [
+            ("operative", operative, computed.operative),
+            ("enacted", enacted, computed.enacted),
+            ("editorial", editorial, computed.editorial),
+        ] {
+            if declared.hash != computed {
+                self.error(
+                    DiagnosticCode::E710,
+                    declared.span,
+                    format!(
+                        "the `{name}` value of `layers` does not match what the module writes; \
+                         the hash computed from it is `{computed}`"
+                    ),
+                );
+            }
+        }
+    }
+
+    fn marks(&mut self, footnotes: &[Footnote]) {
+        let ordinals: BTreeSet<u32> = footnotes.iter().map(|footnote| footnote.ordinal).collect();
+        for &(footnote, span) in &self.spans.marks {
+            if !ordinals.contains(&footnote) {
+                self.error(
+                    DiagnosticCode::E710,
+                    span,
+                    format!(
+                        "the footnote marker names footnote {footnote}, and the module has no \
+                         footnote {footnote}"
+                    ),
+                );
+            }
+        }
+    }
+
+    fn definitions(&mut self, unit: &UnitModule, provisions: &[Placed<'_>]) {
+        let mut by_address: BTreeMap<&Address, &Placed<'_>> = BTreeMap::new();
+        for placed in provisions {
+            by_address
+                .entry(&placed.provision.address)
+                .or_insert(placed);
+        }
+        for (definition, spans) in unit.definitions.iter().zip(&self.spans.definitions) {
+            let at = &definition.at;
+            let Some(placed) = by_address.get(at) else {
+                self.error(
+                    DiagnosticCode::E710,
+                    spans.at,
+                    format!("the definition names `{at}`, which is no provision of this module"),
+                );
+                continue;
+            };
+            let texts = texts_of(placed.provision, |_| true);
+            let stands =
+                |texts: &[String], words: &str| texts.iter().any(|text| text.contains(words));
+            for (term, span) in definition.terms.iter().zip(&spans.terms) {
+                if !stands(&texts, term) {
+                    self.error(
+                        DiagnosticCode::E710,
+                        *span,
+                        format!("the term `{term}` does not stand in the text of provision `{at}`"),
+                    );
+                }
+            }
+            if let Some(words) = &definition.words {
+                let chapeau = placed
+                    .parent
+                    .map(|parent| texts_of(parent, |role| role == PartRole::Chapeau))
+                    .unwrap_or_default();
+                if !stands(&texts, words) && !stands(&chapeau, words) {
+                    self.error(
+                        DiagnosticCode::E710,
+                        spans.words,
+                        format!(
+                            "the words `{words}` stand neither in the text of provision `{at}` \
+                             nor in the chapeau of its parent"
+                        ),
+                    );
+                }
+            }
+            if definition.kind == DefinitionKind::Borrowed && definition.borrowed_from.is_none() {
+                self.error(
+                    DiagnosticCode::E710,
+                    spans.kind,
+                    "a definition of kind `borrowed` has no `borrowed_from`",
+                );
+            }
+        }
+    }
+}

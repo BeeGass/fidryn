@@ -141,7 +141,7 @@ Workspace members are listed in [`Cargo.toml`](../Cargo.toml).
 fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-check           types, effects, authority, time, strata (hir + core); edition 2 lowering and one-module check (syntax + provision)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)

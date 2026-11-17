@@ -96,7 +96,7 @@ retains the following contracts:
 fidryn-syntax          parser, formatter, Rowan CST (not every Pratt node)
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-check           types, effects, authority, time, strata (hir + core); edition 2 lowering and one-module check (syntax + provision)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
@@ -115,10 +115,12 @@ Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
 Do not put parser logic in `core`. `fidryn-provision` depends on no other
 crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
 depends on `fidryn-provision` only, and no crate depends on
-`fidryn-ingest-uscode`. `fidryn-provision` holds the model of law modules
-and the rules over it, among them addresses, text normalization, file
-paths, hashes and text records. `fidryn-ingest-uscode` is empty: it
-declares no items.
+`fidryn-ingest-uscode`. `fidryn-check` depends on `fidryn-provision` for
+the model into which it lowers modules of edition 2. `fidryn-provision`
+holds the model of law modules and the rules over it, among them
+addresses, text normalization, file paths, hashes, text records and the
+canonical text of a module. `fidryn-ingest-uscode` is empty: it declares
+no items.
 
 ## Public APIs
 
@@ -171,6 +173,11 @@ pub fn elaborate(parse: &fidryn_syntax::Parse, manifest: &SourceManifest)
 ```rust
 pub fn check(hir: &HirModule, manifest: &SourceManifest)
     -> Result<CoreModule, Vec<Diagnostic>>
+
+// fidryn_check::e2, for law modules of edition 2 (see law-modules.md):
+pub fn lower(parse: &fidryn_syntax::e2::Parse) -> Result<Lowered, Vec<Diagnostic>>
+pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic>
+pub fn check_source(source: &str) -> Result<Lowered, Vec<Diagnostic>>
 ```
 
 ### fidryn-eval
@@ -308,7 +315,9 @@ W760 ToolchainMismatch
 ```
 
 `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
-`fidryn-core`; no check raises them. `W750` and `W760` are warnings.
+`fidryn-core`. The checks of one module of edition 2 raise `E700` and
+`E710`, besides `E100` and `E200`; no check raises `E720`, `E730`, `E740`,
+`W750` or `W760`. `W750` and `W760` are warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate
 to `Suspended`, `Contingent`, or `NormConflict`.

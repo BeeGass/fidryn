@@ -107,6 +107,30 @@ pub struct LayerHashes {
 /// The tree hash of `provision`: of its own kind, number, heading, status and
 /// text parts, and of the tree hash of each child. Its address is not in it.
 pub fn hash_provision(provision: &Provision) -> Hash32 {
+    tree_hash(provision, &mut hash_provision)
+}
+
+/// The tree hash of every provision of the tree below `root`, `root`
+/// included, in document order: each provision before its children, and the
+/// children in order. Each provision is hashed once, so the cost grows with
+/// the size of the tree and not with its depth; `hash_provision` of each
+/// provision gives the same values.
+pub fn tree_hashes(root: &Provision) -> Vec<Hash32> {
+    fn walk(provision: &Provision, hashes: &mut Vec<Hash32>) -> Hash32 {
+        let at = hashes.len();
+        hashes.push(Hash32([0; 32]));
+        let hash = tree_hash(provision, &mut |child| walk(child, hashes));
+        hashes[at] = hash;
+        hash
+    }
+    let mut hashes = Vec::new();
+    walk(root, &mut hashes);
+    hashes
+}
+
+/// The tree hash of `provision`, taking the tree hash of each child from
+/// `child_hash`.
+fn tree_hash(provision: &Provision, child_hash: &mut dyn FnMut(&Provision) -> Hash32) -> Hash32 {
     let mut out = Frames::new(PROVISION_DOMAIN);
     out.frame(tag::KIND, provision.kind.as_bytes());
     out.num(provision.num.as_ref());
@@ -115,7 +139,7 @@ pub fn hash_provision(provision: &Provision) -> Hash32 {
     for item in &provision.items {
         match item {
             Item::Part { role, blocks } => out.part(*role, blocks),
-            Item::Child(child) => out.frame(tag::CHILD, &hash_provision(child).0),
+            Item::Child(child) => out.frame(tag::CHILD, &child_hash(child).0),
         }
     }
     out.finish()
@@ -908,6 +932,57 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// Every provision of the tree below `provision`, in document order.
+    fn in_document_order<'a>(provision: &'a Provision, out: &mut Vec<&'a Provision>) {
+        out.push(provision);
+        for item in &provision.items {
+            if let Item::Child(child) = item {
+                in_document_order(child, out);
+            }
+        }
+    }
+
+    #[test]
+    fn tree_hashes_are_the_tree_hash_of_every_provision_in_document_order() {
+        for top in [deep_tree(), tree(), leaf()] {
+            let mut provisions = Vec::new();
+            in_document_order(&top, &mut provisions);
+            let expected: Vec<Hash32> = provisions.iter().map(|p| hash_provision(p)).collect();
+            assert_eq!(super::tree_hashes(&top), expected);
+        }
+        assert_eq!(super::tree_hashes(&tree()).len(), 5);
+        assert_eq!(super::tree_hashes(&deep_tree()).len(), 9);
+    }
+
+    /// The tree of [`tree`] with a chain of four levels below its first
+    /// grandchild.
+    fn deep_tree() -> Provision {
+        let mut deep = provision(
+            "/zz/demo/t1/s9/a/1/A/i/I/aa",
+            "item",
+            None,
+            None,
+            vec![content(vec![para(vec![words("The deepest.")])])],
+        );
+        for at in [
+            "/zz/demo/t1/s9/a/1/A/i/I",
+            "/zz/demo/t1/s9/a/1/A/i",
+            "/zz/demo/t1/s9/a/1/A",
+        ] {
+            deep = provision(at, "level", None, None, vec![Item::Child(deep)]);
+        }
+        let mut root = tree();
+        node(&mut root, "/zz/demo/t1/s9/a/1")
+            .items
+            .push(Item::Child(deep));
+        root
+    }
+
+    /// A provision with no child.
+    fn leaf() -> Provision {
+        provision("/zz/demo/t1/s9", "section", None, None, Vec::new())
     }
 
     fn unit(root: Provision, notes: Vec<Note>, footnote: &str) -> UnitModule {

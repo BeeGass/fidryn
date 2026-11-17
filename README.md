@@ -135,7 +135,7 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | --- | --- |
 | `fidryn-syntax` | Lexer, parser, Rowan CST, formatter |
 | `fidryn-hir` | Names, imports, elaboration |
-| `fidryn-check` | Types, effects, import authentication |
+| `fidryn-check` | Types, effects, import authentication; lowering and the checks of one module of edition 2. Depends on `fidryn-provision` for the model of law modules |
 | `fidryn-core` | IR, values, outcomes, legal state |
 | `fidryn-eval` | Worklist evaluator |
 | `fidryn-handlers` | CaseFile, Explore, Skeptical |
@@ -146,7 +146,7 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
-| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes and text records. Depends on no other crate of the workspace |
+| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records and the canonical text of a module. Depends on no other crate of the workspace |
 | `fidryn-ingest-uscode` | Empty. Of the workspace crates, depends on `fidryn-provision` only |
 | `fidryn-cli` | `fidryn` binary and mill |
 

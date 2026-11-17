@@ -164,18 +164,32 @@ stderr. Parse errors print a diagnostic (<code>E100 ParseError: ...</code>).</p>
 <h2 id="check"><span class="hn">4.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
 <p>Parse, elaborate, and type-check a module, including source-manifest
 authentication as described above.</p>
+<p>A file whose first two words are <code>edition 2</code> is a law module of edition 2,
+which holds provisions of law as data
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#edition-2">Law modules</a>). <code>check</code> reads it with its own
+parser and runs the checks of one module on it: its shape, its addresses,
+the form of its text, its hashes, its footnote markers and its
+definitions, as
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
+lists them.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
 </tbody></table>
 </div>
 <p><strong>Example</strong></p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr</code></pre></figure>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr
+<span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
 <p><strong>Success.</strong> Prints <code>ok</code> and exits 0.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
 <code>CODE Title: message</code> (for example
 <code>E310 PropAsGuard: ...</code>). A module that cannot check:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check tests/diagnostics/e310-prop-as-guard.fr</code></pre></figure>
+<p>A diagnostic of a module of edition 2 names its file, as
+<code>FILE: E710 IntegrityMismatch: ...</code>. Every other command exits 1 on such a
+file, with
+<code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> fmt crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
 <h2 id="run"><span class="hn">4.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>
 <p>Evaluate one query against one case record at a pair of bitemporal
 instants. <code>run</code> never chooses a completion. It does not search

@@ -77,7 +77,7 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, and their hashes |
+| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, and what the checker verifies in one module |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
@@ -1735,6 +1735,15 @@ stderr. Parse errors print a diagnostic (`E100 ParseError: ...`).
 Parse, elaborate, and type-check a module, including source-manifest
 authentication as described above.
 
+A file whose first two words are `edition 2` is a law module of edition 2,
+which holds provisions of law as data
+([Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#edition-2)). `check` reads it with its own
+parser and runs the checks of one module on it: its shape, its addresses,
+the form of its text, its hashes, its footnote markers and its
+definitions, as
+[What the checker verifies in one module](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-one-module)
+lists them.
+
 **Arguments**
 
 | Name | Required | Type |
@@ -1745,6 +1754,7 @@ authentication as described above.
 
 ```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
+fidryn check crates/fidryn-check/tests/fixtures/e2/unit.fr
 ```
 
 **Success.** Prints `ok` and exits 0.
@@ -1755,6 +1765,15 @@ fidryn check examples/trust/bryan-revocable-trust.fr
 
 ```sh exit=1
 fidryn check tests/diagnostics/e310-prop-as-guard.fr
+```
+
+A diagnostic of a module of edition 2 names its file, as
+`FILE: E710 IntegrityMismatch: ...`. Every other command exits 1 on such a
+file, with
+``E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it``:
+
+```sh exit=1
+fidryn fmt crates/fidryn-check/tests/fixtures/e2/unit.fr
 ```
 
 ## `run`
@@ -3625,7 +3644,7 @@ Workspace members are listed in [`Cargo.toml`](https://github.com/BeeGass/fidryn
 fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-check           types, effects, authority, time, strata (hir + core); edition 2 lowering and one-module check (syntax + provision)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)

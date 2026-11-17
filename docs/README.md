@@ -40,7 +40,7 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 | [Licensing](../LICENSING.md) | MIT terms and third-party notices |
 | [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, and their hashes |
+| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, and what the checker verifies in one module |
 | [Implementation status](implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 

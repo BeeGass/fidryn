@@ -95,6 +95,15 @@ stderr. Parse errors print a diagnostic (`E100 ParseError: ...`).
 Parse, elaborate, and type-check a module, including source-manifest
 authentication as described above.
 
+A file whose first two words are `edition 2` is a law module of edition 2,
+which holds provisions of law as data
+([Law modules](law-modules.md#edition-2)). `check` reads it with its own
+parser and runs the checks of one module on it: its shape, its addresses,
+the form of its text, its hashes, its footnote markers and its
+definitions, as
+[What the checker verifies in one module](law-modules.md#what-the-checker-verifies-in-one-module)
+lists them.
+
 **Arguments**
 
 | Name | Required | Type |
@@ -105,6 +114,7 @@ authentication as described above.
 
 ```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
+fidryn check crates/fidryn-check/tests/fixtures/e2/unit.fr
 ```
 
 **Success.** Prints `ok` and exits 0.
@@ -115,6 +125,15 @@ fidryn check examples/trust/bryan-revocable-trust.fr
 
 ```sh exit=1
 fidryn check tests/diagnostics/e310-prop-as-guard.fr
+```
+
+A diagnostic of a module of edition 2 names its file, as
+`FILE: E710 IntegrityMismatch: ...`. Every other command exits 1 on such a
+file, with
+``E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it``:
+
+```sh exit=1
+fidryn fmt crates/fidryn-check/tests/fixtures/e2/unit.fr
 ```
 
 ## `run`

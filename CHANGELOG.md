@@ -5,6 +5,21 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
+### Added
+
+- Law modules of edition 2, which hold provisions of law as data. A file
+  whose first two words are `edition 2` is read by a parser of its own,
+  lowered into the model of `fidryn-provision`, and checked as one module by
+  `fidryn check`: its shape, its addresses, the normalization of its text,
+  its hashes, its footnote markers and its definitions. Every other command,
+  and `fidryn_cli::compile_source` and `compile_module`, refuses such a file
+  with `E100`. A file without the marker is read as before.
+- `fidryn_provision::render::render`, which writes a module in its
+  canonical form with every hash computed, and `hash::tree_hashes`, the tree
+  hash of every provision of a tree in one pass.
+- The documentation check reads a block that begins with `edition 2` as a
+  complete module and checks it.
+
 ## [0.2.0] - 2026-11-16
 
 ### Changed

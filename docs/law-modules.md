@@ -2,10 +2,12 @@
 
 This reference gives the rules by which a module of law, and each provision
 and note in it, is named, where the file of a module stands in its
-workspace, how the text of a module is normalized, what a module holds, and
-how its provisions, notes and layers are hashed. The crate
-`fidryn-provision` implements them. In the examples, `/zz/demo` is an
-invented corpus.
+workspace, how the text of a module is normalized, what a module holds, how
+its provisions, notes and layers are hashed, how a module is written, and
+what the checker verifies of one module. The crate `fidryn-provision`
+implements the model and the rules over it, `fidryn-syntax` reads the text
+of a module, and `fidryn-check` lowers it into the model and checks it. In
+the examples, `/zz/demo` is an invented corpus.
 
 ## Addresses
 
@@ -312,7 +314,258 @@ What follows from these rules:
 
 `hash::hash_provision`, `hash::hash_note`, `hash::hash_container`,
 `hash::layer_hashes_of_unit` and `hash::layer_hashes_of_container` compute
-them. A second implementation in Python, `conformance/hash_vectors.py`,
-computes the same hashes of the invented models in
-`conformance/fixtures/hash/vectors.json`, and the tests of both hold their
-values to the digests recorded there.
+them. `hash::tree_hashes` gives the tree hash of every provision of a tree
+in document order, hashing each provision once. A second implementation in
+Python, `conformance/hash_vectors.py`, computes the same hashes of the
+invented models in `conformance/fixtures/hash/vectors.json`, and the tests
+of both hold their values to the digests recorded there.
+
+## Edition 2
+
+A law module is a file of edition 2. Its first two significant tokens are
+the word `edition` and the integer `2`; white space, line ends and comments
+before them are skipped. A file whose first significant token is anything
+else is a file of the first edition, which carries no marker, and is read as
+before. A file that begins with the word `edition` followed by anything
+other than `2` is refused with `E100`: "unknown edition `3`; this toolchain
+reads edition 2 after the word `edition`, and files of the first edition
+carry no marker".
+
+A module of edition 2 holds provisions of law as data, and nothing in it is
+evaluated. `fidryn_syntax::edition::edition_of` tells the edition of a
+file, and each entry point asks it before it reads the file:
+
+| Entry point | Given a module of edition 2 |
+| --- | --- |
+| `fidryn check FILE` | the checks of one module, as [below](#what-the-checker-verifies-in-one-module), then `ok` |
+| `fmt`, `inputs`, `run`, `explore`, `explain`, `verify`, `diff`, `render`, `review` and `file` | exit 1 with `E100`: "an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it" |
+| `fidryn_cli::compile_source` and `compile_module`, and so the source pasted into the mill of `ui` | the same `E100` |
+| the documentation check, `cargo xtask docs` | a fenced block, untagged or tagged `fidryn`, whose first line that is not blank is `edition 2` is a complete module and gets the checks of one module |
+
+## Syntax
+
+The tokens are those of the lexer of the first edition. Words such as
+`module` and `content` are identifiers that the parser compares by their
+text. A string is a JSON string literal. Line ends are not significant, and
+`//` begins a comment that runs to the end of its line.
+
+```text
+File        = "edition" "2" Module ;
+Module      = "module" String "{" { Decl } "}" ;
+Decl        = Alias | Within | Source | PositiveLaw | Provision | Container | Credit | Note
+            | Footnote | Definition | Layers | Import | Citation | Binding ;
+
+Alias       = "alias" String ;
+Within      = "within" String ;
+Source      = "source" String ;
+PositiveLaw = "positive_law" ( "true" | "false" ) ;
+
+Provision   = "provision" String Ident "{" [ Num ] [ "heading" Text ] [ "status" Ident ]
+              { Part | Provision } "hash" String "}" ;
+Num         = "num" String Text ;
+Part        = Role ( Text | "{" Block { Block } "}" ) ;
+Role        = "chapeau" | "content" | "continuation" | "proviso" ;
+Block       = "p" Text | "subheading" Text | Table | Quoted | "image" String ;
+Text        = Run { Run } ;
+Run         = String
+            | "[" String "->" String "]"
+            | "sup" String | "sub" String
+            | "mark" String Int ;
+
+Table       = "table" "{" { Row } "}" ;
+Row         = ( "head" | "body" | "foot" ) "{" { Cell } "}" ;
+Cell        = ( "td" | "th" ) [ "span" Int Int ] ( Text | "{" { Block } "}" ) ;
+
+Quoted      = "quoted" [ String ] "{" { QItem } "}" ;
+QItem       = Block | Part | "level" Ident "{" [ Num ] [ "heading" Text ] { QItem } "}" ;
+
+Container   = "container" String Ident "{" [ Num ] [ "heading" Text ] [ "status" Ident ]
+              { "member" String } "hash" String "}" ;
+Credit      = "credit" Text ;
+Note        = "note" String ( "enacted" | "editorial" ) "{" "group" Ident { "topic" String }
+              [ "heading" Text ] { Block } "hash" String "}" ;
+Footnote    = "footnote" Int String "{" { Block } "}" ;
+Definition  = "definition" String "{" "term" String { "term" String } "kind" Ident
+              "words" ( String | "unstated" ) [ "region" String ] "basis" Ident
+              [ "borrowed_from" String ] [ "see_note" String ] "}" ;
+Layers      = "layers" "{" "operative" String "enacted" String "editorial" String "}" ;
+
+Import      = "import" String ( "as" Ident | "{" Ident { "," Ident } "}" ) ;
+Citation    = "citation" Ident "->" String ;
+Binding     = "binding" Ident "{" "binds" ( String | Ident [ "." Ident ] )
+              "release" String "provision_hash" String "notes_hash" String "pending" "}" ;
+```
+
+A link `[words -> target]` holds the linked words and the target as the
+source writes it; `sup` and `sub` hold superscript and subscript words;
+`mark "1" 2` is a footnote marker shown as `1` that names footnote 2. A
+`num` holds the value of a number and the text it is shown as.
+
+The parser, `fidryn_syntax::e2::parse`, enforces the grammar and stops at
+its first error, an `E100` at the token it is about:
+
+- Every block has the fields shown, in the order shown. A word that is no
+  field of its block is "unknown field `<word>` in `<block>`"; a field that
+  stands out of its order, twice, or not at all is named as such.
+- A word that begins no declaration is "unknown declaration `<word>`".
+- Text after the closing brace of the module is an error.
+- A source holds at most 64 MiB and 16,777,216 tokens, and its blocks nest
+  at most 64 deep: "module exceeds resource limits".
+
+A module has one of three shapes. A **unit** has exactly one `provision` at
+the top, a **container module** exactly one `container`, and a **curated**
+module neither. `alias`, `within`, `source`, `positive_law`, `credit`,
+`note`, `footnote`, `definition` and `layers` belong to units and
+containers; `import`, `citation` and `binding` belong to curated modules.
+`within`, `source`, `positive_law`, `credit` and `layers` stand at most
+once, and a unit or a container has a `source` and `layers`. A container
+holds no provision, so a definition in a container module names no
+provision of its module. The declarations may stand in any order.
+
+**The canonical form** is what `fidryn_provision::render::render` writes,
+and generated modules are always in it:
+
+- UTF-8, `\n` line ends, a final line end, two spaces of indentation for
+  each open brace, no blank line, no trailing space.
+- Line 1 is `edition 2`, line 2 is `module "<address>" {`.
+- The declarations in this order: each `alias`, `within`, `source`,
+  `positive_law`, the `provision` or the `container`, `credit`, the notes
+  in document order, the footnotes by ordinal, the definitions in the
+  document order of the provisions they name and then by their first term,
+  and `layers`. A curated module has its imports, then its citations, then
+  its bindings, each in the order of its list.
+- One field to a line. A text is written on one line, its runs separated by
+  one space.
+- A string is written with `\\` for a backslash, `\"` for a quotation mark,
+  `\u00XX` for a character below U+0020 or U+007F, and every other
+  character as itself.
+- A part or a cell whose content is exactly one paragraph is written in the
+  short form (`content "..."`), otherwise in the brace form with one block
+  to a line. A cell with no block is written `td ""`, and that spelling is
+  read back as a cell with no block. The shown form of a number that has
+  none is written `""` and read back as the empty text. An empty string
+  stands nowhere else.
+- `span <colspan> <rowspan>` is written only when one of the two is not 1.
+- Every `hash` and the three values of `layers` are computed by the rules
+  of [Hashes](#hashes) from what is written above them.
+
+`fidryn_check::e2::lower` reads a parsed module back into the model:
+lowering the parse of what `render` writes gives the model back. A unit,
+with invented text, in the canonical form:
+
+```fidryn
+edition 2
+module "/zz/demo/t1/s8" {
+  within "/zz/demo/t1/ch1"
+  source "demo01.xml"
+  positive_law true
+  provision "/zz/demo/t1/s8" section {
+    num "8" "§ 8."
+    heading "Words that include a widget"
+    provision "/zz/demo/t1/s8/a" subsection {
+      num "a" "(a)"
+      content "As used in " ["section 2 of this title" -> "/zz/demo/t1/s2"] ", the term “widget” means a small device."
+      hash "ec085e67853dd9ced4dafa9836e747dc158ae35ed76f628d9b1eacbd6937be77"
+    }
+    provision "/zz/demo/t1/s8/b" subsection {
+      num "b" "(b)"
+      heading "Sizes"
+      content {
+        p "A widget comes in the sizes of this table." mark "1" 1
+        table {
+          head {
+            th "Size"
+            th "Width"
+          }
+          body {
+            td "small"
+            td "1 inch"
+          }
+          body {
+            td "large"
+            td ""
+          }
+          foot {
+            td span 2 1 "Every width is invented."
+          }
+        }
+      }
+      hash "f36533507953a8ee2c81864d9db0cda382347b2322c0df95de608eef5c5c62a3"
+    }
+    hash "699c00e650aa1e79b5d4fa480684eb557f327ebdb41a043553535a12ab189a31"
+  }
+  credit "(Added by an invented act.)"
+  note "/zz/demo/t1/s8/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "This invented section was enacted as part of an invented code."
+    hash "c3b231e97013f057f0ca7072b0aec4cde6432fa8567fe131b4065c60eefb864e"
+  }
+  footnote 1 "1" {
+    p "So in the invented original."
+  }
+  definition "/zz/demo/t1/s8/a" {
+    term "widget"
+    kind means
+    words "As used in section 2 of this title"
+    region "/zz/demo/t1/s2"
+    basis enacted
+  }
+  layers {
+    operative "699c00e650aa1e79b5d4fa480684eb557f327ebdb41a043553535a12ab189a31"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ddcc1297ec38d082f41d0dc581020c81cbb1c1ede2e221dd58b8000528b4cc40"
+  }
+}
+```
+
+This module is
+[`unit.fr`](../crates/fidryn-check/tests/fixtures/e2/unit.fr). Beside it,
+[`container.fr`](../crates/fidryn-check/tests/fixtures/e2/container.fr) is
+a container module and
+[`curated.fr`](../crates/fidryn-check/tests/fixtures/e2/curated.fr) a
+curated module that binds two provisions of the unit. The tests of
+`fidryn-check` hold the three files to what `render` writes, and the
+documentation check checks the module above.
+
+## What the checker verifies in one module
+
+`fidryn check FILE` and the documentation check run
+`fidryn_check::e2::check_source` on a module of edition 2: the marker, the
+grammar, lowering into the model (`lower`), and the checks over the model
+(`check_module`). Every diagnostic carries the span of the text it is
+about. `fidryn check` prints each as `FILE: CODE Title: message` and exits
+1, or prints `ok`.
+
+| Check | Code |
+| --- | --- |
+| The module's address, and every address written in it, is an address | `E700` |
+| The module has one of the three shapes, every declaration belongs to its shape, a declaration that stands once stands once, and a unit or a container has a `source` and `layers` | `E100` |
+| A unit's top provision has the module's address, and a container's address is the module's; every child provision's address is below its parent's; every note's address is below the module's; no address of a provision or a note is declared twice | `E700` |
+| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; an origin of quoted content is not empty | `E710` |
+| Every `hash`, every value of `layers` and both hashes of a binding are 64 lower-case hexadecimal digits | `E710` |
+| Every `hash` and every value of `layers` equals the hash computed from what the module writes | `E710` |
+| Every footnote marker names a footnote of the module | `E710` |
+| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of its parent; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
+| In a curated module, no citation name and no binding name is declared twice | `E200` |
+
+An address is below another when it lies within it and is not the same
+address. The text of a provision is the plain text of each paragraph and
+subheading of its text parts, those in its tables and its quoted content
+included, and none of its children's; a term stands in it when one of
+those texts holds the term. The topics of a note and the origin of quoted
+content have rules of their own because the hash of a note joins its
+topics with one space and the hash of quoted content takes an absent
+origin as an empty one: without them, two different modules could have
+one hash.
+
+A text that is not normalized is reported at the run where it first
+differs from its normalized form. A hash that does not match is reported
+at the hash, with the hash computed from the module. A change to one word
+of a provision is therefore reported at the `hash` of that provision, at
+the `hash` of every provision above it, and at the `operative` value of
+`layers`, since each of them covers the word. When lowering finds an
+error, the module is not lowered and the checks over the model do not
+run: a module whose text is not normalized is not also checked for its
+hashes.
