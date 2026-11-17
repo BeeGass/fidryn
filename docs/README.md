@@ -29,7 +29,10 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 [`schemas/outcome-v0.1.json`](../schemas/outcome-v0.1.json), and
 [`schemas/evaluation-report-v0.2.json`](../schemas/evaluation-report-v0.2.json)
 (CLI `run` / `explore` and mill eval responses nest the outcome as
-`outcomeDocument`).
+`outcomeDocument`). The files of a workspace of law modules follow
+[`schemas/workspace-v0.1.json`](../schemas/workspace-v0.1.json),
+[`schemas/law-lock-v0.1.json`](../schemas/law-lock-v0.1.json) and
+[`schemas/retrieval-v0.1.json`](../schemas/retrieval-v0.1.json).
 
 ## For implementers
 
@@ -40,7 +43,7 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 | [Licensing](../LICENSING.md) | MIT terms and third-party notices |
 | [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, and what the checker verifies in one module |
+| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, and workspaces: their manifest, their lock and what the checker verifies in one |
 | [Implementation status](implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 

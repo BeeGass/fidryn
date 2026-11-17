@@ -1,0 +1,17 @@
+edition 2
+module "/zz/demo/t1/s1" {
+  within "/zz/demo/t1/ch1"
+  source "demo01.xml"
+  positive_law true
+  provision "/zz/demo/t1/s1" section {
+    num "1" "§ 1."
+    heading "Definitions"
+    content "In this invented chapter, a widget is a small device."
+    hash "2f2e93485e3fe14369f8c982e3c5c4f9315eda168b80779c75874382b40db795"
+  }
+  layers {
+    operative "2f2e93485e3fe14369f8c982e3c5c4f9315eda168b80779c75874382b40db795"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

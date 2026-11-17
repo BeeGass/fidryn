@@ -104,20 +104,38 @@ definitions, as
 [What the checker verifies in one module](law-modules.md#what-the-checker-verifies-in-one-module)
 lists them.
 
+A directory is a workspace of edition 2 modules, with a manifest,
+`workspace.json`, at its top ([Workspaces](law-modules.md#workspaces)).
+`check` reads every module of it by itself, and then checks the manifest,
+the lock of a generated workspace, where each module stands, and the
+containers and their members, as
+[What the checker verifies in a workspace](law-modules.md#what-the-checker-verifies-in-a-workspace)
+lists them.
+
 **Arguments**
 
 | Name | Required | Type |
 | --- | --- | --- |
-| `PATH` | yes | path to a `.fr` file |
+| `PATH` | yes | path to a `.fr` file, or to the directory of a workspace |
 
 **Example**
 
 ```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
 fidryn check crates/fidryn-check/tests/fixtures/e2/unit.fr
+fidryn check conformance/fixtures/workspace/demo
 ```
 
-**Success.** Prints `ok` and exits 0.
+**Success.** Prints `ok` and exits 0. For a workspace it prints, before
+`ok`, one summary line:
+
+```text
+modules: 5; from cache: 0; errors: 0; warnings: 0
+```
+
+A warning, such as `W760 ToolchainMismatch` when the manifest's
+`toolchain` is not the running version, is printed to stderr and does not
+change the exit status.
 
 **Failure.** Exit 1. Each diagnostic is printed to stderr as
 `CODE Title: message`, after the file it is in when it is about the text
@@ -130,8 +148,17 @@ fidryn check tests/diagnostics/e310-prop-as-guard.fr
 ```
 
 A module of edition 2 is reported in the same way, as
-`FILE: E710 IntegrityMismatch: ...`. Every other command exits 1 on such a
-file, with
+`FILE: E710 IntegrityMismatch: ...`. A diagnostic of a workspace names its
+file under the directory given, as
+`DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...`; the summary line is
+printed to stdout, its errors counted, and `ok` is not. A directory with no
+`workspace.json` is refused with `E730`:
+
+```sh exit=1
+fidryn check conformance/fixtures/workspace
+```
+
+Every other command exits 1 on a module of edition 2, with
 ``E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it``:
 
 ```sh exit=1

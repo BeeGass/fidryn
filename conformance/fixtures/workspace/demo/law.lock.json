@@ -1,0 +1,46 @@
+{
+  "schema": "fidryn.law-lock/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "generator": {
+    "name": "demo-writer",
+    "version": "0.2.0"
+  },
+  "artifacts": [
+    {
+      "file": "demo01@42-7.zip",
+      "url": "https://example.invalid/releases/42/7/demo01@42-7.zip",
+      "retrieved_at": "2026-11-16T22:14:03Z",
+      "bytes": 42241,
+      "blake3": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+      "sha256": "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0",
+      "members": [
+        {
+          "name": "demo01.xml",
+          "bytes": 2048,
+          "blake3": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+        }
+      ]
+    }
+  ],
+  "addresses": {
+    "aliases": 0,
+    "disambiguated": 0,
+    "assigned": 0
+  },
+  "not_imported": {
+    "tables_of_contents": 0,
+    "footnotes_in_tables_of_contents": 0,
+    "links_in_tables_of_contents": 0,
+    "release_notes": 0,
+    "links_without_words": 0,
+    "note_group_headings": 0
+  },
+  "modules": {
+    "zz/demo/t1.fr": "86697d019cac7c552a5618ca27685a15a5f3973aeaa8803ef03ff2953f184858",
+    "zz/demo/t1/ch1.fr": "901f5ae31311f19e0a45adc0f75c949530867eb5e60ebc0fdbbc1bbaff92b46a",
+    "zz/demo/t1/s1.fr": "be27b8343f3e8570fa23f1bfe745e3fe41cc1d31cba330625b2aa5cf674dfef5",
+    "zz/demo/t1/s2.fr": "8d5f0bebebbe58a6ec4bd65f62c702b4c9dfae170a8f749ae8081ca6720a6541",
+    "zz/demo/t1/s3.fr": "d2f4726157c2733d770a0272e629a648fd67eeb3a71acc81b1755b919d7fbcd6"
+  }
+}

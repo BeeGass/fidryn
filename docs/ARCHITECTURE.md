@@ -101,7 +101,7 @@ fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo
+fidryn-driver          incremental check/run memo; workspace check and writer (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
@@ -116,7 +116,10 @@ Do not put parser logic in `core`. `fidryn-provision` depends on no other
 crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
 depends on `fidryn-provision` only, and no crate depends on
 `fidryn-ingest-uscode`. `fidryn-check` depends on `fidryn-provision` for
-the model into which it lowers modules of edition 2. `fidryn-provision`
+the model into which it lowers modules of edition 2. `fidryn-driver`
+depends on `fidryn-provision` for the files of a workspace: it holds the
+check of a workspace of edition 2 modules and the writer of a generated
+one. `fidryn-provision`
 holds the model of law modules and the rules over it, among them
 addresses, text normalization, file paths, hashes, text records and the
 canonical text of a module. `fidryn-ingest-uscode` is empty: it declares
@@ -316,8 +319,9 @@ W760 ToolchainMismatch
 
 `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
 `fidryn-core`. The checks of one module of edition 2 raise `E700` and
-`E710`, besides `E100` and `E200`; no check raises `E720`, `E730`, `E740`,
-`W750` or `W760`. `W750` and `W760` are warnings.
+`E710`, besides `E100` and `E200`; the check of a workspace raises `E720`,
+`E730` and `W760` besides; no check raises `E740` or `W750`. `W750` and
+`W760` are warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate
 to `Suspended`, `Contingent`, or `NormConflict`.

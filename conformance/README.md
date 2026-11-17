@@ -1,18 +1,31 @@
 # Conformance
 
 JSON Schema checks for case records and source manifests under `examples/`
-and `prelude/`. This is a document-shape check. It does not authenticate
-artifacts, execute Rust, or review legal content. A second implementation
-of the hashes of law modules is described at the end.
+and `prelude/`, and for the three files of a workspace of law modules
+under `fixtures/workspace/`. This is a document-shape check. It does not
+authenticate artifacts, execute Rust, or review legal content. A second
+implementation of the hashes of law modules is described at the end.
 
 ```sh
 uv run python conformance/check_json_contracts.py
 uv run python conformance/check_json_contracts.py /path/to/fidryn --output validation.json
 ```
 
-The checker looks for `"schema": "fidryn.case-record/v0.1"` and
-`"fidryn.source-manifest/v0.1"`. Exit `0` if every checked document is
-valid, `1` on validation failures, `2` on setup or read errors.
+The checker looks for `"schema": "fidryn.case-record/v0.1"`,
+`"fidryn.source-manifest/v0.1"`, `"fidryn.workspace/v0.1"`,
+`"fidryn.law-lock/v0.1"` and `"fidryn.retrieval/v0.1"`. Exit `0` if every
+checked document is valid, `1` on validation failures, `2` on setup or
+read errors.
+
+`fixtures/workspace/` holds a generated workspace, `demo/`, in the
+invented corpus `/zz/demo`, and in `archives/` the retrieval record of its
+archive. Every name, text, address, digest of an archive and count in them
+is invented. The Rust test
+`the_committed_demo_workspace_is_what_the_writer_writes` of `fidryn-driver`
+holds every file there, byte for byte, to what the writer of a generated
+workspace writes. `test_workspace_schemas.py` checks that the manifest,
+the lock and the retrieval record match their schemas, and that the
+schemas refuse what a workspace check refuses.
 
 `uv run` provides Python and `jsonschema` from the repository's
 `pyproject.toml` and `uv.lock`. Without `jsonschema` the script falls

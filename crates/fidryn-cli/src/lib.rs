@@ -280,7 +280,8 @@ pub fn run(cli: Cli) -> ExitCode {
 }
 
 /// The files a command reads as its input. `check` chooses its front end by
-/// the edition of its file, and `ui` reads none.
+/// what it is given, a workspace's directory or a file of either edition,
+/// and `ui` reads none.
 fn inputs_of(command: &Command) -> Vec<PathBuf> {
     match command {
         Command::Check { .. } | Command::Ui { .. } => Vec::new(),
@@ -396,6 +397,33 @@ fn check_edition_2(path: &Path) -> Option<ExitCode> {
             }
             Some(ExitCode::from(1))
         }
+    }
+}
+
+/// `fidryn check DIR`: the check of the workspace in the directory `dir`.
+/// Prints each diagnostic, naming its file under `dir`, then the summary
+/// line, then `ok` when there is no error; exit 1 on an error.
+fn check_workspace(dir: &Path) -> ExitCode {
+    let options = fidryn_driver::workspace::CheckOptions {
+        jobs: 1,
+        cache_dir: None,
+        toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+    };
+    let report = fidryn_driver::workspace::check_workspace(dir, &options);
+    for diagnostic in &report.diagnostics {
+        let mut shown = diagnostic.clone();
+        shown.source_file = diagnostic
+            .source_file
+            .as_ref()
+            .map(|file| dir.join(file).display().to_string());
+        eprintln!("{shown}");
+    }
+    println!("{}", report.summary());
+    if report.errors() == 0 {
+        println!("ok");
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(1)
     }
 }
 
@@ -797,6 +825,9 @@ fn cmd_fmt(path: &Path) -> ExitCode {
 }
 
 fn cmd_check(path: &Path, source_root: Option<&Path>) -> ExitCode {
+    if path.is_dir() {
+        return check_workspace(path);
+    }
     if let Some(checked) = check_edition_2(path) {
         return checked;
     }

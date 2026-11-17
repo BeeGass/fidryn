@@ -14,6 +14,7 @@ const CORPUS_NEUTRAL: &[&str] = &[
     "crates/fidryn-syntax/src/edition.rs",
     "crates/fidryn-syntax/src/e2",
     "crates/fidryn-check/src/e2",
+    "crates/fidryn-driver/src/workspace",
 ];
 
 /// Words compared without regard to case. A word is a maximal run of ASCII

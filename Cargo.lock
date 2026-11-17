@@ -639,6 +639,7 @@ dependencies = [
  "fidryn-handlers",
  "fidryn-hir",
  "fidryn-kernel",
+ "fidryn-provision",
  "fidryn-syntax",
  "salsa",
  "serde_json",

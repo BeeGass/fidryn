@@ -172,15 +172,28 @@ the form of its text, its hashes, its footnote markers and its
 definitions, as
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
 lists them.</p>
+<p>A directory is a workspace of edition 2 modules, with a manifest,
+<code>workspace.json</code>, at its top (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>).
+<code>check</code> reads every module of it by itself, and then checks the manifest,
+the lock of a generated workspace, where each module stands, and the
+containers and their members, as
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
+lists them.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
-<tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
+<tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file, or to the directory of a workspace</td></tr>
 </tbody></table>
 </div>
 <p><strong>Example</strong></p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr
-<span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
-<p><strong>Success.</strong> Prints <code>ok</code> and exits 0.</p>
+<span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr
+<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo</code></pre></figure>
+<p><strong>Success.</strong> Prints <code>ok</code> and exits 0. For a workspace it prints, before
+<code>ok</code>, one summary line:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>modules: 5; from cache: 0; errors: 0; warnings: 0</code></pre></figure>
+<p>A warning, such as <code>W760 ToolchainMismatch</code> when the manifest's
+<code>toolchain</code> is not the running version, is printed to stderr and does not
+change the exit status.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
 <code>CODE Title: message</code>, after the file it is in when it is about the text
 of a module (for example
@@ -188,8 +201,13 @@ of a module (for example
 module that cannot check:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check tests/diagnostics/e310-prop-as-guard.fr</code></pre></figure>
 <p>A module of edition 2 is reported in the same way, as
-<code>FILE: E710 IntegrityMismatch: ...</code>. Every other command exits 1 on such a
-file, with
+<code>FILE: E710 IntegrityMismatch: ...</code>. A diagnostic of a workspace names its
+file under the directory given, as
+<code>DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...</code>; the summary line is
+printed to stdout, its errors counted, and <code>ok</code> is not. A directory with no
+<code>workspace.json</code> is refused with <code>E730</code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check conformance/fixtures/workspace</code></pre></figure>
+<p>Every other command exits 1 on a module of edition 2, with
 <code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> fmt crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
 <h2 id="run"><span class="hn">4.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>

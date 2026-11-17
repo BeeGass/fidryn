@@ -4,7 +4,10 @@
 //!
 //! Each file is read with `from_json`, which refuses an unknown field, a
 //! missing field, a `schema` other than the file's and a digest of another
-//! form, and names the field. Each is written with `to_json`: its keys in a
+//! form, and names the field. It also refuses a text whose JSON value is not
+//! the value that the data read from it writes back, such as an object
+//! written as an array of its values, and names the place where the two
+//! differ. Each is written with `to_json`: its keys in a
 //! fixed order, two spaces of indentation, one member to a line, every object
 //! and array that is not empty spread over lines, an empty one written `{}` or
 //! `[]`, and a final line end. The `modules` of a lock are written sorted by
@@ -14,6 +17,7 @@ use crate::address::Address;
 use crate::hash::Hash32;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, Visitor};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::BTreeMap;
 use std::fmt;
 
@@ -165,14 +169,18 @@ impl Manifest {
     /// The manifest written as `text`.
     pub fn from_json(text: &str) -> Result<Manifest, String> {
         let file: ManifestFile = read(text)?;
-        Ok(Manifest {
-            name: file.name,
-            kind: file.kind,
-            prefix: file.prefix,
-            release: file.release,
-            toolchain: file.toolchain,
-            dependencies: file.dependencies,
-        })
+        closed(
+            text,
+            MANIFEST_SCHEMA,
+            Manifest {
+                name: file.name,
+                kind: file.kind,
+                prefix: file.prefix,
+                release: file.release,
+                toolchain: file.toolchain,
+                dependencies: file.dependencies,
+            },
+        )
     }
 
     /// The text of the manifest's file.
@@ -185,15 +193,19 @@ impl Lock {
     /// The lock written as `text`.
     pub fn from_json(text: &str) -> Result<Lock, String> {
         let file: LockFile = read(text)?;
-        Ok(Lock {
-            prefix: file.prefix,
-            release: file.release,
-            generator: file.generator,
-            artifacts: file.artifacts,
-            addresses: file.addresses,
-            not_imported: file.not_imported,
-            modules: file.modules,
-        })
+        closed(
+            text,
+            LOCK_SCHEMA,
+            Lock {
+                prefix: file.prefix,
+                release: file.release,
+                generator: file.generator,
+                artifacts: file.artifacts,
+                addresses: file.addresses,
+                not_imported: file.not_imported,
+                modules: file.modules,
+            },
+        )
     }
 
     /// The text of the lock's file.
@@ -212,10 +224,14 @@ impl RetrievalRecord {
     /// The retrieval record written as `text`.
     pub fn from_json(text: &str) -> Result<RetrievalRecord, String> {
         let file: RetrievalFile = read(text)?;
-        Ok(RetrievalRecord {
-            release: file.release,
-            archives: file.archives,
-        })
+        closed(
+            text,
+            RETRIEVAL_SCHEMA,
+            RetrievalRecord {
+                release: file.release,
+                archives: file.archives,
+            },
+        )
     }
 
     /// The text of the retrieval record's file.
@@ -249,6 +265,107 @@ impl NotImported {
 /// where it stands.
 fn read<'a, T: Deserialize<'a>>(text: &'a str) -> Result<T, String> {
     serde_json::from_str(text).map_err(|error| error.to_string())
+}
+
+/// `data`, read from `text`, when the JSON value of `text` is the value that
+/// `data` writes back with `schema` before it. The readers `serde` derives
+/// also take an object written as an array of its values; no file of a
+/// workspace is written so, and this refuses such a text. The values are
+/// compared, not the bytes, so the layout and the order of the keys do not
+/// matter.
+fn closed<T: Serialize>(text: &str, schema: &'static str, data: T) -> Result<T, String> {
+    let given: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
+    let written = serde_json::to_value(Tagged {
+        schema,
+        body: &data,
+    })
+    .expect("a file of strings, numbers, digests and addresses is written");
+    let mut pointer = String::new();
+    match difference(&given, &written, &mut pointer) {
+        None => Ok(data),
+        Some(found) => {
+            let place = if pointer.is_empty() {
+                "the top of the file".to_owned()
+            } else {
+                format!("`{pointer}`")
+            };
+            Err(format!("{place} is {found}"))
+        }
+    }
+}
+
+/// The first place, in the order of `written`, where `given` differs from
+/// it: `pointer` is left as the JSON pointer of that place, and the result
+/// says what stands there.
+fn difference(given: &Value, written: &Value, pointer: &mut String) -> Option<String> {
+    match (given, written) {
+        (Value::Object(given), Value::Object(written)) => {
+            for (key, value) in written {
+                let at = pointer.len();
+                push_key(pointer, key);
+                match given.get(key) {
+                    Some(found) => {
+                        if let Some(found) = difference(found, value, pointer) {
+                            return Some(found);
+                        }
+                    }
+                    None => return Some("missing where the file is written with it".to_owned()),
+                }
+                pointer.truncate(at);
+            }
+            given
+                .keys()
+                .find(|key| !written.contains_key(*key))
+                .map(|key| {
+                    push_key(pointer, key);
+                    "a key the file is not written with".to_owned()
+                })
+        }
+        (Value::Array(given), Value::Array(written)) if given.len() == written.len() => {
+            for (index, (found, value)) in given.iter().zip(written).enumerate() {
+                let at = pointer.len();
+                pointer.push_str(&format!("/{index}"));
+                if let Some(found) = difference(found, value, pointer) {
+                    return Some(found);
+                }
+                pointer.truncate(at);
+            }
+            None
+        }
+        (Value::Array(given), Value::Array(written)) => Some(format!(
+            "an array of {} values where the file is written with {}",
+            given.len(),
+            written.len()
+        )),
+        _ if given == written => None,
+        _ if kind_of(given) == kind_of(written) => {
+            Some("a value other than the one the file is written with".to_owned())
+        }
+        _ => Some(format!(
+            "{} where the file is written with {}",
+            kind_of(given),
+            kind_of(written)
+        )),
+    }
+}
+
+/// Appends `key` to the JSON pointer `pointer`, with `~` written `~0` and
+/// `/` written `~1`.
+fn push_key(pointer: &mut String, key: &str) {
+    pointer.push('/');
+    pointer.push_str(&key.replace('~', "~0").replace('/', "~1"));
+}
+
+/// What a JSON value is, as a diagnostic names it.
+fn kind_of(value: &Value) -> &'static str {
+    match value {
+        Value::Null => "null",
+        Value::Bool(_) => "true or false",
+        Value::Number(_) => "a number",
+        Value::String(_) => "a string",
+        Value::Array(_) => "an array",
+        Value::Object(_) => "an object",
+    }
 }
 
 /// The text of a file: `schema`, then the fields of `body` in the order of
@@ -865,6 +982,75 @@ mod tests {
                 assert!(error.contains(named), "{key} = {other}: {error}");
             }
         }
+    }
+
+    /// `text` with the object at `pointer` written as the array of its
+    /// values, in their order.
+    fn as_array(text: &str, pointer: &str) -> String {
+        let mut value: Value = serde_json::from_str(text).expect("an example is JSON");
+        let place = value
+            .pointer_mut(pointer)
+            .unwrap_or_else(|| panic!("nothing at {pointer:?}"));
+        let values: Vec<Value> = place
+            .as_object()
+            .unwrap_or_else(|| panic!("no object at {pointer:?}"))
+            .values()
+            .cloned()
+            .collect();
+        *place = Value::Array(values);
+        serde_json::to_string_pretty(&value).expect("a JSON value is written")
+    }
+
+    #[test]
+    fn an_object_written_as_an_array_is_refused() {
+        let places: [(&str, &str, Read, &str); 9] = [
+            ("a manifest", GENERATED_MANIFEST, read_manifest, ""),
+            (
+                "a manifest",
+                CURATED_MANIFEST,
+                read_manifest,
+                "/dependencies/0",
+            ),
+            ("a lock", LOCK, read_lock, ""),
+            ("a lock", LOCK, read_lock, "/generator"),
+            ("a lock", LOCK, read_lock, "/artifacts/0"),
+            ("a lock", LOCK, read_lock, "/artifacts/0/members/0"),
+            ("a lock", LOCK, read_lock, "/not_imported"),
+            ("a retrieval record", RETRIEVAL, read_retrieval, ""),
+            (
+                "a retrieval record",
+                RETRIEVAL,
+                read_retrieval,
+                "/archives/0",
+            ),
+        ];
+        for (what, text, read, pointer) in places {
+            let at = format!("{what}, at {pointer:?}");
+            let text = as_array(text, pointer);
+            let error = read(&text).expect_err(&at);
+            let place = if pointer.is_empty() {
+                "the top of the file".to_owned()
+            } else {
+                format!("`{pointer}`")
+            };
+            assert!(
+                error.contains(&format!(
+                    "{place} is an array where the file is written with an object"
+                )),
+                "{at}: {error}"
+            );
+        }
+        // The value is compared, not the bytes: another layout and another
+        // order of the keys read as before.
+        let compact: Value = serde_json::from_str(LOCK).expect("the lock is JSON");
+        let compact = serde_json::to_string(&compact).expect("a JSON value is written");
+        assert_eq!(Lock::from_json(&compact), Ok(lock()));
+        let reordered = changed(GENERATED_MANIFEST, "", |object| {
+            let name = object.remove("name").expect("a name");
+            object.insert("name".to_owned(), name);
+        });
+        assert_ne!(keys(&reordered, "")[1], "name");
+        assert_eq!(Manifest::from_json(&reordered), Ok(generated_manifest()));
     }
 
     #[test]

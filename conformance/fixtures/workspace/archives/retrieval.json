@@ -1,0 +1,14 @@
+{
+  "schema": "fidryn.retrieval/v0.1",
+  "release": "42-7",
+  "archives": [
+    {
+      "file": "demo01@42-7.zip",
+      "url": "https://example.invalid/releases/42/7/demo01@42-7.zip",
+      "retrieved_at": "2026-11-16T22:14:03Z",
+      "bytes": 42241,
+      "sha256": "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0",
+      "blake3": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90"
+    }
+  ]
+}

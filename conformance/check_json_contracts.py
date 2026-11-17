@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Validate Fidryn case records and manifests against the supplied schemas.
+"""Validate Fidryn case records, source manifests and the files of workspaces.
+
+The files of a workspace are its manifest, its lock and the retrieval record of
+its archives; the demo workspace under conformance/fixtures/workspace is checked.
 
 Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
@@ -19,7 +22,14 @@ from typing import Any
 SCHEMA_FILES = {
     "fidryn.case-record/v0.1": "case-record-v0.1.json",
     "fidryn.source-manifest/v0.1": "source-manifest-v0.1.json",
+    "fidryn.workspace/v0.1": "workspace-v0.1.json",
+    "fidryn.law-lock/v0.1": "law-lock-v0.1.json",
+    "fidryn.retrieval/v0.1": "retrieval-v0.1.json",
 }
+
+# The directories, relative to the repository root, whose JSON documents are
+# checked: every one whose `schema` names a schema of SCHEMA_FILES.
+DOCUMENT_DIRS = ("examples", "prelude", "conformance/fixtures/workspace")
 
 JSON_TYPE_NAMES = {
     type(None): "null",
@@ -184,7 +194,7 @@ def main() -> int:
                 file=sys.stderr,
             )
         results = []
-        for base in (root / "examples", root / "prelude"):
+        for base in (root / directory for directory in DOCUMENT_DIRS):
             if not base.is_dir():
                 continue
             for path in sorted(base.rglob("*.json")):

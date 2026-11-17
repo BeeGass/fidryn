@@ -3,11 +3,13 @@
 This reference gives the rules by which a module of law, and each provision
 and note in it, is named, where the file of a module stands in its
 workspace, how the text of a module is normalized, what a module holds, how
-its provisions, notes and layers are hashed, how a module is written, and
-what the checker verifies of one module. The crate `fidryn-provision`
-implements the model and the rules over it, `fidryn-syntax` reads the text
-of a module, and `fidryn-check` lowers it into the model and checks it. In
-the examples, `/zz/demo` is an invented corpus.
+its provisions, notes and layers are hashed, how a module is written, what
+the checker verifies of one module, and how modules form a workspace and
+what the checker verifies of one. The crate `fidryn-provision` implements
+the model and the rules over it, `fidryn-syntax` reads the text of a
+module, `fidryn-check` lowers it into the model and checks it, and
+`fidryn-driver` checks a workspace and writes a generated one. In the
+examples, `/zz/demo` is an invented corpus.
 
 ## Addresses
 
@@ -338,6 +340,7 @@ file, and each entry point asks it before it reads the file:
 | Entry point | Given a module of edition 2 |
 | --- | --- |
 | `fidryn check FILE` | the checks of one module, as [below](#what-the-checker-verifies-in-one-module), then `ok` |
+| `fidryn check DIR` | the checks of the workspace in the directory, every module of it included, as under [Workspaces](#workspaces) |
 | `fmt`, `inputs`, `run`, `explore`, `explain`, `verify`, `diff`, `render`, `review` and `file` | exit 1 with `E100`: "an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it" |
 | `fidryn_cli::compile_source` and `compile_module`, and so the source pasted into the mill of `ui` | the same `E100` |
 | the documentation check, `cargo xtask docs` | a fenced block, untagged or tagged `fidryn`, whose first line that is not blank is `edition 2` is a complete module and gets the checks of one module |
@@ -580,3 +583,200 @@ the `hash` of every provision above it, and at the `operative` value of
 error, the module is not lowered and the checks over the model do not
 run: a module whose text is not normalized is not also checked for its
 hashes.
+
+## Workspaces
+
+A workspace is a directory with a manifest, `workspace.json`, at its top.
+Every `.fr` file in it is a module of edition 2 whose address is below the
+manifest's `prefix` and which stands at the [file path](#file-paths) of its
+address. A directory whose name begins with a dot is not read, nor is
+anything in it.
+
+```json
+{
+  "schema": "fidryn.workspace/v0.1",
+  "name": "demo",
+  "kind": "generated",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "toolchain": "0.2.0",
+  "dependencies": []
+}
+```
+
+- `kind` is `generated` or `curated`. A generated workspace is written by
+  an importer from the archives of one release: its manifest has that
+  `release`, and it has no dependencies. A curated workspace is written by
+  hand: its manifest has no `release` key.
+- Each dependency of a curated workspace names a generated workspace with
+  its `name`, its directory `path`, relative to the manifest's directory
+  with `/` between its segments, its `release`, and `lock_digest`, the
+  BLAKE3 of the bytes of its lock.
+- `toolchain` is the version of the toolchain the workspace was last
+  checked with.
+
+A generated workspace has a lock, `law.lock.json`, beside its manifest; a
+curated workspace has none. The lock records the archives the workspace
+was made from, what the importer counted, and the BLAKE3 of the bytes of
+every module file by its path:
+
+```json
+{
+  "schema": "fidryn.law-lock/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "generator": {
+    "name": "demo-writer",
+    "version": "0.2.0"
+  },
+  "artifacts": [
+    {
+      "file": "demo01@42-7.zip",
+      "url": "https://example.invalid/releases/42/7/demo01@42-7.zip",
+      "retrieved_at": "2026-11-16T22:14:03Z",
+      "bytes": 42241,
+      "blake3": "<64 hexadecimal digits>",
+      "sha256": "<64 hexadecimal digits>",
+      "members": [
+        {
+          "name": "demo01.xml",
+          "bytes": 2048,
+          "blake3": "<64 hexadecimal digits>"
+        }
+      ]
+    }
+  ],
+  "addresses": {
+    "aliases": 0,
+    "disambiguated": 0,
+    "assigned": 0
+  },
+  "not_imported": {
+    "tables_of_contents": 0,
+    "footnotes_in_tables_of_contents": 0,
+    "links_in_tables_of_contents": 0,
+    "release_notes": 0,
+    "links_without_words": 0,
+    "note_group_headings": 0
+  },
+  "modules": {
+    "zz/demo/t1.fr": "<64 hexadecimal digits>",
+    "zz/demo/t1/ch1.fr": "<64 hexadecimal digits>"
+  }
+}
+```
+
+`url`, `retrieved_at`, `bytes`, `blake3` and `sha256` of an artifact are
+those of the archive in the retrieval record, `retrieval.json`, which
+stands beside the archives of one release and is written when they are
+downloaded:
+
+```json
+{
+  "schema": "fidryn.retrieval/v0.1",
+  "release": "42-7",
+  "archives": [
+    {
+      "file": "demo01@42-7.zip",
+      "url": "https://example.invalid/releases/42/7/demo01@42-7.zip",
+      "retrieved_at": "2026-11-16T22:14:03Z",
+      "bytes": 42241,
+      "sha256": "<64 hexadecimal digits>",
+      "blake3": "<64 hexadecimal digits>"
+    }
+  ]
+}
+```
+
+`fidryn_provision::workspace` holds the three files as data. Each is
+written with its keys in the order shown, two spaces of indentation, one
+member to a line, an empty object or array written `{}` or `[]`, the
+`modules` of a lock sorted by path, and a final line end. Each is read
+back, and refused with the place named, when it has a field it does not
+know or lacks one it needs, when its `schema` is another, when a digest is
+not 64 lower-case hexadecimal digits, and when its JSON value is not the
+value its data writes back, such as an object written as the array of its
+values. [`workspace-v0.1.json`](../schemas/workspace-v0.1.json),
+[`law-lock-v0.1.json`](../schemas/law-lock-v0.1.json) and
+[`retrieval-v0.1.json`](../schemas/retrieval-v0.1.json) in `schemas/` are
+their JSON Schemas.
+
+### Writing a generated workspace
+
+An importer writes a generated workspace with
+`fidryn_driver::workspace::GeneratedWriter`:
+
+- `create(out, manifest)` takes the manifest of a generated workspace with a
+  release and no dependencies, and a directory `out` that does not exist,
+  is empty, or holds a generated workspace of the same prefix. Such a
+  directory may also hold `coverage.json` at its top and any directory
+  whose name begins with a dot, which the run leaves as they are. Any
+  other directory, a curated workspace and a generated workspace of
+  another prefix among them, is refused, and nothing in it is changed.
+- `write(module)` writes a unit or a container whose address is below the
+  prefix, in the canonical form, to its path, through a temporary file
+  that is renamed. It may be called from several threads at once, and it
+  fails when the run has already written a module to that path, so that
+  no module replaces another.
+- `finish(generator, artifacts, addresses, not_imported)` removes every
+  `.fr` file the run did not write, and each directory that leaves empty,
+  then writes `workspace.json`, then `law.lock.json`, and returns the lock.
+
+What a run writes depends only on its modules, its manifest and what
+`finish` is given: neither the order of the calls nor the number of
+threads changes a byte.
+
+### What the checker verifies in a workspace
+
+`fidryn check DIR` runs `fidryn_driver::workspace::check_workspace`. It
+reads each module file by itself: its bytes, its edition and, for a module
+of edition 2, the checks of
+[one module](#what-the-checker-verifies-in-one-module). Then it checks what
+holds across the files, from the manifest and a summary of each module
+that lowered: its path, its address, its shape, `within`, its members and
+its aliases.
+
+| Check | Code |
+| --- | --- |
+| The directory has a `workspace.json`, and it is a manifest | `E730` |
+| A generated workspace has a `release`, no dependencies and a lock, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
+| In a generated workspace, every module file is listed in the lock with the BLAKE3 of its bytes, and every file the lock lists is present | `E730` |
+| Every `.fr` file is a module of edition 2; every entry of the directory is a file or a directory, and none is a symbolic link | `E730` |
+| Every module's address is below the prefix, and the module stands at the path of its address | `E730` |
+| A unit's or a container's `within` names a container of the workspace that lists it as a `member`, and every `member` of a container is a module whose `within` is that container | `E720` |
+| The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
+
+When the directory has no manifest that can be read, that is the one
+diagnostic, and nothing else of the directory is read. A module file that
+does not lower, and a file the lock lists that is missing, take no part in
+the checks of `within` and members: their own diagnostics say what is
+wrong, and a container that lists them is not reported for it.
+
+Every diagnostic names its file by its path in the workspace. One about a
+file as a whole, such as a module file the lock does not list or a file of
+the first edition, has no span. One about where a module stands is at its
+address; one about a `within` is at the string after `within`, and one
+about a member at the string after that `member`. The diagnostics are
+sorted by the path of their file and then by position, a diagnostic about
+the file as a whole first.
+
+`fidryn check DIR` prints each diagnostic as
+`DIR/PATH: CODE Title: message`, then one summary line, and then `ok` when
+there is no error. It exits 1 when there is an error, and 0 otherwise, a
+warning included. The
+invented demo workspace under `conformance/fixtures/workspace/demo` is
+what the writer writes from one title, one chapter and three sections;
+the tests of `fidryn-driver` hold it to that:
+
+```sh
+fidryn check conformance/fixtures/workspace/demo
+```
+
+```text
+modules: 5; from cache: 0; errors: 0; warnings: 0
+ok
+```
+
+`modules` counts the module files read, every `.fr` file of the workspace,
+and `from cache` how many of them were read from a cache; the check keeps
+none, so it is 0.

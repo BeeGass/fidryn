@@ -1,7 +1,9 @@
 //! The model of law modules and the rules over it: addresses, the
 //! normalization of text, the file path of a module, the model of provisions,
 //! notes and modules ([`model`]), their hashes ([`hash`]), their text
-//! records ([`records`]) and their canonical text ([`render`]).
+//! records ([`records`]), their canonical text ([`render`]), and the files of
+//! a workspace as data: its manifest, its lock and the retrieval record of
+//! its archives ([`workspace`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.

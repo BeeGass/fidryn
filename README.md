@@ -142,7 +142,7 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-verify` | Determinacy search |
 | `fidryn-kernel` | Covering-certificate checks |
 | `fidryn-solve` | Streamed finite-domain search |
-| `fidryn-driver` | Compile and run session |
+| `fidryn-driver` | Compile and run session; the check of a workspace of edition 2 modules and the writer of a generated one. Depends on `fidryn-provision` for the files of a workspace |
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |

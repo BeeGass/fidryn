@@ -1,0 +1,17 @@
+edition 2
+module "/zz/demo/t1/s2" {
+  within "/zz/demo/t1/ch1"
+  source "demo01.xml"
+  positive_law true
+  provision "/zz/demo/t1/s2" section {
+    num "2" "§ 2."
+    heading "Sizes"
+    content "A widget is small or large."
+    hash "238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f"
+  }
+  layers {
+    operative "238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -1,0 +1,19 @@
+edition 2
+module "/zz/demo/t1/ch1" {
+  within "/zz/demo/t1"
+  source "demo01.xml"
+  positive_law true
+  container "/zz/demo/t1/ch1" chapter {
+    num "1" "Chapter 1—"
+    heading "Widgets"
+    member "/zz/demo/t1/s1"
+    member "/zz/demo/t1/s2"
+    member "/zz/demo/t1/s3"
+    hash "b42dbbce78f1ba1815db0c914c2fd6a43047156e8923bb7d591d4ae5e5092e71"
+  }
+  layers {
+    operative "b42dbbce78f1ba1815db0c914c2fd6a43047156e8923bb7d591d4ae5e5092e71"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

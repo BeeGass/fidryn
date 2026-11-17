@@ -19,6 +19,17 @@ interchange schema versions are maintained independently of the interpreter.
   hash of every provision of a tree in one pass.
 - The documentation check reads a block that begins with `edition 2` as a
   complete module and checks it.
+- Workspaces of edition 2 modules. `fidryn check DIR` checks a directory
+  with a manifest, `workspace.json`, at its top: every module by itself,
+  then the manifest, the lock `law.lock.json` of a generated workspace,
+  where each module stands, the agreement of the module files with the
+  lock (`E730`), the containers and their members (`E720`), and the
+  toolchain's version (`W760`, a warning); it prints a summary line.
+  `fidryn_driver::workspace::GeneratedWriter` writes a generated workspace.
+  The manifest, the lock and the retrieval record refuse a file whose JSON
+  value is not the value they write back, and have the JSON Schemas
+  `schemas/workspace-v0.1.json`, `law-lock-v0.1.json` and
+  `retrieval-v0.1.json`.
 
 ## [0.2.0] - 2026-11-16
 
