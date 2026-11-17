@@ -124,10 +124,13 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span></code></pre></figure>
 <p><code>cargo xtask ci --fmt</code> runs formatting, the complete Rust tests and Clippy,
 Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, required JavaScript tests, generated-site consistency, the
-example status and documentation checks described below, and benchmark
-compilation. Node and <a href="https://docs.astral.sh/uv/">uv</a> are required for
-qualification. <code>uv run --locked</code> uses <code>.python-version</code> and <code>uv.lock</code>.</p>
+and probe controls, the sample check (<code>cargo xtask uscode-sample</code>: the
+committed archives of the Code against their retrieval record, and the
+committed profile against what the profile script prints), required
+JavaScript tests, generated-site consistency, the example status and
+documentation checks described below, and benchmark compilation. Node and
+<a href="https://docs.astral.sh/uv/">uv</a> are required for qualification.
+<code>uv run --locked</code> uses <code>.python-version</code> and <code>uv.lock</code>.</p>
 <p>GitHub runs this gate for pushes and PRs to <code>dev</code> and <code>main</code>, plus separate
 Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
 and CodeQL. Development and native branch protections are described in

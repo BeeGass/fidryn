@@ -47,10 +47,13 @@ cargo test --workspace --all-features --locked --offline
 
 `cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
 Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, required JavaScript tests, generated-site consistency, the
-example status and documentation checks described below, and benchmark
-compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
-qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+and probe controls, the sample check (`cargo xtask uscode-sample`: the
+committed archives of the Code against their retrieval record, and the
+committed profile against what the profile script prints), required
+JavaScript tests, generated-site consistency, the example status and
+documentation checks described below, and benchmark compilation. Node and
+[uv](https://docs.astral.sh/uv/) are required for qualification.
+`uv run --locked` uses `.python-version` and `uv.lock`.
 
 GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
 Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
