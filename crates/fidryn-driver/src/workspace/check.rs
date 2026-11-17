@@ -3,13 +3,16 @@
 //! Phase one reads each module file by itself, on several threads: the
 //! BLAKE3 of its bytes, its edition and, for a module of edition 2, the
 //! grammar, lowering, the checks of one module and the module's
-//! [`Interface`]. Its result depends on the file's bytes alone. Phase two
-//! compares each file's digest with the lock of a generated workspace,
-//! checks where each module stands, and then runs the checks across the
-//! modules and gives every reference its outcome from the interfaces alone
+//! [`Interface`]. Its result depends on the file's bytes alone, so it is
+//! kept in the [cache](super::cache) under a key of those bytes, and taken
+//! from there when the bytes come again. Phase two compares each file's
+//! digest with the lock of a generated workspace, checks where each module
+//! stands, and then runs the checks across the modules and gives every
+//! reference its outcome from the interfaces alone
 //! ([`check_interfaces`](super::check_interfaces)); it reads no module
 //! again.
 
+use super::cache::Cache;
 use super::discover::walk;
 use super::index::{Unresolved, across, no_references, order, span};
 use super::{LOCK_FILE, MANIFEST_FILE};
@@ -32,11 +35,13 @@ pub struct CheckOptions {
     /// The number of worker threads of each phase, at least 1; 0 is taken as
     /// 1. The result is the same for every number.
     pub jobs: usize,
-    /// The directory of the cache. The check keeps no cache and does not read
-    /// this.
+    /// The directory of the cache, which the check reads the result of
+    /// phase one from and writes it to; `None` for no cache, when every
+    /// module file is read and checked and nothing is written.
     pub cache_dir: Option<PathBuf>,
     /// The version of the running toolchain, which the manifest's
-    /// `toolchain` is compared with.
+    /// `toolchain` is compared with and which is part of the key of every
+    /// entry of the cache.
     pub toolchain: String,
 }
 
@@ -60,6 +65,11 @@ pub struct WorkspaceReport {
     /// Every reference whose outcome is not `exact`, sorted by the address
     /// it stands in, then by its target.
     pub unresolved: Vec<Unresolved>,
+    /// Why the cache could not be written, the first time an entry could
+    /// not be; `None` when every entry was, and when there is no cache. The
+    /// rest of the report does not depend on it, and neither the summary
+    /// line nor the check report holds it.
+    pub cache_failure: Option<String>,
 }
 
 impl WorkspaceReport {
@@ -113,7 +123,10 @@ impl WorkspaceReport {
 ///
 /// It also gives every reference of the workspace its outcome. Phase one,
 /// and the outcomes of the references in phase two, run on `options.jobs`
-/// threads, and the report is the same for every number of them.
+/// threads, and the report is the same for every number of them. With a
+/// cache, `options.cache_dir`, the result of phase one of a file whose bytes
+/// were checked before is read from it, and the report is the same as
+/// without one, but for the count of the modules read from it.
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
@@ -124,6 +137,7 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
             references: no_references(),
             outside_by_body: BTreeMap::new(),
             unresolved: Vec::new(),
+            cache_failure: None,
         };
     };
     let lock = read_lock(root, &manifest, &mut diagnostics);
@@ -145,14 +159,19 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     }
     let jobs = options.jobs.max(1);
 
-    // Phase one: each module file by itself.
-    let read = phase_one(root, &found.modules, jobs);
+    // Phase one: each module file by itself, or its result from the cache.
+    let cache = options
+        .cache_dir
+        .as_deref()
+        .map(|dir| Cache::new(dir, &options.toolchain));
+    let read = phase_one(root, &found.modules, jobs, cache.as_ref());
+    let from_cache = read.iter().filter(|(_, cached)| *cached).count();
 
     // Phase two: the files against the lock, where each module stands, and
     // then the interfaces alone.
     let mut interfaces = Vec::new();
     let mut unread = BTreeSet::new();
-    for (rel, module) in found.modules.iter().zip(read) {
+    for (rel, (module, _)) in found.modules.iter().zip(read) {
         diagnostics.extend(
             module
                 .diagnostics
@@ -198,11 +217,12 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
     WorkspaceReport {
         modules: found.modules.len(),
-        from_cache: 0,
+        from_cache,
         diagnostics,
         references: phase_two.references,
         outside_by_body: phase_two.outside_by_body,
         unresolved: phase_two.unresolved,
+        cache_failure: cache.and_then(Cache::failure),
     }
 }
 
@@ -293,19 +313,27 @@ fn read_lock(root: &Path, manifest: &Manifest, diagnostics: &mut Vec<Diagnostic>
     }
 }
 
-/// What phase one gives of one module file. It depends on the file's bytes
-/// alone: no diagnostic names the file yet.
-struct PhaseOne {
+/// What phase one gives of one module file, and what an entry of the cache
+/// holds. It depends on the file's bytes alone: no diagnostic names the file
+/// yet, and nothing of the path, the lock, the manifest or another module is
+/// in it.
+pub(super) struct PhaseOne {
     /// The BLAKE3 of the file's bytes; `None` when it cannot be read.
-    digest: Option<Hash32>,
-    diagnostics: Vec<Diagnostic>,
+    pub(super) digest: Option<Hash32>,
+    pub(super) diagnostics: Vec<Diagnostic>,
     /// The module's interface, when it lowers.
-    interface: Option<Interface>,
+    pub(super) interface: Option<Interface>,
 }
 
 /// Phase one of every file of `modules`, relative to `root`, on `jobs`
-/// threads, in the order of `modules`.
-fn phase_one(root: &Path, modules: &[String], jobs: usize) -> Vec<PhaseOne> {
+/// threads, in the order of `modules`, each with whether it was read from
+/// `cache`.
+fn phase_one(
+    root: &Path,
+    modules: &[String],
+    jobs: usize,
+    cache: Option<&Cache>,
+) -> Vec<(PhaseOne, bool)> {
     let next = AtomicUsize::new(0);
     let work = || {
         let mut done = Vec::new();
@@ -314,7 +342,7 @@ fn phase_one(root: &Path, modules: &[String], jobs: usize) -> Vec<PhaseOne> {
             let Some(rel) = modules.get(at) else {
                 break;
             };
-            done.push((at, read_one(&root.join(rel))));
+            done.push((at, read_one(&root.join(rel), cache)));
         }
         done
     };
@@ -334,13 +362,16 @@ fn phase_one(root: &Path, modules: &[String], jobs: usize) -> Vec<PhaseOne> {
     done.into_iter().map(|(_, read)| read).collect()
 }
 
-/// Phase one of the module file at `path`: its digest, its edition, and the
-/// checks of one module.
-fn read_one(path: &Path) -> PhaseOne {
+/// Phase one of the module file at `path`, and whether it was read from
+/// `cache`: the entry of the file's bytes when the cache holds one that is
+/// valid, and otherwise [`check_file`], whose result is then written to the
+/// cache. A file larger than the largest source is not kept in the cache,
+/// since only its first bytes are held.
+fn read_one(path: &Path, cache: Option<&Cache>) -> (PhaseOne, bool) {
     let (digest, head) = match read_module(path) {
         Ok(read) => read,
         Err(error) => {
-            return PhaseOne {
+            let unread = PhaseOne {
                 digest: None,
                 diagnostics: vec![Diagnostic::new(
                     DiagnosticCode::E730,
@@ -348,8 +379,27 @@ fn read_one(path: &Path) -> PhaseOne {
                 )],
                 interface: None,
             };
+            return (unread, false);
         }
     };
+    let keyed = cache
+        .filter(|_| head.len() <= E2_MAX_SOURCE_BYTES)
+        .map(|cache| (cache, cache.key(&head)));
+    if let Some((cache, key)) = &keyed
+        && let Some(kept) = cache.read(key, &digest)
+    {
+        return (kept, true);
+    }
+    let checked = check_file(digest, head);
+    if let Some((cache, key)) = keyed {
+        cache.write(&key, &checked);
+    }
+    (checked, false)
+}
+
+/// Phase one of the module file whose bytes have the BLAKE3 `digest` and
+/// begin with `head`: its edition, and the checks of one module.
+fn check_file(digest: Hash32, head: Vec<u8>) -> PhaseOne {
     let mut diagnostics = Vec::new();
     let interface = match edition_of(utf8_prefix(&head)) {
         Err(diagnostic) => {

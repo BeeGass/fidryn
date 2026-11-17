@@ -297,8 +297,12 @@ impl Interface {
         file.interface.validated()
     }
 
-    /// This interface, when what it names is there.
-    fn validated(self) -> Result<Interface, String> {
+    /// This interface, when what it names is there: every word, provision
+    /// and note it names by its place, every address it writes relative to
+    /// the module's, and the parts of its shape. [`Interface::from_json`]
+    /// checks this of what it reads; an interface read with `serde` as part
+    /// of another document is checked with this before it is used.
+    pub fn validated(self) -> Result<Interface, String> {
         let words = self.words.len();
         let word = |word: Word, what: &str| {
             if (word.0 as usize) < words {

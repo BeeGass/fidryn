@@ -2,12 +2,15 @@
 //! built in a temporary directory from invented models, in the invented
 //! corpus `/zz/demo`, and so is every text.
 
+use super::cache::Cache;
+use super::discover::walk;
 use super::{
     CheckOptions, GeneratedWriter, Unresolved, WorkspaceReport, WriteError, check_interfaces,
     check_workspace,
 };
 use fidryn_check::e2::lower;
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
+use fidryn_provision::layout::module_path;
 use fidryn_provision::render::render;
 use fidryn_provision::workspace::{
     AddressCounts, Artifact, Dependency, Generator, Lock, Manifest, Member, NotImported,
@@ -1779,13 +1782,14 @@ fn section_index(n: usize) -> usize {
     9 + n
 }
 
-#[test]
-fn the_report_and_the_output_are_the_same_for_one_and_eight_workers() {
-    let scratch = Scratch::new("workers");
+/// Writes the generated workspace of [`many_models`] into `root`, with
+/// defects seeded. In the models: a chapter that lists a member that is no
+/// module, and a section within another section, which its chapter does not
+/// list. In the files: a word changed, a text that is not normalized, and a
+/// section deleted. It holds 199 module files.
+fn seeded_workspace(root: &Path) {
     let mut models = many_models();
     assert_eq!(models.len(), 200);
-    // Seeded in the models: a chapter that lists a member that is no module,
-    // and a section within another section, which its chapter does not list.
     container_at(&mut models, 3)
         .members
         .push(address("/zz/demo/t1/s999"));
@@ -1793,9 +1797,7 @@ fn the_report_and_the_output_are_the_same_for_one_and_eight_workers() {
         .members
         .retain(|member| member.as_str() != "/zz/demo/t1/s100");
     unit_at(&mut models, section_index(100)).within = Some(address("/zz/demo/t1/s1"));
-    write_workspace(scratch.path(), &models);
-    // Seeded in the files: a word changed, a text that is not normalized, and
-    // a section deleted.
+    write_workspace(root, &models);
     for (rel, from, to) in [
         ("zz/demo/t1/s7.fr", "numbered section.", "numbered sectio."),
         (
@@ -1804,11 +1806,17 @@ fn the_report_and_the_output_are_the_same_for_one_and_eight_workers() {
             "invented  numbered",
         ),
     ] {
-        let text = read(scratch.path(), rel);
+        let text = read(root, rel);
         assert!(text.contains(from), "{rel}");
-        put(scratch.path(), rel, &text.replacen(from, to, 1));
+        put(root, rel, &text.replacen(from, to, 1));
     }
-    fs::remove_file(scratch.join("zz/demo/t1/s50.fr")).expect("remove");
+    fs::remove_file(root.join("zz/demo/t1/s50.fr")).expect("remove");
+}
+
+#[test]
+fn the_report_and_the_output_are_the_same_for_one_and_eight_workers() {
+    let scratch = Scratch::new("workers");
+    seeded_workspace(scratch.path());
 
     let one = check_workspace(scratch.path(), &with_jobs(1));
     assert_eq!(one.modules, 199);
@@ -1868,4 +1876,299 @@ fn the_committed_check_report_is_what_the_check_writes() {
             fresh.path().display()
         );
     }
+}
+
+/// How [`check_workspace`] runs with its cache in `cache`, on `jobs` threads.
+fn cached(cache: &Path, jobs: usize) -> CheckOptions {
+    CheckOptions {
+        cache_dir: Some(cache.to_owned()),
+        ..with_jobs(jobs)
+    }
+}
+
+/// `report` with no module counted as read from the cache, which is what a
+/// check without a cache reports.
+fn uncounted(report: &WorkspaceReport) -> WorkspaceReport {
+    WorkspaceReport {
+        from_cache: 0,
+        ..report.clone()
+    }
+}
+
+fn address_of(model: &Module) -> &Address {
+    match model {
+        Module::Unit(unit) => &unit.address,
+        Module::Container(container) => &container.address,
+        Module::Curated(curated) => &curated.address,
+    }
+}
+
+/// Writes a curated workspace into `out` that holds the five demo modules,
+/// each at the path of its address. It has no lock, so a module file may be
+/// changed without disagreeing with one.
+fn curated_demo(out: &Path) {
+    let files: Vec<(String, String)> = demo_models()
+        .iter()
+        .map(|model| (module_path(address_of(model)), render(model)))
+        .collect();
+    let files: Vec<(&str, String)> = files
+        .iter()
+        .map(|(rel, text)| (rel.as_str(), text.clone()))
+        .collect();
+    fs::create_dir_all(out).expect("create the workspace's directory");
+    curated_workspace(out, &files);
+}
+
+/// The BLAKE3 of the bytes of the file `rel` under `root`, and its key in
+/// `cache`.
+fn digest_and_key(cache: &Cache, root: &Path, rel: &str) -> (Hash32, Hash32) {
+    let bytes = fs::read(root.join(rel)).unwrap_or_else(|error| panic!("{rel}: {error}"));
+    (Hash32(*blake3::hash(&bytes).as_bytes()), cache.key(&bytes))
+}
+
+#[test]
+fn a_second_check_reads_every_module_from_the_cache() {
+    let scratch = Scratch::new("cache-second");
+    let workspace = scratch.join("workspace");
+    seeded_workspace(&workspace);
+    let cache = scratch.join("cache");
+    let uncached = check_workspace(&workspace, &with_jobs(4));
+    assert!(uncached.errors() > 0, "{uncached:#?}");
+
+    let first = check_workspace(&workspace, &cached(&cache, 4));
+    assert_eq!(first, uncached);
+    let second = check_workspace(&workspace, &cached(&cache, 4));
+    assert_eq!(second.modules, 199);
+    assert_eq!(second.from_cache, second.modules);
+    assert_eq!(uncounted(&second), uncached);
+    assert_eq!(
+        second.summary(),
+        uncached
+            .summary()
+            .replace("from cache: 0", "from cache: 199")
+    );
+    assert_eq!(
+        second.to_json(),
+        uncached
+            .to_json()
+            .replace("\"from_cache\": 0,", "\"from_cache\": 199,")
+    );
+    assert_eq!(second.unresolved_lines(), uncached.unresolved_lines());
+
+    // An entry holds nothing of the path of its file: the same workspace at
+    // another path reads every module from the same cache.
+    let copy = scratch.join("copy");
+    seeded_workspace(&copy);
+    let moved = check_workspace(&copy, &cached(&cache, 4));
+    assert_eq!(moved.from_cache, moved.modules);
+    assert_eq!(uncounted(&moved), uncached);
+}
+
+#[test]
+fn editing_one_module_rereads_only_it() {
+    let scratch = Scratch::new("cache-edit");
+    let workspace = scratch.join("workspace");
+    curated_demo(&workspace);
+    let cache = scratch.join("cache");
+    let first = check_workspace(&workspace, &cached(&cache, 2));
+    assert_eq!(first.diagnostics, []);
+    assert_eq!((first.modules, first.from_cache), (5, 0));
+
+    let rel = "zz/demo/t1/s2.fr";
+    let text = read(&workspace, rel);
+    assert!(text.contains("small or large"), "{text}");
+    put(
+        &workspace,
+        rel,
+        &text.replacen("small or large", "small, medium or large", 1),
+    );
+    let second = check_workspace(&workspace, &cached(&cache, 2));
+    assert_eq!((second.modules, second.from_cache), (5, 4));
+    assert_eq!(uncounted(&second), check(&workspace));
+    // The words changed and the hashes the file records did not: the module
+    // was read again.
+    assert!(!second.diagnostics.is_empty(), "{second:#?}");
+    assert!(
+        second
+            .diagnostics
+            .iter()
+            .all(|diagnostic| diagnostic.source_file.as_deref() == Some(rel)),
+        "{second:#?}"
+    );
+    assert_eq!(
+        check_workspace(&workspace, &cached(&cache, 2)).from_cache,
+        5
+    );
+}
+
+#[test]
+fn diagnostics_come_back_from_the_cache() {
+    let scratch = Scratch::new("cache-diagnostics");
+    let workspace = scratch.join("workspace");
+    curated_demo(&workspace);
+    let rel = "zz/demo/t1/s2.fr";
+    let text = read(&workspace, rel);
+    put(
+        &workspace,
+        rel,
+        &text.replacen("small or large", "small  or large", 1),
+    );
+    let cache = scratch.join("cache");
+    let uncached = check(&workspace);
+    let first = check_workspace(&workspace, &cached(&cache, 1));
+    let second = check_workspace(&workspace, &cached(&cache, 1));
+    assert_eq!((second.modules, second.from_cache), (5, 5));
+    assert_eq!(second.diagnostics, uncached.diagnostics);
+    assert_eq!(first.diagnostics, uncached.diagnostics);
+    assert!(
+        second.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == DiagnosticCode::E710
+                && diagnostic.message.contains("text is not normalized")
+        }),
+        "{second:#?}"
+    );
+    for diagnostic in &second.diagnostics {
+        assert_eq!(
+            diagnostic.source_file.as_deref(),
+            Some(rel),
+            "{diagnostic:#?}"
+        );
+        assert!(diagnostic.primary_span.is_some(), "{diagnostic:#?}");
+    }
+}
+
+#[test]
+fn a_damaged_entry_is_ignored_and_rewritten() {
+    let scratch = Scratch::new("cache-damaged");
+    let workspace = scratch.join("workspace");
+    curated_demo(&workspace);
+    let cache_dir = scratch.join("cache");
+    let uncached = check(&workspace);
+    assert_eq!(
+        check_workspace(&workspace, &cached(&cache_dir, 1)),
+        uncached
+    );
+
+    let cache = Cache::new(&cache_dir, TOOLCHAIN);
+    let rels = [
+        "zz/demo/t1.fr",
+        "zz/demo/t1/ch1.fr",
+        "zz/demo/t1/s1.fr",
+        "zz/demo/t1/s2.fr",
+        "zz/demo/t1/s3.fr",
+    ];
+    let [title, chapter, s1, s2, s3] =
+        rels.map(|rel| cache.entry_path(&digest_and_key(&cache, &workspace, rel).1));
+    let entry = |path: &Path| fs::read_to_string(path).expect("an entry is written");
+    // Cut short.
+    let text = entry(&title);
+    fs::write(&title, &text[..text.len() / 2]).expect("write");
+    // JSON of another shape.
+    fs::write(&chapter, "{}\n").expect("write");
+    // The entry of another key.
+    fs::write(&s1, entry(&s3)).expect("write");
+    // A struct written as an array of its values, which a reader that serde
+    // derives takes.
+    let mut value: serde_json::Value = serde_json::from_str(&entry(&s2)).expect("JSON");
+    let range = value["interface"]["address_range"].take();
+    assert!(range.is_object(), "{range}");
+    value["interface"]["address_range"] = serde_json::json!([range["start"], range["end"]]);
+    fs::write(&s2, serde_json::to_string(&value).expect("JSON")).expect("write");
+
+    let second = check_workspace(&workspace, &cached(&cache_dir, 1));
+    assert_eq!((second.modules, second.from_cache), (5, 1));
+    assert_eq!(uncounted(&second), uncached);
+    // Each was written again, and reads back.
+    for rel in rels {
+        let (digest, key) = digest_and_key(&cache, &workspace, rel);
+        assert!(cache.read(&key, &digest).is_some(), "{rel}");
+    }
+    assert_eq!(
+        check_workspace(&workspace, &cached(&cache_dir, 1)).from_cache,
+        5
+    );
+}
+
+#[test]
+fn the_key_depends_on_the_toolchain_version() {
+    let scratch = Scratch::new("cache-version");
+    let workspace = scratch.join("workspace");
+    curated_demo(&workspace);
+    let cache_dir = scratch.join("cache");
+    let under = |version: &str| CheckOptions {
+        cache_dir: Some(cache_dir.clone()),
+        ..options(version)
+    };
+    assert_eq!(check_workspace(&workspace, &under("0.3.0")).from_cache, 0);
+    let other = check_workspace(&workspace, &under("0.3.1"));
+    assert_eq!(other.from_cache, 0);
+    assert_eq!(other, check_workspace(&workspace, &options("0.3.1")));
+    assert_eq!(check_workspace(&workspace, &under("0.3.0")).from_cache, 5);
+
+    // The key is the BLAKE3 of three frames, each a tag byte, the length of
+    // its value as eight bytes little-endian, and the value.
+    let frame = |tag: u8, value: &[u8]| {
+        let mut frame = vec![tag];
+        frame.extend_from_slice(&(value.len() as u64).to_le_bytes());
+        frame.extend_from_slice(value);
+        frame
+    };
+    let bytes = b"edition 2\nAn invented module.\n";
+    let expected = |version: &str| {
+        let mut frames = frame(0x00, b"fidryn.cache/v1");
+        frames.extend(frame(0x01, version.as_bytes()));
+        frames.extend(frame(0x02, bytes));
+        Hash32(*blake3::hash(&frames).as_bytes())
+    };
+    assert_eq!(
+        Cache::new(&cache_dir, "0.3.0").key(bytes),
+        expected("0.3.0")
+    );
+    assert_eq!(
+        Cache::new(&cache_dir, "0.3.1").key(bytes),
+        expected("0.3.1")
+    );
+    assert_ne!(expected("0.3.0"), expected("0.3.1"));
+}
+
+#[test]
+fn two_checks_at_once_leave_a_valid_cache() {
+    let scratch = Scratch::new("cache-at-once");
+    let workspace = scratch.join("workspace");
+    seeded_workspace(&workspace);
+    let cache_dir = scratch.join("cache");
+    let uncached = check_workspace(&workspace, &with_jobs(4));
+    let (one, two) = std::thread::scope(|scope| {
+        let one = scope.spawn(|| check_workspace(&workspace, &cached(&cache_dir, 4)));
+        let two = scope.spawn(|| check_workspace(&workspace, &cached(&cache_dir, 4)));
+        (
+            one.join().expect("a check panicked"),
+            two.join().expect("a check panicked"),
+        )
+    });
+    assert_eq!(uncounted(&one), uncached);
+    assert_eq!(uncounted(&two), uncached);
+
+    // Every file of the cache is the entry of a module file, at
+    // `v1/<first two digits>/<key>.json`, and reads back; no temporary file
+    // is left.
+    let cache = Cache::new(&cache_dir, TOOLCHAIN);
+    let mut expected = BTreeSet::new();
+    for rel in walk(&workspace).modules {
+        let (digest, key) = digest_and_key(&cache, &workspace, &rel);
+        assert!(cache.read(&key, &digest).is_some(), "{rel}");
+        let key = key.to_string();
+        expected.insert(format!("v1/{}/{key}.json", &key[..2]));
+    }
+    assert_eq!(expected.len(), 199);
+    let files: BTreeSet<String> = tree(&cache_dir)
+        .into_iter()
+        .filter(|(_, entry)| matches!(entry, Entry::File(_)))
+        .map(|(rel, _)| rel)
+        .collect();
+    assert_eq!(files, expected);
+    assert_eq!(
+        check_workspace(&workspace, &cached(&cache_dir, 4)).from_cache,
+        199
+    );
 }

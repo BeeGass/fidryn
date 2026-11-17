@@ -119,8 +119,8 @@ depends on `fidryn-provision` only, and no crate depends on
 the model into which it lowers modules of edition 2. `fidryn-driver`
 depends on `fidryn-provision` for the files of a workspace and the
 interfaces of its modules: it holds the check of a workspace of edition 2
-modules, in two phases on several threads, and the writer of a generated
-one. `fidryn-provision`
+modules, in two phases on several threads with a cache of the first, and
+the writer of a generated one. `fidryn-provision`
 holds the model of law modules and the rules over it, among them
 addresses, text normalization, file paths, hashes, text records, the
 canonical text of a module, the interface of a module and the index of

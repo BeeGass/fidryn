@@ -1,8 +1,11 @@
 //! `fidryn check DIR` checks a workspace of edition 2 modules. The workspace
 //! here is the invented demo workspace under
 //! `conformance/fixtures/workspace/demo`, in the invented corpus `/zz/demo`,
-//! which the tests of `fidryn-driver` hold to what the writer writes.
+//! which the tests of `fidryn-driver` hold to what the writer writes. A
+//! check of it in place is run with `--no-cache`, so that nothing is
+//! written into the repository; a check that keeps a cache runs on a copy.
 
+use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -13,11 +16,21 @@ fn demo_workspace() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../conformance/fixtures/workspace/demo")
 }
 
+/// `fidryn check` with `args`, and with `FIDRYN_CACHE_DIR` set to `cache`,
+/// or not set when it is `None`.
+fn check_in(args: &[&OsStr], cache: Option<&OsStr>) -> Output {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_fidryn"));
+    command.arg("check").args(args);
+    match cache {
+        Some(cache) => command.env("FIDRYN_CACHE_DIR", cache),
+        None => command.env_remove("FIDRYN_CACHE_DIR"),
+    };
+    command.output().expect("run fidryn")
+}
+
+/// `fidryn check DIR --no-cache`.
 fn check(dir: &Path) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_fidryn"))
-        .args([OsStr::new("check"), dir.as_os_str()])
-        .output()
-        .expect("run fidryn")
+    check_in(&[dir.as_os_str(), OsStr::new("--no-cache")], None)
 }
 
 fn stdout(output: &Output) -> String {
@@ -130,11 +143,7 @@ fn a_directory_with_no_manifest_is_refused() {
 }
 
 fn check_with(args: &[&OsStr]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_fidryn"))
-        .arg("check")
-        .args(args)
-        .output()
-        .expect("run fidryn")
+    check_in(args, None)
 }
 
 #[test]
@@ -145,6 +154,7 @@ fn the_report_and_the_unresolved_list_are_written_on_request() {
     let workspace = demo_workspace();
     let checked = check_with(&[
         workspace.as_os_str(),
+        OsStr::new("--no-cache"),
         OsStr::new("--jobs"),
         OsStr::new("3"),
         OsStr::new("--report"),
@@ -173,20 +183,29 @@ fn the_report_and_the_unresolved_list_are_written_on_request() {
 fn the_flags_of_a_workspace_check_are_refused_for_a_file() {
     let module = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../crates/fidryn-check/tests/fixtures/e2/unit.fr");
-    for flag in ["--jobs", "--report", "--unresolved"] {
-        let checked = check_with(&[module.as_os_str(), OsStr::new(flag), OsStr::new("2")]);
+    let flags: [&[&str]; 5] = [
+        &["--jobs", "2"],
+        &["--cache-dir", "2"],
+        &["--no-cache"],
+        &["--report", "2"],
+        &["--unresolved", "2"],
+    ];
+    for flag in flags {
+        let mut args = vec![module.as_os_str()];
+        args.extend(flag.iter().map(OsStr::new));
+        let checked = check_with(&args);
         assert_eq!(
             checked.status.code(),
             Some(1),
-            "{flag}: {}",
+            "{flag:?}: {}",
             stderr(&checked)
         );
         assert!(
             stderr(&checked).contains("belong to the check of a workspace"),
-            "{flag}: {}",
+            "{flag:?}: {}",
             stderr(&checked)
         );
-        assert_eq!(stdout(&checked), "", "{flag}");
+        assert_eq!(stdout(&checked), "", "{flag:?}");
     }
     let checked = check_with(&[
         demo_workspace().as_os_str(),
@@ -194,4 +213,127 @@ fn the_flags_of_a_workspace_check_are_refused_for_a_file() {
         OsStr::new("0"),
     ]);
     assert_eq!(checked.status.code(), Some(2), "{}", stderr(&checked));
+    // A cache directory and no cache are not given together.
+    let checked = check_with(&[
+        demo_workspace().as_os_str(),
+        OsStr::new("--no-cache"),
+        OsStr::new("--cache-dir"),
+        OsStr::new("2"),
+    ]);
+    assert_eq!(checked.status.code(), Some(2), "{}", stderr(&checked));
+}
+
+/// Every entry below `root`, a file with its bytes and a directory with
+/// `None`, by its path relative to `root`.
+fn entries_below(root: &Path) -> BTreeMap<String, Option<Vec<u8>>> {
+    fn walk(dir: &Path, prefix: &str, out: &mut BTreeMap<String, Option<Vec<u8>>>) {
+        for entry in fs::read_dir(dir).unwrap_or_else(|error| panic!("{}: {error}", dir.display()))
+        {
+            let entry = entry.expect("read an entry");
+            let name = entry.file_name().into_string().expect("a UTF-8 name");
+            let rel = format!("{prefix}{name}");
+            if entry.file_type().expect("the kind of an entry").is_dir() {
+                out.insert(rel.clone(), None);
+                walk(&entry.path(), &format!("{rel}/"), out);
+            } else {
+                out.insert(rel, Some(fs::read(entry.path()).expect("read a file")));
+            }
+        }
+    }
+    let mut out = BTreeMap::new();
+    walk(root, "", &mut out);
+    out
+}
+
+/// The output of a clean check of the demo workspace, `cached` of whose
+/// modules were read from the cache.
+fn clean(cached: usize) -> String {
+    format!("modules: 5; from cache: {cached}; errors: 0; warnings: 0\nok\n")
+}
+
+#[test]
+fn no_cache_writes_nothing() {
+    let scratch = Scratch::new("no-cache");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let named = scratch.path().join("named-cache");
+    let before = entries_below(scratch.path());
+    for _ in 0..2 {
+        let checked = check_in(
+            &[workspace.as_os_str(), OsStr::new("--no-cache")],
+            Some(named.as_os_str()),
+        );
+        assert!(checked.status.success(), "{}", stderr(&checked));
+        assert_eq!(stdout(&checked), clean(0));
+        assert_eq!(stderr(&checked), "");
+        assert_eq!(entries_below(scratch.path()), before);
+    }
+}
+
+#[test]
+fn the_cache_directory_is_chosen_in_the_stated_order() {
+    let scratch = Scratch::new("cache-order");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let flagged = scratch.path().join("flagged-cache");
+    let named = scratch.path().join("named-cache");
+    let default = workspace.join(".fidryn-cache");
+    let run = |args: &[&OsStr], cache: Option<&OsStr>, cached: usize| {
+        let mut args = args.to_vec();
+        args.insert(0, workspace.as_os_str());
+        let checked = check_in(&args, cache);
+        assert!(checked.status.success(), "{args:?}: {}", stderr(&checked));
+        assert_eq!(stdout(&checked), clean(cached), "{args:?}");
+        assert_eq!(stderr(&checked), "", "{args:?}");
+    };
+
+    // `--cache-dir` before `FIDRYN_CACHE_DIR`.
+    let flag = [OsStr::new("--cache-dir"), flagged.as_os_str()];
+    run(&flag, Some(named.as_os_str()), 0);
+    run(&flag, Some(named.as_os_str()), 5);
+    assert!(flagged.join("v1").is_dir());
+    assert!(!named.exists());
+    assert!(!default.exists());
+
+    // `FIDRYN_CACHE_DIR` before the default.
+    run(&[], Some(named.as_os_str()), 0);
+    run(&[], Some(named.as_os_str()), 5);
+    assert!(named.join("v1").is_dir());
+    assert!(!default.exists());
+
+    // Then `.fidryn-cache` in the workspace, which a `FIDRYN_CACHE_DIR` that
+    // is empty also leaves; the check writes nothing else in the workspace.
+    let before = entries_below(&workspace);
+    run(&[], None, 0);
+    run(&[], Some(OsStr::new("")), 5);
+    assert!(default.join("v1").is_dir());
+    let mut after = entries_below(&workspace);
+    after.retain(|rel, _| !rel.starts_with(".fidryn-cache"));
+    assert_eq!(after, before);
+}
+
+#[test]
+fn a_cache_that_cannot_be_written_is_said_once_and_the_check_goes_on() {
+    let scratch = Scratch::new("cache-unwritable");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    // A file stands where the cache's directory would be made.
+    let blocked = scratch.path().join("blocked");
+    fs::write(&blocked, "An invented file where a directory would be.\n").expect("write");
+    let checked = check_in(
+        &[
+            workspace.as_os_str(),
+            OsStr::new("--cache-dir"),
+            blocked.as_os_str(),
+        ],
+        None,
+    );
+    assert!(checked.status.success(), "{}", stderr(&checked));
+    assert_eq!(stdout(&checked), clean(0));
+    let message = stderr(&checked);
+    assert_eq!(message.lines().count(), 1, "{message}");
+    assert!(
+        message.starts_with("the cache could not be written, and the check went on without it: "),
+        "{message}"
+    );
 }

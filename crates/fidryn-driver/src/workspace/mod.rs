@@ -12,7 +12,10 @@
 //!
 //! [`check_workspace`] checks a workspace in two phases, each on several
 //! threads. Phase one reads, lowers and checks each module by itself and
-//! builds its [`Interface`](fidryn_provision::Interface). Phase two checks
+//! builds its [`Interface`](fidryn_provision::Interface); its result for a
+//! file is kept in a cache on disk under a key of the file's bytes, so that
+//! a later check takes it from there ([`CheckOptions::cache_dir`]). Phase
+//! two checks
 //! what holds across the files: the manifest and the lock, where each module
 //! stands and the agreement of the files with the lock, and then, from the
 //! interfaces alone ([`check_interfaces`]), the hierarchy of containers and
@@ -22,6 +25,7 @@
 //! request. This crate names no corpus; `xtask/tests/corpus_neutrality.rs`
 //! checks it for this directory.
 
+mod cache;
 mod check;
 mod discover;
 mod index;

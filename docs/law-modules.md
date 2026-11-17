@@ -786,10 +786,12 @@ there is no error. It exits 1 when there is an error, and 0 otherwise, a
 warning included. The
 invented demo workspace under `conformance/fixtures/workspace/demo` is
 what the writer writes from one title, one chapter and three sections;
-the tests of `fidryn-driver` hold it to that:
+the tests of `fidryn-driver` hold it to that. Checked with `--no-cache`,
+which keeps no [cache](#the-cache) and so writes nothing into the
+repository:
 
 ```sh
-fidryn check conformance/fixtures/workspace/demo
+fidryn check conformance/fixtures/workspace/demo --no-cache
 ```
 
 ```text
@@ -798,8 +800,8 @@ ok
 ```
 
 `modules` counts the module files read, every `.fr` file of the workspace,
-and `from cache` how many of them were read from a cache; the check keeps
-none, so it is 0.
+and `from cache` how many of them were read from the cache rather than
+checked again.
 
 ## How a workspace is checked
 
@@ -809,7 +811,8 @@ The check of a workspace runs in two phases.
    its edition, the grammar, lowering, the checks of
    [one module](#what-the-checker-verifies-in-one-module), and the
    module's [interface](#interfaces). What it gives of a file depends on
-   the file's bytes alone.
+   the file's bytes alone, so it is kept in the [cache](#the-cache), and a
+   file whose bytes were checked before is not checked again.
 2. **Phase two**, with the result of every module in memory: the BLAKE3 of
    each file against the lock of a generated workspace, and where each
    module stands, below the prefix and at the path of its address. Then,
@@ -1035,3 +1038,77 @@ the tree hash of the provision at an address and the enacted-layer hash of
 the unit an address lies in. A lookup of it costs the same however many
 addresses it holds, and a target has few segments, so the outcomes of all
 the references of a workspace cost time in proportion to their number.
+
+## The cache
+
+What phase one gives of a module file depends on the file's bytes alone,
+so it does not change while the file does not. The check keeps it in a
+cache on disk, and a check that finds there the entry of a file's bytes
+takes phase one's result from it, instead of lowering and checking the
+module again. Phase two runs in full every time. A check of a workspace
+in which nothing changed reads the bytes of each module file, to find its
+entry, and the entry, and does none of the rest of phase one.
+
+An entry holds the result of phase one of one file: the BLAKE3 of its
+bytes, which phase two compares with the lock; its diagnostics, with
+their spans, none of which names the file; and the module's
+[interface](#interfaces), or none when the module does not lower. Nothing
+that depends on the path of the file, on the lock, on the manifest or on
+another module is in it, so two files with the same bytes, in one
+workspace or in two, share one entry.
+
+The key of an entry is the BLAKE3 of three frames, built as the
+[hashes](#hashes) are:
+
+```text
+F(0x00, "fidryn.cache/v1") ‖ F(0x01, UTF-8 of the toolchain's version) ‖ F(0x02, the file's bytes)
+```
+
+The toolchain's version is the one `fidryn --version` prints, so an entry
+that another version wrote is never read. A file larger than the largest
+source of edition 2 is not kept; the check refuses it in any case.
+
+The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
+in the cache's directory. That directory is the one `--cache-dir` names;
+else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
+set and not empty; else `.fidryn-cache` inside the workspace. `--no-cache`
+keeps no cache: the check then reads and checks every module file and
+writes nothing. The name `.fidryn-cache` begins with a dot, so the check
+does not read it as part of the workspace and the writer of a generated
+workspace leaves it alone; the check writes nothing else into the
+workspace.
+
+An entry is one line of compact JSON with these keys, in this order:
+`schema`, which is `fidryn.cache/v1`; `key`; `digest`, the BLAKE3 of the
+file's bytes; `diagnostics`, each as `fidryn_core::Diagnostic` writes it,
+with `code`, `message`, `primary_span`, `related_spans` and `suggestion`;
+and `interface`, the object that the JSON of an interface holds under
+`interface`, or `null`.
+
+Each worker of phase one looks up the entry of the file it reads by the
+entry's path; the cache's directory is never listed. An entry is read back
+only when it is what the writer writes: its JSON value is the value that
+what is read from it writes back, its key is that of its name, its digest
+is that of the file's bytes, and its interface names only what it holds,
+as `Interface::from_json` requires. Any other entry, one cut short, one
+that is not JSON or is JSON of another shape, or one copied from another
+key, is ignored: the module is checked again and its entry written again.
+An entry that cannot be read is missing in the same way. An entry is
+written to a temporary name in its directory and then renamed, so that a
+reader never sees half of one, and two checks at once, which may write the
+same entry, leave a valid cache. A failure to write the cache, such as a
+full disk or a directory that cannot be made, does not fail the check:
+`fidryn check` says once on stderr that the cache could not be written,
+and why, and goes on.
+
+The diagnostics, the summary line, the check report and the unresolved
+list of a check that reads from the cache are byte for byte those of a
+check without one, but for the count `from cache`. A first and a second
+check of a copy of the demo workspace:
+
+```text
+modules: 5; from cache: 0; errors: 0; warnings: 0
+ok
+modules: 5; from cache: 5; errors: 0; warnings: 0
+ok
+```

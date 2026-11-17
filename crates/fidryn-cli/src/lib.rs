@@ -28,6 +28,7 @@ use fidryn_verify::verify_property;
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
+use std::ffi::OsString;
 use std::fmt;
 use std::fs;
 use std::io::Read;
@@ -58,6 +59,13 @@ pub enum Command {
         /// Worker threads of the check of a workspace (default: the number available).
         #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
         jobs: Option<u32>,
+        /// The cache of the check of a workspace (default: `$FIDRYN_CACHE_DIR`, else
+        /// `.fidryn-cache` in the workspace).
+        #[arg(long, value_name = "DIR")]
+        cache_dir: Option<PathBuf>,
+        /// Keep no cache: check every module of a workspace, and write no entry.
+        #[arg(long, conflicts_with = "cache_dir")]
+        no_cache: bool,
         /// Write the check report of a workspace (`fidryn.check-report/v0.1`) to FILE.
         #[arg(long, value_name = "FILE")]
         report: Option<PathBuf>,
@@ -186,6 +194,8 @@ pub fn run(cli: Cli) -> ExitCode {
         Command::Check {
             path,
             jobs,
+            cache_dir,
+            no_cache,
             report,
             unresolved,
         } => cmd_check(
@@ -193,6 +203,8 @@ pub fn run(cli: Cli) -> ExitCode {
             source_root,
             &WorkspaceFlags {
                 jobs,
+                cache_dir,
+                no_cache,
                 report,
                 unresolved,
             },
@@ -426,22 +438,60 @@ fn check_edition_2(path: &Path) -> Option<ExitCode> {
 /// The flags of `fidryn check` that only the check of a workspace takes.
 struct WorkspaceFlags {
     jobs: Option<u32>,
+    cache_dir: Option<PathBuf>,
+    no_cache: bool,
     report: Option<PathBuf>,
     unresolved: Option<PathBuf>,
 }
 
 impl WorkspaceFlags {
     fn any(&self) -> bool {
-        self.jobs.is_some() || self.report.is_some() || self.unresolved.is_some()
+        self.jobs.is_some()
+            || self.cache_dir.is_some()
+            || self.no_cache
+            || self.report.is_some()
+            || self.unresolved.is_some()
     }
 }
 
+/// The environment variable that names the directory of the cache of a
+/// workspace check when `--cache-dir` does not.
+const CACHE_DIR_VARIABLE: &str = "FIDRYN_CACHE_DIR";
+
+/// The name of the directory of the cache inside a workspace, when neither
+/// `--cache-dir` nor `FIDRYN_CACHE_DIR` names one. It begins with a dot, so
+/// the check does not read it as part of the workspace and the writer of a
+/// generated workspace leaves it alone.
+const DEFAULT_CACHE_DIR: &str = ".fidryn-cache";
+
+/// The directory of the cache of the check of the workspace `dir`: none with
+/// `--no-cache`; otherwise `--cache-dir`, else `variable`, the value of
+/// `FIDRYN_CACHE_DIR`, when it is set and not empty, else `.fidryn-cache`
+/// inside `dir`.
+fn cache_dir(dir: &Path, flags: &WorkspaceFlags, variable: Option<OsString>) -> Option<PathBuf> {
+    if flags.no_cache {
+        return None;
+    }
+    let named = variable
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from);
+    Some(
+        flags
+            .cache_dir
+            .clone()
+            .or(named)
+            .unwrap_or_else(|| dir.join(DEFAULT_CACHE_DIR)),
+    )
+}
+
 /// `fidryn check DIR`: the check of the workspace in the directory `dir`, on
-/// `--jobs` threads, by default as many as are available. Prints each
-/// diagnostic, naming its file under `dir`, then the summary line; writes
-/// the check report to `--report` and the unresolved list to
-/// `--unresolved` when they are given; then prints `ok` when there is no
-/// error. Exit 1 on an error, and when a file cannot be written.
+/// `--jobs` threads, by default as many as are available, with the cache of
+/// [`cache_dir`]. Prints each diagnostic, naming its file under `dir`, then
+/// says once when the cache could not be written, which fails nothing; then
+/// prints the summary line; writes the check report to `--report` and the
+/// unresolved list to `--unresolved` when they are given; then prints `ok`
+/// when there is no error. Exit 1 on an error, and when a file cannot be
+/// written.
 fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
     let jobs = match flags.jobs {
         Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
@@ -449,7 +499,7 @@ fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
     };
     let options = fidryn_driver::workspace::CheckOptions {
         jobs,
-        cache_dir: None,
+        cache_dir: cache_dir(dir, flags, std::env::var_os(CACHE_DIR_VARIABLE)),
         toolchain: env!("CARGO_PKG_VERSION").to_owned(),
     };
     let report = fidryn_driver::workspace::check_workspace(dir, &options);
@@ -460,6 +510,9 @@ fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
             .as_ref()
             .map(|file| dir.join(file).display().to_string());
         eprintln!("{shown}");
+    }
+    if let Some(failure) = &report.cache_failure {
+        eprintln!("the cache could not be written, and the check went on without it: {failure}");
     }
     println!("{}", report.summary());
     let written = [
@@ -884,8 +937,8 @@ fn cmd_check(path: &Path, source_root: Option<&Path>, flags: &WorkspaceFlags) ->
     }
     if flags.any() {
         return fail(format!(
-            "`--jobs`, `--report` and `--unresolved` belong to the check of a workspace, and {} \
-             is no directory",
+            "`--jobs`, `--cache-dir`, `--no-cache`, `--report` and `--unresolved` belong to the \
+             check of a workspace, and {} is no directory",
             path.display()
         ));
     }

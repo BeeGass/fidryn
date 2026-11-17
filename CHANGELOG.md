@@ -42,6 +42,14 @@ interchange schema versions are maintained independently of the interpreter.
   --report FILE` writes the check report, whose JSON Schema is
   `schemas/check-report-v0.1.json`, and `--unresolved FILE` every
   reference whose outcome is not `exact`, one JSON object to a line.
+- A cache of the check of a workspace. The result of checking each module
+  file by itself, its digest, its diagnostics and its interface, is kept on
+  disk under a key of the file's bytes and the toolchain's version, and a
+  later check reads it instead of checking the module again; its output
+  is the same but for the count `from cache`. The directory is
+  `--cache-dir DIR`, else `$FIDRYN_CACHE_DIR`, else `.fidryn-cache` in the
+  workspace; `--no-cache` keeps none. A damaged entry is checked again and
+  rewritten, and a cache that cannot be written does not fail the check.
 
 ## [0.2.0] - 2026-11-16
 
