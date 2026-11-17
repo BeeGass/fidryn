@@ -1057,23 +1057,27 @@ that depends on the path of the file, on the lock, on the manifest or on
 another module is in it, so two files with the same bytes, in one
 workspace or in two, share one entry.
 
-The key of an entry is the BLAKE3 of three frames, built as the
+The key of an entry is the BLAKE3 of four frames, built as the
 [hashes](#hashes) are:
 
 ```text
-F(0x00, "fidryn.cache/v1") ‖ F(0x01, UTF-8 of the toolchain's version) ‖ F(0x02, the file's bytes)
+F(0x00, "fidryn.cache/v1") ‖ F(0x01, UTF-8 of the toolchain's version) ‖ F(0x02, UTF-8 of the identity of the executable) ‖ F(0x03, the file's bytes)
 ```
 
-The toolchain's version is the one `fidryn --version` prints, so an entry
-that another version wrote is never read. A file larger than the largest
-source of edition 2 is not kept; the check refuses it in any case.
+The toolchain's version is the one `fidryn --version` prints. The identity
+of the executable is the BLAKE3 of the file of the running `fidryn`, as 64
+hexadecimal digits: two builds of one version can differ in what phase one
+does, and an entry that another build wrote is never read. When that
+identity cannot be read, the check keeps no cache, and `fidryn check` says
+so once on stderr. A file larger than the largest source of edition 2 is
+not kept; the check refuses it in any case.
 
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
 in the cache's directory. That directory is the one `--cache-dir` names;
 else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
 set and not empty; else `.fidryn-cache` inside the workspace. `--no-cache`
 keeps no cache: the check then reads and checks every module file and
-writes nothing. The name `.fidryn-cache` begins with a dot, so the check
+writes no entry. The name `.fidryn-cache` begins with a dot, so the check
 does not read it as part of the workspace and the writer of a generated
 workspace leaves it alone; the check writes nothing else into the
 workspace.
@@ -1093,13 +1097,19 @@ is that of the file's bytes, and its interface names only what it holds,
 as `Interface::from_json` requires. Any other entry, one cut short, one
 that is not JSON or is JSON of another shape, or one copied from another
 key, is ignored: the module is checked again and its entry written again.
-An entry that cannot be read is missing in the same way. An entry is
-written to a temporary name in its directory and then renamed, so that a
-reader never sees half of one, and two checks at once, which may write the
-same entry, leave a valid cache. A failure to write the cache, such as a
-full disk or a directory that cannot be made, does not fail the check:
-`fidryn check` says once on stderr that the cache could not be written,
-and why, and goes on.
+An entry that cannot be read is missing in the same way.
+
+No read of a check sees an entry that the same check wrote: the entries of
+the files whose entries were missing are written once every file has been
+read, one for each key. So two module files of the same bytes in one
+workspace are both checked when the cache holds neither, and the count
+`from cache` is the same for any number of workers. An entry is written to
+a temporary name in its directory and then renamed, so that a reader never
+sees half of one, and two checks at once, which may write the same entry,
+leave a valid cache. A failure to write the cache, such as a full disk or
+a directory that cannot be made, does not fail the check: no further entry
+is written, and `fidryn check` says once on stderr that the cache could not
+be written, naming the cache's directory and the error, and goes on.
 
 The diagnostics, the summary line, the check report and the unresolved
 list of a check that reads from the cache are byte for byte those of a

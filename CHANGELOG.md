@@ -44,12 +44,14 @@ interchange schema versions are maintained independently of the interpreter.
   reference whose outcome is not `exact`, one JSON object to a line.
 - A cache of the check of a workspace. The result of checking each module
   file by itself, its digest, its diagnostics and its interface, is kept on
-  disk under a key of the file's bytes and the toolchain's version, and a
-  later check reads it instead of checking the module again; its output
-  is the same but for the count `from cache`. The directory is
-  `--cache-dir DIR`, else `$FIDRYN_CACHE_DIR`, else `.fidryn-cache` in the
-  workspace; `--no-cache` keeps none. A damaged entry is checked again and
-  rewritten, and a cache that cannot be written does not fail the check.
+  disk under a key of the file's bytes, the toolchain's version and the
+  identity of the running executable, and a later check reads it instead
+  of checking the module again; its output is the same but for the count
+  `from cache`, which does not depend on the number of workers. The
+  directory is `--cache-dir DIR`, else `$FIDRYN_CACHE_DIR`, else
+  `.fidryn-cache` in the workspace; `--no-cache` keeps none. The module of
+  a damaged entry is checked again and its entry rewritten, and a cache
+  that cannot be written does not fail the check.
 
 ## [0.2.0] - 2026-11-16
 

@@ -43,6 +43,11 @@ pub struct CheckOptions {
     /// `toolchain` is compared with and which is part of the key of every
     /// entry of the cache.
     pub toolchain: String,
+    /// The identity of the running executable, which the command gives as
+    /// the BLAKE3 of its file. It is part of the key of every entry of the
+    /// cache, so that an entry that another build of the same version wrote
+    /// is never read; the check uses it for nothing else.
+    pub executable: String,
 }
 
 /// What [`check_workspace`] found.
@@ -159,13 +164,20 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     }
     let jobs = options.jobs.max(1);
 
-    // Phase one: each module file by itself, or its result from the cache.
+    // Phase one: each module file by itself, or its result from the cache;
+    // then the entries of the files the cache did not hold.
     let cache = options
         .cache_dir
         .as_deref()
-        .map(|dir| Cache::new(dir, &options.toolchain));
+        .map(|dir| Cache::new(dir, &options.toolchain, &options.executable));
     let read = phase_one(root, &found.modules, jobs, cache.as_ref());
-    let from_cache = read.iter().filter(|(_, cached)| *cached).count();
+    let from_cache = read
+        .iter()
+        .filter(|(_, cached)| matches!(cached, Cached::Read))
+        .count();
+    if let Some(cache) = &cache {
+        write_missed(cache, &read, jobs);
+    }
 
     // Phase two: the files against the lock, where each module stands, and
     // then the interfaces alone.
@@ -325,15 +337,27 @@ pub(super) struct PhaseOne {
     pub(super) interface: Option<Interface>,
 }
 
+/// What the cache gave, or is to be given, of one file's phase one.
+#[derive(Clone, Copy)]
+enum Cached {
+    /// The result was read from the cache.
+    Read,
+    /// The cache had no valid entry of the key; the result is to be written
+    /// under it once every file has been read.
+    Missed(Hash32),
+    /// There is no cache, or the file is not kept in it.
+    Not,
+}
+
 /// Phase one of every file of `modules`, relative to `root`, on `jobs`
-/// threads, in the order of `modules`, each with whether it was read from
-/// `cache`.
+/// threads, in the order of `modules`, each with what `cache` gave of it.
+/// Nothing is written to the cache here.
 fn phase_one(
     root: &Path,
     modules: &[String],
     jobs: usize,
     cache: Option<&Cache>,
-) -> Vec<(PhaseOne, bool)> {
+) -> Vec<(PhaseOne, Cached)> {
     let next = AtomicUsize::new(0);
     let work = || {
         let mut done = Vec::new();
@@ -362,12 +386,12 @@ fn phase_one(
     done.into_iter().map(|(_, read)| read).collect()
 }
 
-/// Phase one of the module file at `path`, and whether it was read from
-/// `cache`: the entry of the file's bytes when the cache holds one that is
-/// valid, and otherwise [`check_file`], whose result is then written to the
-/// cache. A file larger than the largest source is not kept in the cache,
-/// since only its first bytes are held.
-fn read_one(path: &Path, cache: Option<&Cache>) -> (PhaseOne, bool) {
+/// Phase one of the module file at `path`, and what `cache` gave of it: the
+/// entry of the file's bytes when the cache holds one that is valid, and
+/// otherwise [`check_file`], whose result is to be written to the cache. A
+/// file larger than the largest source is not kept in the cache, since only
+/// its first bytes are held.
+fn read_one(path: &Path, cache: Option<&Cache>) -> (PhaseOne, Cached) {
     let (digest, head) = match read_module(path) {
         Ok(read) => read,
         Err(error) => {
@@ -379,22 +403,51 @@ fn read_one(path: &Path, cache: Option<&Cache>) -> (PhaseOne, bool) {
                 )],
                 interface: None,
             };
-            return (unread, false);
+            return (unread, Cached::Not);
         }
     };
-    let keyed = cache
+    let key = cache
         .filter(|_| head.len() <= E2_MAX_SOURCE_BYTES)
         .map(|cache| (cache, cache.key(&head)));
-    if let Some((cache, key)) = &keyed
-        && let Some(kept) = cache.read(key, &digest)
-    {
-        return (kept, true);
+    match key {
+        Some((cache, key)) => match cache.read(&key, &digest) {
+            Some(kept) => (kept, Cached::Read),
+            None => (check_file(digest, head), Cached::Missed(key)),
+        },
+        None => (check_file(digest, head), Cached::Not),
     }
-    let checked = check_file(digest, head);
-    if let Some((cache, key)) = keyed {
-        cache.write(&key, &checked);
+}
+
+/// Writes to `cache` the result of each file of `read` whose entry it
+/// missed, once for each key, on `jobs` threads. It runs after every file
+/// has been read, so that no read of a check sees an entry that the check
+/// wrote, and the count of the modules read from the cache is the same for
+/// any number of workers.
+fn write_missed(cache: &Cache, read: &[(PhaseOne, Cached)], jobs: usize) {
+    let mut keys = BTreeSet::new();
+    let missed: Vec<(Hash32, &PhaseOne)> = read
+        .iter()
+        .filter_map(|(result, cached)| match cached {
+            Cached::Missed(key) if keys.insert(*key) => Some((*key, result)),
+            _ => None,
+        })
+        .collect();
+    let next = AtomicUsize::new(0);
+    let work = || {
+        while let Some((key, result)) = missed.get(next.fetch_add(1, Ordering::Relaxed)) {
+            cache.write(key, result);
+        }
+    };
+    let workers = jobs.clamp(1, missed.len().max(1));
+    if workers == 1 {
+        work();
+    } else {
+        std::thread::scope(|scope| {
+            for _ in 0..workers {
+                scope.spawn(work);
+            }
+        });
     }
-    (checked, false)
 }
 
 /// Phase one of the module file whose bytes have the BLAKE3 `digest` and

@@ -484,23 +484,48 @@ fn cache_dir(dir: &Path, flags: &WorkspaceFlags, variable: Option<OsString>) -> 
     )
 }
 
+/// The identity of the running executable that the keys of the cache hold:
+/// the BLAKE3 of its file, which [`engine::executable_identity`] computes
+/// once for the process.
+fn executable_digest() -> Result<String, String> {
+    let identity = engine::executable_identity()?;
+    identity["digest"]
+        .as_str()
+        .map(str::to_owned)
+        .ok_or_else(|| "the identity of the running executable has no digest".to_owned())
+}
+
 /// `fidryn check DIR`: the check of the workspace in the directory `dir`, on
 /// `--jobs` threads, by default as many as are available, with the cache of
-/// [`cache_dir`]. Prints each diagnostic, naming its file under `dir`, then
-/// says once when the cache could not be written, which fails nothing; then
-/// prints the summary line; writes the check report to `--report` and the
-/// unresolved list to `--unresolved` when they are given; then prints `ok`
-/// when there is no error. Exit 1 on an error, and when a file cannot be
-/// written.
+/// [`cache_dir`], keyed also by the identity of the running executable. When
+/// that identity cannot be read, the check keeps no cache. Prints each
+/// diagnostic, naming its file under `dir`, then says once when the cache
+/// could not be used or written, which fails nothing; then prints the
+/// summary line; writes the check report to `--report` and the unresolved
+/// list to `--unresolved` when they are given; then prints `ok` when there
+/// is no error. Exit 1 on an error, and when a file cannot be written.
 fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
     let jobs = match flags.jobs {
         Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
         None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
     };
+    let mut cache = cache_dir(dir, flags, std::env::var_os(CACHE_DIR_VARIABLE));
+    let mut executable = String::new();
+    let mut unused = None;
+    if cache.is_some() {
+        match executable_digest() {
+            Ok(digest) => executable = digest,
+            Err(error) => {
+                cache = None;
+                unused = Some(error);
+            }
+        }
+    }
     let options = fidryn_driver::workspace::CheckOptions {
         jobs,
-        cache_dir: cache_dir(dir, flags, std::env::var_os(CACHE_DIR_VARIABLE)),
+        cache_dir: cache,
         toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+        executable,
     };
     let report = fidryn_driver::workspace::check_workspace(dir, &options);
     for diagnostic in &report.diagnostics {
@@ -510,6 +535,9 @@ fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
             .as_ref()
             .map(|file| dir.join(file).display().to_string());
         eprintln!("{shown}");
+    }
+    if let Some(error) = &unused {
+        eprintln!("the cache could not be used, and the check went on without it: {error}");
     }
     if let Some(failure) = &report.cache_failure {
         eprintln!("the cache could not be written, and the check went on without it: {failure}");

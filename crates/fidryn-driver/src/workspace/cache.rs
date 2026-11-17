@@ -1,26 +1,28 @@
 //! The cache of the check of a workspace: the result of phase one of each
 //! module file ([`PhaseOne`]), kept on disk and keyed by the file's bytes.
 //!
-//! The key of a file is the BLAKE3 of three frames, built as the hashes of
+//! The key of a file is the BLAKE3 of four frames, built as the hashes of
 //! `fidryn_provision::hash` are, each one tag byte, the length of its value
 //! as eight bytes little-endian, and the value: `F(0x00, "fidryn.cache/v1")`,
-//! `F(0x01, the toolchain's version)` and `F(0x02, the file's bytes)`. An
-//! entry is therefore read only by the version of the toolchain that wrote
-//! it, and two files with the same bytes, in one workspace or in two, share
-//! one entry.
+//! `F(0x01, the toolchain's version)`, `F(0x02, the identity of the running
+//! executable)` and `F(0x03, the file's bytes)`. An entry is therefore read
+//! only by the build of the toolchain that wrote it, and two files with the
+//! same bytes, in one workspace or in two, share one entry.
 //!
 //! The entry of a key is the file `v1/<first two digits>/<key>.json` below
 //! the cache's directory, one line of compact JSON with the keys `schema`,
 //! `key`, `digest`, `diagnostics` and `interface`. It is looked up by its
 //! path, on the thread that reads its module file; the directory is never
-//! listed. It is written to a temporary name in its directory and renamed,
-//! so that a reader never sees half an entry and two checks at once leave a
-//! valid cache. An entry is read back only when it is what the writer
-//! writes; any other, one cut short, one that is not JSON or is JSON of
-//! another shape, or one of another key or of other bytes, is a miss, and
-//! the check writes it again. A failure to read an entry is a miss, and a
-//! failure to write one fails nothing: the first is recorded, for the
-//! command to say once.
+//! listed. The check writes the entries it missed after it has read every
+//! file, so that none of its reads sees an entry it wrote. An entry is
+//! written to a temporary name in its directory and renamed, so that a
+//! reader never sees half an entry and two checks at once leave a valid
+//! cache. An entry is read back only when it is what the writer writes; any
+//! other, one cut short, one that is not JSON or is JSON of another shape,
+//! or one of another key or of other bytes, is a miss, and the check writes
+//! it again. A failure to read an entry is a miss, and a failure to write
+//! one fails nothing: the first is recorded, with the cache's directory, for
+//! the command to say once, and no other entry is written.
 
 use super::check::PhaseOne;
 use fidryn_core::Diagnostic;
@@ -41,7 +43,8 @@ const LAYOUT_DIR: &str = "v1";
 /// The tags of the frames of a key.
 const DOMAIN_TAG: u8 = 0x00;
 const TOOLCHAIN_TAG: u8 = 0x01;
-const BYTES_TAG: u8 = 0x02;
+const EXECUTABLE_TAG: u8 = 0x02;
+const BYTES_TAG: u8 = 0x03;
 
 /// How many temporary names a writer tries before it gives up.
 const TEMPORARY_TRIES: u32 = 64;
@@ -77,23 +80,29 @@ fn entry(
     Value::Object(entry)
 }
 
-/// The cache in one directory, for one version of the toolchain. It is
-/// shared by the worker threads of phase one.
+/// The cache in one directory, for one build of the toolchain. It is shared
+/// by the worker threads of the check.
 pub(super) struct Cache {
+    /// The cache's directory, which a failure names.
+    dir: PathBuf,
     /// The directory of the entries, [`LAYOUT_DIR`] below the cache's.
     entries: PathBuf,
     toolchain: String,
+    executable: String,
     /// Why an entry could not be written, the first time one could not.
     failure: OnceLock<String>,
 }
 
 impl Cache {
     /// The cache in the directory `dir`, for the toolchain of version
-    /// `toolchain`. Nothing is read or made until an entry is.
-    pub(super) fn new(dir: &Path, toolchain: &str) -> Cache {
+    /// `toolchain` whose running executable has the identity `executable`.
+    /// Nothing is read or made until an entry is.
+    pub(super) fn new(dir: &Path, toolchain: &str, executable: &str) -> Cache {
         Cache {
+            dir: dir.to_owned(),
             entries: dir.join(LAYOUT_DIR),
             toolchain: toolchain.to_owned(),
+            executable: executable.to_owned(),
             failure: OnceLock::new(),
         }
     }
@@ -104,6 +113,7 @@ impl Cache {
         let frames = [
             (DOMAIN_TAG, CACHE_SCHEMA.as_bytes()),
             (TOOLCHAIN_TAG, self.toolchain.as_bytes()),
+            (EXECUTABLE_TAG, self.executable.as_bytes()),
             (BYTES_TAG, bytes),
         ];
         for (tag, value) in frames {
@@ -165,21 +175,25 @@ impl Cache {
     /// Keeps `result`, phase one of a file whose key is `key`, replacing
     /// any entry of the key. A result without a digest, of a file that could
     /// not be read, is not kept. A failure is recorded, the first one only,
-    /// and is not an error.
+    /// as the cache's directory and the error, and is not an error; once
+    /// one is recorded, nothing more is written.
     pub(super) fn write(&self, key: &Hash32, result: &PhaseOne) {
         let Some(digest) = result.digest else {
             return;
         };
+        if self.failure.get().is_some() {
+            return;
+        }
         let entry = entry(key, &digest, &result.diagnostics, result.interface.as_ref());
         let mut text = entry.to_string();
         text.push('\n');
-        let path = self.entry_path(key);
-        if let Err(error) = write_replacing(&path, text.as_bytes()) {
-            let _ = self.failure.set(format!("{}: {error}", path.display()));
+        if let Err(error) = write_replacing(&self.entry_path(key), text.as_bytes()) {
+            let _ = self.failure.set(format!("{}: {error}", self.dir.display()));
         }
     }
 
-    /// Why an entry could not be written, the first time one could not.
+    /// Why an entry could not be written, the first time one could not: the
+    /// cache's directory and the error.
     pub(super) fn failure(self) -> Option<String> {
         self.failure.into_inner()
     }

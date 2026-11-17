@@ -126,7 +126,7 @@ it ([The cache](law-modules.md#the-cache)).
 | `PATH` | yes | path to a `.fr` file, or to the directory of a workspace |
 | `--jobs N` | no | the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available |
 | `--cache-dir DIR` | no | the directory of the cache of a workspace check; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside the workspace |
-| `--no-cache` | no | flag; keep no cache: check every module file, and write nothing |
+| `--no-cache` | no | flag; keep no cache: check every module file, and write no entry of a cache |
 | `--report FILE` | no | path of the check report of a workspace to write, `fidryn.check-report/v0.1` |
 | `--unresolved FILE` | no | path of the list to write of the references of a workspace whose outcome is not `exact`, one JSON object to a line |
 
@@ -144,7 +144,7 @@ error, and each replaces a file of its name.
 
 **Example**
 
-The demo workspace is checked with `--no-cache`, so that nothing is
+The demo workspace is checked with `--no-cache`, so that no cache is
 written into it:
 
 ```sh
@@ -175,9 +175,12 @@ A warning, such as `W760 ToolchainMismatch` when the manifest's
 change the exit status. Nor does a reference whose target the check does
 not find: its outcome is counted in the report and listed in the
 unresolved list, and is never a diagnostic. Nor does a cache that cannot
-be written: the check says so once on stderr, as
-`the cache could not be written, and the check went on without it: ...`,
-and its output is what it would have been.
+be written: the check writes no further entry, says so once on stderr, as
+`the cache could not be written, and the check went on without it: DIR: ...`
+with the cache's directory and the error, and its output is what it would
+have been. When the identity of the running executable, which the keys of
+the cache hold, cannot be read, the check keeps no cache and says so once,
+as `the cache could not be used, and the check went on without it: ...`.
 
 **Failure.** Exit 1. Each diagnostic is printed to stderr as
 `CODE Title: message`, after the file it is in when it is about the text

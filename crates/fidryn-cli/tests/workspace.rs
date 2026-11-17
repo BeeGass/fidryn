@@ -70,11 +70,16 @@ impl Drop for Scratch {
     }
 }
 
-/// Copies every file and directory below `from` to `to`.
+/// Copies every file and directory below `from` to `to`, but for those
+/// whose names begin with a dot, which are not a workspace's own, such as a
+/// cache that a check of the fixture in place left.
 fn copy_tree(from: &Path, to: &Path) {
     fs::create_dir_all(to).expect("create a directory");
     for entry in fs::read_dir(from).unwrap_or_else(|error| panic!("{}: {error}", from.display())) {
         let entry = entry.expect("read an entry");
+        if entry.file_name().as_encoded_bytes().first() == Some(&b'.') {
+            continue;
+        }
         let target = to.join(entry.file_name());
         if entry.file_type().expect("the kind of an entry").is_dir() {
             copy_tree(&entry.path(), &target);
@@ -332,8 +337,11 @@ fn a_cache_that_cannot_be_written_is_said_once_and_the_check_goes_on() {
     assert_eq!(stdout(&checked), clean(0));
     let message = stderr(&checked);
     assert_eq!(message.lines().count(), 1, "{message}");
-    assert!(
-        message.starts_with("the cache could not be written, and the check went on without it: "),
-        "{message}"
+    // The message names the cache's directory, not the entry of whichever
+    // write failed first.
+    let expected = format!(
+        "the cache could not be written, and the check went on without it: {}: ",
+        blocked.display()
     );
+    assert!(message.starts_with(&expected), "{message}");
 }

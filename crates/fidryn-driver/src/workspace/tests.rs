@@ -29,6 +29,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 /// The version of the running toolchain, which the demo manifest records.
 const TOOLCHAIN: &str = env!("CARGO_PKG_VERSION");
 
+/// The identity of the running executable that the checks here give: any
+/// string will do, since the driver only puts it into the keys of the cache.
+const BUILD: &str = "an invented build";
+
 const ARCHIVE_BLAKE3: &str = "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90";
 const ARCHIVE_SHA256: &str = "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0";
 const MEMBER_BLAKE3: &str = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
@@ -368,6 +372,7 @@ fn options(toolchain: &str) -> CheckOptions {
         jobs: 1,
         cache_dir: None,
         toolchain: toolchain.to_owned(),
+        executable: BUILD.to_owned(),
     }
 }
 
@@ -455,9 +460,20 @@ fn a_workspace_from_the_writer_checks_clean() {
     );
 }
 
+/// The entries of `tree` that are a workspace's own: those with no segment
+/// whose name begins with a dot, which the writer leaves alone, such as the
+/// cache of a check.
+fn own(tree: BTreeMap<String, Entry>) -> BTreeMap<String, Entry> {
+    tree.into_iter()
+        .filter(|(rel, _)| !rel.split('/').any(|segment| segment.starts_with('.')))
+        .collect()
+}
+
 /// The demo workspace under `conformance/fixtures/workspace` is what the
 /// writer writes from the demo models, beside the retrieval record of its
-/// archive. The schemas of the three files are checked on it there.
+/// archive. The schemas of the three files are checked on it there. Entries
+/// whose names begin with a dot, which the writer leaves alone, are not
+/// compared: a check of the fixture with its default cache leaves one.
 #[test]
 fn the_committed_demo_workspace_is_what_the_writer_writes() {
     let mut scratch = Scratch::new("fixture");
@@ -469,7 +485,7 @@ fn the_committed_demo_workspace_is_what_the_writer_writes() {
     );
     let fixture =
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../conformance/fixtures/workspace");
-    if !fixture.is_dir() || tree(scratch.path()) != tree(&fixture) {
+    if !fixture.is_dir() || own(tree(scratch.path())) != own(tree(&fixture)) {
         scratch.keep = true;
         panic!(
             "conformance/fixtures/workspace is not what the writer writes from the demo models; \
@@ -2037,51 +2053,116 @@ fn diagnostics_come_back_from_the_cache() {
     }
 }
 
+/// `text`, the JSON of an entry, with `change` made to its value.
+fn changed_entry(text: &str, change: impl FnOnce(&mut serde_json::Value)) -> String {
+    let mut value: serde_json::Value = serde_json::from_str(text).expect("an entry is JSON");
+    change(&mut value);
+    serde_json::to_string(&value).expect("JSON is written")
+}
+
+/// A way of damaging an entry: the module file whose entry is damaged, what
+/// is done to it, and the damaged text made from the entry's text.
+type Damage<'a> = (&'a str, &'a str, Box<dyn Fn(&str) -> String + 'a>);
+
 #[test]
 fn a_damaged_entry_is_ignored_and_rewritten() {
     let scratch = Scratch::new("cache-damaged");
     let workspace = scratch.join("workspace");
     curated_demo(&workspace);
+    // One module with a diagnostic, so that its entry holds one.
+    let s3 = "zz/demo/t1/s3.fr";
+    let text = read(&workspace, s3);
+    put(&workspace, s3, &text.replacen("any color", "any  color", 1));
     let cache_dir = scratch.join("cache");
     let uncached = check(&workspace);
+    assert!(!uncached.diagnostics.is_empty(), "{uncached:#?}");
     assert_eq!(
         check_workspace(&workspace, &cached(&cache_dir, 1)),
         uncached
     );
 
-    let cache = Cache::new(&cache_dir, TOOLCHAIN);
-    let rels = [
-        "zz/demo/t1.fr",
-        "zz/demo/t1/ch1.fr",
-        "zz/demo/t1/s1.fr",
-        "zz/demo/t1/s2.fr",
-        "zz/demo/t1/s3.fr",
+    let cache = Cache::new(&cache_dir, TOOLCHAIN, BUILD);
+    let entry_of = |rel: &str| cache.entry_path(&digest_and_key(&cache, &workspace, rel).1);
+    let entry = |rel: &str| fs::read_to_string(entry_of(rel)).expect("an entry is written");
+    let damages: Vec<Damage> = vec![
+        (
+            "zz/demo/t1.fr",
+            "cut short",
+            Box::new(|text: &str| text[..text.len() / 2].to_owned()),
+        ),
+        (
+            "zz/demo/t1/ch1.fr",
+            "JSON of another shape",
+            Box::new(|_: &str| "{}\n".to_owned()),
+        ),
+        (
+            "zz/demo/t1/ch1.fr",
+            "JSON that is not an object",
+            Box::new(|_: &str| "[]\n".to_owned()),
+        ),
+        (
+            "zz/demo/t1/s1.fr",
+            "the entry of another key",
+            Box::new(|_: &str| entry("zz/demo/t1/s2.fr")),
+        ),
+        // A reader that serde derives takes the next two.
+        (
+            "zz/demo/t1/s2.fr",
+            "a struct written as an array of its values",
+            Box::new(|text: &str| {
+                changed_entry(text, |value| {
+                    let range = value["interface"]["address_range"].take();
+                    assert!(range.is_object(), "{range}");
+                    value["interface"]["address_range"] =
+                        serde_json::json!([range["start"], range["end"]]);
+                })
+            }),
+        ),
+        (
+            "zz/demo/t1/s2.fr",
+            "the key of an optional field missing",
+            Box::new(|text: &str| {
+                changed_entry(text, |value| {
+                    let interface = value["interface"].as_object_mut().expect("an interface");
+                    assert_eq!(interface.remove("container"), Some(serde_json::Value::Null));
+                })
+            }),
+        ),
+        (
+            "zz/demo/t1/s1.fr",
+            "a key the writer does not write",
+            Box::new(|text: &str| {
+                changed_entry(text, |value| {
+                    value["extra"] = serde_json::json!(1);
+                })
+            }),
+        ),
+        (
+            s3,
+            "a diagnostic that names a file",
+            Box::new(|text: &str| {
+                changed_entry(text, |value| {
+                    let diagnostic = value["diagnostics"][0]
+                        .as_object_mut()
+                        .expect("the entry holds a diagnostic");
+                    diagnostic.insert("source_file".to_owned(), serde_json::json!(s3));
+                })
+            }),
+        ),
     ];
-    let [title, chapter, s1, s2, s3] =
-        rels.map(|rel| cache.entry_path(&digest_and_key(&cache, &workspace, rel).1));
-    let entry = |path: &Path| fs::read_to_string(path).expect("an entry is written");
-    // Cut short.
-    let text = entry(&title);
-    fs::write(&title, &text[..text.len() / 2]).expect("write");
-    // JSON of another shape.
-    fs::write(&chapter, "{}\n").expect("write");
-    // The entry of another key.
-    fs::write(&s1, entry(&s3)).expect("write");
-    // A struct written as an array of its values, which a reader that serde
-    // derives takes.
-    let mut value: serde_json::Value = serde_json::from_str(&entry(&s2)).expect("JSON");
-    let range = value["interface"]["address_range"].take();
-    assert!(range.is_object(), "{range}");
-    value["interface"]["address_range"] = serde_json::json!([range["start"], range["end"]]);
-    fs::write(&s2, serde_json::to_string(&value).expect("JSON")).expect("write");
-
-    let second = check_workspace(&workspace, &cached(&cache_dir, 1));
-    assert_eq!((second.modules, second.from_cache), (5, 1));
-    assert_eq!(uncounted(&second), uncached);
-    // Each was written again, and reads back.
-    for rel in rels {
+    for (rel, what, damage) in &damages {
+        let path = entry_of(rel);
+        let text = entry(rel);
+        let damaged = damage(&text);
+        assert_ne!(damaged, text, "{what}");
+        fs::write(&path, &damaged).expect("write");
+        let again = check_workspace(&workspace, &cached(&cache_dir, 1));
+        assert_eq!((again.modules, again.from_cache), (5, 4), "{what}");
+        assert_eq!(uncounted(&again), uncached, "{what}");
+        // The module was checked again and its entry written again.
         let (digest, key) = digest_and_key(&cache, &workspace, rel);
-        assert!(cache.read(&key, &digest).is_some(), "{rel}");
+        assert!(cache.read(&key, &digest).is_some(), "{what}");
+        assert_eq!(entry(rel), text, "{what}");
     }
     assert_eq!(
         check_workspace(&workspace, &cached(&cache_dir, 1)).from_cache,
@@ -2095,17 +2176,25 @@ fn the_key_depends_on_the_toolchain_version() {
     let workspace = scratch.join("workspace");
     curated_demo(&workspace);
     let cache_dir = scratch.join("cache");
-    let under = |version: &str| CheckOptions {
+    let built = |version: &str, build: &str| CheckOptions {
         cache_dir: Some(cache_dir.clone()),
+        executable: build.to_owned(),
         ..options(version)
     };
+    let under = |version: &str| built(version, BUILD);
     assert_eq!(check_workspace(&workspace, &under("0.3.0")).from_cache, 0);
     let other = check_workspace(&workspace, &under("0.3.1"));
     assert_eq!(other.from_cache, 0);
     assert_eq!(other, check_workspace(&workspace, &options("0.3.1")));
     assert_eq!(check_workspace(&workspace, &under("0.3.0")).from_cache, 5);
+    // Two builds of one version: no entry that one wrote is read by the
+    // other.
+    let rebuilt = check_workspace(&workspace, &built("0.3.0", "another invented build"));
+    assert_eq!(rebuilt.from_cache, 0);
+    assert_eq!(rebuilt, check_workspace(&workspace, &options("0.3.0")));
+    assert_eq!(check_workspace(&workspace, &under("0.3.0")).from_cache, 5);
 
-    // The key is the BLAKE3 of three frames, each a tag byte, the length of
+    // The key is the BLAKE3 of four frames, each a tag byte, the length of
     // its value as eight bytes little-endian, and the value.
     let frame = |tag: u8, value: &[u8]| {
         let mut frame = vec![tag];
@@ -2114,21 +2203,46 @@ fn the_key_depends_on_the_toolchain_version() {
         frame
     };
     let bytes = b"edition 2\nAn invented module.\n";
-    let expected = |version: &str| {
+    let expected = |version: &str, build: &str| {
         let mut frames = frame(0x00, b"fidryn.cache/v1");
         frames.extend(frame(0x01, version.as_bytes()));
-        frames.extend(frame(0x02, bytes));
+        frames.extend(frame(0x02, build.as_bytes()));
+        frames.extend(frame(0x03, bytes));
         Hash32(*blake3::hash(&frames).as_bytes())
     };
-    assert_eq!(
-        Cache::new(&cache_dir, "0.3.0").key(bytes),
-        expected("0.3.0")
-    );
-    assert_eq!(
-        Cache::new(&cache_dir, "0.3.1").key(bytes),
-        expected("0.3.1")
-    );
-    assert_ne!(expected("0.3.0"), expected("0.3.1"));
+    for (version, build) in [("0.3.0", BUILD), ("0.3.1", BUILD), ("0.3.0", "another")] {
+        assert_eq!(
+            Cache::new(&cache_dir, version, build).key(bytes),
+            expected(version, build),
+            "{version} {build}"
+        );
+    }
+    assert_ne!(expected("0.3.0", BUILD), expected("0.3.1", BUILD));
+    assert_ne!(expected("0.3.0", BUILD), expected("0.3.0", "another"));
+}
+
+#[test]
+fn the_count_from_the_cache_does_not_depend_on_the_workers() {
+    // Two module files of the same bytes share one key. A check reads no
+    // entry that it wrote itself, so neither of them is read from the cache
+    // by the check that writes their entry, however the workers are
+    // scheduled.
+    let scratch = Scratch::new("cache-workers");
+    let workspace = scratch.join("workspace");
+    curated_demo(&workspace);
+    let twin = read(&workspace, "zz/demo/t1/s1.fr");
+    put(&workspace, "zz/demo/t1/s9.fr", &twin);
+    let uncached = check(&workspace);
+    assert_eq!(uncached.modules, 6);
+    for jobs in [1, 8] {
+        let cache_dir = scratch.join(&format!("cache-{jobs}"));
+        let cold = check_workspace(&workspace, &cached(&cache_dir, jobs));
+        assert_eq!(cold.from_cache, 0, "cold, {jobs} workers");
+        assert_eq!(cold, uncached, "cold, {jobs} workers");
+        let warm = check_workspace(&workspace, &cached(&cache_dir, jobs));
+        assert_eq!(warm.from_cache, 6, "warm, {jobs} workers");
+        assert_eq!(uncounted(&warm), uncached, "warm, {jobs} workers");
+    }
 }
 
 #[test]
@@ -2152,7 +2266,7 @@ fn two_checks_at_once_leave_a_valid_cache() {
     // Every file of the cache is the entry of a module file, at
     // `v1/<first two digits>/<key>.json`, and reads back; no temporary file
     // is left.
-    let cache = Cache::new(&cache_dir, TOOLCHAIN);
+    let cache = Cache::new(&cache_dir, TOOLCHAIN, BUILD);
     let mut expected = BTreeSet::new();
     for rel in walk(&workspace).modules {
         let (digest, key) = digest_and_key(&cache, &workspace, &rel);
