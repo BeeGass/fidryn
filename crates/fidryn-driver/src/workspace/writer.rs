@@ -37,7 +37,8 @@ const COVERAGE_FILE: &str = "coverage.json";
 ///
 /// A writer made by [`GeneratedWriter::compare`] writes nothing: it compares
 /// each file the run would write with the file at its path, and its `finish`
-/// reports every path that differs.
+/// reports every path that differs, every entry that `create` would refuse
+/// among them.
 pub struct GeneratedWriter {
     out: PathBuf,
     manifest: Manifest,
@@ -67,8 +68,10 @@ pub enum Difference {
     /// The run writes a file at the path, and the directory holds nothing
     /// there.
     Missing,
-    /// The directory holds a module at the path, and the run writes none
-    /// there.
+    /// The directory holds an entry at the path that a run neither writes
+    /// nor keeps: a module the run does not write, a file that is no module
+    /// and not one a run keeps at the top, or an entry that is neither a
+    /// file nor a directory, such as a symbolic link.
     Extra,
     /// The directory holds a file of other bytes at the path, or something
     /// that is not a file.
@@ -159,12 +162,15 @@ impl GeneratedWriter {
     /// generated workspace `manifest` would write with what the directory
     /// `out` holds: the manifest, each module given to
     /// [`write`](Self::write), and the lock [`finish`](Self::finish) is
-    /// given. An entry whose name begins with a dot is not looked at.
+    /// given. Every other entry of `out` that [`create`](Self::create) would
+    /// refuse is extra; what a run keeps beside its own files,
+    /// `coverage.json` at the top, is not looked at, and nor is any entry
+    /// whose name begins with a dot.
     ///
-    /// `manifest` is refused as by [`create`](Self::create). `out` is a
-    /// directory, or does not exist, in which case every file the run writes
-    /// is missing and nothing is made. Whatever else `out` holds is not
-    /// refused: what differs is reported by `finish`.
+    /// `manifest` is refused as by `create`. `out` is a directory, or does
+    /// not exist, in which case every file the run writes is missing and
+    /// nothing is made. A directory that `create` would refuse is not
+    /// refused here: `finish` reports what in it differs.
     pub fn compare(out: &Path, manifest: Manifest) -> Result<GeneratedWriter, WriteError> {
         refuse_manifest(&manifest)?;
         let found = match fs::metadata(out) {
@@ -248,9 +254,12 @@ impl GeneratedWriter {
     /// is not touched.
     ///
     /// A writer made by [`compare`](Self::compare) removes and writes
-    /// nothing. It compares the lock, and counts as extra every `.fr` file
-    /// the directory held that the run did not write. It returns the lock
-    /// when nothing differs, and [`WriteError::Differs`] otherwise.
+    /// nothing. It compares the lock, and counts as extra every module file
+    /// of the directory that the run did not write and every entry that
+    /// `create` would refuse. It returns the lock when nothing differs, in
+    /// which case `create` accepts the directory and a run of the same
+    /// modules changes none of its bytes, and [`WriteError::Differs`]
+    /// otherwise.
     pub fn finish(
         self,
         generator: Generator,
@@ -273,6 +282,13 @@ impl GeneratedWriter {
                 if !lock.modules.contains_key(rel) {
                     differences.insert(rel.clone(), Difference::Extra);
                 }
+            }
+            // An entry that is not the workspace's is extra, unless it
+            // stands where the run writes a file and is already different.
+            for (rel, _) in strays(&compared.found) {
+                differences
+                    .entry(rel.to_owned())
+                    .or_insert(Difference::Extra);
             }
             if differences.is_empty() {
                 return Ok(lock);
@@ -475,17 +491,45 @@ fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
             error: io::Error::other(why.clone()),
         });
     }
-    if let Some(rel) = found.special.first() {
-        return Err(foreign(
+    match strays(&found).next() {
+        Some((rel, Stray::Special)) => Err(foreign(
             out,
             format!("`{rel}`, which is neither a file nor a directory"),
-        ));
-    }
-    let kept = [MANIFEST_FILE, LOCK_FILE, COVERAGE_FILE];
-    match found.files.iter().find(|rel| !kept.contains(&rel.as_str())) {
-        Some(rel) => Err(foreign(out, format!("`{rel}`"))),
+        )),
+        Some((rel, Stray::File)) => Err(foreign(out, format!("`{rel}`"))),
         None => Ok(()),
     }
+}
+
+/// The files a run keeps at the top of a generated workspace besides its
+/// modules: its manifest, its lock, and `coverage.json`.
+const KEPT: [&str; 3] = [MANIFEST_FILE, LOCK_FILE, COVERAGE_FILE];
+
+/// What kind of entry a stray entry is.
+enum Stray {
+    /// Neither a file nor a directory: a symbolic link, for one.
+    Special,
+    /// A file that is neither a module nor one of [`KEPT`] at the top.
+    File,
+}
+
+/// The entries of `found` that are not a generated workspace's: first every
+/// entry that is neither a file nor a directory, then every file that is
+/// neither a module nor one of [`KEPT`] at the top, each list in the byte
+/// order of its paths. Entries whose name begins with a dot are in no walk.
+/// `create` refuses a directory that holds one, and a comparing writer
+/// reports each as extra, so that the two cannot disagree.
+fn strays(found: &Walk) -> impl Iterator<Item = (&str, Stray)> + '_ {
+    let special = found
+        .special
+        .iter()
+        .map(|rel| (rel.as_str(), Stray::Special));
+    let files = found
+        .files
+        .iter()
+        .filter(|rel| !KEPT.contains(&rel.as_str()))
+        .map(|rel| (rel.as_str(), Stray::File));
+    special.chain(files)
 }
 
 fn foreign(out: &Path, found: String) -> WriteError {
@@ -746,6 +790,30 @@ mod tests {
         fs::remove_file(out.join("zz/demo/t1/s2.fr")).expect("remove a module");
         fs::copy(out.join("zz/demo/t1/s3.fr"), out.join("zz/demo/t1/s9.fr")).expect("add a module");
         fs::remove_file(out.join(LOCK_FILE)).expect("remove the lock");
+        // Every entry a run would refuse is extra: a file that is neither a
+        // module nor one a run keeps at the top, and a symbolic link.
+        fs::write(out.join("notes.txt"), "a note\n").expect("write");
+        fs::write(out.join("zz/demo/coverage.json"), "{}\n").expect("write");
+        let mut expected = vec![
+            (LOCK_FILE, Difference::Missing),
+            ("notes.txt", Difference::Extra),
+            (MANIFEST_FILE, Difference::Different),
+            ("zz/demo/coverage.json", Difference::Extra),
+            ("zz/demo/t1/s1.fr", Difference::Different),
+            ("zz/demo/t1/s2.fr", Difference::Missing),
+            ("zz/demo/t1/s9.fr", Difference::Extra),
+        ];
+        #[cfg(unix)]
+        {
+            // A link where the run writes a module is different, and one
+            // where it writes nothing is extra.
+            fs::remove_file(out.join("zz/demo/t1/s3.fr")).expect("remove a module");
+            std::os::unix::fs::symlink("s1.fr", out.join("zz/demo/t1/s3.fr")).expect("link");
+            std::os::unix::fs::symlink("t1", out.join("zz/demo/link")).expect("link");
+            expected.push(("zz/demo/link", Difference::Extra));
+            expected.push(("zz/demo/t1/s3.fr", Difference::Different));
+            expected.sort_by(|a, b| a.0.cmp(b.0));
+        }
         // What a run keeps beside the workspace, and entries whose name
         // begins with a dot, are not looked at, and a comparing writer does
         // not touch the directory of a writer's temporary files.
@@ -756,15 +824,17 @@ mod tests {
         let before = tree(&out);
 
         let found = differences(run(compare(&out, manifest("0.0.1")), &models()));
-        let expected = [
-            (LOCK_FILE, Difference::Missing),
-            (MANIFEST_FILE, Difference::Different),
-            ("zz/demo/t1/s1.fr", Difference::Different),
-            ("zz/demo/t1/s2.fr", Difference::Missing),
-            ("zz/demo/t1/s9.fr", Difference::Extra),
-        ]
-        .map(|(path, difference)| (path.to_owned(), difference));
+        let expected: Vec<(String, Difference)> = expected
+            .into_iter()
+            .map(|(path, difference)| (path.to_owned(), difference))
+            .collect();
         assert_eq!(found, expected);
+        assert_eq!(tree(&out), before);
+        // A writer that writes refuses the directory, and changes nothing.
+        assert!(matches!(
+            GeneratedWriter::create(&out, manifest("0.0.1")),
+            Err(WriteError::Foreign { .. })
+        ));
         assert_eq!(tree(&out), before);
 
         // The lock a run writes is compared like any other file.

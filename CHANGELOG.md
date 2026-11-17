@@ -36,9 +36,10 @@ interchange schema versions are maintained independently of the interpreter.
   against its retrieval record, and writes a generated workspace that
   `fidryn check` accepts, the same bytes on every run and on every host.
   `--title T` writes only the titles named, `--jobs N` sets the number of
-  workers, and `--verify` writes nothing and reports each file that is
-  missing, extra or different. `GeneratedWriter::compare` makes a writer
-  that compares instead of writing.
+  workers, and `--verify` writes nothing and reports each path under `DIR`
+  that is missing, extra or different, every entry a run would refuse
+  among the extra. `GeneratedWriter::compare` makes a writer that compares
+  instead of writing, by the rule by which `create` refuses a directory.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,

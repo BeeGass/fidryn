@@ -35,8 +35,9 @@ pub enum Corpus {
         /// Worker threads (default: the number available).
         #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
         jobs: Option<u32>,
-        /// Write nothing; print each file under DIR that differs from what the
-        /// run would write, and exit 1 when there is one.
+        /// Write nothing; print each path under DIR that differs from what the
+        /// run would write, every entry a run would refuse among them, and exit
+        /// 1 when there is one.
         #[arg(long)]
         verify: bool,
     },

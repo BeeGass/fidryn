@@ -738,12 +738,17 @@ An importer writes a generated workspace with
 - `compare(out, manifest)` makes a writer that writes nothing. It compares
   the manifest with `workspace.json` at once, `write` compares each module
   with the file at its path, and `finish` compares the lock with
-  `law.lock.json` and counts every `.fr` file of `out` that the run did not
-  write as extra. `finish` returns the lock when nothing differs, and
-  otherwise `WriteError::Differs`, which lists every path that is
-  `missing`, `extra` or `different`, in the byte order of the paths.
-  Nothing else in `out` is looked at, and no entry whose name begins with
-  a dot. A directory that does not exist lacks every file and is not made.
+  `law.lock.json`. `finish` counts as extra every `.fr` file of `out` that
+  the run did not write and every entry that `create` refuses: a file other
+  than a module and `coverage.json` at the top, and a symbolic link or any
+  other entry that is neither a file nor a directory. The two follow one
+  rule, so they cannot disagree. Only `coverage.json` and the entries whose
+  name begins with a dot are not looked at. `finish` returns the lock when
+  nothing differs, and then `create` accepts the directory and a run of the
+  same modules changes none of its bytes; otherwise it returns
+  `WriteError::Differs`, which lists every path that is `missing`, `extra`
+  or `different`, in the byte order of the paths. A directory that does
+  not exist lacks every file and is not made.
 
 What a run writes depends only on its modules, its manifest and what
 `finish` is given: neither the order of the calls nor the number of
@@ -1190,7 +1195,8 @@ A document is refused when:
 - a span of a table cell is not a whole number written in ASCII digits;
 - a `br`, an `img` or a column holds content, or an `img` has an attribute
   other than `src`;
-- a `signature` holds anything but `name` and `role`;
+- a `signature` holds anything but `name` and `role`, a footnote that
+  stands directly in it included;
 - a unit or a container has a second source credit, or a source credit
   stands anywhere but directly in one;
 - a cross heading has no topic, or one that is not one word of ASCII
@@ -1218,7 +1224,7 @@ one.
 | Provision inside a unit | any element of the two classes above, and `subsection`, `paragraph`, `subparagraph`, `clause`, `subclause`, `item`, `subitem`, `subsubitem` and `level`, inside a unit. Its kind is its tag |
 | Label | `num` and `heading` of a level |
 | Text part | `chapeau`, `content`, `continuation`, `proviso` |
-| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, `signature`, any `subheading`, any `heading` after the note's first, and a text part directly in the note; in quoted content, `note`, and a `heading` or `subheading` directly in it |
+| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, `signature`; in a note also any `subheading`, any `heading` after the note's first, and a text part directly in the note; in quoted content also `note`, and a `heading` or `subheading` directly in it |
 | Inline, kept as structure | `ref` with an `href` (a link); `ref` of the class `footnoteRef` (a footnote marker); `sup` and `xhtml:sup`; `sub` and `xhtml:sub` |
 | Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
 | Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col`, which hold no text, are dropped |
@@ -1230,8 +1236,9 @@ stands inside another section is a provision of kind `section` of the
 outer one. A footnote (a `note` of the type `footnote`) is taken out of
 the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
-the text that gives no words. An `img` is imported as the source it names,
-normalized; the picture is not in the archive.
+the text that gives no words. An `img` is imported as the source its `src`
+names, normalized, and empty when it has none; the picture is not in the
+archive.
 
 ### Notes and their layers
 
@@ -1241,7 +1248,7 @@ itself a note. So is each `note` that stands directly in a level and is
 neither a footnote nor a release note. A note belongs to the unit or the
 container it is anchored in. Its group is the topic of the nearest cross
 heading before it in its `notes` element, and `ungrouped` when there is
-none:
+none or the note stands directly in a level:
 
 | Group | Layer |
 | --- | --- |
@@ -1250,38 +1257,66 @@ none:
 | any other: `statutoryNotes`, `execDoc`, `courtRules`, any other `ungrouped` note, and any group word a release introduces | enacted |
 
 Its address is the address of its anchor followed by
-`/note/<group>/<law>/<heading>`. `<law>` is the law the note cites first,
-by the origin of its quoted content or else by its first link to a public
-law or an act, written as `pl.999.2`, or `nolaw` when it cites none.
-`<heading>` is its heading with the letters `A` to `Z` in lower case and
-every run of characters other than ASCII letters and digits written `-`,
-cut to 60 characters, or `noheading` when it has none. A note with neither
-a law nor a heading is named `h.` followed by the first 16 hexadecimal
-digits of its hash. When several notes of one anchor agree in all three,
-the second gets `/2`, the third `/3`.
+`/note/<group>/<law>/<heading>`:
 
-### Addresses
+- `<law>` is the `origin` of the note's first quoted content when it
+  begins `/us/pl/`, `/us/act/` or `/us/stat/`; otherwise the `href` of the
+  first link that begins `/us/pl/` or `/us/act/`, taking the note's
+  heading and then its blocks in order, where a link in a footnote and a
+  link with no words do not count. Of that reference the first four
+  segments are kept and the last three joined by full stops:
+  `pl.999.2`, `act.2099-07-30.ch9`, `stat.999.10`. A note with neither has
+  `nolaw`.
+- `<heading>` is the text of the note's heading with the letters `A` to
+  `Z` put in lower case and every run of characters other than ASCII
+  letters and digits written `-`, without `-` at either end, cut to 60
+  characters and again without `-` at its end.
+- Of a note with no heading, or whose heading leaves nothing by that
+  rule, `<heading>` is `noheading` when it has a law, and, when it has
+  neither, `h.` followed by the first 16 hexadecimal digits of its hash.
+- When several notes of one anchor agree in all three parts, the second in
+  document order gets `/2`, the third `/3`.
 
-The address of a unit or a container is the publisher's identifier, with
-these exceptions, each counted in the lock's `addresses`:
+### How it gives addresses
 
-- A unit or a container whose identifier a unit or a container before it
-  in the release already has, taking the members in the order of their
-  names and the elements in document order, gets `~2`, `~3` and so on.
-  The count runs over the release, so the addresses are the same for any
-  number of workers (`disambiguated`).
-- An element that has no identifier gets the segment `~<tag>.<n>` below
-  the container it stands in, or below the prefix for the top element of
-  a file (`assigned`).
-- An identifier that lists several, separated by spaces, gives its first
-  as the address and the others as aliases; one that names a range, as
-  `s44...46` does, is the address, and its two ends and the whole numbers
-  between them are aliases. An alias that is the address of another
-  element is dropped (`aliases`).
+An address is the publisher's identifier except for the later holders of
+a repeated identifier, the elements without one, and what stands inside
+either:
 
-The address of a provision inside a unit is its parent's followed by the
-last segment of its identifier, or by `~<tag>.<n>` when it has none, and
-by `~2`, `~3` when a sibling before it has that address already.
+1. **A unit or a container with an identifier.** An identifier that holds
+   a space is a list: its first member is the identifier used, and the
+   other members are aliases. An identifier whose last segment holds three
+   full stops in a row stands for a range, as `s44...46` does: it is used
+   as it is, and its aliases are its two ends, the identifier cut before
+   the full stops and the identifier with its last segment replaced by
+   that segment's leading lower-case letters followed by what stands after
+   the full stops. When the two ends differ only in a whole number at their
+   end, the second not smaller than the first and at most 999 above it,
+   every number between them gives an alias as well; a member of a range
+   whose number is followed by a letter gets no alias. The address is the
+   identifier, unless a unit or a container before it in the release,
+   taking the members in the order of their names and the elements in
+   document order, already has it; then it is the identifier followed by
+   `~2`, by `~3` for the next, and so on.
+2. **A unit or a container without an identifier.** The address of the
+   container it stands in, or the prefix for the top element of a file,
+   followed by `~<tag>.<n>`, where `n` counts from 1 the elements of that
+   tag without an identifier in that place, in document order.
+3. **A provision inside a unit.** The address of its parent followed by
+   the last segment of its identifier, of its first member if it lists
+   several, and by `~2`, `~3` when a sibling before it already has that
+   address; without an identifier, followed by `~<tag>.<n>` as in rule 2.
+4. An alias that is the address of a unit, a container or a provision is
+   dropped, and so is one the element already has.
+
+The count of rule 1, and that of rule 2 for the top element of a file,
+run over every member of the release that the archive directory holds,
+in the order of their names, whichever titles are written: an address
+depends neither on the titles chosen nor on the number of workers. The
+lock's `addresses` counts the elements whose address got `~2`, `~3` by
+rule 1 or 3 (`disambiguated`), the elements whose own segment is
+`~<tag>.<n>` (`assigned`), and the aliases kept (`aliases`). What stands
+inside such an element is not counted again.
 
 ### What it does not import
 
@@ -1304,20 +1339,24 @@ group it opens.
 `GeneratedWriter` ([Writing a generated workspace](#writing-a-generated-workspace)):
 the manifest, of the name `uscode`, the kind `generated`, the prefix
 `/us/usc`, the release of the record and the running toolchain's version;
-a module for each unit and container of the titles read; and the lock,
-whose generator is `fidryn-ingest-uscode` at the same version, whose
-artifacts are the archives read, each with the members read, as the record
-gives them, and whose counts are those above.
+a module for each unit and container of the titles chosen, every title by
+default; and the lock, whose generator is `fidryn-ingest-uscode` at the
+same version, whose artifacts are the archives and members whose modules
+the run wrote, as the record gives them, and whose counts are those above.
+The numbering of addresses still runs over every member of the archive
+directory, as [How it gives addresses](#how-it-gives-addresses) says.
 
 ```text
 fidryn ingest uscode ARCHIVE_DIR --out DIR
 ingested: U units, C containers from A archives (release R)
 ```
 
-The bytes it writes depend on the archives alone. No time is written but
-the retrieval times the record gives, and no path but the paths of the
-files inside the workspace; neither the host, its user, its time zone,
-the working directory nor the number of workers changes a byte. Two
-documents that differ only in their element ids, their publication name,
-the creation time of their metadata and their release note give the same
-modules, and locks that differ only in `release` and `artifacts`.
+The bytes it writes depend on the archives, on the titles chosen and on
+the toolchain's version, which the manifest and the lock record, and on
+nothing else. No time is written but the retrieval times the record
+gives, and no path but the paths of the files inside the workspace;
+neither the host, its user, its time zone, the working directory nor the
+number of workers changes a byte. Two documents that differ only in their
+element ids, their publication name, the creation time of their metadata
+and their release note give the same modules, and locks that differ only
+in `release` and `artifacts`.

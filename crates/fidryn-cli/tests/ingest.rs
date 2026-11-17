@@ -240,9 +240,15 @@ fn tree(root: &Path) -> BTreeMap<String, Option<Vec<u8>>> {
             let entry = entry.expect("an entry");
             let name = entry.file_name().into_string().expect("UTF-8");
             let rel = format!("{prefix}{name}");
-            if entry.file_type().expect("the kind of an entry").is_dir() {
+            let kind = entry.file_type().expect("the kind of an entry");
+            if kind.is_dir() {
                 entries.insert(rel.clone(), None);
                 walk(&entry.path(), &format!("{rel}/"), entries);
+            } else if kind.is_symlink() {
+                let target = fs::read_link(entry.path()).expect("a link");
+                let mut recorded = b"link to ".to_vec();
+                recorded.extend_from_slice(target.to_string_lossy().as_bytes());
+                entries.insert(rel, Some(recorded));
             } else {
                 entries.insert(rel, Some(fs::read(entry.path()).expect("read a file")));
             }
@@ -623,6 +629,10 @@ fn verify_reports_a_changed_a_missing_and_an_extra_file_and_writes_nothing() {
     one_archive(&archives, fixture_members("two-files"));
     let out = scratch.join("out");
     succeeded(&ingest(&archives, &out, &[]), "the run");
+    // What a run keeps beside its own files, and entries whose name begins
+    // with a dot, are not looked at.
+    fs::write(out.join("coverage.json"), "{}\n").expect("write");
+    fs::write(out.join(".notes"), "not the workspace's\n").expect("write");
 
     let verified = ingest(&archives, &out, &["--verify"]);
     succeeded(&verified, "a directory that holds what the run writes");
@@ -633,17 +643,38 @@ fn verify_reports_a_changed_a_missing_and_an_extra_file_and_writes_nothing() {
     fs::write(&s1, changed).expect("change a module");
     fs::remove_file(out.join("us/usc/t99a.fr")).expect("remove a module");
     fs::copy(&s1, out.join("us/usc/t99/s7.fr")).expect("add a module");
-    fs::write(out.join(".notes"), "not the workspace's\n").expect("write");
+    // A stray file at the top and a symbolic link are entries a run refuses.
+    fs::write(out.join("notes.txt"), "a note\n").expect("write");
+    let mut expected = vec![
+        "extra notes.txt",
+        "different us/usc/t99/s1.fr",
+        "extra us/usc/t99/s7.fr",
+        "missing us/usc/t99a.fr",
+    ];
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink("t99", out.join("us/usc/link")).expect("link");
+        expected.insert(1, "extra us/usc/link");
+    }
     let before = tree(&out);
 
     let verified = ingest(&archives, &out, &["--verify"]);
     assert_eq!(verified.status.code(), Some(1), "{}", stderr(&verified));
     assert_eq!(
         stdout(&verified),
-        "different us/usc/t99/s1.fr\nextra us/usc/t99/s7.fr\nmissing us/usc/t99a.fr\n"
+        expected
+            .iter()
+            .map(|line| format!("{line}\n"))
+            .collect::<String>()
     );
     assert_eq!(stderr(&verified), "");
     assert_eq!(tree(&out), before, "nothing is written");
+
+    // A run refuses the directory, which holds entries that are not the
+    // workspace's, and changes nothing.
+    let refused = ingest(&archives, &out, &[]);
+    assert_eq!(refused.status.code(), Some(1), "{}", stderr(&refused));
+    assert_eq!(tree(&out), before);
 
     // A directory that does not exist lacks every file, and is not made.
     let absent = scratch.join("absent");

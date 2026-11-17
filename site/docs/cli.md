@@ -635,8 +635,9 @@ published by the Office of the Law Revision Counsel, each verified against
 the retrieval record beside them, and writes a generated workspace that
 `fidryn check DIR` accepts
 ([The ingester for the United States Code](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-ingester-for-the-united-states-code)).
-The same archives give the same bytes on every run and on every host, for
-any number of workers.
+The same archives, the same titles and the same version of the toolchain
+give the same bytes on every run and on every host, for any number of
+workers.
 
 **Arguments**
 
@@ -646,17 +647,24 @@ any number of workers.
 | `--out DIR` | yes | path to the directory of the workspace: one that does not exist, one that holds nothing but entries whose name begins with a dot, or an earlier output of the command |
 | `--title T` | no | a title to write, by the publisher's designation, such as `1` or `5a`, its letter in either case; may be given more than once; by default every title of the release |
 | `--jobs N` | no | the number of worker threads, at least 1; by default as many as the system reports as available |
-| `--verify` | no | flag; write nothing, and report every file under `DIR` that differs from what the run would write |
+| `--verify` | no | flag; write nothing, and report every entry under `DIR` that differs from what the run would write |
 
 A run writes `workspace.json` first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
 output that it does not write, and writes `law.lock.json` last, so a run
 that is stopped leaves a directory the next run accepts. With `--title`,
-only the modules of those titles are written, and the lock lists only the
-archives that hold them, each with the members read. `--verify` compares
-`workspace.json`, `law.lock.json` and every module file of `DIR` with what
-the run would write, and looks at nothing else; it writes nothing, `DIR`
-included.
+only the modules of those titles are written, and the lock lists the
+archives and members whose modules the run wrote. The numbering of
+addresses still runs over every member the archive directory holds,
+whichever titles are chosen, so an address does not depend on the
+selection.
+
+`--verify` compares `workspace.json`, `law.lock.json` and every module
+file of `DIR` with what the run would write. Every other entry that a run
+would refuse is extra: a file other than a module and `coverage.json` at
+the top, and a symbolic link or any other entry that is neither a file
+nor a directory. Only `coverage.json` and the entries whose name begins
+with a dot are not looked at. It writes nothing, `DIR` included.
 
 **Example**
 
@@ -673,7 +681,9 @@ fidryn ingest uscode samples/uscode/archives --out DIR --verify
 ingested: U units, C containers from A archives (release R)
 ```
 
-With `--verify`, prints `ok` when `DIR` holds what the run would write.
+With `--verify`, prints `ok` when nothing differs: `DIR` then holds every
+file the run would write, with the same bytes, and nothing a run would
+refuse, so a run into it is accepted and changes none of its bytes.
 
 **Failure.** Exit 1. A release that is refused, by its retrieval record or
 by a reading rule, is reported with the archive, the member and, for a
@@ -683,9 +693,12 @@ before anything is written. A directory that holds anything other than an
 earlier output of the command is refused with what it holds, and nothing
 in it is changed. With `--verify`, each path under `DIR` that differs is
 printed to stdout, relative to `DIR`, in the byte order of the paths,
-after the word that says how, and the exit status is 1:
+after the word that says how: `missing`, `extra` or `different`. The exit
+status is 1:
 
 ```text
+extra notes.txt
+extra us/usc/link
 different us/usc/t99/s1.fr
 extra us/usc/t99/s7.fr
 missing us/usc/t99a.fr
