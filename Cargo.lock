@@ -2498,6 +2498,7 @@ dependencies = [
  "fidryn-check",
  "fidryn-cli",
  "fidryn-core",
+ "fidryn-provision",
  "fidryn-syntax",
  "pulldown-cmark",
  "semver",

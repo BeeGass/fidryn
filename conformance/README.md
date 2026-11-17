@@ -126,3 +126,27 @@ uv run --locked python -I conformance/usc_profile.py /path/to/release --out prof
 the input. The exit codes are those of `uslm_text.py`. Each fixture has its
 expected `import` profile beside it, `<name>.profile.json`, written by hand;
 `test_usc_profile.py` compares the script's output with them.
+
+## Fetching a release
+
+`tools/fetch_uscode.py` downloads archives of a release point from the
+publisher, one request at a time, and writes or extends the retrieval
+record `retrieval.json` beside them. It is the only program in the
+repository that opens a connection; the sample it fetched is described in
+[samples/uscode/README.md](../samples/uscode/README.md).
+
+```sh
+uv run --locked python -I tools/fetch_uscode.py 119-142 --out DIR --title 1 11a 45
+uv run --locked python -I tools/fetch_uscode.py 119-142 --out DIR --all
+```
+
+An archive that is present and equal to its record is kept, and is not
+fetched again. Exit `0` when every archive is fetched or kept, `1` when
+the tool refuses (an archive whose bytes differ from its record, an
+archive without a record, a record of another release), `2` when an
+archive cannot be fetched or the directory cannot be read or written.
+`test_fetch_uscode.py` serves invented archives through a fake opener and
+opens no connection. It holds the tool to its addresses (titles `1` and
+`5a` of `119-142`, title `11a` of `119-73not60`, and `--all`), to the
+record it writes, to a second run that changes nothing, and to the refusal
+of an archive whose bytes changed.

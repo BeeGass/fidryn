@@ -1,0 +1,108 @@
+{
+  "baseline": {
+    "provisions": 4620,
+    "references": {
+      "exact": 650,
+      "no_section": 287,
+      "section_only": 6,
+      "to_the_code": 943
+    },
+    "sections": 333,
+    "sections_by_status": {
+      "omitted": 9,
+      "operative": 252,
+      "repealed": 68,
+      "transferred": 4
+    }
+  },
+  "import": {
+    "addresses": {
+      "aliases": 229,
+      "assigned": 3,
+      "disambiguated": 0
+    },
+    "containers": 72,
+    "containers_by_kind": {
+      "appendix": 1,
+      "chapter": 25,
+      "courtRules": 1,
+      "level": 1,
+      "part": 13,
+      "subchapter": 29,
+      "title": 2
+    },
+    "footnotes": 107,
+    "not_imported": {
+      "footnotes_in_tables_of_contents": 4,
+      "links_in_tables_of_contents": 341,
+      "links_without_words": 0,
+      "note_group_headings": 358,
+      "release_notes": 3,
+      "tables_of_contents": 19
+    },
+    "notes": {
+      "editorial": 593,
+      "enacted": 1498
+    },
+    "notes_by_group": {
+      "courtRules": 1,
+      "editorialNotes": 303,
+      "execDoc": 9,
+      "statutoryNotes": 539,
+      "ungrouped": 1239
+    },
+    "outside_by_body": {
+      "/us/act": 739,
+      "/us/pl": 3310,
+      "/us/stat": 2516
+    },
+    "prefix": "/us/usc",
+    "provisions": 4857,
+    "references": {
+      "editorial": {
+        "ambiguous": 0,
+        "exact": 275,
+        "malformed": 0,
+        "no-unit": 259,
+        "outside": 4919,
+        "range-form": 1,
+        "target-status": 47,
+        "unit-only": 14
+      },
+      "enacted": {
+        "ambiguous": 0,
+        "exact": 332,
+        "malformed": 0,
+        "no-unit": 364,
+        "outside": 1454,
+        "range-form": 0,
+        "target-status": 18,
+        "unit-only": 14
+      },
+      "operative": {
+        "ambiguous": 0,
+        "exact": 644,
+        "malformed": 0,
+        "no-unit": 273,
+        "outside": 192,
+        "range-form": 1,
+        "target-status": 14,
+        "unit-only": 11
+      }
+    },
+    "release": "119-142",
+    "units": 563,
+    "units_by_kind": {
+      "courtRule": 229,
+      "level": 1,
+      "section": 333
+    },
+    "units_by_status": {
+      "in-force": 482,
+      "omitted": 9,
+      "repealed": 68,
+      "transferred": 4
+    },
+    "with_images": 1
+  }
+}
