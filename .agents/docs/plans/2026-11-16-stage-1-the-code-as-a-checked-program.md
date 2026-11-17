@@ -496,7 +496,7 @@ These rules are implemented twice, in `crates/fidryn-ingest-uscode` and in `conf
 | Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
 | Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col` hold no text and are dropped |
 | Note | `notes`, `note`, `sourceCredit` (S8) |
-| Not imported, counted | `toc` and everything inside it; the release notes described in S8 |
+| Not imported, counted | `toc` and everything inside it; the release notes described in S8; the label of a cross heading (S8) |
 
 The unit of a text is the outermost unit that holds it: the section that stands inside 25 U.S.C. 5329 is a provision of kind `section` of that unit.
 
@@ -532,7 +532,7 @@ So an address is the publisher's identifier in every case but these: the later h
 
 ### S8. Notes: their layers and addresses
 
-**Which elements are notes.** (1) Each `note` child of a `<notes>` element, except one with `role="crossHeading"`, which is read for its topic and is not itself a note. (2) Each `note` that is a direct child of a level and is not a footnote. Of the second kind, one that stands directly under a `title` or an `appendix` and whose text begins `Current through ` is a release note: it is not imported, and it is counted.
+**Which elements are notes.** (1) Each `note` child of a `<notes>` element, except one with `role="crossHeading"`, which is read for its topic and is not itself a note: its heading is the publisher's label of the group, is not imported, and is counted. Where a cross heading holds anything after its first heading, as nine do in release 119-142, those blocks are a note of the group it opens, with no heading and no topics. (2) Each `note` that is a direct child of a level and is not a footnote. Of the second kind, one that stands directly under a `title` or an `appendix` and whose text begins `Current through ` is a release note: it is not imported, and it is counted.
 
 **Where a note belongs.** Its anchor is the level that holds it or its `<notes>` element. A note anchored anywhere in a unit belongs to that unit's module; one anchored at a container belongs to the container's module.
 
@@ -659,7 +659,7 @@ The lock:
     }
   ],
   "addresses": { "aliases": 0, "disambiguated": 0, "assigned": 0 },
-  "not_imported": { "tables_of_contents": 0, "footnotes_in_tables_of_contents": 0, "links_in_tables_of_contents": 0, "release_notes": 0, "links_without_words": 0 },
+  "not_imported": { "tables_of_contents": 0, "footnotes_in_tables_of_contents": 0, "links_in_tables_of_contents": 0, "release_notes": 0, "links_without_words": 0, "note_group_headings": 0 },
   "modules": { "us/usc/t1.fr": "<64 hexadecimal digits>" }
 }
 ```
@@ -787,7 +787,7 @@ Records are sorted by the bytes of their address; for one address, the provision
     "outside_by_body": {},
     "definitions": { "enacted": 0, "restated": 0, "unresolved": 0 },
     "definitions_by_kind": {},
-    "not_imported": { "tables_of_contents": 0, "footnotes_in_tables_of_contents": 0, "links_in_tables_of_contents": 0, "release_notes": 0, "links_without_words": 0 }
+    "not_imported": { "tables_of_contents": 0, "footnotes_in_tables_of_contents": 0, "links_in_tables_of_contents": 0, "release_notes": 0, "links_without_words": 0, "note_group_headings": 0 }
   },
   "by_source": [ { "source": "usc01.xml", "positive_law": true, "units": 0, "provisions": 0, "definitions": 0 } ]
 }
@@ -829,7 +829,7 @@ Records are sorted by the bytes of their address; for one address, the provision
 - A section is a provision with the tag `section`; its status is the `status` attribute, or `operative` when it has none.
 - A reference to the Code in operative text is a `ref` that is not excluded and whose `href` begins `/us/usc/`. It resolves exactly when its `href` is the identifier of a provision. Its section is the prefix matched by `^/us/usc/t[0-9A-Za-z]+/s[^/]+`; it reaches the section only when it does not resolve exactly and that prefix is the section prefix of some provision; otherwise it reaches no section.
 
-**The profile of this plan**, by S7 to S9, with nothing shared with the Rust code: units by kind and by status; containers by kind; provisions (every provision of every unit, its top one included); notes by layer and by group; footnotes; images; references by layer and outcome, and those of outcome `outside` by body; aliases, disambiguated addresses and assigned addresses; tables of contents, the footnotes and links inside them, release notes and links without words, which are not imported.
+**The profile of this plan**, by S7 to S9, with nothing shared with the Rust code: units by kind and by status; containers by kind; provisions (every provision of every unit, its top one included); notes by layer and by group; footnotes; images; references by layer and outcome, and those of outcome `outside` by body; aliases, disambiguated addresses and assigned addresses; tables of contents, the footnotes and links inside them, release notes, links without words and the group headings of notes, which are not imported.
 
 The two differ where the design's profile leaves out what this plan imports: the 20 sections without an identifier; court rules, reorganization plans and the other units that are not sections, and their provisions; provisions of kinds other than the nine; and references whose target is a container or a unit that is not a section, which the design's profile counts as reaching no section.
 
@@ -1077,7 +1077,7 @@ The ingester (Task 8) and the workspace check (Task 11) both read these files an
 
 **Interfaces:**
 - Consumes: `Address`, `Hash32` (Tasks 3 and 4).
-- Produces, in `fidryn_provision::workspace`: `Manifest`, `WorkspaceKind`, `Dependency`, `Lock`, `Generator`, `Artifact`, `Member`, `AddressCounts`, `NotImported`, `RetrievalRecord`, `RetrievedArchive`, with the fields of S11, all public. The lock's `addresses` is an `AddressCounts { aliases, disambiguated, assigned }` and its `not_imported` a `NotImported` with the five counts of S11; every count is a `u64`, and both types have `Default` and `fn add(&mut self, other: &Self)`.
+- Produces, in `fidryn_provision::workspace`: `Manifest`, `WorkspaceKind`, `Dependency`, `Lock`, `Generator`, `Artifact`, `Member`, `AddressCounts`, `NotImported`, `RetrievalRecord`, `RetrievedArchive`, with the fields of S11, all public. The lock's `addresses` is an `AddressCounts { aliases, disambiguated, assigned }` and its `not_imported` a `NotImported` with the six counts of S11; every count is a `u64`, and both types have `Default` and `fn add(&mut self, other: &Self)`.
 - Produces: for each of the three files, `from_json(&str) -> Result<Self, String>`, which refuses an unknown field, a missing field and a wrong `schema` and names the field, and `to_json(&self) -> String` in the layout S11 fixes. The three schema strings are the constants `MANIFEST_SCHEMA`, `LOCK_SCHEMA` and `RETRIEVAL_SCHEMA`.
 - Produces: `Lock::digest(text: &str) -> Hash32`, the BLAKE3 of the bytes of a lock file, which a dependency entry records.
 
