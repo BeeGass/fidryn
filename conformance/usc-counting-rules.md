@@ -2,16 +2,16 @@
 
 `usc_profile.py` counts the official XML release point published by the
 Office of the Law Revision Counsel by two sets of rules and prints both as one
-JSON object with sorted keys: `design` and `plan`. `design` repeats the counting
-of the first profile of the Code (2026-11-13), so that its numbers can be
-reproduced and compared on their own. `plan` counts what the reading rules of
-`uslm_common.py` import, the same reading that `uslm_text.py` prints.
+JSON object with sorted keys: `baseline` and `import`. `baseline` repeats the
+counting of the first profile of the Code (2026-11-13), so that its numbers can
+be reproduced and compared on their own. `import` counts what the reading rules
+of `uslm_common.py` import, the same reading that `uslm_text.py` prints.
 
 ```sh
 uv run --locked python -I conformance/usc_profile.py ARCHIVE_DIR_OR_XML [--out FILE] [--jobs N]
 ```
 
-## The profile `design`
+## The profile `baseline`
 
 - Excluded: every `note`, `notes`, `quotedContent`, `toc` and `sourceCredit`
   element and everything inside one.
@@ -38,7 +38,7 @@ uv run --locked python -I conformance/usc_profile.py ARCHIVE_DIR_OR_XML [--out F
 | `references.section_only` | those that reach the section only |
 | `references.no_section` | those that reach no section |
 
-## The profile `plan`
+## The profile `import`
 
 What is counted is what the reading imports, element by element:
 
@@ -138,19 +138,19 @@ the text a group heading holds after its label is a note of its group.
 | `not_imported.links_without_words` | links whose words are only white space |
 | `not_imported.note_group_headings` | group headings, each of whose labels is not imported |
 
-The fixtures in `fixtures/uslm/` each have their `plan` profile in
+The fixtures in `fixtures/uslm/` each have their `import` profile in
 `<name>.profile.json`, written by hand.
 
 ## Where the two differ
 
-`design` leaves out what `plan` imports: sections without an identifier; court
-rules, reorganization plans and the other units that are not sections, and their
-provisions; provisions of kinds other than the nine; and references whose target
-is a container or a unit that is not a section, which `design` counts as reaching
-no section. `plan` also tells references to a unit or provision with a status
-(`target-status`) and to a repeated identifier (`ambiguous`) from the others,
-counts the nested section of a unit as one of its provisions rather than as a
-unit, and gives every reference of every layer an outcome.
+`baseline` leaves out what the reading imports: sections without an identifier;
+court rules, reorganization plans and the other units that are not sections, and
+their provisions; provisions of kinds other than the nine; and references whose
+target is a container or a unit that is not a section, which `baseline` counts as
+reaching no section. `import` also tells references to a unit or provision with a
+status (`target-status`) and to a repeated identifier (`ambiguous`) from the
+others, counts the nested section of a unit as one of its provisions rather than
+as a unit, and gives every reference of every layer an outcome.
 
 ## Release 119-142
 
@@ -168,7 +168,7 @@ It printed:
 
 ```json
 {
-  "design": {
+  "baseline": {
     "provisions": 772863,
     "references": {
       "exact": 88935,
@@ -188,7 +188,7 @@ It printed:
       "vacant": 17
     }
   },
-  "plan": {
+  "import": {
     "addresses": {
       "aliases": 10530,
       "assigned": 172,

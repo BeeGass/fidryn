@@ -3,8 +3,9 @@
 
 Reads the official XML release point published by the Office of the Law Revision
 Counsel: a directory of archives, one archive, or one XML file. Prints one JSON
-object with sorted keys and two members: `design`, the counts of the profile the
-design quotes, and `plan`, the counts of what the reading rules import.
+object with sorted keys and two members: `baseline`, the counts by the rules of
+the first profile of the Code (2026-11-13), and `import`, the counts of what the
+reading rules import.
 `conformance/usc-counting-rules.md` states every rule and every key.
 
 Usage: uv run --locked python conformance/usc_profile.py ARCHIVE_DIR_OR_XML [--out FILE] [--jobs N]
@@ -48,9 +49,9 @@ from uslm_common import (
     texts_of_blocks,
 )
 
-# The profile of the design.
+# The baseline: the counting rules of the first profile of the Code (2026-11-13).
 
-DESIGN_LEVELS = frozenset(
+BASELINE_LEVELS = frozenset(
     {
         "section",
         "subsection",
@@ -63,30 +64,30 @@ DESIGN_LEVELS = frozenset(
         "subsubitem",
     }
 )
-DESIGN_EXCLUDED = frozenset({"note", "notes", "quotedContent", "toc", "sourceCredit"})
+BASELINE_EXCLUDED = frozenset({"note", "notes", "quotedContent", "toc", "sourceCredit"})
 SECTION_OF = re.compile(r"^(/us/usc/t[0-9A-Za-z]+/s[^/]+)")
 
 
 @dataclass(slots=True)
-class DesignPart:
+class BaselinePart:
     provisions: int = 0
     sections_by_status: Counter[str] = field(default_factory=Counter)
     identifiers: list[str] = field(default_factory=list)
     targets: list[str] = field(default_factory=list)
 
 
-def design_part(root: Element) -> DesignPart:
+def baseline_part(root: Element) -> BaselinePart:
     """Counted elements, identifiers and links to the Code outside the excluded elements."""
-    part = DesignPart()
+    part = BaselinePart()
     namespace = "{" + USLM + "}"
     stack = [root]
     while stack:
         for child in stack.pop():
             name = child.tag[len(namespace) :] if child.tag.startswith(namespace) else child.tag
-            if name in DESIGN_EXCLUDED:
+            if name in BASELINE_EXCLUDED:
                 continue
             stack.append(child)
-            if name in DESIGN_LEVELS:
+            if name in BASELINE_LEVELS:
                 identifier = child.get("identifier")
                 if identifier:
                     part.provisions += 1
@@ -100,7 +101,7 @@ def design_part(root: Element) -> DesignPart:
     return part
 
 
-def design_profile(parts: Iterable[DesignPart]) -> dict[str, object]:
+def baseline_profile(parts: Iterable[BaselinePart]) -> dict[str, object]:
     provisions = 0
     statuses: Counter[str] = Counter()
     identifiers: set[str] = set()
@@ -132,7 +133,7 @@ def design_profile(parts: Iterable[DesignPart]) -> dict[str, object]:
     }
 
 
-# The profile of what the reading rules import.
+# The import: the counts of what the reading rules import.
 
 LAYERS = ("operative", "enacted", "editorial")
 OUTCOMES = (
@@ -239,7 +240,7 @@ def outcome(target: str, index: dict[str, int], aliases: dict[str, int]) -> str:
     return "outside"
 
 
-def plan_profile(release: str, results: list[MemberResult]) -> dict[str, object]:
+def import_profile(release: str, results: list[MemberResult]) -> dict[str, object]:
     sinks = [result.output for result in results]
     if not all(isinstance(sink, ProfileSink) for sink in sinks):
         raise AssertionError(sinks)
@@ -314,19 +315,19 @@ def work(job: Job) -> MemberResult | RefusedError:
         root, reader, meta = read_member(job, sink)
     except RefusedError as error:
         return error
-    design = design_part(root) if job.first_pass else None
+    baseline = baseline_part(root) if job.first_pass else None
     return MemberResult(
-        job.source.member, meta.release, reader.identifiers, reader.counts, sink, design
+        job.source.member, meta.release, reader.identifiers, reader.counts, sink, baseline
     )
 
 
 def profile(path: Path, jobs: int) -> dict[str, object]:
     release, results = read_release(path, work, jobs)
-    parts = [result.design for result in results]
-    if not all(isinstance(part, DesignPart) for part in parts):
+    parts = [result.baseline for result in results]
+    if not all(isinstance(part, BaselinePart) for part in parts):
         raise AssertionError(parts)
-    design = design_profile(part for part in parts if isinstance(part, DesignPart))
-    return {"design": design, "plan": plan_profile(release, results)}
+    baseline = baseline_profile(part for part in parts if isinstance(part, BaselinePart))
+    return {"baseline": baseline, "import": import_profile(release, results)}
 
 
 def main() -> int:

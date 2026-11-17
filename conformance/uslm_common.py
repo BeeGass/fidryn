@@ -1479,7 +1479,7 @@ class MemberResult:
     identifiers: list[str]
     counts: DocumentCounts
     output: object
-    design: object = None
+    baseline: object = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -1551,6 +1551,6 @@ def read_release(path: Path, worker: Worker, workers: int) -> tuple[str, list[Me
         if isinstance(result, RefusedError):
             result.archive = job.source.archive or ""
             raise result
-        result.design = results[index].design
+        result.baseline = results[index].baseline
         results[index] = result
     return release, results

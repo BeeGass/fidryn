@@ -1,8 +1,9 @@
 """Hold the independent profile of the Code to the hand-written profiles of the fixtures.
 
 `<name>.profile.json` beside each fixture is the profile of what the reading rules
-import (`plan`), written by hand. The design's profile (`design`) of a few fixtures
-is written out below, where it shows how the two sets of counting rules differ.
+import (`import`), written by hand. The baseline profile (`baseline`), by the rules
+of the first profile of the Code (2026-11-13), of a few fixtures is written out
+below, where it shows how the two sets of counting rules differ.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ from test_uslm_text import CASES, FIXTURES, HERE, TWO_FILES, fixture_input, run_
 PROFILE_SCRIPT = HERE / "usc_profile.py"
 
 
-def design(
+def baseline(
     provisions: int,
     sections_by_status: dict[str, int],
     to_the_code: int = 0,
@@ -38,29 +39,29 @@ def design(
     }
 
 
-# The design counts the nine tags with an identifier, outside notes, quoted content,
+# The baseline counts the nine tags with an identifier, outside notes, quoted content,
 # tables of contents and source credits, and resolves only against those identifiers.
-DESIGN = {
-    "section": design(6, {"operative": 1}),
+BASELINE = {
+    "section": baseline(6, {"operative": 1}),
     # The link whose words are white space is counted; it reaches no section.
-    "links": design(2, {"operative": 2}, to_the_code=2, exact=1, no_section=1),
+    "links": baseline(2, {"operative": 2}, to_the_code=2, exact=1, no_section=1),
     # Sections without an identifier are not counted; the paragraph that has one is.
-    "no-identifier": design(1, {}),
+    "no-identifier": baseline(1, {}),
     # References to an alias and to a member of a range reach no section.
-    "identifier-lists": design(
+    "identifier-lists": baseline(
         5,
         {"repealed": 2, "omitted": 1, "transferred": 1, "operative": 1},
         to_the_code=2,
         no_section=2,
     ),
     # Court rules, reorganization plans and generic levels are not among the nine tags.
-    "unit-kinds": design(0, {}),
+    "unit-kinds": baseline(0, {}),
     # Elements are counted, not distinct identifiers.
-    "repeated-identifiers": design(6, {"operative": 3}, to_the_code=1, exact=1),
+    "repeated-identifiers": baseline(6, {"operative": 3}, to_the_code=1, exact=1),
     # The section inside a section is a section of its own.
-    "section-in-section": design(3, {"operative": 3}),
+    "section-in-section": baseline(3, {"operative": 3}),
     # The quoted section is inside a note.
-    "notes-content": design(1, {"operative": 1}),
+    "notes-content": baseline(1, {"operative": 1}),
 }
 
 
@@ -81,9 +82,9 @@ class ProfileFixtures(unittest.TestCase):
     def check(self, name: str) -> None:
         expected = json.loads((FIXTURES / f"{name}.profile.json").read_text(encoding="utf-8"))
         profile = self.profile_of(name)
-        self.assertEqual(profile["plan"], expected)
-        if name in DESIGN:
-            self.assertEqual(profile["design"], DESIGN[name])
+        self.assertEqual(profile["import"], expected)
+        if name in BASELINE:
+            self.assertEqual(profile["baseline"], BASELINE[name])
 
     def test_section(self) -> None:
         self.check("section")
@@ -170,17 +171,17 @@ class ProfileFixtures(unittest.TestCase):
         expected = json.loads((FIXTURES / f"{TWO_FILES}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):
             with self.subTest(jobs=jobs):
-                self.assertEqual(self.profile_of(TWO_FILES, "--jobs", jobs)["plan"], expected)
+                self.assertEqual(self.profile_of(TWO_FILES, "--jobs", jobs)["import"], expected)
 
     def test_every_fixture_has_a_profile_test(self) -> None:
         tested = {name.removeprefix("test_").replace("_", "-") for name in dir(self)}
         self.assertLessEqual(set(CASES), tested)
-        self.assertLessEqual(set(DESIGN), set(CASES))
+        self.assertLessEqual(set(BASELINE), set(CASES))
 
     def test_the_profile_is_printed_with_sorted_keys_under_two_members(self) -> None:
         text = self.output_of("section")
         profile = json.loads(text)
-        self.assertEqual(list(profile), ["design", "plan"])
+        self.assertEqual(list(profile), ["baseline", "import"])
         self.assertEqual(text, json.dumps(profile, indent=2, sort_keys=True) + "\n")
 
     def test_out_writes_what_is_printed(self) -> None:
