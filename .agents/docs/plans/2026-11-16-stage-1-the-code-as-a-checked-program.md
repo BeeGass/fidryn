@@ -317,6 +317,7 @@ pub struct ContainerModule {
     pub heading: Option<Text>,
     pub status: Option<String>,
     pub members: Vec<Address>,    // sub-containers and units in document order
+    pub credit: Option<Text>,     // eight containers of release 119-142 have one
     pub notes: Vec<Note>,
     pub footnotes: Vec<Footnote>,
 }
@@ -363,7 +364,7 @@ Encodings (`‖` is concatenation, `F(t, v)` a frame with tag `t`):
 | editorial layer | BLAKE3 of `F(0x00, "fidryn.layer.editorial/v1") ‖ credit as text or absent text`, then the editorial notes as in the enacted layer, then for each footnote in ordinal order `F(0x74, UTF-8 of shown) ‖ blocks`, then for each `Mark` run of the module in document order `F(0x75, UTF-8 of the address of the provision or note it stands in) ‖ F(0x76, UTF-8 of shown) ‖ F(0x77, footnote as four bytes little-endian)` |
 | operative layer | of a unit, the tree hash of its root; of a container, its container hash |
 
-The document order of the `Mark` runs of a module is: the root provision's tree depth first, taking for each provision its number, its heading and then its items in order; then the credit; then each note in the order of the module's list, its heading before its blocks; then each footnote in ordinal order. A container has its number, its heading, its notes and its footnotes. A marker in a provision or a note is recorded with that provision's or note's address, one in quoted content with the address of the note that holds the quotation, and one in a credit or a footnote with the module's address.
+The document order of the `Mark` runs of a module is: the root provision's tree depth first, taking for each provision its number, its heading and then its items in order; then the credit; then each note in the order of the module's list, its heading before its blocks; then each footnote in ordinal order. A container has its number, its heading, its credit, its notes and its footnotes. A marker in a provision or a note is recorded with that provision's or note's address, one in quoted content with the address of the note that holds the quotation, and one in a credit or a footnote with the module's address.
 
 Consequences the tests pin: a change to any word, number, heading, status, link target, superscript, table cell or span of a provision changes its tree hash and the tree hash of every ancestor and of nothing else (goal 3); a footnote, a marker, and the provision a marker stands in change only the editorial layer (where exactly in that provision a marker stands is in no hash); the order of notes in the file does not change a layer hash; moving a note to a new address changes the layer hash and not the note's hash.
 
@@ -484,13 +485,13 @@ These rules are implemented twice, in `crates/fidryn-ingest-uscode` and in `conf
 
 | Class | Elements |
 | --- | --- |
-| Document | `uscDoc`, `meta` (read for the release name and the positive-law flag; nothing else in it is imported), `main` |
+| Document | `uscDoc`, `meta` (read for the release name and the positive-law flag; nothing else in it is imported), `main`. The top container of a file is the `title` inside `main`, or the `appendix` that stands directly under `uscDoc`: an appendix file has no `main` |
 | Container | `title`, `appendix`, `subtitle`, `chapter`, `subchapter`, `part`, `subpart`, `division`, `subdivision`, `article`, `courtRules`, `compiledAct`, `reorganizationPlans`; and `level` when no unit stands above it and no text part or `p` is its child |
 | Unit | `section`, `courtRule`, `reorganizationPlan`; and `level` when no unit stands above it and a text part or a `p` is its child |
 | Provision inside a unit | any element of the two classes above, or `subsection`, `paragraph`, `subparagraph`, `clause`, `subclause`, `item`, `subitem`, `subsubitem`, `level`, that stands inside a unit. Its kind is its tag. |
 | Label | `num` and `heading` of a level |
 | Text part | `chapeau`, `content`, `continuation`, `proviso` |
-| Block | `p` and `xhtml:p`, which are read alike; `xhtml:table`; `quotedContent`; `img`; in a note also `signature`, and any `heading` or `subheading` after the note's first heading; in quoted content also `note` |
+| Block | `p` and `xhtml:p`, which are read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, also `signature`; in a note also any `heading` or `subheading` after the note's first heading, and a text part that stands directly in the note; in quoted content also `note` |
 | Inline, kept as structure | `ref` with an `href` (a link); `ref` of class `footnoteRef` (a footnote marker); `sup` and `xhtml:sup`; `sub` and `xhtml:sub` |
 | Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
 | Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col` hold no text and are dropped |
@@ -499,7 +500,7 @@ These rules are implemented twice, in `crates/fidryn-ingest-uscode` and in `conf
 
 The unit of a text is the outermost unit that holds it: the section that stands inside 25 U.S.C. 5329 is a provision of kind `section` of that unit.
 
-**The blocks of a flow.** A text part, a `p`, a note, quoted content, a level of quoted content and a table cell are flows. Walk the children of a flow in document order. Text and inline elements gather into the current paragraph. A block element closes the current paragraph and is itself the next block. How each block is read: a `p` that holds only text and inline elements is one paragraph; a `p` that holds a block is replaced by the blocks of its own flow; a `heading` or `subheading` after a note's first heading is a `Subheading` of its text; a `signature` gives one paragraph for each `name` and each `role` in it, in document order; a `note` inside quoted content is replaced by the blocks of its own flow, its heading, if it has one, first as a `Subheading`; a table, quoted content and an image are read as their own paragraphs below say. A footnote (`note` with `type="footnote"`) is taken out of the flow where it stands, without closing the paragraph, and becomes a footnote of the module (below). The end of the flow closes the current paragraph. A paragraph whose text is empty after normalization is dropped.
+**The blocks of a flow.** A text part, a `p`, a note, quoted content, a level of quoted content and a table cell are flows. Walk the children of a flow in document order. Text and inline elements gather into the current paragraph. A block element closes the current paragraph and is itself the next block. How each block is read: a `p` that holds only text and inline elements is one paragraph; a `p` that holds a block is replaced by the blocks of its own flow; a `heading` or `subheading` after a note's first heading is a `Subheading` of its text; a `signature` gives one paragraph for each `name` and each `role` in it, in document order; a text part that stands directly in a note, where the publisher sets a law out as loose paragraphs with a proviso among them, is replaced by the blocks of its own flow; a `note` inside quoted content is replaced by the blocks of its own flow, its heading, if it has one, first as a `Subheading`; a table, quoted content and an image are read as their own paragraphs below say. A footnote (`note` with `type="footnote"`) is taken out of the flow where it stands, without closing the paragraph, and becomes a footnote of the module (below). The end of the flow closes the current paragraph. A paragraph whose text is empty after normalization is dropped.
 
 **The text of a paragraph.** Concatenate its text nodes in document order; an inline element gives its own text the same way; a `br` gives one space; the boundary of an element gives nothing; a footnote marker gives nothing, and its place is remembered. Normalize the whole (S3). The runs: a link is a `Ref` with the link's words and its `href`, unchanged; a `sup` or `sub` (of either namespace) is `Sup` or `Sub`; everything else is `Words`. The extent of a `Ref`, `Sup` or `Sub` is that of its own words with white space at its two ends left outside it. A link with no words left is dropped and counted. A footnote marker is a `Mark` with the marker's own text as `shown`; it stands directly after the last character before it that is not white space, which is at the offset `normalize(the text before the marker)` has as its length, so that a marker between two spaces leaves one space, after it. The same holds for the text of a `num` and of a `heading`.
 
@@ -519,13 +520,13 @@ The unit of a text is the outermost unit that holds it: the section that stands 
 2. *A unit or a container that has no identifier.* The address of the container it stands in, or the prefix of the corpus for the top element of a file, followed by the segment `~<tag>.<n>`, where `n` counts from 1 the elements of that tag without an identifier in that same place, in document order.
 3. *A provision inside a unit.* The address of its parent followed by the last segment of its identifier, and by `~2`, `~3` if a sibling before it already has that address; with no identifier, followed by `~<tag>.<n>` as in rule 2.
 4. An alias that is the address of another element is dropped. Aliases are written in the order the rules give them.
-5. The lock counts the addresses that end in a `~` segment by rules 1 and 3 (disambiguated), those made by rule 2 (assigned), and the aliases.
+5. The lock counts the elements whose address got `~2`, `~3` and so on by rule 1 or rule 3 (disambiguated), the elements whose own segment is `~<tag>.<n>` by rule 2 or by the last case of rule 3 (assigned), and the aliases. What stands inside such an element is not counted again.
 
 So an address is the publisher's identifier in every case but these: the later holders of a repeated identifier; elements without one; and what stands inside either.
 
 **Containers and units.** A container's members are the containers and units that are its children, in document order, by address. `within` of a unit or a container is the address of the container it stands in; the top container of a file has none. `source` is the member's file name. `positive_law` is the flag of the file.
 
-**The source credit** of a unit is the text of its `sourceCredit`.
+**The source credit** of a unit or a container is the text of the `sourceCredit` that is its direct child. A second one, and one that stands anywhere else, is refused.
 
 **Definitions** are extracted from finished units by S10.
 
@@ -758,7 +759,7 @@ The records, each with its keys in order:
 - A provision: `address`, `layer` (`"operative"`), `kind`, `status` (the word, or `null`), `num`, `heading`, `items`. An item is a part `{"part": role, "blocks": [...]}` or a child `{"child": address}`, at its place. The record of a unit's top provision has `aliases`, `within`, `source` and `positive_law` after these.
 - A container: `address`, `layer` (`"operative"`), `kind`, `status`, `num`, `heading`, `aliases`, `within`, `members`.
 - A note: `address`, `layer` (`"enacted"` or `"editorial"`), `group`, `topics`, `heading`, `blocks`.
-- A credit: `address` (its unit's), `record` (`"credit"`), then the keys of a paragraph.
+- A credit: `address` (its module's), `record` (`"credit"`), then the keys of a paragraph.
 - A footnote: `address` (its module's), `record` (`"footnote"`), `ordinal`, `shown`, `blocks`.
 
 Records are sorted by the bytes of their address; for one address, the provision or container comes first, then the credit, then the footnotes by ordinal.
@@ -813,7 +814,7 @@ Records are sorted by the bytes of their address; for one address, the provision
 - A provision is `amended_text` when the words of its own text parts and tables differ, and `amended_structure` when its number, heading, status, the order and addresses of its children, or the shape of a table differ; it may be both. A provision whose tree hash changed only because a descendant changed is not listed.
 - `added` and `removed` list the highest added or removed provision only, not what lies below it.
 - A removed and an added provision are one `moved` entry, and are taken out of the other two lists, when their tree hashes are equal once each one's own number is left out (a section that is renumbered and otherwise unchanged has moved). Notes are paired by equal note hashes. When several candidates match they are paired in address order.
-- `credits_changed` lists the units whose credit was added, removed or changed. `footnotes_changed` lists the units and containers whose footnotes or footnote markers differ in any way. `containers.changed` lists the containers present on both sides whose number, heading, status, aliases or members differ.
+- `credits_changed` lists the units and containers whose credit was added, removed or changed. `footnotes_changed` lists the units and containers whose footnotes or footnote markers differ in any way. `containers.changed` lists the containers present on both sides whose number, heading, status, aliases or members differ.
 - Every list is sorted by address.
 - The text form, printed without `--json` and used as a commit message, is: a first line `<prefix>: <old release> to <new release>`; a blank line; one line of counts for each of the four groups; then each non-empty list under its name, one address to a line.
 
@@ -1629,7 +1630,7 @@ impl AddressIndex {
 - Produces: `conformance/usc_compare.py OLD_ARCHIVE_OR_XML NEW_ARCHIVE_OR_XML`, which reads the text records of the two sides (S15) and nothing else, and prints these sets of addresses:
   - *operative*: from the records of provisions with their `marks` left out: only in the old, only in the new (each reduced to the highest provision), and on both sides with a different record;
   - *enacted notes* and *editorial notes*: the same three sets from the records of notes of each layer;
-  - *credits*: the units whose credit record is on one side only or differs;
+  - *credits*: the units and containers whose credit record is on one side only or differs;
   - *footnotes*: the units and containers whose footnote records, or whose `marks` anywhere in their provisions and notes, differ;
   - *containers*: only in the old, only in the new, and on both sides with a different record.
 - `--against CHANGES.json` exits 1, naming the first address that differs, unless: operative old-only equals `operative.removed` with the `from` of `moved`, new-only equals `added` with the `to` of `moved`, and differing equals `amended_text` with `amended_structure`; the same holds for each note layer against `added`, `removed`, `moved` and `amended`; credits equals `editorial.credits_changed`; footnotes equals `editorial.footnotes_changed`; and the three container sets equal `containers.removed`, `added` and `changed`.
