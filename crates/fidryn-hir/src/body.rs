@@ -478,7 +478,20 @@ pub fn parse_duty_parts(src: &str) -> DutyParts {
     let mut content = Vec::new();
     let mut due = None;
     let mut invalid = false;
+    // How many parentheses, brackets and braces are open in the text the
+    // reader steps over: the text of a field it does not know. A word that
+    // begins a field begins one only where none is open; inside them it is
+    // part of that text.
+    let mut open = 0usize;
     while !p.is_eof() {
+        if open > 0 {
+            match p.bump().map(|token| token.kind) {
+                Some(TokenKind::LParen | TokenKind::LBracket | TokenKind::LBrace) => open += 1,
+                Some(TokenKind::RParen | TokenKind::RBracket | TokenKind::RBrace) => open -= 1,
+                _ => {}
+            }
+            continue;
+        }
         if p.eat_ident("bearer") {
             if let Some(term) = p.parse_expr() {
                 bearer = term_as_name(&term).unwrap_or_default();
@@ -520,7 +533,12 @@ pub fn parse_duty_parts(src: &str) -> DutyParts {
             invalid |= due.is_none();
             continue;
         }
-        p.bump();
+        if matches!(
+            p.bump().map(|token| token.kind),
+            Some(TokenKind::LParen | TokenKind::LBracket | TokenKind::LBrace)
+        ) {
+            open = 1;
+        }
     }
     DutyParts {
         bearer,
@@ -757,14 +775,18 @@ pub fn parse_expr_src(src: &str) -> Option<Term> {
     Some(term)
 }
 
-/// The expression at the start of `src`, as `parse_expr_src` reads it, or
-/// `Err` when the text nests deeper than the reader goes. The reader then
-/// returns nothing, or an expression that lacks the part below its limit,
-/// and neither is what the text says.
-pub(crate) fn parse_expr_within_limits(src: &str) -> Result<Option<Term>, ()> {
+/// The whole of `src` read as one expression. `None` when it is not one: no
+/// expression stands there, the reader cannot read a part of it, or text
+/// follows the expression. `Err` when the text nests deeper than the reader
+/// goes: the reader then returns nothing, or an expression that lacks the
+/// part below its limit, and neither is what the text says.
+pub(crate) fn parse_whole_expr(src: &str) -> Result<Option<Term>, ()> {
     let mut p = SliceParser::new(src);
     let term = p.parse_expr();
-    if p.exhausted { Err(()) } else { Ok(term) }
+    if p.exhausted && !p.unreadable {
+        return Err(());
+    }
+    Ok(term.filter(|_| !p.exhausted && p.is_eof()))
 }
 
 pub fn term_as_name(term: &Term) -> Option<String> {
@@ -1015,16 +1037,15 @@ fn parse_contents_until_end(p: &mut SliceParser<'_>) -> Option<Term> {
             continue;
         }
         if p.eat_ident("return") {
-            if let Some(term) = p.parse_expr() {
-                items.push(term);
+            match p.parse_expr() {
+                Some(term) => items.push(term),
+                None => p.give_up(),
             }
             continue;
         }
         match p.parse_expr() {
             Some(term) => items.push(term),
-            None => {
-                p.bump();
-            }
+            None => p.give_up(),
         }
     }
     if items.is_empty() {
@@ -1425,7 +1446,12 @@ struct SliceParser<'a> {
     depth: usize,
     /// How many links of `else if` the reader is inside of.
     links: usize,
+    /// True when the reader gave up: it passed one of its limits, or
+    /// `unreadable` is set. The cursor is then at the end.
     exhausted: bool,
+    /// True when the reader gave up because a token inside an argument
+    /// list, braces or a block begins no item it can read.
+    unreadable: bool,
 }
 
 impl<'a> SliceParser<'a> {
@@ -1450,6 +1476,7 @@ impl<'a> SliceParser<'a> {
             depth: 0,
             links: 0,
             exhausted: false,
+            unreadable: false,
         }
     }
 
@@ -1736,16 +1763,15 @@ impl<'a> SliceParser<'a> {
                 continue;
             }
             if self.eat_ident("return") {
-                if let Some(term) = self.parse_expr() {
-                    items.push(term);
+                match self.parse_expr() {
+                    Some(term) => items.push(term),
+                    None => self.give_up(),
                 }
                 continue;
             }
             match self.parse_expr() {
                 Some(term) => items.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         let _ = self.eat_kind(TokenKind::RBrace);
@@ -1957,13 +1983,16 @@ impl<'a> SliceParser<'a> {
                     continue;
                 }
                 if !self.at_kind(TokenKind::Ident) {
-                    self.bump();
+                    self.give_up();
                     continue;
                 }
                 let key = self.bump_text();
                 let _ = self.eat_kind(TokenKind::Colon) || self.eat_kind(TokenKind::Eq);
-                if let Some(value) = self.parse_expr() {
-                    fields.insert(key, value);
+                match self.parse_expr() {
+                    Some(value) => {
+                        fields.insert(key, value);
+                    }
+                    None => self.give_up(),
                 }
             }
             let _ = self.eat_kind(TokenKind::RBrace);
@@ -1976,9 +2005,7 @@ impl<'a> SliceParser<'a> {
             }
             match self.parse_expr() {
                 Some(term) => items.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         let _ = self.eat_kind(TokenKind::RBrace);
@@ -1999,12 +2026,23 @@ impl<'a> SliceParser<'a> {
             }
             match self.parse_expr() {
                 Some(term) => args.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         args
+    }
+
+    /// Gives the read up: a token inside an argument list, braces or a
+    /// block begins no item the reader can read. Stepping over it would
+    /// read a term the text does not say. The cursor goes to the end, as
+    /// when the reader passes one of its limits, and a caller that rejects
+    /// a read that was given up rejects this one.
+    fn give_up(&mut self) {
+        if !self.exhausted {
+            self.unreadable = true;
+        }
+        self.exhausted = true;
+        self.idx = self.tokens.len();
     }
 
     fn try_skip_type_args(&mut self) -> bool {

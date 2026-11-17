@@ -233,12 +233,19 @@ ReviewClause    ::= "by" Expr ("under" Expr)?
 
 (* ----- interpretation and conflict ----- *)
 
-InterpretationDecl ::= "interpretation_family" Ident "for" Expr
+InterpretationDecl ::= "interpretation_family" Ident ("for" Expr)?
                        "{" InterpretationField* "}"
-InterpretationField::= "alternative" Ident Block
+InterpretationField::= "alternative" Ident "{" Definition* "}"
                   | "admissibility" Expr End
                   | "selector" Expr End
-                  | "defines" Expr "as" Expr End
+Definition      ::= "defines" Expr "as" Status ";"?
+Status          ::= Ident   (* established or not_established, and only one *)
+
+(* The parser steps over the body of an interpretation family, and the
+   lowering reads its definitions from the text. A definition stands in
+   the block of an alternative and ends at the next "defines" or at the
+   "}" of the block. Its Expr is all the text between "defines" and "as",
+   and is one proposition. *)
 
 ConflictDoctrineDecl ::= "conflict_doctrine" Ident SourceRef?
                          "{" ConflictField* "}"

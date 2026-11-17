@@ -281,10 +281,11 @@ interchange schema versions are maintained independently of the interpreter.
   rejected with `E210`. A `conflict_doctrine` that named a clause only
   inside a string, as in `note "we defeat Residual here"`, passed the
   checker, and is now rejected with `E511`. A `source` with no `artifact`
-  field passed the checker when a string in another field held that word,
-  as in `citation "the artifact of 1990"`, and is now rejected with
-  `E540`. A string in a query that held
-  `for_all w in People: true` declared a property; it declares none now.
+  field passed the checker when only a string in another field held that
+  word, with more text after it in the string, as in
+  `citation "the artifact of 1990"`, and is now rejected with `E540`. A
+  string in a query that held `for_all w in People: true` declared a
+  property; it declares none now.
 - Where a part of a declaration is read back out of its text by a word,
   such as the `rank` of a nomination, the word is found only as a word of
   its own, and not inside a longer name. The rank of
@@ -299,35 +300,64 @@ interchange schema versions are maintained independently of the interpreter.
   longer name that holds the word `artifact`, such as `artifact_registry`,
   `my_artifact` or `artifacts`, or with such a name as the value of
   another field, as in `kind artifact_set`, passed the checker with no
-  `artifact` field, and is now rejected with `E540`. Where the grammar
-  puts white space beside such a word, a tab now serves as well as a
-  space, and so does a line end where the parser does not end the
-  statement at it. A nomination with tabs between its words, or with
-  `for` at the start of a line that no space begins, counted for every
-  office, whatever office it named: with `Alice` so nominated for
+  `artifact` field, and is now rejected with `E540`. Beside `for`,
+  `alternative`, `defines` and `as`, where the grammar puts white space, a
+  tab now serves as well as a space, and so does a line end where the
+  parser does not end the statement at it; beside `rank` and `artifact`
+  both already did. A nomination with a tab before or after `for`, or
+  with `for` at the start of a line that no space begins, counted for
+  every office, whatever office it named: with `Alice` so nominated for
   `GuardianOf(BRT)` at rank 1 and `Bob` nominated for `TrusteeOf(BRT)` at
   rank 2, the query above answered `Alice`, and it answers `Bob` now. In
   the `interpretation_family` that makes the candidates eligible, an
   `alternative` with a tab after the word was lost, and one whose name
   ends in `alternative`, such as `both_alternative`, lost its definitions:
   the query was `suspended` for want of them. A `defines` with a tab after
-  the word, or with `as` at the start of a line that a tab begins, was
+  the word, or with `as` at the start of a line that no space begins, was
   lost as well: when it made the candidate of rank 1 eligible, the query
-  answered with the candidate of rank 2. In each of these cases the query
+  answered with the candidate of rank 2. In both of these cases the query
   now answers with the candidate of rank 1.
-- A definition in an `interpretation_family` whose expression is no
-  proposition is rejected with `E210`, in a diagnostic that names the
-  family and quotes the definition, such as "`defines 5 as established` in
-  interpretation family `Reading` requires a proposition". Such a
-  definition, for example `defines 1 + 2 as established`,
+- A definition in an alternative of an `interpretation_family` whose
+  expression is no proposition is rejected with `E210`, in a diagnostic
+  that names the family and quotes the definition, such as
+  "`defines 5 as established` in interpretation family `Reading` requires
+  a proposition". Such a definition, for example
+  `defines 1 + 2 as established`,
   `defines not Eligible(Alice) as not_established` or
   `defines Alice == Alice as established`, was dropped without a
-  diagnostic, and the module passed the checker. A definition with no
-  `as established` or `as not_established` after its expression, such as
-  `defines Eligible(Alice)` or `defines Eligible(Alice) as suspended`, was
-  dropped in the same way, and is now rejected with `E100`. So is one
+  diagnostic, and the module passed the checker. The expression is all
+  the text between `defines` and its `as`, and a definition with more
+  than a proposition there is rejected in the same way:
+  `defines Eligible(Alice) 5 as established` passed the checker, and a
+  definition of `Eligible(Bob, TrusteeOf(BRT))` with
+  `Eligible(Alice, TrusteeOf(BRT))` after it made `Bob` eligible. A
+  definition with no `as established` or `as not_established` after its
+  expression, such as `defines Eligible(Alice)` or
+  `defines Eligible(Alice) as suspended`, was dropped in the same way, and
+  is now rejected with `E100`. So is one
   marked with a longer word: `as established_later` was read as
   `as established`, and `as not_established_yet` as `as not_established`.
+- The definitions of an `interpretation_family` are read from the blocks
+  of its alternatives: an alternative is its name and the block that
+  follows it, and its definitions are the ones inside that block. A
+  `defines` that stands in the family outside the block of every
+  alternative is rejected with `E100`, in a diagnostic that quotes it,
+  names the family and says that it stands outside the block of every
+  alternative. One below the `}` of an alternative was taken into that
+  alternative, and one above the first alternative was dropped. In a
+  module with `Bob` nominated at rank 1 and `Alice` at rank 2 for the
+  office `TrusteeOf(BRT)`, only `Alice` made eligible in the block of
+  `alternative Both`, and a query whose goal is `UniqueOccupant` for that
+  office, on a case that selects `Both`, the query answered `Bob` with
+  `defines Eligible(Bob, TrusteeOf(BRT)) as established` below that
+  block, and `Alice` with it above the block. A `defines` that `(`
+  follows directly is found:
+  `defines(Eligible(Bob, TrusteeOf(BRT))) as established` in that block
+  was dropped, and the query answered `Alice`; it answers `Bob` now. An
+  `alternative` with no name, such as `alternative {`, and a definition
+  with more than one status are rejected with `E100`; the first passed
+  the checker, and `as not_established as established` was read as
+  `as not_established`.
 - A `duty` whose `content` cannot be read is rejected with `E100`, in the
   diagnostic a duty now has for a `bearer`, `claimant`, `attaches` or
   `due` that cannot be read: "duty `Keep` contains an invalid or
@@ -335,9 +365,25 @@ interchange schema versions are maintained independently of the interpreter.
   the checker, and the duty had no content; so did a content of 5,000
   nested brackets, `content days`, `content a +` and a `content` with
   nothing after it. `[a, b)` passed the checker in the other four fields
-  as well. A duty that holds the word `content` inside another field, as
-  in `discharge_by Delivered(content)`, is rejected in the same way now,
-  and so is one that holds `due` there; both passed the checker before.
+  as well.
+- A `duty` field or the `returns` of a `decision` that holds an item its
+  reader cannot read, inside the arguments of a call, the braces of a
+  set, a record or a block, or a `transaction` block, is rejected with
+  `E100`, in the diagnostic that the duty or the decision has for an
+  expression that cannot be read. `content Pay([a, b))`,
+  `content { [a, b) }` and `due f([a, b))` passed the checker, and so did
+  a `decision` with `returns { 1, [a, b) }`. This reader reads less than
+  the parser: an interval, as in `Pay([1, 2))`, a duration word with no
+  number before it, as in `Pay(days)`, and `()` are read in a query or a
+  rule, and are rejected in a duty or a decision.
+- A word that begins a field of a `duty`, such as `content` or `due`,
+  begins one only outside the parentheses, brackets and braces of a field
+  that the reader of the duty does not know; inside them it is part of
+  that field. A duty with
+  `discharge_by Delivered(due 30 counted_days after invoice_date)` and no
+  `due` field took that deadline: once the duty had attached on a case
+  whose invoice date was in January, `duty_status` gave `Breached` in
+  September. It gives `Attached` now.
 - A rule with no `{ ... }` body is rejected with `E100`, and so is a
   `verify` whose name is not followed by `{`:
   `verify Checked extra { assert false }` passed the checker before.
@@ -347,9 +393,12 @@ interchange schema versions are maintained independently of the interpreter.
   `for_all x in {1, 2}: x == 3` is rejected; it passed the checker before.
 - A word that cannot begin an expression, such as `return` or `when`, is no
   longer kept as a name when it begins an item in the braces of an
-  expression, such as the branch of an `if`.
-  `if c > 0 { return 1 } else { return 2 }` is rejected with `E100`; it
-  passed the checker before and failed when run.
+  expression that the parser reads, such as the branch of an `if` in the
+  body of a `calc`. `if c > 0 { return 1 } else { return 2 }` there is
+  rejected with `E100`; it passed the checker before and failed when run.
+  The text of a `duty`, which the parser steps over and the lowering
+  reads, still takes such a word for a name: `content { return Pay(Acme) }`
+  passes the checker, with the name `return` in the content.
 - The type arguments of a call nested 80,000 deep ended the process with
   a stack overflow, and so did an `if` with 20,000 `else if` links in the
   body of a `calc`. Type arguments of a call nested more than 128 deep
@@ -378,11 +427,15 @@ interchange schema versions are maintained independently of the interpreter.
   A `calc` that returns 3,000 of them took about five seconds to check; it
   now takes about a third of a second. One of 65,000 ended the process
   with a stack overflow; it is now rejected with `E100`.
-- Where a type is missing after the `:` of a parameter or after the `->`
-  of a result, the message is "expected a type", as it is after the `:`
-  of an entity. It read "expected type" there. A record field with no type
-  after its `:` passed the checker before, and is now rejected with `E100`,
-  "expected a type".
+- Where a type is missing after the `:` of a parameter of a `calc`, an
+  `fn`, a `query` or a `rule`, or after the `->` of the result of a
+  `calc`, an `fn` or a `query`, the message is "expected a type", as it
+  is after the `:` of an entity; it read "expected type" there. A
+  parameter with no type of a `proposition`, an `office`, a `judgment`, a
+  `decision`, a `duty`, a `clause`, a `legal_act` or an `observation`,
+  the result of a `decision` with no type, and a field with no type of a
+  `record_type` or an `evidence_type` passed the checker before, and are
+  now rejected with `E100`, "expected a type".
 
 ### Security
 

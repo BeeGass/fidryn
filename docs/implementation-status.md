@@ -27,14 +27,14 @@ with it.
 | `judgment` | Yes. An unrecognized clause is kept as text | Yes | Concurrence policies only. One with an unrecognized clause or a `standard` suspends with a `JudgmentPolicy` request | `crates/fidryn-eval/src/judgment.rs:44`, `:57` |
 | `observation` | Yes. An unrecognized clause is kept as text | Yes | Yes. An unrecognized clause is an engine error once a record of the observed schema is on the case | `crates/fidryn-eval/src/judgment.rs:486`, `:533` |
 | `type`, `record_type`, `evidence_type`, `entity`, `proposition` | Yes | Yes | Not applicable | `crates/fidryn-check/src/lib.rs:3459` |
-| `effect` | Re-read from the declaration text | Name and its first operation, with parameters and result | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1980`, `:3552`; `crates/fidryn-eval/src/lib.rs:2346` |
-| `duty` | Re-read from the declaration text. A `bearer`, `claimant`, `attaches`, `content` or `due` whose expression cannot be read is `E100`. Unknown fields are skipped, but each of those five words is taken for its field wherever it stands as a name in the body, also inside an unknown field: `discharge_by Delivered(due)` is `E100` | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialized path | `crates/fidryn-hir/src/body.rs:469`; `crates/fidryn-eval/src/duty.rs`; in `crates/fidryn-hir/src/lib.rs`, test `a_duty_whose_content_cannot_be_read_is_e100` |
-| `decision` | Binders are parsed. Record requirements and `returns` are re-read from the declaration text | Binders, record requirements, the first `returns` | Through `RunDecision` | `crates/fidryn-hir/src/body.rs:327`, `:339` |
-| `interpretation_family`, `nomination` | By splitting the text on keywords. A keyword is found only as a word of its own, not inside a longer name. Where white space stands beside `for`, `rank`, `alternative`, `defines` or `as`, a tab serves as a space, and so does a line end where the parser does not end the statement at it | Alternatives and their definitions; candidate, office as text, rank. A definition whose expression is no proposition is `E210`, and one with no `as established` or `as not_established` after its expression is `E100`. A nomination's `from` basis is dropped | Only by `UniqueOccupant` succession | `crates/fidryn-hir/src/lib.rs:1076`, `:1092`, `:1131`; `crates/fidryn-eval/src/lib.rs:4130`; tests in `crates/fidryn-hir/src/word_tests.rs`; in `crates/fidryn-hir/src/lib.rs`, tests `a_definition_that_is_no_proposition_is_e210_and_names_the_family_and_the_definition` and `a_definition_with_no_status_after_its_expression_is_e100`; in `tests/integration/whole_words.rs`, tests `a_candidate_whose_name_holds_the_word_rank_is_ranked_as_written` and `a_nomination_written_with_tabs_or_line_ends_is_ranked_as_written` |
+| `effect` | Re-read from the declaration text | Name, the parameters of its first operation, and as its result the type after the last `->` of the effect. With the two operations `a(n: String) -> Int` and `b(m: Bool) -> Bool`, a call takes one `String` and returns a `Bool` | A call becomes a `needCustom` request to the case | `crates/fidryn-check/src/lib.rs:1980`, `:3552`; `crates/fidryn-eval/src/lib.rs:2346` |
+| `duty` | Re-read from the declaration text. A `bearer`, `claimant`, `attaches`, `content` or `due` whose expression cannot be read whole is `E100`: also one that holds, in the arguments of a call or between braces, an item this reader cannot read. Among those items are an interval, a duration word with no number before it and `()`, which the parser reads in a query or a rule. Unknown fields are skipped. Each of those five words begins its field where it stands outside the parentheses, brackets and braces of an unknown field; inside them, and inside the expression of a field, it is a name: `discharge_by Delivered(due)` is skipped, and `discharge_by Delivered due` is `E100` | Bearer, claimant, attachment, content, due | `duty_status` and `duty_step`, on one specialized path | `crates/fidryn-hir/src/body.rs:469`; `crates/fidryn-eval/src/duty.rs`; in `crates/fidryn-hir/src/lib.rs`, test `a_duty_whose_content_cannot_be_read_is_e100`; in `crates/fidryn-hir/src/unreadable_tests.rs`, tests `a_term_with_an_item_the_reader_cannot_read_rejects_its_declaration`, `a_field_word_inside_the_brackets_of_an_unknown_field_begins_no_field` and `a_field_word_outside_brackets_begins_its_field_as_before` |
+| `decision` | Binders are parsed. Record requirements and `returns` are re-read from the declaration text. A `returns` whose expression cannot be read whole is `E100`, as in a `duty`: also one that holds an interval | Binders, record requirements, the first `returns` | Through `RunDecision` | `crates/fidryn-hir/src/body.rs:327`, `:339` |
+| `interpretation_family`, `nomination` | A family by the blocks of its alternatives, a nomination by splitting its text on keywords. A keyword is found only as a word of its own, not inside a longer name, a comment or a string. Where white space stands beside `for`, `rank`, `alternative`, `defines` or `as`, a tab serves as a space, and so does a line end where the parser does not end the statement at it | Alternatives and their definitions; candidate, office as text, rank. An alternative is its name and the block after it, and its definitions are the ones inside that block. A `defines` outside the block of every alternative is `E100`, and so are an `alternative` with no name and a definition with more than one status. The expression of a definition is all the text between `defines` and its `as`: when that is not one proposition the definition is `E210`, and one with no `as established` or `as not_established` after its expression is `E100`. Other text in the block of an alternative, before its first `defines` or after a status, is not read. A nomination's `from` basis is dropped | Only by `UniqueOccupant` succession | `crates/fidryn-hir/src/lib.rs:1092`, `:1108`, `:1163`; `crates/fidryn-eval/src/lib.rs:4130`; tests in `crates/fidryn-hir/src/word_tests.rs`; in `crates/fidryn-hir/src/lib.rs`, tests `a_definition_that_is_no_proposition_is_e210_and_names_the_family_and_the_definition`, `a_definition_with_no_status_after_its_expression_is_e100`, `a_definition_outside_the_block_of_every_alternative_is_e100`, `the_whole_text_between_defines_and_as_is_the_proposition`, `an_alternative_with_no_name_and_a_definition_with_two_statuses_are_e100` and `each_alternative_has_the_definitions_of_its_own_block`; in `tests/integration/whole_words.rs`, tests `a_candidate_whose_name_holds_the_word_rank_is_ranked_as_written`, `a_nomination_written_with_tabs_or_line_ends_is_ranked_as_written` and `a_definition_below_the_block_of_an_alternative_is_rejected` |
 | `office` | Name and parameters only | Fixed defaults: occupant type `LegalPerson`, at most one occupant, no competence | Not read at run time | `crates/fidryn-check/src/lib.rs:3524`; test `an_office_keeps_none_of_its_declared_fields` |
 | `clause` | Name and parameters only | Body kept as text | Only through `EvaluateClause`, which knows two clause names (see below) | `crates/fidryn-eval/src/lib.rs:4791`, `:4986` |
-| `legal_act` | Name and parameters only. Unknown fields are accepted | Nothing. The checker types a call of its name as a `LegalAction` | Nothing | `crates/fidryn-hir/src/lib.rs:724`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
-| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:1392`; `crates/fidryn-hir/src/lib.rs:768`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `legal_act` | Name and parameters only. Unknown fields are accepted | Nothing. The checker types a call of its name as a `LegalAction` | Nothing | `crates/fidryn-hir/src/lib.rs:742`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
+| `power`, `scenario` | No. Unknown fields are accepted | Nothing | Nothing | `crates/fidryn-syntax/src/parser.rs:1392`; `crates/fidryn-hir/src/lib.rs:786`; test `power_and_legal_act_bodies_are_not_parsed_so_unknown_fields_pass` |
 | `conflict_doctrine` | No. Unknown fields are accepted. The text must name a declared clause after `defeat`, or the checker reports `E511` | Nothing | Nothing | `crates/fidryn-check/src/lib.rs:2365` |
 | `source` | Fields parsed; an unknown field is a parse error | Nothing. The checker requires an `artifact` field (`E540`) | Nothing. The artifact file is never read, whatever the digest | `crates/fidryn-hir/src/lib.rs:380`; `crates/fidryn-check/src/lib.rs:3419`; test `a_source_declaration_does_not_reach_core_and_its_artifact_is_never_read` |
 | `import` | Name. Version and digest are re-read from the text | Only a package under `packages/` is linked, and only when a path is checked | Not applicable. `alias` is ignored; with no digest and no package the import does nothing | `crates/fidryn-check/src/lib.rs:2412`, `:2767`; test `an_import_that_names_nothing_is_accepted_and_its_alias_is_ignored` |
@@ -123,7 +123,7 @@ Where a verify field ends. The tests named here are in
   test `text_after_the_expression_of_an_assert_joins_it_or_is_e100`).
 - A block with no assertion is `unknown`. Its text is not searched for a
   formula, so a comment is never read as an assertion
-  (`crates/fidryn-hir/src/lib.rs:1249`; test
+  (`crates/fidryn-hir/src/lib.rs:1382`; test
   `a_block_with_no_assertion_is_unknown_whatever_its_comments_say`).
 - The bounds come from a `bounds` field and from nowhere else. The parser
   records the field as the text of its tokens and leaves out every
@@ -132,12 +132,12 @@ Where a verify field ends. The tests named here are in
   `:2591`; parser test
   `a_bounds_field_is_recorded_as_the_text_of_its_tokens`). The numbers are
   read from those tokens, so no comment sets a number and the contents of
-  a string are not read (`crates/fidryn-hir/src/lib.rs:1289`). Each number
+  a string are not read (`crates/fidryn-hir/src/lib.rs:1422`). Each number
   is read at the first place where its word, `persons`, `events` or
   `time_points`, stands as a token. When the next token is an integer, or
   a `:` followed by an integer, that integer is the number. Otherwise the
   number is zero, as it is when the word is not in the field and when the
-  integer does not fit in 32 bits (`crates/fidryn-hir/src/lib.rs:1317` and
+  integer does not fit in 32 bits (`crates/fidryn-hir/src/lib.rs:1450` and
   the unit test
   `the_bounds_of_a_verify_block_come_only_from_a_bounds_field` in that
   file). Another field that holds the word `bounds` does not set the
@@ -253,7 +253,7 @@ clause. Only `UniqueOccupant` succession reads the selection
   (`crates/fidryn-core/src/types.rs:93`, `crates/fidryn-eval/src/lib.rs:3132`).
 - A misspelled type name creates a new sort without a diagnostic (test
   `a_misspelled_type_name_becomes_a_new_sort_without_a_diagnostic`;
-  `crates/fidryn-hir/src/body.rs:680`).
+  `crates/fidryn-hir/src/body.rs:698`).
 - A query that declares a result type must end in a typed value, so one
   that ends in `require` is rejected with `E210` (test
   `a_query_that_ends_in_a_require_has_an_untyped_result`).
@@ -353,14 +353,14 @@ error `fuel exhausted`.
   `if` each take two levels, so 63 of them are read one inside another. A
   `not` takes one, and a chain of `else if` is read up to 126 links. A
   declaration with a deeper expression in one of those places is rejected
-  with `E100` (`crates/fidryn-hir/src/body.rs:1541`, `:1650`, `:1814`; in
+  with `E100` (`crates/fidryn-hir/src/body.rs:1568`, `:1677`, `:1840`; in
   `crates/fidryn-hir/src/depth_tests.rs`, tests
   `an_expression_is_read_whole_or_its_declaration_is_rejected` and
   `a_chain_of_else_if_is_read_126_links_long_and_no_longer`). A type that is
   read from the text of a declaration, such as the result or a parameter
   of the operation of an `effect`, has the parser's limit: more than 128
   levels of `<` are `E100`, "type nesting exceeds the limit of 128"
-  (`crates/fidryn-hir/src/body.rs:568`; `crates/fidryn-check/src/lib.rs:185`;
+  (`crates/fidryn-hir/src/body.rs:586`; `crates/fidryn-check/src/lib.rs:185`;
   in `crates/fidryn-check/src/depth_tests.rs`, test
   `a_type_read_from_text_nests_128_deep_and_no_deeper`).
 - Trace size: a run keeps at most 99,999 evaluation records and the worklist

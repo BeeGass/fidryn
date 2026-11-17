@@ -172,7 +172,8 @@ such as <code>from "Stat. 12(a"</code> opens no parenthesis, and a string that h
 how a report identifies the program (see <a href="/docs/outcomes">outcomes</a>), in
 places such as these. <code>sourceBundle</code> covers the text of the module byte
 for byte, so any comment changes it, and <code>fidryn review</code> shows the text
-of each declaration with its comments. <code>invocation.program.fingerprint</code>,
+of each declaration with the comments inside it, but not a comment at
+the end of its last line or one above it. <code>invocation.program.fingerprint</code>,
 and with it <code>invocationId</code> and the trace ids, is taken over the compiled
 program. That keeps some text as it is written: the body of a <code>clause</code>,
 the first <code>assert</code> of a <code>verify</code> block, a line of a <code>verify</code> block that

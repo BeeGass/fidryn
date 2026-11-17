@@ -64,10 +64,12 @@ const READ_FROM_TEXT: [Place; 6] = [
         format!("    effect Ask {{\n        request(n: String, m: {ty}) -> Bool\n    }}")
     }),
     // A declaration with no parameter list of its own takes the first
-    // parenthesized list in its text for one.
+    // parenthesized list in its text for one. The list stands in a field
+    // the reader of a duty steps over: as a `content`, `pay(amount: ...)`
+    // cannot be read, and the duty is rejected.
     ("the first list in the body of a duty", |ty| {
         format!(
-            "    entity Acme : LegalPerson\n    duty Keep {{\n        bearer Acme\n        content pay(amount: {ty})\n    }}"
+            "    entity Acme : LegalPerson\n    duty Keep {{\n        bearer Acme\n        discharge_by pay(amount: {ty})\n    }}"
         )
     }),
     ("the first list below a proposition", |ty| {

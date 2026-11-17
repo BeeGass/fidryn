@@ -88,7 +88,8 @@ A comment can change text that is kept or shown as it is written, and
 how a report identifies the program (see [outcomes](outcomes.md)), in
 places such as these. `sourceBundle` covers the text of the module byte
 for byte, so any comment changes it, and `fidryn review` shows the text
-of each declaration with its comments. `invocation.program.fingerprint`,
+of each declaration with the comments inside it, but not a comment at
+the end of its last line or one above it. `invocation.program.fingerprint`,
 and with it `invocationId` and the trace ids, is taken over the compiled
 program. That keeps some text as it is written: the body of a `clause`,
 the first `assert` of a `verify` block, a line of a `verify` block that

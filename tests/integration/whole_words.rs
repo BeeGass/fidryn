@@ -210,11 +210,32 @@ fn a_definition_that_is_no_proposition_or_has_no_status_is_rejected() {
         messages(&family("defines Eligible(Alice)")),
         [(
             DiagnosticCode::E100,
-            "`defines Eligible(Alice)` in interpretation family `Reading` has no `as established` or `as not_established` after its expression".to_owned()
+            "`defines Eligible(Alice)` in interpretation family `Reading` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word".to_owned()
         )]
     );
     assert_eq!(
         messages(&family("defines Eligible(Alice) as established")),
         []
     );
+}
+
+#[test]
+fn a_definition_below_the_block_of_an_alternative_is_rejected() {
+    // It was taken into the alternative above it: with `Bob` made eligible
+    // there, the query answered `Bob`. With the line above the block, it
+    // was dropped, and the query was suspended.
+    let nominations = "    nomination Bob for TrusteeOf(BRT) rank 1\n    nomination Frank for TrusteeOf(BRT) rank 2";
+    let below = succession("Frank", "Bob", nominations).replace(
+        "            defines Eligible(Bob, TrusteeOf(BRT)) as established\n        }\n",
+        "        }\n        defines Eligible(Bob, TrusteeOf(BRT)) as established\n",
+    );
+    assert_eq!(
+        messages(&below),
+        [(
+            DiagnosticCode::E100,
+            "`defines Eligible(Bob, TrusteeOf(BRT)) as established` in interpretation family `SuccessorEligibility` stands outside the block of every alternative".to_owned()
+        )]
+    );
+    // Inside the block it is read, and the query answers by it.
+    assert_eq!(acting_trustee("Frank", "Bob", nominations), "Bob");
 }

@@ -112,6 +112,10 @@ fn a_duty_whose_content_cannot_be_read_is_rejected() {
     };
     // The content was dropped, and the duty passed with none.
     assert_eq!(diagnostics(&duty("[a, b)")), rejected);
+    // Inside a call or a set the interval was stepped over, and the duty
+    // passed with the content `Pay(a, b)`, or a set of `a` and `b`.
+    assert_eq!(diagnostics(&duty("Pay([a, b))")), rejected);
+    assert_eq!(diagnostics(&duty("{ [a, b) }")), rejected);
     assert_eq!(
         diagnostics(&duty(&format!(
             "{}a{}",

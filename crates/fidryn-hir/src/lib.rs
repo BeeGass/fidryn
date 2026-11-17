@@ -610,7 +610,25 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                                 UnreadDefinition::NoStatus(text) => (
                                     DiagnosticCode::E100,
                                     format!(
-                                        "`{text}` in interpretation family `{name}` has no `as established` or `as not_established` after its expression"
+                                        "`{text}` in interpretation family `{name}` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
+                                    ),
+                                ),
+                                UnreadDefinition::MoreThanOneStatus(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` has more than one status"
+                                    ),
+                                ),
+                                UnreadDefinition::Outside(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` stands outside the block of every alternative"
+                                    ),
+                                ),
+                                UnreadDefinition::NoName => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "an `alternative` in interpretation family `{name}` has no name"
                                     ),
                                 ),
                             };
@@ -980,7 +998,6 @@ fn after_first_word(structure: &str, word: &str) -> Option<Range<usize>> {
 enum Spaced {
     No,
     Before,
-    After,
     Around,
 }
 
@@ -1004,7 +1021,6 @@ fn find_word(structure: &str, word: &str, from: usize, spaced: Spaced) -> Option
     let (space_before, space_after) = match spaced {
         Spaced::No => (false, false),
         Spaced::Before => (true, false),
-        Spaced::After => (false, true),
         Spaced::Around => (true, true),
     };
     let fits = |beside: Option<char>, space: bool| {
@@ -1113,19 +1129,35 @@ fn extract_alternatives(src: &str) -> Vec<String> {
 }
 
 /// A definition of an interpretation family that is not read, with its
-/// text as `definition_text` gives it, for a diagnostic.
+/// text as `definition_text` gives it, for a diagnostic, and an alternative
+/// that is not read.
 enum UnreadDefinition {
-    /// The expression of the definition is no proposition.
+    /// The text between `defines` and its `as` is not one proposition.
     NotAProposition(String),
     /// No `as established` or `as not_established` follows the expression.
     NoStatus(String),
+    /// More than one status follows the expression.
+    MoreThanOneStatus(String),
+    /// The definition stands in the family outside the block of every
+    /// alternative.
+    Outside(String),
+    /// An `alternative` has no name. Its block is not read.
+    NoName,
 }
 
 /// The alternatives of an `interpretation_family`, each with what it
-/// defines, and each definition that is not read, in the order of the text.
-/// The words `alternative`, `defines` and `as` are found only as words of
-/// their own, with white space after them, and `as` with white space before
-/// it as well: a tab or a line end serves there as well as a space. `Err`
+/// defines, and each definition and alternative that is not read, in the
+/// order of the text.
+///
+/// The body of the family is its last block. An alternative is the word
+/// `alternative` in that body, outside every bracket, its name, the word
+/// after it, and its block: from the first `{` after the name to the `}`
+/// that closes it (`alternative_block`). Its definitions are the ones
+/// inside that block. A definition begins with the word `defines` and runs
+/// to the next one or the end of the block. Its expression is all the text
+/// between `defines` and its status, an `as` with white space around it
+/// and the word `established` or `not_established`. The words are found
+/// only as words of their own, not in a comment or a string literal. `Err`
 /// when the expression of a definition nests deeper than the reader of
 /// expressions goes: the definition would be lost, or cut short.
 fn extract_alternative_defs(src: &str) -> Result<(InterpretationAlts, Vec<UnreadDefinition>), ()> {
@@ -1134,84 +1166,185 @@ fn extract_alternative_defs(src: &str) -> Result<(InterpretationAlts, Vec<Unread
     let (code, structure) = views(src);
     let mut out = Vec::new();
     let mut unread = Vec::new();
-    // An alternative is the text after the word, up to the next one.
-    let mut words = Vec::new();
-    while let Some(word) = find_word(
-        &structure,
-        ALTERNATIVE,
-        words.last().map_or(0, |last| last + ALTERNATIVE.len()),
-        Spaced::After,
-    ) {
-        words.push(word);
-    }
-    for (index, &word) in words.iter().enumerate() {
-        let start = word + ALTERNATIVE.len();
-        let end = words.get(index + 1).copied().unwrap_or(structure.len());
-        let name = code[start..end]
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .trim_matches('{')
-            .to_owned();
-        if name.is_empty() {
-            continue;
-        }
-        let alternative = &structure[..end];
-        let mut defs = Vec::new();
-        let mut rest = start;
-        while let Some(definition) = find_word(alternative, DEFINES, rest, Spaced::After) {
-            // A definition is the text after the word, up to the next one.
-            let stmt_start = definition + DEFINES.len();
-            let stmt_end =
-                find_word(alternative, DEFINES, stmt_start, Spaced::After).unwrap_or(end);
-            let text = || {
-                definition_text(
-                    &code[definition..stmt_end],
-                    &structure[definition..stmt_end],
-                )
-            };
-            match definition_status(&structure[..stmt_end], stmt_start) {
-                Some((expr_end, established)) => {
-                    let expr = code[stmt_start..expr_end].trim();
-                    match body::parse_expr_within_limits(expr)?.and_then(|t| body::term_as_prop(&t))
-                    {
-                        Some(prop) => defs.push((prop, established)),
-                        None => unread.push(UnreadDefinition::NotAProposition(text())),
+    let Some(body) = last_block(&structure) else {
+        return Ok((out, unread));
+    };
+    let mut at = body.start;
+    let mut depth = 0usize;
+    while let Some(c) = structure[at..body.end].chars().next() {
+        match c {
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => depth = depth.saturating_sub(1),
+            _ if depth == 0 && word_at(&structure, at, ALTERNATIVE) => {
+                let name_start = skip_space(&structure, at + ALTERNATIVE.len());
+                let name_end = structure[name_start..]
+                    .find(|c: char| !is_name_char(c))
+                    .map_or(structure.len(), |len| name_start + len);
+                let block = alternative_block(&structure, name_end..body.end);
+                if name_start == name_end {
+                    unread.push(UnreadDefinition::NoName);
+                } else {
+                    let mut defs = Vec::new();
+                    if let Some(block) = block.clone() {
+                        let mut found =
+                            find_word(&structure[..block.end], DEFINES, block.start, Spaced::No);
+                        while let Some(definition) = found {
+                            found = find_word(
+                                &structure[..block.end],
+                                DEFINES,
+                                definition + DEFINES.len(),
+                                Spaced::No,
+                            );
+                            let span = definition..found.unwrap_or(block.end);
+                            match read_definition(&code, &structure, span)? {
+                                Ok(def) => defs.push(def),
+                                Err(not_read) => unread.push(not_read),
+                            }
+                        }
                     }
+                    out.push((code[name_start..name_end].to_owned(), defs));
                 }
-                None => unread.push(UnreadDefinition::NoStatus(text())),
+                // What follows the alternative: past its block, or past its
+                // name when no block follows it.
+                at = block.map_or(name_end, |block| (block.end + 1).min(body.end));
+                continue;
             }
-            rest = stmt_end;
+            _ if word_at(&structure, at, DEFINES) => {
+                // A definition outside every alternative: it runs to the next
+                // definition or alternative of the family, or the end.
+                let next = [DEFINES, ALTERNATIVE]
+                    .iter()
+                    .filter_map(|word| {
+                        find_word(&structure[..body.end], word, at + DEFINES.len(), Spaced::No)
+                    })
+                    .min()
+                    .unwrap_or(body.end);
+                unread.push(UnreadDefinition::Outside(definition_quote(
+                    &code,
+                    &structure,
+                    at..next,
+                )));
+                at += DEFINES.len();
+                continue;
+            }
+            _ => {}
         }
-        out.push((name, defs));
+        at += c.len_utf8();
     }
     Ok((out, unread))
 }
 
-/// Where the expression of a definition that begins at `from` ends, and
-/// whether the definition establishes it: the `as` of the first
-/// `as not_established` in `structure` after `from`, and when there is none,
-/// the `as` of the first `as established`. White space stands before `as`
-/// and between it and the word after it, which is a word of its own.
-fn definition_status(structure: &str, from: usize) -> Option<(usize, bool)> {
-    let mut established = None;
+/// The definition whose text is `span` of `code`, where `structure` is the
+/// structure of `code`: its proposition and whether it is established, or
+/// why it is not read. `Err` when its expression nests deeper than the
+/// reader of expressions goes.
+fn read_definition(
+    code: &str,
+    structure: &str,
+    span: Range<usize>,
+) -> Result<Result<EligibilityDef, UnreadDefinition>, ()> {
+    let expr_start = span.start + "defines".len();
+    let statuses = definition_statuses(&structure[..span.end], expr_start);
+    let text = || definition_quote(code, structure, span.clone());
+    Ok(match statuses.as_slice() {
+        [] => Err(UnreadDefinition::NoStatus(text())),
+        [(word, established, _)] => {
+            match body::parse_whole_expr(&code[expr_start..*word])?
+                .as_ref()
+                .and_then(body::term_as_prop)
+            {
+                Some(prop) => Ok((prop, *established)),
+                None => Err(UnreadDefinition::NotAProposition(text())),
+            }
+        }
+        _ => Err(UnreadDefinition::MoreThanOneStatus(text())),
+    })
+}
+
+/// The text of the definition that is `span` of `code`, for a diagnostic:
+/// up to the end of its last status, or of the definition when it has none,
+/// as `definition_text` gives it.
+fn definition_quote(code: &str, structure: &str, span: Range<usize>) -> String {
+    let statuses = definition_statuses(&structure[..span.end], span.start + "defines".len());
+    let end = statuses.last().map_or(span.end, |status| status.2);
+    definition_text(&code[span.start..end], &structure[span.start..end])
+}
+
+/// The statuses in `structure` after `from`: each `as` with white space
+/// around it that the word `established` or `not_established` follows as a
+/// word of its own, with whether the word is `established` and where it
+/// ends.
+fn definition_statuses(structure: &str, from: usize) -> Vec<(usize, bool, usize)> {
+    let mut statuses = Vec::new();
     let mut rest = from;
     while let Some(word) = find_word(structure, "as", rest, Spaced::Around) {
-        let after = structure[word + "as".len()..].trim_start_matches(is_space);
-        let status = structure.len() - after.len();
-        let stands = |status_word: &str| {
-            after.starts_with(status_word)
-                && is_ident_boundary(structure, status, status_word.len())
-        };
-        if stands("not_established") {
-            return Some((word, false));
-        }
-        if established.is_none() && stands("established") {
-            established = Some((word, true));
+        let status = skip_space(structure, word + "as".len());
+        for (status_word, established) in [("not_established", false), ("established", true)] {
+            if word_at(structure, status, status_word) {
+                statuses.push((word, established, status + status_word.len()));
+            }
         }
         rest = word + "as".len();
     }
-    established
+    statuses
+}
+
+/// The inside of the block of an alternative whose name ends where
+/// `after_name` begins: from the first `{` after the name to the `}` that
+/// closes it. `None` when a `}`, the word `defines` or the word
+/// `alternative` comes first, or the end of `after_name`.
+fn alternative_block(structure: &str, after_name: Range<usize>) -> Option<Range<usize>> {
+    let open = after_name.start + structure[after_name.clone()].find('{')?;
+    let between = &structure[after_name.start..open];
+    let other = between.contains('}')
+        || find_word(between, "defines", 0, Spaced::No).is_some()
+        || find_word(between, "alternative", 0, Spaced::No).is_some();
+    (!other).then(|| open + 1..matching_close(structure, open))
+}
+
+/// True when `word` stands at `at` in `structure` as a word of its own.
+fn word_at(structure: &str, at: usize, word: &str) -> bool {
+    structure[at..].starts_with(word) && is_ident_boundary(structure, at, word.len())
+}
+
+/// The position of the first character at or after `from` that is not
+/// white space, or the end.
+fn skip_space(structure: &str, from: usize) -> usize {
+    structure[from..]
+        .find(|c: char| !is_space(c))
+        .map_or(structure.len(), |len| from + len)
+}
+
+/// The position of the `}` that closes the `{` at `open`, or the end when
+/// none closes it. Braces are counted, as `brace_inner` counts them.
+fn matching_close(structure: &str, open: usize) -> usize {
+    let mut depth = 0usize;
+    for (i, c) in structure[open..].char_indices() {
+        match c {
+            '{' => depth += 1,
+            '}' => {
+                depth = depth.saturating_sub(1);
+                if depth == 0 {
+                    return open + i;
+                }
+            }
+            _ => {}
+        }
+    }
+    structure.len()
+}
+
+/// The inside of the last block of `structure` that stands inside no other
+/// block: from after its `{` to the `}` that closes it.
+fn last_block(structure: &str) -> Option<Range<usize>> {
+    let mut last = None;
+    let mut at = 0;
+    while let Some(open) = structure[at..].find('{').map(|i| at + i) {
+        let close = matching_close(structure, open);
+        last = Some(open + 1..close);
+        at = (close + 1).min(structure.len());
+    }
+    last
 }
 
 /// The text of a definition for a diagnostic: `code` from the word
@@ -1743,6 +1876,9 @@ mod depth_tests;
 
 #[cfg(test)]
 mod word_tests;
+
+#[cfg(test)]
+mod unreadable_tests;
 
 #[cfg(test)]
 mod tests {
@@ -2757,13 +2893,17 @@ module Examples.Retain version "0.1.0" {
             "defines Eligible(Alice) has established",
             "defines 5",
             "defines",
+            // A status the reader does not take: no white space before `as`,
+            // and a `.` joined to the status word.
+            "defines Eligible(Alice)as established",
+            "defines Eligible(Alice) as established.",
         ] {
             assert_eq!(
                 rejected(&family_module(written)),
                 [(
                     DiagnosticCode::E100,
                     format!(
-                        "`{written}` in interpretation family `Reading` has no `as established` or `as not_established` after its expression"
+                        "`{written}` in interpretation family `Reading` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
                     )
                 )],
                 "{written}"
@@ -2777,7 +2917,7 @@ module Examples.Retain version "0.1.0" {
             [
                 (
                     DiagnosticCode::E100,
-                    "`defines Eligible(Alice)` in interpretation family `Reading` has no `as established` or `as not_established` after its expression"
+                    "`defines Eligible(Alice)` in interpretation family `Reading` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
                         .to_owned()
                 ),
                 (
@@ -2810,6 +2950,135 @@ module Examples.Retain version "0.1.0" {
                 ("Eligible".to_owned(), 1, false),
                 ("Flag".to_owned(), 0, true),
                 ("Flag".to_owned(), 0, false),
+            ]
+        );
+    }
+
+    /// A module with one interpretation family, `Reading`, whose body holds
+    /// these statements.
+    fn family_body(body: &str) -> String {
+        format!(
+            "module Examples.Definition version \"0.1.0\" {{\n    entity Alice : NaturalPerson\n    proposition Eligible(person: NaturalPerson)\n    interpretation_family Reading {{\n        {body}\n    }}\n}}\n"
+        )
+    }
+
+    fn e210(text: &str) -> (DiagnosticCode, String) {
+        (
+            DiagnosticCode::E210,
+            format!("`{text}` in interpretation family `Reading` requires a proposition"),
+        )
+    }
+
+    #[test]
+    fn a_definition_outside_the_block_of_every_alternative_is_e100() {
+        // In a family with no alternative, before the first one, after the
+        // `}` of one and between two. The first two were dropped, and the
+        // others were taken into the alternative above them.
+        let outside = [(
+            DiagnosticCode::E100,
+            "`defines Eligible(Alice) as established` in interpretation family `Reading` stands outside the block of every alternative".to_owned(),
+        )];
+        let alternative = "alternative Wide {\n            defines Flag as established\n        }";
+        for body in [
+            "defines Eligible(Alice) as established".to_owned(),
+            format!("defines Eligible(Alice) as established\n        {alternative}"),
+            format!("{alternative}\n        defines Eligible(Alice) as established"),
+            format!(
+                "{alternative}\n        defines Eligible(Alice) as established\n        alternative Other {{ defines Flag as not_established }}"
+            ),
+            // In a block of the family that is no alternative's, and with
+            // another field after it, which the diagnostic does not quote.
+            "selector { defines Eligible(Alice) as established }".to_owned(),
+            format!(
+                "{alternative}\n        defines Eligible(Alice) as established\n        selector explicit"
+            ),
+        ] {
+            assert_eq!(rejected(&family_body(&body)), outside, "{body}");
+        }
+    }
+
+    #[test]
+    fn the_whole_text_between_defines_and_as_is_the_proposition() {
+        // `defines` is found with nothing after it, as before `(`.
+        let parsed = parse_file(&family_module("defines(Eligible(Alice)) as established"));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert_eq!(
+            hir.interpretation_families["Reading"][0].1[0].0.predicate,
+            "Eligible"
+        );
+        // A part of the text the reader does not take as the one
+        // proposition was dropped with no diagnostic, or the definition
+        // was not found.
+        for written in [
+            "defines(5) as established",
+            "defines Eligible(Alice) 5 as established",
+            "defines Eligible(Alice) Eligible(Alice) as established",
+            "defines Eligible(Alice)) as established",
+            "defines Eligible([a, b)) as established",
+        ] {
+            assert_eq!(
+                rejected(&family_module(written)),
+                [e210(written)],
+                "{written}"
+            );
+        }
+    }
+
+    #[test]
+    fn an_alternative_with_no_name_and_a_definition_with_two_statuses_are_e100() {
+        // Each was read without a diagnostic: the alternative was stepped
+        // over with its definitions, and the last status was taken. A string
+        // is no name either; the alternative was named with its quotes.
+        for alternative in ["alternative {", "alternative{", "alternative \"Wide\" {"] {
+            assert_eq!(
+                rejected(&family_body(&format!(
+                    "{alternative}\n            defines Eligible(Alice) as established\n        }}"
+                ))),
+                [(
+                    DiagnosticCode::E100,
+                    "an `alternative` in interpretation family `Reading` has no name".to_owned()
+                )],
+                "{alternative}"
+            );
+        }
+        assert_eq!(
+            rejected(&family_module(
+                "defines Eligible(Alice) as established as not_established"
+            )),
+            [(
+                DiagnosticCode::E100,
+                "`defines Eligible(Alice) as established as not_established` in interpretation family `Reading` has more than one status".to_owned()
+            )]
+        );
+    }
+
+    #[test]
+    fn each_alternative_has_the_definitions_of_its_own_block() {
+        // A comment, a string and the two words inside longer names stand
+        // between the blocks.
+        let parsed = parse_file(&family_body(
+            "alternative First {\n            defines Eligible(Alice) as established // alternative Ghost { defines Wrong() as established }\n        }\n        selector redefines_alternative\n            or \"alternative Ghost defines Wrong() as established\"\n        alternative Second {\n            defines Flag as not_established\n        }",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert!(hir.diagnostics.is_empty(), "{:?}", hir.diagnostics);
+        let alternatives: Vec<(String, Vec<(String, bool)>)> =
+            hir.interpretation_families["Reading"]
+                .iter()
+                .map(|(name, definitions)| {
+                    (
+                        name.clone(),
+                        definitions
+                            .iter()
+                            .map(|(prop, established)| (prop.predicate.clone(), *established))
+                            .collect(),
+                    )
+                })
+                .collect();
+        assert_eq!(
+            alternatives,
+            [
+                ("First".to_owned(), vec![("Eligible".to_owned(), true)]),
+                ("Second".to_owned(), vec![("Flag".to_owned(), false)]),
             ]
         );
     }
