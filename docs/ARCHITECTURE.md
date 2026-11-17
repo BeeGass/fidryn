@@ -107,7 +107,7 @@ fidryn-render          constrained templates
 fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
 fidryn-provision       law-module model and the rules over it (no workspace crate)
-fidryn-ingest-uscode   empty (provision)
+fidryn-ingest-uscode   official XML release point into law modules (provision)
 fidryn-cli             fidryn binary and mill UI
 ```
 
@@ -122,8 +122,11 @@ check of a workspace of edition 2 modules and the writer of a generated
 one. `fidryn-provision`
 holds the model of law modules and the rules over it, among them
 addresses, text normalization, file paths, hashes, text records and the
-canonical text of a module. `fidryn-ingest-uscode` is empty: it declares
-no items.
+canonical text of a module. `fidryn-ingest-uscode` reads the archives of
+the official XML release point published by the Office of the Law Revision
+Counsel, each checked against its retrieval record, and the documents in
+them into the units and containers of that model. It is the one crate of
+the workspace that names the Code, its titles and the publisher's elements.
 
 ## Public APIs
 

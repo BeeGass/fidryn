@@ -155,7 +155,7 @@ fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-provision       law-module model and the rules over it (no workspace crate)
-fidryn-ingest-uscode   empty (provision)
+fidryn-ingest-uscode   official XML release point into law modules (provision)
 fidryn-cli             fidryn binary and localhost mill
 ```
 

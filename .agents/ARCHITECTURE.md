@@ -22,7 +22,7 @@ Fidryn is a programming language for legal instruments. The README says Fidryn 0
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
 | `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records and the canonical text of a module. Depends on no other crate of the workspace |
-| `fidryn-ingest-uscode` | Empty. Of the workspace crates, depends on `fidryn-provision` only |
+| `fidryn-ingest-uscode` | Reads the archives of the official XML release point published by the Office of the Law Revision Counsel, checked against their retrieval record, into law modules of the model of `fidryn-provision`. Of the workspace crates, depends on `fidryn-provision` only |
 | `fidryn-cli` | `fidryn` binary and mill |
 
 Those directories are under `crates/`.
