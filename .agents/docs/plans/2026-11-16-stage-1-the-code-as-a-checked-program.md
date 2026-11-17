@@ -96,6 +96,8 @@ Measured on 2026-11-16 on the publisher's archive of release 119-142 (`xml_uscAl
 
 **F15. The forms of definitions.** Of the first paragraphs of chapeau and content parts of operative provisions that have the sentence form of S10: 6,717 begin with a reach of their own; 23,637 have none and stand directly under a chapeau that is a reach and a dash or a colon, with or without a lead-in such as `the following definitions apply`; 1,873 have none and stand under a provision without a chapeau, below such a chapeau; 1,530 have none of these. Of the paragraphs of the list form, 1,380 stand under such a chapeau and 1,003 under one that ends `, the term` and a dash. About 800 more stand under a chapeau that opens `For the purpose of`. By the rules of S10, an independent prototype outside the repository reads 34,329 definitions in the release: 27,428 with an inherited reach, 6,497 with their own and 404 with none; 6,955 `enacted`, 23,986 `restated` and 3,388 `unresolved`. In the three titles of the sample it reads 144 (10, 4 and 130).
 
+**F16. The 27 releases.** Of the 1,566 files of the 27 releases of F9, one is irregular in its metadata: `usc22.xml` of release 119-83 writes its publication name with an en dash, `Online@119–83`, and has no property `is-positive-law`. Every other file names its release with a hyphen and has the property once, with `yes` (729 files) or `no` (836). With the build of `bab3517` the other 26 releases import and check without an error or a warning, and release 119-83 does once that one file's name and flag are written as the others' in a scratch copy, so nothing else in it is refused. Units grow from 60,922 in the oldest release to 61,171 in the newest, containers from 9,578 to 9,623.
+
 ## Global Constraints
 
 From the design (sections 9.2, 11 and 12) and the owner's standing decisions. Every task's requirements include this section.
@@ -481,7 +483,7 @@ These rules are implemented twice, in `crates/fidryn-ingest-uscode` and in `conf
 
 **Files.** A release is a directory of archives with a retrieval record (S11). A member is read when its name is `usc`, two digits, an optional `a` or `A`, and `.xml`; any other member is refused, and so is one larger than 512 MiB, and so is a release in which two archives hold a member of the same name (an archive of the whole Code beside an archive of one title would otherwise give every unit of that title twice).
 
-**A document is refused** when it has a document type declaration; when its root is not `uscDoc` in the namespace `http://xml.house.gov/schemas/uslm/1.0`; when the file named in its schema location is not `USLM-1.0.15.xsd`; when its `docPublicationName` is not `Online@` followed by the release of the retrieval record; when its property `is-positive-law` is neither `yes` nor `no`; when an element stands where its class below does not allow it or is in no class; when a `ref` has neither an `href` nor the class `footnoteRef`; when a link, a superscript or a subscript stands inside another, or a footnote marker inside one; when a footnote marker holds an element; when normalization composes one character out of characters that stand on both sides of the boundary of a link, a superscript, a subscript or a marker, so that the extent of a run could not be told; when an identifier holds `~`, the character an ingester alone may add; when a level has a second `num` or a second `heading`; when an identifier gives no address by S2; when a span of a table cell is not a whole number written in ASCII digits; when a `br`, an `img` or a column holds content; when a `signature` holds anything but `name` and `role`, a footnote that stands directly in it included; when text stands where only elements may; when a `status` is not one of the 19 values of the schema: `proposed`, `withdrawn`, `cancelled`, `pending`, `operational`, `suspended`, `renumbered`, `repealed`, `expired`, `terminated`, `hadItsEffect`, `omitted`, `notAdopted`, `transferred`, `redesignated`, `reserved`, `vacant`, `crossReference`, `unknown`.
+**A document is refused** when it has a document type declaration; when its root is not `uscDoc` in the namespace `http://xml.house.gov/schemas/uslm/1.0`; when the file named in its schema location is not `USLM-1.0.15.xsd`; when its `docPublicationName` is not `Online@` followed by the release of the retrieval record, an en dash (U+2013) in the name being read as a hyphen; when it has more than one property `is-positive-law`, or one that is neither `yes` nor `no`; when an element stands where its class below does not allow it or is in no class; when a `ref` has neither an `href` nor the class `footnoteRef`; when a link, a superscript or a subscript stands inside another, or a footnote marker inside one; when a footnote marker holds an element; when normalization composes one character out of characters that stand on both sides of the boundary of a link, a superscript, a subscript or a marker, so that the extent of a run could not be told; when an identifier holds `~`, the character an ingester alone may add; when a level has a second `num` or a second `heading`; when an identifier gives no address by S2; when a span of a table cell is not a whole number written in ASCII digits; when a `br`, an `img` or a column holds content; when a `signature` holds anything but `name` and `role`, a footnote that stands directly in it included; when text stands where only elements may; when a `status` is not one of the 19 values of the schema: `proposed`, `withdrawn`, `cancelled`, `pending`, `operational`, `suspended`, `renumbered`, `repealed`, `expired`, `terminated`, `hadItsEffect`, `omitted`, `notAdopted`, `transferred`, `redesignated`, `reserved`, `vacant`, `crossReference`, `unknown`.
 
 **Classes of elements.**
 
@@ -526,7 +528,7 @@ The unit of a text is the outermost unit that holds it: the section that stands 
 
 So an address is the publisher's identifier in every case but these: the later holders of a repeated identifier; elements without one; and what stands inside either.
 
-**Containers and units.** A container's members are the containers and units that are its children, in document order, by address. `within` of a unit or a container is the address of the container it stands in; the top container of a file has none. `source` is the member's file name. `positive_law` is the flag of the file.
+**Containers and units.** A container's members are the containers and units that are its children, in document order, by address. `within` of a unit or a container is the address of the container it stands in; the top container of a file has none. `source` is the member's file name. `positive_law` is the flag of the file; a file with no property `is-positive-law` has no flag, and its modules carry no `positive_law` declaration (F16). Nothing is assumed for it: a definition in such a unit is `restated` when it has a region, because the file does not say that the title is positive law.
 
 **The source credit** of a unit or a container is the text of the `sourceCredit` that is its direct child. A second one, and one that stands anywhere else, is refused.
 
@@ -771,7 +773,7 @@ Where the texts stand:
 
 The records, each with its keys in order:
 
-- A provision: `address`, `layer` (`"operative"`), `kind`, `status` (the word, or `null`), `num`, `heading`, `items`. An item is a part `{"part": role, "blocks": [...]}` or a child `{"child": address}`, at its place. The record of a unit's top provision has `aliases`, `within`, `source` and `positive_law` after these.
+- A provision: `address`, `layer` (`"operative"`), `kind`, `status` (the word, or `null`), `num`, `heading`, `items`. An item is a part `{"part": role, "blocks": [...]}` or a child `{"child": address}`, at its place. The record of a unit's top provision has `aliases`, `within`, `source` and `positive_law` after these; `positive_law` is `null` when the file has no flag.
 - A container: `address`, `layer` (`"operative"`), `kind`, `status`, `num`, `heading`, `aliases`, `within`, `members`.
 - A note: `address`, `layer` (`"enacted"` or `"editorial"`), `group`, `topics`, `heading`, `blocks`.
 - A credit: `address` (its module's), `record` (`"credit"`), then the keys of a paragraph.
@@ -808,7 +810,7 @@ Records are sorted by the bytes of their address; for one address, the provision
 }
 ```
 
-`units` counts unit modules; `provisions` counts every provision of every unit, the unit's own included. "status" keys are the publisher's status words, with `in-force` for none; `with_images` counts the provisions and notes that hold an image, whose picture is not in the pinned archive. Nothing in the ledger comes from outside the workspace: the estimate of missed definitions (design 9.5) is a review record, shown beside the ledger and not inside it.
+`units` counts unit modules; `provisions` counts every provision of every unit, the unit's own included. `positive_law` of a source is `null` when its file has no flag. "status" keys are the publisher's status words, with `in-force` for none; `with_images` counts the provisions and notes that hold an image, whose picture is not in the pinned archive. Nothing in the ledger comes from outside the workspace: the estimate of missed definitions (design 9.5) is a review record, shown beside the ledger and not inside it.
 
 **A change set** (`fidryn.change-set/v0.1`):
 
@@ -928,7 +930,8 @@ Each task ends with the gate green on the tree it commits. "Tests" lists the tes
 | 4b | 4 | 12 | 11 | 20 | 14, 19 |
 | 5 | 1 | 13 | 12 | 21 | 16, 20 |
 | 6 | 4, 5 | 14 | 10, 13 | 22 | 21 |
-| 7 | 2 | 15 | 14 | 23 | 22 |
+| 7 | 2 | 15 | 14b | 23 | 22 |
+| 14b | 14 | | | | |
 
 So after Task 1 three lanes run side by side: Task 2 and then 7; Tasks 3, 4 and 4b; Task 5. Tasks 8 and 9 run beside Tasks 6 and 11 to 13; Task 17 may run beside Tasks 14 to 16.
 
@@ -1490,6 +1493,28 @@ impl AddressIndex {
 - [ ] `cargo xtask uscode-sample --update`; read the diff of what it generated before committing it: every file under `samples/uscode/workspace/` must begin with `edition 2`, and nothing outside that directory may change.
 - [ ] If step 5 or step 6 fails on real text, the ingester or the script disagrees with S7. Find which one departs from S7 and correct it; if S7 itself is silent or wrong for the case, stop and report it with the element and the two readings.
 - [ ] Reference section, sample README, command reference, changelog. Gate. Commit: `Generate the sample of the Code and check it in CI against the publisher's text`
+
+### Task 14b: The two irregular readings of a file's metadata
+
+**Files:**
+- Modify: `crates/fidryn-ingest-uscode/src/uslm.rs` (the metadata of a document), and where the flag is carried (`operative.rs`, `containers.rs`)
+- Modify: `conformance/uslm_common.py` (`parse_document` and the flag of a unit and a container), `conformance/uslm_text.py`, `conformance/usc_profile.py` where they use the flag
+- Create: fixtures `conformance/fixtures/uslm/meta-dash-name.xml` and `meta-no-flag.xml`, each with its records and profile
+- Modify: `schemas/text-record-v0.1.json` (`positive_law` may be `null`), `docs/law-modules.md` (the ingester section: what is refused, and the flag), `CHANGELOG.md`
+
+**Interfaces:**
+- Consumes: the ingester (Tasks 8 to 10), the independent reading (Task 2), the sample step (Task 14).
+- Produces: both readings accept a document whose `docPublicationName` writes the release with an en dash, and a document with no property `is-positive-law`. The modules of the second have no `positive_law` declaration, and the records of their units have `"positive_law":null`. Two such properties, and a value that is neither `yes` nor `no`, are refused as before.
+
+**Tests:**
+- `a_release_name_with_an_en_dash_is_read`: a document of release `999-1` named `Online@999–1` is imported, and its records equal those of the same document named with a hyphen. A name with any other character in the place of the hyphen is still refused.
+- `a_document_without_the_flag_has_none`: its unit and container modules have no `positive_law` declaration, the rendered modules pass the one-module check, and the records have `null`.
+- `two_flags_and_another_value_are_still_refused`.
+- Python: the same three cases in `conformance/test_uslm_text.py`; the refusal table keeps the refusals of two flags and of another value, and a document of that table that has no flag moves to the accepted cases.
+- The sample does not change: `cargo xtask uscode-sample` passes without `--update`.
+
+**Steps:**
+- [ ] Tests and fixtures first; both readings; the schema; the reference section and the changelog. Gate. Commit: `Read a file that writes its release with an en dash or declares no positive-law flag`
 
 ### Task 15: Definitions
 
