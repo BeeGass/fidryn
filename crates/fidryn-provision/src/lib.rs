@@ -31,7 +31,7 @@ pub use model::{
     QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
 };
 pub use records::TextRecord;
-pub use reference::{AddressIndex, Outcome};
+pub use reference::{AddressIndex, DeclaredTwice, Outcome};
 
 /// A seeded generator for the tests: the same sequence on every run and every
 /// host.

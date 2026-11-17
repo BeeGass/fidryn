@@ -15,7 +15,10 @@
 //! - each definition's provision, terms, kind and basis;
 //! - for a curated module its imports, citations and bindings;
 //! - the byte range of the module's address, of `within`, of each alias and
-//!   member, and of each import, citation and binding.
+//!   member, and of each import, citation and binding, with the ranges of
+//!   their parts: of an import its address, its alias and each name in its
+//!   braces, of a citation its name, and of a binding its name and what
+//!   `binds` names, the alias and the name of `alias.name` apart.
 //!
 //! An interface is small: the address of a provision, a note or the
 //! provision of a definition is written relative to the module's
@@ -32,8 +35,8 @@ use crate::hash::{
     Hash32, LayerHashes, hash_note, layer_hashes_of_container, layer_hashes_of_unit, tree_hashes,
 };
 use crate::model::{
-    Basis, Binding, Block, Citation, DefinitionKind, Footnote, Import, Item, Layer, Module, Note,
-    Provision, QuotedItem, Run, Text,
+    Basis, BindTarget, Binding, Block, Citation, DefinitionKind, Footnote, Import, Item, Layer,
+    Module, Note, Provision, QuotedItem, Run, Text,
 };
 use crate::workspace::as_written;
 use serde::de::{self, Deserializer, Visitor};
@@ -72,6 +75,77 @@ pub struct ByteRange {
     pub end: u32,
 }
 
+/// Where an `import` and its parts stand in a module's source.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ImportRanges {
+    /// The declaration, whole.
+    pub whole: ByteRange,
+    /// The address after `import`.
+    pub module: ByteRange,
+    /// The alias after `as`; `None` for an import with braces.
+    pub alias: Option<ByteRange>,
+    /// Each name in the braces, in order.
+    pub names: Vec<ByteRange>,
+}
+
+impl ImportRanges {
+    /// The empty range at 0 for `import` and for each of its parts.
+    fn empty_for(import: &Import) -> ImportRanges {
+        ImportRanges {
+            alias: import.alias.as_ref().map(|_| ByteRange::default()),
+            names: vec![ByteRange::default(); import.names.len()],
+            ..ImportRanges::default()
+        }
+    }
+}
+
+/// Where a `citation` and its name stand in a module's source.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CitationRanges {
+    /// The declaration, whole.
+    pub whole: ByteRange,
+    /// The name after `citation`.
+    pub name: ByteRange,
+}
+
+/// Where a `binding` and its parts stand in a module's source.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BindingRanges {
+    /// The declaration, whole.
+    pub whole: ByteRange,
+    /// The name after `binding`.
+    pub name: ByteRange,
+    /// The alias before the dot of `binds alias.name`; `None` when `binds`
+    /// names an address or a name without an alias.
+    pub qualifier: Option<ByteRange>,
+    /// What `binds` names: the address, or the name after any alias.
+    pub target: ByteRange,
+}
+
+impl BindingRanges {
+    /// The empty range at 0 for `binding` and for each of its parts.
+    fn empty_for(binding: &Binding) -> BindingRanges {
+        BindingRanges {
+            qualifier: qualified(binding).then(ByteRange::default),
+            ..BindingRanges::default()
+        }
+    }
+}
+
+/// Whether `binding` names what it binds as `alias.name`.
+fn qualified(binding: &Binding) -> bool {
+    matches!(
+        binding.binds,
+        BindTarget::Name {
+            module: Some(_),
+            ..
+        }
+    )
+}
+
 /// Where the declarations of a module stand in its source, each list in
 /// the order of the declarations. A range of a string covers its quotation
 /// marks.
@@ -85,20 +159,22 @@ pub struct DeclSpans {
     pub aliases: Vec<ByteRange>,
     /// The address after each `member` of a container.
     pub members: Vec<ByteRange>,
-    /// Each `import` declaration, whole.
-    pub imports: Vec<ByteRange>,
-    /// Each `citation` declaration, whole.
-    pub citations: Vec<ByteRange>,
-    /// Each `binding` declaration, whole.
-    pub bindings: Vec<ByteRange>,
+    /// Each `import` declaration and its parts.
+    pub imports: Vec<ImportRanges>,
+    /// Each `citation` declaration and its name.
+    pub citations: Vec<CitationRanges>,
+    /// Each `binding` declaration and its parts.
+    pub bindings: Vec<BindingRanges>,
 }
 
-/// A declaration of a module and its byte range in the module's source.
+/// A declaration of a module and where it stands in the module's source:
+/// its byte range, or, for a declaration of a curated module, the ranges of
+/// the declaration and of its parts.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Declared<T> {
+pub struct Declared<T, R = ByteRange> {
     pub item: T,
-    pub range: ByteRange,
+    pub range: R,
 }
 
 /// A word of [`Interface::words`], named by its place there, counted from 0.
@@ -213,9 +289,9 @@ pub struct Interface {
     /// In document order.
     pub references: Vec<Reference>,
     pub definitions: Vec<DefinitionEntry>,
-    pub imports: Vec<Declared<Import>>,
-    pub citations: Vec<Declared<Citation>>,
-    pub bindings: Vec<Declared<Binding>>,
+    pub imports: Vec<Declared<Import, ImportRanges>>,
+    pub citations: Vec<Declared<Citation, CitationRanges>>,
+    pub bindings: Vec<Declared<Binding, BindingRanges>>,
 }
 
 /// The text of the address `at` relative to `module`, as
@@ -372,6 +448,22 @@ impl Interface {
             return Err(format!(
                 "the interface of {shape_of} has imports, citations or bindings"
             ));
+        }
+        for (index, import) in self.imports.iter().enumerate() {
+            if import.range.alias.is_some() != import.item.alias.is_some()
+                || import.range.names.len() != import.item.names.len()
+            {
+                return Err(format!(
+                    "the ranges of import {index} are not those of its alias and its names"
+                ));
+            }
+        }
+        for (index, binding) in self.bindings.iter().enumerate() {
+            if binding.range.qualifier.is_some() != qualified(&binding.item) {
+                return Err(format!(
+                    "the ranges of binding {index} are not those of what it binds"
+                ));
+            }
         }
         if !self.definitions.is_empty() && shape != Shape::Unit {
             return Err(format!("the interface of {shape_of} has definitions"));
@@ -539,9 +631,9 @@ pub fn interface_of(module: &Module, spans: &DeclSpans) -> Interface {
             layers: None,
             references: Vec::new(),
             definitions: Vec::new(),
-            imports: declared(&curated.imports, &spans.imports),
+            imports: declared_with(&curated.imports, &spans.imports, ImportRanges::empty_for),
             citations: declared(&curated.citations, &spans.citations),
-            bindings: declared(&curated.bindings, &spans.bindings),
+            bindings: declared_with(&curated.bindings, &spans.bindings, BindingRanges::empty_for),
         },
     };
     interface.shrunk()
@@ -549,13 +641,23 @@ pub fn interface_of(module: &Module, spans: &DeclSpans) -> Interface {
 
 /// Each of `items` with the range at its place in `ranges`, or the empty
 /// range at 0 when `ranges` has none there.
-fn declared<T: Clone>(items: &[T], ranges: &[ByteRange]) -> Vec<Declared<T>> {
+fn declared<T: Clone, R: Clone + Default>(items: &[T], ranges: &[R]) -> Vec<Declared<T, R>> {
+    declared_with(items, ranges, |_| R::default())
+}
+
+/// Each of `items` with the ranges at its place in `ranges`, or, when
+/// `ranges` has none there, those that `empty` gives it.
+fn declared_with<T: Clone, R: Clone>(
+    items: &[T],
+    ranges: &[R],
+    empty: impl Fn(&T) -> R,
+) -> Vec<Declared<T, R>> {
     items
         .iter()
         .enumerate()
         .map(|(index, item)| Declared {
             item: item.clone(),
-            range: ranges.get(index).copied().unwrap_or_default(),
+            range: ranges.get(index).cloned().unwrap_or_else(|| empty(item)),
         })
         .collect()
 }
@@ -955,9 +1057,22 @@ mod tests {
         let range = |start, end| ByteRange { start, end };
         DeclSpans {
             address: range(17, 30),
-            imports: vec![range(35, 63)],
-            citations: vec![range(66, 98)],
-            bindings: vec![range(101, 290)],
+            imports: vec![ImportRanges {
+                whole: range(35, 63),
+                module: range(42, 55),
+                alias: Some(range(59, 61)),
+                names: Vec::new(),
+            }],
+            citations: vec![CitationRanges {
+                whole: range(66, 98),
+                name: range(75, 79),
+            }],
+            bindings: vec![BindingRanges {
+                whole: range(101, 290),
+                name: range(109, 116),
+                qualifier: None,
+                target: range(127, 131),
+            }],
             ..DeclSpans::default()
         }
     }
@@ -972,15 +1087,70 @@ mod tests {
              \"positive_law\":null,\"container\":null,\"words\":[],\"provisions\":[],\
              \"notes\":[],\"footnotes\":0,\"layers\":null,\"references\":[],\"definitions\":[],\
              \"imports\":[{{\"item\":{{\"module\":\"/zz/demo/c2\",\"alias\":\"c2\",\"names\":[]}},\
-             \"range\":{{\"start\":35,\"end\":63}}}}],\
+             \"range\":{{\"whole\":{{\"start\":35,\"end\":63}},\
+             \"module\":{{\"start\":42,\"end\":55}},\"alias\":{{\"start\":59,\"end\":61}},\
+             \"names\":[]}}}}],\
              \"citations\":[{{\"item\":{{\"name\":\"rule\",\"target\":\"/zz/demo/t1/s1\"}},\
-             \"range\":{{\"start\":66,\"end\":98}}}}],\
+             \"range\":{{\"whole\":{{\"start\":66,\"end\":98}},\
+             \"name\":{{\"start\":75,\"end\":79}}}}}}],\
              \"bindings\":[{{\"item\":{{\"name\":\"binding\",\"binds\":{{\"name\":{{\"module\":null,\
              \"name\":\"rule\"}}}},\"release\":\"42-7\",\"provision_hash\":\"{PROVISION_HASH}\",\
-             \"notes_hash\":\"{NOTES_HASH}\"}},\"range\":{{\"start\":101,\"end\":290}}}}]}}}}\n"
+             \"notes_hash\":\"{NOTES_HASH}\"}},\"range\":{{\"whole\":{{\"start\":101,\"end\":290}},\
+             \"name\":{{\"start\":109,\"end\":116}},\"qualifier\":null,\
+             \"target\":{{\"start\":127,\"end\":131}}}}}}]}}}}\n"
         );
         assert_eq!(interface.to_json(), expected);
         assert_eq!(Interface::from_json(&expected), Ok(interface));
+    }
+
+    #[test]
+    fn a_curated_module_built_without_spans_has_a_range_for_each_part() {
+        let Module::Curated(mut module) = curated() else {
+            panic!("the curated model is curated");
+        };
+        module.imports.push(Import {
+            module: address("/zz/demo/c3"),
+            alias: None,
+            names: vec!["one".to_owned(), "two".to_owned()],
+        });
+        module.bindings[0].binds = BindTarget::Name {
+            module: Some("c2".to_owned()),
+            name: "rule".to_owned(),
+        };
+        let interface = interface_of(&Module::Curated(module), &DeclSpans::default());
+        let empty = ByteRange::default();
+        assert_eq!(interface.imports[0].range.alias, Some(empty));
+        assert_eq!(interface.imports[1].range.alias, None);
+        assert_eq!(interface.imports[1].range.names, [empty, empty]);
+        assert_eq!(interface.bindings[0].range.qualifier, Some(empty));
+        assert_eq!(
+            Interface::from_json(&interface.to_json()),
+            Ok(interface.clone())
+        );
+
+        // Ranges that are not those of the parts are refused.
+        let refused = |change: &dyn Fn(&mut Interface), words: &str| {
+            let mut changed = interface.clone();
+            change(&mut changed);
+            match Interface::from_json(&changed.to_json()) {
+                Ok(_) => panic!("accepted: {changed:?}"),
+                Err(error) => assert!(error.contains(words), "{words:?} is not in {error:?}"),
+            }
+        };
+        refused(
+            &|changed| {
+                changed.imports[1].range.names.pop();
+            },
+            "the ranges of import 1 are not those of its alias and its names",
+        );
+        refused(
+            &|changed| changed.imports[0].range.alias = None,
+            "the ranges of import 0 are not those of its alias and its names",
+        );
+        refused(
+            &|changed| changed.bindings[0].range.qualifier = None,
+            "the ranges of binding 0 are not those of what it binds",
+        );
     }
 
     #[test]

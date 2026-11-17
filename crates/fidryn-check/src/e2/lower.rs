@@ -381,18 +381,23 @@ impl Lowering {
             match decl {
                 ast::Decl::Import(import) => {
                     let module = self.address_or_stand_in(&import.module);
-                    let (alias, names) = match &import.form {
-                        ast::ImportForm::As(alias) => (Some(alias.text.clone()), Vec::new()),
-                        ast::ImportForm::Names(names) => {
-                            (None, names.iter().map(|name| name.text.clone()).collect())
-                        }
+                    let (alias, names): (Option<&ast::Ident>, &[ast::Ident]) = match &import.form {
+                        ast::ImportForm::As(alias) => (Some(alias), &[]),
+                        ast::ImportForm::Names(names) => (None, names),
                     };
                     curated.imports.push(Import {
                         module,
-                        alias,
-                        names,
+                        alias: alias.map(|alias| alias.text.clone()),
+                        names: names.iter().map(|name| name.text.clone()).collect(),
                     });
                     self.spans.imports.push(import.span);
+                    self.spans.import_modules.push(import.module.span);
+                    self.spans
+                        .import_aliases
+                        .push(alias.map(|alias| alias.span));
+                    self.spans
+                        .import_names
+                        .push(names.iter().map(|name| name.span).collect());
                 }
                 ast::Decl::Citation(citation) => {
                     let target = self.address_or_stand_in(&citation.target);
@@ -404,17 +409,25 @@ impl Lowering {
                     self.spans.citation_names.push(citation.name.span);
                 }
                 ast::Decl::Binding(binding) => {
-                    let binds = match &binding.binds {
-                        ast::BindTarget::Address(address) => {
-                            BindTarget::Address(self.address_or_stand_in(address))
-                        }
+                    let (binds, qualifier, target) = match &binding.binds {
+                        ast::BindTarget::Address(address) => (
+                            BindTarget::Address(self.address_or_stand_in(address)),
+                            None,
+                            address.span,
+                        ),
                         ast::BindTarget::Name {
                             qualifier, name, ..
-                        } => BindTarget::Name {
-                            module: qualifier.as_ref().map(|qualifier| qualifier.text.clone()),
-                            name: name.text.clone(),
-                        },
+                        } => (
+                            BindTarget::Name {
+                                module: qualifier.as_ref().map(|qualifier| qualifier.text.clone()),
+                                name: name.text.clone(),
+                            },
+                            qualifier.as_ref().map(|qualifier| qualifier.span),
+                            name.span,
+                        ),
                     };
+                    self.spans.qualifiers.push(qualifier);
+                    self.spans.bind_targets.push(target);
                     self.not_empty(&binding.release, "the release of a binding");
                     let provision_hash = self.hash(&binding.provision_hash).hash;
                     let notes_hash = self.hash(&binding.notes_hash).hash;

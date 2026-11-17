@@ -11,7 +11,7 @@
 use crate::address::{self, Address};
 use crate::hash::Hash32;
 use crate::interface::{Interface, Shape, address_text_at};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, hash_map};
 
 /// What a reference reaches: exactly one of these, the first that applies.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -93,6 +93,19 @@ struct Entry {
     unit: Option<u32>,
     /// Whether the address with `~2` added is an address of the index too.
     twin: bool,
+    /// The place of the module that declares it among the interfaces the
+    /// index was built from.
+    declared_by: u32,
+}
+
+/// An address that more than one module of an index declares, as the
+/// address of the module, of a provision or of a note.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeclaredTwice {
+    pub address: Address,
+    /// The place of each module that declares it among the interfaces the
+    /// index was built from, in increasing order.
+    pub modules: Vec<usize>,
 }
 
 /// What the index holds of a unit.
@@ -115,13 +128,17 @@ pub struct AddressIndex {
     units: Vec<UnitEntry>,
     statuses: Vec<Box<str>>,
     prefixes: Vec<Address>,
+    /// Each address that more than one module declares, by address.
+    twice: Vec<DeclaredTwice>,
 }
 
 impl AddressIndex {
     /// The index of the addresses of `interfaces`, the modules, provisions
     /// and notes, and of the aliases of their modules, below `prefixes`.
     /// When two of them have one address, an address is kept over an alias,
-    /// and otherwise the first in the order of `interfaces`.
+    /// and otherwise the first in the order of `interfaces`; an address
+    /// that two modules declare is also recorded
+    /// ([`AddressIndex::declared_twice`]).
     pub fn build<'a>(
         interfaces: impl IntoIterator<Item = &'a Interface>,
         prefixes: &[Address],
@@ -141,13 +158,20 @@ impl AddressIndex {
             units: Vec::new(),
             statuses: Vec::new(),
             prefixes: prefixes.to_vec(),
+            twice: Vec::new(),
         };
         let mut statuses = BTreeMap::new();
+        let mut twice = BTreeMap::new();
         let mut modules = Vec::with_capacity(interfaces.len());
-        for interface in &interfaces {
-            let module = index.module_entry(interface, &mut statuses);
+        for (place, interface) in interfaces.iter().enumerate() {
+            let declared_by = u32::try_from(place).expect("fewer than 2^32 modules");
+            let module = index.module_entry(interface, declared_by, &mut statuses);
             let unit = module.unit;
-            index.insert(interface.address.as_str().into(), module.clone());
+            index.insert(
+                interface.address.as_str().into(),
+                module.clone(),
+                &mut twice,
+            );
             for provision in &interface.provisions {
                 let status = provision
                     .status
@@ -160,7 +184,9 @@ impl AddressIndex {
                         status,
                         unit,
                         twin: false,
+                        declared_by,
                     },
+                    &mut twice,
                 );
             }
             for note in &interface.notes {
@@ -172,7 +198,9 @@ impl AddressIndex {
                         status: None,
                         unit,
                         twin: false,
+                        declared_by,
                     },
+                    &mut twice,
                 );
             }
             modules.push(module);
@@ -186,9 +214,17 @@ impl AddressIndex {
                         hash: None,
                         ..module.clone()
                     },
+                    &mut twice,
                 );
             }
         }
+        index.twice = twice
+            .into_iter()
+            .map(|(address, modules)| DeclaredTwice {
+                address: Address::from_checked(address.into()),
+                modules: modules.into_iter().map(|place| place as usize).collect(),
+            })
+            .collect();
         // An address `B~2` makes `B` ambiguous when `B` is an address too.
         // Only an address whose last segment ends in `~2` is built again.
         for interface in &interfaces {
@@ -218,11 +254,12 @@ impl AddressIndex {
         }
     }
 
-    /// The entry of the module of `interface`, with its unit added to the
-    /// index when it is a unit.
+    /// The entry of the module of `interface`, the interface at the place
+    /// `declared_by`, with its unit added to the index when it is a unit.
     fn module_entry(
         &mut self,
         interface: &Interface,
+        declared_by: u32,
         statuses: &mut BTreeMap<Box<str>, u32>,
     ) -> Entry {
         match interface.shape {
@@ -244,6 +281,7 @@ impl AddressIndex {
                     status,
                     unit: Some(unit),
                     twin: false,
+                    declared_by,
                 }
             }
             Shape::Container => Entry {
@@ -256,6 +294,7 @@ impl AddressIndex {
                     .map(|status| self.status(status, statuses)),
                 unit: None,
                 twin: false,
+                declared_by,
             },
             Shape::Curated => Entry {
                 named: Named::Module,
@@ -263,6 +302,7 @@ impl AddressIndex {
                 status: None,
                 unit: None,
                 twin: false,
+                declared_by,
             },
         }
     }
@@ -281,9 +321,39 @@ impl AddressIndex {
 
     /// Adds `entry` under `key`, unless the key is there already. Every
     /// address is added before any alias, so an address is kept over an
-    /// alias.
-    fn insert(&mut self, key: Box<str>, entry: Entry) {
-        self.entries.entry(key).or_insert(entry);
+    /// alias. An address that another module has added already is recorded
+    /// in `twice`, with the place of each of the two modules.
+    fn insert(
+        &mut self,
+        key: Box<str>,
+        entry: Entry,
+        twice: &mut BTreeMap<Box<str>, BTreeSet<u32>>,
+    ) {
+        match self.entries.entry(key) {
+            hash_map::Entry::Occupied(kept) => {
+                let first = kept.get();
+                if entry.named != Named::Alias
+                    && first.named != Named::Alias
+                    && first.declared_by != entry.declared_by
+                {
+                    twice
+                        .entry(kept.key().clone())
+                        .or_default()
+                        .extend([first.declared_by, entry.declared_by]);
+                }
+            }
+            hash_map::Entry::Vacant(slot) => {
+                slot.insert(entry);
+            }
+        }
+    }
+
+    /// Each address that more than one module of the index declares, as the
+    /// address of the module, of a provision or of a note, sorted by
+    /// address; an alias is none. Nothing that one module declares twice is
+    /// here: that is the check of the module.
+    pub fn declared_twice(&self) -> &[DeclaredTwice] {
+        &self.twice
     }
 
     /// The status of `entry` or, when it has none, of its unit.
@@ -634,6 +704,30 @@ mod tests {
         }
         let index = index_of(&modules);
         assert_eq!(index.outcome("/zz/demo/t1/s1"), Outcome::Exact);
+        assert_eq!(index.declared_twice(), []);
+    }
+
+    #[test]
+    fn an_address_that_two_modules_declare_is_recorded_with_each_of_them() {
+        let mut modules = modules();
+        assert_eq!(index_of(&modules).declared_twice(), []);
+        // The unit `s1/a` and the container `s1/a` declare the address of
+        // the child `a` of the unit `s1`, the third module.
+        modules.push(Module::Unit(unit("/zz/demo/t1/s1/a", false, None)));
+        modules.push(Module::Container(container("/zz/demo/t1/s1/a", &[])));
+        let index = index_of(&modules);
+        assert_eq!(
+            index.declared_twice(),
+            [DeclaredTwice {
+                address: address("/zz/demo/t1/s1/a"),
+                modules: vec![2, 9, 10],
+            }]
+        );
+        // The first is kept.
+        assert_eq!(
+            index.provision_hash(&address("/zz/demo/t1/s1/a")),
+            index_of(&modules[..9]).provision_hash(&address("/zz/demo/t1/s1/a"))
+        );
     }
 
     #[test]

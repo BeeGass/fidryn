@@ -62,6 +62,15 @@ interchange schema versions are maintained independently of the interpreter.
   `.fidryn-cache` in the workspace; `--no-cache` keeps none. The module of
   a damaged entry is checked again and its entry rewritten, and a cache
   that cannot be written does not fail the check.
+- Names across curated modules. The check of a workspace resolves the
+  imports, citations and bindings of each curated module from the
+  interfaces alone (`fidryn_check::e2::names::resolve`): an import names a
+  module of the workspace or of a dependency (`E720`); its alias and the
+  names it brings into scope share one set with the module's citations
+  and bindings; and the name after `binds`, `name` or `alias.name`, names
+  exactly one citation (`E200`). An address that two modules declare is
+  `E700`. The interface records the range of each part of an import, a
+  citation and a binding.
 
 ## [0.2.0] - 2026-11-16
 

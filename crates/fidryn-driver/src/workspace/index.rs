@@ -2,8 +2,9 @@
 //! the outcome of every reference, from the interfaces of the modules alone.
 
 use super::MANIFEST_FILE;
+use fidryn_check::e2::names::resolve;
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
-use fidryn_provision::interface::ByteRange;
+use fidryn_provision::interface::{ByteRange, Shape};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::workspace::{Manifest, WorkspaceKind};
 use fidryn_provision::{Address, AddressIndex, Interface, Layer, Outcome};
@@ -68,15 +69,24 @@ pub(crate) fn no_references() -> BTreeMap<Layer, BTreeMap<String, u64>> {
 /// - the `within` of a unit or a container names a container of the
 ///   workspace that lists it as a member, and every member of a container
 ///   is a module whose `within` is that container (`E720`);
+/// - every import of a curated module names a module of `interfaces` or of
+///   `dependencies` (`E720`), and the names of the curated module resolve
+///   ([`resolve`]; `E200`);
+/// - no two modules of the workspace declare one address, as the address of
+///   a module, a provision or a note: each module after the first by path
+///   that declares it is reported (`E700`), at its address when the address
+///   is its own, and otherwise without a span;
 /// - the outcome of every reference of the workspace, against an index of
 ///   the addresses of `interfaces` and `dependencies` below the manifest's
 ///   prefix.
 ///
 /// Each module is taken to stand at the path of its address, which names
-/// its file in a diagnostic. [`check_workspace`](super::check_workspace)
-/// runs the same, with the interfaces of the modules that stand at their
-/// paths, on several threads, and also names the module files that gave
-/// none, so that nothing that names one of them is reported again.
+/// its file in a diagnostic. The result is the same for any order of
+/// `interfaces` in which no two have one address.
+/// [`check_workspace`](super::check_workspace) runs the same, with the
+/// interfaces of the modules that stand at their paths, on several threads,
+/// and also names the module files that gave none, so that nothing that
+/// names one of them is reported again.
 pub fn check_interfaces(
     interfaces: &[Interface],
     dependencies: &[Interface],
@@ -105,11 +115,13 @@ pub(crate) fn across(
 ) -> PhaseTwo {
     let mut diagnostics = of_manifest(manifest, toolchain);
     diagnostics.extend(hierarchy(interfaces, unread));
-    diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
+    diagnostics.extend(curated(interfaces, dependencies, unread));
     let index = AddressIndex::build(
         interfaces.iter().chain(dependencies),
         std::slice::from_ref(&manifest.prefix),
     );
+    diagnostics.extend(declared_twice(&index, interfaces));
+    diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
     let counted = outcomes(interfaces, &index, jobs);
     let mut references = no_references();
     for (layer, counts) in LAYERS.into_iter().zip(counted.references) {
@@ -197,10 +209,17 @@ struct Modules<'a> {
     /// The paths of the module files that gave no interface, which are
     /// already reported.
     unread: &'a BTreeSet<String>,
+    /// Why an address that is neither a module's nor an alias names
+    /// nothing, as the end of a sentence about it.
+    missing: &'static str,
 }
 
 impl<'a> Modules<'a> {
-    fn new(interfaces: &'a [Interface], unread: &'a BTreeSet<String>) -> Modules<'a> {
+    fn new(
+        interfaces: impl IntoIterator<Item = &'a Interface>,
+        unread: &'a BTreeSet<String>,
+        missing: &'static str,
+    ) -> Modules<'a> {
         let mut by_address = BTreeMap::new();
         let mut by_alias = BTreeMap::new();
         for interface in interfaces {
@@ -213,6 +232,7 @@ impl<'a> Modules<'a> {
             by_address,
             by_alias,
             unread,
+            missing,
         }
     }
 
@@ -230,14 +250,14 @@ impl<'a> Modules<'a> {
                 "is an alias of the module `{}`, and a module is named by its address",
                 module.address
             ),
-            None => "is no module of the workspace".to_owned(),
+            None => self.missing.to_owned(),
         }))
     }
 }
 
 /// The checks of `within` and of the members of containers.
 fn hierarchy(interfaces: &[Interface], unread: &BTreeSet<String>) -> Vec<Diagnostic> {
-    let modules = Modules::new(interfaces, unread);
+    let modules = Modules::new(interfaces, unread, "is no module of the workspace");
     let mut out = Vec::new();
     for interface in interfaces {
         let file = module_path(&interface.address);
@@ -299,6 +319,91 @@ fn hierarchy(interfaces: &[Interface], unread: &BTreeSet<String>) -> Vec<Diagnos
             if let Some(message) = problem {
                 report(member.range, message);
             }
+        }
+    }
+    out
+}
+
+/// The checks of the imports and of the names of each curated module of
+/// `interfaces`: an import names a module of `interfaces` or of
+/// `dependencies` (`E720`, at its address), and the module's names resolve
+/// ([`resolve`]). An import of a module file that gave no interface is not
+/// reported again, and nothing is resolved through it.
+fn curated(
+    interfaces: &[Interface],
+    dependencies: &[Interface],
+    unread: &BTreeSet<String>,
+) -> Vec<Diagnostic> {
+    let importable = Modules::new(
+        interfaces.iter().chain(dependencies),
+        unread,
+        "is no module of the workspace or of a dependency",
+    );
+    let imported = |address: &Address| importable.by_address.get(address).copied();
+    let mut out = Vec::new();
+    let modules = interfaces
+        .iter()
+        .filter(|interface| interface.shape == Shape::Curated);
+    for interface in modules {
+        let file = module_path(&interface.address);
+        for import in &interface.imports {
+            let named = &import.item.module;
+            if let Err(Some(why)) = importable.get(named) {
+                out.push(
+                    Diagnostic::new(
+                        DiagnosticCode::E720,
+                        format!("`import` names `{named}`, which {why}"),
+                    )
+                    .with_span(span(import.range.module))
+                    .with_source(file.as_str()),
+                );
+            }
+        }
+        // Only the names are checked here, not what a binding binds.
+        let (_, diagnostics) = resolve(interface, &imported);
+        out.extend(
+            diagnostics
+                .into_iter()
+                .map(|diagnostic| diagnostic.with_source(file.as_str())),
+        );
+    }
+    out
+}
+
+/// Each address that more than one module of `interfaces` declares, the
+/// index of `interfaces` and then of the dependencies being `index`: it is
+/// reported in each module after the first by path that declares it, naming
+/// both files (`E700`), at the module's address when it is the module's own,
+/// and otherwise without a span, since an interface holds no range of the
+/// address of a provision or a note.
+fn declared_twice(index: &AddressIndex, interfaces: &[Interface]) -> Vec<Diagnostic> {
+    let mut out = Vec::new();
+    for twice in index.declared_twice() {
+        // A place past `interfaces` is a module of a dependency.
+        let mut modules: Vec<(String, &Interface)> = twice
+            .modules
+            .iter()
+            .filter_map(|place| interfaces.get(*place))
+            .map(|interface| (module_path(&interface.address), interface))
+            .collect();
+        modules.sort_by(|a, b| a.0.cmp(&b.0));
+        let Some(((first, _), later)) = modules.split_first() else {
+            continue;
+        };
+        for (file, interface) in later {
+            let mut diagnostic = Diagnostic::new(
+                DiagnosticCode::E700,
+                format!(
+                    "the address `{}` is declared in `{first}` and again in `{file}`, and an \
+                     address is declared by one module only",
+                    twice.address
+                ),
+            )
+            .with_source(file.as_str());
+            if interface.address == twice.address {
+                diagnostic = diagnostic.with_span(span(interface.address_range));
+            }
+            out.push(diagnostic);
         }
     }
     out

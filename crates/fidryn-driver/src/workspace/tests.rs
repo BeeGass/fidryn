@@ -9,7 +9,9 @@ use super::{
     check_workspace,
 };
 use fidryn_check::e2::lower;
+use fidryn_check::e2::names::{ResolvedBinding, resolve};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
+use fidryn_provision::interface::ByteRange;
 use fidryn_provision::layout::module_path;
 use fidryn_provision::render::render;
 use fidryn_provision::workspace::{
@@ -2285,4 +2287,611 @@ fn two_checks_at_once_leave_a_valid_cache() {
         check_workspace(&workspace, &cached(&cache_dir, 4)).from_cache,
         199
     );
+}
+
+// The names of curated modules. The workspace has the prefix `/zz/notes`
+// and the modules `a`, `b` and `c`; `b` cites `/zz/demo/t1/s8/a` as
+// `widget`. No check looks up a cited or bound address.
+
+/// The manifest of a curated workspace of the prefix `/zz/notes`.
+fn notes_manifest() -> Manifest {
+    Manifest {
+        name: "notes".to_owned(),
+        prefix: address("/zz/notes"),
+        ..curated_manifest()
+    }
+}
+
+/// The text of the curated module `/zz/notes/<name>` that declares `decls`,
+/// in order.
+fn note_module(name: &str, decls: &[&str]) -> String {
+    let mut text = format!("edition 2\nmodule \"/zz/notes/{name}\" {{\n");
+    for line in decls.iter().flat_map(|decl| decl.lines()) {
+        text.push_str("  ");
+        text.push_str(line);
+        text.push('\n');
+    }
+    text.push_str("}\n");
+    text
+}
+
+/// A `binding` named `name` whose `binds` names `binds`.
+fn binding(name: &str, binds: &str) -> String {
+    format!(
+        "binding {name} {{\n  binds {binds}\n  release \"demo-1\"\n  \
+         provision_hash \"{ARCHIVE_BLAKE3}\"\n  notes_hash \"{MEMBER_BLAKE3}\"\n  pending\n}}"
+    )
+}
+
+/// The module `b`, which cites `/zz/demo/t1/s8/a` as `widget`.
+fn module_b() -> String {
+    note_module("b", &["citation widget -> \"/zz/demo/t1/s8/a\""])
+}
+
+/// Writes the curated workspace of `modules` into `out`: each `(name,
+/// text)` at `zz/notes/<name>.fr`.
+fn notes_workspace(out: &Path, modules: &[(&str, &str)]) {
+    fs::write(out.join("workspace.json"), notes_manifest().to_json()).expect("write");
+    for (name, text) in modules {
+        put(out, &format!("zz/notes/{name}.fr"), text);
+    }
+}
+
+/// The check of the curated workspace of `modules`.
+fn check_notes(tag: &str, modules: &[(&str, &str)]) -> WorkspaceReport {
+    let scratch = Scratch::new(tag);
+    notes_workspace(scratch.path(), modules);
+    check(scratch.path())
+}
+
+/// The interface of the module written as `text`, as phase one builds it.
+fn interface_of_text(text: &str) -> Interface {
+    let lowered =
+        lower(&parse(text)).unwrap_or_else(|found| panic!("{text} does not lower: {found:#?}"));
+    interface_of(&lowered.module, &lowered.decl_spans())
+}
+
+/// What `resolve` gives of the module `name` of `modules`, with each of them
+/// importable.
+fn resolved_in(modules: &[(&str, &str)], name: &str) -> (Vec<ResolvedBinding>, Vec<Diagnostic>) {
+    let interfaces: Vec<Interface> = modules
+        .iter()
+        .map(|(_, text)| interface_of_text(text))
+        .collect();
+    let at = modules
+        .iter()
+        .position(|(each, _)| *each == name)
+        .expect("the module is one of them");
+    resolve(&interfaces[at], &|address| {
+        interfaces
+            .iter()
+            .find(|interface| interface.address == *address)
+    })
+}
+
+/// The name of each binding of `resolved` and the address it binds.
+fn targets(resolved: &[ResolvedBinding]) -> Vec<(&str, &str)> {
+    resolved
+        .iter()
+        .map(|binding| (binding.binding.item.name.as_str(), binding.target.as_str()))
+        .collect()
+}
+
+/// The span of `word` where it follows `before` in `text`.
+fn span_of(text: &str, before: &str, word: &str) -> Span {
+    let needle = format!("{before}{word}");
+    let at = text
+        .find(&needle)
+        .unwrap_or_else(|| panic!("{needle:?} is not in:\n{text}"))
+        + before.len();
+    let start = u32::try_from(at).expect("a small file");
+    let end = start + u32::try_from(word.len()).expect("a short word");
+    Span { start, end }
+}
+
+/// The one diagnostic of the check of the curated workspace of `modules`,
+/// asserted to be an `E200` in the file of the module `name` at `span`
+/// whose message holds `words`.
+fn one_name_error(
+    tag: &str,
+    modules: &[(&str, &str)],
+    name: &str,
+    span: Span,
+    words: &str,
+) -> Diagnostic {
+    let report = check_notes(tag, modules);
+    let diagnostic = only(&report).clone();
+    assert_diagnostic(
+        &diagnostic,
+        DiagnosticCode::E200,
+        &format!("zz/notes/{name}.fr"),
+        Some(span),
+        words,
+    );
+    diagnostic
+}
+
+#[test]
+fn a_qualified_name_resolves_through_its_alias() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            &binding("widget_binding", "b.widget"),
+        ],
+    );
+    let b = module_b();
+    let modules = [("a", a.as_str()), ("b", b.as_str())];
+    let (bindings, diagnostics) = resolved_in(&modules, "a");
+    assert_eq!(diagnostics, []);
+    assert_eq!(targets(&bindings), [("widget_binding", "/zz/demo/t1/s8/a")]);
+    assert_eq!(
+        bindings[0].binding.range.target,
+        range_of(span_of(&a, "binds b.", "widget"))
+    );
+    assert_eq!(check_notes("names-qualified", &modules).diagnostics, []);
+}
+
+#[test]
+fn a_name_brought_into_scope_resolves_unqualified() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" { widget }",
+            &binding("widget_binding", "widget"),
+        ],
+    );
+    let b = module_b();
+    let modules = [("a", a.as_str()), ("b", b.as_str())];
+    let (bindings, diagnostics) = resolved_in(&modules, "a");
+    assert_eq!(diagnostics, []);
+    assert_eq!(targets(&bindings), [("widget_binding", "/zz/demo/t1/s8/a")]);
+    assert_eq!(check_notes("names-brought", &modules).diagnostics, []);
+}
+
+#[test]
+fn a_local_citation_resolves_unqualified() {
+    let a = note_module(
+        "a",
+        &[
+            "citation gadget -> \"/zz/demo/t1/s9\"",
+            &binding("gadget_binding", "gadget"),
+            &binding("address_binding", "\"/zz/demo/t1/s8/b\""),
+        ],
+    );
+    let modules = [("a", a.as_str())];
+    let (bindings, diagnostics) = resolved_in(&modules, "a");
+    assert_eq!(diagnostics, []);
+    assert_eq!(
+        targets(&bindings),
+        [
+            ("gadget_binding", "/zz/demo/t1/s9"),
+            ("address_binding", "/zz/demo/t1/s8/b"),
+        ]
+    );
+    assert_eq!(check_notes("names-local", &modules).diagnostics, []);
+}
+
+#[test]
+fn an_unqualified_name_that_is_not_in_scope() {
+    let a = note_module("a", &[&binding("gizmo_binding", "gizmo")]);
+    one_name_error(
+        "names-not-in-scope",
+        &[("a", &a)],
+        "a",
+        span_of(&a, "binds ", "gizmo"),
+        "`binds` names `gizmo`, which is no citation of this module and no name that an \
+         import brings into scope",
+    );
+    assert_eq!(resolved_in(&[("a", &a)], "a").0, []);
+}
+
+#[test]
+fn a_binding_binds_a_citation_and_not_an_alias_or_a_binding() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            &binding("by_alias", "b"),
+            &binding("by_binding", "by_alias"),
+        ],
+    );
+    let b = module_b();
+    let report = check_notes("names-not-a-citation", &[("a", &a), ("b", &b)]);
+    let file = "zz/notes/a.fr";
+    match report.diagnostics.as_slice() {
+        [alias, binding] => {
+            assert_diagnostic(
+                alias,
+                DiagnosticCode::E200,
+                file,
+                Some(span_of(&a, "binds ", "b")),
+                "`binds` names `b`, which is the alias of an import and not a citation",
+            );
+            assert_diagnostic(
+                binding,
+                DiagnosticCode::E200,
+                file,
+                Some(span_of(&a, "binds ", "by_alias")),
+                "`binds` names `by_alias`, which is a binding and not a citation",
+            );
+        }
+        other => panic!("expected two diagnostics, found {other:#?}"),
+    }
+}
+
+#[test]
+fn an_alias_that_no_import_declares() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            &binding("widget_binding", "x.widget"),
+        ],
+    );
+    let b = module_b();
+    one_name_error(
+        "names-no-alias",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "binds ", "x"),
+        "`binds` names `x.widget`, and `x` is the alias of no import of this module",
+    );
+}
+
+#[test]
+fn a_name_the_imported_module_does_not_declare() {
+    let b = module_b();
+
+    // In `alias.name`.
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            &binding("gizmo_binding", "b.gizmo"),
+        ],
+    );
+    one_name_error(
+        "names-undeclared-qualified",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "binds b.", "gizmo"),
+        "`binds` names `b.gizmo`, and the module `/zz/notes/b`, imported as `b`, declares no \
+         citation `gizmo`",
+    );
+
+    // In the braces of an import: the binding that uses the name is not
+    // reported again.
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" { widget, gizmo }",
+            &binding("gizmo_binding", "gizmo"),
+        ],
+    );
+    one_name_error(
+        "names-undeclared-braces",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "widget, ", "gizmo"),
+        "the import brings `gizmo` into scope from `/zz/notes/b`, which declares no citation \
+         `gizmo`",
+    );
+    assert_eq!(resolved_in(&[("a", &a), ("b", &b)], "a").0, []);
+}
+
+#[test]
+fn one_name_from_two_sources() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" { widget }",
+            "citation widget -> \"/zz/demo/t1/s9\"",
+            &binding("widget_binding", "widget"),
+        ],
+    );
+    let b = module_b();
+    let diagnostic = one_name_error(
+        "names-two-sources",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "citation ", "widget"),
+        "the name `widget` is declared twice: as a citation, and before that as a name \
+         brought into scope from `/zz/notes/b`",
+    );
+    assert_eq!(diagnostic.related_spans, [span_of(&a, "{ ", "widget")]);
+    // A name that stands for two things binds neither.
+    assert_eq!(resolved_in(&[("a", &a), ("b", &b)], "a").0, []);
+}
+
+#[test]
+fn an_alias_and_a_citation_of_one_name() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            "citation b -> \"/zz/demo/t1/s9\"",
+        ],
+    );
+    let b = module_b();
+    let diagnostic = one_name_error(
+        "names-alias-citation",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "citation ", "b"),
+        "the name `b` is declared twice: as a citation, and before that as the alias of the \
+         import of `/zz/notes/b`",
+    );
+    assert_eq!(diagnostic.related_spans, [span_of(&a, " as ", "b")]);
+}
+
+#[test]
+fn an_alias_declared_twice() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            "import \"/zz/notes/c\" as b",
+            &binding("widget_binding", "b.widget"),
+        ],
+    );
+    let b = module_b();
+    let c = note_module("c", &[]);
+    let diagnostic = one_name_error(
+        "names-alias-twice",
+        &[("a", &a), ("b", &b), ("c", &c)],
+        "a",
+        span_of(&a, "\"/zz/notes/c\" as ", "b"),
+        "the name `b` is declared twice: as the alias of the import of `/zz/notes/c`, and \
+         before that as the alias of the import of `/zz/notes/b`",
+    );
+    assert_eq!(
+        diagnostic.related_spans,
+        [span_of(&a, "\"/zz/notes/b\" as ", "b")]
+    );
+}
+
+#[test]
+fn a_name_reached_only_through_another_modules_import() {
+    let c = note_module("c", &["import \"/zz/notes/b\" { widget }"]);
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/c\" as c",
+            &binding("widget_binding", "c.widget"),
+        ],
+    );
+    let b = module_b();
+    one_name_error(
+        "names-through-import",
+        &[("a", &a), ("b", &b), ("c", &c)],
+        "a",
+        span_of(&a, "binds c.", "widget"),
+        "`binds` names `c.widget`, and the module `/zz/notes/c`, imported as `c`, declares no \
+         citation `widget`; it imports `widget`, and what a module imports is not visible \
+         through it",
+    );
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn an_import_of_a_module_that_does_not_exist_is_E720() {
+    // Nothing that names a citation through the import is reported again.
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/nothing\" as n",
+            "import \"/zz/notes/none\" { widget }",
+            &binding("by_alias", "n.widget"),
+            &binding("by_name", "widget"),
+        ],
+    );
+    let report = check_notes("names-no-module", &[("a", &a)]);
+    match report.diagnostics.as_slice() {
+        [nothing, none] => {
+            for (diagnostic, missing) in [(nothing, "/zz/notes/nothing"), (none, "/zz/notes/none")]
+            {
+                assert_diagnostic(
+                    diagnostic,
+                    DiagnosticCode::E720,
+                    "zz/notes/a.fr",
+                    Some(span_after(&a, "import ", missing)),
+                    &format!(
+                        "`import` names `{missing}`, which is no module of the workspace or of \
+                         a dependency"
+                    ),
+                );
+            }
+        }
+        other => panic!("expected two diagnostics, found {other:#?}"),
+    }
+}
+
+#[test]
+fn an_import_of_a_module_file_that_does_not_lower_is_not_reported_again() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/d\" as d",
+            &binding("widget_binding", "d.widget"),
+        ],
+    );
+    let d = "edition 2\nmodule \"/zz/notes/d\" {\n  unknown\n}\n";
+    let report = check_notes("names-unread", &[("a", &a), ("d", d)]);
+    let diagnostic = only(&report);
+    assert_eq!(diagnostic.code, DiagnosticCode::E100, "{diagnostic:#?}");
+    assert_eq!(diagnostic.source_file.as_deref(), Some("zz/notes/d.fr"));
+}
+
+#[test]
+fn two_modules_may_import_each_other() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            "citation gadget -> \"/zz/demo/t1/s9\"",
+            &binding("widget_binding", "b.widget"),
+        ],
+    );
+    let b = note_module(
+        "b",
+        &[
+            "import \"/zz/notes/a\" { gadget }",
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+            &binding("gadget_binding", "gadget"),
+        ],
+    );
+    let modules = [("a", a.as_str()), ("b", b.as_str())];
+    assert_eq!(check_notes("names-each-other", &modules).diagnostics, []);
+    let (from_a, diagnostics) = resolved_in(&modules, "a");
+    assert_eq!(diagnostics, []);
+    assert_eq!(targets(&from_a), [("widget_binding", "/zz/demo/t1/s8/a")]);
+    let (from_b, diagnostics) = resolved_in(&modules, "b");
+    assert_eq!(diagnostics, []);
+    assert_eq!(targets(&from_b), [("gadget_binding", "/zz/demo/t1/s9")]);
+}
+
+/// A curated workspace whose module `a` has a name not in scope, an import
+/// of a module that does not exist, and a name that `b` does not declare.
+fn defective_notes() -> Vec<(&'static str, String)> {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            "import \"/zz/notes/nothing\" as n",
+            &binding("gizmo_binding", "gizmo"),
+            &binding("sprocket_binding", "b.sprocket"),
+        ],
+    );
+    vec![("a", a), ("b", module_b())]
+}
+
+#[test]
+fn names_are_resolved_from_interfaces_in_any_order_and_from_the_cache() {
+    let files = defective_notes();
+    let modules: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(name, text)| (*name, text.as_str()))
+        .collect();
+    let scratch = Scratch::new("names-phase-two");
+    let workspace = scratch.join("workspace");
+    fs::create_dir_all(&workspace).expect("create the workspace's directory");
+    notes_workspace(&workspace, &modules);
+    let report = check(&workspace);
+    assert_eq!(
+        report
+            .diagnostics
+            .iter()
+            .map(|diagnostic| diagnostic.code)
+            .collect::<Vec<_>>(),
+        [
+            DiagnosticCode::E720,
+            DiagnosticCode::E200,
+            DiagnosticCode::E200
+        ],
+        "{report:#?}"
+    );
+
+    // The same interfaces, in memory, in either order.
+    let interfaces: Vec<Interface> = modules
+        .iter()
+        .map(|(_, text)| interface_of_text(text))
+        .collect();
+    for order in [interfaces.clone(), interfaces.into_iter().rev().collect()] {
+        let phase_two = check_interfaces(&order, &[], &notes_manifest(), TOOLCHAIN);
+        assert_eq!(phase_two.diagnostics, report.diagnostics);
+    }
+
+    // The ranges of the parts come back from the cache.
+    let cache = scratch.join("cache");
+    let first = check_workspace(&workspace, &cached(&cache, 2));
+    let second = check_workspace(&workspace, &cached(&cache, 2));
+    assert_eq!(second.from_cache, 2);
+    assert_eq!(uncounted(&first), report);
+    assert_eq!(uncounted(&second), report);
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn an_address_that_two_modules_declare_is_E700_in_the_later_one() {
+    // `s8` has the child `s8/a` and the note `s8/note/demoNotes/nolaw/a`.
+    // The unit `s8/a` declares the first as its own address, and the unit
+    // `s8/note/demoNotes/nolaw` the second as the address of its child.
+    let s8_at = "/zz/demo/t1/s8";
+    let mut s8 = unit(s8_at, None, "8", "Widgets", "An invented section.");
+    s8.root
+        .items
+        .push(subsection(s8_at, vec![linking(&["/zz/demo/t1/s1"])]));
+    s8.notes.push(linking_note(
+        s8_at,
+        "a",
+        Layer::Enacted,
+        &["/zz/demo/t1/s1"],
+    ));
+    let nolaw_at = "/zz/demo/t1/s8/note/demoNotes/nolaw";
+    let mut nolaw = unit(nolaw_at, None, "1", "Not a Note", "An invented unit.");
+    nolaw
+        .root
+        .items
+        .push(subsection(nolaw_at, vec![linking(&["/zz/demo/t1/s1"])]));
+    let models = [
+        Module::Unit(s8),
+        Module::Unit(unit(
+            "/zz/demo/t1/s8/a",
+            None,
+            "8a",
+            "Not a Subsection",
+            "An invented unit.",
+        )),
+        Module::Unit(nolaw),
+    ];
+    let files: Vec<(String, String)> = models
+        .iter()
+        .map(|model| (module_path(address_of(model)), render(model)))
+        .collect();
+    let files: Vec<(&str, String)> = files
+        .iter()
+        .map(|(rel, text)| (rel.as_str(), text.clone()))
+        .collect();
+    let scratch = Scratch::new("declared-twice");
+    curated_workspace(scratch.path(), &files);
+    let report = check(scratch.path());
+    let nolaw_file = module_path(&address(nolaw_at));
+    assert_eq!(nolaw_file, "zz/demo/t1/s8/note/demo_notes/nolaw.fr");
+    match report.diagnostics.as_slice() {
+        [unit, provision] => {
+            assert_diagnostic(
+                unit,
+                DiagnosticCode::E700,
+                "zz/demo/t1/s8/a.fr",
+                Some(span_after(&files[1].1, "module ", "/zz/demo/t1/s8/a")),
+                "the address `/zz/demo/t1/s8/a` is declared in `zz/demo/t1/s8.fr` and again in \
+                 `zz/demo/t1/s8/a.fr`, and an address is declared by one module only",
+            );
+            assert_diagnostic(
+                provision,
+                DiagnosticCode::E700,
+                &nolaw_file,
+                None,
+                &format!(
+                    "the address `{nolaw_at}/a` is declared in `zz/demo/t1/s8.fr` and again \
+                     in `{nolaw_file}`"
+                ),
+            );
+        }
+        other => panic!("expected two diagnostics, found {other:#?}"),
+    }
+
+    // The same from the interfaces in another order.
+    let interfaces: Vec<Interface> = models.iter().rev().map(interface_in_memory).collect();
+    let phase_two = check_interfaces(&interfaces, &[], &curated_manifest(), TOOLCHAIN);
+    assert_eq!(phase_two.diagnostics, report.diagnostics);
+}
+
+/// `span` as the byte range an interface records.
+fn range_of(span: Span) -> ByteRange {
+    ByteRange {
+        start: span.start,
+        end: span.end,
+    }
 }

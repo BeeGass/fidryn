@@ -363,7 +363,7 @@ fn an_interface_round_trips_and_is_deterministic() {
             interface
                 .imports
                 .iter()
-                .map(|import| import.range)
+                .map(|import| import.range.whole)
                 .collect(),
             lowered.import_spans(),
         );
@@ -371,7 +371,7 @@ fn an_interface_round_trips_and_is_deterministic() {
             interface
                 .citations
                 .iter()
-                .map(|citation| citation.range)
+                .map(|citation| citation.range.whole)
                 .collect(),
             lowered.citation_spans(),
         );
@@ -379,7 +379,7 @@ fn an_interface_round_trips_and_is_deterministic() {
             interface
                 .bindings
                 .iter()
-                .map(|binding| binding.range)
+                .map(|binding| binding.range.whole)
                 .collect(),
             lowered.binding_spans(),
         );
@@ -2026,10 +2026,88 @@ fn the_spans_a_workspace_check_reports_at_cover_exactly_their_strings() {
         [notes_hash.clone(), notes_hash]
     );
 
+    // The ranges of the parts, which the interface records.
+    let spans = lowered.decl_spans();
+    let text = |source: &str, range: ByteRange| {
+        covered(
+            source,
+            Span {
+                start: range.start,
+                end: range.end,
+            },
+        )
+        .to_owned()
+    };
+    let part = |range: ByteRange| text(&curated, range);
+    assert_eq!(
+        spans
+            .imports
+            .iter()
+            .map(|import| (
+                part(import.module),
+                import.alias.map(part),
+                import.names.iter().copied().map(part).collect::<Vec<_>>(),
+            ))
+            .collect::<Vec<_>>(),
+        [
+            (
+                "\"/zz/demo/curated/gadgets\"".to_owned(),
+                Some("gadgets".to_owned()),
+                Vec::new(),
+            ),
+            (
+                "\"/zz/demo/curated/sprockets\"".to_owned(),
+                None,
+                vec!["sprocket_rule".to_owned(), "sprocket_size".to_owned()],
+            ),
+        ]
+    );
+    assert_eq!(
+        spans
+            .citations
+            .iter()
+            .map(|citation| part(citation.name))
+            .collect::<Vec<_>>(),
+        ["widget_rule", "widget_sizes"]
+    );
+    assert_eq!(
+        spans
+            .bindings
+            .iter()
+            .map(|binding| (
+                part(binding.name),
+                binding.qualifier.map(part),
+                part(binding.target),
+            ))
+            .collect::<Vec<_>>(),
+        [
+            ("widget_binding".to_owned(), None, "widget_rule".to_owned()),
+            (
+                "sizes_binding".to_owned(),
+                None,
+                "\"/zz/demo/t1/s8/b\"".to_owned(),
+            ),
+        ]
+    );
+    assert_eq!(
+        spans
+            .imports
+            .iter()
+            .map(|import| part(import.whole))
+            .collect::<Vec<_>>(),
+        all(lowered.import_spans())
+    );
+
     let qualified = curated.replacen("binds widget_rule", "binds gadgets.gadget_rule", 1);
     let lowered = check_source(&qualified).expect("a qualified name checks");
     assert_eq!(
         covered(&qualified, lowered.binds_spans()[0]),
         "gadgets.gadget_rule"
     );
+    let binding = &lowered.decl_spans().bindings[0];
+    assert_eq!(
+        binding.qualifier.map(|range| text(&qualified, range)),
+        Some("gadgets".to_owned())
+    );
+    assert_eq!(text(&qualified, binding.target), "gadget_rule");
 }

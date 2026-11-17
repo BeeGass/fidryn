@@ -12,16 +12,18 @@
 //! hashes, the footnote markers and the definitions (`E710`), and the names
 //! of a curated module (`E200`). [`check_source`] goes the whole way from
 //! the text of a file. Every diagnostic carries the span of the text it is
-//! about.
+//! about. [`names::resolve`] resolves the names of a curated module across
+//! the modules of a workspace, from their interfaces alone.
 
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
-use fidryn_provision::interface::ByteRange;
+use fidryn_provision::interface::{BindingRanges, ByteRange, CitationRanges, ImportRanges};
 use fidryn_provision::{DeclSpans, Hash32, Module};
 use fidryn_syntax::e2::parse;
 use fidryn_syntax::edition::edition_of;
 
 mod lower;
 mod module_check;
+pub mod names;
 #[cfg(test)]
 mod tests;
 
@@ -110,17 +112,53 @@ impl Lowered {
     /// The byte ranges that the interface of the module records: of its
     /// address, of the address after `within`, after each `alias` and after
     /// each `member`, and of each `import`, `citation` and `binding`
-    /// declaration, each list in declaration order.
+    /// declaration with its parts, each list in declaration order.
     pub fn decl_spans(&self) -> DeclSpans {
-        let ranges = |spans: &[Span]| spans.iter().copied().map(range).collect();
+        let spans = &self.spans;
+        let ranges = |list: &[Span]| list.iter().copied().map(range).collect();
+        let imports = spans
+            .imports
+            .iter()
+            .zip(&spans.import_modules)
+            .zip(&spans.import_aliases)
+            .zip(&spans.import_names)
+            .map(|(((whole, module), alias), names)| ImportRanges {
+                whole: range(*whole),
+                module: range(*module),
+                alias: alias.map(range),
+                names: ranges(names),
+            })
+            .collect();
+        let citations = spans
+            .citations
+            .iter()
+            .zip(&spans.citation_names)
+            .map(|(whole, name)| CitationRanges {
+                whole: range(*whole),
+                name: range(*name),
+            })
+            .collect();
+        let bindings = spans
+            .bindings
+            .iter()
+            .zip(&spans.binding_names)
+            .zip(&spans.qualifiers)
+            .zip(&spans.bind_targets)
+            .map(|(((whole, name), qualifier), target)| BindingRanges {
+                whole: range(*whole),
+                name: range(*name),
+                qualifier: qualifier.map(range),
+                target: range(*target),
+            })
+            .collect();
         DeclSpans {
-            address: range(self.spans.module),
-            within: self.spans.within.map(range),
-            aliases: ranges(&self.spans.aliases),
-            members: ranges(&self.spans.members),
-            imports: ranges(&self.spans.imports),
-            citations: ranges(&self.spans.citations),
-            bindings: ranges(&self.spans.bindings),
+            address: range(spans.module),
+            within: spans.within.map(range),
+            aliases: ranges(&spans.aliases),
+            members: ranges(&spans.members),
+            imports,
+            citations,
+            bindings,
         }
     }
 }
@@ -159,13 +197,25 @@ struct Spans {
     regions: Vec<Option<Span>>,
     see_notes: Vec<Option<Span>>,
     imports: Vec<Span>,
+    /// The address after each `import`.
+    import_modules: Vec<Span>,
+    /// The alias after the `as` of each import; `None` for one with braces.
+    import_aliases: Vec<Option<Span>>,
+    /// Each name in the braces of each import.
+    import_names: Vec<Vec<Span>>,
     citations: Vec<Span>,
     /// The name of each citation.
     citation_names: Vec<Span>,
     bindings: Vec<Span>,
     /// The name of each binding.
     binding_names: Vec<Span>,
+    /// What each `binds` names, `alias.name` whole.
     binds: Vec<Span>,
+    /// The alias of each `binds alias.name`; `None` for a name without one
+    /// and for an address.
+    qualifiers: Vec<Option<Span>>,
+    /// What each `binds` names: the address, or the name after any alias.
+    bind_targets: Vec<Span>,
     provision_hashes: Vec<Span>,
     notes_hashes: Vec<Span>,
 }
@@ -187,11 +237,16 @@ impl Spans {
             regions: Vec::new(),
             see_notes: Vec::new(),
             imports: Vec::new(),
+            import_modules: Vec::new(),
+            import_aliases: Vec::new(),
+            import_names: Vec::new(),
             citations: Vec::new(),
             citation_names: Vec::new(),
             bindings: Vec::new(),
             binding_names: Vec::new(),
             binds: Vec::new(),
+            qualifiers: Vec::new(),
+            bind_targets: Vec::new(),
             provision_hashes: Vec::new(),
             notes_hashes: Vec::new(),
         }

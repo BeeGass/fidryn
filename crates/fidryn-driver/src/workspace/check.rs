@@ -124,6 +124,9 @@ impl WorkspaceReport {
 /// - the `within` of a unit or a container names a container of the
 ///   workspace that lists it as a member, and every member of a container is
 ///   a module whose `within` is that container (`E720`);
+/// - every import of a curated module names a module of the workspace
+///   (`E720`), and its names resolve (`E200`);
+/// - no two modules declare one address (`E700`);
 /// - the manifest's `toolchain` is the running one (`W760`).
 ///
 /// It also gives every reference of the workspace its outcome. Phase one,

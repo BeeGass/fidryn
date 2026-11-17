@@ -777,23 +777,37 @@ gives every reference its [outcome](#references).
 | Every `.fr` file is a module of edition 2; every entry of the directory whose name does not begin with a dot is a file or a directory, and none is a symbolic link | `E730` |
 | Every module's address is below the prefix, and the module stands at the path of its address | `E730` |
 | A unit's or a container's `within` names a container of the workspace that lists it as a `member`, and every `member` of a container is a module whose `within` is that container | `E720` |
+| Every `import` of a curated module names a module of the workspace or of a dependency, by its address | `E720` |
+| The names of every curated module resolve, as [Curated modules: imports, citations and names](#curated-modules-imports-citations-and-names) describes | `E200` |
+| No two modules declare one address, as the address of a module, of a provision or of a note | `E700` |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
 
 When the directory has no manifest that can be read, that is the one
 diagnostic, and nothing else of the directory is read. A module file that
 does not lower, a module that does not stand at the path of its address,
 and a file the lock lists that is missing, take no part in the checks of
-`within` and members, and none of their addresses is one that a reference
-reaches: their own diagnostics say what is wrong, and a container that
-lists them is not reported for it.
+`within`, members and imports, and none of their addresses is one that a
+reference reaches: their own diagnostics say what is wrong, and a
+container that lists them, or a module that imports them, is not reported
+for it.
 
 Every diagnostic names its file by its path in the workspace. One about a
 file as a whole, such as a module file the lock does not list or a file of
 the first edition, has no span. One about where a module stands is at its
-address; one about a `within` is at the string after `within`, and one
-about a member at the string after that `member`. The diagnostics are
-sorted by the path of their file and then by position, a diagnostic about
-the file as a whole first.
+address; one about a `within` is at the string after `within`, one about a
+member at the string after that `member`, one about an import at the
+string after `import`, and one about a name at that name. An address that
+two modules declare is reported in the file of each module after the first,
+by path, that declares it, naming the file of the first: at the module's
+address when the address is the module's own, and otherwise about the file
+as a whole, since the interface of a module holds no range of the address
+of a provision or a note. The addresses of a module that passes the checks
+of one module lie at or below its own, so two such modules that declare one
+address lie one within the other, as a unit `/zz/demo/t1/s8/a` lies within
+a unit `/zz/demo/t1/s8` that has a subsection `/zz/demo/t1/s8/a`; the file
+of the outer one comes first by path. The diagnostics are sorted by the
+path of their file and then by position, a diagnostic about the file as a
+whole first.
 
 `fidryn check DIR` prints each diagnostic as
 `DIR/PATH: CODE Title: message`, then one summary line, and then `ok` when
@@ -833,7 +847,9 @@ The check of a workspace runs in two phases.
    module stands, below the prefix and at the path of its address. Then,
    from the manifest and the interfaces alone, the manifest's toolchain,
    the `within` of every unit and container and the members of every
-   container, and the [outcome](#references) of every reference. Phase two
+   container, the imports and the names of every curated module, the
+   addresses that two modules declare, and the [outcome](#references) of
+   every reference. Phase two
    reads no module again. `fidryn_driver::workspace::check_interfaces` is
    that last part as a function of the interfaces of the workspace and of
    its dependencies, the manifest and the toolchain's version.
@@ -843,8 +859,8 @@ system reports as available, each module file being read and checked on
 one of them. Of phase two, the outcomes of the references are found on as
 many threads, the modules shared out among them; the rest of it, the
 comparison with the lock, where each module stands, the manifest, `within`
-and members, and the index of addresses the outcomes are looked up in,
-runs on one thread. The diagnostics, the summary line, the check
+and members, imports and names, and the index of addresses the outcomes
+are looked up in, runs on one thread. The diagnostics, the summary line, the check
 report and the unresolved list are the same, byte for byte, for every
 number of workers: each module's result is collected by itself, and the
 results are sorted by the path of their file and then by position before
@@ -867,8 +883,11 @@ that phase two reads of the module:
 - for a curated module, its imports, citations and bindings;
 - the byte range of the module's address, of the address after `within`,
   after each `alias` and after each `member`, and of each `import`,
-  `citation` and `binding` declaration, at which phase two reports what
-  it finds.
+  `citation` and `binding` declaration, with the ranges of its parts: of an
+  import its address, its alias and each name in its braces, of a citation
+  its name, and of a binding its name and what `binds` names, the alias and
+  the name of `alias.name` apart. Phase two reports what it finds at these
+  ranges.
 
 A provision holds an image when one of its own text parts does, its
 children's not counted; a note holds one when one of its blocks does,
@@ -892,7 +911,7 @@ this order:
 | `layers` | the three layer hashes, or `null` in a curated module |
 | `references` | each reference, in document order: `layer`, `from` and `target` |
 | `definitions` | each definition: `at`, the provision that holds it, `terms`, `kind` and `basis` |
-| `imports`, `citations`, `bindings` | of a curated module, each with its range |
+| `imports`, `citations`, `bindings` | of a curated module, each as `{"item": ..., "range": ...}`, where `range` holds `whole`, the range of the declaration, and the ranges of its parts: of an import `module`, `alias`, or `null` for an import with braces, and `names`; of a citation `name`; of a binding `name`, `qualifier`, the alias of `alias.name` or `null`, and `target`, the address or the name after `binds` and any alias |
 
 `at` is an address relative to the module's: empty for the module's own
 address, and otherwise the segments below it without their first `/`, so
@@ -903,8 +922,9 @@ address that does not lie below the module's, which only a module with an
 in `provisions` or in `notes`. Each place in `words` is counted from 0.
 `Interface::from_json` refuses a text of another `schema`, a key it does
 not know or a missing one, the key of an optional field included, a place
-that names nothing, an `at` that names no address, and parts that the
-shape of the module does not have. It reads only what `to_json` writes: a
+that names nothing, an `at` that names no address, parts that the shape of
+the module does not have, and ranges of parts that a declaration does not
+have, such as the range of an alias of an import with braces. It reads only what `to_json` writes: a
 text whose JSON value is not the value that the interface read from it
 writes back, such as one with an object written as an array of its values,
 is refused, and the place where the two differ is named.
@@ -1008,7 +1028,9 @@ any of its segments, the target itself included: the beginnings of
 and `/zz/demo/t1/s8/a`. A known address is the address of
 a module, a provision or a note of the workspace or of a dependency, or an
 alias of such a module; when an address of one is an alias of another, the
-address wins.
+address wins. An address that two modules declare is an error (`E700`),
+and a reference to it reaches what the module whose file comes first by
+path declares.
 
 | Outcome | When |
 | --- | --- |
@@ -1137,6 +1159,87 @@ ok
 modules: 5; from cache: 5; errors: 0; warnings: 0
 ok
 ```
+
+## Curated modules: imports, citations and names
+
+A curated module is written by a person. It gives names to addresses,
+binds names to provisions, and imports other modules to use the names they
+give. Of three modules of a curated workspace with the prefix `/zz/notes`,
+the first cites a subsection:
+
+```fidryn
+edition 2
+module "/zz/notes/b" {
+  citation widget -> "/zz/demo/t1/s8/a"
+}
+```
+
+The second imports it under an alias, imports a name from a third, cites a
+subsection of its own, and binds what the first cites:
+
+```fidryn
+edition 2
+module "/zz/notes/a" {
+  import "/zz/notes/b" as b
+  import "/zz/notes/c" { gadget }
+  citation sizes -> "/zz/demo/t1/s8/b"
+  binding widget_binding {
+    binds b.widget
+    release "demo-1"
+    provision_hash "ec085e67853dd9ced4dafa9836e747dc158ae35ed76f628d9b1eacbd6937be77"
+    notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    pending
+  }
+}
+```
+
+- A **citation**, `citation NAME -> "ADDRESS"`, gives the name `NAME` to
+  the address.
+- An **import** names a module by its address. Written
+  `import "ADDRESS" as ALIAS`, it makes `ALIAS.NAME` name the citation
+  `NAME` of that module; written `import "ADDRESS" { NAME, ... }`, it
+  brings each citation named in the braces into scope under its own name.
+- A **binding** binds what `binds` names: an address, written as a string;
+  a name without an alias, which is a citation of the module itself or one
+  that an import brings into scope; or `ALIAS.NAME`, a citation of the
+  module imported as `ALIAS`. `fidryn_check::e2::names::resolve` gives each
+  binding that resolves with the address it binds: `widget_binding` above
+  binds `/zz/demo/t1/s8/a`.
+
+The names of a module are one set: the names of its citations and of its
+bindings, the aliases of its imports, and the names its imports bring into
+scope. A name enters it once: in the module `/zz/notes/a` above, a
+citation named `b` or `gadget`, or a second import `as b`, would be an
+error.
+
+Only an imported module's own citations are visible through it, and
+nothing it imports itself: when `/zz/notes/c` imports `widget` from
+`/zz/notes/b`, `c.widget` names nothing, and a module that wants `widget`
+imports `/zz/notes/b`. An import therefore leads no further than the
+module it names, and two modules may import each other.
+
+The check of a workspace resolves the names of each curated module in
+phase two, from the interfaces of the module and of the modules it imports
+alone:
+
+| Check | Code |
+| --- | --- |
+| An `import` names a module of the workspace or of a dependency, by its address | `E720`, at the address |
+| A name enters the set of names of its module once | `E200`, where it enters again, with the place where it entered first as a related span |
+| Each name in the braces of an `import` is a citation of the module it imports | `E200`, at the name |
+| A name after `binds` without an alias is a citation of the module or a name that an import brings into scope, and neither the alias of an import nor the name of a binding | `E200`, at the name |
+| In `ALIAS.NAME` after `binds`, `ALIAS` is the alias of an import, and `NAME` a citation of the module it imports | `E200`, at the alias or at the name |
+
+Two citations or bindings of one name are an error of the
+[check of one module](#what-the-checker-verifies-in-one-module), and the
+check of the workspace does not report them again. Nor does it report a
+binding whose name cannot resolve for a reason it reports elsewhere: a
+name that enters the set twice, a name in braces that the imported module
+does not cite, or an import of a module that is not there. An import of a
+module file that does not lower, or of a module that does not stand at the
+path of its address, is not reported at all: that file's own diagnostics
+say what is wrong. Whether the address that a citation or a binding names
+is a provision is not checked.
 
 ## The ingester for the United States Code
 
