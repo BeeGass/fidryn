@@ -146,6 +146,8 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
+| `fidryn-provision` | Empty. Depends on no other crate of the workspace |
+| `fidryn-ingest-uscode` | Empty. Of the workspace crates, depends on `fidryn-provision` only |
 | `fidryn-cli` | `fidryn` binary and mill |
 
 Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is

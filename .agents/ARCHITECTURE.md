@@ -21,6 +21,8 @@ Fidryn is a programming language for legal instruments. The README says Fidryn 0
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
+| `fidryn-provision` | Empty. Depends on no other crate of the workspace |
+| `fidryn-ingest-uscode` | Empty. Of the workspace crates, depends on `fidryn-provision` only |
 | `fidryn-cli` | `fidryn` binary and mill |
 
 Those directories are under `crates/`.

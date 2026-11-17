@@ -1,3 +1,4 @@
 * text=auto eol=lf
 *.woff2 binary
+*.zip binary
 LICENSES/** -text whitespace=-blank-at-eol

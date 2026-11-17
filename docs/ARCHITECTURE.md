@@ -106,11 +106,16 @@ fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
+fidryn-provision       empty (no workspace crate)
+fidryn-ingest-uscode   empty (provision)
 fidryn-cli             fidryn binary and mill UI
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
-Do not put parser logic in `core`.
+Do not put parser logic in `core`. `fidryn-provision` depends on no other
+crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
+depends on `fidryn-provision` only, and no crate depends on
+`fidryn-ingest-uscode`. Both crates are empty: they declare no items.
 
 ## Public APIs
 
@@ -290,7 +295,17 @@ E530 NegativeRecursion
 E540 MissingLegalSource
 W610 OpenUniverse
 W620 BoundedVerification
+E700 InvalidAddress
+E710 IntegrityMismatch
+E720 UnresolvedModule
+E730 WorkspaceViolation
+E740 PinMismatch
+W750 StaleBinding
+W760 ToolchainMismatch
 ```
+
+`E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
+`fidryn-core`; no check raises them. `W750` and `W760` are warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate
 to `Suspended`, `Contingent`, or `NormConflict`.
