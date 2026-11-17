@@ -107,10 +107,11 @@ lists them.
 A directory is a workspace of edition 2 modules, with a manifest,
 `workspace.json`, at its top ([Workspaces](law-modules.md#workspaces)).
 `check` reads every module of it by itself, and then checks the manifest,
-the lock of a generated workspace, where each module stands, and the
-containers and their members, as
+the lock of a generated workspace, where each module stands, the
+containers and their members, and the dependencies of a curated
+workspace, as
 [What the checker verifies in a workspace](law-modules.md#what-the-checker-verifies-in-a-workspace)
-lists them, and gives every reference its
+lists them, and gives every reference and every citation its
 [outcome](law-modules.md#references). It does so in two phases, each on
 several threads, and its output is the same for any number of them
 ([How a workspace is checked](law-modules.md#how-a-workspace-is-checked)).
@@ -128,7 +129,7 @@ it ([The cache](law-modules.md#the-cache)).
 | `--cache-dir DIR` | no | the directory of the cache of a workspace check; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside the workspace |
 | `--no-cache` | no | flag; keep no cache: check every module file, and write no entry of a cache |
 | `--report FILE` | no | path of the check report of a workspace to write, `fidryn.check-report/v0.1` |
-| `--unresolved FILE` | no | path of the list to write of the references of a workspace whose outcome is not `exact`, one JSON object to a line |
+| `--unresolved FILE` | no | path of the list to write of the references and the citations of a workspace whose outcome is not `exact`, one JSON object to a line |
 
 **Environment**
 

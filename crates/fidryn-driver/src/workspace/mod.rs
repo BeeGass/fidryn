@@ -8,7 +8,9 @@
 //! writer leaves it alone. A **generated**
 //! workspace, which an importer writes with [`GeneratedWriter`], has a
 //! release and a lock, `law.lock.json`, that lists every module file with
-//! the BLAKE3 of its bytes; a **curated** workspace has neither.
+//! the BLAKE3 of its bytes; a **curated** workspace has neither, and may
+//! depend on generated workspaces, each pinned to a release and to the
+//! digest of its lock.
 //!
 //! [`check_workspace`] checks a workspace in two phases, each on several
 //! threads. Phase one reads, lowers and checks each module by itself and
@@ -17,17 +19,19 @@
 //! a later check takes it from there ([`CheckOptions::cache_dir`]). Phase
 //! two checks
 //! what holds across the files: the manifest and the lock, where each module
-//! stands and the agreement of the files with the lock, and then, from the
-//! interfaces alone ([`check_interfaces`]), the hierarchy of containers and
-//! their members and the outcome of every reference. The report
-//! ([`WorkspaceReport::to_json`]) and the list of the references that are
-//! not `exact` ([`WorkspaceReport::unresolved_lines`]) are written on
-//! request. [`read_modules`] reads the modules of a workspace into the
-//! model, for what prints their text. This crate names no corpus;
+//! stands and the agreement of the files with the lock, each dependency by
+//! itself, and then, from the interfaces alone ([`check_interfaces`]), the
+//! hierarchy of containers and their members, the names of curated modules,
+//! and the outcome of every reference and every citation. The report
+//! ([`WorkspaceReport::to_json`]) and the list of the references and the
+//! citations that are not `exact` ([`WorkspaceReport::unresolved_lines`])
+//! are written on request. [`read_modules`] reads the modules of a workspace
+//! into the model, for what prints their text. This crate names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks it for this directory.
 
 mod cache;
 mod check;
+mod deps;
 mod discover;
 mod index;
 mod read;
@@ -38,7 +42,7 @@ mod writer;
 mod tests;
 
 pub use check::{CheckOptions, WorkspaceReport, check_workspace};
-pub use index::{PhaseTwo, Unresolved, check_interfaces};
+pub use index::{DependencyInterfaces, PhaseTwo, Unresolved, UnresolvedCitation, check_interfaces};
 pub use read::read_modules;
 pub use report::CHECK_REPORT_SCHEMA;
 pub use writer::{Difference, GeneratedWriter, WriteError};

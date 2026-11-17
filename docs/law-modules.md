@@ -618,7 +618,8 @@ with a dot is an error.
 - Each dependency of a curated workspace names a generated workspace with
   its `name`, its directory `path`, relative to the manifest's directory
   with `/` between its segments, its `release`, and `lock_digest`, the
-  BLAKE3 of the bytes of its lock.
+  BLAKE3 of the bytes of its lock
+  ([Depending on another workspace](#depending-on-another-workspace)).
 - `toolchain` is the version of the toolchain the workspace was last
   checked with.
 
@@ -781,6 +782,8 @@ gives every reference its [outcome](#references).
 | Every `import` of a curated module names a module of the workspace or of a dependency, by its address | `E720` |
 | The names of every curated module resolve, as [Curated modules: imports, citations and names](#curated-modules-imports-citations-and-names) describes | `E200` |
 | No two modules declare one address, as the address of a module, of a provision or of a note | `E700` |
+| Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it | `E730` |
+| Each dependency is a generated workspace with a lock, the BLAKE3 of the bytes of its lock and the release of its lock are the `lock_digest` and the `release` of its entry, and it has no error of its own | `E740` |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
 
 When the directory has no manifest that can be read, that is the one
@@ -794,7 +797,8 @@ for it.
 
 Every diagnostic names its file by its path in the workspace. One about a
 file as a whole, such as a module file the lock does not list or a file of
-the first edition, has no span. One about where a module stands is at its
+the first edition, has no span, and so has one about a dependency, which
+names the manifest, `workspace.json`. One about where a module stands is at its
 address; one about a `within` is at the string after `within`, one about a
 member at the string after that `member`, one about an import at the
 string after `import`, and one about a name at that name. An address that
@@ -831,35 +835,40 @@ ok
 
 `modules` counts the module files read, every `.fr` file of the workspace,
 and `from cache` how many of them were read from the cache rather than
-checked again.
+checked again. The module files of a dependency are counted in neither.
 
 ## How a workspace is checked
 
 The check of a workspace runs in two phases.
 
-1. **Phase one**, for each module file by itself: the BLAKE3 of its bytes,
-   its edition, the grammar, lowering, the checks of
+1. **Phase one**, for each module file by itself, of the workspace and of
+   each of its [dependencies](#depending-on-another-workspace): the BLAKE3
+   of its bytes, its edition, the grammar, lowering, the checks of
    [one module](#what-the-checker-verifies-in-one-module), and the
    module's [interface](#interfaces). What it gives of a file depends on
    the file's bytes alone, so it is kept in the [cache](#the-cache), and a
    file whose bytes were checked before is not checked again.
 2. **Phase two**, with the result of every module in memory: the BLAKE3 of
    each file against the lock of a generated workspace, and where each
-   module stands, below the prefix and at the path of its address. Then,
-   from the manifest and the interfaces alone, the manifest's toolchain,
-   the `within` of every unit and container and the members of every
-   container, the imports and the names of every curated module, the
-   addresses that two modules declare, and the [outcome](#references) of
-   every reference. Phase two
-   reads no module again. `fidryn_driver::workspace::check_interfaces` is
-   that last part as a function of the interfaces of the workspace and of
-   its dependencies, the manifest and the toolchain's version.
+   module stands, below the prefix and at the path of its address; and the
+   check of each dependency by itself. Then, from the manifest and the
+   interfaces alone, the manifest's toolchain, the `within` of every unit
+   and container and the members of every container, the imports and the
+   names of every curated module, the addresses that two modules declare,
+   and the [outcome](#references) of every reference and of every
+   citation. Phase two reads no module again.
+   `fidryn_driver::workspace::check_interfaces` is that last part as a
+   function of the interfaces of the workspace, the prefix and the
+   interfaces of each of its dependencies, the manifest and the
+   toolchain's version.
 
 Phase one runs on `--jobs` worker threads, by default as many as the
 system reports as available, each module file being read and checked on
-one of them. Of phase two, the outcomes of the references are found on as
-many threads, the modules shared out among them; the rest of it, the
-comparison with the lock, where each module stands, the manifest, `within`
+one of them; the module files of each dependency are read on the same
+workers, one dependency after another. Of phase two, the outcomes of the
+references and the citations are found on as many threads, the modules
+shared out among them; the rest of it, the comparison with the lock, where
+each module stands, the checks of each dependency, the manifest, `within`
 and members, imports and names, and the index of addresses the outcomes
 are looked up in, runs on one thread. The diagnostics, the summary line, the check
 report and the unresolved list are the same, byte for byte, for every
@@ -937,14 +946,15 @@ is refused, and the place where the two differ is named.
 `fidryn check DIR --report FILE` writes the check report,
 `fidryn.check-report/v0.1`, whose JSON Schema is
 [`check-report-v0.1.json`](../schemas/check-report-v0.1.json): the number
-of module files read, of those read from a cache, of errors and of
-warnings; for each layer the number of its references with each outcome;
-and the number of references of outcome `outside` by the body of law they
-name. Every layer and every outcome is written, in the order shown, and
-the bodies are sorted. The report holds no path, so it is the same on
-every host. This is the report of an invented workspace that has a
-reference of every outcome, committed under
-`conformance/fixtures/check-report/`:
+of module files of the workspace read, of those read from a cache, of
+errors and of warnings; for each layer the number of its references with
+each outcome; under `citations`, the number of the citations of its
+curated modules with each outcome; and the number of references of
+outcome `outside` by the body of law they name. Every layer and every
+outcome is written, in the order shown, and the bodies are sorted. The
+report holds no path, so it is the same on every host. This is the report
+of an invented workspace that has a reference of every outcome and no
+curated module, committed under `conformance/fixtures/check-report/`:
 
 ```json
 {
@@ -985,6 +995,16 @@ reference of every outcome, committed under
       "malformed": 0
     }
   },
+  "citations": {
+    "exact": 0,
+    "target-status": 0,
+    "ambiguous": 0,
+    "unit-only": 0,
+    "range-form": 0,
+    "no-unit": 0,
+    "outside": 0,
+    "malformed": 0
+  },
   "outside_by_body": {
     "/yy/stat": 2,
     "/zz/other": 2
@@ -993,10 +1013,15 @@ reference of every outcome, committed under
 ```
 
 `fidryn check DIR --unresolved FILE` writes the unresolved list: every
-reference whose outcome is not `exact`, one object of compact JSON to a
-line with the keys `from`, the address the reference stands in, `layer`,
-`target` and `outcome`, in that order, sorted by the bytes of `from` and
-then of `target`. Its first lines for the same workspace:
+reference and every citation whose outcome is not `exact`, one object of
+compact JSON to a line. The line of a reference has the keys `from`, the
+address the reference stands in, `layer`, `target` and `outcome`, in that
+order; the line of a citation has `from`, the address of its module,
+`citation`, its name, `target` and `outcome`. The lines are sorted by the
+bytes of `from`, a reference before a citation of the same `from`, and
+then by the bytes of `target`, and the lines of the citations of one
+module and one target by the citation's name. Its first lines for the same
+workspace:
 
 ```text
 {"from":"/zz/demo/t1/ch1","layer":"editorial","target":"/yy/stat/116/926","outcome":"outside"}
@@ -1072,7 +1097,13 @@ and `/zz/demo/t1/s5~2`, and the containers `/zz/demo/t1` and
 An outcome is never a diagnostic: a reference that reaches nothing does
 not fail the check. The check report counts the references of each layer
 by outcome, and those of outcome `outside` by body; the unresolved list
-names each one whose outcome is not `exact`.
+names each one whose outcome is not `exact`. The target of every citation
+of a curated module gets its outcome by the same rules; the report counts
+the citations by outcome, and the unresolved list names each one whose
+outcome is not `exact`. A reference or a citation whose target lies below
+the prefix of a dependency that failed its checks is left out of both, as
+[Depending on another workspace](#depending-on-another-workspace)
+describes.
 `fidryn_provision::AddressIndex` gives the outcome of a target, and also
 the tree hash of the provision at an address and the enacted-layer hash of
 the unit an address lies in. A lookup of it costs the same however many
@@ -1120,7 +1151,10 @@ keeps no cache: the check then reads and checks every module file and
 writes no entry. The name `.fidryn-cache` begins with a dot, so the check
 does not read it as part of the workspace and the writer of a generated
 workspace leaves it alone; the check writes nothing else into the
-workspace.
+workspace. The module files of the dependencies of a curated workspace are
+read through the same cache, so their entries go into the cache's
+directory of the workspace that is checked, and nothing is written into a
+dependency's directory.
 
 An entry is one line of compact JSON with these keys, in this order:
 `schema`, which is `fidryn.cache/v1`; `key`; `digest`, the BLAKE3 of the
@@ -1241,8 +1275,116 @@ name that enters the set twice, a name in braces that the imported module
 does not cite, or an import of a module that is not there. An import of a
 module file that does not lower, or of a module that does not stand at the
 path of its address, is not reported at all: that file's own diagnostics
-say what is wrong. Whether the address that a citation or a binding names
-is a provision is not checked.
+say what is wrong. The address that a citation names gets an
+[outcome](#references), from the modules of the workspace and of its
+[dependencies](#depending-on-another-workspace), and an outcome is never a
+diagnostic. Whether the address that a binding names is a provision is not
+checked.
+
+## Depending on another workspace
+
+A curated workspace may depend on generated workspaces, so that what its
+modules import and cite below their prefixes is looked up in their
+modules. Each entry of its manifest's `dependencies` names one:
+
+```json
+{
+  "schema": "fidryn.workspace/v0.1",
+  "name": "notes",
+  "kind": "curated",
+  "prefix": "/zz/notes",
+  "toolchain": "0.2.0",
+  "dependencies": [
+    {
+      "name": "demo",
+      "path": "../demo",
+      "release": "42-7",
+      "lock_digest": "<64 hexadecimal digits>"
+    }
+  ]
+}
+```
+
+- `name` names the dependency in diagnostics; no two entries have one.
+- `path` is its directory, relative to the directory of the manifest, with
+  `/` between its segments; an absolute path is refused.
+- `release` and `lock_digest` pin it: the release its lock records, and the
+  BLAKE3 of the bytes of its `law.lock.json`, as 64 lower-case hexadecimal
+  digits. Any change to the lock, such as a new release of the dependency,
+  gives another digest, so the entry names the very release the curated
+  workspace was written against.
+
+The check of the curated workspace takes the entries in their order, and
+an entry that fails one check is not checked further:
+
+| Check | Code |
+| --- | --- |
+| The `path` is relative | `E730` |
+| No entry before it has its `name` | `E730`, naming the paths of both |
+| Its directory holds a generated workspace with a lock | `E740`, saying what it holds instead: no directory, a directory without `workspace.json`, a `workspace.json` that is no manifest, a curated workspace, a generated workspace without a lock, or a lock that cannot be read as one |
+| The BLAKE3 of the bytes of its lock and the release of its lock are the `lock_digest` and the `release` of the entry | `E740`, naming both releases and both digests |
+| Its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it that passed these checks | `E730`, naming the other prefix |
+| It has no error of its own | `E740`, saying how many it has |
+
+The last check is the check of the dependency by itself, as
+`fidryn check` of its directory runs it: by the rules of any workspace, so
+that an entry whose name begins with a dot is not read and no link is
+followed, its files are compared with its lock, and each of its module
+files goes through phase one, on the worker threads of the check and
+through its cache. Its errors, such as a module file that differs from
+the lock, a module that does not check or a file of the first edition,
+are not printed one by one: one `E740` says how many there are, and
+`fidryn check` of the dependency's directory shows them. Its warnings,
+such as a `toolchain` other than the running one, are not reported. A
+generated workspace has no dependencies of its own, so no chain of them is
+followed. Every diagnostic about a dependency names the manifest,
+`workspace.json`, and has no span.
+
+A dependency that passes every check joins phase two: an import may name
+one of its modules, and a reference or a citation whose target lies below
+its prefix gets the outcome that its modules give. A target below no
+prefix of the workspace or of a dependency is `outside`. Of the curated
+module
+
+```fidryn
+edition 2
+module "/zz/notes/a" {
+  import "/zz/demo/t1/s8" as s8
+  citation widget -> "/zz/demo/t1/s8/a"
+  citation part -> "/zz/demo/t1/s8/z"
+}
+```
+
+in a workspace that depends on a generated workspace of the prefix
+`/zz/demo` whose unit `/zz/demo/t1/s8` has a subsection `a`, the import
+names a module of the dependency, `widget` is `exact`, and `part` is
+`unit-only`, the one line of the unresolved list:
+
+```text
+{"from":"/zz/notes/a","citation":"part","target":"/zz/demo/t1/s8/z","outcome":"unit-only"}
+```
+
+A dependency that fails a check gives phase two no interface, only its
+prefix when its manifest could be read. What lies below that prefix, and
+below no prefix of the workspace or of a dependency that passed, is then
+not known: a reference or a citation whose target lies there is left out
+of the counts of the check report and of the unresolved list, and an
+import of a module there is not reported, since the one diagnostic of the
+dependency is the report. The check exits 1. Of a dependency whose
+manifest could not be read nothing is known, not even its prefix, and a
+target that would lie below it is `outside`.
+
+The check writes nothing inside the directory of a dependency, with any
+cache or with none: the entries of the module files of a dependency go
+into the cache of the workspace that is checked, by default
+`.fidryn-cache` inside it, under the keys of their bytes as every entry is,
+so that the next check reads them from there.
+
+The summary line and the check report are about the workspace that is
+checked. `modules` and `from cache` count its own module files, and the
+module files of a dependency are counted nowhere; `errors` and `warnings`
+count its own diagnostics, among them the one of each dependency that
+failed.
 
 ## The ingester for the United States Code
 

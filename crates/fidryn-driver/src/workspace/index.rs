@@ -1,5 +1,6 @@
 //! Phase two of the check of a workspace: the checks across its modules, and
-//! the outcome of every reference, from the interfaces of the modules alone.
+//! the outcome of every reference and of every citation, from the interfaces
+//! of the modules of the workspace and of its dependencies alone.
 
 use super::MANIFEST_FILE;
 use fidryn_check::e2::names::resolve;
@@ -27,6 +28,31 @@ pub struct Unresolved {
     pub outcome: Outcome,
 }
 
+/// A citation of a curated module whose outcome is not `exact`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UnresolvedCitation {
+    /// The address of the module that declares the citation.
+    pub from: Address,
+    /// The citation's name.
+    pub citation: String,
+    pub target: Address,
+    pub outcome: Outcome,
+}
+
+/// A workspace that the checked one depends on, as phase two knows it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DependencyInterfaces {
+    pub prefix: Address,
+    /// The interfaces of its modules; `None` when the dependency failed its
+    /// checks. Then nothing is known below its prefix but what lies below
+    /// the prefix of the workspace or of a dependency that did not fail: a
+    /// citation or a reference whose target lies elsewhere below it is left
+    /// out of the counts and of the unresolved lists, and an import of a
+    /// module there is not reported, since the diagnostic of the dependency
+    /// says what is wrong.
+    pub interfaces: Option<Vec<Interface>>,
+}
+
 /// What phase two gives.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhaseTwo {
@@ -42,6 +68,12 @@ pub struct PhaseTwo {
     /// Every reference whose outcome is not `exact`, sorted by the address
     /// it stands in, then by its target.
     pub unresolved: Vec<Unresolved>,
+    /// The number of citations of the curated modules with each outcome, by
+    /// the outcome's name; every name is present.
+    pub citations: BTreeMap<String, u64>,
+    /// Every citation whose outcome is not `exact`, sorted by the address of
+    /// its module, then by its target and its name.
+    pub unresolved_citations: Vec<UnresolvedCitation>,
 }
 
 /// Counts of every layer and every outcome, all zero.
@@ -58,9 +90,17 @@ pub(crate) fn no_references() -> BTreeMap<Layer, BTreeMap<String, u64>> {
         .collect()
 }
 
+/// Counts of every outcome, all zero.
+pub(crate) fn no_citations() -> BTreeMap<String, u64> {
+    Outcome::NAMES
+        .into_iter()
+        .map(|name| (name.to_owned(), 0))
+        .collect()
+}
+
 /// Phase two of the check of a workspace whose manifest is `manifest`, run
 /// by the toolchain of version `toolchain`, as a function of the interfaces
-/// of its modules, `interfaces`, and of those of its dependencies,
+/// of its modules, `interfaces`, and of what is known of its dependencies,
 /// `dependencies`:
 ///
 /// - the manifest's `toolchain` is `toolchain` (`W760`); a generated
@@ -70,28 +110,38 @@ pub(crate) fn no_references() -> BTreeMap<Layer, BTreeMap<String, u64>> {
 ///   workspace that lists it as a member, and every member of a container
 ///   is a module whose `within` is that container (`E720`);
 /// - every import of a curated module names a module of `interfaces` or of
-///   `dependencies` (`E720`), and the names of the curated module resolve
+///   a dependency (`E720`), and the names of the curated module resolve
 ///   ([`resolve`]; `E200`);
 /// - no two modules of the workspace declare one address, as the address of
 ///   a module, a provision or a note: each module after the first by path
 ///   that declares it is reported (`E700`), at its address when the address
 ///   is its own, and otherwise without a span;
-/// - the outcome of every reference of the workspace, against an index of
-///   the addresses of `interfaces` and `dependencies` below the manifest's
-///   prefix.
+/// - the outcome of every reference of the workspace and of every citation
+///   of its curated modules, against an index of the addresses of
+///   `interfaces` and of the dependencies, below the manifest's prefix and
+///   theirs.
+///
+/// What lies below the prefix of a dependency that failed, and below no
+/// prefix of the workspace or of a dependency that did not, is not known: a
+/// reference or a citation whose target lies there is left out of the
+/// counts and of the unresolved lists, and an import of a module there that
+/// is not found is not reported.
 ///
 /// Each module is taken to stand at the path of its address, which names
 /// its file in a diagnostic. The result is the same for any order of
-/// `interfaces` in which no two declare one address of a module, a
-/// provision or a note, or one alias, since a reference to such an address
-/// or alias reaches the interface that comes first.
+/// `interfaces`, of `dependencies` and of the interfaces of each, in which
+/// no two modules declare one address of a module, a provision or a note,
+/// or one alias, since a reference to such an address or alias reaches the
+/// interface that comes first, and in which no two of the prefixes of the
+/// workspace and of its dependencies overlap.
 /// [`check_workspace`](super::check_workspace) runs the same, with the
-/// interfaces of the modules that stand at their paths, on several threads,
-/// and also names the module files that gave none, so that nothing that
-/// names one of them is reported again.
+/// interfaces of the modules that stand at their paths and those of the
+/// dependencies it loaded, on several threads, and also names the module
+/// files that gave none, so that nothing that names one of them is reported
+/// again.
 pub fn check_interfaces(
     interfaces: &[Interface],
-    dependencies: &[Interface],
+    dependencies: &[DependencyInterfaces],
     manifest: &Manifest,
     toolchain: &str,
 ) -> PhaseTwo {
@@ -109,22 +159,35 @@ pub fn check_interfaces(
 /// gave no interface, on `jobs` threads.
 pub(crate) fn across(
     interfaces: &[Interface],
-    dependencies: &[Interface],
+    dependencies: &[DependencyInterfaces],
     manifest: &Manifest,
     toolchain: &str,
     unread: &BTreeSet<String>,
     jobs: usize,
 ) -> PhaseTwo {
-    let mut diagnostics = of_manifest(manifest, toolchain);
-    diagnostics.extend(hierarchy(interfaces, unread));
-    diagnostics.extend(curated(interfaces, dependencies, unread));
-    let index = AddressIndex::build(
-        interfaces.iter().chain(dependencies),
-        std::slice::from_ref(&manifest.prefix),
+    let loaded: Vec<&Interface> = dependencies
+        .iter()
+        .filter_map(|dependency| dependency.interfaces.as_deref())
+        .flatten()
+        .collect();
+    let mut known = vec![manifest.prefix.clone()];
+    let mut failed = Vec::new();
+    for dependency in dependencies {
+        match dependency.interfaces {
+            Some(_) => known.push(dependency.prefix.clone()),
+            None => failed.push(&dependency.prefix),
+        }
+    }
+    let unknown = Unknown {
+        known: &known,
+        failed,
+    };
+    let index = AddressIndex::build(interfaces.iter().chain(loaded.iter().copied()), &known);
+    let mut diagnostics = checks(
+        interfaces, &loaded, manifest, toolchain, unread, &index, &unknown,
     );
-    diagnostics.extend(declared_twice(&index, interfaces));
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
-    let counted = outcomes(interfaces, &index, jobs);
+    let counted = outcomes(interfaces, &index, &unknown, jobs);
     let mut references = no_references();
     for (layer, counts) in LAYERS.into_iter().zip(counted.references) {
         let names = references.get_mut(&layer).expect("every layer is counted");
@@ -132,12 +195,91 @@ pub(crate) fn across(
             *names.get_mut(name).expect("every outcome is counted") = count;
         }
     }
+    let citations = Outcome::NAMES
+        .into_iter()
+        .zip(counted.citations)
+        .map(|(name, count)| (name.to_owned(), count))
+        .collect();
     PhaseTwo {
         diagnostics,
         references,
         outside_by_body: counted.outside_by_body,
         unresolved: counted.unresolved,
+        citations,
+        unresolved_citations: counted.unresolved_citations,
     }
+}
+
+/// The diagnostics of phase two of a workspace that has no dependencies,
+/// such as a generated workspace: those of [`check_interfaces`], without
+/// the outcomes. The check of a dependency runs this on its modules, so
+/// that it finds what `fidryn check` of the dependency's directory finds.
+pub(crate) fn own_checks(
+    interfaces: &[Interface],
+    manifest: &Manifest,
+    toolchain: &str,
+    unread: &BTreeSet<String>,
+) -> Vec<Diagnostic> {
+    let index = AddressIndex::build(interfaces, std::slice::from_ref(&manifest.prefix));
+    let unknown = Unknown {
+        known: &[],
+        failed: Vec::new(),
+    };
+    checks(
+        interfaces,
+        &[],
+        manifest,
+        toolchain,
+        unread,
+        &index,
+        &unknown,
+    )
+}
+
+/// The checks of phase two that give diagnostics, with `dependencies` the
+/// interfaces of the dependencies that were loaded, and `index` that of the
+/// addresses of `interfaces` and `dependencies`.
+fn checks(
+    interfaces: &[Interface],
+    dependencies: &[&Interface],
+    manifest: &Manifest,
+    toolchain: &str,
+    unread: &BTreeSet<String>,
+    index: &AddressIndex,
+    unknown: &Unknown<'_>,
+) -> Vec<Diagnostic> {
+    let mut diagnostics = of_manifest(manifest, toolchain);
+    diagnostics.extend(hierarchy(interfaces, unread));
+    diagnostics.extend(curated(interfaces, dependencies, unread, unknown));
+    diagnostics.extend(declared_twice(index, interfaces));
+    diagnostics
+}
+
+/// Where nothing is known: below the prefix of a dependency that failed,
+/// and below no prefix of the workspace or of a dependency that did not.
+struct Unknown<'a> {
+    /// The prefixes of the workspace and of the dependencies that did not
+    /// fail.
+    known: &'a [Address],
+    /// The prefixes of the dependencies that failed.
+    failed: Vec<&'a Address>,
+}
+
+impl Unknown<'_> {
+    /// Whether `target` lies where nothing is known.
+    fn holds(&self, target: &str) -> bool {
+        !self.failed.is_empty()
+            && self.failed.iter().any(|prefix| lies_below(target, prefix))
+            && !self.known.iter().any(|prefix| lies_below(target, prefix))
+    }
+}
+
+/// Whether `target` lies below `prefix`: is it, or continues it at a
+/// segment boundary.
+fn lies_below(target: &str, prefix: &Address) -> bool {
+    target
+        .strip_prefix(prefix.as_str())
+        .is_some_and(|rest| rest.is_empty() || rest.starts_with('/'))
 }
 
 /// The key the diagnostics of a report are sorted by: the file, the
@@ -329,15 +471,17 @@ fn hierarchy(interfaces: &[Interface], unread: &BTreeSet<String>) -> Vec<Diagnos
 /// The checks of the imports and of the names of each curated module of
 /// `interfaces`: an import names a module of `interfaces` or of
 /// `dependencies` (`E720`, at its address), and the module's names resolve
-/// ([`resolve`]). An import of a module file that gave no interface is not
-/// reported again, and nothing is resolved through it.
+/// ([`resolve`]). An import of a module file that gave no interface, and
+/// one of a module where nothing is known, are not reported again, and
+/// nothing is resolved through them.
 fn curated(
     interfaces: &[Interface],
-    dependencies: &[Interface],
+    dependencies: &[&Interface],
     unread: &BTreeSet<String>,
+    unknown: &Unknown<'_>,
 ) -> Vec<Diagnostic> {
     let importable = Modules::new(
-        interfaces.iter().chain(dependencies),
+        interfaces.iter().chain(dependencies.iter().copied()),
         unread,
         "is no module of the workspace or of a dependency",
     );
@@ -350,7 +494,9 @@ fn curated(
         let file = module_path(&interface.address);
         for import in &interface.imports {
             let named = &import.item.module;
-            if let Err(Some(why)) = importable.get(named) {
+            if let Err(Some(why)) = importable.get(named)
+                && !unknown.holds(named.as_str())
+            {
                 out.push(
                     Diagnostic::new(
                         DiagnosticCode::E720,
@@ -411,7 +557,8 @@ fn declared_twice(index: &AddressIndex, interfaces: &[Interface]) -> Vec<Diagnos
     out
 }
 
-/// The outcomes of the references of some modules, counted.
+/// The outcomes of the references and of the citations of some modules,
+/// counted.
 #[derive(Default)]
 struct Counted {
     /// By layer, in the order of [`LAYERS`], and by outcome, in the order of
@@ -419,6 +566,17 @@ struct Counted {
     references: [[u64; 8]; 3],
     outside_by_body: BTreeMap<String, u64>,
     unresolved: Vec<Unresolved>,
+    /// By outcome, in the order of [`Outcome::NAMES`].
+    citations: [u64; 8],
+    unresolved_citations: Vec<UnresolvedCitation>,
+}
+
+/// The place of the name of `outcome` in [`Outcome::NAMES`].
+fn place_of(outcome: &Outcome) -> usize {
+    Outcome::NAMES
+        .iter()
+        .position(|name| *name == outcome.name())
+        .expect("every outcome has a name")
 }
 
 impl Counted {
@@ -432,20 +590,25 @@ impl Counted {
             *self.outside_by_body.entry(body).or_default() += count;
         }
         self.unresolved.extend(other.unresolved);
+        for (count, more) in self.citations.iter_mut().zip(other.citations) {
+            *count += more;
+        }
+        self.unresolved_citations.extend(other.unresolved_citations);
     }
 
-    fn of(&mut self, interface: &Interface, index: &AddressIndex) {
+    /// Counts the references and the citations of `interface`, but for
+    /// those whose target lies where nothing is known.
+    fn of(&mut self, interface: &Interface, index: &AddressIndex, unknown: &Unknown<'_>) {
         for reference in &interface.references {
+            if unknown.holds(&reference.target) {
+                continue;
+            }
             let outcome = index.outcome(&reference.target);
             let layer = LAYERS
                 .iter()
                 .position(|layer| *layer == reference.layer)
                 .expect("a reference has one of the three layers");
-            let name = Outcome::NAMES
-                .iter()
-                .position(|name| *name == outcome.name())
-                .expect("every outcome has a name");
-            self.references[layer][name] += 1;
+            self.references[layer][place_of(&outcome)] += 1;
             if let Outcome::Outside(body) = &outcome {
                 *self.outside_by_body.entry(body.clone()).or_default() += 1;
             }
@@ -458,13 +621,34 @@ impl Counted {
                 });
             }
         }
+        for citation in &interface.citations {
+            let target = &citation.item.target;
+            if unknown.holds(target.as_str()) {
+                continue;
+            }
+            let outcome = index.outcome(target.as_str());
+            self.citations[place_of(&outcome)] += 1;
+            if outcome != Outcome::Exact {
+                self.unresolved_citations.push(UnresolvedCitation {
+                    from: interface.address.clone(),
+                    citation: citation.item.name.clone(),
+                    target: target.clone(),
+                    outcome,
+                });
+            }
+        }
     }
 }
 
-/// The outcome of every reference of `interfaces`, on `jobs` threads. The
-/// result is the same for any number of them: the counts are sums, and the
-/// unresolved references are sorted.
-fn outcomes(interfaces: &[Interface], index: &AddressIndex, jobs: usize) -> Counted {
+/// The outcome of every reference and of every citation of `interfaces`,
+/// on `jobs` threads. The result is the same for any number of them: the
+/// counts are sums, and the unresolved references and citations are sorted.
+fn outcomes(
+    interfaces: &[Interface],
+    index: &AddressIndex,
+    unknown: &Unknown<'_>,
+    jobs: usize,
+) -> Counted {
     let next = AtomicUsize::new(0);
     let work = || {
         let mut counted = Counted::default();
@@ -473,7 +657,7 @@ fn outcomes(interfaces: &[Interface], index: &AddressIndex, jobs: usize) -> Coun
             let Some(interface) = interfaces.get(at) else {
                 break;
             };
-            counted.of(interface, index);
+            counted.of(interface, index, unknown);
         }
         counted
     };
@@ -492,6 +676,14 @@ fn outcomes(interfaces: &[Interface], index: &AddressIndex, jobs: usize) -> Coun
     };
     counted.unresolved.sort_by(|a, b| {
         (&a.from, &a.target, a.layer, &a.outcome).cmp(&(&b.from, &b.target, b.layer, &b.outcome))
+    });
+    counted.unresolved_citations.sort_by(|a, b| {
+        (&a.from, &a.target, &a.citation, &a.outcome).cmp(&(
+            &b.from,
+            &b.target,
+            &b.citation,
+            &b.outcome,
+        ))
     });
     counted
 }

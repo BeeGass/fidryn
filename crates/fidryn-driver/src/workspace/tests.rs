@@ -5,8 +5,8 @@
 use super::cache::Cache;
 use super::discover::walk;
 use super::{
-    CheckOptions, GeneratedWriter, Unresolved, WorkspaceReport, WriteError, check_interfaces,
-    check_workspace,
+    CheckOptions, DependencyInterfaces, GeneratedWriter, Unresolved, UnresolvedCitation,
+    WorkspaceReport, WriteError, check_interfaces, check_workspace,
 };
 use fidryn_check::e2::lower;
 use fidryn_check::e2::names::{ResolvedBinding, resolve};
@@ -2960,5 +2960,702 @@ fn range_of(span: Span) -> ByteRange {
     ByteRange {
         start: span.start,
         end: span.end,
+    }
+}
+
+// Dependencies. A curated workspace of the prefix `/zz/notes`, in `notes/`
+// of a scratch directory, depends on the generated workspace of the prefix
+// `/zz/demo` in `demo/` beside it, named `demo` at `../demo`.
+
+/// The models of the dependency: the demo models, and the unit `s8` of the
+/// chapter, with the subsection `a`.
+fn dependency_models() -> Vec<Module> {
+    let mut models = demo_models();
+    container_at(&mut models, 1)
+        .members
+        .push(address("/zz/demo/t1/s8"));
+    let mut s8 = unit(
+        "/zz/demo/t1/s8",
+        Some(CHAPTER),
+        "8",
+        "Parts",
+        "A widget has invented parts.",
+    );
+    s8.root.items.push(subsection(
+        "/zz/demo/t1/s8",
+        vec![Block::Para(plain("An invented subsection."))],
+    ));
+    models.push(Module::Unit(s8));
+    models
+}
+
+/// The BLAKE3 of the bytes of the lock of the workspace in `dir`.
+fn lock_digest_of(dir: &Path) -> Hash32 {
+    let bytes = fs::read(dir.join("law.lock.json")).expect("read the lock");
+    Hash32(*blake3::hash(&bytes).as_bytes())
+}
+
+/// Writes the generated workspace of `manifest` and `models` into `out`,
+/// and gives the BLAKE3 of the bytes of its lock.
+fn write_generated(out: &Path, manifest: Manifest, models: &[Module]) -> Hash32 {
+    let writer = create(out, manifest);
+    for model in models {
+        writer
+            .write(model)
+            .unwrap_or_else(|error| panic!("write: {error}"));
+    }
+    finish(writer);
+    lock_digest_of(out)
+}
+
+/// Writes the generated workspace of the prefix `/zz/demo`, of the release
+/// `release`, and `models` into `out`, and gives the digest of its lock.
+fn write_release(out: &Path, release: &str, models: &[Module]) -> Hash32 {
+    let manifest = Manifest {
+        release: Some(release.to_owned()),
+        ..demo_manifest()
+    };
+    write_generated(out, manifest, models)
+}
+
+/// The entry of the dependency `name` at `path`, pinned to `release` and
+/// the lock digest `lock_digest`.
+fn dependency(name: &str, path: &str, release: &str, lock_digest: Hash32) -> Dependency {
+    Dependency {
+        name: name.to_owned(),
+        path: path.to_owned(),
+        release: release.to_owned(),
+        lock_digest,
+    }
+}
+
+/// Writes into `out` the curated workspace of the prefix `/zz/notes` with
+/// `dependencies`, and each `(name, text)` of `modules` at
+/// `zz/notes/<name>.fr`.
+fn depending(out: &Path, dependencies: Vec<Dependency>, modules: &[(&str, &str)]) {
+    fs::create_dir_all(out).expect("create the workspace's directory");
+    let manifest = Manifest {
+        dependencies,
+        ..notes_manifest()
+    };
+    fs::write(out.join("workspace.json"), manifest.to_json()).expect("write");
+    for (name, text) in modules {
+        put(out, &format!("zz/notes/{name}.fr"), text);
+    }
+}
+
+/// A scratch directory with the dependency in `demo/`, of the release
+/// `42-7`, and the curated workspace of `modules` in `notes/`, which depends
+/// on it.
+fn with_dependency(tag: &str, modules: &[(&str, &str)]) -> Scratch {
+    let scratch = Scratch::new(tag);
+    let digest = write_release(&scratch.join("demo"), "42-7", &dependency_models());
+    depending(
+        &scratch.join("notes"),
+        vec![dependency("demo", "../demo", "42-7", digest)],
+        modules,
+    );
+    scratch
+}
+
+/// The count of each outcome of the citations of `report` that is not 0, in
+/// the order of the outcomes.
+fn citation_counts(citations: &BTreeMap<String, u64>) -> Vec<(&str, u64)> {
+    Outcome::NAMES
+        .into_iter()
+        .map(|name| (name, citations[name]))
+        .filter(|(_, count)| *count > 0)
+        .collect()
+}
+
+/// Asserts that `report` has one diagnostic, of `code`, about the manifest
+/// as a whole, and that its message holds each of `words`.
+fn about_the_manifest(report: &WorkspaceReport, code: DiagnosticCode, words: &[&str]) {
+    let diagnostic = only(report);
+    assert_eq!(diagnostic.code, code, "{diagnostic:#?}");
+    assert_eq!(
+        diagnostic.source_file.as_deref(),
+        Some("workspace.json"),
+        "{diagnostic:#?}"
+    );
+    assert_eq!(diagnostic.primary_span, None, "{diagnostic:#?}");
+    for word in words {
+        assert!(
+            diagnostic.message.contains(word),
+            "{word:?} is not in {:?}",
+            diagnostic.message
+        );
+    }
+}
+
+/// The keys of the check report of `report`, in their order.
+fn report_keys(report: &WorkspaceReport) -> Vec<String> {
+    let value: serde_json::Value = serde_json::from_str(&report.to_json()).expect("JSON");
+    value
+        .as_object()
+        .expect("an object")
+        .keys()
+        .cloned()
+        .collect()
+}
+
+#[test]
+fn a_curated_workspace_cites_its_dependency_and_checks_clean() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/demo/t1/s8\" as s8",
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+            &binding("widget_binding", "widget"),
+        ],
+    );
+    let scratch = with_dependency("deps-clean", &[("a", &a)]);
+    let report = check(&scratch.join("notes"));
+    assert_eq!(report.diagnostics, []);
+    assert_eq!(citation_counts(&report.citations), [("exact", 1)]);
+    assert_eq!(report.unresolved_citations, []);
+    assert_eq!(report.unresolved_lines(), "");
+    // Only the module files of the workspace itself are counted.
+    assert_eq!(
+        report.summary(),
+        "modules: 1; from cache: 0; errors: 0; warnings: 0"
+    );
+    assert_eq!(
+        report_keys(&report),
+        [
+            "schema",
+            "modules",
+            "from_cache",
+            "errors",
+            "warnings",
+            "references",
+            "citations",
+            "outside_by_body"
+        ]
+    );
+    assert!(
+        report
+            .to_json()
+            .contains("\"citations\": {\n    \"exact\": 1,\n    \"target-status\": 0,"),
+        "{}",
+        report.to_json()
+    );
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn a_different_release_is_E740_and_names_both() {
+    let scratch = Scratch::new("deps-release");
+    let pinned = write_release(&scratch.join("r1"), "r1", &dependency_models());
+    // A copy regenerated as `r2`, with one word changed.
+    let mut models = dependency_models();
+    *unit_at(&mut models, 2) = unit(
+        "/zz/demo/t1/s1",
+        Some(CHAPTER),
+        "1",
+        "Definitions",
+        "In this invented chapter, a widget is a tiny device.",
+    );
+    let found = write_release(&scratch.join("demo"), "r2", &models);
+    assert_ne!(pinned, found);
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/demo/t1/s8\" as s8",
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+        ],
+    );
+    // Pinned to the other release and digest, to the other release, and to
+    // the other digest.
+    let pins = [("r1", pinned), ("r1", found), ("r2", pinned)];
+    for (n, (release, digest)) in pins.into_iter().enumerate() {
+        let notes = scratch.join(&format!("notes-{n}"));
+        depending(
+            &notes,
+            vec![dependency("demo", "../demo", release, digest)],
+            &[("a", &a)],
+        );
+        let report = check(&notes);
+        about_the_manifest(
+            &report,
+            DiagnosticCode::E740,
+            &[
+                "the dependency `demo` at `../demo`",
+                &format!("is pinned to the release `{release}` and the lock digest `{digest}`"),
+                &format!("its lock is of the release `r2` and has the digest `{found}`"),
+            ],
+        );
+        assert_eq!(report.errors(), 1);
+        // The import and the citation into the dependency are not reported
+        // again, and the citation is not counted.
+        assert_eq!(citation_counts(&report.citations), []);
+        assert_eq!(report.unresolved_lines(), "");
+    }
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn a_missing_directory_and_a_dependency_without_a_lock_are_E740() {
+    let scratch = Scratch::new("deps-not-generated");
+    let digest = write_release(&scratch.join("demo"), "42-7", &dependency_models());
+    put(scratch.path(), "a-file", "An invented file.\n");
+    fs::create_dir_all(scratch.join("empty")).expect("create a directory");
+    put(&scratch.join("not-manifest"), "workspace.json", "{}\n");
+    put(
+        &scratch.join("curated"),
+        "workspace.json",
+        &curated_manifest().to_json(),
+    );
+    write_release(&scratch.join("no-lock"), "42-7", &dependency_models());
+    fs::remove_file(scratch.join("no-lock/law.lock.json")).expect("remove the lock");
+    write_release(&scratch.join("bad-lock"), "42-7", &dependency_models());
+    put(
+        &scratch.join("bad-lock"),
+        "law.lock.json",
+        "{\n  \"schema\": \"fidryn.law-lock/v0.1\"\n}\n",
+    );
+    // Each directory, what the message says of it, and whether its prefix
+    // is known: a citation below the prefix of a dependency that failed is
+    // left out, and one below no known prefix is `outside`.
+    let cases = [
+        ("nothing", "and there is no directory there", false),
+        ("a-file", "and there is no directory there", false),
+        ("empty", "which holds no `workspace.json`", false),
+        (
+            "not-manifest",
+            "whose `workspace.json` is no manifest",
+            false,
+        ),
+        (
+            "curated",
+            "which holds a curated workspace, and a dependency is a generated workspace",
+            true,
+        ),
+        (
+            "no-lock",
+            "which holds a generated workspace without a lock, `law.lock.json`",
+            true,
+        ),
+        ("bad-lock", "whose `law.lock.json` is no lock", true),
+    ];
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    for (dir, words, known) in cases {
+        let notes = scratch.join(&format!("notes-{dir}"));
+        let path = format!("../{dir}");
+        depending(
+            &notes,
+            vec![dependency("demo", &path, "42-7", digest)],
+            &[("a", &a)],
+        );
+        let report = check(&notes);
+        about_the_manifest(
+            &report,
+            DiagnosticCode::E740,
+            &[
+                &format!("the dependency `demo` names the directory `{path}`, "),
+                words,
+            ],
+        );
+        let counts = citation_counts(&report.citations);
+        if known {
+            assert_eq!(counts, [], "{dir}");
+        } else {
+            assert_eq!(counts, [("outside", 1)], "{dir}");
+        }
+    }
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn overlapping_prefixes_and_an_absolute_path_are_E730() {
+    let scratch = Scratch::new("deps-overlap");
+    let digest = write_release(&scratch.join("demo"), "42-7", &dependency_models());
+    let demo = || dependency("demo", "../demo", "42-7", digest);
+    let tail = "; no prefix of a workspace and of its dependencies is, contains or lies within \
+                another";
+
+    // The prefix of the dependency and that of the workspace.
+    let relations = [
+        ("/zz/demo", "which is also the prefix of this workspace"),
+        (
+            "/zz",
+            "which lies within the prefix `/zz` of this workspace",
+        ),
+        (
+            "/zz/demo/t1",
+            "which contains the prefix `/zz/demo/t1` of this workspace",
+        ),
+    ];
+    for (n, (prefix, words)) in relations.into_iter().enumerate() {
+        let notes = scratch.join(&format!("notes-{n}"));
+        fs::create_dir_all(&notes).expect("create the workspace's directory");
+        let manifest = Manifest {
+            prefix: address(prefix),
+            dependencies: vec![demo()],
+            ..notes_manifest()
+        };
+        fs::write(notes.join("workspace.json"), manifest.to_json()).expect("write");
+        about_the_manifest(
+            &check(&notes),
+            DiagnosticCode::E730,
+            &[
+                "the dependency `demo` has the prefix `/zz/demo`, ",
+                words,
+                tail,
+            ],
+        );
+    }
+
+    // Two dependencies: the later is reported, naming the earlier, which is
+    // looked up as before.
+    let copy = write_release(&scratch.join("copy"), "42-7", &dependency_models());
+    let wide_manifest = Manifest {
+        name: "wide".to_owned(),
+        prefix: address("/zz"),
+        ..demo_manifest()
+    };
+    let wide = write_generated(&scratch.join("wide"), wide_manifest, &dependency_models());
+    // A citation below the prefix of `demo` is looked up there; one below
+    // the prefix of the dependency that failed and below no other is left
+    // out, and one below no prefix at all is `outside`.
+    let cites = note_module(
+        "a",
+        &[
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+            "citation other -> \"/zz/other/x\"",
+        ],
+    )
+    .replace("/zz/notes/a", "/yy/notes/a");
+    let others = [
+        (
+            dependency("copy", "../copy", "42-7", copy),
+            "the dependency `copy` has the prefix `/zz/demo`, which is also the prefix of the \
+             dependency `demo`",
+            vec![("exact", 1), ("outside", 1)],
+        ),
+        (
+            dependency("wide", "../wide", "42-7", wide),
+            "the dependency `wide` has the prefix `/zz`, which contains the prefix `/zz/demo` of \
+             the dependency `demo`",
+            vec![("exact", 1)],
+        ),
+    ];
+    for (other, words, counts) in others {
+        let notes = scratch.join(&format!("notes-{}", other.name));
+        fs::create_dir_all(&notes).expect("create the workspace's directory");
+        let manifest = Manifest {
+            prefix: address("/yy/notes"),
+            dependencies: vec![demo(), other],
+            ..notes_manifest()
+        };
+        fs::write(notes.join("workspace.json"), manifest.to_json()).expect("write");
+        put(&notes, "yy/notes/a.fr", &cites);
+        let report = check(&notes);
+        about_the_manifest(&report, DiagnosticCode::E730, &[words, tail]);
+        assert_eq!(citation_counts(&report.citations), counts);
+    }
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+
+    // A path that is absolute.
+    let absolute = scratch.join("demo").display().to_string();
+    let notes = scratch.join("notes-absolute");
+    depending(
+        &notes,
+        vec![dependency("demo", &absolute, "42-7", digest)],
+        &[("a", &a)],
+    );
+    about_the_manifest(
+        &check(&notes),
+        DiagnosticCode::E730,
+        &[&format!(
+            "the dependency `demo` has the path `{absolute}`, which is absolute, and the path of \
+             a dependency is relative to the directory of the manifest"
+        )],
+    );
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn two_dependencies_of_one_name_are_E730() {
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    let scratch = with_dependency("deps-one-name", &[("a", &a)]);
+    let copy = write_release(&scratch.join("copy"), "42-7", &dependency_models());
+    let notes = scratch.join("notes");
+    let digest = lock_digest_of(&scratch.join("demo"));
+    depending(
+        &notes,
+        vec![
+            dependency("demo", "../demo", "42-7", digest),
+            dependency("demo", "../copy", "42-7", copy),
+        ],
+        &[("a", &a)],
+    );
+    let report = check(&notes);
+    about_the_manifest(
+        &report,
+        DiagnosticCode::E730,
+        &[
+            "the dependency `demo` is listed twice, at `../demo` and at `../copy`, and each \
+           dependency has a name of its own",
+        ],
+    );
+    // The first is looked up as before.
+    assert_eq!(citation_counts(&report.citations), [("exact", 1)]);
+}
+
+#[test]
+fn a_dependency_with_an_error_is_reported_once() {
+    let scratch = Scratch::new("deps-own-error");
+    let demo = scratch.join("demo");
+    // A dependency last checked with another toolchain, a warning, with a
+    // module file changed since its lock was written and a file of the
+    // first edition, errors.
+    let manifest = Manifest {
+        toolchain: "0.0.1".to_owned(),
+        ..demo_manifest()
+    };
+    let digest = write_generated(&demo, manifest, &dependency_models());
+    let rel = "zz/demo/t1/s2.fr";
+    put(
+        &demo,
+        rel,
+        &read(&demo, rel).replacen("small or large", "small, medium or large", 1),
+    );
+    put(
+        &demo,
+        "zz/demo/t1/old.fr",
+        "module Demo.Old version \"0.1.0\" {\n}\n",
+    );
+    let own = check(&demo);
+    let errors = own.errors();
+    assert!(errors >= 3, "{own:#?}");
+    assert_eq!(own.warnings(), 1, "{own:#?}");
+
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/demo/t1/s99\" as gone",
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+        ],
+    );
+    let notes = scratch.join("notes");
+    depending(
+        &notes,
+        vec![dependency("demo", "../demo", "42-7", digest)],
+        &[("a", &a)],
+    );
+    let report = check(&notes);
+    about_the_manifest(
+        &report,
+        DiagnosticCode::E740,
+        &[&format!(
+            "the dependency `demo` at `../demo` has {errors} errors of its own, which `fidryn \
+             check` of its directory shows"
+        )],
+    );
+    assert_eq!((report.errors(), report.warnings()), (1, 0));
+    assert_eq!(citation_counts(&report.citations), []);
+    assert_eq!(report.unresolved_lines(), "");
+
+    // Phase two leaves out what lies below the prefix of a dependency that
+    // failed, and reports no import into it.
+    let failed = DependencyInterfaces {
+        prefix: address("/zz/demo"),
+        interfaces: None,
+    };
+    let phase_two = check_interfaces(
+        &[interface_of_text(&a)],
+        &[failed],
+        &notes_manifest(),
+        TOOLCHAIN,
+    );
+    assert_eq!(phase_two.diagnostics, []);
+    assert_eq!(citation_counts(&phase_two.citations), []);
+    assert_eq!(phase_two.unresolved_citations, []);
+}
+
+#[test]
+fn references_into_a_dependency_get_outcomes() {
+    let scratch = Scratch::new("deps-outcomes");
+    let demo_digest = write_release(&scratch.join("demo"), "42-7", &dependency_models());
+    // A second dependency, of the prefix `/zz/more`, with one container.
+    let more_models = [Module::Container(container(
+        "/zz/more/t1",
+        None,
+        "title",
+        "Title 1—",
+        "More Invented Things",
+        &[],
+    ))];
+    let more_manifest = Manifest {
+        name: "more".to_owned(),
+        prefix: address("/zz/more"),
+        ..demo_manifest()
+    };
+    let more_digest = write_generated(&scratch.join("more"), more_manifest, &more_models);
+    let a = note_module(
+        "a",
+        &[
+            "citation widget -> \"/zz/demo/t1/s8/a\"",
+            "citation part -> \"/zz/demo/t1/s8/z\"",
+            "citation title -> \"/zz/demo/t9\"",
+            "citation more -> \"/zz/more/t1\"",
+            "citation sibling -> \"/zz/notes/b\"",
+            "citation other -> \"/zz/other/x\"",
+        ],
+    );
+    let b = note_module("b", &["citation section -> \"/zz/demo/t1/s1\""]);
+    // A unit of the workspace links into the dependency too.
+    let mut s1 = unit("/zz/notes/s1", None, "1", "Notes", "Invented notes.");
+    s1.root.items.push(Item::Part {
+        role: PartRole::Content,
+        blocks: vec![linking(&["/zz/demo/t1/s8/z", "/zz/demo/t9"])],
+    });
+    let s1 = Module::Unit(s1);
+    let s1_text = render(&s1);
+    let notes = scratch.join("notes");
+    let dependencies = vec![
+        dependency("demo", "../demo", "42-7", demo_digest),
+        dependency("more", "../more", "42-7", more_digest),
+    ];
+    depending(
+        &notes,
+        dependencies.clone(),
+        &[("a", &a), ("b", &b), ("s1", &s1_text)],
+    );
+    let report = check(&notes);
+    assert_eq!(report.diagnostics, []);
+    assert_eq!(
+        citation_counts(&report.citations),
+        [
+            ("exact", 4),
+            ("unit-only", 1),
+            ("no-unit", 1),
+            ("outside", 1)
+        ]
+    );
+    let operative = &report.references[&Layer::Operative];
+    assert_eq!((operative["unit-only"], operative["no-unit"]), (1, 1));
+    let unresolved = |citation: &str, target: &str, outcome: Outcome| UnresolvedCitation {
+        from: address("/zz/notes/a"),
+        citation: citation.to_owned(),
+        target: address(target),
+        outcome,
+    };
+    assert_eq!(
+        report.unresolved_citations,
+        [
+            unresolved("part", "/zz/demo/t1/s8/z", Outcome::UnitOnly),
+            unresolved("title", "/zz/demo/t9", Outcome::NoUnit),
+            unresolved(
+                "other",
+                "/zz/other/x",
+                Outcome::Outside("/zz/other".to_owned())
+            ),
+        ]
+    );
+    assert_eq!(
+        report.unresolved_lines(),
+        concat!(
+            r#"{"from":"/zz/notes/a","citation":"part","target":"/zz/demo/t1/s8/z","outcome":"unit-only"}"#,
+            "\n",
+            r#"{"from":"/zz/notes/a","citation":"title","target":"/zz/demo/t9","outcome":"no-unit"}"#,
+            "\n",
+            r#"{"from":"/zz/notes/a","citation":"other","target":"/zz/other/x","outcome":"outside"}"#,
+            "\n",
+            r#"{"from":"/zz/notes/s1","layer":"operative","target":"/zz/demo/t1/s8/z","outcome":"unit-only"}"#,
+            "\n",
+            r#"{"from":"/zz/notes/s1","layer":"operative","target":"/zz/demo/t9","outcome":"no-unit"}"#,
+            "\n",
+        )
+    );
+    assert!(
+        report.to_json().contains(
+            "\"citations\": {\n    \"exact\": 4,\n    \"target-status\": 0,\n    \
+             \"ambiguous\": 0,\n    \"unit-only\": 1,\n    \"range-form\": 0,\n    \
+             \"no-unit\": 1,\n    \"outside\": 1,\n    \"malformed\": 0\n  },"
+        ),
+        "{}",
+        report.to_json()
+    );
+    // The same on eight workers.
+    assert_eq!(check_workspace(&notes, &with_jobs(8)), report);
+
+    // The same from the interfaces, in memory, in any order of the
+    // dependencies and of the modules of each.
+    let own = vec![
+        interface_of_text(&a),
+        interface_of_text(&b),
+        interface_in_memory(&s1),
+    ];
+    let demo: Vec<Interface> = dependency_models()
+        .iter()
+        .map(interface_in_memory)
+        .collect();
+    let more: Vec<Interface> = more_models.iter().map(interface_in_memory).collect();
+    let given = |interfaces: &[Interface], prefix: &str| DependencyInterfaces {
+        prefix: address(prefix),
+        interfaces: Some(interfaces.to_vec()),
+    };
+    let reversed = |interfaces: &[Interface]| interfaces.iter().rev().cloned().collect::<Vec<_>>();
+    let manifest = Manifest {
+        dependencies,
+        ..notes_manifest()
+    };
+    let orders = [
+        (
+            own.clone(),
+            vec![given(&demo, "/zz/demo"), given(&more, "/zz/more")],
+        ),
+        (
+            reversed(&own),
+            vec![
+                given(&more, "/zz/more"),
+                given(&reversed(&demo), "/zz/demo"),
+            ],
+        ),
+    ];
+    for (interfaces, dependencies) in orders {
+        let phase_two = check_interfaces(&interfaces, &dependencies, &manifest, TOOLCHAIN);
+        assert_eq!(phase_two.diagnostics, report.diagnostics);
+        assert_eq!(phase_two.references, report.references);
+        assert_eq!(phase_two.unresolved, report.unresolved);
+        assert_eq!(phase_two.citations, report.citations);
+        assert_eq!(phase_two.unresolved_citations, report.unresolved_citations);
+    }
+}
+
+#[test]
+fn checking_writes_nothing_into_the_dependency() {
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    let scratch = with_dependency("deps-no-write", &[("a", &a)]);
+    let demo = scratch.join("demo");
+    // Entries whose names begin with a dot, which are not the dependency's:
+    // a repository's directory, a file, and a cache directory of its own.
+    put(&demo, ".git/HEAD", "ref: refs/heads/invented\n");
+    put(&demo, ".notes", "Invented notes.\n");
+    put(&demo, ".fidryn-cache/README", "An invented file.\n");
+    let before = tree(&demo);
+    let notes = scratch.join("notes");
+    // The default cache: `.fidryn-cache` in the depending workspace.
+    let cache = notes.join(".fidryn-cache");
+    let uncached = check_workspace(&notes, &with_jobs(2));
+    let first = check_workspace(&notes, &cached(&cache, 2));
+    let second = check_workspace(&notes, &cached(&cache, 2));
+    assert_eq!(tree(&demo), before);
+    assert_eq!(uncached.diagnostics, []);
+    assert_eq!(citation_counts(&uncached.citations), [("exact", 1)]);
+    assert_eq!(first, uncached);
+    // Only the workspace's own module is counted, and read from the cache.
+    assert_eq!((second.modules, second.from_cache), (1, 1));
+    assert_eq!(uncounted(&second), uncached);
+    // The entry of each module file of the dependency is in the cache of
+    // the depending workspace.
+    let keys = Cache::new(&cache, TOOLCHAIN, BUILD);
+    let lock = Lock::from_json(&read(&demo, "law.lock.json")).expect("the lock");
+    assert_eq!(lock.modules.len(), 6);
+    for rel in lock.modules.keys() {
+        let (_, key) = digest_and_key(&keys, &demo, rel);
+        assert!(keys.entry_path(&key).is_file(), "{rel}");
     }
 }

@@ -29,6 +29,20 @@ OUTCOMES = (
     "outside",
     "malformed",
 )
+KEYS = (
+    "schema",
+    "modules",
+    "from_cache",
+    "errors",
+    "warnings",
+    "references",
+    "citations",
+    "outside_by_body",
+)
+# The keys of a line of the unresolved list, in their order: of a reference,
+# and of a citation.
+REFERENCE_LINE = ["from", "layer", "target", "outcome"]
+CITATION_LINE = ["from", "citation", "target", "outcome"]
 
 Change = Callable[[dict[str, Any]], object]
 
@@ -63,9 +77,11 @@ class CheckReportSchema(unittest.TestCase):
         report = load_report()
         self.assertEqual(report["schema"], SCHEMA)
         self.assertEqual(self.errors(report), [])
+        self.assertEqual(list(report), list(KEYS))
         self.assertEqual(list(report["references"]), list(LAYERS))
         for layer in LAYERS:
             self.assertEqual(list(report["references"][layer]), list(OUTCOMES), layer)
+        self.assertEqual(list(report["citations"]), list(OUTCOMES))
         refused = {
             "an unknown key": changed(report, lambda d: d.update(extra=1)),
             "a missing count": changed(report, lambda d: d.pop("warnings")),
@@ -80,6 +96,14 @@ class CheckReportSchema(unittest.TestCase):
             ),
             "a missing outcome": changed(
                 report, lambda d: d["references"]["editorial"].pop("range-form")
+            ),
+            "no citations": changed(report, lambda d: d.pop("citations")),
+            "citations by layer": changed(report, lambda d: d.update(citations=d["references"])),
+            "a missing outcome of citations": changed(
+                report, lambda d: d["citations"].pop("no-unit")
+            ),
+            "a negative count of citations": changed(
+                report, lambda d: d["citations"].update(exact=-1)
             ),
             "a body that is no address": changed(
                 report, lambda d: d["outside_by_body"].update({"other": 1})
@@ -104,18 +128,21 @@ class CheckReportSchema(unittest.TestCase):
         lines = text.splitlines()
         rows = [json.loads(line) for line in lines]
         for line, row in zip(lines, rows, strict=True):
-            self.assertEqual(list(row), ["from", "layer", "target", "outcome"], line)
+            self.assertIn(list(row), [REFERENCE_LINE, CITATION_LINE], line)
             self.assertEqual(json.dumps(row, ensure_ascii=False, separators=(",", ":")), line)
-            self.assertIn(row["layer"], LAYERS, line)
+            if "layer" in row:
+                self.assertIn(row["layer"], LAYERS, line)
             self.assertIn(row["outcome"], OUTCOMES[1:], line)
-        keys = [(row["from"].encode(), row["target"].encode()) for row in rows]
+        # By `from`, a reference before a citation of the same `from`, then
+        # by `target`.
+        keys = [(row["from"].encode(), "citation" in row, row["target"].encode()) for row in rows]
         self.assertEqual(keys, sorted(keys))
         not_exact = sum(
             count
             for layer in LAYERS
             for outcome, count in report["references"][layer].items()
             if outcome != "exact"
-        )
+        ) + sum(count for outcome, count in report["citations"].items() if outcome != "exact")
         self.assertEqual(len(rows), not_exact)
 
 

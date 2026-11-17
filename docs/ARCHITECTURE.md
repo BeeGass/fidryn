@@ -331,7 +331,7 @@ W760 ToolchainMismatch
 `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
 `fidryn-core`. The checks of one module of edition 2 raise `E700` and
 `E710`, besides `E100` and `E200`; the check of a workspace raises `E720`,
-`E730` and `W760` besides; no check raises `E740` or `W750`. `W750` and
+`E730`, `E740` and `W760` besides; no check raises `W750`. `W750` and
 `W760` are warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate

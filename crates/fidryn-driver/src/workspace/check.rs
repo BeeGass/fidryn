@@ -8,13 +8,17 @@
 //! from there when the bytes come again. Phase two compares each file's
 //! digest with the lock of a generated workspace, checks where each module
 //! stands, and then runs the checks across the modules and gives every
-//! reference its outcome from the interfaces alone
+//! reference and every citation its outcome from the interfaces alone
 //! ([`check_interfaces`](super::check_interfaces)); it reads no module
-//! again.
+//! again. The module files of the dependencies of a curated workspace go
+//! through both phases in the same way ([`deps`](super::deps)).
 
 use super::cache::Cache;
+use super::deps;
 use super::discover::walk;
-use super::index::{Unresolved, across, no_references, order, span};
+use super::index::{
+    Unresolved, UnresolvedCitation, across, no_citations, no_references, order, span,
+};
 use super::{LOCK_FILE, MANIFEST_FILE};
 use fidryn_check::e2::{Lowered, check_module, lower};
 use fidryn_core::{Diagnostic, DiagnosticCode, Severity};
@@ -54,6 +58,7 @@ pub struct CheckOptions {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WorkspaceReport {
     /// The number of module files read: every `.fr` file of the workspace.
+    /// The module files of its dependencies are counted nowhere.
     pub modules: usize,
     /// How many of them were read from the cache.
     pub from_cache: usize,
@@ -70,6 +75,12 @@ pub struct WorkspaceReport {
     /// Every reference whose outcome is not `exact`, sorted by the address
     /// it stands in, then by its target.
     pub unresolved: Vec<Unresolved>,
+    /// The number of citations of the curated modules with each outcome, by
+    /// the outcome's name; every name is present.
+    pub citations: BTreeMap<String, u64>,
+    /// Every citation whose outcome is not `exact`, sorted by the address of
+    /// its module, then by its target and its name.
+    pub unresolved_citations: Vec<UnresolvedCitation>,
     /// Why the cache could not be written, the first time an entry could
     /// not be; `None` when every entry was, and when there is no cache. The
     /// rest of the report does not depend on it, and neither the summary
@@ -124,17 +135,26 @@ impl WorkspaceReport {
 /// - the `within` of a unit or a container names a container of the
 ///   workspace that lists it as a member, and every member of a container is
 ///   a module whose `within` is that container (`E720`);
-/// - every import of a curated module names a module of the workspace
-///   (`E720`), and its names resolve (`E200`);
+/// - every import of a curated module names a module of the workspace or
+///   of a dependency (`E720`), and its names resolve (`E200`);
 /// - no two modules declare one address (`E700`);
-/// - the manifest's `toolchain` is the running one (`W760`).
+/// - the manifest's `toolchain` is the running one (`W760`);
+/// - each dependency of a curated workspace has a relative path and a name
+///   of its own, and a prefix that neither is, contains nor lies within
+///   that of the workspace or of a dependency before it (`E730`); it is a
+///   generated workspace with a lock, of the digest and the release that
+///   the manifest records, and has no error of its own (`E740`), as its
+///   own check finds, which reads its module files through the cache of
+///   this one and writes nothing into its directory. Each of these
+///   diagnostics names the manifest.
 ///
-/// It also gives every reference of the workspace its outcome. Phase one,
-/// and the outcomes of the references in phase two, run on `options.jobs`
-/// threads, and the report is the same for every number of them. With a
-/// cache, `options.cache_dir`, the result of phase one of a file whose bytes
-/// were checked before is read from it, and the report is the same as
-/// without one, but for the count of the modules read from it.
+/// It also gives every reference of the workspace, and every citation of
+/// its curated modules, its outcome, from the modules of the workspace and
+/// of its dependencies. Phase one, and the outcomes in phase two, run on
+/// `options.jobs` threads, and the report is the same for every number of
+/// them. With a cache, `options.cache_dir`, the result of phase one of a
+/// file whose bytes were checked before is read from it, and the report is
+/// the same as without one, but for the count of the modules read from it.
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
@@ -145,84 +165,40 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
             references: no_references(),
             outside_by_body: BTreeMap::new(),
             unresolved: Vec::new(),
+            citations: no_citations(),
+            unresolved_citations: Vec::new(),
             cache_failure: None,
         };
     };
     let lock = read_lock(root, &manifest, &mut diagnostics);
-    let found = walk(root);
-    for (rel, why) in &found.unreadable {
-        diagnostics.push(of_file(
-            DiagnosticCode::E730,
-            rel,
-            format!("this entry cannot be read: {why}"),
-        ));
-    }
-    for rel in &found.special {
-        diagnostics.push(of_file(
-            DiagnosticCode::E730,
-            rel,
-            "this entry is neither a file nor a directory; a workspace check follows no \
-             symbolic link",
-        ));
-    }
     let jobs = options.jobs.max(1);
 
-    // Phase one: each module file by itself, or its result from the cache;
-    // then the entries of the files the cache did not hold.
+    // Phase one: each module file of the workspace and of its dependencies
+    // by itself, or its result from the cache; then the entries of the
+    // files the cache did not hold.
     let cache = options
         .cache_dir
         .as_deref()
         .map(|dir| Cache::new(dir, &options.toolchain, &options.executable));
-    let read = phase_one(root, &found.modules, jobs, cache.as_ref());
-    let from_cache = read
+    let files = read_files(root, jobs, cache.as_ref());
+    let opened = deps::open(root, &manifest, jobs, cache.as_ref());
+    let modules = files.modules.len();
+    let from_cache = files
+        .read
         .iter()
         .filter(|(_, cached)| matches!(cached, Cached::Read))
         .count();
     if let Some(cache) = &cache {
-        write_missed(cache, &read, jobs);
+        write_missed(cache, files.read.iter().chain(opened.phase_one()), jobs);
     }
 
-    // Phase two: the files against the lock, where each module stands, and
-    // then the interfaces alone.
-    let mut interfaces = Vec::new();
-    let mut unread = BTreeSet::new();
-    for (rel, (module, _)) in found.modules.iter().zip(read) {
-        diagnostics.extend(
-            module
-                .diagnostics
-                .into_iter()
-                .map(|diagnostic| diagnostic.with_source(rel.as_str())),
-        );
-        if let (Some(lock), Some(digest)) = (&lock, module.digest) {
-            diagnostics.extend(against_lock(rel, digest, lock));
-        }
-        let Some(interface) = module.interface else {
-            unread.insert(rel.clone());
-            continue;
-        };
-        diagnostics.extend(stands(rel, &interface, &manifest.prefix));
-        let path = module_path(&interface.address);
-        if path == *rel {
-            interfaces.push(interface);
-        } else {
-            unread.insert(path);
-        }
-    }
-    if let Some(lock) = &lock {
-        for rel in lock.modules.keys() {
-            if found.modules.binary_search(rel).is_err() {
-                diagnostics.push(of_file(
-                    DiagnosticCode::E730,
-                    rel,
-                    "the lock lists this module file, and it is missing",
-                ));
-                unread.insert(rel.clone());
-            }
-        }
-    }
+    // Phase two: the files against the lock, where each module stands, each
+    // dependency by itself, and then the interfaces alone.
+    let (interfaces, unread) = settle(files, lock.as_ref(), &manifest.prefix, &mut diagnostics);
+    let dependencies = deps::settle(opened, &options.toolchain, &mut diagnostics);
     let phase_two = across(
         &interfaces,
-        &[],
+        &dependencies,
         &manifest,
         &options.toolchain,
         &unread,
@@ -231,12 +207,14 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     diagnostics.extend(phase_two.diagnostics);
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
     WorkspaceReport {
-        modules: found.modules.len(),
+        modules,
         from_cache,
         diagnostics,
         references: phase_two.references,
         outside_by_body: phase_two.outside_by_body,
         unresolved: phase_two.unresolved,
+        citations: phase_two.citations,
+        unresolved_citations: phase_two.unresolved_citations,
         cache_failure: cache.and_then(Cache::failure),
     }
 }
@@ -308,24 +286,134 @@ fn read_lock(root: &Path, manifest: &Manifest, diagnostics: &mut Vec<Diagnostic>
                 None
             }
             Ok(lock) => {
-                if lock.prefix != manifest.prefix {
-                    report(format!(
-                        "the lock is of the prefix `{}`, and the manifest of `{}`",
-                        lock.prefix, manifest.prefix
-                    ));
-                }
-                if let Some(release) = &manifest.release
-                    && *release != lock.release
-                {
-                    report(format!(
-                        "the lock is of the release `{}`, and the manifest of `{release}`",
-                        lock.release
-                    ));
-                }
+                diagnostics.extend(lock_disagrees(manifest, &lock));
                 Some(lock)
             }
         },
     }
+}
+
+/// Where the lock `lock` of a generated workspace disagrees with its
+/// manifest, `manifest`: in its prefix, and in its release.
+pub(super) fn lock_disagrees(manifest: &Manifest, lock: &Lock) -> Vec<Diagnostic> {
+    let mut out = Vec::new();
+    if lock.prefix != manifest.prefix {
+        out.push(of_file(
+            DiagnosticCode::E730,
+            LOCK_FILE,
+            format!(
+                "the lock is of the prefix `{}`, and the manifest of `{}`",
+                lock.prefix, manifest.prefix
+            ),
+        ));
+    }
+    if let Some(release) = &manifest.release
+        && *release != lock.release
+    {
+        out.push(of_file(
+            DiagnosticCode::E730,
+            LOCK_FILE,
+            format!(
+                "the lock is of the release `{}`, and the manifest of `{release}`",
+                lock.release
+            ),
+        ));
+    }
+    out
+}
+
+/// The files of a workspace, read: every module file, with phase one of
+/// it and what the cache gave of it, and a diagnostic for each entry that
+/// is neither a file nor a directory, or that cannot be read.
+pub(super) struct Files {
+    /// The path of every module file, in the byte order of the paths.
+    pub(super) modules: Vec<String>,
+    /// Phase one of each file of `modules`, in their order.
+    pub(super) read: Vec<(PhaseOne, Cached)>,
+    pub(super) diagnostics: Vec<Diagnostic>,
+}
+
+/// The files of the workspace at `root`, by the rules of a workspace: no
+/// entry whose name begins with a dot is read, and no link is followed.
+/// Phase one runs on `jobs` threads, through `cache`, which nothing is
+/// written to here.
+pub(super) fn read_files(root: &Path, jobs: usize, cache: Option<&Cache>) -> Files {
+    let found = walk(root);
+    let mut diagnostics = Vec::new();
+    for (rel, why) in &found.unreadable {
+        diagnostics.push(of_file(
+            DiagnosticCode::E730,
+            rel,
+            format!("this entry cannot be read: {why}"),
+        ));
+    }
+    for rel in &found.special {
+        diagnostics.push(of_file(
+            DiagnosticCode::E730,
+            rel,
+            "this entry is neither a file nor a directory; a workspace check follows no \
+             symbolic link",
+        ));
+    }
+    let read = phase_one(root, &found.modules, jobs, cache);
+    Files {
+        modules: found.modules,
+        read,
+        diagnostics,
+    }
+}
+
+/// The first part of phase two of the workspace of the prefix `prefix`
+/// whose files are `files`, and which has the lock `lock` when it is a
+/// generated workspace whose lock could be read: the diagnostics of the
+/// files, each file against the lock, and where each module stands, added
+/// to `diagnostics`. It gives the interfaces of the modules that stand at
+/// the paths of their addresses, and the paths of the module files that
+/// gave none.
+pub(super) fn settle(
+    files: Files,
+    lock: Option<&Lock>,
+    prefix: &Address,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> (Vec<Interface>, BTreeSet<String>) {
+    diagnostics.extend(files.diagnostics);
+    let mut interfaces = Vec::new();
+    let mut unread = BTreeSet::new();
+    for (rel, (module, _)) in files.modules.iter().zip(files.read) {
+        diagnostics.extend(
+            module
+                .diagnostics
+                .into_iter()
+                .map(|diagnostic| diagnostic.with_source(rel.as_str())),
+        );
+        if let (Some(lock), Some(digest)) = (lock, module.digest) {
+            diagnostics.extend(against_lock(rel, digest, lock));
+        }
+        let Some(interface) = module.interface else {
+            unread.insert(rel.clone());
+            continue;
+        };
+        diagnostics.extend(stands(rel, &interface, prefix));
+        let path = module_path(&interface.address);
+        if path == *rel {
+            interfaces.push(interface);
+        } else {
+            unread.insert(path);
+        }
+    }
+    if let Some(lock) = lock {
+        for rel in lock.modules.keys() {
+            if files.modules.binary_search(rel).is_err() {
+                diagnostics.push(of_file(
+                    DiagnosticCode::E730,
+                    rel,
+                    "the lock lists this module file, and it is missing",
+                ));
+                unread.insert(rel.clone());
+            }
+        }
+    }
+    (interfaces, unread)
 }
 
 /// What phase one gives of one module file, and what an entry of the cache
@@ -342,7 +430,7 @@ pub(super) struct PhaseOne {
 
 /// What the cache gave, or is to be given, of one file's phase one.
 #[derive(Clone, Copy)]
-enum Cached {
+pub(super) enum Cached {
     /// The result was read from the cache.
     Read,
     /// The cache had no valid entry of the key; the result is to be written
@@ -422,14 +510,18 @@ fn read_one(path: &Path, cache: Option<&Cache>) -> (PhaseOne, Cached) {
 }
 
 /// Writes to `cache` the result of each file of `read` whose entry it
-/// missed, once for each key, on `jobs` threads. It runs after every file
-/// has been read, so that no read of a check sees an entry that the check
-/// wrote, and the count of the modules read from the cache is the same for
-/// any number of workers.
-fn write_missed(cache: &Cache, read: &[(PhaseOne, Cached)], jobs: usize) {
+/// missed, once for each key, on `jobs` threads. It runs after every file,
+/// of the workspace and of its dependencies, has been read, so that no read
+/// of a check sees an entry that the check wrote, and the count of the
+/// modules read from the cache is the same for any number of workers.
+fn write_missed<'a>(
+    cache: &Cache,
+    read: impl IntoIterator<Item = &'a (PhaseOne, Cached)>,
+    jobs: usize,
+) {
     let mut keys = BTreeSet::new();
     let missed: Vec<(Hash32, &PhaseOne)> = read
-        .iter()
+        .into_iter()
         .filter_map(|(result, cached)| match cached {
             Cached::Missed(key) if keys.insert(*key) => Some((*key, result)),
             _ => None,

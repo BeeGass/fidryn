@@ -92,6 +92,19 @@ interchange schema versions are maintained independently of the interpreter.
   exactly one citation (`E200`). An address that two modules declare is
   `E700`. The interface records the range of each part of an import, a
   citation and a binding.
+- Dependencies between workspaces. A curated workspace names each
+  generated workspace it depends on with its relative `path`, its
+  `release` and the BLAKE3 of the bytes of its lock; a dependency that is
+  no generated workspace with a lock, of another digest or release, or
+  with an error of its own is `E740`, and an absolute path, a name listed
+  twice and a prefix that overlaps another are `E730`. Each dependency is
+  checked by itself through the cache of the depending workspace, and
+  nothing is written into its directory. The target of every citation gets
+  an outcome from the modules of the workspace and of its dependencies:
+  the check report gains `citations`, the count of each outcome, and the
+  unresolved list a line for each citation that is not `exact`.
+  `check_interfaces` takes the prefix and the interfaces of each
+  dependency (`fidryn_driver::workspace::DependencyInterfaces`).
 
 ## [0.2.0] - 2026-11-16
 

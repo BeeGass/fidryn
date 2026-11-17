@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fidryn.dev/schemas/check-report-v0.1.json",
   "title": "fidryn.check-report/v0.1",
-  "description": "The report of the check of a workspace of law modules, which `fidryn check DIR --report FILE` writes: the number of module files, of those read from the cache, of errors and of warnings; the references of each layer by outcome; and the references of outcome `outside` by the body of law they name.",
+  "description": "The report of the check of a workspace of law modules, which `fidryn check DIR --report FILE` writes: the number of module files of the workspace, of those read from the cache, of errors and of warnings; the references of each layer by outcome; the citations of the curated modules by outcome; and the references of outcome `outside` by the body of law they name.",
   "type": "object",
-  "required": ["schema", "modules", "from_cache", "errors", "warnings", "references", "outside_by_body"],
+  "required": ["schema", "modules", "from_cache", "errors", "warnings", "references", "citations", "outside_by_body"],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "fidryn.check-report/v0.1" },
@@ -21,6 +21,10 @@
         "enacted": { "$ref": "#/$defs/outcomes" },
         "editorial": { "$ref": "#/$defs/outcomes" }
       }
+    },
+    "citations": {
+      "$comment": "Every citation of every curated module of the workspace, by the outcome of its target; all zero in a workspace without curated modules.",
+      "$ref": "#/$defs/outcomes"
     },
     "outside_by_body": {
       "$comment": "A body of law is the first two segments of a target, or the target when it has one segment; only a body with a reference is listed.",

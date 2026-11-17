@@ -175,10 +175,11 @@ lists them.</p>
 <p>A directory is a workspace of edition 2 modules, with a manifest,
 <code>workspace.json</code>, at its top (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>).
 <code>check</code> reads every module of it by itself, and then checks the manifest,
-the lock of a generated workspace, where each module stands, and the
-containers and their members, as
+the lock of a generated workspace, where each module stands, the
+containers and their members, and the dependencies of a curated
+workspace, as
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
-lists them, and gives every reference its
+lists them, and gives every reference and every citation its
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#references">outcome</a>. It does so in two phases, each on
 several threads, and its output is the same for any number of them
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#how-a-workspace-is-checked">How a workspace is checked</a>).
@@ -193,7 +194,7 @@ it (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the
 <tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of a workspace check; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>.fidryn-cache</code> inside the workspace</td></tr>
 <tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry of a cache</td></tr>
 <tr><td><code>--report FILE</code></td><td>no</td><td>path of the check report of a workspace to write, <code>fidryn.check-report/v0.1</code></td></tr>
-<tr><td><code>--unresolved FILE</code></td><td>no</td><td>path of the list to write of the references of a workspace whose outcome is not <code>exact</code>, one JSON object to a line</td></tr>
+<tr><td><code>--unresolved FILE</code></td><td>no</td><td>path of the list to write of the references and the citations of a workspace whose outcome is not <code>exact</code>, one JSON object to a line</td></tr>
 </tbody></table>
 </div>
 <p><strong>Environment</strong></p>

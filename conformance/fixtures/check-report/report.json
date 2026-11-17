@@ -36,6 +36,16 @@
       "malformed": 0
     }
   },
+  "citations": {
+    "exact": 0,
+    "target-status": 0,
+    "ambiguous": 0,
+    "unit-only": 0,
+    "range-form": 0,
+    "no-unit": 0,
+    "outside": 0,
+    "malformed": 0
+  },
   "outside_by_body": {
     "/yy/stat": 2,
     "/zz/other": 2
