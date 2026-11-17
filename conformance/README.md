@@ -110,3 +110,19 @@ which the test packs into one archive. Beside each, `<name>.records.jsonl`
 holds the expected records, written by hand from the reading rules.
 `test_uslm_text.py` compares the script's output with them and checks
 that the script refuses what the rules refuse.
+
+`usc_profile.py` reads the same inputs and prints the counts of two sets of
+counting rules as one JSON object with sorted keys: `design`, the counting of
+the first profile of the Code, and `plan`, the counts of what the reading
+imports. [usc-counting-rules.md](usc-counting-rules.md) states both sets of
+rules and every key, and gives the profile of release 119-142 with the
+command that measured it.
+
+```sh
+uv run --locked python -I conformance/usc_profile.py /path/to/release --out profile.json
+```
+
+`--out FILE` also writes the profile to that file; nothing is written beside
+the input. The exit codes are those of `uslm_text.py`. Each fixture has its
+expected `plan` profile beside it, `<name>.profile.json`, written by hand;
+`test_usc_profile.py` compares the script's output with them.

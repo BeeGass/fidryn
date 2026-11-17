@@ -193,6 +193,7 @@ class TextFixtures(unittest.TestCase):
         self.assertEqual(names, set(CASES))
         for name in [*CASES, TWO_FILES]:
             self.assertTrue((FIXTURES / f"{name}.records.jsonl").is_file(), name)
+            self.assertTrue((FIXTURES / f"{name}.profile.json").is_file(), name)
         for path in [*FIXTURES.glob("*.xml"), *(FIXTURES / TWO_FILES).glob("*.xml")]:
             first = path.read_text(encoding="utf-8").split("\n", 1)[0]
             self.assertIn("Invented for tests", first, path.name)
@@ -267,7 +268,7 @@ class TextFixtures(unittest.TestCase):
 
 
 # The scripts whose reading the refusal test holds to the rules.
-SCRIPTS = [TEXT_SCRIPT]
+SCRIPTS = [TEXT_SCRIPT, HERE / "usc_profile.py"]
 
 DOCUMENT = """<!-- Invented for tests: this document is not the text of any law. -->
 {doctype}<{root} xmlns="{namespace}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
