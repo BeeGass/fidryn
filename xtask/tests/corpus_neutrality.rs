@@ -9,7 +9,11 @@ use std::path::{Path, PathBuf};
 
 /// Directories and files, relative to the workspace root, whose `.rs` files
 /// must name no corpus.
-const CORPUS_NEUTRAL: &[&str] = &["crates/fidryn-provision/src"];
+const CORPUS_NEUTRAL: &[&str] = &[
+    "crates/fidryn-provision/src",
+    "crates/fidryn-syntax/src/edition.rs",
+    "crates/fidryn-syntax/src/e2",
+];
 
 /// Words compared without regard to case. A word is a maximal run of ASCII
 /// letters and digits.
