@@ -1,0 +1,14 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">yes</property>
+</meta>
+<main>
+<title identifier="/us/usc/t99"><num value="99">Title 99</num><heading>Invented</heading>
+<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Invented form</heading>
+<content>The invented form reads as follows: <quotedContent origin="/us/pl/999/15/s3"><p>“An invented preamble.</p><section><num value="7">“SEC. 7.</num><heading>INVENTED FORM.</heading><content>The form is invented.</content></section><note topic="miscellaneous"><heading>Invented Instructions</heading><p>Fill in the form.</p><p>Sign below.”</p></note></quotedContent></content>
+</section>
+</title>
+</main>
+</uscDoc>

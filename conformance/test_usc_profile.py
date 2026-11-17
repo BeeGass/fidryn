@@ -179,6 +179,9 @@ class ProfileFixtures(unittest.TestCase):
     def test_subheadings(self) -> None:
         self.check("subheadings")
 
+    def test_quoted_operative(self) -> None:
+        self.check("quoted-operative")
+
     def test_top_elements_without_an_identifier_are_counted_over_the_release(self) -> None:
         expected = json.loads((FIXTURES / f"{UNNAMED}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):

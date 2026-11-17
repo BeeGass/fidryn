@@ -8,20 +8,29 @@
 //! `docPublicationName` is not `Online@` followed by the release, and when
 //! its property `is-positive-law` is neither `yes` nor `no`.
 //!
-//! The text of a flow (a text part, a `p`, a table cell) is read into blocks:
-//! text and inline elements gather into the current paragraph, and a block
-//! element closes it and is the next block. A paragraph is normalized as a
-//! whole; a link, a superscript and a subscript keep the extent of their own
-//! words, with white space at their two ends left outside them. A footnote is
-//! taken out of the flow where it stands, without closing the paragraph, and
-//! set aside; a footnote marker gives no text. An element that stands where
-//! its class does not allow it, or that is in no class, is refused.
+//! The text of a flow (a text part, a `p`, a note, quoted content, a level
+//! of quoted content, a table cell) is read into blocks: text and inline
+//! elements gather into the current paragraph, and a block element closes it
+//! and is the next block. A paragraph is normalized as a whole; a link, a
+//! superscript and a subscript keep the extent of their own words, with
+//! white space at their two ends left outside them. A footnote is taken out
+//! of the flow where it stands, without closing the paragraph; it is a
+//! footnote of its module, numbered in document order. A footnote marker
+//! gives no text: it is a `Mark` run that stands directly after the last
+//! character before it that is not white space. Quoted content keeps its
+//! levels, parts and blocks, and has no address. An element that stands
+//! where its class does not allow it, or that is in no class, is refused.
 
 use crate::IngestError;
+use crate::operative;
 use fidryn_provision::normalize::{WHITE_SPACE, normalize};
 use fidryn_provision::workspace::NotImported;
-use fidryn_provision::{Block, Cell, Num, PartRole, Row, RowGroup, Run, Table, Text};
+use fidryn_provision::{
+    Address, Block, Cell, Footnote, Num, PartRole, Quoted, QuotedItem, QuotedLevel, Row, RowGroup,
+    Run, Table, Text,
+};
 use roxmltree::{Document, Node, NodeId, ParsingOptions};
+use std::collections::HashMap;
 
 /// The namespace of the publisher's schema.
 pub(crate) const USLM: &str = "http://xml.house.gov/schemas/uslm/1.0";
@@ -332,7 +341,7 @@ fn schema_location(root: Node<'_, '_>) -> Result<(), IngestError> {
 
 /// The text of `node`: its text nodes and those of its descendants,
 /// concatenated.
-fn text_content(node: Node<'_, '_>) -> String {
+pub(crate) fn text_content(node: Node<'_, '_>) -> String {
     node.descendants()
         .filter(Node::is_text)
         .filter_map(|text| text.text())
@@ -385,25 +394,83 @@ fn metadata(meta: Node<'_, '_>, release: &str) -> Result<bool, IngestError> {
 pub(crate) struct Scope {
     pub(crate) counts: NotImported,
     pub(crate) aside: SetAside,
+    pub(crate) footnotes: Footnotes,
 }
 
-/// The elements of a module that are not read with its provisions, in
-/// document order: its notes (the `notes` elements and the notes that stand
-/// directly in its levels), its source credit, and its footnotes.
+/// The elements of a module that are read after its provisions or its own
+/// fields: its notes (the `notes` elements and the notes that stand directly
+/// in its levels), in document order and each with the address of the level
+/// that holds it, and its source credit.
 #[derive(Debug, Default)]
 pub(crate) struct SetAside {
-    pub(crate) notes: Vec<NodeId>,
+    pub(crate) notes: Vec<(NodeId, Address)>,
     pub(crate) credit: Option<NodeId>,
-    pub(crate) footnotes: Vec<NodeId>,
+}
+
+/// The footnotes of a module: every footnote that stands in it, outside its
+/// tables of contents and, for a container, outside its members, in
+/// document order; the ordinal of each is its place from 1.
+#[derive(Debug, Default)]
+pub(crate) struct Footnotes {
+    pub(crate) nodes: Vec<NodeId>,
+    ordinals: HashMap<String, u32>,
+}
+
+impl Footnotes {
+    /// The footnotes of the module whose element is `node`. `is_member` says
+    /// whether a child of `node` is a module of its own.
+    pub(crate) fn of_module(
+        node: Node<'_, '_>,
+        is_member: &dyn Fn(Node<'_, '_>) -> bool,
+    ) -> Result<Footnotes, IngestError> {
+        let mut footnotes = Footnotes::default();
+        for child in node.children().filter(|child| !is_member(*child)) {
+            footnotes.collect(child)?;
+        }
+        Ok(footnotes)
+    }
+
+    /// Adds the footnotes of `node` and of what stands in it, outside tables
+    /// of contents.
+    fn collect(&mut self, node: Node<'_, '_>) -> Result<(), IngestError> {
+        if !node.is_element() || is(node, "toc") {
+            return Ok(());
+        }
+        if is_footnote(node) {
+            let ordinal = u32::try_from(self.nodes.len() + 1)
+                .map_err(|_| IngestError::at(node, "a module holds too many footnotes"))?;
+            if let Some(id) = node.attribute("id")
+                && self.ordinals.insert(id.to_owned(), ordinal).is_some()
+            {
+                return Err(IngestError::at(
+                    node,
+                    format!(
+                        "two footnotes of the module have the id {id:?}, so a marker cannot \
+                         name one"
+                    ),
+                ));
+            }
+            self.nodes.push(node.id());
+        }
+        for child in node.children() {
+            self.collect(child)?;
+        }
+        Ok(())
+    }
+
+    /// The ordinal of the footnote whose `id` is `id`.
+    fn ordinal(&self, id: &str) -> Option<u32> {
+        self.ordinals.get(id).copied()
+    }
 }
 
 impl Scope {
-    /// Sets aside the note, the `notes` element or the footnote `node`.
-    pub(crate) fn set_aside_note(&mut self, node: Node<'_, '_>) {
-        if is_footnote(node) {
-            self.aside.footnotes.push(node.id());
-        } else {
-            self.aside.notes.push(node.id());
+    /// Sets aside the note or the `notes` element `node`, which stands
+    /// directly in the level at `anchor`. A footnote is not set aside: it is
+    /// among the module's footnotes already.
+    pub(crate) fn set_aside_note(&mut self, node: Node<'_, '_>, anchor: &Address) {
+        if !is_footnote(node) {
+            self.aside.notes.push((node.id(), anchor.clone()));
         }
     }
 
@@ -489,39 +556,30 @@ impl Labels {
 /// Absent when it has neither a value nor text and holds no footnote marker.
 fn number(node: Node<'_, '_>, scope: &mut Scope) -> Result<Option<Num>, IngestError> {
     let value = node.attribute("value").unwrap_or("");
-    let label = label(node, scope)?;
-    if value.is_empty() && label.text.runs.is_empty() && !label.marker {
+    let shown = label(node, scope)?;
+    if value.is_empty() && shown.runs.is_empty() {
         return Ok(None);
     }
     Ok(Some(Num {
         value: value.to_owned(),
-        shown: label.text,
+        shown,
     }))
 }
 
-/// The heading of a level: one text, absent when it has none and holds no
-/// footnote marker.
-fn heading(node: Node<'_, '_>, scope: &mut Scope) -> Result<Option<Text>, IngestError> {
-    let label = label(node, scope)?;
-    Ok((!label.text.runs.is_empty() || label.marker).then_some(label.text))
-}
-
-/// The text of a label, and whether it holds a footnote marker.
-struct Label {
-    text: Text,
-    marker: bool,
+/// The text of a heading, a subheading or a source credit: absent when it
+/// has no text and holds no footnote marker.
+pub(crate) fn heading(node: Node<'_, '_>, scope: &mut Scope) -> Result<Option<Text>, IngestError> {
+    let text = label(node, scope)?;
+    Ok((!text.runs.is_empty()).then_some(text))
 }
 
 /// The text of the label `node`, which holds text and inline elements only.
-fn label(node: Node<'_, '_>, scope: &mut Scope) -> Result<Label, IngestError> {
+/// A footnote marker is one of its runs, so a label that holds one is never
+/// empty.
+fn label(node: Node<'_, '_>, scope: &mut Scope) -> Result<Text, IngestError> {
     let mut pieces = Pieces::default();
     inline_children(node, &mut pieces, Within::Text, scope)?;
-    let shaped =
-        shape(pieces, &mut scope.counts).map_err(|message| IngestError::at(node, message))?;
-    Ok(Label {
-        text: shaped.text,
-        marker: shaped.marker,
-    })
+    shape(pieces, &mut scope.counts).map_err(|message| IngestError::at(node, message))
 }
 
 /// The text of a paragraph before it is normalized: its pieces in document
@@ -541,9 +599,13 @@ enum Piece {
     },
     Sup(String),
     Sub(String),
-    /// A footnote marker, which gives no text. Its place among the pieces is
-    /// where it stands.
-    Marker,
+    /// A footnote marker, which gives no text: its own text, and the ordinal
+    /// of the footnote it points at. Its place among the pieces is where it
+    /// stands.
+    Marker {
+        shown: String,
+        footnote: u32,
+    },
 }
 
 impl Pieces {
@@ -676,7 +738,19 @@ fn inline(
                     "a footnote marker that holds an element",
                 ));
             }
-            pieces.pieces.push(Piece::Marker);
+            let idref = node.attribute("idref").unwrap_or("");
+            let Some(footnote) = scope.footnotes.ordinal(idref) else {
+                return Err(IngestError::at(
+                    node,
+                    format!(
+                        "a footnote marker whose idref {idref:?} names no footnote of its module"
+                    ),
+                ));
+            };
+            pieces.pieces.push(Piece::Marker {
+                shown: normalize(&text_content(node)),
+                footnote,
+            });
         }
         Inline::Plain => inline_children(node, pieces, within, scope)?,
         Inline::Break => {
@@ -688,7 +762,9 @@ fn inline(
             }
             pieces.words(" ");
         }
-        Inline::Footnote => scope.set_aside_note(node),
+        // A footnote is taken out of the flow; it is among the module's
+        // footnotes already.
+        Inline::Footnote => {}
     }
     Ok(true)
 }
@@ -721,18 +797,15 @@ fn styled(
         .collect())
 }
 
-/// A paragraph's text, normalized, and whether it held a footnote marker.
-struct Shaped {
-    text: Text,
-    marker: bool,
-}
-
 /// The text of `pieces`, normalized as a whole. A link, a superscript or a
 /// subscript keeps the extent of its own words with white space at its two
-/// ends left outside it; a link with no words left is dropped and counted.
-/// Refused, with the reason, when a character composes across the end of a
-/// piece, so that its text cannot be divided as its pieces are.
-fn shape(pieces: Pieces, counts: &mut NotImported) -> Result<Shaped, String> {
+/// ends left outside it; a link with no words left is dropped and counted. A
+/// footnote marker is a `Mark` run at the offset that the normalized text
+/// before it has as its length: directly after the last character before it
+/// that is not white space. Refused, with the reason, when a character
+/// composes across the end of a piece, so that its text cannot be divided as
+/// its pieces are.
+fn shape(pieces: Pieces, counts: &mut NotImported) -> Result<Text, String> {
     enum Kind {
         Words,
         Link(String),
@@ -749,16 +822,28 @@ fn shape(pieces: Pieces, counts: &mut NotImported) -> Result<Shaped, String> {
             .last()
             .is_some_and(|c| WHITE_SPACE.contains(&c))
     };
+    let undivided = |expected: &str| {
+        format!(
+            "the text {expected:?} cannot be divided into its runs once normalized: a character \
+             composes across the end of a link, a superscript, a subscript or a footnote marker"
+        )
+    };
     let mut whole = String::new();
     let mut runs = Vec::new();
+    // The length of the text of `runs`, in characters.
+    let mut length = 0;
     let mut started = false;
     let mut space = false;
-    let mut marker = false;
     let mut links_without_words = 0;
     for piece in pieces.pieces {
         let (raw, kind) = match piece {
-            Piece::Marker => {
-                marker = true;
+            Piece::Marker { shown, footnote } => {
+                // The pending space, if any, stands after the marker.
+                let before = normalize(&whole);
+                if before.chars().count() != length {
+                    return Err(undivided(&before));
+                }
+                runs.push(Run::Mark { shown, footnote });
                 continue;
             }
             Piece::Words(words) => (words, Kind::Words),
@@ -777,7 +862,9 @@ fn shape(pieces: Pieces, counts: &mut NotImported) -> Result<Shaped, String> {
         }
         if space || (started && starts_with_space(&raw)) {
             runs.push(Run::Words(" ".to_owned()));
+            length += 1;
         }
+        length += core.chars().count();
         runs.push(match kind {
             Kind::Words => Run::Words(core),
             Kind::Link(target) => Run::Ref {
@@ -793,27 +880,37 @@ fn shape(pieces: Pieces, counts: &mut NotImported) -> Result<Shaped, String> {
     let text = Text::from_runs(runs);
     let expected = normalize(&whole);
     if text.plain() != expected {
-        return Err(format!(
-            "the text {expected:?} cannot be divided into its runs once normalized: a character \
-             composes across the end of a link, a superscript, a subscript or a footnote marker"
-        ));
+        return Err(undivided(&expected));
     }
     counts.links_without_words += links_without_words;
-    Ok(Shaped { text, marker })
+    Ok(text)
+}
+
+/// What holds a flow, which decides the blocks it holds besides a `p`, a
+/// table, quoted content and an image.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Holder {
+    /// Operative text, a footnote, or quoted content that no note holds.
+    Text,
+    /// A note, or quoted content inside one: a `signature`, any `subheading`
+    /// and any `heading` after the note's first are blocks of it too.
+    Note,
 }
 
 /// The blocks of a flow as they are read.
 struct Blocks<'a, 'i> {
     /// The element whose flow is read, for messages.
     node: Node<'a, 'i>,
+    holder: Holder,
     blocks: Vec<Block>,
     pieces: Pieces,
 }
 
 impl<'a, 'i> Blocks<'a, 'i> {
-    fn new(node: Node<'a, 'i>) -> Self {
+    fn new(node: Node<'a, 'i>, holder: Holder) -> Self {
         Self {
             node,
+            holder,
             blocks: Vec::new(),
             pieces: Pieces::default(),
         }
@@ -825,10 +922,10 @@ impl<'a, 'i> Blocks<'a, 'i> {
             return Ok(());
         }
         let pieces = std::mem::take(&mut self.pieces);
-        let shaped = shape(pieces, &mut scope.counts)
+        let text = shape(pieces, &mut scope.counts)
             .map_err(|message| IngestError::at(self.node, message))?;
-        if !shaped.text.plain().is_empty() {
-            self.blocks.push(Block::Para(shaped.text));
+        if !text.plain().is_empty() {
+            self.blocks.push(Block::Para(text));
         }
         Ok(())
     }
@@ -852,15 +949,22 @@ impl<'a, 'i> Blocks<'a, 'i> {
             self.node = outer;
         } else if is_xhtml(child, "table") {
             self.close(scope)?;
-            self.blocks.push(Block::Table(table(child, scope)?));
+            self.blocks
+                .push(Block::Table(table(child, self.holder, scope)?));
         } else if is(child, "img") {
             self.close(scope)?;
             self.blocks.push(image(child)?);
         } else if is(child, "quotedContent") {
-            return Err(IngestError::at(
-                child,
-                "quoted content stands in operative text, where the reading does not read it",
-            ));
+            self.close(scope)?;
+            self.blocks
+                .push(Block::Quoted(quoted(child, self.holder, scope)?));
+        } else if self.holder == Holder::Note && is(child, "signature") {
+            self.close(scope)?;
+            self.blocks.extend(signature(child, scope)?);
+        } else if self.holder == Holder::Note && (is(child, "subheading") || is(child, "heading")) {
+            self.close(scope)?;
+            self.blocks
+                .extend(heading(child, scope)?.map(Block::Subheading));
         } else if !inline(child, &mut self.pieces, Within::Text, scope)? {
             return Err(misplaced(child, self.node));
         }
@@ -874,26 +978,31 @@ impl<'a, 'i> Blocks<'a, 'i> {
     }
 }
 
-/// The blocks of the flow of `node`.
-pub(crate) fn flow(node: Node<'_, '_>, scope: &mut Scope) -> Result<Vec<Block>, IngestError> {
-    let mut blocks = Blocks::new(node);
+/// The blocks of the flow of `node`, held by `holder`.
+pub(crate) fn flow(
+    node: Node<'_, '_>,
+    holder: Holder,
+    scope: &mut Scope,
+) -> Result<Vec<Block>, IngestError> {
+    let mut blocks = Blocks::new(node, holder);
     for child in node.children() {
         blocks.child(child, scope)?;
     }
     blocks.take(scope)
 }
 
-/// The parts of the text part `node` of role `role`, in order. A
-/// `continuation` or a `proviso` that stands inside a `content` closes the
-/// content part, is a part of its own, and what follows it opens a further
-/// content part. A part with no block is dropped.
+/// The parts of the text part `node` of role `role`, held by `holder`, in
+/// order. A `continuation` or a `proviso` that stands inside a `content`
+/// closes the content part, is a part of its own, and what follows it opens a
+/// further content part. A part with no block is dropped.
 pub(crate) fn text_part(
     node: Node<'_, '_>,
     role: PartRole,
+    holder: Holder,
     scope: &mut Scope,
 ) -> Result<Vec<(PartRole, Vec<Block>)>, IngestError> {
     let mut parts = Vec::new();
-    let mut blocks = Blocks::new(node);
+    let mut blocks = Blocks::new(node, holder);
     for child in node.children() {
         let inner = text_part_role(child).filter(|inner| {
             role == PartRole::Content && matches!(inner, PartRole::Continuation | PartRole::Proviso)
@@ -901,7 +1010,7 @@ pub(crate) fn text_part(
         match inner {
             Some(inner) => {
                 parts.push((role, blocks.take(scope)?));
-                parts.push((inner, flow(child, scope)?));
+                parts.push((inner, flow(child, holder, scope)?));
             }
             None => blocks.child(child, scope)?,
         }
@@ -911,10 +1020,200 @@ pub(crate) fn text_part(
     Ok(parts)
 }
 
-/// The table `node`. A row belongs to the group of the `thead`, `tbody` or
-/// `tfoot` it stands in, and to the body when it stands in none; column
-/// groups and columns hold nothing and are dropped.
-fn table(node: Node<'_, '_>, scope: &mut Scope) -> Result<Table, IngestError> {
+/// The heading and the blocks of the note `node`: its first `heading`, and
+/// the flow of everything else in it, where a text part that stands directly
+/// in the note is replaced by the blocks of its own flow. The first heading
+/// of a cross heading is the label of its group, which is not imported:
+/// `read_heading` false leaves it unread.
+pub(crate) fn note(
+    node: Node<'_, '_>,
+    read_heading: bool,
+    scope: &mut Scope,
+) -> Result<(Option<Text>, Vec<Block>), IngestError> {
+    let mut first = None;
+    let mut seen = false;
+    let mut blocks = Blocks::new(node, Holder::Note);
+    for child in node.children() {
+        if !seen && is(child, "heading") {
+            seen = true;
+            if read_heading {
+                first = heading(child, scope)?;
+            }
+        } else if let Some(role) = text_part_role(child) {
+            blocks.close(scope)?;
+            for (_, inner) in text_part(child, role, Holder::Note, scope)? {
+                blocks.blocks.extend(inner);
+            }
+        } else {
+            blocks.child(child, scope)?;
+        }
+    }
+    Ok((first, blocks.take(scope)?))
+}
+
+/// The footnote `node`, numbered `ordinal`: the text of its `num`, empty when
+/// it has none, and the blocks of the flow of the rest.
+pub(crate) fn footnote(
+    node: Node<'_, '_>,
+    ordinal: u32,
+    scope: &mut Scope,
+) -> Result<Footnote, IngestError> {
+    let mut shown = None;
+    let mut blocks = Blocks::new(node, Holder::Text);
+    for child in node.children() {
+        if shown.is_none() && is(child, "num") {
+            shown = Some(label(child, scope)?.plain());
+        } else {
+            blocks.child(child, scope)?;
+        }
+    }
+    Ok(Footnote {
+        ordinal,
+        shown: shown.unwrap_or_default(),
+        blocks: blocks.take(scope)?,
+    })
+}
+
+/// The paragraphs of the `signature` `node`: one for each `name` and each
+/// `role` in it, in document order. A signature that holds anything else, a
+/// footnote included, is refused.
+fn signature(node: Node<'_, '_>, scope: &mut Scope) -> Result<Vec<Block>, IngestError> {
+    let mut blocks = Vec::new();
+    for child in node.children() {
+        only_elements(child)?;
+        if !child.is_element() {
+            continue;
+        }
+        if is_footnote(child) {
+            return Err(IngestError::at(
+                child,
+                "a footnote that stands directly in a signature; a signature holds only name and \
+                 role",
+            ));
+        }
+        if !is(child, "name") && !is(child, "role") {
+            return Err(IngestError::at(
+                child,
+                format!(
+                    "<{}> in a signature; a signature holds only name and role",
+                    tag(child)
+                ),
+            ));
+        }
+        let text = label(child, scope)?;
+        if !text.plain().is_empty() {
+            blocks.push(Block::Para(text));
+        }
+    }
+    Ok(blocks)
+}
+
+/// The quoted content `node`, held by `holder`: its origin as the source
+/// writes it, and its items.
+fn quoted(node: Node<'_, '_>, holder: Holder, scope: &mut Scope) -> Result<Quoted, IngestError> {
+    let mut items = Items::new(node, holder);
+    for child in node.children() {
+        if is(child, "heading") || is(child, "subheading") {
+            items.flush(scope)?;
+            if let Some(text) = heading(child, scope)? {
+                items.items.push(QuotedItem::Block(Block::Subheading(text)));
+            }
+        } else if !items.structure(child, scope)? {
+            items.blocks.child(child, scope)?;
+        }
+    }
+    Ok(Quoted {
+        origin: node.attribute("origin").map(str::to_owned),
+        items: items.finish(scope)?,
+    })
+}
+
+/// The level of quoted content `node`, held by `holder`: its kind, number,
+/// heading and items. It has no address.
+fn quoted_level(
+    node: Node<'_, '_>,
+    holder: Holder,
+    scope: &mut Scope,
+) -> Result<QuotedLevel, IngestError> {
+    status(node)?;
+    let mut labels = Labels::default();
+    let mut items = Items::new(node, holder);
+    for child in node.children() {
+        if !labels.read(child, scope)? && !items.structure(child, scope)? {
+            items.blocks.child(child, scope)?;
+        }
+    }
+    Ok(QuotedLevel {
+        kind: node.tag_name().name().to_owned(),
+        num: labels.num,
+        heading: labels.heading,
+        items: items.finish(scope)?,
+    })
+}
+
+/// The items of quoted content or of one of its levels, as they are read:
+/// the blocks of its flow, each an item, between its parts, levels and
+/// notes.
+struct Items<'a, 'i> {
+    items: Vec<QuotedItem>,
+    blocks: Blocks<'a, 'i>,
+}
+
+impl<'a, 'i> Items<'a, 'i> {
+    fn new(node: Node<'a, 'i>, holder: Holder) -> Self {
+        Self {
+            items: Vec::new(),
+            blocks: Blocks::new(node, holder),
+        }
+    }
+
+    /// Adds the blocks read so far as items.
+    fn flush(&mut self, scope: &mut Scope) -> Result<(), IngestError> {
+        let blocks = self.blocks.take(scope)?;
+        self.items.extend(blocks.into_iter().map(QuotedItem::Block));
+        Ok(())
+    }
+
+    /// Reads `child` when it is a text part, a level or a note, and says
+    /// whether it is one. A note inside quoted content is replaced by the
+    /// blocks of its own flow, its heading first as a subheading.
+    fn structure(&mut self, child: Node<'a, 'i>, scope: &mut Scope) -> Result<bool, IngestError> {
+        let holder = self.blocks.holder;
+        if let Some(role) = text_part_role(child) {
+            self.flush(scope)?;
+            for (role, blocks) in text_part(child, role, holder, scope)? {
+                self.items.push(QuotedItem::Part { role, blocks });
+            }
+        } else if operative::is_provision(child) {
+            self.flush(scope)?;
+            self.items
+                .push(QuotedItem::Level(quoted_level(child, holder, scope)?));
+        } else if is(child, "note") && !is_footnote(child) {
+            self.flush(scope)?;
+            let (heading, blocks) = note(child, true, scope)?;
+            self.items.extend(
+                heading
+                    .map(Block::Subheading)
+                    .into_iter()
+                    .chain(blocks)
+                    .map(QuotedItem::Block),
+            );
+        } else {
+            return Ok(false);
+        }
+        Ok(true)
+    }
+
+    fn finish(mut self, scope: &mut Scope) -> Result<Vec<QuotedItem>, IngestError> {
+        self.flush(scope)?;
+        Ok(self.items)
+    }
+}
+
+/// The table `node`, held by `holder`. A row belongs to the group of the
+/// `thead`, `tbody` or `tfoot` it stands in, and to the body when it stands
+/// in none; column groups and columns hold nothing and are dropped.
+fn table(node: Node<'_, '_>, holder: Holder, scope: &mut Scope) -> Result<Table, IngestError> {
     let mut rows = Vec::new();
     for child in node.children() {
         only_elements(child)?;
@@ -937,10 +1236,10 @@ fn table(node: Node<'_, '_>, scope: &mut Scope) -> Result<Table, IngestError> {
                 if !is_xhtml(row, "tr") {
                     return Err(misplaced(row, child));
                 }
-                rows.push(table_row(row, group, scope)?);
+                rows.push(table_row(row, group, holder, scope)?);
             }
         } else if is_xhtml(child, "tr") {
-            rows.push(table_row(child, RowGroup::Body, scope)?);
+            rows.push(table_row(child, RowGroup::Body, holder, scope)?);
         } else if is_xhtml(child, "colgroup") {
             for column in child.children() {
                 if column.is_text() && !is_white_space(column.text().unwrap_or("")) {
@@ -975,7 +1274,12 @@ fn empty_column(node: Node<'_, '_>) -> Result<(), IngestError> {
 }
 
 /// The row `node` of the group `group`.
-fn table_row(node: Node<'_, '_>, group: RowGroup, scope: &mut Scope) -> Result<Row, IngestError> {
+fn table_row(
+    node: Node<'_, '_>,
+    group: RowGroup,
+    holder: Holder,
+    scope: &mut Scope,
+) -> Result<Row, IngestError> {
     let mut cells = Vec::new();
     for child in node.children() {
         only_elements(child)?;
@@ -993,7 +1297,7 @@ fn table_row(node: Node<'_, '_>, group: RowGroup, scope: &mut Scope) -> Result<R
             header,
             colspan: span(child, "colspan")?,
             rowspan: span(child, "rowspan")?,
-            blocks: flow(child, scope)?,
+            blocks: flow(child, holder, scope)?,
         });
     }
     Ok(Row { group, cells })
@@ -1091,6 +1395,13 @@ mod tests {
 
     fn para(runs: Vec<Run>) -> Block {
         Block::Para(Text { runs })
+    }
+
+    fn mark(shown: &str, footnote: u32) -> Run {
+        Run::Mark {
+            shown: shown.to_owned(),
+            footnote,
+        }
     }
 
     #[test]
@@ -1300,8 +1611,30 @@ mod tests {
                 "<img> does not stand in <section>",
             ),
             (
-                "<content><quotedContent>Quoted.</quotedContent></content>".to_owned(),
-                "quoted content stands in operative text",
+                "<content><subheading>A</subheading></content>".to_owned(),
+                "<subheading> does not stand in <content>",
+            ),
+            (
+                "<content><signature><name>A.</name></signature></content>".to_owned(),
+                "<signature> does not stand in <content>",
+            ),
+            (
+                "<content>A<quotedContent><p>B<heading>C</heading></p></quotedContent>\
+                 </content>"
+                    .to_owned(),
+                "<heading> does not stand in <p>",
+            ),
+            (
+                "<content>A<quotedContent><signature><name>B.</name></signature>\
+                 </quotedContent></content>"
+                    .to_owned(),
+                "<signature> does not stand in <quotedContent>",
+            ),
+            (
+                "<content>A<quotedContent><section><heading>B</heading><heading>C</heading>\
+                 </section></quotedContent></content>"
+                    .to_owned(),
+                "a second heading",
             ),
         ];
         for (inner, phrase) in cases {
@@ -1416,7 +1749,9 @@ mod tests {
         assert_eq!(
             blocks,
             [para(vec![
-                words("Due by rule"),
+                words("Due"),
+                mark("1", 1),
+                words(" by rule"),
                 Run::Sup("1".to_owned()),
                 words(" and C"),
                 Run::Sub("3".to_owned()),
@@ -1440,7 +1775,15 @@ mod tests {
             text.plain(),
             "The fee is set by rule1 and is 1⁄4 of a coin."
         );
-        assert!(text.runs.iter().all(|run| !matches!(run, Run::Mark { .. })));
+        // The one marker is the `footnoteRef`, and both superscripts are
+        // superscripts.
+        assert_eq!(
+            text.runs
+                .iter()
+                .filter(|run| matches!(run, Run::Mark { .. }))
+                .collect::<Vec<_>>(),
+            [&mark("1", 1)]
+        );
         assert_eq!(
             text.runs
                 .iter()
@@ -1452,18 +1795,92 @@ mod tests {
 
     #[test]
     fn a_footnote_does_not_close_its_paragraph_and_a_marker_gives_no_text() {
+        // A marker stands directly after the last character before it that
+        // is not white space: between two spaces it leaves one, after it.
         assert_eq!(
             blocks_of(
                 "<content>The keeper shall keep<ref class=\"footnoteRef\" idref=\"f\">3</ref>\
                  <note type=\"footnote\" id=\"f\"><num>3</num> So in original.<p>Two.</p></note> \
-                 the gate and <ref class=\"footnoteRef\" idref=\"f\">3</ref> the key.</content>"
+                 the gate and <ref class=\"footnoteRef\" idref=\"f\"> 3\n</ref> the key<ref \
+                 class=\"footnoteRef\" idref=\"f\">*</ref>  </content>"
             ),
-            [para(vec![words(
-                "The keeper shall keep the gate and the key."
-            )])]
+            [para(vec![
+                words("The keeper shall keep"),
+                mark("3", 1),
+                words(" the gate and"),
+                mark("3", 1),
+                words(" the key"),
+                mark("*", 1),
+            ])]
+        );
+        // After a link, and at the start of a paragraph.
+        assert_eq!(
+            blocks_of(
+                "<content> <ref class=\"footnoteRef\" idref=\"f\">1</ref> See <ref \
+                 href=\"/us/usc/t99/s2\">section 2</ref><ref class=\"footnoteRef\" \
+                 idref=\"f\">1</ref>.<note type=\"footnote\" id=\"f\"><num>1</num> X.</note>\
+                 </content>"
+            ),
+            [para(vec![
+                mark("1", 1),
+                words("See "),
+                Run::Ref {
+                    words: "section 2".to_owned(),
+                    target: "/us/usc/t99/s2".to_owned(),
+                },
+                mark("1", 1),
+                words("."),
+            ])]
+        );
+        // A paragraph that holds a marker and no text is dropped.
+        assert_eq!(
+            blocks_of(
+                "<content><p>Kept.</p><p><ref class=\"footnoteRef\" idref=\"f\">1</ref></p><note \
+                 type=\"footnote\" id=\"f\"><num>1</num> X.</note></content>"
+            ),
+            [para(vec![words("Kept.")])]
         );
         assert_fixture("footnotes");
         assert_fixture("marker-labels");
+    }
+
+    #[test]
+    fn quoted_content_in_operative_text_is_read() {
+        assert_fixture("quoted-operative");
+        // A subheading in a note that is quoted in operative text is a
+        // subheading, as in any note, and so is a heading that stands directly
+        // in the quotation.
+        let blocks = blocks_of(
+            "<content>Reads: <quotedContent><heading>Part</heading><note \
+             topic=\"miscellaneous\"><heading>Instructions</heading><p>Fill.</p><subheading>\
+             Signature Line</subheading><p>Sign.</p></note><chapeau>Words—</chapeau>\
+             </quotedContent></content>",
+        );
+        let subheading = |text: &str| {
+            QuotedItem::Block(Block::Subheading(Text {
+                runs: vec![words(text)],
+            }))
+        };
+        assert_eq!(
+            blocks,
+            [
+                para(vec![words("Reads:")]),
+                Block::Quoted(Quoted {
+                    origin: None,
+                    items: vec![
+                        subheading("Part"),
+                        subheading("Instructions"),
+                        QuotedItem::Block(para(vec![words("Fill.")])),
+                        subheading("Signature Line"),
+                        QuotedItem::Block(para(vec![words("Sign.")])),
+                        QuotedItem::Part {
+                            role: PartRole::Chapeau,
+                            blocks: vec![para(vec![words("Words—")])],
+                        },
+                    ],
+                }),
+            ]
+        );
     }
 
     #[test]
@@ -1594,7 +2011,9 @@ mod tests {
             provisions(&modules)[0].num,
             Some(Num {
                 value: String::new(),
-                shown: Text::default(),
+                shown: Text {
+                    runs: vec![mark("1", 1)],
+                },
             })
         );
     }

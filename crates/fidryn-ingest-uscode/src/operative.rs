@@ -15,7 +15,7 @@
 
 use crate::IngestError;
 use crate::containers::{Assigned, CONTAINER_TAGS};
-use crate::uslm::{self, Labels, Scope};
+use crate::uslm::{self, Holder, Labels, Scope};
 use fidryn_provision::{Address, Item, PartRole, Provision, UnitModule};
 use roxmltree::Node;
 use std::collections::HashMap;
@@ -126,8 +126,9 @@ pub(crate) fn child_segments<'a, 'i>(
     Ok(segments)
 }
 
-/// The unit `node`, at its address and with its aliases, without its notes,
-/// credit and footnotes, which `scope` sets aside.
+/// The unit `node`, at its address and with its aliases, without its notes
+/// and credit, which `scope` sets aside, and its footnotes, which `scope`
+/// holds; `notes::matter` reads them.
 pub(crate) fn unit(
     node: Node<'_, '_>,
     assigned: &Assigned,
@@ -180,13 +181,13 @@ fn provision(
             continue;
         }
         if let Some(role) = uslm::text_part_role(child) {
-            for (role, blocks) in uslm::text_part(child, role, scope)? {
+            for (role, blocks) in uslm::text_part(child, role, Holder::Text, scope)? {
                 items.push(Item::Part { role, blocks });
             }
             continue;
         }
         if uslm::is_p(child) {
-            let blocks = uslm::flow(child, scope)?;
+            let blocks = uslm::flow(child, Holder::Text, scope)?;
             if !blocks.is_empty() {
                 items.push(Item::Part {
                     role: PartRole::Content,
@@ -196,7 +197,7 @@ fn provision(
             continue;
         }
         match uslm::uslm_name(child) {
-            Some("note" | "notes") => scope.set_aside_note(child),
+            Some("note" | "notes") => scope.set_aside_note(child, &address),
             Some("sourceCredit") if top => scope.set_aside_credit(child)?,
             Some("sourceCredit") => {
                 return Err(IngestError::at(

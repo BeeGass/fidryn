@@ -33,13 +33,14 @@
 //! refused, and so is a release in which two elements would end with one
 //! address.
 
+use crate::notes;
 use crate::operative::{self, Made, UNIT_TAGS};
-use crate::uslm::{self, Head, Labels, Scope};
+use crate::uslm::{self, Footnotes, Head, Labels, Scope};
 use crate::{IngestError, PREFIX};
 use fidryn_provision::workspace::{AddressCounts, NotImported};
-use fidryn_provision::{Address, ContainerModule, Module};
+use fidryn_provision::{Address, ContainerModule, Item, Module, Provision};
 use roxmltree::{Document, Node, NodeId};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// The tags of containers.
 pub(crate) const CONTAINER_TAGS: [&str; 13] = [
@@ -442,20 +443,35 @@ pub(crate) fn build(
             .get_node(entry.node)
             .ok_or_else(|| IngestError::new("an element of the outline is not in the document"))?;
         let within = entry.parent.map(|parent| assigned[parent].address.clone());
-        let mut scope = Scope::default();
+        // A unit holds everything inside it; a container holds what is not
+        // one of its members.
+        let is_member = |child: Node<'_, '_>| !entry.unit && class_in_container(child).is_some();
+        let mut scope = Scope {
+            footnotes: Footnotes::of_module(node, &is_member)?,
+            ..Scope::default()
+        };
         let module = if entry.unit {
             built.units += 1;
-            Module::Unit(operative::unit(
+            let mut unit = operative::unit(
                 node,
                 &assigned[index],
                 within,
                 source,
                 head.positive_law,
                 &mut scope,
-            )?)
+            )?;
+            let mut provisions = HashSet::new();
+            provisions_of(&unit.root, &mut provisions);
+            let matter = notes::matter(document, &mut scope, &|address| {
+                provisions.contains(address)
+            })?;
+            unit.credit = matter.credit;
+            unit.notes = matter.notes;
+            unit.footnotes = matter.footnotes;
+            Module::Unit(unit)
         } else {
             built.containers += 1;
-            Module::Container(container(
+            let mut container = container(
                 node,
                 &assigned[index],
                 within,
@@ -463,7 +479,12 @@ pub(crate) fn build(
                 source,
                 head.positive_law,
                 &mut scope,
-            )?)
+            )?;
+            let matter = notes::matter(document, &mut scope, &|_| false)?;
+            container.credit = matter.credit;
+            container.notes = matter.notes;
+            container.footnotes = matter.footnotes;
+            Module::Container(container)
         };
         built.not_imported.add(&scope.counts);
         give(module)?;
@@ -471,8 +492,20 @@ pub(crate) fn build(
     Ok(built)
 }
 
+/// Adds the address of `provision` and of every provision below it to
+/// `out`.
+fn provisions_of<'p>(provision: &'p Provision, out: &mut HashSet<&'p str>) {
+    out.insert(provision.address.as_str());
+    for item in &provision.items {
+        if let Item::Child(child) = item {
+            provisions_of(child, out);
+        }
+    }
+}
+
 /// The container `node`, at its address and with its aliases and members,
-/// without its notes, credit and footnotes, which `scope` sets aside.
+/// without its notes and credit, which `scope` sets aside, and its
+/// footnotes, which `scope` holds.
 fn container(
     node: Node<'_, '_>,
     assigned: &Assigned,
@@ -492,7 +525,7 @@ fn container(
             continue;
         }
         match uslm::uslm_name(child) {
-            Some("note" | "notes") => scope.set_aside_note(child),
+            Some("note" | "notes") => scope.set_aside_note(child, &assigned.address),
             Some("sourceCredit") => scope.set_aside_credit(child)?,
             Some("toc") => uslm::table_of_contents(child, &mut scope.counts),
             _ => {
@@ -525,8 +558,8 @@ mod tests {
     use super::*;
     use crate::testing::{
         Counts, Document, MEMBER_SETS, RELEASE, Scratch, assert_fixture, document_fixtures,
-        expected_operative, fixture, fixture_members, ingest_all, json_file, operative_records,
-        read_fixture, refusal, release_of, workspace,
+        expected_records, fixture, fixture_members, ingest_all, json_file, not_imported_counts,
+        not_imported_of_profile, read_fixture, records, refusal, release_of, workspace,
     };
     use fidryn_provision::Item;
 
@@ -554,7 +587,7 @@ mod tests {
     }
 
     #[test]
-    fn every_fixture_reads_to_its_expected_operative_records() {
+    fn every_fixture_reads_to_its_expected_records() {
         let names = document_fixtures();
         // Every file of expected records is compared: one for each document
         // and one for each directory of members.
@@ -577,7 +610,7 @@ mod tests {
             .collect();
         compared.sort();
         assert_eq!(compared, expected);
-        assert!(names.len() >= 31, "{names:?}");
+        assert!(names.len() >= 32, "{names:?}");
         for name in &names {
             assert_fixture(name);
         }
@@ -586,11 +619,7 @@ mod tests {
             let archives = member_set(&scratch, name);
             let (modules, _) =
                 ingest_all(&archives, &[], 2).unwrap_or_else(|error| panic!("{error}"));
-            assert_eq!(
-                operative_records(&modules),
-                expected_operative(name),
-                "{name}"
-            );
+            assert_eq!(records(&modules), expected_records(name), "{name}");
         }
     }
 
@@ -618,27 +647,11 @@ mod tests {
             let addresses: AddressCounts =
                 serde_json::from_value(profile["addresses"].clone()).expect("addresses");
             assert_eq!(summary.addresses, addresses, "{name}");
-            let not_imported = &profile["not_imported"];
-            for (key, count) in [
-                (
-                    "tables_of_contents",
-                    summary.not_imported.tables_of_contents,
-                ),
-                (
-                    "footnotes_in_tables_of_contents",
-                    summary.not_imported.footnotes_in_tables_of_contents,
-                ),
-                (
-                    "links_in_tables_of_contents",
-                    summary.not_imported.links_in_tables_of_contents,
-                ),
-                (
-                    "links_without_words",
-                    summary.not_imported.links_without_words,
-                ),
-            ] {
-                assert_eq!(not_imported[key].as_u64(), Some(count), "{name}: {key}");
-            }
+            assert_eq!(
+                not_imported_counts(&summary.not_imported),
+                not_imported_of_profile(&profile),
+                "{name}"
+            );
             assert_eq!(
                 (summary.units, summary.containers),
                 (Counts::of(&modules).units, Counts::of(&modules).containers),
@@ -931,7 +944,7 @@ mod tests {
         let archives = member_set(&scratch, "two-files");
         for jobs in [1, 8] {
             let (modules, summary) = ingest_all(&archives, &[], jobs).expect("ingested");
-            assert_eq!(operative_records(&modules), expected_operative("two-files"));
+            assert_eq!(records(&modules), expected_records("two-files"));
             assert_eq!(
                 unit_addresses(&modules)
                     .into_iter()
@@ -1051,7 +1064,7 @@ mod tests {
     }
 
     #[test]
-    fn the_sample_archives_ingest() {
+    fn the_sample_archives_ingest_with_their_notes() {
         let root = workspace().join("samples/uscode");
         let archives = crate::open(&root.join("archives")).expect("the sample opens");
         assert_eq!(archives.release(), "119-142");
@@ -1060,7 +1073,24 @@ mod tests {
         let profile = json_file(&root.join("profile.json"));
         let import = &profile["import"];
         let counts = Counts::of(&modules);
-        assert_eq!(counts, Counts::of_profile(import));
+        let expected = Counts::of_profile(import);
+        // The notes by layer and by group, the footnotes and the images.
+        assert_eq!(
+            (
+                &counts.notes,
+                &counts.notes_by_group,
+                counts.footnotes,
+                counts.with_images
+            ),
+            (
+                &expected.notes,
+                &expected.notes_by_group,
+                expected.footnotes,
+                expected.with_images
+            )
+        );
+        assert!(counts.footnotes > 100 && counts.notes["enacted"] > 1000);
+        assert_eq!(counts, expected);
         assert_eq!(
             (summary.units, summary.containers),
             (counts.units, counts.containers)
@@ -1068,21 +1098,9 @@ mod tests {
         let addresses: AddressCounts =
             serde_json::from_value(import["addresses"].clone()).expect("addresses");
         assert_eq!(summary.addresses, addresses);
-        let not_imported = &import["not_imported"];
         assert_eq!(
-            [
-                summary.not_imported.tables_of_contents,
-                summary.not_imported.footnotes_in_tables_of_contents,
-                summary.not_imported.links_in_tables_of_contents,
-                summary.not_imported.links_without_words,
-            ],
-            [
-                "tables_of_contents",
-                "footnotes_in_tables_of_contents",
-                "links_in_tables_of_contents",
-                "links_without_words",
-            ]
-            .map(|key| not_imported[key].as_u64().expect(key))
+            not_imported_counts(&summary.not_imported),
+            not_imported_of_profile(import)
         );
         // Each title alone gives its own modules, numbered as in the release.
         let (title_one, _) = ingest_all(&archives, &["1"], 2).expect("title 1");

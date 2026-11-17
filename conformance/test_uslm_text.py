@@ -63,6 +63,8 @@ CASES = {
     "notes-unknown-group": "a group heading with a group word the rules do not know",
     "marker-labels": "a number, a heading and a source credit that hold only a footnote marker",
     "subheadings": "a subheading in a note with no heading, a heading directly in quoted content",
+    "quoted-operative": "quoted content in operative text with an origin, a paragraph, a quoted "
+    "section with a number and a heading, and a note with a heading",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -200,6 +202,9 @@ class TextFixtures(unittest.TestCase):
 
     def test_subheadings(self) -> None:
         self.check("subheadings")
+
+    def test_quoted_operative(self) -> None:
+        self.check("quoted-operative")
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)

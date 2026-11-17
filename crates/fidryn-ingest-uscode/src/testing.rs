@@ -4,8 +4,8 @@
 
 use crate::{IngestError, IngestOptions, IngestSummary, ReleaseArchives, ingest};
 use fidryn_provision::records::text_records;
-use fidryn_provision::workspace::{RetrievalRecord, RetrievedArchive};
-use fidryn_provision::{Hash32, Item, Module, Provision};
+use fidryn_provision::workspace::{NotImported, RetrievalRecord, RetrievedArchive};
+use fidryn_provision::{Block, Hash32, Item, Layer, Module, Provision, QuotedItem};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
@@ -82,76 +82,35 @@ pub(crate) fn read_fixture(name: &str) -> Vec<Module> {
         .0
 }
 
-/// A record line with every `"marks"` list left out, and the shown form of a
-/// number written as the plain string when, without its markers, it holds
-/// words only: the form the record of the same text without markers has.
-pub(crate) fn without_marks(line: &str) -> String {
-    fn strip(value: &mut Value) {
-        match value {
-            Value::Object(object) => {
-                object.remove("marks");
-                for inner in object.values_mut() {
-                    strip(inner);
-                }
-                if let Some(Value::Array(num)) = object.get_mut("num")
-                    && let [_, shown @ Value::Object(_)] = num.as_mut_slice()
-                {
-                    let words_only = ["refs", "sup", "sub"]
-                        .iter()
-                        .all(|key| shown[*key].as_array().is_some_and(Vec::is_empty));
-                    if words_only {
-                        *shown = shown["text"].clone();
-                    }
-                }
-            }
-            Value::Array(items) => items.iter_mut().for_each(strip),
-            _ => {}
-        }
-    }
-    let mut value: Value = serde_json::from_str(line).expect("a record is JSON");
-    strip(&mut value);
-    serde_json::to_string(&value).expect("a record is written")
-}
-
-/// Whether a record line is that of a provision or a container.
-fn is_operative(line: &str) -> bool {
-    let value: Value = serde_json::from_str(line).expect("a record is JSON");
-    value.get("layer") == Some(&Value::from("operative"))
-}
-
-/// The records of provisions and containers that `<name>.records.jsonl`
-/// expects, without their markers.
-pub(crate) fn expected_operative(name: &str) -> Vec<String> {
+/// The lines of `<name>.records.jsonl`: every record the fixture expects.
+pub(crate) fn expected_records(name: &str) -> Vec<String> {
     let path = fixtures().join(format!("{name}.records.jsonl"));
     fs::read_to_string(&path)
         .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
         .lines()
-        .filter(|line| is_operative(line))
-        .map(without_marks)
+        .map(str::to_owned)
         .collect()
 }
 
-/// The records of provisions and containers of `modules`, in the order of
-/// their addresses, without their markers.
-pub(crate) fn operative_records(modules: &[Module]) -> Vec<String> {
+/// The text records of `modules`, sorted as a record file is: by the bytes of
+/// their address, and for one address in the order of their module's
+/// records (the provision or container, the credit, the footnotes).
+pub(crate) fn records(modules: &[Module]) -> Vec<String> {
     let mut records: Vec<(String, String)> = modules
         .iter()
         .flat_map(text_records)
         .map(|record| (record.address().as_str().to_owned(), record.to_json()))
-        .filter(|(_, line)| is_operative(line))
         .collect();
     records.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
-    records
-        .into_iter()
-        .map(|(_, line)| without_marks(&line))
-        .collect()
+    records.into_iter().map(|(_, line)| line).collect()
 }
 
-/// Asserts that the fixture `name` reads to its expected records.
+/// Asserts that the fixture `name` reads to its expected records, line for
+/// line.
 pub(crate) fn assert_fixture(name: &str) {
-    let expected = expected_operative(name);
-    assert!(!expected.is_empty(), "{name} expects no operative record");
-    assert_eq!(operative_records(&read_fixture(name)), expected, "{name}");
+    let expected = expected_records(name);
+    assert!(!expected.is_empty(), "{name} expects no record");
+    assert_eq!(records(&read_fixture(name)), expected, "{name}");
 }
 
 /// An empty directory under the system's directory for temporary files,
@@ -295,7 +254,8 @@ pub(crate) fn address_of(module: &Module) -> &str {
 }
 
 /// The counts of a profile's `import` that the modules give: units by kind
-/// and by status, containers by kind, and provisions.
+/// and by status, containers by kind, provisions, notes by layer and by
+/// group, footnotes, and the provisions and notes that hold an image.
 #[derive(Debug, Default, PartialEq, Eq)]
 pub(crate) struct Counts {
     pub(crate) units: u64,
@@ -304,24 +264,50 @@ pub(crate) struct Counts {
     pub(crate) containers: u64,
     pub(crate) containers_by_kind: BTreeMap<String, u64>,
     pub(crate) provisions: u64,
+    pub(crate) notes: BTreeMap<String, u64>,
+    pub(crate) notes_by_group: BTreeMap<String, u64>,
+    pub(crate) footnotes: u64,
+    pub(crate) with_images: u64,
+}
+
+/// Whether `blocks` hold an image, in a table or quoted content included.
+pub(crate) fn holds_image(blocks: &[Block]) -> bool {
+    fn in_items(items: &[QuotedItem]) -> bool {
+        items.iter().any(|item| match item {
+            QuotedItem::Block(block) => holds_image(std::slice::from_ref(block)),
+            QuotedItem::Part { blocks, .. } => holds_image(blocks),
+            QuotedItem::Level(level) => in_items(&level.items),
+        })
+    }
+    blocks.iter().any(|block| match block {
+        Block::Image { .. } => true,
+        Block::Table(table) => table
+            .rows
+            .iter()
+            .flat_map(|row| &row.cells)
+            .any(|cell| holds_image(&cell.blocks)),
+        Block::Quoted(quoted) => in_items(&quoted.items),
+        Block::Para(_) | Block::Subheading(_) => false,
+    })
 }
 
 impl Counts {
     /// The counts of `modules`.
     pub(crate) fn of(modules: &[Module]) -> Self {
-        fn provisions(provision: &Provision) -> u64 {
-            1 + provision
-                .items
-                .iter()
-                .map(|item| match item {
-                    Item::Child(child) => provisions(child),
-                    Item::Part { .. } => 0,
-                })
-                .sum::<u64>()
+        fn provisions(provision: &Provision, counts: &mut Counts) {
+            counts.provisions += 1;
+            let mut image = false;
+            for item in &provision.items {
+                match item {
+                    Item::Child(child) => provisions(child, counts),
+                    Item::Part { blocks, .. } => image |= holds_image(blocks),
+                }
+            }
+            counts.with_images += u64::from(image);
         }
         let mut counts = Self::default();
         for module in modules {
-            match module {
+            let (notes, footnotes) = match module {
                 Module::Unit(unit) => {
                     counts.units += 1;
                     *counts
@@ -330,7 +316,8 @@ impl Counts {
                         .or_default() += 1;
                     let status = unit.root.status.clone().unwrap_or("in-force".to_owned());
                     *counts.units_by_status.entry(status).or_default() += 1;
-                    counts.provisions += provisions(&unit.root);
+                    provisions(&unit.root, &mut counts);
+                    (&unit.notes, &unit.footnotes)
                 }
                 Module::Container(container) => {
                     counts.containers += 1;
@@ -338,9 +325,25 @@ impl Counts {
                         .containers_by_kind
                         .entry(container.kind.clone())
                         .or_default() += 1;
+                    (&container.notes, &container.footnotes)
                 }
-                Module::Curated(_) => {}
+                Module::Curated(_) => continue,
+            };
+            for note in notes {
+                let layer = match note.layer {
+                    Layer::Operative => "operative",
+                    Layer::Enacted => "enacted",
+                    Layer::Editorial => "editorial",
+                };
+                *counts.notes.entry(layer.to_owned()).or_default() += 1;
+                *counts.notes_by_group.entry(note.group.clone()).or_default() += 1;
+                counts.with_images += u64::from(holds_image(&note.blocks));
             }
+            counts.footnotes += footnotes.len() as u64;
+        }
+        // A profile writes both layers, a count of none included.
+        for layer in ["editorial", "enacted"] {
+            counts.notes.entry(layer.to_owned()).or_default();
         }
         counts
     }
@@ -363,8 +366,41 @@ impl Counts {
             containers: number("containers"),
             containers_by_kind: map("containers_by_kind"),
             provisions: number("provisions"),
+            notes: map("notes"),
+            notes_by_group: map("notes_by_group"),
+            footnotes: number("footnotes"),
+            with_images: number("with_images"),
         }
     }
+}
+
+/// The six counts of `not_imported` of a profile, in the order of S11.
+pub(crate) fn not_imported_of_profile(profile: &Value) -> [u64; 6] {
+    [
+        "tables_of_contents",
+        "footnotes_in_tables_of_contents",
+        "links_in_tables_of_contents",
+        "release_notes",
+        "links_without_words",
+        "note_group_headings",
+    ]
+    .map(|key| {
+        profile["not_imported"][key]
+            .as_u64()
+            .unwrap_or_else(|| panic!("not_imported.{key}"))
+    })
+}
+
+/// The six counts of `counts`, in the order of S11.
+pub(crate) fn not_imported_counts(counts: &NotImported) -> [u64; 6] {
+    [
+        counts.tables_of_contents,
+        counts.footnotes_in_tables_of_contents,
+        counts.links_in_tables_of_contents,
+        counts.release_notes,
+        counts.links_without_words,
+        counts.note_group_headings,
+    ]
 }
 
 /// The JSON of the file at `path`.

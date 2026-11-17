@@ -14,13 +14,19 @@
 //! containers and units that are its members; a unit holds its tree of
 //! provisions, with their numbers, headings, statuses and text. Every one of
 //! them has an address, which is the publisher's identifier except where the
-//! release repeats an identifier or an element has none. Notes, source
-//! credits and footnotes are found where they stand and set aside: a footnote
-//! does not interrupt the paragraph it stands in, and a footnote marker gives
-//! no text. What the reading leaves out by rule is counted.
+//! release repeats an identifier or an element has none. Each module also
+//! holds its source credit, its notes, each with its group, its layer
+//! (enacted or editorial) and an address derived from its group, the law it
+//! cites and its heading, and its footnotes, numbered in document order: a
+//! footnote does not interrupt the paragraph it stands in, and its marker is
+//! a run of the text that gives no words. Quoted content keeps its structure
+//! and has no address. What the reading leaves out by rule (tables of
+//! contents, release notes, the labels of note groups, links without words)
+//! is counted.
 
 mod archive;
 mod containers;
+mod notes;
 mod operative;
 mod uslm;
 
