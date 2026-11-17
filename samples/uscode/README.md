@@ -20,6 +20,16 @@ positive law; Title 11 Appendix and Title 45 are not.
   `law.lock.json`, and one module of edition 2 for each of the 563 units
   and 72 containers of the three titles, 637 files in all. It is generated,
   never written by hand.
+- `curated/` is a curated workspace of the prefix `/zz/sample`, written by
+  hand, that depends on `workspace/`. Its manifest `workspace.json` names
+  the generated workspace at `../workspace`, pinned to its release `119-142`
+  and to the BLAKE3 of the bytes of its lock. Its one module,
+  `zz/sample/citations.fr`, gives names to provisions of the sample: whole
+  sections of Title 1 and of Title 45, a subsection and a subparagraph of
+  1 U.S.C. 112b, a paragraph of 45 U.S.C. 1005, Rule 1001 of the appendix
+  and its subsection (a), and a statutory note under 1 U.S.C. 1. It holds
+  names and addresses, and no text of the Code; every citation has the
+  outcome `exact`.
 
 | Title | Archive | Bytes | Retrieved (UTC) |
 | --- | --- | --- | --- |
@@ -46,8 +56,10 @@ uv run --locked python -I conformance/usc_profile.py samples/uscode/archives --o
 
 The workspace is regenerated, from the repository root, with the command
 below, which writes it with
-`fidryn ingest uscode samples/uscode/archives --out samples/uscode/workspace`
-and then runs every check of the sample on it:
+`fidryn ingest uscode samples/uscode/archives --out samples/uscode/workspace`,
+then writes in `curated/workspace.json` the release and the lock digest of
+its dependency and the manifest's `toolchain`, and nothing else of that
+file, and then runs every check of the sample:
 
 ```sh
 cargo xtask uscode-sample --update
@@ -62,7 +74,15 @@ fidryn check samples/uscode/workspace --no-cache
 fidryn text samples/uscode/workspace /us/usc/t1/s1
 ```
 
-`cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks six
+The curated sample is checked with its dependency, and with
+`--unresolved FILE` each citation whose outcome is not `exact` would be
+listed:
+
+```sh
+fidryn check samples/uscode/curated --no-cache
+```
+
+`cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks seven
 things, in this order, and fails with a message that names the first
 difference:
 
@@ -82,10 +102,16 @@ difference:
 6. it fails when what `conformance/uslm_text.py` prints for the archives,
    an independent reading of the publisher's XML, is not, line for line,
    what `fidryn text samples/uscode/workspace --json` prints, and names the
-   first line that differs.
+   first line that differs;
+7. it checks `curated/` with its dependency, and fails, naming the file and
+   the first thing that is wrong, on an error, such as a pin that is no
+   longer the lock's (`E740`), on a warning, and on a citation whose
+   outcome is not `exact`, such as one that stops resolving after a
+   regeneration.
 
 The step writes nothing in the repository, a cache included; with
-`--update` it writes `workspace/` alone.
+`--update` it writes `workspace/` and those three values of
+`curated/workspace.json`, and never the curated module.
 [Law modules](../../docs/law-modules.md#the-sample) describes it.
 
 The text of the archives, and of the workspace generated from them, is a

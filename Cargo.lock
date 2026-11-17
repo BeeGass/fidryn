@@ -2503,6 +2503,7 @@ dependencies = [
  "fidryn-check",
  "fidryn-cli",
  "fidryn-core",
+ "fidryn-driver",
  "fidryn-provision",
  "fidryn-syntax",
  "pulldown-cmark",

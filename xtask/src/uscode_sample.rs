@@ -1,6 +1,6 @@
-//! Checks the pinned sample of the Code under `samples/uscode/`, six things in
-//! this order, and fails with a message that names the first difference when
-//! one of them does not hold:
+//! Checks the pinned sample of the Code under `samples/uscode/`, seven things
+//! in this order, and fails with a message that names the first difference
+//! when one of them does not hold:
 //!
 //! 1. every archive in `archives/` has the size, the SHA-256 and the BLAKE3
 //!    that the retrieval record beside it gives, and the record names every
@@ -16,18 +16,30 @@
 //!    prints for the archives, and its counts of references by layer and
 //!    outcome are those of the check report of step 4;
 //! 6. what `conformance/uslm_text.py` prints for the archives is, line for
-//!    line, what `fidryn text samples/uscode/workspace --json` prints.
+//!    line, what `fidryn text samples/uscode/workspace --json` prints;
+//! 7. the check of the curated sample, `samples/uscode/curated`, which
+//!    depends on the generated one at a pinned release, finds no error and
+//!    no warning, and gives every one of its citations the outcome `exact`;
+//!    `--update` writes, after the workspace, the release and the lock
+//!    digest of that dependency and the toolchain of the curated manifest,
+//!    and nothing else of it.
 //!
 //! The `fidryn` commands run in this process, through `fidryn_cli`, as the
-//! binary runs them. Their temporary directories are made under the system's
-//! directory for temporary files and removed whether the step passes or
-//! fails, and the check keeps no cache, so the step leaves the repository as
-//! it found it; only `--update` writes, and only the committed workspace.
+//! binary runs them, and the check of the curated sample through the check
+//! of a workspace that `fidryn check` runs, so that its diagnostics can be
+//! named. Their temporary directories are made under the system's directory
+//! for temporary files and removed whether the step passes or fails, and the
+//! checks keep no cache, so the step leaves the repository as it found it;
+//! only `--update` writes, and only the committed workspace and those three
+//! values of the curated manifest.
 
 use crate::workspace::workspace_root;
 use anyhow::{Context, Result, anyhow, bail};
 use clap::Parser as _;
-use fidryn_provision::workspace::RetrievalRecord;
+use fidryn_core::DiagnosticCode;
+use fidryn_driver::workspace::{CheckOptions, check_workspace};
+use fidryn_provision::layout::module_path;
+use fidryn_provision::workspace::{Lock, Manifest, RetrievalRecord};
 use fidryn_provision::{Hash32, Outcome};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -52,12 +64,24 @@ pub const WORKSPACE: &str = "samples/uscode/workspace";
 /// The script that prints the text records of the archives, independently.
 pub const TEXT_SCRIPT: &str = "conformance/uslm_text.py";
 
+/// The curated sample, which depends on the generated sample.
+pub const CURATED: &str = "samples/uscode/curated";
+/// The path at which the curated manifest names the generated sample.
+const DEPENDENCY_PATH: &str = "../workspace";
+/// The manifest of a workspace, at its top.
+const MANIFEST: &str = "workspace.json";
+/// The lock of a generated workspace, at its top.
+const LOCK: &str = "law.lock.json";
+/// The version of the running toolchain: that of the crates of the
+/// repository, which `fidryn` and this task share.
+const TOOLCHAIN: &str = env!("CARGO_PKG_VERSION");
+
 /// The layers whose references the profile and the check report count.
 const LAYERS: [&str; 3] = ["operative", "enacted", "editorial"];
 
 #[derive(Debug, clap::Args)]
 pub struct UscodeSampleArgs {
-    /// Write samples/uscode/workspace with what the ingester writes from the archives, then check it
+    /// Write samples/uscode/workspace with what the ingester writes from the archives, and the pin and the toolchain of samples/uscode/curated, then check them
     #[arg(long)]
     pub update: bool,
 }
@@ -66,8 +90,9 @@ pub fn run(args: UscodeSampleArgs) -> Result<()> {
     check(&workspace_root(), args.update)
 }
 
-/// Runs the six steps on the sample under `root`; with `update`, step 2
-/// first writes the committed workspace.
+/// Runs the seven steps on the sample under `root`; with `update`, step 2
+/// first writes the committed workspace, and then the pin and the toolchain
+/// of the curated manifest.
 pub fn check(root: &Path, update: bool) -> Result<()> {
     let problems = archive_problems(&root.join(ARCHIVES))?;
     if !problems.is_empty() {
@@ -85,6 +110,8 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     if update {
         ingest(&archives, &committed, 8)?;
         eprintln!("wrote {WORKSPACE}");
+        update_curated(root)?;
+        eprintln!("wrote the pin and the toolchain of {CURATED}/{MANIFEST}");
     }
     if !committed.is_dir() {
         bail!("{WORKSPACE} does not exist; write it with `cargo xtask uscode-sample --update`");
@@ -140,11 +167,14 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
         bail!("{problem}");
     }
     let records = text.iter().filter(|&&byte| byte == b'\n').count();
+
+    let citations = check_curated(root)?;
     eprintln!(
         "{ARCHIVES} matches {RECORD}; {WORKSPACE} is what the ingester writes from it, on one \
          worker and on eight, and checks with no error; {PROFILE} is current and counts the \
-         references the check counts; and the text of its {records} records is what \
-         {TEXT_SCRIPT} prints"
+         references the check counts; the text of its {records} records is what \
+         {TEXT_SCRIPT} prints; and {CURATED} checks against it with no error and no warning, \
+         each of its {citations} citations `exact`"
     );
     Ok(())
 }
@@ -214,6 +244,83 @@ fn ingest(archives: &Path, out: &Path, jobs: u32) -> Result<()> {
         );
     }
     Ok(())
+}
+
+/// Step 7: the check of the curated sample under `root`, in this process
+/// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
+/// runs it. It gives the number of the sample's citations, and fails,
+/// naming the file and the first thing that is wrong, on an error, on a
+/// warning, and on a citation whose outcome is not `exact`.
+fn check_curated(root: &Path) -> Result<u64> {
+    eprintln!("+ fidryn check {CURATED} --no-cache");
+    let options = CheckOptions {
+        jobs: std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
+        cache_dir: None,
+        toolchain: TOOLCHAIN.to_owned(),
+        executable: String::new(),
+    };
+    let report = check_workspace(&root.join(CURATED), &options);
+    if let Some(first) = report.diagnostics.first() {
+        let mut shown = first.clone();
+        shown.source_file = Some(match &first.source_file {
+            Some(file) => format!("{CURATED}/{file}"),
+            None => CURATED.to_owned(),
+        });
+        let mut problem = format!(
+            "{shown}; `fidryn check {CURATED} --no-cache` finds {} errors and {} warnings, and the \
+             curated sample checks with none",
+            report.errors(),
+            report.warnings()
+        );
+        if first.code == DiagnosticCode::E740 {
+            problem.push_str(
+                "; when the generated sample was written again, write the pin with `cargo xtask \
+                 uscode-sample --update`",
+            );
+        }
+        bail!("{problem}");
+    }
+    if let Some(citation) = report.unresolved_citations.first() {
+        bail!(
+            "{CURATED}/{}: the citation `{}` of `{}` names `{}`, whose outcome is `{}`, and every \
+             citation of the curated sample is `exact`; {} of its citations are not",
+            module_path(&citation.from),
+            citation.citation,
+            citation.from,
+            citation.target,
+            citation.outcome.name(),
+            report.unresolved_citations.len()
+        );
+    }
+    Ok(report.citations.values().sum())
+}
+
+/// What `--update` writes of the curated manifest under `root`, after the
+/// generated sample: the release and the lock digest of the dependency at
+/// `../workspace`, those of the generated sample's lock, and the manifest's
+/// toolchain, the running one. Nothing else of the file changes, and it is
+/// written in the canonical form of a manifest. The curated module is not
+/// touched.
+fn update_curated(root: &Path) -> Result<()> {
+    let shown = format!("{CURATED}/{MANIFEST}");
+    let path = root.join(CURATED).join(MANIFEST);
+    let text = fs::read_to_string(&path).with_context(|| format!("read {shown}"))?;
+    let mut manifest = Manifest::from_json(&text).map_err(|error| anyhow!("{shown}: {error}"))?;
+    let lock_shown = format!("{WORKSPACE}/{LOCK}");
+    let lock_text = fs::read_to_string(root.join(WORKSPACE).join(LOCK))
+        .with_context(|| format!("read {lock_shown}"))?;
+    let lock = Lock::from_json(&lock_text).map_err(|error| anyhow!("{lock_shown}: {error}"))?;
+    let Some(entry) = manifest
+        .dependencies
+        .iter_mut()
+        .find(|entry| entry.path == DEPENDENCY_PATH)
+    else {
+        bail!("{shown} names no dependency at `{DEPENDENCY_PATH}`");
+    };
+    entry.release = lock.release;
+    entry.lock_digest = Lock::digest(&lock_text);
+    manifest.toolchain = TOOLCHAIN.to_owned();
+    fs::write(&path, manifest.to_json()).with_context(|| format!("write {shown}"))
 }
 
 fn read_json(path: &Path) -> Result<Value> {
@@ -813,6 +920,97 @@ mod tests {
                 && problem.contains("line 2, the record of `/zz/demo/t1/s1`"),
             "{problem}"
         );
+    }
+
+    /// A copy of the generated and of the curated sample in a scratch
+    /// directory, each at its path.
+    fn copy_of_the_samples(name: &str) -> PathBuf {
+        let root = workspace_root();
+        let copy = scratch("xtask-uscode-sample-", name);
+        copy_tree(&root.join(WORKSPACE), &copy.join(WORKSPACE));
+        copy_tree(&root.join(CURATED), &copy.join(CURATED));
+        copy
+    }
+
+    fn read_text(path: &Path) -> String {
+        fs::read_to_string(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+    }
+
+    fn manifest_of(text: &str) -> Manifest {
+        Manifest::from_json(text).unwrap_or_else(|error| panic!("{error}"))
+    }
+
+    #[test]
+    fn the_curated_sample_checks_against_the_generated_one() {
+        let copy = copy_of_the_samples("curated-clean");
+        let committed = read_text(&copy.join(CURATED).join(MANIFEST));
+        assert_eq!(manifest_of(&committed).to_json(), committed);
+        let citations = check_curated(&copy).unwrap_or_else(|error| panic!("{error:#}"));
+        assert!(citations >= 5, "{citations}");
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_pin_that_is_not_the_lock_fails_the_step_and_names_the_curated_manifest() {
+        let copy = copy_of_the_samples("curated-pin");
+        let path = copy.join(CURATED).join(MANIFEST);
+        let mut manifest = manifest_of(&read_text(&path));
+        manifest.dependencies[0].lock_digest = Hash32([0; 32]);
+        fs::write(&path, manifest.to_json()).expect("write the manifest");
+        let error = check_curated(&copy).expect_err("a pin that is not the lock");
+        let message = format!("{error:#}");
+        assert!(
+            message.contains("samples/uscode/curated/workspace.json: E740 PinMismatch: ")
+                && message.contains("cargo xtask uscode-sample --update"),
+            "{message}"
+        );
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_citation_the_sample_does_not_hold_fails_the_step_and_names_the_module() {
+        let copy = copy_of_the_samples("curated-citation");
+        let module = copy.join(CURATED).join("zz/sample/citations.fr");
+        let original = read_text(&module);
+        let changed = original.replacen("\"/us/usc/t1/s1\"", "\"/us/usc/t1/s999\"", 1);
+        assert_ne!(changed, original);
+        fs::write(&module, changed).expect("change the module");
+        let error = check_curated(&copy).expect_err("a citation that does not resolve");
+        let message = format!("{error:#}");
+        assert!(
+            message.starts_with(
+                "samples/uscode/curated/zz/sample/citations.fr: the citation \
+                 `words_denoting_number` of `/zz/sample/citations` names `/us/usc/t1/s999`, \
+                 whose outcome is `no-unit`"
+            ),
+            "{message}"
+        );
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn update_rewrites_exactly_the_three_values_of_a_stale_pin() {
+        let copy = copy_of_the_samples("curated-update");
+        let path = copy.join(CURATED).join(MANIFEST);
+        let module = copy.join(CURATED).join("zz/sample/citations.fr");
+        let committed = read_text(&path);
+        let module_text = read_text(&module);
+        let mut stale = manifest_of(&committed);
+        stale.dependencies[0].release = "119-141".to_owned();
+        stale.dependencies[0].lock_digest = Hash32([0; 32]);
+        stale.toolchain = "0.0.1".to_owned();
+        // A value that the update leaves as it is.
+        stale.name = "another-name".to_owned();
+        fs::write(&path, stale.to_json()).expect("write the manifest");
+        update_curated(&copy).unwrap_or_else(|error| panic!("{error:#}"));
+        let expected = Manifest {
+            name: "another-name".to_owned(),
+            ..manifest_of(&committed)
+        };
+        assert_eq!(read_text(&path), expected.to_json());
+        assert_eq!(read_text(&module), module_text);
+        check_curated(&copy).unwrap_or_else(|error| panic!("{error:#}"));
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
     }
 
     #[test]

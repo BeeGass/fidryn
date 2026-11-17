@@ -1,0 +1,11 @@
+edition 2
+module "/zz/sample/citations" {
+  citation words_denoting_number -> "/us/usc/t1/s1"
+  citation monthly_agreement_reports -> "/us/usc/t1/s112b/a"
+  citation reported_agreements -> "/us/usc/t1/s112b/a/1/A"
+  citation railway_labor_definitions -> "/us/usc/t45/s151"
+  citation subsistence_allowances -> "/us/usc/t45/s1005/a/1"
+  citation bankruptcy_rules_scope -> "/us/usc/rule1001"
+  citation bankruptcy_rules_in_general -> "/us/usc/rule1001/a"
+  citation respect_for_marriage_short_title -> "/us/usc/t1/s1/note/statutoryNotes/pl.117.228/short-title-of-2022-amendment"
+}

@@ -1374,6 +1374,13 @@ names a module of the dependency, `widget` is `exact`, and `part` is
 {"from":"/zz/notes/a","citation":"part","target":"/zz/demo/t1/s8/z","outcome":"unit-only"}
 ```
 
+The example in the repository is the curated sample,
+`samples/uscode/curated/` ([The sample](#the-sample)): a workspace of the
+prefix `/zz/sample` that depends on the generated sample of the Code at
+`../workspace`, pinned to its release and to the digest of its lock, whose
+one module cites sections, deeper provisions and a note of it, each with
+the outcome `exact`.
+
 A dependency that fails a check gives phase two no interface, only its
 prefix when the check read the manifest of its directory; the manifest of
 an entry refused for its `path` or its `name` is not read. What lies below
@@ -1661,9 +1668,16 @@ point published by the Office of the Law Revision Counsel, Title 1, Title
   manifest, its lock, and a module for each of the 563 units and 72
   containers of the three titles, 637 files in all. It is written by
   `cargo xtask uscode-sample --update` and never by hand.
+- `curated/` holds a curated workspace written by hand that
+  [depends](#depending-on-another-workspace) on `workspace/`, at
+  `../workspace`, pinned to its release and to the BLAKE3 of its lock. Its
+  one module gives names to provisions of the sample, a whole section, a
+  subsection and deeper provisions, a rule of the appendix title and a
+  note, and holds no text of the Code; `fidryn check
+  samples/uscode/curated --no-cache` checks it with its dependency.
 
 `cargo xtask uscode-sample`, which `cargo xtask ci` runs, holds the sample
-to six things, in this order, and fails with a message that names the
+to seven things, in this order, and fails with a message that names the
 first difference when one of them does not hold:
 
 1. every archive has the size, the SHA-256 and the BLAKE3 that its record
@@ -1681,13 +1695,19 @@ first difference when one of them does not hold:
    footnote that `fidryn text samples/uscode/workspace --json` reads back
    from the modules equals, line for line, what `conformance/uslm_text.py`
    reads from the publisher's XML by the [rules of the reading](#the-ingester-for-the-united-states-code),
-   which it implements on its own, sharing no code with the ingester.
+   which it implements on its own, sharing no code with the ingester;
+7. the check of `curated/` with its dependency finds no error and no
+   warning, a pin that is no longer the lock's (`E740`) among the errors,
+   and gives every citation of it the outcome `exact`; the step names the
+   file and the first thing that is wrong.
 
 The `fidryn` commands run in the process of the step, as the binary runs
 them. The step makes its temporary directories under the system's
 directory for temporary files and removes them whether it passes or fails,
-and its check keeps no cache, so it leaves the repository as it found it:
-only `--update` writes, and only the workspace.
+and its checks keep no cache, so it leaves the repository as it found it:
+only `--update` writes, the workspace, and then, in the curated manifest,
+the release and the lock digest of its dependency and its `toolchain`,
+and nothing else; it never touches the curated module.
 
 ```text
 cargo xtask uscode-sample

@@ -1,0 +1,15 @@
+{
+  "schema": "fidryn.workspace/v0.1",
+  "name": "sample",
+  "kind": "curated",
+  "prefix": "/zz/sample",
+  "toolchain": "0.2.0",
+  "dependencies": [
+    {
+      "name": "uscode",
+      "path": "../workspace",
+      "release": "119-142",
+      "lock_digest": "92072a9aeac273e950cb8effdb5b878bb20147e1cc5488290b7f59783b391e7f"
+    }
+  ]
+}

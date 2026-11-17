@@ -107,6 +107,12 @@ interchange schema versions are maintained independently of the interpreter.
   not `exact`; what a dependency that failed hides is left out of both.
   `check_interfaces` takes what is known of each dependency
   (`fidryn_driver::workspace::DependencyInterfaces`).
+- A curated sample, `samples/uscode/curated/`, which depends on the
+  generated sample of the Code at its pinned release and cites sections,
+  deeper provisions, a rule of the appendix title and a note of it.
+  `cargo xtask uscode-sample` also checks it, and fails on an error, a
+  warning or a citation whose outcome is not `exact`, naming the file;
+  `--update` also writes the pin and the toolchain of its manifest.
 
 ## [0.2.0] - 2026-11-16
 

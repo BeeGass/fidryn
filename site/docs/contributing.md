@@ -51,9 +51,10 @@ and probe controls, the sample check (`cargo xtask uscode-sample`: the
 committed archives of the Code against their retrieval record, the committed
 workspace against what the importer writes from them on one worker and on
 eight, its check, the committed profile and its counts of references against
-the script that counts the archives and the check, and the text of every
+the script that counts the archives and the check, the text of every
 provision and note against what an independent script reads from the
-publisher's XML), required
+publisher's XML, and the curated sample, checked with the generated one as
+its dependency, every citation of it `exact`), required
 JavaScript tests, generated-site consistency, the example status and
 documentation checks described below, and benchmark compilation. Node and
 [uv](https://docs.astral.sh/uv/) are required for qualification.
