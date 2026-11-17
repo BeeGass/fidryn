@@ -134,7 +134,7 @@ pub(crate) fn unit(
     assigned: &Assigned,
     within: Option<Address>,
     source: &str,
-    positive_law: bool,
+    positive_law: Option<bool>,
     scope: &mut Scope,
 ) -> Result<UnitModule, IngestError> {
     let root = provision(node, assigned.address.clone(), true, scope)?;
@@ -143,7 +143,7 @@ pub(crate) fn unit(
         aliases: assigned.aliases.clone(),
         within,
         source: source.to_owned(),
-        positive_law: Some(positive_law),
+        positive_law,
         root,
         credit: None,
         notes: Vec::new(),

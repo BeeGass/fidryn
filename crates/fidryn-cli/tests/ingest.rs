@@ -384,6 +384,78 @@ fn the_text_of_the_workspace_of_a_fixture_is_its_expected_records() {
     }
 }
 
+/// A document without the property `is-positive-law` has no flag: none of
+/// its modules declares `positive_law`, each checks by itself, and the
+/// record of its unit has `null`. The same document with the property
+/// `yes` gives the same modules, each with the declaration `positive_law
+/// true`.
+#[test]
+fn a_document_without_the_flag_has_none() {
+    let document = String::from_utf8(fixture("meta-no-flag.xml")).expect("UTF-8");
+    assert!(!document.contains("is-positive-law"));
+    let name = "<docPublicationName>Online@999-1</docPublicationName>";
+    let with_flag = document.replace(
+        name,
+        &format!("{name}\n<property role=\"is-positive-law\">yes</property>"),
+    );
+    assert_ne!(with_flag, document);
+    let scratch = Scratch::new("no-flag");
+    let mut written = Vec::new();
+    for (tag, text) in [("none", &document), ("yes", &with_flag)] {
+        let archives = scratch.join(&format!("archives-{tag}"));
+        one_archive(
+            &archives,
+            vec![("usc99.xml".to_owned(), text.as_bytes().to_vec())],
+        );
+        let out = scratch.join(&format!("out-{tag}"));
+        succeeded(&ingest(&archives, &out, &[]), tag);
+        written.push((out.clone(), modules(&out)));
+    }
+    let [(out, unflagged), (_, flagged)] = written.try_into().expect("two workspaces");
+
+    // A unit and two containers, none of which declares the flag.
+    assert_eq!(
+        unflagged.keys().map(String::as_str).collect::<Vec<_>>(),
+        ["us/usc/t99.fr", "us/usc/t99/ch1.fr", "us/usc/t99/s1.fr"]
+    );
+    for (rel, text) in &unflagged {
+        assert!(!text.contains("positive_law"), "{rel}:\n{text}");
+        let checked = check(&out.join(rel));
+        succeeded(&checked, &format!("check of {rel}"));
+        assert_eq!(stdout(&checked), "ok\n", "{rel}");
+        let declared = &flagged[rel];
+        assert_eq!(
+            declared.matches("\n  positive_law true\n").count(),
+            1,
+            "{rel}"
+        );
+        assert_eq!(
+            &declared.replace("\n  positive_law true\n", "\n"),
+            text,
+            "{rel}"
+        );
+    }
+    let checked = check(&out);
+    succeeded(&checked, "check of the workspace");
+    assert!(stdout(&checked).contains("errors: 0; warnings: 0"));
+
+    let printed = fidryn()
+        .args([OsStr::new("text"), out.as_os_str(), OsStr::new("--json")])
+        .output()
+        .expect("run fidryn");
+    succeeded(&printed, "text");
+    let records = stdout(&printed);
+    assert_eq!(
+        records,
+        read(&fixtures().join("meta-no-flag.records.jsonl"))
+    );
+    let unit: Value =
+        serde_json::from_str(records.lines().nth(2).expect("the unit's record")).expect("a record");
+    assert_eq!(unit["address"], "/us/usc/t99/s1");
+    assert_eq!(unit.get("positive_law"), Some(&Value::Null));
+    assert_eq!(records.matches("\"positive_law\":null").count(), 1);
+}
+
 #[test]
 fn two_runs_give_the_same_bytes() {
     let scratch = Scratch::new("same-bytes");

@@ -512,7 +512,7 @@ fn container(
     within: Option<Address>,
     members: Vec<Address>,
     source: &str,
-    positive_law: bool,
+    positive_law: Option<bool>,
     scope: &mut Scope,
 ) -> Result<ContainerModule, IngestError> {
     let mut labels = Labels::default();
@@ -541,7 +541,7 @@ fn container(
         aliases: assigned.aliases.clone(),
         within,
         source: source.to_owned(),
-        positive_law: Some(positive_law),
+        positive_law,
         kind: node.tag_name().name().to_owned(),
         num: labels.num,
         heading: labels.heading,

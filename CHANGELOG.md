@@ -40,6 +40,12 @@ interchange schema versions are maintained independently of the interpreter.
   that is missing, extra or different, every entry a run would refuse
   among the extra. `GeneratedWriter::compare` makes a writer that compares
   instead of writing, by the rule by which `create` refuses a directory.
+- The importer of the Code, and the independent reading in `conformance/`,
+  read a document whose `docPublicationName` writes the release with an en
+  dash, each en dash of the name read as a hyphen, and a document without
+  the property `is-positive-law`, whose modules then declare no
+  `positive_law` and whose units have `"positive_law":null` in their text
+  records. A document with two such properties is refused by both.
 - `fidryn text DIR [ADDRESS] [--json]` prints the text of the provisions
   and notes of a workspace, or of one address and what lies below it: for
   a person, each provision indented by its depth and the notes after the

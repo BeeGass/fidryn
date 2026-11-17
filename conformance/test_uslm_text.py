@@ -67,6 +67,8 @@ CASES = {
     "quoted-operative": "quoted content in operative text with an origin, a paragraph, a quoted "
     "section with a number and a heading, a note with no heading that holds a content and a "
     "heading inside a p, and a note with a heading and a subheading",
+    "meta-dash-name": "a publication name that writes the release with an en dash",
+    "meta-no-flag": "a file without the property is-positive-law, with a chapter and a section",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -213,6 +215,12 @@ class TextFixtures(unittest.TestCase):
     def test_quoted_operative(self) -> None:
         self.check("quoted-operative")
 
+    def test_meta_dash_name(self) -> None:
+        self.check("meta-dash-name")
+
+    def test_meta_no_flag(self) -> None:
+        self.check("meta-no-flag")
+
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)
         self.assertIn('"address":"/us/usc/~appendix.2"', expected[2])
@@ -328,7 +336,8 @@ class TextFixtures(unittest.TestCase):
 
 
 # The scripts whose reading the refusal test holds to the rules.
-SCRIPTS = [TEXT_SCRIPT, HERE / "usc_profile.py"]
+PROFILE_SCRIPT = HERE / "usc_profile.py"
+SCRIPTS = [TEXT_SCRIPT, PROFILE_SCRIPT]
 
 DOCUMENT = """<!-- Invented for tests: this document is not the text of any law. -->
 {doctype}<{root} xmlns="{namespace}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
@@ -360,6 +369,15 @@ def document(**changes: str) -> str:
     }
     fields.update(changes)
     return DOCUMENT.format(**fields)
+
+
+FLAG = '<property role="is-positive-law">yes</property>'
+
+
+def with_flags(*values: str) -> str:
+    """The document above with one property is-positive-law for each value, in order."""
+    properties = "".join(f'<property role="is-positive-law">{value}</property>' for value in values)
+    return document().replace(FLAG, properties)
 
 
 def archive(directory: Path, name: str, members: dict[str, str]) -> None:
@@ -418,6 +436,9 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
     "schema location naming another file": (document(schema="USLM-1.0.14.xsd"), "schema"),
     "publication name not beginning Online@": (document(release="Print@999-1"), "Online@"),
     "positive-law flag that is neither yes nor no": (document(flag="maybe"), "is-positive-law"),
+    "positive-law flag that is empty": (document(flag=""), "neither yes nor no"),
+    "two positive-law flags of one value": (with_flags("yes", "yes"), "more than one property"),
+    "two positive-law flags of two values": (with_flags("yes", "no"), "more than one property"),
     "element in no class": (document(inner="<widget>Text.</widget>"), "does not stand"),
     "element where its class does not stand": (
         document(
@@ -608,15 +629,20 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
 }
 
 
+def assert_refused(case: unittest.TestCase, path: Path, phrase: str) -> None:
+    """Both scripts refuse the input at `path`, with a message that holds `phrase`."""
+    for script in SCRIPTS:
+        with case.subTest(script=script.name):
+            result = run_script(script, path)
+            case.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            case.assertTrue(result.stderr.startswith("refused: "), result.stderr)
+            case.assertIn(phrase, result.stderr)
+            case.assertEqual(result.stdout, "")
+
+
 class Refusals(unittest.TestCase):
     def refused(self, path: Path, phrase: str) -> None:
-        for script in SCRIPTS:
-            with self.subTest(script=script.name):
-                result = run_script(script, path)
-                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-                self.assertTrue(result.stderr.startswith("refused: "), result.stderr)
-                self.assertIn(phrase, result.stderr)
-                self.assertEqual(result.stdout, "")
+        assert_refused(self, path, phrase)
 
     def test_the_scripts_refuse_what_the_rules_refuse(self) -> None:
         with tempfile.TemporaryDirectory(prefix="fidryn-uslm-refused-") as name:
@@ -649,6 +675,111 @@ class Refusals(unittest.TestCase):
                 case.mkdir()
                 oversized_archive(case)
                 self.refused(case, "larger than 512 MiB")
+
+
+# The entries of the refusal table that concern the positive-law flag.
+FLAG_REFUSALS = (
+    "positive-law flag that is neither yes nor no",
+    "positive-law flag that is empty",
+    "two positive-law flags of one value",
+    "two positive-law flags of two values",
+)
+EN_DASH = chr(0x2013)
+# Characters that stand in the place of the hyphen of a release name and are not an en
+# dash: the em dash, the figure dash, the hyphen, the non-breaking hyphen, the minus sign,
+# the small and the fullwidth hyphen-minus, a space and a low line.
+OTHER_DASHES = tuple(
+    chr(code) for code in (0x2014, 0x2012, 0x2010, 0x2011, 0x2212, 0xFE63, 0xFF0D, 0x20, 0x5F)
+)
+
+
+class Metadata(unittest.TestCase):
+    """The release name and the positive-law flag of a document, as both scripts read them.
+
+    The scripts read no retrieval record: the release is what the first member names
+    after `Online@`, and every other member must name the same.
+    """
+
+    def printed(self, script: Path, path: Path) -> str:
+        result = run_script(script, path)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+        return result.stdout
+
+    def test_a_release_name_with_an_en_dash_is_read(self) -> None:
+        dashed = document(release=f"Online@999{EN_DASH}1")
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            directory = Path(name)
+            path = directory / MEMBER
+            for script in SCRIPTS:
+                with self.subTest(script=script.name):
+                    path.write_text(document(), encoding="utf-8")
+                    hyphenated = self.printed(script, path)
+                    path.write_text(dashed, encoding="utf-8")
+                    self.assertEqual(self.printed(script, path), hyphenated)
+            self.assertEqual(
+                json.loads(self.printed(PROFILE_SCRIPT, path))["import"]["release"], "999-1"
+            )
+            # A member named with an en dash and one named with a hyphen are of one release.
+            case = directory / "dashed"
+            case.mkdir()
+            second = dashed.replace("t99", "t99a")
+            archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+            for script in SCRIPTS:
+                with self.subTest(script=script.name, members="dashed"):
+                    self.printed(script, case)
+            # No other character is read as another: a member that writes one of them in
+            # the place of the hyphen names another release, and alone it is read as one.
+            for index, other in enumerate(OTHER_DASHES):
+                with self.subTest(other=other):
+                    case = directory / f"other-{index}"
+                    case.mkdir()
+                    second = document(release=f"Online@999{other}1").replace("t99", "t99a")
+                    archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+                    assert_refused(self, case, "the first member says 999-1")
+                    alone = case / MEMBER
+                    alone.write_text(document(release=f"Online@999{other}1"), encoding="utf-8")
+                    profile = json.loads(self.printed(PROFILE_SCRIPT, alone))
+                    self.assertEqual(profile["import"]["release"], f"999{other}1")
+
+    def test_a_document_without_the_flag_has_none(self) -> None:
+        # The document of the refusal table without its property is read: the record of
+        # its unit has null, and nothing else of what the scripts print changes.
+        self.assertNotIn("is-positive-law", with_flags())
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            path = Path(name) / MEMBER
+            printed: dict[str, list[str]] = {}
+            profiles: list[str] = []
+            for flag, text in (
+                ("none", with_flags()),
+                ("yes", document()),
+                ("no", with_flags("no")),
+            ):
+                path.write_text(text, encoding="utf-8")
+                printed[flag] = self.printed(TEXT_SCRIPT, path).splitlines()
+                profiles.append(self.printed(PROFILE_SCRIPT, path))
+        records = [json.loads(line) for line in printed["none"]]
+        self.assertEqual([r["address"] for r in records], ["/us/usc/t99", "/us/usc/t99/s1"])
+        self.assertNotIn("positive_law", records[0])
+        self.assertIn("positive_law", records[1])
+        self.assertIsNone(records[1]["positive_law"])
+        for flag, value in (("yes", "true"), ("no", "false")):
+            self.assertEqual(printed[flag][0], printed["none"][0])
+            self.assertEqual(
+                printed[flag][1].replace(f'"positive_law":{value}}}', '"positive_law":null}'),
+                printed["none"][1],
+            )
+        # The profile prints no flag.
+        self.assertEqual(profiles, [profiles[0]] * 3)
+
+    def test_two_flags_and_another_value_are_still_refused(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            path = Path(name) / MEMBER
+            for label in FLAG_REFUSALS:
+                text, phrase = DOCUMENT_REFUSALS[label]
+                with self.subTest(refusal=label):
+                    path.write_text(text, encoding="utf-8")
+                    assert_refused(self, path, phrase)
 
 
 def record_key(record: dict[str, object]) -> tuple[bytes, int, int]:
@@ -704,7 +835,8 @@ def check_record(case: unittest.TestCase, record: dict[str, object]) -> None:
                     check_part(case, item)
         if keys == UNIT_KEYS:
             case.assertIsInstance(record["source"], str)
-            case.assertIsInstance(record["positive_law"], bool)
+            flag = record["positive_law"]
+            case.assertTrue(flag is None or isinstance(flag, bool), flag)
 
 
 def check_text(case: unittest.TestCase, value: object, key: str = "text") -> None:

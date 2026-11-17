@@ -105,6 +105,8 @@ EDITORIAL_TOPICS = frozenset({"removalDescription", "historicalAndRevision"})
 LAW_ORIGINS = ("/us/pl/", "/us/act/", "/us/stat/")
 LAW_LINKS = ("/us/pl/", "/us/act/")
 RELEASE_NOTE_START = "Current through "
+# The en dash, which a publication name may write in the place of the hyphen of its release.
+EN_DASH = chr(0x2013)
 
 # The 25 characters with the Unicode property White_Space.
 WHITE_SPACE = (
@@ -312,7 +314,7 @@ class Unit:
     aliases: list[str]
     within: str | None
     source: str
-    positive_law: bool
+    positive_law: bool | None
     root: Provision
     credit: Text | None
     notes: list[Note]
@@ -325,7 +327,7 @@ class Container:
     aliases: list[str]
     within: str | None
     source: str
-    positive_law: bool
+    positive_law: bool | None
     kind: str
     num: Num | None
     heading: Text | None
@@ -744,12 +746,19 @@ class ModuleSink(Protocol):
 
 @dataclass(frozen=True, slots=True)
 class DocumentMeta:
+    """The release a document names, and its positive-law flag (None when it has none)."""
+
     release: str
-    positive_law: bool
+    positive_law: bool | None
 
 
 def parse_document(member: str, data: bytes) -> tuple[Element, DocumentMeta]:
-    """Parse one member and check what its root and metadata must say."""
+    """Parse one member and check what its root and metadata must say.
+
+    The release is what the publication name gives after `Online@`, each en dash in it
+    read as a hyphen and no other character as another. The flag is the one property
+    is-positive-law, `yes` or `no`; a document without it has none.
+    """
     try:
         root = SafeXml.fromstring(data, forbid_dtd=True, forbid_entities=True)
     except defusedxml.DTDForbidden:
@@ -769,18 +778,23 @@ def parse_document(member: str, data: bytes) -> tuple[Element, DocumentMeta]:
         raise RefusedError(f"the schema location does not name {SCHEMA_FILE}", member)
     meta = next((child for child in root if tag_of(child) == "meta"), None)
     name = ""
-    flag = ""
+    flags: list[str] = []
     if meta is not None:
         for child in meta:
             if tag_of(child) == "docPublicationName":
                 name = (child.text or "").strip()
             elif tag_of(child) == "property" and child.get("role") == "is-positive-law":
-                flag = (child.text or "").strip()
+                flags.append((child.text or "").strip())
     if not name.startswith("Online@") or name == "Online@":
         raise RefusedError(f"the publication name {name!r} does not begin Online@", member)
-    if flag not in ("yes", "no"):
-        raise RefusedError(f"the property is-positive-law is {flag!r}, neither yes nor no", member)
-    return root, DocumentMeta(name[len("Online@") :], flag == "yes")
+    if len(flags) > 1:
+        raise RefusedError("the metadata holds more than one property is-positive-law", member)
+    if flags and flags[0] not in ("yes", "no"):
+        raise RefusedError(
+            f"the property is-positive-law is {flags[0]!r}, neither yes nor no", member
+        )
+    release = name[len("Online@") :].replace(EN_DASH, "-")
+    return root, DocumentMeta(release, flags[0] == "yes" if flags else None)
 
 
 def leading_letters(segment: str) -> str:
@@ -826,7 +840,7 @@ class MemberReader:
     def __init__(
         self,
         member: str,
-        positive_law: bool,
+        positive_law: bool | None,
         offsets: dict[str, int],
         sink: ModuleSink,
         top_offsets: dict[str, int] | None = None,

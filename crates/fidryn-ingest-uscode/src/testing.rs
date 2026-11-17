@@ -412,14 +412,15 @@ pub(crate) fn json_file(path: &Path) -> Value {
 
 /// A document of release `999-1` with one section `/us/usc/t99/s1`, the
 /// title and the section holding what is given, in the form of the
-/// refusal documents of the independent reading.
+/// refusal documents of the independent reading. `flags` gives the value of
+/// each property `is-positive-law` of its metadata, in order.
 pub(crate) struct Document {
     pub(crate) doctype: &'static str,
     pub(crate) root: &'static str,
     pub(crate) namespace: &'static str,
     pub(crate) schema: &'static str,
     pub(crate) release: &'static str,
-    pub(crate) flag: &'static str,
+    pub(crate) flags: &'static [&'static str],
     pub(crate) body: String,
 }
 
@@ -440,19 +441,23 @@ impl Document {
             namespace: "http://xml.house.gov/schemas/uslm/1.0",
             schema: "USLM-1.0.15.xsd",
             release: "Online@999-1",
-            flag: "yes",
+            flags: &["yes"],
             body,
         }
     }
 
     pub(crate) fn text(&self) -> String {
+        let flags: String = self
+            .flags
+            .iter()
+            .map(|flag| format!("<property role=\"is-positive-law\">{flag}</property>"))
+            .collect();
         format!(
             "<!-- Invented for tests: this document is not the text of any law. -->\n\
              {doctype}<{root} xmlns=\"{namespace}\" \
              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \
              xsi:schemaLocation=\"http://xml.house.gov/schemas/uslm/1.0 {schema}\">\n\
-             <meta><docPublicationName>{release}</docPublicationName>\
-             <property role=\"is-positive-law\">{flag}</property></meta>\n\
+             <meta><docPublicationName>{release}</docPublicationName>{flags}</meta>\n\
              <main><title identifier=\"/us/usc/t99\"><num value=\"99\">Title 99</num>\
              <heading>Invented</heading>\n{body}\n</title></main>\n</{root}>\n",
             doctype = self.doctype,
@@ -460,7 +465,6 @@ impl Document {
             namespace = self.namespace,
             schema = self.schema,
             release = self.release,
-            flag = self.flag,
             body = self.body,
         )
     }

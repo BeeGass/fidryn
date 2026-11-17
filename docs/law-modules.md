@@ -1283,8 +1283,10 @@ A document is refused when:
   `http://xml.house.gov/schemas/uslm/1.0`, or its schema location names a
   file other than `USLM-1.0.15.xsd`;
 - its `docPublicationName` is not `Online@` followed by the release of the
-  retrieval record, or its property `is-positive-law` is neither `yes` nor
-  `no`;
+  retrieval record, where each en dash (U+2013) of the name is read as a
+  hyphen and no other character as another;
+- it has more than one property `is-positive-law`, or one that is neither
+  `yes` nor `no`;
 - an element stands where its class does not allow it, or is in no class
   below; or text stands where only elements may;
 - a `ref` has neither an `href` nor the class `footnoteRef`; a link, a
@@ -1317,6 +1319,12 @@ A document is refused when:
 A refusal names the archive, the member, the element, the line it starts
 on, and the identifier of the element or of its nearest ancestor that has
 one.
+
+The flag of every module of a document, its `positive_law`, is the
+document's property `is-positive-law`: `true` for `yes`, `false` for `no`.
+A document may have no such property, and then its modules have no flag:
+they declare no `positive_law`, and the text record of each of its units
+has `"positive_law":null`.
 
 ### The classes of elements
 

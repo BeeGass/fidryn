@@ -5,8 +5,10 @@
 //! declaration and with it every entity declaration. It is refused when its
 //! root is not `uscDoc` in the namespace of the publisher's schema, when its
 //! schema location names another file than `USLM-1.0.15.xsd`, when its
-//! `docPublicationName` is not `Online@` followed by the release, and when
-//! its property `is-positive-law` is neither `yes` nor `no`.
+//! `docPublicationName` is not `Online@` followed by the release, an en dash
+//! in the name read as a hyphen, and when it has more than one property
+//! `is-positive-law` or one that is neither `yes` nor `no`. A document
+//! without that property has no flag.
 //!
 //! The text of a flow (a text part, a `p`, a note, quoted content, a level
 //! of quoted content, a table cell) is read into blocks: text and inline
@@ -238,8 +240,8 @@ pub(crate) fn parse(xml: &str) -> Result<Document<'_>, IngestError> {
 pub(crate) struct Head<'a, 'i> {
     /// The `title` inside `main`, or the `appendix` under `uscDoc`.
     pub(crate) top: Node<'a, 'i>,
-    /// The flag `is-positive-law` of the document.
-    pub(crate) positive_law: bool,
+    /// The flag `is-positive-law` of the document, `None` when it has none.
+    pub(crate) positive_law: Option<bool>,
 }
 
 /// Checks the root, the schema location and the metadata of `document`
@@ -348,8 +350,10 @@ pub(crate) fn text_content(node: Node<'_, '_>) -> String {
         .collect()
 }
 
-/// Checks the release name of `meta` and reads its positive-law flag.
-fn metadata(meta: Node<'_, '_>, release: &str) -> Result<bool, IngestError> {
+/// Checks the release name of `meta`, each en dash of which is read as a
+/// hyphen and no other character as another, and reads its positive-law
+/// flag: `None` when it has no property `is-positive-law`.
+fn metadata(meta: Node<'_, '_>, release: &str) -> Result<Option<bool>, IngestError> {
     let mut names = meta
         .children()
         .filter(|child| is(*child, "docPublicationName"));
@@ -361,7 +365,7 @@ fn metadata(meta: Node<'_, '_>, release: &str) -> Result<bool, IngestError> {
     };
     let published = text_content(name);
     let expected = format!("Online@{release}");
-    if published != expected {
+    if published.replace('\u{2013}', "-") != expected {
         return Err(IngestError::at(
             name,
             format!(
@@ -373,15 +377,18 @@ fn metadata(meta: Node<'_, '_>, release: &str) -> Result<bool, IngestError> {
     let mut flags = meta.children().filter(|child| {
         is(*child, "property") && child.attribute("role") == Some("is-positive-law")
     });
-    let (Some(flag), None) = (flags.next(), flags.next()) else {
+    let Some(flag) = flags.next() else {
+        return Ok(None);
+    };
+    if flags.next().is_some() {
         return Err(IngestError::at(
             meta,
-            "meta holds no property is-positive-law, or more than one",
+            "meta holds more than one property is-positive-law",
         ));
-    };
+    }
     match text_content(flag).as_str() {
-        "yes" => Ok(true),
-        "no" => Ok(false),
+        "yes" => Ok(Some(true)),
+        "no" => Ok(Some(false)),
         other => Err(IngestError::at(
             flag,
             format!("the property is-positive-law is {other:?}, neither yes nor no"),
@@ -1355,7 +1362,9 @@ fn image(node: Node<'_, '_>) -> Result<Block, IngestError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing::{Document as Doc, assert_fixture, read_fixture, refusal};
+    use crate::testing::{
+        Document as Doc, MEMBER, RELEASE, assert_fixture, fixture, read_fixture, records, refusal,
+    };
     use fidryn_provision::{Item, Module, Provision};
 
     /// The provisions of the one unit of `modules`, in document order.
@@ -1472,13 +1481,101 @@ mod tests {
     }
 
     #[test]
-    fn a_positive_law_flag_that_is_neither_yes_nor_no_is_refused() {
+    fn a_release_name_with_an_en_dash_is_read() {
+        let read = |xml: &str| {
+            crate::ingest_xml(MEMBER, xml, RELEASE)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .0
+        };
+        // The document of release 999-1 named `Online@999–1` reads to the
+        // records of the same document named with a hyphen; the en dash of
+        // its words stays.
+        let dashed = fixture("meta-dash-name");
+        assert!(dashed.contains("<docPublicationName>Online@999\u{2013}1</docPublicationName>"));
+        let hyphenated = dashed.replace("Online@999\u{2013}1", "Online@999-1");
+        assert_ne!(dashed, hyphenated);
+        assert_eq!(records(&read(&dashed)), records(&read(&hyphenated)));
+        assert_fixture("meta-dash-name");
+        assert!(records(&read(&dashed))[1].contains("release 999\u{2013}1 keep"));
+        // Any other character in the place of the hyphen is refused, and so
+        // is a name with an en dash of another release; the message shows the
+        // name as the document writes it.
+        let others = [
+            "Online@999\u{2014}1",
+            "Online@999\u{2012}1",
+            "Online@999\u{2010}1",
+            "Online@999\u{2011}1",
+            "Online@999\u{2212}1",
+            "Online@999\u{FE63}1",
+            "Online@999\u{FF0D}1",
+            "Online@999 1",
+            "Online@999_1",
+            "Online@9991",
+            "Online@999\u{2013}\u{2013}1",
+            "Online@999\u{2013}2",
+            "Online@99\u{2013}9-1",
+        ];
+        for release in others {
+            let mut document = Doc::with_section("<content>Text.</content>");
+            document.release = release;
+            let error = refusal(&document);
+            assert_eq!(
+                error.message(),
+                format!(
+                    "the document names its release {release:?}, and a document of release \
+                     999-1 says Online@999-1"
+                ),
+                "{release}"
+            );
+            assert!(error.message().contains(release), "{release}: {error}");
+            assert_eq!(error.element(), Some("docPublicationName"));
+        }
+    }
+
+    #[test]
+    fn two_flags_and_another_value_are_still_refused() {
         let mut document = Doc::with_section("<content>Text.</content>");
-        document.flag = "maybe";
-        let error = refusal(&document);
-        assert!(error.message().contains("is-positive-law"), "{error}");
-        document.flag = "no";
-        assert!(document.read().is_ok());
+        let twice: [&'static [&'static str]; 3] = [&["yes", "yes"], &["yes", "no"], &["no", "no"]];
+        for flags in twice {
+            document.flags = flags;
+            let error = refusal(&document);
+            assert_eq!(
+                error.message(),
+                "meta holds more than one property is-positive-law",
+                "{flags:?}"
+            );
+            assert_eq!(error.element(), Some("meta"));
+        }
+        let others: [&'static [&'static str]; 4] = [&["maybe"], &[""], &["Yes"], &["true"]];
+        for flags in others {
+            document.flags = flags;
+            let error = refusal(&document);
+            assert_eq!(
+                error.message(),
+                format!(
+                    "the property is-positive-law is {:?}, neither yes nor no",
+                    flags[0]
+                ),
+            );
+            assert_eq!(error.element(), Some("property"));
+        }
+        // One `yes` or `no` is the flag of every module of the document, and
+        // a document without the property has none.
+        let read: [(&'static [&'static str], Option<bool>); 3] =
+            [(&["yes"], Some(true)), (&["no"], Some(false)), (&[], None)];
+        for (flags, flag) in read {
+            document.flags = flags;
+            let modules = document.read().unwrap_or_else(|error| panic!("{error}"));
+            assert_eq!(modules.len(), 2);
+            for module in &modules {
+                let positive_law = match module {
+                    Module::Unit(unit) => unit.positive_law,
+                    Module::Container(container) => container.positive_law,
+                    Module::Curated(_) => panic!("{module:?}"),
+                };
+                assert_eq!(positive_law, flag, "{flags:?}");
+            }
+        }
     }
 
     #[test]

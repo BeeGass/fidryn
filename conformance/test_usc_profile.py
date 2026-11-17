@@ -182,6 +182,13 @@ class ProfileFixtures(unittest.TestCase):
     def test_quoted_operative(self) -> None:
         self.check("quoted-operative")
 
+    def test_meta_dash_name(self) -> None:
+        # The release is the one the name gives, its en dash read as a hyphen.
+        self.check("meta-dash-name")
+
+    def test_meta_no_flag(self) -> None:
+        self.check("meta-no-flag")
+
     def test_top_elements_without_an_identifier_are_counted_over_the_release(self) -> None:
         expected = json.loads((FIXTURES / f"{UNNAMED}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):

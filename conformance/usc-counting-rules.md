@@ -127,7 +127,7 @@ it has no other.
 
 | Key | Count |
 | --- | --- |
-| `prefix`, `release` | the corpus prefix, and the release that every document names in `docPublicationName` after `Online@` |
+| `prefix`, `release` | the corpus prefix, and the release that every document names in `docPublicationName` after `Online@`, each en dash in it read as a hyphen |
 | `units` | units |
 | `units_by_kind` | units by tag |
 | `units_by_status` | units by status word, `in-force` for none |
