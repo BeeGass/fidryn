@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 
 import blake3
@@ -33,6 +34,21 @@ class HashVectors(unittest.TestCase):
         self.assertEqual(len(problems), 2, problems)
         self.assertTrue(problems[0].startswith("provisions[0] (a provision with text only): hash"))
         self.assertTrue(problems[1].startswith("units[0] "), problems[1])
+
+    def test_the_order_of_notes_changes_no_layer(self) -> None:
+        vectors = hash_vectors.load(hash_vectors.VECTORS)
+        unit = vectors["units"][0]["unit"]
+        container = vectors["containers"][0]["container"]
+        for model, layers in [
+            (unit, hash_vectors.unit_layers),
+            (container, hash_vectors.container_layers),
+        ]:
+            marked = [note for note in model["notes"] if '"mark"' in json.dumps(note)]
+            self.assertGreaterEqual(len(marked), 2, model["address"])
+            reversed_model = copy.deepcopy(model)
+            reversed_model["notes"].reverse()
+            self.assertNotEqual(reversed_model["notes"], model["notes"])
+            self.assertEqual(layers(reversed_model), layers(model), model["address"])
 
     def test_a_frame_is_a_tag_a_length_and_a_value(self) -> None:
         self.assertEqual(hash_vectors.frame(0x10, b"ab"), b"\x10\x02\x00\x00\x00\x00\x00\x00\x00ab")

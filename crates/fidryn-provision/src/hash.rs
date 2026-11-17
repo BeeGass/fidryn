@@ -395,13 +395,20 @@ impl Frames {
     /// The frames of the notes of `layer`, in the byte order of their
     /// addresses.
     fn notes(&mut self, notes: &[Note], layer: Layer) {
-        let mut chosen: Vec<&Note> = notes.iter().filter(|note| note.layer == layer).collect();
-        chosen.sort_by(|a, b| a.address.cmp(&b.address));
-        for note in chosen {
-            self.frame(tag::NOTE_ADDRESS, note.address.as_str().as_bytes());
-            self.frame(tag::NOTE_HASH, &hash_note(note).0);
+        for note in in_address_order(notes) {
+            if note.layer == layer {
+                self.frame(tag::NOTE_ADDRESS, note.address.as_str().as_bytes());
+                self.frame(tag::NOTE_HASH, &hash_note(note).0);
+            }
         }
     }
+}
+
+/// `notes` in the byte order of their addresses.
+fn in_address_order(notes: &[Note]) -> Vec<&Note> {
+    let mut sorted: Vec<&Note> = notes.iter().collect();
+    sorted.sort_by(|a, b| a.address.cmp(&b.address));
+    sorted
 }
 
 fn enacted_layer(notes: &[Note]) -> Hash32 {
@@ -432,13 +439,14 @@ impl<'a> Matter<'a> {
         footnotes
     }
 
-    /// Adds the markers of the credit, of each note in list order and of each
-    /// footnote in ordinal order.
+    /// Adds the markers of the credit, of each note in the byte order of its
+    /// address, as the layers take the notes, and of each footnote in ordinal
+    /// order. So the order of the module's list of notes is in no hash.
     fn marks(&self, out: &mut Vec<MarkAt<'a>>) {
         if let Some(credit) = self.credit {
             marks_of_text(credit, self.address, out);
         }
-        for note in self.notes {
+        for note in in_address_order(self.notes) {
             if let Some(heading) = &note.heading {
                 marks_of_text(heading, &note.address, out);
             }
@@ -1067,8 +1075,27 @@ mod tests {
             members: vec![address("/zz/demo/t1/s9")],
             credit: Some(plain_text("(Invented act.)")),
             notes,
-            footnotes: Vec::new(),
+            footnotes: vec![Footnote {
+                ordinal: 1,
+                shown: "1".to_owned(),
+                blocks: vec![para(vec![words("An invented footnote.")])],
+            }],
         }
+    }
+
+    /// The notes of [`notes`], each with a footnote marker after its words,
+    /// and the first also with one in its heading.
+    fn notes_with_marks() -> Vec<Note> {
+        let mut notes = notes();
+        for note in &mut notes {
+            if let Some(Block::Para(text)) = note.blocks.first_mut() {
+                text.runs.push(mark("1", 1));
+            }
+        }
+        if let Some(heading) = notes[0].heading.as_mut() {
+            heading.runs.push(mark("1", 1));
+        }
+        notes
     }
 
     fn relocate(notes: &[Note]) -> Vec<Note> {
@@ -1085,21 +1112,31 @@ mod tests {
 
     #[test]
     fn note_order_does_not_change_a_layer_hash() {
-        let notes = notes();
-        let base = unit(tree(), notes.clone(), "An invented footnote.");
-        let base_container = container(relocate(&notes));
-        let layers = layer_hashes_of_unit(&base);
-        let container_layers = layer_hashes_of_container(&base_container);
-        for order in [[0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] {
-            let reordered: Vec<Note> = order.iter().map(|&index| notes[index].clone()).collect();
-            let changed = unit(tree(), reordered.clone(), "An invented footnote.");
-            assert_ne!(changed.notes, base.notes);
-            assert_eq!(layer_hashes_of_unit(&changed), layers, "{order:?}");
-            assert_eq!(
-                layer_hashes_of_container(&container(relocate(&reordered))),
-                container_layers,
-                "{order:?}"
-            );
+        let plain = notes();
+        let marked = notes_with_marks();
+        // The markers are in the editorial layer: the two sets of notes differ
+        // there and nowhere else.
+        let plain_layers = layer_hashes_of_unit(&unit(tree(), plain.clone(), "A footnote."));
+        let marked_layers = layer_hashes_of_unit(&unit(tree(), marked.clone(), "A footnote."));
+        assert_ne!(plain_layers.editorial, marked_layers.editorial);
+        assert_eq!(plain_layers.enacted, marked_layers.enacted);
+
+        for (what, notes) in [("without markers", plain), ("each with markers", marked)] {
+            let base = unit(tree(), notes.clone(), "An invented footnote.");
+            let layers = layer_hashes_of_unit(&base);
+            let container_layers = layer_hashes_of_container(&container(relocate(&notes)));
+            for order in [[0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] {
+                let reordered: Vec<Note> =
+                    order.iter().map(|&index| notes[index].clone()).collect();
+                let changed = unit(tree(), reordered.clone(), "An invented footnote.");
+                assert_ne!(changed.notes, base.notes);
+                assert_eq!(layer_hashes_of_unit(&changed), layers, "{what}, {order:?}");
+                assert_eq!(
+                    layer_hashes_of_container(&container(relocate(&reordered))),
+                    container_layers,
+                    "{what}, {order:?}"
+                );
+            }
         }
     }
 

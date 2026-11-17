@@ -276,10 +276,14 @@ def address_of(value: Json) -> str:
     return as_str(field(value, "address"), "an address")
 
 
+def in_address_order(notes: list[Json]) -> list[Json]:
+    return sorted(notes, key=lambda note: utf8(address_of(note)))
+
+
 def notes_of_layer(notes: list[Json], layer: str) -> bytes:
     """The frames of the notes of one layer, in the byte order of their addresses."""
     chosen = [note for note in notes if as_str(field(note, "layer"), "a layer") == layer]
-    chosen.sort(key=lambda note: utf8(address_of(note)))
+    chosen = in_address_order(chosen)
     return b"".join(
         frame(0x72, utf8(address_of(note))) + frame(0x73, note_hash(note)) for note in chosen
     )
@@ -375,9 +379,10 @@ def marks_of_provision(provision: Any, out: list[Mark]) -> None:
 def marks_after_the_text(
     address: str, credit: Any, notes: list[Json], footnotes: list[Json], out: list[Mark]
 ) -> None:
-    """The markers of a credit, then of each note in list order, then of each footnote."""
+    """The markers of a credit, then of each note in the byte order of its address, then of
+    each footnote in ordinal order."""
     marks_of_text(credit, address, out)
-    for note in notes:
+    for note in in_address_order(notes):
         marks_of_text(field(note, "heading"), address_of(note), out)
         marks_of_blocks(field(note, "blocks"), address_of(note), out)
     for footnote in in_ordinal_order(footnotes):

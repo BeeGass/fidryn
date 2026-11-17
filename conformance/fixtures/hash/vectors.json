@@ -748,7 +748,7 @@
   ],
   "units": [
     {
-      "name": "a unit with two enacted notes, one editorial note, a credit, a footnote and two markers",
+      "name": "a unit with two enacted notes, one editorial note, a credit, a footnote and three markers, two of them in notes listed out of address order",
       "unit": {
         "address": "/zz/demo/t1/s4",
         "aliases": [
@@ -976,6 +976,12 @@
                   "runs": [
                     {
                       "words": "This invented section takes effect on enactment."
+                    },
+                    {
+                      "mark": {
+                        "shown": "1",
+                        "footnote": 1
+                      }
                     }
                   ]
                 }
@@ -1018,7 +1024,7 @@
       "layers": {
         "operative": "9359e6a1ed0e44d60b0094a4a910d52dceede29587081c0992f46586074e8af8",
         "enacted": "f46c25b9cbdb3d16d640bfa08136ba896c80e594eabd74b05d1411d421c6da20",
-        "editorial": "36c0d316c1bf8446f6c3e82ffc4bc2f402e370a2f167445f8728bd8e5fb66e68"
+        "editorial": "9d7328ad269d9f7d3c18e114b700e694e284822d95de88928fa8a5a9ead2c4e4"
       }
     },
     {
@@ -1068,7 +1074,7 @@
   ],
   "containers": [
     {
-      "name": "a container with a credit, an enacted note, an editorial note, a footnote and three markers",
+      "name": "a container with a credit, an enacted note, an editorial note, a footnote and four markers, two of them in notes listed out of address order",
       "container": {
         "address": "/zz/demo/t1/ch1",
         "aliases": [],
@@ -1149,6 +1155,12 @@
                   "runs": [
                     {
                       "words": "An invented chapter 1 stood here before."
+                    },
+                    {
+                      "mark": {
+                        "shown": "*",
+                        "footnote": 1
+                      }
                     }
                   ]
                 }
@@ -1213,7 +1225,7 @@
       "layers": {
         "operative": "d6580e9b1992904abeb4cbb9df383fefe88bf06b8fc928c02e2094facded00d6",
         "enacted": "e1e7c6c09f4aa0da50eb99aa2314a0e67817fc38e01234827ebe4d903860716e",
-        "editorial": "5593ace573e450adf4bf61da9f931f984ca807e47fd96ff2969697764c3e768c"
+        "editorial": "b7fc8a35eaa6d0d71ffe6b4869dd0875e4fdda69e36076b3321652d7e808c012"
       }
     },
     {

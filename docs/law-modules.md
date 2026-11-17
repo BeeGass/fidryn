@@ -287,10 +287,11 @@ container's credit is in its editorial layer and not in its container hash.
 
 The document order of the footnote markers of a unit is: the tree of
 provisions depth first, taking for each provision its number, its heading
-and then its items in order; then the credit; then each note in the order
-of the module's list, its heading before its blocks; then each footnote in
-ordinal order. For a container it is its number, its heading, its credit,
-its notes and its footnotes. A marker in a provision is recorded with that
+and then its items in order; then the credit; then the notes in the byte
+order of their addresses, as the layers take them, the heading of each
+before its blocks; then each footnote in ordinal order. For a container it
+is its number, its heading, its credit, its notes in the same order, and
+its footnotes. A marker in a provision is recorded with that
 provision's address, and a marker in a note, its quoted content included,
 with the note's address. A marker in a credit, in a footnote, or in a
 container's own number or heading is recorded with the module's address.
@@ -304,12 +305,10 @@ What follows from these rules:
 - A footnote, a footnote marker, and the provision a marker stands in
   change the editorial layer and nothing else. Where in its provision a
   marker stands is in no hash.
-- The notes of a layer are taken in the byte order of their addresses, so
-  the order of the notes of a module does not change the note frames of a
-  layer. The footnote markers of notes are taken in the order of the
-  module's list: two notes that each hold a marker, listed the other way
-  round, give another editorial layer. Moving a note to a new address
-  changes the hash of its layer and not the note's own hash.
+- The notes and their footnote markers are taken in the byte order of the
+  notes' addresses, so the order in which a module lists its notes changes
+  no layer hash. Moving a note to a new address changes the hash of its
+  layer and not the note's own hash.
 
 `hash::hash_provision`, `hash::hash_note`, `hash::hash_container`,
 `hash::layer_hashes_of_unit` and `hash::layer_hashes_of_container` compute
