@@ -1,6 +1,6 @@
 //! The writer of a generated workspace.
 
-use super::discover::walk;
+use super::discover::{is_dot_named, walk};
 use super::{LOCK_FILE, MANIFEST_FILE};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::render::render;
@@ -24,8 +24,10 @@ const SCRATCH: &str = ".fidryn-write";
 /// besides its own two.
 const COVERAGE_FILE: &str = "coverage.json";
 
-/// Writes a generated workspace: the modules of one run, then its manifest,
-/// then its lock.
+/// Writes a generated workspace: its manifest, the modules of one run, then
+/// its lock. A run that stops before its end leaves a generated workspace of
+/// the same prefix whose lock is missing or outdated: the check reports it,
+/// and the next run accepts the directory and puts it right.
 ///
 /// [`GeneratedWriter::write`] may be called from several threads at once.
 /// What the run writes depends only on the modules, the manifest and what
@@ -61,14 +63,16 @@ impl GeneratedWriter {
     /// A writer of the generated workspace `manifest` into the directory
     /// `out`.
     ///
-    /// `out` is a directory that does not exist, which is created, an empty
-    /// one, or one whose `workspace.json` is the manifest of a generated
-    /// workspace of the same prefix. Such a directory may hold, besides
-    /// `.fr` files and the manifest and the lock, a file `coverage.json` at
-    /// its top and any directory whose name begins with a dot, which the run
-    /// leaves as they are. Any other directory is refused, and nothing in it
-    /// is changed. `manifest` is of kind `generated`, has a release and has no
-    /// dependencies.
+    /// `out` is a directory that does not exist, which is created, one that
+    /// holds nothing but entries whose name begins with a dot, or one whose
+    /// `workspace.json` is the manifest of a generated workspace of the same
+    /// prefix. Such a directory may hold, besides `.fr` files and the
+    /// manifest and the lock, a file `coverage.json` at its top and, anywhere,
+    /// any file, directory or symbolic link whose name begins with a dot,
+    /// which the run leaves as they are. Any other directory is refused, and
+    /// nothing in it is changed. `manifest` is of kind `generated`, has a
+    /// release and has no dependencies; it is written at once, so that a run
+    /// that stops before its end leaves a directory the next run accepts.
     pub fn create(out: &Path, manifest: Manifest) -> Result<GeneratedWriter, WriteError> {
         if manifest.kind != WorkspaceKind::Generated {
             return Err(WriteError::Manifest(
@@ -103,12 +107,14 @@ impl GeneratedWriter {
             _ => {}
         }
         fs::create_dir(&scratch).map_err(|error| io_error(&scratch, error))?;
-        Ok(GeneratedWriter {
+        let writer = GeneratedWriter {
             out: out.to_owned(),
             manifest,
             written: Mutex::new(BTreeMap::new()),
             next: AtomicU64::new(0),
-        })
+        };
+        writer.put(MANIFEST_FILE, &writer.manifest.to_json())?;
+        Ok(writer)
     }
 
     /// Renders `module`, a unit or a container whose address is below the
@@ -154,9 +160,10 @@ impl GeneratedWriter {
     }
 
     /// Ends the run: removes every `.fr` file the run did not write, and each
-    /// directory that leaves empty, then writes `workspace.json`, then
-    /// `law.lock.json`, the lock of `generator`, `artifacts`, `addresses`,
-    /// `not_imported` and every module the run wrote, which it returns.
+    /// directory that leaves empty, then writes `law.lock.json`, the lock of
+    /// `generator`, `artifacts`, `addresses`, `not_imported` and every module
+    /// the run wrote, which it returns. An entry whose name begins with a dot
+    /// is not touched.
     pub fn finish(
         self,
         generator: Generator,
@@ -201,7 +208,6 @@ impl GeneratedWriter {
             not_imported,
             modules,
         };
-        self.put(MANIFEST_FILE, &self.manifest.to_json())?;
         self.put(LOCK_FILE, &lock.to_json())?;
         let scratch = self.out.join(SCRATCH);
         fs::remove_dir_all(&scratch).map_err(|error| io_error(&scratch, error))?;
@@ -224,20 +230,26 @@ impl GeneratedWriter {
 
 impl Drop for GeneratedWriter {
     /// Removes the scratch directory, which `finish` removes when it ends
-    /// the run, so that a run that stops before then leaves no temporary
-    /// file behind.
+    /// the run, so that a run that stops with an error leaves no temporary
+    /// file behind. A run that is killed leaves it, and the next `create`
+    /// clears it.
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(self.out.join(SCRATCH));
     }
 }
 
 /// `Err` when the directory `out` holds anything but a generated workspace of
-/// the prefix of `manifest`, and what a run keeps beside it.
+/// the prefix of `manifest`, and what a run keeps beside it. Entries whose
+/// name begins with a dot are not the workspace's and are not looked at, so
+/// a directory that holds nothing else counts as empty.
 fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
     let mut names = Vec::new();
     for entry in fs::read_dir(out).map_err(|error| io_error(out, error))? {
         let entry = entry.map_err(|error| io_error(out, error))?;
-        names.push(entry.file_name().to_string_lossy().into_owned());
+        let name = entry.file_name();
+        if !is_dot_named(&name) {
+            names.push(name.to_string_lossy().into_owned());
+        }
     }
     if names.is_empty() {
         return Ok(());

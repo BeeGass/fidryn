@@ -589,8 +589,12 @@ hashes.
 A workspace is a directory with a manifest, `workspace.json`, at its top.
 Every `.fr` file in it is a module of edition 2 whose address is below the
 manifest's `prefix` and which stands at the [file path](#file-paths) of its
-address. A directory whose name begins with a dot is not read, nor is
-anything in it.
+address. An entry whose name begins with a dot, whether a file, a
+directory or a symbolic link, is not the workspace's: the check does not
+read it, nor anything in it, and the writer leaves it alone, so a
+repository's `.git`, a `.gitignore` or an editor's lock link may stand in a
+workspace. No symbolic link is followed, and one whose name does not begin
+with a dot is an error.
 
 ```json
 {
@@ -708,11 +712,16 @@ An importer writes a generated workspace with
 
 - `create(out, manifest)` takes the manifest of a generated workspace with a
   release and no dependencies, and a directory `out` that does not exist,
-  is empty, or holds a generated workspace of the same prefix. Such a
-  directory may also hold `coverage.json` at its top and any directory
-  whose name begins with a dot, which the run leaves as they are. Any
-  other directory, a curated workspace and a generated workspace of
-  another prefix among them, is refused, and nothing in it is changed.
+  holds nothing but entries whose name begins with a dot (the working
+  directory of a new repository, with its `.git`, is such a one), or holds
+  a generated workspace of the same prefix. Such a directory may also hold
+  `coverage.json` at its top, and anywhere any entry whose name begins with
+  a dot, which the run leaves as they are. Any other directory, a curated
+  workspace, a generated workspace of another prefix and one that holds a
+  symbolic link of another name among them, is refused, and nothing in it
+  is changed. `create` writes `workspace.json` at once, through a temporary
+  file like every file of the run, and clears the temporary files that an
+  earlier run which was stopped left behind.
 - `write(module)` writes a unit or a container whose address is below the
   prefix, in the canonical form, to its path, through a temporary file
   that is renamed. It may be called from several threads at once, and it
@@ -720,11 +729,15 @@ An importer writes a generated workspace with
   no module replaces another.
 - `finish(generator, artifacts, addresses, not_imported)` removes every
   `.fr` file the run did not write, and each directory that leaves empty,
-  then writes `workspace.json`, then `law.lock.json`, and returns the lock.
+  then writes `law.lock.json` last, and returns the lock.
 
 What a run writes depends only on its modules, its manifest and what
 `finish` is given: neither the order of the calls nor the number of
-threads changes a byte.
+threads changes a byte. A run that is stopped before `finish`, by an error
+or because it was killed, leaves a generated workspace of the same prefix
+whose lock is missing or is that of the run before it. `fidryn check`
+reports it with `E730`, and the next run accepts the directory and, when it
+finishes, puts it right.
 
 ### What the checker verifies in a workspace
 
@@ -741,7 +754,7 @@ its aliases.
 | The directory has a `workspace.json`, and it is a manifest | `E730` |
 | A generated workspace has a `release`, no dependencies and a lock, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
 | In a generated workspace, every module file is listed in the lock with the BLAKE3 of its bytes, and every file the lock lists is present | `E730` |
-| Every `.fr` file is a module of edition 2; every entry of the directory is a file or a directory, and none is a symbolic link | `E730` |
+| Every `.fr` file is a module of edition 2; every entry of the directory whose name does not begin with a dot is a file or a directory, and none is a symbolic link | `E730` |
 | Every module's address is below the prefix, and the module stands at the path of its address | `E730` |
 | A unit's or a container's `within` names a container of the workspace that lists it as a `member`, and every `member` of a container is a module whose `within` is that container | `E720` |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |

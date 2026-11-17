@@ -316,21 +316,37 @@ fn read(root: &Path, rel: &str) -> String {
     fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
 }
 
-/// Every file and every directory below `root`: a file with its bytes, a
-/// directory with none.
-fn tree(root: &Path) -> BTreeMap<String, Option<Vec<u8>>> {
-    fn walk(dir: &Path, prefix: &str, out: &mut BTreeMap<String, Option<Vec<u8>>>) {
+/// An entry of a directory, as [`tree`] records it.
+#[derive(Debug, PartialEq, Eq)]
+enum Entry {
+    Directory,
+    File(Vec<u8>),
+    /// A symbolic link, which is not followed, and its target.
+    Link(PathBuf),
+}
+
+/// Every entry below `root`: a file with its bytes, a symbolic link with its
+/// target, and a directory, whose entries follow it.
+fn tree(root: &Path) -> BTreeMap<String, Entry> {
+    fn walk(dir: &Path, prefix: &str, out: &mut BTreeMap<String, Entry>) {
         let entries =
             fs::read_dir(dir).unwrap_or_else(|error| panic!("{}: {error}", dir.display()));
         for entry in entries {
             let entry = entry.expect("read an entry");
             let name = entry.file_name().into_string().expect("a UTF-8 name");
             let rel = format!("{prefix}{name}");
-            if entry.file_type().expect("the kind of an entry").is_dir() {
-                out.insert(rel.clone(), None);
+            let kind = entry.file_type().expect("the kind of an entry");
+            if kind.is_symlink() {
+                let target = fs::read_link(entry.path()).expect("read a link");
+                out.insert(rel, Entry::Link(target));
+            } else if kind.is_dir() {
+                out.insert(rel.clone(), Entry::Directory);
                 walk(&entry.path(), &format!("{rel}/"), out);
             } else {
-                out.insert(rel, Some(fs::read(entry.path()).expect("read a file")));
+                out.insert(
+                    rel,
+                    Entry::File(fs::read(entry.path()).expect("read a file")),
+                );
             }
         }
     }
@@ -616,14 +632,61 @@ fn a_module_written_twice_in_one_run_and_one_no_generated_workspace_holds_are_re
         matches!(&error, WriteError::Io { error, .. } if error.kind() == std::io::ErrorKind::NotADirectory),
         "{error}"
     );
+}
 
-    // A run that stops before `finish` leaves no temporary file, so its
-    // directory can be written again.
-    let stopped = Scratch::new("stopped");
-    let out = stopped.join("out");
-    drop(create(&out, demo_manifest()));
-    assert_eq!(tree(&out), BTreeMap::new());
-    write_workspace(&out, &models);
+#[test]
+fn an_interrupted_run_leaves_a_workspace_the_next_run_accepts() {
+    // A first run that stops after it wrote a module, before `finish`: the
+    // directory holds the manifest, which `create` wrote at once, the module
+    // and no lock, and the check says so.
+    let scratch = Scratch::new("interrupted");
+    let out = scratch.join("out");
+    let alone = Module::Unit(unit(
+        "/zz/demo/t9",
+        None,
+        "9",
+        "Alone",
+        "An invented section that no container lists.",
+    ));
+    {
+        let writer = create(&out, demo_manifest());
+        writer.write(&alone).expect("write");
+    }
+    assert_eq!(read(&out, "workspace.json"), demo_manifest().to_json());
+    assert!(out.join("zz/demo/t9.fr").is_file());
+    assert!(!out.join(".fidryn-write").exists());
+    assert_diagnostic(
+        only(&check(&out)),
+        DiagnosticCode::E730,
+        "law.lock.json",
+        None,
+        "has a lock",
+    );
+
+    // A run that was killed outright also leaves its temporary files, which
+    // the next run clears; a complete run puts the workspace right.
+    put(&out, ".fidryn-write/7.tmp", "An invented leftover.\n");
+    let lock = write_workspace(&out, &demo_models());
+    assert!(!out.join(".fidryn-write").exists());
+    assert!(!out.join("zz/demo/t9.fr").exists());
+    assert_eq!(lock.modules.len(), 5);
+    assert_eq!(check(&out).diagnostics, []);
+
+    // A later run of another release that stops before `finish` leaves the
+    // new manifest beside the lock of the run before it.
+    let mut next = demo_manifest();
+    next.release = Some("42-8".to_owned());
+    drop(create(&out, next.clone()));
+    assert_eq!(read(&out, "workspace.json"), next.to_json());
+    assert_diagnostic(
+        only(&check(&out)),
+        DiagnosticCode::E730,
+        "law.lock.json",
+        None,
+        "`42-7`",
+    );
+    write_workspace(&out, &demo_models());
+    assert_eq!(check(&out).diagnostics, []);
 }
 
 #[test]
@@ -937,22 +1000,125 @@ fn hierarchy_defects_are_E720() {
             words: "within `/zz/demo/t1`",
         },
     ];
-    for case in cases {
-        let scratch = Scratch::new("hierarchy");
-        let mut models = demo_models();
-        (case.change)(&mut models);
-        write_workspace(scratch.path(), &models);
-        let report = check(scratch.path());
-        assert_eq!(report.diagnostics.len(), 1, "{}: {report:#?}", case.what);
-        let text = read(scratch.path(), case.file);
-        assert_diagnostic(
-            only(&report),
-            DiagnosticCode::E720,
-            case.file,
-            Some(span_after(&text, case.before, case.quoted)),
-            case.words,
-        );
+    for case in &cases {
+        assert_hierarchy_case(case);
     }
+}
+
+/// Writes the demo models with `case`'s change and checks that the one
+/// diagnostic of the workspace is the `E720` the case gives.
+fn assert_hierarchy_case(case: &HierarchyCase) {
+    let scratch = Scratch::new("hierarchy");
+    let mut models = demo_models();
+    (case.change)(&mut models);
+    write_workspace(scratch.path(), &models);
+    let report = check(scratch.path());
+    assert_eq!(report.diagnostics.len(), 1, "{}: {report:#?}", case.what);
+    let text = read(scratch.path(), case.file);
+    assert_diagnostic(
+        only(&report),
+        DiagnosticCode::E720,
+        case.file,
+        Some(span_after(&text, case.before, case.quoted)),
+        case.words,
+    );
+}
+
+#[test]
+fn a_within_that_names_an_alias_is_reported_at_the_within() {
+    assert_hierarchy_case(&HierarchyCase {
+        what: "a `within` that names an alias of a container",
+        change: |models| {
+            let chapter = container_at(models, 1);
+            chapter.aliases.push(address("/zz/demo/t1/chI"));
+            chapter.members.pop();
+            unit_at(models, 4).within = Some(address("/zz/demo/t1/chI"));
+        },
+        file: "zz/demo/t1/s3.fr",
+        before: "within ",
+        quoted: "/zz/demo/t1/chI",
+        words: "an alias of the module `/zz/demo/t1/ch1`",
+    });
+}
+
+#[test]
+fn a_member_with_no_within_is_reported_at_the_member() {
+    assert_hierarchy_case(&HierarchyCase {
+        what: "a member with no `within`",
+        change: |models| {
+            unit_at(models, 4).within = None;
+        },
+        file: "zz/demo/t1/ch1.fr",
+        before: "member ",
+        quoted: "/zz/demo/t1/s3",
+        words: "has no `within`",
+    });
+}
+
+#[test]
+fn a_within_that_names_a_curated_module_is_reported_at_the_within() {
+    // A curated workspace may hold units beside its curated modules.
+    let scratch = Scratch::new("within-curated");
+    let curated = render(&Module::Curated(CuratedModule {
+        address: address("/zz/demo/c1"),
+        imports: Vec::new(),
+        citations: Vec::new(),
+        bindings: Vec::new(),
+    }));
+    let section = render(&Module::Unit(unit(
+        "/zz/demo/s1",
+        Some("/zz/demo/c1"),
+        "1",
+        "Within",
+        "An invented section within a curated module.",
+    )));
+    curated_workspace(
+        scratch.path(),
+        &[
+            ("zz/demo/c1.fr", curated),
+            ("zz/demo/s1.fr", section.clone()),
+        ],
+    );
+    assert_diagnostic(
+        only(&check(scratch.path())),
+        DiagnosticCode::E720,
+        "zz/demo/s1.fr",
+        Some(span_after(&section, "within ", "/zz/demo/c1")),
+        "which is a curated module, not a container",
+    );
+}
+
+#[test]
+fn a_lock_that_is_no_lock_is_reported_at_the_lock() {
+    let scratch = Scratch::new("lock-no-lock");
+    write_workspace(scratch.path(), &demo_models());
+    put(scratch.path(), "law.lock.json", "{}\n");
+    assert_diagnostic(
+        only(&check(scratch.path())),
+        DiagnosticCode::E730,
+        "law.lock.json",
+        None,
+        "this file is no lock of a workspace: missing field",
+    );
+}
+
+#[test]
+fn a_lock_of_another_prefix_is_reported_at_the_lock() {
+    let scratch = Scratch::new("lock-prefix");
+    write_workspace(scratch.path(), &demo_models());
+    let text = read(scratch.path(), "law.lock.json").replacen(
+        "\"prefix\": \"/zz/demo\"",
+        "\"prefix\": \"/zz/other\"",
+        1,
+    );
+    put(scratch.path(), "law.lock.json", &text);
+    assert_diagnostic(
+        only(&check(scratch.path())),
+        DiagnosticCode::E730,
+        "law.lock.json",
+        None,
+        "the lock is of the prefix `/zz/other`, and the manifest of `/zz/demo`",
+    );
 }
 
 #[test]
@@ -972,6 +1138,81 @@ fn a_directory_whose_name_begins_with_a_dot_is_not_read() {
     let report = check(scratch.path());
     assert_eq!(report.diagnostics, []);
     assert_eq!(report.modules, 5);
+}
+
+#[test]
+fn a_file_or_a_link_whose_name_begins_with_a_dot_is_not_read() {
+    let scratch = Scratch::new("dot-entries");
+    write_workspace(scratch.path(), &demo_models());
+    put(scratch.path(), ".gitignore", ".fidryn-cache/\n");
+    put(
+        scratch.path(),
+        "zz/demo/t1/.s9.fr",
+        "An invented file that is no module.\n",
+    );
+    // A cache on another disk, and the lock link of an editor, whose target
+    // does not exist.
+    #[cfg(unix)]
+    let elsewhere = Scratch::new("dot-entries-cache");
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(elsewhere.path(), scratch.join(".fidryn-cache")).expect("link");
+        std::os::unix::fs::symlink("someone@host.1234", scratch.join("zz/demo/t1/.#s1.fr"))
+            .expect("link");
+    }
+    let report = check(scratch.path());
+    assert_eq!(report.diagnostics, []);
+    assert_eq!(report.modules, 5);
+}
+
+#[test]
+fn a_writer_leaves_names_that_begin_with_a_dot_alone() {
+    // A directory that holds nothing but such names is empty to `create`,
+    // as the working directory of a new repository is.
+    let scratch = Scratch::new("fresh-repository");
+    put(scratch.path(), ".git/HEAD", "ref: refs/heads/main\n");
+    put(scratch.path(), ".gitignore", ".fidryn-cache/\n");
+    write_workspace(scratch.path(), &demo_models());
+    assert_eq!(check(scratch.path()).diagnostics, []);
+
+    // Files and links of such names anywhere are kept by a later run, which
+    // removes the module it does not write.
+    put(scratch.path(), "zz/demo/t1/.s9.fr", "An invented draft.\n");
+    #[cfg(unix)]
+    let elsewhere = Scratch::new("fresh-repository-cache");
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(elsewhere.path(), scratch.join(".fidryn-cache")).expect("link");
+        std::os::unix::fs::symlink("someone@host.1234", scratch.join("zz/demo/t1/.#s1.fr"))
+            .expect("link");
+    }
+    let kept: Vec<(String, Entry)> = tree(scratch.path())
+        .into_iter()
+        .filter(|(rel, _)| rel.starts_with('.') || rel.contains("/."))
+        .collect();
+    let mut models = demo_models();
+    models.pop();
+    container_at(&mut models, 1).members.pop();
+    write_workspace(scratch.path(), &models);
+    assert!(!scratch.join("zz/demo/t1/s3.fr").exists());
+    let now = tree(scratch.path());
+    for (rel, entry) in &kept {
+        assert_eq!(now.get(rel), Some(entry), "{rel}");
+    }
+    assert_eq!(check(scratch.path()).diagnostics, []);
+
+    // A link of any other name is refused, and nothing is changed.
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink("s1.fr", scratch.join("zz/demo/t1/s4.fr")).expect("link");
+        let before = tree(scratch.path());
+        let error = refused(scratch.path(), demo_manifest());
+        assert!(
+            matches!(&error, WriteError::Foreign { found, .. } if found.contains("`zz/demo/t1/s4.fr`")),
+            "{error}"
+        );
+        assert_eq!(tree(scratch.path()), before);
+    }
 }
 
 #[test]

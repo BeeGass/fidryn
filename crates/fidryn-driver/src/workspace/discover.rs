@@ -1,5 +1,6 @@
 //! Discovery: what a workspace's directory holds.
 
+use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -19,8 +20,14 @@ pub(crate) struct Walk {
     pub(crate) unreadable: Vec<(String, String)>,
 }
 
-/// Every entry below `root`, except what lies in a directory whose name
-/// begins with a dot, which is not read.
+/// Whether the entry named `name` is outside every workspace: a file, a
+/// directory or a symbolic link whose name begins with a dot.
+pub(crate) fn is_dot_named(name: &OsStr) -> bool {
+    name.as_encoded_bytes().first() == Some(&b'.')
+}
+
+/// Every entry below `root`, except those whose name begins with a dot,
+/// which are not read and, when they are directories, not entered.
 pub(crate) fn walk(root: &Path) -> Walk {
     let mut found = Walk::default();
     let mut pending: Vec<(PathBuf, String)> = vec![(root.to_owned(), String::new())];
@@ -46,6 +53,9 @@ pub(crate) fn walk(root: &Path) -> Walk {
                 }
             };
             let name = entry.file_name();
+            if is_dot_named(&name) {
+                continue;
+            }
             let Some(name) = name.to_str() else {
                 found.unreadable.push((
                     format!("{prefix}{}", name.to_string_lossy()),
@@ -56,11 +66,7 @@ pub(crate) fn walk(root: &Path) -> Walk {
             let rel = format!("{prefix}{name}");
             match entry.file_type() {
                 Err(error) => found.unreadable.push((rel, error.to_string())),
-                Ok(kind) if kind.is_dir() => {
-                    if !name.starts_with('.') {
-                        pending.push((entry.path(), format!("{rel}/")));
-                    }
-                }
+                Ok(kind) if kind.is_dir() => pending.push((entry.path(), format!("{rel}/"))),
                 Ok(kind) if kind.is_file() => {
                     if name.ends_with(".fr") {
                         found.modules.push(rel);

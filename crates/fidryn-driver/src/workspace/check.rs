@@ -80,9 +80,9 @@ impl WorkspaceReport {
 /// The check of the workspace whose directory is `root`.
 ///
 /// A directory with no readable manifest is reported with `E730` and
-/// nothing else of it is read. Otherwise every `.fr` file outside the
-/// directories whose name begins with a dot is read and checked by itself,
-/// and then the checks across the modules run:
+/// nothing else of it is read. Otherwise every `.fr` file is read and
+/// checked by itself, and then the checks across the modules run. No entry
+/// whose name begins with a dot is read, nor anything below one:
 ///
 /// - the manifest and the lock are well formed, a generated workspace has a
 ///   release, a lock and no dependencies, and a curated workspace neither a
@@ -90,7 +90,7 @@ impl WorkspaceReport {
 ///   below the prefix; in a generated workspace every module file is listed
 ///   in the lock with the BLAKE3 of its bytes, and every listed file is
 ///   present; no file is of the first edition, and every entry is a file or
-///   a directory (`E730`);
+///   a directory, none a symbolic link (`E730`);
 /// - the `within` of a unit or a container names a container of the
 ///   workspace that lists it as a member, and every member of a container is
 ///   a module whose `within` is that container (`E720`);

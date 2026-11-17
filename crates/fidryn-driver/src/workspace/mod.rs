@@ -2,8 +2,10 @@
 //!
 //! A workspace is a directory with a manifest, `workspace.json`, at its top
 //! ([`Manifest`](fidryn_provision::workspace::Manifest)). Every `.fr` file in
-//! it, in any directory whose name does not begin with a dot, is a module of
-//! edition 2 that stands at the path of its address. A **generated**
+//! it is a module of edition 2 that stands at the path of its address. An
+//! entry whose name begins with a dot, whether a file, a directory or a
+//! symbolic link, is not the workspace's: the check does not read it and the
+//! writer leaves it alone. A **generated**
 //! workspace, which an importer writes with [`GeneratedWriter`], has a
 //! release and a lock, `law.lock.json`, that lists every module file with
 //! the BLAKE3 of its bytes; a **curated** workspace has neither.
