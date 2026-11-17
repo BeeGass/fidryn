@@ -64,7 +64,7 @@ CASES = {
     "marker-labels": "a number, a heading and a source credit that hold only a footnote marker",
     "subheadings": "a subheading in a note with no heading, a heading directly in quoted content",
     "quoted-operative": "quoted content in operative text with an origin, a paragraph, a quoted "
-    "section with a number and a heading, and a note with a heading",
+    "section with a number and a heading, and a note with a heading and a subheading",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -378,12 +378,39 @@ def oversized_archive(directory: Path) -> None:
             stream.write(chunk)
 
 
+COMPOSED = "composes across the boundary"
+# The combining acute accent, which composes with the `e` before it into U+00E9.
+ACUTE = chr(0x0301)
+# A document whose only fault is an entity declaration cannot be written: an entity
+# declaration stands only inside a document type declaration, and the XML reader
+# refuses the declaration of the document type as soon as it opens, before it reads
+# any declaration inside it. So the documents below, each with an entity declaration
+# of another kind, are refused as a document type declaration, and no document
+# reaches the refusal of an entity declaration of its own.
+ENTITY_DECLARATIONS = {
+    "an internal entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY w "widget">]>\n',
+        "<content>A &w;.</content>",
+    ),
+    "an external entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY w SYSTEM "file:///widget.txt">]>\n',
+        "<content>A &w;.</content>",
+    ),
+    "a parameter entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY % w "widget">]>\n',
+        "<content>Text.</content>",
+    ),
+}
+
 DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
     "document type declaration": (document(doctype="<!DOCTYPE uscDoc>\n"), "document type"),
-    "entity declaration": (
-        document(doctype='<!DOCTYPE uscDoc [<!ENTITY w "widget">]>\n'),
-        "declaration",
-    ),
+    **{
+        f"entity declaration, {kind}": (
+            document(doctype=doctype, inner=inner),
+            "a document type declaration",
+        )
+        for kind, (doctype, inner) in ENTITY_DECLARATIONS.items()
+    },
     "root that is not uscDoc": (document(root="uscDocument"), "not uscDoc"),
     "root in another namespace": (document(namespace="http://example.invalid/other"), "not uscDoc"),
     "schema location naming another file": (document(schema="USLM-1.0.14.xsd"), "schema"),
@@ -422,12 +449,26 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
         document(inner='<content>Text<ref class="footnoteRef" idref="none">1</ref>.</content>'),
         "names no footnote",
     ),
+    "two footnotes of one module with one id": (
+        document(
+            inner='<content>Text<ref class="footnoteRef" idref="f1">1</ref>'
+            f"{FOOTNOTE}.</content><content>More{FOOTNOTE}.</content>"
+        ),
+        "two footnotes of the module have the id 'f1'",
+    ),
     "note citing a law in fewer than four segments": (
         document(
             inner='<notes type="uscNote"><note topic="miscellaneous"><heading>Odd</heading>'
             '<p><ref href="/us/pl/999">Pub. L. 999</ref></p></note></notes>'
         ),
-        "four segments",
+        "fewer than four segments",
+    ),
+    "note citing a law with a character a segment cannot hold": (
+        document(
+            inner='<notes type="uscNote"><note topic="miscellaneous"><heading>Odd</heading>'
+            '<p><ref href="/us/pl/999/1(5)">Pub. L. 999-1</ref></p></note></notes>'
+        ),
+        "a character an address segment cannot hold",
     ),
     "cross heading with no topic": (
         document(
@@ -479,6 +520,40 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
     "identifier that gives no address": (
         document(body=SECTION.format(inner="<content>Text.</content>").replace("/s1", "/s(1)")),
         "not an address",
+    ),
+    "identifier of a unit that holds a tilde": (
+        document(body=SECTION.format(inner="<content>Text.</content>").replace("/s1", "/s1~2")),
+        "holds ~",
+    ),
+    "identifier of a provision that holds a tilde": (
+        document(
+            inner='<subsection identifier="/us/usc/t99/s1/a~2"><content>Text.</content>'
+            "</subsection>"
+        ),
+        "holds ~",
+    ),
+    "character composed across the start of a link": (
+        document(inner=f'<content>cafe<ref href="/us/usc/t99/s2">{ACUTE} owner</ref></content>'),
+        COMPOSED,
+    ),
+    "character composed across the end of a link": (
+        document(inner=f'<content><ref href="/us/usc/t99/s2">cafe</ref>{ACUTE} owner</content>'),
+        COMPOSED,
+    ),
+    "character composed across the boundary of a superscript": (
+        document(inner=f"<content>cafe<sup>{ACUTE}</sup> owner</content>"),
+        COMPOSED,
+    ),
+    "character composed across the boundary of a subscript": (
+        document(inner=f"<content>cafe<sub>{ACUTE}</sub> owner</content>"),
+        COMPOSED,
+    ),
+    "character composed across a footnote marker": (
+        document(
+            inner=f'<content>cafe<ref class="footnoteRef" idref="f1">1</ref>{ACUTE} owner'
+            f"{FOOTNOTE}</content>"
+        ),
+        COMPOSED,
     ),
     "span that is not a whole number": (
         document(

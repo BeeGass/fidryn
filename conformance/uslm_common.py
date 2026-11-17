@@ -12,6 +12,7 @@ and read into units and containers one at a time. Nothing is written anywhere.
 
 from __future__ import annotations
 
+import itertools
 import multiprocessing
 import re
 import unicodedata
@@ -633,6 +634,7 @@ class TextBuilder:
         plain = normalize(raw)
         if not self.spans and not self.marks:
             return Text(plain)
+        self.check_divided(raw)
         lengths = PrefixLengths(raw)
         refs: list[tuple[int, int, str]] = []
         sup: list[tuple[int, int]] = []
@@ -655,6 +657,23 @@ class TextBuilder:
                 sub.append(extent)
         marks = tuple((lengths.at(position), shown, n) for position, shown, n in self.marks)
         return Text(plain, tuple(refs), tuple(sup), tuple(sub), marks)
+
+    def check_divided(self, raw: str) -> None:
+        """Refuse a text in which normalization acts across the boundary of a link, a
+        superscript, a subscript or a footnote marker, so that the extent of a run could
+        not be told: its pieces between those boundaries, each in Normalization Form C,
+        must give the whole text in that form."""
+        cuts = {0, len(raw)}
+        for _, start, end, _ in self.spans:
+            cuts.update((start, end))
+        cuts.update(position for position, _, _ in self.marks)
+        pieces = (raw[start:end] for start, end in itertools.pairwise(sorted(cuts)))
+        divided = "".join(unicodedata.normalize("NFC", piece) for piece in pieces)
+        if divided != unicodedata.normalize("NFC", raw):
+            self.reader.refuse(
+                "a character that normalization composes across the boundary of a link, "
+                "a superscript, a subscript or a footnote marker"
+            )
 
 
 class Flow:
@@ -846,6 +865,18 @@ class MemberReader:
             self.refuse(f"the identifier gives {address!r}, which is not an address", element)
         return address
 
+    def identifier_of(self, element: Element) -> list[str]:
+        """The members of an element's identifier; one that holds `~`, the character the
+        reading alone may add to an address, is refused."""
+        raw = element.get("identifier")
+        if raw is not None and "~" in raw:
+            self.refuse(
+                f"the identifier {raw!r} holds ~, the character the reading alone may add "
+                "to an address",
+                element,
+            )
+        return split_at_spaces(raw)
+
     # The document and its containers.
 
     def read(self, root: Element) -> None:
@@ -881,7 +912,7 @@ class MemberReader:
     def module_address(
         self, element: Element, within: str | None, place: Counter[str]
     ) -> tuple[str, list[str]]:
-        identifier = split_at_spaces(element.get("identifier"))
+        identifier = self.identifier_of(element)
         if not identifier:
             tag = tag_of(element)
             place[tag] += 1
@@ -946,7 +977,16 @@ class MemberReader:
 
         walk(module)
         for ordinal, footnote in enumerate(found, start=1):
-            scope.ordinals.setdefault(footnote.get("id") or f"#{ordinal}", ordinal)
+            identifier = footnote.get("id")
+            if identifier is None:
+                continue
+            if identifier in scope.ordinals:
+                self.refuse(
+                    f"two footnotes of the module have the id {identifier!r}, so a marker "
+                    "cannot name one",
+                    footnote,
+                )
+            scope.ordinals[identifier] = ordinal
         for ordinal, footnote in enumerate(found, start=1):
             num = next((c for c in footnote if tag_of(c) == "num"), None)
             shown = self.read_text(num, scope).plain if num is not None else ""
@@ -1111,7 +1151,7 @@ class MemberReader:
     def provision_address(
         self, element: Element, parent: str, siblings: Counter[str], place: Counter[str]
     ) -> str:
-        identifier = split_at_spaces(element.get("identifier"))
+        identifier = self.identifier_of(element)
         if not identifier:
             tag = tag_of(element)
             place[tag] += 1
@@ -1290,14 +1330,15 @@ class MemberReader:
         return QuotedLevel(tag_of(element), num, heading, items)
 
     def read_quoted_note(self, element: Element, context: Context, scope: Scope) -> list[Block]:
+        """A note inside quoted content, wherever the quotation stands: its heading first
+        as a subheading, then the flow of the rest, read as the flow of a note."""
         heading = next((c for c in element if tag_of(c) == "heading"), None)
         blocks: list[Block] = []
-        inner = context
         if heading is not None:
             text = self.read_optional_text(heading, scope)
             if text is not None:
                 blocks.append(Subheading(text))
-            inner = Context(context.in_note, context.in_quoted, True)
+        inner = Context(True, context.in_quoted, context.subheadings or heading is not None)
         return blocks + self.read_flow(element, inner, scope, skip=heading)
 
     # Notes.
@@ -1401,17 +1442,22 @@ class MemberReader:
 
     def law_segment(self, reference: str, note: Element, anchor: str) -> str:
         segments = reference.split("/")[1:]
-        if len(segments) < 4 or not all(is_segment(s) for s in segments[1:4]):
-            heading = next((c for c in note if tag_of(c) == "heading"), None)
-            shown = normalize("".join(heading.itertext())) if heading is not None else ""
-            raise RefusedError(
-                f"the note under {anchor} headed {shown!r} cites {reference!r}, "
-                "which does not name a law in four segments",
-                self.member,
-                "note",
-                anchor,
-            )
-        return ".".join(segments[1:4])
+        if len(segments) < 4:
+            why = "a reference of fewer than four segments"
+        else:
+            bad = next((s for s in segments[1:4] if not is_segment(s)), None)
+            if bad is None:
+                return ".".join(segments[1:4])
+            why = f"whose segment {bad!r} is empty or holds a character an address segment "
+            why += "cannot hold"
+        heading = next((c for c in note if tag_of(c) == "heading"), None)
+        shown = normalize("".join(heading.itertext())) if heading is not None else ""
+        raise RefusedError(
+            f"the note under {anchor} headed {shown!r} cites {reference!r}, {why}",
+            self.member,
+            "note",
+            anchor,
+        )
 
 
 @dataclass(slots=True)
