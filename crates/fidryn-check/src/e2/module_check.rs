@@ -17,13 +17,14 @@ use std::collections::{BTreeMap, BTreeSet};
 ///   provision's address is below its parent's, every note's address is
 ///   below the module's, and no address is declared twice (`E700`);
 /// - every `hash` and every value of `layers` is the hash computed from what
-///   the module writes, every footnote marker names a footnote of the
-///   module, and every definition names a provision of the unit whose text
-///   holds each term, whose text or whose parent's chapeau holds the reach
-///   words when they are stated, and, when its kind is `borrowed`, says what
-///   it borrows from (`E710`);
-/// - no citation name and no binding name of a curated module is declared
-///   twice (`E200`).
+///   the module writes; the footnotes are numbered from 1, without a gap,
+///   in the order they are written, and every footnote marker names a
+///   footnote of the module; and every definition names a provision of the
+///   unit whose text holds each term, whose text or whose parent's chapeau
+///   holds the reach words when they are stated, and, when its kind is
+///   `borrowed`, says what it borrows from (`E710`);
+/// - no name of a curated module is declared twice, its citations and its
+///   bindings sharing one set of names (`E200`).
 pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic> {
     let mut check = Check {
         spans: &lowered.spans,
@@ -175,6 +176,7 @@ impl Check<'_> {
         }
         self.note_hashes(&unit.notes);
         self.layers(&layer_hashes_of_unit(unit));
+        self.footnote_numbers(&unit.footnotes);
         self.marks(&unit.footnotes);
         self.definitions(unit, &provisions);
     }
@@ -198,25 +200,50 @@ impl Check<'_> {
         }
         self.note_hashes(&container.notes);
         self.layers(&layer_hashes_of_container(container));
+        self.footnote_numbers(&container.footnotes);
         self.marks(&container.footnotes);
     }
 
+    /// Citations and bindings share one set of names: each name declared
+    /// earlier in the source is reported where it is declared again.
     fn curated(&mut self, curated: &CuratedModule) {
         let spans = self.spans;
-        let citations: Vec<(&str, Span)> = curated
+        let mut names: Vec<(&str, Span)> = curated
             .citations
             .iter()
             .map(|citation| citation.name.as_str())
             .zip(spans.citation_names.iter().copied())
+            .chain(
+                curated
+                    .bindings
+                    .iter()
+                    .map(|binding| binding.name.as_str())
+                    .zip(spans.binding_names.iter().copied()),
+            )
             .collect();
-        self.named_once("citation", &citations);
-        let bindings: Vec<(&str, Span)> = curated
-            .bindings
-            .iter()
-            .map(|binding| binding.name.as_str())
-            .zip(spans.binding_names.iter().copied())
-            .collect();
-        self.named_once("binding", &bindings);
+        names.sort_by_key(|(_, span)| span.start);
+        self.named_once(&names);
+    }
+
+    /// Each footnote is numbered one more than the one written before it,
+    /// the first 1.
+    fn footnote_numbers(&mut self, footnotes: &[Footnote]) {
+        let mut previous = 0_u64;
+        for (footnote, span) in footnotes.iter().zip(&self.spans.footnotes) {
+            let next = previous + 1;
+            let ordinal = u64::from(footnote.ordinal);
+            if ordinal != next {
+                self.error(
+                    DiagnosticCode::E710,
+                    *span,
+                    format!(
+                        "this footnote is numbered {ordinal} where {next} is next; the footnotes \
+                         are numbered from 1, without a gap, in the order they are written"
+                    ),
+                );
+            }
+            previous = ordinal;
+        }
     }
 
     fn notes_below(&mut self, module: &Address, notes: &[Note]) {
@@ -260,14 +287,16 @@ impl Check<'_> {
         }
     }
 
-    fn named_once(&mut self, what: &str, names: &[(&str, Span)]) {
+    /// Reports each name of `names`, which are in the order of the source,
+    /// that an earlier one declares.
+    fn named_once(&mut self, names: &[(&str, Span)]) {
         let mut first: BTreeMap<&str, Span> = BTreeMap::new();
         for &(name, span) in names {
             match first.get(name) {
                 Some(earlier) => {
                     let mut diagnostic = Diagnostic::new(
                         DiagnosticCode::E200,
-                        format!("the {what} name `{name}` is declared twice"),
+                        format!("the name `{name}` is declared twice"),
                     )
                     .with_span(span);
                     diagnostic.related_spans.push(*earlier);

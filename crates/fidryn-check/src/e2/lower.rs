@@ -21,9 +21,9 @@ use fidryn_syntax::e2::{Parse, ast};
 ///
 /// - the shape of the module: a unit has one `provision` at the top, a
 ///   container module one `container`, a curated module neither; every
-///   declaration belongs to its shape; `alias`, `within`, `source`,
-///   `positive_law`, `credit` and `layers` stand at most once, and a unit or
-///   a container has a `source` and `layers` (`E100`);
+///   declaration belongs to its shape; `within`, `source`, `positive_law`,
+///   `credit` and `layers` stand at most once, and a unit or a container has
+///   a `source` and `layers` (`E100`);
 /// - every address, and the address of a container, which is the module's
 ///   (`E700`);
 /// - the form of every hash, the kind and the basis of every definition, and
@@ -31,8 +31,12 @@ use fidryn_syntax::e2::{Parse, ast};
 ///   (`E710`);
 /// - the form of every text: no run without words, except that `td ""` is a
 ///   cell with no block and the shown form `""` of a number is the empty
-///   text; the text of every block normalized; every topic one word; no
-///   empty origin of quoted content (`E710`).
+///   text; the text of every block normalized; every topic one word (`E710`);
+/// - no empty string where no value may be empty: a term, stated reach
+///   words, `borrowed_from`, `source`, the release of a binding, and the
+///   origin of quoted content (`E710`). The value of a number, the shown
+///   form of a footnote and of a marker, the source of an image and the
+///   target of a link may be empty.
 pub fn lower(parse: &Parse) -> Result<Lowered, Vec<Diagnostic>> {
     let Some(module) = &parse.module else {
         return Err(parse.diagnostics.clone());
@@ -187,7 +191,10 @@ impl Lowering {
                 let members = top
                     .members
                     .iter()
-                    .map(|member| self.address(member).unwrap_or_else(stand_in_address))
+                    .map(|member| {
+                        self.spans.members.push(member.span);
+                        self.address_or_stand_in(member)
+                    })
                     .collect();
                 let matter = self.matter(&module.decls, shape);
                 Module::Container(ContainerModule {
@@ -306,11 +313,14 @@ impl Lowering {
                 ast::Decl::Alias(alias) => {
                     let address = self.address_or_stand_in(&alias.address);
                     matter.aliases.push(address);
+                    self.spans.aliases.push(alias.address.span);
                 }
                 ast::Decl::Within(within) if matter.within.is_none() => {
                     matter.within = Some(self.address_or_stand_in(&within.address));
+                    self.spans.within = Some(within.address.span);
                 }
                 ast::Decl::Source(source) if matter.source.is_none() => {
+                    self.not_empty(&source.name, "the source");
                     matter.source = Some(source.name.value.clone());
                 }
                 ast::Decl::PositiveLaw(positive_law) if matter.positive_law.is_none() => {
@@ -324,6 +334,7 @@ impl Lowering {
                     matter.notes.push(note);
                 }
                 ast::Decl::Footnote(footnote) => {
+                    self.spans.footnotes.push(footnote.ordinal.span);
                     let footnote = Footnote {
                         ordinal: footnote.ordinal.value,
                         shown: footnote.shown.value.clone(),
@@ -404,6 +415,7 @@ impl Lowering {
                             name: name.text.clone(),
                         },
                     };
+                    self.not_empty(&binding.release, "the release of a binding");
                     let provision_hash = self.hash(&binding.provision_hash).hash;
                     let notes_hash = self.hash(&binding.notes_hash).hash;
                     curated.bindings.push(Binding {
@@ -415,6 +427,11 @@ impl Lowering {
                     });
                     self.spans.bindings.push(binding.span);
                     self.spans.binding_names.push(binding.name.span);
+                    self.spans.binds.push(binding.binds.span());
+                    self.spans
+                        .provision_hashes
+                        .push(binding.provision_hash.span);
+                    self.spans.notes_hashes.push(binding.notes_hash.span);
                 }
                 _ => {}
             }
@@ -656,10 +673,26 @@ impl Lowering {
                 Basis::Unresolved
             }
         };
+        for term in &definition.terms {
+            self.not_empty(term, "a term");
+        }
         let (words, words_span) = match &definition.words {
-            ast::Words::Stated(words) => (Some(words.value.clone()), words.span),
+            ast::Words::Stated(words) => {
+                if words.value.is_empty() {
+                    self.error(
+                        DiagnosticCode::E710,
+                        words.span,
+                        "the reach words are an empty string; a definition whose text states \
+                         none has `words unstated`",
+                    );
+                }
+                (Some(words.value.clone()), words.span)
+            }
             ast::Words::Unstated(span) => (None, *span),
         };
+        if let Some(borrowed_from) = &definition.borrowed_from {
+            self.not_empty(borrowed_from, "`borrowed_from`");
+        }
         let region = definition
             .region
             .as_ref()
@@ -674,6 +707,12 @@ impl Lowering {
             words: words_span,
             kind: definition.kind.span,
         });
+        self.spans
+            .regions
+            .push(definition.region.as_ref().map(|region| region.span));
+        self.spans
+            .see_notes
+            .push(definition.see_note.as_ref().map(|see_note| see_note.span));
         Definition {
             at,
             terms: definition
@@ -744,6 +783,17 @@ impl Lowering {
     fn words(&mut self, words: &ast::Str) {
         if words.value.is_empty() {
             self.error(DiagnosticCode::E710, words.span, "a run has no words");
+        }
+    }
+
+    /// An `E710` when `value`, which names `what`, is the empty string.
+    fn not_empty(&mut self, value: &ast::Str, what: &str) {
+        if value.value.is_empty() {
+            self.error(
+                DiagnosticCode::E710,
+                value.span,
+                format!("{what} is an empty string"),
+            );
         }
     }
 }

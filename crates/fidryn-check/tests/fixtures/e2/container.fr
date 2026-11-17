@@ -1,5 +1,6 @@
 edition 2
 module "/zz/demo/t1/ch1" {
+  alias "/zz/demo/t1/chI"
   within "/zz/demo/t1"
   source "demo01.xml"
   positive_law true

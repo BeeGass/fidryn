@@ -182,10 +182,12 @@ lists them.</p>
 <span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
 <p><strong>Success.</strong> Prints <code>ok</code> and exits 0.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
-<code>CODE Title: message</code> (for example
-<code>E310 PropAsGuard: ...</code>). A module that cannot check:</p>
+<code>CODE Title: message</code>, after the file it is in when it is about the text
+of a module (for example
+<code>tests/diagnostics/e310-prop-as-guard.fr: E310 PropAsGuard: ...</code>). A
+module that cannot check:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check tests/diagnostics/e310-prop-as-guard.fr</code></pre></figure>
-<p>A diagnostic of a module of edition 2 names its file, as
+<p>A module of edition 2 is reported in the same way, as
 <code>FILE: E710 IntegrityMismatch: ...</code>. Every other command exits 1 on such a
 file, with
 <code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>

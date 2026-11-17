@@ -58,25 +58,80 @@ impl Lowered {
     pub fn binding_spans(&self) -> &[Span] {
         &self.spans.bindings
     }
+
+    /// The span of the address after `within`, when the module has one.
+    pub fn within_span(&self) -> Option<Span> {
+        self.spans.within
+    }
+
+    /// The span of the address after each `alias`, in the order of the
+    /// module's aliases.
+    pub fn alias_spans(&self) -> &[Span] {
+        &self.spans.aliases
+    }
+
+    /// The span of the address after each `member` of a container, in the
+    /// order of its members.
+    pub fn member_spans(&self) -> &[Span] {
+        &self.spans.members
+    }
+
+    /// The span of the address after the `region` of each definition, in the
+    /// order of the module's definitions; `None` for one that has none.
+    pub fn region_spans(&self) -> &[Option<Span>] {
+        &self.spans.regions
+    }
+
+    /// The span of the address after the `see_note` of each definition, in
+    /// the order of the module's definitions; `None` for one that has none.
+    pub fn see_note_spans(&self) -> &[Option<Span>] {
+        &self.spans.see_notes
+    }
+
+    /// The span of the address or the name after the `binds` of each
+    /// binding, `alias.name` whole, in the order of the module's bindings.
+    pub fn binds_spans(&self) -> &[Span] {
+        &self.spans.binds
+    }
+
+    /// The span of the `provision_hash` value of each binding, in the order
+    /// of the module's bindings.
+    pub fn provision_hash_spans(&self) -> &[Span] {
+        &self.spans.provision_hashes
+    }
+
+    /// The span of the `notes_hash` value of each binding, in the order of
+    /// the module's bindings.
+    pub fn notes_hash_spans(&self) -> &[Span] {
+        &self.spans.notes_hashes
+    }
 }
 
-/// Where the parts of a lowered module stand in its source.
+/// Where the parts of a lowered module stand in its source. A span of a
+/// string covers its quotation marks.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Spans {
     /// The module's address, after the word `module`.
     module: Span,
+    within: Option<Span>,
+    aliases: Vec<Span>,
     /// Each provision of a unit, in document order.
     provisions: Vec<Declared>,
     /// The container of a container module.
     container: Option<Declared>,
+    members: Vec<Span>,
     /// Each note, in the order of the module's notes.
     notes: Vec<Declared>,
+    /// The ordinal of each footnote, in the order of the module's footnotes.
+    footnotes: Vec<Span>,
     /// The values of `layers`: operative, enacted and editorial.
     layers: Option<[Value; 3]>,
     /// Each footnote marker: the footnote it names, and its span.
     marks: Vec<(u32, Span)>,
     /// Each definition, in the order of the module's definitions.
     definitions: Vec<DefinitionSpans>,
+    regions: Vec<Option<Span>>,
+    see_notes: Vec<Option<Span>>,
     imports: Vec<Span>,
     citations: Vec<Span>,
     /// The name of each citation.
@@ -84,23 +139,35 @@ struct Spans {
     bindings: Vec<Span>,
     /// The name of each binding.
     binding_names: Vec<Span>,
+    binds: Vec<Span>,
+    provision_hashes: Vec<Span>,
+    notes_hashes: Vec<Span>,
 }
 
 impl Spans {
     fn new(module: Span) -> Spans {
         Spans {
             module,
+            within: None,
+            aliases: Vec::new(),
             provisions: Vec::new(),
             container: None,
+            members: Vec::new(),
             notes: Vec::new(),
+            footnotes: Vec::new(),
             layers: None,
             marks: Vec::new(),
             definitions: Vec::new(),
+            regions: Vec::new(),
+            see_notes: Vec::new(),
             imports: Vec::new(),
             citations: Vec::new(),
             citation_names: Vec::new(),
             bindings: Vec::new(),
             binding_names: Vec::new(),
+            binds: Vec::new(),
+            provision_hashes: Vec::new(),
+            notes_hashes: Vec::new(),
         }
     }
 }

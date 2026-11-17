@@ -437,14 +437,19 @@ and generated modules are always in it:
 - One field to a line. A text is written on one line, its runs separated by
   one space.
 - A string is written with `\\` for a backslash, `\"` for a quotation mark,
-  `\u00XX` for a character below U+0020 or U+007F, and every other
-  character as itself.
+  `\u00XX` with lower-case hexadecimal digits for a character below U+0020
+  or U+007F, and every other character as itself.
 - A part or a cell whose content is exactly one paragraph is written in the
   short form (`content "..."`), otherwise in the brace form with one block
   to a line. A cell with no block is written `td ""`, and that spelling is
   read back as a cell with no block. The shown form of a number that has
-  none is written `""` and read back as the empty text. An empty string
-  stands nowhere else.
+  none is written `""` and read back as the empty text. Besides these two,
+  an empty string stands only where the source itself may give an empty
+  value: the value of a number, the shown form of a footnote and of a
+  marker, the source of an image, and the target of a link. Anywhere else
+  an empty string is refused: as the words of a run, as a term, as stated
+  reach words, as `borrowed_from`, as `source`, as the release of a
+  binding, as a topic, and as the origin of quoted content.
 - `span <colspan> <rowspan>` is written only when one of the two is not 1.
 - Every `hash` and the three values of `layers` are computed by the rules
   of [Hashes](#hashes) from what is written above them.
@@ -543,22 +548,28 @@ about. `fidryn check` prints each as `FILE: CODE Title: message` and exits
 | The module's address, and every address written in it, is an address | `E700` |
 | The module has one of the three shapes, every declaration belongs to its shape, a declaration that stands once stands once, and a unit or a container has a `source` and `layers` | `E100` |
 | A unit's top provision has the module's address, and a container's address is the module's; every child provision's address is below its parent's; every note's address is below the module's; no address of a provision or a note is declared twice | `E700` |
-| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; an origin of quoted content is not empty | `E710` |
+| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, `borrowed_from`, `source`, release of a binding or origin of quoted content is an empty string | `E710` |
 | Every `hash`, every value of `layers` and both hashes of a binding are 64 lower-case hexadecimal digits | `E710` |
 | Every `hash` and every value of `layers` equals the hash computed from what the module writes | `E710` |
-| Every footnote marker names a footnote of the module | `E710` |
+| The footnotes are numbered from 1, without a gap, in the order they are written; every footnote marker names a footnote of the module | `E710` |
 | A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of its parent; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
-| In a curated module, no citation name and no binding name is declared twice | `E200` |
+| In a curated module, no name is declared twice, its citations and its bindings sharing one set of names | `E200` |
 
 An address is below another when it lies within it and is not the same
 address. The text of a provision is the plain text of each paragraph and
 subheading of its text parts, those in its tables and its quoted content
 included, and none of its children's; a term stands in it when one of
-those texts holds the term. The topics of a note and the origin of quoted
-content have rules of their own because the hash of a note joins its
-topics with one space and the hash of quoted content takes an absent
-origin as an empty one: without them, two different modules could have
-one hash.
+those texts holds the term. Every text holds the empty string, so an empty
+term or empty reach words would pass the checks of a definition without
+checking anything. The topics of a note and the origin of quoted content
+have rules of their own because the hash of a note joins its topics with
+one space and the hash of quoted content takes an absent origin as an
+empty one: without them, two different modules could have one hash.
+
+An address or a name declared twice is reported at its later declaration,
+with the earlier one as a related span. A footnote is reported at its
+number when the number is not one more than that of the footnote written
+before it, the first being 1.
 
 A text that is not normalized is reported at the run where it first
 differs from its normalized form. A hash that does not match is reported

@@ -131,14 +131,16 @@ fidryn check crates/fidryn-check/tests/fixtures/e2/unit.fr
 **Success.** Prints `ok` and exits 0.
 
 **Failure.** Exit 1. Each diagnostic is printed to stderr as
-`CODE Title: message` (for example
-`E310 PropAsGuard: ...`). A module that cannot check:
+`CODE Title: message`, after the file it is in when it is about the text
+of a module (for example
+`tests/diagnostics/e310-prop-as-guard.fr: E310 PropAsGuard: ...`). A
+module that cannot check:
 
 ```sh exit=1
 fidryn check tests/diagnostics/e310-prop-as-guard.fr
 ```
 
-A diagnostic of a module of edition 2 names its file, as
+A module of edition 2 is reported in the same way, as
 `FILE: E710 IntegrityMismatch: ...`. Every other command exits 1 on such a
 file, with
 ``E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it``:

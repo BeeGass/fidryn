@@ -196,7 +196,7 @@ fn golden_unit() -> UnitModule {
 fn golden_container() -> ContainerModule {
     ContainerModule {
         address: address("/zz/demo/t1/ch1"),
-        aliases: Vec::new(),
+        aliases: vec![address("/zz/demo/t1/chI")],
         within: Some(address("/zz/demo/t1")),
         source: "demo01.xml".to_owned(),
         positive_law: Some(true),
@@ -583,7 +583,17 @@ const TARGETS: &[&str] = &[
     "/yy/stat/1/2",
     "an \"invented\" act\\1",
 ];
-const MARKERS: &[&str] = &["1", "2", "*", "†"];
+/// The targets of links: those of [`TARGETS`] and the empty one, which a
+/// link may have.
+const LINK_TARGETS: &[&str] = &[
+    "/zz/demo/t1/s2",
+    "/zz/demo/t1/s8/a",
+    "/yy/stat/1/2",
+    "an \"invented\" act\\1",
+    "",
+];
+/// The shown forms of footnotes and of markers, which may be empty.
+const MARKERS: &[&str] = &["1", "2", "*", "†", ""];
 const KINDS: &[&str] = &[
     "section",
     "subsection",
@@ -595,7 +605,7 @@ const KINDS: &[&str] = &[
 const STATUSES: &[&str] = &["repealed", "omitted", "transferred"];
 const GROUPS: &[&str] = &["editorialNotes", "statutoryNotes", "ungrouped", "demoNotes"];
 const TOPICS: &[&str] = &["codification", "amendments", "a\"b", "c\\d", "\u{1}"];
-const IMAGES: &[&str] = &["figure1.eps", "a \"b\".eps"];
+const IMAGES: &[&str] = &["figure1.eps", "a \"b\".eps", ""];
 const ORIGINS: &[&str] = &["/yy/act/1947/ch388", "an invented act, sec. 2"];
 const SOURCES: &[&str] = &["demo01.xml", "dir/demo \"2\".xml", "back\\slash.xml"];
 const ROLES: &[PartRole] = &[
@@ -666,7 +676,7 @@ impl Generator {
             }
             has_words = true;
             runs.push(match kind {
-                5 | 6 => link(&piece, self.rng.pick(TARGETS)),
+                5 | 6 => link(&piece, self.rng.pick(LINK_TARGETS)),
                 7 => Run::Sup(piece),
                 8 => Run::Sub(piece),
                 _ => Run::Words(piece),
@@ -685,7 +695,7 @@ impl Generator {
         if self.rng.chance(20) {
             return None;
         }
-        let value = (*self.rng.pick(&["8", "a", "iv", "A", "1395i–3", "2a"])).to_owned();
+        let value = (*self.rng.pick(&["8", "a", "iv", "A", "1395i–3", "2a", ""])).to_owned();
         let shown = if self.rng.chance(15) {
             Text::default()
         } else {
@@ -1575,5 +1585,324 @@ fn a_parse_error_is_returned_as_it_is() {
     assert!(
         errors[0].message.starts_with("unknown edition `3`"),
         "{errors:?}"
+    );
+}
+
+fn span(start: usize, end: usize) -> Span {
+    Span {
+        start: u32::try_from(start).expect("a span"),
+        end: u32::try_from(end).expect("a span"),
+    }
+}
+
+/// The text of `source` at `span`.
+fn covered(source: &str, span: Span) -> &str {
+    &source[span.start as usize..span.end as usize]
+}
+
+/// The span of `word` where it follows the first occurrence of `before` in
+/// `source`.
+fn word_after(source: &str, before: &str, word: &str) -> Span {
+    let start = source.find(before).expect("the text before") + before.len();
+    assert_eq!(&source[start..start + word.len()], word);
+    span(start, start + word.len())
+}
+
+#[test]
+fn an_empty_string_stands_only_where_a_value_may_be_empty() {
+    let mut unit = golden_unit();
+    unit.root.num = Some(Num {
+        value: String::new(),
+        shown: plain("§ 8."),
+    });
+    unit.footnotes[0].shown = String::new();
+    let Item::Child(sizes) = &mut unit.root.items[1] else {
+        panic!("subsection (b)");
+    };
+    let Item::Part { blocks, .. } = &mut sizes.items[0] else {
+        panic!("the content of subsection (b)");
+    };
+    blocks[0] = para(vec![
+        words("A widget comes in the sizes of this table."),
+        mark("", 1),
+        link(" and of an image", ""),
+    ]);
+    blocks.push(Block::Image {
+        source: String::new(),
+    });
+    let module = Module::Unit(unit);
+    let text = render(&module);
+    for written in [
+        "num \"\" \"§ 8.\"",
+        "footnote 1 \"\" {",
+        "mark \"\" 1",
+        "[\" and of an image\" -> \"\"]",
+        "image \"\"",
+    ] {
+        assert!(text.contains(written), "{written}\n{text}");
+    }
+    match check_source(&text) {
+        Ok(lowered) => assert_eq!(lowered.module, module),
+        Err(diagnostics) => panic!("{diagnostics:#?}\n{text}"),
+    }
+
+    let unit = fixture("unit.fr");
+    let container = fixture("container.fr");
+    let curated = fixture("curated.fr");
+    for (what, source, find, replace) in [
+        (
+            "the words of a run",
+            &unit,
+            "credit \"(Added by an invented act.)\"",
+            "credit \"(Added by an invented act.)\" \"\"",
+        ),
+        ("a term", &unit, "term \"widget\"", "term \"\""),
+        (
+            "stated reach words",
+            &unit,
+            "words \"As used in section 2 of this title\"",
+            "words \"\"",
+        ),
+        (
+            "`borrowed_from`",
+            &unit,
+            "    basis enacted\n",
+            "    basis enacted\n    borrowed_from \"\"\n",
+        ),
+        (
+            "the source of a unit",
+            &unit,
+            "source \"demo01.xml\"",
+            "source \"\"",
+        ),
+        (
+            "the source of a container",
+            &container,
+            "source \"demo01.xml\"",
+            "source \"\"",
+        ),
+        ("a topic", &unit, "topic \"codification\"", "topic \"\""),
+        (
+            "the origin of quoted content",
+            &unit,
+            "    p \"This invented section was enacted as part of an invented code.\"\n",
+            "    quoted \"\" {\n      p \"This invented section was enacted as part of an \
+             invented code.\"\n    }\n",
+        ),
+        (
+            "the release of a binding",
+            &curated,
+            "release \"demo-1\"",
+            "release \"\"",
+        ),
+    ] {
+        let changed = source.replacen(find, replace, 1);
+        assert_ne!(&changed, source, "{what}");
+        let errors = check_source(&changed).expect_err(what);
+        assert_eq!(errors.len(), 1, "{what}: {errors:#?}");
+        assert_eq!(errors[0].code, DiagnosticCode::E710, "{what}");
+        assert_eq!(text_at(&changed, &errors[0]), "\"\"", "{what}");
+    }
+}
+
+#[test]
+fn the_footnotes_are_numbered_from_1_without_a_gap_in_the_order_they_are_written() {
+    let unit = fixture("unit.fr");
+    let footnote = "  footnote 1 \"1\" {\n    p \"So in the invented original.\"\n  }\n";
+    assert!(unit.contains(footnote));
+    let second = |ordinal: &str| {
+        format!(
+            "{footnote}  footnote {ordinal} \"2\" {{\n    p \"A second invented footnote.\"\n  }}\n"
+        )
+    };
+    for (what, replace, offending) in [
+        (
+            "the first numbered 0",
+            footnote.replace("footnote 1", "footnote 0"),
+            Some("footnote 0 \"1\""),
+        ),
+        (
+            "a number given twice",
+            second("1"),
+            Some("footnote 1 \"2\""),
+        ),
+        ("a gap", second("3"), Some("footnote 3 \"2\"")),
+        ("the next number", second("2"), None),
+    ] {
+        let changed = unit.replacen(footnote, &replace, 1);
+        // A footnote added or renumbered also changes the editorial layer.
+        let errors = check_source(&changed).expect_err(what);
+        let numbered: Vec<&Diagnostic> = errors
+            .iter()
+            .filter(|diagnostic| diagnostic.message.contains("numbered"))
+            .collect();
+        match offending {
+            Some(line) => {
+                let start = changed.find(line).expect("the footnote") + "footnote ".len();
+                assert_eq!(numbered.len(), 1, "{what}: {errors:#?}");
+                assert_eq!(numbered[0].code, DiagnosticCode::E710, "{what}");
+                assert_eq!(
+                    numbered[0].primary_span,
+                    Some(span(start, start + 1)),
+                    "{what}"
+                );
+            }
+            None => assert!(numbered.is_empty(), "{what}: {errors:#?}"),
+        }
+    }
+}
+
+#[test]
+fn citations_and_bindings_share_one_set_of_names() {
+    let curated = fixture("curated.fr");
+    for (what, replace, earlier) in [
+        (
+            "a binding named as a citation",
+            "binding widget_rule",
+            "citation ",
+        ),
+        (
+            "two bindings of one name",
+            "binding widget_binding",
+            "binding ",
+        ),
+    ] {
+        let changed = curated.replacen("binding sizes_binding", replace, 1);
+        let name = &replace["binding ".len()..];
+        let errors = check_source(&changed).expect_err(what);
+        assert_eq!(errors.len(), 1, "{what}: {errors:#?}");
+        assert_eq!(errors[0].code, DiagnosticCode::E200, "{what}");
+        let later = changed.rfind(replace).expect("the later name") + "binding ".len();
+        assert_eq!(
+            errors[0].primary_span,
+            Some(span(later, later + name.len())),
+            "{what}"
+        );
+        assert_eq!(
+            errors[0].related_spans,
+            [word_after(&changed, earlier, name)],
+            "{what}"
+        );
+    }
+}
+
+#[test]
+fn the_spans_a_workspace_check_reports_at_cover_exactly_their_strings() {
+    let unit = fixture("unit.fr");
+    let lowered = check_source(&unit).expect("the unit checks");
+    assert_eq!(covered(&unit, lowered.address_span()), "\"/zz/demo/t1/s8\"");
+    assert_eq!(
+        lowered.within_span().map(|at| covered(&unit, at)),
+        Some("\"/zz/demo/t1/ch1\"")
+    );
+    assert!(lowered.alias_spans().is_empty());
+    assert!(lowered.member_spans().is_empty());
+    assert_eq!(
+        lowered
+            .region_spans()
+            .iter()
+            .map(|at| at.map(|at| covered(&unit, at)))
+            .collect::<Vec<_>>(),
+        [Some("\"/zz/demo/t1/s2\"")]
+    );
+    assert_eq!(lowered.see_note_spans(), [None]);
+
+    let note = "/zz/demo/t1/s8/note/editorialNotes/nolaw/codification";
+    let with_both = unit
+        .replacen(
+            "module \"/zz/demo/t1/s8\" {\n",
+            "module \"/zz/demo/t1/s8\" {\n  alias \"/zz/demo/t1/s8a\"\n",
+            1,
+        )
+        .replacen(
+            "    basis enacted\n",
+            &format!("    basis enacted\n    see_note \"{note}\"\n"),
+            1,
+        );
+    let lowered = check_source(&with_both).expect("the unit with an alias checks");
+    let aliases: Vec<&str> = lowered
+        .alias_spans()
+        .iter()
+        .map(|at| covered(&with_both, *at))
+        .collect();
+    assert_eq!(aliases, ["\"/zz/demo/t1/s8a\""]);
+    let see_note = format!("\"{note}\"");
+    assert_eq!(
+        lowered
+            .see_note_spans()
+            .iter()
+            .map(|at| at.map(|at| covered(&with_both, at)))
+            .collect::<Vec<_>>(),
+        [Some(see_note.as_str())]
+    );
+
+    let container = fixture("container.fr");
+    let lowered = check_source(&container).expect("the container checks");
+    let aliases: Vec<&str> = lowered
+        .alias_spans()
+        .iter()
+        .map(|at| covered(&container, *at))
+        .collect();
+    assert_eq!(aliases, ["\"/zz/demo/t1/chI\""]);
+    assert_eq!(
+        lowered.within_span().map(|at| covered(&container, at)),
+        Some("\"/zz/demo/t1\"")
+    );
+    let members: Vec<&str> = lowered
+        .member_spans()
+        .iter()
+        .map(|at| covered(&container, *at))
+        .collect();
+    assert_eq!(members, ["\"/zz/demo/t1/s8\"", "\"/zz/demo/t1/s9\""]);
+
+    let curated = fixture("curated.fr");
+    let lowered = check_source(&curated).expect("the curated module checks");
+    let all = |spans: &[Span]| -> Vec<String> {
+        spans
+            .iter()
+            .map(|at| covered(&curated, *at).to_owned())
+            .collect()
+    };
+    assert_eq!(
+        all(lowered.import_spans()),
+        [
+            "import \"/zz/demo/curated/gadgets\" as gadgets",
+            "import \"/zz/demo/curated/sprockets\" { sprocket_rule, sprocket_size }",
+        ]
+    );
+    assert_eq!(
+        all(lowered.citation_spans()),
+        [
+            "citation widget_rule -> \"/zz/demo/t1/s8/a\"",
+            "citation widget_sizes -> \"/zz/demo/t1/s8/b\"",
+        ]
+    );
+    let bindings = all(lowered.binding_spans());
+    assert_eq!(bindings.len(), 2);
+    assert!(bindings[0].starts_with("binding widget_binding {") && bindings[0].ends_with('}'));
+    assert!(bindings[1].starts_with("binding sizes_binding {") && bindings[1].ends_with('}'));
+    assert_eq!(
+        all(lowered.binds_spans()),
+        ["widget_rule", "\"/zz/demo/t1/s8/b\""]
+    );
+    let quoted = |hash: Hash32| format!("\"{hash}\"");
+    let notes_hash = quoted(layer_hashes_of_unit(&golden_unit()).enacted);
+    assert_eq!(
+        all(lowered.provision_hash_spans()),
+        [
+            quoted(hash_provision(&subsection_a())),
+            quoted(hash_provision(&subsection_b())),
+        ]
+    );
+    assert_eq!(
+        all(lowered.notes_hash_spans()),
+        [notes_hash.clone(), notes_hash]
+    );
+
+    let qualified = curated.replacen("binds widget_rule", "binds gadgets.gadget_rule", 1);
+    let lowered = check_source(&qualified).expect("a qualified name checks");
+    assert_eq!(
+        covered(&qualified, lowered.binds_spans()[0]),
+        "gadgets.gadget_rule"
     );
 }
