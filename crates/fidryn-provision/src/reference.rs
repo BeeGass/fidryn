@@ -4,8 +4,9 @@
 //! applies. A beginning of a target is the target cut after any of its
 //! segments, the target included; "such an address" is the address of a
 //! module, a provision or a note of the index, or an alias of a module of
-//! it, and an address wins over an alias. "Below" a prefix is within it and
-//! not the prefix itself.
+//! it, and an address wins over an alias. A target lies below a prefix when
+//! it is the prefix itself or continues it at a segment boundary, so a
+//! reference to the corpus as a whole reaches no unit.
 
 use crate::address::{self, Address};
 use crate::hash::Hash32;
@@ -293,14 +294,14 @@ impl AddressIndex {
             .map(|status| &*self.statuses[status as usize])
     }
 
-    /// The length of the prefix of the index that `target` lies below, and
-    /// is not.
+    /// The length of the prefix of the index that `target` lies below: the
+    /// prefix that `target` is, or continues at a segment boundary.
     fn prefix_below(&self, target: &str) -> Option<usize> {
         self.prefixes.iter().find_map(|prefix| {
             let prefix = prefix.as_str();
             target
                 .strip_prefix(prefix)
-                .is_some_and(|rest| rest.starts_with('/'))
+                .is_some_and(|rest| rest.is_empty() || rest.starts_with('/'))
                 .then_some(prefix.len())
         })
     }
@@ -343,9 +344,11 @@ impl AddressIndex {
             }
         }
         let below = self.prefix_below(target);
-        if let Some(base) = longest.map(|(end, _)| end).or(below) {
-            // The segment after the base, which the target has, since the
-            // base is a beginning of it and not the whole.
+        // The base, when the target has a segment after it: a longest
+        // beginning that is an address is not the whole target, which would
+        // have been exact, but the prefix may be.
+        let base = longest.map(|(end, _)| end).or(below);
+        if let Some(base) = base.filter(|base| *base < target.len()) {
             let segment = target[base + 1..].split('/').next().unwrap_or_default();
             if let Some(dash) = segment.find(['\u{2013}', '-'])
                 && dash > 0
@@ -397,18 +400,26 @@ mod tests {
     use crate::model::build::*;
     use crate::model::{ContainerModule, Item, Layer, Module, Provision, UnitModule};
 
+    /// A subsection at `at`, with the status `status`.
+    fn subsection(at: &str, status: Option<&str>) -> Item {
+        Item::Child(Provision {
+            status: status.map(str::to_owned),
+            ..provision(
+                at,
+                "subsection",
+                num("a", "(a)"),
+                None,
+                vec![content(vec![para(vec![words("An invented subsection.")])])],
+            )
+        })
+    }
+
     /// A unit of one section at `at`, with a subsection `a` when `child` is
     /// set, and the status `status`.
     fn unit(at: &str, child: bool, status: Option<&str>) -> UnitModule {
         let mut items = vec![content(vec![para(vec![words("An invented section.")])])];
         if child {
-            items.push(Item::Child(provision(
-                &format!("{at}/a"),
-                "subsection",
-                num("a", "(a)"),
-                None,
-                vec![content(vec![para(vec![words("An invented subsection.")])])],
-            )));
+            items.push(subsection(&format!("{at}/a"), None));
         }
         let root = Provision {
             status: status.map(str::to_owned),
@@ -453,12 +464,33 @@ mod tests {
 
     /// The modules of the outcome table: the units `s1` (child `a`), `s2`
     /// (repealed), `s3` (omitted, alias `s4`), `s5` (child `a`) and `s5~2`,
-    /// and the containers `t1` and `t1/ch1`.
+    /// and the containers `t1` and `t1/ch1`. For the edges, also: a child
+    /// `b` of `s1` that is repealed, a child `a` of `s3` with no status of
+    /// its own, the repealed container `t1/ch2`, and the unit `s6`, whose
+    /// child `a` and whose note each have a twin with `~2`.
     fn modules() -> Vec<Module> {
+        let mut s1 = unit("/zz/demo/t1/s1", true, None);
+        s1.root
+            .items
+            .push(subsection("/zz/demo/t1/s1/b", Some("repealed")));
         let mut s3 = unit("/zz/demo/t1/s3", false, Some("omitted"));
         s3.aliases.push(address("/zz/demo/t1/s4"));
+        s3.root.items.push(subsection("/zz/demo/t1/s3/a", None));
+        let mut ch2 = container("/zz/demo/t1/ch2", &["/zz/demo/t1/s6"]);
+        ch2.status = Some("repealed".to_owned());
+        let mut s6 = unit("/zz/demo/t1/s6", true, None);
+        s6.root.items.push(subsection("/zz/demo/t1/s6/a~2", None));
+        s6.notes.push(note(
+            "/zz/demo/t1/s6/note/statutoryNotes/nolaw/effective~2",
+            Layer::Enacted,
+            "Effective Date",
+            "A second invented note took effect on another invented day.",
+        ));
         vec![
-            Module::Container(container("/zz/demo/t1", &["/zz/demo/t1/ch1"])),
+            Module::Container(container(
+                "/zz/demo/t1",
+                &["/zz/demo/t1/ch1", "/zz/demo/t1/ch2"],
+            )),
             Module::Container(container(
                 "/zz/demo/t1/ch1",
                 &[
@@ -469,11 +501,13 @@ mod tests {
                     "/zz/demo/t1/s5~2",
                 ],
             )),
-            Module::Unit(unit("/zz/demo/t1/s1", true, None)),
+            Module::Unit(s1),
             Module::Unit(unit("/zz/demo/t1/s2", false, Some("repealed"))),
             Module::Unit(s3),
             Module::Unit(unit("/zz/demo/t1/s5", true, None)),
             Module::Unit(unit("/zz/demo/t1/s5~2", false, None)),
+            Module::Container(ch2),
+            Module::Unit(s6),
         ]
     }
 
@@ -518,6 +552,7 @@ mod tests {
     #[test]
     fn the_edges_of_the_outcomes() {
         let index = index_of(&modules());
+        let status = |word: &str| Outcome::TargetStatus(word.to_owned());
         let table = [
             // A note of a unit is exact, and a part below one reaches the
             // unit.
@@ -539,8 +574,28 @@ mod tests {
             ("/zz/demo/t1\u{2013}3", Outcome::RangeForm),
             // A segment that begins with a dash names no first end.
             ("/zz/demo/t1/\u{2013}9", Outcome::NoUnit),
-            // The prefix itself lies below no prefix.
-            ("/zz/demo", Outcome::Outside("/zz/demo".to_owned())),
+            // A child with no status of its own takes the status of its
+            // unit; a provision has a status of its own in a unit that has
+            // none; and a container has a status.
+            ("/zz/demo/t1/s3/a", status("omitted")),
+            ("/zz/demo/t1/s1/b", status("repealed")),
+            ("/zz/demo/t1/ch2", status("repealed")),
+            // A provision or a note beside which its twin with `~2` exists
+            // is ambiguous, and so is what lies below it; the twin itself and
+            // the unit that holds both are not.
+            ("/zz/demo/t1/s6/a", Outcome::Ambiguous),
+            ("/zz/demo/t1/s6/a/1", Outcome::Ambiguous),
+            (
+                "/zz/demo/t1/s6/note/statutoryNotes/nolaw/effective",
+                Outcome::Ambiguous,
+            ),
+            ("/zz/demo/t1/s6/a~2", Outcome::Exact),
+            ("/zz/demo/t1/s6", Outcome::Exact),
+            // A reference to the corpus as a whole, the prefix itself, lies
+            // below the prefix; one that continues the prefix but not at a
+            // segment boundary, and a beginning of the prefix, do not.
+            ("/zz/demo", Outcome::NoUnit),
+            ("/zz/demox/t1", Outcome::Outside("/zz/demox".to_owned())),
             ("/zz", Outcome::Outside("/zz".to_owned())),
             ("", Outcome::Malformed),
         ];

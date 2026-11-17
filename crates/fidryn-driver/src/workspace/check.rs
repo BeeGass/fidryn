@@ -111,9 +111,9 @@ impl WorkspaceReport {
 ///   a module whose `within` is that container (`E720`);
 /// - the manifest's `toolchain` is the running one (`W760`).
 ///
-/// It also gives every reference of the workspace its outcome. Both phases
-/// run on `options.jobs` threads, and the report is the same for every
-/// number of them.
+/// It also gives every reference of the workspace its outcome. Phase one,
+/// and the outcomes of the references in phase two, run on `options.jobs`
+/// threads, and the report is the same for every number of them.
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {

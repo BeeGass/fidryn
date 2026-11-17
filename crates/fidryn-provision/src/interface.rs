@@ -24,7 +24,8 @@
 //!
 //! [`Interface::to_json`] writes it as one line of JSON, `{"schema":
 //! "fidryn.interface/v0.1", "interface": {...}}`, with the fields of
-//! [`Interface`] in their order, and [`Interface::from_json`] reads it back.
+//! [`Interface`] in their order. [`Interface::from_json`] reads back what it
+//! writes, and nothing else.
 
 use crate::address::{self, Address};
 use crate::hash::{
@@ -34,6 +35,7 @@ use crate::model::{
     Basis, Binding, Block, Citation, DefinitionKind, Footnote, Import, Item, Layer, Module, Note,
     Provision, QuotedItem, Run, Text,
 };
+use crate::workspace::as_written;
 use serde::de::{self, Deserializer, Visitor};
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -277,9 +279,21 @@ impl Interface {
     /// no JSON of an interface, names another `schema`, has a field it does
     /// not know or lacks one, or names a word, a provision or a note that is
     /// not there, an address that is none, or parts that its shape has not.
+    /// It is also refused when its JSON value is not the value that the
+    /// interface read from it writes back, as when the key of an optional
+    /// field is missing or a struct is written as an array of its values,
+    /// which the readers `serde` derives would take; the values are compared,
+    /// not the bytes.
     pub fn from_json(text: &str) -> Result<Interface, String> {
         let file: InterfaceFile<Interface> =
             serde_json::from_str(text).map_err(|error| error.to_string())?;
+        as_written(
+            text,
+            &InterfaceFile {
+                schema: InterfaceSchema,
+                interface: &file.interface,
+            },
+        )?;
         file.interface.validated()
     }
 
@@ -975,7 +989,12 @@ mod tests {
             change(&mut interface);
             interface.to_json()
         };
-        let cases: [(String, &str); 8] = [
+        assert!(text.contains(",\"status\":null,"), "{text}");
+        assert!(
+            text.contains("\"address_range\":{\"start\":0,\"end\":0}"),
+            "{text}"
+        );
+        let cases: [(String, &str); 10] = [
             (
                 text.replacen("fidryn.interface/v0.1", "fidryn.interface/v0.2", 1),
                 "`schema` is \"fidryn.interface/v0.2\"",
@@ -987,6 +1006,22 @@ mod tests {
             (
                 text.replacen(",\"footnotes\":1", "", 1),
                 "missing field `footnotes`",
+            ),
+            // The key of an optional field, which the reader would take as
+            // `null` when it is missing.
+            (
+                text.replacen(",\"status\":null", "", 1),
+                "`/interface/provisions/0/status` is missing where the file is written with it",
+            ),
+            // A struct written as an array of its values, which the reader
+            // would take.
+            (
+                text.replacen(
+                    "\"address_range\":{\"start\":0,\"end\":0}",
+                    "\"address_range\":[0,0]",
+                    1,
+                ),
+                "`/interface/address_range` is an array where the file is written with an object",
             ),
             (
                 changed(&|interface| interface.provisions[1].kind = Word(9)),

@@ -820,8 +820,13 @@ The check of a workspace runs in two phases.
    that last part as a function of the interfaces of the workspace and of
    its dependencies, the manifest and the toolchain's version.
 
-Both phases run on `--jobs` worker threads, by default as many as the
-system reports as available. The diagnostics, the summary line, the check
+Phase one runs on `--jobs` worker threads, by default as many as the
+system reports as available, each module file being read and checked on
+one of them. Of phase two, the outcomes of the references are found on as
+many threads, the modules shared out among them; the rest of it, the
+comparison with the lock, where each module stands, the manifest, `within`
+and members, and the index of addresses the outcomes are looked up in,
+runs on one thread. The diagnostics, the summary line, the check
 report and the unresolved list are the same, byte for byte, for every
 number of workers: each module's result is collected by itself, and the
 results are sorted by the path of their file and then by position before
@@ -879,8 +884,12 @@ address that does not lie below the module's, which only a module with an
 `{"note": n}`, the place of what the reference stands in, counted from 0
 in `provisions` or in `notes`. Each place in `words` is counted from 0.
 `Interface::from_json` refuses a text of another `schema`, a key it does
-not know or a missing one, a place that names nothing, an `at` that names
-no address, and parts that the shape of the module does not have.
+not know or a missing one, the key of an optional field included, a place
+that names nothing, an `at` that names no address, and parts that the
+shape of the module does not have. It reads only what `to_json` writes: a
+text whose JSON value is not the value that the interface read from it
+writes back, such as one with an object written as an array of its values,
+is refused, and the place where the two differ is named.
 
 ### The check report and the unresolved list
 
@@ -971,11 +980,14 @@ layer is that of what it stands in, and so is the address it stands in:
 | a source credit | `editorial` | the module's |
 | a footnote | `editorial` | the module's |
 
-The check of a workspace gives every reference of every module exactly one
-outcome, the first of this list that applies. A beginning of a target is
-the target cut after any of its segments, the target itself included: the
-beginnings of `/zz/demo/t1/s8/a` are `/zz`, `/zz/demo`, `/zz/demo/t1`,
-`/zz/demo/t1/s8` and `/zz/demo/t1/s8/a`. A known address is the address of
+The check of a workspace gives every reference of every module that stands
+at the path of its address exactly one outcome, the first of this list
+that applies. A module that does not stand there, and a module file that
+does not lower, are reported, and their references are left out of the
+outcomes and the counts. A beginning of a target is the target cut after
+any of its segments, the target itself included: the beginnings of
+`/zz/demo/t1/s8/a` are `/zz`, `/zz/demo`, `/zz/demo/t1`, `/zz/demo/t1/s8`
+and `/zz/demo/t1/s8/a`. A known address is the address of
 a module, a provision or a note of the workspace or of a dependency, or an
 alias of such a module; when an address of one is an alias of another, the
 address wins.
@@ -991,9 +1003,12 @@ address wins.
 | `no-unit` | the target lies below the prefix of the workspace or of a dependency |
 | `outside` | the target lies below no such prefix; it is recorded with its first two segments, the body of law it names |
 
-One of the last two always applies, so no reference is left without an
-outcome. A target that is the prefix itself lies below no prefix. Of a
-workspace with the prefix `/zz/demo`, the units `/zz/demo/t1/s1` and
+A target lies below a prefix when it is the prefix itself or continues it
+at a segment boundary: in a workspace with the prefix `/zz/demo`, a
+reference to the corpus as a whole, `/zz/demo`, is `no-unit`, and
+`/zz/demox/t1` lies below no prefix. One of the last two rows always
+applies, so no reference is left without an outcome. Of a workspace with
+the prefix `/zz/demo`, the units `/zz/demo/t1/s1` and
 `/zz/demo/t1/s5`, each with a subsection `a`, `/zz/demo/t1/s2` (status
 `repealed`), `/zz/demo/t1/s3` (status `omitted`, alias `/zz/demo/t1/s4`)
 and `/zz/demo/t1/s5~2`, and the containers `/zz/demo/t1` and

@@ -274,15 +274,26 @@ fn read<'a, T: Deserialize<'a>>(text: &'a str) -> Result<T, String> {
 /// compared, not the bytes, so the layout and the order of the keys do not
 /// matter.
 fn closed<T: Serialize>(text: &str, schema: &'static str, data: T) -> Result<T, String> {
+    as_written(
+        text,
+        &Tagged {
+            schema,
+            body: &data,
+        },
+    )?;
+    Ok(data)
+}
+
+/// `Ok` when the JSON value of `text` is the value that `written` writes;
+/// otherwise the place where they first differ, as a JSON pointer, and what
+/// stands there. The values are compared, not the bytes.
+pub(crate) fn as_written(text: &str, written: &impl Serialize) -> Result<(), String> {
     let given: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
-    let written = serde_json::to_value(Tagged {
-        schema,
-        body: &data,
-    })
-    .expect("a file of strings, numbers, digests and addresses is written");
+    let written = serde_json::to_value(written)
+        .expect("a file of strings, numbers, digests and addresses is written");
     let mut pointer = String::new();
     match difference(&given, &written, &mut pointer) {
-        None => Ok(data),
+        None => Ok(()),
         Some(found) => {
             let place = if pointer.is_empty() {
                 "the top of the file".to_owned()
