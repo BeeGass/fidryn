@@ -434,8 +434,8 @@ A module is one of three shapes, decided when it is lowered (S12): a **unit** ha
 - Line 1 is `edition 2`, line 2 is `module "<address>" {`.
 - Declarations in this order: each `alias` in the order of S7, `within`, `source`, `positive_law`, the `provision` or `container`, `credit`, notes in document order, footnotes by ordinal, definitions in the order of their provisions in the document and then of their first term, `layers`.
 - One field to a line. A text is written on one line, its runs separated by one space.
-- A string is written with `\\` for a backslash, `\"` for a quotation mark, `\u00XX` for a character below U+0020 or U+007F, and every other character as itself.
-- A part or a cell whose content is exactly one paragraph is written in the short form (`content "..."`); otherwise in the brace form with one block to a line. A cell with no block is written `td ""`, and that spelling is read back as a cell with no block. The shown form of a number that has none is written `""` and read back as the empty text. An empty string stands nowhere else.
+- A string is written with `\\` for a backslash, `\"` for a quotation mark, `\u00XX` with lower-case hexadecimal digits for a character below U+0020 or U+007F, and every other character as itself.
+- A part or a cell whose content is exactly one paragraph is written in the short form (`content "..."`); otherwise in the brace form with one block to a line. A cell with no block is written `td ""`, and that spelling is read back as a cell with no block. The shown form of a number that has none is written `""` and read back as the empty text. Besides these two, an empty string may stand only where the source itself may give an empty value: the value of a number, the shown form of a footnote and of a marker, the source of an image, and the target of a link. Anywhere else an empty string is refused: as the words of a run, as a term, as stated reach words, as `borrowed_from`, as `source`, as the release of a binding, as a topic, and as the origin of quoted content.
 - `span <colspan> <rowspan>` is written only when one of the two is not 1.
 - Every `hash` and the three values of `layers` are computed by the rule of S5 from what is written above them.
 
@@ -689,9 +689,9 @@ The ingester recomputes the size and both digests of every archive and refuses o
 | A unit's top provision has the module's address; every child provision's address is below its parent's; every note's address is below the module's; no address is declared twice | `E700` |
 | The text of every block is normalized (S3) | `E710` |
 | Every `hash` and every value of `layers` equals the value computed by S5 | `E710` |
-| Every `mark` names a footnote of the module | `E710` |
+| Every `mark` names a footnote of the module; the footnotes are numbered from 1, without a gap, in the order they are written | `E710` |
 | The checks of a definition listed in S10 | `E710` |
-| In a curated module: no name is declared twice; a binding's two hashes are 64 hexadecimal digits | `E200`, `E710` |
+| In a curated module: no name is declared twice, citations and bindings sharing one set of names; a binding's two hashes are 64 hexadecimal digits | `E200`, `E710` |
 
 **A workspace** (`fidryn check DIR`), in addition:
 
