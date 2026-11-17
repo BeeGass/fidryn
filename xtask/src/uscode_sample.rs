@@ -19,7 +19,8 @@
 //!    line, what `fidryn text samples/uscode/workspace --json` prints;
 //! 7. the check of the curated sample, `samples/uscode/curated`, which
 //!    depends on the generated one at a pinned release, finds no error and
-//!    no warning, and gives every one of its citations the outcome `exact`;
+//!    no warning, counts at least one citation, and gives every one of its
+//!    citations the outcome `exact`;
 //!    `--update` writes, after the workspace, the release and the lock
 //!    digest of that dependency and the toolchain of the curated manifest,
 //!    and nothing else of it.
@@ -250,16 +251,11 @@ fn ingest(archives: &Path, out: &Path, jobs: u32) -> Result<()> {
 /// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
 /// runs it. It gives the number of the sample's citations, and fails,
 /// naming the file and the first thing that is wrong, on an error, on a
-/// warning, and on a citation whose outcome is not `exact`.
+/// warning, on a citation whose outcome is not `exact`, and, naming the
+/// curated sample, when the check counts no citation at all.
 fn check_curated(root: &Path) -> Result<u64> {
     eprintln!("+ fidryn check {CURATED} --no-cache");
-    let options = CheckOptions {
-        jobs: std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
-        cache_dir: None,
-        toolchain: TOOLCHAIN.to_owned(),
-        executable: String::new(),
-    };
-    let report = check_workspace(&root.join(CURATED), &options);
+    let report = check_workspace(&root.join(CURATED), &curated_options());
     if let Some(first) = report.diagnostics.first() {
         let mut shown = first.clone();
         shown.source_file = Some(match &first.source_file {
@@ -292,7 +288,25 @@ fn check_curated(root: &Path) -> Result<u64> {
             report.unresolved_citations.len()
         );
     }
-    Ok(report.citations.values().sum())
+    let citations = report.citations.values().sum();
+    if citations == 0 {
+        bail!(
+            "{CURATED}: `fidryn check {CURATED} --no-cache` counts no citation, and the curated \
+             sample cites provisions of the generated one"
+        );
+    }
+    Ok(citations)
+}
+
+/// How step 7 checks the curated sample: as `--no-cache` does, with no
+/// cache, on as many workers as are available.
+fn curated_options() -> CheckOptions {
+    CheckOptions {
+        jobs: std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
+        cache_dir: None,
+        toolchain: TOOLCHAIN.to_owned(),
+        executable: String::new(),
+    }
 }
 
 /// What `--update` writes of the curated manifest under `root`, after the
@@ -940,13 +954,76 @@ mod tests {
         Manifest::from_json(text).unwrap_or_else(|error| panic!("{error}"))
     }
 
+    /// The citations of the committed curated module, by name, in its order.
+    const CITATIONS: [&str; 8] = [
+        "words_denoting_number",
+        "monthly_agreement_reports",
+        "reported_agreements",
+        "railway_labor_definitions",
+        "subsistence_allowances",
+        "bankruptcy_rules_scope",
+        "bankruptcy_rules_in_general",
+        "respect_for_marriage_short_title",
+    ];
+
+    /// The name of each citation of the curated module under `root`, in
+    /// its order, with the outcome that the check of the curated sample
+    /// gives it: the outcome the unresolved citations record for it, and
+    /// otherwise `exact`, every citation being counted.
+    fn citation_outcomes(root: &Path) -> Vec<(String, &'static str)> {
+        let curated = root.join(CURATED);
+        let report = check_workspace(&curated, &curated_options());
+        let modules = fidryn_driver::workspace::read_modules(&curated, 1)
+            .unwrap_or_else(|diagnostics| panic!("{diagnostics:#?}"));
+        let [fidryn_provision::Module::Curated(module)] = modules.as_slice() else {
+            panic!("the curated sample holds one curated module: {modules:#?}");
+        };
+        let counted: u64 = report.citations.values().sum();
+        assert_eq!(counted, module.citations.len() as u64, "{report:#?}");
+        module
+            .citations
+            .iter()
+            .map(|citation| {
+                let outcome = report
+                    .unresolved_citations
+                    .iter()
+                    .find(|each| each.from == module.address && each.citation == citation.name)
+                    .map_or("exact", |each| each.outcome.name());
+                (citation.name.clone(), outcome)
+            })
+            .collect()
+    }
+
     #[test]
     fn the_curated_sample_checks_against_the_generated_one() {
         let copy = copy_of_the_samples("curated-clean");
         let committed = read_text(&copy.join(CURATED).join(MANIFEST));
         assert_eq!(manifest_of(&committed).to_json(), committed);
         let citations = check_curated(&copy).unwrap_or_else(|error| panic!("{error:#}"));
-        assert!(citations >= 5, "{citations}");
+        assert_eq!(citations, CITATIONS.len() as u64);
+        let expected: Vec<(String, &str)> = CITATIONS
+            .iter()
+            .map(|name| ((*name).to_owned(), "exact"))
+            .collect();
+        assert_eq!(citation_outcomes(&copy), expected);
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_curated_sample_that_cites_nothing_fails_the_step_and_names_it() {
+        let copy = copy_of_the_samples("curated-no-citation");
+        let module = copy.join(CURATED).join("zz/sample/citations.fr");
+        fs::write(&module, "edition 2\nmodule \"/zz/sample/citations\" {\n}\n")
+            .expect("change the module");
+        let error = check_curated(&copy).expect_err("a curated sample with no citation");
+        let message = format!("{error:#}");
+        assert!(
+            message.starts_with(
+                "samples/uscode/curated: `fidryn check samples/uscode/curated --no-cache` counts \
+                 no citation"
+            ),
+            "{message}"
+        );
         fs::remove_dir_all(&copy).expect("remove scratch dir");
     }
 

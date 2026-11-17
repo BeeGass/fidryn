@@ -346,20 +346,17 @@ fn a_cache_that_cannot_be_written_is_said_once_and_the_check_goes_on() {
     assert!(message.starts_with(&expected), "{message}");
 }
 
-#[test]
-fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
-    // An invented curated workspace that depends on a copy of the demo
-    // workspace, with its cache's directory inside that copy.
-    let scratch = Scratch::new("cache-in-dependency");
-    let demo = scratch.path().join("demo");
-    copy_tree(&demo_workspace(), &demo);
+/// Writes into `notes` an invented curated workspace of the prefix
+/// `/zz/notes` that depends on a copy of the demo workspace at `path`,
+/// relative to `notes`, pinned to its lock, `demo`, and that cites one of its
+/// sections.
+fn depending_on_the_demo(notes: &Path, path: &str, demo: &Path) {
     let lock = fs::read(demo.join("law.lock.json")).expect("read the lock");
-    let notes = scratch.path().join("notes");
     fs::create_dir_all(notes.join("zz/notes")).expect("create a directory");
     let manifest = format!(
         "{{\n  \"schema\": \"fidryn.workspace/v0.1\",\n  \"name\": \"notes\",\n  \"kind\": \
          \"curated\",\n  \"prefix\": \"/zz/notes\",\n  \"toolchain\": \"{}\",\n  \
-         \"dependencies\": [\n    {{\n      \"name\": \"demo\",\n      \"path\": \"../demo\",\n      \
+         \"dependencies\": [\n    {{\n      \"name\": \"demo\",\n      \"path\": \"{path}\",\n      \
          \"release\": \"42-7\",\n      \"lock_digest\": \"{}\"\n    }}\n  ]\n}}\n",
         env!("CARGO_PKG_VERSION"),
         blake3::hash(&lock).to_hex()
@@ -370,6 +367,17 @@ fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
         "edition 2\nmodule \"/zz/notes/a\" {\n  citation sizes -> \"/zz/demo/t1/s2\"\n}\n",
     )
     .expect("write");
+}
+
+#[test]
+fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
+    // An invented curated workspace that depends on a copy of the demo
+    // workspace, with its cache's directory inside that copy.
+    let scratch = Scratch::new("cache-in-dependency");
+    let demo = scratch.path().join("demo");
+    copy_tree(&demo_workspace(), &demo);
+    let notes = scratch.path().join("notes");
+    depending_on_the_demo(&notes, "../demo", &demo);
     let cache = demo.join(".fidryn-cache");
     let before = entries_below(&demo);
     for _ in 0..2 {
@@ -394,6 +402,48 @@ fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
             cache.display()
         );
         assert!(message.starts_with(&expected), "{message}");
+        assert_eq!(entries_below(&demo), before);
+    }
+}
+
+#[test]
+fn a_cache_that_holds_a_dependency_is_said_once_and_not_used() {
+    // The copy of the demo workspace stands where the cache would write its
+    // entries, `v1` in the cache's directory, beside entries of its own
+    // whose names begin with a dot.
+    let scratch = Scratch::new("cache-holds-dependency");
+    let cache = scratch.path().join("cache");
+    let demo = cache.join("v1");
+    copy_tree(&demo_workspace(), &demo);
+    fs::create_dir_all(demo.join(".git")).expect("create a directory");
+    fs::write(demo.join(".git/HEAD"), "ref: refs/heads/invented\n").expect("write");
+    fs::write(demo.join(".notes"), "Invented notes.\n").expect("write");
+    let notes = scratch.path().join("notes");
+    depending_on_the_demo(&notes, "../cache/v1", &demo);
+    let before = entries_below(&demo);
+    for _ in 0..2 {
+        let checked = check_in(
+            &[
+                notes.as_os_str(),
+                OsStr::new("--cache-dir"),
+                cache.as_os_str(),
+            ],
+            None,
+        );
+        assert!(checked.status.success(), "{}", stderr(&checked));
+        assert_eq!(
+            stdout(&checked),
+            "modules: 1; from cache: 0; errors: 0; warnings: 0\nok\n"
+        );
+        assert_eq!(
+            stderr(&checked),
+            format!(
+                "the cache could not be used, and the check went on without it: {}: the \
+                 directory of the dependency `demo`, `../cache/v1`, lies inside the directory, \
+                 and nothing is written inside a dependency\n",
+                cache.display()
+            )
+        );
         assert_eq!(entries_below(&demo), before);
     }
 }

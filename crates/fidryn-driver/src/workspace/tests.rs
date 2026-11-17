@@ -3763,34 +3763,38 @@ fn a_cache_inside_a_dependency_is_not_used() {
     let uncached = check_workspace(&notes, &with_jobs(2));
     assert_eq!(uncached.diagnostics, []);
     assert_eq!(uncached.cache_unused, None);
+    let inside = "the directory lies inside the directory of the dependency `demo`, `../demo`";
     let mut caches = vec![
         // The dependency's own cache, which a check of its directory keeps.
-        demo.join(".fidryn-cache"),
+        (demo.join(".fidryn-cache"), inside),
         // A directory below one that does not exist yet.
-        demo.join("new/cache"),
+        (demo.join("new/cache"), inside),
         // The dependency's directory itself, named through `..`.
-        notes.join("../demo"),
+        (
+            notes.join("../demo"),
+            "the directory is the directory of the dependency `demo`, `../demo`",
+        ),
         // A directory that does not exist, whose `..` leads into it.
-        scratch.join("new/../demo/cache"),
+        (scratch.join("new/../demo/cache"), inside),
     ];
     #[cfg(unix)]
     {
         // A link beside the dependency that leads into it.
         std::os::unix::fs::symlink(&demo, scratch.join("link")).expect("link");
-        caches.push(scratch.join("link/cache"));
+        caches.push((scratch.join("link/cache"), inside));
     }
     let before = tree(&demo);
-    for cache in &caches {
+    for (cache, words) in &caches {
         for _ in 0..2 {
             let report = check_workspace(&notes, &cached(cache, 2));
             let why = report.cache_unused.as_deref().unwrap_or_default();
-            assert!(
-                why.starts_with(&format!(
-                    "{}: the directory lies inside the directory of the dependency `demo`, \
-                     `../demo`, and nothing is written inside a dependency",
+            assert_eq!(
+                why,
+                format!(
+                    "{}: {words}, and nothing is written inside a dependency",
                     cache.display()
-                )),
-                "{}: {why:?}",
+                ),
+                "{}",
                 cache.display()
             );
             assert_eq!(without_cache_note(&report), uncached, "{}", cache.display());
@@ -3798,6 +3802,57 @@ fn a_cache_inside_a_dependency_is_not_used() {
         assert_eq!(tree(&demo), before, "{}", cache.display());
     }
     assert!(!scratch.join("new").exists());
+}
+
+#[test]
+fn a_cache_that_holds_a_dependency_is_not_used() {
+    // The dependency stands where the cache writes its entries, `v1` in the
+    // cache's directory, and holds entries whose names begin with a dot.
+    let scratch = Scratch::new("deps-cache-holds");
+    let cache = scratch.join("cache");
+    let demo = cache.join("v1");
+    let digest = write_release(&demo, "42-7", &dependency_models());
+    put(&demo, ".git/HEAD", "ref: refs/heads/invented\n");
+    put(&demo, ".notes", "Invented notes.\n");
+    let notes = scratch.join("notes");
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    depending(
+        &notes,
+        vec![dependency("demo", "../cache/v1", "42-7", digest)],
+        &[("a", &a)],
+    );
+    let uncached = check_workspace(&notes, &with_jobs(2));
+    assert_eq!(uncached.diagnostics, []);
+    assert_eq!(uncached.cache_unused, None);
+    assert_eq!(citation_counts(&uncached.citations), [("exact", 1)]);
+    let caches = [
+        // The directory whose `v1` the dependency is.
+        cache.clone(),
+        // The same directory, named through `..`.
+        notes.join("../cache"),
+        // The directory that holds both workspaces.
+        scratch.path().to_owned(),
+    ];
+    let before = tree(&demo);
+    for dir in &caches {
+        for _ in 0..2 {
+            let report = check_workspace(&notes, &cached(dir, 2));
+            assert_eq!(
+                report.cache_unused.as_deref().unwrap_or_default(),
+                format!(
+                    "{}: the directory of the dependency `demo`, `../cache/v1`, lies inside \
+                     the directory, and nothing is written inside a dependency",
+                    dir.display()
+                ),
+                "{}",
+                dir.display()
+            );
+            assert_eq!(without_cache_note(&report), uncached, "{}", dir.display());
+        }
+        assert_eq!(tree(&demo), before, "{}", dir.display());
+    }
+    // No entry was written anywhere, beside the dependency either.
+    assert!(!scratch.join("v1").exists());
 }
 
 #[test]

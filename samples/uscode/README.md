@@ -107,7 +107,8 @@ difference:
    the first thing that is wrong, on an error, such as a pin that is no
    longer the lock's (`E740`), on a warning, and on a citation whose
    outcome is not `exact`, such as one that stops resolving after a
-   regeneration.
+   regeneration; and it fails, naming `curated/`, when the check counts no
+   citation at all.
 
 The step writes nothing in the repository, a cache included; with
 `--update` it writes `workspace/` and those three values of

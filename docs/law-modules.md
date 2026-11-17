@@ -1146,9 +1146,9 @@ of the executable is the BLAKE3 of the file of the running `fidryn`, as 64
 hexadecimal digits: two builds of one version can differ in what phase one
 does, and an entry that another build wrote is never read. When that
 identity cannot be read, the check keeps no cache, and `fidryn check` says
-so once on stderr; so it does when the cache's directory lies inside the
-directory of a dependency. A file larger than the largest source of edition 2 is
-not kept; the check refuses it in any case.
+so once on stderr; so it does when the cache's directory is the directory
+of a dependency, lies inside it or holds it. A file larger than the largest
+source of edition 2 is not kept; the check refuses it in any case.
 
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
 in the cache's directory. That directory is the one `--cache-dir` names;
@@ -1161,8 +1161,9 @@ workspace leaves it alone; the check writes nothing else into the
 workspace. The module files of the dependencies of a curated workspace are
 read through the same cache, so their entries go into the cache's
 directory of the workspace that is checked, and nothing is written into a
-dependency's directory: when the cache's directory lies inside the
-directory of a dependency the manifest names, the check keeps no cache, as
+dependency's directory: when the cache's directory is the directory of a
+dependency the manifest names, lies inside it or holds it, the check keeps
+no cache, as
 [Depending on another workspace](#depending-on-another-workspace)
 describes.
 
@@ -1401,17 +1402,23 @@ cache or with none: the entries of the module files of a dependency go
 into the cache of the workspace that is checked, by default
 `.fidryn-cache` inside it, under the keys of their bytes as every entry is,
 so that the next check reads them from there. When the cache's directory
-lies inside the directory of a dependency that the manifest names,
-whatever the checks of the entry find, as the dependency's own
-`.fidryn-cache` does, or the default one of a workspace that stands in a
-directory of its dependency, the check keeps no cache at all: it reads
-and writes no entry, says so once on stderr, as
+and the directory of a dependency that the manifest names, whatever the
+checks of the entry find, are the same, or one lies inside the other, the
+check keeps no cache at all. The cache's directory lies inside the
+dependency's when it is the dependency's own `.fidryn-cache`, or the
+default one of a workspace that stands in a directory of its dependency;
+the dependency's lies inside the cache's when it stands where the cache
+writes its entries, at `v1` in the cache's directory, or anywhere else
+below it. The check then reads and writes no entry, says so once on
+stderr, as
 `the cache could not be used, and the check went on without it: DIR: ...`
-with the cache's directory and the dependency it lies in, and goes on. Its
-diagnostics, its report and its exit status are then those of a check with
-`--no-cache`. The paths are compared with every link and every `..`
-resolved, and of a directory that does not exist yet, the part that
-exists is resolved and the rest taken as written.
+with the cache's directory, the dependency and which holds which, and goes
+on. Its diagnostics, its report and its exit status are then those of a
+check with `--no-cache`. The paths are compared with every link and every
+`..` resolved, and of a directory that does not exist yet, the part that
+exists is resolved and the rest taken as written; a cache's directory that
+does not exist yet lies inside a dependency when the part of it that exists
+does.
 
 The summary line and the check report are about the workspace that is
 checked. `modules` and `from cache` count its own module files, and the
@@ -1698,8 +1705,9 @@ first difference when one of them does not hold:
    which it implements on its own, sharing no code with the ingester;
 7. the check of `curated/` with its dependency finds no error and no
    warning, a pin that is no longer the lock's (`E740`) among the errors,
-   and gives every citation of it the outcome `exact`; the step names the
-   file and the first thing that is wrong.
+   counts at least one citation, and gives every citation of it the
+   outcome `exact`; the step names the file and the first thing that is
+   wrong, and the curated sample when it counts no citation.
 
 The `fidryn` commands run in the process of the step, as the binary runs
 them. The step makes its temporary directories under the system's

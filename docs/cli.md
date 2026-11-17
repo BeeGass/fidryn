@@ -182,8 +182,9 @@ with the cache's directory and the error, and its output is what it would
 have been. When the identity of the running executable, which the keys of
 the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
-so it does when the cache's directory lies inside the directory of a
-dependency of the workspace, where nothing is written
+so it does when the cache's directory is the directory of a dependency of
+the workspace, lies inside it or holds it, since nothing is written inside
+a dependency
 ([Depending on another workspace](law-modules.md#depending-on-another-workspace)),
 and its output is then that of a check with `--no-cache`.
 

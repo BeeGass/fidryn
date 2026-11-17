@@ -87,10 +87,11 @@ pub struct WorkspaceReport {
     /// line nor the check report holds it.
     pub cache_failure: Option<String>,
     /// Why the cache of `CheckOptions::cache_dir` was not used at all: its
-    /// directory lies inside the directory of a dependency, where nothing is
-    /// written. The check then reads and writes no entry, and the rest of
-    /// the report is that of a check without a cache; neither the summary
-    /// line nor the check report holds this.
+    /// directory is the directory of a dependency, lies inside it or holds
+    /// it, and nothing is written inside a dependency. The check then reads
+    /// and writes no entry, and the rest of the report is that of a check
+    /// without a cache; neither the summary line nor the check report holds
+    /// this.
     pub cache_unused: Option<String>,
 }
 
@@ -161,10 +162,10 @@ impl WorkspaceReport {
 /// them. With a cache, `options.cache_dir`, the result of phase one of a
 /// file whose bytes were checked before is read from it, and the report is
 /// the same as without one, but for the count of the modules read from it.
-/// A cache whose directory lies inside the directory of a dependency the
-/// manifest names is not used at all, since nothing is written inside a
-/// dependency: the report is that of a check without a cache, and says why
-/// in [`WorkspaceReport::cache_unused`].
+/// A cache whose directory is the directory of a dependency the manifest
+/// names, lies inside it or holds it is not used at all, since nothing is
+/// written inside a dependency: the report is that of a check without a
+/// cache, and says why in [`WorkspaceReport::cache_unused`].
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
@@ -186,11 +187,12 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
 
     // Phase one: each module file of the workspace and of its dependencies
     // by itself, or its result from the cache; then the entries of the
-    // files the cache did not hold. A cache inside a dependency is not used.
+    // files the cache did not hold. A cache that shares a directory with a
+    // dependency is not used.
     let cache_unused = options
         .cache_dir
         .as_deref()
-        .and_then(|dir| deps::cache_inside(root, &manifest, dir));
+        .and_then(|dir| deps::cache_shared(root, &manifest, dir));
     let cache = options
         .cache_dir
         .as_deref()

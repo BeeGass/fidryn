@@ -523,8 +523,9 @@ fn executable_digest() -> Result<String, String> {
 /// `fidryn check DIR`: the check of the workspace in the directory `dir`, on
 /// `--jobs` threads, by default as many as are available, with the cache of
 /// [`cache_dir`], keyed also by the identity of the running executable. When
-/// that identity cannot be read, or the cache's directory lies inside the
-/// directory of a dependency of the workspace, the check keeps no cache.
+/// that identity cannot be read, or the cache's directory is the directory
+/// of a dependency of the workspace, lies inside it or holds it, the check
+/// keeps no cache.
 /// Prints each diagnostic, naming its file under `dir`, then says once when
 /// the cache could not be used or written, which fails nothing; then prints the
 /// summary line; writes the check report to `--report` and the unresolved

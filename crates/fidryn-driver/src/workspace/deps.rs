@@ -21,7 +21,8 @@
 //! no interface, only its prefix when the manifest of its directory was
 //! read; the manifest of an entry refused for its path or its name is not
 //! read. Nothing is written inside a dependency's directory: a check whose
-//! cache's directory lies inside one keeps no cache ([`cache_inside`]).
+//! cache's directory is that directory, lies inside it or holds it keeps no
+//! cache ([`cache_shared`]).
 
 use super::cache::Cache;
 use super::check::{Cached, Files, PhaseOne, lock_disagrees, read_files, settle as settle_files};
@@ -346,24 +347,32 @@ pub(super) fn settle(
 }
 
 /// Why the cache's directory `cache` must not be used in the check of the
-/// workspace at `root`, whose manifest is `manifest`: it lies inside the
-/// directory of one of the dependencies the manifest names, where nothing
-/// is written. `None` when it lies inside none. The paths are compared with
-/// every link and `..` resolved, as far as each exists ([`resolved`]); the
-/// directory of every entry is compared, whatever its checks find.
-pub(super) fn cache_inside(root: &Path, manifest: &Manifest, cache: &Path) -> Option<String> {
+/// workspace at `root`, whose manifest is `manifest`: it shares a directory
+/// with one of the dependencies the manifest names, where nothing is
+/// written. It does when it is the directory of the dependency, lies inside
+/// it, or holds it, so that an entry written below it could land inside the
+/// dependency. `None` when it shares a directory with none. The paths are
+/// compared with every link and `..` resolved, as far as each exists
+/// ([`resolved`]); the directory of every entry is compared, whatever its
+/// checks find.
+pub(super) fn cache_shared(root: &Path, manifest: &Manifest, cache: &Path) -> Option<String> {
     let (existing, at) = resolved(cache)?;
     manifest.dependencies.iter().find_map(|entry| {
         let (_, dir) = resolved(&root.join(&entry.path))?;
-        (at.starts_with(&dir) || existing.starts_with(&dir)).then(|| {
-            format!(
-                "{}: the directory lies inside the directory of the dependency `{}`, `{}`, and \
-                 nothing is written inside a dependency",
-                cache.display(),
-                entry.name,
-                entry.path
-            )
-        })
+        let named = format!("the dependency `{}`, `{}`", entry.name, entry.path);
+        let relation = if at == dir {
+            format!("the directory is the directory of {named}")
+        } else if at.starts_with(&dir) || existing.starts_with(&dir) {
+            format!("the directory lies inside the directory of {named}")
+        } else if dir.starts_with(&at) {
+            format!("the directory of {named}, lies inside the directory")
+        } else {
+            return None;
+        };
+        Some(format!(
+            "{}: {relation}, and nothing is written inside a dependency",
+            cache.display()
+        ))
     })
 }
 

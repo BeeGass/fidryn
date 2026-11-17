@@ -99,8 +99,9 @@ interchange schema versions are maintained independently of the interpreter.
   with an error of its own is `E740`, and an absolute path, a name listed
   twice and a prefix that overlaps another are `E730`. Each dependency is
   checked by itself through the cache of the depending workspace, and
-  nothing is written into its directory: a cache whose directory lies
-  inside a dependency is not used, and the check says so once. The target
+  nothing is written into its directory: a cache whose directory is the
+  directory of a dependency, lies inside it or holds it is not used, and
+  the check says so once. The target
   of every citation gets an outcome from the modules of the workspace and
   of its dependencies: the check report gains `citations`, the count of
   each outcome, and the unresolved list a line for each citation that is
@@ -111,8 +112,9 @@ interchange schema versions are maintained independently of the interpreter.
   generated sample of the Code at its pinned release and cites sections,
   deeper provisions, a rule of the appendix title and a note of it.
   `cargo xtask uscode-sample` also checks it, and fails on an error, a
-  warning or a citation whose outcome is not `exact`, naming the file;
-  `--update` also writes the pin and the toolchain of its manifest.
+  warning or a citation whose outcome is not `exact`, naming the file, and
+  when the check counts no citation, naming the curated sample; `--update`
+  also writes the pin and the toolchain of its manifest.
 
 ## [0.2.0] - 2026-11-16
 
