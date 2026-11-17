@@ -924,8 +924,10 @@ in `provisions` or in `notes`. Each place in `words` is counted from 0.
 `Interface::from_json` refuses a text of another `schema`, a key it does
 not know or a missing one, the key of an optional field included, a place
 that names nothing, an `at` that names no address, parts that the shape of
-the module does not have, and ranges of parts that a declaration does not
-have, such as the range of an alias of an import with braces. It reads only what `to_json` writes: a
+the module does not have, the range of a part that a declaration does not
+have, such as the range of an alias of an import with braces, and a
+declaration that lacks the range of a part it has, such as an import with
+an alias and no range of it. It reads only what `to_json` writes: a
 text whose JSON value is not the value that the interface read from it
 writes back, such as one with an object written as an array of its values,
 is refused, and the place where the two differ is named.

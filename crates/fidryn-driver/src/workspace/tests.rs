@@ -2652,6 +2652,73 @@ fn an_alias_declared_twice() {
 }
 
 #[test]
+fn an_alias_that_another_import_brings_into_scope() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" { widget }",
+            "import \"/zz/notes/c\" as widget",
+        ],
+    );
+    let b = module_b();
+    let c = note_module("c", &[]);
+    let diagnostic = one_name_error(
+        "names-alias-brought",
+        &[("a", &a), ("b", &b), ("c", &c)],
+        "a",
+        span_of(&a, "\"/zz/notes/c\" as ", "widget"),
+        "the name `widget` is declared twice: as the alias of the import of `/zz/notes/c`, and \
+         before that as a name brought into scope from `/zz/notes/b`",
+    );
+    assert_eq!(diagnostic.related_spans, [span_of(&a, "{ ", "widget")]);
+}
+
+#[test]
+fn a_binding_named_as_an_alias() {
+    let a = note_module(
+        "a",
+        &[
+            "import \"/zz/notes/b\" as b",
+            &binding("b", "\"/zz/demo/t1/s9\""),
+        ],
+    );
+    let b = module_b();
+    let diagnostic = one_name_error(
+        "names-binding-alias",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "binding ", "b"),
+        "the name `b` is declared twice: as a binding, and before that as the alias of the \
+         import of `/zz/notes/b`",
+    );
+    assert_eq!(diagnostic.related_spans, [span_of(&a, " as ", "b")]);
+}
+
+#[test]
+fn a_citation_before_a_name_of_its_text_in_braces() {
+    let a = note_module(
+        "a",
+        &[
+            "citation widget -> \"/zz/demo/t1/s9\"",
+            "import \"/zz/notes/b\" { widget }",
+        ],
+    );
+    let b = module_b();
+    let diagnostic = one_name_error(
+        "names-citation-brought",
+        &[("a", &a), ("b", &b)],
+        "a",
+        span_of(&a, "{ ", "widget"),
+        "the name `widget` is declared twice: as a name brought into scope from \
+         `/zz/notes/b`, and before that as a citation",
+    );
+    assert_eq!(
+        diagnostic.related_spans,
+        [span_of(&a, "citation ", "widget")]
+    );
+}
+
+#[test]
 fn a_name_reached_only_through_another_modules_import() {
     let c = note_module("c", &["import \"/zz/notes/b\" { widget }"]);
     let a = note_module(

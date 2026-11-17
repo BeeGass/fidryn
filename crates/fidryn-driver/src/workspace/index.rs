@@ -82,7 +82,9 @@ pub(crate) fn no_references() -> BTreeMap<Layer, BTreeMap<String, u64>> {
 ///
 /// Each module is taken to stand at the path of its address, which names
 /// its file in a diagnostic. The result is the same for any order of
-/// `interfaces` in which no two have one address.
+/// `interfaces` in which no two declare one address of a module, a
+/// provision or a note, or one alias, since a reference to such an address
+/// or alias reaches the interface that comes first.
 /// [`check_workspace`](super::check_workspace) runs the same, with the
 /// interfaces of the modules that stand at their paths, on several threads,
 /// and also names the module files that gave none, so that nothing that
