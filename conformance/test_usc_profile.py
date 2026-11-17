@@ -13,7 +13,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from test_uslm_text import CASES, FIXTURES, HERE, TWO_FILES, fixture_input, run_script
+from test_uslm_text import CASES, FIXTURES, HERE, TWO_FILES, UNNAMED, fixture_input, run_script
 
 PROFILE_SCRIPT = HERE / "usc_profile.py"
 
@@ -172,6 +172,18 @@ class ProfileFixtures(unittest.TestCase):
 
     def test_notes_unknown_group(self) -> None:
         self.check("notes-unknown-group")
+
+    def test_marker_labels(self) -> None:
+        self.check("marker-labels")
+
+    def test_subheadings(self) -> None:
+        self.check("subheadings")
+
+    def test_top_elements_without_an_identifier_are_counted_over_the_release(self) -> None:
+        expected = json.loads((FIXTURES / f"{UNNAMED}.profile.json").read_text(encoding="utf-8"))
+        for jobs in ("1", "2"):
+            with self.subTest(jobs=jobs):
+                self.assertEqual(self.profile_of(UNNAMED, "--jobs", jobs)["import"], expected)
 
     def test_two_files_are_counted_the_same_for_any_number_of_workers(self) -> None:
         expected = json.loads((FIXTURES / f"{TWO_FILES}.profile.json").read_text(encoding="utf-8"))

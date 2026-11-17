@@ -213,7 +213,14 @@ def work(job: Job) -> MemberResult | RefusedError:
         _, reader, meta = read_member(job, sink)
     except RefusedError as error:
         return error
-    return MemberResult(job.source.member, meta.release, reader.identifiers, reader.counts, sink)
+    return MemberResult(
+        job.source.member,
+        meta.release,
+        reader.identifiers,
+        reader.counts,
+        sink,
+        unnamed_tops=reader.unnamed_tops,
+    )
 
 
 def text_lines(results: list[MemberResult]) -> list[str]:

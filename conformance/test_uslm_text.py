@@ -61,8 +61,13 @@ CASES = {
     "empty-labels": "a quoted section with an empty number, a number with a value and no text, "
     "an empty heading, an empty source credit",
     "notes-unknown-group": "a group heading with a group word the rules do not know",
+    "marker-labels": "a number, a heading and a source credit that hold only a footnote marker",
+    "subheadings": "a subheading in a note with no heading, a heading directly in quoted content",
 }
 TWO_FILES = "two-files"
+UNNAMED = "unnamed-appendices"
+# Fixtures of several members, each a directory that the test packs into one archive.
+MEMBER_SETS = (TWO_FILES, UNNAMED)
 
 
 def run_script(script: Path, path: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -75,13 +80,13 @@ def run_script(script: Path, path: Path, *args: str) -> subprocess.CompletedProc
 
 
 def fixture_input(name: str, directory: Path) -> Path:
-    """The fixture as the scripts read it: a member file, or for two files an archive."""
-    if name == TWO_FILES:
+    """The fixture as the scripts read it: a member file, or for several members an archive."""
+    if name in MEMBER_SETS:
         release = directory / "release"
         release.mkdir()
-        with zipfile.ZipFile(release / "two-files.zip", "w", zipfile.ZIP_DEFLATED) as archive:
-            for member in ("usc99.xml", "usc99a.xml"):
-                archive.write(FIXTURES / TWO_FILES / member, member)
+        with zipfile.ZipFile(release / f"{name}.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+            for member in sorted((FIXTURES / name).glob("*.xml")):
+                archive.write(member, member.name)
         return release
     target = directory / MEMBER
     shutil.copyfile(FIXTURES / f"{name}.xml", target)
@@ -190,6 +195,19 @@ class TextFixtures(unittest.TestCase):
     def test_notes_unknown_group(self) -> None:
         self.check("notes-unknown-group")
 
+    def test_marker_labels(self) -> None:
+        self.check("marker-labels")
+
+    def test_subheadings(self) -> None:
+        self.check("subheadings")
+
+    def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
+        expected = expected_lines(UNNAMED)
+        self.assertIn('"address":"/us/usc/~appendix.2"', expected[2])
+        for jobs in ("1", "2"):
+            with self.subTest(jobs=jobs):
+                self.assertEqual(self.text_of(UNNAMED, "--jobs", jobs), expected)
+
     def test_two_files_are_numbered_over_the_release_for_any_number_of_workers(self) -> None:
         expected = expected_lines(TWO_FILES)
         self.assertIn('"address":"/us/usc/t99/s1~2"', expected[2])
@@ -200,10 +218,11 @@ class TextFixtures(unittest.TestCase):
     def test_every_fixture_is_tested(self) -> None:
         names = {path.stem for path in FIXTURES.glob("*.xml")}
         self.assertEqual(names, set(CASES))
-        for name in [*CASES, TWO_FILES]:
+        for name in [*CASES, *MEMBER_SETS]:
             self.assertTrue((FIXTURES / f"{name}.records.jsonl").is_file(), name)
             self.assertTrue((FIXTURES / f"{name}.profile.json").is_file(), name)
-        for path in [*FIXTURES.glob("*.xml"), *(FIXTURES / TWO_FILES).glob("*.xml")]:
+        members = [path for name in MEMBER_SETS for path in (FIXTURES / name).glob("*.xml")]
+        for path in [*FIXTURES.glob("*.xml"), *members]:
             first = path.read_text(encoding="utf-8").split("\n", 1)[0]
             self.assertIn("Invented for tests", first, path.name)
 
@@ -267,7 +286,7 @@ class TextFixtures(unittest.TestCase):
         self.assertIsNone(named[0]["heading"])
 
     def test_text_records_are_sorted_and_match_the_schema_shape(self) -> None:
-        for name in [*CASES, TWO_FILES]:
+        for name in [*CASES, *MEMBER_SETS]:
             with self.subTest(fixture=name):
                 records = [json.loads(line) for line in self.text_of(name)]
                 keys = [record_key(r) for r in records]
@@ -293,6 +312,8 @@ SECTION = (
     '<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Refused</heading>'
     "{inner}</section>"
 )
+
+FOOTNOTE = '<note type="footnote" id="f1"><num>1</num> A footnote.</note>'
 
 
 def document(**changes: str) -> str:
@@ -391,6 +412,80 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             "<heading>Notes</heading></note></notes>"
         ),
         "not one word of ASCII letters",
+    ),
+    "link inside a link": (
+        document(
+            inner='<content>See <ref href="/us/usc/t99/s2">section <ref href="/us/usc/t99/s3">'
+            "3</ref></ref>.</content>"
+        ),
+        "inside another",
+    ),
+    "superscript inside a subscript": (
+        document(inner="<content>A<sub>b<sup>c</sup></sub>.</content>"),
+        "inside another",
+    ),
+    "footnote marker inside a superscript": (
+        document(
+            inner='<content>Text<sup><ref class="footnoteRef" idref="f1">1</ref></sup>'
+            f"{FOOTNOTE}.</content>"
+        ),
+        "marker inside",
+    ),
+    "footnote marker that holds an element": (
+        document(
+            inner='<content>Text<ref class="footnoteRef" idref="f1"><i>1</i></ref>'
+            f"{FOOTNOTE}.</content>"
+        ),
+        "marker that holds an element",
+    ),
+    "second num": (
+        document(inner='<num value="2">§ 2.</num><content>Text.</content>'),
+        "second num",
+    ),
+    "second heading": (
+        document(inner="<heading>Again</heading><content>Text.</content>"),
+        "second heading",
+    ),
+    "identifier that gives no address": (
+        document(body=SECTION.format(inner="<content>Text.</content>").replace("/s1", "/s(1)")),
+        "not an address",
+    ),
+    "span that is not a whole number": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><tr>'
+            '<td colspan="two">A</td></tr></table></content>'
+        ),
+        "whole number written in ASCII digits",
+    ),
+    "span written in digits that are not ASCII": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><tr>'
+            '<td rowspan="\u0662">A</td></tr></table></content>'
+        ),
+        "whole number written in ASCII digits",
+    ),
+    "br with content": (
+        document(inner="<content>A<br>b</br>c.</content>"),
+        "a br that holds",
+    ),
+    "column with content": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
+            "<col>A</col></colgroup><tr><td>A</td></tr></table></content>"
+        ),
+        "column",
+    ),
+    "signature that holds something other than name and role": (
+        document(
+            inner='<content>Text.</content><notes type="uscNote"><note topic="miscellaneous">'
+            "<heading>Signed</heading><p>Text.</p><signature><name>A. Person.</name>"
+            "<date>2099</date></signature></note></notes>"
+        ),
+        "signature",
+    ),
+    "text where only elements may stand": (
+        document(inner="stray words<content>Text.</content>"),
+        "text where only elements may stand",
     ),
     "second source credit": (
         document(inner="<sourceCredit>(One.)</sourceCredit><sourceCredit>(Two.)</sourceCredit>"),

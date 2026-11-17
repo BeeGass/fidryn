@@ -115,6 +115,7 @@ WHITE_SET = frozenset(WHITE_SPACE)
 WHITE_RUN = re.compile("[" + re.escape(WHITE_SPACE) + "]+")
 SEGMENT = re.compile("[A-Za-z0-9.~\u2013-]+")
 GROUP_WORD = re.compile("[A-Za-z][A-Za-z0-9]*")
+ASCII_NUMBER = re.compile("[0-9]+")
 LABEL_NAMES = {"num": "num", "heading": "heading", "sourceCredit": "source credit"}
 
 
@@ -163,6 +164,11 @@ def is_address(text: str) -> bool:
     if not text.startswith("/"):
         return False
     return all(is_segment(segment) for segment in text[1:].split("/"))
+
+
+def split_at_spaces(value: str | None) -> list[str]:
+    """The members of an identifier or the topics of a note: split at U+0020 only."""
+    return [member for member in (value or "").split(" ") if member]
 
 
 def is_within(target: str, prefix: str) -> bool:
@@ -522,13 +528,16 @@ class Scope:
 
 @dataclass(frozen=True, slots=True)
 class Context:
-    """Where a flow stands: in a note, in quoted content, whether subheadings are read,
-    and whether it is the note's own flow, where a text part is read as a block."""
+    """Where a flow stands: in a note, in quoted content, whether a heading after the
+    note's first is read as a subheading, whether it is the note's own flow (where a
+    text part is read as a block), and whether it is quoted content's own flow (where a
+    heading or subheading is a subheading)."""
 
     in_note: bool = False
     in_quoted: bool = False
     subheadings: bool = False
     note_flow: bool = False
+    quoted_top: bool = False
 
     def inner(self) -> Context:
         """The context of a flow inside this one."""
@@ -610,15 +619,14 @@ class TextBuilder:
     def marker(self, element: Element) -> None:
         if self.in_run:
             self.reader.refuse("a footnote marker inside a link, superscript or subscript", element)
-        words = TextBuilder(self.reader, self.scope)
-        words.in_run = True
-        words.children(element)
+        if len(element):
+            self.reader.refuse("a footnote marker that holds an element", element)
         ordinal = self.scope.ordinals.get(element.get("idref") or "")
         if ordinal is None:
             self.reader.refuse(
                 "a footnote marker whose idref names no footnote of its module", element
             )
-        self.marks.append((self.length, normalize("".join(words.pieces)), ordinal))
+        self.marks.append((self.length, normalize(element.text or ""), ordinal))
 
     def finish(self) -> Text:
         raw = "".join(self.pieces)
@@ -690,7 +698,11 @@ class Flow:
             self.add([reader.read_image(child)])
         elif tag == "signature" and context.in_note:
             self.add(reader.read_signature(child, scope))
-        elif tag in ("heading", "subheading") and context.subheadings:
+        elif (
+            (tag == "subheading" and context.in_note)
+            or (tag == "heading" and context.subheadings)
+            or (tag in ("heading", "subheading") and context.quoted_top)
+        ):
             self.add([Subheading(reader.read_text(child, scope))])
         elif tag == "note" and context.in_quoted:
             self.add(reader.read_quoted_note(child, context.inner(), scope))
@@ -797,13 +809,20 @@ class MemberReader:
     """Reads the units and containers of one member, one module at a time."""
 
     def __init__(
-        self, member: str, positive_law: bool, offsets: dict[str, int], sink: ModuleSink
+        self,
+        member: str,
+        positive_law: bool,
+        offsets: dict[str, int],
+        sink: ModuleSink,
+        top_offsets: dict[str, int] | None = None,
     ) -> None:
         self.member = member
         self.positive_law = positive_law
         self.offsets = offsets
+        self.top_offsets = top_offsets or {}
         self.held: Counter[str] = Counter()
         self.identifiers: list[str] = []
+        self.unnamed_tops: list[str] = []
         self.sink = sink
         self.counts = DocumentCounts()
         self.at: list[str] = []
@@ -832,7 +851,7 @@ class MemberReader:
     def read(self, root: Element) -> None:
         """The top container of a file: the title inside main, or an appendix under uscDoc."""
         self.check_blank(root)
-        place: Counter[str] = Counter()
+        place: Counter[str] = Counter(self.top_offsets)
         for top in root:
             tag = tag_of(top)
             if tag == "meta":
@@ -862,11 +881,13 @@ class MemberReader:
     def module_address(
         self, element: Element, within: str | None, place: Counter[str]
     ) -> tuple[str, list[str]]:
-        identifier = (element.get("identifier") or "").split()
+        identifier = split_at_spaces(element.get("identifier"))
         if not identifier:
             tag = tag_of(element)
             place[tag] += 1
             self.counts.assigned += 1
+            if within is None:
+                self.unnamed_tops.append(tag)
             address = f"{within or PREFIX}/~{tag}.{place[tag]}"
             return self.check_address(address, element), []
         used = identifier[0]
@@ -1030,15 +1051,15 @@ class MemberReader:
         seen.add(tag)
 
     def read_num(self, element: Element, scope: Scope) -> Num | None:
-        """A number; absent when it has neither a value nor text."""
+        """A number; absent when it has neither a value, nor text, nor a footnote marker."""
         value = element.get("value") or ""
         shown = self.read_text(element, scope)
-        return Num(value, shown) if value or shown.plain else None
+        return Num(value, shown) if value or shown.plain or shown.marks else None
 
     def read_optional_text(self, element: Element, scope: Scope) -> Text | None:
-        """A heading or a source credit; absent when it has no text."""
+        """A heading or a source credit; absent when it has no text and no footnote marker."""
         text = self.read_text(element, scope)
-        return text if text.plain else None
+        return text if text.plain or text.marks else None
 
     def read_provision(self, element: Element, address: str, unit: UnitState) -> Provision:
         scope = unit.scope
@@ -1090,7 +1111,7 @@ class MemberReader:
     def provision_address(
         self, element: Element, parent: str, siblings: Counter[str], place: Counter[str]
     ) -> str:
-        identifier = (element.get("identifier") or "").split()
+        identifier = split_at_spaces(element.get("identifier"))
         if not identifier:
             tag = tag_of(element)
             place[tag] += 1
@@ -1163,8 +1184,6 @@ class MemberReader:
         self.check_blank(element)
         blocks: list[Block] = []
         for child in element:
-            if is_footnote(child):
-                continue
             if tag_of(child) not in ("name", "role"):
                 self.refuse("an element of a signature that is neither a name nor a role", child)
             text = self.read_text(child, scope)
@@ -1219,12 +1238,12 @@ class MemberReader:
         value = element.get(name)
         if value is None:
             return 1
-        if not value.strip().isdigit():
-            self.refuse(f"a {name} that is not a whole number", element)
-        return int(value.strip())
+        if not ASCII_NUMBER.fullmatch(value):
+            self.refuse(f"a {name} that is not a whole number written in ASCII digits", element)
+        return int(value)
 
     def read_quoted(self, element: Element, context: Context, scope: Scope) -> Quoted:
-        quoted = Context(context.in_note, True, context.subheadings)
+        quoted = Context(context.in_note, True, context.subheadings, quoted_top=True)
         return Quoted(element.get("origin"), self.read_items(element, quoted, scope, None))
 
     def read_items(
@@ -1251,10 +1270,10 @@ class MemberReader:
                 labels[1] = self.read_optional_text(child, scope)
             elif tag in TEXT_PARTS:
                 flow.close()
-                items += self.read_parts(child, context, scope)
+                items += self.read_parts(child, context.inner(), scope)
             elif tag in LEVEL_TAGS:
                 flow.close()
-                items.append(self.read_quoted_level(child, context, scope))
+                items.append(self.read_quoted_level(child, context.inner(), scope))
             else:
                 flow.child(child)
             flow.text(child.tail)
@@ -1346,7 +1365,7 @@ class MemberReader:
                 if not blocks:
                     continue
             else:
-                topics = (element.get("topic") or "").split()
+                topics = split_at_spaces(element.get("topic"))
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
                 if heading_element is not None:
                     heading = self.read_optional_text(heading_element, scope)
@@ -1497,13 +1516,18 @@ class MemberResult:
     counts: DocumentCounts
     output: object
     baseline: object = None
+    unnamed_tops: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)
 class Job:
+    """One member to read, with what earlier members hold: the holders of each
+    identifier, and the top elements without an identifier of each tag."""
+
     source: Source
     offsets: dict[str, int]
     first_pass: bool
+    top_offsets: dict[str, int] = field(default_factory=dict)
 
 
 Worker = Callable[[Job], "MemberResult | RefusedError"]
@@ -1515,7 +1539,7 @@ def read_member(job: Job, sink: ModuleSink) -> tuple[Element, MemberReader, Docu
     data = load(job.source)
     root, meta = parse_document(member, data)
     del data
-    reader = MemberReader(member, meta.positive_law, job.offsets, sink)
+    reader = MemberReader(member, meta.positive_law, job.offsets, sink, job.top_offsets)
     reader.read(root)
     return root, reader, meta
 
@@ -1534,9 +1558,10 @@ def read_release(path: Path, worker: Worker, workers: int) -> tuple[str, list[Me
     """Read every member of the input; repeated identifiers are numbered over the release.
 
     Every member is read once on its own. A unit or container whose identifier an
-    earlier member already holds needs the count of those holders, so a member that
-    holds one is read again with the counts. The result is the same for any number
-    of workers.
+    earlier member already holds needs the count of those holders, and a top element
+    without an identifier the count of such top elements of its tag in earlier
+    members, so a member that holds one is read again with the counts. The result is
+    the same for any number of workers.
     """
     sources = list_sources(path)
     first = run_jobs(worker, [Job(s, {}, True) for s in sources], workers)
@@ -1556,12 +1581,15 @@ def read_release(path: Path, worker: Worker, workers: int) -> tuple[str, list[Me
             )
         results.append(result)
     held: Counter[str] = Counter()
+    unnamed: Counter[str] = Counter()
     again: list[tuple[int, Job]] = []
     for index, (source, result) in enumerate(zip(sources, results, strict=True)):
         offsets = {name: held[name] for name in set(result.identifiers) if held[name]}
-        if offsets:
-            again.append((index, Job(source, offsets, False)))
+        tops = {tag: unnamed[tag] for tag in set(result.unnamed_tops) if unnamed[tag]}
+        if offsets or tops:
+            again.append((index, Job(source, offsets, False, tops)))
         held.update(result.identifiers)
+        unnamed.update(result.unnamed_tops)
     for (index, job), result in zip(
         again, run_jobs(worker, [job for _, job in again], workers), strict=True
     ):

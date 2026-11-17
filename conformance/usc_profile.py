@@ -317,7 +317,13 @@ def work(job: Job) -> MemberResult | RefusedError:
         return error
     baseline = baseline_part(root) if job.first_pass else None
     return MemberResult(
-        job.source.member, meta.release, reader.identifiers, reader.counts, sink, baseline
+        job.source.member,
+        meta.release,
+        reader.identifiers,
+        reader.counts,
+        sink,
+        baseline,
+        reader.unnamed_tops,
     )
 
 

@@ -56,17 +56,18 @@ What is counted is what the reading imports, element by element:
 - **Provisions** are every level inside a unit, the unit's own top level
   included.
 - **Addresses.** A unit or container has its identifier as its address; the
-  first member of an identifier that lists several, with the others as aliases;
-  an identifier whose last segment holds `...` keeps the range as its address and
-  has its two ends as aliases, and every whole number between ends that differ
-  only in a whole number (at most 999 apart). A later holder of an identifier that
-  a unit or container before it in the release already has gets `~2`, `~3` and so
-  on, counting over the files in the order of their names. A provision's address
-  is its parent's followed by the last segment of its identifier, and `~2`, `~3`
-  for a later sibling with the same address. An element without an identifier
-  gets the segment `~<tag>.<n>` below its parent. An alias is dropped when it is
-  the address of a unit, a container or a provision, or one the element already
-  has.
+  first member of an identifier that lists several, separated by U+0020 and no
+  other character, with the others as aliases; an identifier whose last segment
+  holds `...` keeps the range as its address and has its two ends as aliases, and
+  every whole number between ends that differ only in a whole number (at most 999
+  apart). A later holder of an identifier that a unit or container before it in
+  the release already has gets `~2`, `~3` and so on, counting over the files in
+  the order of their names. A provision's address is its parent's followed by the
+  last segment of its identifier, and `~2`, `~3` for a later sibling with the same
+  address. An element without an identifier gets the segment `~<tag>.<n>` below
+  its parent; the top element of a file gets it below `/us/usc`, counted over the
+  release in the order of member names. An alias is dropped when it is the address
+  of a unit, a container or a provision, or one the element already has.
 - **Notes** are the `note` children of a `notes` element and the notes that
   stand directly in a level, footnotes and release notes left out. A note's group
   is the topic of the last group heading (`note role="crossHeading"`) before it
@@ -75,11 +76,14 @@ What is counted is what the reading imports, element by element:
   a word these rules do not know is a group like any other. A group heading is no
   note: its label, its first heading, is not imported and is counted; what it holds
   after that label is a note of the group it opens, with no heading and no
-  topics. A note is editorial when its group is `editorialNotes`, or when it is
-  ungrouped and its topic is `removalDescription` or `historicalAndRevision`;
-  every other note is enacted. A note's text may hold a text part that stands
-  directly in it, read as the blocks of its own flow, and a `signature`, also
-  inside quoted content.
+  topics. Topics are the `topic` attribute split at U+0020. A note is editorial
+  when its group is `editorialNotes`, or when it is ungrouped and one of its
+  topics is `removalDescription` or `historicalAndRevision`; every other note is
+  enacted. A note's text may hold a text part that stands directly in it, read as
+  the blocks of its own flow, and a `signature`, also inside quoted content. Any
+  `subheading` in a note and any `heading` after the note's first is a subheading
+  of its text, and so is a `heading` or `subheading` that stands directly in quoted
+  content.
 - **Source credits.** A unit or a container has the credit that is its direct
   child; its links are references of the editorial layer.
 - **Footnotes** are the `note type="footnote"` elements of a unit or a
@@ -117,7 +121,9 @@ counts as assigned, whether it is a unit, a container or a provision; the
 the text a group heading holds after its label is a note of its group. A number
 with neither a value nor text is absent, as it is in 201 sections quoted in notes
 of release 119-142; a number with a value and no text keeps the value with an empty
-shown form; a heading and a source credit with no text are absent.
+shown form; a heading and a source credit with no text are absent. A number, a
+heading or a credit that holds a footnote marker keeps it, with an empty text when
+it has no other.
 
 | Key | Count |
 | --- | --- |

@@ -6,10 +6,10 @@
 </meta>
 <appendix identifier="/us/usc/t99a"><num value="99a">Title 99—Appendix</num><heading>Rules and Plans</heading>
 <courtRules identifier="/us/usc/t99a/courtRules/Demo"><heading>RULES OF DEMONSTRATION</heading>
-<courtRule identifier="/us/usc/t99a/courtRules/Demo/rule1"><num value="1">Rule 1.</num><heading>Scope</heading><content>These rules govern demonstrations.</content></courtRule>
+<courtRule identifier="/us/usc/t99a/courtRules/Demo/rule1"><num value="1">Rule 1.</num><heading>Reach of the Demonstration Rules</heading><content>The invented rules govern demonstrations.</content></courtRule>
 <level identifier="/us/usc/t99a/courtRules/Demo/Form1"><num value="1">Form 1.</num><heading>Notice</heading><content>Take notice of the demonstration.</content></level>
 </courtRules>
-<reorganizationPlans identifier="/us/usc/t99a/reorgPlans"><heading>REORGANIZATION PLANS</heading>
+<reorganizationPlans identifier="/us/usc/t99a/reorgPlans"><heading>INVENTED PLANS OF REORGANIZATION</heading>
 <reorganizationPlan identifier="/us/usc/t99a/reorgPlan/2099/1"><num value="1">Reorganization Plan No. 1 of 2099</num><content>The office is moved.</content></reorganizationPlan>
 </reorganizationPlans>
 </appendix>

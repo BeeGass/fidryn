@@ -1,0 +1,6 @@
+{"address":"/us/usc/t99","layer":"operative","kind":"title","status":null,"num":["99","Title 99"],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},"aliases":[],"within":null,"members":["/us/usc/t99/s1"]}
+{"address":"/us/usc/t99/s1","layer":"operative","kind":"section","status":null,"num":["",{"text":"","refs":[],"sup":[],"sub":[],"marks":[[0,"1",1]]}],"heading":{"text":"","refs":[],"sup":[],"sub":[],"marks":[[0,"2",2]]},"items":[{"part":"content","blocks":[{"p":"Text.","refs":[],"sup":[],"sub":[]}]}],"aliases":[],"within":"/us/usc/t99","source":"usc99.xml","positive_law":true}
+{"address":"/us/usc/t99/s1","record":"credit","p":"","refs":[],"sup":[],"sub":[],"marks":[[0,"3",3]]}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":1,"shown":"1","blocks":[{"p":"Number omitted.","refs":[],"sup":[],"sub":[]}]}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":2,"shown":"2","blocks":[{"p":"Heading omitted.","refs":[],"sup":[],"sub":[]}]}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":3,"shown":"3","blocks":[{"p":"Credit omitted.","refs":[],"sup":[],"sub":[]}]}

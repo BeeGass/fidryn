@@ -4,12 +4,12 @@
 <docPublicationName>Online@999-1</docPublicationName>
 <property role="is-positive-law">no</property>
 </meta>
-<appendix identifier="/us/usc/t99a"><num value="99a">Title 99—Appendix</num><heading>Rules of Procedure</heading>
-<part identifier="/us/usc/ptI"><num value="I">PART I</num><heading>Commencement</heading>
-<courtRule identifier="/us/usc/ptI/rule1"><num value="1">Rule 1.</num><heading>Petition</heading>
-<subsection identifier="/us/usc/ptI/rule1/a"><num value="a">(a)</num><content>A petition starts a case.</content></subsection>
+<appendix identifier="/us/usc/t99a"><num value="99a">Title 99—Appendix</num><heading>Invented Rules</heading>
+<part identifier="/us/usc/ptI"><num value="I">PART I</num><heading>Opening of Invented Cases</heading>
+<courtRule identifier="/us/usc/ptI/rule1"><num value="1">Rule 1.</num><heading>Invented Filing</heading>
+<subsection identifier="/us/usc/ptI/rule1/a"><num value="a">(a)</num><content>An invented filing opens a case.</content></subsection>
 </courtRule>
 </part>
-<courtRule identifier="/us/usc/rule2"><num value="2">Rule 2.</num><heading>Answer</heading><content>An answer follows.</content></courtRule>
+<courtRule identifier="/us/usc/rule2"><num value="2">Rule 2.</num><heading>Invented Reply</heading><content>An invented reply follows.</content></courtRule>
 </appendix>
 </uscDoc>

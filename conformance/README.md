@@ -87,8 +87,8 @@ holds what it reads: archives and members, the checks on each document,
 the classes of elements, and the units, containers and notes they give.
 
 ```sh
-uv run --locked python conformance/uslm_text.py /path/to/release
-uv run --locked python conformance/uslm_text.py usc01.xml --jobs 1
+uv run --locked python -I conformance/uslm_text.py /path/to/release
+uv run --locked python -I conformance/uslm_text.py usc01.xml --jobs 1
 ```
 
 The input is a directory of archives (every `.zip` in it is read, and
