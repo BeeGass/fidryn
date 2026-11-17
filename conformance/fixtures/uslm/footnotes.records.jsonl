@@ -1,0 +1,5 @@
+{"address":"/us/usc/t99","layer":"operative","kind":"title","status":null,"num":["99","Title 99"],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},"aliases":[],"within":null,"members":["/us/usc/t99/s1"]}
+{"address":"/us/usc/t99/s1","layer":"operative","kind":"section","status":null,"num":["1",{"text":"§ 1.","refs":[],"sup":[],"sub":[],"marks":[[4,"1",1]]}],"heading":{"text":"Duties","refs":[],"sup":[],"sub":[],"marks":[[0,"2",2]]},"items":[{"part":"content","blocks":[{"p":"The keeper shall keep the gate and the key.","refs":[],"sup":[],"sub":[],"marks":[[21,"3",3],[34,"3",3]]}]}],"aliases":[],"within":"/us/usc/t99","source":"usc99.xml","positive_law":true}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":1,"shown":"1","blocks":[{"p":"So in original.","refs":[],"sup":[],"sub":[]}]}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":2,"shown":"2","blocks":[{"p":"Heading supplied.","refs":[],"sup":[],"sub":[]}]}
+{"address":"/us/usc/t99/s1","record":"footnote","ordinal":3,"shown":"3","blocks":[{"p":"So in original. Probably should be “keep and guard”.","refs":[],"sup":[],"sub":[]}]}

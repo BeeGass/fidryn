@@ -74,3 +74,39 @@ digests:
 | `notes` | `note` | `hash` |
 | `units` | `unit` | `layers`: `operative`, `enacted`, `editorial` |
 | `containers` | `container` | `hash`, and `layers` |
+
+## The official XML of the Code
+
+`uslm_text.py` reads the official XML release point published by the
+Office of the Law Revision Counsel and prints one text record to a line
+for every provision, container, note, source credit and footnote, sorted
+by the bytes of their addresses. It is a second reading of the
+publisher's XML, written apart from the Rust importer and sharing no code
+with it, so that the two can be compared line for line. `uslm_common.py`
+holds what it reads: archives and members, the checks on each document,
+the classes of elements, and the units, containers and notes they give.
+
+```sh
+uv run --locked python conformance/uslm_text.py /path/to/release
+uv run --locked python conformance/uslm_text.py usc01.xml --jobs 1
+```
+
+The input is a directory of archives (every `.zip` in it is read, and
+nothing else), one archive, or one XML file named as an archive member
+is (`usc`, two digits, an optional `a` or `A`, `.xml`). Members are read
+in the order of their names, at most `--jobs` at a time (default 4), and
+the output is the same for any number. Downloaded archives are untrusted
+data: run the script with `python -I`. It parses with `defusedxml` and
+refuses a document type declaration and an entity declaration. Exit
+`0` when the records are printed, `1` when the input is refused by a
+reading rule (the message names the archive, the member, the element and
+the nearest identifier), `2` when it cannot be read at all.
+
+`fixtures/uslm/` holds invented documents in the publisher's XML, one
+for each case of the reading rules, in the invented title 99 and the
+invented release `999-1`. Each `<name>.xml` is read as the member
+`usc99.xml`; `two-files/` holds the members `usc99.xml` and `usc99a.xml`,
+which the test packs into one archive. Beside each, `<name>.records.jsonl`
+holds the expected records, written by hand from the reading rules.
+`test_uslm_text.py` compares the script's output with them and checks
+that the script refuses what the rules refuse.

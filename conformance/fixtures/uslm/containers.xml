@@ -1,0 +1,34 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">yes</property>
+</meta>
+<main>
+<title identifier="/us/usc/t99"><num value="99">Title 99</num><heading>Invented</heading>
+<subtitle identifier="/us/usc/t99/stA"><num value="A">Subtitle A</num><heading>First</heading>
+<part identifier="/us/usc/t99/stA/ptI"><num value="I">PART I</num><heading>Parts</heading>
+<subpart identifier="/us/usc/t99/stA/ptI/sptA"><num value="A">Subpart A</num><heading>Subparts</heading>
+<chapter identifier="/us/usc/t99/stA/ptI/sptA/ch1"><num value="1">CHAPTER 1</num><heading>Chapters</heading>
+<subchapter identifier="/us/usc/t99/stA/ptI/sptA/ch1/schI"><num value="I">SUBCHAPTER I</num><heading>Subchapters</heading>
+<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>One</heading><content>First.</content></section>
+</subchapter>
+</chapter>
+</subpart>
+</part>
+</subtitle>
+<subtitle identifier="/us/usc/t99/stB"><num value="B">Subtitle B</num><heading>Second</heading>
+<division identifier="/us/usc/t99/stB/dA"><num value="A">DIVISION A</num><heading>Divisions</heading>
+<subdivision identifier="/us/usc/t99/stB/dA/sd1"><num value="1">Subdivision 1</num><heading>Subdivisions</heading>
+<section identifier="/us/usc/t99/s2"><num value="2">§ 2.</num><heading>Two</heading><content>Second.</content></section>
+</subdivision>
+</division>
+</subtitle>
+<chapter identifier="/us/usc/t99/ch3"><num value="3">CHAPTER 3</num><heading>Levels</heading>
+<level><heading>Unnamed Group</heading>
+<section identifier="/us/usc/t99/s3"><num value="3">§ 3.</num><heading>Three</heading><content>Third.</content></section>
+</level>
+</chapter>
+</title>
+</main>
+</uscDoc>

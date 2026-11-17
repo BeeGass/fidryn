@@ -1,0 +1,15 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">no</property>
+</meta>
+<appendix identifier="/us/usc/t99a"><num value="99a">Title 99—Appendix</num><heading>Rules of Procedure</heading>
+<part identifier="/us/usc/ptI"><num value="I">PART I</num><heading>Commencement</heading>
+<courtRule identifier="/us/usc/ptI/rule1"><num value="1">Rule 1.</num><heading>Petition</heading>
+<subsection identifier="/us/usc/ptI/rule1/a"><num value="a">(a)</num><content>A petition starts a case.</content></subsection>
+</courtRule>
+</part>
+<courtRule identifier="/us/usc/rule2"><num value="2">Rule 2.</num><heading>Answer</heading><content>An answer follows.</content></courtRule>
+</appendix>
+</uscDoc>
