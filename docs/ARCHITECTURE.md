@@ -106,7 +106,7 @@ fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
-fidryn-provision       provision model: addresses, normalization, file paths (no workspace crate)
+fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   empty (provision)
 fidryn-cli             fidryn binary and mill UI
 ```
@@ -115,9 +115,10 @@ Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
 Do not put parser logic in `core`. `fidryn-provision` depends on no other
 crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
 depends on `fidryn-provision` only, and no crate depends on
-`fidryn-ingest-uscode`. `fidryn-provision` holds the provision model:
-addresses, text normalization and file paths. `fidryn-ingest-uscode` is
-empty: it declares no items.
+`fidryn-ingest-uscode`. `fidryn-provision` holds the model of law modules
+and the rules over it, among them addresses, text normalization, file
+paths, hashes and text records. `fidryn-ingest-uscode` is empty: it
+declares no items.
 
 ## Public APIs
 

@@ -1,15 +1,27 @@
-//! The provision model: addresses, the normalization of text and the file
-//! path of a module.
+//! The model of law modules and the rules over it: addresses, the
+//! normalization of text, the file path of a module, the model of provisions,
+//! notes and modules ([`model`]), their hashes ([`hash`]) and their text
+//! records ([`records`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.
 
 mod address;
+pub mod hash;
 pub mod layout;
+pub mod model;
 pub mod normalize;
+pub mod records;
 
 pub use address::{Address, AddressError};
+pub use hash::{Hash32, HashError, LayerHashes};
 pub use layout::LayoutError;
+pub use model::{
+    Basis, BindTarget, Binding, Block, Cell, Citation, ContainerModule, CuratedModule, Definition,
+    DefinitionKind, Footnote, Import, Item, Layer, Module, Note, Num, PartRole, Provision, Quoted,
+    QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
+};
+pub use records::TextRecord;
 
 /// A seeded generator for the tests: the same sequence on every run and every
 /// host.

@@ -162,7 +162,7 @@ fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
-fidryn-provision       provision model: addresses, normalization, file paths (no workspace crate)
+fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   empty (provision)
 fidryn-cli             fidryn binary and localhost mill
 ```

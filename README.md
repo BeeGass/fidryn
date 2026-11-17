@@ -146,7 +146,7 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
-| `fidryn-provision` | The provision model: addresses, text normalization and file paths. Depends on no other crate of the workspace |
+| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes and text records. Depends on no other crate of the workspace |
 | `fidryn-ingest-uscode` | Empty. Of the workspace crates, depends on `fidryn-provision` only |
 | `fidryn-cli` | `fidryn` binary and mill |
 

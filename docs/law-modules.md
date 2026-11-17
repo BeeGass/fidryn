@@ -2,7 +2,8 @@
 
 This reference gives the rules by which a module of law, and each provision
 and note in it, is named, where the file of a module stands in its
-workspace, and how the text of a module is normalized. The crate
+workspace, how the text of a module is normalized, what a module holds, and
+how its provisions, notes and layers are hashed. The crate
 `fidryn-provision` implements them. In the examples, `/zz/demo` is an
 invented corpus.
 
@@ -138,3 +139,181 @@ The unit of normalization is the block: a paragraph, a heading, a number or
 a paragraph of a table cell. The text of a block is the words of its runs,
 concatenated, and that text is normalized: a run may begin or end with a
 space, a block may not.
+
+## Provisions, notes and layers
+
+A module of law has one of three shapes:
+
+- A **unit** holds one tree of provisions, whose top provision has the
+  module's address. It also records the other addresses the source gives
+  it (`aliases`), the container it stands in (`within`), the member of the
+  source archive it was read from (`source`) and whether the source marks it
+  as positive law (`positive_law`, which may be unknown), and it holds a
+  source credit, notes, footnotes and definitions.
+- A **container**, such as a chapter, has a kind, a number, a heading and a
+  status of its own and lists its members: the containers and units directly
+  below it, in document order. It holds a source credit, notes and
+  footnotes, and records `aliases`, `within`, `source` and `positive_law` as
+  a unit does.
+- A **curated** module is written by hand. It imports modules, names
+  addresses (citations) and binds names to provisions (bindings). A binding
+  records the release it was made against and two hashes, one of the
+  provision and one of the notes.
+
+The crate holds the model in its module `model`.
+
+### Provisions
+
+A provision has an address, a kind, a number, a heading and a status, each
+of the last three optional, and its items: text parts and child provisions,
+in document order. The address of a child lies below the address of its
+parent.
+
+- The kind and the status are identifiers, such as `section` and
+  `repealed`. The model gives them no meaning and knows no list of them. A
+  provision without a status is in force.
+- A number has a value, its machine form, and the text it is shown as,
+  which may hold a footnote marker: the value `8` shown as `§ 8.`.
+- A text part has a role and at least one block:
+
+| Role | The part holds |
+| --- | --- |
+| `chapeau` | the words that lead into the children |
+| `content` | the text of the provision |
+| `continuation` | words that follow children |
+| `proviso` | a proviso |
+
+### Texts and blocks
+
+A text is a list of runs:
+
+| Run | Holds |
+| --- | --- |
+| words | plain words |
+| link | the linked words, and the target as the source writes it |
+| superscript | superscript words |
+| subscript | subscript words |
+| footnote marker | the marker as shown, and the number of the footnote it points at |
+
+The plain text of a text is the words of its runs, footnote markers left
+out, concatenated; it is the text that is normalized. `Text::from_runs`
+merges adjacent runs of words into one and drops every run whose words are
+empty. A footnote marker has no words of its own and is kept.
+
+A block is a paragraph, a subheading, a table, quoted content or an image:
+
+- A table is a list of rows. A row belongs to the head, the body or the foot
+  of its table and holds cells. A cell is a header cell or not, spans one or
+  more columns and one or more rows, and holds blocks. An empty cell holds
+  none.
+- Quoted content has the origin the source names for it, if any, and items:
+  blocks, text parts and levels. A level, such as a quoted section, has a
+  kind, an optional number, an optional heading and items of its own, and
+  no address.
+- An image names the source of its picture. The picture is not part of the
+  model.
+
+### Notes, footnotes and definitions
+
+A note has an address, a layer, the group word of the source (`ungrouped`
+when there is none), its topics, an optional heading and blocks. The layer
+of a note is enacted or editorial. A note belongs to the unit or the
+container it is anchored in.
+
+A footnote belongs to its module. The footnotes of a module are numbered
+from 1 in document order; each has the marker it shows and its blocks. A
+footnote marker names its footnote by that number.
+
+A definition records the provision that holds it (`at`), the terms it
+defines, its kind (`means`, `includes`, `does_not_include` or `borrowed`),
+the words that state its reach or none when the text states none, the
+region the reach covers, its basis (`enacted`, `restated` or `unresolved`),
+what a borrowed definition takes its meaning from (`borrowed_from`), and a
+note to read with it (`see_note`). Definitions are in no hash.
+
+### Layers
+
+The text of a module falls into three layers:
+
+| Layer | Holds |
+| --- | --- |
+| operative | the provisions of a unit; the kind, number, heading, status and members of a container |
+| enacted | the enacted notes |
+| editorial | the source credit, the editorial notes, the footnotes and the footnote markers |
+
+### In JSON
+
+In JSON the model has the form that `serde` derives: a struct is an object
+of its fields, an absent value is `null`, a variant without fields is its
+name in snake case (`content`, `does_not_include`), and any other variant
+is an object whose one key is its name in snake case. A text is
+`{"runs": [...]}`, and a paragraph that holds a link is:
+
+```json
+{"para": {"runs": [{"words": "As used in "}, {"ref": {"words": "section 2", "target": "/zz/demo/t1/s2"}}]}}
+```
+
+## Hashes
+
+A hash is 32 bytes of BLAKE3, written as 64 lower-case hexadecimal digits.
+`Hash32` reads only that form: a text of another length, or one with an
+upper-case or any other character, is refused and the fault is named.
+
+Every hash is BLAKE3 over a sequence of frames. A frame is one tag byte,
+the length of its value as eight bytes little-endian, and the value. The
+first frame of every hash has the tag `0x00` and holds a domain string.
+Below, `‖` is concatenation and `F(t, v)` the frame with tag `t` and
+value `v`:
+
+| What | Frames |
+| --- | --- |
+| a text `T` | `F(0x10, UTF-8 of the plain text of T)`, then for each run that is not words, in order: a link `F(0x11, start ‖ end ‖ UTF-8 of its target)`; a superscript `F(0x12, start ‖ end)`; a subscript `F(0x13, start ‖ end)`; a footnote marker nothing. `start` and `end` are byte offsets into the plain text, eight bytes little-endian each, `end` exclusive. |
+| an absent text | `F(0x1F, empty)` |
+| a block | a paragraph `F(0x20, text)`; a subheading `F(0x21, text)`; a table `F(0x22, table)`; quoted content `F(0x23, quoted)`; an image `F(0x24, UTF-8 of its source)` |
+| a table | for each row `F(0x30 + group, cells)`, with the group 0 for the head, 1 for the body and 2 for the foot; a cell is `F(0x34, colspan ‖ rowspan ‖ blocks)`, or `F(0x35, ...)` for a header cell, each span four bytes little-endian |
+| quoted content | `F(0x40, UTF-8 of the origin, or empty)`, then each item: a block as above, a part as below, a level `F(0x41, F(0x01, kind) ‖ number ‖ heading ‖ items)` |
+| a number | `F(0x02, UTF-8 of the value) ‖ F(0x03, the shown text as a text)`, or `F(0x04, empty)` when there is none |
+| a text part | `F(0x50 + role, blocks)`, with the role 0 for `chapeau`, 1 `content`, 2 `continuation` and 3 `proviso` |
+| a provision (its tree hash) | BLAKE3 of `F(0x00, "fidryn.provision/v1") ‖ F(0x01, kind) ‖ number ‖ heading ‖ F(0x05, status or empty) ‖ items`, where a text part is as above and a child is `F(0x60, its tree hash)` |
+| a note | BLAKE3 of `F(0x00, "fidryn.note/v1") ‖ F(0x70, group) ‖ F(0x71, topics joined by one space) ‖ heading ‖ blocks` |
+| a container | BLAKE3 of `F(0x00, "fidryn.container/v1") ‖ F(0x01, kind) ‖ number ‖ heading ‖ F(0x05, status or empty)`, then `F(0x61, address)` for each member in order |
+| the enacted layer | BLAKE3 of `F(0x00, "fidryn.layer.enacted/v1")`, then for each enacted note in the byte order of its address `F(0x72, address) ‖ F(0x73, note hash)` |
+| the editorial layer | BLAKE3 of `F(0x00, "fidryn.layer.editorial/v1") ‖ the credit as a text, or an absent text`, then the editorial notes as in the enacted layer, then for each footnote in ordinal order `F(0x74, UTF-8 of its marker) ‖ blocks`, then for each footnote marker of the module in document order `F(0x75, UTF-8 of the address it is recorded with) ‖ F(0x76, UTF-8 of the marker as shown) ‖ F(0x77, its footnote number as four bytes little-endian)` |
+| the operative layer | of a unit, the tree hash of its top provision; of a container, its container hash |
+
+The address of a provision is not in its tree hash, and the address and
+the layer of a note are not in its hash. Definitions are in no hash. A
+container's credit is in its editorial layer and not in its container hash.
+
+The document order of the footnote markers of a unit is: the tree of
+provisions depth first, taking for each provision its number, its heading
+and then its items in order; then the credit; then each note in the order
+of the module's list, its heading before its blocks; then each footnote in
+ordinal order. For a container it is its number, its heading, its credit,
+its notes and its footnotes. A marker in a provision is recorded with that
+provision's address, and a marker in a note, its quoted content included,
+with the note's address. A marker in a credit, in a footnote, or in a
+container's own number or heading is recorded with the module's address.
+
+What follows from these rules:
+
+- A change to any word, number, heading, status, link target or link
+  extent, superscript, subscript, table cell or span of a provision changes
+  its tree hash and the tree hash of every provision above it, and of no
+  other provision.
+- A footnote, a footnote marker, and the provision a marker stands in
+  change the editorial layer and nothing else. Where in its provision a
+  marker stands is in no hash.
+- The notes of a layer are taken in the byte order of their addresses, so
+  the order of the notes of a module does not change the note frames of a
+  layer. The footnote markers of notes are taken in the order of the
+  module's list: two notes that each hold a marker, listed the other way
+  round, give another editorial layer. Moving a note to a new address
+  changes the hash of its layer and not the note's own hash.
+
+`hash::hash_provision`, `hash::hash_note`, `hash::hash_container`,
+`hash::layer_hashes_of_unit` and `hash::layer_hashes_of_container` compute
+them. A second implementation in Python, `conformance/hash_vectors.py`,
+computes the same hashes of the invented models in
+`conformance/fixtures/hash/vectors.json`, and the tests of both hold their
+values to the digests recorded there.

@@ -2,7 +2,8 @@
 
 JSON Schema checks for case records and source manifests under `examples/`
 and `prelude/`. This is a document-shape check. It does not authenticate
-artifacts, execute Rust, or review legal content.
+artifacts, execute Rust, or review legal content. A second implementation
+of the hashes of law modules is described at the end.
 
 ```sh
 uv run python conformance/check_json_contracts.py
@@ -45,3 +46,31 @@ operative report and `{ "ok": true, "report": ... }` should be accepted.
 Flattened mill `{ ..., "ok": true }` on the report object, scenario
 without `assumptions`, operative with a nonempty `assumptions` array,
 and `finiteReplay` without a coverage object should be rejected.
+
+Known answers of the hashes of law modules (`cargo xtask ci` runs them
+through `test_hash_vectors.py`):
+
+```sh
+uv run --locked python conformance/hash_vectors.py
+uv run --locked python conformance/hash_vectors.py --write
+```
+
+`hash_vectors.py` computes the hashes of the "Hashes" section of
+`docs/law-modules.md` from the rules alone, and shares no code with the
+crate `fidryn-provision`. Without `--write` it verifies the digests recorded
+in `fixtures/hash/vectors.json` and exits `1` when one differs, `2` when
+the file cannot be read; `--write` fills them in. The Rust test
+`known_answers_match_the_independent_implementation` holds the crate to the
+same digests.
+
+`vectors.json` is one object. Its first key, `invented`, says on the first
+line that every model in the file is invented. Then four lists, each entry
+with a `name`, a model in the JSON form of the crate's model types, and its
+digests:
+
+| List | Model | Digests |
+| --- | --- | --- |
+| `provisions` | `provision` | `hash`: its tree hash |
+| `notes` | `note` | `hash` |
+| `units` | `unit` | `layers`: `operative`, `enacted`, `editorial` |
+| `containers` | `container` | `hash`, and `layers` |
