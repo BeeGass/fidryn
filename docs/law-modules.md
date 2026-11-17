@@ -61,7 +61,7 @@ workspace's root:
    | an upper-case ASCII letter | `_` followed by its lower-case form |
    | the en dash U+2013 | `-` |
    | the ASCII hyphen | `%2D` |
-   | a full stop | kept, except as the last character of a segment, where it is `%2E` |
+   | a full stop | kept, except as the first or the last character of a segment and before the letters `fr` that end a segment, where it is `%2E` |
 
 2. If the mapped segment, or its part before its first full stop, compared
    without regard to case, is one of `con`, `prn`, `aux`, `nul`, `com1` to
@@ -83,6 +83,14 @@ workspace's root:
 | `/zz/demo/con` | `zz/demo/%63on.fr` |
 | `/zz/demo/con.1` | `zz/demo/%63on.1.fr` |
 | `/zz/demo/lpt1` | `zz/demo/%6Cpt1.fr` |
+| `/zz/demo/.a` | `zz/demo/%2Ea.fr` |
+| `/zz/demo/a.fr/b` | `zz/demo/a%2Efr/b.fr` |
+| `/zz/demo/a..fr` | `zz/demo/a.%2Efr.fr` |
+
+No path segment begins with a full stop, and none ends in a full stop or in
+`.fr`, so the file of one module never has the name of another module's
+directory: `/zz/demo/a.fr/b` is `zz/demo/a%2Efr/b.fr`, beside the file
+`zz/demo/a.fr` of the address `/zz/demo/a`.
 
 The mapping is one to one, so two addresses never share a path, also on a
 file system that ignores case: `/zz/demo/ch6A` is `zz/demo/ch6_a.fr` and
@@ -91,8 +99,8 @@ file system that ignores case: `/zz/demo/ch6A` is `zz/demo/ch6_a.fr` and
 `layout::address_of_path` reads a path back as its address. It refuses
 every path that the three rules do not write, such as `zz/demo/CH1.fr`,
 `zz/demo/a_.fr`, `zz/demo/a%2d.fr`, `zz/demo/a%5F.fr`, `zz/demo/con.fr`,
-`zz/demo/a.txt` and `zz\demo\a.fr`. The path `zz/demo/a-b.fr` is the
-address `/zz/demo/a–b`, with an en dash.
+`zz/demo/.a.fr`, `zz/demo/a.fr/b.fr`, `zz/demo/a.txt` and `zz\demo\a.fr`.
+The path `zz/demo/a-b.fr` is the address `/zz/demo/a–b`, with an en dash.
 
 ## Normalization
 

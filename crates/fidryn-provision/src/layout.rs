@@ -7,16 +7,19 @@
 //!    character: a lower-case ASCII letter, a digit or `~` is kept; an
 //!    upper-case ASCII letter is written as `_` followed by its lower-case
 //!    form; the en dash is written `-`; the ASCII hyphen is written `%2D`; a
-//!    full stop is kept, except as the last character of a segment, where it
-//!    is written `%2E`.
+//!    full stop is kept, except in three places, where it is written `%2E`:
+//!    as the first character of a segment, as the last character of a
+//!    segment, and before the letters `fr` that end a segment.
 //! 2. If the mapped segment, or its part before its first full stop, compared
 //!    without regard to case, is one of `con`, `prn`, `aux`, `nul`, `com1` to
 //!    `com9` or `lpt1` to `lpt9`, its first character is written as `%`
 //!    followed by the two upper-case hexadecimal digits of its code.
 //! 3. The path is the mapped segments joined by `/`, followed by `.fr`.
 //!
-//! The mapping is one to one, also when paths are compared without regard to
-//! case, and [`address_of_path`] is its inverse.
+//! No path segment begins with a full stop, and none ends in a full stop or in
+//! `.fr`, so the file of one module never has the name of another module's
+//! directory. The mapping is one to one, also when paths are compared without
+//! regard to case, and [`address_of_path`] is its inverse.
 
 use crate::address::{self, Address};
 use std::fmt;
@@ -76,8 +79,7 @@ pub fn address_of_path(path: &str) -> Result<Address, LayoutError> {
 /// rules 1 and 2.
 fn push_segment(path: &mut String, segment: &str) {
     let start = path.len();
-    let mut characters = segment.chars().peekable();
-    while let Some(character) = characters.next() {
+    for (at, character) in segment.char_indices() {
         match character {
             'A'..='Z' => {
                 path.push('_');
@@ -85,7 +87,7 @@ fn push_segment(path: &mut String, segment: &str) {
             }
             '\u{2013}' => path.push('-'),
             '-' => path.push_str("%2D"),
-            '.' if characters.peek().is_none() => path.push_str("%2E"),
+            '.' if at == 0 || matches!(&segment[at + 1..], "" | "fr") => path.push_str("%2E"),
             _ => path.push(character),
         }
     }
@@ -166,24 +168,49 @@ mod tests {
         "/zz/demo/con",
         "/zz/demo/con.1",
         "/zz/demo/lpt1",
+        "/zz/demo/.a",
+        "/zz/demo/a.fr/b",
+        "/zz/demo/a..fr",
+        "/zz/demo/.fr",
+        "/zz/demo/...",
+        "/zz/demo/con.fr",
     ];
 
-    /// Letters of the reserved names, in both cases, and every other
-    /// character a segment may hold.
+    /// Letters of the reserved names and of `fr`, in both cases, and every
+    /// other character a segment may hold.
     const ALPHABET: &[char] = &[
-        'a', 'c', 'l', 'm', 'n', 'o', 'p', 'r', 't', 'u', 'x', 'z', 'A', 'C', 'L', 'M', 'N', 'O',
-        'P', 'R', 'T', 'U', 'X', 'Z', '0', '1', '4', '9', '-', '.', '~', '\u{2013}',
+        'a', 'c', 'f', 'l', 'm', 'n', 'o', 'p', 'r', 't', 'u', 'x', 'z', 'A', 'C', 'F', 'L', 'M',
+        'N', 'O', 'P', 'R', 'T', 'U', 'X', 'Z', '0', '1', '4', '9', '-', '.', '~', '\u{2013}',
     ];
 
     const RESERVED: &[&str] = &[
         "con", "prn", "aux", "nul", "com1", "com5", "com9", "lpt1", "lpt4", "lpt9",
     ];
 
-    const SUFFIXES: &[&str] = &["", ".", ".1", "..", "~2", "x", "-", "\u{2013}a"];
+    const SUFFIXES: &[&str] = &[
+        "",
+        ".",
+        ".1",
+        "..",
+        "~2",
+        "x",
+        "-",
+        "\u{2013}a",
+        ".fr",
+        "..fr",
+        "fr",
+        ".frx",
+    ];
 
+    /// A segment: a reserved name in random case followed by a suffix, or
+    /// random characters; either begins with a full stop one time in six.
     fn generated_segment(rng: &mut Xorshift) -> String {
         loop {
-            let segment: String = if rng.below(4) == 0 {
+            let mut segment = String::new();
+            if rng.below(6) == 0 {
+                segment.push('.');
+            }
+            segment += &if rng.below(4) == 0 {
                 let name = rng.pick(RESERVED);
                 let mut segment: String = name
                     .chars()
@@ -199,7 +226,7 @@ mod tests {
                 segment
             } else {
                 let length = 1 + rng.below(8);
-                (0..length).map(|_| *rng.pick(ALPHABET)).collect()
+                (0..length).map(|_| *rng.pick(ALPHABET)).collect::<String>()
             };
             if segment != "." && segment != ".." {
                 return segment;
@@ -207,9 +234,10 @@ mod tests {
         }
     }
 
-    fn generated_addresses(seed: u64, count: usize) -> Vec<Address> {
-        let mut rng = Xorshift::new(seed);
-        (0..count)
+    /// The 2,000 generated addresses of the tests, of one to six segments.
+    fn generated_addresses() -> Vec<Address> {
+        let mut rng = Xorshift::new(0x5EED_0032);
+        (0..2_000)
             .map(|_| {
                 let segments = 1 + rng.below(6);
                 let text: String = (0..segments)
@@ -237,12 +265,64 @@ mod tests {
             ("/zz/demo/con", "zz/demo/%63on.fr"),
             ("/zz/demo/con.1", "zz/demo/%63on.1.fr"),
             ("/zz/demo/lpt1", "zz/demo/%6Cpt1.fr"),
+            ("/zz/demo/.a", "zz/demo/%2Ea.fr"),
+            ("/zz/demo/a.fr/b", "zz/demo/a%2Efr/b.fr"),
+            ("/zz/demo/a..fr", "zz/demo/a.%2Efr.fr"),
         ] {
             assert_eq!(module_path(&address(text)), path, "{text}");
         }
         assert_eq!(module_path(&address("/con/nul")), "%63on/%6Eul.fr");
         assert_eq!(module_path(&address("/zz/Con")), "zz/_con.fr");
         assert_eq!(module_path(&address("/zz/con~1")), "zz/con~1.fr");
+        assert_eq!(module_path(&address("/zz/.fr")), "zz/%2Efr.fr");
+        assert_eq!(module_path(&address("/zz/...")), "zz/%2E.%2E.fr");
+        assert_eq!(module_path(&address("/zz/con.fr")), "zz/con%2Efr.fr");
+        assert_eq!(module_path(&address("/zz/a.frx")), "zz/a.frx.fr");
+        assert_eq!(module_path(&address("/zz/a.FR")), "zz/a._f_r.fr");
+    }
+
+    #[test]
+    fn a_module_file_is_never_a_directory_of_another_module() {
+        assert_eq!(module_path(&address("/zz/demo/a")), "zz/demo/a.fr");
+        assert_eq!(
+            module_path(&address("/zz/demo/a.fr/b")),
+            "zz/demo/a%2Efr/b.fr"
+        );
+
+        let generated = generated_addresses();
+        let segments = || generated.iter().flat_map(|a| a.segments());
+        assert!(
+            segments().any(|segment| segment.starts_with('.')),
+            "no generated segment begins with a full stop"
+        );
+        assert!(
+            generated.iter().any(|a| {
+                let segments: Vec<&str> = a.segments().collect();
+                segments[..segments.len() - 1]
+                    .iter()
+                    .any(|segment| segment.ends_with(".fr"))
+            }),
+            "no generated segment but a last one ends in `.fr`"
+        );
+        for a in &generated {
+            let path = module_path(a);
+            let parts: Vec<&str> = path.split('/').collect();
+            for (index, part) in parts.iter().enumerate() {
+                let folded = part.to_ascii_lowercase();
+                assert!(!folded.starts_with('.'), "{a} at {path}");
+                if index + 1 < parts.len() {
+                    assert!(!folded.ends_with(".fr"), "{a} at {path}");
+                } else {
+                    let stem = folded
+                        .strip_suffix(".fr")
+                        .expect("a module path ends in .fr");
+                    assert!(
+                        !stem.ends_with('.') && !stem.ends_with(".fr"),
+                        "{a} at {path}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]
@@ -264,7 +344,7 @@ mod tests {
         };
         let mut seen: BTreeMap<String, Address> = BTreeMap::new();
         let mut pairs = 0;
-        for generated in generated_addresses(0x5EED_0031, 2_000) {
+        for generated in generated_addresses() {
             let text = generated.as_str();
             for variant in [
                 text.to_owned(),
@@ -289,10 +369,10 @@ mod tests {
 
     #[test]
     fn layout_is_reversible_for_every_segment_form() {
-        let generated = generated_addresses(0x5EED_0032, 2_000);
+        let generated = generated_addresses();
         let paths: Vec<String> = generated.iter().map(module_path).collect();
         for form in [
-            "_", "-", "%2D", "%2E", "~", "%61", "%63", "%6C", "%6E", "%70",
+            "_", "-", "%2D", "%2E", "/%2E", "%2Efr/", "~", "%61", "%63", "%6C", "%6E", "%70",
         ] {
             assert!(
                 paths.iter().any(|path| path.contains(form)),
@@ -316,6 +396,10 @@ mod tests {
             ("zz/demo/a%2Fb.fr", LayoutError::Segment { index: 2 }),
             ("zz/demo/a%2Eb.fr", LayoutError::Segment { index: 2 }),
             ("zz/demo/a..fr", LayoutError::Segment { index: 2 }),
+            ("zz/demo/.a.fr", LayoutError::Segment { index: 2 }),
+            ("zz/demo/a.fr/b.fr", LayoutError::Segment { index: 2 }),
+            ("zz/demo/a.fr.fr", LayoutError::Segment { index: 2 }),
+            ("zz/demo/a%2Efr%2E.fr", LayoutError::Segment { index: 2 }),
             ("zz/demo/%61b.fr", LayoutError::Segment { index: 2 }),
             ("zz/demo/a\u{2013}b.fr", LayoutError::Segment { index: 2 }),
             ("zz//a.fr", LayoutError::Segment { index: 1 }),
