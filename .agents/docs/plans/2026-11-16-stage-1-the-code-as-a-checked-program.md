@@ -94,6 +94,8 @@ Measured on 2026-11-16 on the publisher's archive of release 119-142 (`xml_uscAl
 
 **F14. Definitions.** Of 682,600 operative text parts: 27,719 hold `the term(s) “X” mean(s)`, 2,444 `... include(s)`, 596 `... does/do not include`, 3,898 `has/have the (same) meaning(s) given`, 23 `the word(s) “X” include(s)`, and 5,707 hold a quoted term within 60 characters before one of those verbs without matching any of them. No term is written with straight quotation marks.
 
+**F15. The forms of definitions.** Of the first paragraphs of chapeau and content parts of operative provisions that have the sentence form of S10: 6,717 begin with a reach of their own; 23,637 have none and stand directly under a chapeau that is a reach and a dash or a colon, with or without a lead-in such as `the following definitions apply`; 1,873 have none and stand under a provision without a chapeau, below such a chapeau; 1,530 have none of these. Of the paragraphs of the list form, 1,380 stand under such a chapeau and 1,003 under one that ends `, the term` and a dash. About 800 more stand under a chapeau that opens `For the purpose of`. By the rules of S10, an independent prototype outside the repository reads 34,329 definitions in the release: 27,428 with an inherited reach, 6,497 with their own and 404 with none; 6,955 `enacted`, 23,986 `restated` and 3,388 `unresolved`. In the three titles of the sample it reads 144 (10, 4 and 130).
+
 ## Global Constraints
 
 From the design (sections 9.2, 11 and 12) and the owner's standing decisions. Every task's requirements include this section.
@@ -582,7 +584,7 @@ Against the counts of the design's acceptance item 2: `exact`, `target-status` a
 
 ### S10. Definitions
 
-A definition is extracted by the ingester from the first paragraph of a `chapeau` or `content` part of an operative provision, when that paragraph's text matches one of the patterns below, and from nothing else. A provision that matches none stays a plain provision (design 9.5). `Q` is a term in curly quotation marks, `“` and `”`; the term is recorded without the marks.
+A definition is extracted by the ingester from the first block of a `chapeau` or `content` part of an operative provision, when that block is a paragraph and its text matches one of the patterns below, and from nothing else. A provision that matches none stays a plain provision (design 9.5). The text of a paragraph is its plain text: the words of its runs, in order. `Q` is a term in curly quotation marks, `“` and `”`, with at least one character and neither mark inside it; the term is recorded without the marks. Where these rules say "in any case", the letters `A` to `Z` are compared as `a` to `z`, and no other character is changed.
 
 **Verbs.**
 
@@ -593,22 +595,35 @@ A definition is extracted by the ingester from the first paragraph of a `chapeau
 | `does_not_include` | `does not include`, `do not include`, `shall not include` |
 | `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given` |
 
+A verb form stands where its words are followed by the end of the text or by a character that is not one of the letters `A` to `Z` and `a` to `z`; where a rule looks for a verb form inside other text, the character before it is not such a letter either.
+
 **Patterns.**
 
-1. *Sentence form.* `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`. `Aside` is text with no quotation mark and no verb form of the table in it.
-2. *List form.* The paragraph begins `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and the provision's parent has a `chapeau` whose text is `Reach` followed by nothing but a dash (U+2014 or `-`) or a colon. The reach words are the parent's.
+1. *Sentence form.* The paragraph begins `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`. `Aside` is text with no quotation mark and no verb form of the table in it.
+2. *List form.* The paragraph begins `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and it has an inherited reach (below).
 
-**Reach.** `Reach` is `("As used in" | "In" | "For purposes of" | "For the purposes of" | "When used in") Object`, where `Object` is text up to the comma or dash that ends the reach, with no quotation mark in it. After `In`, the `Object` must begin with `this` and a space, or be a single link; a paragraph that opens with `In` and anything else ("In the case of an individual, the term ...") states a condition, not a reach, and is not extracted. The reach words are recorded exactly as the text has them, without the closing comma or dash. A paragraph of the sentence form with no `Reach` has the words `unstated`. A paragraph whose text before `the term` is anything other than a `Reach` is not extracted.
+**Reach.** `Reach` is `Opening Object`. `Opening` is one of `As used in`, `In`, `For purposes of`, `For the purposes of`, `For the purpose of`, `For purpose of` and `When used in`. `Object` is the text from the opening to the end of the reach: it is not empty, it holds no quotation mark, and it holds none of the words `term`, `terms`, `word`, `words`, `phrase`, `phrases`, `definition`, `definitions`, `following`, `meaning` and `meanings`, in any case. After `In`, the `Object` must begin with `this` and a space, or be a single link; a paragraph that opens with `In` and anything else ("In the case of an individual, the term ...") states a condition, not a reach. In the sentence form the reach ends at the comma that stands before `the term` (or `The`, `terms`, `word`, `words`, `phrase`), and no quotation mark stands before that comma. A paragraph whose text before those words is anything other than a `Reach` is not extracted.
 
-**Region.** When `Object` is `this` followed by one of `title`, `subtitle`, `chapter`, `subchapter`, `part`, `subpart`, `division`, `section`, `subsection`, `paragraph`, `subparagraph`, `clause`, the region is the nearest ancestor of the provision (the provision itself included, then its unit's containers in order) whose kind is that word. When `Object` is a single link whose target lies below the prefix of the corpus, the region is that target. Otherwise there is no region; a link to a public law or to the Statutes at Large names no region of the Code.
+**A reach chapeau.** The chapeau of a provision is a *reach chapeau* when it is one paragraph whose text is `Reach [[","] LeadIn] Close`, and nothing more. `LeadIn` is one of `the term`, `the terms`, `the following definitions apply` and `the following definitions shall apply`. `Close` is a dash (U+2014 or `-`) or a colon, with at most one space before it. The lead-in and the close are no part of the reach.
+
+**The reach of a paragraph.** A paragraph of the sentence form that begins with a `Reach` has that reach. Any other paragraph looks to the nearest ancestor of its provision that has a chapeau. When that chapeau is a reach chapeau, the paragraph has its reach, an *inherited* reach. When it is any other chapeau, the paragraph is not extracted: such a chapeau may state a reach in words these rules do not read. When no ancestor has a chapeau, a paragraph of the sentence form has no reach, and a paragraph of the list form is not extracted. The reach words are recorded exactly as the text has them, from the opening to the end of the object; a definition with no reach has the words `unstated`.
+
+**What is not extracted.** A paragraph that matches a pattern is still not extracted when one of these holds:
+
+- *It defines a second term.* After the `Verb`, the text holds a `Q` that is followed by a space and a verb form, or by a comma, a space, text with no quotation mark, a comma, a space and a verb form.
+- *Its aside speaks of a reach.* The `Aside` begins with `in` and a space, or holds `as used in`, `when used in`, `for purposes of`, `for the purposes of`, `for the purpose of` or `for purpose of`, in any case.
+- *A reach follows its verb.* The `Verb` is followed by a comma, a space, one of the openings in any case, and a space.
+- *It has no reach, and speaks of one.* It has the words `unstated`, and its text holds one of the six phrases of the second case, in any case.
+
+**Region.** When the `Object` is `this`, a space and one of `title`, `subtitle`, `chapter`, `subchapter`, `part`, `subpart`, `division`, `section`, `subsection`, `paragraph`, `subparagraph`, `clause`, and then either nothing more or a comma, a space and text that begins `unless the context`, the region is the nearest ancestor whose kind is that word, counted from the provision whose text holds the reach (that provision included, then its unit's containers in order). When the `Object` is a single link whose target is an address below the prefix of the corpus, the region is that target. Otherwise there is no region: a link to a public law or to the Statutes at Large names no region of the Code, and an object that says more than these forms allow ("this chapter and chapter 5", "paragraph (1)") is not resolved.
 
 **Basis.** No region: `unresolved`. A region, in a unit whose `positive_law` is true: `enacted`. A region, in any other unit: `restated`.
 
 **Borrowed.** A definition of kind `borrowed` records as `borrowed_from` the target of the first link after the verb. If there is none, the paragraph is not extracted.
 
-**The note.** When the basis is `restated` and the unit has an editorial note whose heading is "References in Text" and whose text contains, without regard to case, the `Object` followed by ", referred to in", the definition records that note's address as `see_note`.
+**The note.** When the basis is `restated` and the unit has an editorial note whose heading is "References in Text", one of whose own paragraphs (not one inside a table or quoted content) holds, in any case, the words that name the region (`this` and the kind word, or the words of the link) followed by `, referred to in`, the definition records the address of the first such note as `see_note`.
 
-The checker verifies of each definition, in any module: the provision it names is in the module; each term stands in that provision's text; the reach words, when stated, stand in the provision's text or in the chapeau of its parent; the kind and the basis are of the closed lists; a `borrowed` definition has `borrowed_from`.
+The checker verifies of each definition, in any module: the provision it names is in the module; each term stands in that provision's text; the reach words, when stated, stand in the provision's text or in the chapeau of one of its ancestors; the kind and the basis are of the closed lists; a `borrowed` definition has `borrowed_from`.
 
 ### S11. Workspaces
 
@@ -1481,6 +1496,7 @@ impl AddressIndex {
 **Files:**
 - Create: `crates/fidryn-ingest-uscode/src/definitions.rs`, fixtures `conformance/fixtures/uslm/definitions-*.xml`
 - Modify: `crates/fidryn-ingest-uscode/src/operative.rs` or `lib.rs` (call the extraction once a unit is built), `samples/uscode/workspace/**` (regenerated)
+- Modify: `crates/fidryn-check/src/e2/module_check.rs` and its tests (the reach words of a definition may stand in the chapeau of any ancestor of its provision, where the check today looks at the parent alone)
 - Modify: `docs/law-modules.md` (section "Definitions", with the patterns of S10 word for word), `CHANGELOG.md`
 
 **Interfaces:**
@@ -1504,13 +1520,32 @@ impl AddressIndex {
 | `As used in ` a link to `/us/usc/t99/s2` `, the term “widget” means a small device.` | region the link's target |
 | `As used in ` a link to `/us/pl/99/1` `, the term “widget” means a small device.` | words recorded; no region; `unresolved` |
 | `In the case of a gadget, the term “widget” means a small device.` | not extracted: after `In` stands neither `this` nor a link |
-| `The term “widget” means, and the term “gadget” includes, a device.` | not extracted |
+| `The term “widget” means, and the term “gadget” includes, a device.` | not extracted: it defines a second term |
+| `The term “widget” means a small device. The term “gadget” means a tool.` | not extracted: it defines a second term |
 | a paragraph with the sentence form in its second sentence | not extracted |
 | a paragraph inside a note, and one inside quoted content | not extracted |
+| a chapeau `In this section:` with the child `The term “widget” means a small device.` | words `In this section`; region the unit |
+| the same child in a paragraph that has a heading and no chapeau, whose own parent has the chapeau `For the purpose of this chapter—` | words `For the purpose of this chapter`; region the chapter container |
+| a chapeau `As used in this chapter, the term—` with the child `“widget” means a small device;` | words `As used in this chapter`; region the chapter container |
+| a chapeau `In this section, the following definitions apply:` with the child `The term “widget” means a small device.` | words `In this section`; region the unit |
+| a chapeau `In this section the following definitions shall apply:` with the same child | words `In this section`; region the unit |
+| a chapeau `In this chapter, unless the context otherwise requires—` with the same child | words `In this chapter, unless the context otherwise requires`; region the chapter container |
+| a chapeau `In this chapter and chapter 5:` with the same child | words `In this chapter and chapter 5`; no region; `unresolved` |
+| a chapeau `In this subsection:` of a subsection, with the same child | region that subsection |
+| a chapeau `Except as otherwise provided, in this chapter:` with the same child | not extracted: the nearest chapeau is not a reach chapeau |
+| a chapeau `In this chapter, the following terms have the following meanings:` with the same child | not extracted: the object holds `following` |
+| a chapeau `In this section:` over a paragraph whose chapeau is `The following rules apply:`, over the same child | not extracted: the nearest chapeau decides |
+| `For the purpose of this section, the term “widget” means a small device.` | words `For the purpose of this section`; region the unit |
+| `The term “widget”, as used in this section, means a small device.` | not extracted: the aside speaks of a reach |
+| `The term “widget”, in the case of a gadget, means a small device.` | not extracted: the aside begins with `in` |
+| `The term “widget” means, for purposes of this section, a small device.` | not extracted: a reach follows the verb |
+| `The term “widget” means, with respect to a gadget, a small device.`, under no chapeau | `means`; words unstated |
+| `The term “widget” means a device as used in commerce.`, under no chapeau | not extracted: no reach, and the text holds `as used in` |
 
 - `basis_follows_the_files_flag`: the same fixture with the positive-law flag on and off gives `enacted` and `restated`.
 - `the_references_in_text_note_is_linked`: a `restated` definition in a unit whose editorial note headed "References in Text" contains "This chapter, referred to in" records that note's address.
 - `every_extracted_definition_passes_the_checker`: each fixture, ingested and rendered, passes the one-module check.
+- `the_reach_words_may_stand_in_the_chapeau_of_any_ancestor` (the one-module check): a definition whose words stand in the chapeau of its provision's grandparent passes; one whose words stand in no ancestor's chapeau and not in its provision is `E710`.
 - On the sample: `cargo xtask uscode-sample --update` adds `definition` blocks; the implementer reads every one against its text (the sample is small) and lists in the report any that looks wrong, with the pattern that produced it.
 
 **Steps:**
