@@ -74,16 +74,18 @@ What is counted is what the reading imports, element by element:
   in its `notes` element, and `ungrouped` before any. The topic of a group
   heading is one word of ASCII letters and digits that begins with a letter, and
   a word these rules do not know is a group like any other. A group heading is no
-  note: its label, its first heading, is not imported and is counted; what it holds
-  after that label is a note of the group it opens, with no heading and no
-  topics. Topics are the `topic` attribute split at U+0020. A note is editorial
+  note: its label, its first `heading` child, is not imported and is counted; what
+  it holds after that label is a note of the group it opens, with no heading and
+  no topics. Topics are the `topic` attribute split at U+0020. A note is editorial
   when its group is `editorialNotes`, or when it is ungrouped and one of its
   topics is `removalDescription` or `historicalAndRevision`; every other note is
   enacted. A note's text may hold a text part that stands directly in it, read as
-  the blocks of its own flow, and a `signature`, also inside quoted content. Any
-  `subheading` in a note and any `heading` after the note's first is a subheading
-  of its text, and so is a `heading` or `subheading` that stands directly in quoted
-  content.
+  the blocks of its own flow, and a `signature`, also inside quoted content. A
+  note's own heading is the first `heading` that is a child of the note. Any
+  `subheading` in a note and any other `heading`, at any depth inside the note, is
+  a subheading of its text, whether or not the note has a heading of its own, and
+  a note inside quoted content is read the same way; so is a `heading` or
+  `subheading` that stands directly in quoted content.
 - **Source credits.** A unit or a container has the credit that is its direct
   child; its links are references of the editorial layer.
 - **Footnotes** are the `note type="footnote"` elements of a unit or a

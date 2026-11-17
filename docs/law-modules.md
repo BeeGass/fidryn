@@ -1336,7 +1336,7 @@ has `"positive_law":null`.
 | Provision inside a unit | any element of the two classes above, and `subsection`, `paragraph`, `subparagraph`, `clause`, `subclause`, `item`, `subitem`, `subsubitem` and `level`, inside a unit. Its kind is its tag |
 | Label | `num` and `heading` of a level |
 | Text part | `chapeau`, `content`, `continuation`, `proviso` |
-| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, `signature`; in a note also any `subheading`, any `heading` after the note's first, and a text part directly in the note; in quoted content also `note`, and a `heading` or `subheading` directly in it |
+| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, `signature`; in a note also any `subheading`, any `heading` other than the note's own (the first `heading` that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also `note`, and a `heading` or `subheading` directly in it |
 | Inline, kept as structure | `ref` with an `href` (a link); `ref` of the class `footnoteRef` (a footnote marker); `sup` and `xhtml:sup`; `sub` and `xhtml:sub` |
 | Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
 | Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col`, which hold no text, are dropped |

@@ -900,7 +900,8 @@ pub(crate) enum Holder {
     /// Operative text, a footnote, or quoted content that no note holds.
     Text,
     /// A note, or quoted content inside one: a `signature`, any `subheading`
-    /// and any `heading` after the note's first are blocks of it too.
+    /// and, at any depth, any `heading` other than the note's own (its first
+    /// `heading` child, which a note may lack) are blocks of it too.
     Note,
 }
 
@@ -1027,11 +1028,11 @@ pub(crate) fn text_part(
     Ok(parts)
 }
 
-/// The heading and the blocks of the note `node`: its first `heading`, and
-/// the flow of everything else in it, where a text part that stands directly
-/// in the note is replaced by the blocks of its own flow. The first heading
-/// of a cross heading is the label of its group, which is not imported:
-/// `read_heading` false leaves it unread.
+/// The heading and the blocks of the note `node`: its first `heading` child,
+/// and the flow of everything else in it, where a text part that stands
+/// directly in the note is replaced by the blocks of its own flow. The first
+/// `heading` child of a cross heading is the label of its group, which is not
+/// imported: `read_heading` false leaves it unread.
 pub(crate) fn note(
     node: Node<'_, '_>,
     read_heading: bool,
@@ -1468,7 +1469,16 @@ mod tests {
 
     #[test]
     fn a_release_name_that_differs_from_the_records_is_refused() {
-        for release in ["Online@999-2", "Print@999-1", "Online@999-1 ", ""] {
+        // White space around the name is part of it.
+        let names = [
+            "Online@999-2",
+            "Print@999-1",
+            "Online@999-1 ",
+            " Online@999-1",
+            "Online@999-1\n",
+            "",
+        ];
+        for release in names {
             let mut document = Doc::with_section("<content>Text.</content>");
             document.release = release;
             let error = refusal(&document);
@@ -1478,6 +1488,56 @@ mod tests {
             );
             assert_eq!(error.element(), Some("docPublicationName"));
         }
+    }
+
+    #[test]
+    fn a_second_release_name_is_refused() {
+        for second in ["Online@999-1", "Online@999-2"] {
+            let text = Doc::with_section("<content>Text.</content>")
+                .text()
+                .replace(
+                    "</docPublicationName>",
+                    &format!(
+                        "</docPublicationName><docPublicationName>{second}</docPublicationName>"
+                    ),
+                );
+            let error = crate::ingest_xml(MEMBER, &text, RELEASE)
+                .map(|_| ())
+                .expect_err("a document with two names is refused");
+            assert!(
+                error
+                    .message()
+                    .contains("meta holds no docPublicationName, or more than one"),
+                "{error}"
+            );
+            assert_eq!(error.element(), Some("meta"));
+        }
+    }
+
+    #[test]
+    fn the_name_and_the_flag_are_read_as_their_whole_text() {
+        // Markup inside the name or the flag is read as the words it holds.
+        let plain = Doc::with_section("<content>Text.</content>")
+            .read()
+            .unwrap_or_else(|error| panic!("{error}"));
+        let mut document = Doc::with_section("<content>Text.</content>");
+        document.release = "Online@<i>999</i>-1";
+        document.flags = &["y<b>es</b>"];
+        let marked = document.read().unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(records(&marked), records(&plain));
+        document.flags = &["<i>n</i>o"];
+        let modules = document.read().unwrap_or_else(|error| panic!("{error}"));
+        assert!(modules.iter().all(|module| match module {
+            Module::Unit(unit) => unit.positive_law == Some(false),
+            Module::Container(container) => container.positive_law == Some(false),
+            Module::Curated(_) => false,
+        }));
+        document.flags = &["<i>maybe</i>"];
+        let error = refusal(&document);
+        assert_eq!(
+            error.message(),
+            "the property is-positive-law is \"maybe\", neither yes nor no"
+        );
     }
 
     #[test]
@@ -1546,7 +1606,8 @@ mod tests {
             );
             assert_eq!(error.element(), Some("meta"));
         }
-        let others: [&'static [&'static str]; 4] = [&["maybe"], &[""], &["Yes"], &["true"]];
+        let others: [&'static [&'static str]; 6] =
+            [&["maybe"], &[""], &["Yes"], &["true"], &[" yes"], &["no\n"]];
         for flags in others {
             document.flags = flags;
             let error = refusal(&document);

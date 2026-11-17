@@ -372,6 +372,13 @@ def document(**changes: str) -> str:
 
 
 FLAG = '<property role="is-positive-law">yes</property>'
+NAME = "<docPublicationName>Online@999-1</docPublicationName>"
+
+
+def with_names(*releases: str) -> str:
+    """The document above with one docPublicationName for each release name, in order."""
+    names = "".join(f"<docPublicationName>{release}</docPublicationName>" for release in releases)
+    return document().replace(NAME, names)
 
 
 def with_flags(*values: str) -> str:
@@ -435,8 +442,26 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
     "root in another namespace": (document(namespace="http://example.invalid/other"), "not uscDoc"),
     "schema location naming another file": (document(schema="USLM-1.0.14.xsd"), "schema"),
     "publication name not beginning Online@": (document(release="Print@999-1"), "Online@"),
+    "publication name with white space before it": (
+        document(release=" Online@999-1"),
+        "does not begin Online@",
+    ),
+    "two publication names of one release": (
+        with_names("Online@999-1", "Online@999-1"),
+        "more than one docPublicationName",
+    ),
+    "two publication names, the first of another release": (
+        with_names("Online@999-2", "Online@999-1"),
+        "more than one docPublicationName",
+    ),
     "positive-law flag that is neither yes nor no": (document(flag="maybe"), "is-positive-law"),
     "positive-law flag that is empty": (document(flag=""), "neither yes nor no"),
+    "positive-law flag with white space before it": (document(flag=" yes"), "neither yes nor no"),
+    "positive-law flag with white space after it": (document(flag="no\n"), "neither yes nor no"),
+    "positive-law flag whose markup holds another value": (
+        document(flag="<i>maybe</i>"),
+        "is 'maybe', neither yes nor no",
+    ),
     "two positive-law flags of one value": (with_flags("yes", "yes"), "more than one property"),
     "two positive-law flags of two values": (with_flags("yes", "no"), "more than one property"),
     "element in no class": (document(inner="<widget>Text.</widget>"), "does not stand"),
@@ -681,6 +706,9 @@ class Refusals(unittest.TestCase):
 FLAG_REFUSALS = (
     "positive-law flag that is neither yes nor no",
     "positive-law flag that is empty",
+    "positive-law flag with white space before it",
+    "positive-law flag with white space after it",
+    "positive-law flag whose markup holds another value",
     "two positive-law flags of one value",
     "two positive-law flags of two values",
 )
@@ -741,6 +769,36 @@ class Metadata(unittest.TestCase):
                     alone.write_text(document(release=f"Online@999{other}1"), encoding="utf-8")
                     profile = json.loads(self.printed(PROFILE_SCRIPT, alone))
                     self.assertEqual(profile["import"]["release"], f"999{other}1")
+
+    def test_the_name_and_the_flag_are_read_as_their_whole_text(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            directory = Path(name)
+            path = directory / MEMBER
+            # Markup inside the name or the flag is read as the words it holds.
+            marked = document(release="Online@<i>999</i>-1", flag="y<b>es</b>")
+            for script in SCRIPTS:
+                with self.subTest(script=script.name):
+                    for plain, text in (
+                        (document(), marked),
+                        (document(flag="no"), document(flag="<i>n</i>o")),
+                    ):
+                        path.write_text(plain, encoding="utf-8")
+                        expected = self.printed(script, path)
+                        path.write_text(text, encoding="utf-8")
+                        self.assertEqual(self.printed(script, path), expected)
+            # White space after the name is part of it: such a member names another
+            # release, and alone it is read as one.
+            for index, after in enumerate((" ", "\n")):
+                with self.subTest(after=after):
+                    case = directory / f"after-{index}"
+                    case.mkdir()
+                    second = document(release=f"Online@999-1{after}").replace("t99", "t99a")
+                    archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+                    assert_refused(self, case, "the first member says 999-1")
+                    alone = case / MEMBER
+                    alone.write_text(document(release=f"Online@999-1{after}"), encoding="utf-8")
+                    profile = json.loads(self.printed(PROFILE_SCRIPT, alone))
+                    self.assertEqual(profile["import"]["release"], f"999-1{after}")
 
     def test_a_document_without_the_flag_has_none(self) -> None:
         # The document of the refusal table without its property is read: the record of

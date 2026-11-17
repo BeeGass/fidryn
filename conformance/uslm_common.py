@@ -755,7 +755,9 @@ class DocumentMeta:
 def parse_document(member: str, data: bytes) -> tuple[Element, DocumentMeta]:
     """Parse one member and check what its root and metadata must say.
 
-    The release is what the publication name gives after `Online@`, each en dash in it
+    The name and the flag are the whole text of their elements, as written: markup
+    inside them gives its words, and white space around them is part of them. The
+    release is what the one publication name gives after `Online@`, each en dash in it
     read as a hyphen and no other character as another. The flag is the one property
     is-positive-law, `yes` or `no`; a document without it has none.
     """
@@ -777,14 +779,17 @@ def parse_document(member: str, data: bytes) -> tuple[Element, DocumentMeta]:
     if len(tokens) % 2 or location.rsplit("/", 1)[-1] != SCHEMA_FILE:
         raise RefusedError(f"the schema location does not name {SCHEMA_FILE}", member)
     meta = next((child for child in root if tag_of(child) == "meta"), None)
-    name = ""
+    names: list[str] = []
     flags: list[str] = []
     if meta is not None:
         for child in meta:
             if tag_of(child) == "docPublicationName":
-                name = (child.text or "").strip()
+                names.append("".join(child.itertext()))
             elif tag_of(child) == "property" and child.get("role") == "is-positive-law":
-                flags.append((child.text or "").strip())
+                flags.append("".join(child.itertext()))
+    if len(names) > 1:
+        raise RefusedError("the metadata holds more than one docPublicationName", member)
+    name = names[0] if names else ""
     if not name.startswith("Online@") or name == "Online@":
         raise RefusedError(f"the publication name {name!r} does not begin Online@", member)
     if len(flags) > 1:
@@ -1382,7 +1387,7 @@ class MemberReader:
         return found
 
     def after_label(self, element: Element, scope: Scope) -> list[Block]:
-        """The blocks a cross heading holds after its first heading, its label."""
+        """The blocks a cross heading holds after its first heading child, its label."""
         label = next((c for c in element if tag_of(c) == "heading"), None)
         context = Context(True, False, note_flow=True)
         if label is None:
