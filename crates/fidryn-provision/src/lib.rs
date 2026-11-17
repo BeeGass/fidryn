@@ -1,24 +1,29 @@
 //! The model of law modules and the rules over it: addresses, the
 //! normalization of text, the file path of a module, the model of provisions,
 //! notes and modules ([`model`]), their hashes ([`hash`]), their text
-//! records ([`records`]), their canonical text ([`render`]), and the files of
-//! a workspace as data: its manifest, its lock and the retrieval record of
-//! its archives ([`workspace`]).
+//! records ([`records`]), their canonical text ([`render`]), the interface
+//! of a module ([`interface`]), the index of addresses that gives each
+//! reference its outcome ([`mod@reference`]), and the files of a workspace as
+//! data: its manifest, its lock and the retrieval record of its archives
+//! ([`workspace`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.
 
 mod address;
 pub mod hash;
+pub mod interface;
 pub mod layout;
 pub mod model;
 pub mod normalize;
 pub mod records;
+pub mod reference;
 pub mod render;
 pub mod workspace;
 
 pub use address::{Address, AddressError};
 pub use hash::{Hash32, HashError, LayerHashes};
+pub use interface::{DeclSpans, Interface, interface_of};
 pub use layout::LayoutError;
 pub use model::{
     Basis, BindTarget, Binding, Block, Cell, Citation, ContainerModule, CuratedModule, Definition,
@@ -26,6 +31,7 @@ pub use model::{
     QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
 };
 pub use records::TextRecord;
+pub use reference::{AddressIndex, Outcome};
 
 /// A seeded generator for the tests: the same sequence on every run and every
 /// host.

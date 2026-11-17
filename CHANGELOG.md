@@ -30,6 +30,18 @@ interchange schema versions are maintained independently of the interpreter.
   value is not the value they write back, and have the JSON Schemas
   `schemas/workspace-v0.1.json`, `law-lock-v0.1.json` and
   `retrieval-v0.1.json`.
+- References and interfaces. The check of a workspace gives every
+  reference of every module one of eight outcomes (`exact`,
+  `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,
+  `outside` and `malformed`), counted by layer and never a diagnostic. It
+  runs in two phases on `--jobs` threads, with the same output for any
+  number of them: each module by itself, then the checks across modules
+  from the interface of each module alone
+  (`fidryn_provision::Interface`, `fidryn.interface/v0.1`;
+  `fidryn_driver::workspace::check_interfaces`). `fidryn check DIR
+  --report FILE` writes the check report, whose JSON Schema is
+  `schemas/check-report-v0.1.json`, and `--unresolved FILE` every
+  reference whose outcome is not `exact`, one JSON object to a line.
 
 ## [0.2.0] - 2026-11-16
 

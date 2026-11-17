@@ -48,7 +48,7 @@ pub(crate) fn check_segment(segment: &str, index: usize) -> Result<(), AddressEr
 }
 
 /// Checks `text` as an address.
-fn check(text: &str) -> Result<(), AddressError> {
+pub(crate) fn check(text: &str) -> Result<(), AddressError> {
     if text.is_empty() {
         return Err(AddressError::Empty);
     }

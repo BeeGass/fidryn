@@ -19,8 +19,9 @@ use crate::hash::Hash32;
 use serde::{Deserialize, Serialize};
 
 /// What a text is part of: the operative text of the provisions, the notes
-/// the source marks as enacted, or the editorial matter.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// the source marks as enacted, or the editorial matter. Layers are ordered
+/// as they are declared.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Layer {
     Operative,

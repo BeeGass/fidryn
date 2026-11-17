@@ -2,7 +2,11 @@
 //! built in a temporary directory from invented models, in the invented
 //! corpus `/zz/demo`, and so is every text.
 
-use super::{CheckOptions, GeneratedWriter, WorkspaceReport, WriteError, check_workspace};
+use super::{
+    CheckOptions, GeneratedWriter, Unresolved, WorkspaceReport, WriteError, check_interfaces,
+    check_workspace,
+};
+use fidryn_check::e2::lower;
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
 use fidryn_provision::render::render;
 use fidryn_provision::workspace::{
@@ -10,10 +14,11 @@ use fidryn_provision::workspace::{
     RetrievalRecord, RetrievedArchive, WorkspaceKind,
 };
 use fidryn_provision::{
-    Address, Block, ContainerModule, CuratedModule, Hash32, Item, Module, Num, PartRole, Provision,
-    Run, Text, UnitModule,
+    Address, Block, ContainerModule, CuratedModule, Footnote, Hash32, Interface, Item, Layer,
+    Module, Note, Num, Outcome, PartRole, Provision, Run, Text, UnitModule, interface_of,
 };
-use std::collections::BTreeMap;
+use fidryn_syntax::e2::parse;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -360,6 +365,13 @@ fn options(toolchain: &str) -> CheckOptions {
         jobs: 1,
         cache_dir: None,
         toolchain: toolchain.to_owned(),
+    }
+}
+
+fn with_jobs(jobs: usize) -> CheckOptions {
+    CheckOptions {
+        jobs,
+        ..options(TOOLCHAIN)
     }
 }
 
@@ -1323,4 +1335,537 @@ fn a_directory_with_no_manifest_is_refused() {
         report.summary(),
         "modules: 0; from cache: 0; errors: 1; warnings: 0"
     );
+}
+
+/// A text that links to each of `targets`, in order.
+fn linked(targets: &[&str]) -> Text {
+    let mut runs = vec![Run::Words("See ".to_owned())];
+    for (n, target) in targets.iter().enumerate() {
+        if n > 0 {
+            runs.push(Run::Words(", ".to_owned()));
+        }
+        runs.push(Run::Ref {
+            words: format!("reference {}", n + 1),
+            target: (*target).to_owned(),
+        });
+    }
+    runs.push(Run::Words(".".to_owned()));
+    Text::from_runs(runs)
+}
+
+/// A paragraph that links to each of `targets`, in order.
+fn linking(targets: &[&str]) -> Block {
+    Block::Para(linked(targets))
+}
+
+/// A note of the module `module`, named `name`, in `layer`, that links to
+/// each of `targets`.
+fn linking_note(module: &str, name: &str, layer: Layer, targets: &[&str]) -> Note {
+    Note {
+        address: address(&format!("{module}/note/demoNotes/nolaw/{name}")),
+        layer,
+        group: "demoNotes".to_owned(),
+        topics: Vec::new(),
+        heading: Some(plain("An Invented Note")),
+        blocks: vec![linking(targets)],
+    }
+}
+
+/// A subsection `a` of the provision at `parent`, holding `blocks`.
+fn subsection(parent: &str, blocks: Vec<Block>) -> Item {
+    Item::Child(Provision {
+        address: address(&format!("{parent}/a")),
+        kind: "subsection".to_owned(),
+        num: num("a", "(a)"),
+        heading: None,
+        status: None,
+        items: vec![Item::Part {
+            role: PartRole::Content,
+            blocks,
+        }],
+    })
+}
+
+/// The targets of the references of the section `s6` of the outcome
+/// workspace, each with its outcome, as `each_outcome_from_a_fixture` of
+/// `fidryn-provision` gives them. The section links to the first nine in
+/// its own text and to the others in its subsection `a`.
+fn outcome_targets() -> [(&'static str, Outcome); 18] {
+    let status = |word: &str| Outcome::TargetStatus(word.to_owned());
+    let outside = |body: &str| Outcome::Outside(body.to_owned());
+    [
+        ("/zz/demo/t1/s1/a", Outcome::Exact),
+        ("/zz/demo/t1/s1", Outcome::Exact),
+        ("/zz/demo/t1/ch1", Outcome::Exact),
+        ("/zz/demo/t1/s2", status("repealed")),
+        ("/zz/demo/t1/s4", status("omitted")),
+        ("/zz/demo/t1/s5", Outcome::Ambiguous),
+        ("/zz/demo/t1/s5/a", Outcome::Ambiguous),
+        ("/zz/demo/t1/s1/z", Outcome::UnitOnly),
+        ("/zz/demo/t1/s2/a", Outcome::UnitOnly),
+        ("/zz/demo/t1/s1\u{2013}9", Outcome::RangeForm),
+        ("/zz/demo/t1/s1\u{2013}9/b", Outcome::RangeForm),
+        ("/zz/demo/t1/s9", Outcome::NoUnit),
+        ("/zz/demo/t9/s1", Outcome::NoUnit),
+        ("/zz/demo/t1/s8\u{2013}9", Outcome::NoUnit),
+        ("/zz/other/x", outside("/zz/other")),
+        ("/yy/stat/116/926", outside("/yy/stat")),
+        ("not an address", Outcome::Malformed),
+        ("/zz/demo/t1/s1/a ", Outcome::Malformed),
+    ]
+}
+
+const CHAPTER: &str = "/zz/demo/t1/ch1";
+const S6: &str = "/zz/demo/t1/s6";
+const AMENDMENT: &str = "/zz/demo/t1/s6/note/demoNotes/nolaw/amendment";
+const CODIFICATION: &str = "/zz/demo/t1/s6/note/demoNotes/nolaw/codification";
+
+/// The outcome workspace: the title `t1`, its chapter `ch1`, which lists
+/// the units `s1` (with a subsection `a`), `s2` (repealed), `s3` (omitted,
+/// with the alias `s4`), `s5` (with a subsection `a`), `s5~2` and `s6`.
+/// `s6` links to every target of [`outcome_targets`] in operative text, and
+/// to others in an enacted note, an editorial note, its credit and a
+/// footnote; the chapter's credit holds one link too.
+fn outcome_models() -> Vec<Module> {
+    let sections = [
+        "/zz/demo/t1/s1",
+        "/zz/demo/t1/s2",
+        "/zz/demo/t1/s3",
+        "/zz/demo/t1/s5",
+        "/zz/demo/t1/s5~2",
+        S6,
+    ];
+    let mut chapter = container(
+        CHAPTER,
+        Some("/zz/demo/t1"),
+        "chapter",
+        "Chapter 1—",
+        "Widgets",
+        &sections,
+    );
+    chapter.credit = Some(linked(&["/yy/stat/116/926"]));
+    let section = |at: &str, value: &str| {
+        unit(
+            at,
+            Some(CHAPTER),
+            value,
+            "Invented",
+            "An invented section of the chapter.",
+        )
+    };
+    let mut s1 = section("/zz/demo/t1/s1", "1");
+    s1.root.items.push(subsection(
+        "/zz/demo/t1/s1",
+        vec![Block::Para(plain("An invented subsection."))],
+    ));
+    let mut s2 = section("/zz/demo/t1/s2", "2");
+    s2.root.status = Some("repealed".to_owned());
+    let mut s3 = section("/zz/demo/t1/s3", "3");
+    s3.root.status = Some("omitted".to_owned());
+    s3.aliases.push(address("/zz/demo/t1/s4"));
+    let mut s5 = section("/zz/demo/t1/s5", "5");
+    s5.root.items.push(subsection(
+        "/zz/demo/t1/s5",
+        vec![Block::Para(plain("An invented subsection."))],
+    ));
+    let s5_2 = section("/zz/demo/t1/s5~2", "5");
+    let targets = outcome_targets().map(|(target, _)| target);
+    let mut s6 = section(S6, "6");
+    s6.root.items = vec![
+        Item::Part {
+            role: PartRole::Content,
+            blocks: vec![linking(&targets[..9])],
+        },
+        subsection(S6, vec![linking(&targets[9..])]),
+    ];
+    s6.notes = vec![
+        linking_note(
+            S6,
+            "amendment",
+            Layer::Enacted,
+            &["/zz/demo/t1/s1", "/zz/demo/t1/s9"],
+        ),
+        linking_note(S6, "codification", Layer::Editorial, &["/zz/demo/t1/s2/a"]),
+    ];
+    s6.credit = Some(linked(&["/zz/other/x"]));
+    s6.footnotes = vec![Footnote {
+        ordinal: 1,
+        shown: "1".to_owned(),
+        blocks: vec![linking(&["/zz/demo/t9/s1"])],
+    }];
+    vec![
+        Module::Container(container(
+            "/zz/demo/t1",
+            None,
+            "title",
+            "Title 1—",
+            "Invented Things",
+            &[CHAPTER],
+        )),
+        Module::Container(chapter),
+        Module::Unit(s1),
+        Module::Unit(s2),
+        Module::Unit(s3),
+        Module::Unit(s5),
+        Module::Unit(s5_2),
+        Module::Unit(s6),
+    ]
+}
+
+/// Every reference of the outcome workspace: the address it stands in, its
+/// layer, its target and its outcome.
+fn outcome_references() -> Vec<(&'static str, Layer, &'static str, Outcome)> {
+    let mut all = vec![(
+        CHAPTER,
+        Layer::Editorial,
+        "/yy/stat/116/926",
+        Outcome::Outside("/yy/stat".to_owned()),
+    )];
+    for (n, (target, outcome)) in outcome_targets().into_iter().enumerate() {
+        let from = if n < 9 { S6 } else { "/zz/demo/t1/s6/a" };
+        all.push((from, Layer::Operative, target, outcome));
+    }
+    all.extend([
+        (
+            S6,
+            Layer::Editorial,
+            "/zz/other/x",
+            Outcome::Outside("/zz/other".to_owned()),
+        ),
+        (AMENDMENT, Layer::Enacted, "/zz/demo/t1/s1", Outcome::Exact),
+        (AMENDMENT, Layer::Enacted, "/zz/demo/t1/s9", Outcome::NoUnit),
+        (
+            CODIFICATION,
+            Layer::Editorial,
+            "/zz/demo/t1/s2/a",
+            Outcome::UnitOnly,
+        ),
+        (S6, Layer::Editorial, "/zz/demo/t9/s1", Outcome::NoUnit),
+    ]);
+    all
+}
+
+/// The interface of `module` as phase one builds it from its text, read
+/// from memory.
+fn interface_in_memory(module: &Module) -> Interface {
+    let lowered = lower(&parse(&render(module)))
+        .unwrap_or_else(|found| panic!("{module:?} does not lower: {found:#?}"));
+    interface_of(&lowered.module, &lowered.decl_spans())
+}
+
+#[test]
+fn an_unresolved_reference_is_never_a_diagnostic() {
+    let scratch = Scratch::new("unresolved");
+    let mut models = demo_models();
+    for index in 2..5 {
+        unit_at(&mut models, index).root.items.push(Item::Part {
+            role: PartRole::Content,
+            blocks: vec![linking(&["/zz/demo/t1/s9", "/zz/other/x"])],
+        });
+    }
+    write_workspace(scratch.path(), &models);
+    let report = check(scratch.path());
+    assert_eq!(report.diagnostics, []);
+    assert_eq!(report.errors(), 0);
+    let operative = &report.references[&Layer::Operative];
+    assert_eq!(operative["no-unit"], 3);
+    assert_eq!(operative["outside"], 3);
+    assert_eq!(operative.values().sum::<u64>(), 6);
+    assert_eq!(
+        report.outside_by_body,
+        BTreeMap::from([("/zz/other".to_owned(), 3)])
+    );
+    assert_eq!(report.unresolved.len(), 6);
+    assert!(report.to_json().contains("\"no-unit\": 3"));
+}
+
+#[test]
+fn references_are_counted_by_layer() {
+    let scratch = Scratch::new("layers");
+    let mut models = demo_models();
+    let s1 = unit_at(&mut models, 2);
+    s1.root.items.push(Item::Part {
+        role: PartRole::Content,
+        blocks: vec![linking(&["/zz/demo/t1/s2"])],
+    });
+    s1.notes.push(linking_note(
+        "/zz/demo/t1/s1",
+        "effective",
+        Layer::Enacted,
+        &["/zz/demo/t1/s9"],
+    ));
+    s1.credit = Some(linked(&["/zz/other/x"]));
+    write_workspace(scratch.path(), &models);
+    let report = check(scratch.path());
+    assert_eq!(report.diagnostics, []);
+    let count = |layer: Layer, outcome: &str| report.references[&layer][outcome];
+    let total = |layer: Layer| report.references[&layer].values().sum::<u64>();
+    assert_eq!(count(Layer::Operative, "exact"), 1);
+    assert_eq!(count(Layer::Enacted, "no-unit"), 1);
+    assert_eq!(count(Layer::Editorial, "outside"), 1);
+    assert_eq!(
+        [Layer::Operative, Layer::Enacted, Layer::Editorial].map(total),
+        [1, 1, 1]
+    );
+    assert_eq!(
+        report.references.keys().copied().collect::<Vec<_>>(),
+        [Layer::Operative, Layer::Enacted, Layer::Editorial]
+    );
+    for counts in report.references.values() {
+        assert_eq!(
+            counts.keys().map(String::as_str).collect::<BTreeSet<_>>(),
+            Outcome::NAMES.into_iter().collect::<BTreeSet<_>>()
+        );
+    }
+}
+
+#[test]
+fn the_unresolved_list_is_sorted_and_complete() {
+    let scratch = Scratch::new("unresolved-list");
+    write_workspace(scratch.path(), &outcome_models());
+    let report = check(scratch.path());
+    assert_eq!(report.diagnostics, []);
+
+    let all = outcome_references();
+    let mut expected: Vec<Unresolved> = all
+        .iter()
+        .filter(|(.., outcome)| *outcome != Outcome::Exact)
+        .map(|(from, layer, target, outcome)| Unresolved {
+            from: address(from),
+            layer: *layer,
+            target: (*target).to_owned(),
+            outcome: outcome.clone(),
+        })
+        .collect();
+    expected.sort_by(|a, b| (&a.from, &a.target).cmp(&(&b.from, &b.target)));
+    assert_eq!(report.unresolved, expected);
+    let exact = all.len() - expected.len();
+    assert_eq!(exact, 4);
+    let counted: u64 = report
+        .references
+        .values()
+        .flat_map(|counts| counts.values())
+        .sum();
+    assert_eq!(counted, all.len() as u64);
+
+    // One object to a line, with the keys in their order, sorted by `from`
+    // and then by `target`.
+    let lines = report.unresolved_lines();
+    assert_eq!(lines.lines().count(), expected.len());
+    assert!(lines.ends_with('\n'));
+    let mut keys = Vec::new();
+    for (line, unresolved) in lines.lines().zip(&expected) {
+        let value: serde_json::Value = serde_json::from_str(line).expect("a line is JSON");
+        let object = value.as_object().expect("a line is an object");
+        assert_eq!(
+            object.keys().map(String::as_str).collect::<Vec<_>>(),
+            ["from", "layer", "target", "outcome"],
+            "{line}"
+        );
+        assert_eq!(object["from"], unresolved.from.as_str(), "{line}");
+        assert_eq!(object["target"], unresolved.target.as_str(), "{line}");
+        assert_eq!(object["outcome"], unresolved.outcome.name(), "{line}");
+        keys.push((
+            object["from"].as_str().expect("a string").to_owned(),
+            object["target"].as_str().expect("a string").to_owned(),
+        ));
+    }
+    assert!(keys.windows(2).all(|pair| pair[0] <= pair[1]), "{keys:#?}");
+    assert_eq!(
+        lines.lines().next(),
+        Some(
+            r#"{"from":"/zz/demo/t1/ch1","layer":"editorial","target":"/yy/stat/116/926","outcome":"outside"}"#
+        )
+    );
+}
+
+#[test]
+fn phase_two_is_a_function_of_interfaces() {
+    // The outcome workspace with two hierarchy defects, which give three
+    // diagnostics: a member that is no module, and a unit within the title,
+    // which does not list it, while the chapter does.
+    let mut models = outcome_models();
+    let chapter = container_at(&mut models, 1);
+    chapter.members.push(address("/zz/demo/t1/s9"));
+    unit_at(&mut models, 6).within = Some(address("/zz/demo/t1"));
+    let scratch = Scratch::new("phase-two");
+    write_workspace(scratch.path(), &models);
+    let report = check(scratch.path());
+    assert_eq!(
+        report
+            .diagnostics
+            .iter()
+            .map(|diagnostic| (diagnostic.source_file.as_deref(), diagnostic.code))
+            .collect::<Vec<_>>(),
+        [
+            (Some("zz/demo/t1/ch1.fr"), DiagnosticCode::E720),
+            (Some("zz/demo/t1/ch1.fr"), DiagnosticCode::E720),
+            (Some("zz/demo/t1/s5~2.fr"), DiagnosticCode::E720),
+        ],
+        "{report:#?}"
+    );
+
+    // The same interfaces, built in memory and given in another order.
+    let interfaces: Vec<Interface> = models.iter().rev().map(interface_in_memory).collect();
+    let phase_two = check_interfaces(&interfaces, &[], &demo_manifest(), TOOLCHAIN);
+    assert_eq!(phase_two.diagnostics, report.diagnostics);
+    assert_eq!(phase_two.references, report.references);
+    assert_eq!(phase_two.outside_by_body, report.outside_by_body);
+    assert_eq!(phase_two.unresolved, report.unresolved);
+    assert_eq!(
+        phase_two.references[&Layer::Operative]["ambiguous"],
+        2,
+        "{phase_two:#?}"
+    );
+}
+
+/// The modules of a generated workspace of 200 modules: the title `t1`,
+/// nine chapters and 190 sections, the section `n` in the chapter
+/// `(n - 1) % 9 + 1`. Each section links to the next section, to a part of
+/// itself that does not exist, and to an address of another corpus.
+fn many_models() -> Vec<Module> {
+    let chapter_of = |n: usize| format!("/zz/demo/t1/ch{}", (n - 1) % 9 + 1);
+    let chapters: Vec<String> = (1..=9).map(|k| format!("/zz/demo/t1/ch{k}")).collect();
+    let chapter_refs: Vec<&str> = chapters.iter().map(String::as_str).collect();
+    let mut models = vec![Module::Container(container(
+        "/zz/demo/t1",
+        None,
+        "title",
+        "Title 1—",
+        "Invented Things",
+        &chapter_refs,
+    ))];
+    for chapter in &chapters {
+        let members: Vec<String> = (1..=190)
+            .filter(|n| chapter_of(*n) == *chapter)
+            .map(|n| format!("/zz/demo/t1/s{n}"))
+            .collect();
+        let members: Vec<&str> = members.iter().map(String::as_str).collect();
+        models.push(Module::Container(container(
+            chapter,
+            Some("/zz/demo/t1"),
+            "chapter",
+            "Chapter—",
+            "Numbered Sections",
+            &members,
+        )));
+    }
+    for n in 1..=190 {
+        let at = format!("/zz/demo/t1/s{n}");
+        let mut section = unit(
+            &at,
+            Some(&chapter_of(n)),
+            &n.to_string(),
+            "Numbered",
+            "An invented numbered section.",
+        );
+        let next = format!("/zz/demo/t1/s{}", n + 1);
+        let part = format!("{at}/z");
+        let other = format!("/zz/other/x{}", n % 3);
+        section.root.items = vec![Item::Part {
+            role: PartRole::Content,
+            blocks: vec![
+                Block::Para(plain("An invented numbered section.")),
+                linking(&[&next, &part, &other]),
+            ],
+        }];
+        models.push(Module::Unit(section));
+    }
+    models
+}
+
+/// The index in [`many_models`] of the section `n`.
+fn section_index(n: usize) -> usize {
+    9 + n
+}
+
+#[test]
+fn the_report_and_the_output_are_the_same_for_one_and_eight_workers() {
+    let scratch = Scratch::new("workers");
+    let mut models = many_models();
+    assert_eq!(models.len(), 200);
+    // Seeded in the models: a chapter that lists a member that is no module,
+    // and a section within another section, which its chapter does not list.
+    container_at(&mut models, 3)
+        .members
+        .push(address("/zz/demo/t1/s999"));
+    container_at(&mut models, 1)
+        .members
+        .retain(|member| member.as_str() != "/zz/demo/t1/s100");
+    unit_at(&mut models, section_index(100)).within = Some(address("/zz/demo/t1/s1"));
+    write_workspace(scratch.path(), &models);
+    // Seeded in the files: a word changed, a text that is not normalized, and
+    // a section deleted.
+    for (rel, from, to) in [
+        ("zz/demo/t1/s7.fr", "numbered section.", "numbered sectio."),
+        (
+            "zz/demo/t1/s20.fr",
+            "invented numbered",
+            "invented  numbered",
+        ),
+    ] {
+        let text = read(scratch.path(), rel);
+        assert!(text.contains(from), "{rel}");
+        put(scratch.path(), rel, &text.replacen(from, to, 1));
+    }
+    fs::remove_file(scratch.join("zz/demo/t1/s50.fr")).expect("remove");
+
+    let one = check_workspace(scratch.path(), &with_jobs(1));
+    assert_eq!(one.modules, 199);
+    let files: BTreeSet<&str> = one
+        .diagnostics
+        .iter()
+        .filter_map(|diagnostic| diagnostic.source_file.as_deref())
+        .collect();
+    assert_eq!(
+        files,
+        BTreeSet::from([
+            "zz/demo/t1/ch3.fr",
+            "zz/demo/t1/s100.fr",
+            "zz/demo/t1/s20.fr",
+            "zz/demo/t1/s50.fr",
+            "zz/demo/t1/s7.fr",
+        ]),
+        "{one:#?}"
+    );
+    let operative = &one.references[&Layer::Operative];
+    assert!(operative["exact"] > 100, "{operative:?}");
+    assert!(operative["unit-only"] > 100, "{operative:?}");
+    assert_eq!(one.outside_by_body.len(), 1);
+    let printed = |report: &WorkspaceReport| {
+        let mut lines: Vec<String> = report.diagnostics.iter().map(ToString::to_string).collect();
+        lines.push(report.summary());
+        lines
+    };
+    for _ in 0..3 {
+        let eight = check_workspace(scratch.path(), &with_jobs(8));
+        assert_eq!(eight, one);
+        assert_eq!(printed(&eight), printed(&one));
+        assert_eq!(eight.to_json(), one.to_json());
+        assert_eq!(eight.unresolved_lines(), one.unresolved_lines());
+    }
+}
+
+/// The check report and the unresolved list of the outcome workspace,
+/// under `conformance/fixtures/check-report`, are what the check writes;
+/// the schema of the report is checked on them there.
+#[test]
+fn the_committed_check_report_is_what_the_check_writes() {
+    let scratch = Scratch::new("check-report");
+    write_workspace(&scratch.join("outcomes"), &outcome_models());
+    let report = check(&scratch.join("outcomes"));
+    assert_eq!(report.diagnostics, []);
+    let mut fresh = Scratch::new("check-report-fresh");
+    put(fresh.path(), "report.json", &report.to_json());
+    put(fresh.path(), "unresolved.jsonl", &report.unresolved_lines());
+    let fixture =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../conformance/fixtures/check-report");
+    if !fixture.is_dir() || tree(fresh.path()) != tree(&fixture) {
+        fresh.keep = true;
+        panic!(
+            "conformance/fixtures/check-report is not what the check writes of the outcome \
+             workspace; what it writes is in {}",
+            fresh.path().display()
+        );
+    }
 }

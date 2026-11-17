@@ -128,3 +128,70 @@ fn a_directory_with_no_manifest_is_refused() {
         "{message}"
     );
 }
+
+fn check_with(args: &[&OsStr]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_fidryn"))
+        .arg("check")
+        .args(args)
+        .output()
+        .expect("run fidryn")
+}
+
+#[test]
+fn the_report_and_the_unresolved_list_are_written_on_request() {
+    let scratch = Scratch::new("report");
+    let report = scratch.path().join("report.json");
+    let unresolved = scratch.path().join("unresolved.jsonl");
+    let workspace = demo_workspace();
+    let checked = check_with(&[
+        workspace.as_os_str(),
+        OsStr::new("--jobs"),
+        OsStr::new("3"),
+        OsStr::new("--report"),
+        report.as_os_str(),
+        OsStr::new("--unresolved"),
+        unresolved.as_os_str(),
+    ]);
+    assert!(checked.status.success(), "{}", stderr(&checked));
+    assert_eq!(
+        stdout(&checked),
+        "modules: 5; from cache: 0; errors: 0; warnings: 0\nok\n"
+    );
+    let text = fs::read_to_string(&report).expect("the report is written");
+    assert!(
+        text.starts_with("{\n  \"schema\": \"fidryn.check-report/v0.1\",\n  \"modules\": 5,\n"),
+        "{text}"
+    );
+    assert!(text.ends_with("\n}\n"), "{text}");
+    assert_eq!(
+        fs::read_to_string(&unresolved).expect("the list is written"),
+        ""
+    );
+}
+
+#[test]
+fn the_flags_of_a_workspace_check_are_refused_for_a_file() {
+    let module = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../crates/fidryn-check/tests/fixtures/e2/unit.fr");
+    for flag in ["--jobs", "--report", "--unresolved"] {
+        let checked = check_with(&[module.as_os_str(), OsStr::new(flag), OsStr::new("2")]);
+        assert_eq!(
+            checked.status.code(),
+            Some(1),
+            "{flag}: {}",
+            stderr(&checked)
+        );
+        assert!(
+            stderr(&checked).contains("belong to the check of a workspace"),
+            "{flag}: {}",
+            stderr(&checked)
+        );
+        assert_eq!(stdout(&checked), "", "{flag}");
+    }
+    let checked = check_with(&[
+        demo_workspace().as_os_str(),
+        OsStr::new("--jobs"),
+        OsStr::new("0"),
+    ]);
+    assert_eq!(checked.status.code(), Some(2), "{}", stderr(&checked));
+}

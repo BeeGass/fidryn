@@ -4,12 +4,13 @@ This reference gives the rules by which a module of law, and each provision
 and note in it, is named, where the file of a module stands in its
 workspace, how the text of a module is normalized, what a module holds, how
 its provisions, notes and layers are hashed, how a module is written, what
-the checker verifies of one module, and how modules form a workspace and
-what the checker verifies of one. The crate `fidryn-provision` implements
-the model and the rules over it, `fidryn-syntax` reads the text of a
-module, `fidryn-check` lowers it into the model and checks it, and
-`fidryn-driver` checks a workspace and writes a generated one. In the
-examples, `/zz/demo` is an invented corpus.
+the checker verifies of one module, how modules form a workspace and what
+the checker verifies of one, how a workspace is checked, and what outcome
+each reference has. The crate `fidryn-provision` implements the model and
+the rules over it, `fidryn-syntax` reads the text of a module,
+`fidryn-check` lowers it into the model and checks it, and `fidryn-driver`
+checks a workspace and writes a generated one. In the examples, `/zz/demo`
+is an invented corpus.
 
 ## Addresses
 
@@ -721,7 +722,10 @@ An importer writes a generated workspace with
   symbolic link of another name among them, is refused, and nothing in it
   is changed. `create` writes `workspace.json` at once, through a temporary
   file like every file of the run, and clears the temporary files that an
-  earlier run which was stopped left behind.
+  earlier run which was stopped left behind. One entry whose name begins
+  with a dot is the writer's own and is not left alone: `.fidryn-write` at
+  the top of the workspace, the directory of the temporary files of a run,
+  which `create` clears and `finish` removes.
 - `write(module)` writes a unit or a container whose address is below the
   prefix, in the canonical form, to its path, through a temporary file
   that is renamed. It may be called from several threads at once, and it
@@ -745,9 +749,10 @@ finishes, puts it right.
 reads each module file by itself: its bytes, its edition and, for a module
 of edition 2, the checks of
 [one module](#what-the-checker-verifies-in-one-module). Then it checks what
-holds across the files, from the manifest and a summary of each module
-that lowered: its path, its address, its shape, `within`, its members and
-its aliases.
+holds across the files, from the manifest, the lock, the BLAKE3 of each
+file's bytes and the [interface](#interfaces) of each module that lowered,
+as [How a workspace is checked](#how-a-workspace-is-checked) describes, and
+gives every reference its [outcome](#references).
 
 | Check | Code |
 | --- | --- |
@@ -761,9 +766,11 @@ its aliases.
 
 When the directory has no manifest that can be read, that is the one
 diagnostic, and nothing else of the directory is read. A module file that
-does not lower, and a file the lock lists that is missing, take no part in
-the checks of `within` and members: their own diagnostics say what is
-wrong, and a container that lists them is not reported for it.
+does not lower, a module that does not stand at the path of its address,
+and a file the lock lists that is missing, take no part in the checks of
+`within` and members, and none of their addresses is one that a reference
+reaches: their own diagnostics say what is wrong, and a container that
+lists them is not reported for it.
 
 Every diagnostic names its file by its path in the workspace. One about a
 file as a whole, such as a module file the lock does not list or a file of
@@ -793,3 +800,223 @@ ok
 `modules` counts the module files read, every `.fr` file of the workspace,
 and `from cache` how many of them were read from a cache; the check keeps
 none, so it is 0.
+
+## How a workspace is checked
+
+The check of a workspace runs in two phases.
+
+1. **Phase one**, for each module file by itself: the BLAKE3 of its bytes,
+   its edition, the grammar, lowering, the checks of
+   [one module](#what-the-checker-verifies-in-one-module), and the
+   module's [interface](#interfaces). What it gives of a file depends on
+   the file's bytes alone.
+2. **Phase two**, with the result of every module in memory: the BLAKE3 of
+   each file against the lock of a generated workspace, and where each
+   module stands, below the prefix and at the path of its address. Then,
+   from the manifest and the interfaces alone, the manifest's toolchain,
+   the `within` of every unit and container and the members of every
+   container, and the [outcome](#references) of every reference. Phase two
+   reads no module again. `fidryn_driver::workspace::check_interfaces` is
+   that last part as a function of the interfaces of the workspace and of
+   its dependencies, the manifest and the toolchain's version.
+
+Both phases run on `--jobs` worker threads, by default as many as the
+system reports as available. The diagnostics, the summary line, the check
+report and the unresolved list are the same, byte for byte, for every
+number of workers: each module's result is collected by itself, and the
+results are sorted by the path of their file and then by position before
+anything is printed or written.
+
+### Interfaces
+
+The interface of a module, which `fidryn_provision::interface_of` builds
+from the lowered module and the byte ranges of its declarations, holds all
+that phase two reads of the module:
+
+- its address, its shape, its aliases, `within`, `source` and
+  `positive_law`; for a container its kind, status and members;
+- each provision's address, kind, status and tree hash, and whether it
+  holds an image; each note's address, layer, group and hash, and whether
+  it holds an image; the number of footnotes; the three layer hashes;
+- each reference's layer, the address of the provision or note it stands
+  in, and its target;
+- each definition's provision, terms, kind and basis;
+- for a curated module, its imports, citations and bindings;
+- the byte range of the module's address, of the address after `within`,
+  after each `alias` and after each `member`, and of each `import`,
+  `citation` and `binding` declaration, at which phase two reports what
+  it finds.
+
+A provision holds an image when one of its own text parts does, its
+children's not counted; a note holds one when one of its blocks does,
+tables and quoted content included.
+
+An interface is written as one line of JSON,
+`{"schema":"fidryn.interface/v0.1","interface":{...}}`, with these keys in
+this order:
+
+| Key | Holds |
+| --- | --- |
+| `address`, `address_range` | the module's address, and the range `{"start": s, "end": e}` of bytes of its source where the address stands |
+| `shape` | `unit`, `container` or `curated` |
+| `aliases`, `within` | each alias, and `within` or `null`, as `{"item": address, "range": ...}` |
+| `source`, `positive_law` | as the module declares them; `null` in a curated module |
+| `container` | of a container module, its `kind`, `status` and `members`, each member with its range; otherwise `null` |
+| `words` | each kind and status of a provision and each group of a note, once, in the order in which they first occur |
+| `provisions` | each provision of a unit, in document order, each before its children, the unit's top provision first: `at`, `kind` and `status` as places in `words`, `hash`, its tree hash, and `image` |
+| `notes` | each note: `at`, `layer`, `group` as a place in `words`, `hash` and `image` |
+| `footnotes` | the number of footnotes |
+| `layers` | the three layer hashes, or `null` in a curated module |
+| `references` | each reference, in document order: `layer`, `from` and `target` |
+| `definitions` | each definition: `at`, the provision that holds it, `terms`, `kind` and `basis` |
+| `imports`, `citations`, `bindings` | of a curated module, each with its range |
+
+`at` is an address relative to the module's: empty for the module's own
+address, and otherwise the segments below it without their first `/`, so
+that `a/1` in the module `/zz/demo/t1/s8` is `/zz/demo/t1/s8/a/1`. An
+address that does not lie below the module's, which only a module with an
+`E700` has, is written whole. `from` is `"module"`, `{"provision": n}` or
+`{"note": n}`, the place of what the reference stands in, counted from 0
+in `provisions` or in `notes`. Each place in `words` is counted from 0.
+`Interface::from_json` refuses a text of another `schema`, a key it does
+not know or a missing one, a place that names nothing, an `at` that names
+no address, and parts that the shape of the module does not have.
+
+### The check report and the unresolved list
+
+`fidryn check DIR --report FILE` writes the check report,
+`fidryn.check-report/v0.1`, whose JSON Schema is
+[`check-report-v0.1.json`](../schemas/check-report-v0.1.json): the number
+of module files read, of those read from a cache, of errors and of
+warnings; for each layer the number of its references with each outcome;
+and the number of references of outcome `outside` by the body of law they
+name. Every layer and every outcome is written, in the order shown, and
+the bodies are sorted. The report holds no path, so it is the same on
+every host. This is the report of an invented workspace that has a
+reference of every outcome, committed under
+`conformance/fixtures/check-report/`:
+
+```json
+{
+  "schema": "fidryn.check-report/v0.1",
+  "modules": 8,
+  "from_cache": 0,
+  "errors": 0,
+  "warnings": 0,
+  "references": {
+    "operative": {
+      "exact": 3,
+      "target-status": 2,
+      "ambiguous": 2,
+      "unit-only": 2,
+      "range-form": 2,
+      "no-unit": 3,
+      "outside": 2,
+      "malformed": 2
+    },
+    "enacted": {
+      "exact": 1,
+      "target-status": 0,
+      "ambiguous": 0,
+      "unit-only": 0,
+      "range-form": 0,
+      "no-unit": 1,
+      "outside": 0,
+      "malformed": 0
+    },
+    "editorial": {
+      "exact": 0,
+      "target-status": 0,
+      "ambiguous": 0,
+      "unit-only": 1,
+      "range-form": 0,
+      "no-unit": 1,
+      "outside": 2,
+      "malformed": 0
+    }
+  },
+  "outside_by_body": {
+    "/yy/stat": 2,
+    "/zz/other": 2
+  }
+}
+```
+
+`fidryn check DIR --unresolved FILE` writes the unresolved list: every
+reference whose outcome is not `exact`, one object of compact JSON to a
+line with the keys `from`, the address the reference stands in, `layer`,
+`target` and `outcome`, in that order, sorted by the bytes of `from` and
+then of `target`. Its first lines for the same workspace:
+
+```text
+{"from":"/zz/demo/t1/ch1","layer":"editorial","target":"/yy/stat/116/926","outcome":"outside"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s1/z","outcome":"unit-only"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s2","outcome":"target-status"}
+```
+
+Both files are written whether or not the check finds an error, and
+`fidryn check` exits 1 when one of them cannot be written.
+
+## References
+
+A reference is a link in a text of a module, `Run::Ref`: the linked words
+and the target as the source writes it. A reference needs no import. Its
+layer is that of what it stands in, and so is the address it stands in:
+
+| The link stands in | Layer | Address it stands in |
+| --- | --- | --- |
+| a provision: its number, its heading and its text parts, tables and quoted content included | `operative` | the provision's |
+| the number or the heading of a container | `operative` | the module's |
+| a note: its heading and its blocks, quoted content included | the note's own, `enacted` or `editorial` | the note's |
+| a source credit | `editorial` | the module's |
+| a footnote | `editorial` | the module's |
+
+The check of a workspace gives every reference of every module exactly one
+outcome, the first of this list that applies. A beginning of a target is
+the target cut after any of its segments, the target itself included: the
+beginnings of `/zz/demo/t1/s8/a` are `/zz`, `/zz/demo`, `/zz/demo/t1`,
+`/zz/demo/t1/s8` and `/zz/demo/t1/s8/a`. A known address is the address of
+a module, a provision or a note of the workspace or of a dependency, or an
+alias of such a module; when an address of one is an alias of another, the
+address wins.
+
+| Outcome | When |
+| --- | --- |
+| `malformed` | the target is not an [address](#addresses) |
+| `ambiguous` | a beginning `B` of the target is the address of a module, a provision or a note, and so is `B~2`: the source gave one identifier to more than one element, and the reference cannot say which it means |
+| `exact` | the target is a known address, and neither what it names nor the unit it lies in has a status |
+| `target-status` | as `exact`, but what the target names, or the unit it lies in, has a status, which is recorded: its own, or else its unit's |
+| `unit-only` | the longest beginning of the target that is a known address is a unit, or lies in one: a provision, a note of a unit, an alias of a unit |
+| `range-form` | the segment of the target after its base holds a dash, the en dash or `-`, and the base followed by that segment cut before its first dash is a known address. The base is the longest beginning that is a known address or, when there is none, the prefix the target lies below. The target is a range of units or a dashed number that is no unit, and the reference cannot say which |
+| `no-unit` | the target lies below the prefix of the workspace or of a dependency |
+| `outside` | the target lies below no such prefix; it is recorded with its first two segments, the body of law it names |
+
+One of the last two always applies, so no reference is left without an
+outcome. A target that is the prefix itself lies below no prefix. Of a
+workspace with the prefix `/zz/demo`, the units `/zz/demo/t1/s1` and
+`/zz/demo/t1/s5`, each with a subsection `a`, `/zz/demo/t1/s2` (status
+`repealed`), `/zz/demo/t1/s3` (status `omitted`, alias `/zz/demo/t1/s4`)
+and `/zz/demo/t1/s5~2`, and the containers `/zz/demo/t1` and
+`/zz/demo/t1/ch1`:
+
+| Target | Outcome |
+| --- | --- |
+| `/zz/demo/t1/s1/a`, `/zz/demo/t1/s1`, `/zz/demo/t1/ch1` | `exact` |
+| `/zz/demo/t1/s2` | `target-status`, `repealed` |
+| `/zz/demo/t1/s4` | `target-status`, `omitted`, through the alias |
+| `/zz/demo/t1/s5`, `/zz/demo/t1/s5/a` | `ambiguous` |
+| `/zz/demo/t1/s1/z`, `/zz/demo/t1/s2/a` | `unit-only` |
+| `/zz/demo/t1/s1–9`, `/zz/demo/t1/s1–9/b` | `range-form` |
+| `/zz/demo/t1/s9`, `/zz/demo/t9/s1`, `/zz/demo/t1/s8–9` | `no-unit` |
+| `/zz/other/x`, `/yy/stat/116/926` | `outside`, with the bodies `/zz/other` and `/yy/stat` |
+| `not an address`, `/zz/demo/t1/s1/a ` with a space at its end | `malformed` |
+
+An outcome is never a diagnostic: a reference that reaches nothing does
+not fail the check. The check report counts the references of each layer
+by outcome, and those of outcome `outside` by body; the unresolved list
+names each one whose outcome is not `exact`.
+`fidryn_provision::AddressIndex` gives the outcome of a target, and also
+the tree hash of the provision at an address and the enacted-layer hash of
+the unit an address lies in. A lookup of it costs the same however many
+addresses it holds, and a target has few segments, so the outcomes of all
+the references of a workspace cost time in proportion to their number.

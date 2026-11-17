@@ -97,7 +97,8 @@ impl<'de> Deserialize<'de> for Hash32 {
 }
 
 /// The three layer hashes of a module.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LayerHashes {
     pub operative: Hash32,
     pub enacted: Hash32,

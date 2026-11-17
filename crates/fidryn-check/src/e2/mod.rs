@@ -15,7 +15,8 @@
 //! about.
 
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
-use fidryn_provision::{Hash32, Module};
+use fidryn_provision::interface::ByteRange;
+use fidryn_provision::{DeclSpans, Hash32, Module};
 use fidryn_syntax::e2::parse;
 use fidryn_syntax::edition::edition_of;
 
@@ -104,6 +105,31 @@ impl Lowered {
     /// the module's bindings.
     pub fn notes_hash_spans(&self) -> &[Span] {
         &self.spans.notes_hashes
+    }
+
+    /// The byte ranges that the interface of the module records: of its
+    /// address, of the address after `within`, after each `alias` and after
+    /// each `member`, and of each `import`, `citation` and `binding`
+    /// declaration, each list in declaration order.
+    pub fn decl_spans(&self) -> DeclSpans {
+        let ranges = |spans: &[Span]| spans.iter().copied().map(range).collect();
+        DeclSpans {
+            address: range(self.spans.module),
+            within: self.spans.within.map(range),
+            aliases: ranges(&self.spans.aliases),
+            members: ranges(&self.spans.members),
+            imports: ranges(&self.spans.imports),
+            citations: ranges(&self.spans.citations),
+            bindings: ranges(&self.spans.bindings),
+        }
+    }
+}
+
+/// `span` as a range of bytes of the source.
+fn range(span: Span) -> ByteRange {
+    ByteRange {
+        start: span.start,
+        end: span.end,
     }
 }
 

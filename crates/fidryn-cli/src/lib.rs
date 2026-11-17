@@ -55,6 +55,16 @@ pub enum Command {
     },
     Check {
         path: PathBuf,
+        /// Worker threads of the check of a workspace (default: the number available).
+        #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
+        jobs: Option<u32>,
+        /// Write the check report of a workspace (`fidryn.check-report/v0.1`) to FILE.
+        #[arg(long, value_name = "FILE")]
+        report: Option<PathBuf>,
+        /// Write every reference of a workspace whose outcome is not `exact` to FILE, one JSON
+        /// object to a line.
+        #[arg(long, value_name = "FILE")]
+        unresolved: Option<PathBuf>,
     },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
@@ -173,7 +183,20 @@ pub fn run(cli: Cli) -> ExitCode {
     let source_root = cli.source_root.as_deref();
     match cli.command {
         Command::Fmt { path } => cmd_fmt(&path),
-        Command::Check { path } => cmd_check(&path, source_root),
+        Command::Check {
+            path,
+            jobs,
+            report,
+            unresolved,
+        } => cmd_check(
+            &path,
+            source_root,
+            &WorkspaceFlags {
+                jobs,
+                report,
+                unresolved,
+            },
+        ),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -400,12 +423,32 @@ fn check_edition_2(path: &Path) -> Option<ExitCode> {
     }
 }
 
-/// `fidryn check DIR`: the check of the workspace in the directory `dir`.
-/// Prints each diagnostic, naming its file under `dir`, then the summary
-/// line, then `ok` when there is no error; exit 1 on an error.
-fn check_workspace(dir: &Path) -> ExitCode {
+/// The flags of `fidryn check` that only the check of a workspace takes.
+struct WorkspaceFlags {
+    jobs: Option<u32>,
+    report: Option<PathBuf>,
+    unresolved: Option<PathBuf>,
+}
+
+impl WorkspaceFlags {
+    fn any(&self) -> bool {
+        self.jobs.is_some() || self.report.is_some() || self.unresolved.is_some()
+    }
+}
+
+/// `fidryn check DIR`: the check of the workspace in the directory `dir`, on
+/// `--jobs` threads, by default as many as are available. Prints each
+/// diagnostic, naming its file under `dir`, then the summary line; writes
+/// the check report to `--report` and the unresolved list to
+/// `--unresolved` when they are given; then prints `ok` when there is no
+/// error. Exit 1 on an error, and when a file cannot be written.
+fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
+    let jobs = match flags.jobs {
+        Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
+        None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
+    };
     let options = fidryn_driver::workspace::CheckOptions {
-        jobs: 1,
+        jobs,
         cache_dir: None,
         toolchain: env!("CARGO_PKG_VERSION").to_owned(),
     };
@@ -419,6 +462,17 @@ fn check_workspace(dir: &Path) -> ExitCode {
         eprintln!("{shown}");
     }
     println!("{}", report.summary());
+    let written = [
+        (&flags.report, report.to_json()),
+        (&flags.unresolved, report.unresolved_lines()),
+    ];
+    for (file, text) in written {
+        if let Some(file) = file
+            && let Err(error) = fs::write(file, text)
+        {
+            return fail(format!("cannot write {}: {error}", file.display()));
+        }
+    }
     if report.errors() == 0 {
         println!("ok");
         ExitCode::SUCCESS
@@ -824,9 +878,16 @@ fn cmd_fmt(path: &Path) -> ExitCode {
     }
 }
 
-fn cmd_check(path: &Path, source_root: Option<&Path>) -> ExitCode {
+fn cmd_check(path: &Path, source_root: Option<&Path>, flags: &WorkspaceFlags) -> ExitCode {
     if path.is_dir() {
-        return check_workspace(path);
+        return check_workspace(path, flags);
+    }
+    if flags.any() {
+        return fail(format!(
+            "`--jobs`, `--report` and `--unresolved` belong to the check of a workspace, and {} \
+             is no directory",
+            path.display()
+        ));
     }
     if let Some(checked) = check_edition_2(path) {
         return checked;

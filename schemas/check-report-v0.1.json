@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/check-report-v0.1.json",
+  "title": "fidryn.check-report/v0.1",
+  "description": "The report of the check of a workspace of law modules, which `fidryn check DIR --report FILE` writes: the number of module files, of those read from the cache, of errors and of warnings; the references of each layer by outcome; and the references of outcome `outside` by the body of law they name.",
+  "type": "object",
+  "required": ["schema", "modules", "from_cache", "errors", "warnings", "references", "outside_by_body"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.check-report/v0.1" },
+    "modules": { "$ref": "#/$defs/count" },
+    "from_cache": { "$ref": "#/$defs/count" },
+    "errors": { "$ref": "#/$defs/count" },
+    "warnings": { "$ref": "#/$defs/count" },
+    "references": {
+      "type": "object",
+      "required": ["operative", "enacted", "editorial"],
+      "additionalProperties": false,
+      "properties": {
+        "operative": { "$ref": "#/$defs/outcomes" },
+        "enacted": { "$ref": "#/$defs/outcomes" },
+        "editorial": { "$ref": "#/$defs/outcomes" }
+      }
+    },
+    "outside_by_body": {
+      "$comment": "A body of law is the first two segments of a target, or the target when it has one segment; only a body with a reference is listed.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/body" },
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    }
+  },
+  "$defs": {
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outcomes": {
+      "type": "object",
+      "required": ["exact", "target-status", "ambiguous", "unit-only", "range-form", "no-unit", "outside", "malformed"],
+      "additionalProperties": false,
+      "properties": {
+        "exact": { "$ref": "#/$defs/count" },
+        "target-status": { "$ref": "#/$defs/count" },
+        "ambiguous": { "$ref": "#/$defs/count" },
+        "unit-only": { "$ref": "#/$defs/count" },
+        "range-form": { "$ref": "#/$defs/count" },
+        "no-unit": { "$ref": "#/$defs/count" },
+        "outside": { "$ref": "#/$defs/count" },
+        "malformed": { "$ref": "#/$defs/count" }
+      }
+    },
+    "body": {
+      "$comment": "An address of one or two segments; a segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+){1,2}$"
+    }
+  }
+}

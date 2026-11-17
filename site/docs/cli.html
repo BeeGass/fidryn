@@ -178,22 +178,36 @@ lists them.</p>
 the lock of a generated workspace, where each module stands, and the
 containers and their members, as
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
-lists them.</p>
+lists them, and gives every reference its
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#references">outcome</a>. It does so in two phases, each on
+several threads, and its output is the same for any number of them
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#how-a-workspace-is-checked">How a workspace is checked</a>).</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file, or to the directory of a workspace</td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--report FILE</code></td><td>no</td><td>path of the check report of a workspace to write, <code>fidryn.check-report/v0.1</code></td></tr>
+<tr><td><code>--unresolved FILE</code></td><td>no</td><td>path of the list to write of the references of a workspace whose outcome is not <code>exact</code>, one JSON object to a line</td></tr>
 </tbody></table>
 </div>
+<p><code>--jobs</code>, <code>--report</code> and <code>--unresolved</code> belong to the check of a
+workspace; given with a <code>.fr</code> file, they are refused with exit 1. The two
+files are written whether or not the check finds an error, and each
+replaces a file of its name.</p>
 <p><strong>Example</strong></p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr
 <span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr
-<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo</code></pre></figure>
+<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo
+<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo <span class="tk-ty">--jobs</span> 2</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn check DIR --report report.json --unresolved unresolved.jsonl</code></pre></figure>
 <p><strong>Success.</strong> Prints <code>ok</code> and exits 0. For a workspace it prints, before
 <code>ok</code>, one summary line:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>modules: 5; from cache: 0; errors: 0; warnings: 0</code></pre></figure>
 <p>A warning, such as <code>W760 ToolchainMismatch</code> when the manifest's
 <code>toolchain</code> is not the running version, is printed to stderr and does not
-change the exit status.</p>
+change the exit status. Nor does a reference whose target the check does
+not find: its outcome is counted in the report and listed in the
+unresolved list, and is never a diagnostic.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
 <code>CODE Title: message</code>, after the file it is in when it is about the text
 of a module (for example
@@ -204,7 +218,9 @@ module that cannot check:</p>
 <code>FILE: E710 IntegrityMismatch: ...</code>. A diagnostic of a workspace names its
 file under the directory given, as
 <code>DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...</code>; the summary line is
-printed to stdout, its errors counted, and <code>ok</code> is not. A directory with no
+printed to stdout, its errors counted, and <code>ok</code> is not. A file of
+<code>--report</code> or <code>--unresolved</code> that cannot be written is reported as
+<code>cannot write FILE: ...</code>, also with exit 1. A directory with no
 <code>workspace.json</code> is refused with <code>E730</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check conformance/fixtures/workspace</code></pre></figure>
 <p>Every other command exits 1 on a module of edition 2, with

@@ -10,20 +10,30 @@
 //! release and a lock, `law.lock.json`, that lists every module file with
 //! the BLAKE3 of its bytes; a **curated** workspace has neither.
 //!
-//! [`check_workspace`] reads, lowers and checks each module by itself, and
-//! then checks what holds across the files: the manifest and the lock, where
-//! each module stands, the agreement of the files with the lock, and the
-//! hierarchy of containers and their members. This crate names no corpus;
-//! `xtask/tests/corpus_neutrality.rs` checks it for this directory.
+//! [`check_workspace`] checks a workspace in two phases, each on several
+//! threads. Phase one reads, lowers and checks each module by itself and
+//! builds its [`Interface`](fidryn_provision::Interface). Phase two checks
+//! what holds across the files: the manifest and the lock, where each module
+//! stands and the agreement of the files with the lock, and then, from the
+//! interfaces alone ([`check_interfaces`]), the hierarchy of containers and
+//! their members and the outcome of every reference. The report
+//! ([`WorkspaceReport::to_json`]) and the list of the references that are
+//! not `exact` ([`WorkspaceReport::unresolved_lines`]) are written on
+//! request. This crate names no corpus; `xtask/tests/corpus_neutrality.rs`
+//! checks it for this directory.
 
 mod check;
 mod discover;
+mod index;
+mod report;
 mod writer;
 
 #[cfg(test)]
 mod tests;
 
 pub use check::{CheckOptions, WorkspaceReport, check_workspace};
+pub use index::{PhaseTwo, Unresolved, check_interfaces};
+pub use report::CHECK_REPORT_SCHEMA;
 pub use writer::{GeneratedWriter, WriteError};
 
 /// The file name of the manifest, at the top of a workspace.

@@ -1,0 +1,20 @@
+{"from":"/zz/demo/t1/ch1","layer":"editorial","target":"/yy/stat/116/926","outcome":"outside"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s1/z","outcome":"unit-only"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s2","outcome":"target-status"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s2/a","outcome":"unit-only"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s4","outcome":"target-status"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s5","outcome":"ambiguous"}
+{"from":"/zz/demo/t1/s6","layer":"operative","target":"/zz/demo/t1/s5/a","outcome":"ambiguous"}
+{"from":"/zz/demo/t1/s6","layer":"editorial","target":"/zz/demo/t9/s1","outcome":"no-unit"}
+{"from":"/zz/demo/t1/s6","layer":"editorial","target":"/zz/other/x","outcome":"outside"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/yy/stat/116/926","outcome":"outside"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t1/s1/a ","outcome":"malformed"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t1/s1–9","outcome":"range-form"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t1/s1–9/b","outcome":"range-form"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t1/s8–9","outcome":"no-unit"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t1/s9","outcome":"no-unit"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/demo/t9/s1","outcome":"no-unit"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"/zz/other/x","outcome":"outside"}
+{"from":"/zz/demo/t1/s6/a","layer":"operative","target":"not an address","outcome":"malformed"}
+{"from":"/zz/demo/t1/s6/note/demoNotes/nolaw/amendment","layer":"enacted","target":"/zz/demo/t1/s9","outcome":"no-unit"}
+{"from":"/zz/demo/t1/s6/note/demoNotes/nolaw/codification","layer":"editorial","target":"/zz/demo/t1/s2/a","outcome":"unit-only"}

@@ -110,13 +110,24 @@ A directory is a workspace of edition 2 modules, with a manifest,
 the lock of a generated workspace, where each module stands, and the
 containers and their members, as
 [What the checker verifies in a workspace](law-modules.md#what-the-checker-verifies-in-a-workspace)
-lists them.
+lists them, and gives every reference its
+[outcome](law-modules.md#references). It does so in two phases, each on
+several threads, and its output is the same for any number of them
+([How a workspace is checked](law-modules.md#how-a-workspace-is-checked)).
 
 **Arguments**
 
 | Name | Required | Type |
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file, or to the directory of a workspace |
+| `--jobs N` | no | the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available |
+| `--report FILE` | no | path of the check report of a workspace to write, `fidryn.check-report/v0.1` |
+| `--unresolved FILE` | no | path of the list to write of the references of a workspace whose outcome is not `exact`, one JSON object to a line |
+
+`--jobs`, `--report` and `--unresolved` belong to the check of a
+workspace; given with a `.fr` file, they are refused with exit 1. The two
+files are written whether or not the check finds an error, and each
+replaces a file of its name.
 
 **Example**
 
@@ -124,6 +135,11 @@ lists them.
 fidryn check examples/trust/bryan-revocable-trust.fr
 fidryn check crates/fidryn-check/tests/fixtures/e2/unit.fr
 fidryn check conformance/fixtures/workspace/demo
+fidryn check conformance/fixtures/workspace/demo --jobs 2
+```
+
+```text
+fidryn check DIR --report report.json --unresolved unresolved.jsonl
 ```
 
 **Success.** Prints `ok` and exits 0. For a workspace it prints, before
@@ -135,7 +151,9 @@ modules: 5; from cache: 0; errors: 0; warnings: 0
 
 A warning, such as `W760 ToolchainMismatch` when the manifest's
 `toolchain` is not the running version, is printed to stderr and does not
-change the exit status.
+change the exit status. Nor does a reference whose target the check does
+not find: its outcome is counted in the report and listed in the
+unresolved list, and is never a diagnostic.
 
 **Failure.** Exit 1. Each diagnostic is printed to stderr as
 `CODE Title: message`, after the file it is in when it is about the text
@@ -151,7 +169,9 @@ A module of edition 2 is reported in the same way, as
 `FILE: E710 IntegrityMismatch: ...`. A diagnostic of a workspace names its
 file under the directory given, as
 `DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...`; the summary line is
-printed to stdout, its errors counted, and `ok` is not. A directory with no
+printed to stdout, its errors counted, and `ok` is not. A file of
+`--report` or `--unresolved` that cannot be written is reported as
+`cannot write FILE: ...`, also with exit 1. A directory with no
 `workspace.json` is refused with `E730`:
 
 ```sh exit=1

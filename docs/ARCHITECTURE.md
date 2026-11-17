@@ -117,16 +117,19 @@ crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
 depends on `fidryn-provision` only, and no crate depends on
 `fidryn-ingest-uscode`. `fidryn-check` depends on `fidryn-provision` for
 the model into which it lowers modules of edition 2. `fidryn-driver`
-depends on `fidryn-provision` for the files of a workspace: it holds the
-check of a workspace of edition 2 modules and the writer of a generated
+depends on `fidryn-provision` for the files of a workspace and the
+interfaces of its modules: it holds the check of a workspace of edition 2
+modules, in two phases on several threads, and the writer of a generated
 one. `fidryn-provision`
 holds the model of law modules and the rules over it, among them
-addresses, text normalization, file paths, hashes, text records and the
-canonical text of a module. `fidryn-ingest-uscode` reads the archives of
-the official XML release point published by the Office of the Law Revision
-Counsel, each checked against its retrieval record, and the documents in
-them into the units and containers of that model. It is the one crate of
-the workspace that names the Code, its titles and the publisher's elements.
+addresses, text normalization, file paths, hashes, text records, the
+canonical text of a module, the interface of a module and the index of
+addresses that gives each reference its outcome. `fidryn-ingest-uscode`
+reads the archives of the official XML release point published by the
+Office of the Law Revision Counsel, each checked against its retrieval
+record, and the documents in them into the units and containers of that
+model. It is the one crate of the workspace that names the Code, its
+titles and the publisher's elements.
 
 ## Public APIs
 

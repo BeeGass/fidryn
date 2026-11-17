@@ -3,7 +3,8 @@
 
 use super::{Lowered, check_module, check_source, lower};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
-use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit};
+use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit, tree_hashes};
+use fidryn_provision::interface::{ByteRange, DeclSpans, Interface, interface_of};
 use fidryn_provision::normalize::is_normalized;
 use fidryn_provision::render::render;
 use fidryn_provision::{
@@ -295,6 +296,132 @@ fn render_of_the_golden_models_is_the_golden_text() {
             Err(diagnostics) => panic!("{name}: {diagnostics:#?}"),
         }
     }
+}
+
+/// `span` as the byte range an interface records.
+fn range(span: Span) -> ByteRange {
+    ByteRange {
+        start: span.start,
+        end: span.end,
+    }
+}
+
+#[test]
+fn an_interface_round_trips_and_is_deterministic() {
+    for (name, module) in goldens() {
+        let source = fixture(name);
+        let lowered = check_source(&source).unwrap_or_else(|found| panic!("{name}: {found:#?}"));
+        let spans = lowered.decl_spans();
+        let interface = interface_of(&lowered.module, &spans);
+        let json = interface.to_json();
+        assert_eq!(json.lines().count(), 1, "{name}: {json}");
+        assert!(json.ends_with('\n'), "{name}");
+        assert_eq!(Interface::from_json(&json), Ok(interface.clone()), "{name}");
+
+        // The module lowered once more, and its model as built in memory,
+        // give the same text.
+        let again = check_source(&source).unwrap_or_else(|found| panic!("{name}: {found:#?}"));
+        assert_eq!(
+            interface_of(&again.module, &again.decl_spans()).to_json(),
+            json,
+            "{name}"
+        );
+        assert_eq!(interface_of(&module, &spans).to_json(), json, "{name}");
+
+        // The ranges are those of the declarations.
+        assert_eq!(
+            interface.address_range,
+            range(lowered.address_span()),
+            "{name}"
+        );
+        assert_eq!(
+            interface.within.as_ref().map(|within| within.range),
+            lowered.within_span().map(range),
+            "{name}"
+        );
+        let ranges = |found: Vec<ByteRange>, spans: &[Span]| {
+            assert_eq!(
+                found,
+                spans.iter().copied().map(range).collect::<Vec<_>>(),
+                "{name}"
+            );
+        };
+        ranges(
+            interface.aliases.iter().map(|alias| alias.range).collect(),
+            lowered.alias_spans(),
+        );
+        ranges(
+            interface
+                .container
+                .iter()
+                .flat_map(|container| &container.members)
+                .map(|member| member.range)
+                .collect(),
+            lowered.member_spans(),
+        );
+        ranges(
+            interface
+                .imports
+                .iter()
+                .map(|import| import.range)
+                .collect(),
+            lowered.import_spans(),
+        );
+        ranges(
+            interface
+                .citations
+                .iter()
+                .map(|citation| citation.range)
+                .collect(),
+            lowered.citation_spans(),
+        );
+        ranges(
+            interface
+                .bindings
+                .iter()
+                .map(|binding| binding.range)
+                .collect(),
+            lowered.binding_spans(),
+        );
+    }
+
+    // What the interface of the golden unit holds.
+    let unit = golden_unit();
+    let interface = interface_of(&Module::Unit(unit.clone()), &DeclSpans::default());
+    assert_eq!(
+        interface
+            .provisions
+            .iter()
+            .map(|provision| {
+                (
+                    interface.address_at(&provision.at).to_string(),
+                    interface.word(provision.kind),
+                    provision.hash,
+                )
+            })
+            .collect::<Vec<_>>(),
+        ["/zz/demo/t1/s8", "/zz/demo/t1/s8/a", "/zz/demo/t1/s8/b"]
+            .into_iter()
+            .zip(["section", "subsection", "subsection"])
+            .zip(tree_hashes(&unit.root))
+            .map(|((at, kind), hash)| (at.to_owned(), kind, hash))
+            .collect::<Vec<_>>()
+    );
+    assert_eq!(interface.layers, Some(layer_hashes_of_unit(&unit)));
+    assert_eq!(interface.footnotes, 1);
+    let reference = &interface.references[..];
+    assert_eq!(reference.len(), 1, "{reference:#?}");
+    assert_eq!(reference[0].layer, Layer::Operative);
+    assert_eq!(
+        interface.place_address(reference[0].from),
+        address("/zz/demo/t1/s8/a")
+    );
+    assert_eq!(&*reference[0].target, "/zz/demo/t1/s2");
+    assert_eq!(interface.notes.len(), 1);
+    assert_eq!(interface.notes[0].layer, Layer::Editorial);
+    assert_eq!(interface.word(interface.notes[0].group), "editorialNotes");
+    assert_eq!(&*interface.definitions[0].at, "a");
+    assert_eq!(interface.definitions[0].terms, ["widget"]);
 }
 
 #[test]

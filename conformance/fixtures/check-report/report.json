@@ -1,0 +1,43 @@
+{
+  "schema": "fidryn.check-report/v0.1",
+  "modules": 8,
+  "from_cache": 0,
+  "errors": 0,
+  "warnings": 0,
+  "references": {
+    "operative": {
+      "exact": 3,
+      "target-status": 2,
+      "ambiguous": 2,
+      "unit-only": 2,
+      "range-form": 2,
+      "no-unit": 3,
+      "outside": 2,
+      "malformed": 2
+    },
+    "enacted": {
+      "exact": 1,
+      "target-status": 0,
+      "ambiguous": 0,
+      "unit-only": 0,
+      "range-form": 0,
+      "no-unit": 1,
+      "outside": 0,
+      "malformed": 0
+    },
+    "editorial": {
+      "exact": 0,
+      "target-status": 0,
+      "ambiguous": 0,
+      "unit-only": 1,
+      "range-form": 0,
+      "no-unit": 1,
+      "outside": 2,
+      "malformed": 0
+    }
+  },
+  "outside_by_body": {
+    "/yy/stat": 2,
+    "/zz/other": 2
+  }
+}

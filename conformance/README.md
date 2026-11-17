@@ -1,8 +1,9 @@
 # Conformance
 
 JSON Schema checks for case records and source manifests under `examples/`
-and `prelude/`, and for the three files of a workspace of law modules
-under `fixtures/workspace/`. This is a document-shape check. It does not
+and `prelude/`, for the three files of a workspace of law modules
+under `fixtures/workspace/`, and for the report of the check of a
+workspace under `fixtures/check-report/`. This is a document-shape check. It does not
 authenticate artifacts, execute Rust, or review legal content. A second
 implementation of the hashes of law modules is described at the end.
 
@@ -13,7 +14,8 @@ uv run python conformance/check_json_contracts.py /path/to/fidryn --output valid
 
 The checker looks for `"schema": "fidryn.case-record/v0.1"`,
 `"fidryn.source-manifest/v0.1"`, `"fidryn.workspace/v0.1"`,
-`"fidryn.law-lock/v0.1"` and `"fidryn.retrieval/v0.1"`. Exit `0` if every
+`"fidryn.law-lock/v0.1"`, `"fidryn.retrieval/v0.1"` and
+`"fidryn.check-report/v0.1"`. Exit `0` if every
 checked document is valid, `1` on validation failures, `2` on setup or
 read errors.
 
@@ -26,6 +28,18 @@ holds every file there, byte for byte, to what the writer of a generated
 workspace writes. `test_workspace_schemas.py` checks that the manifest,
 the lock and the retrieval record match their schemas, and that the
 schemas refuse what a workspace check refuses.
+
+`fixtures/check-report/` holds `report.json`, the check report of an
+invented workspace in the corpus `/zz/demo` that has a reference of every
+outcome, and `unresolved.jsonl`, its list of the references whose outcome
+is not `exact`. Every name and address in them is invented. The Rust test
+`the_committed_check_report_is_what_the_check_writes` of `fidryn-driver`
+holds both files, byte for byte, to what the check of that workspace
+writes. `test_check_report_schema.py` checks that the report matches
+`schemas/check-report-v0.1.json` and that the schema refuses what the
+check never writes, and that the list has one object to a line with its
+keys in order, sorted, one line for each reference the report counts
+with an outcome other than `exact`.
 
 `uv run` provides Python and `jsonschema` from the repository's
 `pyproject.toml` and `uv.lock`. Without `jsonschema` the script falls

@@ -2,7 +2,8 @@
 """Validate Fidryn case records, source manifests and the files of workspaces.
 
 The files of a workspace are its manifest, its lock and the retrieval record of
-its archives; the demo workspace under conformance/fixtures/workspace is checked.
+its archives; the demo workspace under conformance/fixtures/workspace is checked,
+and so is the check report under conformance/fixtures/check-report.
 
 Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
@@ -25,11 +26,17 @@ SCHEMA_FILES = {
     "fidryn.workspace/v0.1": "workspace-v0.1.json",
     "fidryn.law-lock/v0.1": "law-lock-v0.1.json",
     "fidryn.retrieval/v0.1": "retrieval-v0.1.json",
+    "fidryn.check-report/v0.1": "check-report-v0.1.json",
 }
 
 # The directories, relative to the repository root, whose JSON documents are
 # checked: every one whose `schema` names a schema of SCHEMA_FILES.
-DOCUMENT_DIRS = ("examples", "prelude", "conformance/fixtures/workspace")
+DOCUMENT_DIRS = (
+    "examples",
+    "prelude",
+    "conformance/fixtures/workspace",
+    "conformance/fixtures/check-report",
+)
 
 JSON_TYPE_NAMES = {
     type(None): "null",
