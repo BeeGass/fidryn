@@ -53,7 +53,10 @@ refused with `E100`: "unknown edition `3`; this toolchain reads edition 2
 after the word `edition`, and files of the first edition carry no marker".
 
 `fidryn_syntax::edition::edition_of` tells the edition of a file, and each
-entry point asks it before it reads the file:
+entry point asks it before it reads the file. The command line asks it of
+a regular file only: an input that is no regular file, such as a pipe or
+`/dev/stdin`, could not be read twice, and every command reads it as a
+file of the first edition.
 
 | Entry point | Given a module of edition 2 |
 | --- | --- |
@@ -622,7 +625,8 @@ Every `.fr` file in it is a module of edition 2 whose address is below the
 manifest's `prefix` and which stands at the [file path](#file-paths) of its
 address. An entry whose name begins with a dot, whether a file, a
 directory or a symbolic link, is not the workspace's: the check does not
-read it, nor anything in it, and the writer leaves it alone, so a
+read it, nor anything in it, unless it is told to keep its
+[cache](#the-cache) there, and the writer leaves it alone, so a
 repository's `.git`, a `.gitignore` or an editor's lock link may stand in a
 workspace. No symbolic link is followed, and one whose name does not begin
 with a dot is an error.
@@ -751,10 +755,17 @@ An importer writes a generated workspace with
   a generated workspace of the same prefix. Such a directory may also hold
   its [coverage ledger](#the-coverage-ledger), `coverage.json`, at its top,
   which the run writes again, and anywhere any entry whose name begins with
-  a dot, which the run leaves as they are. Any other directory, a curated
-  workspace, a generated workspace of another prefix and one that holds a
-  symbolic link of another name among them, is refused, and nothing in it
-  is changed. `create` writes `workspace.json` at once, through a temporary
+  a dot, which the run leaves as they are. Each of its `.fr` files must be
+  the output of an earlier run: a module of edition 2 whose address lies
+  below the prefix and which stands at the path of its address. `create`
+  reads the head of each, the first significant tokens up to the brace
+  after the module's address, which must lie in its first 64 KiB, before
+  it writes anything. Any other
+  directory, a curated workspace, a generated workspace of another prefix,
+  one that holds a symbolic link of another name, and one that holds a
+  `.fr` file of the first edition, a module of another prefix or a module
+  at another path among them, is refused, with every such `.fr` file named,
+  and nothing in it is changed. `create` writes `workspace.json` at once, through a temporary
   file like every file of the run, and clears the temporary files that an
   earlier run which was stopped left behind. One entry whose name begins
   with a dot is the writer's own and is not left alone: `.fidryn-write` at
@@ -767,8 +778,9 @@ An importer writes a generated workspace with
   at once, and it fails when the run has already written a module to that
   path, so that no module replaces another.
 - `finish(generator, artifacts, addresses, not_imported)` removes every
-  `.fr` file the run did not write, and each directory that leaves empty,
-  then writes `law.lock.json`, then, last, `coverage.json`, the
+  module of an earlier run, found by `create`, that the run did not write,
+  and each directory that leaves empty, then writes `law.lock.json`, then,
+  last, `coverage.json`, the
   [coverage ledger](#the-coverage-ledger) counted from the interfaces of
   the modules it wrote, the manifest and the lock, and returns the lock.
   Nothing is read again to count the ledger: neither the text of the
@@ -780,7 +792,9 @@ An importer writes a generated workspace with
   extra every `.fr` file of `out` that the run did not write and every
   entry that `create` refuses: a file other than a module, the manifest,
   the lock and the ledger at the top, and a symbolic link or any other
-  entry that is neither a file nor a directory. The two follow one rule, so
+  entry that is neither a file nor a directory. A `.fr` file that `create`
+  refuses for its head is extra where the run writes nothing, and
+  different where it writes a module. The two follow one rule, so
   they cannot disagree. Only the entries whose name begins with a dot are
   not looked at. `finish` returns the lock when
   nothing differs, and then `create` accepts the directory and a run of the
@@ -814,8 +828,8 @@ gives every reference its [outcome](#references).
 
 | Check | Code |
 | --- | --- |
-| The directory has a `workspace.json`, and it is a manifest | `E730` |
-| A generated workspace has a `release`, no dependencies and a lock, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
+| The directory has a `workspace.json`, a regular file of at most 64 MiB, and it is a manifest | `E730` |
+| A generated workspace has a `release`, no dependencies and a lock, a regular file of at most 64 MiB, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
 | In a generated workspace, every module file is listed in the lock with the BLAKE3 of its bytes, and every file the lock lists is present | `E730` |
 | Every `.fr` file is a module of edition 2; every entry of the directory whose name does not begin with a dot is a file or a directory, and none is a symbolic link | `E730` |
 | Every module's address is below the prefix, and the module stands at the path of its address | `E730` |
@@ -823,7 +837,7 @@ gives every reference its [outcome](#references).
 | Every `import` of a curated module names a module of the workspace or of a dependency, by its address | `E720` |
 | The names of every curated module resolve, as [Curated modules: imports, citations and names](#curated-modules-imports-citations-and-names) describes | `E200` |
 | No two modules declare one address, as the address of a module, of a provision or of a note | `E700` |
-| Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it | `E730` |
+| Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it that passed its checks | `E730` |
 | Each dependency is a generated workspace with a lock, the BLAKE3 of the bytes of its lock and the release of its lock are the `lock_digest` and the `release` of its entry, and it has no error of its own | `E740` |
 | No binding of a curated module is stale, as [Bindings](#bindings) describes | `W750`, a warning |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
@@ -864,8 +878,7 @@ warning included. The
 invented demo workspace under `conformance/fixtures/workspace/demo` is
 what the writer writes from one title, one chapter and three sections;
 the tests of `fidryn-driver` hold it to that. Checked with `--no-cache`,
-which keeps no [cache](#the-cache) and so writes nothing into the
-repository:
+which keeps no [cache](#the-cache) and so writes nothing:
 
 ```sh
 fidryn check conformance/fixtures/workspace/demo --no-cache
@@ -904,9 +917,9 @@ The check of a workspace runs in two phases.
    two reads no module again.
    `fidryn_driver::workspace::check_interfaces` is that last part as a
    function of the interfaces of the workspace, what is known of each of
-   its dependencies (the prefix and the interfaces of one that passed its
-   checks, the prefix, when it is known, of one that failed), the manifest
-   and the toolchain's version.
+   its dependencies (the name, the release, the prefix and the interfaces
+   of one that passed its checks, the prefix, when it is known, of one that
+   failed), the manifest and the toolchain's version.
 
 Phase one runs on `--jobs` worker threads, by default as many as the
 system reports as available, each module file being read and checked on
@@ -1196,16 +1209,42 @@ not kept; the check refuses it in any case.
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
 in the cache's directory. That directory is the one `--cache-dir` names;
 else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
-set and not empty; else `.fidryn-cache` inside the workspace. `--no-cache`
-keeps no cache: the check then reads and checks every module file and
-writes no entry. The name `.fidryn-cache` begins with a dot, so the check
-does not read it as part of the workspace and the writer of a generated
-workspace leaves it alone; the check writes nothing else into the
-workspace. The module files of the dependencies of a curated workspace are
-read through the same cache, and the check keeps no cache when the cache's
-directory and the directory of a dependency overlap, as
+set and not empty; else `fidryn` in the cache directory of the user,
+outside every workspace: on Windows the directory `LOCALAPPDATA` names,
+and on other systems the one `XDG_CACHE_HOME` names, else `.cache` in
+`HOME`, each taken only when it is an absolute path. When none of them
+names a directory, the check keeps no cache, as with `--no-cache`, and
+`fidryn check` says so once on stderr. `--no-cache` keeps no cache: the
+check then reads and checks every module file and writes no entry. Unless
+the cache is named inside it, the check writes nothing into the workspace,
+and it reads nothing there but the workspace's own files: a
+`.fidryn-cache` or any other entry whose name begins with a dot is not
+read, and a symbolic link of any name is not followed.
+
+One cache serves every workspace of a user. An entry is the result of the
+bytes of one file, whatever workspace holds the file, so the workspaces
+that hold a file of the same bytes share its entry, and the first check of
+a workspace may read some of its modules from the cache. The module files
+of the dependencies of a curated workspace are read through the same
+cache, and the check keeps no cache when the cache's directory and the
+directory of a dependency overlap, as
 [Depending on another workspace](#depending-on-another-workspace)
 describes.
+
+A check trusts its cache. An entry that is what the writer writes is
+taken as the result of the bytes it names, and its key is no secret: each
+of its frames can be known, and the identity of an executable that is
+published can be computed by anyone. Whoever can write in the cache's
+directory can therefore make a check pass a module whose hashes do not
+match its text, leave a module out without a diagnostic, or hide a stale
+binding. A cache belongs where only people one trusts can write, which is
+why the default is a directory of the user. A cache named inside the
+workspace it serves, with `--cache-dir` or `FIDRYN_CACHE_DIR`, is the
+user's choice and is used. Its entries then go with the workspace when it
+is copied or committed, and a check of a copy that came from someone else,
+with that cache named, takes as results whatever they put there. Its
+entries are also files of the workspace, and unless its name begins with a
+dot, the writer of a generated workspace refuses the directory for them.
 
 An entry is one line of compact JSON with these keys, in this order:
 `schema`, which is `fidryn.cache/v1`; `key`; `digest`, the BLAKE3 of the
@@ -1230,16 +1269,19 @@ read, one for each key. So two module files of the same bytes in one
 workspace are both checked when the cache holds neither, and the count
 `from cache` is the same for any number of workers. An entry is written to
 a temporary name in its directory and then renamed, so that a reader never
-sees half of one, and two checks at once, which may write the same entry,
-leave a valid cache. A failure to write the cache, such as a full disk or
-a directory that cannot be made, does not fail the check: no further entry
-is written, and `fidryn check` says once on stderr that the cache could not
-be written, naming the cache's directory and the error, and goes on.
+sees half of one, and two checks at once, of one workspace or of two,
+which may write the same entry, leave a valid cache; a check may read an
+entry that another check wrote while it ran. A failure to write the
+cache, such as a full disk or a directory that cannot be made, does not
+fail the check: no further entry is written, and `fidryn check` says once
+on stderr that the cache could not be written, naming the cache's
+directory and the error, and goes on.
 
 The diagnostics, the summary line, the check report and the unresolved
 list of a check that reads from the cache are byte for byte those of a
-check without one, but for the count `from cache`. A first and a second
-check of a copy of the demo workspace:
+check without one, but for the count `from cache`, as long as nothing but
+a check wrote the cache. A first and a second check of a copy of the demo
+workspace, with a cache that held none of its files:
 
 ```text
 modules: 5; from cache: 0; errors: 0; warnings: 0
@@ -1652,19 +1694,18 @@ check exits 1.
 
 But for one layout that [Limits](#limits) names, the check writes nothing
 inside the directory of a dependency, with any cache or with none: the
-entries of the module files of a dependency go
-into the cache of the workspace that is checked, by default
-`.fidryn-cache` inside it, under the keys of their bytes as every entry is,
+entries of the module files of a dependency go into the cache of the
+check of the workspace, under the keys of their bytes as every entry is,
 so that the next check reads them from there. When the cache's directory
 and the directory of a dependency that the manifest names, whatever the
 checks of the entry find, are the same, or one lies inside the other, the
 check keeps no cache at all. The cache's directory lies inside the
-dependency's when it is the dependency's own `.fidryn-cache`, or the
-default one of a workspace that stands in a directory of its dependency;
-the dependency's lies inside the cache's when it stands where the cache
-writes its entries, at `v1` in the cache's directory, or anywhere else
-below it. The check then reads and writes no entry, says so once on
-stderr, as
+dependency's when it is named inside it, such as a `.fidryn-cache` of the
+dependency, or inside a workspace that stands in a directory of its
+dependency; the dependency's lies inside the cache's when it stands where
+the cache writes its entries, at `v1` in the cache's directory, or
+anywhere else below it. The check then reads and writes no entry, says so
+once on stderr, as
 `the cache could not be used, and the check went on without it: DIR: ...`
 with the cache's directory, the dependency and which holds which, and goes
 on. Its diagnostics, its report and its exit status are then those of a
@@ -2388,10 +2429,27 @@ more.
   a path relative to the directory of the manifest. A curated workspace
   cannot depend on another curated workspace (`E740`), and a dependency
   named by an absolute path is refused (`E730`).
+- A command reads a manifest, a lock and an entry of the cache only from a
+  regular file of at most 64 MiB (67,108,864 bytes), more than nine times
+  the lock of the import of the whole Code. A symbolic link, a named pipe,
+  a device or a directory in the place of a manifest or a lock is refused
+  before anything is opened, as the check refuses a symbolic link, and a
+  larger file is refused, with a sentence that gives the bound, without
+  being read; such an entry of the cache is a miss, and an entry that would
+  be larger is not written.
+- A check trusts its cache: an entry written by hand under the key of a
+  module's bytes is taken as that module's result. A cache belongs where
+  only people one trusts can write, and the default is a directory of the
+  user, outside every workspace ([The cache](#the-cache)).
 - The check compares the cache's directory with the directory of each
   dependency, and not what lies below the cache's directory. When a
   symbolic link there, such as a `v1` that leads into a dependency, is
   followed, the check writes its entries inside the dependency.
+- The writer of a generated workspace tells an earlier output from another
+  `.fr` file by its head alone. A module of the prefix at its own path
+  whose head lies past its first 64 KiB, after comments, is refused,
+  though the check would read it; and a module that a person changed below
+  its head is an earlier output, which a run writes again or removes.
 - A check that is killed while it writes an entry of the cache leaves the
   temporary file of the entry, whose name begins with a dot and ends in
   `.tmp`, in the cache. Nothing reads it, and nothing removes it.

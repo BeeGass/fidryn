@@ -153,7 +153,8 @@ impl WorkspaceReport {
 /// - the manifest's `toolchain` is the running one (`W760`);
 /// - each dependency of a curated workspace has a relative path and a name
 ///   of its own, and a prefix that neither is, contains nor lies within
-///   that of the workspace or of a dependency before it (`E730`); it is a
+///   that of the workspace or of a dependency before it that passed the
+///   checks of its entry, its manifest and its lock (`E730`); it is a
 ///   generated workspace with a lock, of the digest and the release that
 ///   the manifest records, and has no error of its own (`E740`), as its
 ///   own check finds, which reads its module files through the cache of

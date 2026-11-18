@@ -3694,7 +3694,7 @@ fn a_target_that_is_no_address_is_malformed_beside_a_failed_dependency() {
 fn a_dependency_with_an_error_is_reported_once() {
     let scratch = Scratch::new("deps-own-error");
     let demo = scratch.join("demo");
-    // A dependency last checked with another toolchain, a warning, with a
+    // A dependency that records another toolchain, a warning, with a
     // module file changed since its lock was written and a file of the
     // first edition, errors.
     let manifest = Manifest {

@@ -173,16 +173,21 @@ trailing newline.</p>
 <p><strong>Failure.</strong> Exit 1. Unreadable files print <code>cannot read PATH: ...</code> to
 stderr. Parse errors print a diagnostic (<code>E100 ParseError: ...</code>).</p>
 <h2 id="check"><span class="hn">5.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
-<p>Parse, elaborate, and type-check a module, including source-manifest
+<p>Check a module of either edition, or the workspace of edition 2 modules in
+a directory, as <code>fidryn check --help</code> says. A module of the first edition
+is parsed, elaborated and type-checked, including source-manifest
 authentication as described above.</p>
 <p>A file whose first two words are <code>edition 2</code> is a law module of edition 2,
 which holds provisions of law as data
-(<a href="/docs/law-modules#editions">Law modules</a>). <code>check</code> reads it with its own
-parser and runs the checks of one module on it: its shape, its addresses,
-the form of its text, its hashes, its footnote markers and its
+(<a href="/docs/law-modules#editions">Law modules</a>). <code>check</code> reads such a module with
+its own parser and runs the checks of one module on it: its shape, its
+addresses, the form of its text, its hashes, its footnote markers and its
 definitions, as
 <a href="/docs/law-modules#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
-lists them.</p>
+lists them. The marker is looked for in a regular file only, so a module
+of edition 2 is read from a regular file: an input that is no regular
+file, such as a pipe or <code>/dev/stdin</code>, is read by every command as a file
+of the first edition.</p>
 <p>A directory is a workspace of edition 2 modules, with a manifest,
 <code>workspace.json</code>, at its top (<a href="/docs/law-modules#workspaces">Workspaces</a>).
 <code>check</code> reads every module of it by itself, and then checks the manifest,
@@ -194,15 +199,18 @@ lists them, and gives every reference and every citation its
 <a href="/docs/law-modules#references">outcome</a>. It does so in two phases, each on
 several threads, and its output is the same for any number of them
 (<a href="/docs/law-modules#how-a-workspace-is-checked">How a workspace is checked</a>).
-It keeps the result of the first phase in a cache, so that a module file
-whose bytes it has checked before is not checked again, and its output is
-the same as without the cache, but for the count of the modules read from
-it (<a href="/docs/law-modules#the-cache">The cache</a>).</p>
+It keeps the result of the first phase in a cache, by default a directory
+of the user outside every workspace, so that a module file whose bytes it
+has checked before is not checked again, and its output is the same as
+without the cache, but for the count of the modules read from it, as long
+as nothing but a check wrote the cache
+(<a href="/docs/law-modules#the-cache">The cache</a>). A check trusts its cache, so a
+cache belongs where only people one trusts can write.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file, or to the directory of a workspace</td></tr>
 <tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available</td></tr>
-<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of a workspace check; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>.fidryn-cache</code> inside the workspace</td></tr>
+<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of a workspace check; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>fidryn</code> in the cache directory of the user</td></tr>
 <tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry of a cache</td></tr>
 <tr><td><code>--report FILE</code></td><td>no</td><td>path of the check report of a workspace to write, <code>fidryn.check-report/v0.1</code></td></tr>
 <tr><td><code>--unresolved FILE</code></td><td>no</td><td>path of the list to write of the references and the citations of a workspace whose outcome is not <code>exact</code>, one JSON object to a line</td></tr>
@@ -211,16 +219,25 @@ it (<a href="/docs/law-modules#the-cache">The cache</a>).</p>
 <p><strong>Environment</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>FIDRYN_CACHE_DIR</code></td><td>the directory of the cache of a workspace check when <code>--cache-dir</code> is not given; an empty value is taken as not set</td></tr>
+<tr><td><code>XDG_CACHE_HOME</code></td><td>on systems other than Windows, the cache directory of the user when <code>FIDRYN_CACHE_DIR</code> is not set, if it is an absolute path: the cache is <code>fidryn</code> in it</td></tr>
+<tr><td><code>HOME</code></td><td>on systems other than Windows, when <code>XDG_CACHE_HOME</code> is not an absolute path: the cache is <code>.cache/fidryn</code> in it, if it is an absolute path</td></tr>
+<tr><td><code>LOCALAPPDATA</code></td><td>on Windows, the cache directory of the user when <code>FIDRYN_CACHE_DIR</code> is not set, if it is an absolute path: the cache is <code>fidryn</code> in it</td></tr>
 </tbody></table>
 </div>
+<p>The cache is outside every workspace unless <code>--cache-dir</code> or
+<code>FIDRYN_CACHE_DIR</code> names a directory inside one; such a directory is used
+like any other, and what that means is said under
+<a href="/docs/law-modules#the-cache">The cache</a>. When none of these names a
+directory, the check keeps no cache, as with <code>--no-cache</code>, and says so once
+on stderr.</p>
 <p><code>--jobs</code>, <code>--cache-dir</code>, <code>--no-cache</code>, <code>--report</code> and <code>--unresolved</code>
 belong to the check of a workspace; given with a <code>.fr</code> file, they are
 refused with exit 1. <code>--cache-dir</code> and <code>--no-cache</code> are not given
 together. The two files are written whether or not the check finds an
 error, and each replaces a file of its name.</p>
 <p><strong>Example</strong></p>
-<p>The demo workspace is checked with <code>--no-cache</code>, so that no cache is
-written into it:</p>
+<p>The demo workspace is checked with <code>--no-cache</code>, so that the check writes
+no cache:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr
 <span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr
 <span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span>
@@ -246,7 +263,9 @@ with the cache's directory and the error, and its output is what it would
 have been. When the identity of the running executable, which the keys of
 the cache hold, cannot be read, the check keeps no cache and says so once,
 as <code>the cache could not be used, and the check went on without it: ...</code>;
-so it does when the cache's directory is the directory of a dependency of
+so it does when no directory is named for the cache, as
+<code>the cache could not be used, and the check went on without it: no directory is named for it: ...</code>,
+and when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency but through a symbolic link below the cache's directory that
 leads into one
@@ -264,8 +283,11 @@ file under the directory given, as
 <code>DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...</code>; the summary line is
 printed to stdout, its errors counted, and <code>ok</code> is not. A file of
 <code>--report</code> or <code>--unresolved</code> that cannot be written is reported as
-<code>cannot write FILE: ...</code>, also with exit 1. A directory with no
-<code>workspace.json</code> is refused with <code>E730</code>:</p>
+<code>cannot write FILE: ...</code>, also with exit 1. A manifest or a lock is read
+only from a regular file of at most 64 MiB: a symbolic link, a named pipe,
+a device or a directory in its place, and a larger file, are refused with
+<code>E730</code> before anything is read of them, as are those of a dependency with
+<code>E740</code>. A directory with no <code>workspace.json</code> is refused with <code>E730</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check conformance/fixtures/workspace</code></pre></figure>
 <p>Every other command exits 1 on a module of edition 2, with
 <code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>
@@ -596,14 +618,22 @@ archives and members whose modules the run wrote. The numbering of
 addresses still runs over every member the archive directory holds,
 whichever titles are chosen, so an address does not depend on the
 selection.</p>
+<p>An earlier output of the command is a generated workspace of the prefix
+<code>/us/usc</code> whose <code>.fr</code> files are each a module of edition 2 whose address
+lies below the prefix and which stands at the path of its address. A run
+reads the head of every <code>.fr</code> file of <code>DIR</code>, its marker and the address
+after <code>module</code>, in its first 64 KiB, before it writes anything, and
+removes only such modules.</p>
 <p><code>--verify</code> compares <code>workspace.json</code>, <code>law.lock.json</code>, <code>coverage.json</code>
 and every module file of <code>DIR</code> with what the run would write. Every other
 entry that a run would refuse is extra: a file other than a module and
-those three at the top, and a symbolic link or any other entry that is
-neither a file nor a directory. Only the entries whose name begins with a
-dot are not looked at. It writes nothing, <code>DIR</code> included. A run stopped
-after the lock and before the ledger leaves a workspace that <code>fidryn check</code>
-accepts, since no check reads the ledger, and <code>--verify</code> reports it as
+those three at the top, a symbolic link or any other entry that is
+neither a file nor a directory, and a <code>.fr</code> file that is no earlier output,
+which is different instead where the run writes a module. Only the entries
+whose name begins with a dot are not looked at. It writes nothing, <code>DIR</code>
+included. A run stopped after the lock and before the ledger leaves a
+workspace that <code>fidryn check</code> accepts, since no check reads the ledger,
+and <code>--verify</code> reports it as
 <code>missing coverage.json</code>, or <code>different coverage.json</code> when the ledger is
 that of an earlier run.</p>
 <p><strong>Example</strong></p>
@@ -613,6 +643,8 @@ fidryn check DIR
 fidryn ingest uscode samples/uscode/archives --out DIR --verify</code></pre></figure>
 <p><strong>Success.</strong> Prints one line and exits 0:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>ingested: U units, C containers from A archives (release R)</code></pre></figure>
+<p>A noun whose count is 1 is in the singular, as in
+<code>ingested: 1 unit, 1 container from 1 archive (release R)</code>.</p>
 <p>With <code>--verify</code>, prints <code>ok</code> when nothing differs: <code>DIR</code> then holds every
 file the run would write, with the same bytes, and nothing a run would
 refuse, so a run into it is accepted and changes none of its bytes.</p>
@@ -622,7 +654,9 @@ document, the element, the line it starts on and the nearest identifier.
 A title that no member holds is reported, by the designation given,
 before anything is written. A directory that holds anything other than an
 earlier output of the command is refused with what it holds, and nothing
-in it is changed. With <code>--verify</code>, each path under <code>DIR</code> that differs is
+in it is changed: every <code>.fr</code> file that is no earlier output is named, a
+file of the first edition, a module of another prefix and a module at
+another path among them. With <code>--verify</code>, each path under <code>DIR</code> that differs is
 printed to stdout, relative to <code>DIR</code>, in the byte order of the paths,
 after the word that says how: <code>missing</code>, <code>extra</code> or <code>different</code>. The exit
 status is 1:</p>
@@ -821,16 +855,19 @@ provision.</p>
 <tr><td><code>--bindings DIR</code></td><td>no</td><td>path to the directory of a curated workspace whose bindings are judged against <code>NEW_DIR</code>; may be given more than once, and a directory given twice is read once</td></tr>
 <tr><td><code>--json</code></td><td>no</td><td>flag; print the change set as JSON, <code>fidryn.change-set/v0.1</code></td></tr>
 <tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads, at least 1; by default as many as the system reports as available</td></tr>
-<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of every workspace read; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>.fidryn-cache</code> inside each workspace</td></tr>
+<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of every workspace read; by default the one <a href="#check"><code>check</code></a> keeps, <code>FIDRYN_CACHE_DIR</code> or <code>fidryn</code> in the cache directory of the user</td></tr>
 <tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry</td></tr>
 </tbody></table>
 </div>
-<p><code>FIDRYN_CACHE_DIR</code> is read as by <a href="#check"><code>check</code></a>. <code>--cache-dir</code> and
-<code>--no-cache</code> are not given together.</p>
+<p>The cache is chosen, from the same variables, as by <a href="#check"><code>check</code></a>, and
+every workspace the command reads, the two sides and each <code>--bindings</code>
+directory, shares it; nothing is written into any of them unless the
+cache is named inside one. A check trusts its cache, so a cache belongs
+where only people one trusts can write. <code>--cache-dir</code> and <code>--no-cache</code> are
+not given together.</p>
 <p><strong>Example</strong></p>
 <p>Each of these compares a workspace with itself, with <code>--no-cache</code>, so that
-no cache is written into the repository; each prints a change set in which
-nothing changed:</p>
+no cache is written; each prints a change set in which nothing changed:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span>
 <span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span> <span class="tk-ty">--json</span>
 <span class="tk-kw">fidryn</span> changes samples/uscode/workspace samples/uscode/workspace <span class="tk-ty">--no-cache</span> <span class="tk-ty">--bindings</span> samples/uscode/curated</code></pre></figure>
@@ -869,7 +906,12 @@ as no workspace:</p>
 <p>A workspace that has an error ends the command with its diagnostics, each
 naming its file under the directory given, as <code>fidryn check</code> prints them;
 for a curated workspace of <code>--bindings</code> these are the diagnostics of its
-module files by themselves.</p>
+module files by themselves. When the command keeps no cache because no
+directory is named for one, or because the identity of the running
+executable cannot be read, it says so after the diagnostics of a failure
+too, as <code>the cache could not be used, and the check went on without it: ...</code>;
+what the checks of the workspaces it read found of their cache is said
+only when the comparison succeeds.</p>
 <h2 id="see-also"><span class="hn">5.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>

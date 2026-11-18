@@ -125,6 +125,23 @@ fn a_workspace_from_the_writer_checks_clean() {
 }
 
 #[test]
+fn the_help_of_check_says_what_it_checks_and_lists() {
+    let help = Command::new(env!("CARGO_BIN_EXE_fidryn"))
+        .args(["check", "--help"])
+        .output()
+        .expect("run fidryn");
+    assert!(help.status.success(), "{}", stderr(&help));
+    let text = stdout(&help);
+    for words in [
+        "Check a module of either edition, or the workspace of edition 2 modules in a directory",
+        "A `.fr` file of either edition, or the directory of a workspace",
+        "Write every reference and every citation of a workspace whose outcome is not `exact`",
+    ] {
+        assert!(text.contains(words), "{words}: {text}");
+    }
+}
+
+#[test]
 fn a_toolchain_mismatch_is_a_warning() {
     let scratch = Scratch::new("toolchain");
     copy_tree(&demo_workspace(), scratch.path());
@@ -147,6 +164,14 @@ fn a_toolchain_mismatch_is_a_warning() {
     let message = stderr(&checked);
     assert!(
         message.starts_with(&format!("{}: W760 ToolchainMismatch: ", manifest.display())),
+        "{message}"
+    );
+    // The manifest records a version, which no check writes.
+    assert!(
+        message.contains(&format!(
+            "the workspace records the toolchain `0.0.0-invented`, and this is `{}`",
+            env!("CARGO_PKG_VERSION")
+        )),
         "{message}"
     );
     assert_eq!(message.lines().count(), 1, "{message}");

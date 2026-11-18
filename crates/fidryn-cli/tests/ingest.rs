@@ -1009,7 +1009,7 @@ fn title_selects_titles() {
     succeeded(&ingested, "title 99a");
     assert_eq!(
         stdout(&ingested),
-        "ingested: 1 units, 1 containers from 1 archives (release 999-1)\n"
+        "ingested: 1 unit, 1 container from 1 archive (release 999-1)\n"
     );
     let selected = modules(&one);
     assert_eq!(selected, of(&["usc99a.xml"]));

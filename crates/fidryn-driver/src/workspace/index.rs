@@ -370,7 +370,7 @@ fn of_manifest(manifest: &Manifest, toolchain: &str) -> Vec<Diagnostic> {
         report(
             DiagnosticCode::W760,
             format!(
-                "the workspace was last checked with the toolchain `{}`, and this is `{toolchain}`",
+                "the workspace records the toolchain `{}`, and this is `{toolchain}`",
                 manifest.toolchain
             ),
         );

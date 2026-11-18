@@ -55,7 +55,10 @@ pub enum Command {
     Fmt {
         path: PathBuf,
     },
+    /// Check a module of either edition, or the workspace of edition 2 modules in a
+    /// directory.
     Check {
+        /// A `.fr` file of either edition, or the directory of a workspace.
         path: PathBuf,
         /// Worker threads of the check of a workspace (default: the number available).
         #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
@@ -71,8 +74,8 @@ pub enum Command {
         /// Write the check report of a workspace (`fidryn.check-report/v0.1`) to FILE.
         #[arg(long, value_name = "FILE")]
         report: Option<PathBuf>,
-        /// Write every reference of a workspace whose outcome is not `exact` to FILE, one JSON
-        /// object to a line.
+        /// Write every reference and every citation of a workspace whose outcome is not
+        /// `exact` to FILE, one JSON object to a line.
         #[arg(long, value_name = "FILE")]
         unresolved: Option<PathBuf>,
     },

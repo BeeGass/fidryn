@@ -147,9 +147,10 @@ fn uscode(
         }
         Ok(_) => {
             println!(
-                "ingested: {} units, {} containers from {read} archives (release {})",
-                summary.units,
-                summary.containers,
+                "ingested: {}, {} from {} (release {})",
+                counted(summary.units, "unit"),
+                counted(summary.containers, "container"),
+                counted(u64::try_from(read).unwrap_or(u64::MAX), "archive"),
                 archives.release()
             );
             ExitCode::SUCCESS
@@ -161,6 +162,15 @@ fn uscode(
             ExitCode::from(1)
         }
         Err(error) => super::fail(error.to_string()),
+    }
+}
+
+/// `count` and `noun`, which takes an `s` unless the count is 1.
+fn counted(count: u64, noun: &str) -> String {
+    if count == 1 {
+        format!("1 {noun}")
+    } else {
+        format!("{count} {noun}s")
     }
 }
 
@@ -351,7 +361,9 @@ pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<()
 /// says so once on stderr, as `fidryn check` does, and the change set is the
 /// same. Exit 1, with the diagnostics on stderr and nothing on stdout, when
 /// a directory is not what the command compares or a workspace has an
-/// error.
+/// error; then it says after them why there is no cache when it knew that
+/// before it read a workspace, no directory being named for the cache or
+/// the identity of the executable being unknown.
 pub(crate) fn changes(
     old: &Path,
     new: &Path,
@@ -370,6 +382,12 @@ pub(crate) fn changes(
         Err(diagnostics) => {
             for diagnostic in diagnostics {
                 eprintln!("{diagnostic}");
+            }
+            // What the command knows of its cache before any workspace is
+            // read is said on a failure too; the comparison gives nothing of
+            // the checks it ran when one fails.
+            if let Some(error) = &unused {
+                eprintln!("{}: {error}", super::CACHE_UNUSED);
             }
             return ExitCode::from(1);
         }

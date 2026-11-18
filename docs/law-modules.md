@@ -826,7 +826,7 @@ gives every reference its [outcome](#references).
 | Every `import` of a curated module names a module of the workspace or of a dependency, by its address | `E720` |
 | The names of every curated module resolve, as [Curated modules: imports, citations and names](#curated-modules-imports-citations-and-names) describes | `E200` |
 | No two modules declare one address, as the address of a module, of a provision or of a note | `E700` |
-| Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it | `E730` |
+| Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it that passed its checks | `E730` |
 | Each dependency is a generated workspace with a lock, the BLAKE3 of the bytes of its lock and the release of its lock are the `lock_digest` and the `release` of its entry, and it has no error of its own | `E740` |
 | No binding of a curated module is stale, as [Bindings](#bindings) describes | `W750`, a warning |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
@@ -906,9 +906,9 @@ The check of a workspace runs in two phases.
    two reads no module again.
    `fidryn_driver::workspace::check_interfaces` is that last part as a
    function of the interfaces of the workspace, what is known of each of
-   its dependencies (the prefix and the interfaces of one that passed its
-   checks, the prefix, when it is known, of one that failed), the manifest
-   and the toolchain's version.
+   its dependencies (the name, the release, the prefix and the interfaces
+   of one that passed its checks, the prefix, when it is known, of one that
+   failed), the manifest and the toolchain's version.
 
 Phase one runs on `--jobs` worker threads, by default as many as the
 system reports as available, each module file being read and checked on

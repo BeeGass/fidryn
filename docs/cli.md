@@ -104,7 +104,9 @@ stderr. Parse errors print a diagnostic (`E100 ParseError: ...`).
 
 ## `check`
 
-Parse, elaborate, and type-check a module, including source-manifest
+Check a module of either edition, or the workspace of edition 2 modules in
+a directory, as `fidryn check --help` says. A module of the first edition
+is parsed, elaborated and type-checked, including source-manifest
 authentication as described above.
 
 A file whose first two words are `edition 2` is a law module of edition 2,
@@ -728,6 +730,9 @@ fidryn ingest uscode samples/uscode/archives --out DIR --verify
 ingested: U units, C containers from A archives (release R)
 ```
 
+A noun whose count is 1 is in the singular, as in
+`ingested: 1 unit, 1 container from 1 archive (release R)`.
+
 With `--verify`, prints `ok` when nothing differs: `DIR` then holds every
 file the run would write, with the same bytes, and nothing a run would
 refuse, so a run into it is accepted and changes none of its bytes.
@@ -1066,7 +1071,12 @@ fidryn changes conformance/fixtures/workspace conformance/fixtures/workspace/dem
 A workspace that has an error ends the command with its diagnostics, each
 naming its file under the directory given, as `fidryn check` prints them;
 for a curated workspace of `--bindings` these are the diagnostics of its
-module files by themselves.
+module files by themselves. When the command keeps no cache because no
+directory is named for one, or because the identity of the running
+executable cannot be read, it says so after the diagnostics of a failure
+too, as `the cache could not be used, and the check went on without it: ...`;
+what the checks of the workspaces it read found of their cache is said
+only when the comparison succeeds.
 
 ## See also
 

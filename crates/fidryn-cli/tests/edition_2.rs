@@ -131,6 +131,61 @@ fn check_accepts_an_edition_2_file_and_refuses_to_run_one() {
     assert_eq!(String::from_utf8_lossy(&checked.stdout), "ok\n");
 }
 
+#[test]
+fn every_command_of_the_first_edition_refuses_an_edition_2_file() {
+    // The six commands the test above does not run, each given the module
+    // of edition 2 where it reads a file; the refusal comes before any other
+    // input is read, so the other files need not exist.
+    let unit = workspace_file("crates/fidryn-check/tests/fixtures/e2/unit.fr");
+    let unit = unit.to_str().expect("a UTF-8 path");
+    let at = "2026-01-01T00:00:00Z";
+    let cases: [&[&str]; 6] = [
+        &["inputs", unit, "--query", "evaluate"],
+        &[
+            "explore",
+            unit,
+            "--query",
+            "evaluate",
+            "--case",
+            "case.json",
+            "--valid-at",
+            at,
+            "--known-at",
+            at,
+        ],
+        &["explain", unit],
+        &["diff", unit, unit, "--query", "evaluate"],
+        &[
+            "review",
+            unit,
+            "--query",
+            "evaluate",
+            "--case",
+            "case.json",
+            "--valid-at",
+            at,
+            "--known-at",
+            at,
+        ],
+        &["file", unit],
+    ];
+    for args in cases {
+        let refused = fidryn(args);
+        assert_eq!(
+            refused.status.code(),
+            Some(1),
+            "{args:?}: {}",
+            stderr(&refused)
+        );
+        let message = stderr(&refused);
+        assert!(
+            message.contains(REFUSAL) && message.contains("E100"),
+            "{args:?}: {message}"
+        );
+        assert!(refused.stdout.is_empty(), "{args:?}");
+    }
+}
+
 /// How a command ended: its exit status, then what it printed to stdout and
 /// to stderr.
 #[cfg(unix)]

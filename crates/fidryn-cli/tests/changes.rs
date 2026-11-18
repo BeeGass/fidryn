@@ -489,6 +489,31 @@ fn a_cache_that_cannot_be_used_or_written_is_said_once() {
 }
 
 #[test]
+fn a_cache_that_is_not_kept_is_said_on_a_failure_too() {
+    let scratch = two_versions("cache-on-failure");
+    let (new, notes) = (scratch.join("new"), scratch.join("notes"));
+    // No variable names a directory for the cache, and a curated workspace
+    // is no side of a change set.
+    let refused = changes(&notes, &new, &[]);
+    assert_eq!(refused.status.code(), Some(1), "{}", stderr(&refused));
+    assert_eq!(stdout(&refused), "");
+    let errors = stderr(&refused);
+    let lines: Vec<&str> = errors.lines().collect();
+    assert_eq!(lines.len(), 2, "{lines:?}");
+    assert!(
+        lines[0].contains("is the manifest of a curated workspace"),
+        "{lines:?}"
+    );
+    assert!(
+        lines[1].starts_with(
+            "the cache could not be used, and the check went on without it: no directory is \
+             named for it: "
+        ),
+        "{lines:?}"
+    );
+}
+
+#[test]
 fn changes_refuses_what_it_does_not_compare() {
     let scratch = two_versions("refused");
     let (old, new, notes) = (

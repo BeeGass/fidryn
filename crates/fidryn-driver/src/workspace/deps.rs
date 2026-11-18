@@ -57,7 +57,9 @@ enum Opening {
 /// The dependencies of a workspace, opened, and the diagnostics about them
 /// so far.
 pub(super) struct Dependencies {
-    /// One for each entry of the manifest, in their order.
+    /// One for each entry of the manifest of a curated workspace, in their
+    /// order; none for a generated workspace, whose manifest may list
+    /// dependencies, which are reported and not opened.
     entries: Vec<Opening>,
     diagnostics: Vec<Diagnostic>,
 }
