@@ -2455,6 +2455,11 @@ more.
 
 ### Fetching
 
-- `tools/fetch_uscode.py` follows a redirect without checking the host it
-  leads to, and the retrieval record names the address the tool asked for,
-  not the one that served the bytes.
+- `tools/fetch_uscode.py` follows a redirect only to the host it asked,
+  over `https`, and refuses any other, naming where it pointed. The
+  retrieval record names the address the tool asked for, not the one a
+  redirect led to.
+- It takes at most `--max-bytes` bytes in one response, 536,870,912
+  (512 MiB) unless that says otherwise, a bound with room above the
+  largest archive the publisher offers, the archive of every title, and it
+  refuses a larger response as soon as it has read one byte more.

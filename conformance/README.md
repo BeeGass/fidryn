@@ -238,17 +238,24 @@ uv run --locked python -I tools/fetch_uscode.py 119-142 --out DIR --all
 An archive that is present and equal to its record is kept, and is not
 fetched again. An archive and the record are written through a new file
 beside each, and an entry of that name there already, a link among them,
-is not written through. Exit `0` when every archive is fetched or kept,
-`1` when the tool refuses (an archive whose bytes differ from its record,
-an archive without a record, a record of another release), `2` when an
-archive cannot be fetched or the directory cannot be read or written,
-such as when the name of a file it writes through is taken.
-`test_fetch_uscode.py` serves invented archives through a fake opener and
-opens no connection. It holds the tool to its addresses (titles `1` and
-`5a` of `119-142`, title `11a` of `119-73not60`, and `--all`), to the
-record it writes, to a second run that changes nothing, to the refusal
-of an archive whose bytes changed, and to the refusal of a temporary file
-that is there already.
+is not written through. A redirect is followed only to the host the tool
+asked, over `https`, and a response of more than `--max-bytes` bytes
+(512 MiB unless it says otherwise) is refused while it is read. Exit `0`
+when every archive is fetched or kept, `1` when the tool refuses (an
+archive whose bytes differ from its record, an archive without a record,
+a record of another release, a redirect to another host or scheme, a
+response larger than the bound), `2` when an archive cannot be fetched or
+the directory cannot be read or written, such as when the name of a file
+it writes through is taken. `test_fetch_uscode.py` serves invented
+archives through a fake opener and opens no connection. It holds the tool
+to its addresses (titles `1` and `5a` of `119-142`, title `11a` of
+`119-73not60`, and `--all`), to the record it writes, to a second run that
+changes nothing, to the refusal of an archive whose bytes changed, of a
+temporary file that is there already and of a body larger than the bound,
+which it reads no further than one byte past it. Its tests of redirects
+run the tool's own opener, in which a handler of the test serves invented
+responses before any handler that would connect, and the opening of a
+socket fails the test.
 
 ## Checking a law repository
 

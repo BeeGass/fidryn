@@ -1,7 +1,10 @@
 """Hold the tool that fetches a release to its addresses and its record, with no network.
 
 Every archive here is invented: the fake opener serves small archives of one member,
-whose first line says that it is invented, and never opens a connection.
+whose first line says that it is invented, and never opens a connection. The tests of
+redirects run the tool's own opener, in which handlers of the tests serve invented
+responses for `https` and `http` before any handler that would connect, and in which
+the opening of a socket fails the test.
 """
 
 from __future__ import annotations
@@ -10,16 +13,19 @@ import contextlib
 import hashlib
 import io
 import json
+import socket
 import sys
 import tempfile
 import unittest
 import urllib.error
 import urllib.request
+import urllib.response
 import zipfile
 from collections.abc import Callable
 from datetime import UTC, datetime
 from email.message import Message
 from pathlib import Path
+from unittest import mock
 
 import blake3
 
@@ -84,6 +90,52 @@ class FakeOpener:
 
     def urls(self) -> list[str]:
         return [request.full_url for request in self.requests]
+
+
+class Endless:
+    """A served body that never ends, and counts the bytes it was asked for."""
+
+    def __init__(self) -> None:
+        self.read_bytes = 0
+
+    def __call__(self, request: urllib.request.Request) -> Endless:
+        return self
+
+    def read(self, amt: int, /) -> bytes:
+        self.read_bytes += amt
+        return b"\0" * amt
+
+    def close(self) -> None:
+        pass
+
+
+class Invented(urllib.response.addinfourl):
+    """An invented response, with the reason phrase that `urllib.request` reads."""
+
+    msg = "Invented"
+
+
+class Served(urllib.request.BaseHandler):
+    """Serves invented responses, by address, for `https` and `http`, before the handlers
+    that would open a connection; an address it does not serve fails the test."""
+
+    handler_order = 100
+
+    def __init__(self, responses: dict[str, tuple[int, dict[str, str], bytes]]) -> None:
+        self.responses = responses
+        self.asked: list[str] = []
+
+    def https_open(self, request: urllib.request.Request) -> Invented:
+        self.asked.append(request.full_url)
+        if request.full_url not in self.responses:
+            raise AssertionError(f"{request.full_url} was asked for, and is not served")
+        status, headers, body = self.responses[request.full_url]
+        message = Message()
+        for name, value in headers.items():
+            message[name] = value
+        return Invented(io.BytesIO(body), message, request.full_url, status)
+
+    http_open = https_open
 
 
 def clock_at(moment: datetime) -> Callable[[], datetime]:
@@ -304,6 +356,34 @@ class Fetching(unittest.TestCase):
         self.assertEqual(self.fetch("1"), ["fetched xml_usc01@119-142.zip"])
         self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
 
+    def test_a_body_larger_than_the_bound_is_refused_while_it_is_read(self) -> None:
+        fetched = fetch_uscode.fetch(
+            "119-142", ["1"], self.out, self.opener, clock_at(FIRST), max_bytes=len(TITLE_1)
+        )
+        self.assertEqual(fetched, ["fetched xml_usc01@119-142.zip"])
+        bound = len(TITLE_11A) - 1
+        with self.assertRaises(fetch_uscode.RefusedError) as caught:
+            fetch_uscode.fetch(
+                "119-142", ["11a"], self.out, self.opener, clock_at(FIRST), max_bytes=bound
+            )
+        self.assertIn(f"{URL_11A} serves more than {bound} bytes", str(caught.exception))
+        self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
+        self.assertEqual(
+            self.record_text(),
+            record(
+                "119-142", entry("xml_usc01@119-142.zip", URL_1, "2026-11-16T22:14:03Z", TITLE_1)
+            ),
+        )
+        # A body that never ends is read no further than one byte past the bound.
+        endless = Endless()
+        with self.assertRaises(fetch_uscode.RefusedError) as caught:
+            fetch_uscode.fetch(
+                "119-142", ["45"], self.out, endless, clock_at(FIRST), max_bytes=200_000
+            )
+        self.assertIn("serves more than 200000 bytes", str(caught.exception))
+        self.assertLessEqual(endless.read_bytes, 200_001)
+        self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
+
     def test_a_refused_request_keeps_what_came_before(self) -> None:
         del self.opener.served[URL_45]
         with self.assertRaises(fetch_uscode.FetchError) as caught:
@@ -316,6 +396,83 @@ class Fetching(unittest.TestCase):
                 "119-142", entry("xml_usc01@119-142.zip", URL_1, "2026-11-16T22:14:03Z", TITLE_1)
             ),
         )
+
+
+MOVED = "https://uscode.house.gov/download/moved/xml_usc01@119-142.zip"
+AGAIN = "https://uscode.house.gov/download/again/xml_usc01@119-142.zip"
+REDIRECTS = (301, 302, 303, 307, 308)
+
+
+class Redirects(unittest.TestCase):
+    def setUp(self) -> None:
+        self.directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.out = self.directory / "archives"
+        self.enterContext(
+            mock.patch.object(
+                socket.socket, "connect", side_effect=AssertionError("a socket was opened")
+            )
+        )
+        self.served = Served({})
+
+    def fetch(self, *hops: tuple[int, str, str]) -> list[str]:
+        """Fetches title 1 through the redirects of `hops`, each a status, the `Location`
+        it gives and the address that leads to, the last of which serves the archive."""
+        at = URL_1
+        for code, location, then in hops:
+            self.served.responses[at] = (code, {"Location": location}, b"")
+            at = then
+        self.served.responses[at] = (200, {}, TITLE_1)
+        director = fetch_uscode.build_opener(self.served, urllib.request.ProxyHandler({}))
+        return fetch_uscode.fetch(
+            "119-142",
+            ["1"],
+            self.out,
+            lambda request: director.open(request, timeout=5),
+            clock_at(FIRST),
+        )
+
+    def test_a_redirect_to_the_same_host_over_https_is_followed(self) -> None:
+        lines = self.fetch(
+            (301, MOVED, MOVED), (308, "/download/again/xml_usc01@119-142.zip", AGAIN)
+        )
+        self.assertEqual(lines, ["fetched xml_usc01@119-142.zip"])
+        self.assertEqual(self.served.asked, [URL_1, MOVED, AGAIN])
+        self.assertEqual((self.out / "xml_usc01@119-142.zip").read_bytes(), TITLE_1)
+        # The record names the address the tool asked for.
+        archives = json.loads((self.out / "retrieval.json").read_text(encoding="utf-8"))
+        self.assertEqual(archives["archives"][0]["url"], URL_1)
+
+    def test_a_redirect_to_another_host_or_scheme_is_refused_and_names_where_it_pointed(
+        self,
+    ) -> None:
+        for pointed, shown in (
+            ("https://mirror.example.invalid/xml_usc01@119-142.zip", None),
+            ("http://uscode.house.gov/download/xml_usc01@119-142.zip", None),
+            ("https://uscode.house.gov:8443/download/xml_usc01@119-142.zip", None),
+            (
+                "//mirror.example.invalid/xml_usc01@119-142.zip",
+                "https://mirror.example.invalid/xml_usc01@119-142.zip",
+            ),
+            ("ftp://uscode.house.gov/xml_usc01@119-142.zip", None),
+            ("file:///xml_usc01@119-142.zip", None),
+        ):
+            for code in REDIRECTS:
+                for before in ([], [(302, MOVED, MOVED)]):
+                    with self.subTest(pointed=pointed, code=code, hops=len(before) + 1):
+                        self.served = Served({})
+                        self.out = (
+                            self.directory / f"archives-{len(list(self.directory.iterdir()))}"
+                        )
+                        with self.assertRaises(fetch_uscode.RefusedError) as caught:
+                            self.fetch(*before, (code, pointed, shown or pointed))
+                        from_url = MOVED if before else URL_1
+                        self.assertIn(
+                            f"{from_url} redirects to {shown or pointed}, and the tool follows "
+                            "a redirect only to uscode.house.gov over https",
+                            str(caught.exception),
+                        )
+                        self.assertEqual(self.served.asked, [URL_1, *(MOVED for _ in before)])
+                        self.assertEqual(list(self.out.iterdir()), [])
 
 
 class CommandLine(unittest.TestCase):
@@ -338,6 +495,21 @@ class CommandLine(unittest.TestCase):
             status, stdout, stderr = self.run_main(opener, "119-142", "--out", out, "--title", "45")
             self.assertEqual((status, stdout), (2, ""))
             self.assertTrue(stderr.startswith(f"cannot fetch: {URL_45}"), stderr)
+            opener.served[URL_11A] = TITLE_11A
+            bound = str(len(TITLE_11A) - 1)
+            arguments = ("119-142", "--out", out, "--title", "11a", "--max-bytes", bound)
+            status, stdout, stderr = self.run_main(opener, *arguments)
+            self.assertEqual((status, stdout), (1, ""))
+            self.assertTrue(
+                stderr.startswith(f"refused: {URL_11A} serves more than {bound} bytes"), stderr
+            )
+            for bound in ("0", "-1", "ten"):
+                with (
+                    self.subTest(bound=bound),
+                    self.assertRaises(SystemExit),
+                    contextlib.redirect_stderr(io.StringIO()),
+                ):
+                    fetch_uscode.main(["119-142", "--out", out, "--all", "--max-bytes", bound])
 
 
 if __name__ == "__main__":

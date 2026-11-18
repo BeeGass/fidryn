@@ -12,10 +12,18 @@ names it, are each written into a new file beside it, which is renamed once both
 complete; an entry that has the name of such a file already, a symbolic link among
 them, is refused and left as it is.
 
+A redirect is followed only to the host of the request, over https; any other is
+refused before it is followed, with the address it pointed to, and the record names
+the address the tool asked for. A response of more than `--max-bytes` bytes (512 MiB
+unless it says otherwise) is refused while it is read, as soon as one byte more has
+come, and nothing of it is kept.
+
 This is the only program in the repository that opens a connection.
 
 Usage: uv run --locked python -I tools/fetch_uscode.py RELEASE --out DIR (--all | --title T ...)
-Exit codes: 0 every archive fetched or kept; 1 refused; 2 cannot fetch, read or write.
+  [--max-bytes N]
+Exit codes: 0 every archive fetched or kept; 1 refused, a redirect or a response too
+large among them; 2 cannot fetch, read or write.
 """
 
 from __future__ import annotations
@@ -27,13 +35,14 @@ import io
 import json
 import re
 import sys
+import urllib.parse
 import urllib.request
 import zipfile
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Protocol
+from typing import IO, Any, Protocol
 
 import blake3
 
@@ -48,6 +57,10 @@ DIGEST = re.compile(r"[0-9a-f]{64}")
 FIELDS = ("file", "url", "retrieved_at", "bytes", "sha256", "blake3")
 TIMEOUT_SECONDS = 60
 CHUNK = 1 << 16
+# The most bytes the tool takes in one response, unless `--max-bytes` says otherwise.
+# The largest archive the publisher offers, that of every title, is about 109 MB
+# (108,706,565 bytes for 119-142); the bound leaves it room to grow almost five times.
+MAX_BYTES = 512 << 20
 
 
 class RefusedError(Exception):
@@ -68,8 +81,58 @@ Opener = Callable[[urllib.request.Request], Response]
 Clock = Callable[[], datetime]
 
 
+def refuse_redirect(asked: str, pointed: str) -> None:
+    """Refuses a redirect from `asked` to `pointed` unless `pointed` is on the host and
+    the port of `asked`, over https."""
+    here, there = urllib.parse.urlsplit(asked), urllib.parse.urlsplit(pointed)
+    try:
+        same = (
+            there.scheme == "https"
+            and there.hostname == here.hostname
+            and (there.port or 443) == (here.port or 443)
+        )
+    except ValueError:
+        same = False
+    if not same:
+        raise RefusedError(
+            f"{asked} redirects to {pointed}, and the tool follows a redirect only to "
+            f"{here.hostname} over https; nothing is written"
+        )
+
+
+class SameHostRedirect(urllib.request.HTTPRedirectHandler):
+    """Follows a redirect only to the host of the request, over https, and refuses any
+    other before it is followed."""
+
+    def http_error_302(
+        self,
+        req: urllib.request.Request,
+        fp: IO[bytes],
+        code: int,
+        msg: str,
+        headers: http.client.HTTPMessage,
+    ) -> Any:
+        pointed = headers.get("location", headers.get("uri"))
+        if pointed is not None:
+            try:
+                refuse_redirect(req.full_url, urllib.parse.urljoin(req.full_url, pointed))
+            except RefusedError:
+                fp.close()
+                raise
+        return super().http_error_302(req, fp, code, msg, headers)
+
+    http_error_301 = http_error_303 = http_error_307 = http_error_308 = http_error_302
+
+
+def build_opener(*handlers: urllib.request.BaseHandler) -> urllib.request.OpenerDirector:
+    """The opener of the tool: the default handlers of `urllib.request`, but for the
+    redirects, which `SameHostRedirect` follows, and for those of the kinds of
+    `handlers`, which take their place."""
+    return urllib.request.build_opener(SameHostRedirect(), *handlers)
+
+
 def open_url(request: urllib.request.Request) -> Response:
-    response: Response = urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS)
+    response: Response = build_opener().open(request, timeout=TIMEOUT_SECONDS)
     return response
 
 
@@ -248,18 +311,25 @@ def record_beside(path: Path, release: str, archives: dict[str, Archive]) -> Pat
     return partial
 
 
-def download(opener: Opener, url: str, stream: io.BufferedWriter) -> Digests:
-    """Writes the body served at `url` to `stream`, and returns its digests."""
+def download(opener: Opener, url: str, stream: io.BufferedWriter, max_bytes: int) -> Digests:
+    """Writes the body served at `url` to `stream`, and returns its digests. A body of
+    more than `max_bytes` bytes is refused as soon as one byte more has been read, and
+    no more is asked for."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     sha256, digest, size = hashlib.sha256(), blake3.blake3(), 0
     try:
         response = opener(request)
         try:
-            while chunk := response.read(CHUNK):
+            while chunk := response.read(min(CHUNK, max_bytes + 1 - size)):
+                size += len(chunk)
+                if size > max_bytes:
+                    raise RefusedError(
+                        f"{url} serves more than {max_bytes} bytes, the most the tool takes in "
+                        "one response (--max-bytes); nothing is written"
+                    )
                 stream.write(chunk)
                 sha256.update(chunk)
                 digest.update(chunk)
-                size += len(chunk)
         finally:
             response.close()
     except (OSError, http.client.HTTPException) as error:
@@ -273,8 +343,10 @@ def fetch(
     out: Path,
     opener: Opener = open_url,
     clock: Clock = utc_now,
+    max_bytes: int = MAX_BYTES,
 ) -> list[str]:
-    """Fetches the archives of `titles` (of every title when None) of `release` into `out`.
+    """Fetches the archives of `titles` (of every title when None) of `release` into `out`,
+    each of at most `max_bytes` bytes.
 
     Returns one line for each archive: `fetched FILE` or `kept FILE`.
     """
@@ -309,7 +381,7 @@ def fetch(
         pending: Path | None = None
         try:
             with stream:
-                served = download(opener, url, stream)
+                served = download(opener, url, stream, max_bytes)
             if not zipfile.is_zipfile(partial):
                 raise FetchError(f"{url} served {served.bytes} bytes that are not a zip archive")
             retrieved_at = clock().astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -339,6 +411,16 @@ def fetch(
     return lines
 
 
+def bound_of(text: str) -> int:
+    try:
+        value = int(text)
+    except ValueError:
+        value = 0
+    if value < 1:
+        raise argparse.ArgumentTypeError(f"{text} is not a number of bytes of at least 1")
+    return value
+
+
 def main(
     argv: Sequence[str] | None = None, opener: Opener = open_url, clock: Clock = utc_now
 ) -> int:
@@ -352,10 +434,17 @@ def main(
     which.add_argument(
         "--title", nargs="+", action="extend", metavar="T", help="titles, such as 1, 5a or 45"
     )
+    parser.add_argument(
+        "--max-bytes",
+        type=bound_of,
+        default=MAX_BYTES,
+        metavar="N",
+        help=f"the most bytes taken in one response (default {MAX_BYTES})",
+    )
     args = parser.parse_args(argv)
     titles: list[str] | None = None if args.all else args.title
     try:
-        lines = fetch(args.release, titles, args.out, opener, clock)
+        lines = fetch(args.release, titles, args.out, opener, clock, args.max_bytes)
     except RefusedError as error:
         print(f"refused: {error}", file=sys.stderr)
         return 1
