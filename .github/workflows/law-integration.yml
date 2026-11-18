@@ -9,12 +9,18 @@
 #   matching change of the law repository.
 # - "Drift of the newest law repository" checks the newest commit of the law
 #   repository with the newest commit of this one, and reports drift when the
-#   check fails. On a schedule that is the newest commit of the default
+#   check fails, and that it could not check, which is no drift, when the
+#   script exits otherwise, as on a failed build or a directory with no
+#   workspace. On a schedule that is the newest commit of the default
 #   branch; on a manual run, the commit of the branch the run was started on.
+#   It names the pin only in what it reports, so a pin whose commit is no
+#   full commit id fails the first job and not this one.
 #
 # Both check out the law repository with the default token, which reads this
 # repository and public ones; a law repository that is not public needs a
-# token of its own, given to the checkout as `token`.
+# token of its own, given to the checkout as `token`. No checkout keeps its
+# token in the repository it checks out (`persist-credentials: false`),
+# since the script runs on what the law repository holds.
 #
 # The only trigger is a manual run. When the law repository is published,
 # remove the "# " at the start of the two lines under `workflow_dispatch:`:
@@ -42,6 +48,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Read the pin
         id: pin
         run: |
@@ -68,6 +76,7 @@ jobs:
           repository: ${{ steps.pin.outputs.repository }}
           ref: ${{ steps.pin.outputs.commit }}
           path: law-repository
+          persist-credentials: false
       - name: Install the pinned Rust toolchain
         if: steps.pin.outputs.check == 'true'
         run: rustup toolchain install --no-self-update
@@ -86,6 +95,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Read the pin
         id: pin
         run: |
@@ -97,8 +108,8 @@ jobs:
             exit 0
           fi
           if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id" >&2
-            exit 1
+            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id; this job checks the newest commit all the same" >&2
+            commit=
           fi
           {
             echo "check=true"
@@ -111,6 +122,7 @@ jobs:
         with:
           repository: ${{ steps.pin.outputs.repository }}
           path: law-repository
+          persist-credentials: false
       - name: Install the pinned Rust toolchain
         if: steps.pin.outputs.check == 'true'
         run: rustup toolchain install --no-self-update
@@ -125,14 +137,28 @@ jobs:
           PINNED: ${{ steps.pin.outputs.commit }}
         run: |
           newest="$(git -C law-repository rev-parse HEAD)"
-          echo "this repository at $GITHUB_SHA, the law repository at $newest, pinned at $PINNED"
-          if sh tools/check-law-repository.sh --cache-dir "$RUNNER_TEMP/fidryn-cache" law-repository; then
-            if test "$newest" = "$PINNED"; then
-              echo "No drift: the newest law repository, $newest, is the pinned one and checks with $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
-            else
-              echo "No drift: the newest law repository, $newest, checks with $GITHUB_SHA; the pin is at $PINNED" >> "$GITHUB_STEP_SUMMARY"
-            fi
+          if test -n "$PINNED"; then
+            pin="the pin is at $PINNED"
           else
-            echo "Drift: the newest law repository, $newest, does not check with $GITHUB_SHA; the pin is at $PINNED" | tee -a "$GITHUB_STEP_SUMMARY" >&2
-            exit 1
+            pin="the pin names no full commit id"
           fi
+          echo "this repository at $GITHUB_SHA, the law repository at $newest; $pin"
+          status=0
+          sh tools/check-law-repository.sh --cache-dir "$RUNNER_TEMP/fidryn-cache" law-repository || status=$?
+          case $status in
+            0)
+              if test "$newest" = "$PINNED"; then
+                echo "No drift: the newest law repository, $newest, is the pinned one and checks with $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "No drift: the newest law repository, $newest, checks with $GITHUB_SHA; $pin" >> "$GITHUB_STEP_SUMMARY"
+              fi
+              ;;
+            1)
+              echo "Drift: the newest law repository, $newest, does not check with $GITHUB_SHA; $pin" | tee -a "$GITHUB_STEP_SUMMARY" >&2
+              exit 1
+              ;;
+            *)
+              echo "Not checked: the newest law repository, $newest, could not be checked with $GITHUB_SHA (exit $status), as when the build fails or no workspace stands at its top; this is no drift" | tee -a "$GITHUB_STEP_SUMMARY" >&2
+              exit "$status"
+              ;;
+          esac

@@ -102,20 +102,29 @@ repository is named. The workflow `Law integration`
   matching change of the law repository;
 - `Drift of the newest law repository` checks the newest commit of the law
   repository with the newest commit of this one, and reports drift when the
-  check fails. On a schedule that is the newest commit of the default
-  branch; on a manual run, the commit of the branch the run was started on.
+  check fails (exit 1). When the script could not check (exit 2, as on a
+  failed build or a directory with no workspace at its top), it says so,
+  with the exit status, and that this is no drift. On a schedule that is the
+  newest commit of the default branch; on a manual run, the commit of the
+  branch the run was started on. It names the pin only in what it reports:
+  a pin whose `commit` is no full commit id fails the first job, and this one
+  says so and checks all the same.
 
 Both check out the law repository with the default token of the workflow,
 which reads this repository and public ones; a law repository that is not
-public needs a token of its own, given to the checkout as `token`. While
-`repository` in the pin is empty, each job says so and ends. The
-workflow runs only when it is started by hand; the comment at its top names
-the two lines that make it run on pull requests and on a schedule.
-`conformance/test_law_integration_workflow.py` reads the workflow as YAML and
-holds its trigger, its two jobs, the step of each that reads the pin, the
-commit and the directory each checks out, the failure of each job when the
-check fails, and the actions it uses, which are those of `ci.yml` at the same
-commits.
+public needs a token of its own, given to the checkout as `token`. No
+checkout keeps its token in the repository it checks out
+(`persist-credentials: false`), since the script runs on what the law
+repository holds. While `repository` in the pin is empty, each job says so
+and ends. The workflow runs only when it is started by hand; the comment at
+its top names the two lines that make it run on pull requests and on a
+schedule. `conformance/test_law_integration_workflow.py` reads the workflow
+as YAML and holds its trigger, its two jobs, the step of each that reads
+the pin, a pin whose commit is no full commit id, the commit and the
+directory each checks out, that no checkout keeps its token, the failure of
+each job when the check fails, what the drift job reports for each exit
+status of the script, and the actions it uses, which are those of `ci.yml`
+at the same commits.
 
 ## Promote through GitHub
 

@@ -17,6 +17,7 @@ nothing is built or checked.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -400,7 +401,7 @@ class Workflow(unittest.TestCase):
                 self.assertEqual(settings["if"], f"github.event_name != '{never}'")
                 steps = self.steps(job)
                 self.assertTrue(str(steps[0]["uses"]).startswith("actions/checkout@"))
-                self.assertNotIn("with", steps[0])
+                self.assertEqual(steps[0]["with"], {"persist-credentials": "false"})
                 self.assertEqual(steps[1]["id"], "pin")
                 self.assertIn("law-repository.pin.json", str(steps[1]["run"]))
                 for step in steps[2:]:
@@ -409,7 +410,7 @@ class Workflow(unittest.TestCase):
                 self.assertIn("sh tools/check-law-repository.sh", runs)
 
     def run_step(
-        self, step: dict[str, object], directory: Path, env: dict[str, str]
+        self, step: dict[str, object], directory: Path, env: dict[str, str], cwd: Path = ROOT
     ) -> subprocess.CompletedProcess[str]:
         """`step` run as the runner runs a step that names no `shell`: `bash -e FILE`."""
         bash = shutil.which("bash")
@@ -419,12 +420,48 @@ class Workflow(unittest.TestCase):
         script.write_text(str(step["run"]))
         return subprocess.run(
             [bash, "-e", str(script)],
-            cwd=ROOT,
+            cwd=cwd,
             env={**os.environ, **env},
             capture_output=True,
             check=False,
             text=True,
         )
+
+    def test_no_checkout_keeps_its_token_in_the_repository_it_checks_out(self) -> None:
+        checkouts = [
+            step
+            for job in JOBS
+            for step in self.steps(job)
+            if str(step.get("uses", "")).startswith("actions/checkout@")
+        ]
+        self.assertEqual(len(checkouts), 4)
+        for step in checkouts:
+            self.assertEqual(mapping(step["with"]).get("persist-credentials"), "false", step)
+
+    def test_a_pin_whose_commit_is_no_full_commit_id_fails_only_the_pinned_job(self) -> None:
+        if shutil.which("jq") is None:
+            self.fail("the step that reads the pin needs jq")
+        for commit in ("main", "", "a" * 39):
+            for job in JOBS:
+                with self.subTest(job=job, commit=commit), tempfile.TemporaryDirectory() as name:
+                    directory = Path(name)
+                    (directory / "law-repository.pin.json").write_text(
+                        json.dumps({"repository": "invented/law", "commit": commit}) + "\n"
+                    )
+                    output = directory / "output"
+                    result = self.run_step(
+                        self.steps(job)[1], directory, {"GITHUB_OUTPUT": str(output)}, directory
+                    )
+                    self.assertIn("which is no full commit id", result.stderr)
+                    if job == "pinned":
+                        self.assertEqual(result.returncode, 1, result.stderr)
+                        self.assertFalse(output.exists())
+                    else:
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(
+                            output.read_text(),
+                            "check=true\nrepository=invented/law\ncommit=\n",
+                        )
 
     def test_while_the_pin_names_no_repository_each_job_says_so_and_ends(self) -> None:
         if shutil.which("jq") is None:
@@ -465,7 +502,15 @@ class Workflow(unittest.TestCase):
     def test_the_last_step_of_each_job_fails_when_the_check_fails(self) -> None:
         newest = "b" * 40
         for job in JOBS:
-            for check_exit, pinned in ((0, newest), (0, "a" * 40), (1, newest)):
+            for check_exit, pinned in (
+                (0, newest),
+                (0, "a" * 40),
+                (0, ""),
+                (1, newest),
+                (1, ""),
+                (2, newest),
+                (127, "a" * 40),
+            ):
                 with (
                     self.subTest(job=job, check_exit=check_exit, pinned=pinned),
                     tempfile.TemporaryDirectory() as name,
@@ -504,15 +549,27 @@ class Workflow(unittest.TestCase):
                     if job != "drift":
                         continue
                     written = summary.read_text()
-                    if check_exit:
+                    pin = f"the pin is at {pinned}" if pinned else "the pin names no full commit id"
+                    if check_exit == 1:
                         self.assertTrue(
                             written.startswith(f"Drift: the newest law repository, {newest}")
                         )
+                        self.assertIn(pin, written)
                         self.assertIn("Drift:", result.stderr)
+                    elif check_exit:
+                        # The script could not check: a failed build, no workspace at the
+                        # top of the directory, or a script that did not run.
+                        self.assertTrue(
+                            written.startswith(f"Not checked: the newest law repository, {newest}")
+                        )
+                        self.assertIn(f"(exit {check_exit})", written)
+                        self.assertIn("this is no drift", written)
+                        self.assertNotIn("Drift", written)
+                        self.assertIn("Not checked:", result.stderr)
                     elif pinned == newest:
                         self.assertIn("is the pinned one", written)
                     else:
-                        self.assertIn(f"the pin is at {pinned}", written)
+                        self.assertIn(pin, written)
 
     def test_every_action_it_uses_is_one_the_other_workflows_use_at_the_same_commit(
         self,
