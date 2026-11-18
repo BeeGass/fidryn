@@ -1,7 +1,7 @@
 //! The writer of a generated workspace, and the comparison of a directory
 //! with what a run would write into it.
 
-use super::discover::{Walk, is_dot_named, walk};
+use super::discover::{JSON_LIMIT, Unread, Walk, is_dot_named, read_regular, walk};
 use super::report::ledger_of;
 use super::{COVERAGE_FILE, LOCK_FILE, MANIFEST_FILE};
 use fidryn_provision::layout::module_path;
@@ -429,7 +429,12 @@ impl GeneratedWriter {
         };
         let target = self.out.join(rel);
         let difference = if listed(&compared.found.modules) || listed(&compared.found.files) {
-            let bytes = fs::read(&target).map_err(|error| io_error(&target, error))?;
+            // One byte more than `text` is enough to know that a larger file
+            // differs.
+            let mut bytes = Vec::new();
+            fs::File::open(&target)
+                .and_then(|file| file.take(text.len() as u64 + 1).read_to_end(&mut bytes))
+                .map_err(|error| io_error(&target, error))?;
             (bytes != text.as_bytes()).then_some(Difference::Different)
         } else {
             match fs::symlink_metadata(&target) {
@@ -510,23 +515,34 @@ fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<Vec<String>, WriteE
         return Ok(Vec::new());
     }
     names.sort();
+    // The manifest is read as the check reads it, only from a regular file
+    // of a bounded size.
     let path = out.join(MANIFEST_FILE);
-    let text = match fs::read_to_string(&path) {
-        Ok(text) => text,
-        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+    let bytes = match read_regular(&path, JSON_LIMIT) {
+        Ok(bytes) => bytes,
+        Err(Unread::Missing) => {
             return Err(foreign(
                 out,
                 format!("`{}` and no `{MANIFEST_FILE}`", names[0]),
             ));
         }
-        Err(error) => return Err(io_error(&path, error)),
+        Err(Unread::Io(error)) => return Err(io_error(&path, error)),
+        Err(unread) => {
+            return Err(foreign(
+                out,
+                format!("a `{MANIFEST_FILE}` that {}", unread.clause()),
+            ));
+        }
     };
-    let existing = Manifest::from_json(&text).map_err(|error| {
-        foreign(
-            out,
-            format!("a `{MANIFEST_FILE}` that is no manifest: {error}"),
-        )
-    })?;
+    let existing = String::from_utf8(bytes)
+        .map_err(|error| error.to_string())
+        .and_then(|text| Manifest::from_json(&text))
+        .map_err(|error| {
+            foreign(
+                out,
+                format!("a `{MANIFEST_FILE}` that is no manifest: {error}"),
+            )
+        })?;
     if existing.kind != WorkspaceKind::Generated {
         return Err(foreign(out, "a curated workspace".to_owned()));
     }

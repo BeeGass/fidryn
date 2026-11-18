@@ -1,8 +1,111 @@
-//! Discovery: what a workspace's directory holds.
+//! Discovery: what a workspace's directory holds, and the reading of the
+//! JSON files a command reads from a workspace and from its cache.
 
 use std::ffi::OsStr;
 use std::fs;
+use std::io::{self, Read};
 use std::path::{Path, PathBuf};
+
+/// The most bytes that a command reads of a manifest, a lock or an entry of
+/// the cache: 64 MiB, the bound on the source of a module, many times the
+/// largest of these files a workspace of a whole corpus has needed. A larger
+/// file is refused unread, so that no such file can exhaust memory.
+pub(crate) const JSON_LIMIT: u64 = 64 * 1024 * 1024;
+
+/// The refusal of an entry that is neither a file nor a directory, a
+/// symbolic link among them, which the check of a workspace gives both for
+/// what its walk finds and for a manifest or a lock in such an entry.
+pub(crate) const NOT_FILE_OR_DIRECTORY: &str =
+    "this entry is neither a file nor a directory; a workspace check follows no symbolic link";
+
+/// Why [`read_regular`] read nothing.
+#[derive(Debug)]
+pub(crate) enum Unread {
+    /// Nothing stands at the path.
+    Missing,
+    /// A directory stands there.
+    Directory,
+    /// An entry that is neither a file nor a directory stands there: a
+    /// symbolic link, a named pipe, a device or a socket.
+    Special,
+    /// A file larger than [`JSON_LIMIT`] stands there.
+    TooLarge,
+    /// It could not be read.
+    Io(io::Error),
+}
+
+impl Unread {
+    /// Why nothing was read, as a sentence about the entry, `this ...`.
+    pub(crate) fn sentence(&self) -> String {
+        match self {
+            Unread::Missing => "nothing stands at this path".to_owned(),
+            Unread::Special => NOT_FILE_OR_DIRECTORY.to_owned(),
+            Unread::Directory => {
+                "this entry is a directory, and a workspace check reads it only from a regular \
+                 file"
+                    .to_owned()
+            }
+            Unread::TooLarge => format!(
+                "this file is larger than {JSON_LIMIT} bytes (64 MiB), the most a workspace check \
+                 reads of a manifest, a lock or an entry of the cache"
+            ),
+            Unread::Io(error) => format!("this file cannot be read: {error}"),
+        }
+    }
+
+    /// Why nothing was read, as the end of a sentence about the entry, from
+    /// its verb on.
+    pub(crate) fn clause(&self) -> String {
+        match self {
+            Unread::Missing => "is missing".to_owned(),
+            Unread::Special => "is neither a file nor a directory, and a workspace check follows \
+                                no symbolic link"
+                .to_owned(),
+            Unread::Directory => "is a directory".to_owned(),
+            Unread::TooLarge => format!(
+                "is larger than {JSON_LIMIT} bytes (64 MiB), the most a workspace check reads of \
+                 it"
+            ),
+            Unread::Io(error) => format!("cannot be read: {error}"),
+        }
+    }
+}
+
+/// The bytes of the regular file at `path`, of at most `limit` bytes. The
+/// entry is looked at, without a link being followed, before it is opened:
+/// a symbolic link, a named pipe, a device or a directory is not opened, and
+/// a file larger than `limit` is not read. What is opened is read only when
+/// it is a regular file, and never past `limit`, should the entry have been
+/// replaced or grown in the meantime.
+pub(crate) fn read_regular(path: &Path, limit: u64) -> Result<Vec<u8>, Unread> {
+    let metadata = match fs::symlink_metadata(path) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Err(Unread::Missing),
+        Err(error) => return Err(Unread::Io(error)),
+    };
+    let kind = metadata.file_type();
+    if kind.is_dir() {
+        return Err(Unread::Directory);
+    }
+    if !kind.is_file() {
+        return Err(Unread::Special);
+    }
+    if metadata.len() > limit {
+        return Err(Unread::TooLarge);
+    }
+    let file = fs::File::open(path).map_err(Unread::Io)?;
+    if !file.metadata().map_err(Unread::Io)?.is_file() {
+        return Err(Unread::Special);
+    }
+    let mut bytes = Vec::new();
+    file.take(limit.saturating_add(1))
+        .read_to_end(&mut bytes)
+        .map_err(Unread::Io)?;
+    if bytes.len() as u64 > limit {
+        return Err(Unread::TooLarge);
+    }
+    Ok(bytes)
+}
 
 /// What [`walk`] found below a directory, every path relative to it with `/`
 /// between its segments, each list in the byte order of its paths.

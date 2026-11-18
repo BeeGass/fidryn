@@ -245,6 +245,12 @@ interchange schema versions are maintained independently of the interpreter.
   of `DIR`, and refuses the directory, naming each, for a file of the first
   edition, a module of another prefix and a module at another path; it
   removes only modules of an earlier run.
+- A command reads the manifest and the lock of a workspace and of each
+  dependency, and an entry of the cache, only from a regular file of at
+  most 64 MiB: a symbolic link, a named pipe, a device or a directory in
+  its place is refused before it is opened (`E730`, and `E740` for a
+  dependency), a larger file is refused with a sentence that gives the
+  bound, and such an entry of the cache is a miss.
 
 ## [0.2.0] - 2026-11-16
 

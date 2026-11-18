@@ -234,8 +234,11 @@ file under the directory given, as
 `DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...`; the summary line is
 printed to stdout, its errors counted, and `ok` is not. A file of
 `--report` or `--unresolved` that cannot be written is reported as
-`cannot write FILE: ...`, also with exit 1. A directory with no
-`workspace.json` is refused with `E730`:
+`cannot write FILE: ...`, also with exit 1. A manifest or a lock is read
+only from a regular file of at most 64 MiB: a symbolic link, a named pipe,
+a device or a directory in its place, and a larger file, are refused with
+`E730` before anything is read of them, as are those of a dependency with
+`E740`. A directory with no `workspace.json` is refused with `E730`:
 
 ```sh exit=1
 fidryn check conformance/fixtures/workspace

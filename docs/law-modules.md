@@ -814,8 +814,8 @@ gives every reference its [outcome](#references).
 
 | Check | Code |
 | --- | --- |
-| The directory has a `workspace.json`, and it is a manifest | `E730` |
-| A generated workspace has a `release`, no dependencies and a lock, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
+| The directory has a `workspace.json`, a regular file of at most 64 MiB, and it is a manifest | `E730` |
+| A generated workspace has a `release`, no dependencies and a lock, a regular file of at most 64 MiB, whose prefix and release are the manifest's; a curated workspace has neither a `release` nor a lock | `E730` |
 | In a generated workspace, every module file is listed in the lock with the BLAKE3 of its bytes, and every file the lock lists is present | `E730` |
 | Every `.fr` file is a module of edition 2; every entry of the directory whose name does not begin with a dot is a file or a directory, and none is a symbolic link | `E730` |
 | Every module's address is below the prefix, and the module stands at the path of its address | `E730` |
@@ -2415,6 +2415,14 @@ more.
   a path relative to the directory of the manifest. A curated workspace
   cannot depend on another curated workspace (`E740`), and a dependency
   named by an absolute path is refused (`E730`).
+- A command reads a manifest, a lock and an entry of the cache only from a
+  regular file of at most 64 MiB (67,108,864 bytes), more than nine times
+  the lock of the import of the whole Code. A symbolic link, a named pipe,
+  a device or a directory in the place of a manifest or a lock is refused
+  before anything is opened, as the check refuses a symbolic link, and a
+  larger file is refused, with a sentence that gives the bound, without
+  being read; such an entry of the cache is a miss, and an entry that would
+  be larger is not written.
 - A check trusts its cache: an entry written by hand under the key of a
   module's bytes is taken as that module's result. A cache belongs where
   only people one trusts can write, and the default is a directory of the

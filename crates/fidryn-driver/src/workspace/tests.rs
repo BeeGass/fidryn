@@ -4123,3 +4123,211 @@ fn a_cache_beside_a_dependency_is_used() {
     assert!(cache.join("v1").is_dir());
     assert_eq!(tree(&demo), before);
 }
+
+/// How a test puts something other than a regular file of a bounded size
+/// where a workspace has its manifest or its lock.
+#[cfg(unix)]
+#[derive(Clone, Copy, Debug)]
+enum NotRegular {
+    /// A symbolic link to a named pipe beside it, which waits for ever when
+    /// it is followed and opened.
+    Link,
+    /// A named pipe, which no one writes.
+    Pipe,
+    /// A file one byte larger than the bound of 64 MiB, of no bytes but
+    /// zeros, which takes no room on the disk.
+    TooLarge,
+}
+
+/// Makes a named pipe at `path`.
+#[cfg(unix)]
+fn make_pipe(path: &Path) {
+    let made = std::process::Command::new("mkfifo")
+        .arg(path)
+        .status()
+        .expect("run mkfifo");
+    assert!(made.success(), "mkfifo {}", path.display());
+}
+
+#[cfg(unix)]
+impl NotRegular {
+    /// Puts this at `path`, where the file `path` was, which is moved aside;
+    /// gives the named pipes it made.
+    fn put(self, path: &Path) -> Vec<PathBuf> {
+        fs::rename(path, path.with_extension("kept")).expect("move the file aside");
+        match self {
+            NotRegular::Link => {
+                let pipe = path.with_extension("pipe");
+                make_pipe(&pipe);
+                std::os::unix::fs::symlink(&pipe, path).expect("link");
+                vec![pipe]
+            }
+            NotRegular::Pipe => {
+                make_pipe(path);
+                vec![path.to_owned()]
+            }
+            NotRegular::TooLarge => {
+                fs::File::create(path)
+                    .and_then(|file| file.set_len(64 * 1024 * 1024 + 1))
+                    .expect("make a large file");
+                Vec::new()
+            }
+        }
+    }
+
+    /// The end of the sentence that refuses it.
+    fn refusal(self) -> &'static str {
+        match self {
+            NotRegular::Link | NotRegular::Pipe => {
+                "neither a file nor a directory; a workspace check follows no symbolic link"
+            }
+            NotRegular::TooLarge => "larger than 67108864 bytes (64 MiB)",
+        }
+    }
+}
+
+/// The check of the workspace at `root` with `options`, run on a thread of
+/// its own, or `None` when it has not ended within a minute. A check that
+/// waits on a named pipe is then let go by opening each pipe of `pipes` for
+/// writing, so that no test waits for ever.
+#[cfg(unix)]
+fn check_within_a_minute(
+    root: &Path,
+    options: CheckOptions,
+    pipes: &[PathBuf],
+) -> Option<WorkspaceReport> {
+    let (sender, receiver) = std::sync::mpsc::channel();
+    let root = root.to_owned();
+    let worker = std::thread::spawn(move || {
+        let _ = sender.send(check_workspace(&root, &options));
+    });
+    match receiver.recv_timeout(std::time::Duration::from_secs(60)) {
+        Ok(report) => {
+            worker.join().expect("the check ends");
+            Some(report)
+        }
+        Err(_) => {
+            for pipe in pipes {
+                let _ = fs::OpenOptions::new().write(true).open(pipe);
+            }
+            None
+        }
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn a_manifest_or_a_lock_is_read_only_as_a_regular_file_of_a_bounded_size() {
+    let a = note_module("a", &["citation widget -> \"/zz/demo/t1/s8/a\""]);
+    for kind in [NotRegular::Link, NotRegular::Pipe, NotRegular::TooLarge] {
+        for file in ["workspace.json", "law.lock.json"] {
+            // In a workspace that is checked.
+            let scratch = Scratch::new("not-regular");
+            write_workspace(scratch.path(), &demo_models());
+            let pipes = kind.put(&scratch.join(file));
+            let Some(report) = check_within_a_minute(scratch.path(), with_jobs(2), &pipes) else {
+                panic!("{kind:?} as `{file}`: the check did not end");
+            };
+            let about: Vec<&Diagnostic> = report
+                .diagnostics
+                .iter()
+                .filter(|diagnostic| diagnostic.source_file.as_deref() == Some(file))
+                .collect();
+            assert_eq!(about.len(), 1, "{kind:?} as `{file}`: {report:#?}");
+            assert_eq!(about[0].code, DiagnosticCode::E730, "{kind:?} as `{file}`");
+            assert!(
+                about[0].message.contains(kind.refusal()),
+                "{kind:?} as `{file}`: {}",
+                about[0].message
+            );
+            if file == "workspace.json" {
+                assert_eq!(report.diagnostics.len(), 1, "{report:#?}");
+                // The writer of a generated workspace refuses the directory
+                // as well, without opening the entry.
+                let (sender, receiver) = std::sync::mpsc::channel();
+                let out = scratch.path().to_owned();
+                std::thread::spawn(move || {
+                    let created = GeneratedWriter::create(&out, demo_manifest());
+                    let _ = sender.send(created.err().map(|error| error.to_string()));
+                });
+                let held = match kind {
+                    NotRegular::Link | NotRegular::Pipe => {
+                        "holds a `workspace.json` that is neither a file nor a directory"
+                    }
+                    NotRegular::TooLarge => {
+                        "holds a `workspace.json` that is larger than 67108864 bytes"
+                    }
+                };
+                match receiver.recv_timeout(std::time::Duration::from_secs(60)) {
+                    Ok(Some(error)) => assert!(error.contains(held), "{kind:?}: {error}"),
+                    Ok(None) => panic!("{kind:?}: the writer accepted the directory"),
+                    Err(_) => {
+                        for pipe in &pipes {
+                            let _ = fs::OpenOptions::new().write(true).open(pipe);
+                        }
+                        panic!("{kind:?}: the writer did not end");
+                    }
+                }
+            }
+
+            // In a dependency of a curated workspace.
+            let scratch = with_dependency("not-regular-dependency", &[("a", &a)]);
+            let pipes = kind.put(&scratch.join("demo").join(file));
+            let notes = scratch.join("notes");
+            let Some(report) = check_within_a_minute(&notes, with_jobs(2), &pipes) else {
+                panic!("{kind:?} as the dependency's `{file}`: the check did not end");
+            };
+            let refused = report
+                .diagnostics
+                .iter()
+                .find(|diagnostic| diagnostic.code == DiagnosticCode::E740)
+                .unwrap_or_else(|| panic!("{kind:?} as `{file}`: {report:#?}"));
+            assert_eq!(refused.source_file.as_deref(), Some("workspace.json"));
+            let clause = match kind {
+                NotRegular::Link | NotRegular::Pipe => {
+                    "is neither a file nor a directory, and a workspace check follows no \
+                     symbolic link"
+                }
+                NotRegular::TooLarge => {
+                    "is larger than 67108864 bytes (64 MiB), the most a workspace check reads \
+                     of it"
+                }
+            };
+            assert_eq!(
+                refused.message,
+                format!(
+                    "the dependency `demo` names the directory `../demo`, whose `{file}` {clause}"
+                ),
+                "{kind:?}"
+            );
+        }
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn an_entry_of_the_cache_that_is_no_regular_file_of_a_bounded_size_is_a_miss() {
+    let scratch = Scratch::new("cache-not-regular");
+    write_workspace(&scratch.join("ws"), &demo_models());
+    let cache = scratch.join("cache");
+    let uncached = check_workspace(&scratch.join("ws"), &with_jobs(1));
+    let first = check_workspace(&scratch.join("ws"), &cached(&cache, 1));
+    assert_eq!(first, uncached);
+    let keys = Cache::new(&cache, TOOLCHAIN, BUILD);
+    let (_, key) = digest_and_key(&keys, &scratch.join("ws"), "zz/demo/t1/s1.fr");
+    let entry = keys.entry_path(&key);
+    for kind in [NotRegular::Link, NotRegular::Pipe, NotRegular::TooLarge] {
+        let pipes = kind.put(&entry);
+        let Some(report) = check_within_a_minute(&scratch.join("ws"), cached(&cache, 1), &pipes)
+        else {
+            panic!("{kind:?} as an entry: the check did not end");
+        };
+        // The entry is a miss, and is written again as a regular file.
+        assert_eq!(report.from_cache, uncached.modules - 1, "{kind:?}");
+        assert_eq!(uncounted(&report), uncached, "{kind:?}");
+        let written = fs::symlink_metadata(&entry).expect("the entry");
+        assert!(written.file_type().is_file(), "{kind:?}");
+        assert!(written.len() < 1024 * 1024, "{kind:?}");
+        let _ = fs::remove_file(entry.with_extension("kept"));
+    }
+}

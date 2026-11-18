@@ -26,6 +26,7 @@
 
 use super::cache::Cache;
 use super::check::{Cached, Files, PhaseOne, lock_disagrees, read_files, settle as settle_files};
+use super::discover::{JSON_LIMIT, Unread, read_regular};
 use super::index::{DependencyInterfaces, own_checks};
 use super::{LOCK_FILE, MANIFEST_FILE};
 use fidryn_core::{Diagnostic, DiagnosticCode, Severity};
@@ -227,22 +228,27 @@ fn generated(dir: &Path, entry: &Dependency) -> Result<(Manifest, Lock, Hash32),
         }
         Err(error) => return Err((format!("{named}, which cannot be read: {error}"), None)),
     }
-    let manifest = match fs::read_to_string(dir.join(MANIFEST_FILE)) {
-        Ok(text) => Manifest::from_json(&text).map_err(|error| {
-            (
-                format!("{named}, whose `{MANIFEST_FILE}` is no manifest of a workspace: {error}"),
-                None,
-            )
-        })?,
-        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+    let manifest = match read_regular(&dir.join(MANIFEST_FILE), JSON_LIMIT) {
+        Ok(bytes) => String::from_utf8(bytes)
+            .map_err(|error| error.to_string())
+            .and_then(|text| Manifest::from_json(&text))
+            .map_err(|error| {
+                (
+                    format!(
+                        "{named}, whose `{MANIFEST_FILE}` is no manifest of a workspace: {error}"
+                    ),
+                    None,
+                )
+            })?,
+        Err(Unread::Missing) => {
             return Err((
                 format!("{named}, which holds no `{MANIFEST_FILE}` and so is no workspace"),
                 None,
             ));
         }
-        Err(error) => {
+        Err(unread) => {
             return Err((
-                format!("{named}, whose `{MANIFEST_FILE}` cannot be read: {error}"),
+                format!("{named}, whose `{MANIFEST_FILE}` {}", unread.clause()),
                 None,
             ));
         }
@@ -257,17 +263,17 @@ fn generated(dir: &Path, entry: &Dependency) -> Result<(Manifest, Lock, Hash32),
             prefix,
         ));
     }
-    let bytes = match fs::read(dir.join(LOCK_FILE)) {
+    let bytes = match read_regular(&dir.join(LOCK_FILE), JSON_LIMIT) {
         Ok(bytes) => bytes,
-        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+        Err(Unread::Missing) => {
             return Err((
                 format!("{named}, which holds a generated workspace without a lock, `{LOCK_FILE}`"),
                 prefix,
             ));
         }
-        Err(error) => {
+        Err(unread) => {
             return Err((
-                format!("{named}, whose `{LOCK_FILE}` cannot be read: {error}"),
+                format!("{named}, whose `{LOCK_FILE}` {}", unread.clause()),
                 prefix,
             ));
         }

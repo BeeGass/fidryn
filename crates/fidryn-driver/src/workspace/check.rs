@@ -15,7 +15,7 @@
 
 use super::cache::Cache;
 use super::deps;
-use super::discover::walk;
+use super::discover::{JSON_LIMIT, NOT_FILE_OR_DIRECTORY, Unread, read_regular, walk};
 use super::index::{
     Unresolved, UnresolvedCitation, across, no_citations, no_references, order, span,
 };
@@ -133,11 +133,13 @@ impl WorkspaceReport {
 /// A directory with no readable manifest is reported with `E730` and
 /// nothing else of it is read. Otherwise every `.fr` file is read and
 /// checked by itself, and then the checks across the modules run. No entry
-/// whose name begins with a dot is read, nor anything below one:
+/// whose name begins with a dot is read as part of the workspace, nor
+/// anything below one:
 ///
-/// - the manifest and the lock are well formed, a generated workspace has a
-///   release, a lock and no dependencies, and a curated workspace neither a
-///   release nor a lock; every module stands at the path of its address,
+/// - the manifest and the lock are regular files of at most 64 MiB, which
+///   are opened only when they are, and well formed; a generated workspace
+///   has a release, a lock and no dependencies, and a curated workspace
+///   neither a release nor a lock; every module stands at the path of its address,
 ///   below the prefix; in a generated workspace every module file is listed
 ///   in the lock with the BLAKE3 of its bytes, and every listed file is
 ///   present; no file is of the first edition, and every entry is a file or
@@ -216,7 +218,12 @@ pub(super) fn checked(root: &Path, manifest: &Manifest, options: &CheckOptions) 
     // files the cache did not hold. A cache that shares a directory with a
     // dependency is not used.
     let (cache, cache_unused) = cache_of(root, manifest, options);
-    let files = read_files(root, jobs, cache.as_ref());
+    let mut files = read_files(root, jobs, cache.as_ref());
+    // A lock that is no file nor directory is refused once, by `read_lock`,
+    // as the walk refuses it.
+    files
+        .diagnostics
+        .retain(|diagnostic| !diagnostics.contains(diagnostic));
     let opened = deps::open(root, manifest, jobs, cache.as_ref());
     let modules = files.modules.len();
     let from_cache = files
@@ -324,15 +331,27 @@ pub(super) fn of_file(code: DiagnosticCode, rel: &str, message: impl Into<String
 }
 
 /// The manifest of the workspace at `root`; `None`, with the reason in
-/// `diagnostics`, when it is missing or cannot be read.
+/// `diagnostics`, when it is missing or cannot be read. It is read only from
+/// a regular file of at most [`JSON_LIMIT`] bytes ([`read_regular`]): a
+/// symbolic link, a named pipe, a device or a directory in its place is
+/// refused before anything is opened.
 pub(super) fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> Option<Manifest> {
-    let text = match fs::read_to_string(root.join(MANIFEST_FILE)) {
-        Ok(text) => text,
-        Err(error) => {
-            let message = if error.kind() == io::ErrorKind::NotFound {
-                format!("no `{MANIFEST_FILE}` was found in the directory, so it is no workspace")
-            } else {
-                format!("this file cannot be read: {error}")
+    let text = match read_regular(&root.join(MANIFEST_FILE), JSON_LIMIT).map(String::from_utf8) {
+        Ok(Ok(text)) => text,
+        Ok(Err(error)) => {
+            diagnostics.push(of_file(
+                DiagnosticCode::E730,
+                MANIFEST_FILE,
+                format!("this file cannot be read: {error}"),
+            ));
+            return None;
+        }
+        Err(unread) => {
+            let message = match unread {
+                Unread::Missing => format!(
+                    "no `{MANIFEST_FILE}` was found in the directory, so it is no workspace"
+                ),
+                unread => unread.sentence(),
             };
             diagnostics.push(of_file(DiagnosticCode::E730, MANIFEST_FILE, message));
             return None;
@@ -351,48 +370,56 @@ pub(super) fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> O
 
 /// The lock of a generated workspace, when it has one that can be read, with
 /// the BLAKE3 of the bytes of its file. A generated workspace without one,
-/// and a curated workspace with one, are reported in `diagnostics`.
+/// and a curated workspace with one, are reported in `diagnostics`. The lock
+/// is read only from a regular file of at most [`JSON_LIMIT`] bytes
+/// ([`read_regular`]); a symbolic link, a named pipe, a device or a
+/// directory in its place is refused before anything is opened, the first
+/// three as the walk of the workspace refuses them, and the lock of a curated
+/// workspace is not read at all.
 pub(super) fn read_lock(
     root: &Path,
     manifest: &Manifest,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Option<(Lock, Hash32)> {
-    let text = match fs::read_to_string(root.join(LOCK_FILE)) {
-        Ok(text) => Ok(Some(text)),
-        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),
-        Err(error) => Err(error),
-    };
+    let path = root.join(LOCK_FILE);
     let mut report = |message: String| {
         diagnostics.push(of_file(DiagnosticCode::E730, LOCK_FILE, message));
     };
-    match (manifest.kind, text) {
-        (WorkspaceKind::Curated, Ok(None)) => None,
-        (WorkspaceKind::Curated, _) => {
-            report(format!(
+    if manifest.kind == WorkspaceKind::Curated {
+        match fs::symlink_metadata(&path) {
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+            _ => report(format!(
                 "a curated workspace has no lock, and this one has `{LOCK_FILE}`"
-            ));
-            None
+            )),
         }
-        (WorkspaceKind::Generated, Ok(None)) => {
+        return None;
+    }
+    let text = match read_regular(&path, JSON_LIMIT).map(String::from_utf8) {
+        Ok(Ok(text)) => text,
+        Ok(Err(error)) => {
+            report(format!("this file cannot be read: {error}"));
+            return None;
+        }
+        Err(Unread::Missing) => {
             report(format!(
                 "a generated workspace has a lock, `{LOCK_FILE}`, and this one has none"
             ));
+            return None;
+        }
+        Err(unread) => {
+            report(unread.sentence());
+            return None;
+        }
+    };
+    match Lock::from_json(&text) {
+        Err(error) => {
+            report(format!("this file is no lock of a workspace: {error}"));
             None
         }
-        (WorkspaceKind::Generated, Err(error)) => {
-            report(format!("this file cannot be read: {error}"));
-            None
+        Ok(lock) => {
+            diagnostics.extend(lock_disagrees(manifest, &lock));
+            Some((lock, Hash32(*blake3::hash(text.as_bytes()).as_bytes())))
         }
-        (WorkspaceKind::Generated, Ok(Some(text))) => match Lock::from_json(&text) {
-            Err(error) => {
-                report(format!("this file is no lock of a workspace: {error}"));
-                None
-            }
-            Ok(lock) => {
-                diagnostics.extend(lock_disagrees(manifest, &lock));
-                Some((lock, Hash32(*blake3::hash(text.as_bytes()).as_bytes())))
-            }
-        },
     }
 }
 
@@ -451,12 +478,7 @@ pub(super) fn read_files(root: &Path, jobs: usize, cache: Option<&Cache>) -> Fil
         ));
     }
     for rel in &found.special {
-        diagnostics.push(of_file(
-            DiagnosticCode::E730,
-            rel,
-            "this entry is neither a file nor a directory; a workspace check follows no \
-             symbolic link",
-        ));
+        diagnostics.push(of_file(DiagnosticCode::E730, rel, NOT_FILE_OR_DIRECTORY));
     }
     let read = phase_one(root, &found.modules, jobs, cache);
     Files {

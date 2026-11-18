@@ -20,7 +20,8 @@
 //! cache. An entry is read back only when it is what the writer writes; any
 //! other, one cut short, one that is not JSON or is JSON of another shape,
 //! or one of another key or of other bytes, is a miss, and the check writes
-//! it again. A failure to read an entry is a miss, and a failure to write
+//! it again. So is anything at its path that is not a regular file of at
+//! most 64 MiB, which is not opened or not read. A failure to read an entry is a miss, and a failure to write
 //! one fails nothing: the first is recorded, with the cache's directory, for
 //! the command to say once, and no other entry is written.
 //!
@@ -31,6 +32,7 @@
 //! one that only those whose results are trusted write.
 
 use super::check::PhaseOne;
+use super::discover::{JSON_LIMIT, read_regular};
 use fidryn_core::Diagnostic;
 use fidryn_provision::{Hash32, Interface};
 use serde_json::{Map, Value};
@@ -140,9 +142,12 @@ impl Cache {
     /// The result of phase one kept under `key` for a file whose bytes have
     /// the BLAKE3 `digest`, when the entry is one the writer wrote for them;
     /// `None` when there is none, when it cannot be read, and when it is
-    /// damaged.
+    /// damaged. An entry is read only from a regular file of at most
+    /// [`JSON_LIMIT`] bytes ([`read_regular`]): anything else at its path is
+    /// a miss, and is not opened.
     pub(super) fn read(&self, key: &Hash32, digest: &Hash32) -> Option<PhaseOne> {
-        let text = fs::read_to_string(self.entry_path(key)).ok()?;
+        let bytes = read_regular(&self.entry_path(key), JSON_LIMIT).ok()?;
+        let text = String::from_utf8(bytes).ok()?;
         let given: Value = serde_json::from_str(&text).ok()?;
         let fields = given.as_object()?;
         let digest_of = |name: &str| fields.get(name)?.as_str()?.parse::<Hash32>().ok();
@@ -180,9 +185,10 @@ impl Cache {
 
     /// Keeps `result`, phase one of a file whose key is `key`, replacing
     /// any entry of the key. A result without a digest, of a file that could
-    /// not be read, is not kept. A failure is recorded, the first one only,
-    /// as the cache's directory and the error, and is not an error; once
-    /// one is recorded, nothing more is written.
+    /// not be read, is not kept, nor one whose entry is larger than
+    /// [`JSON_LIMIT`], which no read would take. A failure is recorded, the
+    /// first one only, as the cache's directory and the error, and is not an
+    /// error; once one is recorded, nothing more is written.
     pub(super) fn write(&self, key: &Hash32, result: &PhaseOne) {
         let Some(digest) = result.digest else {
             return;
@@ -193,6 +199,9 @@ impl Cache {
         let entry = entry(key, &digest, &result.diagnostics, result.interface.as_ref());
         let mut text = entry.to_string();
         text.push('\n');
+        if text.len() as u64 > JSON_LIMIT {
+            return;
+        }
         if let Err(error) = write_replacing(&self.entry_path(key), text.as_bytes()) {
             let _ = self.failure.set(format!("{}: {error}", self.dir.display()));
         }
