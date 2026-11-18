@@ -1882,8 +1882,8 @@ and then by `to`.
 | `operative.amended_text` | a provision on both sides whose own words differ |
 | `operative.amended_structure` | a provision on both sides whose own structure differs |
 | `operative.moved` | a removed and an added provision that are one (below) |
-| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address, once like-named notes are paired (below) |
-| `enacted_notes.amended` | an enacted note at one address on both sides, once like-named notes are paired, whose [note hash](#hashes) differs |
+| `enacted_notes.added`, `removed` | an enacted note left unpaired once like-named notes are paired (below), at an address at which the other side has no unpaired note |
+| `enacted_notes.amended` | an address at which each side has an enacted note left unpaired once like-named notes are paired, the two of different [note hashes](#hashes) |
 | `enacted_notes.moved` | a like-named note paired with one at another address, or a removed and an added enacted note of equal note hashes (below) |
 | `editorial.added`, `removed`, `amended`, `moved` | the same, of the editorial notes |
 | `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or changed in its words, its links, its superscripts or its subscripts; a footnote marker in a credit counts for `footnotes_changed` |
@@ -1960,11 +1960,21 @@ that none has is `removed` or `added`. A removed and an added note are one
 `moved` entry when their note hashes are equal, paired in the same way as
 provisions across the workspace: a note whose address changed and whose
 text did not has moved, as the notes of a renumbered section do, and so
-does a note whose address names another law while its text is the same. A
-note of a family that is amended while another is inserted before it has no
-note of equal hash on the other side, so it is compared by address: the
-note at its old address is `amended`, and the one at its new address
-`added`.
+does a note whose address names another law while its text is the same.
+
+A note whose text changed has no note of equal hash on the other side, so
+it is compared by address, with whatever unpaired note stands at its old
+address on the other side. When one does, the address is `amended`, and
+what the old note is compared with may be another note: of two like-named
+notes before which a note is inserted, an amended first is `amended` at the
+first address, where it is compared with the inserted note, and its new
+text is `added` at the second. When a paired note took its old address, the
+changed note is `removed` there, and its new text is `added` at its new
+address: an amended second, after an unchanged first that moved to its
+address, is `removed` at the second address and `added` at the third. In
+neither case can a change set tell that the note at the new address is the
+old one amended, since a note has no identity but its address and its
+text.
 
 ### Stale bindings
 
@@ -2054,7 +2064,8 @@ set: the provisions only in the old are `operative.removed` with the
 the `to`, and those that differ `amended_text` with `amended_structure`;
 the notes of each layer likewise against `added`, `removed`, `moved` and
 `amended`, once it has paired like-named notes as above, by the equality of
-their records but for their addresses, so that a note paired with one at
+their records but for their addresses and their footnote markers, which no
+note hash holds, so that a note paired with one at
 another address is only in the old at its old address and only in the new
 at its new one; the units and containers whose credit or footnotes differ
 `credits_changed` and `footnotes_changed`; and the containers `removed`,
@@ -2590,11 +2601,21 @@ more.
   other change, gives a change set in which every list is empty, and the
   bases of its definitions, which follow the flag, are in no list either:
   definitions are in no hash.
-- Like-named notes are paired by equal note hashes alone: a note of a
-  family that is amended while another is inserted before it is `amended`
-  at its old address and `added` at its new one. Units and containers whose
-  addresses `~2`, `~3` mark as later holders of one identifier are not
-  paired this way: they are compared by address.
+- Like-named notes are paired by equal note hashes alone, and a note has no
+  identity but its address and its text. A note of a family whose text
+  changed while another was inserted before it is compared with whatever
+  unpaired note stands at its old address on the other side: that address
+  is `amended` when one does, though what it compares may be the old note
+  and the inserted one, and the note is `removed` there when a paired note
+  took the address; its new text is `added` at its new address. No change
+  set says that the note at the new address is the old one amended. Units
+  and containers whose addresses `~2`, `~3` mark as later holders of one
+  identifier are not paired this way: they are compared by address.
+- The addresses of a family are taken in the order of their bytes on both
+  sides, so `…/10` comes before `…/2`: in a family of ten or more
+  like-named notes, notes of equal text pair in that order, and one may be
+  listed as moved from `/2` to `/11` where pairing by the order of the
+  ordinals would leave it in place.
 - `conformance/usc_compare.py --against` checks the unions of the lists,
   as [Change sets](#change-sets) says. It cannot see a provision in the
   wrong one of two lists whose union it checks, or a wrong pairing of a

@@ -1765,8 +1765,8 @@ and then by <code>to</code>.</p>
 <tr><td><code>operative.amended_text</code></td><td>a provision on both sides whose own words differ</td></tr>
 <tr><td><code>operative.amended_structure</code></td><td>a provision on both sides whose own structure differs</td></tr>
 <tr><td><code>operative.moved</code></td><td>a removed and an added provision that are one (below)</td></tr>
-<tr><td><code>enacted_notes.added</code>, <code>removed</code></td><td>an enacted note on one side only, by its address, once like-named notes are paired (below)</td></tr>
-<tr><td><code>enacted_notes.amended</code></td><td>an enacted note at one address on both sides, once like-named notes are paired, whose <a href="#hashes">note hash</a> differs</td></tr>
+<tr><td><code>enacted_notes.added</code>, <code>removed</code></td><td>an enacted note left unpaired once like-named notes are paired (below), at an address at which the other side has no unpaired note</td></tr>
+<tr><td><code>enacted_notes.amended</code></td><td>an address at which each side has an enacted note left unpaired once like-named notes are paired, the two of different <a href="#hashes">note hashes</a></td></tr>
 <tr><td><code>enacted_notes.moved</code></td><td>a like-named note paired with one at another address, or a removed and an added enacted note of equal note hashes (below)</td></tr>
 <tr><td><code>editorial.added</code>, <code>removed</code>, <code>amended</code>, <code>moved</code></td><td>the same, of the editorial notes</td></tr>
 <tr><td><code>editorial.credits_changed</code></td><td>a unit or a container on both sides whose source credit was added, removed, or changed in its words, its links, its superscripts or its subscripts; a footnote marker in a credit counts for <code>footnotes_changed</code></td></tr>
@@ -1839,11 +1839,20 @@ that none has is <code>removed</code> or <code>added</code>. A removed and an ad
 <code>moved</code> entry when their note hashes are equal, paired in the same way as
 provisions across the workspace: a note whose address changed and whose
 text did not has moved, as the notes of a renumbered section do, and so
-does a note whose address names another law while its text is the same. A
-note of a family that is amended while another is inserted before it has no
-note of equal hash on the other side, so it is compared by address: the
-note at its old address is <code>amended</code>, and the one at its new address
-<code>added</code>.</p>
+does a note whose address names another law while its text is the same.</p>
+<p>A note whose text changed has no note of equal hash on the other side, so
+it is compared by address, with whatever unpaired note stands at its old
+address on the other side. When one does, the address is <code>amended</code>, and
+what the old note is compared with may be another note: of two like-named
+notes before which a note is inserted, an amended first is <code>amended</code> at the
+first address, where it is compared with the inserted note, and its new
+text is <code>added</code> at the second. When a paired note took its old address, the
+changed note is <code>removed</code> there, and its new text is <code>added</code> at its new
+address: an amended second, after an unchanged first that moved to its
+address, is <code>removed</code> at the second address and <code>added</code> at the third. In
+neither case can a change set tell that the note at the new address is the
+old one amended, since a note has no identity but its address and its
+text.</p>
 <h3 id="stale-bindings"><span class="hn">4.17.3</span> Stale bindings <a class="anchor" href="#stale-bindings" aria-label="Link to this section">#</a></h3>
 <p>With <code>--bindings DIR</code>, each binding of the curated workspace in <code>DIR</code> is
 judged against the new side by the rule of <a href="#bindings">Bindings</a>,
@@ -1921,7 +1930,8 @@ set: the provisions only in the old are <code>operative.removed</code> with the
 the <code>to</code>, and those that differ <code>amended_text</code> with <code>amended_structure</code>;
 the notes of each layer likewise against <code>added</code>, <code>removed</code>, <code>moved</code> and
 <code>amended</code>, once it has paired like-named notes as above, by the equality of
-their records but for their addresses, so that a note paired with one at
+their records but for their addresses and their footnote markers, which no
+note hash holds, so that a note paired with one at
 another address is only in the old at its old address and only in the new
 at its new one; the units and containers whose credit or footnotes differ
 <code>credits_changed</code> and <code>footnotes_changed</code>; and the containers <code>removed</code>,
@@ -2422,11 +2432,21 @@ changed. A title enacted as positive law between two releases, with no
 other change, gives a change set in which every list is empty, and the
 bases of its definitions, which follow the flag, are in no list either:
 definitions are in no hash.</li>
-<li>Like-named notes are paired by equal note hashes alone: a note of a
-family that is amended while another is inserted before it is <code>amended</code>
-at its old address and <code>added</code> at its new one. Units and containers whose
-addresses <code>~2</code>, <code>~3</code> mark as later holders of one identifier are not
-paired this way: they are compared by address.</li>
+<li>Like-named notes are paired by equal note hashes alone, and a note has no
+identity but its address and its text. A note of a family whose text
+changed while another was inserted before it is compared with whatever
+unpaired note stands at its old address on the other side: that address
+is <code>amended</code> when one does, though what it compares may be the old note
+and the inserted one, and the note is <code>removed</code> there when a paired note
+took the address; its new text is <code>added</code> at its new address. No change
+set says that the note at the new address is the old one amended. Units
+and containers whose addresses <code>~2</code>, <code>~3</code> mark as later holders of one
+identifier are not paired this way: they are compared by address.</li>
+<li>The addresses of a family are taken in the order of their bytes on both
+sides, so <code>…/10</code> comes before <code>…/2</code>: in a family of ten or more
+like-named notes, notes of equal text pair in that order, and one may be
+listed as moved from <code>/2</code> to <code>/11</code> where pairing by the order of the
+ordinals would leave it in place.</li>
 <li><code>conformance/usc_compare.py --against</code> checks the unions of the lists,
 as <a href="#change-sets">Change sets</a> says. It cannot see a provision in the
 wrong one of two lists whose union it checks, or a wrong pairing of a
