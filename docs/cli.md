@@ -109,12 +109,15 @@ authentication as described above.
 
 A file whose first two words are `edition 2` is a law module of edition 2,
 which holds provisions of law as data
-([Law modules](law-modules.md#editions)). `check` reads it with its own
-parser and runs the checks of one module on it: its shape, its addresses,
-the form of its text, its hashes, its footnote markers and its
+([Law modules](law-modules.md#editions)). `check` reads such a module with
+its own parser and runs the checks of one module on it: its shape, its
+addresses, the form of its text, its hashes, its footnote markers and its
 definitions, as
 [What the checker verifies in one module](law-modules.md#what-the-checker-verifies-in-one-module)
-lists them.
+lists them. The marker is looked for in a regular file only, so a module
+of edition 2 is read from a regular file: an input that is no regular
+file, such as a pipe or `/dev/stdin`, is read by every command as a file
+of the first edition.
 
 A directory is a workspace of edition 2 modules, with a manifest,
 `workspace.json`, at its top ([Workspaces](law-modules.md#workspaces)).

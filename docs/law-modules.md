@@ -42,7 +42,10 @@ refused with `E100`: "unknown edition `3`; this toolchain reads edition 2
 after the word `edition`, and files of the first edition carry no marker".
 
 `fidryn_syntax::edition::edition_of` tells the edition of a file, and each
-entry point asks it before it reads the file:
+entry point asks it before it reads the file. The command line asks it of
+a regular file only: an input that is no regular file, such as a pipe or
+`/dev/stdin`, could not be read twice, and every command reads it as a
+file of the first edition.
 
 | Entry point | Given a module of edition 2 |
 | --- | --- |

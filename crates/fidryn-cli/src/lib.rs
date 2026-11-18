@@ -440,7 +440,8 @@ fn inputs_of(command: &Command) -> Vec<PathBuf> {
 }
 
 /// Exit 1 when a file `command` reads is a module of edition 2, or carries a
-/// marker that names no edition: only `fidryn check` reads edition 2.
+/// marker that names no edition: only `fidryn check` reads edition 2. Only a
+/// regular file is looked at ([`read_head`]).
 fn refuse_edition_2(command: &Command) -> Option<ExitCode> {
     for path in inputs_of(command) {
         if let Err(diagnostic) = first_edition_file(&path) {
@@ -461,7 +462,9 @@ fn first_edition(source: &str) -> Result<(), Diagnostic> {
 }
 
 /// As [`first_edition`], of the file at `path`, naming the file. A file that
-/// cannot be read passes, so that the command reports why.
+/// cannot be read passes, so that the command reports why, and so does an
+/// input that is no regular file, which the command reads as a file of the
+/// first edition ([`read_head`]).
 fn first_edition_file(path: &Path) -> Result<(), Diagnostic> {
     let Some(head) = read_head(path) else {
         return Ok(());
@@ -470,9 +473,16 @@ fn first_edition_file(path: &Path) -> Result<(), Diagnostic> {
         .map_err(|diagnostic| diagnostic.with_source(path.display().to_string()))
 }
 
-/// The bytes of the file at `path`, up to one more than the largest source
-/// of edition 2; `None` when it cannot be read.
+/// The bytes of the regular file at `path`, up to one more than the largest
+/// source of edition 2; `None` when it cannot be read, and when it is no
+/// regular file. An input such as a pipe, `/dev/stdin` or a terminal is not
+/// read here, since what is read of it could not be read again: the command
+/// reads it whole, as a file of the first edition. A module of edition 2 is
+/// read from a regular file.
 fn read_head(path: &Path) -> Option<Vec<u8>> {
+    if !fs::metadata(path).ok()?.is_file() {
+        return None;
+    }
     let mut bytes = Vec::new();
     fs::File::open(path)
         .ok()?
@@ -491,8 +501,9 @@ fn utf8_prefix(bytes: &[u8]) -> &str {
 }
 
 /// `fidryn check` of a module of edition 2: the checks of one module, then
-/// `ok`. `None` when the file at `path` is no module of edition 2, or cannot
-/// be read; the check of the first edition then reads it.
+/// `ok`. `None` when the file at `path` is no module of edition 2, cannot be
+/// read or is no regular file ([`read_head`]); the check of the first
+/// edition then reads it.
 fn check_edition_2(path: &Path) -> Option<ExitCode> {
     let head = read_head(path)?;
     if !matches!(edition_of(utf8_prefix(&head)), Ok(Edition::Two)) {

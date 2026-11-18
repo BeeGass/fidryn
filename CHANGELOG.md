@@ -251,6 +251,10 @@ interchange schema versions are maintained independently of the interpreter.
   its place is refused before it is opened (`E730`, and `E740` for a
   dependency), a larger file is refused with a sentence that gives the
   bound, and such an entry of the cache is a miss.
+- The edition marker is looked for in a regular file only: an input that
+  is no regular file, such as a pipe or `/dev/stdin`, is read by every
+  command as a file of the first edition, as in 0.2.0, and a module of
+  edition 2 is read from a regular file.
 
 ## [0.2.0] - 2026-11-16
 
