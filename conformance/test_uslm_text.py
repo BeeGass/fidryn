@@ -78,6 +78,11 @@ CASES = {
     "definitions-restated": "definitions in a file whose positive-law flag is no, with notes "
     "headed References in Text in the editorial group, in quoted content and in the statutory "
     "group",
+    "notes-empty-topic": "a note whose topic attribute is empty, and one whose topic is one space",
+    "notes-spaced-topics": "topics with two spaces between them, with a line break between them, "
+    "and with spaces before, between and after them in a note named by its hash",
+    "quoted-empty-origin": "quoted content whose origin is empty, in operative text and in a note "
+    "that cites a law by a link after it",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -239,6 +244,15 @@ class TextFixtures(unittest.TestCase):
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
 
+    def test_notes_empty_topic(self) -> None:
+        self.check("notes-empty-topic")
+
+    def test_notes_spaced_topics(self) -> None:
+        self.check("notes-spaced-topics")
+
+    def test_quoted_empty_origin(self) -> None:
+        self.check("quoted-empty-origin")
+
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)
         self.assertIn('"address":"/us/usc/~appendix.2"', expected[2])
@@ -343,6 +357,33 @@ class TextFixtures(unittest.TestCase):
         self.assertEqual(named[0]["topics"], [])
         self.assertIsNone(named[0]["heading"])
 
+    def test_the_hash_of_a_note_joins_its_topics_with_one_space(self) -> None:
+        # The topic attribute "  miscellaneous   effectiveDate " gives two topics, and
+        # the note hash holds them joined by one space:
+        #   00 | 0e 00 00 00 00 00 00 00 | "fidryn.note/v1"                domain
+        #   70 | 09 00 00 00 00 00 00 00 | "ungrouped"                     group
+        #   71 | 1b 00 00 00 00 00 00 00 | "miscellaneous effectiveDate"   topics
+        #   1f | 00 00 00 00 00 00 00 00 |                                 no heading
+        #   20 | 38 00 00 00 00 00 00 00 | the text below                  a paragraph
+        #        10 | 2f 00 00 00 00 00 00 00 | "Neither a law nor a heading, and spaced topics."
+        frames = (
+            bytes([0x00, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"fidryn.note/v1"
+            + bytes([0x70, 0x09, 0, 0, 0, 0, 0, 0, 0])
+            + b"ungrouped"
+            + bytes([0x71, 0x1B, 0, 0, 0, 0, 0, 0, 0])
+            + b"miscellaneous effectiveDate"
+            + bytes([0x1F, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x20, 0x38, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x10, 0x2F, 0, 0, 0, 0, 0, 0, 0])
+            + b"Neither a law nor a heading, and spaced topics."
+        )
+        address = "/us/usc/t99/s1/note/ungrouped/nolaw/h." + blake3.blake3(frames).hexdigest()[:16]
+        records = [json.loads(line) for line in expected_lines("notes-spaced-topics")]
+        named = [r for r in records if r["address"] == address]
+        self.assertEqual(len(named), 1, address)
+        self.assertEqual(named[0]["topics"], ["miscellaneous", "effectiveDate"])
+
     def test_text_records_are_sorted_and_match_the_schema_shape(self) -> None:
         for name in [*CASES, *MEMBER_SETS]:
             with self.subTest(fixture=name):
@@ -426,6 +467,8 @@ def oversized_archive(directory: Path) -> None:
 COMPOSED = "composes across the boundary"
 # The combining acute accent, which composes with the `e` before it into U+00E9.
 ACUTE = chr(0x0301)
+# A white-space character other than U+0020.
+NO_BREAK_SPACE = chr(0x00A0)
 # A document whose only fault is an entity declaration cannot be written: an entity
 # declaration stands only inside a document type declaration, and the XML reader
 # refuses the declaration of the document type as soon as it opens, before it reads
@@ -549,6 +592,14 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             "<heading>Notes</heading></note></notes>"
         ),
         "not one word of ASCII letters",
+    ),
+    "note whose topic holds a no-break space": (
+        document(
+            inner='<content>Text.</content><notes type="uscNote"><note topic="amendments'
+            + NO_BREAK_SPACE
+            + 'effectiveDate"><heading>Odd</heading><p>Text.</p></note></notes>'
+        ),
+        "holds a white-space character other than U+0020",
     ),
     "link inside a link": (
         document(

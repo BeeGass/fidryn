@@ -2087,7 +2087,8 @@ A document is refused when:
 - a unit or a container has a second source credit, or a source credit
   stands anywhere but directly in one;
 - a cross heading has no topic, or one that is not one word of ASCII
-  letters and digits beginning with a letter;
+  letters and digits beginning with a letter; or a topic of a note holds a
+  white-space character other than U+0020, at which topics are split;
 - the law a note cites first is a reference of fewer than four segments,
   or one whose second, third or fourth segment holds a character that an
   address segment cannot hold;
@@ -2131,7 +2132,8 @@ the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
 the text that gives no words. An `img` is imported as the source its `src`
 names, normalized, and empty when it has none; the picture is not in the
-archive.
+archive. Quoted content has the `origin` it names as the source writes it,
+and none when the attribute is absent or empty.
 
 ### Notes and their layers
 
@@ -2139,7 +2141,10 @@ Each `note` in a `notes` element is a note, except a cross heading
 (`role="crossHeading"`), which opens a group named by its topic and is not
 itself a note. So is each `note` that stands directly in a level and is
 neither a footnote nor a release note. A note belongs to the unit or the
-container it is anchored in. Its group is the topic of the nearest cross
+container it is anchored in. Its topics are its `topic` attribute split at
+U+0020 and no other character, with the empty members dropped: an empty
+attribute, or one of spaces, gives no topic, and two spaces between two
+words give two topics. Its group is the topic of the nearest cross
 heading before it in its `notes` element, and `ungrouped` when there is
 none or the note stands directly in a level:
 

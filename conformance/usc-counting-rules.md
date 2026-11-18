@@ -76,7 +76,9 @@ What is counted is what the reading imports, element by element:
   a word these rules do not know is a group like any other. A group heading is no
   note: its label, its first `heading` child, is not imported and is counted; what
   it holds after that label is a note of the group it opens, with no heading and
-  no topics. Topics are the `topic` attribute split at U+0020. A note is editorial
+  no topics. Topics are the `topic` attribute split at U+0020, with no empty
+  member, so that an empty attribute gives none; a topic that holds any other
+  white-space character is refused. A note is editorial
   when its group is `editorialNotes`, or when it is ungrouped and one of its
   topics is `removalDescription` or `historicalAndRevision`; every other note is
   enacted. A note's text may hold a text part that stands directly in it, read as
@@ -125,7 +127,7 @@ with neither a value nor text is absent, as it is in 201 sections quoted in note
 of release 119-142; a number with a value and no text keeps the value with an empty
 shown form; a heading and a source credit with no text are absent. A number, a
 heading or a credit that holds a footnote marker keeps it, with an empty text when
-it has no other.
+it has no other. Quoted content whose `origin` is empty has no origin.
 
 | Key | Count |
 | --- | --- |

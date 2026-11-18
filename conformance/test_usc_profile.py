@@ -198,6 +198,15 @@ class ProfileFixtures(unittest.TestCase):
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
 
+    def test_notes_empty_topic(self) -> None:
+        self.check("notes-empty-topic")
+
+    def test_notes_spaced_topics(self) -> None:
+        self.check("notes-spaced-topics")
+
+    def test_quoted_empty_origin(self) -> None:
+        self.check("quoted-empty-origin")
+
     def test_top_elements_without_an_identifier_are_counted_over_the_release(self) -> None:
         expected = json.loads((FIXTURES / f"{UNNAMED}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):

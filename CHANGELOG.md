@@ -255,6 +255,12 @@ interchange schema versions are maintained independently of the interpreter.
   is no regular file, such as a pipe or `/dev/stdin`, is read by every
   command as a file of the first edition, as in 0.2.0, and a module of
   edition 2 is read from a regular file.
+- The importer of the Code and the independent reading in `conformance/`
+  read the topics of a note as its `topic` attribute split at spaces with
+  no empty member, so that an empty attribute gives no topic, and read
+  quoted content whose `origin` is empty as having none; a topic that holds
+  any other white space is refused with the note named. A workspace the
+  importer writes from such a release checks.
 
 ## [0.2.0] - 2026-11-16
 

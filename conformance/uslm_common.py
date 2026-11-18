@@ -1298,8 +1298,11 @@ class MemberReader:
         return int(value)
 
     def read_quoted(self, element: Element, context: Context, scope: Scope) -> Quoted:
+        """Quoted content: its origin as written, none when it has none or an empty one,
+        and its items."""
         quoted = Context(context.in_note, True, quoted_top=True)
-        return Quoted(element.get("origin"), self.read_items(element, quoted, scope, None))
+        origin = element.get("origin") or None
+        return Quoted(origin, self.read_items(element, quoted, scope, None))
 
     def read_items(
         self,
@@ -1422,7 +1425,7 @@ class MemberReader:
                 if not blocks:
                     continue
             else:
-                topics = split_at_spaces(element.get("topic"))
+                topics = self.topics_of(element)
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
                 if heading_element is not None:
                     heading = self.read_optional_text(heading_element, scope)
@@ -1443,6 +1446,20 @@ class MemberReader:
             layer = "editorial" if editorial else "enacted"
             read.append(Note(address, layer, group, topics, heading, blocks))
         return read
+
+    def topics_of(self, note: Element) -> list[str]:
+        """The topics of a note: its `topic` attribute split at U+0020, with no empty
+        member, so that an empty attribute gives none. A topic that holds any other
+        white-space character is refused."""
+        topics = split_at_spaces(note.get("topic"))
+        for topic in topics:
+            if any(character in WHITE_SET for character in topic):
+                self.refuse(
+                    f"a note whose topic {topic!r} holds a white-space character other than "
+                    "U+0020, at which its topics are split",
+                    note,
+                )
+        return topics
 
     def law_of(self, heading: Text | None, blocks: list[Block], note: Element, anchor: str) -> str:
         """The law a note cites first: its first quoted origin, else its first link to a law."""

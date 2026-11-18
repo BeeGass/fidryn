@@ -1117,7 +1117,7 @@ fn signature(node: Node<'_, '_>, scope: &mut Scope) -> Result<Vec<Block>, Ingest
 }
 
 /// The quoted content `node`, held by `holder`: its origin as the source
-/// writes it, and its items.
+/// writes it, none when the attribute is absent or empty, and its items.
 fn quoted(node: Node<'_, '_>, holder: Holder, scope: &mut Scope) -> Result<Quoted, IngestError> {
     let mut items = Items::new(node, holder);
     for child in node.children() {
@@ -1131,7 +1131,10 @@ fn quoted(node: Node<'_, '_>, holder: Holder, scope: &mut Scope) -> Result<Quote
         }
     }
     Ok(Quoted {
-        origin: node.attribute("origin").map(str::to_owned),
+        origin: node
+            .attribute("origin")
+            .filter(|origin| !origin.is_empty())
+            .map(str::to_owned),
         items: items.finish(scope)?,
     })
 }
@@ -2039,6 +2042,29 @@ mod tests {
                 }),
             ]
         );
+    }
+
+    #[test]
+    fn quoted_content_whose_origin_is_empty_has_none() {
+        assert_fixture("quoted-empty-origin");
+        let quoted = |origin: &str| {
+            blocks_of(&format!(
+                "<content>Reads: <quotedContent{origin}>“Words.”</quotedContent></content>"
+            ))
+        };
+        let none = quoted("");
+        assert_eq!(quoted(" origin=\"\""), none);
+        let [_, Block::Quoted(read)] = none.as_slice() else {
+            panic!("{none:?}");
+        };
+        assert_eq!(read.origin, None);
+        // An origin of white space is not empty, and is kept as the source
+        // writes it.
+        let spaced = quoted(" origin=\" \"");
+        let [_, Block::Quoted(read)] = spaced.as_slice() else {
+            panic!("{spaced:?}");
+        };
+        assert_eq!(read.origin.as_deref(), Some(" "));
     }
 
     #[test]

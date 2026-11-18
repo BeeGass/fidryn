@@ -10,7 +10,9 @@
 //! that begins with a letter, and its label is counted and not imported;
 //! what it holds after its label is a note of that group, with no heading
 //! and no topics. A note that follows no cross heading, and one that stands
-//! directly in a level, is `ungrouped`.
+//! directly in a level, is `ungrouped`. The topics of a note are its `topic`
+//! attribute split at U+0020, the empty members dropped; a topic that holds
+//! any other white-space character is refused.
 //!
 //! A note is editorial when its group is `editorialNotes`, or when it is
 //! ungrouped and one of its topics is `removalDescription` or
@@ -36,7 +38,7 @@
 use crate::IngestError;
 use crate::uslm::{self, Scope};
 use fidryn_provision::hash::hash_note;
-use fidryn_provision::normalize::normalize;
+use fidryn_provision::normalize::{WHITE_SPACE, normalize};
 use fidryn_provision::{Address, Block, Footnote, Layer, Note, Quoted, QuotedItem, Run, Text};
 use roxmltree::{Document, Node};
 use std::collections::HashMap;
@@ -162,10 +164,7 @@ fn note<'a, 'i>(
     group: String,
     scope: &mut Scope,
 ) -> Result<Unnamed<'a, 'i>, IngestError> {
-    let topics: Vec<String> = node
-        .attribute("topic")
-        .map(|topic| topic.split(' ').map(str::to_owned).collect())
-        .unwrap_or_default();
+    let topics = topics(node)?;
     let (heading, blocks) = uslm::note(node, true, scope)?;
     Ok(Unnamed {
         node,
@@ -179,6 +178,29 @@ fn note<'a, 'i>(
             blocks,
         },
     })
+}
+
+/// The topics of the note `node`: its `topic` attribute split at U+0020,
+/// with the empty members dropped, so that an empty attribute gives none. A
+/// member that holds any other white-space character is refused.
+fn topics(node: Node<'_, '_>) -> Result<Vec<String>, IngestError> {
+    let mut topics = Vec::new();
+    for topic in node.attribute("topic").unwrap_or("").split(' ') {
+        if topic.is_empty() {
+            continue;
+        }
+        if topic.contains(WHITE_SPACE) {
+            return Err(IngestError::at(
+                node,
+                format!(
+                    "a note whose topic {topic:?} holds a white-space character other than \
+                     U+0020, at which its topics are split"
+                ),
+            ));
+        }
+        topics.push(topic.to_owned());
+    }
+    Ok(topics)
 }
 
 /// Whether the note `node` is a release note: it stands directly in a
@@ -541,7 +563,7 @@ mod tests {
              <note topic=\"amendments historicalAndRevision\"><p>B.</p></note>\
              <note topic=\"amendments\"><p>C.</p></note>\
              <note><p>D.</p></note>\
-             <note topic=\"removalDescription\u{A0}x\"><p>E.</p></note>\
+             <note topic=\"removalDescription x\"><p>E.</p></note>\
              <note role=\"crossHeading\" topic=\"statutoryNotes\"><heading>S</heading></note>\
              <note topic=\"removalDescription\"><p>F.</p></note>\
              <note role=\"crossHeading\" topic=\"editorialNotes\"><heading>E</heading></note>\
@@ -555,15 +577,64 @@ mod tests {
                 Layer::Editorial,
                 Layer::Enacted,
                 Layer::Enacted,
-                Layer::Enacted,
+                Layer::Editorial,
                 Layer::Enacted,
                 Layer::Editorial,
             ]
         );
-        // Topics are split at U+0020 and at no other character.
         assert_eq!(notes[1].topics, ["amendments", "historicalAndRevision"]);
         assert_eq!(notes[3].topics, Vec::<String>::new());
-        assert_eq!(notes[4].topics, ["removalDescription\u{A0}x"]);
+        assert_eq!(notes[4].topics, ["removalDescription", "x"]);
+    }
+
+    #[test]
+    fn topics_are_split_at_spaces_and_an_empty_one_is_none() {
+        assert_fixture("notes-empty-topic");
+        assert_fixture("notes-spaced-topics");
+        // The empty members of the split are dropped: an empty topic attribute
+        // and one of spaces give no topic, and spaces before, between and
+        // after topics give the topics alone.
+        let notes = notes_of(
+            "<note topic=\"\"><p>A.</p></note>\
+             <note topic=\"   \"><p>B.</p></note>\
+             <note topic=\" amendments   historicalAndRevision  \"><p>C.</p></note>",
+        );
+        let topics: Vec<Vec<&str>> = notes
+            .iter()
+            .map(|note| note.topics.iter().map(String::as_str).collect())
+            .collect();
+        assert_eq!(
+            topics,
+            [vec![], vec![], vec!["amendments", "historicalAndRevision"]]
+        );
+        assert_eq!(notes[2].layer, Layer::Editorial);
+        // A line break written in the attribute is a space once the attribute
+        // is read; one written as a character reference is not.
+        let notes = notes_of("<note topic=\"amendments\nshortTitle\"><p>A.</p></note>");
+        assert_eq!(notes[0].topics, ["amendments", "shortTitle"]);
+        // A topic that holds any other white-space character is refused, and
+        // the refusal names the note.
+        for topic in [
+            "amendments\u{A0}x",
+            "amendments&#x9;x",
+            "amendments&#xA;x",
+            "&#xD;",
+            "amendments \u{2003}",
+            "\u{3000}",
+        ] {
+            let error = refusal(&Document::with_section(&format!(
+                "<content>Text.</content><notes type=\"uscNote\"><note topic=\"{topic}\">\
+                 <heading>Odd</heading><p>A.</p></note></notes>"
+            )));
+            assert!(
+                error
+                    .message()
+                    .contains("holds a white-space character other than U+0020"),
+                "{topic}: {error}"
+            );
+            assert_eq!(error.element(), Some("note"), "{topic}: {error}");
+            assert_eq!(error.identifier(), Some("/us/usc/t99/s1"), "{topic}");
+        }
     }
 
     #[test]
@@ -1374,6 +1445,13 @@ mod tests {
                      <heading>Notes</heading></note>",
                 ),
                 "not one word of ASCII letters and digits",
+            ),
+            (
+                in_notes(
+                    "<note topic=\"amendments\u{A0}effectiveDate\"><heading>Odd</heading>\
+                     <p>Text.</p></note>",
+                ),
+                "holds a white-space character other than U+0020",
             ),
             (
                 in_notes(
