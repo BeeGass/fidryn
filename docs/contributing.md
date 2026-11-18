@@ -50,7 +50,7 @@ citation of it `exact` and its binding not stale, and the table of the
 coverage page against the ledger), generated-site consistency, the example
 status and documentation checks described below, required JavaScript tests,
 and benchmark compilation. Node, [uv](https://docs.astral.sh/uv/) and the
-commands `git`, `bash`, `jq` and `sha256sum`, which the tests run, are
+commands `git`, `bash`, `jq`, `sha256sum` and `tar`, which the tests run, are
 required for qualification.
 `uv run --locked` uses `.python-version` and `uv.lock`.
 

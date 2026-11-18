@@ -157,12 +157,21 @@ The fixtures in `fixtures/uslm/` each have their `import` profile in
 
 ## Where the two differ
 
-`baseline` leaves out what the reading imports: sections without an identifier;
-court rules, reorganization plans and the other units that are not sections, and
-their provisions; provisions of kinds other than the nine; and references whose
-target is a container or a unit that is not a section, which `baseline` counts as
-reaching no section. `import` also tells references to a unit or provision with a
-status (`target-status`) and to a repeated identifier (`ambiguous`) from the
+`baseline` leaves out what the reading imports: sections and other provisions
+without an identifier; court rules, reorganization plans and the other units that
+are not sections, with the top provision of each, though it counts the provisions
+of the nine kinds that stand in them; provisions of kinds other than the nine,
+wherever they stand, so that it resolves no reference exactly to one; and
+references whose target is a container or a unit that is not a section, which
+`baseline` counts as reaching no section. `baseline` compares a target with an
+identifier, and takes a section prefix from it, as the attribute writes it, while
+`import` gives a section whose identifier lists several sections, or names a
+range, an address and aliases. A reference whose target is the first or another
+member of such a list, an end or a member of such a range, or lies below one of
+them, therefore reaches no section in `baseline`, and is resolved in `import`
+against that address or alias like any other target. `import` also tells
+references to a unit or provision with a status (`target-status`), and references
+to an identifier that two elements hold or below it (`ambiguous`), from the
 others, counts the nested section of a unit as one of its provisions rather than
 as a unit, and gives every reference of every layer an outcome.
 

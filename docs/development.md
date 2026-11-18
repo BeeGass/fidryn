@@ -19,8 +19,8 @@ cargo xtask ci --fmt
 ```
 
 The canonical gate requires the pinned Rust toolchain, uv with its locked Python
-environment, Node, and the commands `git`, `bash`, `jq` and `sha256sum`, which
-its tests run. It runs, in this order: the formatting check (`--fmt`),
+environment, Node, and the commands `git`, `bash`, `jq`, `sha256sum` and `tar`,
+which its tests run. It runs, in this order: the formatting check (`--fmt`),
 workspace tests, Clippy across targets/features, Rustdoc, the schema probes,
 the Python lint, format and type checks, the conformance tests of
 `conformance/` (`unittest`, given the built binary in `FIDRYN_BINARY`), the
@@ -72,10 +72,10 @@ FIDRYN_BINARY=target/release/fidryn tools/check-law-repository.sh DIR
   time (600 by default) with `timeout`, and to `FIDRYN_CHECK_CPU` seconds
   of processor time (900) and `FIDRYN_CHECK_ADDRESS_SPACE` bytes of address
   space (8589934592) with `prlimit`, each where that command exists. The
-  script prints the limits, and where one of the two commands is missing,
-  as on macOS, which has neither, it says in one line which limits it does
-  not apply and checks all the same. A check that reaches a limit is
-  stopped and fails its workspace.
+  script prints the limits, and for each of the two commands that is
+  missing, as both are on macOS, it prints one line that says which limits
+  it does not apply, and it checks all the same. A check that reaches a
+  limit is stopped and fails its workspace.
 - The cache of the checks is `--cache-dir CACHE`, else `FIDRYN_CACHE_DIR`,
   else `fidryn/law-repository` in `XDG_CACHE_HOME` or in `~/.cache`, and the
   script prints which. A cache that is `DIR`, lies inside it or holds it is
