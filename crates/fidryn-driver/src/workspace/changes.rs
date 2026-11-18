@@ -17,7 +17,7 @@ use super::{LOCK_FILE, MANIFEST_FILE};
 use fidryn_check::e2::names::resolve;
 use fidryn_core::{Diagnostic, DiagnosticCode, Severity};
 use fidryn_provision::changes::{
-    ChangeSet, NoteChanges, OneSided, Release, StaleBinding, diff_containers, diff_units,
+    ChangeSet, NoteAt, OneSided, Release, StaleBinding, diff_containers, diff_units, note_changes,
     pair_moved, unnumbered_hash,
 };
 use fidryn_provision::interface::Shape;
@@ -120,10 +120,12 @@ pub fn compare(
     let [old_modules, new_modules] = &modules;
 
     // Notes, from the interfaces alone.
-    let [old_enacted, old_editorial] = notes_of(&old_side.interfaces);
-    let [new_enacted, new_editorial] = notes_of(&new_side.interfaces);
-    set.enacted_notes = note_changes(&old_enacted, &new_enacted);
-    set.editorial.notes = note_changes(&old_editorial, &new_editorial);
+    let (old_notes, new_notes) = (
+        notes_of(&old_side.interfaces),
+        notes_of(&new_side.interfaces),
+    );
+    set.enacted_notes = note_changes(&old_notes, &new_notes, Layer::Enacted);
+    set.editorial.notes = note_changes(&old_notes, &new_notes, Layer::Editorial);
 
     // Containers: those on one side, those whose hash or aliases differ,
     // and the credits and footnotes of those whose editorial hash differs.
@@ -426,46 +428,20 @@ fn aliases(interface: &Interface) -> Vec<&Address> {
     interface.aliases.iter().map(|alias| &alias.item).collect()
 }
 
-/// The enacted and the editorial notes of `interfaces`, each by address
-/// with its note hash.
-fn notes_of(interfaces: &[Interface]) -> [BTreeMap<Address, Hash32>; 2] {
-    let mut notes = [BTreeMap::new(), BTreeMap::new()];
-    for interface in interfaces {
-        for note in &interface.notes {
-            let layer = match note.layer {
-                Layer::Enacted => 0,
-                Layer::Editorial => 1,
-                Layer::Operative => continue,
-            };
-            notes[layer].insert(interface.address_at(&note.at), note.hash);
-        }
-    }
-    notes
-}
-
-/// The notes of one layer from `old` to `new`: those on both sides whose
-/// note hash differs, and those on one side, of which a removed and an
-/// added note of equal hashes have moved.
-fn note_changes(old: &BTreeMap<Address, Hash32>, new: &BTreeMap<Address, Hash32>) -> NoteChanges {
-    let mut changes = NoteChanges::default();
-    let mut removed = Vec::new();
-    for (address, hash) in old {
-        match new.get(address) {
-            Some(other) if other != hash => changes.amended.push(address.clone()),
-            Some(_) => {}
-            None => removed.push((address.clone(), Some(*hash))),
-        }
-    }
-    let added = new
+/// The notes of `interfaces`, each with the module that holds it, its
+/// address, its layer and its note hash, as [`note_changes`] compares them.
+fn notes_of(interfaces: &[Interface]) -> Vec<NoteAt> {
+    interfaces
         .iter()
-        .filter(|(address, _)| !old.contains_key(*address))
-        .map(|(address, hash)| (address.clone(), Some(*hash)))
-        .collect();
-    let paired = pair_moved(removed, added);
-    changes.removed = paired.removed;
-    changes.added = paired.added;
-    changes.moved = paired.moved;
-    changes
+        .flat_map(|interface| {
+            interface.notes.iter().map(|note| NoteAt {
+                module: interface.address.clone(),
+                address: interface.address_at(&note.at),
+                layer: note.layer,
+                hash: note.hash,
+            })
+        })
+        .collect()
 }
 
 /// A highest provision on one side only, with what it is paired by, which

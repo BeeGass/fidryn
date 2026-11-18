@@ -19,6 +19,9 @@
 //!   only, the highest are kept, those whose parent is on both sides.
 //! - [`diff_containers`] compares the credit and the footnotes of the two
 //!   versions of a container, as [`diff_units`] does those of a unit.
+//! - [`note_changes`] compares the notes of one layer: it pairs like-named
+//!   notes of one module by their note hashes first, and then compares the
+//!   notes that remain by address.
 //! - [`pair_moved`] makes one `moved` entry of a removed and an added entry
 //!   of equal hashes: provisions by [`unnumbered_hash`], notes by their
 //!   note hash, and among several candidates in the order of their
@@ -31,11 +34,11 @@ use crate::address::Address;
 use crate::binding::StaleReason;
 use crate::hash::{Hash32, marks_of_container, marks_of_unit, unnumbered_tree_hash};
 use crate::model::{
-    Block, Cell, ContainerModule, Footnote, Item, Num, PartRole, Provision, Quoted, QuotedItem,
-    QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
+    Block, Cell, ContainerModule, Footnote, Item, Layer, Num, PartRole, Provision, Quoted,
+    QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
 };
 use serde::{Serialize, Serializer};
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 /// The `schema` of a change set.
 pub const CHANGE_SET_SCHEMA: &str = "fidryn.change-set/v0.1";
@@ -75,7 +78,8 @@ pub struct OperativeChanges {
 pub struct NoteChanges {
     pub added: Vec<Address>,
     pub removed: Vec<Address>,
-    /// The notes on both sides whose note hash differs.
+    /// The notes at one address on both sides, once like-named notes are
+    /// paired ([`note_changes`]), whose note hashes differ.
     pub amended: Vec<Address>,
     pub moved: Vec<Moved>,
 }
@@ -727,6 +731,136 @@ fn own_structure(provision: &Provision) -> Structure<'_> {
     }
 }
 
+/// A note of one side of a change set, as [`note_changes`] takes it: the
+/// address of the unit or container that holds it, its own address, its
+/// layer and its note hash.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NoteAt {
+    pub module: Address,
+    pub address: Address,
+    pub layer: Layer,
+    pub hash: Hash32,
+}
+
+/// The notes of the layer `layer` from `old` to `new`, each side given
+/// whole, every layer included.
+///
+/// Like-named notes are paired first. Two notes of one module and one side
+/// are of one family when their addresses differ only in the ordinal that
+/// marks like-named notes: a last segment that is a whole number of 2 or
+/// more, written in ASCII digits with no leading zero, after an address
+/// that is itself the address of a note of the module on that side. Within
+/// one module, the layer `layer` and one family, an old and a new note of
+/// equal hashes are paired: each old note, in the order of the addresses,
+/// with the first new one, in the order of the addresses, that has an equal
+/// hash and is not paired yet. A pair at one address is unchanged and is
+/// listed nowhere; a pair at two addresses is one `moved` entry. So a note
+/// inserted before two like-named notes is `added` at the address of the
+/// first, and the two have moved, each to the ordinal after its own.
+///
+/// The notes that remain are compared by address: one at an address that a
+/// remaining note on the other side has is `amended`, and one at an address
+/// that none has is `removed` or `added`. A removed and an added note of
+/// equal hashes are then one `moved` entry, as [`pair_moved`] pairs them,
+/// across the whole workspace. No note is paired by its hash across modules
+/// or families before the notes are compared by address, since many notes
+/// are the same words in different units. Every list is sorted.
+pub fn note_changes(old: &[NoteAt], new: &[NoteAt], layer: Layer) -> NoteChanges {
+    // The notes of `layer` of one side, each with its family, by module and
+    // family, and within each in the order of their addresses.
+    fn families(side: &[NoteAt], layer: Layer) -> BTreeMap<(&Address, &str), Vec<&NoteAt>> {
+        let held: BTreeSet<(&Address, &str)> = side
+            .iter()
+            .map(|note| (&note.module, note.address.as_str()))
+            .collect();
+        let mut families: BTreeMap<(&Address, &str), Vec<&NoteAt>> = BTreeMap::new();
+        for note in side.iter().filter(|note| note.layer == layer) {
+            let text = note.address.as_str();
+            let family = match text.rsplit_once('/') {
+                Some((base, last)) if is_ordinal(last) && held.contains(&(&note.module, base)) => {
+                    base
+                }
+                _ => text,
+            };
+            families
+                .entry((&note.module, family))
+                .or_default()
+                .push(note);
+        }
+        for notes in families.values_mut() {
+            notes.sort_by(|a, b| a.address.cmp(&b.address));
+        }
+        families
+    }
+    let (old_families, new_families) = (families(old, layer), families(new, layer));
+    let mut changes = NoteChanges::default();
+    let mut paired_old: BTreeSet<&Address> = BTreeSet::new();
+    let mut paired_new: BTreeSet<&Address> = BTreeSet::new();
+    for (key, old_notes) in &old_families {
+        let Some(new_notes) = new_families.get(key) else {
+            continue;
+        };
+        for before in old_notes {
+            let Some(after) = new_notes
+                .iter()
+                .find(|after| after.hash == before.hash && !paired_new.contains(&after.address))
+            else {
+                continue;
+            };
+            paired_old.insert(&before.address);
+            paired_new.insert(&after.address);
+            if before.address != after.address {
+                changes.moved.push(Moved {
+                    from: before.address.clone(),
+                    to: after.address.clone(),
+                });
+            }
+        }
+    }
+    let remaining = |families: &BTreeMap<(&Address, &str), Vec<&NoteAt>>,
+                     paired: &BTreeSet<&Address>| {
+        families
+            .values()
+            .flatten()
+            .filter(|note| !paired.contains(&note.address))
+            .map(|note| (note.address.clone(), note.hash))
+            .collect::<BTreeMap<Address, Hash32>>()
+    };
+    let (old_left, new_left) = (
+        remaining(&old_families, &paired_old),
+        remaining(&new_families, &paired_new),
+    );
+    let mut removed = Vec::new();
+    for (address, hash) in &old_left {
+        match new_left.get(address) {
+            Some(other) if other != hash => changes.amended.push(address.clone()),
+            Some(_) => {}
+            None => removed.push((address.clone(), Some(*hash))),
+        }
+    }
+    let added = new_left
+        .iter()
+        .filter(|(address, _)| !old_left.contains_key(*address))
+        .map(|(address, hash)| (address.clone(), Some(*hash)))
+        .collect();
+    let paired = pair_moved(removed, added);
+    changes.removed = paired.removed;
+    changes.added = paired.added;
+    changes.moved.extend(paired.moved);
+    changes.amended.sort();
+    changes.moved.sort();
+    changes
+}
+
+/// Whether `segment` is an ordinal that marks a like-named note: a whole
+/// number of 2 or more, written in ASCII digits with no leading zero.
+fn is_ordinal(segment: &str) -> bool {
+    !segment.is_empty()
+        && !segment.starts_with('0')
+        && segment.bytes().all(|byte| byte.is_ascii_digit())
+        && segment != "1"
+}
+
 /// What [`pair_moved`] gives: the entries that are removed and added, and
 /// those that moved.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -830,6 +964,201 @@ mod tests {
 
     fn address_list(texts: &[&str]) -> Vec<Address> {
         texts.iter().map(|text| address(text)).collect()
+    }
+
+    /// The note at `at` of the unit `/zz/demo/t1/s<module>`, in `layer`,
+    /// whose hash stands for the words `words`.
+    fn note_in(module: &str, at: &str, layer: Layer, words: &str) -> NoteAt {
+        let module = format!("/zz/demo/t1/s{module}");
+        NoteAt {
+            address: address(&format!("{module}/note/demoNotes/nolaw/{at}")),
+            module: address(&module),
+            layer,
+            hash: Hash32(*blake3::hash(words.as_bytes()).as_bytes()),
+        }
+    }
+
+    fn enacted(at: &str, words: &str) -> NoteAt {
+        note_in("1", at, Layer::Enacted, words)
+    }
+
+    fn of_s1(at: &str) -> String {
+        format!("/zz/demo/t1/s1/note/demoNotes/nolaw/{at}")
+    }
+
+    fn move_of(from: &str, to: &str) -> Moved {
+        Moved {
+            from: address(&of_s1(from)),
+            to: address(&of_s1(to)),
+        }
+    }
+
+    fn of_s1_list(texts: &[&str]) -> Vec<Address> {
+        texts.iter().map(|text| address(&of_s1(text))).collect()
+    }
+
+    #[test]
+    fn a_note_inserted_before_two_like_named_notes_is_added_and_they_have_moved() {
+        let old = [enacted("effective", "A"), enacted("effective/2", "B")];
+        let new = [
+            enacted("effective", "N"),
+            enacted("effective/2", "A"),
+            enacted("effective/3", "B"),
+        ];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted),
+            NoteChanges {
+                added: of_s1_list(&["effective"]),
+                removed: Vec::new(),
+                amended: Vec::new(),
+                moved: vec![
+                    move_of("effective", "effective/2"),
+                    move_of("effective/2", "effective/3"),
+                ],
+            }
+        );
+        // Nothing of the other layer is listed.
+        assert_eq!(
+            note_changes(&old, &new, Layer::Editorial),
+            NoteChanges::default()
+        );
+    }
+
+    #[test]
+    fn a_note_amended_while_another_is_inserted_before_it_is_compared_by_address() {
+        // The first note is amended, and a note is inserted before it: no new
+        // note has its hash, so the notes that remain are compared by address.
+        let old = [enacted("effective", "A"), enacted("effective/2", "B")];
+        let new = [
+            enacted("effective", "N"),
+            enacted("effective/2", "A amended"),
+            enacted("effective/3", "B"),
+        ];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted),
+            NoteChanges {
+                added: of_s1_list(&["effective/2"]),
+                removed: Vec::new(),
+                amended: of_s1_list(&["effective"]),
+                moved: vec![move_of("effective/2", "effective/3")],
+            }
+        );
+    }
+
+    #[test]
+    fn a_pair_at_one_address_is_unchanged_and_equal_notes_pair_in_address_order() {
+        let old = [enacted("effective", "A"), enacted("effective/2", "A")];
+        let new = [
+            enacted("effective", "A"),
+            enacted("effective/2", "A"),
+            enacted("effective/3", "A"),
+        ];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted),
+            NoteChanges {
+                added: of_s1_list(&["effective/3"]),
+                ..NoteChanges::default()
+            }
+        );
+        // Two like-named notes that trade places have both moved.
+        let new = [enacted("effective", "B"), enacted("effective/2", "A")];
+        let old = [enacted("effective", "A"), enacted("effective/2", "B")];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted).moved,
+            [
+                move_of("effective", "effective/2"),
+                move_of("effective/2", "effective")
+            ]
+        );
+    }
+
+    #[test]
+    fn notes_are_paired_by_their_hash_only_within_one_module_and_one_family() {
+        // The new words of one note are the old words of a note of another
+        // unit, and of a note of another family of the same unit: each is
+        // amended at its address, and none has moved.
+        let old = [
+            note_in("1", "effective", Layer::Enacted, "A"),
+            note_in("1", "short-title", Layer::Enacted, "B"),
+            note_in("2", "effective", Layer::Enacted, "C"),
+        ];
+        let new = [
+            note_in("1", "effective", Layer::Enacted, "B"),
+            note_in("1", "short-title", Layer::Enacted, "C"),
+            note_in("2", "effective", Layer::Enacted, "A"),
+        ];
+        let found = note_changes(&old, &new, Layer::Enacted);
+        assert_eq!(found.moved, []);
+        assert_eq!(
+            found.amended,
+            [
+                address(&of_s1("effective")),
+                address(&of_s1("short-title")),
+                address("/zz/demo/t1/s2/note/demoNotes/nolaw/effective"),
+            ]
+        );
+        // A note on one side only still pairs with one of equal hash across
+        // the workspace, as a note of a renumbered section does.
+        let old = [note_in("1", "effective", Layer::Enacted, "A")];
+        let new = [note_in("2", "effective", Layer::Enacted, "A")];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted).moved,
+            [Moved {
+                from: address(&of_s1("effective")),
+                to: address("/zz/demo/t1/s2/note/demoNotes/nolaw/effective"),
+            }]
+        );
+    }
+
+    #[test]
+    fn the_family_of_a_note_is_named_by_a_note_whatever_its_layer() {
+        // The first of three like-named notes is editorial and the others
+        // enacted; a note inserted before them shifts both layers.
+        let old = [
+            note_in("1", "effective", Layer::Editorial, "E"),
+            note_in("1", "effective/2", Layer::Enacted, "A"),
+        ];
+        let new = [
+            note_in("1", "effective", Layer::Editorial, "N"),
+            note_in("1", "effective/2", Layer::Editorial, "E"),
+            note_in("1", "effective/3", Layer::Enacted, "A"),
+        ];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted).moved,
+            [move_of("effective/2", "effective/3")]
+        );
+        assert_eq!(
+            note_changes(&old, &new, Layer::Editorial),
+            NoteChanges {
+                added: of_s1_list(&["effective"]),
+                moved: vec![move_of("effective", "effective/2")],
+                ..NoteChanges::default()
+            }
+        );
+        // A last segment of digits is an ordinal only after the address of a
+        // note: a note whose heading gives the segment `2` begins a family of
+        // its own, and its like-named notes follow it.
+        let old = [enacted("2", "A"), enacted("2/2", "B")];
+        let new = [enacted("2", "N"), enacted("2/2", "A"), enacted("2/3", "B")];
+        assert_eq!(
+            note_changes(&old, &new, Layer::Enacted),
+            NoteChanges {
+                added: of_s1_list(&["2"]),
+                moved: vec![move_of("2", "2/2"), move_of("2/2", "2/3")],
+                ..NoteChanges::default()
+            }
+        );
+        for (segment, ordinal) in [
+            ("2", true),
+            ("10", true),
+            ("1", false),
+            ("0", false),
+            ("02", false),
+            ("", false),
+            ("2a", false),
+        ] {
+            assert_eq!(is_ordinal(segment), ordinal, "{segment:?}");
+        }
     }
 
     #[test]

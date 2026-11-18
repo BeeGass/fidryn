@@ -264,6 +264,14 @@ interchange schema versions are maintained independently of the interpreter.
 - Both readings of the publisher's XML refuse a `ref` that has an `href`
   and the class `footnoteRef`, which would be at once a link and a footnote
   marker, with the element named.
+- A change set pairs like-named notes by their note hashes before it
+  compares notes by address: within one unit or container, one layer and
+  one family of notes whose addresses differ only in the ordinal that marks
+  like-named notes, an old and a new note of equal hashes are one note,
+  unchanged at one address and `moved` between two, so that a note inserted
+  before two like-named notes is `added` and the two have moved.
+  `conformance/usc_compare.py` pairs them in the same way, by their
+  records, before it builds the sets that `--against` checks.
 
 ## [0.2.0] - 2026-11-16
 

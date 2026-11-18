@@ -178,7 +178,8 @@ extracts from them.
 it, into their text records, and from the records alone prints which
 addresses differ: the provisions, the notes of each layer and the
 containers only in the old, only in the new and on both sides with another
-record, footnote markers left out; and the units and containers whose
+record, footnote markers left out, the notes once like-named notes are
+paired as change sets pair them; and the units and containers whose
 credit, or whose footnotes or footnote markers, differ. With
 `--against CHANGES.json`, a change set that `fidryn changes --json` printed
 for the same releases, it exits `1` and names the first address that
@@ -197,9 +198,12 @@ uv run --locked python -I conformance/usc_compare.py OLD_RELEASE NEW_RELEASE --a
 `<name>/old.xml` of the release `999-1` and `<name>/new.xml` of `999-2`,
 one pair for each case: a footnote marker added, a source credit changed,
 the heading of a chapter changed, a word amended, a subsection added, a
-section renumbered with its note, a section removed, and notes amended,
-removed and added. `test_usc_compare.py` holds the script to the sets
-written by hand for each pair, and fails for a pair it does not name. Its
+section renumbered with its note, a section removed, notes amended,
+removed and added, a note inserted before two like-named notes, and one
+inserted before two of which the first is amended. `test_usc_compare.py`
+holds the script to the sets written by hand for each pair, and fails for
+a pair it does not name; the tests of `fidryn-cli` hold the change sets of
+the last two pairs whole. Its
 test of agreement imports both documents of each pair with the built
 `fidryn`, which `FIDRYN_BINARY` names, runs `fidryn changes --json`, and
 checks the change set against the script with `--against`; it fails,

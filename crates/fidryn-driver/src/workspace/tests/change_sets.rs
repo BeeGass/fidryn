@@ -446,6 +446,96 @@ fn a_note_whose_cited_law_changed_and_whose_text_did_not_has_moved() {
     assert_eq!(found, expected);
 }
 
+/// [`v1`] with the enacted notes of `s8` like-named, one for each of
+/// `words` in that order: the first at `effective`, the second at
+/// `effective/2`, and so on.
+fn with_effective_notes(words: &[&str]) -> Vec<Module> {
+    let mut models = v1();
+    let s8 = s8_of(&mut models);
+    s8.notes.retain(|note| note.layer != Layer::Enacted);
+    for (place, said) in words.iter().enumerate() {
+        let name = match place {
+            0 => "effective".to_owned(),
+            place => format!("effective/{}", place + 1),
+        };
+        s8.notes.push(note_of(S8, &name, Layer::Enacted, said));
+    }
+    models
+}
+
+/// The address of the like-named note `effective` of `s8` that `ordinal`
+/// gives: none for the first, `/2` for the second.
+fn effective(ordinal: u32) -> String {
+    match ordinal {
+        1 => note_at(S8, "nolaw", "effective"),
+        ordinal => format!("{}/{ordinal}", note_at(S8, "nolaw", "effective")),
+    }
+}
+
+const NOTE_A: &str = "Invented note A took effect.";
+const NOTE_B: &str = "Invented note B took effect.";
+const NOTE_N: &str = "Invented note N took effect.";
+
+#[test]
+fn a_note_inserted_before_two_like_named_notes_is_added_and_they_have_moved() {
+    let pair = pair(
+        "note-inserted",
+        &with_effective_notes(&[NOTE_A, NOTE_B]),
+        &with_effective_notes(&[NOTE_N, NOTE_A, NOTE_B]),
+    );
+    let compared = compare(&pair.older(), &pair.newer(), &[], &with_jobs(1))
+        .unwrap_or_else(|diagnostics| panic!("{diagnostics:#?}"));
+    let mut expected = nothing(&pair);
+    expected.enacted_notes.added = at(&[&effective(1)]);
+    expected.enacted_notes.moved = vec![
+        moved(&effective(1), &effective(2)),
+        moved(&effective(2), &effective(3)),
+    ];
+    assert_eq!(changes_of(&pair, &[]), expected);
+    assert_eq!(compared.set, expected);
+    // Notes are compared from the interfaces: no module is opened.
+    assert_eq!(compared.opened, 0);
+}
+
+#[test]
+fn a_note_amended_while_another_is_inserted_before_it_is_compared_by_address() {
+    // The first of two like-named notes is amended and a note is inserted
+    // before it: no new note has its hash, so the notes that remain once the
+    // second is paired are compared by address.
+    let pair = pair(
+        "note-amended-inserted",
+        &with_effective_notes(&[NOTE_A, NOTE_B]),
+        &with_effective_notes(&[NOTE_N, "Invented note A took effect later.", NOTE_B]),
+    );
+    let mut expected = nothing(&pair);
+    expected.enacted_notes.amended = at(&[&effective(1)]);
+    expected.enacted_notes.added = at(&[&effective(2)]);
+    expected.enacted_notes.moved = vec![moved(&effective(2), &effective(3))];
+    assert_eq!(changes_of(&pair, &[]), expected);
+}
+
+#[test]
+fn like_named_notes_of_two_units_are_not_paired_with_each_other() {
+    // The note of `s8` comes to say what the note of `s3` said, and the note
+    // of `s3` comes to say something new: both are amended, and neither has
+    // moved to the other unit.
+    let s3 = "/zz/demo/t1/s3";
+    let with = |s8_words: &str, s3_words: &str| {
+        let mut models = with_effective_notes(&[s8_words]);
+        unit_named(&mut models, s3).notes =
+            vec![note_of(s3, "effective", Layer::Enacted, s3_words)];
+        models
+    };
+    let pair = pair(
+        "notes-of-two-units",
+        &with(NOTE_A, NOTE_B),
+        &with(NOTE_B, NOTE_N),
+    );
+    let mut expected = nothing(&pair);
+    expected.enacted_notes.amended = at(&[&note_at(s3, "nolaw", "effective"), &effective(1)]);
+    assert_eq!(changes_of(&pair, &[]), expected);
+}
+
 #[test]
 fn a_credit_changed_is_a_changed_credit() {
     let (pair, found) = from_v1("credit", |models| {

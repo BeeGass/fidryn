@@ -13,7 +13,15 @@ alone prints, as one JSON object, which addresses differ between the two:
   aliases, the container it is within, its source and its positive-law flag are
   not compared.
 - `enacted_notes` and `editorial_notes`: the same three sets from the records of
-  the notes of each layer, footnote markers left out.
+  the notes of each layer, footnote markers left out, once like-named notes are
+  paired. Within one unit or container, one layer and one family of notes (those
+  whose addresses differ only in the ordinal that marks like-named notes, a last
+  segment of 2 or more after the address of another note of the module), an old and
+  a new note whose records are the same but for their addresses are paired, each old
+  note in the order of the addresses with the first new one in that order not paired
+  yet: a pair at one address is in no set, and a pair at two addresses is only in the
+  old at its old address and only in the new at its new one. The notes that remain
+  are compared by address, as the other records are.
 - `credits`: the units and containers on both sides whose credit record, footnote
   markers left out, is on one side only or differs.
 - `footnotes`: the units and containers on both sides whose footnote records,
@@ -48,6 +56,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -64,6 +73,8 @@ Mark = tuple[str, str, int]
 
 # The keys of the record of a unit's top provision that are not compared.
 UNIT_KEYS = ("aliases", "within", "source", "positive_law")
+# The ordinal that marks a like-named note: a whole number of 2 or more.
+ORDINAL = re.compile("[2-9]|[1-9][0-9]+")
 
 
 def unmarked(value: object) -> object:
@@ -293,15 +304,107 @@ def footnotes_differ(old: Side, new: Side, module: str) -> bool:
     return old.lines_of(module) != new.lines_of(module) and old.marks(module) != new.marks(module)
 
 
+def is_ordinal(segment: str) -> bool:
+    """Whether `segment` is the ordinal that marks a like-named note: a whole number of
+    2 or more, written in ASCII digits with no leading zero."""
+    return bool(ORDINAL.fullmatch(segment))
+
+
+def family_of(address: str, held: set[str]) -> str:
+    """The family of the note at `address`, of a module whose notes on its side are at
+    `held`: the address without its last segment when that segment is an ordinal and
+    what stands before it is the address of a note of `held`, and otherwise the address
+    itself."""
+    base, _, last = address.rpartition("/")
+    return base if is_ordinal(last) and base in held else address
+
+
+def note_rest(line: str, address: str) -> str | None:
+    """The line of the record of the note at `address` after its address, which a
+    record writes first; None when the line does not begin with it."""
+    head = '{"address":' + json.dumps(address, ensure_ascii=False)
+    return line[len(head) :] if line.startswith(head) else None
+
+
+def same_but_address(old: str, old_address: str, new: str, new_address: str) -> bool:
+    """Whether the records of the note lines `old` and `new` are the same in everything
+    but their addresses, footnote markers left out."""
+    before, after = note_rest(old, old_address), note_rest(new, new_address)
+    if before is not None and before == after:
+        return True
+    records = [json.loads(line) for line in (old, new)]
+    for record in records:
+        del record["address"]
+    return bool(unmarked(records[0]) == unmarked(records[1]))
+
+
+def note_sets(old: Side, new: Side, layer: str) -> dict[str, set[str]]:
+    """The notes of `layer` only in `old`, only in `new`, and on both sides with another
+    record, once like-named notes are paired.
+
+    Within one unit or container, the layer and one family of notes (those whose
+    addresses differ only in the ordinal that marks like-named notes), each old note, in
+    the order of the addresses, is paired with the first new one, in the order of the
+    addresses, whose record is the same but for its address and that is not paired yet:
+    a pair at one address is in no set, and a pair at two addresses is only in the old at
+    its old address and only in the new at its new one. The notes that remain are
+    compared by address."""
+
+    def families(side: Side) -> dict[tuple[str, str], list[str]]:
+        found: dict[tuple[str, str], list[str]] = {}
+        for module, addresses in side.notes_of.items():
+            held = set(addresses)
+            for address in addresses:
+                if side.note_layers[address] == layer:
+                    key = (module, family_of(address, held))
+                    found.setdefault(key, []).append(address)
+        return found
+
+    sets: dict[str, set[str]] = {"old_only": set(), "new_only": set(), "differ": set()}
+    paired_old: set[str] = set()
+    paired_new: set[str] = set()
+    new_families = families(new)
+    for key, before in sorted(families(old).items()):
+        after = new_families.get(key, [])
+        for address in before:
+            partner = next(
+                (
+                    other
+                    for other in after
+                    if other not in paired_new
+                    and same_but_address(old.notes[address], address, new.notes[other], other)
+                ),
+                None,
+            )
+            if partner is None:
+                continue
+            paired_old.add(address)
+            paired_new.add(partner)
+            if partner != address:
+                sets["old_only"].add(address)
+                sets["new_only"].add(partner)
+    old_left = {
+        a: line
+        for a, line in old.notes.items()
+        if old.note_layers[a] == layer and a not in paired_old
+    }
+    new_left = {
+        a: line
+        for a, line in new.notes.items()
+        if new.note_layers[a] == layer and a not in paired_new
+    }
+    for name, found in three_sets(old_left, new_left, unmarked).items():
+        sets[name] |= found
+    return sets
+
+
 def compare(old: Side, new: Side) -> Sets:
     operative = three_sets(old.provisions, new.provisions, comparable_provision)
     operative["old_only"] = highest(operative["old_only"], old.parent)
     operative["new_only"] = highest(operative["new_only"], new.parent)
     groups = {"operative": operative}
     for layer in ("enacted", "editorial"):
-        old_notes = {a: line for a, line in old.notes.items() if old.note_layers[a] == layer}
-        new_notes = {a: line for a, line in new.notes.items() if new.note_layers[a] == layer}
-        groups[f"{layer}_notes"] = three_sets(old_notes, new_notes, unmarked)
+        groups[f"{layer}_notes"] = note_sets(old, new, layer)
     groups["containers"] = three_sets(old.containers, new.containers, comparable_container)
     both = (old.units & new.units) | (old.containers.keys() & new.containers.keys())
     credited = {m for m in both if not same(old.credits.get(m), new.credits.get(m), unmarked)}

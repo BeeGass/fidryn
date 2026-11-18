@@ -1865,9 +1865,9 @@ and then by `to`.
 | `operative.amended_text` | a provision on both sides whose own words differ |
 | `operative.amended_structure` | a provision on both sides whose own structure differs |
 | `operative.moved` | a removed and an added provision that are one (below) |
-| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address |
-| `enacted_notes.amended` | an enacted note on both sides whose [note hash](#hashes) differs |
-| `enacted_notes.moved` | a removed and an added enacted note of equal note hashes |
+| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address, once like-named notes are paired (below) |
+| `enacted_notes.amended` | an enacted note at one address on both sides, once like-named notes are paired, whose [note hash](#hashes) differs |
+| `enacted_notes.moved` | a like-named note paired with one at another address, or a removed and an added enacted note of equal note hashes (below) |
 | `editorial.added`, `removed`, `amended`, `moved` | the same, of the editorial notes |
 | `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or changed in its words, its links, its superscripts or its subscripts; a footnote marker in a credit counts for `footnotes_changed` |
 | `editorial.footnotes_changed` | a unit or a container on both sides whose footnotes or footnote markers differ in any way: a footnote added, removed or changed, or a marker added, removed, standing in another provision or note, showing another mark or pointing at another footnote |
@@ -1920,11 +1920,34 @@ an equal hash and is not paired yet. So the provisions on the old side
 only, reduced to their highest, are exactly `removed` together with the
 `from` of `moved`, and those on the new side only `added` with the `to`.
 
-Notes are paired in the same way by their note hashes, which hold neither
-the address nor the layer of a note: a note whose address changed and
-whose text did not has moved, as the notes of a renumbered section do, and
-so does a note whose address names another law while its text is the
-same.
+Notes are compared by their note hashes, which hold neither the address
+nor the layer of a note, in two steps. Like-named notes are paired first.
+Two notes of one unit or container are of one **family** when their
+addresses differ only in the ordinal that marks like-named notes: a last
+segment that is a whole number of 2 or more, written in ASCII digits with
+no leading zero, after an address that is itself the address of a note of
+the module on that side. Within one module, one layer and one family, an
+old and a new note of equal hashes are paired, each old note, in the order
+of the addresses, with the first new one, in the order of the addresses,
+that has an equal hash and is not paired yet. A pair at one address is
+unchanged and is listed nowhere; a pair at two addresses is one `moved`
+entry. So a note inserted before two like-named notes is `added` at the
+address of the first, and the two, whose text did not change, have moved,
+each to the ordinal after its own. The pairing stays within a family,
+since many notes are the same words in different units: a note amended to
+the words of a note of another unit is `amended`, and has not moved there.
+
+The notes that remain are then compared by address: one at an address that
+a remaining note on the other side has is `amended`, and one at an address
+that none has is `removed` or `added`. A removed and an added note are one
+`moved` entry when their note hashes are equal, paired in the same way as
+provisions across the workspace: a note whose address changed and whose
+text did not has moved, as the notes of a renumbered section do, and so
+does a note whose address names another law while its text is the same. A
+note of a family that is amended while another is inserted before it has no
+note of equal hash on the other side, so it is compared by address: the
+note at its old address is `amended`, and the one at its new address
+`added`.
 
 ### Stale bindings
 
@@ -2013,7 +2036,10 @@ set: the provisions only in the old are `operative.removed` with the
 `from` of `operative.moved`, those only in the new `operative.added` with
 the `to`, and those that differ `amended_text` with `amended_structure`;
 the notes of each layer likewise against `added`, `removed`, `moved` and
-`amended`; the units and containers whose credit or footnotes differ
+`amended`, once it has paired like-named notes as above, by the equality of
+their records but for their addresses, so that a note paired with one at
+another address is only in the old at its old address and only in the new
+at its new one; the units and containers whose credit or footnotes differ
 `credits_changed` and `footnotes_changed`; and the containers `removed`,
 `added` and `changed`. So an address in `amended_text` where
 `amended_structure` was due, or a wrong pairing of moved provisions, is

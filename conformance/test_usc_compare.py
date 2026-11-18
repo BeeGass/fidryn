@@ -37,6 +37,9 @@ SIDES = (("old.xml", "999-1"), ("new.xml", "999-2"))
 S1 = "/us/usc/t99/s1"
 CHAPTER = "/us/usc/t99/ch1"
 NOTES = f"{S1}/note"
+# The first of the like-named notes of the pairs `inserted-note` and
+# `amended-and-inserted-note`.
+EFFECTIVE = f"{NOTES}/statutoryNotes/nolaw/effective-date"
 
 # Each pair, and what differs between its two documents: each set by its group and
 # its name, `operative.differ`, or `credits`; a set not named is empty.
@@ -72,6 +75,21 @@ EXPECTED: dict[str, dict[str, list[str]]] = {
         "enacted_notes.old_only": [f"{NOTES}/statutoryNotes/nolaw/short-title"],
         "enacted_notes.differ": [f"{NOTES}/statutoryNotes/pl.999.7/effective-date"],
         "editorial_notes.new_only": [f"{NOTES}/editorialNotes/nolaw/amendments"],
+    },
+    # A note inserted before two like-named notes, which are paired with their
+    # unchanged selves at the next ordinal: each is old only at its old address and new
+    # only at its new one, and the inserted note is new only at the first.
+    "inserted-note": {
+        "enacted_notes.old_only": [EFFECTIVE, f"{EFFECTIVE}/2"],
+        "enacted_notes.new_only": [EFFECTIVE, f"{EFFECTIVE}/2", f"{EFFECTIVE}/3"],
+    },
+    # A note inserted before two like-named notes, the first of them amended: the
+    # second is paired with its unchanged self, and the notes that remain are compared
+    # by address.
+    "amended-and-inserted-note": {
+        "enacted_notes.old_only": [f"{EFFECTIVE}/2"],
+        "enacted_notes.new_only": [f"{EFFECTIVE}/2", f"{EFFECTIVE}/3"],
+        "enacted_notes.differ": [EFFECTIVE],
     },
 }
 
@@ -228,6 +246,44 @@ class Pairs(unittest.TestCase):
                 "operative only in the old: the text records hold `/us/usc/t99/s2`, and the "
                 "change set does not\n",
             )
+
+    def test_against_holds_like_named_notes_to_their_pairing(self) -> None:
+        second, third = f"{EFFECTIVE}/2", f"{EFFECTIVE}/3"
+        with tempfile.TemporaryDirectory(prefix="fidryn-usc-compare-like-named-") as directory:
+            path = Path(directory) / "changes.json"
+
+            def against(name: str, value: dict[str, Any]) -> subprocess.CompletedProcess[str]:
+                path.write_text(json.dumps(value), encoding="utf-8")
+                return self.compared(name, "--against", path)
+
+            paired = change_set(
+                enacted_notes__added=[EFFECTIVE],
+                enacted_notes__moved=[
+                    {"from": EFFECTIVE, "to": second},
+                    {"from": second, "to": third},
+                ],
+            )
+            agreed = against("inserted-note", paired)
+            self.assertEqual((agreed.returncode, agreed.stderr), (0, ""))
+            # Compared by address alone, the two unchanged notes would be amended and
+            # the last one added: that is not what the pairing gives.
+            by_address = change_set(
+                enacted_notes__added=[third], enacted_notes__amended=[EFFECTIVE, second]
+            )
+            refused = against("inserted-note", by_address)
+            self.assertEqual(refused.returncode, 1)
+            self.assertEqual(
+                refused.stderr,
+                f"enacted_notes only in the old: the text records hold `{EFFECTIVE}`, and the "
+                "change set does not\n",
+            )
+            amended = change_set(
+                enacted_notes__amended=[EFFECTIVE],
+                enacted_notes__added=[second],
+                enacted_notes__moved=[{"from": second, "to": third}],
+            )
+            agreed = against("amended-and-inserted-note", amended)
+            self.assertEqual((agreed.returncode, agreed.stderr), (0, ""))
 
 
 def release(directory: Path, version: str, document: Path) -> Path:
