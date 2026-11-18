@@ -107,8 +107,9 @@ repository is named. The workflow `Law integration`
   with the exit status, and that this is no drift. On a schedule that is the
   newest commit of the default branch; on a manual run, the commit of the
   branch the run was started on. It names the pin only in what it reports:
-  a pin whose `commit` is no full commit id fails the first job, and this one
-  says so and checks all the same.
+  a pin whose `commit` is no full commit id, a value that is no string or
+  none among them, fails the first job, which says so, and this one says so
+  and checks all the same.
 
 Both check out the law repository with the default token of the workflow,
 which reads this repository and public ones; a law repository that is not

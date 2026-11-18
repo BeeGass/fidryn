@@ -335,26 +335,51 @@ class Fetching(unittest.TestCase):
         self.assertIn(URL_1, str(caught.exception))
         self.assertEqual(self.names(), [])
 
-    def test_a_temporary_file_that_is_there_already_is_refused_and_left_alone(self) -> None:
+    def test_a_link_or_a_directory_with_the_name_of_a_temporary_file_is_refused_and_left_alone(
+        self,
+    ) -> None:
         self.out.mkdir()
         elsewhere = self.directory / "elsewhere.txt"
         elsewhere.write_text("Invented, and kept.\n", encoding="utf-8")
         for name in (".xml_usc01@119-142.zip.part", ".retrieval.json.part"):
-            with self.subTest(name):
-                partial = self.out / name
-                partial.symlink_to(elsewhere)
-                try:
-                    with self.assertRaises(fetch_uscode.FetchError) as caught:
-                        self.fetch("1")
-                    self.assertIn(f"{partial} is there already", str(caught.exception))
-                    self.assertEqual(elsewhere.read_text(encoding="utf-8"), "Invented, and kept.\n")
-                    self.assertTrue(partial.is_symlink())
-                    # Neither the archive nor a record of it is written.
-                    self.assertEqual(self.names(), [name])
-                finally:
-                    partial.unlink()
+            partial = self.out / name
+            for kind in ("a symbolic link", "a directory"):
+                with self.subTest(name=name, kind=kind):
+                    if kind == "a directory":
+                        partial.mkdir()
+                    else:
+                        partial.symlink_to(elsewhere)
+                    try:
+                        with self.assertRaises(fetch_uscode.FetchError) as caught:
+                            self.fetch("1")
+                        self.assertIn(f"{partial} is {kind}, and the tool", str(caught.exception))
+                        self.assertEqual(
+                            elsewhere.read_text(encoding="utf-8"), "Invented, and kept.\n"
+                        )
+                        self.assertTrue(partial.is_symlink() or partial.is_dir())
+                        # Neither the archive nor a record of it is written.
+                        self.assertEqual(self.names(), [name])
+                    finally:
+                        if partial.is_symlink():
+                            partial.unlink()
+                        else:
+                            partial.rmdir()
         self.assertEqual(self.fetch("1"), ["fetched xml_usc01@119-142.zip"])
         self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
+
+    def test_a_temporary_file_that_a_stopped_run_left_is_removed(self) -> None:
+        self.out.mkdir()
+        for name in (".xml_usc01@119-142.zip.part", ".retrieval.json.part"):
+            (self.out / name).write_bytes(b"Invented: what a run that was killed left.\n")
+        self.assertEqual(self.fetch("1"), ["fetched xml_usc01@119-142.zip"])
+        self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
+        self.assertEqual((self.out / "xml_usc01@119-142.zip").read_bytes(), TITLE_1)
+        self.assertEqual(
+            self.record_text(),
+            record(
+                "119-142", entry("xml_usc01@119-142.zip", URL_1, "2026-11-16T22:14:03Z", TITLE_1)
+            ),
+        )
 
     def test_a_body_larger_than_the_bound_is_refused_while_it_is_read(self) -> None:
         fetched = fetch_uscode.fetch(

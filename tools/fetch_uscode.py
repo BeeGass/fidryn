@@ -9,8 +9,9 @@ in UTC, its size, its SHA-256 and its BLAKE3. An archive that is present and equ
 its record is not fetched again, and its record keeps its time. An archive whose bytes
 differ from its record is refused, never replaced. An archive, and the record that
 names it, are each written into a new file beside it, which is renamed once both are
-complete; an entry that has the name of such a file already, a symbolic link among
-them, is refused and left as it is.
+complete. A regular file that has the name of such a file already is what a run
+stopped while it wrote left, and is removed first; a symbolic link, a directory or
+anything else of that name is refused and left as it is.
 
 A redirect is followed only to the host of the request, over https; any other is
 refused before it is followed, with the address it pointed to, and the record names
@@ -34,6 +35,7 @@ import http.client
 import io
 import json
 import re
+import stat
 import sys
 import urllib.parse
 import urllib.request
@@ -284,14 +286,36 @@ def record_text(release: str, archives: dict[str, Archive]) -> str:
 
 
 def create(path: Path) -> io.BufferedWriter:
-    """A new file at `path`, open for writing. An entry that has that name already, a
-    symbolic link among them, is refused and left as it is."""
+    """A new file at `path`, open for writing. A regular file of that name is what a run
+    stopped while it wrote left, and is removed first; a symbolic link, a directory or
+    anything else of that name is refused and left as it is."""
+    try:
+        mode: int | None = path.lstat().st_mode
+    except FileNotFoundError:
+        mode = None
+    except OSError as error:
+        raise FetchError(f"{path}: {error}") from error
+    if mode is not None and stat.S_ISREG(mode):
+        try:
+            path.unlink(missing_ok=True)
+        except OSError as error:
+            raise FetchError(f"{path}: {error}") from error
+    elif mode is not None:
+        if stat.S_ISLNK(mode):
+            kind = "a symbolic link"
+        elif stat.S_ISDIR(mode):
+            kind = "a directory"
+        else:
+            kind = "neither a file nor a directory"
+        raise FetchError(
+            f"{path} is {kind}, and the tool writes only through a regular file of that name "
+            "that it makes; it is left as it is"
+        )
     try:
         return path.open("xb")
     except FileExistsError as error:
         raise FetchError(
-            f"{path} is there already: the tool writes through a new file of that name, and "
-            "leaves an entry it did not make as it is"
+            f"{path} appeared while the tool was about to make it; it is left as it is"
         ) from error
     except OSError as error:
         raise FetchError(f"{path}: {error}") from error

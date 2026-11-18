@@ -237,22 +237,25 @@ uv run --locked python -I tools/fetch_uscode.py 119-142 --out DIR --all
 
 An archive that is present and equal to its record is kept, and is not
 fetched again. An archive and the record are written through a new file
-beside each, and an entry of that name there already, a link among them,
-is not written through. A redirect is followed only to the host the tool
+beside each. A regular file of that name, which a run that was stopped
+left, is removed first; a link, a directory or anything else of that name
+is refused and left alone. A redirect is followed only to the host the tool
 asked, over `https`, and a response of more than `--max-bytes` bytes
 (512 MiB unless it says otherwise) is refused while it is read. Exit `0`
 when every archive is fetched or kept, `1` when the tool refuses (an
 archive whose bytes differ from its record, an archive without a record,
 a record of another release, a redirect to another host or scheme, a
 response larger than the bound), `2` when an archive cannot be fetched or
-the directory cannot be read or written, such as when the name of a file
-it writes through is taken. `test_fetch_uscode.py` serves invented
+the directory cannot be read or written, such as when a link or a
+directory has the name of a file it writes through. `test_fetch_uscode.py` serves invented
 archives through a fake opener and opens no connection. It holds the tool
 to its addresses (titles `1` and `5a` of `119-142`, title `11a` of
 `119-73not60`, and `--all`), to the record it writes, to a second run that
 changes nothing, to the refusal of an archive whose bytes changed, of a
-temporary file that is there already and of a body larger than the bound,
-which it reads no further than one byte past it. Its tests of redirects
+link or a directory with the name of a temporary file and of a body
+larger than the bound, which it reads no further than one byte past it,
+and to the removal of a temporary file that a stopped run left. Its tests
+of redirects
 run the tool's own opener, in which a handler of the test serves invented
 responses before any handler that would connect, and the opening of a
 socket fails the test.
@@ -303,8 +306,9 @@ link with the manifest of a generated workspace of `/us/usc`, or an empty
 directory that a replay stopped between the removal of the manifest and
 of the directory left, when the run found the text form of the release
 kept, and `uscode.next/` holds the complete import of the next release. It
-writes each file through a new file beside it, and an entry of that name
-there already, a link among them, stops it and is left alone. Anything
+writes each file through a new file beside it: a regular file of that
+name, which a run that was stopped left, is removed first, and a link, a
+directory or anything else of that name stops it and is left alone. Anything
 else stops it with what it found. The cache may not be the repository nor
 lie inside it, with links resolved on both sides. Each run of `fidryn`
 has a limit of its own on its address space and its time
@@ -315,16 +319,23 @@ the list to the publisher's, the reading of a history to the commits it
 names, and the replacement to its conditions, with no network and no
 binary. `test_replay_repository.py` replays three invented releases into
 a repository made with `git init` in a temporary directory, whose own
-configuration needs no signing key, with a stand-in for `fidryn`: a
+configuration needs no signing key, with a stand-in for `fidryn`. Every
+git command it starts, and every one the tool runs, has neither the
+variables by which git finds a repository or its configuration nor the
+user's or the machine's configuration, so that inside a hook of git,
+where `GIT_DIR` names the calling repository, nothing is written there. It
+holds a
 complete replay; replays stopped by a failure, of the stand-in, of a hook
 or of one call of the tool, before the replacement, before the commit,
 between the removal of the manifest and of the directory, and after the
 commit, and started again; a workspace changed after its commit; a path
 staged beyond what a commit holds; and the refusals of a `uscode.next`
 that is a link or a file, of a directory that is no repository of its
-own, of a cache inside the repository through a link, and of a temporary
-file that is there already. It needs `git` and `sh`, and is skipped where
-either is missing.
+own, of a cache inside the repository through a link, and of a link or a
+directory with the name of a temporary file; the removal of a temporary
+file that a stopped run left; and, with `GIT_DIR` naming a second
+repository, that neither its configuration nor its history changes. It
+needs `git` and `sh`, and is skipped where either is missing.
 
 ## Drawing definition samples
 

@@ -2413,17 +2413,26 @@ more.
 ### Modules written by hand
 
 - A module's definitions, its aliases, `within`, `source` and
-  `positive_law` are in no hash ([Hashes](#hashes)), and the check of a
-  definition holds its form and not its region, its basis or its note
-  ([What the checker verifies in one module](#what-the-checker-verifies-in-one-module)):
-  a definition whose region, basis or note is edited by hand passes the
-  check.
-- `fidryn text` prints the strings of a module as they are. A module
-  written by hand can hold a control character below U+0020 that is no
-  white space, such as the escape, U+001B, that begins the sequences a
-  terminal acts on: normalization keeps it, the check accepts it, and
-  `fidryn text` writes it to the terminal. The importer never writes one,
-  since XML cannot hold one.
+  `positive_law` are in no hash of the module ([Hashes](#hashes)), and the
+  check of a definition holds its form and not its region, its basis or
+  its note
+  ([What the checker verifies in one module](#what-the-checker-verifies-in-one-module)).
+  In a generated workspace the lock holds the BLAKE3 of the bytes of every
+  module file, so a module edited by hand there fails the check (`E730`)
+  unless the lock is written again with it, and then the digest of the
+  lock changes, which a curated workspace that depends on it reports
+  (`E740`). A module checked by itself, and a module of a curated
+  workspace, which has no lock, pass the check with a definition whose
+  region, basis or note was edited by hand.
+- `fidryn text` prints the strings of a module as they are. Every control
+  character that is no white space passes normalization and the check:
+  U+0000 to U+0008, U+000E to U+001F, U+007F, and U+0080 to U+009F but
+  U+0085. Among them is the escape, U+001B, that begins the sequences a
+  terminal acts on, and `fidryn text` writes such a character to the
+  terminal as it is. A module written by hand can hold any of them. The
+  importer writes none below U+0020, since XML cannot hold one, and keeps
+  U+007F and the C1 controls but U+0085 where the publisher's XML holds
+  them.
 
 ### Definitions
 

@@ -14,7 +14,8 @@
 #   workspace. On a schedule that is the newest commit of the default
 #   branch; on a manual run, the commit of the branch the run was started on.
 #   It names the pin only in what it reports, so a pin whose commit is no
-#   full commit id fails the first job and not this one.
+#   full commit id, a value that is no string or none among them, fails the
+#   first job, saying so, and not this one.
 #
 # Both check out the law repository with the default token, which reads this
 # repository and public ones; a law repository that is not public needs a
@@ -54,14 +55,15 @@ jobs:
         id: pin
         run: |
           repository="$(jq -er '.repository | strings' law-repository.pin.json)"
-          commit="$(jq -er '.commit | strings' law-repository.pin.json)"
+          # A commit that is no string, or none, reads as empty, and is no full commit id.
+          commit="$(jq -r '.commit | strings' law-repository.pin.json)"
           if test -z "$repository"; then
             echo "law-repository.pin.json names no law repository, so there is nothing to check"
             echo "check=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id" >&2
+            echo "law-repository.pin.json pins $repository to $(jq -c '.commit' law-repository.pin.json), which is no full commit id" >&2
             exit 1
           fi
           {
@@ -101,14 +103,15 @@ jobs:
         id: pin
         run: |
           repository="$(jq -er '.repository | strings' law-repository.pin.json)"
-          commit="$(jq -er '.commit | strings' law-repository.pin.json)"
+          # A commit that is no string, or none, reads as empty, and is no full commit id.
+          commit="$(jq -r '.commit | strings' law-repository.pin.json)"
           if test -z "$repository"; then
             echo "law-repository.pin.json names no law repository, so there is nothing to check"
             echo "check=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id; this job checks the newest commit all the same" >&2
+            echo "law-repository.pin.json pins $repository to $(jq -c '.commit' law-repository.pin.json), which is no full commit id; this job checks the newest commit all the same" >&2
             commit=
           fi
           {

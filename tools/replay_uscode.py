@@ -38,9 +38,10 @@ form of the release kept (a replay stopped between the removal of the manifest a
 the directory leaves one); and `uscode.next/` holds the complete import of the next
 release: its manifest and its lock read, and `fidryn check` of it found nothing. The
 manifest is removed last, and no symbolic link is followed. The tool writes each of its
-files through a new file beside it, which it makes and renames; an entry that has the
-name of that file already stops the replay and is left as it is. Anything else stops
-the replay with a sentence that says what it found.
+files through a new file beside it, which it makes and renames. A regular file of that
+name is what a run stopped while it wrote left, and is removed first; a symbolic link,
+a directory or anything else of that name stops the replay and is left as it is.
+Anything else stops the replay with a sentence that says what it found.
 
 Each run of `fidryn` has a limit of its own on its address space, set in the child
 before the program starts, and on its time; a run that exceeds one stops the replay.
@@ -471,16 +472,30 @@ def read_state(repository: Path) -> tuple[str, str] | None:
 
 
 def write_file(path: Path, text: str) -> None:
-    """Writes `text` to `path` through a new file beside it that is renamed. An entry
-    that has the name of that file already, a symbolic link among them, stops the
-    replay and is left as it is."""
+    """Writes `text` to `path` through a new file beside it that is renamed. A regular
+    file of that name is what a run stopped while it wrote left, and is removed first;
+    a symbolic link, a directory or anything else of that name stops the replay and is
+    left as it is."""
     partial = path.with_name(f".{path.name}.part")
+    found = kind_of(partial)
+    if found == "file":
+        try:
+            partial.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError as error:
+            raise CannotRunError(f"{partial}: {error}") from error
+    elif found != "missing":
+        raise StopReplayError(
+            f"{partial} is {describe(found)}, and the replay writes {path.name} only through "
+            "a regular file of that name that it makes; it is left as it is"
+        )
     try:
         stream = partial.open("x", encoding="utf-8", newline="\n")
     except FileExistsError as error:
         raise StopReplayError(
-            f"{partial} is there already, and the replay writes {path.name} through a new "
-            "file of that name; it is left as it is"
+            f"{partial} appeared while the replay was about to make it, to write "
+            f"{path.name} through it; it is left as it is"
         ) from error
     except OSError as error:
         raise CannotRunError(f"{partial}: {error}") from error

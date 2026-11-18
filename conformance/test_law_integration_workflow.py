@@ -441,18 +441,25 @@ class Workflow(unittest.TestCase):
     def test_a_pin_whose_commit_is_no_full_commit_id_fails_only_the_pinned_job(self) -> None:
         if shutil.which("jq") is None:
             self.fail("the step that reads the pin needs jq")
-        for commit in ("main", "", "a" * 39):
+        absent = object()
+        for commit in ("main", "", "a" * 39, None, 42, ["a" * 40], absent):
+            pin: dict[str, object] = {"repository": "invented/law"}
+            if commit is not absent:
+                pin["commit"] = commit
+            shown = json.dumps(pin.get("commit"))
             for job in JOBS:
-                with self.subTest(job=job, commit=commit), tempfile.TemporaryDirectory() as name:
+                with self.subTest(job=job, pin=pin), tempfile.TemporaryDirectory() as name:
                     directory = Path(name)
-                    (directory / "law-repository.pin.json").write_text(
-                        json.dumps({"repository": "invented/law", "commit": commit}) + "\n"
-                    )
+                    (directory / "law-repository.pin.json").write_text(json.dumps(pin) + "\n")
                     output = directory / "output"
                     result = self.run_step(
                         self.steps(job)[1], directory, {"GITHUB_OUTPUT": str(output)}, directory
                     )
-                    self.assertIn("which is no full commit id", result.stderr)
+                    self.assertIn(
+                        f"law-repository.pin.json pins invented/law to {shown}, which is no "
+                        "full commit id",
+                        result.stderr,
+                    )
                     if job == "pinned":
                         self.assertEqual(result.returncode, 1, result.stderr)
                         self.assertFalse(output.exists())

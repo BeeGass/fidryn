@@ -3,7 +3,11 @@
 
 Each test makes a repository in a temporary directory and sets the configuration of that
 repository only: a name and an address for its commits, no signing, and a directory of
-hooks of its own. It replays three invented releases, whose archives are in place with
+hooks of its own. Every git command, the test's and the tool's, runs without the
+variables by which git finds a repository or its configuration (`GIT_DIR`, as inside a
+hook of git, among them), with an empty file of the test as the global configuration
+and none of the system, so that neither the repository the tests are run from nor the
+user's or the machine's configuration is read or written. It replays three invented releases, whose archives are in place with
 their retrieval records, so that nothing is fetched; a call that would open a connection
 fails the test. The stand-in for `fidryn` is a shell script that reads no law: `ingest`
 writes a workspace of the invented title 99 for the release its archive directory is
@@ -90,6 +94,33 @@ release=$(sed -n 's/.*"release": "\\([^"]*\\)".*/\\1/p' uscode/workspace.json)
 """
 
 
+# The variables by which git finds a repository, its objects or its configuration; the
+# whole `GIT_CONFIG` family is removed too.
+GIT_LOCATIONS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_CEILING_DIRECTORIES",
+)
+
+
+def isolated(environment: dict[str, str], config: Path) -> dict[str, str]:
+    """`environment` without the variables by which git finds a repository or its
+    configuration, and with `config`, an empty file, as the only global configuration
+    and no configuration of the system, so that git reads and writes neither the
+    caller's repository, nor the user's configuration, nor the machine's."""
+    kept = {
+        name: value
+        for name, value in environment.items()
+        if name not in GIT_LOCATIONS and not name.startswith("GIT_CONFIG")
+    }
+    return {**kept, "GIT_CONFIG_GLOBAL": str(config), "GIT_CONFIG_NOSYSTEM": "1"}
+
+
 def invented_archive(release: str) -> bytes:
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -111,6 +142,14 @@ class Replays(unittest.TestCase):
         if sh is None or git is None:
             raise unittest.SkipTest("the replay runs git, and its stand-in is a shell script")
         self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        # Every git command of the test, and every one the tool runs, inherits this
+        # environment.
+        (self.root / "gitconfig").write_bytes(b"")
+        self.enterContext(
+            mock.patch.dict(
+                os.environ, isolated(dict(os.environ), self.root / "gitconfig"), clear=True
+            )
+        )
         self.archives = self.root / "archives"
         self.cache = self.root / "cache"
         self.failing = self.root / "fail"
@@ -480,21 +519,84 @@ class Refusals(Replays):
                 self.assertEqual([entry.name for entry in self.repository.iterdir()], [".git"])
                 self.assertEqual(self.commands(), [])
 
-    def test_a_temporary_file_that_is_there_already_is_refused_and_left_alone(self) -> None:
+    def test_a_link_or_a_directory_with_the_name_of_a_temporary_file_is_refused_and_left_alone(
+        self,
+    ) -> None:
         elsewhere = self.root / "elsewhere.txt"
         elsewhere.write_text("Invented, and kept.\n", encoding="utf-8")
         partial = self.repository / ".git" / ".fidryn-replay.json.part"
-        partial.symlink_to(elsewhere)
-        status, _, stderr = self.replay()
-        self.assertEqual(status, 1, stderr)
-        self.assertIn(".fidryn-replay.json.part", stderr)
-        self.assertEqual(elsewhere.read_text(encoding="utf-8"), "Invented, and kept.\n")
-        self.assertTrue(partial.is_symlink())
-        self.assertFalse(self.state().exists())
-        partial.unlink()
+        for name in ("a symbolic link", "a directory"):
+            with self.subTest(name):
+                if name == "a directory":
+                    partial.mkdir()
+                else:
+                    partial.symlink_to(elsewhere)
+                try:
+                    status, _, stderr = self.replay()
+                    self.assertEqual(status, 1, stderr)
+                    self.assertIn(f"{partial} is {name}, and the replay writes", stderr)
+                    self.assertEqual(elsewhere.read_text(encoding="utf-8"), "Invented, and kept.\n")
+                    self.assertTrue(partial.is_symlink() or partial.is_dir())
+                    self.assertFalse(self.state().exists())
+                finally:
+                    if partial.is_symlink():
+                        partial.unlink()
+                    else:
+                        partial.rmdir()
         status, _, stderr = self.replay()
         self.assertEqual((status, stderr), (0, ""))
         self.assert_complete()
+
+    def test_a_temporary_file_that_a_stopped_run_left_is_removed_and_the_replay_goes_on(
+        self,
+    ) -> None:
+        for partial in (
+            self.repository / ".git" / ".fidryn-replay.json.part",
+            self.repository / "..gitattributes.part",
+        ):
+            partial.write_text("Invented: what a run that was killed left.\n", encoding="utf-8")
+        status, _, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        self.assert_complete()
+        self.assertEqual(self.git("show", "HEAD:.gitattributes"), "* -text\n")
+        self.assertFalse((self.repository / ".git" / ".fidryn-replay.json.part").exists())
+        self.assertFalse((self.repository / "..gitattributes.part").exists())
+
+
+class Guard(unittest.TestCase):
+    def test_the_tests_write_nothing_into_the_repository_that_git_dir_names(self) -> None:
+        """Inside a hook of git, `GIT_DIR` names the repository the hook runs for. The
+        setup of these tests, and a replay they start, write neither its configuration
+        nor a commit."""
+        if shutil.which("git") is None or shutil.which("sh") is None:
+            raise unittest.SkipTest("the replay runs git, and its stand-in is a shell script")
+        root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        caller = root / "caller"
+        (root / "gitconfig").write_bytes(b"")
+        without = isolated(dict(os.environ), root / "gitconfig")
+        subprocess.run(
+            ["git", "init", "--quiet", str(caller)], env=without, capture_output=True, check=True
+        )
+        config = caller / ".git" / "config"
+        before = config.read_bytes()
+        with mock.patch.dict(os.environ, {"GIT_DIR": str(caller / ".git")}):
+            case = Complete(
+                "test_a_replay_commits_each_release_with_its_text_form_and_its_change_set"
+            )
+            try:
+                case.setUp()
+                status, _, stderr = case.replay()
+            finally:
+                case.doCleanups()
+        self.assertEqual(config.read_bytes(), before)
+        head = subprocess.run(
+            ["git", "-C", str(caller), "rev-parse", "--verify", "--quiet", "HEAD"],
+            env=without,
+            capture_output=True,
+            check=False,
+        )
+        self.assertNotEqual(head.returncode, 0, "a commit was made in the calling repository")
+        self.assertEqual((status, stderr), (0, ""))
 
 
 if __name__ == "__main__":
