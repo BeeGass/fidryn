@@ -5,14 +5,16 @@
 //! their canonical text ([`render`]), the interface
 //! of a module ([`interface`]), the index of addresses that gives each
 //! reference its outcome ([`mod@reference`]), the staleness of a binding
-//! ([`binding`]), and the files of a workspace as data: its manifest, its
-//! lock and the retrieval record of its archives ([`workspace`]).
+//! ([`binding`]), what changed between two releases ([`changes`]), and the
+//! files of a workspace as data: its manifest, its lock and the retrieval
+//! record of its archives ([`workspace`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.
 
 mod address;
 pub mod binding;
+pub mod changes;
 pub mod hash;
 pub mod interface;
 pub mod layout;

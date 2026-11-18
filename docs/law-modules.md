@@ -6,15 +6,16 @@ workspace, how the text of a module is normalized, what a module holds, how
 its provisions, notes and layers are hashed, how a module is written, what
 the checker verifies of one module, how modules form a workspace and what
 the checker verifies of one, how a workspace is checked, what outcome
-each reference has, when a binding is stale, how the ingester for the
-United States Code reads the publisher's XML, by which rules it extracts
-definitions, what the coverage ledger of a generated workspace counts, and
-what the sample of the Code in the repository holds and how it is
-checked. The crate `fidryn-provision` implements the model and the rules
-over it, `fidryn-syntax` reads the text of a module, `fidryn-check`
-lowers it into the model and checks it, `fidryn-driver` checks a
-workspace and writes a generated one, and `fidryn-ingest-uscode` imports
-the Code. In the examples, `/zz/demo` is an invented corpus.
+each reference has, when a binding is stale, what a change set between
+two releases lists, how the ingester for the United States Code reads the
+publisher's XML, by which rules it extracts definitions, what the coverage
+ledger of a generated workspace counts, and what the sample of the Code in
+the repository holds and how it is checked. The crate `fidryn-provision`
+implements the model and the rules over it, `fidryn-syntax` reads the text
+of a module, `fidryn-check` lowers it into the model and checks it,
+`fidryn-driver` checks a workspace, writes a generated one and compares
+two, and `fidryn-ingest-uscode` imports the Code. In the examples,
+`/zz/demo` is an invented corpus.
 
 ## Addresses
 
@@ -901,7 +902,8 @@ anything is printed or written.
 The interface of a module, which `fidryn_provision::interface_of` builds
 from the lowered module and the byte ranges of its declarations, holds all
 that phase two and the [coverage ledger](#the-coverage-ledger) read of the
-module:
+module, and all that a [change set](#change-sets) reads of a module whose
+hashes did not change:
 
 - its address, its shape, its aliases, `within`, `source` and
   `positive_law`; for a container its kind, status and members;
@@ -1561,6 +1563,186 @@ binds one section of the generated sample by the name of its citation,
 with the hashes that `fidryn text samples/uscode/workspace /us/usc/t45/s151 --hashes`
 prints and the release of the sample, and the check of the sample fails
 when that binding is stale.
+
+## Change sets
+
+A **change set** says what changed between two releases of one corpus:
+which provisions, notes and containers were added, removed, moved or
+amended between two generated workspaces of one prefix, each the import of
+one release, by layer, and which bindings of given curated workspaces are
+stale against the newer one. [`fidryn changes OLD_DIR NEW_DIR`](cli.md#changes)
+prints it as JSON, `fidryn.change-set/v0.1`, whose JSON Schema is
+[`change-set-v0.1.json`](../schemas/change-set-v0.1.json), or as the text
+of a commit message, under which a release enters a repository of the
+imported law.
+
+Each of the two workspaces is read as `fidryn check` reads it
+([How a workspace is checked](#how-a-workspace-is-checked)), through phase
+one and the cache; a workspace that has an error ends the command with its
+diagnostics, and no change set is made. Then the two are compared from
+their [interfaces](#interfaces). A unit whose three layer hashes and the
+addresses of whose provisions are equal on both sides is not read again,
+nor is a container whose hashes are equal. The notes, the containers, and
+the units on one side only are compared from the interfaces alone. Only a
+unit whose operative or editorial layer or whose provisions differ, a
+container whose editorial layer differs, and a unit on one side whose top
+provision has the kind and the status of a provision on the other side
+only, so that it could have moved, are opened, and their provisions,
+credits and footnotes compared.
+
+### The lists
+
+Every list holds addresses, and every list is sorted by the bytes of its
+addresses; a moved entry is `{"from": ..., "to": ...}`, sorted by `from`
+and then by `to`.
+
+| List | What puts an address into it |
+| --- | --- |
+| `operative.added` | a provision on the new side only whose parent is on both sides, or the top provision of a unit on the new side only |
+| `operative.removed` | the same, of the old side |
+| `operative.amended_text` | a provision on both sides whose own words differ |
+| `operative.amended_structure` | a provision on both sides whose own structure differs |
+| `operative.moved` | a removed and an added provision that are one (below) |
+| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address |
+| `enacted_notes.amended` | an enacted note on both sides whose [note hash](#hashes) differs |
+| `enacted_notes.moved` | a removed and an added enacted note of equal note hashes |
+| `editorial.added`, `removed`, `amended`, `moved` | the same, of the editorial notes |
+| `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or whose words changed |
+| `editorial.footnotes_changed` | a unit or a container on both sides whose footnotes or footnote markers differ in any way: a footnote added, removed or changed, or a marker added, removed, standing in another provision or note, showing another mark or pointing at another footnote |
+| `containers.added`, `removed` | a container on one side only |
+| `containers.changed` | a container on both sides whose kind, number, heading, status, aliases or members differ |
+| `stale_bindings` | a binding of a curated workspace given with `--bindings` that is stale against the new side (below) |
+
+A provision is listed for what is its own, and at one place. Its **own
+words** are, in order, the text of each paragraph and subheading of its
+own text parts, those in the cells of its tables included, with its links,
+superscripts and subscripts, each quoted content whole, and the source of
+each image: a link added to words, or taken from them, amends the text. Its
+**own structure** is its
+kind, its number, its heading and its status, the order of its text parts
+and their roles, the addresses of its children in their order, and the
+shape of its tables: the group of each row, and the header and the spans
+of each cell. A provision may be in both lists. A provision whose tree hash
+changed only because something below it changed is in neither: a word
+changed in a subsection lists the subsection, and not its section. A
+subsection added to a section is `added`, and the section is
+`amended_structure`, since the addresses of its children changed; the
+children of the subsection are not listed. A column added to a table
+changes its shape, and its words when its cells hold any.
+
+A footnote marker is no word of the text it stands in, so a marker that is
+added, removed or renumbered changes `editorial.footnotes_changed` of its
+unit or container and nothing in `operative`. Of the top provision of a
+unit, its aliases, the container it is within, its source and its
+positive-law flag are not compared: a unit that leaves one container for
+another lists the two containers, whose members changed, and not the unit.
+The credits and the footnotes of a module on one side only are not listed,
+since the module is.
+
+### Moved provisions and notes
+
+`added` and `removed` are first reduced to their highest provisions. Among
+the entries that remain, a removed and an added provision are one `moved`
+entry, and are taken out of the other two lists, when their tree hashes
+are equal once each one's own number is left out: the tree hash of
+[Hashes](#hashes) computed with the frame of no number, `F(0x04, empty)`,
+in place of the provision's number, and the tree hash of each child as it
+is (`fidryn_provision::changes::unnumbered_hash`). A section renumbered and
+otherwise unchanged has moved, and it carries its children with it: they
+are not listed. Each removed provision, in the order of the addresses, is
+paired with the first added one, in the order of the addresses, that has
+an equal hash and is not paired yet. So the provisions on the old side
+only, reduced to their highest, are exactly `removed` together with the
+`from` of `moved`, and those on the new side only `added` with the `to`.
+
+Notes are paired in the same way by their note hashes, which hold neither
+the address nor the layer of a note: a note whose address changed and
+whose text did not has moved, as the notes of a renumbered section do, and
+so does a note whose address names another law while its text is the
+same.
+
+### Stale bindings
+
+With `--bindings DIR`, each binding of the curated workspace in `DIR` is
+judged against the new side by the rule of [Bindings](#bindings),
+whatever release that workspace is pinned to and whether or not its pin is
+satisfied: the change set answers which bindings would be stale if the
+pin moved to the new release. The modules of `DIR` are read by phase one
+alone, and an error there ends the command; the names of its curated
+modules are resolved against its own modules and those of the new side, a
+binding whose name does not resolve is left out, and so is one whose
+address lies below another prefix than the new side's. Each entry names
+the curated workspace by the `name` of its manifest, the module that
+declares the binding, the binding, the address it binds and the reason; the
+entries are sorted by workspace, module and binding.
+
+### The two forms
+
+`--json` prints the change set as pretty JSON with two spaces and a final
+line end, every key present and every list as above, empty lists
+included:
+
+```json
+{
+  "schema": "fidryn.change-set/v0.1",
+  "prefix": "/zz/demo",
+  "old": { "release": "v1", "lock_digest": "..." },
+  "new": { "release": "v2", "lock_digest": "..." },
+  "operative": { "added": [], "removed": [], "amended_text": [], "amended_structure": [], "moved": [] },
+  "enacted_notes": { "added": [], "removed": [], "amended": [], "moved": [] },
+  "editorial": { "added": [], "removed": [], "amended": [], "moved": [], "credits_changed": [], "footnotes_changed": [] },
+  "containers": { "added": [], "removed": [], "changed": [] },
+  "stale_bindings": [ { "workspace": "notes", "module": "/zz/notes/a", "binding": "first", "address": "/zz/demo/t1/s8/a", "reason": "provision text changed" } ]
+}
+```
+
+`lock_digest` is the BLAKE3 of the bytes of the lock of each side.
+Without `--json` the command prints the text form, a commit message: a
+first line `<prefix>: <old release> to <new release>`; a blank line; one
+line of counts for each of the four groups, `operative`, `enacted_notes`,
+`editorial` and `containers`; then each list that is not empty, after a
+blank line, under its name as its key path and a colon, one entry to a
+line: an address, a moved entry as `<from> to <to>`, and a stale binding
+as `<address>: <binding> of <module> in <workspace> (<reason>)`. No line
+begins with `#`, none ends in a space, and the text ends with one line
+end. Between two invented workspaces in which one word of `s8/a` changed,
+`s8/b` was renumbered `s8/c` and an enacted note was added to `s3`, with
+a curated workspace `notes` whose module `/zz/notes/a` binds `s1`, `s4`,
+an alias of `s3`, `s8`, `s8/a` and `s8/b` with the hashes of the older:
+
+```text
+/zz/demo: v1 to v2
+
+operative: 0 added, 0 removed, 1 amended_text, 1 amended_structure, 1 moved
+enacted_notes: 1 added, 0 removed, 0 amended, 0 moved
+editorial: 0 added, 0 removed, 0 amended, 0 moved, 0 credits_changed, 0 footnotes_changed
+containers: 0 added, 0 removed, 0 changed
+
+operative.amended_text:
+/zz/demo/t1/s8/a
+
+operative.amended_structure:
+/zz/demo/t1/s8
+
+operative.moved:
+/zz/demo/t1/s8/b to /zz/demo/t1/s8/c
+
+enacted_notes.added:
+/zz/demo/t1/s3/note/demoNotes/nolaw/amendment
+
+stale_bindings:
+/zz/demo/t1/s4: aliased of /zz/notes/a in notes (enacted notes of the unit changed)
+/zz/demo/t1/s8/a: first of /zz/notes/a in notes (provision text changed)
+/zz/demo/t1/s8/b: second of /zz/notes/a in notes (provision removed or moved)
+/zz/demo/t1/s8: section of /zz/notes/a in notes (provision text changed)
+```
+
+Both forms are the same bytes on every run and for every number of
+workers. `conformance/usc_compare.py` compares two releases of the
+publisher's XML independently, from their text records alone, and checks
+that a change set lists exactly the provisions, notes, credits, footnotes
+and containers that differ in them; the conformance tests run it on
+invented pairs of releases beside the command.
 
 ## The ingester for the United States Code
 

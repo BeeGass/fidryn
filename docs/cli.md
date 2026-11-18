@@ -928,6 +928,87 @@ of the repository is refused:
 fidryn coverage samples/uscode/curated
 ```
 
+## `changes`
+
+`fidryn changes OLD_DIR NEW_DIR` prints the change set between two
+generated workspaces of one prefix, the imports of two releases of one
+corpus: the provisions, notes and containers added, removed, moved or
+amended, by layer ([Change sets](law-modules.md#change-sets)). With
+`--bindings DIR` it also lists the bindings of the curated workspace in
+`DIR` that are stale against `NEW_DIR`, whatever release that workspace is
+pinned to: it answers what would go stale if the pin moved there. Each
+workspace is read as `fidryn check` reads it, through phase one and the
+cache, and only the modules whose hashes differ are read again.
+
+**Arguments**
+
+| Name | Required | Type |
+| --- | --- | --- |
+| `OLD_DIR` | yes | path to the directory of the older generated workspace |
+| `NEW_DIR` | yes | path to the directory of the newer generated workspace, of the prefix of `OLD_DIR` |
+| `--bindings DIR` | no | path to the directory of a curated workspace whose bindings are judged against `NEW_DIR`; may be given more than once |
+| `--json` | no | flag; print the change set as JSON, `fidryn.change-set/v0.1` |
+| `--jobs N` | no | the number of worker threads, at least 1; by default as many as the system reports as available |
+| `--cache-dir DIR` | no | the directory of the cache of every workspace read; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside each workspace |
+| `--no-cache` | no | flag; keep no cache: check every module file, and write no entry |
+
+`FIDRYN_CACHE_DIR` is read as by [`check`](#check). `--cache-dir` and
+`--no-cache` are not given together.
+
+**Example**
+
+Each of these compares a workspace with itself, with `--no-cache`, so that
+no cache is written into the repository; each prints a change set in which
+nothing changed:
+
+```sh
+fidryn changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo --no-cache
+fidryn changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo --no-cache --json
+fidryn changes samples/uscode/workspace samples/uscode/workspace --no-cache --bindings samples/uscode/curated
+```
+
+```text
+fidryn changes OLD_DIR NEW_DIR --bindings CURATED_DIR > message.txt
+fidryn changes OLD_DIR NEW_DIR --json --jobs 8 > changes.json
+```
+
+**Success.** Exit 0. Without `--json` it prints the change set as the text
+of a commit message: a first line `<prefix>: <old release> to <new release>`,
+a blank line, one line of counts for each of the four groups, and then
+each list that is not empty under its name, one entry to a line. Of the
+demo workspace compared with itself:
+
+```text
+/zz/demo: 42-7 to 42-7
+
+operative: 0 added, 0 removed, 0 amended_text, 0 amended_structure, 0 moved
+enacted_notes: 0 added, 0 removed, 0 amended, 0 moved
+editorial: 0 added, 0 removed, 0 amended, 0 moved, 0 credits_changed, 0 footnotes_changed
+containers: 0 added, 0 removed, 0 changed
+```
+
+With `--json` it prints the change set as pretty JSON, every key present,
+the JSON Schema of which is
+[schemas/change-set-v0.1.json](../schemas/change-set-v0.1.json). Every list
+is sorted, and both forms are the same bytes on every run and for every
+number of workers. [Change sets](law-modules.md#change-sets) says what puts
+an address into each list and shows the text of one with every kind of
+list.
+
+**Failure.** Exit 1, with nothing on stdout. A directory that holds no
+workspace, a curated workspace as `OLD_DIR` or `NEW_DIR`, a generated one
+as `--bindings`, and two workspaces of different prefixes are each refused
+with one `E730` that says which, as
+``this is the manifest of a curated workspace, and a change set is made between two generated workspaces``.
+A workspace that has an error ends the command with its diagnostics, each
+naming its file under the directory given, as `fidryn check` prints them;
+for a curated workspace of `--bindings` these are the diagnostics of its
+module files by themselves:
+
+```sh exit=1
+fidryn changes conformance/fixtures/workspace conformance/fixtures/workspace/demo --no-cache
+```
+
 ## See also
 
 - [Getting started](getting-started.md)

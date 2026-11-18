@@ -167,9 +167,23 @@ impl WorkspaceReport {
 /// written inside a dependency: the report is that of a check without a
 /// cache, and says why in [`WorkspaceReport::cache_unused`].
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
+    checked(root, options).report
+}
+
+/// What [`checked`] gives: the report of [`check_workspace`], and the
+/// interfaces of the modules that stand at the paths of their addresses,
+/// which phase two read, in the order of their paths.
+pub(super) struct Checked {
+    pub(super) report: WorkspaceReport,
+    pub(super) interfaces: Vec<Interface>,
+}
+
+/// The check of the workspace whose directory is `root`, as
+/// [`check_workspace`] runs it, with the interfaces it read.
+pub(super) fn checked(root: &Path, options: &CheckOptions) -> Checked {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
-        return WorkspaceReport {
+        let report = WorkspaceReport {
             modules: 0,
             from_cache: 0,
             diagnostics,
@@ -181,6 +195,10 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
             cache_failure: None,
             cache_unused: None,
         };
+        return Checked {
+            report,
+            interfaces: Vec::new(),
+        };
     };
     let lock = read_lock(root, &manifest, &mut diagnostics);
     let jobs = options.jobs.max(1);
@@ -189,15 +207,7 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     // by itself, or its result from the cache; then the entries of the
     // files the cache did not hold. A cache that shares a directory with a
     // dependency is not used.
-    let cache_unused = options
-        .cache_dir
-        .as_deref()
-        .and_then(|dir| deps::cache_shared(root, &manifest, dir));
-    let cache = options
-        .cache_dir
-        .as_deref()
-        .filter(|_| cache_unused.is_none())
-        .map(|dir| Cache::new(dir, &options.toolchain, &options.executable));
+    let (cache, cache_unused) = cache_of(root, &manifest, options);
     let files = read_files(root, jobs, cache.as_ref());
     let opened = deps::open(root, &manifest, jobs, cache.as_ref());
     let modules = files.modules.len();
@@ -224,7 +234,7 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
     );
     diagnostics.extend(phase_two.diagnostics);
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
-    WorkspaceReport {
+    let report = WorkspaceReport {
         modules,
         from_cache,
         diagnostics,
@@ -235,7 +245,52 @@ pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
         unresolved_citations: phase_two.unresolved_citations,
         cache_failure: cache.and_then(Cache::failure),
         cache_unused,
+    };
+    Checked { report, interfaces }
+}
+
+/// The cache of the check of the workspace at `root`, whose manifest is
+/// `manifest`, that `options` names, and why it is not used when its
+/// directory shares a directory with a dependency.
+fn cache_of(
+    root: &Path,
+    manifest: &Manifest,
+    options: &CheckOptions,
+) -> (Option<Cache>, Option<String>) {
+    let cache_unused = options
+        .cache_dir
+        .as_deref()
+        .and_then(|dir| deps::cache_shared(root, manifest, dir));
+    let cache = options
+        .cache_dir
+        .as_deref()
+        .filter(|_| cache_unused.is_none())
+        .map(|dir| Cache::new(dir, &options.toolchain, &options.executable));
+    (cache, cache_unused)
+}
+
+/// Phase one alone of the workspace at `root`, whose manifest is
+/// `manifest`, through the cache of `options` as [`check_workspace`] keeps
+/// it, and then where each module stands: the interfaces of the modules
+/// that stand at the paths of their addresses, in the order of their paths,
+/// and the diagnostics of the files, each naming its file by its path
+/// relative to `root`, sorted. Nothing of a lock, of the manifest, of a
+/// dependency or across the modules is checked.
+pub(super) fn modules_of(
+    root: &Path,
+    manifest: &Manifest,
+    options: &CheckOptions,
+) -> (Vec<Interface>, Vec<Diagnostic>) {
+    let (cache, _) = cache_of(root, manifest, options);
+    let jobs = options.jobs.max(1);
+    let files = read_files(root, jobs, cache.as_ref());
+    if let Some(cache) = &cache {
+        write_missed(cache, &files.read, jobs);
     }
+    let mut diagnostics = Vec::new();
+    let (interfaces, _) = settle(files, None, &manifest.prefix, &mut diagnostics);
+    diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
+    (interfaces, diagnostics)
 }
 
 /// A diagnostic about the file `rel` as a whole, which has no span.

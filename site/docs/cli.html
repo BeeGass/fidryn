@@ -98,7 +98,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.19</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">4.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.20</span> See also</a></li></ol></details>
     <div class="prose">
 <p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
@@ -790,7 +790,67 @@ neither a file nor a directory (<code>E730</code>); and a module file that is no
 module of edition 2 that lowers, with its diagnostics. The curated sample
 of the repository is refused:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage samples/uscode/curated</code></pre></figure>
-<h2 id="see-also"><span class="hn">4.19</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="changes"><span class="hn">4.19</span> <code>changes</code> <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn changes OLD_DIR NEW_DIR</code> prints the change set between two
+generated workspaces of one prefix, the imports of two releases of one
+corpus: the provisions, notes and containers added, removed, moved or
+amended, by layer (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets">Change sets</a>). With
+<code>--bindings DIR</code> it also lists the bindings of the curated workspace in
+<code>DIR</code> that are stale against <code>NEW_DIR</code>, whatever release that workspace is
+pinned to: it answers what would go stale if the pin moved there. Each
+workspace is read as <code>fidryn check</code> reads it, through phase one and the
+cache, and only the modules whose hashes differ are read again.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>OLD_DIR</code></td><td>yes</td><td>path to the directory of the older generated workspace</td></tr>
+<tr><td><code>NEW_DIR</code></td><td>yes</td><td>path to the directory of the newer generated workspace, of the prefix of <code>OLD_DIR</code></td></tr>
+<tr><td><code>--bindings DIR</code></td><td>no</td><td>path to the directory of a curated workspace whose bindings are judged against <code>NEW_DIR</code>; may be given more than once</td></tr>
+<tr><td><code>--json</code></td><td>no</td><td>flag; print the change set as JSON, <code>fidryn.change-set/v0.1</code></td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of every workspace read; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>.fidryn-cache</code> inside each workspace</td></tr>
+<tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry</td></tr>
+</tbody></table>
+</div>
+<p><code>FIDRYN_CACHE_DIR</code> is read as by <a href="#check"><code>check</code></a>. <code>--cache-dir</code> and
+<code>--no-cache</code> are not given together.</p>
+<p><strong>Example</strong></p>
+<p>Each of these compares a workspace with itself, with <code>--no-cache</code>, so that
+no cache is written into the repository; each prints a change set in which
+nothing changed:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span>
+<span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span> <span class="tk-ty">--json</span>
+<span class="tk-kw">fidryn</span> changes samples/uscode/workspace samples/uscode/workspace <span class="tk-ty">--no-cache</span> <span class="tk-ty">--bindings</span> samples/uscode/curated</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn changes OLD_DIR NEW_DIR --bindings CURATED_DIR &gt; message.txt
+fidryn changes OLD_DIR NEW_DIR --json --jobs 8 &gt; changes.json</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. Without <code>--json</code> it prints the change set as the text
+of a commit message: a first line <code>&lt;prefix&gt;: &lt;old release&gt; to &lt;new release&gt;</code>,
+a blank line, one line of counts for each of the four groups, and then
+each list that is not empty under its name, one entry to a line. Of the
+demo workspace compared with itself:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>/zz/demo: 42-7 to 42-7
+
+operative: 0 added, 0 removed, 0 amended_text, 0 amended_structure, 0 moved
+enacted_notes: 0 added, 0 removed, 0 amended, 0 moved
+editorial: 0 added, 0 removed, 0 amended, 0 moved, 0 credits_changed, 0 footnotes_changed
+containers: 0 added, 0 removed, 0 changed</code></pre></figure>
+<p>With <code>--json</code> it prints the change set as pretty JSON, every key present,
+the JSON Schema of which is
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json">schemas/change-set-v0.1.json</a>. Every list
+is sorted, and both forms are the same bytes on every run and for every
+number of workers. <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets">Change sets</a> says what puts
+an address into each list and shows the text of one with every kind of
+list.</p>
+<p><strong>Failure.</strong> Exit 1, with nothing on stdout. A directory that holds no
+workspace, a curated workspace as <code>OLD_DIR</code> or <code>NEW_DIR</code>, a generated one
+as <code>--bindings</code>, and two workspaces of different prefixes are each refused
+with one <code>E730</code> that says which, as
+<code>this is the manifest of a curated workspace, and a change set is made between two generated workspaces</code>.
+A workspace that has an error ends the command with its diagnostics, each
+naming its file under the directory given, as <code>fidryn check</code> prints them;
+for a curated workspace of <code>--bindings</code> these are the diagnostics of its
+module files by themselves:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span></code></pre></figure>
+<h2 id="see-also"><span class="hn">4.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
@@ -801,7 +861,7 @@ of the repository is refused:</p>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.19</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">4.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.20</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

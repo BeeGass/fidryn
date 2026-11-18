@@ -125,7 +125,9 @@ at Command Line Tools clang because the Xcode license is unsigned.</p>
 <span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span></code></pre></figure>
 <p><code>cargo xtask ci --fmt</code> runs formatting, the complete Rust tests and Clippy,
 Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, the sample check (<code>cargo xtask uscode-sample</code>: the
+and probe controls, the conformance tests of <code>conformance/</code> (given the built
+binary in <code>FIDRYN_BINARY</code>, since the comparison of two releases there runs
+<code>fidryn changes</code>), the sample check (<code>cargo xtask uscode-sample</code>: the
 committed archives of the Code against their retrieval record, the committed
 workspace against what the importer writes from them on one worker and on
 eight, its check and its coverage ledger, the committed profile and its
@@ -220,14 +222,14 @@ fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo; workspace check and writer (provision)
+fidryn-driver          incremental check/run memo; workspace check, writer and change sets (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and localhost mill; ingest, text and coverage commands (driver + provision + ingest-uscode)</code></pre></figure>
+fidryn-cli             fidryn binary and localhost mill; ingest, text, coverage and changes commands (driver + provision + ingest-uscode)</code></pre></figure>
 <h2 id="tests"><span class="hn">9.7</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
 <p>Tests live next to the crates they exercise (<code>#[cfg(test)]</code> in <code>src</code>,
 and <code>crates/&lt;name&gt;/tests/</code> when a crate has an integration kit).</p>

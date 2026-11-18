@@ -1,7 +1,8 @@
 //! The commands of law modules: `fidryn ingest`, a generated workspace
 //! written from the archives of one release of a corpus, `fidryn text`, the
-//! text of the provisions and notes a workspace holds, and `fidryn
-//! coverage`, the coverage ledger of a generated workspace.
+//! text of the provisions and notes a workspace holds, `fidryn coverage`, the
+//! coverage ledger of a generated workspace, and `fidryn changes`, what
+//! changed between two releases.
 //!
 //! `ingest` is the one place of the command line that names the corpus it
 //! imports, the United States Code, read from the official XML release point
@@ -11,12 +12,15 @@
 //! it prints the text records of `fidryn_provision::records` of the modules
 //! `fidryn-driver` reads, or the same text laid out for a person, or the two
 //! hashes a binding to one provision records. Nor does `coverage`, which
-//! prints the ledger `fidryn-driver` counts from a workspace's files.
+//! prints the ledger `fidryn-driver` counts from a workspace's files, nor
+//! `changes`, which prints the change set that `fidryn-driver` finds between
+//! two generated workspaces.
 
 use clap::Subcommand;
 use fidryn_core::Diagnostic;
+use fidryn_driver::workspace::changes::change_set;
 use fidryn_driver::workspace::{
-    CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
+    CheckOptions, CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
 };
 use fidryn_ingest_uscode::{IngestError, IngestOptions, generator, ingest, open};
 use fidryn_provision::records::text_records;
@@ -25,6 +29,7 @@ use fidryn_provision::{
     Address, AddressIndex, Block, DeclSpans, Footnote, Interface, Item, Layer, Module, Note, Num,
     Provision, QuotedItem, Run, Text, bound_hashes, interface_of,
 };
+use std::ffi::OsString;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -334,6 +339,84 @@ pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<()
         hashes.provision_hash, hashes.notes_hash
     )
     .map_err(|error| format!("cannot write the hashes: {error}"))
+}
+
+/// `fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json]`: prints the
+/// change set from the generated workspace in `old` to the one in `new`,
+/// with the bindings of the curated workspaces in `bindings` that are stale
+/// against `new`, as JSON with `json` and otherwise as the text of a commit
+/// message. Every workspace is read as `fidryn check` reads it, on `--jobs`
+/// threads and through the cache of `--cache-dir`, else of
+/// `$FIDRYN_CACHE_DIR`, else of `.fidryn-cache` inside each workspace;
+/// `--no-cache` keeps none. Exit 1, with the diagnostics on stderr and
+/// nothing on stdout, when a directory is not what the command compares or
+/// a workspace has an error.
+pub(crate) fn changes(
+    old: &Path,
+    new: &Path,
+    bindings: &[PathBuf],
+    json: bool,
+    flags: &super::WorkspaceFlags,
+) -> ExitCode {
+    let jobs = match flags.jobs {
+        Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
+        None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
+    };
+    let mut cache = changes_cache(flags, std::env::var_os(super::CACHE_DIR_VARIABLE));
+    let mut executable = String::new();
+    if cache.is_some() {
+        match super::executable_digest() {
+            Ok(digest) => executable = digest,
+            Err(error) => {
+                cache = None;
+                eprintln!(
+                    "the cache could not be used, and the comparison went on without it: {error}"
+                );
+            }
+        }
+    }
+    let options = CheckOptions {
+        jobs,
+        cache_dir: cache,
+        toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+        executable,
+    };
+    let set = match change_set(old, new, bindings, &options) {
+        Ok(set) => set,
+        Err(diagnostics) => {
+            for diagnostic in diagnostics {
+                eprintln!("{diagnostic}");
+            }
+            return ExitCode::from(1);
+        }
+    };
+    let text = if json { set.to_json() } else { set.to_text() };
+    let stdout = io::stdout();
+    let mut out = stdout.lock();
+    match out.write_all(text.as_bytes()).and_then(|()| out.flush()) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => super::fail(format!("cannot write the change set: {error}")),
+    }
+}
+
+/// The cache of every workspace that `fidryn changes` reads: none with
+/// `--no-cache`; otherwise `--cache-dir`, else `variable`, the value of
+/// `FIDRYN_CACHE_DIR` when it is set and not empty, made absolute, which
+/// every workspace shares; else `.fidryn-cache`, a relative path, which
+/// [`change_set`] takes inside the directory of each workspace.
+fn changes_cache(flags: &super::WorkspaceFlags, variable: Option<OsString>) -> Option<PathBuf> {
+    if flags.no_cache {
+        return None;
+    }
+    let named = flags.cache_dir.clone().or_else(|| {
+        variable
+            .filter(|value| !value.is_empty())
+            .map(PathBuf::from)
+    });
+    Some(match named {
+        Some(dir) => std::path::absolute(&dir).unwrap_or(dir),
+        None => PathBuf::from(super::DEFAULT_CACHE_DIR),
+    })
 }
 
 /// What `at` is in `modules`, where it is no provision and no alias of a

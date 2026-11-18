@@ -4,8 +4,9 @@
 The files of a workspace are its manifest, its lock, its coverage ledger and the
 retrieval record of its archives; the demo workspace under
 conformance/fixtures/workspace and the workspace of the sample under
-samples/uscode are checked, and so is the check report under
-conformance/fixtures/check-report. Every line of every `*.records.jsonl` under
+samples/uscode are checked, and so are the check report under
+conformance/fixtures/check-report and the change set under
+conformance/fixtures/change-set. Every line of every `*.records.jsonl` under
 conformance/fixtures is a text record.
 
 Requires: jsonschema, which uv run provides (preferred). Falls back to a
@@ -32,6 +33,7 @@ SCHEMA_FILES = {
     "fidryn.check-report/v0.1": "check-report-v0.1.json",
     "fidryn.text-record/v0.1": "text-record-v0.1.json",
     "fidryn.coverage/v0.1": "coverage-v0.1.json",
+    "fidryn.change-set/v0.1": "change-set-v0.1.json",
 }
 
 # The directories, relative to the repository root, whose JSON documents are
@@ -41,6 +43,7 @@ DOCUMENT_DIRS = (
     "prelude",
     "conformance/fixtures/workspace",
     "conformance/fixtures/check-report",
+    "conformance/fixtures/change-set",
     "samples/uscode",
 )
 

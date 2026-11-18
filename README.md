@@ -100,6 +100,7 @@ fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
 fidryn text DIR [ADDRESS] [--json | --hashes]
 fidryn coverage DIR
+fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json] [--jobs N] [--cache-dir DIR | --no-cache]
 ```
 
 Every subcommand also takes `--source-root PATH`, the root for source
@@ -145,13 +146,13 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | `fidryn-verify` | Determinacy search |
 | `fidryn-kernel` | Covering-certificate checks |
 | `fidryn-solve` | Streamed finite-domain search |
-| `fidryn-driver` | Compile and run session; the check of a workspace of edition 2 modules, in two phases on several threads with a cache of the first, and the writer of a generated one. Depends on `fidryn-provision` for the files of a workspace and the interfaces of its modules |
+| `fidryn-driver` | Compile and run session; the check of a workspace of edition 2 modules, in two phases on several threads with a cache of the first, the writer of a generated one, and the change set between two generated ones. Depends on `fidryn-provision` for the files of a workspace and the interfaces of its modules |
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
-| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records, the coverage ledger of a generated workspace, the canonical text of a module, the interface of a module and the index of addresses that gives each reference its outcome. Depends on no other crate of the workspace |
+| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records, the coverage ledger of a generated workspace, the canonical text of a module, the interface of a module, the index of addresses that gives each reference its outcome, and the comparison of two versions of a module. Depends on no other crate of the workspace |
 | `fidryn-ingest-uscode` | Reads the archives of the official XML release point published by the Office of the Law Revision Counsel, checked against their retrieval record, into law modules of the model of `fidryn-provision`. Of the workspace crates, depends on `fidryn-provision` only, and only `fidryn-cli` depends on it |
-| `fidryn-cli` | `fidryn` binary and mill, `fidryn ingest uscode`, which writes a generated workspace from the archives of one release with the ingester and the writer of `fidryn-driver`, `fidryn text`, which prints the text of the modules of a workspace, and `fidryn coverage`, which prints the coverage ledger of a generated workspace |
+| `fidryn-cli` | `fidryn` binary and mill, `fidryn ingest uscode`, which writes a generated workspace from the archives of one release with the ingester and the writer of `fidryn-driver`, `fidryn text`, which prints the text of the modules of a workspace, `fidryn coverage`, which prints the coverage ledger of a generated workspace, and `fidryn changes`, which prints what changed between two generated workspaces |
 
 Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is
 actually implemented: [docs/implementation-status.md](docs/implementation-status.md).

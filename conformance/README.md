@@ -3,7 +3,8 @@
 JSON Schema checks for case records and source manifests under `examples/`
 and `prelude/`, for the four files of a workspace of law modules
 under `fixtures/workspace/` and under `samples/uscode/`, for the report of
-the check of a workspace under `fixtures/check-report/`, and for every text
+the check of a workspace under `fixtures/check-report/`, for the change set
+between two workspaces under `fixtures/change-set/`, and for every text
 record of `fixtures/`. This is a document-shape check. It does not
 authenticate artifacts, execute Rust, or review legal content. A second
 implementation of the hashes of law modules is described at the end.
@@ -16,8 +17,8 @@ uv run python conformance/check_json_contracts.py /path/to/fidryn --output valid
 The checker looks for `"schema": "fidryn.case-record/v0.1"`,
 `"fidryn.source-manifest/v0.1"`, `"fidryn.workspace/v0.1"`,
 `"fidryn.law-lock/v0.1"`, `"fidryn.retrieval/v0.1"`,
-`"fidryn.check-report/v0.1"` and `"fidryn.coverage/v0.1"`, and holds every
-line of every
+`"fidryn.check-report/v0.1"`, `"fidryn.coverage/v0.1"` and
+`"fidryn.change-set/v0.1"`, and holds every line of every
 `*.records.jsonl` under `fixtures/` to `schemas/text-record-v0.1.json`,
 the schema of `fidryn.text-record/v0.1`, whose records hold no `schema`
 key. Exit `0` if every checked document is valid, `1` on validation
@@ -56,6 +57,16 @@ writes. `test_check_report_schema.py` checks that the report matches
 check never writes, and that the list has one object to a line with its
 keys in order, sorted, one line for each reference the report counts
 with an outcome other than `exact`.
+
+`fixtures/change-set/change-set.json` is the change set between two
+invented generated workspaces in the corpus `/zz/demo`, with the stale
+bindings of two invented curated workspaces, in which every list holds
+more than one entry. The Rust test
+`the_committed_change_set_is_what_the_comparison_writes` of `fidryn-driver`
+holds it, byte for byte, to what the comparison writes.
+`test_change_set_schema.py` checks that it matches
+`schemas/change-set-v0.1.json`, with every key in its order and every list
+sorted, and that the schema refuses what the comparison never writes.
 
 `uv run` provides Python and `jsonschema` from the repository's
 `pyproject.toml` and `uv.lock`. Without `jsonschema` the script falls
@@ -162,6 +173,36 @@ The documents `definitions-*.xml` hold the cases of the rules of
 definition, so their records and profiles are those of any other document;
 the Rust tests of `fidryn-ingest-uscode` hold the definitions the importer
 extracts from them.
+
+`usc_compare.py` reads two releases, each an input as `uslm_text.py` reads
+it, into their text records, and from the records alone prints which
+addresses differ: the provisions, the notes of each layer and the
+containers only in the old, only in the new and on both sides with another
+record, footnote markers left out; and the units and containers whose
+credit, or whose footnotes or footnote markers, differ. With
+`--against CHANGES.json`, a change set that `fidryn changes --json` printed
+for the same releases, it exits `1` and names the first address that
+differs unless the change set lists exactly those sets
+([Change sets](../docs/law-modules.md#change-sets)). The other exit codes
+are those of `uslm_text.py`.
+
+```sh
+uv run --locked python -I conformance/usc_compare.py OLD_RELEASE NEW_RELEASE
+uv run --locked python -I conformance/usc_compare.py OLD_RELEASE NEW_RELEASE --against changes.json
+```
+
+`fixtures/uslm/pairs/` holds pairs of invented documents of the title 99,
+`<name>/old.xml` of the release `999-1` and `<name>/new.xml` of `999-2`,
+one pair for each case: a footnote marker added, a source credit changed,
+the heading of a chapter changed, a word amended, a subsection added, a
+section renumbered with its note, a section removed, and notes amended,
+removed and added. `test_usc_compare.py` holds the script to the sets
+written by hand for each pair, and fails for a pair it does not name. Its
+test of agreement imports both documents of each pair with the built
+`fidryn`, which `FIDRYN_BINARY` names, runs `fidryn changes --json`, and
+checks the change set against the script with `--against`; it fails,
+and does not skip, when `FIDRYN_BINARY` is not set. `cargo xtask ci` sets
+it.
 
 `usc_profile.py` reads the same inputs and prints the counts of two sets of
 counting rules as one JSON object with sorted keys: `baseline`, the counting

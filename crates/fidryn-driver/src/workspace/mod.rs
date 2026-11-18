@@ -26,13 +26,15 @@
 //! ([`WorkspaceReport::to_json`]) and the list of the references and the
 //! citations that are not `exact` ([`WorkspaceReport::unresolved_lines`])
 //! are written on request. [`read_modules`] reads the modules of a workspace
-//! into the model, for what prints their text. A generated workspace also
-//! holds its coverage ledger, `coverage.json`, which the writer writes after
-//! the lock and [`read_coverage`] counts again from the files; no check reads
-//! it. This crate names no corpus; `xtask/tests/corpus_neutrality.rs` checks
-//! it for this directory.
+//! into the model, for what prints their text, and
+//! [`changes::change_set`] compares two generated workspaces of one prefix.
+//! A generated workspace also holds its coverage ledger, `coverage.json`,
+//! which the writer writes after the lock and [`read_coverage`] counts again
+//! from the files; no check reads it. This crate names no corpus;
+//! `xtask/tests/corpus_neutrality.rs` checks it for this directory.
 
 mod cache;
+pub mod changes;
 mod check;
 mod deps;
 mod discover;

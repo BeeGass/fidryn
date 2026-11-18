@@ -36,7 +36,9 @@ cargo test --workspace --all-features --locked --offline
 
 `cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
 Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, the sample check (`cargo xtask uscode-sample`: the
+and probe controls, the conformance tests of `conformance/` (given the built
+binary in `FIDRYN_BINARY`, since the comparison of two releases there runs
+`fidryn changes`), the sample check (`cargo xtask uscode-sample`: the
 committed archives of the Code against their retrieval record, the committed
 workspace against what the importer writes from them on one worker and on
 eight, its check and its coverage ledger, the committed profile and its
@@ -155,14 +157,14 @@ fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo; workspace check and writer (provision)
+fidryn-driver          incremental check/run memo; workspace check, writer and change sets (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and localhost mill; ingest, text and coverage commands (driver + provision + ingest-uscode)
+fidryn-cli             fidryn binary and localhost mill; ingest, text, coverage and changes commands (driver + provision + ingest-uscode)
 ```
 
 ## Tests

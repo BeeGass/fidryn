@@ -11,10 +11,10 @@ use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit};
 use fidryn_provision::{BoundHashes, StaleReason};
 
 /// The unit whose provisions most bindings here bind.
-const S8: &str = "/zz/demo/t1/s8";
+pub(super) const S8: &str = "/zz/demo/t1/s8";
 
 /// A subsection `value` of the provision at `parent` that says `words`.
-fn child(parent: &str, value: &str, words: &str) -> Item {
+pub(super) fn child(parent: &str, value: &str, words: &str) -> Item {
     Item::Child(Provision {
         address: address(&format!("{parent}/{value}")),
         kind: "subsection".to_owned(),
@@ -29,7 +29,7 @@ fn child(parent: &str, value: &str, words: &str) -> Item {
 }
 
 /// A note `name` of the module at `module`, in `layer`, that says `words`.
-fn note_of(module: &str, name: &str, layer: Layer, words: &str) -> Note {
+pub(super) fn note_of(module: &str, name: &str, layer: Layer, words: &str) -> Note {
     Note {
         address: address(&format!("{module}/note/demoNotes/nolaw/{name}")),
         layer,
@@ -45,7 +45,7 @@ fn note_of(module: &str, name: &str, layer: Layer, words: &str) -> Note {
 /// `/zz/demo/t1/chI`, and the unit `s8` of the chapter, with the
 /// subsections `a` and `b`, an enacted note, an editorial note, a source
 /// credit and a footnote whose marker stands in its heading.
-fn v1() -> Vec<Module> {
+pub(super) fn v1() -> Vec<Module> {
     let mut models = demo_models();
     let chapter = container_at(&mut models, 1);
     chapter.members.push(address(S8));
@@ -98,7 +98,7 @@ fn v1() -> Vec<Module> {
 }
 
 /// The unit `s8` of `models`, which [`v1`] gives.
-fn s8_of(models: &mut [Module]) -> &mut UnitModule {
+pub(super) fn s8_of(models: &mut [Module]) -> &mut UnitModule {
     unit_at(models, 5)
 }
 
@@ -114,7 +114,7 @@ fn find<'a>(provision: &'a Provision, at: &str) -> Option<&'a Provision> {
 }
 
 /// The provision at `at` in the tree of `provision`, to change.
-fn find_mut<'a>(provision: &'a mut Provision, at: &str) -> Option<&'a mut Provision> {
+pub(super) fn find_mut<'a>(provision: &'a mut Provision, at: &str) -> Option<&'a mut Provision> {
     if provision.address.as_str() == at {
         return Some(provision);
     }
@@ -126,7 +126,7 @@ fn find_mut<'a>(provision: &'a mut Provision, at: &str) -> Option<&'a mut Provis
 
 /// Replaces `from` with `to` in the words of the provision at `at` of
 /// `models`, which must hold them.
-fn reword(models: &mut [Module], at: &str, from: &str, to: &str) {
+pub(super) fn reword(models: &mut [Module], at: &str, from: &str, to: &str) {
     let mut changed = false;
     for model in models.iter_mut() {
         let Module::Unit(unit) = model else {
@@ -156,7 +156,7 @@ fn reword(models: &mut [Module], at: &str, from: &str, to: &str) {
 /// `models`, worked out from the models: the tree hash of the provision at
 /// `at`, or of the top provision of the unit whose alias it is, and the
 /// enacted layer of its unit. `None` when `at` is neither.
-fn hashes_of(models: &[Module], at: &str) -> Option<BoundHashes> {
+pub(super) fn hashes_of(models: &[Module], at: &str) -> Option<BoundHashes> {
     models.iter().find_map(|model| {
         let Module::Unit(unit) = model else {
             return None;
@@ -175,7 +175,7 @@ fn hashes_of(models: &[Module], at: &str) -> Option<BoundHashes> {
 
 /// A `binding` named `name` whose `binds` names `binds`, written against the
 /// release `release` with `hashes`.
-fn binding_text(name: &str, binds: &str, release: &str, hashes: BoundHashes) -> String {
+pub(super) fn binding_text(name: &str, binds: &str, release: &str, hashes: BoundHashes) -> String {
     format!(
         "binding {name} {{\n  binds {binds}\n  release \"{release}\"\n  provision_hash \"{}\"\n  \
          notes_hash \"{}\"\n  pending\n}}",
@@ -199,7 +199,7 @@ pub(super) fn written_against(
 
 /// The bindings that most tests here check: of the unit `s8`, of each of
 /// its subsections, of the unit `s1`, and of the unit `s3` by its alias.
-const BOUND: [(&str, &str); 5] = [
+pub(super) const BOUND: [(&str, &str); 5] = [
     ("section", S8),
     ("first", "/zz/demo/t1/s8/a"),
     ("second", "/zz/demo/t1/s8/b"),
@@ -210,7 +210,7 @@ const BOUND: [(&str, &str); 5] = [
 /// The module `/zz/notes/a`, which binds each `(name, address)` of `bound`
 /// by its address, written against [`v1`] of the release `v1`. A binding of
 /// what is no provision there records the hashes of `s8`.
-fn binding_module(bound: &[(&str, &str)]) -> String {
+pub(super) fn binding_module(bound: &[(&str, &str)]) -> String {
     let models = v1();
     let decls: Vec<String> = bound
         .iter()

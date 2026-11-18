@@ -59,8 +59,12 @@ pub fn run(args: CiArgs) -> Result<()> {
 
     run_schema_probes()?;
     run_python_checks()?;
+    // The conformance tests run the built `fidryn`, as the schema probes do:
+    // the agreement of `fidryn changes` with `conformance/usc_compare.py`
+    // fails without it.
     let mut probes = std::process::Command::new("uv");
     probes.current_dir(crate::workspace::workspace_root());
+    probes.env("FIDRYN_BINARY", crate::workspace::fidryn_binary()?);
     probes.args([
         "run",
         "--locked",

@@ -101,14 +101,14 @@ fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo; workspace check and writer (provision)
+fidryn-driver          incremental check/run memo; workspace check, writer and change sets (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and mill UI; ingest, text and coverage commands (driver + provision + ingest-uscode)
+fidryn-cli             fidryn binary and mill UI; ingest, text, coverage and changes commands (driver + provision + ingest-uscode)
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
@@ -120,13 +120,15 @@ nor `fidryn-provision` may. `fidryn-check` depends on `fidryn-provision` for
 the model into which it lowers modules of edition 2. `fidryn-driver`
 depends on `fidryn-provision` for the files of a workspace and the
 interfaces of its modules: it holds the check of a workspace of edition 2
-modules, in two phases on several threads with a cache of the first, and
-the writer of a generated one. `fidryn-provision`
+modules, in two phases on several threads with a cache of the first, the
+writer of a generated one, and the change set between two generated ones.
+`fidryn-provision`
 holds the model of law modules and the rules over it, among them
 addresses, text normalization, file paths, hashes, text records, the
 coverage ledger of a generated workspace, the
-canonical text of a module, the interface of a module and the index of
-addresses that gives each reference its outcome. `fidryn-ingest-uscode`
+canonical text of a module, the interface of a module, the index of
+addresses that gives each reference its outcome, and the comparison of two
+versions of a module. `fidryn-ingest-uscode`
 reads the archives of the official XML release point published by the
 Office of the Law Revision Counsel, each checked against its retrieval
 record, and the documents in them into the units and containers of that
@@ -268,6 +270,8 @@ fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
 fidryn text DIR [ADDRESS] [--json | --hashes]
 fidryn coverage DIR
+fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json] [--jobs N]
+    [--cache-dir DIR | --no-cache]
 ```
 
 Every subcommand also takes `--source-root PATH`. `run` never chooses a

@@ -104,6 +104,31 @@ pub enum Command {
         /// The directory of the generated workspace.
         dir: PathBuf,
     },
+    /// Print what changed between two generated workspaces of one prefix, and the bindings
+    /// of curated workspaces that are stale against the newer one.
+    Changes {
+        /// The directory of the older generated workspace.
+        old_dir: PathBuf,
+        /// The directory of the newer generated workspace.
+        new_dir: PathBuf,
+        /// A curated workspace whose bindings are judged against NEW_DIR; may be given more
+        /// than once.
+        #[arg(long = "bindings", value_name = "DIR")]
+        bindings: Vec<PathBuf>,
+        /// Print the change set (`fidryn.change-set/v0.1`) as JSON.
+        #[arg(long)]
+        json: bool,
+        /// Worker threads (default: the number available).
+        #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
+        jobs: Option<u32>,
+        /// The cache of the check of every workspace read (default: `$FIDRYN_CACHE_DIR`,
+        /// else `.fidryn-cache` in each workspace).
+        #[arg(long, value_name = "DIR")]
+        cache_dir: Option<PathBuf>,
+        /// Keep no cache: check every module, and write no entry.
+        #[arg(long, conflicts_with = "cache_dir")]
+        no_cache: bool,
+    },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
         path: PathBuf,
@@ -250,6 +275,27 @@ pub fn run(cli: Cli) -> ExitCode {
             address => law::text(&dir, address, json),
         },
         Command::Coverage { dir } => law::coverage(&dir),
+        Command::Changes {
+            old_dir,
+            new_dir,
+            bindings,
+            json,
+            jobs,
+            cache_dir,
+            no_cache,
+        } => law::changes(
+            &old_dir,
+            &new_dir,
+            &bindings,
+            json,
+            &WorkspaceFlags {
+                jobs,
+                cache_dir,
+                no_cache,
+                report: None,
+                unresolved: None,
+            },
+        ),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -357,14 +403,15 @@ pub fn run(cli: Cli) -> ExitCode {
 
 /// The files a command reads as its input. `check` chooses its front end by
 /// what it is given, a workspace's directory or a file of either edition,
-/// `ingest` reads archives, `text` and `coverage` the modules of edition 2
-/// of a workspace, and `ui` reads none.
+/// `ingest` reads archives, `text`, `coverage` and `changes` the modules of
+/// edition 2 of workspaces, and `ui` reads none.
 fn inputs_of(command: &Command) -> Vec<PathBuf> {
     match command {
         Command::Check { .. }
         | Command::Ingest { .. }
         | Command::Text { .. }
         | Command::Coverage { .. }
+        | Command::Changes { .. }
         | Command::Ui { .. } => Vec::new(),
         Command::Fmt { path }
         | Command::Inputs { path, .. }

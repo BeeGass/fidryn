@@ -132,9 +132,26 @@ pub fn tree_hashes(root: &Provision) -> Vec<Hash32> {
 /// The tree hash of `provision`, taking the tree hash of each child from
 /// `child_hash`.
 fn tree_hash(provision: &Provision, child_hash: &mut dyn FnMut(&Provision) -> Hash32) -> Hash32 {
+    numbered_tree_hash(provision, provision.num.as_ref(), child_hash)
+}
+
+/// The tree hash of `provision` computed with its own number absent: the
+/// frame of no number in place of the frames of its number, and the tree
+/// hash of each child as it is, number and all.
+pub(crate) fn unnumbered_tree_hash(provision: &Provision) -> Hash32 {
+    numbered_tree_hash(provision, None, &mut hash_provision)
+}
+
+/// The tree hash of `provision` with `num` as its number, taking the tree
+/// hash of each child from `child_hash`.
+fn numbered_tree_hash(
+    provision: &Provision,
+    num: Option<&Num>,
+    child_hash: &mut dyn FnMut(&Provision) -> Hash32,
+) -> Hash32 {
     let mut out = Frames::new(PROVISION_DOMAIN);
     out.frame(tag::KIND, provision.kind.as_bytes());
-    out.num(provision.num.as_ref());
+    out.num(num);
     out.optional_text(provision.heading.as_ref());
     out.status(provision.status.as_deref());
     for item in &provision.items {
@@ -174,25 +191,56 @@ pub fn hash_container(container: &ContainerModule) -> Hash32 {
 /// The layer hashes of `unit`: the tree hash of its root, the hash of its
 /// enacted notes, and the hash of its editorial matter.
 pub fn layer_hashes_of_unit(unit: &UnitModule) -> LayerHashes {
-    let mut marks = Vec::new();
-    marks_of_provision(&unit.root, &mut marks);
-    let matter = Matter {
-        address: &unit.address,
-        credit: unit.credit.as_ref(),
-        notes: &unit.notes,
-        footnotes: &unit.footnotes,
-    };
-    matter.marks(&mut marks);
     LayerHashes {
         operative: hash_provision(&unit.root),
         enacted: enacted_layer(&unit.notes),
-        editorial: matter.editorial_layer(&marks),
+        editorial: unit_matter(unit).editorial_layer(&marks_of_unit(unit)),
     }
 }
 
 /// The layer hashes of `container`: its container hash, the hash of its
 /// enacted notes, and the hash of its editorial matter.
 pub fn layer_hashes_of_container(container: &ContainerModule) -> LayerHashes {
+    LayerHashes {
+        operative: hash_container(container),
+        enacted: enacted_layer(&container.notes),
+        editorial: container_matter(container).editorial_layer(&marks_of_container(container)),
+    }
+}
+
+fn unit_matter(unit: &UnitModule) -> Matter<'_> {
+    Matter {
+        address: &unit.address,
+        credit: unit.credit.as_ref(),
+        notes: &unit.notes,
+        footnotes: &unit.footnotes,
+    }
+}
+
+fn container_matter(container: &ContainerModule) -> Matter<'_> {
+    Matter {
+        address: &container.address,
+        credit: container.credit.as_ref(),
+        notes: &container.notes,
+        footnotes: &container.footnotes,
+    }
+}
+
+/// Every footnote marker of `unit`, in the document order of the editorial
+/// layer: the tree of its top provision depth first, then its credit, its
+/// notes in the byte order of their addresses and its footnotes in ordinal
+/// order.
+pub(crate) fn marks_of_unit(unit: &UnitModule) -> Vec<MarkAt<'_>> {
+    let mut marks = Vec::new();
+    marks_of_provision(&unit.root, &mut marks);
+    unit_matter(unit).marks(&mut marks);
+    marks
+}
+
+/// Every footnote marker of `container`, in the document order of the
+/// editorial layer: its number, its heading, then its credit, its notes and
+/// its footnotes as a unit's.
+pub(crate) fn marks_of_container(container: &ContainerModule) -> Vec<MarkAt<'_>> {
     let mut marks = Vec::new();
     if let Some(num) = &container.num {
         marks_of_text(&num.shown, &container.address, &mut marks);
@@ -200,18 +248,8 @@ pub fn layer_hashes_of_container(container: &ContainerModule) -> LayerHashes {
     if let Some(heading) = &container.heading {
         marks_of_text(heading, &container.address, &mut marks);
     }
-    let matter = Matter {
-        address: &container.address,
-        credit: container.credit.as_ref(),
-        notes: &container.notes,
-        footnotes: &container.footnotes,
-    };
-    matter.marks(&mut marks);
-    LayerHashes {
-        operative: hash_container(container),
-        enacted: enacted_layer(&container.notes),
-        editorial: matter.editorial_layer(&marks),
-    }
+    container_matter(container).marks(&mut marks);
+    marks
 }
 
 const PROVISION_DOMAIN: &str = "fidryn.provision/v1";
@@ -442,11 +480,14 @@ fn enacted_layer(notes: &[Note]) -> Hash32 {
     out.finish()
 }
 
-/// A footnote marker of a module, with the address it is recorded under.
-struct MarkAt<'a> {
-    address: &'a Address,
-    shown: &'a str,
-    footnote: u32,
+/// A footnote marker of a module, with the address it is recorded under: of
+/// the provision or note it stands in, or of the module for one in a credit
+/// or a footnote.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct MarkAt<'a> {
+    pub(crate) address: &'a Address,
+    pub(crate) shown: &'a str,
+    pub(crate) footnote: u32,
 }
 
 /// What a module holds besides its provisions or its own fields.

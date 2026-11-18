@@ -29,6 +29,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
+mod change_sets;
 mod staleness;
 
 /// The version of the running toolchain, which the demo manifest records.

@@ -160,6 +160,25 @@ interchange schema versions are maintained independently of the interpreter.
   the ledger to `fidryn coverage` and, key for key, to the independent
   profile, and the site shows its figures in the guide Coverage,
   `docs/coverage.md`, whose table the step generates and checks.
+- Change sets. `fidryn changes OLD_DIR NEW_DIR` prints what changed
+  between two generated workspaces of one prefix, each read as `fidryn
+  check` reads it: the provisions added, removed, moved, amended in their
+  own words or in their own structure, the enacted and the editorial notes
+  added, removed, moved or amended, the units and containers whose credit
+  or footnotes changed, and the containers added, removed or changed. Units
+  are compared by their layer hashes first, and only those whose hashes
+  differ are read again; a removed and an added provision whose tree hashes
+  are equal with their own numbers left out have moved
+  (`fidryn_provision::changes::unnumbered_hash`). With `--bindings DIR` it
+  lists the bindings of a curated workspace that are stale against
+  `NEW_DIR`, whatever its pin. It prints the text of a commit message, or
+  with `--json` the change set, whose JSON Schema is
+  `schemas/change-set-v0.1.json`
+  (`fidryn_driver::workspace::changes::change_set`).
+  `conformance/usc_compare.py` compares two releases of the publisher's XML
+  from their text records alone and checks a change set against them; the
+  conformance tests, which `cargo xtask ci` now runs with the built binary
+  in `FIDRYN_BINARY`, run both on invented pairs of releases.
 
 ## [0.2.0] - 2026-11-16
 
