@@ -272,6 +272,11 @@ interchange schema versions are maintained independently of the interpreter.
   before two like-named notes is `added` and the two have moved.
   `conformance/usc_compare.py` pairs them in the same way, by their
   records, before it builds the sets that `--against` checks.
+- `fidryn ingest uscode` opens the retrieval record only when it is a
+  regular file, refusing a symbolic link, a directory, a pipe or a device in
+  its place before it is opened, and reads it through a bound of 1 MiB; the
+  files of the archive directory that the record does not list are named in
+  the order of the bytes of their names.
 
 ## [0.2.0] - 2026-11-16
 

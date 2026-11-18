@@ -1,9 +1,13 @@
 //! The archives of a release: a directory that holds the publisher's zip
 //! archives and nothing else but their retrieval record, `retrieval.json`.
 //!
-//! [`open`] checks every archive against its record (its size, its SHA-256
-//! and its BLAKE3), refuses an archive the record does not list and one it
-//! lists that is absent, and checks every member before reading it: its name
+//! The record is read only when it is a regular file of at most 1 MiB; a
+//! symbolic link, a directory, a pipe or a device in its place is refused
+//! before it is opened. [`open`] checks every archive against its record
+//! (its size, its SHA-256 and its BLAKE3), refuses the files the record does
+//! not list, each named in the order of the bytes of their names, and an
+//! archive it lists that is absent, and checks every member before reading
+//! it: its name
 //! is `usc`, two digits, an optional `a` or `A`, and `.xml`; its declared
 //! size is at most 512 MiB; and no two archives of the release hold a member
 //! of the same name. Reading a member stops at the limit even when its header
@@ -23,6 +27,10 @@ pub(crate) const MEMBER_LIMIT: u64 = 512 * 1024 * 1024;
 
 /// The retrieval record, beside the archives.
 const RECORD: &str = "retrieval.json";
+
+/// The largest retrieval record the reading reads: 1 MiB. A record lists
+/// each archive in a few hundred bytes, so this is room for thousands.
+const RECORD_LIMIT: u64 = 1024 * 1024;
 
 /// The verified archives of one release and their record.
 #[derive(Debug)]
@@ -57,19 +65,7 @@ pub(crate) fn open_with_limit(
     limit: u64,
 ) -> Result<ReleaseArchives, IngestError> {
     let shown = directory.display();
-    let text = match fs::read_to_string(directory.join(RECORD)) {
-        Ok(text) => text,
-        Err(error) if error.kind() == io::ErrorKind::NotFound => {
-            return Err(IngestError::new(format!(
-                "{shown} has no {RECORD}, the retrieval record of its archives"
-            )));
-        }
-        Err(error) => {
-            return Err(IngestError::new(format!(
-                "{RECORD} in {shown} cannot be read: {error}"
-            )));
-        }
-    };
+    let text = read_record(directory)?;
     let record = RetrievalRecord::from_json(&text)
         .map_err(|error| IngestError::new(format!("{RECORD} in {shown}: {error}")))?;
 
@@ -88,24 +84,46 @@ pub(crate) fn open_with_limit(
             )));
         }
     }
-    let entries = fs::read_dir(directory)
-        .map_err(|error| IngestError::new(format!("{shown} cannot be listed: {error}")))?;
-    let mut present = BTreeSet::new();
+    // The entries of the directory, in the order of the bytes of their
+    // names, so that what a refusal names does not depend on the order of
+    // the listing.
+    let mut entries = Vec::new();
+    for entry in fs::read_dir(directory)
+        .map_err(|error| IngestError::new(format!("{shown} cannot be listed: {error}")))?
+    {
+        entries.push(
+            entry
+                .map_err(|error| IngestError::new(format!("{shown} cannot be listed: {error}")))?,
+        );
+    }
+    entries.sort_by(|a, b| {
+        a.file_name()
+            .as_encoded_bytes()
+            .cmp(b.file_name().as_encoded_bytes())
+    });
+    let mut named = Vec::with_capacity(entries.len());
     for entry in entries {
-        let entry = entry
-            .map_err(|error| IngestError::new(format!("{shown} cannot be listed: {error}")))?;
         let name = entry.file_name().into_string().map_err(|name| {
             IngestError::new(format!("{shown} holds {name:?}, whose name is not UTF-8"))
         })?;
-        if name == RECORD {
-            continue;
+        if name != RECORD {
+            named.push((name, entry));
         }
-        if !listed.contains(name.as_str()) {
-            return Err(IngestError::new(format!(
-                "{shown} holds {name}, which {RECORD} does not list"
-            ))
-            .in_archive(&name));
-        }
+    }
+    let unlisted: Vec<&str> = named
+        .iter()
+        .map(|(name, _)| name.as_str())
+        .filter(|name| !listed.contains(name))
+        .collect();
+    if let Some(first) = unlisted.first() {
+        return Err(IngestError::new(format!(
+            "{shown} holds {}, which {RECORD} does not list",
+            in_words(&unlisted)
+        ))
+        .in_archive(first));
+    }
+    let mut present = BTreeSet::new();
+    for (name, entry) in named {
         let is_file = entry
             .file_type()
             .map_err(|error| IngestError::new(format!("{error}")).in_archive(&name))?
@@ -167,6 +185,63 @@ pub(crate) fn open_with_limit(
         members: members.into_values().collect(),
         limit,
     })
+}
+
+/// The text of the retrieval record in `directory`. It is opened only when
+/// it is a regular file, which a symbolic link to one is not, and read
+/// through [`RECORD_LIMIT`]: a link, a directory, a pipe or a device in its
+/// place is refused before it is opened, and so is a record larger than the
+/// limit.
+fn read_record(directory: &Path) -> Result<String, IngestError> {
+    let shown = directory.display();
+    let path = directory.join(RECORD);
+    let unreadable =
+        |error: io::Error| IngestError::new(format!("{RECORD} in {shown} cannot be read: {error}"));
+    let too_large = || {
+        IngestError::new(format!(
+            "{RECORD} in {shown} is larger than {}, the most the reading reads of a retrieval \
+             record",
+            limit_text(RECORD_LIMIT)
+        ))
+    };
+    let metadata = match fs::symlink_metadata(&path) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            return Err(IngestError::new(format!(
+                "{shown} has no {RECORD}, the retrieval record of its archives"
+            )));
+        }
+        Err(error) => return Err(unreadable(error)),
+    };
+    if !metadata.file_type().is_file() {
+        return Err(IngestError::new(format!(
+            "{RECORD} in {shown} is not a regular file, and the record is read only from one: a \
+             symbolic link, a directory, a pipe or a device in its place is not opened"
+        )));
+    }
+    if metadata.len() > RECORD_LIMIT {
+        return Err(too_large());
+    }
+    let mut bytes = Vec::new();
+    File::open(&path)
+        .map_err(unreadable)?
+        .take(RECORD_LIMIT + 1)
+        .read_to_end(&mut bytes)
+        .map_err(unreadable)?;
+    if bytes.len() as u64 > RECORD_LIMIT {
+        return Err(too_large());
+    }
+    String::from_utf8(bytes)
+        .map_err(|error| IngestError::new(format!("{RECORD} in {shown} cannot be read: {error}")))
+}
+
+/// `names` as a sentence writes them: `a`, `a and b`, `a, b and c`.
+fn in_words(names: &[&str]) -> String {
+    match names {
+        [] => String::new(),
+        [one] => (*one).to_owned(),
+        [first @ .., last] => format!("{} and {last}", first.join(", ")),
+    }
 }
 
 /// Checks the archive `archived` against its record, checks the name and the
@@ -628,6 +703,91 @@ mod tests {
                 .message()
                 .contains(&scratch.path().display().to_string()),
             "{error}"
+        );
+    }
+
+    #[test]
+    fn the_retrieval_record_is_read_only_as_a_regular_file_of_bounded_size() {
+        let scratch = Scratch::new("record-kinds");
+        pack(scratch.path(), "a.zip", &[("usc01.xml", DOCUMENT)]);
+        record_all(scratch.path(), RELEASE);
+        assert!(open(scratch.path()).is_ok());
+        let record = scratch.path().join(RECORD);
+        let elsewhere = Scratch::new("record-elsewhere");
+        fs::rename(&record, elsewhere.path().join(RECORD)).expect("moved");
+        let not_regular = |what: &str| {
+            let error = open(scratch.path()).expect_err(what);
+            assert!(
+                error.message().contains(&format!(
+                    "{RECORD} in {} is not a regular file",
+                    scratch.path().display()
+                )),
+                "{what}: {error}"
+            );
+        };
+        // A directory in its place.
+        fs::create_dir(&record).expect("a directory");
+        not_regular("a directory");
+        fs::remove_dir(&record).expect("removed");
+        #[cfg(unix)]
+        {
+            // A symbolic link to a record that would be read, and one to a
+            // device that would never end.
+            std::os::unix::fs::symlink(elsewhere.path().join(RECORD), &record).expect("a link");
+            not_regular("a link to a record");
+            fs::remove_file(&record).expect("removed");
+            std::os::unix::fs::symlink("/dev/zero", &record).expect("a link");
+            not_regular("a link to a device");
+            fs::remove_file(&record).expect("removed");
+            // A named pipe, which would wait for a writer if it were opened.
+            let made = std::process::Command::new("mkfifo")
+                .arg(&record)
+                .status()
+                .expect("mkfifo runs");
+            assert!(made.success());
+            not_regular("a named pipe");
+            fs::remove_file(&record).expect("removed");
+        }
+        // A record larger than the bound is refused before it is parsed.
+        fs::write(
+            &record,
+            vec![b' '; usize::try_from(RECORD_LIMIT).expect("small") + 1],
+        )
+        .expect("written");
+        let error = open(scratch.path()).expect_err("too large");
+        assert!(error.message().contains("larger than 1 MiB"), "{error}");
+        fs::rename(elsewhere.path().join(RECORD), &record).expect("moved back");
+        assert!(open(scratch.path()).is_ok());
+    }
+
+    #[test]
+    fn files_the_record_does_not_list_are_named_in_the_order_of_their_bytes() {
+        let scratch = Scratch::new("unlisted-order");
+        pack(scratch.path(), "c.zip", &[("usc01.xml", DOCUMENT)]);
+        record_all(scratch.path(), RELEASE);
+        for name in ["b.txt", "a.zip", "B.zip"] {
+            fs::write(scratch.path().join(name), b"x").expect("written");
+        }
+        let error = open(scratch.path()).expect_err("unlisted files");
+        assert_eq!(
+            error.message(),
+            format!(
+                "{} holds B.zip, a.zip and b.txt, which {RECORD} does not list",
+                scratch.path().display()
+            )
+        );
+        assert_eq!(error.archive(), Some("B.zip"));
+        // One alone is named alone.
+        for name in ["b.txt", "B.zip"] {
+            fs::remove_file(scratch.path().join(name)).expect("removed");
+        }
+        let error = open(scratch.path()).expect_err("an unlisted file");
+        assert_eq!(
+            error.message(),
+            format!(
+                "{} holds a.zip, which {RECORD} does not list",
+                scratch.path().display()
+            )
         );
     }
 

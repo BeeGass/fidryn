@@ -2070,10 +2070,14 @@ A release is a directory that holds the publisher's zip archives and,
 beside them, nothing but their [retrieval record](#workspaces),
 `retrieval.json`. Before it reads a document, the ingester:
 
-- reads the record, and refuses a directory that has none;
+- reads the record, and refuses a directory that has none; the record is
+  opened only when it is a regular file, so that a symbolic link, a
+  directory, a pipe or a device in its place is refused before it is
+  opened, and it is read through a bound of 1 MiB, past which it is refused;
 - recomputes the size, the SHA-256 and the BLAKE3 of every archive, and
-  refuses one that differs from its record, an archive the record does not
-  list, and one it lists that the directory does not hold;
+  refuses one that differs from its record, the files the record does not
+  list, named in the order of the bytes of their names, and an archive it
+  lists that the directory does not hold;
 - refuses a member whose name is not `usc`, two digits, an optional `a` or
   `A`, and `.xml`, a member larger than 512 MiB, whatever its header
   declares, and a release in which two archives hold a member of the same
