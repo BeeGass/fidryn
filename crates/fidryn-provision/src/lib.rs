@@ -3,14 +3,15 @@
 //! notes and modules ([`model`]), their hashes ([`hash`]), their text
 //! records ([`records`]), their canonical text ([`render`]), the interface
 //! of a module ([`interface`]), the index of addresses that gives each
-//! reference its outcome ([`mod@reference`]), and the files of a workspace as
-//! data: its manifest, its lock and the retrieval record of its archives
-//! ([`workspace`]).
+//! reference its outcome ([`mod@reference`]), the staleness of a binding
+//! ([`binding`]), and the files of a workspace as data: its manifest, its
+//! lock and the retrieval record of its archives ([`workspace`]).
 //!
 //! This crate depends on no other crate of the workspace and names no corpus;
 //! `xtask/tests/corpus_neutrality.rs` checks the second rule.
 
 mod address;
+pub mod binding;
 pub mod hash;
 pub mod interface;
 pub mod layout;
@@ -22,6 +23,7 @@ pub mod render;
 pub mod workspace;
 
 pub use address::{Address, AddressError};
+pub use binding::{BoundHashes, StaleReason, bound_hashes, staleness};
 pub use hash::{Hash32, HashError, LayerHashes};
 pub use interface::{DeclSpans, Interface, interface_of};
 pub use layout::LayoutError;

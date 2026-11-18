@@ -43,7 +43,7 @@ eight, its check, the committed profile and its counts of references against
 the script that counts the archives and the check, the text of every
 provision and note against what an independent script reads from the
 publisher's XML, and the curated sample, checked with the generated one as
-its dependency, every citation of it `exact`), required
+its dependency, every citation of it `exact` and its binding not stale), required
 JavaScript tests, generated-site consistency, the example status and
 documentation checks described below, and benchmark compilation. Node and
 [uv](https://docs.astral.sh/uv/) are required for qualification.

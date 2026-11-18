@@ -98,7 +98,7 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
-fidryn text DIR [ADDRESS] [--json]
+fidryn text DIR [ADDRESS] [--json | --hashes]
 ```
 
 Every subcommand also takes `--source-root PATH`, the root for source

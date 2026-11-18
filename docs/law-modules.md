@@ -6,8 +6,9 @@ workspace, how the text of a module is normalized, what a module holds, how
 its provisions, notes and layers are hashed, how a module is written, what
 the checker verifies of one module, how modules form a workspace and what
 the checker verifies of one, how a workspace is checked, what outcome
-each reference has, how the ingester for the United States Code reads
-the publisher's XML, and what the sample of the Code in the repository
+each reference has, when a binding is stale, how the ingester for the
+United States Code reads the publisher's XML, and what the sample of the
+Code in the repository
 holds and how it is checked. The crate `fidryn-provision` implements the model and
 the rules over it, `fidryn-syntax` reads the text of a module,
 `fidryn-check` lowers it into the model and checks it, `fidryn-driver`
@@ -165,7 +166,8 @@ A module of law has one of three shapes:
 - A **curated** module is written by hand. It imports modules, names
   addresses (citations) and binds names to provisions (bindings). A binding
   records the release it was made against and two hashes, one of the
-  provision and one of the notes.
+  provision and one of the enacted notes of its unit, which tell when it
+  is [stale](#bindings).
 
 The crate holds the model in its module `model`.
 
@@ -784,6 +786,7 @@ gives every reference its [outcome](#references).
 | No two modules declare one address, as the address of a module, of a provision or of a note | `E700` |
 | Each dependency of a curated workspace has a relative `path` and a name that no dependency before it has, and its prefix neither is, contains nor lies within the prefix of the workspace or of a dependency before it | `E730` |
 | Each dependency is a generated workspace with a lock, the BLAKE3 of the bytes of its lock and the release of its lock are the `lock_digest` and the `release` of its entry, and it has no error of its own | `E740` |
+| No binding of a curated module is stale, as [Bindings](#bindings) describes | `W750`, a warning |
 | The manifest's `toolchain` is the version of the running toolchain | `W760`, a warning |
 
 When the directory has no manifest that can be read, that is the one
@@ -801,7 +804,8 @@ the first edition, has no span, and so has one about a dependency, which
 names the manifest, `workspace.json`. One about where a module stands is at its
 address; one about a `within` is at the string after `within`, one about a
 member at the string after that `member`, one about an import at the
-string after `import`, and one about a name at that name. An address that
+string after `import`, one about a name at that name, and one about a
+stale binding at the binding's name. An address that
 two modules declare is reported in the file of each module after the first,
 by path, that declares it, naming the file of the first: at the module's
 address when the address is the module's own, and otherwise about the file
@@ -855,9 +859,10 @@ The check of a workspace runs in two phases.
    check of each dependency by itself. Then, from the manifest and the
    interfaces alone, the manifest's toolchain, the `within` of every unit
    and container and the members of every container, the imports and the
-   names of every curated module, the addresses that two modules declare,
-   and the [outcome](#references) of every reference and of every
-   citation. Phase two reads no module again.
+   names of every curated module, the [staleness](#bindings) of every
+   binding, the addresses that two modules declare, and the
+   [outcome](#references) of every reference and of every citation. Phase
+   two reads no module again.
    `fidryn_driver::workspace::check_interfaces` is that last part as a
    function of the interfaces of the workspace, what is known of each of
    its dependencies (the prefix and the interfaces of one that passed its
@@ -871,8 +876,8 @@ workers, one dependency after another. Of phase two, the outcomes of the
 references and the citations are found on as many threads, the modules
 shared out among them; the rest of it, the comparison with the lock, where
 each module stands, the checks of each dependency, the manifest, `within`
-and members, imports and names, and the index of addresses the outcomes
-are looked up in, runs on one thread. The diagnostics, the summary line, the check
+and members, imports and names, the staleness of the bindings, and the
+index of addresses the outcomes are looked up in, runs on one thread. The diagnostics, the summary line, the check
 report and the unresolved list are the same, byte for byte, for every
 number of workers: each module's result is collected by itself, and the
 results are sorted by the path of their file and then by position before
@@ -1112,9 +1117,11 @@ the workspace or of a dependency that passed, as
 describes.
 `fidryn_provision::AddressIndex` gives the outcome of a target, and also
 the tree hash of the provision at an address and the enacted-layer hash of
-the unit an address lies in. A lookup of it costs the same however many
-addresses it holds, and a target has few segments, so the outcomes of all
-the references of a workspace cost time in proportion to their number.
+the unit an address lies in, an alias of a unit standing for the unit,
+which the staleness of a [binding](#bindings) compares. A lookup of it
+costs the same however many addresses it holds, and a target has few
+segments, so the outcomes of all the references of a workspace cost time
+in proportion to their number.
 
 ## The cache
 
@@ -1289,8 +1296,8 @@ path of its address, is not reported at all: that file's own diagnostics
 say what is wrong. The address that a citation names gets an
 [outcome](#references), from the modules of the workspace and of its
 [dependencies](#depending-on-another-workspace), and an outcome is never a
-diagnostic. Whether the address that a binding names is a provision is not
-checked.
+diagnostic. What a binding binds is compared with what it was written
+against, as [Bindings](#bindings) describes.
 
 ## Depending on another workspace
 
@@ -1380,7 +1387,7 @@ The example in the repository is the curated sample,
 prefix `/zz/sample` that depends on the generated sample of the Code at
 `../workspace`, pinned to its release and to the digest of its lock, whose
 one module cites sections, deeper provisions and a note of it, each with
-the outcome `exact`.
+the outcome `exact`, and binds one of the sections.
 
 A dependency that fails a check gives phase two no interface, only its
 prefix when the check read the manifest of its directory; the manifest of
@@ -1393,9 +1400,10 @@ manifest that cannot be read, or an entry refused for its `path` or its
 dependency that passed, since the prefix could be any of it. A reference
 or a citation whose target is an address that lies where nothing is known
 is left out of the counts of the check report and of the unresolved list,
-and an import of a module there is not reported, since the one diagnostic
-of the dependency is the report; a target that is no address is
-`malformed` all the same. The check exits 1.
+an import of a module there is not reported, and a binding of an address
+there is not judged, since the one diagnostic of the dependency is the
+report; a target that is no address is `malformed` all the same. The
+check exits 1.
 
 The check writes nothing inside the directory of a dependency, with any
 cache or with none: the entries of the module files of a dependency go
@@ -1425,6 +1433,120 @@ checked. `modules` and `from cache` count its own module files, and the
 module files of a dependency are counted nowhere; `errors` and `warnings`
 count its own diagnostics, among them the one of each dependency that
 failed.
+
+## Bindings
+
+A binding of a curated module records what a person read when they wrote
+it: the provision it binds, the release of the dependency they read it in,
+and two hashes of what they read. Of a curated workspace that depends on
+the demo workspace, `conformance/fixtures/workspace/demo` of the release
+`42-7`:
+
+```fidryn
+edition 2
+module "/zz/notes/a" {
+  citation sizes -> "/zz/demo/t1/s2"
+  binding sizes_binding {
+    binds sizes
+    release "42-7"
+    provision_hash "238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f"
+    notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    pending
+  }
+}
+```
+
+- What `binds` names is an address of a dependency, written out or reached
+  through a citation, as
+  [Curated modules](#curated-modules-imports-citations-and-names)
+  describes; `sizes_binding` binds `/zz/demo/t1/s2`. An alias of a unit
+  stands for the unit, as it does for a [reference](#references), and an
+  address wins over an alias.
+- `release` is the release of the dependency the binding was written
+  against.
+- `provision_hash` is the [tree hash](#hashes) of the provision: of its
+  number, heading, status and text and of the tree hash of each child, so
+  that a change to any word of it or below it changes it.
+- `notes_hash` is the hash of the [enacted layer](#layers) of the unit the
+  provision lies in, which holds its enacted notes.
+
+Both hashes are 64 lower-case hexadecimal digits, which the check of one
+module requires (`E710`). The check of a workspace compares them, in
+phase two and from the interfaces alone, with what the dependency holds
+now. A binding is **stale**, for the first of these reasons that holds:
+
+| Reason | When |
+| --- | --- |
+| provision removed or moved | the address is no provision of a dependency: the address of a note, of a container or of nothing in the dependency whose prefix it lies below, an alias of a container, or an address below the prefix of no dependency of the workspace, such as one of the workspace's own |
+| provision text changed | the tree hash of the provision at the address differs from `provision_hash` |
+| enacted notes of the unit changed | the hash of the enacted layer of its unit differs from `notes_hash` |
+
+A binding whose provision changed in a word is stale, and so is a binding
+of the section that holds it; a binding of a sibling is not. A new
+enacted note of a unit makes every binding of a provision of that unit
+stale. Nothing else makes a binding stale:
+
+- Editorial matter, the source credit, the editorial notes and the
+  footnotes and their markers, is in neither hash, so a change to it makes
+  nothing stale.
+- A note set out under a container enters the enacted layer of no unit.
+- The release a binding records is compared with nothing. It is shown in
+  the warning beside the release of the dependency, so that a reader sees
+  against which release the binding was written; against a dependency of
+  another release in which neither hash changed, the binding is not stale.
+- A dependency that fails a check makes no binding stale: the bindings of
+  what lies below its prefix are not judged, and its one diagnostic is the
+  report.
+
+A stale binding is `W750 StaleBinding`, a warning, at the binding's name:
+it tells a person to read the provision again. It never changes the exit
+status and is counted in `warnings` of the summary line and of the check
+report. Its message names the binding, the address, the reason, the
+release the binding records and the release of the dependency, and says
+what to do. Once the curated workspace above, in `notes/`, is pinned to a
+release `42-8` of its dependency in which a word of the section changed,
+`fidryn check notes` prints:
+
+```text
+notes/zz/notes/a.fr: W750 StaleBinding: the binding `sizes_binding` of `/zz/demo/t1/s2` is stale (provision text changed) in the release `42-8` of the dependency `demo`, and was written against the release `42-7`; read the provision again, and write into the binding the hashes that `fidryn text` prints for it with `--hashes`
+```
+
+For `enacted notes of the unit changed` it says to read the provision and
+the enacted notes of its unit again; for `provision removed or moved`, to
+find where the provision now stands and bind its address; and for an
+address below no dependency, that the address lies below no dependency of
+the workspace, and to bind a provision of a dependency.
+
+A binding is written with what
+[`fidryn text DIR ADDRESS --hashes`](cli.md#text) prints: read the
+provision with `fidryn text DIR ADDRESS`, then print its two lines and
+write them into the binding after its `release`, the release of the
+dependency's manifest:
+
+```sh
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes
+```
+
+```text
+provision_hash "238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f"
+notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+```
+
+The command takes the hashes from the [interfaces](#interfaces) of the
+modules, where the check takes them, so a binding written from its output
+is not stale against the workspace it was printed from. It prints the
+hashes of a provision, or of the unit an alias names, and refuses any
+other address, saying what it is. `fidryn_provision::staleness` gives the
+reason of a binding against an index of addresses, and
+`fidryn_provision::bound_hashes` the hashes a binding records; both name
+no corpus.
+
+The curated sample, `samples/uscode/curated/` ([The sample](#the-sample)),
+binds one section of the generated sample by the name of its citation,
+with the hashes that `fidryn text samples/uscode/workspace /us/usc/t45/s151 --hashes`
+prints and the release of the sample, and the check of the sample fails
+when that binding is stale.
 
 ## The ingester for the United States Code
 
@@ -1680,8 +1802,10 @@ point published by the Office of the Law Revision Counsel, Title 1, Title
   `../workspace`, pinned to its release and to the BLAKE3 of its lock. Its
   one module gives names to provisions of the sample, a whole section, a
   subsection and deeper provisions, a rule of the appendix title and a
-  note, and holds no text of the Code; `fidryn check
-  samples/uscode/curated --no-cache` checks it with its dependency.
+  note, and [binds](#bindings) one section, with the release of the sample
+  and the two hashes that `fidryn text --hashes` prints for it; it holds no
+  text of the Code. `fidryn check samples/uscode/curated --no-cache` checks
+  it with its dependency.
 
 `cargo xtask uscode-sample`, which `cargo xtask ci` runs, holds the sample
 to seven things, in this order, and fails with a message that names the
@@ -1704,10 +1828,11 @@ first difference when one of them does not hold:
    reads from the publisher's XML by the [rules of the reading](#the-ingester-for-the-united-states-code),
    which it implements on its own, sharing no code with the ingester;
 7. the check of `curated/` with its dependency finds no error and no
-   warning, a pin that is no longer the lock's (`E740`) among the errors,
-   counts at least one citation, and gives every citation of it the
-   outcome `exact`; the step names the file and the first thing that is
-   wrong, and the curated sample when it counts no citation.
+   warning, a pin that is no longer the lock's (`E740`) among the errors
+   and a stale binding (`W750`) among the warnings, counts at least one
+   citation, and gives every citation of it the outcome `exact`; the step
+   names the file and the first thing that is wrong, and the curated
+   sample when it counts no citation.
 
 The `fidryn` commands run in the process of the step, as the binary runs
 them. The step makes its temporary directories under the system's

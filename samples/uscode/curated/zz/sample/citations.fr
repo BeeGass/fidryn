@@ -8,4 +8,11 @@ module "/zz/sample/citations" {
   citation bankruptcy_rules_scope -> "/us/usc/rule1001"
   citation bankruptcy_rules_in_general -> "/us/usc/rule1001/a"
   citation respect_for_marriage_short_title -> "/us/usc/t1/s1/note/statutoryNotes/pl.117.228/short-title-of-2022-amendment"
+  binding railway_labor_definitions_binding {
+    binds railway_labor_definitions
+    release "119-142"
+    provision_hash "180a7eb8dde5870f26e8ef67c1c2808fa942036ee549a94fb84e3dca5c83e924"
+    notes_hash "31a067f1770263653690bbb4d488684076d29965f7997b31d2db56bac12d354c"
+    pending
+  }
 }

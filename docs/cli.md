@@ -172,8 +172,10 @@ modules: 5; from cache: 0; errors: 0; warnings: 0
 with a cache that holds nothing yet, or with `--no-cache`, it is 0.
 
 A warning, such as `W760 ToolchainMismatch` when the manifest's
-`toolchain` is not the running version, is printed to stderr and does not
-change the exit status. Nor does a reference whose target the check does
+`toolchain` is not the running version, or `W750 StaleBinding` when what a
+binding of a curated module was written against has changed
+([Bindings](law-modules.md#bindings)), is printed to stderr, counted in
+`warnings`, and does not change the exit status. Nor does a reference whose target the check does
 not find: its outcome is counted in the report and listed in the
 unresolved list, and is never a diagnostic. Nor does a cache that cannot
 be written: the check writes no further entry, says so once on stderr, as
@@ -706,8 +708,10 @@ workspace in `DIR`: of every provision, container, note, source credit and
 footnote of its modules, read from its module files
 ([Workspaces](law-modules.md#workspaces)). With `ADDRESS` it prints the
 provision, container or note at that address and what lies below it: every
-one whose address is `ADDRESS` or continues it at a segment boundary. It
-reads the modules and checks nothing else of the workspace, which
+one whose address is `ADDRESS` or continues it at a segment boundary. With
+`ADDRESS` and `--hashes` it prints the two hashes that a binding to that
+provision records instead ([Bindings](law-modules.md#bindings)). It reads
+the modules and checks nothing else of the workspace, which
 `fidryn check DIR` does.
 
 **Arguments**
@@ -715,8 +719,9 @@ reads the modules and checks nothing else of the workspace, which
 | Name | Required | Type |
 | --- | --- | --- |
 | `DIR` | yes | path to the directory of a workspace |
-| `ADDRESS` | no | the address of a provision, a container or a note of the workspace |
+| `ADDRESS` | no | the address of a provision, a container or a note of the workspace; with `--hashes`, of a provision, or an alias of a unit |
 | `--json` | no | flag; print one text record to a line |
+| `--hashes` | no | flag; print the two lines that a binding to `ADDRESS` records; needs `ADDRESS`, and is not given with `--json` |
 
 **Example**
 
@@ -724,6 +729,7 @@ reads the modules and checks nothing else of the workspace, which
 fidryn text conformance/fixtures/workspace/demo
 fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2
 fidryn text conformance/fixtures/workspace/demo --json
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes
 fidryn text samples/uscode/workspace /us/usc/t1/s1
 ```
 
@@ -809,6 +815,22 @@ publisher's XML, independently of the ingester, and the check of the
 sample of the Code compares the two line for line
 ([The sample](law-modules.md#the-sample)).
 
+With `--hashes` it prints exactly two lines and nothing else, the two
+that a person writes into a binding after its `release`: the tree hash of
+the provision at `ADDRESS`, or of the top provision of the unit that
+`ADDRESS` is an alias of, and the hash of the enacted layer of that unit,
+each as 64 lower-case hexadecimal digits. They come from the
+[interfaces](law-modules.md#interfaces) of the modules, the place the check
+of a workspace takes them from, so a binding that records them is not
+stale against the workspace they were printed from. Of the demo
+workspace, `fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes`
+prints:
+
+```text
+provision_hash "238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f"
+notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+```
+
 **Failure.** Exit 1. Nothing is printed to stdout, and the reason is
 printed to stderr: a directory that holds no workspace (`E730`), an entry
 that cannot be read or is neither a file nor a directory (`E730`), a
@@ -820,6 +842,20 @@ workspace holds no provision, container or note, as
 ```sh exit=1
 fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s9
 ```
+
+With `--hashes`, an address that is no provision and no alias of a unit is
+refused in the same way, saying what it is: the address of a note, of a
+container or of a curated module, an alias of a container, or the address
+of nothing, as
+``the workspace holds no provision, container or note at `/zz/demo/t1/s9` ``.
+The chapter of the demo workspace is a container:
+
+```sh exit=1
+fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 --hashes
+```
+
+`--hashes` without `ADDRESS`, and `--hashes` with `--json`, are usage
+errors, exit 2.
 
 ## See also
 

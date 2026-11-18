@@ -1,14 +1,15 @@
-//! Phase two of the check of a workspace: the checks across its modules, and
-//! the outcome of every reference and of every citation, from the interfaces
-//! of the modules of the workspace and of its dependencies alone.
+//! Phase two of the check of a workspace: the checks across its modules, the
+//! staleness of every binding, and the outcome of every reference and of
+//! every citation, from the interfaces of the modules of the workspace and of
+//! its dependencies alone.
 
 use super::MANIFEST_FILE;
-use fidryn_check::e2::names::resolve;
+use fidryn_check::e2::names::{ResolvedBinding, resolve};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
 use fidryn_provision::interface::{ByteRange, Shape};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::workspace::{Manifest, WorkspaceKind};
-use fidryn_provision::{Address, AddressIndex, Interface, Layer, Outcome};
+use fidryn_provision::{Address, AddressIndex, Interface, Layer, Outcome, StaleReason, staleness};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -42,9 +43,12 @@ pub struct UnresolvedCitation {
 /// A workspace that the checked one depends on, as phase two knows it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DependencyInterfaces {
-    /// A dependency that passed its checks: its prefix, and the interfaces
-    /// of its modules.
+    /// A dependency that passed its checks: the name its entry gives it,
+    /// the release of its lock, which a stale binding into it is reported
+    /// with, its prefix, and the interfaces of its modules.
     Loaded {
+        name: String,
+        release: String,
         prefix: Address,
         interfaces: Vec<Interface>,
     },
@@ -53,9 +57,9 @@ pub enum DependencyInterfaces {
     /// below the prefix of the workspace or of a loaded dependency; and when
     /// the prefix is not known, nothing is known below no such prefix. A
     /// citation or a reference whose target lies where nothing is known is
-    /// left out of the counts and of the unresolved lists, and an import of
-    /// a module there is not reported, since the diagnostic of the
-    /// dependency says what is wrong.
+    /// left out of the counts and of the unresolved lists, an import of a
+    /// module there is not reported, and a binding there is not judged,
+    /// since the diagnostic of the dependency says what is wrong.
     Failed { prefix: Option<Address> },
 }
 
@@ -118,6 +122,11 @@ pub(crate) fn no_citations() -> BTreeMap<String, u64> {
 /// - every import of a curated module names a module of `interfaces` or of
 ///   a dependency (`E720`), and the names of the curated module resolve
 ///   ([`resolve`]; `E200`);
+/// - no binding that resolves is stale (`W750`, a warning, at its name):
+///   what it binds lies below the prefix of a dependency that passed its
+///   checks, and the two hashes it records are those of the provision there
+///   and of its unit ([`staleness`]); what lies below no such prefix is
+///   "provision removed or moved";
 /// - no two modules of the workspace declare one address, as the address of
 ///   a module, a provision or a note: each module after the first by path
 ///   that declares it is reported (`E700`), at its address when the address
@@ -131,9 +140,9 @@ pub(crate) fn no_citations() -> BTreeMap<String, u64> {
 /// loaded dependency and, when every dependency that failed has a known
 /// prefix, below the prefix of one of them: a reference or a citation whose
 /// target is an address that lies there is left out of the counts and of
-/// the unresolved lists, and an import of a module there that is not found
-/// is not reported. A target that is no address is `malformed` wherever it
-/// would lie.
+/// the unresolved lists, an import of a module there that is not found is
+/// not reported, and a binding of an address there is not judged. A target
+/// that is no address is `malformed` wherever it would lie.
 ///
 /// Each module is taken to stand at the path of its address, which names
 /// its file in a diagnostic. The result is the same for any order of
@@ -175,13 +184,24 @@ pub(crate) fn across(
 ) -> PhaseTwo {
     let mut loaded: Vec<&Interface> = Vec::new();
     let mut known = vec![manifest.prefix.clone()];
+    let mut pinned = Vec::new();
     let mut failed = Vec::new();
     let mut unplaced = false;
     for dependency in dependencies {
         match dependency {
-            DependencyInterfaces::Loaded { prefix, interfaces } => {
+            DependencyInterfaces::Loaded {
+                name,
+                release,
+                prefix,
+                interfaces,
+            } => {
                 loaded.extend(interfaces);
                 known.push(prefix.clone());
+                pinned.push(Pinned {
+                    name,
+                    release,
+                    prefix,
+                });
             }
             DependencyInterfaces::Failed {
                 prefix: Some(prefix),
@@ -195,8 +215,12 @@ pub(crate) fn across(
         unplaced,
     };
     let index = AddressIndex::build(interfaces.iter().chain(loaded.iter().copied()), &known);
+    let passed = Loaded {
+        interfaces: &loaded,
+        pinned: &pinned,
+    };
     let mut diagnostics = checks(
-        interfaces, &loaded, manifest, toolchain, unread, &index, &unknown,
+        interfaces, &passed, manifest, toolchain, unread, &index, &unknown,
     );
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
     let counted = outcomes(interfaces, &index, &unknown, jobs);
@@ -238,23 +262,39 @@ pub(crate) fn own_checks(
         failed: Vec::new(),
         unplaced: false,
     };
+    let none = Loaded {
+        interfaces: &[],
+        pinned: &[],
+    };
     checks(
-        interfaces,
-        &[],
-        manifest,
-        toolchain,
-        unread,
-        &index,
-        &unknown,
+        interfaces, &none, manifest, toolchain, unread, &index, &unknown,
     )
 }
 
-/// The checks of phase two that give diagnostics, with `dependencies` the
-/// interfaces of the dependencies that were loaded, and `index` that of the
-/// addresses of `interfaces` and `dependencies`.
+/// A dependency that passed its checks, as the warning of a stale binding
+/// into it names it.
+struct Pinned<'a> {
+    name: &'a str,
+    /// The release of its lock.
+    release: &'a str,
+    prefix: &'a Address,
+}
+
+/// What phase two holds of the dependencies that passed their checks.
+struct Loaded<'a> {
+    /// The interfaces of their modules.
+    interfaces: &'a [&'a Interface],
+    /// Each of them, in the order in which phase two is given them; their
+    /// prefixes do not overlap, so at most one holds a bound address.
+    pinned: &'a [Pinned<'a>],
+}
+
+/// The checks of phase two that give diagnostics, with `dependencies` what
+/// is held of the dependencies that were loaded, and `index` the index of
+/// the addresses of `interfaces` and of theirs.
 fn checks(
     interfaces: &[Interface],
-    dependencies: &[&Interface],
+    dependencies: &Loaded<'_>,
     manifest: &Manifest,
     toolchain: &str,
     unread: &BTreeSet<String>,
@@ -263,7 +303,7 @@ fn checks(
 ) -> Vec<Diagnostic> {
     let mut diagnostics = of_manifest(manifest, toolchain);
     diagnostics.extend(hierarchy(interfaces, unread));
-    diagnostics.extend(curated(interfaces, dependencies, unread, unknown));
+    diagnostics.extend(curated(interfaces, dependencies, unread, index, unknown));
     diagnostics.extend(declared_twice(index, interfaces));
     diagnostics
 }
@@ -485,20 +525,24 @@ fn hierarchy(interfaces: &[Interface], unread: &BTreeSet<String>) -> Vec<Diagnos
     out
 }
 
-/// The checks of the imports and of the names of each curated module of
-/// `interfaces`: an import names a module of `interfaces` or of
-/// `dependencies` (`E720`, at its address), and the module's names resolve
-/// ([`resolve`]). An import of a module file that gave no interface, and
-/// one of a module where nothing is known, are not reported again, and
-/// nothing is resolved through them.
+/// The checks of the imports, the names and the bindings of each curated
+/// module of `interfaces`: an import names a module of `interfaces` or of
+/// `dependencies` (`E720`, at its address), the module's names resolve
+/// ([`resolve`]), and no binding that resolves is stale ([`stale`],
+/// `W750`). An import of a module file that gave no interface, and one of a
+/// module where nothing is known, are not reported again, and nothing is
+/// resolved through them.
 fn curated(
     interfaces: &[Interface],
-    dependencies: &[&Interface],
+    dependencies: &Loaded<'_>,
     unread: &BTreeSet<String>,
+    index: &AddressIndex,
     unknown: &Unknown<'_>,
 ) -> Vec<Diagnostic> {
     let importable = Modules::new(
-        interfaces.iter().chain(dependencies.iter().copied()),
+        interfaces
+            .iter()
+            .chain(dependencies.interfaces.iter().copied()),
         unread,
         "is no module of the workspace or of a dependency",
     );
@@ -524,15 +568,74 @@ fn curated(
                 );
             }
         }
-        // Only the names are checked here, not what a binding binds.
-        let (_, diagnostics) = resolve(interface, &imported);
+        let (bindings, diagnostics) = resolve(interface, &imported);
         out.extend(
             diagnostics
                 .into_iter()
                 .map(|diagnostic| diagnostic.with_source(file.as_str())),
         );
+        out.extend(bindings.iter().filter_map(|binding| {
+            stale(binding, dependencies.pinned, index, unknown)
+                .map(|diagnostic| diagnostic.with_source(file.as_str()))
+        }));
     }
     out
+}
+
+/// The warning (`W750`, at the binding's name) of `binding` when it is
+/// stale: when what it binds lies below the prefix of a dependency of
+/// `pinned` and [`staleness`] gives a reason against `index`, the index of
+/// the workspace and of the dependencies that passed their checks; and when
+/// it lies below no prefix of a dependency, "provision removed or moved".
+/// A binding of an address where nothing is known, below the prefix of a
+/// dependency that failed, is not judged.
+fn stale(
+    binding: &ResolvedBinding,
+    pinned: &[Pinned<'_>],
+    index: &AddressIndex,
+    unknown: &Unknown<'_>,
+) -> Option<Diagnostic> {
+    let target = &binding.target;
+    if unknown.holds(target.as_str()) {
+        return None;
+    }
+    let declared = &binding.binding.item;
+    let release = &declared.release;
+    let named = format!("the binding `{}` of `{target}`", declared.name);
+    let hashes = "the hashes that `fidryn text` prints for it with `--hashes`";
+    let message = match pinned
+        .iter()
+        .find(|dependency| lies_below(target.as_str(), dependency.prefix))
+    {
+        None => format!(
+            "{named} is stale ({}): the address lies below no dependency of the workspace, and \
+             the binding was written against the release `{release}`; bind a provision of a \
+             dependency, with {hashes}",
+            StaleReason::Removed
+        ),
+        Some(dependency) => {
+            let reason = staleness(target, declared.provision_hash, declared.notes_hash, index)?;
+            let action = match reason {
+                StaleReason::Removed => format!(
+                    "find where the provision now stands, read it again, and bind its address \
+                     with {hashes}"
+                ),
+                StaleReason::TextChanged => {
+                    format!("read the provision again, and write into the binding {hashes}")
+                }
+                StaleReason::EnactedNotesChanged => format!(
+                    "read the provision and the enacted notes of its unit again, and write into \
+                     the binding {hashes}"
+                ),
+            };
+            format!(
+                "{named} is stale ({reason}) in the release `{}` of the dependency `{}`, and \
+                 was written against the release `{release}`; {action}",
+                dependency.release, dependency.name
+            )
+        }
+    };
+    Some(Diagnostic::new(DiagnosticCode::W750, message).with_span(span(binding.binding.range.name)))
 }
 
 /// Each address that more than one module of `interfaces` declares, the

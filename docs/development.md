@@ -28,7 +28,7 @@ and its counts of references against the script that counts the archives and
 the check, the text of every provision and note against what an
 independent script reads from the publisher's XML, and the curated sample,
 checked with the generated one as its dependency, every citation of it
-`exact`), generated-site
+`exact` and its binding not stale), generated-site
 consistency, the example status check
 (`cargo xtask examples`), the documentation check (`cargo xtask docs`) and
 benchmark compilation. The example status and documentation checks are

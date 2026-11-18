@@ -223,8 +223,10 @@ FIDRYN_CACHE_DIR=/var/cache/fidryn fidryn check DIR</code></pre></figure>
 <p><code>from cache</code> counts the modules whose result was read from the cache;
 with a cache that holds nothing yet, or with <code>--no-cache</code>, it is 0.</p>
 <p>A warning, such as <code>W760 ToolchainMismatch</code> when the manifest's
-<code>toolchain</code> is not the running version, is printed to stderr and does not
-change the exit status. Nor does a reference whose target the check does
+<code>toolchain</code> is not the running version, or <code>W750 StaleBinding</code> when what a
+binding of a curated module was written against has changed
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings">Bindings</a>), is printed to stderr, counted in
+<code>warnings</code>, and does not change the exit status. Nor does a reference whose target the check does
 not find: its outcome is counted in the report and listed in the
 unresolved list, and is never a diagnostic. Nor does a cache that cannot
 be written: the check writes no further entry, says so once on stderr, as
@@ -616,20 +618,24 @@ workspace in <code>DIR</code>: of every provision, container, note, source credi
 footnote of its modules, read from its module files
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>). With <code>ADDRESS</code> it prints the
 provision, container or note at that address and what lies below it: every
-one whose address is <code>ADDRESS</code> or continues it at a segment boundary. It
-reads the modules and checks nothing else of the workspace, which
+one whose address is <code>ADDRESS</code> or continues it at a segment boundary. With
+<code>ADDRESS</code> and <code>--hashes</code> it prints the two hashes that a binding to that
+provision records instead (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings">Bindings</a>). It reads
+the modules and checks nothing else of the workspace, which
 <code>fidryn check DIR</code> does.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>DIR</code></td><td>yes</td><td>path to the directory of a workspace</td></tr>
-<tr><td><code>ADDRESS</code></td><td>no</td><td>the address of a provision, a container or a note of the workspace</td></tr>
+<tr><td><code>ADDRESS</code></td><td>no</td><td>the address of a provision, a container or a note of the workspace; with <code>--hashes</code>, of a provision, or an alias of a unit</td></tr>
 <tr><td><code>--json</code></td><td>no</td><td>flag; print one text record to a line</td></tr>
+<tr><td><code>--hashes</code></td><td>no</td><td>flag; print the two lines that a binding to <code>ADDRESS</code> records; needs <code>ADDRESS</code>, and is not given with <code>--json</code></td></tr>
 </tbody></table>
 </div>
 <p><strong>Example</strong></p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo
 <span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s2
 <span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo <span class="tk-ty">--json</span>
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s2 <span class="tk-ty">--hashes</span>
 <span class="tk-kw">fidryn</span> text samples/uscode/workspace /us/usc/t1/s1</code></pre></figure>
 <p><strong>Success.</strong> Exit 0. Without <code>--json</code> it prints the text for a person,
 module by module in the order of their addresses, with a blank line
@@ -699,6 +705,18 @@ byte. <code>conformance/uslm_text.py</code> prints the same records from the
 publisher's XML, independently of the ingester, and the check of the
 sample of the Code compares the two line for line
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-sample">The sample</a>).</p>
+<p>With <code>--hashes</code> it prints exactly two lines and nothing else, the two
+that a person writes into a binding after its <code>release</code>: the tree hash of
+the provision at <code>ADDRESS</code>, or of the top provision of the unit that
+<code>ADDRESS</code> is an alias of, and the hash of the enacted layer of that unit,
+each as 64 lower-case hexadecimal digits. They come from the
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#interfaces">interfaces</a> of the modules, the place the check
+of a workspace takes them from, so a binding that records them is not
+stale against the workspace they were printed from. Of the demo
+workspace, <code>fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes</code>
+prints:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>provision_hash &quot;238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f&quot;
+notes_hash &quot;a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff&quot;</code></pre></figure>
 <p><strong>Failure.</strong> Exit 1. Nothing is printed to stdout, and the reason is
 printed to stderr: a directory that holds no workspace (<code>E730</code>), an entry
 that cannot be read or is neither a file nor a directory (<code>E730</code>), a
@@ -707,6 +725,15 @@ diagnostics; a text that is no address; and an address at which the
 workspace holds no provision, container or note, as
 <code>the workspace holds no provision, container or note at `/zz/demo/t1/s9` </code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s9</code></pre></figure>
+<p>With <code>--hashes</code>, an address that is no provision and no alias of a unit is
+refused in the same way, saying what it is: the address of a note, of a
+container or of a curated module, an alias of a container, or the address
+of nothing, as
+<code>the workspace holds no provision, container or note at `/zz/demo/t1/s9` </code>.
+The chapter of the demo workspace is a container:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 <span class="tk-ty">--hashes</span></code></pre></figure>
+<p><code>--hashes</code> without <code>ADDRESS</code>, and <code>--hashes</code> with <code>--json</code>, are usage
+errors, exit 2.</p>
 <h2 id="see-also"><span class="hn">4.18</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>

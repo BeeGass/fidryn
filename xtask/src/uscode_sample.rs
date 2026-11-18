@@ -19,8 +19,9 @@
 //!    line, what `fidryn text samples/uscode/workspace --json` prints;
 //! 7. the check of the curated sample, `samples/uscode/curated`, which
 //!    depends on the generated one at a pinned release, finds no error and
-//!    no warning, counts at least one citation, and gives every one of its
-//!    citations the outcome `exact`;
+//!    no warning, a stale binding (`W750`) among the warnings, counts at
+//!    least one citation, and gives every one of its citations the outcome
+//!    `exact`;
 //!    `--update` writes, after the workspace, the release and the lock
 //!    digest of that dependency and the toolchain of the curated manifest,
 //!    and nothing else of it.
@@ -251,8 +252,9 @@ fn ingest(archives: &Path, out: &Path, jobs: u32) -> Result<()> {
 /// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
 /// runs it. It gives the number of the sample's citations, and fails,
 /// naming the file and the first thing that is wrong, on an error, on a
-/// warning, on a citation whose outcome is not `exact`, and, naming the
-/// curated sample, when the check counts no citation at all.
+/// warning, such as a stale binding, on a citation whose outcome is not
+/// `exact`, and, naming the curated sample, when the check counts no
+/// citation at all.
 fn check_curated(root: &Path) -> Result<u64> {
     eprintln!("+ fidryn check {CURATED} --no-cache");
     let report = check_workspace(&root.join(CURATED), &curated_options());
@@ -1006,6 +1008,33 @@ mod tests {
             .map(|name| ((*name).to_owned(), "exact"))
             .collect();
         assert_eq!(citation_outcomes(&copy), expected);
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_stale_binding_fails_the_step_and_names_the_module() {
+        let copy = copy_of_the_samples("curated-stale");
+        let module = copy.join(CURATED).join("zz/sample/citations.fr");
+        let original = read_text(&module);
+        // The binding records another tree hash than the provision's.
+        let at = original
+            .find("provision_hash \"")
+            .expect("the module has a binding")
+            + 16;
+        let mut changed = original.clone();
+        let digit = if &original[at..=at] == "0" { "1" } else { "0" };
+        changed.replace_range(at..=at, digit);
+        fs::write(&module, changed).expect("change the module");
+        let error = check_curated(&copy).expect_err("a stale binding");
+        let message = format!("{error:#}");
+        assert!(
+            message.starts_with(
+                "samples/uscode/curated/zz/sample/citations.fr: W750 StaleBinding: the binding \
+                 `railway_labor_definitions_binding` of `/us/usc/t45/s151` is stale (provision \
+                 text changed)"
+            ) && message.contains("finds 0 errors and 1 warnings"),
+            "{message}"
+        );
         fs::remove_dir_all(&copy).expect("remove scratch dir");
     }
 

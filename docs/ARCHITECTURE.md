@@ -265,7 +265,7 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
 fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
-fidryn text DIR [ADDRESS] [--json]
+fidryn text DIR [ADDRESS] [--json | --hashes]
 ```
 
 Every subcommand also takes `--source-root PATH`. `run` never chooses a
@@ -331,8 +331,8 @@ W760 ToolchainMismatch
 `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
 `fidryn-core`. The checks of one module of edition 2 raise `E700` and
 `E710`, besides `E100` and `E200`; the check of a workspace raises `E720`,
-`E730`, `E740` and `W760` besides; no check raises `W750`. `W750` and
-`W760` are warnings.
+`E730`, `E740`, `W750` and `W760` besides. `W750` and `W760` are
+warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate
 to `Suspended`, `Contingent`, or `NormConflict`.

@@ -27,9 +27,12 @@ positive law; Title 11 Appendix and Title 45 are not.
   `zz/sample/citations.fr`, gives names to provisions of the sample: whole
   sections of Title 1 and of Title 45, a subsection and a subparagraph of
   1 U.S.C. 112b, a paragraph of 45 U.S.C. 1005, Rule 1001 of the appendix
-  and its subsection (a), and a statutory note under 1 U.S.C. 1. It holds
-  names and addresses, and no text of the Code; every citation has the
-  outcome `exact`.
+  and its subsection (a), and a statutory note under 1 U.S.C. 1. It also
+  binds 45 U.S.C. 151 by the name of its citation, with the release
+  `119-142` and the two hashes that
+  `fidryn text samples/uscode/workspace /us/usc/t45/s151 --hashes` prints. It
+  holds names, addresses and hashes, and no text of the Code; every
+  citation has the outcome `exact`, and the binding is not stale.
 
 | Title | Archive | Bytes | Retrieved (UTC) |
 | --- | --- | --- | --- |
@@ -105,7 +108,8 @@ difference:
    first line that differs;
 7. it checks `curated/` with its dependency, and fails, naming the file and
    the first thing that is wrong, on an error, such as a pin that is no
-   longer the lock's (`E740`), on a warning, and on a citation whose
+   longer the lock's (`E740`), on a warning, such as a binding whose
+   provision changed in a regeneration (`W750`), and on a citation whose
    outcome is not `exact`, such as one that stops resolving after a
    regeneration; and it fails, naming `curated/`, when the check counts no
    citation at all.

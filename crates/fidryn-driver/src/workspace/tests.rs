@@ -28,6 +28,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
+mod staleness;
+
 /// The version of the running toolchain, which the demo manifest records.
 const TOOLCHAIN: &str = env!("CARGO_PKG_VERSION");
 
@@ -2291,7 +2293,8 @@ fn two_checks_at_once_leave_a_valid_cache() {
 
 // The names of curated modules. The workspace has the prefix `/zz/notes`
 // and the modules `a`, `b` and `c`; `b` cites `/zz/demo/t1/s8/a` as
-// `widget`. No check looks up a cited or bound address.
+// `widget`. It has no dependency, so no cited address is found, and every
+// binding that resolves is stale; `check_notes` leaves those warnings out.
 
 /// The manifest of a curated workspace of the prefix `/zz/notes`.
 fn notes_manifest() -> Manifest {
@@ -2337,11 +2340,18 @@ fn notes_workspace(out: &Path, modules: &[(&str, &str)]) {
     }
 }
 
-/// The check of the curated workspace of `modules`.
+/// The check of the curated workspace of `modules`, which has no
+/// dependency, but for the warnings of its stale bindings: every binding
+/// that resolves here binds an address below no dependency, and so is stale
+/// (`W750`), which the tests of staleness check. These tests check names.
 fn check_notes(tag: &str, modules: &[(&str, &str)]) -> WorkspaceReport {
     let scratch = Scratch::new(tag);
     notes_workspace(scratch.path(), modules);
-    check(scratch.path())
+    let mut report = check(scratch.path());
+    report
+        .diagnostics
+        .retain(|diagnostic| diagnostic.code != DiagnosticCode::W750);
+    report
 }
 
 /// The interface of the module written as `text`, as phase one builds it.
@@ -3101,12 +3111,19 @@ fn report_keys(report: &WorkspaceReport) -> Vec<String> {
 
 #[test]
 fn a_curated_workspace_cites_its_dependency_and_checks_clean() {
+    // The binding records the hashes of what it binds, so it is not stale.
     let a = note_module(
         "a",
         &[
             "import \"/zz/demo/t1/s8\" as s8",
             "citation widget -> \"/zz/demo/t1/s8/a\"",
-            &binding("widget_binding", "widget"),
+            &staleness::written_against(
+                "widget_binding",
+                "widget",
+                "42-7",
+                &dependency_models(),
+                "/zz/demo/t1/s8/a",
+            ),
         ],
     );
     let scratch = with_dependency("deps-clean", &[("a", &a)]);
@@ -3678,6 +3695,8 @@ fn references_into_a_dependency_get_outcomes() {
         .collect();
     let more: Vec<Interface> = more_models.iter().map(interface_in_memory).collect();
     let given = |interfaces: &[Interface], prefix: &str| DependencyInterfaces::Loaded {
+        name: prefix.rsplit('/').next().unwrap_or_default().to_owned(),
+        release: "42-7".to_owned(),
         prefix: address(prefix),
         interfaces: interfaces.to_vec(),
     };

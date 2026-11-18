@@ -321,6 +321,8 @@ pub(super) fn settle(
             .count();
         if errors == 0 {
             out.push(DependencyInterfaces::Loaded {
+                name: entry.name,
+                release: lock.release,
                 prefix: manifest.prefix,
                 interfaces,
             });

@@ -115,6 +115,24 @@ interchange schema versions are maintained independently of the interpreter.
   warning or a citation whose outcome is not `exact`, naming the file, and
   when the check counts no citation, naming the curated sample; `--update`
   also writes the pin and the toolchain of its manifest.
+- Bindings and staleness. The check of a workspace compares each binding
+  of a curated module with the dependency it binds into: a binding is
+  stale (`W750`, a warning at its name, counted in `warnings` and never
+  changing the exit status) when its address is no longer a provision of
+  a dependency ("provision removed or moved"), when the tree hash of the
+  provision differs ("provision text changed"), or when the enacted-layer
+  hash of its unit differs ("enacted notes of the unit changed"); the
+  warning names the binding, the address, the reason, the release it was
+  written against and the release of the dependency. A change to
+  editorial matter makes nothing stale, and a dependency that failed
+  makes no binding stale. `fidryn text DIR ADDRESS --hashes` prints the
+  two lines a binding to a provision records, `provision_hash` and
+  `notes_hash`, and `fidryn_provision::staleness` gives the reason
+  (`StaleReason`). An alias of a unit stands for the unit in
+  `AddressIndex::provision_hash`. The curated sample binds one section of
+  the generated sample, and the sample step fails when that binding is
+  stale. `DependencyInterfaces::Loaded` records the name and the release
+  of the dependency.
 
 ## [0.2.0] - 2026-11-16
 

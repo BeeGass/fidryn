@@ -92,6 +92,11 @@ pub enum Command {
         /// their addresses.
         #[arg(long)]
         json: bool,
+        /// Print the two lines a binding to ADDRESS records, `provision_hash` and
+        /// `notes_hash`: the tree hash of the provision at ADDRESS, or of the unit it is an
+        /// alias of, and the enacted-layer hash of its unit.
+        #[arg(long, requires = "address", conflicts_with = "json")]
+        hashes: bool,
     },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
@@ -229,7 +234,15 @@ pub fn run(cli: Cli) -> ExitCode {
             },
         ),
         Command::Ingest { corpus } => law::run(corpus),
-        Command::Text { dir, address, json } => law::text(&dir, address.as_deref(), json),
+        Command::Text {
+            dir,
+            address,
+            json,
+            hashes,
+        } => match address.as_deref() {
+            Some(address) if hashes => law::hashes(&dir, address),
+            address => law::text(&dir, address, json),
+        },
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))

@@ -8,7 +8,8 @@
 //! `fidryn-ingest-uscode`. What it writes, `fidryn-driver` writes: the
 //! command joins the two. `text` names no corpus: it prints the text records
 //! of `fidryn_provision::records` of the modules `fidryn-driver` reads, or
-//! the same text laid out for a person.
+//! the same text laid out for a person, or the two hashes a binding to one
+//! provision records.
 
 use clap::Subcommand;
 use fidryn_core::Diagnostic;
@@ -17,7 +18,8 @@ use fidryn_ingest_uscode::{IngestError, IngestOptions, generator, ingest, open};
 use fidryn_provision::records::text_records;
 use fidryn_provision::workspace::{Manifest, WorkspaceKind};
 use fidryn_provision::{
-    Address, Block, Footnote, Item, Layer, Module, Note, Num, Provision, QuotedItem, Run, Text,
+    Address, AddressIndex, Block, DeclSpans, Footnote, Interface, Item, Layer, Module, Note, Num,
+    Provision, QuotedItem, Run, Text, bound_hashes, interface_of,
 };
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -235,6 +237,95 @@ pub fn write_text(
         })
     };
     written.map_err(|error| format!("cannot write the text: {error}"))
+}
+
+/// `fidryn text DIR ADDRESS --hashes`: prints to stdout what
+/// [`write_hashes`] writes. Exit 1, with the reason on stderr and nothing on
+/// stdout, when the workspace cannot be read or `address` is not what a
+/// binding binds.
+pub(crate) fn hashes(dir: &Path, address: &str) -> ExitCode {
+    let stdout = io::stdout();
+    let mut out = io::BufWriter::new(stdout.lock());
+    match write_hashes(dir, address, &mut out) {
+        Ok(()) => match out.flush() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => super::fail(format!("cannot write the hashes: {error}")),
+        },
+        Err(message) => super::fail(message),
+    }
+}
+
+/// Writes to `out` the two lines that a binding to `address` records when it
+/// is written against the workspace in `dir`, as a person writes them into
+/// the binding:
+///
+/// ```text
+/// provision_hash "<64 hexadecimal digits>"
+/// notes_hash "<64 hexadecimal digits>"
+/// ```
+///
+/// They are what [`bound_hashes`] gives from the interfaces of the modules,
+/// the place the check of a workspace takes them from, so a binding that
+/// records them is not stale against this workspace: the tree hash of the
+/// provision at `address`, or of the top provision of the unit `address` is
+/// an alias of, and the enacted-layer hash of its unit. Any other address,
+/// that of a note, of a container or of nothing, is refused, saying what it
+/// is, and nothing is written; so are a workspace that cannot be read and a
+/// text that is no address.
+pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<(), String> {
+    let jobs = std::thread::available_parallelism().map_or(1, std::num::NonZero::get);
+    let modules =
+        read_modules(dir, jobs).map_err(|diagnostics| diagnostics_under(dir, &diagnostics))?;
+    let at =
+        Address::parse(address).map_err(|error| format!("`{address}` is no address: {error}"))?;
+    let interfaces: Vec<Interface> = modules
+        .iter()
+        .map(|module| interface_of(module, &DeclSpans::default()))
+        .collect();
+    let index = AddressIndex::build(&interfaces, &[]);
+    let Some(hashes) = bound_hashes(&at, &index) else {
+        return Err(unbound(&modules, &at));
+    };
+    write!(
+        out,
+        "provision_hash \"{}\"\nnotes_hash \"{}\"\n",
+        hashes.provision_hash, hashes.notes_hash
+    )
+    .map_err(|error| format!("cannot write the hashes: {error}"))
+}
+
+/// What `at` is in `modules`, where it is no provision and no alias of a
+/// unit, as the reason `--hashes` refuses it. An address is looked for
+/// before an alias, as the index of the check looks.
+fn unbound(modules: &[Module], at: &Address) -> String {
+    let notes = |module: &Module| match module {
+        Module::Unit(unit) => unit.notes.iter().any(|note| note.address == *at),
+        Module::Container(container) => container.notes.iter().any(|note| note.address == *at),
+        Module::Curated(_) => false,
+    };
+    let what = if modules.iter().any(notes) {
+        format!("`{at}` is the address of a note")
+    } else if let Some(module) = modules.iter().find(|module| module_address(module) == at) {
+        let shape = match module {
+            Module::Unit(_) => "a unit",
+            Module::Container(_) => "a container",
+            Module::Curated(_) => "a curated module",
+        };
+        format!("`{at}` is the address of {shape}")
+    } else if let Some(container) = modules.iter().find_map(|module| match module {
+        Module::Container(container) if container.aliases.contains(at) => Some(container),
+        _ => None,
+    }) {
+        format!(
+            "`{at}` is an alias of the container `{}`",
+            container.address
+        )
+    } else {
+        return format!("the workspace holds no provision, container or note at `{at}`");
+    };
+    format!(
+        "{what}, and `--hashes` prints the hashes of a provision, or of a unit named by an alias"
+    )
 }
 
 /// The diagnostics of a workspace, one to a line, each naming its file under

@@ -82,7 +82,7 @@ enum Named {
 struct Entry {
     named: Named,
     /// The tree hash, of a provision and of a unit, whose address is that of
-    /// its top provision.
+    /// its top provision, and of an alias of a unit, which stands for it.
     hash: Option<Hash32>,
     /// The status of what is named itself: of a provision, of a container,
     /// and of a unit, which is that of its top provision; an index of
@@ -211,7 +211,6 @@ impl AddressIndex {
                     alias.item.as_str().into(),
                     Entry {
                         named: Named::Alias,
-                        hash: None,
                         ..module.clone()
                     },
                     &mut twice,
@@ -434,11 +433,12 @@ impl AddressIndex {
     }
 
     /// The tree hash of the provision at `address`, when it is a provision
-    /// of the index; the address of a unit is that of its top provision.
+    /// of the index; the address of a unit is that of its top provision, and
+    /// an alias of a unit stands for the unit. A note, a container, an alias
+    /// of a container and an address of nothing have none.
     pub fn provision_hash(&self, address: &Address) -> Option<Hash32> {
         self.entries
             .get(address.as_str())
-            .filter(|entry| entry.named != Named::Alias)
             .and_then(|entry| entry.hash)
     }
 
@@ -765,5 +765,15 @@ mod tests {
         }
         assert_eq!(index.unit_enacted_hash(&address("/zz/demo/t1/ch1")), None);
         assert_eq!(index.unit_enacted_hash(&address("/zz/demo/t1/s9")), None);
+        // The alias `s4` of the unit `s3` stands for the unit.
+        let Module::Unit(s3) = &modules[4] else {
+            panic!("the fifth module is the unit s3");
+        };
+        let alias = address("/zz/demo/t1/s4");
+        assert_eq!(index.provision_hash(&alias), Some(hash_provision(&s3.root)));
+        assert_eq!(
+            index.unit_enacted_hash(&alias),
+            Some(layer_hashes_of_unit(s3).enacted)
+        );
     }
 }
