@@ -100,7 +100,7 @@
     <h1 id="doc-title">Contributing to Fidryn</h1>
     <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">9.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">9.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">9.3</span> Website</a></li><li class="lvl-2"><a href="#example-status-and-documentation-checks"><span class="n">9.4</span> Example status and documentation checks</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">9.5</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">9.6</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">9.7</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">9.8</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">9.9</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">9.10</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">9.11</span> Not legal advice</a></li></ol></details>
     <div class="prose">
-<p>This file is for people building the 0.2 reference interpreter. It is
+<p>This file is for people building the 0.3 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md">README</a> and the <a href="/docs/">documentation hub</a>.</p>
 <p>Fidryn (FID-rin) is a research fixture. Modules under <code>examples/</code> and
@@ -250,7 +250,7 @@ commits in pipeline order, then tests and docs. Do not dump unrelated
 crates into one commit.</p>
 <h2 id="grammar"><span class="hn">9.9</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
 <p>The grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the repository root.
-It is closed, but the 0.2 parser enforces closed field sets only in
+It is closed, but the 0.3 parser enforces closed field sets only in
 <code>source</code> blocks, rule bodies and judgment request blocks. In most other
 declarations an unknown field is skipped without a diagnostic; see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>.</p>
@@ -259,7 +259,7 @@ declarations an unknown field is skipped without a diagnostic; see
 tutorials.</p>
 <ul>
 <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a> — Frozen crate graph, public APIs, and the pipeline of total functions over trees.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status.md</a> — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A <code>.fr</code> file is not an executable specification.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status.md</a> — What the 0.3 interpreter does and does not do, each statement backed by a test or a code location. A <code>.fr</code> file is not an executable specification.</li>
 </ul>
 <p>The internal working ledgers are indexed in
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md">internal/README.md</a>. They are not reader
@@ -280,7 +280,7 @@ advice.</p>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

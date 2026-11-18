@@ -2,18 +2,55 @@
 
 The interpreter's workspace version is the release version. The project is under the MIT License; [Licensing](../LICENSING.md) describes it and the third-party notices. Source instruments,
 prelude modules and interchange schemas retain their own version histories.
-Release 0.2 therefore still loads the repository's 0.1.0 instrument
+Release 0.3 therefore still loads the repository's 0.1.0 instrument
 fixtures and emits checked evaluation reports using schema v0.2.
 
 ## Prepare a release
 
 1. Increase `[workspace.package].version` and the internal workspace dependency
-   versions in `Cargo.toml`, then update `Cargo.lock`.
+   versions in `Cargo.toml`, then update `Cargo.lock` with
+   `cargo update --workspace --offline`, which changes the entries of the
+   workspace's own packages and no dependency.
 2. Add a dated `## [VERSION] - YYYY-MM-DD` entry to `CHANGELOG.md` with classified
-   release notes. Document breaking behavior and remaining limits.
-3. Run `cargo xtask release-check` and `cargo xtask ci --fmt`.
-4. Build a native package with `cargo xtask package` from a clean checkout.
-5. Promote through the same-repository `dev` to `main` PR after every required
+   release notes. Document breaking behavior and remaining limits. The notes
+   gathered under `## [Unreleased]` move below the new heading, and the
+   `## [Unreleased]` heading stays above it, empty.
+3. Regenerate the files that record the version, with the build of the new
+   version, in this order:
+   1. `cargo xtask uscode-sample --update` writes the sample's generated
+      workspace, whose manifest records the version as `toolchain` and whose
+      lock records it as `generator.version`, and then the `toolchain` of
+      `samples/uscode/curated/workspace.json` and its pin, the `lock_digest`
+      of the lock that changed.
+   2. The demo workspace under `conformance/fixtures/workspace/` records the
+      version in the same two places. The test
+      `the_committed_demo_workspace_is_what_the_writer_writes` of
+      `fidryn-driver` (`cargo test -p fidryn-driver --lib`) fails while it
+      differs and names the directory that holds what the writer writes;
+      copy the files that differ from there.
+   3. The change set under `conformance/fixtures/change-set/` records the
+      `lock_digest` of the two workspaces it compares, whose locks record the
+      version. The test `the_committed_change_set_is_what_the_comparison_writes`
+      of `fidryn-driver` fails while it differs and names the directory that
+      holds what the comparison writes; copy `change-set.json` from there.
+   4. The examples of a manifest and a lock in
+      [Law modules](law-modules.md) show the version; edit them.
+   5. When the major or the minor version changes, the documents that name
+      the release series, such as `Fidryn 0.3` in `README.md`, the guides
+      under `docs/` and `grammar.ebnf`, name the new one. The changelog's
+      entries of earlier releases keep theirs.
+   6. Last, `cargo xtask site` renders the site from the documents; the
+      footer of every page shows the version.
+
+   In the generated files, only the lines that carry the version differ, and
+   the digests of the locks that changed: the pin of the curated manifest and
+   the two of the change set. No module file, coverage ledger, profile or text
+   record changes.
+4. Run `cargo xtask release-check` and `cargo xtask ci --fmt`.
+5. Build a native package with `cargo xtask package` from a clean checkout,
+   and check the dependencies with
+   `cargo deny --offline check licenses bans sources`.
+6. Promote through the same-repository `dev` to `main` PR after every required
    check passes. `Release metadata` requires a genuine version increase over the
    PR's pinned base, including agreement across workspace packages, internal
    dependencies and the lockfile.

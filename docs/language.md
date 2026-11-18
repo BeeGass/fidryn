@@ -6,11 +6,11 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2 research interpreter. Example modules are fixtures. They are
+the 0.3 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
-The grammar in `grammar.ebnf` is closed, but the 0.2 parser enforces
+The grammar in `grammar.ebnf` is closed, but the 0.3 parser enforces
 that only inside `source` blocks, the bodies of rules and the request
 block of a judgment's `otherwise suspend NeedJudgment`. In most other
 declarations an unknown field is skipped without a diagnostic; see
@@ -23,7 +23,7 @@ declarations an unknown field is skipped without a diagnostic; see
 
 The grammar ([`grammar.ebnf`](../grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2 is **parsed / checked / executed** only where noted — see
+Support in 0.3 is **parsed / checked / executed** only where noted — see
 [implementation-status](implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -136,7 +136,7 @@ source FinalPayStatute {
 }
 ```
 
-In 0.2 a `source` block is a record for the reader. The parser rejects
+In 0.3 a `source` block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an `artifact` field
 (`E540`). The checker also types the source's name as a `String`, so a
 query that returns `FinalPayStatute` passes `check`, but `run` fails
@@ -205,7 +205,7 @@ office TrusteeOf(trust: Trust) occupied_by LegalPerson {
 }
 ```
 
-Fidryn 0.2 reads only an office's name and parameters. The rest of the
+Fidryn 0.3 reads only an office's name and parameters. The rest of the
 declaration, `occupied_by` and every field in the body, is discarded:
 every office reaches the intermediate representation with occupant type
 `LegalPerson`, at most one occupant and no competence, and nothing reads
@@ -363,7 +363,7 @@ the completed prefix, so a later term does not re-run an earlier
 attach.
 
 `require determined P using Determine` asks for a determination of `P`
-instead of treating `P` as a Bool. In 0.2 the `using` clause is parsed
+instead of treating `P` as a Bool. In 0.3 the `using` clause is parsed
 and discarded. Any determination of `P` on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
@@ -483,7 +483,7 @@ calc federal_hourly_floor() -> Money<USD> {
 A `calc` or an `fn` needs its `{ ... }` body. A header with none is
 rejected with `E100`.
 
-Fidryn 0.2 cannot add a duration to a time in an expression: `end +
+Fidryn 0.3 cannot add a duration to a time in an expression: `end +
 return_deadline()`, with `end: Time`, is `E210`. A deadline is computed
 only by a duty's `due` clause; see [Duties](#duties).
 
@@ -563,7 +563,7 @@ a proposition: `then establish 5` is rejected with `E210`, and so is a
 consequence that is the name of an entity whose type is neither `Prop`
 nor an alias of `Prop`. Two more lines are accepted:
 `valid_time` and `record_time`, each followed by an interval with both of
-its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
+its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.3 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever
 the interval says (see
 [implementation-status](implementation-status.md#known-limits-pinned-by-tests)).
@@ -640,7 +640,7 @@ legal_act AcceptOffice(candidate: LegalPerson, office: Office) { ... }
 conflict_doctrine ChildSupportCannotBeAdverselyAffected ...
 ```
 
-Fidryn 0.2 does not interpret the bodies of `power`, `legal_act`,
+Fidryn 0.3 does not interpret the bodies of `power`, `legal_act`,
 `conflict_doctrine` or `scenario` declarations, so an unknown field in
 one of them passes without a diagnostic. A `clause` body is kept as text.
 The evaluator knows two clause names, `SpousalSupportWaiver` and
@@ -717,7 +717,7 @@ scenario InsideCityHalfAcre {
 ```
 
 Grammar: `ScenarioDecl` in [`grammar.ebnf`](../grammar.ebnf). Fidryn
-0.2 does not interpret a `scenario` block: the parser reads its name and
+0.3 does not interpret a `scenario` block: the parser reads its name and
 skips its body, and nothing in it reaches evaluation
 ([implementation status](implementation-status.md)). Neither `run` nor
 `run --scenario` reads these blocks.
@@ -731,7 +731,7 @@ mode when the pasted case has a nonempty `assumptions` list. A default
 
 ## Verify
 
-A `verify` block is a named property made of `assert` lines. Fidryn 0.2
+A `verify` block is a named property made of `assert` lines. Fidryn 0.3
 decides closed formulas only: literals, arithmetic, comparisons, Boolean
 connectives, and quantifiers over a literal set or bounded synthetic
 entities.

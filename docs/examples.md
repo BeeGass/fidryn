@@ -125,7 +125,7 @@ fidryn run examples/tax/federal-tax.fr \
 ```
 
 Under its consequence, the exemption rule of `federal-tax.fr` writes
-`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.2 reads
+`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.3 reads
 such lines and does not apply them (see
 `the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` under
 [Known limits pinned by tests](implementation-status.md#known-limits-pinned-by-tests)).

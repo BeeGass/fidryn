@@ -611,7 +611,7 @@ with a dot is an error.
   "kind": "generated",
   "prefix": "/zz/demo",
   "release": "42-7",
-  "toolchain": "0.2.0",
+  "toolchain": "0.3.0",
   "dependencies": []
 }
 ```
@@ -640,7 +640,7 @@ every module file by its path:
   "release": "42-7",
   "generator": {
     "name": "demo-writer",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "artifacts": [
     {
@@ -1327,7 +1327,7 @@ modules. Each entry of its manifest's `dependencies` names one:
   "name": "notes",
   "kind": "curated",
   "prefix": "/zz/notes",
-  "toolchain": "0.2.0",
+  "toolchain": "0.3.0",
   "dependencies": [
     {
       "name": "demo",

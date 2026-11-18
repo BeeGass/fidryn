@@ -4,6 +4,6 @@
   "kind": "generated",
   "prefix": "/zz/demo",
   "release": "42-7",
-  "toolchain": "0.2.0",
+  "toolchain": "0.3.0",
   "dependencies": []
 }

@@ -1094,9 +1094,11 @@ fn ingest_refuses_a_directory_that_is_not_its_own() {
     fs::create_dir_all(&curated).expect("create");
     fs::write(
         curated.join("workspace.json"),
-        "{\n  \"schema\": \"fidryn.workspace/v0.1\",\n  \"name\": \"demo\",\n  \
-         \"kind\": \"curated\",\n  \"prefix\": \"/zz/demo\",\n  \"toolchain\": \"0.2.0\",\n  \
-         \"dependencies\": []\n}\n",
+        format!(
+            "{{\n  \"schema\": \"fidryn.workspace/v0.1\",\n  \"name\": \"demo\",\n  \
+             \"kind\": \"curated\",\n  \"prefix\": \"/zz/demo\",\n  \
+             \"toolchain\": \"{VERSION}\",\n  \"dependencies\": []\n}}\n"
+        ),
     )
     .expect("write");
 

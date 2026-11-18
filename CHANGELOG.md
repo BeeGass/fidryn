@@ -5,6 +5,8 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-17
+
 ### Added
 
 - Law modules of edition 2, which hold provisions of law as data. A file

@@ -4,7 +4,7 @@
   "release": "42-7",
   "generator": {
     "name": "demo-writer",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "artifacts": [
     {

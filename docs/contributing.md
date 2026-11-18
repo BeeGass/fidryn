@@ -1,6 +1,6 @@
 # Contributing to Fidryn
 
-This file is for people building the 0.2 reference interpreter. It is
+This file is for people building the 0.3 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](../README.md) and the [documentation hub](README.md).
 
@@ -194,7 +194,7 @@ crates into one commit.
 ## Grammar
 
 The grammar is [`grammar.ebnf`](../grammar.ebnf) at the repository root.
-It is closed, but the 0.2 parser enforces closed field sets only in
+It is closed, but the 0.3 parser enforces closed field sets only in
 `source` blocks, rule bodies and judgment request blocks. In most other
 declarations an unknown field is skipped without a diagnostic; see
 [implementation status](implementation-status.md).
@@ -205,7 +205,7 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
+- [implementation-status.md](implementation-status.md) — What the 0.3 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
 
 The internal working ledgers are indexed in
 [internal/README.md](internal/README.md). They are not reader

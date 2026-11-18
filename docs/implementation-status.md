@@ -6,7 +6,7 @@ or `prelude/` does not mean the interpreter implements the feature.
 A feature counts as implemented only when syntax, name resolution, checking,
 evaluation, uncertainty, provenance, and tests agree.
 
-This page says what the 0.2 interpreter does today. Each statement below
+This page says what the 0.3 interpreter does today. Each statement below
 cites a test or a code location in this version. Tests are in
 `tests/integration/known_limits.rs` unless another file is named. The review
 records from earlier passes are listed in the

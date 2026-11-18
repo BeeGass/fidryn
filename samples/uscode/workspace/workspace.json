@@ -4,6 +4,6 @@
   "kind": "generated",
   "prefix": "/us/usc",
   "release": "119-142",
-  "toolchain": "0.2.0",
+  "toolchain": "0.3.0",
   "dependencies": []
 }

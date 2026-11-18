@@ -3,11 +3,11 @@
   "prefix": "/zz/demo",
   "old": {
     "release": "v1",
-    "lock_digest": "4304fbe1dad218d71bedb69ea9354eb5414cbb740f276bfa9928447cf7693b2d"
+    "lock_digest": "5e6a8d1f0764e8180215208bf2d3a1514d34f37b038bb7f934ac80dcf7eca7cb"
   },
   "new": {
     "release": "v2",
-    "lock_digest": "91216f628b1c5fe0b388b407dd21f789ed155988295da424bdc489ffd2112bdd"
+    "lock_digest": "5d8c07a67e39b851a5e623d72fca78b721f8bf03f059811cd02d31ec762240d7"
   },
   "operative": {
     "added": [

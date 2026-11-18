@@ -43,7 +43,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the 0.2 reference
+This directory is the human documentation for the 0.3 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -87,7 +87,7 @@ report of the check of a workspace follows
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
 | [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, the coverage ledger of a generated workspace, and the sample of the Code the repository holds and its check |
-| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
+| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.3 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
 Mill HTTP routes live in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in Architecture.
@@ -118,7 +118,7 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the 0.2 research interpreter. The modules under
+This repository is the 0.3 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
@@ -376,11 +376,11 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2 research interpreter. Example modules are fixtures. They are
+the 0.3 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
-The grammar in `grammar.ebnf` is closed, but the 0.2 parser enforces
+The grammar in `grammar.ebnf` is closed, but the 0.3 parser enforces
 that only inside `source` blocks, the bodies of rules and the request
 block of a judgment's `otherwise suspend NeedJudgment`. In most other
 declarations an unknown field is skipped without a diagnostic; see
@@ -393,7 +393,7 @@ declarations an unknown field is skipped without a diagnostic; see
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2 is **parsed / checked / executed** only where noted — see
+Support in 0.3 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
@@ -506,7 +506,7 @@ source FinalPayStatute {
 }
 ```
 
-In 0.2 a `source` block is a record for the reader. The parser rejects
+In 0.3 a `source` block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an `artifact` field
 (`E540`). The checker also types the source's name as a `String`, so a
 query that returns `FinalPayStatute` passes `check`, but `run` fails
@@ -575,7 +575,7 @@ office TrusteeOf(trust: Trust) occupied_by LegalPerson {
 }
 ```
 
-Fidryn 0.2 reads only an office's name and parameters. The rest of the
+Fidryn 0.3 reads only an office's name and parameters. The rest of the
 declaration, `occupied_by` and every field in the body, is discarded:
 every office reaches the intermediate representation with occupant type
 `LegalPerson`, at most one occupant and no competence, and nothing reads
@@ -733,7 +733,7 @@ the completed prefix, so a later term does not re-run an earlier
 attach.
 
 `require determined P using Determine` asks for a determination of `P`
-instead of treating `P` as a Bool. In 0.2 the `using` clause is parsed
+instead of treating `P` as a Bool. In 0.3 the `using` clause is parsed
 and discarded. Any determination of `P` on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
@@ -853,7 +853,7 @@ calc federal_hourly_floor() -> Money<USD> {
 A `calc` or an `fn` needs its `{ ... }` body. A header with none is
 rejected with `E100`.
 
-Fidryn 0.2 cannot add a duration to a time in an expression: `end +
+Fidryn 0.3 cannot add a duration to a time in an expression: `end +
 return_deadline()`, with `end: Time`, is `E210`. A deadline is computed
 only by a duty's `due` clause; see [Duties](#duties).
 
@@ -933,7 +933,7 @@ a proposition: `then establish 5` is rejected with `E210`, and so is a
 consequence that is the name of an entity whose type is neither `Prop`
 nor an alias of `Prop`. Two more lines are accepted:
 `valid_time` and `record_time`, each followed by an interval with both of
-its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
+its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.3 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever
 the interval says (see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
@@ -1010,7 +1010,7 @@ legal_act AcceptOffice(candidate: LegalPerson, office: Office) { ... }
 conflict_doctrine ChildSupportCannotBeAdverselyAffected ...
 ```
 
-Fidryn 0.2 does not interpret the bodies of `power`, `legal_act`,
+Fidryn 0.3 does not interpret the bodies of `power`, `legal_act`,
 `conflict_doctrine` or `scenario` declarations, so an unknown field in
 one of them passes without a diagnostic. A `clause` body is kept as text.
 The evaluator knows two clause names, `SpousalSupportWaiver` and
@@ -1087,7 +1087,7 @@ scenario InsideCityHalfAcre {
 ```
 
 Grammar: `ScenarioDecl` in [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Fidryn
-0.2 does not interpret a `scenario` block: the parser reads its name and
+0.3 does not interpret a `scenario` block: the parser reads its name and
 skips its body, and nothing in it reaches evaluation
 ([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)). Neither `run` nor
 `run --scenario` reads these blocks.
@@ -1101,7 +1101,7 @@ mode when the pasted case has a nonempty `assumptions` list. A default
 
 ## Verify
 
-A `verify` block is a named property made of `assert` lines. Fidryn 0.2
+A `verify` block is a named property made of `assert` lines. Fidryn 0.3
 decides closed formulas only: literals, arithmetic, comparisons, Boolean
 connectives, and quantifiers over a literal set or bounded synthetic
 entities.
@@ -1649,7 +1649,7 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the 0.2 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.3 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
@@ -3500,7 +3500,7 @@ fidryn run examples/tax/federal-tax.fr \
 ```
 
 Under its consequence, the exemption rule of `federal-tax.fr` writes
-`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.2 reads
+`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.3 reads
 such lines and does not apply them (see
 `the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` under
 [Known limits pinned by tests](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
@@ -4120,7 +4120,7 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the 0.2 reference interpreter. It is
+This file is for people building the 0.3 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 
@@ -4314,7 +4314,7 @@ crates into one commit.
 ## Grammar
 
 The grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the repository root.
-It is closed, but the 0.2 parser enforces closed field sets only in
+It is closed, but the 0.3 parser enforces closed field sets only in
 `source` blocks, rule bodies and judgment request blocks. In most other
 declarations an unknown field is skipped without a diagnostic; see
 [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
@@ -4325,7 +4325,7 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
+- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — What the 0.3 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
 
 The internal working ledgers are indexed in
 [internal/README.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md). They are not reader

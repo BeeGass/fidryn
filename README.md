@@ -9,7 +9,7 @@ Fidryn is released under the MIT License: see [LICENSE](LICENSE). [Licensing](LI
 
 ## Status
 
-Fidryn 0.2 is a research interpreter. It checks and runs modules (`.fr`
+Fidryn 0.3 is a research interpreter. It checks and runs modules (`.fr`
 files) built from queries; functions; calculations; rules; observations;
 judgments that use a concurrence policy; decisions, which run through a
 query's `RunDecision` goal; duties, which run only through the built-in

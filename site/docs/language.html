@@ -105,10 +105,10 @@ open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
 <p>Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2 research interpreter. Example modules are fixtures. They are
+the 0.3 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
-<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
+<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.3 parser enforces
 that only inside <code>source</code> blocks, the bodies of rules and the request
 block of a judgment's <code>otherwise suspend NeedJudgment</code>. In most other
 declarations an unknown field is skipped without a diagnostic; see
@@ -118,7 +118,7 @@ declarations an unknown field is skipped without a diagnostic; see
 <h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted — see
+Support in 0.3 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
 <tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
@@ -210,7 +210,7 @@ Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
     <span class="tk-kw">digest</span> fixture
     <span class="tk-kw">effective</span> <span class="tk-pu">[</span><span class="tk-nu">2026-09-17</span><span class="tk-pu">,</span> <span class="tk-nu">+inf</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>In 0.2 a <code>source</code> block is a record for the reader. The parser rejects
+<p>In 0.3 a <code>source</code> block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an <code>artifact</code> field
 (<code>E540</code>). The checker also types the source's name as a <code>String</code>, so a
 query that returns <code>FinalPayStatute</code> passes <code>check</code>, but <code>run</code> fails
@@ -261,7 +261,7 @@ proposition is not a Boolean.</p>
     <span class="tk-kw">lost_by</span> <span class="tk-pu">{</span>Death<span class="tk-pu">,</span> EffectiveResignation<span class="tk-pu">,</span> EffectiveRemoval<span class="tk-pu">}</span>
     <span class="tk-kw">competence</span> <span class="tk-pu">{</span>AdministerTrust<span class="tk-pu">,</span> DecideTrustDistributions<span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>Fidryn 0.2 reads only an office's name and parameters. The rest of the
+<p>Fidryn 0.3 reads only an office's name and parameters. The rest of the
 declaration, <code>occupied_by</code> and every field in the body, is discarded:
 every office reaches the intermediate representation with occupant type
 <code>LegalPerson</code>, at most one occupant and no competence, and nothing reads
@@ -378,7 +378,7 @@ runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</co
 the completed prefix, so a later term does not re-run an earlier
 attach.</p>
 <p><code>require determined P using Determine</code> asks for a determination of <code>P</code>
-instead of treating <code>P</code> as a Bool. In 0.2 the <code>using</code> clause is parsed
+instead of treating <code>P</code> as a Bool. In 0.3 the <code>using</code> clause is parsed
 and discarded. Any determination of <code>P</code> on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
@@ -479,7 +479,7 @@ keyword: the value is not read from the next line.</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>A <code>calc</code> or an <code>fn</code> needs its <code>{ ... }</code> body. A header with none is
 rejected with <code>E100</code>.</p>
-<p>Fidryn 0.2 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
+<p>Fidryn 0.3 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
 only by a duty's <code>due</code> clause; see <a href="#duties">Duties</a>.</p>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
 calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
@@ -538,7 +538,7 @@ a proposition: <code>then establish 5</code> is rejected with <code>E210</code>,
 consequence that is the name of an entity whose type is neither <code>Prop</code>
 nor an alias of <code>Prop</code>. Two more lines are accepted:
 <code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
-its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
+its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.3 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever
 the interval says (see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests">implementation-status</a>).</p>
@@ -593,7 +593,7 @@ the first name on the list.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">conflict_doctrine</span> ChildSupportCannotBeAdverselyAffected <span class="tk-pu">..</span><span class="tk-pu">.</span></code></pre></figure>
-<p>Fidryn 0.2 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
+<p>Fidryn 0.3 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
 <code>conflict_doctrine</code> or <code>scenario</code> declarations, so an unknown field in
 one of them passes without a diagnostic. A <code>clause</code> body is kept as text.
 The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
@@ -652,7 +652,7 @@ not ship companion JSON case files (for example under
     <span class="tk-kw">at</span> <span class="tk-nu">2026-09-17T12:00:00-04:00</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Fidryn
-0.2 does not interpret a <code>scenario</code> block: the parser reads its name and
+0.3 does not interpret a <code>scenario</code> block: the parser reads its name and
 skips its body, and nothing in it reaches evaluation
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>). Neither <code>run</code> nor
 <code>run --scenario</code> reads these blocks.</p>
@@ -663,7 +663,7 @@ mode when the pasted case has a nonempty <code>assumptions</code> list. A defaul
 <code>run</code> is operative and ignores <code>assumptions</code>. See
 <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
 <h2 id="verify"><span class="hn">2.20</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.2
+<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.3
 decides closed formulas only: literals, arithmetic, comparisons, Boolean
 connectives, and quantifiers over a literal set or bounded synthetic
 entities.</p>
@@ -812,7 +812,7 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

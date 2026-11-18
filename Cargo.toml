@@ -23,7 +23,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 license = "MIT"
 authors = ["Bryan Gass"]
@@ -31,22 +31,22 @@ repository = "https://github.com/BeeGass/fidryn"
 rust-version = "1.98"
 
 [workspace.dependencies]
-fidryn-syntax = { version = "0.2.0", path = "crates/fidryn-syntax" }
-fidryn-hir = { version = "0.2.0", path = "crates/fidryn-hir" }
-fidryn-core = { version = "0.2.0", path = "crates/fidryn-core" }
-fidryn-check = { version = "0.2.0", path = "crates/fidryn-check" }
-fidryn-eval = { version = "0.2.0", path = "crates/fidryn-eval" }
-fidryn-handlers = { version = "0.2.0", path = "crates/fidryn-handlers" }
-fidryn-driver = { version = "0.2.0", path = "crates/fidryn-driver" }
-fidryn-verify = { version = "0.2.0", path = "crates/fidryn-verify" }
-fidryn-kernel = { version = "0.2.0", path = "crates/fidryn-kernel" }
-fidryn-trace = { version = "0.2.0", path = "crates/fidryn-trace" }
-fidryn-solve = { version = "0.2.0", path = "crates/fidryn-solve" }
-fidryn-adapt = { version = "0.2.0", path = "crates/fidryn-adapt" }
-fidryn-render = { version = "0.2.0", path = "crates/fidryn-render" }
-fidryn-provision = { version = "0.2.0", path = "crates/fidryn-provision" }
-fidryn-ingest-uscode = { version = "0.2.0", path = "crates/fidryn-ingest-uscode" }
-fidryn-cli = { version = "0.2.0", path = "crates/fidryn-cli" }
+fidryn-syntax = { version = "0.3.0", path = "crates/fidryn-syntax" }
+fidryn-hir = { version = "0.3.0", path = "crates/fidryn-hir" }
+fidryn-core = { version = "0.3.0", path = "crates/fidryn-core" }
+fidryn-check = { version = "0.3.0", path = "crates/fidryn-check" }
+fidryn-eval = { version = "0.3.0", path = "crates/fidryn-eval" }
+fidryn-handlers = { version = "0.3.0", path = "crates/fidryn-handlers" }
+fidryn-driver = { version = "0.3.0", path = "crates/fidryn-driver" }
+fidryn-verify = { version = "0.3.0", path = "crates/fidryn-verify" }
+fidryn-kernel = { version = "0.3.0", path = "crates/fidryn-kernel" }
+fidryn-trace = { version = "0.3.0", path = "crates/fidryn-trace" }
+fidryn-solve = { version = "0.3.0", path = "crates/fidryn-solve" }
+fidryn-adapt = { version = "0.3.0", path = "crates/fidryn-adapt" }
+fidryn-render = { version = "0.3.0", path = "crates/fidryn-render" }
+fidryn-provision = { version = "0.3.0", path = "crates/fidryn-provision" }
+fidryn-ingest-uscode = { version = "0.3.0", path = "crates/fidryn-ingest-uscode" }
+fidryn-cli = { version = "0.3.0", path = "crates/fidryn-cli" }
 anyhow = "1.0.100"
 axum = { version = "0.8.9", features = ["json"] }
 tokio = { version = "1.47.1", features = ["rt-multi-thread", "macros", "net", "signal", "sync"] }
