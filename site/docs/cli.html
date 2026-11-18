@@ -63,27 +63,28 @@
     <ol>
       <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
       <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+      <li><a href="/docs/law-modules"><span class="n">&sect;4</span><span class="t">Law modules</span><span class="d">Provisions of law as data</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Run</p>
     <ol>
-      <li><a href="/docs/cli" aria-current="page"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
-      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+      <li><a href="/docs/cli" aria-current="page"><span class="n">&sect;5</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;6</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Read results</p>
     <ol>
-      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
-      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
-      <li><a href="/docs/coverage"><span class="n">&sect;8</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
+      <li><a href="/docs/outcomes"><span class="n">&sect;7</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;8</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage"><span class="n">&sect;9</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Contribute</p>
     <ol>
-      <li><a href="/docs/contributing"><span class="n">&sect;9</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+      <li><a href="/docs/contributing"><span class="n">&sect;10</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
     </ol>
   </div>
   <div class="group">
@@ -96,24 +97,33 @@
   </div>
 </nav>
   <article class="doc" aria-labelledby="doc-title">
-    <p class="kicker">&sect; 4 &middot; Run</p>
+    <p class="kicker">&sect; 5 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">4.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.20</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">5.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">5.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">5.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">5.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">5.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">5.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">5.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">5.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">5.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">5.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">5.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">5.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">5.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">5.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">5.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">5.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">5.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">5.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">5.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.20</span> See also</a></li></ol></details>
     <div class="prose">
 <p>The binary name is <code>fidryn</code>. It is the 0.3 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
-It is not legal advice and does not file anything unless you opt into live
-HTTP as described under <a href="#file"><code>file</code></a>.</p>
+For <a href="/docs/law-modules">law modules</a> of edition 2 it checks a module or a
+workspace (<a href="#check"><code>check</code></a>), imports the United States Code
+(<a href="#ingest"><code>ingest</code></a>), prints the text of a workspace (<a href="#text"><code>text</code></a>)
+and its coverage ledger (<a href="#coverage"><code>coverage</code></a>), and says what changed
+between two releases (<a href="#changes"><code>changes</code></a>). It is not legal advice and
+does not file anything unless you opt into live HTTP as described under
+<a href="#file"><code>file</code></a>.</p>
 <p>From a clone of this repository:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- &lt;subcommand&gt; ...</code></pre></figure>
 <p>After install, the same arguments work as <code>fidryn &lt;subcommand&gt; ...</code>.
-<code>fidryn --help</code> and <code>fidryn &lt;subcommand&gt; --help</code> print clap usage.</p>
-<h2 id="install"><span class="hn">4.1</span> Install <a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
+<code>fidryn --help</code> (<code>-h</code>) and <code>fidryn &lt;subcommand&gt; --help</code> print clap usage,
+as does the subcommand <code>help</code>, as in <code>fidryn help check</code> and
+<code>fidryn ingest help uscode</code>. <code>fidryn --version</code>
+(<code>-V</code>) prints the name and the version of the binary:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> <span class="tk-ty">--version</span></code></pre></figure>
+<h2 id="install"><span class="hn">5.1</span> Install <a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
 <p>From the repository root:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> install <span class="tk-ty">--path</span> crates/fidryn-cli</code></pre></figure>
 <p>That places <code>fidryn</code> on your Cargo bin path. Workspace <code>rust-version</code> is
 1.98.</p>
-<h2 id="exit-status"><span class="hn">4.2</span> Exit status <a class="anchor" href="#exit-status" aria-label="Link to this section">#</a></h2>
+<h2 id="exit-status"><span class="hn">5.2</span> Exit status <a class="anchor" href="#exit-status" aria-label="Link to this section">#</a></h2>
 <p>Success is exit 0. A command line the argument parser rejects, such as an
 unknown subcommand or flag, a missing required argument, or <code>--budget abc</code>,
 is a usage error: the usage message goes to stderr and the exit status is
@@ -128,7 +138,7 @@ the nested outcome kind is <code>suspended</code>, <code>contingent</code>, <cod
 <code>outsideCompetence</code>, or <code>inconsistent</code>. Unknown queries, invalid
 timestamps, missing files, and check errors are engine or compiler
 failures and exit 1.</p>
-<h2 id="source-checking-and-trust"><span class="hn">4.3</span> Source checking and trust <a class="anchor" href="#source-checking-and-trust" aria-label="Link to this section">#</a></h2>
+<h2 id="source-checking-and-trust"><span class="hn">5.3</span> Source checking and trust <a class="anchor" href="#source-checking-and-trust" aria-label="Link to this section">#</a></h2>
 <p><code>check</code>, <code>inputs</code>, <code>run</code>, <code>explore</code>, <code>review</code>, <code>verify</code>, <code>diff</code> (when a snapshot is a <code>.fr</code>
 file), and <code>render</code> compile through <code>Driver::check_path</code>. That call loads
 the module’s <code>source_manifest</code> (or a <code>sources/</code> fallback) and then
@@ -148,7 +158,7 @@ import in this corpus; it is not byte verification of the artifact. Most
 example manifests under <code>examples/</code> use <code>"digest": "fixture"</code>.</p>
 <p>Pasted source in the <a href="/docs/mill">mill</a> is different: it compiles in memory
 with an empty default manifest and does not read artifact files.</p>
-<h2 id="fmt"><span class="hn">4.4</span> <code>fmt</code> <a class="anchor" href="#fmt" aria-label="Link to this section">#</a></h2>
+<h2 id="fmt"><span class="hn">5.4</span> <code>fmt</code> <a class="anchor" href="#fmt" aria-label="Link to this section">#</a></h2>
 <p>Rewrite a module’s trailing whitespace to stdout. The file on disk is not
 modified.</p>
 <p><strong>Arguments</strong></p>
@@ -162,32 +172,32 @@ modified.</p>
 trailing newline.</p>
 <p><strong>Failure.</strong> Exit 1. Unreadable files print <code>cannot read PATH: ...</code> to
 stderr. Parse errors print a diagnostic (<code>E100 ParseError: ...</code>).</p>
-<h2 id="check"><span class="hn">4.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
+<h2 id="check"><span class="hn">5.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
 <p>Parse, elaborate, and type-check a module, including source-manifest
 authentication as described above.</p>
 <p>A file whose first two words are <code>edition 2</code> is a law module of edition 2,
 which holds provisions of law as data
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#edition-2">Law modules</a>). <code>check</code> reads it with its own
+(<a href="/docs/law-modules#editions">Law modules</a>). <code>check</code> reads it with its own
 parser and runs the checks of one module on it: its shape, its addresses,
 the form of its text, its hashes, its footnote markers and its
 definitions, as
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
+<a href="/docs/law-modules#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
 lists them.</p>
 <p>A directory is a workspace of edition 2 modules, with a manifest,
-<code>workspace.json</code>, at its top (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>).
+<code>workspace.json</code>, at its top (<a href="/docs/law-modules#workspaces">Workspaces</a>).
 <code>check</code> reads every module of it by itself, and then checks the manifest,
 the lock of a generated workspace, where each module stands, the
 containers and their members, and the dependencies of a curated
 workspace, as
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
+<a href="/docs/law-modules#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
 lists them, and gives every reference and every citation its
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#references">outcome</a>. It does so in two phases, each on
+<a href="/docs/law-modules#references">outcome</a>. It does so in two phases, each on
 several threads, and its output is the same for any number of them
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#how-a-workspace-is-checked">How a workspace is checked</a>).
+(<a href="/docs/law-modules#how-a-workspace-is-checked">How a workspace is checked</a>).
 It keeps the result of the first phase in a cache, so that a module file
 whose bytes it has checked before is not checked again, and its output is
 the same as without the cache, but for the count of the modules read from
-it (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-cache">The cache</a>).</p>
+it (<a href="/docs/law-modules#the-cache">The cache</a>).</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
 <tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file, or to the directory of a workspace</td></tr>
@@ -226,7 +236,7 @@ with a cache that holds nothing yet, or with <code>--no-cache</code>, it is 0.</
 <p>A warning, such as <code>W760 ToolchainMismatch</code> when the manifest's
 <code>toolchain</code> is not the running version, or <code>W750 StaleBinding</code> when what a
 binding of a curated module was written against has changed
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings">Bindings</a>), is printed to stderr, counted in
+(<a href="/docs/law-modules#bindings">Bindings</a>), is printed to stderr, counted in
 <code>warnings</code>, and does not change the exit status. Nor does a reference whose target the check does
 not find: its outcome is counted in the report and listed in the
 unresolved list, and is never a diagnostic. Nor does a cache that cannot
@@ -239,7 +249,7 @@ as <code>the cache could not be used, and the check went on without it: ...</cod
 so it does when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#depending-on-another-workspace">Depending on another workspace</a>),
+(<a href="/docs/law-modules#depending-on-another-workspace">Depending on another workspace</a>),
 and its output is then that of a check with <code>--no-cache</code>.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
 <code>CODE Title: message</code>, after the file it is in when it is about the text
@@ -259,7 +269,7 @@ printed to stdout, its errors counted, and <code>ok</code> is not. A file of
 <p>Every other command exits 1 on a module of edition 2, with
 <code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> fmt crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
-<h2 id="run"><span class="hn">4.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>
+<h2 id="run"><span class="hn">5.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>
 <p>Evaluate one query against one case record at a pair of bitemporal
 instants. <code>run</code> never chooses a completion. It does not search
 <code>admissibleCompletions</code>, pick an interpretation, or fill in missing
@@ -311,7 +321,7 @@ retains checked branch <code>searchEvidence</code>. Nested <code>outcomeDocument
 <code>--valid-at</code> / <code>--known-at</code> parse errors; or an engine failure such as
 <code>UnknownQuery: unknown query ...</code>. Those engine errors are not rewritten
 as <code>outcome.kind = inconsistent</code>.</p>
-<h2 id="explore"><span class="hn">4.7</span> <code>explore</code> <a class="anchor" href="#explore" aria-label="Link to this section">#</a></h2>
+<h2 id="explore"><span class="hn">5.7</span> <code>explore</code> <a class="anchor" href="#explore" aria-label="Link to this section">#</a></h2>
 <p>Evaluate a query under an explicit finite completion space: the case's
 <code>admissibleCompletions</code>, with any completions from <code>--bounds</code> merged in.
 When neither supplies a completion, <code>explore</code> evaluates the case as it
@@ -366,7 +376,7 @@ on stdout. If <code>case.assumptions</code> is nonempty, explore labels the repo
 <code>cannot read</code> / <code>invalid bounds JSON</code> for <code>--bounds</code>; or
 <code>bounds JSON must be AdmissibleCompletions or {interpretations, evidence, choices}: ...</code>.
 Engine failures print <code>kind: message</code> to stderr.</p>
-<h2 id="explain"><span class="hn">4.8</span> <code>explain</code> <a class="anchor" href="#explain" aria-label="Link to this section">#</a></h2>
+<h2 id="explain"><span class="hn">5.8</span> <code>explain</code> <a class="anchor" href="#explain" aria-label="Link to this section">#</a></h2>
 <p>Render a trace as text, JSON, or Graphviz DOT.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
@@ -397,7 +407,7 @@ fidryn explain outcome.json --format text</code></pre></figure>
 <p><strong>Success.</strong> Formatted trace on stdout. Text with no nodes is
 <code>trace &lt;hex&gt;</code>. JSON is a canonical <code>TraceDocument</code>. DOT is a <code>digraph</code>.</p>
 <p><strong>Failure.</strong> Exit 1. <code>cannot read PATH: ...</code> or <code>invalid trace JSON PATH: ...</code>.</p>
-<h2 id="verify"><span class="hn">4.9</span> <code>verify</code> <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
+<h2 id="verify"><span class="hn">5.9</span> <code>verify</code> <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
 <p>Check a property of a module. A <code>verify</code> block declares one under its
 name. A <code>for_all</code> or an <code>exists</code> written in a query, in a <code>verify</code> block
 or as a declaration of its own is a property as well. It is named after
@@ -428,7 +438,7 @@ query name such as <code>acting_trustee</code> is invalid.</p>
 <code>unknown NAME: ...</code>, <code>counterexample for NAME: ...</code>,
 <code>`NAME` is a query, not a declared verification property</code>, or
 <code>unknown property NAME</code>.</p>
-<h2 id="diff"><span class="hn">4.10</span> <code>diff</code> <a class="anchor" href="#diff" aria-label="Link to this section">#</a></h2>
+<h2 id="diff"><span class="hn">5.10</span> <code>diff</code> <a class="anchor" href="#diff" aria-label="Link to this section">#</a></h2>
 <p>Compare two snapshots and print canonical JSON with two named
 operations: <code>result</code> (outcomeDocument / compiled query bodies) and
 <code>assurance</code> (executionMode, sourceTrust, assumptions,
@@ -458,7 +468,7 @@ compiled; any other path is read as JSON (an evaluation report, mill
 <p><strong>Failure.</strong> Exit 1. Compile diagnostics for <code>.fr</code> inputs;
 <code>cannot read PATH</code>; <code>invalid snapshot JSON PATH: ...</code>; or
 <code>cannot encode diff: ...</code>.</p>
-<h2 id="render"><span class="hn">4.11</span> <code>render</code> <a class="anchor" href="#render" aria-label="Link to this section">#</a></h2>
+<h2 id="render"><span class="hn">5.11</span> <code>render</code> <a class="anchor" href="#render" aria-label="Link to this section">#</a></h2>
 <p>Interpolate Core fields into a template. Available keys from the compiled
 module are <code>module</code>, <code>version</code>, typed <code>outside_scope</code> and its text
 <code>outside_scope_label</code>. Optional <code>--data DATA.json</code> adds typed values under <code>data</code>.
@@ -480,7 +490,7 @@ closed. A directory named <code>certified</code> does not approve legal content;
 template).</p>
 <p><strong>Failure.</strong> Exit 1. Check diagnostics; <code>cannot read TEMPLATE</code>; or
 <code>missing template key \</code>...``.</p>
-<h2 id="file"><span class="hn">4.12</span> <code>file</code> <a class="anchor" href="#file" aria-label="Link to this section">#</a></h2>
+<h2 id="file"><span class="hn">5.12</span> <code>file</code> <a class="anchor" href="#file" aria-label="Link to this section">#</a></h2>
 <p>Submit a JSON filing packet through an adapter. Dry-run is the default.
 Live HTTP requires both <code>--live</code> and the environment variable
 <code>FIDRYN_ALLOW_LIVE_FILING=1</code>. A successful transport receipt is not a
@@ -521,7 +531,7 @@ the packet echoed; or, for live Massachusetts HTTP, <code>accepted</code> (with
 <p><strong>Failure.</strong> Exit 1. <code>cannot read PACKET</code>; <code>invalid packet JSON</code>; or
 <code>live filing is disabled (set FIDRYN_ALLOW_LIVE_FILING=1 and pass --live)</code>.</p>
 <p>The <a href="/docs/mill">mill</a> has no filing route.</p>
-<h2 id="ui"><span class="hn">4.13</span> <code>ui</code> <a class="anchor" href="#ui" aria-label="Link to this section">#</a></h2>
+<h2 id="ui"><span class="hn">5.13</span> <code>ui</code> <a class="anchor" href="#ui" aria-label="Link to this section">#</a></h2>
 <p>Serve the localhost mill. See <a href="/docs/mill">mill</a> for routes and the HTML
 page. The process binds <code>127.0.0.1</code> only and does not live-file.</p>
 <p><strong>Arguments</strong></p>
@@ -541,26 +551,26 @@ is omitted.</p>
 <p><strong>Failure.</strong> Exit 1.
 <code>127.0.0.1:PORT is already in use. Stop that process or pass --port.</code>
 Other bind or runtime errors are printed to stderr.</p>
-<h2 id="inputs"><span class="hn">4.14</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
+<h2 id="inputs"><span class="hn">5.14</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn inputs MODULE --query QUERY</code> emits JSON Schema for the declared query
 argument object. Aliases, sum constructors, records, nominal entities and
 collections come from checked declarations. Observation schemas and external
 review requests appear as metadata. Unsupported representations refuse instead
 of producing an unconstrained input schema.</p>
-<h2 id="review"><span class="hn">4.15</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
+<h2 id="review"><span class="hn">5.15</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at TIME</code> emits a portable <code>fidryn.review-bundle/v0.1</code> JSON archive. It retains exact
 source/case/dependency/lock bytes, a labeled normalized manifest, checked report
 and actual trace, source spans, executable digest and rerun arguments. Optional
 <code>--scenario</code>, <code>--budget N</code> and <code>--template FILE</code> select the disclosed evaluation
 or retain reviewer material. Reviewer status is <code>not_assessed</code>; the archive does
 not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>.</p>
-<h2 id="ingest"><span class="hn">4.16</span> <code>ingest</code> <a class="anchor" href="#ingest" aria-label="Link to this section">#</a></h2>
+<h2 id="ingest"><span class="hn">5.16</span> <code>ingest</code> <a class="anchor" href="#ingest" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn ingest uscode ARCHIVE_DIR --out DIR</code> imports the United States
 Code from the archives of one release of the official XML release point
 published by the Office of the Law Revision Counsel, each verified against
 the retrieval record beside them, and writes a generated workspace that
 <code>fidryn check DIR</code> accepts
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-ingester-for-the-united-states-code">The ingester for the United States Code</a>).
+(<a href="/docs/law-modules#the-ingester-for-the-united-states-code">The ingester for the United States Code</a>).
 The same archives, the same titles and the same version of the toolchain
 give the same bytes on every run and on every host, for any number of
 workers.</p>
@@ -576,7 +586,7 @@ workers.</p>
 <p>A run writes <code>workspace.json</code> first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
 output that it does not write, and writes <code>law.lock.json</code> and then, last,
-<code>coverage.json</code>, the <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger">coverage ledger</a>
+<code>coverage.json</code>, the <a href="/docs/law-modules#the-coverage-ledger">coverage ledger</a>
 of the workspace, which <a href="#coverage"><code>coverage</code></a> prints; so a run that is
 stopped leaves a directory the next run accepts. The lock does not list
 the ledger. With <code>--title</code>,
@@ -620,15 +630,15 @@ extra us/usc/link
 different us/usc/t99/s1.fr
 extra us/usc/t99/s7.fr
 missing us/usc/t99a.fr</code></pre></figure>
-<h2 id="text"><span class="hn">4.17</span> <code>text</code> <a class="anchor" href="#text" aria-label="Link to this section">#</a></h2>
+<h2 id="text"><span class="hn">5.17</span> <code>text</code> <a class="anchor" href="#text" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn text DIR</code> prints the text of the provisions and notes of the
 workspace in <code>DIR</code>: of every provision, container, note, source credit and
 footnote of its modules, read from its module files
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces">Workspaces</a>). With <code>ADDRESS</code> it prints the
+(<a href="/docs/law-modules#workspaces">Workspaces</a>). With <code>ADDRESS</code> it prints the
 provision, container or note at that address and what lies below it: every
 one whose address is <code>ADDRESS</code> or continues it at a segment boundary. With
 <code>ADDRESS</code> and <code>--hashes</code> it prints the two hashes that a binding to that
-provision records instead (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings">Bindings</a>). It reads
+provision records instead (<a href="/docs/law-modules#bindings">Bindings</a>). It reads
 the modules and checks nothing else of the workspace, which
 <code>fidryn check DIR</code> does.</p>
 <p><strong>Arguments</strong></p>
@@ -712,13 +722,13 @@ working directory nor the number of threads the system offers changes a
 byte. <code>conformance/uslm_text.py</code> prints the same records from the
 publisher's XML, independently of the ingester, and the check of the
 sample of the Code compares the two line for line
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-sample">The sample</a>).</p>
+(<a href="/docs/law-modules#the-sample">The sample</a>).</p>
 <p>With <code>--hashes</code> it prints exactly two lines and nothing else, the two
 that a person writes into a binding after its <code>release</code>: the tree hash of
 the provision at <code>ADDRESS</code>, or of the top provision of the unit that
 <code>ADDRESS</code> is an alias of, and the hash of the enacted layer of that unit,
 each as 64 lower-case hexadecimal digits. They come from the
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#interfaces">interfaces</a> of the modules, the place the check
+<a href="/docs/law-modules#interfaces">interfaces</a> of the modules, the place the check
 of a workspace takes them from, so a binding that records them is not
 stale against the workspace they were printed from. Of the demo
 workspace, <code>fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes</code>
@@ -742,13 +752,13 @@ The chapter of the demo workspace is a container:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 <span class="tk-ty">--hashes</span></code></pre></figure>
 <p><code>--hashes</code> without <code>ADDRESS</code>, and <code>--hashes</code> with <code>--json</code>, are usage
 errors, exit 2.</p>
-<h2 id="coverage"><span class="hn">4.18</span> <code>coverage</code> <a class="anchor" href="#coverage" aria-label="Link to this section">#</a></h2>
+<h2 id="coverage"><span class="hn">5.18</span> <code>coverage</code> <a class="anchor" href="#coverage" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn coverage DIR</code> prints the coverage ledger of the generated workspace
 in <code>DIR</code>, <code>fidryn.coverage/v0.1</code>: its units, containers and provisions,
 its notes, footnotes and images, its references of each layer by outcome,
 the definitions extracted from its provisions by basis and by kind, and
 what its importer counted and did not import
-(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger">The coverage ledger</a>). It computes the
+(<a href="/docs/law-modules#the-coverage-ledger">The coverage ledger</a>). It computes the
 ledger from the modules as their files stand, the manifest and the lock.
 It does not verify the module files against the lock, which is what
 <code>fidryn check DIR</code> is for. Of a workspace whose files are those its run
@@ -790,11 +800,11 @@ neither a file nor a directory (<code>E730</code>); and a module file that is no
 module of edition 2 that lowers, with its diagnostics. The curated sample
 of the repository is refused:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage samples/uscode/curated</code></pre></figure>
-<h2 id="changes"><span class="hn">4.19</span> <code>changes</code> <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
+<h2 id="changes"><span class="hn">5.19</span> <code>changes</code> <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn changes OLD_DIR NEW_DIR</code> prints the change set between two
 generated workspaces of one prefix, the imports of two releases of one
 corpus: the provisions, notes and containers added, removed, moved or
-amended, by layer (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets">Change sets</a>). With
+amended, by layer (<a href="/docs/law-modules#change-sets">Change sets</a>). With
 <code>--bindings DIR</code> it also lists the bindings of the curated workspace in
 <code>DIR</code> that are stale against <code>NEW_DIR</code>, whatever release that workspace is
 pinned to: it answers what would go stale if the pin moved there. Each
@@ -840,7 +850,7 @@ containers: 0 added, 0 removed, 0 changed</code></pre></figure>
 the JSON Schema of which is
 <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json">schemas/change-set-v0.1.json</a>. Every list
 is sorted, and both forms are the same bytes on every run and for every
-number of workers. <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets">Change sets</a> says what puts
+number of workers. <a href="/docs/law-modules#change-sets">Change sets</a> says what puts
 an address into each list and shows the text of one.</p>
 <p>When the cache of a workspace could not be used or could not be written,
 the command says so once on stderr, as <a href="#check"><code>check</code></a> does, with
@@ -859,18 +869,18 @@ as no workspace:</p>
 naming its file under the directory given, as <code>fidryn check</code> prints them;
 for a curated workspace of <code>--bindings</code> these are the diagnostics of its
 module files by themselves.</p>
-<h2 id="see-also"><span class="hn">4.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="see-also"><span class="hn">5.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
 </ul>
 
     </div>
-    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cases-and-time"><span class="label">Previous &middot; &sect;3</span><span class="t">Cases and time</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;5</span><span class="t">Mill</span></a></nav>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/law-modules"><span class="label">Previous &middot; &sect;4</span><span class="t">Law modules</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;6</span><span class="t">Mill</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">4.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.20</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">5.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">5.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">5.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">5.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">5.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">5.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">5.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">5.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">5.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">5.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">5.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">5.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">5.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">5.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">5.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">5.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">5.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">5.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">5.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.20</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

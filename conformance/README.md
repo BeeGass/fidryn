@@ -245,3 +245,16 @@ opens no connection. It holds the tool to its addresses (titles `1` and
 `5a` of `119-142`, title `11a` of `119-73not60`, and `--all`), to the
 record it writes, to a second run that changes nothing, and to the refusal
 of an archive whose bytes changed.
+
+## Checking a law repository
+
+`test_check_law_repository.py` runs `tools/check-law-repository.sh` on
+copies of `fixtures/workspace/demo` in temporary directories, with the
+built `fidryn` that `FIDRYN_BINARY` names, and fails, and does not skip,
+when it is not set; its two tests of the build put stand-ins for `cargo`
+and `lease` on the search path and build nothing.
+`test_law_integration_workflow.py` reads
+`.github/workflows/law-integration.yml` as YAML, with a small reader of
+its own, and holds the workflow and `law-repository.pin.json` to what
+[Checking a law repository](../docs/development.md#checking-a-law-repository)
+says.

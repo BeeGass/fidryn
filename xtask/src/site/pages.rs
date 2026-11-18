@@ -293,7 +293,7 @@ fn toc_items(toc: &[TocEntry]) -> String {
         .collect()
 }
 
-/// Previous and next guide in reading order: the overview, then §1 to §8.
+/// Previous and next guide in reading order: the overview, then §1 to §10.
 fn pager(slug: &str) -> String {
     let Some(at) = GUIDES.iter().position(|g| g.slug == slug) else {
         return String::new();
@@ -573,7 +573,11 @@ mod tests {
         ));
         assert!(start.find("/docs/\"").unwrap() < start.find("/docs/getting-started").unwrap());
         assert!(nav.contains(
-            "<a href=\"/docs/outcomes\"><span class=\"n\">&sect;6</span><span class=\"t\">Outcomes</span><span class=\"d\">The six kinds and the envelope</span></a>"
+            "<a href=\"/docs/outcomes\"><span class=\"n\">&sect;7</span><span class=\"t\">Outcomes</span><span class=\"d\">The six kinds and the envelope</span></a>"
+        ));
+        let write = between(&nav, "<p class=\"label\">Write</p>", "</ol>");
+        assert!(write.contains(
+            "<a href=\"/docs/law-modules\"><span class=\"n\">&sect;4</span><span class=\"t\">Law modules</span><span class=\"d\">Provisions of law as data</span></a>"
         ));
         assert!(nav.contains(
             "<a href=\"https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md\"><span class=\"n\" aria-hidden=\"true\">&#8599;</span><span class=\"t\">Architecture</span>"
@@ -632,22 +636,26 @@ mod tests {
         );
         assert_eq!(
             pager("outcomes"),
-            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/mill\"><span class=\"label\">Previous &middot; &sect;5</span><span class=\"t\">Mill</span></a><a class=\"next\" href=\"/docs/examples\"><span class=\"label\">Next &middot; &sect;7</span><span class=\"t\">Examples</span></a></nav>"
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/mill\"><span class=\"label\">Previous &middot; &sect;6</span><span class=\"t\">Mill</span></a><a class=\"next\" href=\"/docs/examples\"><span class=\"label\">Next &middot; &sect;8</span><span class=\"t\">Examples</span></a></nav>"
+        );
+        assert_eq!(
+            pager("law-modules"),
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/cases-and-time\"><span class=\"label\">Previous &middot; &sect;3</span><span class=\"t\">Cases and time</span></a><a class=\"next\" href=\"/docs/cli\"><span class=\"label\">Next &middot; &sect;5</span><span class=\"t\">CLI</span></a></nav>"
         );
         assert_eq!(
             pager("coverage"),
-            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/examples\"><span class=\"label\">Previous &middot; &sect;7</span><span class=\"t\">Examples</span></a><a class=\"next\" href=\"/docs/contributing\"><span class=\"label\">Next &middot; &sect;9</span><span class=\"t\">Contributing</span></a></nav>"
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/examples\"><span class=\"label\">Previous &middot; &sect;8</span><span class=\"t\">Examples</span></a><a class=\"next\" href=\"/docs/contributing\"><span class=\"label\">Next &middot; &sect;10</span><span class=\"t\">Contributing</span></a></nav>"
         );
         assert_eq!(
             pager("contributing"),
-            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/coverage\"><span class=\"label\">Previous &middot; &sect;8</span><span class=\"t\">Coverage</span></a></nav>"
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/coverage\"><span class=\"label\">Previous &middot; &sect;9</span><span class=\"t\">Coverage</span></a></nav>"
         );
     }
 
     #[test]
     fn doc_page_has_kicker_title_links_and_body() {
         let html = doc(guide("outcomes"), &page(true), &assets());
-        assert!(html.contains("<p class=\"kicker\">&sect; 6 &middot; Read results</p>"));
+        assert!(html.contains("<p class=\"kicker\">&sect; 7 &middot; Read results</p>"));
         assert!(html.contains("<h1 id=\"doc-title\">Outcomes</h1>"));
         assert!(html.contains("<title>Outcomes — Fidryn</title>"));
         assert!(html.contains(
@@ -766,6 +774,7 @@ mod tests {
                 "/docs/getting-started",
                 "/docs/language",
                 "/docs/cases-and-time",
+                "/docs/law-modules",
                 "/docs/cli",
                 "/docs/mill",
                 "/docs/outcomes",

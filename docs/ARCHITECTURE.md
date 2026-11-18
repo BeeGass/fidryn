@@ -253,7 +253,8 @@ Conservative precedence (first match wins):
 
 ```text
 fidryn fmt PATH
-fidryn check PATH
+fidryn check PATH [--jobs N] [--cache-dir DIR | --no-cache]
+    [--report FILE] [--unresolved FILE]
 fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
     [--arg KEY=VALUE] [--scenario] [--budget N]
@@ -303,6 +304,53 @@ parse
 
 A guard that is `Open` or `Conflict` stages no partial mutation. Name-dispatch
 on a query name is not evaluation of Core.
+
+## Law modules of edition 2
+
+A file whose first two words are `edition 2` is a law module, which holds
+provisions of law as data and is never evaluated
+([Law modules](law-modules.md)). It takes a pipeline of its own:
+
+```
+bytes
+  -> edition_of                     (fidryn-syntax)
+  -> e2::parse                      (fidryn-syntax)
+  -> e2::lower into the model       (fidryn-check, the model of fidryn-provision)
+  -> e2::check_module               (fidryn-check)
+  -> interface_of                   (fidryn-provision)
+```
+
+Two crates hold what no other crate does. `fidryn-provision` holds the
+model of law modules and every rule over it, and depends on no other crate
+of the workspace. `fidryn-ingest-uscode` reads the publisher's XML of the
+United States Code into that model; it depends, of the workspace crates, on
+`fidryn-provision` only, and only `fidryn-cli` depends on it. The direction
+runs one way: the ingester knows the model, and the model, the parser and
+lowering of edition 2 and the check of a workspace know no corpus. The test
+`corpus_neutral_code_names_no_corpus` in `xtask/tests/corpus_neutrality.rs`
+holds `fidryn-provision`, the edition-2 parts of `fidryn-syntax` and
+`fidryn-check` and the workspace code of `fidryn-driver` to that.
+
+`fidryn_driver::workspace::check_workspace` checks a workspace in two
+phases:
+
+1. **Phase one**, for each module file by itself, of the workspace and of
+   each dependency, on worker threads: the BLAKE3 of its bytes, its edition,
+   the grammar, lowering, the checks of one module and the module's
+   interface. What it gives of a file depends on the file's bytes alone, so
+   it is kept in a cache keyed by those bytes, the toolchain's version and
+   the identity of the executable.
+2. **Phase two**, with the result of every module in memory: the files
+   against the lock, where each module stands, the check of each
+   dependency, and then, from the manifest and the interfaces alone
+   (`check_interfaces`), the toolchain, `within` and members, imports and
+   names, the staleness of bindings, addresses declared twice, and the
+   outcome of every reference and citation. Phase two reads no module
+   again.
+
+The change set between two generated workspaces
+(`fidryn_driver::workspace::changes`) reads each of them as that check
+does, and then compares their interfaces.
 
 ## Diagnostic codes
 

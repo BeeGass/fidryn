@@ -18,6 +18,15 @@ declarations an unknown field is skipped without a diagnostic; see
 `.fr` file when you are unsure a spelling parses. The reference is
 [`grammar.ebnf`](../grammar.ebnf).
 
+## Editions
+
+A `.fr` file is of one of two editions. This guide describes the first,
+which carries no marker: modules of queries, rules and the other
+declarations below, which the interpreter checks and runs. A file whose
+first two words are `edition 2`, before which only white space and
+comments may stand, is a law module of edition 2: it holds provisions of
+law as data in a grammar of its own, and it is checked and never
+evaluated. Its reference is [Law modules](law-modules.md).
 
 ## Surface inventory (status-qualified)
 

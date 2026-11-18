@@ -29,6 +29,7 @@ statement of any jurisdiction's law.
 | --- | --- |
 | [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md) | First hour: build, `check`, `run` |
 | [Language](https://fidryn.onlygass.dev/docs/language.md) | `.fr` modules, queries, rules, duties, verify |
+| [Law modules](https://fidryn.onlygass.dev/docs/law-modules.md) | Law modules of edition 2, which hold provisions of law as data: the two editions, addresses and file paths, normalization, provisions, notes and layers, hashes, the syntax, workspaces with their manifest and lock, how a workspace is checked and the outcome of each reference, the cache, definitions, curated modules with their names, dependencies and bindings, change sets, the ingester for the United States Code, the coverage ledger and the sample of the Code, and the limits |
 | [CLI](https://fidryn.onlygass.dev/docs/cli.md) | Every `fidryn` subcommand and flag |
 | [Mill](https://fidryn.onlygass.dev/docs/mill.md) | Localhost UI on 127.0.0.1 |
 | [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) | Case records, valid time, known-at |
@@ -46,9 +47,13 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 [`schemas/law-lock-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/law-lock-v0.1.json) and
 [`schemas/retrieval-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/retrieval-v0.1.json), the
 coverage ledger of a generated workspace follows
-[`schemas/coverage-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json), and the
+[`schemas/coverage-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json), the
 report of the check of a workspace follows
-[`schemas/check-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/check-report-v0.1.json).
+[`schemas/check-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/check-report-v0.1.json), the
+text records that `fidryn text --json` prints follow
+[`schemas/text-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/text-record-v0.1.json), and
+the change set that `fidryn changes --json` prints follows
+[`schemas/change-set-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json).
 
 ## For implementers
 
@@ -59,7 +64,6 @@ report of the check of a workspace follows
 | [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, the coverage ledger of a generated workspace, and the sample of the Code the repository holds and its check |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.3 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 

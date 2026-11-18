@@ -19,7 +19,7 @@ Counsel: Title 1, Title 11 Appendix and Title 45. The table below is
 generated from the coverage ledger of the sample's workspace,
 [`samples/uscode/workspace/coverage.json`](https://github.com/BeeGass/fidryn/blob/main/samples/uscode/workspace/coverage.json),
 which [`fidryn coverage`](https://fidryn.onlygass.dev/docs/cli.md#coverage) prints and
-[The coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger) describes key by
+[The coverage ledger](https://fidryn.onlygass.dev/docs/law-modules.md#the-coverage-ledger) describes key by
 key.
 
 ## What the words mean
@@ -58,15 +58,16 @@ Each definition extracted has one of three bases:
 - `unresolved`: the rules found no region of the Code for it, for one of
   four causes: it states no reach that they read; its reach is a link to a
   law outside the Code, such as a public law; its reach words are in a form
-  the rules do not resolve, whether they name a part of the Code, as "this
-  chapter and chapter 5" does, or a law outside it, as "this Act" does; or
+  the rules do not resolve, whatever they name: a part of the Code, as "this
+  chapter and chapter 5" and, of a court rule, "this Rule 3021" do, or a law
+  outside it, as "this Act" does; or
   its reach is in a form they resolve, "this" and the name of a kind of
   provision or container, but neither the provision that states the reach
   nor any provision or container above it is of that kind, as with "As
   used in this subtitle" in a section that stands in no subtitle.
 
 The rules read definitions written in a closed list of forms
-([Definitions](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#definitions)), and they do not find every
+([Definitions](https://fidryn.onlygass.dev/docs/law-modules.md#definitions)), and they do not find every
 definition that the text holds. The share of the definitions they miss has
 not been measured for the sample.
 

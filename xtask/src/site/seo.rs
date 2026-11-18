@@ -304,6 +304,7 @@ mod tests {
                 "https://fidryn.onlygass.dev/docs/getting-started",
                 "https://fidryn.onlygass.dev/docs/language",
                 "https://fidryn.onlygass.dev/docs/cases-and-time",
+                "https://fidryn.onlygass.dev/docs/law-modules",
                 "https://fidryn.onlygass.dev/docs/cli",
                 "https://fidryn.onlygass.dev/docs/mill",
                 "https://fidryn.onlygass.dev/docs/outcomes",
@@ -321,7 +322,7 @@ mod tests {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url>\n    <loc>https://fidryn.onlygass.dev/</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n"
         ));
         assert!(xml.ends_with("  </url>\n</urlset>\n"));
-        assert_eq!(xml.matches("<url>").count(), 11);
+        assert_eq!(xml.matches("<url>").count(), 12);
         assert!(!xml.contains("lastmod"));
     }
 }

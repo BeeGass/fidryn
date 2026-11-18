@@ -61,10 +61,19 @@ pub const GUIDES: &[Guide] = &[
         description: "Case records, admissible completions, valid-at and known-at in Fidryn.",
     },
     Guide {
+        slug: "law-modules",
+        file: "law-modules.md",
+        title: "Law modules",
+        number: Some(4),
+        group: "Write",
+        blurb: "Provisions of law as data",
+        description: "The reference of Fidryn law modules of edition 2: addresses, hashes, syntax, workspaces, references, definitions, bindings, change sets and the importer of the United States Code.",
+    },
+    Guide {
         slug: "cli",
         file: "cli.md",
         title: "CLI",
-        number: Some(4),
+        number: Some(5),
         group: "Run",
         blurb: "Every subcommand and flag",
         description: "Every fidryn CLI subcommand and flag the reference binary accepts.",
@@ -73,7 +82,7 @@ pub const GUIDES: &[Guide] = &[
         slug: "mill",
         file: "mill.md",
         title: "Mill",
-        number: Some(5),
+        number: Some(6),
         group: "Run",
         blurb: "The localhost UI",
         description: "Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.",
@@ -82,7 +91,7 @@ pub const GUIDES: &[Guide] = &[
         slug: "outcomes",
         file: "outcomes.md",
         title: "Outcomes",
-        number: Some(6),
+        number: Some(7),
         group: "Read results",
         blurb: "The six kinds and the envelope",
         description: "Determinate, Suspended, Contingent, and the rest of the Fidryn outcome envelope.",
@@ -91,7 +100,7 @@ pub const GUIDES: &[Guide] = &[
         slug: "examples",
         file: "examples.md",
         title: "Examples",
-        number: Some(7),
+        number: Some(8),
         group: "Read results",
         blurb: "Trust, tax, fifty states",
         description: "Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.",
@@ -100,7 +109,7 @@ pub const GUIDES: &[Guide] = &[
         slug: "coverage",
         file: "coverage.md",
         title: "Coverage",
-        number: Some(8),
+        number: Some(9),
         group: "Read results",
         blurb: "What the sample of the Code holds",
         description: "The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.",
@@ -109,7 +118,7 @@ pub const GUIDES: &[Guide] = &[
         slug: "contributing",
         file: "contributing.md",
         title: "Contributing",
-        number: Some(9),
+        number: Some(10),
         group: "Contribute",
         blurb: "Toolchain, tests, commits",
         description: "Toolchain, tests, and how to work on the Fidryn reference interpreter.",
@@ -169,9 +178,9 @@ mod tests {
     }
 
     #[test]
-    fn numbered_guides_run_one_to_nine_in_order() {
+    fn numbered_guides_run_one_to_ten_in_order() {
         let numbers: Vec<u32> = GUIDES.iter().filter_map(|g| g.number).collect();
-        assert_eq!(numbers, (1..=9).collect::<Vec<u32>>());
+        assert_eq!(numbers, (1..=10).collect::<Vec<u32>>());
     }
 
     #[test]
@@ -222,6 +231,10 @@ mod tests {
     fn by_file_finds_published_guides_only() {
         assert_eq!(by_file("outcomes.md").map(|g| g.slug), Some("outcomes"));
         assert_eq!(by_file("README.md").map(|g| g.slug), Some("index"));
+        assert_eq!(
+            by_file("law-modules.md").map(|g| (g.slug, g.number, g.group)),
+            Some(("law-modules", Some(4), "Write"))
+        );
         assert!(by_file("ARCHITECTURE.md").is_none());
         assert!(by_file("docs/cli.md").is_none());
     }

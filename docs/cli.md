@@ -2,8 +2,13 @@
 
 The binary name is `fidryn`. It is the 0.3 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
-It is not legal advice and does not file anything unless you opt into live
-HTTP as described under [`file`](#file).
+For [law modules](law-modules.md) of edition 2 it checks a module or a
+workspace ([`check`](#check)), imports the United States Code
+([`ingest`](#ingest)), prints the text of a workspace ([`text`](#text))
+and its coverage ledger ([`coverage`](#coverage)), and says what changed
+between two releases ([`changes`](#changes)). It is not legal advice and
+does not file anything unless you opt into live HTTP as described under
+[`file`](#file).
 
 From a clone of this repository:
 
@@ -12,7 +17,14 @@ cargo run -p fidryn-cli -- <subcommand> ...
 ```
 
 After install, the same arguments work as `fidryn <subcommand> ...`.
-`fidryn --help` and `fidryn <subcommand> --help` print clap usage.
+`fidryn --help` (`-h`) and `fidryn <subcommand> --help` print clap usage,
+as does the subcommand `help`, as in `fidryn help check` and
+`fidryn ingest help uscode`. `fidryn --version`
+(`-V`) prints the name and the version of the binary:
+
+```sh
+fidryn --version
+```
 
 ## Install
 
@@ -97,7 +109,7 @@ authentication as described above.
 
 A file whose first two words are `edition 2` is a law module of edition 2,
 which holds provisions of law as data
-([Law modules](law-modules.md#edition-2)). `check` reads it with its own
+([Law modules](law-modules.md#editions)). `check` reads it with its own
 parser and runs the checks of one module on it: its shape, its addresses,
 the form of its text, its hashes, its footnote markers and its
 definitions, as

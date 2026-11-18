@@ -25,13 +25,16 @@ alone prints, as one JSON object, which addresses differ between the two:
 
 With `--against CHANGES.json`, a change set that `fidryn changes --json` printed
 for the same two releases, it prints nothing and exits 1, naming the first address
-that differs, unless each set equals what the change set lists: the provisions
-only in the old equal `operative.removed` with the `from` of `operative.moved`,
-those only in the new `operative.added` with the `to` of `operative.moved`, and
-those that differ `amended_text` with `amended_structure`; the notes of each layer
-likewise against `added`, `removed`, `moved` and `amended`; the credits
-`editorial.credits_changed`; the footnotes `editorial.footnotes_changed`; and the
-containers `containers.removed`, `added` and `changed`.
+that differs, unless each set equals the union of the lists of the change set that
+it stands for: the provisions only in the old equal `operative.removed` with the
+`from` of `operative.moved`, those only in the new `operative.added` with the `to`
+of `operative.moved`, and those that differ `amended_text` with
+`amended_structure`; the notes of each layer likewise against `added`, `removed`,
+`moved` and `amended`; the credits `editorial.credits_changed`; the footnotes
+`editorial.footnotes_changed`; and the containers `containers.removed`, `added`
+and `changed`. An address in the wrong one of two lists of one union, and a wrong
+pairing of a move, are not seen, and `prefix`, the two releases and
+`stale_bindings` are not compared.
 
 Each record is kept as its line, and read again only where the lines of the two
 releases differ, so that two whole releases fit in memory.

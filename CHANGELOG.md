@@ -183,6 +183,22 @@ interchange schema versions are maintained independently of the interpreter.
   from their text records alone and checks a change set against them; the
   conformance tests, which `cargo xtask ci` now runs with the built binary
   in `FIDRYN_BINARY`, run both on invented pairs of releases.
+- `tools/check-law-repository.sh DIR` checks every workspace at the top of
+  a directory, such as a law repository, with a release build of the
+  commit, or with the binary `FIDRYN_BINARY` names: it compares the
+  version each manifest records with the binary's and runs `fidryn check`
+  on each, every run under limits of time and of address space, with a
+  cache outside `DIR`, and fails when a version differs or a check fails.
+  It builds through `lease` when that command exists and never falls back.
+- `law-repository.pin.json`, which names no law repository, and the
+  workflow `Law integration`, whose two jobs check the law repository at
+  its pin with the toolchain of the commit under test, and the newest of
+  each against the other; while the pin is empty each job says so and
+  ends, and the workflow runs only when it is started by hand.
+- The reference of law modules is the guide Law modules of the site, in
+  the group Write, in reading order, with a section of its limits;
+  `docs/implementation-status.md` has a section for edition 2, and
+  `docs/language.md` a section on the two editions.
 
 ## [0.2.0] - 2026-11-16
 

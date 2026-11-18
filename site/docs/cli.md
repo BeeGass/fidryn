@@ -13,8 +13,13 @@ author: "Bryan Gass"
 
 The binary name is `fidryn`. It is the 0.3 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
-It is not legal advice and does not file anything unless you opt into live
-HTTP as described under [`file`](#file).
+For [law modules](https://fidryn.onlygass.dev/docs/law-modules.md) of edition 2 it checks a module or a
+workspace ([`check`](#check)), imports the United States Code
+([`ingest`](#ingest)), prints the text of a workspace ([`text`](#text))
+and its coverage ledger ([`coverage`](#coverage)), and says what changed
+between two releases ([`changes`](#changes)). It is not legal advice and
+does not file anything unless you opt into live HTTP as described under
+[`file`](#file).
 
 From a clone of this repository:
 
@@ -23,7 +28,14 @@ cargo run -p fidryn-cli -- <subcommand> ...
 ```
 
 After install, the same arguments work as `fidryn <subcommand> ...`.
-`fidryn --help` and `fidryn <subcommand> --help` print clap usage.
+`fidryn --help` (`-h`) and `fidryn <subcommand> --help` print clap usage,
+as does the subcommand `help`, as in `fidryn help check` and
+`fidryn ingest help uscode`. `fidryn --version`
+(`-V`) prints the name and the version of the binary:
+
+```sh
+fidryn --version
+```
 
 ## Install
 
@@ -108,28 +120,28 @@ authentication as described above.
 
 A file whose first two words are `edition 2` is a law module of edition 2,
 which holds provisions of law as data
-([Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#edition-2)). `check` reads it with its own
+([Law modules](https://fidryn.onlygass.dev/docs/law-modules.md#editions)). `check` reads it with its own
 parser and runs the checks of one module on it: its shape, its addresses,
 the form of its text, its hashes, its footnote markers and its
 definitions, as
-[What the checker verifies in one module](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-one-module)
+[What the checker verifies in one module](https://fidryn.onlygass.dev/docs/law-modules.md#what-the-checker-verifies-in-one-module)
 lists them.
 
 A directory is a workspace of edition 2 modules, with a manifest,
-`workspace.json`, at its top ([Workspaces](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces)).
+`workspace.json`, at its top ([Workspaces](https://fidryn.onlygass.dev/docs/law-modules.md#workspaces)).
 `check` reads every module of it by itself, and then checks the manifest,
 the lock of a generated workspace, where each module stands, the
 containers and their members, and the dependencies of a curated
 workspace, as
-[What the checker verifies in a workspace](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#what-the-checker-verifies-in-a-workspace)
+[What the checker verifies in a workspace](https://fidryn.onlygass.dev/docs/law-modules.md#what-the-checker-verifies-in-a-workspace)
 lists them, and gives every reference and every citation its
-[outcome](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#references). It does so in two phases, each on
+[outcome](https://fidryn.onlygass.dev/docs/law-modules.md#references). It does so in two phases, each on
 several threads, and its output is the same for any number of them
-([How a workspace is checked](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#how-a-workspace-is-checked)).
+([How a workspace is checked](https://fidryn.onlygass.dev/docs/law-modules.md#how-a-workspace-is-checked)).
 It keeps the result of the first phase in a cache, so that a module file
 whose bytes it has checked before is not checked again, and its output is
 the same as without the cache, but for the count of the modules read from
-it ([The cache](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-cache)).
+it ([The cache](https://fidryn.onlygass.dev/docs/law-modules.md#the-cache)).
 
 **Arguments**
 
@@ -185,7 +197,7 @@ with a cache that holds nothing yet, or with `--no-cache`, it is 0.
 A warning, such as `W760 ToolchainMismatch` when the manifest's
 `toolchain` is not the running version, or `W750 StaleBinding` when what a
 binding of a curated module was written against has changed
-([Bindings](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings)), is printed to stderr, counted in
+([Bindings](https://fidryn.onlygass.dev/docs/law-modules.md#bindings)), is printed to stderr, counted in
 `warnings`, and does not change the exit status. Nor does a reference whose target the check does
 not find: its outcome is counted in the report and listed in the
 unresolved list, and is never a diagnostic. Nor does a cache that cannot
@@ -198,7 +210,7 @@ as `the cache could not be used, and the check went on without it: ...`;
 so it does when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency
-([Depending on another workspace](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#depending-on-another-workspace)),
+([Depending on another workspace](https://fidryn.onlygass.dev/docs/law-modules.md#depending-on-another-workspace)),
 and its output is then that of a check with `--no-cache`.
 
 **Failure.** Exit 1. Each diagnostic is printed to stderr as
@@ -642,7 +654,7 @@ Code from the archives of one release of the official XML release point
 published by the Office of the Law Revision Counsel, each verified against
 the retrieval record beside them, and writes a generated workspace that
 `fidryn check DIR` accepts
-([The ingester for the United States Code](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-ingester-for-the-united-states-code)).
+([The ingester for the United States Code](https://fidryn.onlygass.dev/docs/law-modules.md#the-ingester-for-the-united-states-code)).
 The same archives, the same titles and the same version of the toolchain
 give the same bytes on every run and on every host, for any number of
 workers.
@@ -660,7 +672,7 @@ workers.
 A run writes `workspace.json` first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
 output that it does not write, and writes `law.lock.json` and then, last,
-`coverage.json`, the [coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)
+`coverage.json`, the [coverage ledger](https://fidryn.onlygass.dev/docs/law-modules.md#the-coverage-ledger)
 of the workspace, which [`coverage`](#coverage) prints; so a run that is
 stopped leaves a directory the next run accepts. The lock does not list
 the ledger. With `--title`,
@@ -724,11 +736,11 @@ missing us/usc/t99a.fr
 `fidryn text DIR` prints the text of the provisions and notes of the
 workspace in `DIR`: of every provision, container, note, source credit and
 footnote of its modules, read from its module files
-([Workspaces](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#workspaces)). With `ADDRESS` it prints the
+([Workspaces](https://fidryn.onlygass.dev/docs/law-modules.md#workspaces)). With `ADDRESS` it prints the
 provision, container or note at that address and what lies below it: every
 one whose address is `ADDRESS` or continues it at a segment boundary. With
 `ADDRESS` and `--hashes` it prints the two hashes that a binding to that
-provision records instead ([Bindings](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#bindings)). It reads
+provision records instead ([Bindings](https://fidryn.onlygass.dev/docs/law-modules.md#bindings)). It reads
 the modules and checks nothing else of the workspace, which
 `fidryn check DIR` does.
 
@@ -831,14 +843,14 @@ working directory nor the number of threads the system offers changes a
 byte. `conformance/uslm_text.py` prints the same records from the
 publisher's XML, independently of the ingester, and the check of the
 sample of the Code compares the two line for line
-([The sample](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-sample)).
+([The sample](https://fidryn.onlygass.dev/docs/law-modules.md#the-sample)).
 
 With `--hashes` it prints exactly two lines and nothing else, the two
 that a person writes into a binding after its `release`: the tree hash of
 the provision at `ADDRESS`, or of the top provision of the unit that
 `ADDRESS` is an alias of, and the hash of the enacted layer of that unit,
 each as 64 lower-case hexadecimal digits. They come from the
-[interfaces](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#interfaces) of the modules, the place the check
+[interfaces](https://fidryn.onlygass.dev/docs/law-modules.md#interfaces) of the modules, the place the check
 of a workspace takes them from, so a binding that records them is not
 stale against the workspace they were printed from. Of the demo
 workspace, `fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes`
@@ -882,7 +894,7 @@ in `DIR`, `fidryn.coverage/v0.1`: its units, containers and provisions,
 its notes, footnotes and images, its references of each layer by outcome,
 the definitions extracted from its provisions by basis and by kind, and
 what its importer counted and did not import
-([The coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)). It computes the
+([The coverage ledger](https://fidryn.onlygass.dev/docs/law-modules.md#the-coverage-ledger)). It computes the
 ledger from the modules as their files stand, the manifest and the lock.
 It does not verify the module files against the lock, which is what
 `fidryn check DIR` is for. Of a workspace whose files are those its run
@@ -944,7 +956,7 @@ fidryn coverage samples/uscode/curated
 `fidryn changes OLD_DIR NEW_DIR` prints the change set between two
 generated workspaces of one prefix, the imports of two releases of one
 corpus: the provisions, notes and containers added, removed, moved or
-amended, by layer ([Change sets](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets)). With
+amended, by layer ([Change sets](https://fidryn.onlygass.dev/docs/law-modules.md#change-sets)). With
 `--bindings DIR` it also lists the bindings of the curated workspace in
 `DIR` that are stale against `NEW_DIR`, whatever release that workspace is
 pinned to: it answers what would go stale if the pin moved there. Each
@@ -1005,7 +1017,7 @@ With `--json` it prints the change set as pretty JSON, every key present,
 the JSON Schema of which is
 [schemas/change-set-v0.1.json](https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json). Every list
 is sorted, and both forms are the same bytes on every run and for every
-number of workers. [Change sets](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets) says what puts
+number of workers. [Change sets](https://fidryn.onlygass.dev/docs/law-modules.md#change-sets) says what puts
 an address into each list and shows the text of one.
 
 When the cache of a workspace could not be used or could not be written,

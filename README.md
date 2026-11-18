@@ -26,6 +26,27 @@ not pass the checker cannot be run.
 [Implementation status](docs/implementation-status.md) lists what works
 and what does not, with the test or code that shows each one.
 
+Fidryn 0.3 also reads law modules, files of edition 2 that hold provisions
+of law as data and are checked, never evaluated
+([Law modules](docs/law-modules.md)). `fidryn ingest uscode` imports the
+United States Code from the official XML release point published by the
+Office of the Law Revision Counsel, each archive verified against its
+retrieval record, into a generated workspace in which every provision and
+note has an address and hashes; `fidryn check` checks such a workspace,
+gives every reference in it an outcome, and judges the bindings of a
+curated workspace, written by hand, against the provisions they name;
+`fidryn changes` says what changed between two releases; and
+`fidryn coverage` counts what a workspace holds. The repository holds a
+sample of three titles of the Code, imported and checked by
+`cargo xtask ci`, whose figures are on the page
+[Coverage](docs/coverage.md). Check the sample, then read one of its
+sections:
+
+```sh
+fidryn check samples/uscode/workspace --no-cache
+fidryn text samples/uscode/workspace /us/usc/t1/s1
+```
+
 Nothing in this repository is legal advice. The modules under `examples/`
 and the programs under `tests/` exist to exercise the interpreter. None of
 them is a complete statement of any jurisdiction's law.
@@ -74,10 +95,12 @@ The guides are indexed in [docs/README.md](docs/README.md).
 | --- | --- |
 | Check and run a first module | [Getting started](docs/getting-started.md) |
 | Write `.fr` | [Language](docs/language.md) |
+| Read, check and compare law modules | [Law modules](docs/law-modules.md) |
 | Use every subcommand | [CLI](docs/cli.md) |
 | Supply facts and evidence | [Cases and time](docs/cases-and-time.md) |
 | Interpret `Determinate` vs `Suspended` | [Outcomes](docs/outcomes.md) |
 | Browse fixtures | [Examples](docs/examples.md) |
+| See what the sample of the Code holds | [Coverage](docs/coverage.md) |
 | Change the interpreter | [Contributing](docs/contributing.md) |
 
 ## CLI at a glance
@@ -86,7 +109,7 @@ The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 
 ```text
 fidryn fmt PATH
-fidryn check PATH
+fidryn check PATH [--jobs N] [--cache-dir DIR | --no-cache] [--report FILE] [--unresolved FILE]
 fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario] [--budget N]
 fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] --valid-at TIME --known-at TIME

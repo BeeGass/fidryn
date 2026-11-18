@@ -34,27 +34,31 @@ cargo clippy --workspace --all-targets --all-features --locked --offline -- -D w
 cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
-Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, the conformance tests of `conformance/` (given the built
-binary in `FIDRYN_BINARY`, since the comparison of two releases there runs
-`fidryn changes`), the sample check (`cargo xtask uscode-sample`: the
-committed archives of the Code against their retrieval record, the committed
-workspace against what the importer writes from them on one worker and on
-eight, its check and its coverage ledger, the committed profile and its
-counts against the script that counts the archives, the check and the
-ledger, the text of every provision and note against what an independent
-script reads from the publisher's XML, the curated sample, checked with the
-generated one as its dependency, every citation of it `exact` and its
-binding not stale, and the table of the coverage page against the ledger), required
-JavaScript tests, generated-site consistency, the example status and
-documentation checks described below, and benchmark compilation. Node and
-[uv](https://docs.astral.sh/uv/) are required for qualification.
+`cargo xtask ci --fmt` runs, in this order, formatting, the complete Rust
+tests and Clippy, Rustdoc with warnings denied, executable schema probes,
+Python lint/format/types, the conformance tests of `conformance/` (given the
+built binary in `FIDRYN_BINARY`, since the comparison of two releases and the
+check of a law repository there run it), the sample check
+(`cargo xtask uscode-sample`: the committed archives of the Code against
+their retrieval record, the committed workspace against what the importer
+writes from them on one worker and on eight, its check and its coverage
+ledger, the committed profile and its counts against the script that counts
+the archives, the check and the ledger, the text of every provision and note
+against what an independent script reads from the publisher's XML, the
+curated sample, checked with the generated one as its dependency, every
+citation of it `exact` and its binding not stale, and the table of the
+coverage page against the ledger), generated-site consistency, the example
+status and documentation checks described below, required JavaScript tests,
+and benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are
+required for qualification.
 `uv run --locked` uses `.python-version` and `uv.lock`.
 
 GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
 Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
-and CodeQL. Development and native branch protections are described in
+and CodeQL. The workflow `Law integration`, which checks a law repository
+with the toolchain of a commit, runs only when it is started by hand
+([Checking a law repository](development.md#checking-a-law-repository)).
+Development and native branch protections are described in
 [Development and promotion](development.md). Generated environments and build
 outputs are not committed.
 
@@ -97,11 +101,13 @@ because the site is generated from the guides it rewrites.
 
 `cargo xtask docs` reads the Markdown in `README.md`, `LICENSING.md`,
 `CHANGELOG.md`, `SECURITY.md`, `docs/`, `examples/`, `packages/`,
-`conformance/` and `site/README.md`. It checks that every relative link
-resolves, that every untagged or `fidryn`-tagged code block that starts
-with `module` passes the checker, and that the `fidryn` commands in
-blocks tagged `sh` behave as the tag says. `--skip-commands` leaves out
-the commands.
+`conformance/`, `samples/` and `site/README.md`. It checks that every
+relative link resolves, that every untagged or `fidryn`-tagged code block
+that starts with `module` passes the checker, that every such block whose
+first line that is not blank is `edition 2` passes the checks of one law
+module ([Law modules](law-modules.md#editions)), and that the `fidryn`
+commands in blocks tagged `sh` behave as the tag says. `--skip-commands`
+leaves out the commands.
 
 A code block that shows a `fidryn` command takes one of these tags:
 

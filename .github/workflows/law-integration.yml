@@ -1,0 +1,133 @@
+# The law repository, checked with the toolchain of this repository by
+# tools/check-law-repository.sh. law-repository.pin.json names the law
+# repository, as "owner/name", and the commit it is pinned at. While its
+# "repository" is empty, each job says so and ends.
+#
+# - "Law repository at its pin" checks the pinned commit of the law
+#   repository with the toolchain of the commit under test. A change of the
+#   toolchain that breaks it fails, unless the pin moves together with a
+#   matching change of the law repository.
+# - "Drift of the newest law repository" checks the newest commit of the law
+#   repository with the newest commit of this one, and reports drift when the
+#   check fails.
+#
+# The only trigger is a manual run. When the law repository is published,
+# remove the "# " at the start of the two lines under `workflow_dispatch:`:
+# the first runs the first job on every pull request to main and dev, the
+# second runs the second job every day.
+
+name: Law integration
+
+on:
+  workflow_dispatch:
+  # pull_request: {branches: [main, dev]}
+  # schedule: [{cron: "41 6 * * *"}]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  pinned:
+    name: Law repository at its pin
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Read the pin
+        id: pin
+        run: |
+          repository="$(jq -er '.repository | strings' law-repository.pin.json)"
+          commit="$(jq -er '.commit | strings' law-repository.pin.json)"
+          if test -z "$repository"; then
+            echo "law-repository.pin.json names no law repository, so there is nothing to check"
+            echo "check=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id" >&2
+            exit 1
+          fi
+          {
+            echo "check=true"
+            echo "repository=$repository"
+            echo "commit=$commit"
+          } >> "$GITHUB_OUTPUT"
+      - name: Check out the law repository at its pin
+        if: steps.pin.outputs.check == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ steps.pin.outputs.repository }}
+          ref: ${{ steps.pin.outputs.commit }}
+          path: law-repository
+      - name: Install the pinned Rust toolchain
+        if: steps.pin.outputs.check == 'true'
+        run: rustup toolchain install --no-self-update
+      - if: steps.pin.outputs.check == 'true'
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - name: Fetch locked crates
+        if: steps.pin.outputs.check == 'true'
+        run: cargo fetch --locked
+      - name: Check the law repository with the toolchain of this commit
+        if: steps.pin.outputs.check == 'true'
+        run: sh tools/check-law-repository.sh --cache-dir "$RUNNER_TEMP/fidryn-cache" law-repository
+  drift:
+    name: Drift of the newest law repository
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Read the pin
+        id: pin
+        run: |
+          repository="$(jq -er '.repository | strings' law-repository.pin.json)"
+          commit="$(jq -er '.commit | strings' law-repository.pin.json)"
+          if test -z "$repository"; then
+            echo "law-repository.pin.json names no law repository, so there is nothing to check"
+            echo "check=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "law-repository.pin.json pins $repository to \"$commit\", which is no full commit id" >&2
+            exit 1
+          fi
+          {
+            echo "check=true"
+            echo "repository=$repository"
+            echo "commit=$commit"
+          } >> "$GITHUB_OUTPUT"
+      - name: Check out the newest commit of the law repository
+        if: steps.pin.outputs.check == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ steps.pin.outputs.repository }}
+          path: law-repository
+      - name: Install the pinned Rust toolchain
+        if: steps.pin.outputs.check == 'true'
+        run: rustup toolchain install --no-self-update
+      - if: steps.pin.outputs.check == 'true'
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+      - name: Fetch locked crates
+        if: steps.pin.outputs.check == 'true'
+        run: cargo fetch --locked
+      - name: Check the newest law repository with the newest toolchain
+        if: steps.pin.outputs.check == 'true'
+        env:
+          PINNED: ${{ steps.pin.outputs.commit }}
+        run: |
+          newest="$(git -C law-repository rev-parse HEAD)"
+          echo "this repository at $GITHUB_SHA, the law repository at $newest, pinned at $PINNED"
+          if sh tools/check-law-repository.sh --cache-dir "$RUNNER_TEMP/fidryn-cache" law-repository; then
+            if test "$newest" = "$PINNED"; then
+              echo "No drift: the newest law repository, $newest, is the pinned one and checks with $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "No drift: the newest law repository, $newest, checks with $GITHUB_SHA; the pin is at $PINNED" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "Drift: the newest law repository, $newest, does not check with $GITHUB_SHA; the pin is at $PINNED" | tee -a "$GITHUB_STEP_SUMMARY" >&2
+            exit 1
+          fi

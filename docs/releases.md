@@ -2,8 +2,10 @@
 
 The interpreter's workspace version is the release version. The project is under the MIT License; [Licensing](../LICENSING.md) describes it and the third-party notices. Source instruments,
 prelude modules and interchange schemas retain their own version histories.
-Release 0.3 therefore still loads the repository's 0.1.0 instrument
-fixtures and emits checked evaluation reports using schema v0.2.
+Release 0.3 therefore loads the repository's 0.1.0 instrument fixtures,
+emits checked evaluation reports using schema v0.2, and writes the files of
+law modules, the manifest, the lock, the coverage ledger, the check report,
+the text records and the change set, using schemas v0.1.
 
 ## Prepare a release
 
@@ -46,6 +48,13 @@ fixtures and emits checked evaluation reports using schema v0.2.
    the digests of the locks that changed: the pin of the curated manifest and
    the two of the change set. No module file, coverage ledger, profile or text
    record changes.
+
+   A law repository kept apart from this one records the version in the
+   same places as the sample: `tools/check-law-repository.sh DIR`
+   ([Checking a law repository](development.md#checking-a-law-repository))
+   fails until each generated workspace in it is imported again with the
+   new build, and each curated one names the new version and the new
+   digest of the lock it depends on.
 4. Run `cargo xtask release-check` and `cargo xtask ci --fmt`.
 5. Build a native package with `cargo xtask package` from a clean checkout,
    and check the dependencies with

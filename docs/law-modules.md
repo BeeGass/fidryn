@@ -1,21 +1,56 @@
 # Law modules
 
-This reference gives the rules by which a module of law, and each provision
-and note in it, is named, where the file of a module stands in its
-workspace, how the text of a module is normalized, what a module holds, how
-its provisions, notes and layers are hashed, how a module is written, what
-the checker verifies of one module, how modules form a workspace and what
-the checker verifies of one, how a workspace is checked, what outcome
-each reference has, when a binding is stale, what a change set between
-two releases lists, how the ingester for the United States Code reads the
-publisher's XML, by which rules it extracts definitions, what the coverage
-ledger of a generated workspace counts, and what the sample of the Code in
-the repository holds and how it is checked. The crate `fidryn-provision`
-implements the model and the rules over it, `fidryn-syntax` reads the text
-of a module, `fidryn-check` lowers it into the model and checks it,
-`fidryn-driver` checks a workspace, writes a generated one and compares
-two, and `fidryn-ingest-uscode` imports the Code. In the examples,
-`/zz/demo` is an invented corpus.
+A law module is a file of edition 2. It holds provisions of law as data,
+with their notes and what the source says of them, each named by an
+address and covered by hashes; or, written by hand, it gives names to
+provisions and binds names to them. Nothing in a law module is evaluated.
+Law modules stand in workspaces: a generated workspace holds what an
+importer writes from the archives of one release, and a curated workspace
+holds modules written by hand, which may depend on generated workspaces.
+`fidryn check` checks one module or a whole workspace, and `fidryn changes`
+says what changed between two releases.
+
+This reference gives, in this order: the two editions; the addresses of
+modules, provisions and notes, and the file path of a module; the
+normalization of text; the model of provisions, notes and layers; their
+hashes; the syntax of edition 2, with three modules written in it; what the
+checker verifies in one module; workspaces, their manifest and their lock,
+and what the checker verifies in one; how a workspace is checked, and the
+outcome of each reference; the cache of the check; the definitions that the
+ingester extracts and the patterns it reads them by; curated modules, their
+names, the dependencies of a curated workspace and its bindings; change
+sets; the ingester for the United States Code, what it reads and what it
+does not import; what is counted, in the coverage ledger and in the sample
+of the Code that the repository holds; and the limits of all of these.
+
+The crate `fidryn-provision` implements the model and the rules over it,
+`fidryn-syntax` reads the text of a module, `fidryn-check` lowers it into
+the model and checks it, `fidryn-driver` checks a workspace, writes a
+generated one and compares two, and `fidryn-ingest-uscode` imports the
+Code. In the examples, `/zz/demo` is an invented corpus.
+
+## Editions
+
+A `.fr` file is of one of two editions. A file of the first edition is a
+program of the language that [Language](language.md) describes, and
+carries no marker. A file of edition 2 is a law module: its first two
+significant tokens are the word `edition` and the integer `2`; white
+space, line ends and comments before them are skipped. A file whose first
+significant token is anything else is a file of the first edition. A file
+that begins with the word `edition` followed by anything other than `2` is
+refused with `E100`: "unknown edition `3`; this toolchain reads edition 2
+after the word `edition`, and files of the first edition carry no marker".
+
+`fidryn_syntax::edition::edition_of` tells the edition of a file, and each
+entry point asks it before it reads the file:
+
+| Entry point | Given a module of edition 2 |
+| --- | --- |
+| `fidryn check FILE` | the checks of one module, as [below](#what-the-checker-verifies-in-one-module), then `ok` |
+| `fidryn check DIR` | the checks of the workspace in the directory, every module of it included, as under [Workspaces](#workspaces) |
+| `fmt`, `inputs`, `run`, `explore`, `explain`, `verify`, `diff`, `render`, `review` and `file` | exit 1 with `E100`: "an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it" |
+| `fidryn_cli::compile_source` and `compile_module`, and so the source pasted into the mill of `ui` | the same `E100` |
+| the documentation check, `cargo xtask docs` | a fenced block, untagged or tagged `fidryn`, whose first line that is not blank is `edition 2` is a complete module and gets the checks of one module |
 
 ## Addresses
 
@@ -240,8 +275,8 @@ defines, its kind (`means`, `includes`, `does_not_include` or `borrowed`),
 the words that state its reach or none when the text states none, the
 region the reach covers, its basis (`enacted`, `restated` or `unresolved`),
 what a borrowed definition takes its meaning from (`borrowed_from`), and a
-note to read with it (`see_note`). Definitions are in no hash. The ingester
-for the Code extracts them by the rules of [Definitions](#definitions).
+note to read with it (`see_note`). The ingester for the Code extracts them
+by the rules of [Definitions](#definitions).
 
 ### Layers
 
@@ -329,29 +364,6 @@ in document order, hashing each provision once. A second implementation in
 Python, `conformance/hash_vectors.py`, computes the same hashes of the
 invented models in `conformance/fixtures/hash/vectors.json`, and the tests
 of both hold their values to the digests recorded there.
-
-## Edition 2
-
-A law module is a file of edition 2. Its first two significant tokens are
-the word `edition` and the integer `2`; white space, line ends and comments
-before them are skipped. A file whose first significant token is anything
-else is a file of the first edition, which carries no marker, and is read as
-before. A file that begins with the word `edition` followed by anything
-other than `2` is refused with `E100`: "unknown edition `3`; this toolchain
-reads edition 2 after the word `edition`, and files of the first edition
-carry no marker".
-
-A module of edition 2 holds provisions of law as data, and nothing in it is
-evaluated. `fidryn_syntax::edition::edition_of` tells the edition of a
-file, and each entry point asks it before it reads the file:
-
-| Entry point | Given a module of edition 2 |
-| --- | --- |
-| `fidryn check FILE` | the checks of one module, as [below](#what-the-checker-verifies-in-one-module), then `ok` |
-| `fidryn check DIR` | the checks of the workspace in the directory, every module of it included, as under [Workspaces](#workspaces) |
-| `fmt`, `inputs`, `run`, `explore`, `explain`, `verify`, `diff`, `render`, `review` and `file` | exit 1 with `E100`: "an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it" |
-| `fidryn_cli::compile_source` and `compile_module`, and so the source pasted into the mill of `ui` | the same `E100` |
-| the documentation check, `cargo xtask docs` | a fenced block, untagged or tagged `fidryn`, whose first line that is not blank is `edition 2` is a complete module and gets the checks of one module |
 
 ## Syntax
 
@@ -1123,13 +1135,9 @@ by outcome, and those of outcome `outside` by body; the unresolved list
 names each one whose outcome is not `exact`. The target of every citation
 of a curated module gets its outcome by the same rules; the report counts
 the citations by outcome, and the unresolved list names each one whose
-outcome is not `exact`. A reference or a citation whose target is an
-address that lies below the prefix of a dependency that failed its checks,
-and below no prefix of the workspace or of a dependency that passed them,
-is left out of both; when a dependency failed whose prefix the check did
-not learn, so is every one whose target is an address below no prefix of
-the workspace or of a dependency that passed, as
-[Depending on another workspace](#depending-on-another-workspace)
+outcome is not `exact`. A reference or a citation whose target lies where
+a dependency that failed its checks leaves nothing known is left out of
+both, as [Depending on another workspace](#depending-on-another-workspace)
 describes.
 `fidryn_provision::AddressIndex` gives the outcome of a target, and also
 the tree hash of the provision at an address and the enacted-layer hash of
@@ -1169,9 +1177,8 @@ of the executable is the BLAKE3 of the file of the running `fidryn`, as 64
 hexadecimal digits: two builds of one version can differ in what phase one
 does, and an entry that another build wrote is never read. When that
 identity cannot be read, the check keeps no cache, and `fidryn check` says
-so once on stderr; so it does when the cache's directory is the directory
-of a dependency, lies inside it or holds it. A file larger than the largest
-source of edition 2 is not kept; the check refuses it in any case.
+so once on stderr. A file larger than the largest source of edition 2 is
+not kept; the check refuses it in any case.
 
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
 in the cache's directory. That directory is the one `--cache-dir` names;
@@ -1182,11 +1189,8 @@ writes no entry. The name `.fidryn-cache` begins with a dot, so the check
 does not read it as part of the workspace and the writer of a generated
 workspace leaves it alone; the check writes nothing else into the
 workspace. The module files of the dependencies of a curated workspace are
-read through the same cache, so their entries go into the cache's
-directory of the workspace that is checked, and nothing is written into a
-dependency's directory: when the cache's directory is the directory of a
-dependency the manifest names, lies inside it or holds it, the check keeps
-no cache, as
+read through the same cache, and the check keeps no cache when the cache's
+directory and the directory of a dependency overlap, as
 [Depending on another workspace](#depending-on-another-workspace)
 describes.
 
@@ -1230,6 +1234,218 @@ ok
 modules: 5; from cache: 5; errors: 0; warnings: 0
 ok
 ```
+
+## Definitions
+
+The [ingester for the United States Code](#the-ingester-for-the-united-states-code)
+extracts definitions from the
+provisions of every unit it imports, once the unit's provisions and notes
+are read, and writes each in the unit's module as a `definition` block
+([Syntax](#syntax)): the provision that holds it, its terms, its kind, the
+words that state its reach, the region the reach covers, its basis, and,
+where the rules give them, what it borrows its meaning from and a note to
+read with it. A container has no definitions. The rules read definitions
+written in a closed list of forms and in no other: they do not find every
+definition of the Code, and a provision whose text matches none of the
+forms is imported as a plain provision, with no definition. A definition
+the rules do not find is missing from the module; a definition they find
+records its terms, its kind and its reach words as the text has them.
+
+### Where definitions are read
+
+A definition is extracted from the first block of a `chapeau` or `content`
+part of a provision of a unit, when that block is a paragraph and its text
+matches one of the patterns below, and from nothing else: not from a note,
+not from quoted content, and not from a later block of a part. The text of
+a paragraph is its plain text: the words of its runs, in order, without its
+footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
+at least one character and neither mark inside it; the term is recorded
+without the marks. Where these rules say "in any case", the letters `A` to
+`Z` are compared as `a` to `z`, and no other character is changed. Where
+they speak of words that a text holds, they mean whole words: a word is
+bounded by the start or the end of the text or by a character that is not
+one of the letters `A` to `Z` and `a` to `z`.
+
+### Verbs
+
+| Kind | Verb forms |
+| --- | --- |
+| `means` | `means`, `mean`, `shall mean` |
+| `includes` | `includes`, `include`, `shall include` |
+| `does_not_include` | `does not include`, `do not include`, `shall not include` |
+| `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given` |
+
+A verb form stands where its words are followed by the end of the text or
+by a character that is not one of the letters `A` to `Z` and `a` to `z`;
+where a rule looks for a verb form inside other text, the character before
+it is not such a letter either.
+
+### Patterns
+
+1. *Sentence form.* The paragraph begins
+   `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`.
+   `Aside` is text with no quotation mark and no verb form of the table in
+   it.
+2. *List form.* The paragraph begins
+   `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and it has
+   an inherited reach (below).
+
+One space stands between two parts of a pattern, and a comma stands
+directly after the part before it: `the term “widget”, with respect to a
+gadget, means`, `the terms “widget” and “gadget” mean`. The kind of the
+definition is the kind of its verb form.
+
+### The reach
+
+`Reach` is `Opening Object`. `Opening` is one of `As used in`, `In`,
+`For purposes of`, `For the purposes of`, `For the purpose of`,
+`For purpose of` and `When used in`. `Object` is the text from the opening
+to the end of the reach: it is not empty, it holds no quotation mark, and
+it holds none of the words `term`, `terms`, `word`, `words`, `phrase`,
+`phrases`, `definition`, `definitions`, `following`, `meaning` and
+`meanings`, in any case. After `In`, the `Object` must begin with `this` and
+a space, or be a single link; a paragraph that opens with `In` and anything
+else ("In the case of an individual, the term ...") states a condition, not
+a reach. In the sentence form the reach ends at the comma that stands before
+`the term` (or `The`, `terms`, `word`, `words`, `phrase`), and no quotation
+mark stands before that comma. A paragraph whose text before those words is
+anything other than a `Reach` is not extracted.
+
+A single link is an object whose words are exactly the words of one link
+of the paragraph.
+
+### A reach chapeau
+
+The chapeau of a provision is a *reach chapeau* when it is one paragraph
+whose text is `Reach [[","] LeadIn] Close`, and nothing more. `LeadIn` is
+one of `the term`, `the terms`, `the following definitions apply` and
+`the following definitions shall apply`. `Close` is a dash (U+2014 or `-`)
+or a colon, with at most one space before it. The lead-in and the close are
+no part of the reach. `In this section:`, `As used in this chapter, the
+term—` and `In this section, the following definitions apply:` are reach
+chapeaus; `The following rules apply:`, `Except as otherwise provided, in
+this chapter:` and `In this chapter, the following terms have the following
+meanings:` are not.
+
+### The reach of a paragraph
+
+A paragraph of the sentence form that begins with a `Reach` has that reach.
+Any other paragraph looks to the nearest ancestor of its provision that has
+a chapeau. When that chapeau is a reach chapeau, the paragraph has its
+reach, an *inherited* reach. When it is any other chapeau, the paragraph is
+not extracted: such a chapeau may state a reach in words these rules do not
+read. When no ancestor has a chapeau, a paragraph of the sentence form has
+no reach, and a paragraph of the list form is not extracted. The reach
+words are recorded exactly as the text has them, from the opening to the
+end of the object; a definition with no reach has the words `unstated`.
+
+### What is not extracted
+
+A paragraph that matches a pattern is still not extracted when one of these
+holds:
+
+- *It defines a second term.* After the `Verb`, the text holds a `Q` that
+  is followed by a space and a verb form, or by a comma, a space, text with
+  no quotation mark, a comma, a space and a verb form.
+- *Its aside speaks of a reach.* The `Aside` begins with `in` and a space,
+  or holds `as used in`, `when used in`, `for purposes of`,
+  `for the purposes of`, `for the purpose of` or `for purpose of`, in any
+  case.
+- *A reach follows its verb.* The `Verb` is followed by a comma, a space,
+  one of the openings in any case, and a space.
+- *It has no reach, and speaks of one.* It has the words `unstated`, and
+  its text holds one of the six phrases of the second case, in any case.
+
+A borrowed definition with no link after its verb is not extracted either
+(below).
+
+### The region
+
+When the `Object` is `this`, a space and one of `title`, `subtitle`,
+`chapter`, `subchapter`, `part`, `subpart`, `division`, `section`,
+`subsection`, `paragraph`, `subparagraph`, `clause`, and then either
+nothing more or a comma, a space and text that begins `unless the context`,
+the region is the nearest ancestor whose kind is that word, counted from
+the provision whose text holds the reach (that provision included, then its
+ancestors, then its unit's containers in order, the nearest first). When
+the `Object` is a single link whose target is an address below the prefix
+of the corpus, the region is that target. Otherwise there is no region: a
+link to a public law or to the Statutes at Large names no region of the
+Code, and an object that says more than these forms allow ("this chapter
+and chapter 5", "paragraph (1)") is not resolved.
+
+### The basis
+
+| Region | Unit | Basis |
+| --- | --- | --- |
+| none | any | `unresolved` |
+| an address | its file declares its title positive law (`positive_law true`) | `enacted` |
+| an address | any other | `restated` |
+
+### Borrowed definitions
+
+A definition of kind `borrowed` records as `borrowed_from` the target of the
+first link that begins at or after the end of its verb form. If there is
+none, the paragraph is not extracted, and so it is when that link has an
+empty target.
+
+### The note
+
+When the basis is `restated` and the unit has an editorial note whose
+heading is "References in Text", one of whose own paragraphs (not one
+inside a table or quoted content) holds, in any case, the words that name
+the region (`this` and the kind word, or the words of the link) followed by
+`, referred to in`, the definition records the address of the first such
+note as `see_note`.
+
+### What the values mean
+
+- `unstated`: neither the paragraph nor a chapeau above it states a reach
+  in the forms these rules read. A reach stated somewhere else, for example
+  in another subsection of the same section, is not read, so a definition
+  whose words are `unstated` may still have a reach that the text states
+  elsewhere.
+- `unresolved`: the rules found no region. That includes reach words that
+  name a part of the Code in a form the rules do not resolve, such as "this
+  chapter and chapter 5", "subparagraph (A) of this paragraph" or, of a
+  court rule, "this Rule 3021", a reach
+  that names a law outside the Code, such as "this Act" or a link to a
+  public law, and a reach whose kind word names neither the provision that
+  states the reach nor any provision or container above it. For an
+  inherited reach, the provision that states it is the provision of the
+  chapeau.
+- `restated`: the file does not declare its title positive law (its flag is
+  `no`, or it has none), so the words of the provision are those of the
+  editors of the Code, and the reach the law enacted may differ from the
+  one they state: a "this chapter" of the Code may stand for "this Act" or
+  "this title" of the law the editors classified there. `see_note`, when a
+  definition has one, is the address of the first editorial note headed
+  "References in Text" one of whose own paragraphs holds, in any case, the
+  words that name the region followed by `, referred to in`. Such a note
+  often says what the enacted words were; the rules do not check that it
+  does.
+
+An invented example: the chapeau of a section of an invented title that is
+positive law, and the definitions extracted from its paragraphs.
+
+```text
+§ 2. Definitions
+In this section:
+  (1) Widget.—The term “widget” means a small device.
+  (2) “gadget” includes a widget.
+  (3) The term “sprocket” has the meaning given such term in section 5 of this title.
+
+definition ".../s2/1"  term "widget"    kind means     words "In this section"  region ".../s2"  basis enacted
+definition ".../s2/2"  term "gadget"    kind includes  words "In this section"  region ".../s2"  basis enacted
+definition ".../s2/3"  term "sprocket"  kind borrowed  words "In this section"  region ".../s2"  basis enacted
+                       borrowed_from the target of the link "section 5 of this title"
+```
+
+Of the definitions of a module, which [the canonical form](#syntax) writes
+in the order of their provisions and then of their first term, two of one
+provision with one first term keep the order of their parts. The checker
+holds each to the rules of
+[What the checker verifies in one module](#what-the-checker-verifies-in-one-module).
 
 ## Curated modules: imports, citations and names
 
@@ -1421,8 +1637,9 @@ there is not judged, since the one diagnostic of the dependency is the
 report; a target that is no address is `malformed` all the same. The
 check exits 1.
 
-The check writes nothing inside the directory of a dependency, with any
-cache or with none: the entries of the module files of a dependency go
+But for one layout that [Limits](#limits) names, the check writes nothing
+inside the directory of a dependency, with any cache or with none: the
+entries of the module files of a dependency go
 into the cache of the workspace that is checked, by default
 `.fidryn-cache` inside it, under the keys of their bytes as every entry is,
 so that the next check reads them from there. When the cache's directory
@@ -1442,7 +1659,9 @@ check with `--no-cache`. The paths are compared with every link and every
 `..` resolved, and of a directory that does not exist yet, the part that
 exists is resolved and the rest taken as written; a cache's directory that
 does not exist yet lies inside a dependency when the part of it that exists
-does.
+does. Only the two directories themselves are compared: a symbolic link
+below the cache's directory that leads into a dependency is followed when
+an entry is written through it.
 
 The summary line and the check report are about the workspace that is
 checked. `modules` and `from cache` count its own module files, and the
@@ -1756,15 +1975,17 @@ the notes of each layer likewise against `added`, `removed`, `moved` and
 `added` and `changed`. So an address in `amended_text` where
 `amended_structure` was due, or a wrong pairing of moved provisions, is
 not something it can see; the tests of `fidryn-driver` hold each list on
-its own. The conformance tests run it on invented pairs of releases beside
-the command.
+its own. It compares neither `prefix`, nor the two releases and their lock
+digests, nor `stale_bindings`. The conformance tests run it on invented
+pairs of releases beside the command.
 
 ## The ingester for the United States Code
 
 `fidryn-ingest-uscode` imports the United States Code from the official
 XML release point published by the Office of the Law Revision Counsel. It
 reads the archives of one release, each verified against its retrieval
-record, into the units and containers of the model, which
+record, into the units and containers of the model, with the definitions
+of each unit that [Definitions](#definitions) describes, which
 [`fidryn ingest uscode`](cli.md#ingest) writes as a generated workspace
 with the prefix `/us/usc`. It is the one crate that knows the Code's
 titles, the publisher's elements and their status values; the command
@@ -1991,217 +2212,6 @@ element ids, their publication name, the creation time of their metadata
 and their release note give the same modules, and locks that differ only
 in `release` and `artifacts`.
 
-## Definitions
-
-The ingester for the United States Code extracts definitions from the
-provisions of every unit it imports, once the unit's provisions and notes
-are read, and writes each in the unit's module as a `definition` block
-([Syntax](#syntax)): the provision that holds it, its terms, its kind, the
-words that state its reach, the region the reach covers, its basis, and,
-where the rules give them, what it borrows its meaning from and a note to
-read with it. A container has no definitions. The rules read definitions
-written in a closed list of forms and in no other: they do not find every
-definition of the Code, and a provision whose text matches none of the
-forms is imported as a plain provision, with no definition. A definition
-the rules do not find is missing from the module; a definition they find
-records its terms, its kind and its reach words as the text has them.
-
-### Where definitions are read
-
-A definition is extracted from the first block of a `chapeau` or `content`
-part of a provision of a unit, when that block is a paragraph and its text
-matches one of the patterns below, and from nothing else: not from a note,
-not from quoted content, and not from a later block of a part. The text of
-a paragraph is its plain text: the words of its runs, in order, without its
-footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
-at least one character and neither mark inside it; the term is recorded
-without the marks. Where these rules say "in any case", the letters `A` to
-`Z` are compared as `a` to `z`, and no other character is changed. Where
-they speak of words that a text holds, they mean whole words: a word is
-bounded by the start or the end of the text or by a character that is not
-one of the letters `A` to `Z` and `a` to `z`.
-
-### Verbs
-
-| Kind | Verb forms |
-| --- | --- |
-| `means` | `means`, `mean`, `shall mean` |
-| `includes` | `includes`, `include`, `shall include` |
-| `does_not_include` | `does not include`, `do not include`, `shall not include` |
-| `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given` |
-
-A verb form stands where its words are followed by the end of the text or
-by a character that is not one of the letters `A` to `Z` and `a` to `z`;
-where a rule looks for a verb form inside other text, the character before
-it is not such a letter either.
-
-### Patterns
-
-1. *Sentence form.* The paragraph begins
-   `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`.
-   `Aside` is text with no quotation mark and no verb form of the table in
-   it.
-2. *List form.* The paragraph begins
-   `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and it has
-   an inherited reach (below).
-
-One space stands between two parts of a pattern, and a comma stands
-directly after the part before it: `the term “widget”, with respect to a
-gadget, means`, `the terms “widget” and “gadget” mean`. The kind of the
-definition is the kind of its verb form.
-
-### The reach
-
-`Reach` is `Opening Object`. `Opening` is one of `As used in`, `In`,
-`For purposes of`, `For the purposes of`, `For the purpose of`,
-`For purpose of` and `When used in`. `Object` is the text from the opening
-to the end of the reach: it is not empty, it holds no quotation mark, and
-it holds none of the words `term`, `terms`, `word`, `words`, `phrase`,
-`phrases`, `definition`, `definitions`, `following`, `meaning` and
-`meanings`, in any case. After `In`, the `Object` must begin with `this` and
-a space, or be a single link; a paragraph that opens with `In` and anything
-else ("In the case of an individual, the term ...") states a condition, not
-a reach. In the sentence form the reach ends at the comma that stands before
-`the term` (or `The`, `terms`, `word`, `words`, `phrase`), and no quotation
-mark stands before that comma. A paragraph whose text before those words is
-anything other than a `Reach` is not extracted.
-
-A single link is an object whose words are exactly the words of one link
-of the paragraph.
-
-### A reach chapeau
-
-The chapeau of a provision is a *reach chapeau* when it is one paragraph
-whose text is `Reach [[","] LeadIn] Close`, and nothing more. `LeadIn` is
-one of `the term`, `the terms`, `the following definitions apply` and
-`the following definitions shall apply`. `Close` is a dash (U+2014 or `-`)
-or a colon, with at most one space before it. The lead-in and the close are
-no part of the reach. `In this section:`, `As used in this chapter, the
-term—` and `In this section, the following definitions apply:` are reach
-chapeaus; `The following rules apply:`, `Except as otherwise provided, in
-this chapter:` and `In this chapter, the following terms have the following
-meanings:` are not.
-
-### The reach of a paragraph
-
-A paragraph of the sentence form that begins with a `Reach` has that reach.
-Any other paragraph looks to the nearest ancestor of its provision that has
-a chapeau. When that chapeau is a reach chapeau, the paragraph has its
-reach, an *inherited* reach. When it is any other chapeau, the paragraph is
-not extracted: such a chapeau may state a reach in words these rules do not
-read. When no ancestor has a chapeau, a paragraph of the sentence form has
-no reach, and a paragraph of the list form is not extracted. The reach
-words are recorded exactly as the text has them, from the opening to the
-end of the object; a definition with no reach has the words `unstated`.
-
-### What is not extracted
-
-A paragraph that matches a pattern is still not extracted when one of these
-holds:
-
-- *It defines a second term.* After the `Verb`, the text holds a `Q` that
-  is followed by a space and a verb form, or by a comma, a space, text with
-  no quotation mark, a comma, a space and a verb form.
-- *Its aside speaks of a reach.* The `Aside` begins with `in` and a space,
-  or holds `as used in`, `when used in`, `for purposes of`,
-  `for the purposes of`, `for the purpose of` or `for purpose of`, in any
-  case.
-- *A reach follows its verb.* The `Verb` is followed by a comma, a space,
-  one of the openings in any case, and a space.
-- *It has no reach, and speaks of one.* It has the words `unstated`, and
-  its text holds one of the six phrases of the second case, in any case.
-
-A borrowed definition with no link after its verb is not extracted either
-(below).
-
-### The region
-
-When the `Object` is `this`, a space and one of `title`, `subtitle`,
-`chapter`, `subchapter`, `part`, `subpart`, `division`, `section`,
-`subsection`, `paragraph`, `subparagraph`, `clause`, and then either
-nothing more or a comma, a space and text that begins `unless the context`,
-the region is the nearest ancestor whose kind is that word, counted from
-the provision whose text holds the reach (that provision included, then its
-ancestors, then its unit's containers in order, the nearest first). When
-the `Object` is a single link whose target is an address below the prefix
-of the corpus, the region is that target. Otherwise there is no region: a
-link to a public law or to the Statutes at Large names no region of the
-Code, and an object that says more than these forms allow ("this chapter
-and chapter 5", "paragraph (1)") is not resolved.
-
-### The basis
-
-| Region | Unit | Basis |
-| --- | --- | --- |
-| none | any | `unresolved` |
-| an address | its file declares its title positive law (`positive_law true`) | `enacted` |
-| an address | any other | `restated` |
-
-### Borrowed definitions
-
-A definition of kind `borrowed` records as `borrowed_from` the target of the
-first link that begins at or after the end of its verb form. If there is
-none, the paragraph is not extracted, and so it is when that link has an
-empty target.
-
-### The note
-
-When the basis is `restated` and the unit has an editorial note whose
-heading is "References in Text", one of whose own paragraphs (not one
-inside a table or quoted content) holds, in any case, the words that name
-the region (`this` and the kind word, or the words of the link) followed by
-`, referred to in`, the definition records the address of the first such
-note as `see_note`.
-
-### What the values mean
-
-- `unstated`: neither the paragraph nor a chapeau above it states a reach
-  in the forms these rules read. A reach stated somewhere else, for example
-  in another subsection of the same section, is not read, so a definition
-  whose words are `unstated` may still have a reach that the text states
-  elsewhere.
-- `unresolved`: the rules found no region. That includes reach words that
-  name a part of the Code in a form the rules do not resolve, such as "this
-  chapter and chapter 5" or "subparagraph (A) of this paragraph", a reach
-  that names a law outside the Code, such as "this Act" or a link to a
-  public law, and a reach whose kind word names neither the provision that
-  states the reach nor any provision or container above it. For an
-  inherited reach, the provision that states it is the provision of the
-  chapeau.
-- `restated`: the file does not declare its title positive law (its flag is
-  `no`, or it has none), so the words of the provision are those of the
-  editors of the Code, and the reach the law enacted may differ from the
-  one they state: a "this chapter" of the Code may stand for "this Act" or
-  "this title" of the law the editors classified there. `see_note`, when a
-  definition has one, is the address of the first editorial note headed
-  "References in Text" one of whose own paragraphs holds, in any case, the
-  words that name the region followed by `, referred to in`. Such a note
-  often says what the enacted words were; the rules do not check that it
-  does.
-
-An invented example: the chapeau of a section of an invented title that is
-positive law, and the definitions extracted from its paragraphs.
-
-```text
-§ 2. Definitions
-In this section:
-  (1) Widget.—The term “widget” means a small device.
-  (2) “gadget” includes a widget.
-  (3) The term “sprocket” has the meaning given such term in section 5 of this title.
-
-definition ".../s2/1"  term "widget"    kind means     words "In this section"  region ".../s2"  basis enacted
-definition ".../s2/2"  term "gadget"    kind includes  words "In this section"  region ".../s2"  basis enacted
-definition ".../s2/3"  term "sprocket"  kind borrowed  words "In this section"  region ".../s2"  basis enacted
-                       borrowed_from the target of the link "section 5 of this title"
-```
-
-The definitions of a module are written in the order of their provisions
-in the document and then of their first term, and two definitions of one
-provision with one first term keep the order of their parts. The checker
-holds each to the rules of [What the checker verifies in one module](#what-the-checker-verifies-in-one-module):
-its provision is in the module, each term stands in its text, and the reach
-words stand in its text or in the chapeau of one of its ancestors.
-
 ## The coverage ledger
 
 A generated workspace holds at its top its coverage ledger,
@@ -2352,3 +2362,99 @@ documents give.
 cargo xtask uscode-sample
 cargo xtask uscode-sample --update
 ```
+
+## Limits
+
+Each of these is true of the code at this version. They say what the code
+does and does not do where a reader of the sections above could expect
+more.
+
+### Workspaces and the cache
+
+- A dependency of a curated workspace is a generated workspace, named by
+  a path relative to the directory of the manifest. A curated workspace
+  cannot depend on another curated workspace (`E740`), and a dependency
+  named by an absolute path is refused (`E730`).
+- The check compares the cache's directory with the directory of each
+  dependency, and not what lies below the cache's directory. When a
+  symbolic link there, such as a `v1` that leads into a dependency, is
+  followed, the check writes its entries inside the dependency.
+- A check that is killed while it writes an entry of the cache leaves the
+  temporary file of the entry, whose name begins with a dot and ends in
+  `.tmp`, in the cache. Nothing reads it, and nothing removes it.
+- A module file name such as `s1932~2.fr` has the shape of a Windows 8.3
+  short name. On a volume that gives files such short names, it could be
+  the short name of another file of the same directory.
+
+### Diagnostics
+
+- `fidryn check` prints a diagnostic of a module of edition 2 as
+  `FILE: CODE Title: message`, with no line and no column: the span the
+  diagnostic is about is recorded and not printed. A message that names
+  what it is about, such as the provision whose hash does not match, says
+  where it is; "text is not normalized" does not.
+- `E740` has the title `PinMismatch` also when a dependency fails for
+  another reason than its pin: no directory, no manifest, a curated
+  workspace, no lock, or errors of its own.
+
+### Definitions
+
+- The rules read definitions in a closed list of forms and in no other
+  ([Definitions](#definitions)). They do not find every definition, and
+  the share of the definitions they miss has not been measured.
+- `unstated` is given when neither the paragraph nor a chapeau above it
+  states a reach. A reach stated in a sibling provision, such as "In this
+  section" as subsection (a) with the definitions in subsection (b), is
+  not seen.
+- An exception written inside the text of a definition, such as "means a
+  widget, except in section 5", does not narrow its region: the region is
+  that of the reach alone.
+
+### Change sets
+
+- The credit and the footnotes of a unit or a container that is on one
+  side only, and of a unit that moved, are in no list.
+- Where a footnote marker stands inside its provision is in no hash, and
+  so in no list: a marker that moves within one provision changes nothing
+  that a change set lists.
+- A superscript that the source does not mark as a footnote marker is
+  text, even when it shows the number of a footnote. A provision that
+  gained only such a superscript is in `operative.amended_text`, and a
+  binding of it, or of a provision above it, goes stale. The cost is a
+  false alarm, never a missed change.
+- A change of the aliases of a unit, of the container a unit or a container
+  stands in, or of the positive-law flag of a file, is in no list; a unit
+  that moves to another container lists the two containers, whose members
+  changed. A title enacted as positive law between two releases, with no
+  other change, gives a change set in which every list is empty, and the
+  bases of its definitions, which follow the flag, are in no list either:
+  definitions are in no hash.
+- `conformance/usc_compare.py --against` checks the unions of the lists,
+  as [Change sets](#change-sets) says. It cannot see a provision in the
+  wrong one of two lists whose union it checks, or a wrong pairing of a
+  move, and it compares neither the prefix, the two releases nor
+  `stale_bindings`. The tests of `fidryn-driver` hold each list on its
+  own.
+
+### The ingester and the independent reading
+
+- The ingester and `conformance/uslm_text.py` read two forms of the
+  publisher's XML differently. A `continuation` or a `proviso` inside a
+  `content` that stands directly in a note is read by the ingester as
+  blocks of the note and refused by the independent reading. A note inside
+  a paragraph or a text part of quoted content, rather than directly in
+  the quoted content or in one of its levels, is refused by the ingester
+  and read by the independent reading. Each fails loudly when one appears:
+  a refusal, or a comparison of the two readings that fails, never
+  altered text. The check of [the sample](#the-sample) holds the two to
+  the same text on the sample.
+- A table of contents is not imported. The lock counts it
+  ([What it does not import](#what-it-does-not-import)).
+- No display citation is derived. The address is the one citation a module
+  records, and no form such as "1 U.S.C. § 8(b)" is made from it.
+
+### Fetching
+
+- `tools/fetch_uscode.py` follows a redirect without checking the host it
+  leads to, and the retrieval record names the address the tool asked for,
+  not the one that served the bytes.
