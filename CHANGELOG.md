@@ -261,6 +261,9 @@ interchange schema versions are maintained independently of the interpreter.
   quoted content whose `origin` is empty as having none; a topic that holds
   any other white space is refused with the note named. A workspace the
   importer writes from such a release checks.
+- Both readings of the publisher's XML refuse a `ref` that has an `href`
+  and the class `footnoteRef`, which would be at once a link and a footnote
+  marker, with the element named.
 
 ## [0.2.0] - 2026-11-16
 

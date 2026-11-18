@@ -2070,7 +2070,8 @@ A document is refused when:
   `yes` nor `no`;
 - an element stands where its class does not allow it, or is in no class
   below; or text stands where only elements may;
-- a `ref` has neither an `href` nor the class `footnoteRef`; a link, a
+- a `ref` has neither an `href` nor the class `footnoteRef`, or has both,
+  so that it would be at once a link and a footnote marker; a link, a
   superscript or a subscript stands inside another, or a footnote marker
   inside one; a footnote marker holds an element; a marker names no
   footnote of its module, or two footnotes of one module have one `id`;

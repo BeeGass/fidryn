@@ -591,12 +591,19 @@ class TextBuilder:
         if is_footnote(element):
             return
         if tag == "ref":
-            if is_marker(element):
+            link = element.get("href")
+            if link is not None and is_marker(element):
+                self.reader.refuse(
+                    "a ref that is both a link, with an href, and a footnote marker, of the "
+                    "class footnoteRef",
+                    element,
+                )
+            elif is_marker(element):
                 self.marker(element)
-            elif element.get("href") is None:
+            elif link is None:
                 self.reader.refuse("a ref with neither an href nor the class footnoteRef", element)
             else:
-                self.run("ref", element, element.get("href") or "")
+                self.run("ref", element, link)
         elif tag in SUP_TAGS:
             self.run("sup", element, "")
         elif tag in SUB_TAGS:

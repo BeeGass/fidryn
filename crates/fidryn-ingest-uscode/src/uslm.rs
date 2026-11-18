@@ -654,18 +654,25 @@ fn inline_class<'a>(node: Node<'a, '_>) -> Result<Option<Inline<'a>>, IngestErro
     if let Some(name) = uslm_name(node) {
         return Ok(match name {
             "ref" => {
-                if let Some(target) = node.attribute("href") {
-                    Some(Inline::Link(target))
-                } else if node
-                    .attribute("class")
-                    .is_some_and(|class| class.split_ascii_whitespace().any(|c| c == "footnoteRef"))
-                {
-                    Some(Inline::Marker)
-                } else {
-                    return Err(IngestError::at(
-                        node,
-                        "a ref that has neither an href nor the class footnoteRef",
-                    ));
+                let marker = node.attribute("class").is_some_and(|class| {
+                    class.split_ascii_whitespace().any(|c| c == "footnoteRef")
+                });
+                match (node.attribute("href"), marker) {
+                    (Some(_), true) => {
+                        return Err(IngestError::at(
+                            node,
+                            "a ref that is both a link, with an href, and a footnote marker, of \
+                             the class footnoteRef",
+                        ));
+                    }
+                    (Some(target), false) => Some(Inline::Link(target)),
+                    (None, true) => Some(Inline::Marker),
+                    (None, false) => {
+                        return Err(IngestError::at(
+                            node,
+                            "a ref that has neither an href nor the class footnoteRef",
+                        ));
+                    }
                 }
             }
             "sup" => Some(Inline::Sup),
@@ -1685,6 +1692,13 @@ mod tests {
                 "neither an href nor the class footnoteRef",
             ),
             (
+                format!(
+                    "<content>A widget<ref class=\"footnoteRef\" href=\"/us/usc/t99/s2\" \
+                     idref=\"f1\">1</ref> is red.{FOOTNOTE}</content>"
+                ),
+                "both a link, with an href, and a footnote marker",
+            ),
+            (
                 "<content>See <ref href=\"/us/usc/t99/s2\">section <ref href=\"/us/usc/t99/s3\">3\
                  </ref></ref>.</content>"
                     .to_owned(),
@@ -1812,6 +1826,31 @@ mod tests {
             error.message().contains("not one of the 19 values"),
             "{error}"
         );
+    }
+
+    #[test]
+    fn a_ref_that_is_both_a_link_and_a_footnote_marker_is_refused() {
+        const FOOTNOTE: &str = "<note type=\"footnote\" id=\"f1\"><num>1</num> A footnote.</note>";
+        let both = "<ref class=\"other footnoteRef\" href=\"/us/usc/t99/s2\" idref=\"f1\">1</ref>";
+        for inner in [
+            format!("<content>A widget{both} is red.{FOOTNOTE}</content>"),
+            format!("<heading>Widgets{both}{FOOTNOTE}</heading><content>Text.</content>"),
+            format!(
+                "<content>Text.{FOOTNOTE}</content><notes type=\"uscNote\"><note \
+                 topic=\"miscellaneous\"><heading>Note</heading><p>A note{both}.</p></note></notes>"
+            ),
+        ] {
+            let mut document = Doc::with_section(&inner);
+            document.body = document.body.replacen("<heading>Invented</heading>", "", 1);
+            let error = refusal(&document);
+            assert!(
+                error
+                    .message()
+                    .contains("both a link, with an href, and a footnote marker"),
+                "{inner}: {error}"
+            );
+            assert_eq!(error.element(), Some("ref"), "{inner}: {error}");
+        }
     }
 
     /// The document of an empty section with the status `status`.

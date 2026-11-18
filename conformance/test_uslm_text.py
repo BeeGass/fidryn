@@ -542,6 +542,13 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
         document(inner="<content>See <ref>this</ref>.</content>"),
         "neither an href nor the class footnoteRef",
     ),
+    "ref that is both a link and a footnote marker": (
+        document(
+            inner='<content>A widget<ref class="footnoteRef" href="/us/usc/t99/s2" idref="f1">'
+            f"1</ref> is red.{FOOTNOTE}</content>"
+        ),
+        "both a link, with an href, and a footnote marker",
+    ),
     "status that is not one of the schema's": (
         document(body=SECTION.format(inner="").replace("<section ", '<section status="gone" ')),
         "status",
