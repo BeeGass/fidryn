@@ -183,7 +183,7 @@ requires that digest fails with E200. Pasted source in the
 Modules may import another module by name and version. An import that
 carries a `digest` must find that digest on an authenticated artifact of
 the source manifest above, or the checker reports E200. An `alias` line
-in an import is accepted and ignored in 0.2.
+in an import is accepted and ignored in 0.3.
 
 ```
 import MA.TrustLaw.Fixture version "2026-08-23"

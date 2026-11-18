@@ -40,7 +40,9 @@ pub struct Manifest {
     /// the check of the workspace to say, not for [`Manifest::from_json`].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release: Option<String>,
-    /// The version of the toolchain the workspace was last checked with.
+    /// The version of the toolchain that whoever wrote the manifest recorded;
+    /// an importer records its own. No check writes it: a check compares it
+    /// with its own version and reports a difference as `W760`, a warning.
     pub toolchain: String,
     pub dependencies: Vec<Dependency>,
 }

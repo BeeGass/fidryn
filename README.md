@@ -39,7 +39,8 @@ curated workspace, written by hand, against the provisions they name;
 `fidryn coverage` counts what a generated workspace holds. The repository holds a
 sample of three titles of the Code, imported and checked by
 `cargo xtask ci`, whose figures are on the page
-[Coverage](docs/coverage.md). Check the sample, then read one of its
+[Coverage](docs/coverage.md). Once `fidryn` is installed, as
+[Quick start](#quick-start) shows, check the sample, then read one of its
 sections:
 
 ```sh

@@ -42,7 +42,7 @@ the reader. The lines are written in the order of the draw, as compact JSON.
 The draw is that of `draw`: the population in the order of its addresses (the bytes of
 the address, then the place in the module or in the provision), shuffled by the first
 steps of a Fisher-Yates shuffle driven by SplitMix64 (`SplitMix64`), so that one seed
-draws the same lines with any version of the language.
+draws the same lines with any version of Python.
 
 Usage: uv run --locked python -I tools/draw_definition_samples.py --workspace DIR
   --records FILE --seed N --out DIR

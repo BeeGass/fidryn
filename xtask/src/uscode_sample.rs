@@ -647,6 +647,15 @@ fn ingest(archives: &Path, out: &Path, jobs: u32) -> Result<()> {
     Ok(())
 }
 
+/// `count` and `noun`, the noun in the plural unless the count is 1.
+fn counted(count: usize, noun: &str) -> String {
+    if count == 1 {
+        format!("1 {noun}")
+    } else {
+        format!("{count} {noun}s")
+    }
+}
+
 /// Step 7: the check of the curated sample under `root`, in this process
 /// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
 /// runs it. It gives the number of the sample's citations, and fails,
@@ -664,10 +673,10 @@ fn check_curated(root: &Path) -> Result<u64> {
             None => CURATED.to_owned(),
         });
         let mut problem = format!(
-            "{shown}; `fidryn check {CURATED} --no-cache` finds {} errors and {} warnings, and the \
-             curated sample checks with none",
-            report.errors(),
-            report.warnings()
+            "{shown}; `fidryn check {CURATED} --no-cache` finds {} and {}, and the curated sample \
+             checks with none",
+            counted(report.errors(), "error"),
+            counted(report.warnings(), "warning")
         );
         if first.code == DiagnosticCode::E740 {
             problem.push_str(
@@ -1615,10 +1624,17 @@ mod tests {
                 "samples/uscode/curated/zz/sample/citations.fr: W750 StaleBinding: the binding \
                  `railway_labor_definitions_binding` of `/us/usc/t45/s151` is stale (provision \
                  text changed)"
-            ) && message.contains("finds 0 errors and 1 warnings"),
+            ) && message.contains("finds 0 errors and 1 warning, and the curated sample"),
             "{message}"
         );
         fs::remove_dir_all(&copy).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_count_in_a_message_takes_its_noun_in_the_number_it_needs() {
+        assert_eq!(counted(0, "error"), "0 errors");
+        assert_eq!(counted(1, "error"), "1 error");
+        assert_eq!(counted(2, "warning"), "2 warnings");
     }
 
     #[test]

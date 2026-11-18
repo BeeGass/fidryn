@@ -637,8 +637,10 @@ with a dot is an error.
   with `/` between its segments, its `release`, and `lock_digest`, the
   BLAKE3 of the bytes of its lock
   ([Depending on another workspace](#depending-on-another-workspace)).
-- `toolchain` is the version of the toolchain the workspace was last
-  checked with.
+- `toolchain` is the version of the toolchain that whoever wrote the
+  manifest recorded; the importer records its own. No check writes it: a
+  check compares it with its own version and reports a difference as
+  `W760`, a warning.
 
 A generated workspace has a lock, `law.lock.json`, beside its manifest; a
 curated workspace has none. The lock records the archives the workspace
@@ -2396,6 +2398,21 @@ more.
 - `E740` has the title `PinMismatch` also when a dependency fails for
   another reason than its pin: no directory, no manifest, a curated
   workspace, no lock, or errors of its own.
+
+### Modules written by hand
+
+- A module's definitions, its aliases, `within`, `source` and
+  `positive_law` are in no hash ([Hashes](#hashes)), and the check of a
+  definition holds its form and not its region, its basis or its note
+  ([What the checker verifies in one module](#what-the-checker-verifies-in-one-module)):
+  a definition whose region, basis or note is edited by hand passes the
+  check.
+- `fidryn text` prints the strings of a module as they are. A module
+  written by hand can hold a control character below U+0020 that is no
+  white space, such as the escape, U+001B, that begins the sequences a
+  terminal acts on: normalization keeps it, the check accepts it, and
+  `fidryn text` writes it to the terminal. The importer never writes one,
+  since XML cannot hold one.
 
 ### Definitions
 

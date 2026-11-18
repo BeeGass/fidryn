@@ -7,6 +7,19 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [0.3.0] - 2026-11-18
 
+### Changed
+
+- `fidryn check PATH` given a directory checks the workspace at its top,
+  where 0.2.0 tried to read the directory as a module file and reported
+  `E100`; given a file, it checks the module as before.
+- The public enumeration `fidryn_core::DiagnosticCode` has seven new
+  variants, `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760`, and
+  `fidryn_cli::Command` four, `Ingest`, `Text`, `Coverage` and `Changes`.
+  Neither is `#[non_exhaustive]`, so a `match` that lists every variant of
+  either no longer compiles. `Command::Check` has five new fields, `jobs`,
+  `cache_dir`, `no_cache`, `report` and `unresolved`, which a pattern
+  without `..` and an expression that builds the variant must name.
+
 ### Added
 
 - Law modules of edition 2, which hold provisions of law as data. A file
@@ -72,9 +85,9 @@ interchange schema versions are maintained independently of the interpreter.
   definition borrows from, and the editorial note "References in Text" to
   read with a restated one (`fidryn_ingest_uscode::definitions::extract`).
   The rules do not find every definition. The one-module check accepts
-  reach words that stand in the chapeau of any ancestor of the provision,
-  where it accepted only its parent's. The sample's modules hold the
-  definitions extracted from them.
+  reach words that stand in the text of the provision or in the chapeau of
+  any of its ancestors. The sample's modules hold the definitions
+  extracted from them.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,
@@ -118,9 +131,10 @@ interchange schema versions are maintained independently of the interpreter.
   directory of a dependency, lies inside it or holds it is not used, and
   the check says so once. The target
   of every citation gets an outcome from the modules of the workspace and
-  of its dependencies: the check report gains `citations`, the count of
-  each outcome, and the unresolved list a line for each citation that is
-  not `exact`; what a dependency that failed hides is left out of both.
+  of its dependencies: the check report counts the citations by outcome,
+  in `citations`, and the unresolved list has a line for each citation
+  that is not `exact`; what a dependency that failed hides is left out of
+  both.
   `check_interfaces` takes what is known of each dependency
   (`fidryn_driver::workspace::DependencyInterfaces`).
 - A curated sample, `samples/uscode/curated/`, which depends on the
@@ -146,8 +160,10 @@ interchange schema versions are maintained independently of the interpreter.
   (`StaleReason`). An alias of a unit stands for the unit in
   `AddressIndex::provision_hash`. The curated sample binds one section of
   the generated sample, and the sample step fails when that binding is
-  stale. `DependencyInterfaces::Loaded` records the name and the release
-  of the dependency.
+  stale. `DependencyInterfaces::Loaded`, what is known of a dependency
+  that passed its checks, holds its name, the release of its lock, which a
+  stale binding into it is reported with, its prefix and the interfaces of
+  its modules.
 - The coverage ledger of a generated workspace, `coverage.json`,
   `fidryn.coverage/v0.1`, with the JSON Schema
   `schemas/coverage-v0.1.json`: the units, containers and provisions

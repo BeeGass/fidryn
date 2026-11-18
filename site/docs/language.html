@@ -242,7 +242,7 @@ requires that digest fails with E200. Pasted source in the
 <p>Modules may import another module by name and version. An import that
 carries a <code>digest</code> must find that digest on an authenticated artifact of
 the source manifest above, or the checker reports E200. An <code>alias</code> line
-in an import is accepted and ignored in 0.2.</p>
+in an import is accepted and ignored in 0.3.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture

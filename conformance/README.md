@@ -346,7 +346,7 @@ what a reader needs to judge it without opening the Code (the paragraph's
 text and the nearest chapeau above it among them), and an empty
 `verdict`. The draw is a Fisher-Yates shuffle driven by SplitMix64, written
 out in the tool, so that one seed draws the same lines with any version of
-the language; a sample once drawn is not written over.
+Python; a sample once drawn is not written over.
 
 ```sh
 uv run --locked python -I tools/draw_definition_samples.py --workspace DIR --records FILE --seed N --out DIR
