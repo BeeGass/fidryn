@@ -7,7 +7,10 @@ into a directory, and writes or extends the directory's retrieval record,
 `retrieval.json`: for each archive its file name, its address, the time of its download
 in UTC, its size, its SHA-256 and its BLAKE3. An archive that is present and equal to
 its record is not fetched again, and its record keeps its time. An archive whose bytes
-differ from its record is refused, never replaced.
+differ from its record is refused, never replaced. An archive, and the record that
+names it, are each written into a new file beside it, which is renamed once both are
+complete; an entry that has the name of such a file already, a symbolic link among
+them, is refused and left as it is.
 
 This is the only program in the repository that opens a connection.
 
@@ -20,6 +23,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import http.client
+import io
 import json
 import re
 import sys
@@ -216,34 +220,50 @@ def record_text(release: str, archives: dict[str, Archive]) -> str:
     return json.dumps(document, indent=2, ensure_ascii=False) + "\n"
 
 
-def write_record(path: Path, release: str, archives: dict[str, Archive]) -> None:
-    partial = path.with_name(f".{path.name}.part")
+def create(path: Path) -> io.BufferedWriter:
+    """A new file at `path`, open for writing. An entry that has that name already, a
+    symbolic link among them, is refused and left as it is."""
     try:
-        partial.write_text(record_text(release, archives), encoding="utf-8", newline="\n")
-        partial.replace(path)
-    finally:
+        return path.open("xb")
+    except FileExistsError as error:
+        raise FetchError(
+            f"{path} is there already: the tool writes through a new file of that name, and "
+            "leaves an entry it did not make as it is"
+        ) from error
+    except OSError as error:
+        raise FetchError(f"{path}: {error}") from error
+
+
+def record_beside(path: Path, release: str, archives: dict[str, Archive]) -> Path:
+    """Writes the record of `archives` into a new file beside `path`, and returns that
+    file, for the caller to rename to `path`."""
+    partial = path.with_name(f".{path.name}.part")
+    stream = create(partial)
+    try:
+        with stream:
+            stream.write(record_text(release, archives).encode("utf-8"))
+    except OSError as error:
         partial.unlink(missing_ok=True)
+        raise FetchError(f"{path}: {error}") from error
+    return partial
 
 
-def download(opener: Opener, url: str, target: Path) -> Digests:
-    """Writes the body served at `url` to `target`, and returns its digests."""
+def download(opener: Opener, url: str, stream: io.BufferedWriter) -> Digests:
+    """Writes the body served at `url` to `stream`, and returns its digests."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     sha256, digest, size = hashlib.sha256(), blake3.blake3(), 0
     try:
         response = opener(request)
         try:
-            with target.open("wb") as stream:
-                while chunk := response.read(CHUNK):
-                    stream.write(chunk)
-                    sha256.update(chunk)
-                    digest.update(chunk)
-                    size += len(chunk)
+            while chunk := response.read(CHUNK):
+                stream.write(chunk)
+                sha256.update(chunk)
+                digest.update(chunk)
+                size += len(chunk)
         finally:
             response.close()
     except (OSError, http.client.HTTPException) as error:
         raise FetchError(f"{url}: {error}") from error
-    if not zipfile.is_zipfile(target):
-        raise FetchError(f"{url} served {size} bytes that are not a zip archive")
     return Digests(size, sha256.hexdigest(), digest.hexdigest())
 
 
@@ -282,28 +302,39 @@ def fetch(
                 )
             lines.append(f"kept {file}")
             continue
+        # The archive and, for one not yet recorded, the record that names it are each
+        # written into a new file beside it; both are complete before either is renamed.
         partial = out / f".{file}.part"
+        stream = create(partial)
+        pending: Path | None = None
         try:
-            served = download(opener, url, partial)
+            with stream:
+                served = download(opener, url, stream)
+            if not zipfile.is_zipfile(partial):
+                raise FetchError(f"{url} served {served.bytes} bytes that are not a zip archive")
             retrieved_at = clock().astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
             if recorded is not None and (differences := served.differences(recorded)):
                 raise RefusedError(
                     f"{file}: {url} now serves bytes that differ from the record "
                     f"({'; '.join(differences)}); nothing is written"
                 )
+            if recorded is None:
+                archives[file] = Archive(
+                    file, url, retrieved_at, served.bytes, served.sha256, served.blake3
+                )
+                pending = record_beside(record, release, archives)
             partial.replace(target)
+            if pending is not None:
+                try:
+                    pending.replace(record)
+                except OSError as error:
+                    raise FetchError(f"{record}: {error}") from error
         except OSError as error:
             raise FetchError(f"{target}: {error}") from error
         finally:
             partial.unlink(missing_ok=True)
-        if recorded is None:
-            archives[file] = Archive(
-                file, url, retrieved_at, served.bytes, served.sha256, served.blake3
-            )
-            try:
-                write_record(record, release, archives)
-            except OSError as error:
-                raise FetchError(f"{record}: {error}") from error
+            if pending is not None:
+                pending.unlink(missing_ok=True)
         lines.append(f"fetched {file}")
     return lines
 

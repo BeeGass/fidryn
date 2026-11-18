@@ -236,15 +236,19 @@ uv run --locked python -I tools/fetch_uscode.py 119-142 --out DIR --all
 ```
 
 An archive that is present and equal to its record is kept, and is not
-fetched again. Exit `0` when every archive is fetched or kept, `1` when
-the tool refuses (an archive whose bytes differ from its record, an
-archive without a record, a record of another release), `2` when an
-archive cannot be fetched or the directory cannot be read or written.
+fetched again. An archive and the record are written through a new file
+beside each, and an entry of that name there already, a link among them,
+is not written through. Exit `0` when every archive is fetched or kept,
+`1` when the tool refuses (an archive whose bytes differ from its record,
+an archive without a record, a record of another release), `2` when an
+archive cannot be fetched or the directory cannot be read or written,
+such as when the name of a file it writes through is taken.
 `test_fetch_uscode.py` serves invented archives through a fake opener and
 opens no connection. It holds the tool to its addresses (titles `1` and
 `5a` of `119-142`, title `11a` of `119-73not60`, and `--all`), to the
-record it writes, to a second run that changes nothing, and to the refusal
-of an archive whose bytes changed.
+record it writes, to a second run that changes nothing, to the refusal
+of an archive whose bytes changed, and to the refusal of a temporary file
+that is there already.
 
 ## Checking a law repository
 
@@ -282,18 +286,38 @@ uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR
 
 The commits of the branch that is checked out, from its root, say where
 the replay stands, so a replay that is stopped goes on from the release it
-was in, and never commits a release twice or skips one. It removes only
-`uscode/`, and only when the repository holds `.git`, `uscode` is a
-directory and no link with the manifest of a generated workspace of
-`/us/usc`, and `uscode.next/` holds the complete import of the next
-release; anything else stops it with what it found. Each run of `fidryn`
+was in, and never commits a release twice or skips one. Before it asks
+git anything or writes anything, it holds the repository to be one of its
+own: `.git` is a directory in it, and git takes it to be the top of that
+repository, not a directory inside another one. It imports only into a
+`uscode.next` that is absent or a directory. It removes only `uscode/`,
+and only when the repository holds `.git`, `uscode` is a directory and no
+link with the manifest of a generated workspace of `/us/usc`, or an empty
+directory that a replay stopped between the removal of the manifest and
+of the directory left, when the run found the text form of the release
+kept, and `uscode.next/` holds the complete import of the next release. It
+writes each file through a new file beside it, and an entry of that name
+there already, a link among them, stops it and is left alone. Anything
+else stops it with what it found. The cache may not be the repository nor
+lie inside it, with links resolved on both sides. Each run of `fidryn`
 has a limit of its own on its address space and its time
 (`--memory-limit`, `--time-limit`). Exit `0` when every release is
 committed, `1` when the replay stops at what it found, `2` when a command
 or a file cannot be run, read or written. `test_replay_order.py` holds
 the list to the publisher's, the reading of a history to the commits it
 names, and the replacement to its conditions, with no network and no
-binary.
+binary. `test_replay_repository.py` replays three invented releases into
+a repository made with `git init` in a temporary directory, whose own
+configuration needs no signing key, with a stand-in for `fidryn`: a
+complete replay; replays stopped by a failure, of the stand-in, of a hook
+or of one call of the tool, before the replacement, before the commit,
+between the removal of the manifest and of the directory, and after the
+commit, and started again; a workspace changed after its commit; a path
+staged beyond what a commit holds; and the refusals of a `uscode.next`
+that is a link or a file, of a directory that is no repository of its
+own, of a cache inside the repository through a link, and of a temporary
+file that is there already. It needs `git` and `sh`, and is skipped where
+either is missing.
 
 ## Drawing definition samples
 

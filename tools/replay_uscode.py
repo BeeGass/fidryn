@@ -27,18 +27,28 @@ was in and goes on, and never makes a commit twice or skips a release. Before
 release, so that a replay stopped between the replacement and the commit commits that
 release with it; the file is removed once the commit holds the message.
 
-The only directory the tool removes is `uscode/`, and only when the repository holds
-`.git`; `uscode` is a directory, no symbolic link, with the manifest of a generated
-workspace of the prefix; and `uscode.next/` holds the complete import of the next
+Before it asks git anything or writes anything, the tool holds the repository to be a
+repository of its own: `.git` is a directory in it, and git takes the directory to be
+the top of the repository of that `.git`, not a directory inside another repository.
+Before an import, `uscode.next` is absent or a directory, never a symbolic link or a
+file. The only directory the tool removes is `uscode/`, and only when the repository
+holds `.git`; `uscode` is a directory, no symbolic link, with the manifest of a
+generated workspace of the prefix, or an empty directory when the run found the text
+form of the release kept (a replay stopped between the removal of the manifest and of
+the directory leaves one); and `uscode.next/` holds the complete import of the next
 release: its manifest and its lock read, and `fidryn check` of it found nothing. The
-manifest is removed last, and no symbolic link is followed. Anything else stops the
-replay with a sentence that says what it found.
+manifest is removed last, and no symbolic link is followed. The tool writes each of its
+files through a new file beside it, which it makes and renames; an entry that has the
+name of that file already stops the replay and is left as it is. Anything else stops
+the replay with a sentence that says what it found.
 
 Each run of `fidryn` has a limit of its own on its address space, set in the child
 before the program starts, and on its time; a run that exceeds one stops the replay.
 Git's configuration decides whether a commit is signed; no option is passed either
 way. Git's automatic housekeeping is turned off for these commits (`gc.auto=0`), so
-that no packing runs in the background while the replay works.
+that no packing runs in the background while the replay works. The cache of the checks
+is neither the repository nor inside it, the two paths compared with every link in the
+part of each that exists resolved.
 
 Usage: uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR
   --fidryn PATH --cache-dir DIR [--jobs N] [--memory-limit BYTES] [--time-limit SECONDS]
@@ -264,9 +274,18 @@ def remove_tree(top: Path, last: str) -> None:
         raise CannotRunError(f"{top}: {error}") from error
 
 
-def replace_workspace(repository: Path, release: str) -> None:
+def empty(directory: Path) -> bool:
+    try:
+        with os.scandir(directory) as found:
+            return next(found, None) is None
+    except OSError as error:
+        raise CannotRunError(f"{directory}: {error}") from error
+
+
+def replace_workspace(repository: Path, release: str, kept: bool = False) -> None:
     """Replaces `uscode/` of `repository` with `uscode.next/`, the import of `release`,
-    under the conditions the module says."""
+    under the conditions the module says; `kept` says that the run found the text form
+    of `release` kept."""
     if kind_of(repository / ".git") != "directory":
         raise StopReplayError(
             f"{repository} holds no directory `.git`, and the replay removes nothing "
@@ -283,7 +302,14 @@ def replace_workspace(repository: Path, release: str) -> None:
         raise StopReplayError(
             f"{workspace} is a symbolic link, and the replay removes only a directory"
         )
-    if found != "missing":
+    if kept and found == "directory" and empty(workspace):
+        # What a replay stopped between the removal of the manifest and of the
+        # directory leaves.
+        try:
+            os.rmdir(workspace)
+        except OSError as error:
+            raise CannotRunError(f"{workspace}: {error}") from error
+    elif found != "missing":
         generated_release(workspace)
         remove_tree(workspace, MANIFEST)
     try:
@@ -379,6 +405,31 @@ def text_of(found: bytes, what: str) -> str:
         raise StopReplayError(f"{what} is not UTF-8") from error
 
 
+def own_repository(repository: Path) -> None:
+    """Stops the replay unless `repository` holds a directory `.git` and git takes
+    `repository` to be the top of the repository of that `.git`. Git is asked only
+    after `.git` is found to be a directory."""
+    found = kind_of(repository / ".git")
+    if found != "directory":
+        raise StopReplayError(
+            f"{repository / '.git'} is {describe(found)}, and the replay commits only to a "
+            "repository whose `.git` is a directory of its own"
+        )
+    shown = git(repository, "rev-parse", "--show-toplevel", "--absolute-git-dir")
+    lines = text_of(shown, "what git names as the repository").split("\n")
+    if len(lines) != 3 or lines[2]:
+        raise StopReplayError(f"git does not name the top and the `.git` of {repository}")
+    top, git_directory = Path(lines[0]), Path(lines[1])
+    if (top.resolve(), git_directory.resolve()) != (
+        repository.resolve(),
+        (repository / ".git").resolve(),
+    ):
+        raise StopReplayError(
+            f"git takes {repository} to be in the repository {git_directory}, whose top is "
+            f"{top}; {repository / '.git'} is no repository of its own"
+        )
+
+
 def commits_of(repository: Path) -> list[str]:
     """The commits of the branch that is checked out, from its root, along first
     parents; none when the branch is unborn."""
@@ -420,10 +471,21 @@ def read_state(repository: Path) -> tuple[str, str] | None:
 
 
 def write_file(path: Path, text: str) -> None:
-    """Writes `text` to `path` through a file beside it that is renamed."""
+    """Writes `text` to `path` through a new file beside it that is renamed. An entry
+    that has the name of that file already, a symbolic link among them, stops the
+    replay and is left as it is."""
     partial = path.with_name(f".{path.name}.part")
     try:
-        with partial.open("w", encoding="utf-8", newline="\n") as stream:
+        stream = partial.open("x", encoding="utf-8", newline="\n")
+    except FileExistsError as error:
+        raise StopReplayError(
+            f"{partial} is there already, and the replay writes {path.name} through a new "
+            "file of that name; it is left as it is"
+        ) from error
+    except OSError as error:
+        raise CannotRunError(f"{partial}: {error}") from error
+    try:
+        with stream:
             stream.write(text)
         partial.replace(path)
     except OSError as error:
@@ -668,6 +730,12 @@ class Replay:
         """Commits `RELEASES[index]`; `kept` is the text form kept before a replacement
         that a replay stopped before its commit."""
         release = RELEASES[index]
+        found = kind_of(self.repository / NEXT)
+        if found not in ("missing", "directory"):
+            raise StopReplayError(
+                f"{self.repository / NEXT} is {describe(found)}, and the import of {release} "
+                "is made only into a directory, or where nothing is"
+            )
         archives = self.fetch(release)
         if kept is None:
             self.unchanged(index)
@@ -684,15 +752,16 @@ class Replay:
         else:
             message = kept
             self.say(release, "the text form was kept: the replacement is finished")
-            if kind_of(self.repository / NEXT) != "missing":
+            if found != "missing":
                 self.check(release, NEXT)
-                replace_workspace(self.repository, release)
+                replace_workspace(self.repository, release, kept=True)
             else:
                 self.check(release, WORKSPACE)
                 complete_import(self.repository / WORKSPACE, release)
         self.commit(index, message)
 
     def run(self) -> None:
+        own_repository(self.repository)
         commits = commits_of(self.repository)
         subjects = [
             text_of(message_of(self.repository, commit), f"the message of {commit}").split("\n", 1)[
@@ -770,7 +839,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--jobs, --memory-limit and --time-limit are at least 1")
     repository = args.repository.absolute()
     cache = args.cache_dir.absolute()
-    if cache == repository or repository in cache.parents:
+    # Compared with every link resolved in the part of each path that exists.
+    held, inside = repository.resolve(), cache.resolve()
+    if inside == held or held in inside.parents:
         parser.error("the cache directory lies outside the repository")
     replay = Replay(
         args.archives.absolute(),

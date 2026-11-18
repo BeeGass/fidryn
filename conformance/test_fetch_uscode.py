@@ -283,6 +283,27 @@ class Fetching(unittest.TestCase):
         self.assertIn(URL_1, str(caught.exception))
         self.assertEqual(self.names(), [])
 
+    def test_a_temporary_file_that_is_there_already_is_refused_and_left_alone(self) -> None:
+        self.out.mkdir()
+        elsewhere = self.directory / "elsewhere.txt"
+        elsewhere.write_text("Invented, and kept.\n", encoding="utf-8")
+        for name in (".xml_usc01@119-142.zip.part", ".retrieval.json.part"):
+            with self.subTest(name):
+                partial = self.out / name
+                partial.symlink_to(elsewhere)
+                try:
+                    with self.assertRaises(fetch_uscode.FetchError) as caught:
+                        self.fetch("1")
+                    self.assertIn(f"{partial} is there already", str(caught.exception))
+                    self.assertEqual(elsewhere.read_text(encoding="utf-8"), "Invented, and kept.\n")
+                    self.assertTrue(partial.is_symlink())
+                    # Neither the archive nor a record of it is written.
+                    self.assertEqual(self.names(), [name])
+                finally:
+                    partial.unlink()
+        self.assertEqual(self.fetch("1"), ["fetched xml_usc01@119-142.zip"])
+        self.assertEqual(self.names(), ["retrieval.json", "xml_usc01@119-142.zip"])
+
     def test_a_refused_request_keeps_what_came_before(self) -> None:
         del self.opener.served[URL_45]
         with self.assertRaises(fetch_uscode.FetchError) as caught:
