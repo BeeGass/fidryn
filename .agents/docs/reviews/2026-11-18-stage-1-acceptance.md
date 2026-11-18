@@ -19,11 +19,21 @@ it whether the stage is merged.
   `.agents/docs/reviews/2026-11-17-stage-1-full-code-run.md`, called "the
   run's record" below. Its sections are cited by their headings, and the lines
   that decide are copied from it. The import was not made again.
-- What was run again for this record is cheap and shows the state today: the
-  release build, `fidryn check` of the law repository's workspaces, `git log`
-  of the law repository, the script of item 13, the gate, the release check
-  and the license check. These runs were made on 2026-11-17 between 23:06 and
-  23:22, Eastern time, on the same workstation, through its scheduler.
+- The record was first committed in `e6fef77`, after cheap runs that showed
+  the state of that day: the release build, `fidryn check` of the law
+  repository's workspaces, `git log` of the law repository, the script of
+  item 13, the gate, the release check and the license check, made on
+  2026-11-17 between 23:06 and 23:22, Eastern time, on the same workstation,
+  through its scheduler.
+- A review of the whole branch then found eight faults, in cases no release
+  of the Code holds, and they were corrected. The section "What a review of
+  the whole branch found, and what was corrected", after the thirteen items,
+  says what was found, what was done and what was checked again. This record
+  was brought up to the corrected branch on 2026-11-18: the release build,
+  the check of the law repository, the script of item 13, the gate, the
+  release check, the license check and the package build were run again on
+  it. Each item says whether its verdict stands after the corrections, and
+  why.
 
 The record holds no text of the Code beyond addresses.
 
@@ -43,17 +53,24 @@ The record holds no text of the Code beyond addresses.
 | 10 | the existing tests and the Stage 0 checks pass | met with a written difference |
 | 11 | the reference documents the new declarations; the site shows the ledger | met with a written difference |
 | 12 | a second workspace at a pinned release | met |
-| 13 | the integration test of section 4.3 | met with a written difference |
+| 13 | the integration test of section 4.3, on this machine | met |
+| 13 | the integration test of section 4.3, on GitHub | **open** |
 
 ## Where things are
 
-**This repository.** The record is added by the commit whose parent is
-`71377f79e1b89afce3b954e5fa3b3cdc5fba297d` on the branch `lane/docs`. The
-gate ran on the tree of that commit without this file; no step of the gate
-reads `.agents/`.
+**This repository.** The record, as it stands now, is committed on the
+branch `fix/records`, in a commit whose parent is
+`47c9205a721739ecbe93add79aff079f7a0960e3`, which amends the plan on top of
+`b6d8b49a84729e2c83e0985d76f79654ab45ac07`, the last commit that changes
+code. The gate of item 10 ran on the tree of that commit
+with the changes of `.agents/` set aside; no step of the gate reads
+`.agents/`.
 
-**The binary.** It was built again from
-`98d5765a9391a69da231d0a20f68b19aed662094`, on a clean tree:
+**Two binaries.**
+
+The binary of the run made the import, the checks and the replay that items 1
+to 9 rest on. It was built from `d0658b6`, and built again from
+`98d5765a9391a69da231d0a20f68b19aed662094` on a clean tree on 2026-11-17:
 
 ```sh
 env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 16 --mem 25G --time 1h -- /usr/bin/time -v cargo build --release -p fidryn-cli --locked --offline
@@ -63,20 +80,27 @@ env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 16 --mem 25
 - 13,837,000 bytes; SHA-256
   `f2dd81dde0ade77b922bfb1a37155ef26f803377fc6d0548f4eb8bfe681a6ef3`, BLAKE3
   `1588aa901707193fda1858482da57f874c76152eff36cd5af10564f1c1412427`
-  (`sha256sum`, and `blake3` of the locked Python environment).
-- These are the digests of the binary of the run's record, built from
-  `d0658b6`, the one that made the import, the checks and the replay
-  (`sha256sum /cache/fidryn/task-21/fidryn` prints the same).
-- The commits after `98d5765` change no file under `crates/` or `xtask/`, nor
-  `Cargo.toml` or `Cargo.lock` (`git diff --stat 98d5765 HEAD -- crates xtask
-  Cargo.toml Cargo.lock rust-toolchain.toml` prints nothing).
+  (`sha256sum`, and `blake3` of the locked Python environment), the digests
+  `sha256sum /cache/fidryn/task-21/fidryn` gives of the run's own copy.
 - It was copied to `/cache/fidryn/task-23b/fidryn`. "BINARY" below is that
   file in the commands of this record, and the binary of the run in the
-  commands copied from the run's record: the same bytes. `BINARY --version`
-  prints `fidryn 0.3.0`.
+  commands copied from the run's record: the same bytes.
 
-Each run of BINARY for this record ran inside a job of the scheduler, one job
-at a time, under these limits:
+The corrected binary was built from `47c9205` on a clean tree on 2026-11-18,
+by the same command:
+
+- Exit 0, 23.26 s wall, 1,047,700 KiB peak.
+- 13,921,584 bytes; SHA-256
+  `ec39b6b99f44d200b003aaeb7f5d1180a8c340c22d9838be34a499331b4cb0fa`, BLAKE3
+  `56f9dc6a1f25cbebfd01a087ec8cb96fd7c9d9790448cf5f337ccc87899bf0c2`: the
+  same bytes as `/cache/fidryn/final/fidryn`, the build of `b6d8b49` with which
+  the controller of the run made the checks of the section on the corrections.
+- It was copied to `/cache/fidryn/task-23b/fidryn-final`, "FINAL" below.
+  `FINAL --version` prints `fidryn 0.3.0`. The commit that adds this version
+  of the record changes no file the binary is built from.
+
+Each run of BINARY or FINAL for this record ran inside a job of the
+scheduler, one job at a time, under these limits:
 
 ```sh
 lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit --as=17179869184 --cpu=3600 -- BINARY ...
@@ -84,7 +108,10 @@ lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit
 
 One job held six runs one after the other, each under its own limits ("Known
 limits", 1). The script of item 13 ran inside a job of the same size and gave
-each run of the binary the limits it sets itself.
+each run of the binary the limits it sets itself. Every check named its cache
+with `--cache-dir` under `/cache/fidryn/task-23b/`; `~/.cache/fidryn`, the
+default cache of a check since the corrections, did not exist before these
+runs and does not exist after them.
 
 **The law repository** is `/work/projects/law-local/`, local and with no
 remote (decision O-6). It was only read. Today:
@@ -97,8 +124,9 @@ remote (decision O-6). It was only read. Today:
 - `git --no-optional-locks status --short` prints nothing.
 
 Its git commands were run with `--no-optional-locks`, so that not even git's
-index was written. A file `MARKER` was made just before the first run of
-BINARY on the law repository, and after the last one
+index was written. On each of the two days a file `MARKER` was made just
+before the first run of a binary on the law repository, and after the last
+one
 
 ```sh
 find /work/projects/law-local -newer MARKER -not -path '/work/projects/law-local/.git/*' -not -path '/work/projects/law-local/.git'
@@ -126,8 +154,9 @@ archive").
 
 **Scratch.** The scripts and logs of this record are in
 `.agents/scratchpad/2026-11-17-stage1/work/task-23b/` of the main checkout of
-this repository, which git ignores. "SCRATCH" below is that directory. The
-caches and large outputs are under `/cache/fidryn/task-23b/`.
+this repository, which git ignores; those of 2026-11-18 begin with `fix1-`.
+"SCRATCH" below is that directory. The caches and large outputs are under
+`/cache/fidryn/task-23b/`.
 
 ## Item 1: the workspace is accepted in one invocation
 
@@ -144,11 +173,11 @@ lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit
 > - Output: `modules: 70794; from cache: 0; errors: 0; warnings: 0`, then `ok`.
 > - Exit 0, 3.29 s wall, 18.6 s user, 831,792 KiB peak.
 
-**Today**, on `uscode/` of `main` at `c9bd0e4`, with the cache the script of
-item 13 had filled:
+**Today**, on `uscode/` of `main` at `c9bd0e4`, with FINAL and the cache the
+script of item 13 had filled:
 
 ```sh
-cd /work/projects/law-local && lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v -o /cache/fidryn/task-23b/check-uscode.time timeout 1800 prlimit --as=17179869184 --cpu=3600 -- BINARY check /work/projects/law-local/uscode --jobs 16 --cache-dir /cache/fidryn/task-23b/cache --report /cache/fidryn/task-23b/report-uscode.json --unresolved /cache/fidryn/task-23b/unresolved-uscode.jsonl
+cd /work/projects/law-local && lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v -o /cache/fidryn/task-23b/fix1-check-uscode.time timeout 1800 prlimit --as=17179869184 --cpu=3600 -- FINAL check /work/projects/law-local/uscode --jobs 16 --cache-dir /cache/fidryn/task-23b/cache-final --report /cache/fidryn/task-23b/fix1-report-uscode.json --unresolved /cache/fidryn/task-23b/fix1-unresolved-uscode.jsonl
 ```
 
 ```text
@@ -156,16 +185,21 @@ modules: 70794; from cache: 70794; errors: 0; warnings: 0
 ok
 ```
 
-- Exit 0, 1.66 s wall, 831,296 KiB peak; nothing on stderr.
-- `diff /cache/fidryn/task-21/report-cold.json /cache/fidryn/task-23b/report-uscode.json`
+- Exit 0, 1.89 s wall, 831,244 KiB peak; nothing on stderr.
+- `diff /cache/fidryn/task-21/report-cold.json /cache/fidryn/task-23b/fix1-report-uscode.json`
   prints only `"from_cache": 0` against `"from_cache": 70794`.
-- `cmp /cache/fidryn/task-21/unresolved-cold.jsonl /cache/fidryn/task-23b/unresolved-uscode.jsonl`
+- `cmp /cache/fidryn/task-21/unresolved-cold.jsonl /cache/fidryn/task-23b/fix1-unresolved-uscode.jsonl`
   exits 0.
+- The same check with BINARY, on 2026-11-17, gave the same output, the same
+  report but for `from_cache`, and the same unresolved list
+  (`/cache/fidryn/task-23b/report-uscode.json`, `unresolved-uscode.jsonl`).
 
-The workspace in the law repository today is the one the import wrote, and it
-checks as it did then.
+The workspace in the law repository today is the one the import wrote, and
+the corrected build checks it as the build of the run did.
 
-**Verdict: met.**
+**Verdict: met.** It stands after the corrections: the corrected build checks
+the workspace the same way, and writes the same workspace for every release
+(the section on the corrections).
 
 ## Item 2: the counts
 
@@ -235,6 +269,12 @@ reproduced exactly by its own counting (`baseline`). The workspace's counts
 differ from them, by the rules above, for the reasons the run's record gives;
 the item asks for that explanation and it is written.
 
+It stands after the corrections. The ledger is part of the workspace, and
+the corrected build writes the same workspace for 119-142, so its counts are
+the same bytes. The profile was not run again with the corrected independent
+reading; the text that reading gives of every release of 2026 is the
+importer's, line for line (item 4).
+
 ## Item 3: every unresolved reference has a recorded reason
 
 > 3. Every unresolved reference in every layer has a recorded reason. None
@@ -268,13 +308,15 @@ unresolved list.
   closed list; none is without one. Each that is not `exact` has its line in
   the unresolved list, with its outcome as the reason.
 - Of these outcomes, the nearest to the design's "unknown" is `no-unit`: a
-  target below `/us/usc` that names nothing the workspace holds. The run's record lists one example
-  of it for each layer, and one of each other outcome but `exact` and
-  `outside`, for each layer; `outside` is given by the body of law it names.
+  target below `/us/usc` that names nothing the workspace holds. The run's
+  record lists one example of it for each layer, and one of each other
+  outcome but `exact` and `outside`, for each layer; `outside` is given by
+  the body of law it names.
 - `malformed` never occurs, so it has no example.
-- Today's unresolved list is the same bytes as that of the import (item 1).
+- The unresolved list that FINAL writes today is the same bytes as that of
+  the import (item 1).
 
-**Verdict: met.**
+**Verdict: met.** It stands after the corrections, by the last point.
 
 ## Item 4: the text and the pinned artifact
 
@@ -313,9 +355,22 @@ script, and with `cmp`.
   digest its lock records (`E730`).
 - In CI the same comparison runs on the sample: the gate of item 10 printed
   "the text of its 7609 records is what conformance/uslm_text.py prints".
+- **On every release, after the corrections.** The controller of the run
+  compared the output of `fidryn text uscode --json` with that of
+  `conformance/uslm_text.py` for each of the 27 releases of 2026, both with
+  the code of `e6fef77` and the binary of the run, and with the corrected
+  code of `b6d8b49` and its build. Both runs found the two outputs the same
+  bytes for 27 of 27 releases, 27,376,226 lines in all, from 1,006,854 for
+  119-73not60 to 1,015,386 for 119-142
+  (`/cache/fidryn/controller-text27/result.tsv` and
+  `/cache/fidryn/controller-text27-final/result.tsv`, one line for each
+  release; the script is `work/controller/text27.py` with the scratch files
+  of the run). The corrections changed both readings, so both runs count.
 
-**Verdict: met.** The two readings read two forms of the XML differently; no
-release of 2026 holds either form ("Known limits", 3).
+**Verdict: met.** It stands after the corrections, and its evidence is now
+wider than the item asks: the two readings agree on every release of the
+year, not only on 119-142. They read some forms of the XML differently that
+no release holds ("Known limits", 3).
 
 ## Item 5: the change set of a real pair, confirmed independently
 
@@ -359,16 +414,28 @@ amended, 0 moved, 4 credits and 18 footnotes changed; and no container.
   unions of the change set's lists that stand for them: added with the targets
   of moves, removed with their origins, and the two kinds of amended
   together. So the set of what changed in each of the three layers is
-  confirmed independently. Which list of a union an address is in, and the
-  pairing of a move, are held by the tests of `fidryn-driver` only ("Known
-  limits", 1).
+  confirmed independently.
+- "Exactly" holds within what a change set lists ("Known limits", 1). The
+  credit and the footnotes of a unit on one side only or moved, the place of
+  a footnote marker inside its provision, and a change of a unit's aliases,
+  of its container or of a file's positive-law flag are in no list. A
+  superscript that is not marked as a footnote marker is text, so a provision
+  that gained only one is listed as amended. Which list of a union an address
+  is in, and the pairing of a move, are held by the tests of `fidryn-driver`
+  only, not by the independent comparison.
 - F10 counts 9 units with a change in operative text and 14 with only an
   editorial one; the change set gives 10 and 13. The tenth is 26 U.S.C. 45Y,
   where a link was taken off words that stayed, which S15 counts as a change
   of the provision's own words; the independent comparison agrees with the
   change set (the run's record, "The count of each list").
 
-**Verdict: met.**
+**Verdict: met.** It stands after the corrections. One of them changed how
+like-named notes are listed, in `fidryn changes` and in `usc_compare.py`
+alike. The 26 change sets the corrected build writes from the archives are
+the same bytes as those the replay committed (the section on the
+corrections), so the change sets the independent comparison confirmed are the
+corrected build's. The corrected `usc_compare.py` was not run again on the
+real pairs.
 
 ## Item 6: staleness
 
@@ -384,7 +451,9 @@ workspace `encodings/` of the law repository, pinned to 119-142, binds
 changed only in its enacted notes) and `/us/usc/t26/s457/e/14` (its unit
 changed only in editorial matter, a footnote marker added in this very
 paragraph), each with the release 119-138 and the hashes `fidryn text
---hashes` printed for it in 119-138.
+--hashes` printed for it in 119-138. The names of the bindings are
+identifiers of the law repository's module, chosen when it was written, and
+are given as the tool printed them.
 
 **At the replay** (the run's record, "Item 6: what the check and the change
 set say"): `fidryn check encodings` warned `W750` for the first two and not
@@ -392,7 +461,7 @@ the third, and `fidryn changes /work/projects/law-local-pair/119-138 uscode
 --bindings encodings` listed the same two in `stale_bindings`.
 
 **Today**, the script of item 13 checked `encodings/` of `main` at `c9bd0e4`
-(its whole output is under item 13). On stderr:
+with FINAL (its whole output is under item 13). On stderr:
 
 ```text
 /work/projects/law-local/encodings/local/encodings/bindings.fr: W750 StaleBinding: the binding `chapter_13_debt_limits` of `/us/usc/t11/s109/e` is stale (provision text changed) in the release `119-142` of the dependency `uscode`, and was written against the release `119-138`; read the provision again, and write into the binding the hashes that `fidryn text` prints for it with `--hashes`
@@ -400,10 +469,11 @@ the third, and `fidryn changes /work/projects/law-local-pair/119-138 uscode
 ```
 
 and on stdout `modules: 1; from cache: 0; errors: 0; warnings: 2`, then `ok`.
-The same check run alone, by the command of item 1 with `encodings` in place
-of `uscode` (1.32 s, 577,396 KiB), printed the same two lines and
-`modules: 1; from cache: 1; errors: 0; warnings: 2`, then `ok`. Its
-report differs from that of the replay's check
+BINARY printed the same on 2026-11-17. That day the same check run alone, by
+the command of item 1 with `encodings` in place of `uscode` (1.32 s,
+577,396 KiB), printed the same two lines and
+`modules: 1; from cache: 1; errors: 0; warnings: 2`, then `ok`, and its report
+differed from that of the replay's check
 (`/cache/fidryn/task-22/encodings-report.json`) only in `from_cache`.
 
 The three cases are also held on invented text by the tests
@@ -414,7 +484,7 @@ in the gate of item 10. `cargo test -p fidryn-driver --locked --offline --
 staleness::` runs them with the other tests of staleness, through `lease` on
 this machine.
 
-**Verdict: met.**
+**Verdict: met.** It stands after the corrections: FINAL reports the same.
 
 ## Item 7: the definition samples
 
@@ -431,14 +501,23 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
 >   `drew 500 of 34329 definitions and 500 of 5940 near misses of the release 119-142 with the seed 20261117`
 >   and exited 0, in 6.94 s wall with a peak of 231,908 KiB.
 
+The corrections made the drawing tool hold the definitions it reads to the
+workspace's ledger, and the records to the workspace's counts. Run again on
+the same inputs, the corrected tool drew the same two files byte for byte
+(`fix-wave-Z-report.md` with the scratch files of the run, "The drawing of
+definition samples").
+
 **Where they are, today**, in the law repository, committed in `c9bd0e4`
 (`review: two samples of definitions drawn from 119-142`):
 
 - `review/definitions/2026-11-17-sample-1/extracted.jsonl`: 500 lines
   (`wc -l`), each one definition drawn from the 34,329 of the workspace;
 - `review/definitions/2026-11-17-sample-1/near-misses.jsonl`: 500 lines,
-  each one paragraph drawn from the 5,940 that look definitional under the
-  looser pattern of design 9.5 and from which nothing was extracted;
+  each one paragraph drawn from the 5,940 paragraphs of operative text that
+  hold a term in curly quotation marks within 60 characters before `mean`,
+  `means`, `include`, `includes`, `shall mean` or `has the meaning`, and from
+  which nothing was extracted: the population the plan's Task 22 names, as
+  the run's record says;
 - in each file, `grep -c '"verdict":""'` prints 500: no line has a verdict;
 - `review/definitions/estimate.json` says `"status": "drawn, not read"`.
 
@@ -448,13 +527,23 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
 
 1. reads each of the 500 lines of `extracted.jsonl` against the official text,
    and writes into its `verdict` whether the terms, the kind and the reach
-   words are right, and if not which is wrong. Each line holds the paragraph,
-   and the nearest chapeau above it, so the Code need not be opened; the bar
-   is textual and needs no attorney;
+   words are right, and if not which is wrong;
 2. reads each of the 500 lines of `near-misses.jsonl`, and writes whether the
    paragraph defines a term the closed patterns missed;
 3. writes into `estimate.json` the errors found in the first sample and the
    share of the 5,940 that the definitions found among the near misses imply.
+
+**What a line holds, and when it is not enough.** A line holds the
+paragraph, and the nearest chapeau above it with its address. They are
+enough to judge the terms, the kind, and reach words taken from them; the
+bar is textual and needs no attorney. They are not always enough to judge
+the reach. 6 of the 500 lines of the first sample have the words `unstated`
+and no chapeau. For two of them, `/us/usc/t15/s1602/o` and
+`/us/usc/t15/s1602/dd/7`, the reach is stated in the sibling subsection
+`/us/usc/t15/s1602/a`, which no line holds ("Known limits", 2). For a line
+whose words are `unstated`, and wherever the reach may be stated elsewhere in
+the unit, the reader opens the unit: `fidryn text DIR UNIT`, with the
+workspace as `DIR` and the address of the unit, or the official text.
 
 The item is met when the first sample has no error. If it has one, the
 patterns are corrected (with a test for the case), the sample and its
@@ -462,10 +551,11 @@ verdicts are kept, and a new sample is drawn with a new seed.
 
 **What is not claimed.** The importer's 34,329 definitions equal, field for
 field, those of a second implementation of the same rules (S10), written
-apart from the repository (the run's record, "Definitions"). That shows the
-importer applies its rules as written. It does not show that the rules find
-every definition, or that each definition they find is right. No claim about
-the correctness of the definitions is made until the samples are read.
+apart from the repository and kept with the scratch files of the run (the
+run's record, "Definitions"). The importer and that implementation agree on
+every definition. That does not show that the rules find every definition,
+or that each definition they find is right. No claim about the correctness
+of the definitions is made until the samples are read.
 
 **Verdict: open.**
 
@@ -545,6 +635,12 @@ b8ec1e448 G /us/usc: release 119-73not60
 release before it among the 27 to compare it with, so its message names the
 release, as the plan's Task 22 prescribes.
 
+It stands after the corrections. The corrected replay tool and build,
+replaying the 27 archives into a new repository, made 27 signed commits
+whose trees are those of the 27 commits above, hash for hash (the section on
+the corrections). So the law repository was not made again, and its commits
+stand.
+
 ## Item 9: time and memory
 
 > 9. Checking the full workspace, notes included, takes at most 10 minutes
@@ -560,42 +656,47 @@ with `--jobs 16` inside a job of 16 processors and 16 GB:
 | cold, the cache empty | 3.29 s | 831,792 KiB | 10 minutes, 16 GB |
 | warm, nothing changed | 1.65 s | 831,536 KiB | 30 seconds, 16 GB |
 
-**Today:**
+**Later runs:**
 
-- the warm check of item 1: 1.66 s, 831,296 KiB;
-- the first run of the script of item 13, with an empty cache: checking
-  `encodings/` checked its dependency `uscode/` from cold, then `uscode/`
-  itself from the cache. The whole script took 4.78 s, with a peak of
-  830,144 KiB, under the script's own limit of 8 GiB of address space for
-  each run of the binary.
+- with BINARY, on 2026-11-17: the warm check of item 1, 1.66 s and
+  831,296 KiB; the first run of the script of item 13, with an empty cache,
+  4.78 s for the whole script and 830,144 KiB. Checking `encodings/` checked
+  its dependency `uscode/` from cold, then `uscode/` itself from the cache.
+- with FINAL, on 2026-11-18: the script of item 13 with an empty cache,
+  4.63 s and 831,984 KiB; the warm check of item 1, 1.89 s and 831,244 KiB.
 
-The checks take less than one percent of the time and about five percent of
-the memory the design allows.
+Each run of the binary in the script had at most 8 GiB of address space, the
+script's own limit, and none reached it.
 
-**Verdict: met.**
+The cold check took 0.55 percent of the time the design allows, and the warm
+check 5.5 percent of its 30 seconds (6.3 percent today). Each used about five
+percent of the 16 GB.
+
+**Verdict: met.** It stands after the corrections: FINAL takes the same time
+and memory.
 
 ## Item 10: the existing tests and the Stage 0 checks
 
 > 10. The existing 1,188 tests and the Stage 0 checks still pass.
 
-**The gate**, on the tree of this commit without this file (`HEAD`
-`71377f7` and the date of `CHANGELOG.md`):
+**The gate**, on the tree of `47c9205`, the tree of this commit with the
+changes of `.agents/` set aside, on 2026-11-18:
 
 ```sh
 env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 16 --mem 25G --time 2h -- /usr/bin/time -v cargo xtask ci --fmt
 ```
 
-It ended with exit 0, in 1 min 38.03 s wall, with a peak of 1,295,524 KiB.
-Its log is `SCRATCH/gate-1.log`. In the order of its steps:
+It ended with exit 0, in 1 min 51.44 s wall, with a peak of 1,332,808 KiB.
+Its log is `SCRATCH/fix1-gate.log`. In the order of its steps:
 
 - `cargo fmt --all -- --check` passed;
-- the Rust tests: 71 lines `test result:`, together **1,800 passed, 0
+- the Rust tests: 72 lines `test result:`, together **1,831 passed, 0
   failed, 0 ignored**; no line of the log begins with `warning`;
 - `cargo clippy ... -- -D warnings` and `cargo doc` passed;
-- the schema probes: `"checked": 399`, `"failed": 0`;
-- `All checks passed!`, `29 files already formatted`, `Success: no issues
-  found in 29 source files`;
-- the conformance tests: `Ran 199 tests`, `OK`;
+- the schema probes: `"checked": 411`, `"failed": 0`;
+- `All checks passed!`, `30 files already formatted`, `Success: no issues
+  found in 30 source files`;
+- the conformance tests: `Ran 231 tests`, `OK`;
 - the sample step: "samples/uscode/archives matches retrieval.json;
   samples/uscode/workspace is what the ingester writes from it, on one worker
   and on eight, checks with no error, and holds the ledger `fidryn coverage`
@@ -610,26 +711,42 @@ Its log is `SCRATCH/gate-1.log`. In the order of its steps:
 - the JavaScript tests: `tests 52`, `pass 52`, `fail 0`;
 - `cargo bench --no-run` finished.
 
-Then:
+`~/.cache/fidryn` did not exist before the gate and did not exist after it.
+
+Then, on the same tree:
 
 ```sh
 env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 4 --mem 8G --time 30m -- cargo run -p xtask --offline -- release-check
 lease run --cpus 4 --mem 8G --time 30m -- cargo deny --offline check licenses bans sources
+env CARGO_TARGET_DIR=/cache/cargo/target-lane-model CARGO_NET_OFFLINE=true lease run --cpus 16 --mem 25G --time 1h -- /usr/bin/time -v cargo xtask package --output-dir /cache/fidryn/task-23b/package-final
 ```
 
-printed `release 0.3.0 (2026-11-18): workspace versions and changelog
-verified` and `bans ok, licenses ok, sources ok`, each with exit 0; the
-license check also warned twice `license-not-encountered`, for two licenses
-`deny.toml` allows that no dependency has. The package build refuses a tree
-with changes not committed, so it is not part of this record.
+- The release check printed `release 0.3.0 (2026-11-18): workspace versions
+  and changelog verified`, exit 0.
+- The license check printed `bans ok, licenses ok, sources ok`, exit 0, and
+  warned twice `license-not-encountered`, for two licenses `deny.toml` allows
+  that no dependency has.
+- The package build refuses a tree with changes not committed, so it ran on
+  `47c9205` itself, with the changes of this record set aside: exit 0,
+  "Verified native package: .../fidryn-0.3.0-x86_64-unknown-linux-gnu.tar.gz",
+  `Source: 47c9205a721739ecbe93add79aff079f7a0960e3`, SHA256
+  `0948010775c28fcaf2e072bc2ec4dcf07e10359960768497b7c5639d0438d2b8`, BLAKE3
+  `dacbc0da8d6ed2ccabcf618b48a6001f27f0e4e8116ed8535bcc7adb970e3be7`; the
+  packaged binary checked `examples/package-smoke.fr` with `ok`. It had also
+  passed on `e6fef77`, the commit that first added this record
+  (`SCRATCH/package-2.log`).
+
+On `e6fef77` the gate had passed with 1,800 Rust tests and 199 conformance
+tests (`SCRATCH/gate-1.log`); the corrections added the others.
 
 **The 1,188.** The design counted them at `1a70382` with
-`cargo test --workspace --offline`. Which tests then stand, unchanged, at this
-commit was found by reading the test functions of both commits from git:
+`cargo test --workspace --offline`. Which tests then stand, unchanged, at
+`47c9205` was found by reading the test functions of the commits from git:
 
 ```sh
-uv run --locked python -I SCRATCH/test_names.py /work/projects/fidryn-lanes/model 1a70382 HEAD
-uv run --locked python -I SCRATCH/test_names.py /work/projects/fidryn-lanes/model fd88364 HEAD
+uv run --locked python -I SCRATCH/test_names.py /work/projects/fidryn-lanes/model 1a70382 47c9205
+uv run --locked python -I SCRATCH/test_names.py /work/projects/fidryn-lanes/model fd88364 47c9205
+uv run --locked python -I SCRATCH/test_names.py /work/projects/fidryn-lanes/model e6fef77 47c9205
 ```
 
 The script lists every `fn` that follows a `#[test]` or `#[tokio::test]`
@@ -637,11 +754,13 @@ attribute, by its file and name, and compares the lines of each function on
 both sides. `fd88364` is the commit the stage began from.
 
 - `1a70382` has 1,186 test functions. With the two doc tests of
-  `crates/fidryn-core/src/outcome.rs`, they are the design's 1,188. This
-  commit has 1,798, and with the same two doc tests they are the 1,800 the
+  `crates/fidryn-core/src/outcome.rs`, they are the design's 1,188.
+  `47c9205` has 1,830, one of which, a form of
+  `the_cache_directory_is_chosen_in_the_stated_order` for Windows, is not
+  compiled here; the other 1,829 and the same two doc tests are the 1,831 the
   gate ran.
-- Of the 1,467 test functions of `fd88364`, every one but one stands at this
-  commit in its file under its name. The one is
+- Of the 1,467 test functions of `fd88364`, every one but one stands at
+  `47c9205` in its file under its name. The one is
   `numbered_guides_run_one_to_eight_in_order` of `xtask/src/site/guides.rs`,
   which is now `numbered_guides_run_one_to_ten_in_order`, since the site has
   two guides more.
@@ -658,7 +777,7 @@ both sides. `fd88364` is the commit the stage began from.
   diff, each change is to the numbers, the lists or the count of the site's
   guides, for the two new guides Law modules and Coverage, or adds an
   assertion about one of them; none removes an assertion about anything
-  else.
+  else. The corrections changed none of these ten.
 - Between `1a70382` and `fd88364`, Stage 0 changed four more:
   `keywords_are_the_grammars_lowercase_quoted_terminals` and
   `sniff_recognizes_unlabeled_blocks` of `highlight.rs`,
@@ -666,6 +785,9 @@ both sides. `fd88364` is the commit the stage began from.
   `frames_show_the_numbered_source_and_the_evaluated_case` of `specimen.rs`.
 - Every other test that existed when the stage began is unchanged, and all of
   them pass.
+- Every test function of `e6fef77` stands at `47c9205`; the corrections
+  changed eleven tests the stage had written, to hold what they corrected
+  (`SCRATCH/fix1-test-names-e6fef77.txt`).
 
 **Verdict: met with a written difference.** Every test passes and the Stage
 0 checks pass. Ten tests that existed when the stage began were changed by
@@ -678,7 +800,7 @@ guides; one of them was renamed for that reason.
 >     definitions and bindings, and the site shows the coverage ledger.
 
 **The reference** is `docs/law-modules.md`, to which `docs/language.md`
-points ("Editions"). Its sections, at this commit:
+points ("Editions"). Its sections, at `47c9205`:
 
 | Subject | Section of `docs/law-modules.md` |
 | --- | --- |
@@ -716,7 +838,9 @@ the whole Code. That is the default of decision O-2, whether the public site
 shows figures of the whole Code while the law repository is local and
 unnamed; the page says in its first sentence that its figures are the
 sample's. The ledger of the whole Code is `uscode/coverage.json` of the law
-repository, and its counts are those of item 2.
+repository, and its counts are those of item 2. It stands after the
+corrections, which changed sections of the reference and regenerated the
+site; the site check and the documentation check passed on the result.
 
 ## Item 12: a second workspace at a pinned release
 
@@ -735,10 +859,13 @@ repository, and its counts are those of item 2.
   another release, to another lock digest, or to both, the check is `E740`,
   naming the pin and what the dependency's lock holds, with one error, and
   the citation into the dependency is not counted;
-- `uscode_sample::tests::the_curated_sample_checks_against_the_generated_one`
-  and
+- on the sample of the Code (`xtask/src/uscode_sample.rs`):
+  `uscode_sample::tests::the_curated_sample_checks_against_the_generated_one`
+  holds that the curated sample checks against the generated one, and
   `uscode_sample::tests::a_pin_that_is_not_the_lock_fails_the_step_and_names_the_curated_manifest`
-  (`xtask/src/uscode_sample.rs`) hold the same for the sample of the Code.
+  that a pin to another lock digest fails. That test changes the lock digest
+  only, so a pin to a different release is shown on invented workspaces
+  only, by the second test above.
 
 These commands run them alone, through `lease` on this machine:
 
@@ -758,7 +885,8 @@ cargo test -p xtask --bin xtask --locked --offline -- the_curated_sample_checks_
   and checks with no error (item 6; its two warnings are the stale bindings
   item 6 asks for).
 
-**Verdict: met.**
+**Verdict: met.** It stands after the corrections: the tests pass in the gate
+of the corrected branch, and FINAL checks `encodings/` as BINARY did.
 
 ## Item 13: the integration test
 
@@ -770,32 +898,37 @@ cargo test -p xtask --bin xtask --locked --offline -- the_curated_sample_checks_
 Section 4.3: "The law repository records the version of the toolchain it is
 checked with."
 
-**On this machine**, the script `tools/check-law-repository.sh`, as
+The item has two halves: what runs on this machine, and what runs on GitHub.
+Each has a verdict of its own.
+
+### On this machine
+
+**The script on the law repository.** `tools/check-law-repository.sh`, as
 `docs/development.md` ("Checking a law repository") describes it, with its
 default limits, the binary named by `FIDRYN_BINARY`, and a cache under
-`/cache/fidryn/`. The binary is BINARY, built through the scheduler as above,
+`/cache/fidryn/`. The binary is FINAL, built through the scheduler as above,
 since a build by the script through `lease` from inside a job would queue a
-job from within one. Its first run, with no cache directory yet:
+job from within one. Its run of 2026-11-18, with no cache directory yet:
 
 ```sh
-cd /work/projects/fidryn-lanes/model && lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v -o /cache/fidryn/task-23b/script-1.time env FIDRYN_BINARY=/cache/fidryn/task-23b/fidryn tools/check-law-repository.sh --cache-dir /cache/fidryn/task-23b/cache /work/projects/law-local
+cd /work/projects/fidryn-lanes/model && lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v -o /cache/fidryn/task-23b/fix1-script.time env FIDRYN_BINARY=/cache/fidryn/task-23b/fidryn-final tools/check-law-repository.sh --cache-dir /cache/fidryn/task-23b/cache-final /work/projects/law-local
 ```
 
 Its whole output, stdout:
 
 ```text
 limits of each run of the binary: 600 s of time, 900 s of processor time, 8589934592 bytes of address space
-binary: /cache/fidryn/task-23b/fidryn, fidryn 0.3.0 (given by FIDRYN_BINARY)
-cache: /cache/fidryn/task-23b/cache (from --cache-dir)
+binary: /cache/fidryn/task-23b/fidryn-final, fidryn 0.3.0 (given by FIDRYN_BINARY)
+cache: /cache/fidryn/task-23b/cache-final (from --cache-dir)
 
 encodings: the manifest records the toolchain 0.3.0, which is the version of the binary
-encodings: fidryn check /work/projects/law-local/encodings --cache-dir /cache/fidryn/task-23b/cache
+encodings: fidryn check /work/projects/law-local/encodings --cache-dir /cache/fidryn/task-23b/cache-final
 modules: 1; from cache: 0; errors: 0; warnings: 2
 ok
 encodings: the check passed with warnings, which do not fail it
 
 uscode: the manifest records the toolchain 0.3.0, which is the version of the binary
-uscode: fidryn check /work/projects/law-local/uscode --cache-dir /cache/fidryn/task-23b/cache
+uscode: fidryn check /work/projects/law-local/uscode --cache-dir /cache/fidryn/task-23b/cache-final
 modules: 70794; from cache: 70794; errors: 0; warnings: 0
 ok
 uscode: the check passed
@@ -810,66 +943,251 @@ and stderr:
 /work/projects/law-local/encodings/local/encodings/bindings.fr: W750 StaleBinding: the binding `small_business_debtor` of `/us/usc/t11/s101/51D` is stale (enacted notes of the unit changed) in the release `119-142` of the dependency `uscode`, and was written against the release `119-138`; read the provision and the enacted notes of its unit again, and write into the binding the hashes that `fidryn text` prints for it with `--hashes`
 ```
 
-- Exit 0, 4.78 s wall, 25.05 s user, 830,144 KiB peak.
+- Exit 0, 4.63 s wall, 25.87 s user, 831,984 KiB peak.
 - The two workspaces at the top of the law repository are `encodings/` and
   `uscode/`; `changes/` and `review/` hold no manifest. Each manifest records
   the toolchain `0.3.0`, the version of the binary.
 - No limit was reached. The two warnings are the stale bindings of item 6,
   which do not fail a check.
-- The same command again, its time written to `script-2.time`, printed the
-  same, but for one line,
-  `modules: 1; from cache: 1; errors: 0; warnings: 2`, and the same stderr;
-  exit 0, 2.96 s wall.
-- The script wrote nothing into the law repository (above), and the cache
-  holds 70,795 files, 283,255,566 bytes (`find -type f | wc -l`, `du -sb`).
-- The script itself is held by `conformance/test_check_law_repository.py`
-  (11 tests), among them `test_a_manifest_of_another_version_fails_and_names_both_versions`,
-  `test_a_stale_binding_warns_and_does_not_fail`, and, with stand-ins for
-  `lease` and `cargo`, the two tests of the build, which this run did not
-  take.
+- The runs of 2026-11-17 with BINARY (`SCRATCH/script-1.out`, `.err`; and a
+  second, warm run) printed the same, but for the binary's path and the
+  cache's, and the controller's run with the same build as FINAL
+  (`/cache/fidryn/final/check-law.out`, `.err`) the same.
+- The script wrote nothing into the law repository (above).
 
-**In CI, against the sample.** The job "cargo xtask ci" of
+**The gate with the sample step.** The job "cargo xtask ci" of
 `.github/workflows/ci.yml` runs `cargo xtask ci --fmt`, whose sample step
-checks the committed sample of the Code, its curated workspace and its text
-(item 10). That command passed on this tree, on this machine.
+checks the committed sample of the Code, its curated workspace and its text.
+That command passed on this tree, on this machine (item 10).
 
-**The cross-repository job.** `.github/workflows/law-integration.yml` has the
-two jobs of section 4.3: "Law repository at its pin" checks the law
-repository at the commit `law-repository.pin.json` names, with the toolchain
-of the commit under test; "Drift of the newest law repository" checks the
-newest of each. Both run the script. Its only trigger is a manual run, and
-the comment at its top names the two lines that switch on the others.
-`law-repository.pin.json` is `{"repository": "", "commit": ""}`: while it
-names no repository, each job says so and ends.
-`conformance/test_law_integration_workflow.py` (9 tests) holds all this,
-among them `test_its_only_trigger_is_a_manual_run`,
+**The tests of the script and of the workflow.**
+`conformance/test_check_law_repository.py` holds the script, among others by
+`test_a_manifest_of_another_version_fails_and_names_both_versions`,
+`test_a_stale_binding_warns_and_does_not_fail`, and, with stand-ins for
+`lease` and `cargo`, the two tests of the build, which the runs above did not
+take. `conformance/test_law_integration_workflow.py` reads the workflow as
+YAML and holds its trigger, its jobs and what each does, among others by
+`test_its_only_trigger_is_a_manual_run`,
 `test_the_two_lines_its_comment_names_switch_on_the_other_triggers` and
-`test_the_last_step_of_each_job_fails_when_the_check_fails`.
-
-Both test files ran in the gate (`Ran 199 tests`, `OK`):
+`test_the_last_step_of_each_job_fails_when_the_check_fails`; the scripts of
+its steps were checked with `shellcheck`. Both files ran in the gate
+(`Ran 231 tests`, `OK`), and
 
 ```sh
-env FIDRYN_BINARY=/cache/fidryn/task-23b/fidryn uv run --locked python -m unittest discover -s conformance -p 'test_*law*.py'
+env FIDRYN_BINARY=/cache/fidryn/task-23b/fidryn-final uv run --locked python -m unittest discover -s conformance -p 'test_*law*.py'
 ```
 
 runs them alone, through `lease` on this machine.
 
-**Verdict: met with a written difference.**
+**Verdict: met.**
 
-- What CI runs was run here with the same command, not on GitHub: this
-  branch has not been pushed, since pushing is the owner's step. The first
-  push shows it.
-- `actionlint`, which the job "Workflow lint" of CI runs, is not installed on
-  this machine, so no lint has read `law-integration.yml` yet; the test file
-  above reads it as YAML, and its scripts were checked with `shellcheck`.
-- The cross-repository job is written and is not switched on, as the item
-  says it should be while the law repository is not published (decision
-  O-6).
+### On GitHub
+
+What would run there:
+
+- the job "cargo xtask ci", the gate with the sample step, on Ubuntu;
+- the Rust tests on macOS and Windows, among them the code that finds the
+  user's cache directory on Windows, which has never been compiled;
+- the job "Workflow lint", which runs `actionlint` on the workflows,
+  `law-integration.yml` among them. `actionlint` is not installed on this
+  machine, so no lint has read that workflow;
+- the workflow `Law integration` (`.github/workflows/law-integration.yml`),
+  with the two jobs of section 4.3: "Law repository at its pin" checks the
+  law repository at the commit `law-repository.pin.json` names, with the
+  toolchain of the commit under test; "Drift of the newest law repository"
+  checks the newest of each. Both run the script. Its only trigger is a
+  manual run, and the comment at its top names the two lines that switch on
+  the others. `law-repository.pin.json` is
+  `{"repository": "", "commit": ""}`: while it names no repository, each job
+  says so and ends.
+
+None of it has run: this branch has not been pushed, and pushing is the
+owner's step. The cross-repository job is written and is not switched on, as
+the item says it should be while the law repository is not published
+(decision O-6).
+
+**Verdict: open.** What closes it: the owner pushes the branch, and the jobs
+above pass, the lint of `law-integration.yml` among them. The workflow
+`Law integration` itself waits for the law repository to be published and
+named in `law-repository.pin.json`.
+
+## What a review of the whole branch found, and what was corrected
+
+This record was first written before the branch was reviewed as a whole. It
+is set down here as it happened.
+
+### What was reviewed, and how
+
+After every task was done, five readers read the whole branch at `98d5765`,
+side by side, each with one question:
+
+- whether a word of the law can be lost, altered or invented between the
+  publisher's XML and what the tools print;
+- whether everything that reads a workspace agrees on what a workspace is;
+- whether every sentence a reader would act on is true of the code;
+- whether the first edition of the language is untouched and the branch can
+  be released;
+- whether a file the tools read can make them write or remove outside the
+  directory they were given, run without bound, or accept what they should
+  refuse.
+
+The review of the task that made the replay came back at the same time.
+The readers' reports are kept word for word with the scratch files of the
+run (`.agents/scratchpad/2026-11-17-stage1/final/reports/A.md` to `E.md`),
+and are not part of the repository.
+
+### What they found
+
+No fault that changes a result on any release of the Code or on the
+committed sample. Eight faults in cases that no release holds, each shown on
+the built binary or on an invented release:
+
+1. **The cache.** A check trusted a cache that by default lay inside the
+   directory under check, `.fidryn-cache/`. A workspace received from someone
+   else could carry entries that made the check pass altered text: two
+   readers found it independently, one by altering an entry so that a check
+   of a changed module printed `ok`. A symbolic link of that name made the
+   check write elsewhere.
+2. **The import over a directory.** `fidryn ingest uscode --out DIR` removed
+   `.fr` files it had not written, where the documents said such a directory
+   is refused.
+3. **The manifest and the lock** were read through symbolic links, named
+   pipes and devices, with no bound on their size; a link to a pipe made a
+   check wait for ever.
+4. **A piped input.** The check for the edition marker read the start of an
+   input before its command did, which emptied an input given through a
+   pipe: a regression against 0.2.0 for anyone who pipes a module into
+   `fidryn`.
+5. **Topics and origins.** A `topic` attribute with two spaces, or an empty
+   `origin`, made the importer write a module its own check refused, and the
+   two readings read them differently.
+6. **A reference that is both a link and a footnote marker** was read as a
+   link by the importer, which put the marker's digit into the operative
+   text, and as a marker by the independent reading.
+7. **Like-named notes.** In a change set, a note inserted before others of
+   the same group, law and heading made the unchanged ones show as amended,
+   against a sentence of the reference.
+8. **A fixture.** A fixture that said it held the text of no law held an
+   abridged sentence of 1 U.S.C. 1; two readers found it. It was a breach of
+   the rule that text of the Code enters the repository only under
+   `samples/uscode/`.
+
+The review of the replay's task found four places where the run's record
+quoted the Code; they were reworded in `71377f7`, and the readers' smaller
+points were triaged into corrections and recorded limits.
+
+### What was done
+
+Three implementers corrected them on three branches, each correction was
+reviewed again, and the three were joined on the stage branch: nineteen
+commits, `e6fef77..b6d8b49`, every one signed, then `47c9205`, which amends
+the plan to what changed. The reports of the implementers and of the
+reviews of their work are with the scratch files of the run
+(`fix-wave-X-report.md`, `fix-wave-Y-report.md`, `fix-wave-Z-report.md`).
+
+By what they correct
+(`git log --reverse --format='%h %s' e6fef77..b6d8b49`):
+
+| Fault | Commits | The rule that now holds | Where the reference says it |
+| --- | --- | --- | --- |
+| 1 | `2997df9` Keep the cache of a check outside the workspace it checks | The default cache is `fidryn` in the user's cache directory, outside every workspace: `XDG_CACHE_HOME`, else `.cache` in `HOME`, on Windows `LOCALAPPDATA`, each only as an absolute path; when none names one, the check keeps no cache and says so once. A check reads no entry of a workspace whose name begins with a dot and follows no symbolic link in it. | `docs/law-modules.md`, "The cache"; `docs/cli.md`, `check` |
+| 2 | `fa7a0f3` Refuse to import over a directory that holds a file the importer did not write | `ingest uscode --out DIR` refuses a directory that holds a `.fr` file no earlier run could have written (no module of edition 2, of another prefix, or at another path, judged by its head), names every such file and changes nothing; it removes only modules of an earlier run. | "Writing a generated workspace" (`create`, `finish`); `docs/cli.md`, `ingest` |
+| 3 | `ffe326e` Read the manifest and the lock of a workspace only as regular files of bounded size; `9d580da` Read the retrieval record only as a regular file of bounded size | A manifest, a lock and an entry of the cache are read only from a regular file of at most 64 MiB, the retrieval record from one of at most 1 MiB; anything else in their place is refused before it is opened (an entry of the cache is a miss). | "What the checker verifies in a workspace", "What it reads", "Limits" |
+| 4 | `dcf83fe` Leave an input that is no regular file for its command to read | The command line looks for the edition marker in a regular file only; any other input, such as a pipe, is read by its command as a file of the first edition, so a module of edition 2 is read from a regular file. | "Editions"; `docs/cli.md`, `check` |
+| 5 | `6c2bf09` Read an empty topic as none and an empty origin as none, and refuse a topic with other white space | A `topic` attribute is split at U+0020 and empty members are dropped; a member that holds another white-space character is refused, naming the note; an empty `origin` is none. Both readings follow the rule. | "Notes and their layers", "What it reads", "The classes of elements" |
+| 6 | `32df3db` Refuse a reference that is both a link and a footnote marker | A `ref` with both an `href` and the class `footnoteRef` is refused, by both readings. | "What it reads" |
+| 7 | `48bef5b` Pair like-named notes by their text before comparing them by address; `b6d8b49` Say what a change set lists for a like-named note that is amended and moved | Within one module, one layer and one family of like-named notes, notes of equal hash are paired first, in the order of their addresses, a pair at two addresses being `moved`; the rest are compared by address. `usc_compare.py` pairs the same way. | "Moved provisions and notes", "Limits" |
+| 8 | `e8660af` Replace a sentence of the Code in a fixture with invented words | The fixture holds invented words of the same shape; the plan's table was amended in `47c9205`. | (a fixture of `conformance/fixtures/uslm/`) |
+| readers' smaller points | `21e1daf` Refuse a document nested or grown beyond what the importer reads; `aed288a` Correct small points of the workspace check and its help; `5e46e51` Correct small points of the importer's documents and the independent reading; `84dedeb` Correct sentences of the changelog, the README and the reference | The importer refuses an element more than 64 deep in its module, a container more than 64 deep in its file, and a document of more than 8,388,608 nodes, and the independent reading refuses the same nesting; other points are of wording and of help. | "What it reads", "Limits" |
+| the tools | `6b5910d` Close the edges of the replay tool and test it against a repository; `9bf8fe6` Keep the replay's test out of the caller's git configuration and remove a leftover partial file; `6796ee3` Hold a sample of definitions to the ledger and the records it is drawn from; `8c98aba` Follow a redirect only to the same host and bound the size of a fetched archive; `1dda1ea` Keep no token in the law repository's checkout and say why the drift job failed | The replay tool holds its repository, `uscode.next/` and its temporary files to stated conditions and is tested against a real repository; the drawing tool holds the definitions to the ledger; the fetching tool follows a redirect only to the same host over `https` and takes at most 512 MiB in one response; the workflow keeps no token in its checkouts. | `conformance/README.md`; "Limits", "Fetching"; `docs/development.md` |
+
+What a user of the tools sees change:
+
+- the default place of the cache, which is a directory of the user and no
+  longer `.fidryn-cache/` in the workspace. This changes a default that the
+  plan's specification had set (S13); the plan was amended in `47c9205`;
+- what an import refuses: a directory with a `.fr` file it did not write,
+  and the new refusals of the importer (a topic with other white space, a
+  `ref` that is both a link and a marker, a document nested or grown beyond
+  the bounds, a retrieval record that is no regular file or is larger than
+  1 MiB);
+- that a module of edition 2 is read from a regular file only;
+- what a change set lists for like-named notes;
+- that a check refuses a manifest or a lock that is no regular file or is
+  larger than 64 MiB;
+- that the fetching tool refuses a redirect to another host and a response
+  larger than its bound.
+
+### What was checked again after the corrections
+
+By the controller of the run, with the release build of `b6d8b49`,
+`/cache/fidryn/final/fidryn` (SHA-256
+`ec39b6b99f44d200b003aaeb7f5d1180a8c340c22d9838be34a499331b4cb0fa`,
+`fidryn 0.3.0`, the bytes of FINAL):
+
+- **The gate** on `b6d8b49`, in a worktree of its own: exit 0; 1,831 Rust
+  tests passed, none failed; `Ran 231 tests`, `OK`; 52 JavaScript tests
+  passed; no line beginning with `warning`
+  (`work/gates/gate-stage-b6d8b49.log` with the scratch files). The gate of
+  item 10 is the one run on the commit of this record.
+- **Every release replayed again.** `tools/replay_uscode.py` of `b6d8b49`,
+  with that binary, from the 27 archives under `/library/corpora/uscode`,
+  into a new empty repository, `/cache/fidryn/controller-replay-final/law`:
+  exit 0, "the replay is complete: 27 releases are committed", 7 min
+  39.74 s wall, 2,297,852 KiB peak, 27 commits, each signed (`G`).
+  The tree of each of its 27 commits is the tree of the same release's
+  commit on `main` of `/work/projects/law-local`: the two lists of 27 tree
+  hashes, `/cache/fidryn/controller-replay-final/trees-mine.txt` and
+  `trees-law.txt`, are the same bytes (`cmp` exits 0). For this record the
+  second list was made again from the law repository,
+  `git -C /work/projects/law-local --no-optional-locks log --format=%T main | sed -n '3,29p'`,
+  and `cmp` finds it the same bytes too
+  (`SCRATCH/fix1-trees-law.txt`). A tree holds the workspace of its release
+  and every change set up to it. So the corrected importer writes the same
+  modules, lock and ledger for every release of 2026, and the corrected
+  comparison the same 26 change sets, byte for byte, as the build that made
+  the law repository. The law repository was therefore not made again, and
+  its commits stand.
+- **The text of the two readings on every release**, with the corrected
+  code: 27 of 27 equal, as item 4 says.
+- **The script on the law repository**, with the same build, inside one
+  `lease` job, `--cache-dir /cache/fidryn/final/check-cache`: exit 0, two
+  workspaces, each recording the toolchain 0.3.0; `uscode` with no error and
+  no warning, `encodings` with the two stale bindings (`W750`)
+  (`/cache/fidryn/final/check-law.out` and `.err`). Item 13 gives the run
+  made for this record.
+- **No cache in the user's directory.** `~/.cache/fidryn` did not exist
+  before the controller's gate and did not exist after it or after any of
+  these runs: no test and no documented command writes there. The same held
+  for every run of this record.
+
+### What it means for the verdicts
+
+Each item says so under its verdict, in short:
+
+- Items 1, 3, 6 and 9 rest on checks that FINAL made again on the law
+  repository today, with the same outputs.
+- Items 2, 5 and 8 rest on the workspaces, the ledgers and the change sets
+  the build of the run wrote. The corrected build writes the same bytes for
+  every release, so they stand. The profile of item 2 and the independent
+  comparison of item 5 were not run again with the corrected scripts.
+- Item 4 stands with wider evidence: the two readings were compared on every
+  release of the year, before and after the corrections.
+- Item 7 is open, as it was. The corrected drawing tool draws the same
+  samples.
+- Item 10 is decided by the gate on the tree of this commit.
+- Items 11 and 12 stand on the gate of the corrected branch.
+- Item 13 is split; the half on this machine was run again with FINAL.
 
 ## Known limits
 
-Each of these is true at this commit. Each is also stated, without counts of
-the whole Code, in "Limits" of `docs/law-modules.md`.
+Each of these is true at `47c9205`. Most are also stated, without counts of
+the whole Code, in "Limits" of `docs/law-modules.md`. The notices that
+`fidryn changes` loses are stated under `changes` in `docs/cli.md`. Stated
+here only are: the forms of the XML that the readers of the whole branch
+found read differently, and the `class` attribute; a module that begins with
+a comment of certain lengths; a `HOME` or `XDG_CACHE_HOME` inside a
+workspace; and the body of a redirect.
 
 1. **Change sets.**
    - The credit and the footnotes of a unit that is on one side only, or that
@@ -884,12 +1202,13 @@ the whole Code, in "Limits" of `docs/law-modules.md`.
      `/us/usc/t26/s6049/d/8/A`. For each, `BINARY text DIR ADDRESS --json` on
      both releases (six runs in one job, each under the limits above, 23.10 s,
      1,414,920 KiB), and a comparison of the two records by the scratch
-     scripts `record_diff.py` and `superscript_only.py`, show the same thing
-     for each: nothing of its own record differs but the words of one
-     paragraph, and they are the same once the superscript digits the newer
-     release added are taken out and a run of spaces is read as one (a space
-     came with two of the four digits). In `/us/usc/t26/s6049/d/8/A` the two
-     digits stand where 119-138 had two footnote markers. The cost is a false
+     scripts `record_diff.py` and `superscript_only.py`, show the same thing.
+     The words of one paragraph of its own record differ, and they are the
+     same once the superscript digits the newer release added are taken out
+     and a run of spaces is read as one (a space came with two of the four
+     digits). Nothing else of the record differs, but in
+     `/us/usc/t26/s6049/d/8/A`: there 119-138 had two footnote markers, and
+     119-142 has none and the two digits in their places. The cost is a false
      alarm, never a missed change.
    - A change of a unit's aliases, of the container it stands in, or of a
      file's positive-law flag is in no list: a title enacted as positive law
@@ -897,46 +1216,87 @@ the whole Code, in "Limits" of `docs/law-modules.md`.
    - `usc_compare.py --against` checks the unions of the lists. It cannot see
      a provision in the wrong one of two lists, or a wrong pairing of a move;
      the Rust tests hold those list by list.
+   - Like-named notes of equal text are paired in the order of the bytes of
+     their addresses, so `…/10` comes before `…/2`: in a family of ten or
+     more, a note may be listed as moved where pairing by the order of the
+     ordinals would leave it in place.
+   - A like-named note that is amended while another is inserted before it is
+     listed as amended at its old address and added at its new one, or as
+     removed there and added; a change set cannot tell that the note at the
+     new address is the old one amended. Units and containers that `~2` and
+     `~3` mark are compared by address, not paired this way.
+   - When the comparison fails, `fidryn changes` prints only the notices it
+     knew before reading the workspaces; what the checks it ran found of
+     their cache is lost.
 2. **Definitions.**
    - The rules do not find every definition; the share they miss is not
      measured until the samples of item 7 are read.
    - `unstated` is given when neither the paragraph nor a chapeau above it
      states a reach; a reach stated in a sibling provision, such as a
      subsection (a) that states the reach of the definitions of a subsection
-     (b), is not seen.
+     (b), is not seen. Two lines of the first sample are such cases (item 7).
    - An exception written inside a definition's own text does not narrow its
      region. About 25 of the 34,329 definitions of release 119-142 hold the
      words of such an exception in their first 300 characters, by the count
      of the review of Task 15; this record did not count them again.
-3. **The two readings of the publisher's XML.** Two forms are read
-   differently by the importer and by the independent reading: a
-   `continuation` or a `proviso` inside a `content` that stands directly in a
-   note, and a note deeper inside quoted content. Each side fails loudly when
-   one appears: a refusal, or a comparison of the two that fails, never
-   altered text. No release of 2026 holds either: the importer imported all
-   27 with no refusal, and the independent reading read all 27 in the
-   comparisons of the 26 pairs with none. The text of the two readings was
-   compared record for record on 119-142 (item 4) and, in every gate, on the
-   sample; on the other 26 releases it was not.
+3. **The two readings of the publisher's XML** read some forms differently,
+   and no release of 2026 holds any of them. Each is loud when it appears: a
+   refusal by one side, or a difference that a comparison of the two shows,
+   never altered text that passes unseen. The forms:
+   - a `continuation` or a `proviso` inside a `content` that stands directly
+     in a note (read by the importer, refused by the independent reading);
+   - a note inside a paragraph or a text part of quoted content (refused by
+     the importer, read by the independent reading);
+   - forms that a reader of the whole branch found, which its corrections
+     left: a `num` or a `heading` in a quoted level, which ends the open
+     paragraph in one reading only; a footnote inside a footnote; white space
+     inside `br`, `img` and a column; an identifier with an empty member of
+     a list; a table of contents inside another; a footnote inside a
+     container's release note;
+   - the `class` attribute of a reference, which the importer splits at ASCII
+     white space and the independent reading at any white space.
+
+   The importer imported all 27 releases with no refusal, and the
+   independent reading read all 27 with none; the text of the two was the
+   same on all 27 (item 4). The independent reading refuses the nesting the
+   importer refuses, but has no bound on the number of nodes of a document,
+   so it can run out of memory on a document the importer refuses for its
+   size (about 3 GB for a member of 64 MiB of empty elements).
 4. **Diagnostics.** `fidryn check` prints no line or column for a diagnostic
    of a module of edition 2. `E740` carries the title `PinMismatch` also when
    a dependency fails for another reason than its pin.
-5. **Files and the cache.** A module file name such as `s1932~2.fr` has the
-   shape of a Windows 8.3 short name, and on a volume that gives files short
-   names it could be the short name of another file. A check that is killed
-   while it writes leaves a temporary file in the cache, which nothing reads
-   and nothing removes.
-6. **Fetching.** `tools/fetch_uscode.py` follows a redirect without checking
-   its host, and records the address it asked for.
+5. **Files and the cache.**
+   - A check trusts its cache: an entry written by hand under the key of a
+     module's bytes is taken as that module's result. The default cache is a
+     directory of the user, outside every workspace, unless the user's own
+     `HOME` or `XDG_CACHE_HOME` points into a workspace; then it lies inside
+     that one.
+   - When the importer examines the head of an existing module file, a
+     module that begins with a comment of certain lengths is refused as no
+     module of edition 2, and so is one whose head lies past its first
+     64 KiB. It errs toward refusing: nothing is removed, no file is taken
+     for an earlier output that is not one, and no writer writes such a
+     file.
+   - A module file name such as `s1932~2.fr` has the shape of a Windows 8.3
+     short name, and on a volume that gives files short names it could be
+     the short name of another file. A check that is killed while it writes
+     leaves a temporary file in the cache, which nothing reads and nothing
+     removes.
+6. **Fetching.** `tools/fetch_uscode.py` follows a redirect only to the host
+   it asked, over `https`, and records the address it asked for, not the one
+   a redirect led to. A redirect that it follows has its own body read whole
+   before the bound on a fetched archive, 512 MiB, applies to the final
+   response.
 
-The run's record, "What is open after the second part", adds two points about
-the replay and the draw: a stop of the replay between the replacement of
-`uscode/` and its commit never occurred, and the population of near misses is
-not that of F14.
+The run's record, "What is open after the second part", adds the population
+of near misses, which is not that of F14. Its other point, a stop of the
+replay between the replacement of `uscode/` and its commit, is now held by
+the tests of the replay tool against a real repository
+(`conformance/test_replay_repository.py`).
 
 ## Differences from the design's numbers
 
-Every "written difference" above, in one table.
+Every "written difference" above, and the open half of item 13, in one table.
 
 | Item | The design | What was found | Why |
 | --- | --- | --- | --- |
@@ -947,9 +1307,9 @@ Every "written difference" above, in one table.
 | 2 | 820 reach the section only | 881 | +61 = 72 below such sections, less those 7 and 4 |
 | 2 | 964 reach no section | 569 | −395 = −323 − 72 |
 | 8 | each commit with its change set as its message | 26 of the 27; the first is `/us/usc: release 119-73not60` | no release before it among the 27 |
-| 10 | the existing 1,188 tests pass | 1,800 pass; of those that existed when the stage began, 10 were changed, one of them also renamed | the stage added two guides to the site, and these tests count and list its guides |
+| 10 | the existing 1,188 tests pass | all pass; of those that existed when the stage began, 10 were changed, one of them also renamed | the stage added two guides to the site, and these tests count and list its guides |
 | 11 | the site shows the coverage ledger | the site shows the ledger of the sample | the default of decision O-2 |
-| 13 | it runs in CI against the sample | run here with the command CI runs; not yet on GitHub; `actionlint` not run on the new workflow | the branch is not pushed, which is the owner's step; `actionlint` is not installed here |
+| 13 | it runs in CI against the sample | run here with the command CI runs; nothing has run on GitHub, and `actionlint` has not read the new workflow (open) | the branch is not pushed, which is the owner's step; `actionlint` is not installed here |
 
 For item 2, the design's own numbers are reproduced exactly by `baseline`;
 the rule for each difference is in `conformance/usc-counting-rules.md`, "Where
@@ -957,4 +1317,34 @@ the two differ".
 
 ## What only the owner can do
 
-(to be completed)
+1. **Read the two samples of definitions, or name someone who will**
+   (decision O-3). This closes item 7. Until then it is open, and no claim
+   about the correctness of the definitions is made beyond their agreement
+   with a second implementation of the same rules.
+2. **Push the branch.** Nothing of it has run on GitHub. The first push runs
+   the gate on Ubuntu, the Rust tests on macOS and Windows (the code that
+   finds the user's cache directory on Windows has never been compiled), and
+   the lint of the new workflow, which could not be run here. This closes
+   the half of item 13 on GitHub.
+3. **Decide whether the stage is merged into `dev`.**
+4. **Decide the name, the visibility and the license of the law repository**
+   (decision O-6). Until then it stays local at `/work/projects/law-local`,
+   the workflow `Law integration` does nothing, and a law repository that is
+   not public will need a token of its own in that workflow.
+5. **Decide whether the second implementation of the definition rules**,
+   with which the importer's 34,329 definitions were found equal, becomes
+   part of the repository as a third independent check. It was written to
+   test the rules and is kept with the scratch files of the run. While it is
+   outside, that comparison cannot be made again from the repository alone.
+6. **Weigh a hazard older than this stage**, found while it was corrected.
+   The Rust tests of `xtask` in `release.rs` and `package.rs` start git with
+   the environment they inherit. If the gate were ever run from inside a git
+   hook, where `GIT_DIR` is set, the release fixtures would commit and tag in
+   the repository the gate was started from, and could delete a tag of it.
+   Nothing triggers it today. The correction is to take git's variables of
+   place and configuration out of the environment of those commands, as the
+   test of the replay tool now does.
+7. **Decide about the plan's header.** The plan of this stage, like the plan
+   of the stage before it, names in its header the tooling it was written
+   for. It is no reader document; whether it should say so in a public
+   repository is his to decide.

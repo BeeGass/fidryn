@@ -11,9 +11,12 @@ time), on one workstation, through the scheduler of that machine.
 Every number below was printed by a command. The line of each command is
 given, or the command is named where its line is plain from the text (`cmp`,
 `sha256sum`, `grep -c`), with three exceptions: the sizes of files and
-directories (in "The import" and in "Sizes"), whose commands this record does
-not give; the run of `compare_counts.py`, which was not timed and whose log
-holds its output but not its line; and `git init`, which was not timed. Times and peaks of memory come
+directories, and the numbers of files, directories and lines they hold,
+wherever they stand (such as the 10,818 bytes of `coverage.json`, the 70,797
+files of the workspace and the 70,799 files of the first commit), whose
+commands this record does not give; the run of `compare_counts.py`, which was
+not timed and whose log holds its output but not its line; and `git init`,
+which was not timed. Times and peaks of memory come
 from `/usr/bin/time -v`: "wall" is its elapsed time and "peak" its maximum
 resident set size, which is that of the largest single process of the command.
 The record holds no text of the Code beyond addresses and the short examples
@@ -330,9 +333,11 @@ What explains each move between groups:
   - The 4 are `ambiguous`. A beginning of the target is held by two elements,
     the second at `~2`, so the reference cannot say which one it means. S9 tells
     `ambiguous` before `unit-only`. S16's list does not name it; the paragraph
-    "Where the two differ" of `conformance/usc-counting-rules.md` does: the
-    import tells references "to a repeated identifier (`ambiguous`) from the
-    others".
+    "Where the two differ" of `conformance/usc-counting-rules.md` does. When
+    the run was made it said that the import tells references "to a repeated
+    identifier (`ambiguous`) from the others"; since `1133f24` it says
+    "references to an identifier that two elements hold or below it
+    (`ambiguous`)", which names the 4, which stand below one.
   - The 323 are targets the import knows by S7, Addresses, rule 1: identifiers
     that list several sections, and ranges. The first member of a list is the
     address and the others are aliases; the ends and the members of a range
@@ -1151,7 +1156,7 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
   the verb that put them in: 277 `means`, 91 `has the meaning`, 59
   `includes`, 51 `include`, 15 `mean`, 7 `shall mean`.
 
-Each line holds what a reader needs to judge it without opening the Code:
+What each line holds:
 
 - For a definition: the address, the terms, the kind, the reach words, the
   region, the basis, the text of the paragraph, and, when a provision above it
@@ -1160,6 +1165,15 @@ Each line holds what a reader needs to judge it without opening the Code:
   text, the same chapeau, and the term and the verb that put it in.
 - For both: the seed, the release, the size of the population, the place in
   the draw, and an empty `verdict`.
+
+The paragraph and the nearest chapeau are enough to judge the terms, the kind,
+and reach words taken from them. They are not always enough to judge the
+reach. 6 of the 500 definitions of the first sample have the words `unstated`
+and no chapeau; for two of them, `/us/usc/t15/s1602/o` and
+`/us/usc/t15/s1602/dd/7`, the reach is stated in the sibling subsection
+`/us/usc/t15/s1602/a`, which no line holds. For a line whose words are
+`unstated`, and wherever the reach may be stated elsewhere in the unit, the
+reader opens the unit, with `fidryn text DIR UNIT` or in the official text.
 
 `review/definitions/estimate.json`:
 
