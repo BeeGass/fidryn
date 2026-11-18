@@ -80,6 +80,20 @@ module "/us/usc/t45/s1014" {
     p "Reference to Veterans’ Administration deemed to refer to Department of Veterans Affairs pursuant to " ["section 10 of Pub. L. 100–527" -> "/us/pl/100/527/s10"] ", set out as a Department of Veterans Affairs Act note under " ["section 301 of Title 38" -> "/us/usc/t38/s301"] ", Veterans’ Benefits."
     hash "8f287ec28c9989546a9525b68875f8240e914d3ae3ee85c8342c78666023494b"
   }
+  definition "/us/usc/t45/s1014/e/1" {
+    term "expenses"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s1014"
+    basis restated
+  }
+  definition "/us/usc/t45/s1014/e/2" {
+    term "qualified institution"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s1014"
+    basis restated
+  }
   layers {
     operative "d31dcb404060d2ebac739a6d3f84adba9d9498fd0d850b26676bebad0ba2a6c5"
     enacted "e81f3b7479b5f34051df1d481587687e5985b4b567c48ee48a0a80f3df1d8750"

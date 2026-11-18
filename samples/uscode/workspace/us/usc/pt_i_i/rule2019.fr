@@ -218,6 +218,19 @@ module "/us/usc/ptII/rule2019" {
     p "The language of Rule 2019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "68456b1d2e82dd5ab9a070431399dc7d2a6633ac3c06bdc43a408e526457983f"
   }
+  definition "/us/usc/ptII/rule2019/a/1" {
+    term "disclosable economic interest"
+    kind means
+    words "In this Rule 2019"
+    basis unresolved
+  }
+  definition "/us/usc/ptII/rule2019/a/2" {
+    term "represent"
+    term "represents"
+    kind means
+    words "In this Rule 2019"
+    basis unresolved
+  }
   layers {
     operative "a3ab44e013f5d0ab04f1cccc6502a7d07bc07c7f329a4b9ae7c344775d634633"
     enacted "3e9a6ec4b3edcaeb4abe433e841184f70dd40e150db6624a61062f98065aae1e"

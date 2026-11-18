@@ -20,12 +20,14 @@
 //! cites and its heading, and its footnotes, numbered in document order: a
 //! footnote does not interrupt the paragraph it stands in, and its marker is
 //! a run of the text that gives no words. Quoted content keeps its structure
-//! and has no address. What the reading leaves out by rule (tables of
-//! contents, release notes, the labels of note groups, links without words)
-//! is counted.
+//! and has no address. A unit holds the definitions that its provisions
+//! state in the closed forms of [`definitions`]. What the reading leaves out
+//! by rule (tables of contents, release notes, the labels of note groups,
+//! links without words) is counted.
 
 mod archive;
 mod containers;
+pub mod definitions;
 mod notes;
 mod operative;
 mod uslm;

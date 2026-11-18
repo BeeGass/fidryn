@@ -61,6 +61,18 @@ interchange schema versions are maintained independently of the interpreter.
   layer and outcome are those of the committed profile, and that its text
   equals, line for line, what `conformance/uslm_text.py` reads from the
   publisher's XML; `--update` writes the workspace.
+- The importer of the Code extracts definitions: a provision whose first
+  paragraph of a chapeau or a content defines a term in one of a closed list
+  of forms gets a `definition` block in its unit's module, with the terms,
+  the kind (`means`, `includes`, `does_not_include` or `borrowed`), the
+  words that state its reach, or `unstated`, the region those words name,
+  the basis (`enacted`, `restated` or `unresolved`), what a borrowed
+  definition borrows from, and the editorial note "References in Text" to
+  read with a restated one (`fidryn_ingest_uscode::definitions::extract`).
+  The rules do not find every definition. The one-module check accepts
+  reach words that stand in the chapeau of any ancestor of the provision,
+  where it accepted only its parent's. The sample's modules hold the
+  definitions extracted from them.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,

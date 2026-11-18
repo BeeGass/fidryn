@@ -117,6 +117,27 @@ module "/us/usc/t45/s1347" {
     p "1986—Subsecs. (a)(1), (2), (d). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”, which for purposes of codification was translated as “title 26” thus requiring no change in text."
     hash "6cbf3c8e733698c3d99c1c1756aa947d550ccc5a3d9bd8e2323ceba8556aea39"
   }
+  definition "/us/usc/t45/s1347/e/1" {
+    term "Conrail"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
+  definition "/us/usc/t45/s1347/e/2" {
+    term "public sale"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
+  definition "/us/usc/t45/s1347/e/3" {
+    term "Secretary"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
   layers {
     operative "11ec4149ffb446a31babb98916fc5239be33603b70a234e16d9c972e4f6fae66"
     enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"

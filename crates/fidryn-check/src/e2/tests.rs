@@ -1913,6 +1913,127 @@ fn citations_and_bindings_share_one_set_of_names() {
     }
 }
 
+/// A unit whose section has a chapeau, whose subsection (a) has a heading
+/// and no chapeau, and whose subsection (b) has a chapeau of its own, with
+/// one definition at `at` whose reach words are `reach`.
+fn unit_with_chapeaus(at: &str, reach: &str) -> Module {
+    let chapeau = |text: &str| Item::Part {
+        role: PartRole::Chapeau,
+        blocks: vec![para(vec![words(text)])],
+    };
+    let paragraph = |at: &str, text: &str| Provision {
+        address: address(at),
+        kind: "paragraph".to_owned(),
+        num: num("1", "(1)"),
+        heading: None,
+        status: None,
+        items: vec![content(vec![para(vec![words(text)])])],
+    };
+    let subsection = |at: &str, letter: &str, heading: Option<Text>, items: Vec<Item>| Provision {
+        address: address(at),
+        kind: "subsection".to_owned(),
+        num: num(letter, &format!("({letter})")),
+        heading,
+        status: None,
+        items,
+    };
+    let root = Provision {
+        address: address("/zz/demo/t1/s5"),
+        kind: "section".to_owned(),
+        num: num("5", "§ 5."),
+        heading: Some(plain("Widgets and gadgets")),
+        status: None,
+        items: vec![
+            chapeau("For the purpose of this section—"),
+            Item::Child(subsection(
+                "/zz/demo/t1/s5/a",
+                "a",
+                Some(plain("Widgets")),
+                vec![Item::Child(paragraph(
+                    "/zz/demo/t1/s5/a/1",
+                    "The term “widget” means a small device.",
+                ))],
+            )),
+            Item::Child(subsection(
+                "/zz/demo/t1/s5/b",
+                "b",
+                None,
+                vec![
+                    chapeau("In this subsection—"),
+                    Item::Child(paragraph(
+                        "/zz/demo/t1/s5/b/1",
+                        "The term “gadget” means a tool.",
+                    )),
+                ],
+            )),
+        ],
+    };
+    let term = if at.contains("/b/") {
+        "gadget"
+    } else {
+        "widget"
+    };
+    Module::Unit(UnitModule {
+        address: address("/zz/demo/t1/s5"),
+        aliases: Vec::new(),
+        within: Some(address("/zz/demo/t1/ch1")),
+        source: "demo01.xml".to_owned(),
+        positive_law: Some(true),
+        root,
+        credit: None,
+        notes: Vec::new(),
+        footnotes: Vec::new(),
+        definitions: vec![Definition {
+            at: address(at),
+            terms: vec![term.to_owned()],
+            kind: DefinitionKind::Means,
+            words: Some(reach.to_owned()),
+            region: Some(address("/zz/demo/t1/s5")),
+            basis: Basis::Enacted,
+            borrowed_from: None,
+            see_note: None,
+        }],
+    })
+}
+
+#[test]
+fn the_reach_words_may_stand_in_the_chapeau_of_any_ancestor() {
+    for (at, reach) in [
+        // The chapeau of the grandparent, past a parent with no chapeau.
+        ("/zz/demo/t1/s5/a/1", "For the purpose of this section"),
+        // The chapeau of the parent.
+        ("/zz/demo/t1/s5/b/1", "In this subsection"),
+        ("/zz/demo/t1/s5/b/1", "For the purpose of this section"),
+    ] {
+        let module = unit_with_chapeaus(at, reach);
+        let source = render(&module);
+        match check_source(&source) {
+            Ok(lowered) => assert_eq!(lowered.module, module, "{at}: {reach}"),
+            Err(diagnostics) => panic!("{at}: {reach}: {diagnostics:#?}\n{source}"),
+        }
+    }
+    for reach in [
+        // The chapeau of a provision that is no ancestor.
+        "In this subsection",
+        // No chapeau and no text of the provision.
+        "As used in this chapter",
+    ] {
+        let at = "/zz/demo/t1/s5/a/1";
+        let source = render(&unit_with_chapeaus(at, reach));
+        let errors = check_source(&source).expect_err(reach);
+        assert_eq!(errors.len(), 1, "{reach}: {errors:#?}");
+        assert_eq!(errors[0].code, DiagnosticCode::E710, "{reach}");
+        assert_eq!(
+            errors[0].message,
+            format!(
+                "the words `{reach}` stand neither in the text of provision `{at}` nor in the \
+                 chapeau of one of its ancestors"
+            )
+        );
+        assert_eq!(text_at(&source, &errors[0]), format!("\"{reach}\""));
+    }
+}
+
 #[test]
 fn the_spans_a_workspace_check_reports_at_cover_exactly_their_strings() {
     let unit = fixture("unit.fr");

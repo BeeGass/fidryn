@@ -45,7 +45,7 @@ report of the check of a workspace follows
 | [Licensing](../LICENSING.md) | MIT terms and third-party notices |
 | [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, and the sample of the Code the repository holds and its check |
+| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, and the sample of the Code the repository holds and its check |
 | [Implementation status](implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 

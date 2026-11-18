@@ -103,6 +103,13 @@ module "/us/usc/t45/s165" {
     }
     hash "fd6c409fecaa36d03f2356cf48f31a26ec4da5204e2935ff1e60576f4025c720"
   }
+  definition "/us/usc/t45/s165/c" {
+    term "appropriate congressional committees"
+    kind means
+    words "In this section"
+    region "/us/usc/t45/s165"
+    basis restated
+  }
   layers {
     operative "546c028fdae955cf471af5f6a369d8ef7c2aefe30cf7da2ca7e8835d41654938"
     enacted "615b05667fea278fb567dc9a0a0d11478fa915282647c3295e108489f2bfb7c9"

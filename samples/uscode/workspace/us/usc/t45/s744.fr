@@ -430,6 +430,13 @@ module "/us/usc/t45/s744" {
   footnote 2 "2" {
     p "So in original. Probably should be “this”."
   }
+  definition "/us/usc/t45/s744/e/7/B" {
+    term "additional rail passenger service"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s744/e/7"
+    basis restated
+  }
   layers {
     operative "25941d9eec8015e70fff0a742d0f854f911b805e9eb7fc37785c090f0cefc8e3"
     enacted "7fa4565106dc715962c9aeaf9d5eb902861f9a4f31c34c139888f9ea95ffcf7e"

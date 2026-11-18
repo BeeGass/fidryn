@@ -10,6 +10,12 @@ module "/us/usc/t1/s4" {
     hash "b9a0c2e74715559311c2c545ccb8c14ce1a152300b967202d875575b953c4551"
   }
   credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 633" -> "/us/stat/61/633"] ".)"
+  definition "/us/usc/t1/s4" {
+    term "vehicle"
+    kind includes
+    words unstated
+    basis unresolved
+  }
   layers {
     operative "b9a0c2e74715559311c2c545ccb8c14ce1a152300b967202d875575b953c4551"
     enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"

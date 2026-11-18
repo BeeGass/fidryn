@@ -86,6 +86,13 @@ module "/us/usc/t45/s1322" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s1322/b/3" {
+    term "railroad"
+    kind means
+    words "As used in this subsection"
+    region "/us/usc/t45/s1322/b"
+    basis restated
+  }
   layers {
     operative "d60cb2d57bbe175de988e6f013dfb0f34c8ed36d7e6a9a5e0abbf5e68583f5be"
     enacted "a717bee657abc14b91d3c694c5ec79464bba284d1a16b1c938b0942dbd84631c"

@@ -175,6 +175,27 @@ module "/us/usc/t45/s915" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s915/b/3/H/i" {
+    term "carrier subject to liquidation"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s915/b/3"
+    basis restated
+  }
+  definition "/us/usc/t45/s915/b/3/H/ii" {
+    term "the court"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s915/b/3"
+    basis restated
+  }
+  definition "/us/usc/t45/s915/b/3/H/iii" {
+    term "financially responsible person"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s915/b/3"
+    basis restated
+  }
   layers {
     operative "b3bbaf3bb6cb5c8554b80e9182b3f8def25ff3e8e8181ef97899e8c83fe1196f"
     enacted "e175611b7d6b52a4386c25ad66c38f39b79771e7f0b3fad08eedd7198f534e63"

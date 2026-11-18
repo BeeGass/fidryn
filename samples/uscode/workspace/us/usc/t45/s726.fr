@@ -421,6 +421,12 @@ module "/us/usc/t45/s726" {
   footnote 4 "4" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s726/f/8/C" {
+    term "person"
+    kind includes
+    words "For purposes of subparagraph (A) of this paragraph"
+    basis unresolved
+  }
   layers {
     operative "92c2c824a5a9f764c58fb3f78a8ec9facca9cfe76c8ab30345f7bd78493899f0"
     enacted "bb7da539d5355bdcb8cb0943781c6326854f8d42b8b3b33bc9a2574f2f607cd3"

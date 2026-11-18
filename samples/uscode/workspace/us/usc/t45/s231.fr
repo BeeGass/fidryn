@@ -657,6 +657,98 @@ module "/us/usc/t45/s231" {
   footnote 2 "2" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s231/a/1" {
+    term "employer"
+    kind includes
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/b/2" {
+    term "employee"
+    kind does_not_include
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/c" {
+    term "employee representative"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/f/1" {
+    term "years of service"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/h/1" {
+    term "compensation"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/h/7" {
+    term "compensation"
+    kind includes
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/i" {
+    term "Board"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/j" {
+    term "company"
+    kind includes
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/k" {
+    term "employee"
+    kind includes
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/l" {
+    term "person"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/n" {
+    term "Social Security Act"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/p" {
+    term "annuity"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/q" {
+    term "quarter"
+    term "calendar quarter"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
   layers {
     operative "082f63deaa959fadb94cac92fb9287faaa1b6a5789eb098e38994a84c67e06ef"
     enacted "6d7896d28f0ead1c3d15d876e86ba9a73c1e890b46edbb6f61315882534d9414"

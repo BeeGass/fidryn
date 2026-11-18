@@ -95,6 +95,49 @@ module "/us/usc/t45/s802" {
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
+  definition "/us/usc/t45/s802/1" {
+    term "Association"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s802/2" {
+    term "Commission"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s802/3" {
+    term "Corporation"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s802/4" {
+    term "final system plan"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s802/6" {
+    term "Office"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s802/7" {
+    term "railroad"
+    kind borrowed
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+    borrowed_from "/us/usc/t49/s20102"
+  }
+  definition "/us/usc/t45/s802/8" {
+    term "Secretary"
+    kind means
+    words "As used in this Act, unless the context otherwise indicates"
+    basis unresolved
+  }
   layers {
     operative "12ddd7671d968dc6860d57d9823f6781f9f65fc9d31ada58b0c820f7c7eb95c6"
     enacted "b0bb181d6ed9712ef0b32af9351738b413d5f3b65d4c98d0911766ed74f795c5"

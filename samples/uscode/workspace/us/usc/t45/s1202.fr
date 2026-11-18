@@ -151,6 +151,114 @@ module "/us/usc/t45/s1202" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s1202/1" {
+    term "Alaska Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/2" {
+    term "Alaska Railroad Revolving Fund"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/3" {
+    term "claim of valid existing rights"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/4" {
+    term "date of transfer"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/5" {
+    term "employees"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/6" {
+    term "exclusive-use easement"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/7" {
+    term "Native Corporation"
+    kind borrowed
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+    borrowed_from "/us/usc/t16/s3102/6"
+  }
+  definition "/us/usc/t45/s1202/8" {
+    term "officers of the Alaska Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/9" {
+    term "public lands"
+    kind borrowed
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+    borrowed_from "/us/usc/t43/s1602/e"
+  }
+  definition "/us/usc/t45/s1202/10" {
+    term "rail properties of the Alaska Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/11" {
+    term "right-of-way"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/12" {
+    term "Secretary"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/13" {
+    term "State"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/14" {
+    term "State-owned railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+  }
+  definition "/us/usc/t45/s1202/15" {
+    term "Village Corporation"
+    kind borrowed
+    words "As used in this chapter"
+    region "/us/usc/t45/ch21"
+    basis restated
+    borrowed_from "/us/usc/t43/s1602/j"
+  }
   layers {
     operative "833f7553da0bcb1478026199f6e95a7a443e41abea5ffba17dc3a07ccfee8aab"
     enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"

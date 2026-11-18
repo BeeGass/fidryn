@@ -62,6 +62,34 @@ module "/us/usc/t45/s661" {
     }
     hash "11088c7a079b81ed1e64571bb7889754a23bfef2650d374b0699aea537d281c7"
   }
+  definition "/us/usc/t45/s661/1" {
+    term "Secretary"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch15"
+    basis restated
+  }
+  definition "/us/usc/t45/s661/2" {
+    term "Board"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch15"
+    basis restated
+  }
+  definition "/us/usc/t45/s661/3" {
+    term "Railroad"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch15"
+    basis restated
+  }
+  definition "/us/usc/t45/s661/4" {
+    term "Certificate"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch15"
+    basis restated
+  }
   layers {
     operative "d1b01c56e31dbd0564a8b8e0f37e22b101a61e9e043b58b5a86507ca75654b08"
     enacted "9c5907d18c28c58c66fa6a4f45695c9733986886118a8e3184649f77c6233830"

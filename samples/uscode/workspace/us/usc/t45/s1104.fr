@@ -86,6 +86,54 @@ module "/us/usc/t45/s1104" {
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
+  definition "/us/usc/t45/s1104/1" {
+    term "Amtrak"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/2" {
+    term "Commission"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/3" {
+    term "Commuter authority"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/4" {
+    term "Commuter service"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/5" {
+    term "Conrail"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/6" {
+    term "Rail carrier"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/7" {
+    term "Secretary"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/8" {
+    term "Special court"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
   layers {
     operative "5a65d93b6e2abfca8e7d123a03ffe5c72bf96613b27d89904ddf22d97fac811d"
     enacted "49fb76befceb72038b593e89a5036cfd87dbbe240621be86942550cd4f5f5d02"

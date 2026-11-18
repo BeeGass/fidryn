@@ -152,6 +152,11 @@ documents, `old.xml` of the release `999-1` and `new.xml` of the release
 `999-2`, which differ in every element id, in the publication name, in the
 creation time of the metadata and in the release note, and in nothing
 else; the test checks that the script prints the same records for both.
+The documents `definitions-*.xml` hold the cases of the rules of
+[Definitions](../docs/law-modules.md#definitions). No text record shows a
+definition, so their records and profiles are those of any other document;
+the Rust tests of `fidryn-ingest-uscode` hold the definitions the importer
+extracts from them.
 
 `usc_profile.py` reads the same inputs and prints the counts of two sets of
 counting rules as one JSON object with sorted keys: `baseline`, the counting

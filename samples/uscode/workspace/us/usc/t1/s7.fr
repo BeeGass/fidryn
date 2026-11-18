@@ -101,6 +101,13 @@ module "/us/usc/t1/s7" {
     }
     hash "fd549721ddf874d3cd7e5d95fb9383ab9b9bae57f2abc09c436840b33abe8615"
   }
+  definition "/us/usc/t1/s7/b" {
+    term "State"
+    kind means
+    words "In this section"
+    region "/us/usc/t1/s7"
+    basis enacted
+  }
   layers {
     operative "4e049aeb576594d2ce24f38e66efb157fb21f784e97a55b394336929fbbdf84e"
     enacted "7e6aa1d41afa01d45400b480c484d70f5b4a7ad0b9eb30fbf852e4d07f427427"

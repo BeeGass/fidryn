@@ -289,6 +289,13 @@ module "/us/usc/t45/s745" {
   footnote 2 "2" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s745/e" {
+    term "fair and equitable"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s745"
+    basis restated
+  }
   layers {
     operative "f464d64bc350963d453b93299bcc7e7826dfebbf6f85d31877cc595b0b6e92ff"
     enacted "068392bf97c2fe5e0a2df7783184b01b7b7f0d95209cf9edb21cf7556d122854"

@@ -384,6 +384,52 @@ fn the_text_of_the_workspace_of_a_fixture_is_its_expected_records() {
     }
 }
 
+/// Every module the importer reads from a fixture, written in its canonical
+/// form, passes the one-module check with the definitions extracted from it
+/// and reads back to the same model; so does the fixture of a file that is
+/// not positive law with its flag turned on. The fixtures of definitions
+/// give the number of definitions they hold.
+#[test]
+fn every_extracted_definition_passes_the_checker() {
+    let mut documents: Vec<(String, String)> = document_fixtures()
+        .into_iter()
+        .map(|name| {
+            let text = String::from_utf8(fixture(&format!("{name}.xml"))).expect("UTF-8");
+            (name, text)
+        })
+        .collect();
+    let restated = String::from_utf8(fixture("definitions-restated.xml")).expect("UTF-8");
+    let flag = "<property role=\"is-positive-law\">no</property>";
+    assert!(restated.contains(flag));
+    documents.push((
+        "definitions-restated, flag on".to_owned(),
+        restated.replace(flag, "<property role=\"is-positive-law\">yes</property>"),
+    ));
+    let mut counts: BTreeMap<String, usize> = BTreeMap::new();
+    for (name, text) in &documents {
+        let (modules, _) = fidryn_ingest_uscode::ingest_xml("usc99.xml", text, RELEASE)
+            .unwrap_or_else(|error| panic!("{name}: {error}"));
+        for module in modules {
+            if let fidryn_provision::Module::Unit(unit) = &module {
+                *counts.entry(name.clone()).or_default() += unit.definitions.len();
+            }
+            let source = fidryn_provision::render::render(&module);
+            match fidryn_check::e2::check_source(&source) {
+                Ok(lowered) => assert_eq!(lowered.module, module, "{name}"),
+                Err(diagnostics) => panic!("{name}: {diagnostics:#?}\n{source}"),
+            }
+        }
+    }
+    for (name, expected) in [
+        ("definitions-chapeau", 14),
+        ("definitions-restated", 5),
+        ("definitions-restated, flag on", 5),
+        ("definitions-sentence", 10),
+    ] {
+        assert_eq!(counts.get(name), Some(&expected), "{name}");
+    }
+}
+
 /// A document without the property `is-positive-law` has no flag: none of
 /// its modules declares `positive_law`, each checks by itself, and the
 /// record of its unit has `null`. The same document with the property

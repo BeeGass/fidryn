@@ -496,6 +496,90 @@ module "/us/usc/t45/s351" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s351/b" {
+    term "carrier"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/c" {
+    term "company"
+    kind includes
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/f" {
+    term "employee representative"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/g" {
+    term "employment"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/h" {
+    term "registration period"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/i/2/A" {
+    term "monthly compensation base"
+    kind means
+    words "For purposes of subdivision (1)"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/l/2" {
+    term "statement of sickness"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/m" {
+    term "benefit year"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/n" {
+    term "base year"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/o" {
+    term "employment office"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/p" {
+    term "account"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/q" {
+    term "fund"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/r" {
+    term "Board"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/t" {
+    term "State"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
   layers {
     operative "14d34be7bbc7b4719bf7423c406b40bbae2b407bc2ccc80fffe46c5fb73dd757"
     enacted "ac322a53b706e7e8908447e9699718fc7020a0c0c323f1eaebb7ea4b4bf96da4"

@@ -64,6 +64,41 @@ module "/us/usc/t45/s902" {
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
+  definition "/us/usc/t45/s902/1" {
+    term "bankruptcy court"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch18"
+    basis restated
+  }
+  definition "/us/usc/t45/s902/2" {
+    term "Board"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch18"
+    basis restated
+  }
+  definition "/us/usc/t45/s902/3" {
+    term "Commission"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch18"
+    basis restated
+  }
+  definition "/us/usc/t45/s902/5" {
+    term "Milwaukee Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch18"
+    basis restated
+  }
+  definition "/us/usc/t45/s902/6" {
+    term "restructured Milwaukee Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch18"
+    basis restated
+  }
   layers {
     operative "7fa7186b62685bfb676e74ff61b0d296de2d5b5598a7695aa7c607eb5f187e3c"
     enacted "77460fecd27a3d8c7a1409effc5b8609cf0e9d1092f53c08df757cda669be5b1"

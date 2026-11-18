@@ -152,6 +152,13 @@ module "/us/usc/t45/s231n–1" {
   footnote 1 "1" {
     p "So in original. Probably should be “this”."
   }
+  definition "/us/usc/t45/s231n–1/f/2" {
+    term "social security equivalent benefits"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s231n–1"
+    basis restated
+  }
   layers {
     operative "566e95e13b7328654505d4aa453a906df301ea728e6a610b6e380e4330acb82d"
     enacted "d557c0ffa219ba13fc859bbfd281da2f660303831f822eb39b2a6aab41d7c35a"

@@ -478,6 +478,13 @@ module "/us/usc/t45/s231a" {
   footnote 6 "6" {
     p "So in original. Probably should be “calendar”."
   }
+  definition "/us/usc/t45/s231a/c/3" {
+    term "spouse"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
   layers {
     operative "e7afbea469fd5b1608859e676d494d559df9a275c7894d28cac8a3f26510f93b"
     enacted "8d4b0dac16eaf94f9241b1fe9e5a4220aab10e7115586c590ee113da10067b4d"

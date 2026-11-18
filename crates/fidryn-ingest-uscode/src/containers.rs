@@ -33,6 +33,7 @@
 //! refused, and so is a release in which two elements would end with one
 //! address.
 
+use crate::definitions;
 use crate::notes;
 use crate::operative::{self, Made, UNIT_TAGS};
 use crate::uslm::{self, Footnotes, Head, Labels, Scope};
@@ -468,6 +469,8 @@ pub(crate) fn build(
             unit.credit = matter.credit;
             unit.notes = matter.notes;
             unit.footnotes = matter.footnotes;
+            unit.definitions =
+                definitions::extract(&unit, &containers_of(outline, assigned, index));
             Module::Unit(unit)
         } else {
             built.containers += 1;
@@ -490,6 +493,19 @@ pub(crate) fn build(
         give(module)?;
     }
     Ok(built)
+}
+
+/// The containers of the entry `index` of `outline`, from the nearest
+/// outward, each at its address and with its kind.
+fn containers_of(outline: &Outline, assigned: &[Assigned], index: usize) -> Vec<(Address, String)> {
+    let mut containers = Vec::new();
+    let mut parent = outline.entries[index].parent;
+    while let Some(at) = parent {
+        let entry = &outline.entries[at];
+        containers.push((assigned[at].address.clone(), entry.tag.clone()));
+        parent = entry.parent;
+    }
+    containers
 }
 
 /// Adds the address of `provision` and of every provision below it to

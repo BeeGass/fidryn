@@ -217,6 +217,146 @@ module "/us/usc/t45/s702" {
   footnote 2 "2" {
     p "So in original. The period probably should be a semicolon."
   }
+  definition "/us/usc/t45/s702/1" {
+    term "Association"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/2" {
+    term "Commission"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/3" {
+    term "Commuter authority"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/4" {
+    term "Commuter service"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/5" {
+    term "Corporation"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/6" {
+    term "effective date of the final system plan"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/7" {
+    term "employee stock ownership plan"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/8" {
+    term "final system plan"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/9" {
+    term "Finance Committee"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/11" {
+    term "local or regional transportation authority"
+    kind includes
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/12" {
+    term "Office"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/13" {
+    term "profitable railroad"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/14" {
+    term "rail properties"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/15" {
+    term "railroad"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/17" {
+    term "Region"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/17A" {
+    term "sale date"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/18" {
+    term "Secretary"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/19" {
+    term "State"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/20" {
+    term "subsidiary"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
+  definition "/us/usc/t45/s702/21" {
+    term "supplemental transaction"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
   layers {
     operative "408111882a1196d1bb7510dfe203d35819ac4b6909b974c4e9f38ed166cd99c2"
     enacted "4f4c3fbe8a64c21467213d38fa86f076e758bf245adc7fce061f6c49d3cdd7da"

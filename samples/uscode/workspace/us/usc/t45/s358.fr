@@ -1095,6 +1095,13 @@ module "/us/usc/t45/s358" {
   footnote 2 "2" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s358/a/17/B" {
+    term "individual employer record"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s358/a/17"
+    basis restated
+  }
   layers {
     operative "13b3d6be1e94381737e367151e4e2bc1408c407422196ef6f01be1aa8fc9d2a6"
     enacted "a00f82de6121bf59610623c723c8564d37847e2dff5f2e316930d3c616ca7db8"

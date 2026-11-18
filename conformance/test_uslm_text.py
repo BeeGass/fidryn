@@ -69,6 +69,15 @@ CASES = {
     "heading inside a p, and a note with a heading and a subheading",
     "meta-dash-name": "a publication name that writes the release with an en dash",
     "meta-no-flag": "a file without the property is-positive-law, with a chapter and a section",
+    "definitions-sentence": "definitions in the sentence form with and without a reach of their "
+    "own, a link in the reach, and paragraphs the definition rules do not extract, in operative "
+    "text, in quoted content and in a note",
+    "definitions-chapeau": "definitions in the list form and the sentence form under a chapeau "
+    "that states a reach, with a lead-in, above a provision with a heading, under chapeaus that "
+    "state none, and two definitions in the parts of one provision",
+    "definitions-restated": "definitions in a file whose positive-law flag is no, with notes "
+    "headed References in Text in the editorial group, in quoted content and in the statutory "
+    "group",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -220,6 +229,15 @@ class TextFixtures(unittest.TestCase):
 
     def test_meta_no_flag(self) -> None:
         self.check("meta-no-flag")
+
+    def test_definitions_sentence(self) -> None:
+        self.check("definitions-sentence")
+
+    def test_definitions_chapeau(self) -> None:
+        self.check("definitions-chapeau")
+
+    def test_definitions_restated(self) -> None:
+        self.check("definitions-restated")
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)

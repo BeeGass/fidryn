@@ -7,9 +7,9 @@ its provisions, notes and layers are hashed, how a module is written, what
 the checker verifies of one module, how modules form a workspace and what
 the checker verifies of one, how a workspace is checked, what outcome
 each reference has, when a binding is stale, how the ingester for the
-United States Code reads the publisher's XML, and what the sample of the
-Code in the repository
-holds and how it is checked. The crate `fidryn-provision` implements the model and
+United States Code reads the publisher's XML, by which rules it extracts
+definitions, and what the sample of the Code in the repository holds and
+how it is checked. The crate `fidryn-provision` implements the model and
 the rules over it, `fidryn-syntax` reads the text of a module,
 `fidryn-check` lowers it into the model and checks it, `fidryn-driver`
 checks a workspace and writes a generated one, and `fidryn-ingest-uscode`
@@ -238,7 +238,8 @@ defines, its kind (`means`, `includes`, `does_not_include` or `borrowed`),
 the words that state its reach or none when the text states none, the
 region the reach covers, its basis (`enacted`, `restated` or `unresolved`),
 what a borrowed definition takes its meaning from (`borrowed_from`), and a
-note to read with it (`see_note`). Definitions are in no hash.
+note to read with it (`see_note`). Definitions are in no hash. The ingester
+for the Code extracts them by the rules of [Definitions](#definitions).
 
 ### Layers
 
@@ -560,7 +561,7 @@ about. `fidryn check` prints each as `FILE: CODE Title: message` and exits
 | Every `hash`, every value of `layers` and both hashes of a binding are 64 lower-case hexadecimal digits | `E710` |
 | Every `hash` and every value of `layers` equals the hash computed from what the module writes | `E710` |
 | The footnotes are numbered from 1, without a gap, in the order they are written; every footnote marker names a footnote of the module | `E710` |
-| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of its parent; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
+| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
 | In a curated module, no name is declared twice, its citations and its bindings sharing one set of names | `E200` |
 
 An address is below another when it lies within it and is not the same
@@ -1778,6 +1779,212 @@ number of workers changes a byte. Two documents that differ only in their
 element ids, their publication name, the creation time of their metadata
 and their release note give the same modules, and locks that differ only
 in `release` and `artifacts`.
+
+## Definitions
+
+The ingester for the United States Code extracts definitions from the
+provisions of every unit it imports, once the unit's provisions and notes
+are read, and writes each in the unit's module as a `definition` block
+([Syntax](#syntax)): the provision that holds it, its terms, its kind, the
+words that state its reach, the region the reach covers, its basis, and,
+where the rules give them, what it borrows its meaning from and a note to
+read with it. A container has no definitions. The rules read definitions
+written in a closed list of forms and in no other: they do not find every
+definition of the Code, and a provision whose text matches none of the
+forms is imported as a plain provision, with no definition. A definition
+the rules do not find is missing from the module; a definition they find
+records its terms, its kind and its reach words as the text has them.
+
+### Where definitions are read
+
+A definition is extracted from the first block of a `chapeau` or `content`
+part of a provision of a unit, when that block is a paragraph and its text
+matches one of the patterns below, and from nothing else: not from a note,
+not from quoted content, and not from a later block of a part. The text of
+a paragraph is its plain text: the words of its runs, in order, without its
+footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
+at least one character and neither mark inside it; the term is recorded
+without the marks. Where these rules say "in any case", the letters `A` to
+`Z` are compared as `a` to `z`, and no other character is changed. Where
+they speak of words that a text holds, they mean whole words: a word is
+bounded by the start or the end of the text or by a character that is not
+one of the letters `A` to `Z` and `a` to `z`.
+
+### Verbs
+
+| Kind | Verb forms |
+| --- | --- |
+| `means` | `means`, `mean`, `shall mean` |
+| `includes` | `includes`, `include`, `shall include` |
+| `does_not_include` | `does not include`, `do not include`, `shall not include` |
+| `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given` |
+
+A verb form stands where its words are followed by the end of the text or
+by a character that is not one of the letters `A` to `Z` and `a` to `z`;
+where a rule looks for a verb form inside other text, the character before
+it is not such a letter either.
+
+### Patterns
+
+1. *Sentence form.* The paragraph begins
+   `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`.
+   `Aside` is text with no quotation mark and no verb form of the table in
+   it.
+2. *List form.* The paragraph begins
+   `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and it has
+   an inherited reach (below).
+
+One space stands between two parts of a pattern, and a comma stands
+directly after the part before it: `the term “widget”, with respect to a
+gadget, means`, `the terms “widget” and “gadget” mean`. The kind of the
+definition is the kind of its verb form.
+
+### The reach
+
+`Reach` is `Opening Object`. `Opening` is one of `As used in`, `In`,
+`For purposes of`, `For the purposes of`, `For the purpose of`,
+`For purpose of` and `When used in`. `Object` is the text from the opening
+to the end of the reach: it is not empty, it holds no quotation mark, and
+it holds none of the words `term`, `terms`, `word`, `words`, `phrase`,
+`phrases`, `definition`, `definitions`, `following`, `meaning` and
+`meanings`, in any case. After `In`, the `Object` must begin with `this` and
+a space, or be a single link; a paragraph that opens with `In` and anything
+else ("In the case of an individual, the term ...") states a condition, not
+a reach. In the sentence form the reach ends at the comma that stands before
+`the term` (or `The`, `terms`, `word`, `words`, `phrase`), and no quotation
+mark stands before that comma. A paragraph whose text before those words is
+anything other than a `Reach` is not extracted.
+
+A single link is an object whose words are exactly the words of one link
+of the paragraph.
+
+### A reach chapeau
+
+The chapeau of a provision is a *reach chapeau* when it is one paragraph
+whose text is `Reach [[","] LeadIn] Close`, and nothing more. `LeadIn` is
+one of `the term`, `the terms`, `the following definitions apply` and
+`the following definitions shall apply`. `Close` is a dash (U+2014 or `-`)
+or a colon, with at most one space before it. The lead-in and the close are
+no part of the reach. `In this section:`, `As used in this chapter, the
+term—` and `In this section, the following definitions apply:` are reach
+chapeaus; `The following rules apply:`, `Except as otherwise provided, in
+this chapter:` and `In this chapter, the following terms have the following
+meanings:` are not.
+
+### The reach of a paragraph
+
+A paragraph of the sentence form that begins with a `Reach` has that reach.
+Any other paragraph looks to the nearest ancestor of its provision that has
+a chapeau. When that chapeau is a reach chapeau, the paragraph has its
+reach, an *inherited* reach. When it is any other chapeau, the paragraph is
+not extracted: such a chapeau may state a reach in words these rules do not
+read. When no ancestor has a chapeau, a paragraph of the sentence form has
+no reach, and a paragraph of the list form is not extracted. The reach
+words are recorded exactly as the text has them, from the opening to the
+end of the object; a definition with no reach has the words `unstated`.
+
+### What is not extracted
+
+A paragraph that matches a pattern is still not extracted when one of these
+holds:
+
+- *It defines a second term.* After the `Verb`, the text holds a `Q` that
+  is followed by a space and a verb form, or by a comma, a space, text with
+  no quotation mark, a comma, a space and a verb form.
+- *Its aside speaks of a reach.* The `Aside` begins with `in` and a space,
+  or holds `as used in`, `when used in`, `for purposes of`,
+  `for the purposes of`, `for the purpose of` or `for purpose of`, in any
+  case.
+- *A reach follows its verb.* The `Verb` is followed by a comma, a space,
+  one of the openings in any case, and a space.
+- *It has no reach, and speaks of one.* It has the words `unstated`, and
+  its text holds one of the six phrases of the second case, in any case.
+
+A borrowed definition with no link after its verb is not extracted either
+(below).
+
+### The region
+
+When the `Object` is `this`, a space and one of `title`, `subtitle`,
+`chapter`, `subchapter`, `part`, `subpart`, `division`, `section`,
+`subsection`, `paragraph`, `subparagraph`, `clause`, and then either
+nothing more or a comma, a space and text that begins `unless the context`,
+the region is the nearest ancestor whose kind is that word, counted from
+the provision whose text holds the reach (that provision included, then its
+ancestors, then its unit's containers in order, the nearest first). When
+the `Object` is a single link whose target is an address below the prefix
+of the corpus, the region is that target. Otherwise there is no region: a
+link to a public law or to the Statutes at Large names no region of the
+Code, and an object that says more than these forms allow ("this chapter
+and chapter 5", "paragraph (1)") is not resolved.
+
+### The basis
+
+| Region | Unit | Basis |
+| --- | --- | --- |
+| none | any | `unresolved` |
+| an address | its file declares its title positive law (`positive_law true`) | `enacted` |
+| an address | any other | `restated` |
+
+### Borrowed definitions
+
+A definition of kind `borrowed` records as `borrowed_from` the target of the
+first link that begins at or after the end of its verb form. If there is
+none, the paragraph is not extracted, and so it is when that link has an
+empty target.
+
+### The note
+
+When the basis is `restated` and the unit has an editorial note whose
+heading is "References in Text", one of whose own paragraphs (not one
+inside a table or quoted content) holds, in any case, the words that name
+the region (`this` and the kind word, or the words of the link) followed by
+`, referred to in`, the definition records the address of the first such
+note as `see_note`.
+
+### What the values mean
+
+- `unstated`: neither the paragraph nor a chapeau above it states a reach
+  in the forms these rules read. A reach stated somewhere else, for example
+  in another subsection of the same section, is not read, so a definition
+  whose words are `unstated` may still have a reach that the text states
+  elsewhere.
+- `unresolved`: the rules found no region. That includes reach words that
+  name a part of the Code in a form the rules do not resolve, such as "this
+  chapter and chapter 5" or "subparagraph (A) of this paragraph", a reach
+  that names a law outside the Code, such as "this Act" or a link to a
+  public law, and a reach whose kind word names no provision or container
+  above the definition.
+- `restated`: the file does not declare its title positive law (its flag is
+  `no`, or it has none), so the words of the provision are those of the
+  editors of the Code, and the reach the law enacted may differ from the
+  one they state: a "this chapter" of the Code may stand for "this Act" or
+  "this title" of the law the editors classified there. `see_note` points
+  to the editorial note that says what the enacted words were, when there
+  is one.
+
+An invented example: the chapeau of a section of an invented title that is
+positive law, and the definitions extracted from its paragraphs.
+
+```text
+§ 2. Definitions
+In this section:
+  (1) Widget.—The term “widget” means a small device.
+  (2) “gadget” includes a widget.
+  (3) The term “sprocket” has the meaning given such term in section 5 of this title.
+
+definition ".../s2/1"  term "widget"    kind means     words "In this section"  region ".../s2"  basis enacted
+definition ".../s2/2"  term "gadget"    kind includes  words "In this section"  region ".../s2"  basis enacted
+definition ".../s2/3"  term "sprocket"  kind borrowed  words "In this section"  region ".../s2"  basis enacted
+                       borrowed_from the target of the link "section 5 of this title"
+```
+
+The definitions of a module are written in the order of their provisions
+in the document and then of their first term, and two definitions of one
+provision with one first term keep the order of their parts. The checker
+holds each to the rules of [What the checker verifies in one module](#what-the-checker-verifies-in-one-module):
+its provision is in the module, each term stands in its text, and the reach
+words stand in its text or in the chapeau of one of its ancestors.
 
 ## The sample
 

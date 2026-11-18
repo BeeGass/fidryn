@@ -120,6 +120,111 @@ module "/us/usc/t45/s1303" {
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
+  definition "/us/usc/t45/s1303/1" {
+    term "capital expenditures"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/2" {
+    term "Commission"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/3" {
+    term "consolidated funded debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/4" {
+    term "consolidated tangible net worth"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/5" {
+    term "Corporation"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/6" {
+    term "cumulative net income"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/7" {
+    term "debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/8" {
+    term "funded debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/9" {
+    term "liabilities"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/10" {
+    term "person"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/11" {
+    term "preferred stock"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/12" {
+    term "public offering"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/13" {
+    term "sale date"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/14" {
+    term "subsidiary"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/15" {
+    term "United States share"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
   layers {
     operative "665e87dc4b76a76befa5f243b556e8c0ce950c1ead91e9b0a82ff33a6e316953"
     enacted "6d1df37b8cc86b034bdcbff2f1979494610c573fd71e5c6fe6a11b358c9f9a17"

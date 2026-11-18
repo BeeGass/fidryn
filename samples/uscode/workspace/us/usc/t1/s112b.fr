@@ -449,6 +449,42 @@ module "/us/usc/t1/s112b" {
     p ["Pub. L. 100–204, title I, § 139" -> "/us/pl/100/204/tI/s139"] ", Dec. 22, 1987, " ["101 Stat. 1347" -> "/us/stat/101/1347"] ", as amended by " ["Pub. L. 108–458, title VII, § 7121(e)" -> "/us/pl/108/458/tVII/s7121/e"] ", Dec. 17, 2004, " ["118 Stat. 3808" -> "/us/stat/118/3808"] ", restricted the use of funds during fiscal years 2005, 2006, and 2007 to implement international agreements whose text was not transmitted to Congress within 60 days pursuant to former section 112b."
     hash "2692bb3dacb375ff22454fb0ea849f1ec7980f67d9a2e507ec68e728a55c0203"
   }
+  definition "/us/usc/t1/s112b/k/1" {
+    term "appropriate congressional committees"
+    kind means
+    words "In this section"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
+  definition "/us/usc/t1/s112b/k/2" {
+    term "appropriate department or agency"
+    kind means
+    words "In this section"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
+  definition "/us/usc/t1/s112b/k/3" {
+    term "intelligence community"
+    kind borrowed
+    words "In this section"
+    region "/us/usc/t1/s112b"
+    basis enacted
+    borrowed_from "/us/usc/t50/s3003/4"
+  }
+  definition "/us/usc/t1/s112b/k/4" {
+    term "international agreement"
+    kind includes
+    words "In this section"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
+  definition "/us/usc/t1/s112b/k/6" {
+    term "Secretary"
+    kind means
+    words "In this section"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
   layers {
     operative "fe4262fb3d8f7cf6c1df90607195b512b13b063aea62798c87fdf35f704b4faa"
     enacted "49326f01c2f7cb4f3638088cd98df36aea735b5a35e84c3f2c4e569defe77c09"

@@ -20,9 +20,9 @@ use std::collections::{BTreeMap, BTreeSet};
 ///   the module writes; the footnotes are numbered from 1, without a gap,
 ///   in the order they are written, and every footnote marker names a
 ///   footnote of the module; and every definition names a provision of the
-///   unit whose text holds each term, whose text or whose parent's chapeau
-///   holds the reach words when they are stated, and, when its kind is
-///   `borrowed`, says what it borrows from (`E710`);
+///   unit whose text holds each term, whose text or the chapeau of one of
+///   whose ancestors holds the reach words when they are stated, and, when
+///   its kind is `borrowed`, says what it borrows from (`E710`);
 /// - no name of a curated module is declared twice, its citations and its
 ///   bindings sharing one set of names (`E200`).
 pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic> {
@@ -400,17 +400,24 @@ impl Check<'_> {
                 }
             }
             if let Some(words) = &definition.words {
-                let chapeau = placed
-                    .parent
-                    .map(|parent| texts_of(parent, |role| role == PartRole::Chapeau))
-                    .unwrap_or_default();
-                if !stands(&texts, words) && !stands(&chapeau, words) {
+                // The chapeaus of the ancestors, the parent first. Each
+                // ancestor is found by its address, which no other provision
+                // of a module that passes the checks of its addresses has.
+                let mut chapeaus = Vec::new();
+                let mut ancestor = placed.parent;
+                while let Some(provision) = ancestor {
+                    chapeaus.extend(texts_of(provision, |role| role == PartRole::Chapeau));
+                    ancestor = by_address
+                        .get(&provision.address)
+                        .and_then(|placed| placed.parent);
+                }
+                if !stands(&texts, words) && !stands(&chapeaus, words) {
                     self.error(
                         DiagnosticCode::E710,
                         spans.words,
                         format!(
                             "the words `{words}` stand neither in the text of provision `{at}` \
-                             nor in the chapeau of its parent"
+                             nor in the chapeau of one of its ancestors"
                         ),
                     );
                 }

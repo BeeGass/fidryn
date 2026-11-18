@@ -55,6 +55,28 @@ module "/us/usc/t45/s363a" {
     p "1947—Subsec. (a). Act Aug. 6, 1947, extended time for application for refund from twelve months to two years after Aug. 2, 1946."
     hash "e0a8c72b4e5a947e1bca527961325e844b150fa44ec0c680a9f39d8c015cb91c"
   }
+  definition "/us/usc/t45/s363a/b/1" {
+    term "employee amount"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s363a"
+    basis restated
+  }
+  definition "/us/usc/t45/s363a/b/2" {
+    term "Unemployment Trust Fund"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s363a"
+    basis restated
+  }
+  definition "/us/usc/t45/s363a/b/3" {
+    term "employees"
+    kind borrowed
+    words "As used in this section"
+    region "/us/usc/t45/s363a"
+    basis restated
+    borrowed_from "/us/usc/t45/s351"
+  }
   layers {
     operative "b781cf5a48173b7ef199502cf22d7c9d5b2481658edf863c514940554cdacc57"
     enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
