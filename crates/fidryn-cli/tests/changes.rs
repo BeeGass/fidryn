@@ -20,20 +20,35 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-/// `fidryn ARGS...`, with no cache named by the environment.
-fn fidryn(args: &[&OsStr]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_fidryn"))
-        .args(args)
-        .env_remove("FIDRYN_CACHE_DIR")
-        .output()
-        .expect("run fidryn")
+/// Every environment variable that `fidryn` reads to find the directory of
+/// its cache.
+const CACHE_VARIABLES: [&str; 4] = ["FIDRYN_CACHE_DIR", "XDG_CACHE_HOME", "HOME", "LOCALAPPDATA"];
+
+/// `fidryn ARGS...`, in an environment in which of [`CACHE_VARIABLES`] only
+/// those of `set` are set, so that no cache of the user who runs the test is
+/// written.
+fn fidryn_with(args: &[&OsStr], set: &[(&str, &OsStr)]) -> Output {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_fidryn"));
+    command.args(args);
+    for name in CACHE_VARIABLES {
+        command.env_remove(name);
+    }
+    for (name, value) in set {
+        command.env(name, value);
+    }
+    command.output().expect("run fidryn")
+}
+
+/// `fidryn changes OLD NEW ARGS...`, with the variables `set`.
+fn changes_with(old: &Path, new: &Path, args: &[&str], set: &[(&str, &OsStr)]) -> Output {
+    let mut all = vec![OsStr::new("changes"), old.as_os_str(), new.as_os_str()];
+    all.extend(args.iter().map(OsStr::new));
+    fidryn_with(&all, set)
 }
 
 /// `fidryn changes OLD NEW ARGS...`.
 fn changes(old: &Path, new: &Path, args: &[&str]) -> Output {
-    let mut all = vec![OsStr::new("changes"), old.as_os_str(), new.as_os_str()];
-    all.extend(args.iter().map(OsStr::new));
-    fidryn(&all)
+    changes_with(old, new, args, &[])
 }
 
 fn stdout(output: &Output) -> String {
@@ -362,23 +377,31 @@ fn changes_prints_the_change_set_as_a_commit_message_or_as_json() {
         assert_eq!(stdout(&again), stdout(&json), "{jobs} workers");
     }
 
-    // By default each workspace keeps its own cache, and a second run reads
-    // from it and prints the same.
-    let first = changes(&old, &new, &["--bindings", bindings]);
+    // By default every workspace is read through one cache, `fidryn` in the
+    // cache directory of the user, and nothing is written into any of them;
+    // a second run reads from it and prints the same.
+    let user = scratch.join("user");
+    let set = [
+        ("XDG_CACHE_HOME", user.as_os_str()),
+        ("LOCALAPPDATA", user.as_os_str()),
+    ];
+    let before = [&old, &new, &notes].map(|dir| listing(dir));
+    let first = changes_with(&old, &new, &["--bindings", bindings], &set);
     assert_eq!(first.status.code(), Some(0), "{}", stderr(&first));
-    for dir in [&old, &new, &notes] {
-        assert!(
-            listing(dir)
-                .iter()
-                .any(|rel| rel.starts_with(".fidryn-cache/v1/")),
-            "{}: {:?}",
-            dir.display(),
-            listing(dir)
-        );
-    }
-    let second = changes(&old, &new, &["--bindings", bindings]);
+    assert_eq!(stderr(&first), "");
+    assert_eq!(stdout(&first), stdout(&text));
+    assert_eq!([&old, &new, &notes].map(|dir| listing(dir)), before);
+    assert!(
+        listing(&user.join("fidryn"))
+            .iter()
+            .any(|rel| rel.starts_with("v1/")),
+        "{:?}",
+        listing(&user)
+    );
+    let second = changes_with(&old, &new, &["--bindings", bindings], &set);
     assert_eq!(stdout(&second), stdout(&text));
     assert_eq!(stderr(&second), "");
+    assert_eq!([&old, &new, &notes].map(|dir| listing(dir)), before);
 
     // A cache named once is the cache of every workspace.
     let shared = scratch.join("cache");

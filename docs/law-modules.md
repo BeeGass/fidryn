@@ -611,7 +611,8 @@ Every `.fr` file in it is a module of edition 2 whose address is below the
 manifest's `prefix` and which stands at the [file path](#file-paths) of its
 address. An entry whose name begins with a dot, whether a file, a
 directory or a symbolic link, is not the workspace's: the check does not
-read it, nor anything in it, and the writer leaves it alone, so a
+read it, nor anything in it, unless it is told to keep its
+[cache](#the-cache) there, and the writer leaves it alone, so a
 repository's `.git`, a `.gitignore` or an editor's lock link may stand in a
 workspace. No symbolic link is followed, and one whose name does not begin
 with a dot is an error.
@@ -853,8 +854,7 @@ warning included. The
 invented demo workspace under `conformance/fixtures/workspace/demo` is
 what the writer writes from one title, one chapter and three sections;
 the tests of `fidryn-driver` hold it to that. Checked with `--no-cache`,
-which keeps no [cache](#the-cache) and so writes nothing into the
-repository:
+which keeps no [cache](#the-cache) and so writes nothing:
 
 ```sh
 fidryn check conformance/fixtures/workspace/demo --no-cache
@@ -1185,16 +1185,42 @@ not kept; the check refuses it in any case.
 The entry of a key is the file `v1/<the first two digits of the key>/<key>.json`
 in the cache's directory. That directory is the one `--cache-dir` names;
 else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
-set and not empty; else `.fidryn-cache` inside the workspace. `--no-cache`
-keeps no cache: the check then reads and checks every module file and
-writes no entry. The name `.fidryn-cache` begins with a dot, so the check
-does not read it as part of the workspace and the writer of a generated
-workspace leaves it alone; the check writes nothing else into the
-workspace. The module files of the dependencies of a curated workspace are
-read through the same cache, and the check keeps no cache when the cache's
-directory and the directory of a dependency overlap, as
+set and not empty; else `fidryn` in the cache directory of the user,
+outside every workspace: on Windows the directory `LOCALAPPDATA` names,
+and on other systems the one `XDG_CACHE_HOME` names, else `.cache` in
+`HOME`, each taken only when it is an absolute path. When none of them
+names a directory, the check keeps no cache, as with `--no-cache`, and
+`fidryn check` says so once on stderr. `--no-cache` keeps no cache: the
+check then reads and checks every module file and writes no entry. Unless
+the cache is named inside it, the check writes nothing into the workspace,
+and it reads nothing there but the workspace's own files: a
+`.fidryn-cache` or any other entry whose name begins with a dot is not
+read, and a symbolic link of any name is not followed.
+
+One cache serves every workspace of a user. An entry is the result of the
+bytes of one file, whatever workspace holds the file, so the workspaces
+that hold a file of the same bytes share its entry, and the first check of
+a workspace may read some of its modules from the cache. The module files
+of the dependencies of a curated workspace are read through the same
+cache, and the check keeps no cache when the cache's directory and the
+directory of a dependency overlap, as
 [Depending on another workspace](#depending-on-another-workspace)
 describes.
+
+A check trusts its cache. An entry that is what the writer writes is
+taken as the result of the bytes it names, and its key is no secret: each
+of its frames can be known, and the identity of an executable that is
+published can be computed by anyone. Whoever can write in the cache's
+directory can therefore make a check pass a module whose hashes do not
+match its text, leave a module out without a diagnostic, or hide a stale
+binding. A cache belongs where only people one trusts can write, which is
+why the default is a directory of the user. A cache named inside the
+workspace it serves, with `--cache-dir` or `FIDRYN_CACHE_DIR`, is the
+user's choice and is used. Its entries then go with the workspace when it
+is copied or committed, and a check of a copy that came from someone else,
+with that cache named, takes as results whatever they put there. Its
+entries are also files of the workspace, and unless its name begins with a
+dot, the writer of a generated workspace refuses the directory for them.
 
 An entry is one line of compact JSON with these keys, in this order:
 `schema`, which is `fidryn.cache/v1`; `key`; `digest`, the BLAKE3 of the
@@ -1219,16 +1245,19 @@ read, one for each key. So two module files of the same bytes in one
 workspace are both checked when the cache holds neither, and the count
 `from cache` is the same for any number of workers. An entry is written to
 a temporary name in its directory and then renamed, so that a reader never
-sees half of one, and two checks at once, which may write the same entry,
-leave a valid cache. A failure to write the cache, such as a full disk or
-a directory that cannot be made, does not fail the check: no further entry
-is written, and `fidryn check` says once on stderr that the cache could not
-be written, naming the cache's directory and the error, and goes on.
+sees half of one, and two checks at once, of one workspace or of two,
+which may write the same entry, leave a valid cache; a check may read an
+entry that another check wrote while it ran. A failure to write the
+cache, such as a full disk or a directory that cannot be made, does not
+fail the check: no further entry is written, and `fidryn check` says once
+on stderr that the cache could not be written, naming the cache's
+directory and the error, and goes on.
 
 The diagnostics, the summary line, the check report and the unresolved
 list of a check that reads from the cache are byte for byte those of a
-check without one, but for the count `from cache`. A first and a second
-check of a copy of the demo workspace:
+check without one, but for the count `from cache`, as long as nothing but
+a check wrote the cache. A first and a second check of a copy of the demo
+workspace, with a cache that held none of its files:
 
 ```text
 modules: 5; from cache: 0; errors: 0; warnings: 0
@@ -1641,19 +1670,18 @@ check exits 1.
 
 But for one layout that [Limits](#limits) names, the check writes nothing
 inside the directory of a dependency, with any cache or with none: the
-entries of the module files of a dependency go
-into the cache of the workspace that is checked, by default
-`.fidryn-cache` inside it, under the keys of their bytes as every entry is,
+entries of the module files of a dependency go into the cache of the
+check of the workspace, under the keys of their bytes as every entry is,
 so that the next check reads them from there. When the cache's directory
 and the directory of a dependency that the manifest names, whatever the
 checks of the entry find, are the same, or one lies inside the other, the
 check keeps no cache at all. The cache's directory lies inside the
-dependency's when it is the dependency's own `.fidryn-cache`, or the
-default one of a workspace that stands in a directory of its dependency;
-the dependency's lies inside the cache's when it stands where the cache
-writes its entries, at `v1` in the cache's directory, or anywhere else
-below it. The check then reads and writes no entry, says so once on
-stderr, as
+dependency's when it is named inside it, such as a `.fidryn-cache` of the
+dependency, or inside a workspace that stands in a directory of its
+dependency; the dependency's lies inside the cache's when it stands where
+the cache writes its entries, at `v1` in the cache's directory, or
+anywhere else below it. The check then reads and writes no entry, says so
+once on stderr, as
 `the cache could not be used, and the check went on without it: DIR: ...`
 with the cache's directory, the dependency and which holds which, and goes
 on. Its diagnostics, its report and its exit status are then those of a
@@ -2377,6 +2405,10 @@ more.
   a path relative to the directory of the manifest. A curated workspace
   cannot depend on another curated workspace (`E740`), and a dependency
   named by an absolute path is refused (`E730`).
+- A check trusts its cache: an entry written by hand under the key of a
+  module's bytes is taken as that module's result. A cache belongs where
+  only people one trusts can write, and the default is a directory of the
+  user, outside every workspace ([The cache](#the-cache)).
 - The check compares the cache's directory with the directory of each
   dependency, and not what lies below the cache's directory. When a
   symbolic link there, such as a `v1` that leads into a dependency, is

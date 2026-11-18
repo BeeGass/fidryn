@@ -2,8 +2,11 @@
 //! here is the invented demo workspace under
 //! `conformance/fixtures/workspace/demo`, in the invented corpus `/zz/demo`,
 //! which the tests of `fidryn-driver` hold to what the writer writes. A
-//! check of it in place is run with `--no-cache`, so that nothing is
-//! written into the repository; a check that keeps a cache runs on a copy.
+//! check of it in place is run with `--no-cache`, and a check that keeps a
+//! cache runs on a copy, with every variable that could name the cache's
+//! directory either removed or set to a directory of the test, so that no
+//! test writes into the repository or into the cache of the user who runs
+//! it.
 
 use std::collections::BTreeMap;
 use std::ffi::OsStr;
@@ -16,16 +19,37 @@ fn demo_workspace() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../conformance/fixtures/workspace/demo")
 }
 
-/// `fidryn check` with `args`, and with `FIDRYN_CACHE_DIR` set to `cache`,
-/// or not set when it is `None`.
-fn check_in(args: &[&OsStr], cache: Option<&OsStr>) -> Output {
+/// Every environment variable that `fidryn` reads to find the directory of
+/// its cache.
+const CACHE_VARIABLES: [&str; 4] = ["FIDRYN_CACHE_DIR", "XDG_CACHE_HOME", "HOME", "LOCALAPPDATA"];
+
+/// `fidryn check` with `args`, run in the directory `cwd`, in an environment
+/// in which of [`CACHE_VARIABLES`] only those of `set` are set.
+fn check_env_in(cwd: &Path, args: &[&OsStr], set: &[(&str, &OsStr)]) -> Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fidryn"));
-    command.arg("check").args(args);
-    match cache {
-        Some(cache) => command.env("FIDRYN_CACHE_DIR", cache),
-        None => command.env_remove("FIDRYN_CACHE_DIR"),
-    };
+    command.current_dir(cwd).arg("check").args(args);
+    for name in CACHE_VARIABLES {
+        command.env_remove(name);
+    }
+    for (name, value) in set {
+        command.env(name, value);
+    }
     command.output().expect("run fidryn")
+}
+
+/// `fidryn check` with `args`, in an environment in which of
+/// [`CACHE_VARIABLES`] only those of `set` are set.
+fn check_env(args: &[&OsStr], set: &[(&str, &OsStr)]) -> Output {
+    check_env_in(&std::env::temp_dir(), args, set)
+}
+
+/// `fidryn check` with `args`, and with `FIDRYN_CACHE_DIR` set to `cache`,
+/// or with no variable that names a cache when it is `None`.
+fn check_in(args: &[&OsStr], cache: Option<&OsStr>) -> Output {
+    match cache {
+        Some(cache) => check_env(args, &[("FIDRYN_CACHE_DIR", cache)]),
+        None => check_env(args, &[]),
+    }
 }
 
 /// `fidryn check DIR --no-cache`.
@@ -275,46 +299,284 @@ fn no_cache_writes_nothing() {
     }
 }
 
+/// Checks the copy `workspace` of the demo workspace twice, in the directory
+/// `cwd`, with `args` and an environment in which of [`CACHE_VARIABLES`]
+/// only those of `set` are set, and holds the first check to read nothing
+/// from the cache and the second to read every module from it, both clean
+/// and silent.
+fn twice(cwd: &Path, workspace: &Path, args: &[&OsStr], set: &[(&str, &OsStr)]) {
+    let mut all = vec![workspace.as_os_str()];
+    all.extend_from_slice(args);
+    for cached in [0, 5] {
+        let checked = check_env_in(cwd, &all, set);
+        assert!(checked.status.success(), "{set:?}: {}", stderr(&checked));
+        assert_eq!(stdout(&checked), clean(cached), "{args:?} {set:?}");
+        assert_eq!(stderr(&checked), "", "{args:?} {set:?}");
+    }
+}
+
+/// The line that says the check keeps no cache because no directory is
+/// named for one, as `fidryn check` prints it on this kind of system.
+fn no_cache_named() -> String {
+    let variables = if cfg!(windows) {
+        "`LOCALAPPDATA` is not an absolute path"
+    } else {
+        "neither `XDG_CACHE_HOME` nor `HOME` is an absolute path"
+    };
+    format!(
+        "the cache could not be used, and the check went on without it: no directory is named \
+         for it: `--cache-dir` is not given, `FIDRYN_CACHE_DIR` is not set, and {variables}\n"
+    )
+}
+
+#[cfg(not(windows))]
 #[test]
 fn the_cache_directory_is_chosen_in_the_stated_order() {
     let scratch = Scratch::new("cache-order");
     let workspace = scratch.path().join("workspace");
     copy_tree(&demo_workspace(), &workspace);
-    let flagged = scratch.path().join("flagged-cache");
-    let named = scratch.path().join("named-cache");
-    let default = workspace.join(".fidryn-cache");
-    let run = |args: &[&OsStr], cache: Option<&OsStr>, cached: usize| {
-        let mut args = args.to_vec();
-        args.insert(0, workspace.as_os_str());
-        let checked = check_in(&args, cache);
-        assert!(checked.status.success(), "{args:?}: {}", stderr(&checked));
-        assert_eq!(stdout(&checked), clean(cached), "{args:?}");
-        assert_eq!(stderr(&checked), "", "{args:?}");
-    };
-
-    // `--cache-dir` before `FIDRYN_CACHE_DIR`.
-    let flag = [OsStr::new("--cache-dir"), flagged.as_os_str()];
-    run(&flag, Some(named.as_os_str()), 0);
-    run(&flag, Some(named.as_os_str()), 5);
-    assert!(flagged.join("v1").is_dir());
-    assert!(!named.exists());
-    assert!(!default.exists());
-
-    // `FIDRYN_CACHE_DIR` before the default.
-    run(&[], Some(named.as_os_str()), 0);
-    run(&[], Some(named.as_os_str()), 5);
-    assert!(named.join("v1").is_dir());
-    assert!(!default.exists());
-
-    // Then `.fidryn-cache` in the workspace, which a `FIDRYN_CACHE_DIR` that
-    // is empty also leaves; the check writes nothing else in the workspace.
     let before = entries_below(&workspace);
-    run(&[], None, 0);
-    run(&[], Some(OsStr::new("")), 5);
-    assert!(default.join("v1").is_dir());
-    let mut after = entries_below(&workspace);
-    after.retain(|rel, _| !rel.starts_with(".fidryn-cache"));
-    assert_eq!(after, before);
+    let [flagged, named, xdg, home] =
+        ["flagged", "named", "xdg", "home"].map(|name| scratch.path().join(name));
+    let every = [
+        ("FIDRYN_CACHE_DIR", named.as_os_str()),
+        ("XDG_CACHE_HOME", xdg.as_os_str()),
+        ("HOME", home.as_os_str()),
+    ];
+    let cwd = scratch.path();
+
+    // `--cache-dir` before every variable.
+    twice(
+        cwd,
+        &workspace,
+        &[OsStr::new("--cache-dir"), flagged.as_os_str()],
+        &every,
+    );
+    assert!(flagged.join("v1").is_dir());
+    assert!(!named.exists() && !xdg.exists() && !home.exists());
+
+    // `FIDRYN_CACHE_DIR` before the cache directory of the user.
+    twice(cwd, &workspace, &[], &every);
+    assert!(named.join("v1").is_dir());
+    assert!(!xdg.exists() && !home.exists());
+
+    // An empty `FIDRYN_CACHE_DIR` is not set: then `fidryn` in
+    // `XDG_CACHE_HOME`, before `HOME`.
+    twice(
+        cwd,
+        &workspace,
+        &[],
+        &[
+            ("FIDRYN_CACHE_DIR", OsStr::new("")),
+            ("XDG_CACHE_HOME", xdg.as_os_str()),
+            ("HOME", home.as_os_str()),
+        ],
+    );
+    assert!(xdg.join("fidryn/v1").is_dir());
+    assert!(!home.exists());
+
+    // An `XDG_CACHE_HOME` that is empty or relative is not taken, and nothing
+    // is made relative to the directory the command runs in: then
+    // `.cache/fidryn` in `HOME`.
+    for (value, home) in [
+        ("", &home),
+        ("relative-cache", &scratch.path().join("home-2")),
+    ] {
+        twice(
+            cwd,
+            &workspace,
+            &[],
+            &[
+                ("XDG_CACHE_HOME", OsStr::new(value)),
+                ("HOME", home.as_os_str()),
+            ],
+        );
+        assert!(home.join(".cache/fidryn/v1").is_dir());
+    }
+    assert!(!scratch.path().join("relative-cache").exists());
+
+    // The check wrote nothing into the workspace.
+    assert_eq!(entries_below(&workspace), before);
+}
+
+#[cfg(windows)]
+#[test]
+fn the_cache_directory_is_chosen_in_the_stated_order() {
+    let scratch = Scratch::new("cache-order");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let before = entries_below(&workspace);
+    let [flagged, named, local] =
+        ["flagged", "named", "local"].map(|name| scratch.path().join(name));
+    let every = [
+        ("FIDRYN_CACHE_DIR", named.as_os_str()),
+        ("LOCALAPPDATA", local.as_os_str()),
+    ];
+    let cwd = scratch.path();
+    twice(
+        cwd,
+        &workspace,
+        &[OsStr::new("--cache-dir"), flagged.as_os_str()],
+        &every,
+    );
+    assert!(flagged.join("v1").is_dir());
+    assert!(!named.exists() && !local.exists());
+    twice(cwd, &workspace, &[], &every);
+    assert!(named.join("v1").is_dir());
+    assert!(!local.exists());
+    twice(
+        cwd,
+        &workspace,
+        &[],
+        &[
+            ("FIDRYN_CACHE_DIR", OsStr::new("")),
+            ("LOCALAPPDATA", local.as_os_str()),
+        ],
+    );
+    assert!(local.join("fidryn").join("v1").is_dir());
+    assert_eq!(entries_below(&workspace), before);
+}
+
+#[test]
+fn with_no_directory_named_for_the_cache_the_check_keeps_none_and_says_so_once() {
+    let scratch = Scratch::new("cache-none");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let before = entries_below(scratch.path());
+    let uncached = check(&workspace);
+    for set in [
+        vec![],
+        vec![
+            ("FIDRYN_CACHE_DIR", OsStr::new("")),
+            ("XDG_CACHE_HOME", OsStr::new("")),
+            ("HOME", OsStr::new("")),
+            ("LOCALAPPDATA", OsStr::new("")),
+        ],
+        vec![
+            ("XDG_CACHE_HOME", OsStr::new("relative-cache")),
+            ("HOME", OsStr::new("relative-home")),
+            ("LOCALAPPDATA", OsStr::new("relative-local")),
+        ],
+    ] {
+        for _ in 0..2 {
+            let checked = check_env_in(scratch.path(), &[workspace.as_os_str()], &set);
+            assert!(checked.status.success(), "{set:?}: {}", stderr(&checked));
+            assert_eq!(stdout(&checked), stdout(&uncached), "{set:?}");
+            assert_eq!(stdout(&checked), clean(0), "{set:?}");
+            assert_eq!(stderr(&checked), no_cache_named(), "{set:?}");
+            assert_eq!(entries_below(scratch.path()), before, "{set:?}");
+        }
+    }
+}
+
+/// The path of every entry of the cache below `dir`, with its JSON.
+fn cache_entries(dir: &Path) -> Vec<(PathBuf, serde_json::Value)> {
+    entries_below(dir)
+        .into_iter()
+        .filter(|(rel, bytes)| rel.ends_with(".json") && bytes.is_some())
+        .map(|(rel, bytes)| {
+            let text = String::from_utf8(bytes.expect("a file")).expect("UTF-8");
+            let value = serde_json::from_str(&text).expect("an entry is JSON");
+            (dir.join(rel), value)
+        })
+        .collect()
+}
+
+#[test]
+fn a_cache_prepared_inside_the_workspace_changes_nothing_of_a_check_with_the_default_cache() {
+    // A workspace that carries a cache, as a clone of a repository that
+    // committed one would. A text of it was changed after its hashes were
+    // written, and its lock records the new bytes, so that only the hashes
+    // are wrong.
+    let scratch = Scratch::new("prepared-cache");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let s1 = workspace.join("zz/demo/t1/s1.fr");
+    let text = fs::read_to_string(&s1).expect("read a module");
+    assert!(text.contains("small device"), "{text}");
+    let changed = text.replace("small device", "large device");
+    fs::write(&s1, &changed).expect("change a module");
+    let lock = workspace.join("law.lock.json");
+    let digest = |text: &str| blake3::hash(text.as_bytes()).to_hex().to_string();
+    let recorded = fs::read_to_string(&lock).expect("read the lock");
+    assert!(recorded.contains(&digest(&text)), "{recorded}");
+    fs::write(&lock, recorded.replace(&digest(&text), &digest(&changed))).expect("write");
+    let uncached = check(&workspace);
+    assert_eq!(uncached.status.code(), Some(1), "{}", stderr(&uncached));
+    assert!(stderr(&uncached).contains("E710"), "{}", stderr(&uncached));
+
+    // The entries a check writes into `.fidryn-cache` when it is told to,
+    // and then the entry of the changed module altered to hold no error.
+    let prepared = workspace.join(".fidryn-cache");
+    let named = [
+        workspace.as_os_str(),
+        OsStr::new("--cache-dir"),
+        prepared.as_os_str(),
+    ];
+    assert_eq!(check_env(&named, &[]).status.code(), Some(1));
+    let mut altered = 0;
+    for (path, mut entry) in cache_entries(&prepared) {
+        if entry["diagnostics"]
+            .as_array()
+            .is_some_and(|found| !found.is_empty())
+        {
+            entry["diagnostics"] = serde_json::Value::Array(Vec::new());
+            fs::write(&path, format!("{entry}\n")).expect("alter an entry");
+            altered += 1;
+        }
+    }
+    assert_eq!(altered, 1);
+    // Named, the cache is trusted, as the reference says a cache named
+    // inside a workspace is.
+    let trusted = check_env(&named, &[]);
+    assert_eq!(trusted.status.code(), Some(0), "{}", stderr(&trusted));
+    assert_eq!(stdout(&trusted), clean(5));
+
+    // The default cache is the user's, and the check is that of a check
+    // without a cache: the same diagnostics, the same errors.
+    let user = scratch.path().join("user");
+    let set = [
+        ("XDG_CACHE_HOME", user.as_os_str()),
+        ("LOCALAPPDATA", user.as_os_str()),
+    ];
+    let before = entries_below(&workspace);
+    for cached in [0, 5] {
+        let checked = check_env(&[workspace.as_os_str()], &set);
+        assert_eq!(checked.status.code(), Some(1), "{}", stderr(&checked));
+        assert_eq!(stderr(&checked), stderr(&uncached));
+        assert_eq!(
+            stdout(&checked),
+            stdout(&uncached).replace("from cache: 0", &format!("from cache: {cached}"))
+        );
+    }
+    assert!(user.join("fidryn").join("v1").is_dir());
+    assert_eq!(entries_below(&workspace), before);
+}
+
+#[cfg(unix)]
+#[test]
+fn a_link_named_like_a_cache_in_the_workspace_is_not_followed() {
+    // A link of the name of the cache a check once kept inside a workspace,
+    // which leads out of it.
+    let scratch = Scratch::new("cache-link");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let outside = scratch.path().join("outside");
+    fs::create_dir_all(&outside).expect("create a directory");
+    std::os::unix::fs::symlink("../outside", workspace.join(".fidryn-cache")).expect("link");
+    let user = scratch.path().join("user");
+    twice(
+        scratch.path(),
+        &workspace,
+        &[],
+        &[("XDG_CACHE_HOME", user.as_os_str())],
+    );
+    assert_eq!(
+        fs::read_dir(&outside).expect("list a directory").count(),
+        0,
+        "nothing is written through the link"
+    );
+    assert!(user.join("fidryn/v1").is_dir());
 }
 
 #[test]

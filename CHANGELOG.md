@@ -107,7 +107,7 @@ interchange schema versions are maintained independently of the interpreter.
   of checking the module again; its output is the same but for the count
   `from cache`, which does not depend on the number of workers. The
   directory is `--cache-dir DIR`, else `$FIDRYN_CACHE_DIR`, else
-  `.fidryn-cache` in the workspace; `--no-cache` keeps none. The module of
+  a directory of the user; `--no-cache` keeps none. The module of
   a damaged entry is checked again and its entry rewritten, and a cache
   that cannot be written does not fail the check.
 - Names across curated modules. The check of a workspace resolves the
@@ -231,6 +231,15 @@ interchange schema versions are maintained independently of the interpreter.
   written out in the tool, the two samples of 500 that a person reads to
   judge the extracted definitions and to estimate the ones the closed
   patterns miss, each line with what a reader needs and an empty verdict.
+- The cache of `fidryn check DIR` and of `fidryn changes` is, by default,
+  `fidryn` in the cache directory of the user, outside every workspace:
+  in `XDG_CACHE_HOME`, else in `~/.cache`, and on Windows in
+  `LOCALAPPDATA`; when none of them is set to an absolute path the check
+  keeps no cache and says so once. One cache serves every workspace. A
+  check trusts what its cache holds, so a cache belongs where only people
+  one trusts can write; a cache named inside a workspace with
+  `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache` that
+  a workspace carries is otherwise not read.
 
 ## [0.2.0] - 2026-11-16
 

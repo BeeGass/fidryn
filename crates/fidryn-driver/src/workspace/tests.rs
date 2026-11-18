@@ -3833,7 +3833,7 @@ fn checking_writes_nothing_into_the_dependency() {
     put(&demo, ".fidryn-cache/README", "An invented file.\n");
     let before = tree(&demo);
     let notes = scratch.join("notes");
-    // The default cache: `.fidryn-cache` in the depending workspace.
+    // A cache named inside the depending workspace.
     let cache = notes.join(".fidryn-cache");
     let uncached = check_workspace(&notes, &with_jobs(2));
     let first = check_workspace(&notes, &cached(&cache, 2));
@@ -3970,7 +3970,8 @@ fn a_cache_that_holds_a_dependency_is_not_used() {
 #[test]
 fn a_workspace_inside_its_dependency_keeps_no_cache() {
     // The depending workspace stands in a directory of its dependency and
-    // names it as `..`, so that its default cache would be inside it.
+    // names it as `..`, so that a cache named inside the depending workspace
+    // is inside the dependency.
     let scratch = Scratch::new("deps-nested");
     let demo = scratch.join("demo");
     let digest = write_release(&demo, "42-7", &dependency_models());

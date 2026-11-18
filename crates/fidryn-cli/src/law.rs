@@ -20,7 +20,7 @@ use clap::Subcommand;
 use fidryn_core::Diagnostic;
 use fidryn_driver::workspace::changes::compare;
 use fidryn_driver::workspace::{
-    CheckOptions, CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
+    CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
 };
 use fidryn_ingest_uscode::{IngestError, IngestOptions, generator, ingest, open};
 use fidryn_provision::records::text_records;
@@ -29,7 +29,6 @@ use fidryn_provision::{
     Address, AddressIndex, Block, DeclSpans, Footnote, Interface, Item, Layer, Module, Note, Num,
     Provision, QuotedItem, Run, Text, bound_hashes, interface_of,
 };
-use std::ffi::OsString;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -346,8 +345,8 @@ pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<()
 /// with the bindings of the curated workspaces in `bindings` that are stale
 /// against `new`, as JSON with `json` and otherwise as the text of a commit
 /// message. Every workspace is read as `fidryn check` reads it, on `--jobs`
-/// threads and through the cache of `--cache-dir`, else of
-/// `$FIDRYN_CACHE_DIR`, else of `.fidryn-cache` inside each workspace;
+/// threads and through one cache, which `fidryn check` chooses
+/// ([`super::cache_dir`]) and every workspace shares, made absolute;
 /// `--no-cache` keeps none. When the cache could not be used or written, it
 /// says so once on stderr, as `fidryn check` does, and the change set is the
 /// same. Exit 1, with the diagnostics on stderr and nothing on stdout, when
@@ -360,28 +359,12 @@ pub(crate) fn changes(
     json: bool,
     flags: &super::WorkspaceFlags,
 ) -> ExitCode {
-    let jobs = match flags.jobs {
-        Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
-        None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
-    };
-    let mut cache = changes_cache(flags, std::env::var_os(super::CACHE_DIR_VARIABLE));
-    let mut executable = String::new();
-    let mut unused = None;
-    if cache.is_some() {
-        match super::executable_digest() {
-            Ok(digest) => executable = digest,
-            Err(error) => {
-                cache = None;
-                unused = Some(error);
-            }
-        }
-    }
-    let options = CheckOptions {
-        jobs,
-        cache_dir: cache,
-        toolchain: env!("CARGO_PKG_VERSION").to_owned(),
-        executable,
-    };
+    let (mut options, unused) = super::check_options(flags);
+    // One directory for every workspace: a relative one would be taken
+    // inside each of them.
+    options.cache_dir = options
+        .cache_dir
+        .map(|dir| std::path::absolute(&dir).unwrap_or(dir));
     let compared = match compare(old, new, bindings, &options) {
         Ok(compared) => compared,
         Err(diagnostics) => {
@@ -393,7 +376,7 @@ pub(crate) fn changes(
     };
     // What `fidryn check` says of its cache, once.
     if let Some(error) = unused.as_ref().or(compared.cache_unused.as_ref()) {
-        eprintln!("the cache could not be used, and the check went on without it: {error}");
+        eprintln!("{}: {error}", super::CACHE_UNUSED);
     }
     if let Some(failure) = &compared.cache_failure {
         eprintln!("the cache could not be written, and the check went on without it: {failure}");
@@ -406,26 +389,6 @@ pub(crate) fn changes(
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => super::fail(format!("cannot write the change set: {error}")),
     }
-}
-
-/// The cache of every workspace that `fidryn changes` reads: none with
-/// `--no-cache`; otherwise `--cache-dir`, else `variable`, the value of
-/// `FIDRYN_CACHE_DIR` when it is set and not empty, made absolute, which
-/// every workspace shares; else `.fidryn-cache`, a relative path, which
-/// [`compare`] takes inside the directory of each workspace.
-fn changes_cache(flags: &super::WorkspaceFlags, variable: Option<OsString>) -> Option<PathBuf> {
-    if flags.no_cache {
-        return None;
-    }
-    let named = flags.cache_dir.clone().or_else(|| {
-        variable
-            .filter(|value| !value.is_empty())
-            .map(PathBuf::from)
-    });
-    Some(match named {
-        Some(dir) => std::path::absolute(&dir).unwrap_or(dir),
-        None => PathBuf::from(super::DEFAULT_CACHE_DIR),
-    })
 }
 
 /// What `at` is in `modules`, where it is no provision and no alias of a

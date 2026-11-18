@@ -20,13 +20,15 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-/// `fidryn ARGS...`.
+/// `fidryn ARGS...`, with no variable that could name the directory of a
+/// cache, so that no cache of the user who runs the test is written.
 fn fidryn(args: &[&OsStr]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_fidryn"))
-        .args(args)
-        .env_remove("FIDRYN_CACHE_DIR")
-        .output()
-        .expect("run fidryn")
+    let mut command = Command::new(env!("CARGO_BIN_EXE_fidryn"));
+    command.args(args);
+    for name in ["FIDRYN_CACHE_DIR", "XDG_CACHE_HOME", "HOME", "LOCALAPPDATA"] {
+        command.env_remove(name);
+    }
+    command.output().expect("run fidryn")
 }
 
 /// `fidryn text DIR ARGS...`.

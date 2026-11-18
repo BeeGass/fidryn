@@ -41,7 +41,10 @@ pub struct CheckOptions {
     pub jobs: usize,
     /// The directory of the cache, which the check reads the result of
     /// phase one from and writes it to; `None` for no cache, when every
-    /// module file is read and checked and nothing is written.
+    /// module file is read and checked and nothing is written. The check
+    /// trusts what an entry there holds, so the directory is one that only
+    /// those whose results are trusted can write: the command line keeps it
+    /// outside every workspace unless it is told otherwise.
     pub cache_dir: Option<PathBuf>,
     /// The version of the running toolchain, which the manifest's
     /// `toolchain` is compared with and which is part of the key of every
@@ -161,7 +164,11 @@ impl WorkspaceReport {
 /// `options.jobs` threads, and the report is the same for every number of
 /// them. With a cache, `options.cache_dir`, the result of phase one of a
 /// file whose bytes were checked before is read from it, and the report is
-/// the same as without one, but for the count of the modules read from it.
+/// the same as without one, but for the count of the modules read from it,
+/// as long as no entry was written by anything but a check: an entry is
+/// trusted as the result of the bytes it names, and one made by hand can
+/// make a module pass that a check without the cache refuses. A cache
+/// named inside the workspace is used like any other.
 /// A cache whose directory is the directory of a dependency the manifest
 /// names, lies inside it or holds it is not used at all, since nothing is
 /// written inside a dependency: the report is that of a check without a

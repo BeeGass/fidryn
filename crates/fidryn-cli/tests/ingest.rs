@@ -205,11 +205,15 @@ fn ingest(archives: &Path, out: &Path, flags: &[&str]) -> Output {
         .expect("run fidryn")
 }
 
+/// `fidryn check PATH`, with `--no-cache` for a directory, so that no check
+/// writes a cache.
 fn check(path: &Path) -> Output {
-    fidryn()
-        .args([OsStr::new("check"), path.as_os_str()])
-        .output()
-        .expect("run fidryn")
+    let mut command = fidryn();
+    command.args([OsStr::new("check"), path.as_os_str()]);
+    if path.is_dir() {
+        command.arg("--no-cache");
+    }
+    command.output().expect("run fidryn")
 }
 
 fn stdout(output: &Output) -> String {

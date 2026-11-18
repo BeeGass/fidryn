@@ -23,6 +23,12 @@
 //! it again. A failure to read an entry is a miss, and a failure to write
 //! one fails nothing: the first is recorded, with the cache's directory, for
 //! the command to say once, and no other entry is written.
+//!
+//! An entry that is what the writer writes is trusted as the result of the
+//! bytes it names. Its key is no secret, since every frame of it can be
+//! known, so whoever can write in the cache's directory can make a check
+//! pass a module that a check without the cache refuses: the directory is
+//! one that only those whose results are trusted write.
 
 use super::check::PhaseOne;
 use fidryn_core::Diagnostic;

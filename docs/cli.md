@@ -127,10 +127,13 @@ lists them, and gives every reference and every citation its
 [outcome](law-modules.md#references). It does so in two phases, each on
 several threads, and its output is the same for any number of them
 ([How a workspace is checked](law-modules.md#how-a-workspace-is-checked)).
-It keeps the result of the first phase in a cache, so that a module file
-whose bytes it has checked before is not checked again, and its output is
-the same as without the cache, but for the count of the modules read from
-it ([The cache](law-modules.md#the-cache)).
+It keeps the result of the first phase in a cache, by default a directory
+of the user outside every workspace, so that a module file whose bytes it
+has checked before is not checked again, and its output is the same as
+without the cache, but for the count of the modules read from it, as long
+as nothing but a check wrote the cache
+([The cache](law-modules.md#the-cache)). A check trusts its cache, so a
+cache belongs where only people one trusts can write.
 
 **Arguments**
 
@@ -138,7 +141,7 @@ it ([The cache](law-modules.md#the-cache)).
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file, or to the directory of a workspace |
 | `--jobs N` | no | the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available |
-| `--cache-dir DIR` | no | the directory of the cache of a workspace check; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside the workspace |
+| `--cache-dir DIR` | no | the directory of the cache of a workspace check; by default the one `FIDRYN_CACHE_DIR` names, else `fidryn` in the cache directory of the user |
 | `--no-cache` | no | flag; keep no cache: check every module file, and write no entry of a cache |
 | `--report FILE` | no | path of the check report of a workspace to write, `fidryn.check-report/v0.1` |
 | `--unresolved FILE` | no | path of the list to write of the references and the citations of a workspace whose outcome is not `exact`, one JSON object to a line |
@@ -148,6 +151,16 @@ it ([The cache](law-modules.md#the-cache)).
 | Name | Meaning |
 | --- | --- |
 | `FIDRYN_CACHE_DIR` | the directory of the cache of a workspace check when `--cache-dir` is not given; an empty value is taken as not set |
+| `XDG_CACHE_HOME` | on systems other than Windows, the cache directory of the user when `FIDRYN_CACHE_DIR` is not set, if it is an absolute path: the cache is `fidryn` in it |
+| `HOME` | on systems other than Windows, when `XDG_CACHE_HOME` is not an absolute path: the cache is `.cache/fidryn` in it, if it is an absolute path |
+| `LOCALAPPDATA` | on Windows, the cache directory of the user when `FIDRYN_CACHE_DIR` is not set, if it is an absolute path: the cache is `fidryn` in it |
+
+The cache is outside every workspace unless `--cache-dir` or
+`FIDRYN_CACHE_DIR` names a directory inside one; such a directory is used
+like any other, and what that means is said under
+[The cache](law-modules.md#the-cache). When none of these names a
+directory, the check keeps no cache, as with `--no-cache`, and says so once
+on stderr.
 
 `--jobs`, `--cache-dir`, `--no-cache`, `--report` and `--unresolved`
 belong to the check of a workspace; given with a `.fr` file, they are
@@ -157,8 +170,8 @@ error, and each replaces a file of its name.
 
 **Example**
 
-The demo workspace is checked with `--no-cache`, so that no cache is
-written into it:
+The demo workspace is checked with `--no-cache`, so that the check writes
+no cache:
 
 ```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
@@ -196,7 +209,9 @@ with the cache's directory and the error, and its output is what it would
 have been. When the identity of the running executable, which the keys of
 the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
-so it does when the cache's directory is the directory of a dependency of
+so it does when no directory is named for the cache, as
+`the cache could not be used, and the check went on without it: no directory is named for it: ...`,
+and when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency but through a symbolic link below the cache's directory that
 leads into one
@@ -965,17 +980,20 @@ provision.
 | `--bindings DIR` | no | path to the directory of a curated workspace whose bindings are judged against `NEW_DIR`; may be given more than once, and a directory given twice is read once |
 | `--json` | no | flag; print the change set as JSON, `fidryn.change-set/v0.1` |
 | `--jobs N` | no | the number of worker threads, at least 1; by default as many as the system reports as available |
-| `--cache-dir DIR` | no | the directory of the cache of every workspace read; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside each workspace |
+| `--cache-dir DIR` | no | the directory of the cache of every workspace read; by default the one [`check`](#check) keeps, `FIDRYN_CACHE_DIR` or `fidryn` in the cache directory of the user |
 | `--no-cache` | no | flag; keep no cache: check every module file, and write no entry |
 
-`FIDRYN_CACHE_DIR` is read as by [`check`](#check). `--cache-dir` and
-`--no-cache` are not given together.
+The cache is chosen, from the same variables, as by [`check`](#check), and
+every workspace the command reads, the two sides and each `--bindings`
+directory, shares it; nothing is written into any of them unless the
+cache is named inside one. A check trusts its cache, so a cache belongs
+where only people one trusts can write. `--cache-dir` and `--no-cache` are
+not given together.
 
 **Example**
 
 Each of these compares a workspace with itself, with `--no-cache`, so that
-no cache is written into the repository; each prints a change set in which
-nothing changed:
+no cache is written; each prints a change set in which nothing changed:
 
 ```sh
 fidryn changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo --no-cache

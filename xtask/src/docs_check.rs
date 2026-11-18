@@ -431,12 +431,25 @@ fn run_with_timeout(mut command: Command, timeout: Duration) -> std::io::Result<
 }
 
 pub fn check_commands(root: &Path, fidryn: &Path) -> Result<()> {
+    // A command that keeps the cache of a workspace check keeps it in a
+    // directory of this run, removed at its end, and never in the cache
+    // directory of the user who runs it.
+    let cache = std::env::temp_dir().join(format!("fidryn-docs-cache-{}", std::process::id()));
+    let ran = run_commands(root, fidryn, &cache);
+    let _ = fs::remove_dir_all(&cache);
+    ran
+}
+
+fn run_commands(root: &Path, fidryn: &Path, cache: &Path) -> Result<()> {
     let mut problems = Vec::new();
     for file in markdown_files(root)? {
         let markdown = read_document(root, &file)?;
         for command in doc_commands(&markdown) {
             let mut process = Command::new(fidryn);
-            process.current_dir(root).args(&command.args);
+            process
+                .current_dir(root)
+                .env("FIDRYN_CACHE_DIR", cache)
+                .args(&command.args);
             let ran = run_with_timeout(process, COMMAND_TIMEOUT)
                 .with_context(|| format!("run {}", fidryn.display()))?;
             match ran {
