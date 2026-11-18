@@ -142,6 +142,29 @@ def manifest(kind: str = "generated") -> str:
     )
 
 
+def ledger(release: str = "42-7", **totals: object) -> str:
+    """The parts of an invented coverage ledger that the tool reads: what the records
+    above and the definitions of `Samples.write_workspace` count, unless `totals` says
+    otherwise."""
+    counted: dict[str, object] = {
+        "units": 4,
+        "containers": 1,
+        "provisions": 17,
+        "notes": {"enacted": 0, "editorial": 1},
+        "footnotes": 0,
+        "definitions": {"enacted": 13, "restated": 0, "unresolved": 0},
+    }
+    counted.update(totals)
+    return json.dumps(
+        {
+            "schema": "fidryn.coverage/v0.1",
+            "prefix": "/zz/demo",
+            "release": release,
+            "totals": counted,
+        }
+    )
+
+
 class Generator(unittest.TestCase):
     def test_the_generator_gives_the_known_answers_of_splitmix64(self) -> None:
         zero = draw.SplitMix64(0)
@@ -167,6 +190,16 @@ class Generator(unittest.TestCase):
             with self.subTest(bound=bound):
                 for _ in range(50):
                     self.assertLess(generator.below(bound), bound)
+
+    def test_the_draws_of_the_two_samples_drawn_give_their_known_answers(self) -> None:
+        # The seed and the populations of the two samples drawn from the release 119-142:
+        # the first five places and the last three of each draw of 500.
+        definitions = draw.draw(34329, 500, 20261117)
+        self.assertEqual(definitions[:5], [19521, 22410, 23053, 3582, 30023])
+        self.assertEqual(definitions[-3:], [17500, 13555, 5951])
+        near_misses = draw.draw(5940, 500, 20261117)
+        self.assertEqual(near_misses[:5], [735, 853, 3403, 777, 2404])
+        self.assertEqual(near_misses[-3:], [4072, 2617, 4662])
 
     def test_a_draw_is_without_replacement_and_given_by_its_seed(self) -> None:
         first = draw.draw(1000, 500, 20261117)
@@ -219,10 +252,16 @@ class Samples(unittest.TestCase):
     def tearDown(self) -> None:
         self.scratch.cleanup()
 
-    def write_workspace(self, s3: str | None = None) -> None:
+    def write_workspace(
+        self,
+        s3: str | None = None,
+        coverage: str | None = None,
+        records: list[dict[str, Any]] | None = None,
+    ) -> None:
         (self.workspace / "zz" / "demo" / "t1").mkdir(parents=True, exist_ok=True)
         (self.workspace / ".fidryn-cache").mkdir(exist_ok=True)
         (self.workspace / "workspace.json").write_text(manifest(), encoding="utf-8")
+        (self.workspace / "coverage.json").write_text(coverage or ledger(), encoding="utf-8")
         s1 = "".join(
             definition(f"{T1}/s1/{number}", term, "In this section", f"{T1}/s1")
             for number, term in enumerate(TERMS, start=1)
@@ -243,7 +282,7 @@ class Samples(unittest.TestCase):
         self.records.write_text(
             "".join(
                 json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
-                for record in RECORDS
+                for record in (RECORDS if records is None else records)
             ),
             encoding="utf-8",
         )
@@ -338,6 +377,77 @@ class Samples(unittest.TestCase):
             self.drawn(1, "refused")
         self.assertIn("zz/demo/t1/s3.fr:4", str(caught.exception))
         self.assertFalse((self.root / "refused").exists())
+
+    def test_a_definition_block_in_another_form_stops_the_reading(self) -> None:
+        canonical = definition(f"{T1}/s3/a", "sprocket", "In this subsection", f"{T1}/s3/a")
+        lines = canonical.splitlines(keepends=True)
+        forms = {
+            "indented more": "".join(f"  {line}" for line in lines),
+            "indented less": "".join(line[2:] for line in lines),
+            "two spaces before its brace": canonical.replace('" {\n', '"  {\n', 1),
+            "on one line": canonical.replace("\n    ", " ").replace("\n  }", " }"),
+        }
+        for name, block in forms.items():
+            with self.subTest(name):
+                self.write_workspace(block)
+                with self.assertRaises(draw.FormError) as caught:
+                    self.drawn(1, f"refused {name}")
+                self.assertIn("zz/demo/t1/s3.fr:3", str(caught.exception))
+                self.assertIn("is no header of a definition block", str(caught.exception))
+                self.assertFalse((self.root / f"refused {name}").exists())
+
+    def test_the_definitions_read_are_held_to_the_ledger_of_the_workspace(self) -> None:
+        cases = {
+            "one more": ledger(definitions={"enacted": 14, "restated": 0, "unresolved": 0}),
+            "another basis": ledger(definitions={"enacted": 12, "restated": 1, "unresolved": 0}),
+            "another release": ledger("42-6"),
+        }
+        for name, coverage in cases.items():
+            with self.subTest(name):
+                self.write_workspace(coverage=coverage)
+                with self.assertRaises(draw.FormError) as caught:
+                    self.drawn(1, f"refused {name}")
+                self.assertIn(str(self.workspace / "coverage.json"), str(caught.exception))
+                self.assertFalse((self.root / f"refused {name}").exists())
+        self.write_workspace(coverage=ledger(definitions={"enacted": 14}))
+        with self.assertRaises(draw.FormError) as caught:
+            self.drawn(1, "refused by the count")
+        self.assertIn(
+            "the module files hold the definitions enacted: 13, restated: 0, unresolved: 0",
+            str(caught.exception),
+        )
+        (self.workspace / "coverage.json").unlink()
+        with self.assertRaises(FileNotFoundError):
+            self.drawn(1, "refused without a ledger")
+
+    def test_the_records_are_held_to_the_workspace(self) -> None:
+        moved = json.loads(
+            json.dumps(RECORDS, ensure_ascii=False).replace(f'"{T1}/s3/a"', f'"{T1}/s3/b"')
+        )
+        unit = provision(f"{T1}/s5", "section", [part("content", "An invented unit.")], unit=True)
+        cases = {
+            "no record of the provision of a definition": (
+                moved,
+                f"the records hold no provision at `{T1}/s3/a`",
+            ),
+            "one unit more": (
+                [*RECORDS, unit],
+                "the records count units: 5, containers: 1, provisions: 18, "
+                "enacted notes: 0, editorial notes: 1, footnotes: 0",
+            ),
+            "one note fewer": (
+                [record for record in RECORDS if "group" not in record],
+                f"{self.workspace / 'coverage.json'} counts units: 4, containers: 1, "
+                "provisions: 17, enacted notes: 0, editorial notes: 1, footnotes: 0",
+            ),
+        }
+        for name, (records, words) in cases.items():
+            with self.subTest(name):
+                self.write_workspace(records=records)
+                with self.assertRaises(draw.FormError) as caught:
+                    self.drawn(1, f"refused {name}")
+                self.assertIn(words, str(caught.exception))
+                self.assertFalse((self.root / f"refused {name}").exists())
 
     def test_a_definition_whose_paragraph_the_records_do_not_hold_stops_the_drawing(self) -> None:
         self.write_workspace(definition(f"{T1}/s3/a", "spanner", "In this subsection", None))

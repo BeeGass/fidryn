@@ -328,9 +328,13 @@ person reads to judge the definitions of a generated workspace:
 term in curly quotation marks within 60 characters before `mean`,
 `means`, `include`, `includes`, `shall mean` or `has the meaning`, and
 from which no definition was extracted. It reads the `definition` blocks
-in their canonical form and the text records that `fidryn text DIR --json`
-printed for the workspace, and starts no program. Each line holds the
-seed, the release, the size of the population, the place in the draw,
+in their canonical form, stops at a block in another form, and holds the
+number it read, by basis, to the workspace's coverage ledger
+`coverage.json`. It reads the text records that `fidryn text DIR --json`
+printed for the workspace, and holds them to it: they count the units,
+containers, provisions, notes and footnotes the ledger counts, and every
+definition's provision has a record. It starts no program. Each line
+holds the seed, the release, the size of the population, the place in the draw,
 what a reader needs to judge it without opening the Code (the paragraph's
 text and the nearest chapeau above it among them), and an empty
 `verdict`. The draw is a Fisher-Yates shuffle driven by SplitMix64, written
@@ -344,5 +348,8 @@ uv run --locked python -I tools/draw_definition_samples.py --workspace DIR --rec
 Exit `0` when both samples are drawn, `1` when an input is not in the form
 the tool reads or a sample is there already, `2` when an input cannot be
 read or the output written. `test_draw_definition_samples.py` holds the
-generator to the known answers of SplitMix64, and the draw, the two
-populations and the lines to an invented workspace.
+generator to the known answers of SplitMix64, the draws of the two samples
+drawn from the release 119-142 to theirs, and the draw, the two
+populations, the lines and the refusals of a block in another form, of a
+ledger that counts other definitions and of records of other provisions to
+an invented workspace.

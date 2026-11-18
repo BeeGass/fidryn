@@ -3,10 +3,16 @@
 
 Reads the definitions of a generated workspace from the `definition` blocks of its
 module files, in the canonical form that a generated workspace holds them in, one
-declaration to a line, and stops at a line of a block that is not in that form. Reads
-the text of its provisions from the text records that `fidryn text DIR --json` printed
-for the same workspace, given as `--records FILE`. It starts no program. It writes
-into `--out DIR`, which must not hold either file yet:
+declaration to a line, and stops at a line of a block that is not in that form, a
+line that begins with the word `definition` at another indentation among them. Holds
+the number of the definitions it read, by basis, to `totals.definitions` of the
+workspace's coverage ledger, `coverage.json`, which is to be of the release of the
+workspace. Reads the text of its provisions from the text records that
+`fidryn text DIR --json` printed for the same workspace, given as `--records FILE`,
+and holds them to the workspace: they count the units, containers, provisions, notes
+by layer and footnotes that the ledger counts, and every definition's provision has a
+record. It starts no program. It writes into `--out DIR`, which must not hold either
+file yet:
 
 - `extracted.jsonl`: 500 definitions drawn without replacement from every definition
   of the workspace. Each line holds the address of the provision, the terms, the kind,
@@ -75,12 +81,16 @@ FIELDS = {
         ("see_note", STRING),
     )
 }
+# A line that begins a definition block in any form: the word `definition` after white
+# space, or none.
+DECLARATION = re.compile(r"[ \t]*definition(?![A-Za-z0-9_])")
 TERM = re.compile(r"“([^“”]+)”")
 VERB = re.compile(
     r"(?<![A-Za-z])(?:shall mean|has the meaning|includes|include|means|mean)(?![A-Za-z])"
 )
 EXTRACTED = "extracted.jsonl"
 NEAR_MISSES = "near-misses.jsonl"
+LEDGER = "coverage.json"
 
 
 class FormError(Exception):
@@ -264,20 +274,54 @@ def read_definitions(workspace: Path) -> tuple[str, list[Definition]]:
     definitions = []
     for path, name in module_files(workspace):
         source = path.read_text(encoding="utf-8")
-        start = source.find("\n  definition")
-        if start == -1:
+        if "definition" not in source:
             continue
-        lines = source[start + 1 :].split("\n")
-        first = source.count("\n", 0, start) + 2
+        lines = source.split("\n")
         index = 0
         while index < len(lines):
-            if lines[index].startswith("  definition"):
-                found, index = read_block(lines, index, name, first + index)
+            if DECLARATION.match(lines[index]):
+                found, index = read_block(lines, index, name, index + 1)
                 definitions.append(found)
             else:
                 index += 1
     definitions.sort(key=lambda found: (found.address.encode(), found.place))
     return release, definitions
+
+
+def listed(counts: dict[str, Any]) -> str:
+    return ", ".join(f"{name}: {count}" for name, count in counts.items())
+
+
+def read_ledger(workspace: Path, release: str) -> dict[str, Any]:
+    """The totals of the coverage ledger of the workspace, which must be of `release`."""
+    path = workspace / LEDGER
+    try:
+        ledger = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise FormError(f"{path} does not read: {error}") from error
+    if (
+        not isinstance(ledger, dict)
+        or ledger.get("schema") != "fidryn.coverage/v0.1"
+        or ledger.get("release") != release
+        or not isinstance(ledger.get("totals"), dict)
+    ):
+        raise FormError(f"{path} is no coverage ledger of the release {release} of the workspace")
+    totals: dict[str, Any] = ledger["totals"]
+    return totals
+
+
+def hold_definitions(definitions: list[Definition], totals: dict[str, Any], ledger: Path) -> None:
+    """Stops unless the ledger counts, by basis, the definitions read."""
+    counted = dict.fromkeys(BASES, 0)
+    for definition in definitions:
+        counted[definition.basis] += 1
+    if totals.get("definitions") != counted:
+        stated = totals.get("definitions")
+        raise FormError(
+            f"the module files hold the definitions {listed(counted)}, and {ledger} counts "
+            f"{listed(stated) if isinstance(stated, dict) else stated}: a definition is in a "
+            "form the tool does not read, or the ledger is of other modules"
+        )
 
 
 def paragraphs(blocks: list[Any]) -> Iterator[tuple[bool, str]]:
@@ -301,6 +345,8 @@ class Provisions:
     # definition, that are paragraphs: the place of the part and the text.
     firsts: dict[str, list[tuple[int, str]]]
     near: list[Paragraph]
+    # What the records count, by the names of the coverage ledger.
+    counted: dict[str, int]
 
     def nearest(self, address: str) -> dict[str, str] | None:
         above = self.parent.get(address)
@@ -311,18 +357,33 @@ class Provisions:
         return None
 
 
+COUNTED = ("units", "containers", "provisions", "enacted notes", "editorial notes", "footnotes")
+
+
 def read_records(records: Path, defined: set[str]) -> Provisions:
-    found = Provisions({}, {}, {}, [])
+    found = Provisions({}, {}, {}, [], dict.fromkeys(COUNTED, 0))
     with records.open(encoding="utf-8") as stream:
         for number, line in enumerate(stream, start=1):
             try:
                 record = json.loads(line)
             except json.JSONDecodeError as error:
                 raise FormError(f"{records}:{number}: no text record: {error}") from error
+            if record.get("record") == "footnote":
+                found.counted["footnotes"] += 1
+            if "group" in record:
+                layer = record.get("layer")
+                if layer not in ("enacted", "editorial"):
+                    raise FormError(f"{records}:{number}: a note of no layer: {layer!r}")
+                found.counted[f"{layer} notes"] += 1
+            if "members" in record:
+                found.counted["containers"] += 1
             if "record" in record or "group" in record or "members" in record:
                 continue
             if record.get("layer") != "operative" or "items" not in record:
                 raise FormError(f"{records}:{number}: no record of a provision")
+            found.counted["provisions"] += 1
+            if "source" in record:
+                found.counted["units"] += 1
             address = str(record["address"])
             if address in defined:
                 found.firsts[address] = []
@@ -354,6 +415,26 @@ def read_records(records: Path, defined: set[str]) -> Provisions:
             if chapeau:
                 found.chapeau[address] = "\n".join(chapeau)
     return found
+
+
+def hold_records(provisions: Provisions, totals: dict[str, Any], ledger: Path) -> None:
+    """Stops unless the records count the units, containers, provisions, notes and
+    footnotes that the ledger of the workspace counts."""
+    notes = totals.get("notes")
+    stated = {
+        "units": totals.get("units"),
+        "containers": totals.get("containers"),
+        "provisions": totals.get("provisions"),
+        "enacted notes": notes.get("enacted") if isinstance(notes, dict) else None,
+        "editorial notes": notes.get("editorial") if isinstance(notes, dict) else None,
+        "footnotes": totals.get("footnotes"),
+    }
+    if provisions.counted != stated:
+        raise FormError(
+            f"the records count {listed(provisions.counted)}, and {ledger} counts "
+            f"{listed(stated)}: they are to be the records that `fidryn text DIR --json` "
+            "printed for the workspace"
+        )
 
 
 def place_definitions(definitions: list[Definition], provisions: Provisions) -> None:
@@ -400,7 +481,10 @@ def draw_samples(workspace: Path, records: Path, seed: int, out: Path, size: int
         if (out / name).exists():
             raise FormError(f"{out / name} is there already, and a sample drawn is kept")
     release, definitions = read_definitions(workspace)
+    totals = read_ledger(workspace, release)
+    hold_definitions(definitions, totals, workspace / LEDGER)
     provisions = read_records(records, {definition.address for definition in definitions})
+    hold_records(provisions, totals, workspace / LEDGER)
     place_definitions(definitions, provisions)
     extracted = {(definition.address, definition.item) for definition in definitions}
     near = sorted(
