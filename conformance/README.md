@@ -251,8 +251,10 @@ of an archive whose bytes changed.
 `test_check_law_repository.py` runs `tools/check-law-repository.sh` on
 copies of `fixtures/workspace/demo` in temporary directories, with the
 built `fidryn` that `FIDRYN_BINARY` names, and fails, and does not skip,
-when it is not set; its two tests of the build put stand-ins for `cargo`
-and `lease` on the search path and build nothing.
+when it is not set; one test runs the script on a search path that holds
+neither `timeout` nor `prlimit`, and its two tests of the build put
+stand-ins for `cargo` and `lease` on the search path and build nothing.
+They need `sh`, and are skipped, saying so, where there is none.
 `test_law_integration_workflow.py` reads
 `.github/workflows/law-integration.yml` as YAML, with a small reader of
 its own, and holds the workflow and `law-repository.pin.json` to what

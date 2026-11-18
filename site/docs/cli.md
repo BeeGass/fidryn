@@ -209,7 +209,8 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
 so it does when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
-a dependency
+a dependency but through a symbolic link below the cache's directory that
+leads into one
 ([Depending on another workspace](https://fidryn.onlygass.dev/docs/law-modules.md#depending-on-another-workspace)),
 and its output is then that of a check with `--no-cache`.
 

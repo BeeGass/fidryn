@@ -50,7 +50,8 @@ the text records and the change set, using schemas v0.1.
    record changes.
 
    A law repository kept apart from this one records the version in the
-   same places as the sample: `tools/check-law-repository.sh DIR`
+   same places as the sample: `tools/check-law-repository.sh DIR` of the
+   repository
    ([Checking a law repository](development.md#checking-a-law-repository))
    fails until each generated workspace in it is imported again with the
    new build, and each curated one names the new version and the new

@@ -19,7 +19,8 @@ cargo xtask ci --fmt
 ```
 
 The canonical gate requires the pinned Rust toolchain, uv with its locked Python
-environment, and Node. It runs, in this order: the formatting check (`--fmt`),
+environment, Node, and the commands `git`, `bash`, `jq` and `sha256sum`, which
+its tests run. It runs, in this order: the formatting check (`--fmt`),
 workspace tests, Clippy across targets/features, Rustdoc, the schema probes,
 the Python lint, format and type checks, the conformance tests of
 `conformance/` (`unittest`, given the built binary in `FIDRYN_BINARY`), the
@@ -47,7 +48,8 @@ A law repository holds workspaces of law modules apart from this repository,
 such as an import of the whole Code and the curated workspaces that depend on
 it, and records in each manifest the version of the toolchain it is checked
 with ([Workspaces](law-modules.md#workspaces)).
-`tools/check-law-repository.sh DIR` checks one:
+`tools/check-law-repository.sh DIR`, a script of the repository that the
+package does not hold, checks one:
 
 ```text
 tools/check-law-repository.sh DIR
@@ -66,24 +68,28 @@ FIDRYN_BINARY=target/release/fidryn tools/check-law-repository.sh DIR
   version of the binary, and runs `fidryn check` on it, and it says what it
   found: the two versions, the output of the check, and whether the check
   passed. A warning, such as a stale binding (`W750`), does not fail a check.
-- Each run of the binary is limited with `timeout` and `prlimit`:
-  `FIDRYN_CHECK_TIMEOUT` seconds of time (600 by default),
-  `FIDRYN_CHECK_CPU` seconds of processor time (900) and
-  `FIDRYN_CHECK_ADDRESS_SPACE` bytes of address space (8589934592). The
-  script prints the limits it uses, and a check that reaches one is
+- Each run of the binary is limited to `FIDRYN_CHECK_TIMEOUT` seconds of
+  time (600 by default) with `timeout`, and to `FIDRYN_CHECK_CPU` seconds
+  of processor time (900) and `FIDRYN_CHECK_ADDRESS_SPACE` bytes of address
+  space (8589934592) with `prlimit`, each where that command exists. The
+  script prints the limits, and where one of the two commands is missing,
+  as on macOS, which has neither, it says in one line which limits it does
+  not apply and checks all the same. A check that reaches a limit is
   stopped and fails its workspace.
 - The cache of the checks is `--cache-dir CACHE`, else `FIDRYN_CACHE_DIR`,
   else `fidryn/law-repository` in `XDG_CACHE_HOME` or in `~/.cache`, and the
   script prints which. A cache that is `DIR`, lies inside it or holds it is
   refused before anything is written, so the script writes nothing into
-  `DIR`.
+  `DIR`, and the cache is made only when `DIR` holds a workspace.
 - It exits 0 when every version is the binary's and every check exits 0, 1
   when a version differs or a check fails, and 2 when it cannot check, such
   as when `DIR` holds no workspace at its top or the build fails.
 
 `conformance/test_check_law_repository.py`, which `cargo xtask ci` runs, holds
 the script to these rules on copies of the invented demo workspace, with the
-built binary in `FIDRYN_BINARY` and stand-ins for `cargo` and `lease`.
+built binary in `FIDRYN_BINARY`, with and without `timeout` and `prlimit` on
+the search path, and with stand-ins for `cargo` and `lease`. Its tests need
+`sh`, and are skipped where there is none.
 
 `law-repository.pin.json` names the law repository that CI checks, as
 `owner/name`, and the commit it is pinned at. Both are empty: no law
@@ -96,14 +102,20 @@ repository is named. The workflow `Law integration`
   matching change of the law repository;
 - `Drift of the newest law repository` checks the newest commit of the law
   repository with the newest commit of this one, and reports drift when the
-  check fails.
+  check fails. On a schedule that is the newest commit of the default
+  branch; on a manual run, the commit of the branch the run was started on.
 
-While `repository` in the pin is empty, each job says so and ends. The
+Both check out the law repository with the default token of the workflow,
+which reads this repository and public ones; a law repository that is not
+public needs a token of its own, given to the checkout as `token`. While
+`repository` in the pin is empty, each job says so and ends. The
 workflow runs only when it is started by hand; the comment at its top names
 the two lines that make it run on pull requests and on a schedule.
 `conformance/test_law_integration_workflow.py` reads the workflow as YAML and
-holds its trigger, its two jobs, the step of each that reads the pin, and the
-actions it uses, which are those of `ci.yml` at the same commits.
+holds its trigger, its two jobs, the step of each that reads the pin, the
+commit and the directory each checks out, the failure of each job when the
+check fails, and the actions it uses, which are those of `ci.yml` at the same
+commits.
 
 ## Promote through GitHub
 

@@ -57,7 +57,7 @@ statement of any jurisdiction's law.
 | --- | --- |
 | [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md) | First hour: build, `check`, `run` |
 | [Language](https://fidryn.onlygass.dev/docs/language.md) | `.fr` modules, queries, rules, duties, verify |
-| [Law modules](https://fidryn.onlygass.dev/docs/law-modules.md) | Law modules of edition 2, which hold provisions of law as data: the two editions, addresses and file paths, normalization, provisions, notes and layers, hashes, the syntax, workspaces with their manifest and lock, how a workspace is checked and the outcome of each reference, the cache, definitions, curated modules with their names, dependencies and bindings, change sets, the ingester for the United States Code, the coverage ledger and the sample of the Code, and the limits |
+| [Law modules](https://fidryn.onlygass.dev/docs/law-modules.md) | Law modules of edition 2, which hold provisions of law as data: the two editions, addresses and file paths, normalization, provisions, notes and layers, hashes, the syntax, what the checker verifies in one module, workspaces with their manifest and lock, how a workspace is checked and the outcome of each reference, the cache, definitions, curated modules with their names, dependencies and bindings, change sets, the ingester for the United States Code, the coverage ledger and the sample of the Code, and the limits |
 | [CLI](https://fidryn.onlygass.dev/docs/cli.md) | Every `fidryn` subcommand and flag |
 | [Mill](https://fidryn.onlygass.dev/docs/mill.md) | Localhost UI on 127.0.0.1 |
 | [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) | Case records, valid time, known-at |
@@ -4335,7 +4335,8 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
 so it does when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
-a dependency
+a dependency but through a symbolic link below the cache's directory that
+leads into one
 ([Depending on another workspace](https://fidryn.onlygass.dev/docs/law-modules.md#depending-on-another-workspace)),
 and its output is then that of a check with `--no-cache`.
 
@@ -6670,7 +6671,8 @@ curated sample, checked with the generated one as its dependency, every
 citation of it `exact` and its binding not stale, and the table of the
 coverage page against the ledger), generated-site consistency, the example
 status and documentation checks described below, required JavaScript tests,
-and benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are
+and benchmark compilation. Node, [uv](https://docs.astral.sh/uv/) and the
+commands `git`, `bash`, `jq` and `sha256sum`, which the tests run, are
 required for qualification.
 `uv run --locked` uses `.python-version` and `uv.lock`.
 

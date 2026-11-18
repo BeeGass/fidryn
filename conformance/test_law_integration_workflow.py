@@ -8,8 +8,11 @@ switch on the others. The tests read the workflow as YAML with the small reader 
 which knows the block mappings, block sequences, literal blocks, quoted and plain
 scalars and flow collections the workflow is written in, and refuses anything else, so
 that a typing mistake that changes what the file means fails here as well as in the
-"Workflow lint" job of CI. They also run the step that reads the pin, as the runner
-runs it, against the committed pin.
+"Workflow lint" job of CI. They also run steps of the workflow: each written to a file
+and run with `bash -e FILE`, as the runner runs a step that names no `shell`
+(`bash -e {0}`). The step that reads the pin runs against the committed pin; the last
+step of each job runs with stand-ins for `sh` and `git` on the search path, so that
+nothing is built or checked.
 """
 
 from __future__ import annotations
@@ -405,25 +408,111 @@ class Workflow(unittest.TestCase):
                 runs = "".join(str(step.get("run", "")) for step in steps)
                 self.assertIn("sh tools/check-law-repository.sh", runs)
 
-    def test_while_the_pin_names_no_repository_each_job_says_so_and_ends(self) -> None:
+    def run_step(
+        self, step: dict[str, object], directory: Path, env: dict[str, str]
+    ) -> subprocess.CompletedProcess[str]:
+        """`step` run as the runner runs a step that names no `shell`: `bash -e FILE`."""
         bash = shutil.which("bash")
-        jq = shutil.which("jq")
-        if bash is None or jq is None:
-            self.fail("the step that reads the pin needs bash and jq")
+        if bash is None:
+            self.fail("the steps of the workflow run with bash")
+        script = directory / "step.sh"
+        script.write_text(str(step["run"]))
+        return subprocess.run(
+            [bash, "-e", str(script)],
+            cwd=ROOT,
+            env={**os.environ, **env},
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+
+    def test_while_the_pin_names_no_repository_each_job_says_so_and_ends(self) -> None:
+        if shutil.which("jq") is None:
+            self.fail("the step that reads the pin needs jq")
         for job in JOBS:
             with self.subTest(job=job), tempfile.TemporaryDirectory() as directory:
                 output = Path(directory) / "output"
-                result = subprocess.run(
-                    [bash, "-e", "-o", "pipefail", "-c", str(self.steps(job)[1]["run"])],
-                    cwd=ROOT,
-                    env={**os.environ, "GITHUB_OUTPUT": str(output)},
-                    capture_output=True,
-                    check=False,
-                    text=True,
+                result = self.run_step(
+                    self.steps(job)[1], Path(directory), {"GITHUB_OUTPUT": str(output)}
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn("names no law repository", result.stdout)
                 self.assertEqual(output.read_text(), "check=false\n")
+
+    def test_the_pinned_job_checks_the_pinned_commit_and_the_drift_job_the_newest(
+        self,
+    ) -> None:
+        for job, ref in (("pinned", "${{ steps.pin.outputs.commit }}"), ("drift", None)):
+            with self.subTest(job=job):
+                steps = self.steps(job)
+                checkout = steps[2]
+                self.assertTrue(str(checkout["uses"]).startswith("actions/checkout@"))
+                settings = mapping(checkout["with"])
+                self.assertEqual(settings["repository"], "${{ steps.pin.outputs.repository }}")
+                self.assertEqual(settings.get("ref"), ref)
+                command = str(steps[-1]["run"])
+                checked = re.findall(
+                    r'sh tools/check-law-repository\.sh --cache-dir "\$RUNNER_TEMP/fidryn-cache" '
+                    r"([^\s;]+)",
+                    command,
+                )
+                self.assertEqual(checked, [settings["path"]], command)
+                self.assertEqual(
+                    [s for s in steps if "tools/check-law-repository.sh" in str(s.get("run"))],
+                    [steps[-1]],
+                )
+
+    def test_the_last_step_of_each_job_fails_when_the_check_fails(self) -> None:
+        newest = "b" * 40
+        for job in JOBS:
+            for check_exit, pinned in ((0, newest), (0, "a" * 40), (1, newest)):
+                with (
+                    self.subTest(job=job, check_exit=check_exit, pinned=pinned),
+                    tempfile.TemporaryDirectory() as name,
+                ):
+                    directory = Path(name)
+                    stand_ins = directory / "bin"
+                    stand_ins.mkdir()
+                    record = directory / "record"
+                    for tool, out, code in (("sh", "", check_exit), ("git", newest, 0)):
+                        stand_in = stand_ins / tool
+                        stand_in.write_text(
+                            "#!/bin/bash\n"
+                            f'printf "{tool} %s\\n" "$*" >> "{record}"\n'
+                            f'printf "%s" "{out}"\n'
+                            f"exit {code}\n"
+                        )
+                        stand_in.chmod(0o755)
+                    summary = directory / "summary"
+                    result = self.run_step(
+                        self.steps(job)[-1],
+                        directory,
+                        {
+                            "PATH": f"{stand_ins}:{os.environ.get('PATH', '')}",
+                            "RUNNER_TEMP": str(directory),
+                            "GITHUB_SHA": "c" * 40,
+                            "GITHUB_STEP_SUMMARY": str(summary),
+                            "PINNED": pinned,
+                        },
+                    )
+                    self.assertEqual(result.returncode, check_exit, result.stdout + result.stderr)
+                    self.assertIn(
+                        f"sh tools/check-law-repository.sh --cache-dir {directory}/fidryn-cache "
+                        "law-repository\n",
+                        record.read_text(),
+                    )
+                    if job != "drift":
+                        continue
+                    written = summary.read_text()
+                    if check_exit:
+                        self.assertTrue(
+                            written.startswith(f"Drift: the newest law repository, {newest}")
+                        )
+                        self.assertIn("Drift:", result.stderr)
+                    elif pinned == newest:
+                        self.assertIn("is the pinned one", written)
+                    else:
+                        self.assertIn(f"the pin is at {pinned}", written)
 
     def test_every_action_it_uses_is_one_the_other_workflows_use_at_the_same_commit(
         self,

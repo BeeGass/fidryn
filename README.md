@@ -36,7 +36,7 @@ note has an address and hashes; `fidryn check` checks such a workspace,
 gives every reference in it an outcome, and judges the bindings of a
 curated workspace, written by hand, against the provisions they name;
 `fidryn changes` says what changed between two releases; and
-`fidryn coverage` counts what a workspace holds. The repository holds a
+`fidryn coverage` counts what a generated workspace holds. The repository holds a
 sample of three titles of the Code, imported and checked by
 `cargo xtask ci`, whose figures are on the page
 [Coverage](docs/coverage.md). Check the sample, then read one of its

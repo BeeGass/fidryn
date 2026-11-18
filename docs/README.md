@@ -18,7 +18,7 @@ statement of any jurisdiction's law.
 | --- | --- |
 | [Getting started](getting-started.md) | First hour: build, `check`, `run` |
 | [Language](language.md) | `.fr` modules, queries, rules, duties, verify |
-| [Law modules](law-modules.md) | Law modules of edition 2, which hold provisions of law as data: the two editions, addresses and file paths, normalization, provisions, notes and layers, hashes, the syntax, workspaces with their manifest and lock, how a workspace is checked and the outcome of each reference, the cache, definitions, curated modules with their names, dependencies and bindings, change sets, the ingester for the United States Code, the coverage ledger and the sample of the Code, and the limits |
+| [Law modules](law-modules.md) | Law modules of edition 2, which hold provisions of law as data: the two editions, addresses and file paths, normalization, provisions, notes and layers, hashes, the syntax, what the checker verifies in one module, workspaces with their manifest and lock, how a workspace is checked and the outcome of each reference, the cache, definitions, curated modules with their names, dependencies and bindings, change sets, the ingester for the United States Code, the coverage ledger and the sample of the Code, and the limits |
 | [CLI](cli.md) | Every `fidryn` subcommand and flag |
 | [Mill](mill.md) | Localhost UI on 127.0.0.1 |
 | [Cases and time](cases-and-time.md) | Case records, valid time, known-at |

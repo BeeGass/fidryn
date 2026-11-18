@@ -113,7 +113,8 @@ interchange schema versions are maintained independently of the interpreter.
   with an error of its own is `E740`, and an absolute path, a name listed
   twice and a prefix that overlaps another are `E730`. Each dependency is
   checked by itself through the cache of the depending workspace, and
-  nothing is written into its directory: a cache whose directory is the
+  nothing is written into its directory, but through a symbolic link below
+  the cache's directory that leads into it: a cache whose directory is the
   directory of a dependency, lies inside it or holds it is not used, and
   the check says so once. The target
   of every citation gets an outcome from the modules of the workspace and
@@ -183,12 +184,14 @@ interchange schema versions are maintained independently of the interpreter.
   from their text records alone and checks a change set against them; the
   conformance tests, which `cargo xtask ci` now runs with the built binary
   in `FIDRYN_BINARY`, run both on invented pairs of releases.
-- `tools/check-law-repository.sh DIR` checks every workspace at the top of
-  a directory, such as a law repository, with a release build of the
-  commit, or with the binary `FIDRYN_BINARY` names: it compares the
-  version each manifest records with the binary's and runs `fidryn check`
-  on each, every run under limits of time and of address space, with a
-  cache outside `DIR`, and fails when a version differs or a check fails.
+- `tools/check-law-repository.sh DIR`, a script of the repository, checks
+  every workspace at the top of a directory, such as a law repository, with
+  a release build of the commit, or with the binary `FIDRYN_BINARY` names:
+  it compares the version each manifest records with the binary's and runs
+  `fidryn check` on each, every run under limits of time and of address
+  space where `timeout` and `prlimit` exist (it says which limit it cannot
+  apply), with a cache outside `DIR` that it makes only when `DIR` holds a
+  workspace, and fails when a version differs or a check fails.
   It builds through `lease` when that command exists and never falls back.
 - `law-repository.pin.json`, which names no law repository, and the
   workflow `Law integration`, whose two jobs check the law repository at

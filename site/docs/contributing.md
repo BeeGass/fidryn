@@ -60,7 +60,8 @@ curated sample, checked with the generated one as its dependency, every
 citation of it `exact` and its binding not stale, and the table of the
 coverage page against the ledger), generated-site consistency, the example
 status and documentation checks described below, required JavaScript tests,
-and benchmark compilation. Node and [uv](https://docs.astral.sh/uv/) are
+and benchmark compilation. Node, [uv](https://docs.astral.sh/uv/) and the
+commands `git`, `bash`, `jq` and `sha256sum`, which the tests run, are
 required for qualification.
 `uv run --locked` uses `.python-version` and `uv.lock`.
 

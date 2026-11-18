@@ -13,14 +13,20 @@
 # The binary is the one FIDRYN_BINARY names; without it, the script builds
 # the release binary with `cargo build --release -p fidryn-cli --locked`,
 # through `lease run` when there is a command lease, and directly when there
-# is none, and fails when the build fails. Each run of the binary is limited
-# with timeout and prlimit: FIDRYN_CHECK_TIMEOUT seconds of time (600 by
-# default), FIDRYN_CHECK_CPU seconds of processor time (900) and
-# FIDRYN_CHECK_ADDRESS_SPACE bytes of address space (8589934592).
+# is none, and fails when the build fails.
+#
+# Each run of the binary is limited to FIDRYN_CHECK_TIMEOUT seconds of time
+# (600 by default) with timeout, when there is such a command, and to
+# FIDRYN_CHECK_CPU seconds of processor time (900) and
+# FIDRYN_CHECK_ADDRESS_SPACE bytes of address space (8589934592) with
+# prlimit, when there is such a command. Where one of the two is missing,
+# the script says once which limits it does not apply, and checks all the
+# same.
 #
 # The cache of the checks is CACHE, else FIDRYN_CACHE_DIR, else
 # fidryn/law-repository in XDG_CACHE_HOME or in ~/.cache; it may be neither
-# DIR, nor inside it, nor hold it, so that nothing is written into DIR.
+# DIR, nor inside it, nor hold it, so that nothing is written into DIR. It
+# is made only when DIR holds a workspace.
 #
 # Exit status: 0 when everything passed, 1 when a version differs or a check
 # failed, 2 when the script could not check, such as on a usage error, a
@@ -29,6 +35,8 @@
 set -eu
 LC_ALL=C
 export LC_ALL
+# A directory the script names is the one it names, whatever CDPATH says.
+unset CDPATH
 
 name=check-law-repository
 usage="usage: tools/check-law-repository.sh [--cache-dir CACHE] DIR"
@@ -96,7 +104,7 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         -h | --help)
-            say "$usage"
+            sed -n '2,/^$/s/^#[ ]\{0,1\}//p' "$0"
             exit 0
             ;;
         --)
@@ -114,15 +122,34 @@ dir=$(cd "$1" && pwd -P)
 time_limit=$(limit FIDRYN_CHECK_TIMEOUT 600)
 cpu_limit=$(limit FIDRYN_CHECK_CPU 900)
 space_limit=$(limit FIDRYN_CHECK_ADDRESS_SPACE 8589934592)
-for tool in timeout prlimit; do
-    command -v "$tool" >/dev/null 2>&1 ||
-        refuse "there is no command $tool, with which each run of the binary is limited"
-done
+has_timeout=no
+has_prlimit=no
+if command -v timeout >/dev/null 2>&1; then has_timeout=yes; fi
+if command -v prlimit >/dev/null 2>&1; then has_prlimit=yes; fi
 
-# Runs the binary with the limits.
+# Runs the binary with the limits there are commands for.
 run() {
-    timeout "$time_limit" prlimit --as="$space_limit" --cpu="$cpu_limit" -- "$binary" "$@"
+    case $has_timeout$has_prlimit in
+        yesyes) timeout "$time_limit" prlimit --as="$space_limit" --cpu="$cpu_limit" -- "$binary" "$@" ;;
+        yesno) timeout "$time_limit" "$binary" "$@" ;;
+        noyes) prlimit --as="$space_limit" --cpu="$cpu_limit" -- "$binary" "$@" ;;
+        *) "$binary" "$@" ;;
+    esac
 }
+
+workspaces=
+for entry in "$dir"/*; do
+    if [ -d "$entry" ] && [ -f "$entry/workspace.json" ]; then
+        workspaces="$workspaces${workspaces:+
+}${entry##*/}"
+    fi
+done
+if [ -z "$workspaces" ]; then
+    if [ -f "$dir/workspace.json" ]; then
+        refuse "$dir holds no workspace at its top; it is a workspace itself, so name the directory that holds it"
+    fi
+    refuse "$dir holds no workspace at its top: no directory directly in it holds workspace.json"
+fi
 
 if [ -z "$cache" ] && [ -n "${FIDRYN_CACHE_DIR:-}" ]; then
     cache=$FIDRYN_CACHE_DIR
@@ -141,20 +168,6 @@ mkdir -p "$cache" || refuse "the cache $cache cannot be made"
 cache=$(cd "$cache" && pwd -P)
 if overlap "$cache" "$dir"; then
     refuse "the cache $cache is $dir, lies inside it or holds it; name a cache outside $dir"
-fi
-
-workspaces=
-for entry in "$dir"/*; do
-    if [ -d "$entry" ] && [ -f "$entry/workspace.json" ]; then
-        workspaces="$workspaces${workspaces:+
-}${entry##*/}"
-    fi
-done
-if [ -z "$workspaces" ]; then
-    if [ -f "$dir/workspace.json" ]; then
-        refuse "$dir holds no workspace at its top; it is a workspace itself, so name the directory that holds it"
-    fi
-    refuse "$dir holds no workspace at its top: no directory directly in it holds workspace.json"
 fi
 
 if [ -n "${FIDRYN_BINARY:-}" ]; then
@@ -187,6 +200,12 @@ if [ ! -f "$binary" ] || [ ! -x "$binary" ]; then
 fi
 
 say "limits of each run of the binary: $time_limit s of time, $cpu_limit s of processor time, $space_limit bytes of address space"
+if [ "$has_timeout" = no ]; then
+    say "there is no command timeout, so the limit of $time_limit s of time is not applied"
+fi
+if [ "$has_prlimit" = no ]; then
+    say "there is no command prlimit, so the limits of $cpu_limit s of processor time and $space_limit bytes of address space are not applied"
+fi
 status=0
 shown=$(run --version) || status=$?
 version=${shown#fidryn }

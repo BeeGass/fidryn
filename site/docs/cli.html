@@ -248,7 +248,8 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as <code>the cache could not be used, and the check went on without it: ...</code>;
 so it does when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
-a dependency
+a dependency but through a symbolic link below the cache's directory that
+leads into one
 (<a href="/docs/law-modules#depending-on-another-workspace">Depending on another workspace</a>),
 and its output is then that of a check with <code>--no-cache</code>.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as

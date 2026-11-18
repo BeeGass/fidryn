@@ -7,6 +7,11 @@ fail, and do not skip, without it. Each test copies `conformance/fixtures/worksp
 into a temporary directory and gives the script a cache outside that directory, so
 that nothing is written into the repository. The two tests of the build put a stand-in
 `cargo`, and a stand-in `lease`, first on the search path, and run no build.
+
+The script limits each run of the binary with `timeout` and `prlimit` where they
+exist, and says which limit it does not apply where one is missing. The tests run it
+on the search path of this process, with whatever of the two it holds, and on a search
+path that holds neither. They need `sh`, and skip, saying so, where there is none.
 """
 
 from __future__ import annotations
@@ -26,6 +31,33 @@ SCRIPT = ROOT / "tools" / "check-law-repository.sh"
 DEMO = ROOT / "conformance" / "fixtures" / "workspace" / "demo"
 # The directories of the system's own programs, without `lease` and `cargo`.
 SYSTEM_PATH = "/usr/bin:/bin"
+# What the script prints for each tool of the limits that the search path lacks.
+NO_TIMEOUT = "there is no command timeout, so the limit of 600 s of time is not applied"
+NO_PRLIMIT = (
+    "there is no command prlimit, so the limits of 900 s of processor time and "
+    "8589934592 bytes of address space are not applied"
+)
+
+
+def shell() -> str:
+    """The `sh` the script runs with; every test is skipped where there is none."""
+    found = shutil.which("sh")
+    if found is None:
+        raise unittest.SkipTest("the script is a shell script, and there is no command sh")
+    return found
+
+
+def without_the_limits(root: Path) -> str:
+    """A search path that holds `sh` and the two other commands the script starts,
+    `sed` and `mkdir`, and neither `timeout` nor `prlimit`."""
+    bin_dir = root / "without-limits"
+    bin_dir.mkdir()
+    for tool in ("sh", "sed", "mkdir"):
+        found = shutil.which(tool)
+        if found is None:
+            raise AssertionError(f"there is no command {tool}")
+        (bin_dir / tool).symlink_to(found)
+    return str(bin_dir)
 
 
 def built_binary(test: unittest.TestCase) -> str:
@@ -52,6 +84,7 @@ class Run:
     demo workspace, and a cache `cache/` beside it."""
 
     def __init__(self, test: unittest.TestCase) -> None:
+        self.sh = shell()
         self.temporary = tempfile.TemporaryDirectory(prefix="fidryn-check-law-")
         test.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
@@ -65,7 +98,7 @@ class Run:
     ) -> subprocess.CompletedProcess[str]:
         options = ["--cache-dir", str(self.cache)] if cache else []
         return subprocess.run(
-            ["sh", str(SCRIPT), *options, *args],
+            [self.sh, str(SCRIPT), *options, *args],
             cwd=self.root,
             env=env,
             capture_output=True,
@@ -178,20 +211,58 @@ class CheckLawRepository(unittest.TestCase):
         result = run.script(str(empty), env=environment(built_binary(self)))
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("holds no workspace at its top", result.stderr)
+        self.assertFalse(run.cache.exists(), "the cache was made for nothing to check")
+
+    def test_an_exported_cdpath_changes_no_directory_the_script_names(self) -> None:
+        run = Run(self)
+        elsewhere = run.root / "elsewhere"
+        (elsewhere / "law").mkdir(parents=True)
+        result = run.script("law", env=environment(built_binary(self), CDPATH=str(elsewhere)))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(f"demo: fidryn check {run.law.resolve()}/demo --cache-dir", result.stdout)
+        self.assertIn("checked 1 workspace: every version is the binary's", result.stdout)
+        self.assertNotIn(str(elsewhere), result.stdout + result.stderr)
+
+    def test_without_timeout_and_prlimit_the_check_runs_and_says_what_is_not_applied(
+        self,
+    ) -> None:
+        verdicts: dict[bool, list[str]] = {}
+        for limited in (True, False):
+            run = Run(self)
+            manifest = run.law / "demo" / "workspace.json"
+            shutil.copytree(run.law / "demo", run.law / "other")
+            other = run.law / "other" / "workspace.json"
+            other.write_text(
+                manifest.read_text(encoding="utf-8").replace(
+                    f'"toolchain": "{version()}"', '"toolchain": "0.0.1"'
+                ),
+                encoding="utf-8",
+            )
+            env = environment(built_binary(self))
+            if not limited:
+                env["PATH"] = without_the_limits(run.root)
+            result = run.script(str(run.law), env=env)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            lines = result.stdout.replace(str(run.root), "ROOT").splitlines()
+            if not limited:
+                self.assertEqual(lines.count(NO_TIMEOUT), 1, result.stdout)
+                self.assertEqual(lines.count(NO_PRLIMIT), 1, result.stdout)
+            verdicts[limited] = [line for line in lines if line not in (NO_TIMEOUT, NO_PRLIMIT)]
+        self.assertEqual(verdicts[True], verdicts[False])
+        self.assertIn("demo: the check passed", verdicts[False])
+        self.assertIn("checked 2 workspaces; failed: other", verdicts[False])
 
     def test_a_cache_inside_the_directory_is_refused_before_anything_is_written(self) -> None:
         run = Run(self)
         before = tree(run.law)
         for cache in (run.law / "demo" / ".cache", run.law, run.root):
             with self.subTest(cache=str(cache)):
-                result = subprocess.run(
-                    ["sh", str(SCRIPT), "--cache-dir", str(cache), str(run.law)],
-                    cwd=run.root,
+                result = run.script(
+                    "--cache-dir",
+                    str(cache),
+                    str(run.law),
                     env=environment(built_binary(self)),
-                    capture_output=True,
-                    check=False,
-                    text=True,
-                    timeout=900,
+                    cache=False,
                 )
                 self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
                 self.assertIn("name a cache outside", result.stderr)
@@ -232,12 +303,20 @@ class CheckLawRepository(unittest.TestCase):
                 FIDRYN_CHECK_ADDRESS_SPACE="1048576",
             ),
         )
-        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn(
             "limits of each run of the binary: 1 s of time, 900 s of processor time, "
             "1048576 bytes of address space",
             result.stdout,
         )
+        if shutil.which("prlimit") is not None:
+            # The binary cannot start in 1 MiB of address space.
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        else:
+            self.assertIn(
+                "there is no command prlimit, so the limits of 900 s of processor time and "
+                "1048576 bytes of address space are not applied",
+                result.stdout,
+            )
         for name in ("FIDRYN_CHECK_TIMEOUT", "FIDRYN_CHECK_CPU", "FIDRYN_CHECK_ADDRESS_SPACE"):
             for value in ("", "0", "ten", "-1"):
                 with self.subTest(name=name, value=value):

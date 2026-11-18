@@ -9,7 +9,12 @@
 #   matching change of the law repository.
 # - "Drift of the newest law repository" checks the newest commit of the law
 #   repository with the newest commit of this one, and reports drift when the
-#   check fails.
+#   check fails. On a schedule that is the newest commit of the default
+#   branch; on a manual run, the commit of the branch the run was started on.
+#
+# Both check out the law repository with the default token, which reads this
+# repository and public ones; a law repository that is not public needs a
+# token of its own, given to the checkout as `token`.
 #
 # The only trigger is a manual run. When the law repository is published,
 # remove the "# " at the start of the two lines under `workflow_dispatch:`:
