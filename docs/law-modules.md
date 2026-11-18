@@ -1304,7 +1304,10 @@ not from quoted content, and not from a later block of a part. The text of
 a paragraph is its plain text: the words of its runs, in order, without its
 footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
 at least one character and neither mark inside it; the term is recorded
-without the marks. Where these rules say "in any case", the letters `A` to
+without the marks. Wherever these rules speak of a quotation mark, they
+mean one of these two characters and no other: a straight `"`, the single
+marks `‘` and `’`, and every other quotation mark are characters like any
+other. Where these rules say "in any case", the letters `A` to
 `Z` are compared as `a` to `z`, and no other character is changed. Where
 they speak of words that a text holds, they mean whole words: a word is
 bounded by the start or the end of the text or by a character that is not
@@ -1850,7 +1853,10 @@ unit whose operative or editorial layer or whose provisions differ, a
 container whose editorial layer differs, and a unit on one side whose top
 provision has the kind and the status of a provision on the other side
 only, so that it could have moved, are opened, and their provisions,
-credits and footnotes compared.
+credits and footnotes compared. A module file that is opened is held to
+the BLAKE3 of the bytes its check accepted, which the lock records: a file
+that changed after the check read it ends the command with an `E730` that
+names it, and enters no change set.
 
 ### The lists
 
@@ -2179,6 +2185,16 @@ the text that gives no words. An `img` is imported as the source its `src`
 names, normalized, and empty when it has none; the picture is not in the
 archive. Quoted content has the `origin` it names as the source writes it,
 and none when the attribute is absent or empty.
+
+A `num` with neither a `value` nor text is absent, and one with a `value`
+and no text keeps the value with an empty shown form; a `heading` with no
+text is absent, and so is a source credit with no text. A number, a heading
+or a credit that holds a footnote marker is never absent: it keeps the
+marker, with an empty text when it has no other. A text part that stands
+directly in a note, where the publisher sets out a law as loose paragraphs,
+gives its blocks to the note, in their place among the note's other
+blocks, and its role word (`chapeau`, `content`, `continuation` or
+`proviso`) is not kept. Each of these rules decides what a hash holds.
 
 ### Notes and their layers
 
@@ -2563,6 +2579,11 @@ more.
   other change, gives a change set in which every list is empty, and the
   bases of its definitions, which follow the flag, are in no list either:
   definitions are in no hash.
+- Like-named notes are paired by equal note hashes alone: a note of a
+  family that is amended while another is inserted before it is `amended`
+  at its old address and `added` at its new one. Units and containers whose
+  addresses `~2`, `~3` mark as later holders of one identifier are not
+  paired this way: they are compared by address.
 - `conformance/usc_compare.py --against` checks the unions of the lists,
   as [Change sets](#change-sets) says. It cannot see a provision in the
   wrong one of two lists whose union it checks, or a wrong pairing of a

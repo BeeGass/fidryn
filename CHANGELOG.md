@@ -284,6 +284,13 @@ interchange schema versions are maintained independently of the interpreter.
   nesting and reads no document deeper than that; the independent reading
   refuses the same. It refuses a document of more than 8,388,608 nodes,
   three times the largest member of release 119-142.
+- `fidryn changes` holds each module file it reads again to the BLAKE3
+  that its check accepted, and ends with an `E730` naming a file that
+  changed after the check read it.
+- `conformance/uslm_text.py` and `usc_profile.py` hold the size of a
+  deflated member to the end of its compressed stream as well as to its
+  header, and refuse a member whose header declares fewer bytes than it
+  holds.
 
 ## [0.2.0] - 2026-11-16
 

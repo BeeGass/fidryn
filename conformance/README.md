@@ -151,7 +151,11 @@ is (`usc`, two digits, an optional `a` or `A`, `.xml`). Members are read
 in the order of their names, at most `--jobs` at a time (default 4), and
 the output is the same for any number. Downloaded archives are untrusted
 data: run the script with `python -I`. It parses with `defusedxml` and
-refuses a document type declaration and an entity declaration. Exit
+refuses a document type declaration and an entity declaration. The size
+of a deflated member is held to the end of its compressed stream as well
+as to its header, so that a member whose header declares fewer bytes than
+it holds is refused rather than read short; a member stored without
+compression has no such end, and is held to its header alone. Exit
 `0` when the records are printed, `1` when the input is refused by a
 reading rule (the message names the archive, the member, the element and
 the nearest identifier), `2` when it cannot be read at all.

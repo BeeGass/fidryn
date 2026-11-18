@@ -10,11 +10,13 @@ from __future__ import annotations
 
 import json
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
 import unittest
 import zipfile
+import zlib
 from pathlib import Path
 
 import blake3
@@ -464,6 +466,36 @@ def oversized_archive(directory: Path) -> None:
             stream.write(chunk)
 
 
+def understated_archive(directory: Path, crc_of_prefix: bool) -> None:
+    """An archive whose one member's local header and central directory entry declare
+    the bytes of a whole document and not the comment after it, with the CRC-32 of the
+    whole member or, when `crc_of_prefix`, of the bytes they declare: a short read of
+    the member is a document that is read."""
+    whole = document().encode("utf-8")
+    data = whole + b"<!-- Invented bytes past the declared size. -->\n"
+    path = directory / "understated.zip"
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as opened:
+        opened.writestr(MEMBER, data)
+    raw = bytearray(path.read_bytes())
+    size = len(whole)
+    crc = zlib.crc32(data[:size] if crc_of_prefix else data)
+    patched = 0
+    for at in range(len(raw) - 4):
+        signature = bytes(raw[at : at + 4])
+        if signature == b"PK\x03\x04":
+            crc_at, size_at = at + 14, at + 22
+        elif signature == b"PK\x01\x02":
+            crc_at, size_at = at + 16, at + 24
+        else:
+            continue
+        raw[size_at : size_at + 4] = struct.pack("<I", size)
+        raw[crc_at : crc_at + 4] = struct.pack("<I", crc)
+        patched += 1
+    if patched != 2:
+        raise AssertionError(patched)
+    path.write_bytes(bytes(raw))
+
+
 COMPOSED = "composes across the boundary"
 # The combining acute accent, which composes with the `e` before it into U+00E9.
 ACUTE = chr(0x0301)
@@ -791,6 +823,14 @@ class Refusals(unittest.TestCase):
                 case.mkdir()
                 oversized_archive(case)
                 self.refused(case, "larger than 512 MiB")
+            # A header that understates the size of a deflated member is seen at the end
+            # of its compressed stream, whatever CRC-32 it gives.
+            for crc_of_prefix in (False, True):
+                with self.subTest(refusal="an understated member", crc_of_prefix=crc_of_prefix):
+                    case = directory / f"understated-{crc_of_prefix}"
+                    case.mkdir()
+                    understated_archive(case, crc_of_prefix)
+                    self.refused(case, "bytes, and its header declares")
 
 
 # The entries of the refusal table that concern the positive-law flag.

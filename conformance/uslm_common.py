@@ -14,9 +14,12 @@ from __future__ import annotations
 
 import itertools
 import multiprocessing
+import os
 import re
+import struct
 import unicodedata
 import zipfile
+import zlib
 from collections import Counter
 from collections.abc import Callable, Iterable, Iterator
 from concurrent.futures import ProcessPoolExecutor
@@ -35,6 +38,12 @@ XSI_SCHEMA_LOCATION = "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation
 SCHEMA_FILE = "USLM-1.0.15.xsd"
 PREFIX = "/us/usc"
 MAX_MEMBER_BYTES = 512 * 1024 * 1024
+# The local header of a member of a zip archive: its signature, and its length before the
+# member's name and extra field.
+LOCAL_HEADER = b"PK\x03\x04"
+LOCAL_HEADER_BYTES = 30
+# The most bytes read or decompressed at once while a member is held to its stream.
+CHUNK_BYTES = 1 << 20
 # The deepest an element stands in its module, and a container among the containers of
 # its file: the limit of nesting of a module in the grammar of edition 2.
 MAX_NESTING = 64
@@ -1463,9 +1472,9 @@ class MemberReader:
         """The notes of one anchor, each named by its group, law and heading."""
         read: list[Note] = []
         named: Counter[str] = Counter()
-        for element, group, labelled in notes:
+        for element, group, labeled in notes:
             heading: Text | None = None
-            if labelled:
+            if labeled:
                 topics: list[str] = []
                 blocks = self.after_label(element, scope)
                 if not blocks:
@@ -1618,15 +1627,68 @@ def list_sources(path: Path) -> list[Source]:
     return [sources[name] for name in sorted(sources)]
 
 
+def deflated_size(path: str, info: zipfile.ZipInfo) -> int | None:
+    """The number of bytes that the compressed data of the deflated member `info` of the
+    archive at `path` gives when it is decompressed to the end of its own stream, which
+    no header declares; None when the data ends before the stream does. The count stops
+    once it passes the limit of a member."""
+    decompressor = zlib.decompressobj(-zlib.MAX_WBITS)
+    total = 0
+    with open(path, "rb") as stream:
+        stream.seek(info.header_offset)
+        header = stream.read(LOCAL_HEADER_BYTES)
+        if len(header) < LOCAL_HEADER_BYTES or header[:4] != LOCAL_HEADER:
+            return None
+        name_bytes, extra_bytes = struct.unpack("<HH", header[26:30])
+        stream.seek(name_bytes + extra_bytes, os.SEEK_CUR)
+        left = info.compress_size
+        while left > 0 and not decompressor.eof:
+            chunk = stream.read(min(left, CHUNK_BYTES))
+            if not chunk:
+                break
+            left -= len(chunk)
+            while chunk and not decompressor.eof:
+                total += len(decompressor.decompress(chunk, CHUNK_BYTES))
+                if total > MAX_MEMBER_BYTES:
+                    return total
+                chunk = decompressor.unconsumed_tail
+    return total if decompressor.eof else None
+
+
 def load(source: Source) -> bytes:
+    """The bytes of one member. The size of a deflated member of an archive is held to
+    the end of its compressed stream as well as to its header, so that a header that
+    understates it, with the CRC-32 of what it declares, is refused rather than read
+    short; a member stored without compression is held to its header alone."""
     try:
         if source.archive is None:
             with open(source.path, "rb") as stream:
                 data = stream.read(MAX_MEMBER_BYTES + 1)
         else:
-            with zipfile.ZipFile(source.path) as archive, archive.open(source.member) as stream:
-                data = stream.read(MAX_MEMBER_BYTES + 1)
-    except (OSError, zipfile.BadZipFile) as error:
+            with zipfile.ZipFile(source.path) as archive:
+                info = archive.getinfo(source.member)
+                if info.compress_type == zipfile.ZIP_DEFLATED:
+                    held = deflated_size(source.path, info)
+                    if held is None:
+                        raise RefusedError(
+                            "the compressed data of the member ends before its stream does",
+                            source.member,
+                            archive=source.archive,
+                        )
+                    if held > MAX_MEMBER_BYTES:
+                        raise RefusedError(
+                            "larger than 512 MiB", source.member, archive=source.archive
+                        )
+                    if held != info.file_size:
+                        raise RefusedError(
+                            f"the member holds {held} bytes, and its header declares "
+                            f"{info.file_size}",
+                            source.member,
+                            archive=source.archive,
+                        )
+                with archive.open(info) as stream:
+                    data = stream.read(MAX_MEMBER_BYTES + 1)
+    except (OSError, zipfile.BadZipFile, zlib.error) as error:
         raise InputError(f"{source.member}: cannot read the member ({error})") from None
     if len(data) > MAX_MEMBER_BYTES:
         raise RefusedError("larger than 512 MiB", source.member, archive=source.archive or "")

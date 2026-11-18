@@ -1315,7 +1315,10 @@ not from quoted content, and not from a later block of a part. The text of
 a paragraph is its plain text: the words of its runs, in order, without its
 footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
 at least one character and neither mark inside it; the term is recorded
-without the marks. Where these rules say "in any case", the letters `A` to
+without the marks. Wherever these rules speak of a quotation mark, they
+mean one of these two characters and no other: a straight `"`, the single
+marks `‘` and `’`, and every other quotation mark are characters like any
+other. Where these rules say "in any case", the letters `A` to
 `Z` are compared as `a` to `z`, and no other character is changed. Where
 they speak of words that a text holds, they mean whole words: a word is
 bounded by the start or the end of the text or by a character that is not
@@ -1861,7 +1864,10 @@ unit whose operative or editorial layer or whose provisions differ, a
 container whose editorial layer differs, and a unit on one side whose top
 provision has the kind and the status of a provision on the other side
 only, so that it could have moved, are opened, and their provisions,
-credits and footnotes compared.
+credits and footnotes compared. A module file that is opened is held to
+the BLAKE3 of the bytes its check accepted, which the lock records: a file
+that changed after the check read it ends the command with an `E730` that
+names it, and enters no change set.
 
 ### The lists
 
@@ -1876,9 +1882,9 @@ and then by `to`.
 | `operative.amended_text` | a provision on both sides whose own words differ |
 | `operative.amended_structure` | a provision on both sides whose own structure differs |
 | `operative.moved` | a removed and an added provision that are one (below) |
-| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address |
-| `enacted_notes.amended` | an enacted note on both sides whose [note hash](#hashes) differs |
-| `enacted_notes.moved` | a removed and an added enacted note of equal note hashes |
+| `enacted_notes.added`, `removed` | an enacted note on one side only, by its address, once like-named notes are paired (below) |
+| `enacted_notes.amended` | an enacted note at one address on both sides, once like-named notes are paired, whose [note hash](#hashes) differs |
+| `enacted_notes.moved` | a like-named note paired with one at another address, or a removed and an added enacted note of equal note hashes (below) |
 | `editorial.added`, `removed`, `amended`, `moved` | the same, of the editorial notes |
 | `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or changed in its words, its links, its superscripts or its subscripts; a footnote marker in a credit counts for `footnotes_changed` |
 | `editorial.footnotes_changed` | a unit or a container on both sides whose footnotes or footnote markers differ in any way: a footnote added, removed or changed, or a marker added, removed, standing in another provision or note, showing another mark or pointing at another footnote |
@@ -1931,11 +1937,34 @@ an equal hash and is not paired yet. So the provisions on the old side
 only, reduced to their highest, are exactly `removed` together with the
 `from` of `moved`, and those on the new side only `added` with the `to`.
 
-Notes are paired in the same way by their note hashes, which hold neither
-the address nor the layer of a note: a note whose address changed and
-whose text did not has moved, as the notes of a renumbered section do, and
-so does a note whose address names another law while its text is the
-same.
+Notes are compared by their note hashes, which hold neither the address
+nor the layer of a note, in two steps. Like-named notes are paired first.
+Two notes of one unit or container are of one **family** when their
+addresses differ only in the ordinal that marks like-named notes: a last
+segment that is a whole number of 2 or more, written in ASCII digits with
+no leading zero, after an address that is itself the address of a note of
+the module on that side. Within one module, one layer and one family, an
+old and a new note of equal hashes are paired, each old note, in the order
+of the addresses, with the first new one, in the order of the addresses,
+that has an equal hash and is not paired yet. A pair at one address is
+unchanged and is listed nowhere; a pair at two addresses is one `moved`
+entry. So a note inserted before two like-named notes is `added` at the
+address of the first, and the two, whose text did not change, have moved,
+each to the ordinal after its own. The pairing stays within a family,
+since many notes are the same words in different units: a note amended to
+the words of a note of another unit is `amended`, and has not moved there.
+
+The notes that remain are then compared by address: one at an address that
+a remaining note on the other side has is `amended`, and one at an address
+that none has is `removed` or `added`. A removed and an added note are one
+`moved` entry when their note hashes are equal, paired in the same way as
+provisions across the workspace: a note whose address changed and whose
+text did not has moved, as the notes of a renumbered section do, and so
+does a note whose address names another law while its text is the same. A
+note of a family that is amended while another is inserted before it has no
+note of equal hash on the other side, so it is compared by address: the
+note at its old address is `amended`, and the one at its new address
+`added`.
 
 ### Stale bindings
 
@@ -2024,7 +2053,10 @@ set: the provisions only in the old are `operative.removed` with the
 `from` of `operative.moved`, those only in the new `operative.added` with
 the `to`, and those that differ `amended_text` with `amended_structure`;
 the notes of each layer likewise against `added`, `removed`, `moved` and
-`amended`; the units and containers whose credit or footnotes differ
+`amended`, once it has paired like-named notes as above, by the equality of
+their records but for their addresses, so that a note paired with one at
+another address is only in the old at its old address and only in the new
+at its new one; the units and containers whose credit or footnotes differ
 `credits_changed` and `footnotes_changed`; and the containers `removed`,
 `added` and `changed`. So an address in `amended_text` where
 `amended_structure` was due, or a wrong pairing of moved provisions, is
@@ -2055,10 +2087,14 @@ A release is a directory that holds the publisher's zip archives and,
 beside them, nothing but their [retrieval record](#workspaces),
 `retrieval.json`. Before it reads a document, the ingester:
 
-- reads the record, and refuses a directory that has none;
+- reads the record, and refuses a directory that has none; the record is
+  opened only when it is a regular file, so that a symbolic link, a
+  directory, a pipe or a device in its place is refused before it is
+  opened, and it is read through a bound of 1 MiB, past which it is refused;
 - recomputes the size, the SHA-256 and the BLAKE3 of every archive, and
-  refuses one that differs from its record, an archive the record does not
-  list, and one it lists that the directory does not hold;
+  refuses one that differs from its record, the files the record does not
+  list, named in the order of the bytes of their names, and an archive it
+  lists that the directory does not hold;
 - refuses a member whose name is not `usc`, two digits, an optional `a` or
   `A`, and `.xml`, a member larger than 512 MiB, whatever its header
   declares, and a release in which two archives hold a member of the same
@@ -2081,7 +2117,8 @@ A document is refused when:
   `yes` nor `no`;
 - an element stands where its class does not allow it, or is in no class
   below; or text stands where only elements may;
-- a `ref` has neither an `href` nor the class `footnoteRef`; a link, a
+- a `ref` has neither an `href` nor the class `footnoteRef`, or has both,
+  so that it would be at once a link and a footnote marker; a link, a
   superscript or a subscript stands inside another, or a footnote marker
   inside one; a footnote marker holds an element; a marker names no
   footnote of its module, or two footnotes of one module have one `id`;
@@ -2098,10 +2135,25 @@ A document is refused when:
 - a unit or a container has a second source credit, or a source credit
   stands anywhere but directly in one;
 - a cross heading has no topic, or one that is not one word of ASCII
-  letters and digits beginning with a letter;
+  letters and digits beginning with a letter; or a topic of a note holds a
+  white-space character other than U+0020, at which topics are split;
 - the law a note cites first is a reference of fewer than four segments,
   or one whose second, third or fourth segment holds a character that an
   address segment cannot hold;
+- an element stands more than 64 deep in its module, or a container more
+  than 64 deep among the containers of its file: the element of a unit or a
+  container stands at depth 1 of its module and each element inside it one
+  deeper, except a unit or a container that is a member of a container,
+  which begins a module of its own, and the top container stands at depth 1
+  among the containers. 64 is the deepest nesting of a module that the
+  grammar of edition 2 reads, and a module holds no block deeper than the
+  elements it is read from, so the check never refuses a module the
+  ingester writes for its nesting; release 119-142 nests at most 17 deep in
+  a module;
+- the document holds more than 8,388,608 nodes (2^23: elements, runs of
+  text, comments and processing instructions, and not attributes), three
+  times the 2,703,416 nodes of `usc42.xml` of release 119-142, its largest
+  member;
 - a `status` is not one of the 19 values of the publisher's schema:
   `proposed`, `withdrawn`, `cancelled`, `pending`, `operational`,
   `suspended`, `renumbered`, `repealed`, `expired`, `terminated`,
@@ -2142,7 +2194,18 @@ the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
 the text that gives no words. An `img` is imported as the source its `src`
 names, normalized, and empty when it has none; the picture is not in the
-archive.
+archive. Quoted content has the `origin` it names as the source writes it,
+and none when the attribute is absent or empty.
+
+A `num` with neither a `value` nor text is absent, and one with a `value`
+and no text keeps the value with an empty shown form; a `heading` with no
+text is absent, and so is a source credit with no text. A number, a heading
+or a credit that holds a footnote marker is never absent: it keeps the
+marker, with an empty text when it has no other. A text part that stands
+directly in a note, where the publisher sets out a law as loose paragraphs,
+gives its blocks to the note, in their place among the note's other
+blocks, and its role word (`chapeau`, `content`, `continuation` or
+`proviso`) is not kept. Each of these rules decides what a hash holds.
 
 ### Notes and their layers
 
@@ -2150,7 +2213,10 @@ Each `note` in a `notes` element is a note, except a cross heading
 (`role="crossHeading"`), which opens a group named by its topic and is not
 itself a note. So is each `note` that stands directly in a level and is
 neither a footnote nor a release note. A note belongs to the unit or the
-container it is anchored in. Its group is the topic of the nearest cross
+container it is anchored in. Its topics are its `topic` attribute split at
+U+0020 and no other character, with the empty members dropped: an empty
+attribute, or one of spaces, gives no topic, and two spaces between two
+words give two topics. Its group is the topic of the nearest cross
 heading before it in its `notes` element, and `ungrouped` when there is
 none or the note stands directly in a level:
 
@@ -2524,6 +2590,11 @@ more.
   other change, gives a change set in which every list is empty, and the
   bases of its definitions, which follow the flag, are in no list either:
   definitions are in no hash.
+- Like-named notes are paired by equal note hashes alone: a note of a
+  family that is amended while another is inserted before it is `amended`
+  at its old address and `added` at its new one. Units and containers whose
+  addresses `~2`, `~3` mark as later holders of one identifier are not
+  paired this way: they are compared by address.
 - `conformance/usc_compare.py --against` checks the unions of the lists,
   as [Change sets](#change-sets) says. It cannot see a provision in the
   wrong one of two lists whose union it checks, or a wrong pairing of a
@@ -2543,6 +2614,10 @@ more.
   a refusal, or a comparison of the two readings that fails, never
   altered text. The check of [the sample](#the-sample) holds the two to
   the same text on the sample.
+- The independent reading refuses the nesting the ingester refuses, by the
+  same rule, but has no bound on the number of nodes of a document: it
+  reads a document the ingester refuses for its size, given the memory,
+  about 3 GB for a member of 64 MiB of empty elements.
 - A table of contents is not imported. The lock counts it
   ([What it does not import](#what-it-does-not-import)).
 - No display citation is derived. The address is the one citation a module

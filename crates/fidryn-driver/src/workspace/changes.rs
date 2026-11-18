@@ -149,8 +149,8 @@ pub fn compare(
         }
     }
     let read = each(&containers_to_open, jobs, |address| {
-        let old = open(&old_side.dir, address, &opened)?;
-        let new = open(&new_side.dir, address, &opened)?;
+        let old = open(&old_side, address, &opened)?;
+        let new = open(&new_side, address, &opened)?;
         match (old, new) {
             (Module::Container(old), Module::Container(new)) => Ok(diff_containers(&old, &new)),
             _ => Err(not_the_shape(address, Shape::Container)),
@@ -184,8 +184,8 @@ pub fn compare(
         }
     }
     let read = each(&units_to_open, jobs, |address| {
-        let old = open(&old_side.dir, address, &opened)?;
-        let new = open(&new_side.dir, address, &opened)?;
+        let old = open(&old_side, address, &opened)?;
+        let new = open(&new_side, address, &opened)?;
         match (old, new) {
             (Module::Unit(old), Module::Unit(new)) => Ok(diff_units(&old, &new)),
             _ => Err(not_the_shape(address, Shape::Unit)),
@@ -218,9 +218,9 @@ pub fn compare(
         removed.iter().map(Candidate::kind).collect();
     let added_kinds: BTreeSet<(String, Option<String>)> =
         added.iter().map(Candidate::kind).collect();
-    for (candidates, others, dir) in [
-        (&mut removed, &added_kinds, &old_side.dir),
-        (&mut added, &removed_kinds, &new_side.dir),
+    for (candidates, others, side) in [
+        (&mut removed, &added_kinds, &old_side),
+        (&mut added, &removed_kinds, &new_side),
     ] {
         let wanted: Vec<usize> = candidates
             .iter()
@@ -232,7 +232,7 @@ pub fn compare(
             .collect();
         let read = each(&wanted, jobs, |place| {
             let address = &candidates[*place].address;
-            match open(dir, address, &opened)? {
+            match open(side, address, &opened)? {
                 Module::Unit(unit) => Ok(unnumbered_hash(&unit.root)),
                 _ => Err(not_the_shape(address, Shape::Unit)),
             }
@@ -294,13 +294,16 @@ impl CacheNotes {
 }
 
 /// A workspace that the comparison reads: its directory, its release and
-/// the digest of its lock, the interfaces of its modules, and what its
-/// check says of its cache.
+/// the digest of its lock, the interfaces of its modules, what its check
+/// says of its cache, and the BLAKE3 of the bytes of each module file that
+/// its check read, by path: the digest its lock records, which the check
+/// held each file to.
 struct Side {
     dir: PathBuf,
     release: Release,
     interfaces: Vec<Interface>,
     cache: CacheNotes,
+    modules: BTreeMap<String, Hash32>,
 }
 
 /// `options` for the workspace in `dir`: a relative directory of the cache
@@ -389,6 +392,7 @@ fn side(dir: &Path, manifest: &Manifest, options: &CheckOptions) -> Result<Side,
             unused: checked.report.cache_unused,
             failure: checked.report.cache_failure,
         },
+        modules: lock.modules,
     })
 }
 
@@ -490,23 +494,36 @@ fn one_sided(side: &Modules<'_>, other: &Modules<'_>) -> Vec<Candidate> {
         .collect()
 }
 
-/// The module at `address` of the workspace in `dir`, read and lowered
-/// again, which is counted in `opened`.
-fn open(dir: &Path, address: &Address, opened: &AtomicUsize) -> Result<Module, Vec<Diagnostic>> {
+/// The module at `address` of the workspace `side`, read and lowered again,
+/// which is counted in `opened`. Its bytes are held to the digest its check
+/// accepted, so that a file that changed since the check read it is
+/// refused and does not enter the change set unchecked.
+fn open(side: &Side, address: &Address, opened: &AtomicUsize) -> Result<Module, Vec<Diagnostic>> {
     opened.fetch_add(1, Ordering::Relaxed);
+    let dir = &side.dir;
     let rel = module_path(address);
-    let (_, head) = read_module(&dir.join(&rel)).map_err(|error| {
+    let refused = |message: String| {
         below(
             dir,
-            vec![
-                Diagnostic::new(
-                    DiagnosticCode::E730,
-                    format!("this file cannot be read again: {error}"),
-                )
-                .with_source(rel.as_str()),
-            ],
+            vec![Diagnostic::new(DiagnosticCode::E730, message).with_source(rel.as_str())],
         )
-    })?;
+    };
+    let (digest, head) = read_module(&dir.join(&rel))
+        .map_err(|error| refused(format!("this file cannot be read again: {error}")))?;
+    match side.modules.get(&rel) {
+        Some(accepted) if *accepted == digest => {}
+        Some(accepted) => {
+            return Err(refused(format!(
+                "this file changed after the check read it: its bytes now have the BLAKE3 \
+                 {digest}, and the check accepted {accepted}"
+            )));
+        }
+        None => {
+            return Err(refused(
+                "the check read no module file at this path, so it is not read again".to_owned(),
+            ));
+        }
+    }
     let lowered = lower_file(head).map_err(|found| {
         below(
             dir,
@@ -622,4 +639,80 @@ fn stale_in(
         }
     }
     Ok((stale, notes))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A copy of the committed demo workspace in a directory of its own
+    /// under the temporary directory, named by the process and by `tag`.
+    fn demo_copy(tag: &str) -> PathBuf {
+        fn copy(from: &Path, to: &Path) {
+            fs::create_dir_all(to).expect("create a directory");
+            for entry in fs::read_dir(from).expect("list a directory") {
+                let entry = entry.expect("an entry");
+                let target = to.join(entry.file_name());
+                if entry.file_type().expect("the kind of an entry").is_dir() {
+                    copy(&entry.path(), &target);
+                } else {
+                    fs::copy(entry.path(), &target).expect("copy a file");
+                }
+            }
+        }
+        let dir = std::env::temp_dir().join(format!(
+            "fidryn-workspace-changes-{}-{tag}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        copy(
+            &Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../conformance/fixtures/workspace/demo"),
+            &dir,
+        );
+        dir
+    }
+
+    #[test]
+    fn a_module_file_that_changed_after_the_check_read_it_is_refused() {
+        let dir = demo_copy("changed-after-the-check");
+        let manifest = manifest_of(&dir, WorkspaceKind::Generated).expect("a generated workspace");
+        let options = CheckOptions {
+            jobs: 1,
+            cache_dir: None,
+            toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+            executable: "a build of the tests".to_owned(),
+        };
+        let side = side(&dir, &manifest, &options).expect("the demo checks");
+        let opened = AtomicUsize::new(0);
+        let address = Address::parse("/zz/demo/t1/s1").expect("an address");
+        assert!(matches!(
+            open(&side, &address, &opened),
+            Ok(Module::Unit(_))
+        ));
+        // The file is changed after the check: reading it again is refused,
+        // and it names the file.
+        let file = dir.join("zz/demo/t1/s1.fr");
+        let mut text = fs::read_to_string(&file).expect("the module");
+        text.push('\n');
+        fs::write(&file, text).expect("changed");
+        let diagnostics = open(&side, &address, &opened).expect_err("changed");
+        let [diagnostic] = diagnostics.as_slice() else {
+            panic!("{diagnostics:#?}");
+        };
+        assert_eq!(diagnostic.code, DiagnosticCode::E730);
+        assert!(
+            diagnostic
+                .message
+                .starts_with("this file changed after the check read it: its bytes now have"),
+            "{}",
+            diagnostic.message
+        );
+        assert_eq!(
+            diagnostic.source_file.as_deref(),
+            Some(dir.join("zz/demo/t1/s1.fr").display().to_string().as_str())
+        );
+        assert_eq!(opened.into_inner(), 2);
+        let _ = fs::remove_dir_all(&dir);
+    }
 }
