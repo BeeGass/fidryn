@@ -949,7 +949,10 @@ amended, by layer ([Change sets](https://github.com/BeeGass/fidryn/blob/main/doc
 `DIR` that are stale against `NEW_DIR`, whatever release that workspace is
 pinned to: it answers what would go stale if the pin moved there. Each
 workspace is read as `fidryn check` reads it, through phase one and the
-cache, and only the modules whose hashes differ are read again.
+cache. Only the modules whose hashes differ are read again, and the units
+on one side only whose top provision has the kind and the status of a
+provision on the other side only, so that the two could be one moved
+provision.
 
 **Arguments**
 
@@ -957,7 +960,7 @@ cache, and only the modules whose hashes differ are read again.
 | --- | --- | --- |
 | `OLD_DIR` | yes | path to the directory of the older generated workspace |
 | `NEW_DIR` | yes | path to the directory of the newer generated workspace, of the prefix of `OLD_DIR` |
-| `--bindings DIR` | no | path to the directory of a curated workspace whose bindings are judged against `NEW_DIR`; may be given more than once |
+| `--bindings DIR` | no | path to the directory of a curated workspace whose bindings are judged against `NEW_DIR`; may be given more than once, and a directory given twice is read once |
 | `--json` | no | flag; print the change set as JSON, `fidryn.change-set/v0.1` |
 | `--jobs N` | no | the number of worker threads, at least 1; by default as many as the system reports as available |
 | `--cache-dir DIR` | no | the directory of the cache of every workspace read; by default the one `FIDRYN_CACHE_DIR` names, else `.fidryn-cache` inside each workspace |
@@ -1003,22 +1006,30 @@ the JSON Schema of which is
 [schemas/change-set-v0.1.json](https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json). Every list
 is sorted, and both forms are the same bytes on every run and for every
 number of workers. [Change sets](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#change-sets) says what puts
-an address into each list and shows the text of one with every kind of
-list.
+an address into each list and shows the text of one.
+
+When the cache of a workspace could not be used or could not be written,
+the command says so once on stderr, as [`check`](#check) does, with
+`the cache could not be used, and the check went on without it: ...` or
+`the cache could not be written, and the check went on without it: ...`,
+and the change set is what it would have been.
 
 **Failure.** Exit 1, with nothing on stdout. A directory that holds no
 workspace, a curated workspace as `OLD_DIR` or `NEW_DIR`, a generated one
 as `--bindings`, and two workspaces of different prefixes are each refused
 with one `E730` that says which, as
 ``this is the manifest of a curated workspace, and a change set is made between two generated workspaces``.
-A workspace that has an error ends the command with its diagnostics, each
-naming its file under the directory given, as `fidryn check` prints them;
-for a curated workspace of `--bindings` these are the diagnostics of its
-module files by themselves:
+`conformance/fixtures/workspace` holds no `workspace.json`, and is refused
+as no workspace:
 
 ```sh exit=1
 fidryn changes conformance/fixtures/workspace conformance/fixtures/workspace/demo --no-cache
 ```
+
+A workspace that has an error ends the command with its diagnostics, each
+naming its file under the directory given, as `fidryn check` prints them;
+for a curated workspace of `--bindings` these are the diagnostics of its
+module files by themselves.
 
 ## See also
 

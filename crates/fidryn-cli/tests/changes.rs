@@ -7,9 +7,12 @@
 use fidryn_driver::workspace::changes::change_set;
 use fidryn_driver::workspace::{CheckOptions, GeneratedWriter};
 use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit};
-use fidryn_provision::workspace::{AddressCounts, Generator, Manifest, NotImported, WorkspaceKind};
+use fidryn_provision::workspace::{
+    AddressCounts, Dependency, Generator, Manifest, NotImported, WorkspaceKind,
+};
 use fidryn_provision::{
-    Address, Block, ContainerModule, Item, Module, Num, PartRole, Provision, Run, Text, UnitModule,
+    Address, Block, ContainerModule, Hash32, Item, Module, Num, PartRole, Provision, Run, Text,
+    UnitModule,
 };
 use std::ffi::OsStr;
 use std::fs;
@@ -386,6 +389,80 @@ fn changes_prints_the_change_set_as_a_commit_message_or_as_json() {
     );
     assert_eq!(named.status.code(), Some(0), "{}", stderr(&named));
     assert!(listing(&shared).iter().any(|rel| rel.starts_with("v1/")));
+}
+
+#[test]
+fn a_cache_that_cannot_be_used_or_written_is_said_once() {
+    let scratch = two_versions("cache-notes");
+    let (old, new, notes) = (
+        scratch.join("old"),
+        scratch.join("new"),
+        scratch.join("notes"),
+    );
+    let bindings = notes.to_str().expect("a UTF-8 path");
+    let unchanged = stdout(&changes(
+        &old,
+        &new,
+        &["--no-cache", "--bindings", bindings],
+    ));
+
+    // A file stands where the directory of the cache would be made: no
+    // workspace can write it, and the command says so once.
+    let blocked = scratch.join("blocked");
+    fs::write(&blocked, "An invented file where a directory would be.\n").expect("write");
+    let blocked_text = blocked.to_str().expect("a UTF-8 path");
+    let written = changes(
+        &old,
+        &new,
+        &["--cache-dir", blocked_text, "--bindings", bindings],
+    );
+    assert_eq!(written.status.code(), Some(0), "{}", stderr(&written));
+    assert_eq!(stdout(&written), unchanged);
+    let message = stderr(&written);
+    assert_eq!(message.lines().count(), 1, "{message}");
+    assert!(
+        message.starts_with(&format!(
+            "the cache could not be written, and the check went on without it: {}: ",
+            blocked.display()
+        )),
+        "{message}"
+    );
+
+    // The workspace of bindings depends on the new side, and a cache inside
+    // it is not used for that workspace; the two sides use it.
+    let manifest = Manifest {
+        name: "notes".to_owned(),
+        kind: WorkspaceKind::Curated,
+        prefix: address("/zz/notes"),
+        release: None,
+        toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+        dependencies: vec![Dependency {
+            name: "demo".to_owned(),
+            path: "../new".to_owned(),
+            release: "v2".to_owned(),
+            lock_digest: Hash32([0; 32]),
+        }],
+    };
+    fs::write(notes.join("workspace.json"), manifest.to_json()).expect("write");
+    let inside = new.join(".cache");
+    let inside_text = inside.to_str().expect("a UTF-8 path");
+    let unused = changes(
+        &old,
+        &new,
+        &["--cache-dir", inside_text, "--bindings", bindings],
+    );
+    assert_eq!(unused.status.code(), Some(0), "{}", stderr(&unused));
+    assert_eq!(stdout(&unused), unchanged);
+    let message = stderr(&unused);
+    assert_eq!(message.lines().count(), 1, "{message}");
+    assert!(
+        message.starts_with(&format!(
+            "the cache could not be used, and the check went on without it: {}: the directory \
+             lies inside the directory of the dependency `demo`, `../new`",
+            inside.display()
+        )),
+        "{message}"
+    );
 }
 
 #[test]

@@ -171,7 +171,9 @@ interchange schema versions are maintained independently of the interpreter.
   are equal with their own numbers left out have moved
   (`fidryn_provision::changes::unnumbered_hash`). With `--bindings DIR` it
   lists the bindings of a curated workspace that are stale against
-  `NEW_DIR`, whatever its pin. It prints the text of a commit message, or
+  `NEW_DIR`, whatever its pin; a directory given twice is read once. As
+  `fidryn check` does, it says once when a cache could not be used or
+  written. It prints the text of a commit message, or
   with `--json` the change set, whose JSON Schema is
   `schemas/change-set-v0.1.json`
   (`fidryn_driver::workspace::changes::change_set`).

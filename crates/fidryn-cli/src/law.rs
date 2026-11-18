@@ -18,7 +18,7 @@
 
 use clap::Subcommand;
 use fidryn_core::Diagnostic;
-use fidryn_driver::workspace::changes::change_set;
+use fidryn_driver::workspace::changes::compare;
 use fidryn_driver::workspace::{
     CheckOptions, CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
 };
@@ -348,9 +348,11 @@ pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<()
 /// message. Every workspace is read as `fidryn check` reads it, on `--jobs`
 /// threads and through the cache of `--cache-dir`, else of
 /// `$FIDRYN_CACHE_DIR`, else of `.fidryn-cache` inside each workspace;
-/// `--no-cache` keeps none. Exit 1, with the diagnostics on stderr and
-/// nothing on stdout, when a directory is not what the command compares or
-/// a workspace has an error.
+/// `--no-cache` keeps none. When the cache could not be used or written, it
+/// says so once on stderr, as `fidryn check` does, and the change set is the
+/// same. Exit 1, with the diagnostics on stderr and nothing on stdout, when
+/// a directory is not what the command compares or a workspace has an
+/// error.
 pub(crate) fn changes(
     old: &Path,
     new: &Path,
@@ -364,14 +366,13 @@ pub(crate) fn changes(
     };
     let mut cache = changes_cache(flags, std::env::var_os(super::CACHE_DIR_VARIABLE));
     let mut executable = String::new();
+    let mut unused = None;
     if cache.is_some() {
         match super::executable_digest() {
             Ok(digest) => executable = digest,
             Err(error) => {
                 cache = None;
-                eprintln!(
-                    "the cache could not be used, and the comparison went on without it: {error}"
-                );
+                unused = Some(error);
             }
         }
     }
@@ -381,8 +382,8 @@ pub(crate) fn changes(
         toolchain: env!("CARGO_PKG_VERSION").to_owned(),
         executable,
     };
-    let set = match change_set(old, new, bindings, &options) {
-        Ok(set) => set,
+    let compared = match compare(old, new, bindings, &options) {
+        Ok(compared) => compared,
         Err(diagnostics) => {
             for diagnostic in diagnostics {
                 eprintln!("{diagnostic}");
@@ -390,6 +391,14 @@ pub(crate) fn changes(
             return ExitCode::from(1);
         }
     };
+    // What `fidryn check` says of its cache, once.
+    if let Some(error) = unused.as_ref().or(compared.cache_unused.as_ref()) {
+        eprintln!("the cache could not be used, and the check went on without it: {error}");
+    }
+    if let Some(failure) = &compared.cache_failure {
+        eprintln!("the cache could not be written, and the check went on without it: {failure}");
+    }
+    let set = compared.set;
     let text = if json { set.to_json() } else { set.to_text() };
     let stdout = io::stdout();
     let mut out = stdout.lock();
@@ -403,7 +412,7 @@ pub(crate) fn changes(
 /// `--no-cache`; otherwise `--cache-dir`, else `variable`, the value of
 /// `FIDRYN_CACHE_DIR` when it is set and not empty, made absolute, which
 /// every workspace shares; else `.fidryn-cache`, a relative path, which
-/// [`change_set`] takes inside the directory of each workspace.
+/// [`compare`] takes inside the directory of each workspace.
 fn changes_cache(flags: &super::WorkspaceFlags, variable: Option<OsString>) -> Option<PathBuf> {
     if flags.no_cache {
         return None;

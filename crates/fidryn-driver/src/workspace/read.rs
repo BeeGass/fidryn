@@ -69,7 +69,7 @@ pub fn read_coverage(root: &Path, jobs: usize) -> Result<Coverage, CoverageError
     }
     let lock = read_lock(root, &manifest, &mut diagnostics);
     let lock = match lock {
-        Some(lock) if diagnostics.is_empty() => lock,
+        Some((lock, _)) if diagnostics.is_empty() => lock,
         _ => return Err(CoverageError::Unread(diagnostics)),
     };
     let interfaces = read_each(root, jobs, |lowered| {

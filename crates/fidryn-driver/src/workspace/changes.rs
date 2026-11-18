@@ -22,7 +22,7 @@ use fidryn_provision::changes::{
 };
 use fidryn_provision::interface::Shape;
 use fidryn_provision::layout::module_path;
-use fidryn_provision::workspace::{Lock, Manifest, WorkspaceKind};
+use fidryn_provision::workspace::{Manifest, WorkspaceKind};
 use fidryn_provision::{Address, AddressIndex, Hash32, Interface, Layer, Module, staleness};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -48,10 +48,12 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 /// whether or not its pin is satisfied: its modules are read by phase one
 /// alone, and an error there ends the comparison as above. A binding is
 /// left out when its name does not resolve, or when it binds an address
-/// below no prefix but `new`'s.
+/// below no prefix but `new`'s. A directory that `bindings` names twice,
+/// once its path is resolved, is read once.
 ///
 /// Every list is sorted ([`ChangeSet::sort`]), and the result is the same
-/// for every number of `options.jobs`.
+/// for every number of `options.jobs`. The manifest and the lock of each
+/// workspace are read once.
 pub fn change_set(
     old: &Path,
     new: &Path,
@@ -61,16 +63,27 @@ pub fn change_set(
     compare(old, new, bindings, options).map(|compared| compared.set)
 }
 
-/// What [`compare`] gives: the change set, and how many module files it
-/// opened to compare their modules, which the tests read.
-pub(super) struct Compared {
-    pub(super) set: ChangeSet,
+/// What [`compare`] gives: the change set, and what the checks of the
+/// workspaces it read say of their cache, which the change set does not
+/// depend on.
+pub struct Compared {
+    pub set: ChangeSet,
+    /// Why the cache was not used, as
+    /// [`WorkspaceReport::cache_unused`](super::WorkspaceReport::cache_unused)
+    /// says it, of the first workspace read whose check says so.
+    pub cache_unused: Option<String>,
+    /// Why the cache could not be written, as
+    /// [`WorkspaceReport::cache_failure`](super::WorkspaceReport::cache_failure)
+    /// says it, of the first workspace read whose check says so.
+    pub cache_failure: Option<String>,
+    /// How many module files the comparison opened to compare their
+    /// modules, which the tests read.
     #[cfg_attr(not(test), allow(dead_code))]
     pub(super) opened: usize,
 }
 
-/// [`change_set`], counting the module files it opens.
-pub(super) fn compare(
+/// [`change_set`], with what the checks say of their cache.
+pub fn compare(
     old: &Path,
     new: &Path,
     bindings: &[PathBuf],
@@ -91,8 +104,11 @@ pub(super) fn compare(
             ),
         )]);
     }
-    let old_side = side(old, options)?;
-    let new_side = side(new, options)?;
+    let old_side = side(old, &old_manifest, options)?;
+    let new_side = side(new, &new_manifest, options)?;
+    let mut cache = CacheNotes::default();
+    cache.add(&old_side.cache);
+    cache.add(&new_side.cache);
     let jobs = options.jobs.max(1);
     let opened = AtomicUsize::new(0);
     let mut set = ChangeSet::empty(
@@ -231,34 +247,58 @@ pub(super) fn compare(
     set.operative.added = paired.added;
     set.operative.moved = paired.moved;
 
-    // The bindings of the curated workspaces, against the new side.
+    // The bindings of the curated workspaces, against the new side; a
+    // directory named twice is read once.
     if !bindings.is_empty() {
         let prefix = &new_manifest.prefix;
         let index = AddressIndex::build(&new_side.interfaces, std::slice::from_ref(prefix));
+        let mut read = BTreeSet::new();
         for dir in bindings {
-            set.stale_bindings.extend(stale_in(
-                dir,
-                &new_side.interfaces,
-                &index,
-                prefix,
-                options,
-            )?);
+            if !read.insert(fs::canonicalize(dir).unwrap_or_else(|_| dir.clone())) {
+                continue;
+            }
+            let (stale, notes) = stale_in(dir, &new_side.interfaces, &index, prefix, options)?;
+            set.stale_bindings.extend(stale);
+            cache.add(&notes);
         }
     }
 
     set.sort();
     Ok(Compared {
         set,
+        cache_unused: cache.unused,
+        cache_failure: cache.failure,
         opened: opened.into_inner(),
     })
 }
 
+/// What the check of a workspace says of its cache.
+#[derive(Default)]
+struct CacheNotes {
+    unused: Option<String>,
+    failure: Option<String>,
+}
+
+impl CacheNotes {
+    /// Keeps of `other` what this does not hold yet.
+    fn add(&mut self, other: &CacheNotes) {
+        if self.unused.is_none() {
+            self.unused.clone_from(&other.unused);
+        }
+        if self.failure.is_none() {
+            self.failure.clone_from(&other.failure);
+        }
+    }
+}
+
 /// A workspace that the comparison reads: its directory, its release and
-/// the digest of its lock, and the interfaces of its modules.
+/// the digest of its lock, the interfaces of its modules, and what its
+/// check says of its cache.
 struct Side {
     dir: PathBuf,
     release: Release,
     interfaces: Vec<Interface>,
+    cache: CacheNotes,
 }
 
 /// `options` for the workspace in `dir`: a relative directory of the cache
@@ -316,37 +356,37 @@ fn manifest_of(dir: &Path, kind: WorkspaceKind) -> Result<Manifest, Vec<Diagnost
     Err(below(dir, vec![diagnostic]))
 }
 
-/// The generated workspace in `dir`, checked as `fidryn check` checks it;
-/// its diagnostics when it has an error.
-fn side(dir: &Path, options: &CheckOptions) -> Result<Side, Vec<Diagnostic>> {
-    let checked = checked(dir, &in_workspace(dir, options));
+/// The generated workspace in `dir`, whose manifest is `manifest`, checked
+/// as `fidryn check` checks it; its diagnostics when it has an error.
+fn side(dir: &Path, manifest: &Manifest, options: &CheckOptions) -> Result<Side, Vec<Diagnostic>> {
+    let checked = checked(dir, manifest, &in_workspace(dir, options));
     if checked.report.errors() > 0 {
         return Err(below(dir, checked.report.diagnostics));
     }
-    let unreadable = |error: String| {
-        below(
+    // A generated workspace that checks without an error has a lock.
+    let Some((lock, lock_digest)) = checked.lock else {
+        return Err(below(
             dir,
             vec![
                 Diagnostic::new(
                     DiagnosticCode::E730,
-                    format!("this file cannot be read again: {error}"),
+                    "a generated workspace has a lock, and this one has none that can be read",
                 )
                 .with_source(LOCK_FILE),
             ],
-        )
+        ));
     };
-    let bytes = fs::read(dir.join(LOCK_FILE)).map_err(|error| unreadable(error.to_string()))?;
-    let lock = String::from_utf8(bytes.clone())
-        .map_err(|error| error.to_string())
-        .and_then(|text| Lock::from_json(&text))
-        .map_err(unreadable)?;
     Ok(Side {
         dir: dir.to_owned(),
         release: Release {
             release: lock.release,
-            lock_digest: Hash32(*blake3::hash(&bytes).as_bytes()),
+            lock_digest,
         },
         interfaces: checked.interfaces,
+        cache: CacheNotes {
+            unused: checked.report.cache_unused,
+            failure: checked.report.cache_failure,
+        },
     })
 }
 
@@ -550,22 +590,29 @@ fn each<T: Sync, R: Send>(items: &[T], jobs: usize, work: impl Fn(&T) -> R + Syn
 
 /// The stale bindings of the curated workspace in `dir` against the
 /// workspace whose interfaces are `interfaces`, of the prefix `prefix`,
-/// indexed in `index`.
+/// indexed in `index`, and what the reading of its modules says of the
+/// cache.
 fn stale_in(
     dir: &Path,
     interfaces: &[Interface],
     index: &AddressIndex,
     prefix: &Address,
     options: &CheckOptions,
-) -> Result<Vec<StaleBinding>, Vec<Diagnostic>> {
+) -> Result<(Vec<StaleBinding>, CacheNotes), Vec<Diagnostic>> {
     let manifest = manifest_of(dir, WorkspaceKind::Curated)?;
-    let (curated, diagnostics) = modules_of(dir, &manifest, &in_workspace(dir, options));
-    if diagnostics
+    let read = modules_of(dir, &manifest, &in_workspace(dir, options));
+    if read
+        .diagnostics
         .iter()
         .any(|diagnostic| diagnostic.code.severity() == Severity::Error)
     {
-        return Err(below(dir, diagnostics));
+        return Err(below(dir, read.diagnostics));
     }
+    let notes = CacheNotes {
+        unused: read.cache_unused,
+        failure: read.cache_failure,
+    };
+    let curated = read.interfaces;
     let importable: BTreeMap<&Address, &Interface> = curated
         .iter()
         .chain(interfaces)
@@ -598,5 +645,5 @@ fn stale_in(
             }
         }
     }
-    Ok(stale)
+    Ok((stale, notes))
 }

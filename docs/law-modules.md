@@ -1607,7 +1607,7 @@ and then by `to`.
 | `enacted_notes.amended` | an enacted note on both sides whose [note hash](#hashes) differs |
 | `enacted_notes.moved` | a removed and an added enacted note of equal note hashes |
 | `editorial.added`, `removed`, `amended`, `moved` | the same, of the editorial notes |
-| `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or whose words changed |
+| `editorial.credits_changed` | a unit or a container on both sides whose source credit was added, removed, or changed in its words, its links, its superscripts or its subscripts; a footnote marker in a credit counts for `footnotes_changed` |
 | `editorial.footnotes_changed` | a unit or a container on both sides whose footnotes or footnote markers differ in any way: a footnote added, removed or changed, or a marker added, removed, standing in another provision or note, showing another mark or pointing at another footnote |
 | `containers.added`, `removed` | a container on one side only |
 | `containers.changed` | a container on both sides whose kind, number, heading, status, aliases or members differ |
@@ -1618,11 +1618,14 @@ words** are, in order, the text of each paragraph and subheading of its
 own text parts, those in the cells of its tables included, with its links,
 superscripts and subscripts, each quoted content whole, and the source of
 each image: a link added to words, or taken from them, amends the text. Its
-**own structure** is its
-kind, its number, its heading and its status, the order of its text parts
-and their roles, the addresses of its children in their order, and the
-shape of its tables: the group of each row, and the header and the spans
-of each cell. A provision may be in both lists. A provision whose tree hash
+**own structure** is its kind, its number, its heading and its status; its
+text parts and children in their order, each text part by its role and by
+the kind of each of its blocks, a paragraph, a subheading, a table, quoted
+content or an image, and each child by its address; and the shape of its
+tables: the group of each row, and the header, the spans and the kinds of
+the blocks of each cell. A paragraph that becomes a subheading with the
+same words amends the structure, and not the text. A provision may be in
+both lists. A provision whose tree hash
 changed only because something below it changed is in neither: a word
 changed in a subsection lists the subsection, and not its section. A
 subsection added to a section is `added`, and the section is
@@ -1671,10 +1674,12 @@ pin moved to the new release. The modules of `DIR` are read by phase one
 alone, and an error there ends the command; the names of its curated
 modules are resolved against its own modules and those of the new side, a
 binding whose name does not resolve is left out, and so is one whose
-address lies below another prefix than the new side's. Each entry names
+address lies below another prefix than the new side's. A directory given
+twice, the same once its path is resolved, is read once. Each entry names
 the curated workspace by the `name` of its manifest, the module that
 declares the binding, the binding, the address it binds and the reason; the
-entries are sorted by workspace, module and binding.
+entries are sorted by workspace, module and binding, and an entry that two
+copies of one curated workspace both give is listed once.
 
 ### The two forms
 
@@ -1739,10 +1744,20 @@ stale_bindings:
 
 Both forms are the same bytes on every run and for every number of
 workers. `conformance/usc_compare.py` compares two releases of the
-publisher's XML independently, from their text records alone, and checks
-that a change set lists exactly the provisions, notes, credits, footnotes
-and containers that differ in them; the conformance tests run it on
-invented pairs of releases beside the command.
+publisher's XML independently, from their text records alone. With
+`--against` it checks, for each group, that the addresses on one side only
+and the addresses that differ are the unions of the lists of the change
+set: the provisions only in the old are `operative.removed` with the
+`from` of `operative.moved`, those only in the new `operative.added` with
+the `to`, and those that differ `amended_text` with `amended_structure`;
+the notes of each layer likewise against `added`, `removed`, `moved` and
+`amended`; the units and containers whose credit or footnotes differ
+`credits_changed` and `footnotes_changed`; and the containers `removed`,
+`added` and `changed`. So an address in `amended_text` where
+`amended_structure` was due, or a wrong pairing of moved provisions, is
+not something it can see; the tests of `fidryn-driver` hold each list on
+its own. The conformance tests run it on invented pairs of releases beside
+the command.
 
 ## The ingester for the United States Code
 

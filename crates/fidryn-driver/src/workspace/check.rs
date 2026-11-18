@@ -167,23 +167,9 @@ impl WorkspaceReport {
 /// written inside a dependency: the report is that of a check without a
 /// cache, and says why in [`WorkspaceReport::cache_unused`].
 pub fn check_workspace(root: &Path, options: &CheckOptions) -> WorkspaceReport {
-    checked(root, options).report
-}
-
-/// What [`checked`] gives: the report of [`check_workspace`], and the
-/// interfaces of the modules that stand at the paths of their addresses,
-/// which phase two read, in the order of their paths.
-pub(super) struct Checked {
-    pub(super) report: WorkspaceReport,
-    pub(super) interfaces: Vec<Interface>,
-}
-
-/// The check of the workspace whose directory is `root`, as
-/// [`check_workspace`] runs it, with the interfaces it read.
-pub(super) fn checked(root: &Path, options: &CheckOptions) -> Checked {
     let mut diagnostics = Vec::new();
     let Some(manifest) = read_manifest(root, &mut diagnostics) else {
-        let report = WorkspaceReport {
+        return WorkspaceReport {
             modules: 0,
             from_cache: 0,
             diagnostics,
@@ -195,21 +181,36 @@ pub(super) fn checked(root: &Path, options: &CheckOptions) -> Checked {
             cache_failure: None,
             cache_unused: None,
         };
-        return Checked {
-            report,
-            interfaces: Vec::new(),
-        };
     };
-    let lock = read_lock(root, &manifest, &mut diagnostics);
+    checked(root, &manifest, options).report
+}
+
+/// What [`checked`] gives: the report of [`check_workspace`]; the
+/// interfaces of the modules that stand at the paths of their addresses,
+/// which phase two read, in the order of their paths; and the lock of a
+/// generated workspace when it could be read, with the BLAKE3 of its bytes.
+pub(super) struct Checked {
+    pub(super) report: WorkspaceReport,
+    pub(super) interfaces: Vec<Interface>,
+    pub(super) lock: Option<(Lock, Hash32)>,
+}
+
+/// The check of the workspace whose directory is `root` and whose manifest,
+/// already read, is `manifest`, as [`check_workspace`] runs it, with the
+/// interfaces and the lock it read.
+pub(super) fn checked(root: &Path, manifest: &Manifest, options: &CheckOptions) -> Checked {
+    let mut diagnostics = Vec::new();
+    let read = read_lock(root, manifest, &mut diagnostics);
+    let lock = read.as_ref().map(|(lock, _)| lock);
     let jobs = options.jobs.max(1);
 
     // Phase one: each module file of the workspace and of its dependencies
     // by itself, or its result from the cache; then the entries of the
     // files the cache did not hold. A cache that shares a directory with a
     // dependency is not used.
-    let (cache, cache_unused) = cache_of(root, &manifest, options);
+    let (cache, cache_unused) = cache_of(root, manifest, options);
     let files = read_files(root, jobs, cache.as_ref());
-    let opened = deps::open(root, &manifest, jobs, cache.as_ref());
+    let opened = deps::open(root, manifest, jobs, cache.as_ref());
     let modules = files.modules.len();
     let from_cache = files
         .read
@@ -222,12 +223,12 @@ pub(super) fn checked(root: &Path, options: &CheckOptions) -> Checked {
 
     // Phase two: the files against the lock, where each module stands, each
     // dependency by itself, and then the interfaces alone.
-    let (interfaces, unread) = settle(files, lock.as_ref(), &manifest.prefix, &mut diagnostics);
+    let (interfaces, unread) = settle(files, lock, &manifest.prefix, &mut diagnostics);
     let dependencies = deps::settle(opened, &options.toolchain, &mut diagnostics);
     let phase_two = across(
         &interfaces,
         &dependencies,
-        &manifest,
+        manifest,
         &options.toolchain,
         &unread,
         jobs,
@@ -246,7 +247,11 @@ pub(super) fn checked(root: &Path, options: &CheckOptions) -> Checked {
         cache_failure: cache.and_then(Cache::failure),
         cache_unused,
     };
-    Checked { report, interfaces }
+    Checked {
+        report,
+        interfaces,
+        lock: read,
+    }
 }
 
 /// The cache of the check of the workspace at `root`, whose manifest is
@@ -269,19 +274,27 @@ fn cache_of(
     (cache, cache_unused)
 }
 
+/// What [`modules_of`] gives.
+pub(super) struct ModulesRead {
+    /// The interfaces of the modules that stand at the paths of their
+    /// addresses, in the order of their paths.
+    pub(super) interfaces: Vec<Interface>,
+    /// The diagnostics of the files, each naming its file by its path
+    /// relative to the workspace's directory, sorted.
+    pub(super) diagnostics: Vec<Diagnostic>,
+    /// Why the cache was not used, as [`WorkspaceReport::cache_unused`].
+    pub(super) cache_unused: Option<String>,
+    /// Why the cache could not be written, as
+    /// [`WorkspaceReport::cache_failure`].
+    pub(super) cache_failure: Option<String>,
+}
+
 /// Phase one alone of the workspace at `root`, whose manifest is
 /// `manifest`, through the cache of `options` as [`check_workspace`] keeps
-/// it, and then where each module stands: the interfaces of the modules
-/// that stand at the paths of their addresses, in the order of their paths,
-/// and the diagnostics of the files, each naming its file by its path
-/// relative to `root`, sorted. Nothing of a lock, of the manifest, of a
-/// dependency or across the modules is checked.
-pub(super) fn modules_of(
-    root: &Path,
-    manifest: &Manifest,
-    options: &CheckOptions,
-) -> (Vec<Interface>, Vec<Diagnostic>) {
-    let (cache, _) = cache_of(root, manifest, options);
+/// it, and then where each module stands. Nothing of a lock, of the
+/// manifest, of a dependency or across the modules is checked.
+pub(super) fn modules_of(root: &Path, manifest: &Manifest, options: &CheckOptions) -> ModulesRead {
+    let (cache, cache_unused) = cache_of(root, manifest, options);
     let jobs = options.jobs.max(1);
     let files = read_files(root, jobs, cache.as_ref());
     if let Some(cache) = &cache {
@@ -290,7 +303,12 @@ pub(super) fn modules_of(
     let mut diagnostics = Vec::new();
     let (interfaces, _) = settle(files, None, &manifest.prefix, &mut diagnostics);
     diagnostics.sort_by(|a, b| order(a).cmp(&order(b)));
-    (interfaces, diagnostics)
+    ModulesRead {
+        interfaces,
+        diagnostics,
+        cache_unused,
+        cache_failure: cache.and_then(Cache::failure),
+    }
 }
 
 /// A diagnostic about the file `rel` as a whole, which has no span.
@@ -324,14 +342,14 @@ pub(super) fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> O
         .ok()
 }
 
-/// The lock of a generated workspace, when it has one that can be read. A
-/// generated workspace without one, and a curated workspace with one, are
-/// reported in `diagnostics`.
+/// The lock of a generated workspace, when it has one that can be read, with
+/// the BLAKE3 of the bytes of its file. A generated workspace without one,
+/// and a curated workspace with one, are reported in `diagnostics`.
 pub(super) fn read_lock(
     root: &Path,
     manifest: &Manifest,
     diagnostics: &mut Vec<Diagnostic>,
-) -> Option<Lock> {
+) -> Option<(Lock, Hash32)> {
     let text = match fs::read_to_string(root.join(LOCK_FILE)) {
         Ok(text) => Ok(Some(text)),
         Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),
@@ -365,7 +383,7 @@ pub(super) fn read_lock(
             }
             Ok(lock) => {
                 diagnostics.extend(lock_disagrees(manifest, &lock));
-                Some(lock)
+                Some((lock, Hash32(*blake3::hash(text.as_bytes()).as_bytes())))
             }
         },
     }

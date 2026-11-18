@@ -557,11 +557,13 @@ fn only_the_modules_whose_hashes_differ_are_opened() {
     );
 }
 
-#[test]
-fn stale_bindings_are_listed() {
-    // The second version of the dependency of the tests of staleness: one
-    // word of `s8/a`, `s8/b` renumbered to `s8/c`, and an enacted note of
-    // `s3`, whose alias is `s4`.
+/// The pair of [`v1`] and of the second version of the dependency of the
+/// tests of staleness, and in `notes/` beside them the curated workspace
+/// `notes`, whose module `/zz/notes/a` binds [`BOUND`] and two addresses
+/// below another prefix, written against [`v1`]. The second version changes
+/// one word of `s8/a`, renumbers `s8/b` to `s8/c`, and adds an enacted note
+/// to `s3`, whose alias is `s4`.
+fn stale_fixture(tag: &str) -> (Pair, PathBuf) {
     let mut v2 = v1();
     reword(
         &mut v2,
@@ -578,7 +580,7 @@ fn stale_bindings_are_listed() {
         Layer::Enacted,
         "An invented act amended this section.",
     ));
-    let pair = pair("stale", &v1(), &v2);
+    let pair = pair(tag, &v1(), &v2);
     // Bindings written against the first version, and two whose addresses
     // lie below another prefix, which are left out.
     let mut bound = BOUND.to_vec();
@@ -593,14 +595,12 @@ fn stale_bindings_are_listed() {
         vec![dependency("demo", "../nowhere", "v0", Hash32([0; 32]))],
         &[("a", &a)],
     );
-    let found = changes_of(&pair, std::slice::from_ref(&notes));
+    (pair, notes)
+}
 
-    let mut expected = nothing(&pair);
-    expected.operative.amended_text = at(&["/zz/demo/t1/s8/a"]);
-    expected.operative.amended_structure = at(&[S8]);
-    expected.operative.moved = vec![moved("/zz/demo/t1/s8/b", "/zz/demo/t1/s8/c")];
-    expected.enacted_notes.added = at(&[&note_at("/zz/demo/t1/s3", "nolaw", "amendment")]);
-    expected.stale_bindings = [
+/// The stale bindings of the curated workspace of [`stale_fixture`].
+fn stale_of_fixture() -> Vec<StaleBinding> {
+    [
         (
             "aliased",
             "/zz/demo/t1/s4",
@@ -618,7 +618,20 @@ fn stale_bindings_are_listed() {
         address: address(bound),
         reason,
     })
-    .collect();
+    .collect()
+}
+
+#[test]
+fn stale_bindings_are_listed() {
+    let (pair, notes) = stale_fixture("stale");
+    let found = changes_of(&pair, std::slice::from_ref(&notes));
+
+    let mut expected = nothing(&pair);
+    expected.operative.amended_text = at(&["/zz/demo/t1/s8/a"]);
+    expected.operative.amended_structure = at(&[S8]);
+    expected.operative.moved = vec![moved("/zz/demo/t1/s8/b", "/zz/demo/t1/s8/c")];
+    expected.enacted_notes.added = at(&[&note_at("/zz/demo/t1/s3", "nolaw", "amendment")]);
+    expected.stale_bindings = stale_of_fixture();
     assert_eq!(found, expected);
     // The commit message that the section "Change sets" of
     // `docs/law-modules.md` shows.
@@ -654,6 +667,29 @@ fn stale_bindings_are_listed() {
     // Without the bindings, the same change set with none.
     expected.stale_bindings.clear();
     assert_eq!(changes_of(&pair, &[]), expected);
+}
+
+#[test]
+fn a_workspace_of_bindings_named_twice_is_read_once() {
+    let (pair, notes) = stale_fixture("stale-twice");
+    let once = changes_of(&pair, std::slice::from_ref(&notes));
+    assert_eq!(once.stale_bindings, stale_of_fixture());
+    // The same directory, as given and by two other paths that lead to it.
+    let named = [notes.clone(), notes.join("."), notes.join("../notes")];
+    assert_eq!(changes_of(&pair, &named), once);
+    // A copy of the workspace in another directory is another workspace of
+    // bindings, whose entries are those of the first: each is listed once.
+    let copy = pair.scratch.join("copy");
+    for rel in ["workspace.json", "zz/notes/a.fr"] {
+        put(&copy, rel, &read(&notes, rel));
+    }
+    let both = changes_of(&pair, &[notes, copy]);
+    assert_eq!(both, once);
+    let value: serde_json::Value = serde_json::from_str(&both.to_json()).expect("JSON");
+    assert_eq!(
+        value["stale_bindings"].as_array().map(Vec::len),
+        Some(stale_of_fixture().len())
+    );
 }
 
 /// The address of the unit `s<n>`.

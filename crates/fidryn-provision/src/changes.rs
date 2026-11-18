@@ -164,7 +164,9 @@ impl ChangeSet {
     /// Sorts every list: the lists of addresses by the bytes of their
     /// addresses, the moved entries by the address they moved from and then
     /// by the one they moved to, and the stale bindings by the name of the
-    /// workspace, the address of the module and the name of the binding.
+    /// workspace, the address of the module and the name of the binding; a
+    /// stale binding found twice, in two copies of one curated workspace, is
+    /// kept once.
     pub fn sort(&mut self) {
         let operative = &mut self.operative;
         for list in [
@@ -201,6 +203,7 @@ impl ChangeSet {
                 b.reason,
             ))
         });
+        self.stale_bindings.dedup();
     }
 
     /// The change set as JSON: `schema` first, then its fields in their
@@ -374,7 +377,9 @@ pub struct OneSided {
 /// Whether the credit and the footnotes of a unit or a container changed.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct MatterDiff {
-    /// The credit was added, removed, or its words changed.
+    /// The credit was added, removed, or changed in its words, its links,
+    /// its superscripts or its subscripts; its footnote markers count for
+    /// `footnotes_changed`.
     pub credit_changed: bool,
     /// A footnote was added, removed or changed, or a footnote marker of
     /// the module was added, removed, or stands in another provision or

@@ -182,9 +182,11 @@ record, footnote markers left out; and the units and containers whose
 credit, or whose footnotes or footnote markers, differ. With
 `--against CHANGES.json`, a change set that `fidryn changes --json` printed
 for the same releases, it exits `1` and names the first address that
-differs unless the change set lists exactly those sets
-([Change sets](../docs/law-modules.md#change-sets)). The other exit codes
-are those of `uslm_text.py`.
+differs unless each of those sets is the union of the lists of the change
+set that it stands for, such as `removed` with the `from` of `moved`
+([Change sets](../docs/law-modules.md#change-sets)); which of the lists an
+address is in, and how moved entries are paired, it does not see. The
+other exit codes are those of `uslm_text.py`.
 
 ```sh
 uv run --locked python -I conformance/usc_compare.py OLD_RELEASE NEW_RELEASE
