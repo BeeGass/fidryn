@@ -2,7 +2,8 @@
 //! elements, and the reading of text.
 //!
 //! A document is parsed by `roxmltree`, which refuses a document type
-//! declaration and with it every entity declaration. It is refused when its
+//! declaration and with it every entity declaration, and a document of more
+//! than [`NODES_LIMIT`] nodes. It is refused when its
 //! root is not `uscDoc` in the namespace of the publisher's schema, when its
 //! schema location names another file than `USLM-1.0.15.xsd`, when its
 //! `docPublicationName` is not `Online@` followed by the release, an en dash
@@ -221,16 +222,33 @@ fn is_known(node: Node<'_, '_>) -> bool {
     }
 }
 
-/// Parses `xml`, refusing a document type declaration.
+/// The most nodes the reading reads of one document: 8,388,608 (2^23),
+/// three times the 2,703,416 nodes of the largest member of release 119-142,
+/// `usc42.xml` of 113,748,800 bytes. A node is an element, a run of text, a
+/// comment or a processing instruction; attributes are not nodes.
+pub(crate) const NODES_LIMIT: u32 = 1 << 23;
+
+/// Parses `xml`, refusing a document type declaration and a document of
+/// more than [`NODES_LIMIT`] nodes.
 pub(crate) fn parse(xml: &str) -> Result<Document<'_>, IngestError> {
+    parse_with_limit(xml, NODES_LIMIT)
+}
+
+/// [`parse`], with `limit` as the most nodes.
+fn parse_with_limit(xml: &str, limit: u32) -> Result<Document<'_>, IngestError> {
     let options = ParsingOptions {
         allow_dtd: false,
+        nodes_limit: limit,
         ..ParsingOptions::default()
     };
     Document::parse_with_options(xml, options).map_err(|error| match error {
         roxmltree::Error::DtdDetected => IngestError::new(
             "the document has a document type declaration, which the reading refuses",
         ),
+        roxmltree::Error::NodesLimitReached => IngestError::new(format!(
+            "the document holds more than {limit} nodes, the most the reading reads of one \
+             document"
+        )),
         other => IngestError::new(format!("the document is not well-formed XML: {other}")),
     })
 }
@@ -1442,6 +1460,23 @@ mod tests {
         document.doctype = "<!DOCTYPE uscDoc [<!ENTITY w \"widget\">]>\n";
         let error = refusal(&document);
         assert!(error.message().contains("declaration"), "{error}");
+    }
+
+    #[test]
+    fn a_document_of_more_nodes_than_the_reading_reads_is_refused() {
+        assert_eq!(NODES_LIMIT, 8_388_608);
+        // The root of the document, `a`, and ten `b`: twelve nodes.
+        let text = format!("<a>{}</a>", "<b/>".repeat(10));
+        assert!(parse_with_limit(&text, 12).is_ok());
+        let error = parse_with_limit(&text, 11).expect_err("more than eleven nodes");
+        assert_eq!(
+            error.message(),
+            "the document holds more than 11 nodes, the most the reading reads of one document"
+        );
+        // A run of text is a node; an attribute is not.
+        let text = "<a x=\"1\" y=\"2\">words<b/>more</a>";
+        assert!(parse_with_limit(text, 5).is_ok());
+        assert!(parse_with_limit(text, 4).is_err());
     }
 
     #[test]

@@ -127,7 +127,10 @@ with neither a value nor text is absent, as it is in 201 sections quoted in note
 of release 119-142; a number with a value and no text keeps the value with an empty
 shown form; a heading and a source credit with no text are absent. A number, a
 heading or a credit that holds a footnote marker keeps it, with an empty text when
-it has no other. Quoted content whose `origin` is empty has no origin.
+it has no other. Quoted content whose `origin` is empty has no origin. An element that
+stands more than 64 deep in its module (the element of a unit or a container at depth 1,
+a unit or container that is a member of a container beginning a module of its own), and
+a container more than 64 deep among the containers of its file, are refused.
 
 | Key | Count |
 | --- | --- |

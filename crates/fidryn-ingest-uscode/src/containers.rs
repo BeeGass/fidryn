@@ -31,7 +31,8 @@
 //!
 //! An identifier that holds `~`, the character only the reading adds, is
 //! refused, and so is a release in which two elements would end with one
-//! address.
+//! address. Before the outline is made, a document nested deeper than
+//! [`MAX_NESTING`] in a module, or in its containers, is refused.
 
 use crate::definitions;
 use crate::notes;
@@ -59,6 +60,13 @@ pub(crate) const CONTAINER_TAGS: [&str; 13] = [
     "compiledAct",
     "reorganizationPlans",
 ];
+
+/// The deepest an element may stand in its module, the element of its unit
+/// or container standing at 1, and the deepest a container may stand among
+/// the containers of its file, the top container standing at 1: the limit of
+/// nesting of a module in the grammar of edition 2, `MAX_NESTING` of
+/// `fidryn_syntax::e2`.
+pub(crate) const MAX_NESTING: usize = 64;
 
 /// Whether a child of a container is a unit (`Some(true)`) or a container
 /// (`Some(false)`); `None` when it is neither.
@@ -192,11 +200,64 @@ pub(crate) struct Outline {
     pub(crate) entries: Vec<Entry>,
 }
 
-/// The outline of the document whose top container is `top`.
+/// The outline of the document whose top container is `top`, once its
+/// nesting is checked ([`nesting`]).
 pub(crate) fn outline(top: Node<'_, '_>) -> Result<Outline, IngestError> {
+    nesting(top)?;
     let mut entries = Vec::new();
     visit(top, None, false, &mut entries)?;
     Ok(Outline { entries })
+}
+
+/// Refuses, before anything below the top container `top` is read, the
+/// first element in document order that stands more than [`MAX_NESTING`]
+/// deep in its module, and the first container that stands more than
+/// [`MAX_NESTING`] deep among the containers of its file. The element of a
+/// unit or a container stands at depth 1 of its module, and each element
+/// inside it one deeper than its parent, except the units and containers
+/// that are members of a container, which begin modules of their own; the
+/// top container stands at depth 1 among the containers, and a container
+/// that is a member of another one deeper. A module holds no block deeper
+/// than the elements it is read from, so a module the reading writes is
+/// never deeper than the grammar of edition 2 reads; and no reading of a
+/// document goes deeper than these limits.
+fn nesting(top: Node<'_, '_>) -> Result<(), IngestError> {
+    // Each element still to be looked at, with its depth in its module, the
+    // depth among the containers of the container nearest it, and whether
+    // it is the element of a container.
+    let mut waiting = vec![(top, 1, 1, true)];
+    while let Some((node, depth, containers, container)) = waiting.pop() {
+        if container && containers > MAX_NESTING {
+            return Err(IngestError::at(
+                node,
+                format!(
+                    "<{}> stands {containers} containers deep in its file, deeper than the \
+                     {MAX_NESTING} the reading reads",
+                    uslm::tag(node)
+                ),
+            ));
+        }
+        if depth > MAX_NESTING {
+            return Err(IngestError::at(
+                node,
+                format!(
+                    "<{}> stands {depth} deep in its unit or container, deeper than the \
+                     {MAX_NESTING} the reading reads",
+                    uslm::tag(node)
+                ),
+            ));
+        }
+        let children: Vec<Node<'_, '_>> = node.children().filter(Node::is_element).collect();
+        // Pushed in reverse, so that they are looked at in document order.
+        for child in children.into_iter().rev() {
+            waiting.push(match class_in_container(child) {
+                Some(false) if container => (child, 1, containers + 1, true),
+                Some(true) if container => (child, 1, containers, false),
+                _ => (child, depth + 1, containers, false),
+            });
+        }
+    }
+    Ok(())
 }
 
 /// Adds the unit or container `node`, and for a container the units and
@@ -673,6 +734,88 @@ mod tests {
                 (Counts::of(&modules).units, Counts::of(&modules).containers),
                 "{name}"
             );
+        }
+    }
+
+    #[test]
+    fn an_element_nested_deeper_than_a_module_holds_is_refused() {
+        // The section stands at depth 1 of its module, so the content inside
+        // `levels` levels stands at `levels + 2`.
+        let nested = |levels: usize, inner: &str| {
+            format!(
+                "{}{inner}{}",
+                "<level>".repeat(levels),
+                "</level>".repeat(levels)
+            )
+        };
+        let content = "<content>A widget is red.</content>";
+        let modules = Document::with_section(&nested(MAX_NESTING - 2, content))
+            .read()
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(crate::testing::Counts::of(&modules).provisions, 63);
+        for (levels, inner, element) in [
+            (MAX_NESTING - 1, content, "content"),
+            (5000, content, "level"),
+            (
+                0,
+                &format!(
+                    "<content>{}A widget{}</content>",
+                    "<b>".repeat(70),
+                    "</b>".repeat(70)
+                ),
+                "b",
+            ),
+        ] {
+            let error = refusal(&Document::with_section(&nested(levels, inner)));
+            assert!(
+                error.message().ends_with(
+                    "deep in its unit or container, deeper than the 64 the reading reads"
+                ),
+                "{levels}: {error}"
+            );
+            assert_eq!(error.element(), Some(element), "{levels}: {error}");
+            assert_eq!(error.identifier(), Some("/us/usc/t99/s1"), "{levels}");
+        }
+        // The notes of a container are counted from the container: the
+        // chapter stands at 1, its `notes` at 2, the note at 3 and its `p` at
+        // 4, so the 61st `b` in it stands at 65.
+        let error = refusal(&Document::with_body(format!(
+            "<chapter identifier=\"/us/usc/t99/ch1\"><notes type=\"uscNote\"><note \
+             topic=\"miscellaneous\"><heading>Deep</heading><p>{}A widget{}</p></note></notes>\
+             </chapter>",
+            "<b>".repeat(61),
+            "</b>".repeat(61)
+        )));
+        assert!(error.message().contains("stands 65 deep"), "{error}");
+        assert_eq!(error.identifier(), Some("/us/usc/t99/ch1"));
+    }
+
+    #[test]
+    fn a_container_nested_deeper_than_the_reading_reads_is_refused() {
+        // The title stands at depth 1 among the containers of its file, and
+        // each container in it one deeper; each container is a module of its
+        // own, whose depth is counted from 1 again.
+        let chapters = |count: usize| {
+            format!(
+                "{}<section identifier=\"/us/usc/t99/s1\"><content>Text.</content></section>{}",
+                "<chapter>".repeat(count),
+                "</chapter>".repeat(count)
+            )
+        };
+        let modules = Document::with_body(chapters(MAX_NESTING - 1))
+            .read()
+            .unwrap_or_else(|error| panic!("{error}"));
+        assert_eq!(crate::testing::Counts::of(&modules).containers, 64);
+        for count in [MAX_NESTING, 5000] {
+            let error = refusal(&Document::with_body(chapters(count)));
+            assert!(
+                error.message().ends_with(
+                    "<chapter> stands 65 containers deep in its file, deeper than the 64 the \
+                     reading reads"
+                ),
+                "{count}: {error}"
+            );
+            assert_eq!(error.element(), Some("chapter"), "{count}: {error}");
         }
     }
 

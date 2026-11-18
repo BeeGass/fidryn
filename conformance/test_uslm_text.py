@@ -720,6 +720,21 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
         document(inner="<sourceCredit>(One.)</sourceCredit><sourceCredit>(Two.)</sourceCredit>"),
         "second source credit",
     ),
+    # The section stands at depth 1 of its module, so the content inside 63 levels stands
+    # at 65; each container is a module of its own, and the title stands at depth 1 among
+    # the containers of its file.
+    "element nested 65 deep in its module": (
+        document(inner="<level>" * 63 + "<content>Text.</content>" + "</level>" * 63),
+        "<content> stands 65 deep in its unit or container, deeper than the 64 the reading",
+    ),
+    "element nested 5000 deep in its module": (
+        document(inner="<level>" * 5000 + "<content>Text.</content>" + "</level>" * 5000),
+        "<level> stands 65 deep in its unit or container, deeper than the 64 the reading",
+    ),
+    "container nested 65 deep in its file": (
+        document(body="<chapter>" * 64 + SECTION.format(inner="") + "</chapter>" * 64),
+        "<chapter> stands 65 containers deep in its file, deeper than the 64 the reading",
+    ),
     "source credit that is not the direct child of its unit": (
         document(
             inner='<subsection identifier="/us/usc/t99/s1/a"><content>Text.</content>'

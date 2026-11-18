@@ -2123,6 +2123,20 @@ A document is refused when:
 - the law a note cites first is a reference of fewer than four segments,
   or one whose second, third or fourth segment holds a character that an
   address segment cannot hold;
+- an element stands more than 64 deep in its module, or a container more
+  than 64 deep among the containers of its file: the element of a unit or a
+  container stands at depth 1 of its module and each element inside it one
+  deeper, except a unit or a container that is a member of a container,
+  which begins a module of its own, and the top container stands at depth 1
+  among the containers. 64 is the deepest nesting of a module that the
+  grammar of edition 2 reads, and a module holds no block deeper than the
+  elements it is read from, so the check never refuses a module the
+  ingester writes for its nesting; release 119-142 nests at most 17 deep in
+  a module;
+- the document holds more than 8,388,608 nodes (2^23: elements, runs of
+  text, comments and processing instructions, and not attributes), three
+  times the 2,703,416 nodes of `usc42.xml` of release 119-142, its largest
+  member;
 - a `status` is not one of the 19 values of the publisher's schema:
   `proposed`, `withdrawn`, `cancelled`, `pending`, `operational`,
   `suspended`, `renumbered`, `repealed`, `expired`, `terminated`,
@@ -2568,6 +2582,10 @@ more.
   a refusal, or a comparison of the two readings that fails, never
   altered text. The check of [the sample](#the-sample) holds the two to
   the same text on the sample.
+- The independent reading refuses the nesting the ingester refuses, by the
+  same rule, but has no bound on the number of nodes of a document: it
+  reads a document the ingester refuses for its size, given the memory,
+  about 3 GB for a member of 64 MiB of empty elements.
 - A table of contents is not imported. The lock counts it
   ([What it does not import](#what-it-does-not-import)).
 - No display citation is derived. The address is the one citation a module

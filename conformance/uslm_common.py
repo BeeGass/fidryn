@@ -35,6 +35,9 @@ XSI_SCHEMA_LOCATION = "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation
 SCHEMA_FILE = "USLM-1.0.15.xsd"
 PREFIX = "/us/usc"
 MAX_MEMBER_BYTES = 512 * 1024 * 1024
+# The deepest an element stands in its module, and a container among the containers of
+# its file: the limit of nesting of a module in the grammar of edition 2.
+MAX_NESTING = 64
 MEMBER_NAME = re.compile(r"usc[0-9]{2}[aA]?\.xml")
 
 STATUS_VALUES = frozenset(
@@ -914,11 +917,47 @@ class MemberReader:
                 for child in top:
                     if tag_of(child) != "title":
                         self.refuse("an element of main that is not a title", child)
+                    self.check_nesting(child)
                     self.read_module(child, None, place)
             elif tag == "appendix":
+                self.check_nesting(top)
                 self.read_module(top, None, place)
             else:
                 self.refuse("an element of uscDoc that is neither meta, main nor appendix", top)
+
+    def check_nesting(self, top: Element) -> None:
+        """Refuse, before the top container `top` is read, the first element in document
+        order that stands more than 64 deep in its module, and the first container that
+        stands more than 64 deep among the containers of its file.
+
+        The element of a unit or a container stands at depth 1 of its module and each
+        element inside it one deeper, but a unit or container that is a member of a
+        container begins a module of its own; the top container stands at depth 1 among
+        the containers, and a container that is a member of another one deeper."""
+        waiting: list[tuple[Element, int, int, bool]] = [(top, 1, 1, True)]
+        while waiting:
+            element, depth, containers, is_container = waiting.pop()
+            shown = tag_of(element).lstrip("?")
+            if is_container and containers > MAX_NESTING:
+                self.refuse(
+                    f"<{shown}> stands {containers} containers deep in its file, deeper than "
+                    f"the {MAX_NESTING} the reading reads",
+                    element,
+                )
+            if depth > MAX_NESTING:
+                self.refuse(
+                    f"<{shown}> stands {depth} deep in its unit or container, deeper than the "
+                    f"{MAX_NESTING} the reading reads",
+                    element,
+                )
+            for child in reversed(list(element)):
+                kind = self.classify(child) if is_container else None
+                if kind == "container":
+                    waiting.append((child, 1, containers + 1, True))
+                elif kind == "unit":
+                    waiting.append((child, 1, containers, False))
+                else:
+                    waiting.append((child, depth + 1, containers, False))
 
     def classify(self, element: Element) -> str | None:
         tag = tag_of(element)

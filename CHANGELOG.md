@@ -277,6 +277,13 @@ interchange schema versions are maintained independently of the interpreter.
   its place before it is opened, and reads it through a bound of 1 MiB; the
   files of the archive directory that the record does not list are named in
   the order of the bytes of their names.
+- The importer of the Code refuses, with the element named and before it
+  reads the document's modules, an element nested more than 64 deep in its
+  unit or container and a container more than 64 deep among the containers
+  of its file, so that it writes no module the check refuses for its
+  nesting and reads no document deeper than that; the independent reading
+  refuses the same. It refuses a document of more than 8,388,608 nodes,
+  three times the largest member of release 119-142.
 
 ## [0.2.0] - 2026-11-16
 
