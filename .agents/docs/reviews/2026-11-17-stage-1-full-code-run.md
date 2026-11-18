@@ -8,11 +8,25 @@ compared with the independent reading of `conformance/`, and committed as the
 first commit of a local law repository. It was run on 2026-11-17 (Eastern
 time), on one workstation, through the scheduler of that machine.
 
-Every number below was printed by a command whose line is given. Times and
-peaks of memory come from `/usr/bin/time -v`: "wall" is its elapsed time and
-"peak" its maximum resident set size, which is that of the largest single
-process of the command. The record holds no text of the Code beyond addresses
-and the short examples asked for.
+Every number below was printed by a command. The line of each command is
+given, or the command is named where its line is plain from the text (`cmp`,
+`sha256sum`, `grep -c`), with three exceptions: the sizes of files and
+directories (in "The import" and in "Sizes"), whose commands this record does
+not give; the run of `compare_counts.py`, which was not timed and whose log
+holds its output but not its line; and `git init`, which was not timed. Times and peaks of memory come
+from `/usr/bin/time -v`: "wall" is its elapsed time and "peak" its maximum
+resident set size, which is that of the largest single process of the command.
+The record holds no text of the Code beyond addresses and the short examples
+asked for.
+
+The short names this record uses are those of the plan of the stage,
+`.agents/docs/plans/2026-11-16-stage-1-the-code-as-a-checked-program.md`: F1
+to F16 and F7a are its "Measured facts", S1 to S16 the sections of its
+"Specification", and O-1 to O-7 its "Decisions that are the owner's". "Design
+9.5" and "design 9.6, item N" are sections of the design,
+`.agents/docs/specs/2026-11-13-law-monorepo-design.md`, and the items named in
+the tables below ("Item 1" and so on) are the acceptance items of its section
+9.6. "Task N" is a task of the plan.
 
 **Result.** Every step succeeded, and nothing in the full release showed a
 defect of the repository, so this repository changes only by this record.
@@ -31,9 +45,9 @@ defect of the repository, so this repository changes only by this record.
 
 ## Limits and the build
 
-Every run of the built binary was one job of its own, one at a time, with these
-limits: 16 threads and 16 GB from the scheduler, half an hour of wall time,
-16 GiB of address space and an hour of processor time.
+Every run of the built binary on the full release was one job of its own, one
+at a time, with these limits: 16 threads and 16 GB from the scheduler, half an
+hour of wall time, 16 GiB of address space and an hour of processor time.
 
 ```sh
 lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit --as=17179869184 --cpu=3600 -- BINARY ...
@@ -72,7 +86,11 @@ Where things are:
 - the cache of the checks: `/cache/fidryn/task-21-cache/`;
 - every large output: `/cache/fidryn/task-21/`, among them the second import,
   the two text streams, the check reports, the unresolved list and the
-  profile.
+  profile;
+- the scratch scripts of this part and the logs of every command:
+  `.agents/scratchpad/2026-11-17-stage1/work/task-21/` in the main checkout of
+  this repository on the workstation, which git ignores, so that they are in
+  no commit. "SCRATCH" below is that directory.
 
 ## The archive
 
@@ -81,7 +99,7 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
 ```
 
 - It printed `kept xml_uscAll@119-142.zip` and exited 0, both times it was run.
-  The second run, timed, took 0.10 s wall with a peak of 25 MB.
+  The second run, timed, took 0.10 s wall with a peak of 25,868 KiB.
 - It opened no connection: an archive that matches its record is kept.
 - The record `retrieval.json` (schema `fidryn.retrieval/v0.1`) says the
   archive was retrieved at 2026-11-17T22:30:11Z:
@@ -113,7 +131,7 @@ The same import was made a second time, into `/cache/fidryn/task-21/uscode-2`:
 - It printed the same line and exited 0, in 6.14 s wall with a peak of
   2,200,012 KiB.
 - `diff -r /work/projects/law-local/uscode /cache/fidryn/task-21/uscode-2`
-  printed nothing and exited 0 (0.42 s wall).
+  printed nothing and exited 0 (0.42 s wall, 15,584 KiB peak).
 - Both trees have 70,797 files and 624,035,591 bytes.
 
 The import writes the same bytes each time it runs.
@@ -155,8 +173,9 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
   `conformance/usc-counting-rules.md`.
 
 The workspace's ledger `coverage.json` (10,818 bytes) was compared with it key
-for key, and the check report with both, by `compare_counts.py`, a script kept
-outside the repository that reads the three JSON files:
+for key, and the check report with both, by `SCRATCH/compare_counts.py`, which
+takes the three JSON files as its arguments, the ledger, the profile and the
+check report, in that order. Its run was not timed:
 
 - **`baseline` equals F1** in every number: provisions, sections, sections by
   status, and the four counts of references.
@@ -205,9 +224,16 @@ The import is grouped against F1 as S9 does it:
 
 ### Where each difference comes from
 
-The differences were found element by element by a script kept outside the
-repository, `analyze_counts.py`, run like the profile (17.54 s, 734,812 KiB).
-On one parse of each file, it reads with the reading of
+The differences were found element by element by the scratch script
+`analyze_counts.py`, run like the profile. The timed command, whose first
+argument is the root of the checkout whose `conformance/` it reads, was
+
+```sh
+uv run --locked python -I SCRATCH/analyze_counts.py /work/projects/fidryn-lanes/check /library/corpora/uscode/119-142 --jobs 4
+```
+
+It took 17.54 s, with a peak of 734,812 KiB. On one parse of each file, it
+reads with the reading of
 `conformance/uslm_common.py`, the reading the `import` profile uses. It also
 counts with the rules of `baseline`, keeping for each counted element the kind
 of the outermost unit it stands in, and for each link the address it stands
@@ -392,9 +418,12 @@ lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit
 - Exit 0, 11.46 s wall, 12.4 s user, 2,423,580 KiB peak.
 - It printed 1,015,386 lines, 652,907,379 bytes.
 
-The time is twice the rehearsal's because the output went through the
-scheduler's stream to the file. Run once more with the binary writing the file
-itself inside the job, through `sh -c "BINARY text ... --json > FILE"` and the
+The time is twice that of the rehearsal (a run of the same commands made on
+the same workstation before this one, with an earlier build, whose notes are
+kept with the scratch files and not in the repository), because the output
+went through the scheduler's stream to the file. Run once more with the binary
+writing the file itself inside the job, through
+`sh -c "BINARY text ... --json > FILE"` and the
 same limits, it took 5.47 s wall with a peak of 2,426,052 KiB, and gave the
 same bytes (`cmp`).
 
@@ -405,9 +434,18 @@ lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked pytho
 - Exit 0, 23.74 s wall, 1,583,884 KiB peak.
 - It printed 652,907,379 bytes.
 
-The two outputs were compared as two sorted streams, held one line at a time.
-The script, `stream_text.py`, is kept outside the repository; it was run like
-the profile and took 4.36 s with a peak of 48,996 KiB.
+The two outputs were compared line by line, by position: the first line of one
+with the first line of the other, and so on, each pair as bytes, one line of
+each held at a time. Nothing was sorted, and no line was paired by its
+address, so the two outputs had to hold the same records in the same order.
+The scratch script `stream_text.py` did it, run like the profile; the timed
+command was
+
+```sh
+uv run --locked python -I SCRATCH/stream_text.py /cache/fidryn/task-21/text-fidryn.jsonl /cache/fidryn/task-21/text-python.jsonl
+```
+
+It took 4.36 s, with a peak of 48,996 KiB.
 
 - Each output has 1,015,386 lines.
 - 1,015,386 lines were compared, and **0 differ**. `cmp` of the two files also
@@ -429,11 +467,23 @@ are the same, record for record, over the whole Code.
 ## Definitions
 
 The `definition` blocks of all 70,794 modules were read, one module at a time,
-by `compare_definitions.py`, a script kept outside the repository (1.87 s,
-129,988 KiB). They were compared with the independent list of S10 in
-`definitions-119-142.jsonl`, paired by address and first term, and compared on
-all eight fields: `at`, `terms`, `kind`, `words`, `region`, `basis`,
-`borrowed_from` and `see_note`.
+by the scratch script `compare_definitions.py`. The timed command was
+
+```sh
+uv run --locked python -I SCRATCH/compare_definitions.py /work/projects/law-local/uscode SCRATCH/../controller/definitions-119-142.jsonl
+```
+
+It took 1.87 s, with a peak of 129,988 KiB. The definitions were compared with
+the independent list of S10, `definitions-119-142.jsonl`, paired by address
+and first term, and compared on all eight fields: `at`, `terms`, `kind`,
+`words`, `region`, `basis`, `borrowed_from` and `see_note`.
+
+The list was written by a second implementation of the rules of S10, which is
+no part of this repository and shares no code with the importer. The
+implementation, `definition_rules.py`, and the list are kept with the scratch
+files of the run, in `.agents/scratchpad/2026-11-17-stage1/work/controller/`
+of the same checkout. So this comparison cannot be made again from the
+repository alone.
 
 - The workspace has 34,329 definitions, and so does the list.
 - Every (address, first term) names one definition, and the 34,329 keys are
@@ -457,6 +507,9 @@ There was no departure to decide on either side.
 | `workspace.json` | 176 bytes |
 | cache after the checks | 70,794 entries, 283,253,854 bytes, 438,149,120 bytes on disk |
 | the law repository's `.git` after its first commit | 231,601,114 bytes |
+
+These sizes were read from the files and directories; this record does not
+give the commands that read them.
 
 **The largest unit is 42 U.S.C. 1395ww.**
 
@@ -490,7 +543,8 @@ its unit: each provision's address is its parent's followed by one segment
 git init --initial-branch=main /work/projects/law-local
 ```
 
-It printed `Initialized empty Git repository in /work/projects/law-local/.git/`.
+It printed `Initialized empty Git repository in /work/projects/law-local/.git/`,
+and was not timed.
 
 At its top it holds two files:
 
@@ -504,7 +558,8 @@ The workspace is in `uscode/`, which is the directory the import wrote.
 cd /work/projects/law-local && git add .gitattributes .gitignore uscode && git commit -q -m "/us/usc: release 119-142"
 ```
 
-- `git add` took 6.40 s with a peak of 22,408 KiB, and `git commit` 1.09 s.
+- `git add` took 6.40 s with a peak of 22,408 KiB, and `git commit` 1.09 s
+  with a peak of 21,644 KiB.
 - The commit is `218b87fb28eccc751436e5eb96d79c1cc1689d2c` on `main`, with the
   tree `a1a6ae4f425dc966e09199a89eabfcd95c3b9fde`. It holds 70,799 files: the
   two above and the 70,797 of the workspace.
@@ -533,25 +588,35 @@ two hashes as the command run on the sample of the repository
   agrees with the independent profile. The only commit is this record.
 - **S16's account of the differences is not complete**, and the record says so
   rather than name a rule S16 does not have:
-  - 395 operative references move between the groups of F1 by the rule of
-    aliases (S7, Addresses, rule 1), which neither S16 nor the paragraph
-    "Where the two differ" of `conformance/usc-counting-rules.md` names;
+  - 395 operative references move between the groups of F1 by the rule of S7
+    for identifiers that list several sections and for ranges (Addresses,
+    rule 1): 344 because their target is an alias of a section or lies below
+    one (278 and 66), and 51 because it is the first member of a list, which
+    is the section's address and not an alias, or lies below one (45 and 6).
+    Neither S16 nor, when the run was made, the paragraph "Where the two
+    differ" of `conformance/usc-counting-rules.md` named that rule;
   - 4 move by `ambiguous`, which only that paragraph names;
-  - the one unit of F4 is a provision by S7's rule of the outermost unit, which
-    S16 does not name either;
-  - S16's rule for references to containers and to units that are not
-    sections has no case in this release;
+  - the one unit of F4 is a provision by S7's rule of the outermost unit,
+    which S16 does not name either; the paragraph does ("counts the nested
+    section of a unit as one of its provisions rather than as a unit");
   - its words "and their provisions" overstate what `baseline` leaves out of
     court rules: it counts their 5,953 provisions of the nine kinds.
 
-  No number is wrong. The wording of `usc-counting-rules.md` is left as it is.
+  No number is wrong. The run left the wording of `usc-counting-rules.md` as
+  it was. Its paragraph "Where the two differ" was completed afterward, in the
+  commit `Name every rule by which the two profiles of the Code differ`, so
+  that it names a rule for each difference above.
+- **One rule of S16 has no case.** Its rule for references to containers and
+  to units that are not sections is no gap in its account, but no operative
+  reference of this release falls under it.
 - **F2 says the 20 sections without an identifier stand inside the compiled
   acts of two appendices.** 19 of them stand in the compiled acts of Title 5
   Appendix. The twentieth, `/us/usc/t18a/~level.1/~section.1`, stands in a
   generic level of Title 18 Appendix that has no identifier.
-- **The text comparison** was made on two sorted streams, which the dispatch
-  allows, not a file of the release at a time. The two outputs are equal, so
-  every file's records are.
+- **The text comparison** was made on the two whole outputs, line by line by
+  position, which the instructions of the run allowed in place of the plan's
+  "a file of the release at a time". The two outputs are equal, so every
+  file's records are.
 - **The fetch** was timed only on its second run. The first, untimed, printed
   the same line.
 - **The definitions are not yet read by a person** (design 9.5, the audit of
@@ -560,11 +625,13 @@ two hashes as the command run on the sample of the repository
   that S10 finds every definition, or that each one is right.
 - **The analysis scripts** (`compare_counts.py`, `analyze_counts.py`,
   `stream_text.py`, `compare_definitions.py`) and the logs of every command
-  are kept outside the repository, with the session's other scratch files, as
-  are the large outputs under `/cache/fidryn/task-21/`. Each script is
-  described above by what it reads and how it pairs what it compares, so that
-  the comparison can be made again from the repository's own scripts and the
-  archive.
+  are in SCRATCH, which git ignores, and the large outputs under
+  `/cache/fidryn/task-21/`; none of them is in a commit. Each script is
+  described above by what it reads and how it pairs what it compares. The
+  counts and the text can be compared again from the repository's own
+  scripts, `conformance/usc_profile.py` and `conformance/uslm_text.py`, and
+  the archive. The definitions cannot: the independent list, and the
+  implementation that wrote it, are not in the repository.
 
 # The second part: the releases replayed, the real pair, and the definition samples
 
@@ -575,7 +642,10 @@ before it as the message. The pair 119-138 to 119-142 was then held to an
 independent comparison of the publisher's XML and to three bindings, and the
 two samples of definitions were drawn. Nothing of the full Code entered this
 repository. The record keeps the form of the first part: each command, its
-time and peak from `/usr/bin/time -v`, what it printed, and what it shows.
+time and peak from `/usr/bin/time -v` where it was timed, what it printed,
+and what it shows. The lines of three scratch scripts, `check_messages.py`,
+`units_by_layer.py` and `log_table.py`, are not given; each is described by
+what it reads and what it compares.
 
 | What was asked | What the run gave |
 | --- | --- |
@@ -610,8 +680,12 @@ env CARGO_TARGET_DIR=/cache/cargo/target-lane-check lease run --cpus 16 --mem 25
   `{"name": "fidryn-ingest-uscode", "version": "0.3.0"}`, and no check warned
   `W760`.
 
-Outside the replay, each run of BINARY was one job of its own, one at a time,
-under the limits of the first part:
+Outside the replay, each run of BINARY had its own limits, those of the first
+part, and the runs were made one at a time, inside jobs of the scheduler. A
+job held one run, or several one after the other, each under its own limits:
+six for the text of the three bindings' units, three for their hashes against
+119-138, and five for the hashes against 119-142 and the two change sets with
+`--bindings`, as each is said below. A job of one run was
 
 ```sh
 lease run --cpus 16 --mem 16G --time 1h -- /usr/bin/time -v timeout 1800 prlimit --as=17179869184 --cpu=3600 -- BINARY ...
@@ -623,7 +697,10 @@ Where things are:
 - the law repository: `/work/projects/law-local/`;
 - the older release of the pair: `/work/projects/law-local-pair/119-138/`;
 - the cache of every check of this part: `/cache/fidryn/task-22-cache/`;
-- every large output: `/cache/fidryn/task-22/`.
+- every large output: `/cache/fidryn/task-22/`;
+- the scratch scripts of this part and the logs of every command:
+  `.agents/scratchpad/2026-11-17-stage1/work/task-22/` in the main checkout of
+  this repository, which git ignores, so that they are in no commit.
 
 ## The archives
 
@@ -688,7 +765,7 @@ signal.
 
 **The stop.** The replay was stopped on purpose once, in the middle of an
 import. A watcher waited until `uscode.next/workspace.json` named 119-95,
-which the importer writes first, waited 1.5 seconds and cancelled the job
+which the importer writes first, waited 1.5 seconds and canceled the job
 (at 22:24:16, Eastern time). The first run, started at 22:21:50, had
 committed 9 releases, 119-73not60 to 119-94; the ninth commit is of 22:24:12.
 What it left:
@@ -767,8 +844,8 @@ The messages were checked twice:
 
 - by the tool, as it went: each message read back from the commit object
   equals the text form `fidryn changes` printed, byte for byte;
-- afterward, by `check_messages.py`, a script kept outside the repository
-  (0.09 s, 27,884 KiB). For each commit it reads the message from the commit
+- afterward, by the scratch script `check_messages.py` (0.09 s,
+  27,884 KiB). For each commit it reads the message from the commit
   object, and the change set from `changes/<release>.json` of the commit's
   own tree. It writes the text form of that change set by the layout of
   `docs/law-modules.md` ("The two forms"), and compares bytes. All 27 are
@@ -812,7 +889,10 @@ changed.
 
 The largest change set is the first, 119-73not60 to 119-73: 1,235 provisions
 added, 751 removed and 1,512 amended in text, with the largest message, as
-the rehearsal found. 119-100 and 119-136 changed nothing but notes.
+the rehearsal of the replay found (a replay made before this one with an
+earlier build, into a scratch directory; its notes are kept with the scratch
+files and not in the repository). 119-100 and 119-136 changed nothing but
+notes.
 
 ### The last release against the first import
 
@@ -845,8 +925,8 @@ the first part, and so are its lock and its ledger.
 ### Every pair of the replay, compared independently
 
 Each of the 26 change sets the replay committed was held to the independent
-comparison of its two archives, one pair after the other, by a scratch
-script kept outside the repository, `compare_pairs.sh`. For each pair it runs
+comparison of its two archives, one pair after the other, by the scratch
+script `compare_pairs.sh`. For each pair it runs
 
 ```sh
 uv run --locked python -I conformance/usc_compare.py /library/corpora/uscode/OLDER /library/corpora/uscode/NEWER --against /work/projects/law-local/changes/NEWER.json --jobs 8
@@ -917,13 +997,12 @@ The count of each list:
 | `stale_bindings` | (no `--bindings`) | 0 |
 
 These are the counts Task 20 measured on the same pair. By unit, from the
-lists, with a scratch script kept outside the repository
-(`units_by_layer.py`):
+lists, with the scratch script `units_by_layer.py`:
 
 - **10 units have a change in operative text.** F10 counts 9, its four
   amendments proper (11 U.S.C. 109 and 1182, 26 U.S.C. 7803, 42 U.S.C. 1395m)
-  among them. The tenth is 26 U.S.C. 45Y, where a link was taken off the
-  words "section 661 of title 49" and the words stayed. By S15 a link is part
+  among them. The tenth is 26 U.S.C. 45Y, where a link was taken off words of
+  `/us/usc/t26/s45Y/g/11/B/i` and the words stayed. By S15 a link is part
   of a provision's own words, so 45Y/g/11/B/i is `amended_text`, as Task 20
   found. 26 U.S.C. 527 and 6049 are `amended_text` only because a bare
   superscript came with a new footnote marker, which F7a counts as text.
@@ -942,9 +1021,9 @@ Each was chosen from the change set, and its text read on both sides with
 
 | Binding | Address | Why |
 | --- | --- | --- |
-| `chapter_13_debt_limits` | `/us/usc/t11/s109/e` | It is in `operative.amended_text`, and a law amended its words: the limits of chapter 13, `$250,000` of unsecured and `$750,000` of secured debts, became one limit of `$2,750,000`. 11 U.S.C. 109 is one of the four amendments proper of F10, and the change is not a footnote's superscript. |
-| `small_business_debtor` | `/us/usc/t11/s101/51D` | 11 U.S.C. 101 changed only in its enacted notes: a note "Short Title of 2026 Amendment", of Pub. L. 119–142, was added. Its paragraph (51D) is unchanged. |
-| `governmental_excess_benefit_arrangements` | `/us/usc/t26/s457/e/14` | 26 U.S.C. 457 changed only in editorial matter: a footnote ("See References in Text note below.") and its marker in this paragraph were added, and its editorial note "References in Text" now stands under Pub. L. 107–16, with a second paragraph on the subsection (c) that (e)(14) refers to. The words of (e)(14) are unchanged, so the binding stands in the very provision whose footnote marker changed. |
+| `chapter_13_debt_limits` | `/us/usc/t11/s109/e` | It is in `operative.amended_text`, and a law amended its words: the limits of debt for chapter 13. 11 U.S.C. 109 is one of the four amendments proper of F10, and the change is not a footnote's superscript. |
+| `small_business_debtor` | `/us/usc/t11/s101/51D` | 11 U.S.C. 101 changed only in its enacted notes: a statutory note of Pub. L. 119–142 was added. Its paragraph (51D) is unchanged. |
+| `governmental_excess_benefit_arrangements` | `/us/usc/t26/s457/e/14` | 26 U.S.C. 457 changed only in editorial matter: a footnote that points to an editorial note was added, with its marker in this paragraph, and its editorial note "References in Text" now stands under Pub. L. 107–16, with a second paragraph on the subsection (c) that (e)(14) refers to. The words of (e)(14) are unchanged, so the binding stands in the very provision whose footnote marker changed. |
 
 The hashes were printed against the older release:
 
@@ -1133,8 +1212,9 @@ of `encodings/` and this one.
   `conformance/test_replay_order.py` hold the replacement to its conditions
   and the reading of a history to the commits it names; they make no commit.
 - **The near-miss population is not F14's**, for the reasons above. It is the
-  population the brief names, counted from the text records.
+  population the plan's Task 22 names, counted from the text records.
 - **The scripts** `units_by_layer.py`, `check_messages.py`, `log_table.py`
-  and `compare_pairs.sh`, and the logs of every command, are kept outside the
-  repository with the session's other scratch files. The large outputs are
-  under `/cache/fidryn/task-22/`.
+  and `compare_pairs.sh`, and the logs of every command, are in
+  `.agents/scratchpad/2026-11-17-stage1/work/task-22/` of the main checkout,
+  which git ignores, so that none of them is in a commit. The large outputs
+  are under `/cache/fidryn/task-22/`.
