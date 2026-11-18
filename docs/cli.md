@@ -687,14 +687,23 @@ addresses still runs over every member the archive directory holds,
 whichever titles are chosen, so an address does not depend on the
 selection.
 
+An earlier output of the command is a generated workspace of the prefix
+`/us/usc` whose `.fr` files are each a module of edition 2 whose address
+lies below the prefix and which stands at the path of its address. A run
+reads the head of every `.fr` file of `DIR`, its marker and the address
+after `module`, in its first 64 KiB, before it writes anything, and
+removes only such modules.
+
 `--verify` compares `workspace.json`, `law.lock.json`, `coverage.json`
 and every module file of `DIR` with what the run would write. Every other
 entry that a run would refuse is extra: a file other than a module and
-those three at the top, and a symbolic link or any other entry that is
-neither a file nor a directory. Only the entries whose name begins with a
-dot are not looked at. It writes nothing, `DIR` included. A run stopped
-after the lock and before the ledger leaves a workspace that `fidryn check`
-accepts, since no check reads the ledger, and `--verify` reports it as
+those three at the top, a symbolic link or any other entry that is
+neither a file nor a directory, and a `.fr` file that is no earlier output,
+which is different instead where the run writes a module. Only the entries
+whose name begins with a dot are not looked at. It writes nothing, `DIR`
+included. A run stopped after the lock and before the ledger leaves a
+workspace that `fidryn check` accepts, since no check reads the ledger,
+and `--verify` reports it as
 `missing coverage.json`, or `different coverage.json` when the ledger is
 that of an earlier run.
 
@@ -723,7 +732,9 @@ document, the element, the line it starts on and the nearest identifier.
 A title that no member holds is reported, by the designation given,
 before anything is written. A directory that holds anything other than an
 earlier output of the command is refused with what it holds, and nothing
-in it is changed. With `--verify`, each path under `DIR` that differs is
+in it is changed: every `.fr` file that is no earlier output is named, a
+file of the first edition, a module of another prefix and a module at
+another path among them. With `--verify`, each path under `DIR` that differs is
 printed to stdout, relative to `DIR`, in the byte order of the paths,
 after the word that says how: `missing`, `extra` or `different`. The exit
 status is 1:

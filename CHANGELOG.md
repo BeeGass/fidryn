@@ -240,6 +240,11 @@ interchange schema versions are maintained independently of the interpreter.
   one trusts can write; a cache named inside a workspace with
   `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache` that
   a workspace carries is otherwise not read.
+- `fidryn ingest uscode --out DIR` writes only over an earlier output of
+  itself: before it writes anything it reads the head of every `.fr` file
+  of `DIR`, and refuses the directory, naming each, for a file of the first
+  edition, a module of another prefix and a module at another path; it
+  removes only modules of an earlier run.
 
 ## [0.2.0] - 2026-11-16
 

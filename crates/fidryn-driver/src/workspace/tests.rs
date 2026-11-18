@@ -5,7 +5,7 @@
 use super::cache::Cache;
 use super::discover::walk;
 use super::{
-    CheckOptions, CoverageError, DependencyInterfaces, GeneratedWriter, Unresolved,
+    CheckOptions, CoverageError, DependencyInterfaces, Difference, GeneratedWriter, Unresolved,
     UnresolvedCitation, WorkspaceReport, WriteError, check_interfaces, check_workspace,
     read_coverage,
 };
@@ -613,6 +613,108 @@ fn the_writer_removes_what_is_gone_and_refuses_a_foreign_directory() {
         "{error}"
     );
     assert_eq!(tree(curated.path()), before);
+}
+
+#[test]
+fn a_writer_refuses_a_module_file_no_run_of_its_prefix_wrote_and_removes_nothing() {
+    let scratch = Scratch::new("foreign-modules");
+    write_workspace(scratch.path(), &demo_models());
+    // An earlier output whose head stands after a comment longer than the
+    // first bytes the writer reads is still one: the run writes it again.
+    let s3 = read(scratch.path(), "zz/demo/t1/s3.fr");
+    let comment = format!("// {}\n", "An invented comment. ".repeat(60));
+    put(
+        scratch.path(),
+        "zz/demo/t1/s3.fr",
+        &format!("{comment}{s3}"),
+    );
+    // Files of other kinds, each of which no run of the prefix wrote; the
+    // last holds a module whose head lies further than a writer looks.
+    let far = format!(
+        "// {}\nedition 2\nmodule \"/zz/demo/t1/s5\" {{\n}}\n",
+        "An invented comment. ".repeat(4000)
+    );
+    let foreign = [
+        (
+            "zz/demo/t1/old.fr",
+            "module Demo.Old version \"0.1.0\" {\n}\n",
+            "which is no module of edition 2",
+        ),
+        (
+            "zz/demo/t1/s5.fr",
+            far.as_str(),
+            "in whose first 65536 bytes no module of edition 2 begins",
+        ),
+        (
+            "zz/demo/t1/marked.fr",
+            "edition 2\n// An invented file with the marker and no module.\n",
+            "which is no module of edition 2",
+        ),
+        (
+            "zz/demo/other.fr",
+            "edition 2\nmodule \"/zz/other/x\" {\n}\n",
+            "whose module `/zz/other/x` is not below the prefix `/zz/demo`",
+        ),
+        (
+            "zz/demo/t1/s7.fr",
+            "edition 2\nmodule \"/zz/demo/t1/s8\" {\n}\n",
+            "whose module `/zz/demo/t1/s8` has the path `zz/demo/t1/s8.fr`",
+        ),
+        (
+            "zz/demo/t1/s9.fr",
+            "edition 2 module \"no address\" {\n}\n",
+            "whose module address `no address` is no address",
+        ),
+    ];
+    for (rel, text, _) in foreign {
+        put(scratch.path(), rel, text);
+    }
+    let before = tree(scratch.path());
+    let error = refused(scratch.path(), demo_manifest());
+    let WriteError::Foreign { found, .. } = &error else {
+        panic!("{error}");
+    };
+    for (rel, _, why) in foreign {
+        assert!(found.contains(&format!("`{rel}`, {why}")), "{rel}: {found}");
+    }
+    assert!(!found.contains("s3.fr"), "{found}");
+    assert_eq!(tree(scratch.path()), before);
+
+    // A comparing writer reports each of them, so that `--verify` and a run
+    // agree: a file where the run writes nothing is extra.
+    let writer = GeneratedWriter::compare(scratch.path(), demo_manifest())
+        .unwrap_or_else(|error| panic!("{error}"));
+    for model in &demo_models() {
+        writer
+            .write(model)
+            .unwrap_or_else(|error| panic!("{error}"));
+    }
+    let compared = writer.finish(
+        generator(),
+        artifacts(),
+        AddressCounts::default(),
+        NotImported::default(),
+    );
+    let differences = match compared {
+        Err(WriteError::Differs { differences, .. }) => differences,
+        other => panic!("{other:?}"),
+    };
+    for (rel, _, _) in foreign {
+        assert!(
+            differences.contains(&(rel.to_owned(), Difference::Extra)),
+            "{rel}: {differences:?}"
+        );
+    }
+    assert_eq!(tree(scratch.path()), before);
+
+    // Without them, the run accepts the directory and writes the module
+    // after the comment again.
+    for (rel, _, _) in foreign {
+        fs::remove_file(scratch.join(rel)).expect("remove a file");
+    }
+    write_workspace(scratch.path(), &demo_models());
+    assert_eq!(read(scratch.path(), "zz/demo/t1/s3.fr"), s3);
+    assert_eq!(check(scratch.path()).diagnostics, []);
 }
 
 #[test]

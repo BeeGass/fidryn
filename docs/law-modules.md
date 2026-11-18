@@ -741,10 +741,17 @@ An importer writes a generated workspace with
   a generated workspace of the same prefix. Such a directory may also hold
   its [coverage ledger](#the-coverage-ledger), `coverage.json`, at its top,
   which the run writes again, and anywhere any entry whose name begins with
-  a dot, which the run leaves as they are. Any other directory, a curated
-  workspace, a generated workspace of another prefix and one that holds a
-  symbolic link of another name among them, is refused, and nothing in it
-  is changed. `create` writes `workspace.json` at once, through a temporary
+  a dot, which the run leaves as they are. Each of its `.fr` files must be
+  the output of an earlier run: a module of edition 2 whose address lies
+  below the prefix and which stands at the path of its address. `create`
+  reads the head of each, the first significant tokens up to the brace
+  after the module's address, which must lie in its first 64 KiB, before
+  it writes anything. Any other
+  directory, a curated workspace, a generated workspace of another prefix,
+  one that holds a symbolic link of another name, and one that holds a
+  `.fr` file of the first edition, a module of another prefix or a module
+  at another path among them, is refused, with every such `.fr` file named,
+  and nothing in it is changed. `create` writes `workspace.json` at once, through a temporary
   file like every file of the run, and clears the temporary files that an
   earlier run which was stopped left behind. One entry whose name begins
   with a dot is the writer's own and is not left alone: `.fidryn-write` at
@@ -757,8 +764,9 @@ An importer writes a generated workspace with
   at once, and it fails when the run has already written a module to that
   path, so that no module replaces another.
 - `finish(generator, artifacts, addresses, not_imported)` removes every
-  `.fr` file the run did not write, and each directory that leaves empty,
-  then writes `law.lock.json`, then, last, `coverage.json`, the
+  module of an earlier run, found by `create`, that the run did not write,
+  and each directory that leaves empty, then writes `law.lock.json`, then,
+  last, `coverage.json`, the
   [coverage ledger](#the-coverage-ledger) counted from the interfaces of
   the modules it wrote, the manifest and the lock, and returns the lock.
   Nothing is read again to count the ledger: neither the text of the
@@ -770,7 +778,9 @@ An importer writes a generated workspace with
   extra every `.fr` file of `out` that the run did not write and every
   entry that `create` refuses: a file other than a module, the manifest,
   the lock and the ledger at the top, and a symbolic link or any other
-  entry that is neither a file nor a directory. The two follow one rule, so
+  entry that is neither a file nor a directory. A `.fr` file that `create`
+  refuses for its head is extra where the run writes nothing, and
+  different where it writes a module. The two follow one rule, so
   they cannot disagree. Only the entries whose name begins with a dot are
   not looked at. `finish` returns the lock when
   nothing differs, and then `create` accepts the directory and a run of the
@@ -2413,6 +2423,11 @@ more.
   dependency, and not what lies below the cache's directory. When a
   symbolic link there, such as a `v1` that leads into a dependency, is
   followed, the check writes its entries inside the dependency.
+- The writer of a generated workspace tells an earlier output from another
+  `.fr` file by its head alone. A module of the prefix at its own path
+  whose head lies past its first 64 KiB, after comments, is refused,
+  though the check would read it; and a module that a person changed below
+  its head is an earlier output, which a run writes again or removes.
 - A check that is killed while it writes an entry of the cache leaves the
   temporary file of the entry, whose name begins with a dot and ends in
   `.tmp`, in the cache. Nothing reads it, and nothing removes it.

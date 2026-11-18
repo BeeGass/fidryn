@@ -1158,6 +1158,63 @@ fn ingest_refuses_a_directory_that_is_not_its_own() {
 }
 
 #[test]
+fn ingest_refuses_a_workspace_that_holds_a_module_file_it_did_not_write() {
+    // A generated workspace of the importer's prefix, and two `.fr` files
+    // that no run wrote: one of the first edition, and a module of edition 2
+    // of another prefix in a directory of the workspace. Both are invented.
+    let scratch = Scratch::new("foreign-modules");
+    let archives = scratch.join("archives");
+    one_archive(&archives, fixture_members("two-files"));
+    let out = scratch.join("out");
+    succeeded(&ingest(&archives, &out, &[]), "the first run");
+    let mine = "// An invented file of the first edition.\nmodule Mine version \"0.1.0\" {\n}\n";
+    let other = "edition 2\n// An invented module of another prefix.\nmodule \"/zz/mine/x\" {\n}\n";
+    fs::write(out.join("mine.fr"), mine).expect("write");
+    fs::create_dir_all(out.join("us/usc/notes")).expect("create");
+    fs::write(out.join("us/usc/notes/x.fr"), other).expect("write");
+    let before = tree(&out);
+
+    // The check of the workspace refuses the module of another prefix.
+    let checked = check(&out);
+    assert_eq!(checked.status.code(), Some(1), "{}", stderr(&checked));
+
+    // `--verify` reports both as extra.
+    let verified = ingest(&archives, &out, &["--verify"]);
+    assert_eq!(verified.status.code(), Some(1), "{}", stderr(&verified));
+    assert_eq!(
+        stdout(&verified),
+        "extra mine.fr\nextra us/usc/notes/x.fr\n"
+    );
+
+    // A run refuses the directory, names both, and changes nothing: both
+    // files are there with their bytes.
+    let refused = ingest(&archives, &out, &[]);
+    assert_eq!(refused.status.code(), Some(1), "{}", stderr(&refused));
+    assert_eq!(stdout(&refused), "");
+    let message = stderr(&refused);
+    assert!(
+        message.contains("`mine.fr`, which is no module of edition 2"),
+        "{message}"
+    );
+    assert!(
+        message.contains(
+            "`us/usc/notes/x.fr`, whose module `/zz/mine/x` is not below the prefix `/us/usc`"
+        ),
+        "{message}"
+    );
+    assert_eq!(message.lines().count(), 1, "{message}");
+    assert_eq!(tree(&out), before);
+    assert_eq!(read(&out.join("mine.fr")), mine);
+    assert_eq!(read(&out.join("us/usc/notes/x.fr")), other);
+
+    // Without them the run is accepted again.
+    fs::remove_file(out.join("mine.fr")).expect("remove");
+    fs::remove_dir_all(out.join("us/usc/notes")).expect("remove");
+    succeeded(&ingest(&archives, &out, &[]), "a run into its own output");
+    assert_eq!(stdout(&ingest(&archives, &out, &["--verify"])), "ok\n");
+}
+
+#[test]
 fn nothing_of_the_host_reaches_the_output() {
     let scratch = Scratch::new("host");
     let first_archives = scratch.join("first/archives");

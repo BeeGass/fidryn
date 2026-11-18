@@ -9,11 +9,12 @@ use fidryn_provision::render::render;
 use fidryn_provision::workspace::{
     AddressCounts, Artifact, Generator, Lock, Manifest, NotImported, WorkspaceKind,
 };
-use fidryn_provision::{DeclSpans, Hash32, Interface, Module, interface_of};
+use fidryn_provision::{Address, DeclSpans, Hash32, Interface, Module, interface_of};
+use fidryn_syntax::{TokenKind, decode_string_literal, lex};
 use std::collections::BTreeMap;
 use std::fmt;
 use std::fs;
-use std::io;
+use std::io::{self, Read};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, PoisonError};
@@ -41,6 +42,10 @@ const SCRATCH: &str = ".fidryn-write";
 pub struct GeneratedWriter {
     out: PathBuf,
     manifest: Manifest,
+    /// The path of every module file the directory held when a writer that
+    /// writes was made, each an earlier output of a writer of the prefix,
+    /// in the byte order of the paths: the only files `finish` may remove.
+    earlier: Vec<String>,
     /// The BLAKE3 of the bytes of every module the run has written, by its
     /// path.
     written: Mutex<BTreeMap<String, Hash32>>,
@@ -122,26 +127,33 @@ impl GeneratedWriter {
     /// `out` is a directory that does not exist, which is created, one that
     /// holds nothing but entries whose name begins with a dot, or one whose
     /// `workspace.json` is the manifest of a generated workspace of the same
-    /// prefix. Such a directory may hold, besides the `.fr` files and the
-    /// manifest, the lock and the ledger `coverage.json` at its top, which
-    /// the run writes again, and, anywhere, any file, directory or symbolic
-    /// link whose name begins with a dot, which the run leaves as they are.
-    /// Any other directory is refused, and nothing in it is changed.
+    /// prefix. Such a directory may hold, besides the module files of an
+    /// earlier run and the manifest, the lock and the ledger `coverage.json`
+    /// at its top, which the run writes again, and, anywhere, any file,
+    /// directory or symbolic link whose name begins with a dot, which the
+    /// run leaves as they are. A module file of an earlier run is a module of
+    /// edition 2 whose address lies below the prefix and which stands at the
+    /// path of its address; every `.fr` file is examined, by its head,
+    /// before anything is written. Any other directory, one that holds a
+    /// `.fr` file of the first edition, a module of another prefix or a
+    /// module at another path among them, is refused with every such file
+    /// named, and nothing in it is changed.
     /// `manifest` is of kind `generated`, has a release and has no
     /// dependencies; it is written at once, so that a run that stops before
     /// its end leaves a directory the next run accepts.
     pub fn create(out: &Path, manifest: Manifest) -> Result<GeneratedWriter, WriteError> {
         refuse_manifest(&manifest)?;
-        match fs::metadata(out) {
+        let earlier = match fs::metadata(out) {
             Err(error) if error.kind() == io::ErrorKind::NotFound => {
                 fs::create_dir_all(out).map_err(|error| io_error(out, error))?;
+                Vec::new()
             }
             Err(error) => return Err(io_error(out, error)),
             Ok(metadata) if !metadata.is_dir() => {
                 return Err(io_error(out, io::ErrorKind::NotADirectory.into()));
             }
             Ok(_) => refuse_foreign(out, &manifest)?,
-        }
+        };
         let scratch = out.join(SCRATCH);
         match fs::remove_dir_all(&scratch) {
             Err(error) if error.kind() != io::ErrorKind::NotFound => {
@@ -153,6 +165,7 @@ impl GeneratedWriter {
         let writer = GeneratedWriter {
             out: out.to_owned(),
             manifest,
+            earlier,
             written: Mutex::new(BTreeMap::new()),
             interfaces: Mutex::new(BTreeMap::new()),
             next: AtomicU64::new(0),
@@ -196,6 +209,7 @@ impl GeneratedWriter {
         let writer = GeneratedWriter {
             out: out.to_owned(),
             manifest,
+            earlier: Vec::new(),
             written: Mutex::new(BTreeMap::new()),
             interfaces: Mutex::new(BTreeMap::new()),
             next: AtomicU64::new(0),
@@ -258,8 +272,9 @@ impl GeneratedWriter {
         Ok(())
     }
 
-    /// Ends the run: removes every `.fr` file the run did not write, and each
-    /// directory that leaves empty, then writes `law.lock.json`, the lock of
+    /// Ends the run: removes every module file of an earlier run, found when
+    /// the writer was made, that the run did not write, and each directory
+    /// that leaves empty, then writes `law.lock.json`, the lock of
     /// `generator`, `artifacts`, `addresses`, `not_imported` and every module
     /// the run wrote, which it returns, and last `coverage.json`, the
     /// coverage ledger of the workspace
@@ -321,10 +336,12 @@ impl GeneratedWriter {
                 error: io::Error::other(why.clone()),
             });
         }
+        // A `.fr` file that came after the writer was made was not examined,
+        // and is left for the check to report.
         for rel in found
             .modules
             .iter()
-            .filter(|rel| !modules.contains_key(*rel))
+            .filter(|rel| !modules.contains_key(*rel) && self.earlier.binary_search(*rel).is_ok())
         {
             let file = self.out.join(rel);
             fs::remove_file(&file).map_err(|error| io_error(&file, error))?;
@@ -475,8 +492,12 @@ fn refuse_manifest(manifest: &Manifest) -> Result<(), WriteError> {
 /// `Err` when the directory `out` holds anything but a generated workspace of
 /// the prefix of `manifest`, and what a run keeps beside it. Entries whose
 /// name begins with a dot are not the workspace's and are not looked at, so
-/// a directory that holds nothing else counts as empty.
-fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
+/// a directory that holds nothing else counts as empty. Every `.fr` file is
+/// examined before anything is written: one that is not an earlier output
+/// of a writer of the prefix ([`not_written_here`]) is refused, each such
+/// file named. `Ok` with the path of every module file found, the earlier
+/// outputs, which are all that [`GeneratedWriter::finish`] may remove.
+fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<Vec<String>, WriteError> {
     let mut names = Vec::new();
     for entry in fs::read_dir(out).map_err(|error| io_error(out, error))? {
         let entry = entry.map_err(|error| io_error(out, error))?;
@@ -486,7 +507,7 @@ fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
         }
     }
     if names.is_empty() {
-        return Ok(());
+        return Ok(Vec::new());
     }
     names.sort();
     let path = out.join(MANIFEST_FILE);
@@ -523,12 +544,164 @@ fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
         });
     }
     match strays(&found).next() {
-        Some((rel, Stray::Special)) => Err(foreign(
-            out,
-            format!("`{rel}`, which is neither a file nor a directory"),
-        )),
-        Some((rel, Stray::File)) => Err(foreign(out, format!("`{rel}`"))),
-        None => Ok(()),
+        Some((rel, Stray::Special)) => {
+            return Err(foreign(
+                out,
+                format!("`{rel}`, which is neither a file nor a directory"),
+            ));
+        }
+        Some((rel, Stray::File)) => return Err(foreign(out, format!("`{rel}`"))),
+        None => {}
+    }
+    let mut refused = Vec::new();
+    for rel in &found.modules {
+        let path = out.join(rel);
+        let head = head_of(&path).map_err(|error| io_error(&path, error))?;
+        if let Some(why) = not_written_here(rel, &head, &manifest.prefix) {
+            refused.push(format!("`{rel}`, {why}"));
+        }
+    }
+    if refused.is_empty() {
+        return Ok(found.modules);
+    }
+    Err(foreign(out, listed(&refused)))
+}
+
+/// `items` as one list: `a`, `a and b`, or `a, b and c`.
+fn listed(items: &[String]) -> String {
+    match items {
+        [] => String::new(),
+        [one] => one.clone(),
+        [first @ .., last] => format!("{} and {last}", first.join(", ")),
+    }
+}
+
+/// Why the module file `rel`, whose head is `head` ([`head_of`]), is not an
+/// earlier output of a writer of the prefix `prefix`, as the end of a
+/// sentence about it; `None` when it is one: a module of edition 2 whose
+/// address lies below the prefix and whose path is that of its address, as
+/// [`GeneratedWriter::write`] writes it. Only the head of the file is read:
+/// a file that one run wrote and a person then changed below its head is an
+/// earlier output, which a run writes again or removes.
+fn not_written_here(rel: &str, head: &Head, prefix: &Address) -> Option<String> {
+    let declared = match head {
+        Head::Address(declared) => declared,
+        Head::NoModule => return Some("which is no module of edition 2".to_owned()),
+        Head::TooFar => {
+            return Some(format!(
+                "in whose first {HEAD_LIMIT} bytes no module of edition 2 begins"
+            ));
+        }
+    };
+    let address = match Address::parse(declared) {
+        Ok(address) => address,
+        Err(_) => return Some(format!("whose module address `{declared}` is no address")),
+    };
+    if address == *prefix || !address.is_within(prefix) {
+        return Some(format!(
+            "whose module `{address}` is not below the prefix `{prefix}`"
+        ));
+    }
+    let path = module_path(&address);
+    (path != rel).then(|| format!("whose module `{address}` has the path `{path}`"))
+}
+
+/// What the head of a `.fr` file declares ([`head_of`]).
+enum Head {
+    /// The head of a module of edition 2, with the value of the string after
+    /// `module`.
+    Address(String),
+    /// A head that is not that of a module of edition 2, the head of every
+    /// file of the first edition among them.
+    NoModule,
+    /// A file whose first [`HEAD_LIMIT`] bytes hold no whole head, as no
+    /// writer writes one.
+    TooFar,
+}
+
+/// The first bytes of a module file that [`head_of`] reads: the head of
+/// every module a writer writes lies well inside them.
+const HEAD_BYTES: usize = 512;
+
+/// The most bytes of a module file that [`head_of`] reads to find its head.
+/// A writer writes no white space or comment before the head, and a file
+/// whose head lies further is no earlier output of one.
+const HEAD_LIMIT: usize = 64 * 1024;
+
+/// The first significant tokens of a module of edition 2: the marker, the
+/// word `module`, the module's address and the brace that opens its body.
+const HEAD: [(TokenKind, Option<&str>); 5] = [
+    (TokenKind::Ident, Some("edition")),
+    (TokenKind::Int, Some("2")),
+    (TokenKind::Ident, Some("module")),
+    (TokenKind::String, None),
+    (TokenKind::LBrace, None),
+];
+
+/// The head of the module file at `path`: the value of the string after
+/// `module` when its first significant tokens are [`HEAD`], as the grammar
+/// of edition 2 begins, and what it is otherwise. White space, line ends
+/// and comments are skipped, as the parser skips them.
+///
+/// Only the head is read: the first [`HEAD_BYTES`] bytes, and twice as many
+/// each time those do not hold the head and a token after it, up to
+/// [`HEAD_LIMIT`]. A token of a window is trusted only when another follows
+/// it in the window, or when the window cannot grow: at the end of the
+/// file, and at bytes that are not UTF-8.
+fn head_of(path: &Path) -> io::Result<Head> {
+    let mut file = fs::File::open(path)?;
+    let mut head = Vec::new();
+    let mut window = HEAD_BYTES;
+    loop {
+        let wanted = (window - head.len()) as u64;
+        (&mut file).take(wanted).read_to_end(&mut head)?;
+        let (text, more) = match std::str::from_utf8(&head) {
+            Ok(text) => (text, head.len() == window),
+            Err(error) => (
+                std::str::from_utf8(&head[..error.valid_up_to()]).unwrap_or_default(),
+                head.len() == window && error.error_len().is_none(),
+            ),
+        };
+        let grows = more && window < HEAD_LIMIT;
+        let tokens: Vec<_> = lex(text)
+            .into_iter()
+            .filter(|token| {
+                !matches!(
+                    token.kind,
+                    TokenKind::Whitespace
+                        | TokenKind::Newline
+                        | TokenKind::Comment
+                        | TokenKind::DocComment
+                )
+            })
+            .take(HEAD.len() + 1)
+            .collect();
+        let trusted = if more {
+            tokens.len().saturating_sub(1)
+        } else {
+            tokens.len()
+        };
+        let token_text = |at: usize| {
+            text.get(tokens[at].start as usize..tokens[at].end as usize)
+                .unwrap_or_default()
+        };
+        let differs = (0..trusted.min(HEAD.len())).any(|at| {
+            let (kind, word) = HEAD[at];
+            tokens[at].kind != kind || word.is_some_and(|word| token_text(at) != word)
+        });
+        if differs || (trusted < HEAD.len() && !more) {
+            return Ok(Head::NoModule);
+        }
+        if trusted >= HEAD.len() {
+            return Ok(match decode_string_literal(token_text(3)) {
+                Ok(address) => Head::Address(address),
+                Err(_) => Head::NoModule,
+            });
+        }
+        if !grows {
+            return Ok(Head::TooFar);
+        }
+        window *= 2;
     }
 }
 
