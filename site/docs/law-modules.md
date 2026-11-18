@@ -2625,16 +2625,50 @@ more.
 
 ### The ingester and the independent reading
 
-- The ingester and `conformance/uslm_text.py` read two forms of the
-  publisher's XML differently. A `continuation` or a `proviso` inside a
-  `content` that stands directly in a note is read by the ingester as
-  blocks of the note and refused by the independent reading. A note inside
-  a paragraph or a text part of quoted content, rather than directly in
-  the quoted content or in one of its levels, is refused by the ingester
-  and read by the independent reading. Each fails loudly when one appears:
-  a refusal, or a comparison of the two readings that fails, never
-  altered text. The check of [the sample](#the-sample) holds the two to
-  the same text on the sample.
+- The ingester and `conformance/uslm_text.py` read nine forms of the
+  publisher's XML differently. No release of 2026 holds any of them.
+  - On five of them one of the two refuses the document, so a release
+    that holds one is refused by that reading:
+    - a `continuation` or a `proviso` inside a `content` that stands
+      directly in a note, which the ingester reads as blocks of the note
+      and the independent reading refuses;
+    - a note inside a paragraph or a text part of quoted content, rather
+      than directly in the quoted content or in one of its levels, which
+      the ingester refuses and the independent reading reads;
+    - white space inside a `br`, an `img` or a column, which the ingester
+      refuses as content and the independent reading takes for none;
+    - an identifier of a unit or a container whose list has an empty
+      member, as two spaces or a space at either end make, and an
+      identifier of a provision that begins with a space, which the
+      ingester refuses as no address and the independent reading reads
+      without the empty member;
+    - a `class` attribute of a `ref` whose words are separated by a
+      white-space character that is not ASCII. The ingester splits the
+      attribute at ASCII white space only, and the independent reading at
+      any, so one of them finds the class `footnoteRef` where the other
+      does not, and one of them refuses the `ref`: as having neither an
+      `href` nor that class, or as having both.
+  - On four of them both read the document, and read it differently:
+    - a `num` or a `heading` among the words of a level of quoted content,
+      where the independent reading ends the open paragraph and the
+      ingester does not;
+    - a footnote inside a footnote, which the ingester counts as a footnote
+      of its own and the independent reading leaves out;
+    - a table of contents inside another, which the ingester counts twice
+      among the tables of contents of the lock and the independent reading
+      once; no text differs;
+    - a footnote inside the release note of a title or an appendix, which
+      the ingester keeps as a footnote of that container and the
+      independent reading leaves out with the note.
+
+    A release that holds one of these four is imported and checked without
+    a word. The difference shows only when the two readings are compared on
+    that release: what `conformance/uslm_text.py` prints for its archives
+    against what `fidryn text DIR --json` prints for its workspace, and, for
+    a table of contents, the counts of `conformance/usc_profile.py` against
+    the ledger. The check of [the sample](#the-sample) makes both
+    comparisons for the sample; neither an import nor the replay of releases
+    makes them.
 - The independent reading refuses the nesting the ingester refuses, by the
   same rule, but has no bound on the number of nodes of a document: it
   reads a document the ingester refuses for its size, given the memory,

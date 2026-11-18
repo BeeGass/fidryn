@@ -33,7 +33,12 @@ it whether the stage is merged.
   the check of the law repository, the script of item 13, the gate, the
   release check, the license check and the package build were run again on
   it. Each item says whether its verdict stands after the corrections, and
-  why.
+  why. The last commit of the stage, which holds this version of the
+  record, adds two checks the controller of the run made again with the
+  corrected scripts (the profile of item 2 and the independent comparison of
+  item 5), a count of the tables of contents that stand inside another, and
+  the list of what the two readings differ on, in the reference as here; its
+  gate is the one item 10 cites.
 
 The record holds no text of the Code beyond addresses.
 
@@ -62,9 +67,10 @@ The record holds no text of the Code beyond addresses.
 branch `fix/records`, in a commit whose parent is
 `47c9205a721739ecbe93add79aff079f7a0960e3`, which amends the plan on top of
 `b6d8b49a84729e2c83e0985d76f79654ab45ac07`, the last commit that changes
-code. The gate of item 10 ran on the tree of that commit
-with the changes of `.agents/` set aside; no step of the gate reads
-`.agents/`.
+code. Besides the records, that commit changes the section "Limits" of
+`docs/law-modules.md` and the site generated from it, and no code. The gate
+of item 10 ran on the tree of that commit before the record was given the
+gate's numbers; no step of the gate reads `.agents/`.
 
 **Two binaries.**
 
@@ -269,11 +275,23 @@ reproduced exactly by its own counting (`baseline`). The workspace's counts
 differ from them, by the rules above, for the reasons the run's record gives;
 the item asks for that explanation and it is written.
 
-It stands after the corrections. The ledger is part of the workspace, and
-the corrected build writes the same workspace for 119-142, so its counts are
-the same bytes. The profile was not run again with the corrected independent
-reading; the text that reading gives of every release of 2026 is the
-importer's, line for line (item 4).
+It stands after the corrections, on both sides of the comparison:
+
+- The ledger is part of the workspace, and the corrected build writes the
+  same workspace for 119-142, so its counts are the same bytes.
+- The profile was counted again with the corrected scripts. The controller of
+  the run ran, inside a `lease` job, from the worktree at `b6d8b49`,
+
+  ```sh
+  uv run --locked python -I conformance/usc_profile.py /library/corpora/uscode/119-142 --out /cache/fidryn/controller-compare-final/profile-119-142.json
+  ```
+
+  It exited 0, and the file is byte for byte the profile the full run kept,
+  `/cache/fidryn/task-21/profile.json`: both have the SHA-256
+  `0ae9dc9d8ec74c99aa44432c8cc2a6a37c6b545c89f90deb606462df16fc8259`
+  (`sha256sum`, and `cmp` exits 0). So the corrected reading counts what the
+  reading of the full run counted, `baseline` still reproduces F1, and
+  `import` still equals the ledger key for key.
 
 ## Item 3: every unresolved reference has a recorded reason
 
@@ -369,8 +387,9 @@ script, and with `cmp`.
 
 **Verdict: met.** It stands after the corrections, and its evidence is now
 wider than the item asks: the two readings agree on every release of the
-year, not only on 119-142. They read some forms of the XML differently that
-no release holds ("Known limits", 3).
+year, not only on 119-142. They read nine forms of the XML differently that
+no release holds, and on four of them only such a comparison shows the
+difference ("Known limits", 3).
 
 ## Item 5: the change set of a real pair, confirmed independently
 
@@ -431,11 +450,19 @@ amended, 0 moved, 4 credits and 18 footnotes changed; and no container.
 
 **Verdict: met.** It stands after the corrections. One of them changed how
 like-named notes are listed, in `fidryn changes` and in `usc_compare.py`
-alike. The 26 change sets the corrected build writes from the archives are
-the same bytes as those the replay committed (the section on the
-corrections), so the change sets the independent comparison confirmed are the
-corrected build's. The corrected `usc_compare.py` was not run again on the
-real pairs.
+alike.
+
+- The 26 change sets the corrected build writes from the archives are the
+  same bytes as those the replay committed (the section on the corrections).
+- The corrected independent comparison agrees with every one of them. For
+  each of the 26 release commits after the first on `main` of the law
+  repository, the controller of the run gave the file
+  `changes/<release>.json` of that commit to
+  `conformance/usc_compare.py OLD NEW --against FILE` on the archives of its
+  two releases, with the script of `b6d8b49`: 26 of 26 exited 0
+  (`/cache/fidryn/controller-compare-final/result.tsv`, one line for each
+  pair; the driver is `work/controller/compare26.py` with the scratch files
+  of the run). The real pair of this item is the last of them.
 
 ## Item 6: staleness
 
@@ -679,15 +706,17 @@ and memory.
 
 > 10. The existing 1,188 tests and the Stage 0 checks still pass.
 
-**The gate**, on the tree of `47c9205`, the tree of this commit with the
-changes of `.agents/` set aside, on 2026-11-18:
+**The gate**, on the tree of this commit, the last of the stage, before the
+record was given its numbers, on 2026-11-18:
 
 ```sh
 env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 16 --mem 25G --time 2h -- /usr/bin/time -v cargo xtask ci --fmt
 ```
 
-It ended with exit 0, in 1 min 51.44 s wall, with a peak of 1,332,808 KiB.
-Its log is `SCRATCH/fix1-gate.log`. In the order of its steps:
+It ended with exit 0, in 1 min 3.81 s wall, with a peak of 1,030,952 KiB.
+Its log is `SCRATCH/closing-gate.log`. `git diff` of everything outside
+`.agents/` had the same SHA-256 before and after it. In the order of its
+steps:
 
 - `cargo fmt --all -- --check` passed;
 - the Rust tests: 72 lines `test result:`, together **1,831 passed, 0
@@ -713,7 +742,10 @@ Its log is `SCRATCH/fix1-gate.log`. In the order of its steps:
 
 `~/.cache/fidryn` did not exist before the gate and did not exist after it.
 
-Then, on the same tree:
+The gate of `47c9205` before the last commit gave the same counts
+(`SCRATCH/fix1-gate.log`, 1 min 51.44 s).
+
+Then:
 
 ```sh
 env CARGO_TARGET_DIR=/cache/cargo/target-lane-model lease run --cpus 4 --mem 8G --time 30m -- cargo run -p xtask --offline -- release-check
@@ -722,12 +754,15 @@ env CARGO_TARGET_DIR=/cache/cargo/target-lane-model CARGO_NET_OFFLINE=true lease
 ```
 
 - The release check printed `release 0.3.0 (2026-11-18): workspace versions
-  and changelog verified`, exit 0.
-- The license check printed `bans ok, licenses ok, sources ok`, exit 0, and
-  warned twice `license-not-encountered`, for two licenses `deny.toml` allows
-  that no dependency has.
+  and changelog verified`, exit 0, on the tree of this commit and on
+  `47c9205`.
+- The license check, on `47c9205`, printed `bans ok, licenses ok, sources
+  ok`, exit 0, and warned twice `license-not-encountered`, for two licenses
+  `deny.toml` allows that no dependency has. `Cargo.lock`, `Cargo.toml` and
+  `deny.toml` are the same at this commit.
 - The package build refuses a tree with changes not committed, so it ran on
-  `47c9205` itself, with the changes of this record set aside: exit 0,
+  `47c9205` itself, which differs from this commit only in the section
+  "Limits" of the reference, the site and the records: exit 0,
   "Verified native package: .../fidryn-0.3.0-x86_64-unknown-linux-gnu.tar.gz",
   `Source: 47c9205a721739ecbe93add79aff079f7a0960e3`, SHA256
   `0948010775c28fcaf2e072bc2ec4dcf07e10359960768497b7c5639d0438d2b8`, BLAKE3
@@ -949,10 +984,12 @@ and stderr:
   the toolchain `0.3.0`, the version of the binary.
 - No limit was reached. The two warnings are the stale bindings of item 6,
   which do not fail a check.
-- The runs of 2026-11-17 with BINARY (`SCRATCH/script-1.out`, `.err`; and a
-  second, warm run) printed the same, but for the binary's path and the
-  cache's, and the controller's run with the same build as FINAL
-  (`/cache/fidryn/final/check-law.out`, `.err`) the same.
+- The first run of 2026-11-17 with BINARY, with an empty cache
+  (`SCRATCH/script-1.out`, `.err`), printed the same, but for the binary's
+  path and the cache's. The second, warm one (`SCRATCH/script-2.out`) printed
+  the same as the first, but for `modules: 1; from cache: 1; errors: 0;
+  warnings: 2` for `encodings`. The controller's run with the same build as
+  FINAL (`/cache/fidryn/final/check-law.out`, `.err`) ended the same way.
 - The script wrote nothing into the law repository (above).
 
 **The gate with the sample step.** The job "cargo xtask ci" of
@@ -1039,28 +1076,45 @@ and are not part of the repository.
 ### What they found
 
 No fault that changes a result on any release of the Code or on the
-committed sample. Eight faults in cases that no release holds, each shown on
-the built binary or on an invented release:
+committed sample. Eight faults in cases that no release holds. The first
+seven were each shown on the built binary or on an invented release; the
+eighth was found by reading the fixture.
 
 1. **The cache.** A check trusted a cache that by default lay inside the
    directory under check, `.fidryn-cache/`. A workspace received from someone
-   else could carry entries that made the check pass altered text: two
-   readers found it independently, one by altering an entry so that a check
-   of a changed module printed `ok`. A symbolic link of that name made the
-   check write elsewhere.
+   else, such as a clone with a committed `.fidryn-cache/`, could carry
+   entries that made `fidryn check` pass a module whose text no longer
+   matched its hashes, drop a module with no diagnostic, or hide a stale
+   binding. Two readers found it independently, each by altering an entry:
+   a check of a module whose words were changed then printed `ok` and exit
+   0, and `fidryn changes` from the unchanged workspace to it printed a
+   change set with every count 0. The module files of a dependency went
+   through the same cache, so a curated workspace from someone else could
+   make its bindings to the Code look fresh, whatever its pin said. A
+   symbolic link named `.fidryn-cache` made the check write its entries
+   outside the workspace.
 2. **The import over a directory.** `fidryn ingest uscode --out DIR` removed
    `.fr` files it had not written, where the documents said such a directory
    is refused.
 3. **The manifest and the lock** were read through symbolic links, named
-   pipes and devices, with no bound on their size; a link to a pipe made a
-   check wait for ever.
+   pipes and devices, with no bound on their size. With `workspace.json` a
+   named pipe, the check waited until something was written into the pipe.
+   With `workspace.json` a link to `/dev/zero`, the check took 4,198,936 KiB
+   of memory before it reported that it could not read the file; without a
+   limit of address space it reads until the machine runs out of memory. The
+   same held for a dependency's manifest and lock, for the manifest an import
+   examines, and for the retrieval record of an archive.
 4. **A piped input.** The check for the edition marker read the start of an
    input before its command did, which emptied an input given through a
-   pipe: a regression against 0.2.0 for anyone who pipes a module into
-   `fidryn`.
-5. **Topics and origins.** A `topic` attribute with two spaces, or an empty
-   `origin`, made the importer write a module its own check refused, and the
-   two readings read them differently.
+   pipe, `/dev/stdin` or a process substitution: a module given that way to
+   `fmt`, `check` or `inputs`, and a trace or a packet given to `explain` or
+   `file`, were read as empty. It was a regression against 0.2.0 for anyone
+   who pipes a module, a trace or a packet into `fidryn`, as an editor
+   integration does.
+5. **Topics and origins.** A `topic` attribute that was empty, that held two
+   spaces or that held a no-break space, and an empty `origin` of quoted
+   content, made the importer write a module its own check refused
+   (`E710`), and the two readings read them differently.
 6. **A reference that is both a link and a footnote marker** was read as a
    link by the importer, which put the marker's digit into the operative
    text, and as a marker by the independent reading.
@@ -1090,15 +1144,15 @@ By what they correct
 
 | Fault | Commits | The rule that now holds | Where the reference says it |
 | --- | --- | --- | --- |
-| 1 | `2997df9` Keep the cache of a check outside the workspace it checks | The default cache is `fidryn` in the user's cache directory, outside every workspace: `XDG_CACHE_HOME`, else `.cache` in `HOME`, on Windows `LOCALAPPDATA`, each only as an absolute path; when none names one, the check keeps no cache and says so once. A check reads no entry of a workspace whose name begins with a dot and follows no symbolic link in it. | `docs/law-modules.md`, "The cache"; `docs/cli.md`, `check` |
-| 2 | `fa7a0f3` Refuse to import over a directory that holds a file the importer did not write | `ingest uscode --out DIR` refuses a directory that holds a `.fr` file no earlier run could have written (no module of edition 2, of another prefix, or at another path, judged by its head), names every such file and changes nothing; it removes only modules of an earlier run. | "Writing a generated workspace" (`create`, `finish`); `docs/cli.md`, `ingest` |
+| 1 | `2997df9` Keep the cache of a check outside the workspace it checks | The default cache is `fidryn` in the user's cache directory, outside every workspace: `XDG_CACHE_HOME`, else `.cache` in `HOME`, on Windows `LOCALAPPDATA`, each only as an absolute path; when none names one, the check keeps no cache and says so once. Unless the cache is named inside the workspace, a check reads no entry of it whose name begins with a dot and follows no symbolic link in it; a cache named inside it is used like any other. | `docs/law-modules.md`, "The cache"; `docs/cli.md`, `check` |
+| 2 | `fa7a0f3` Refuse to import over a directory that holds a file the importer did not write | `ingest uscode --out DIR` refuses a directory that holds a `.fr` file no earlier run could have written (no module of edition 2, of another prefix, or at another path, judged by its head), names every such file and changes nothing; it removes only what it takes for modules of an earlier run. It judges a file by its head alone, so a module that a person changed below its head counts as an earlier output, which a run writes again or removes ("Known limits", 5). | "Writing a generated workspace" (`create`, `finish`); `docs/cli.md`, `ingest` |
 | 3 | `ffe326e` Read the manifest and the lock of a workspace only as regular files of bounded size; `9d580da` Read the retrieval record only as a regular file of bounded size | A manifest, a lock and an entry of the cache are read only from a regular file of at most 64 MiB, the retrieval record from one of at most 1 MiB; anything else in their place is refused before it is opened (an entry of the cache is a miss). | "What the checker verifies in a workspace", "What it reads", "Limits" |
 | 4 | `dcf83fe` Leave an input that is no regular file for its command to read | The command line looks for the edition marker in a regular file only; any other input, such as a pipe, is read by its command as a file of the first edition, so a module of edition 2 is read from a regular file. | "Editions"; `docs/cli.md`, `check` |
 | 5 | `6c2bf09` Read an empty topic as none and an empty origin as none, and refuse a topic with other white space | A `topic` attribute is split at U+0020 and empty members are dropped; a member that holds another white-space character is refused, naming the note; an empty `origin` is none. Both readings follow the rule. | "Notes and their layers", "What it reads", "The classes of elements" |
 | 6 | `32df3db` Refuse a reference that is both a link and a footnote marker | A `ref` with both an `href` and the class `footnoteRef` is refused, by both readings. | "What it reads" |
 | 7 | `48bef5b` Pair like-named notes by their text before comparing them by address; `b6d8b49` Say what a change set lists for a like-named note that is amended and moved | Within one module, one layer and one family of like-named notes, notes of equal hash are paired first, in the order of their addresses, a pair at two addresses being `moved`; the rest are compared by address. `usc_compare.py` pairs the same way. | "Moved provisions and notes", "Limits" |
 | 8 | `e8660af` Replace a sentence of the Code in a fixture with invented words | The fixture holds invented words of the same shape; the plan's table was amended in `47c9205`. | (a fixture of `conformance/fixtures/uslm/`) |
-| readers' smaller points | `21e1daf` Refuse a document nested or grown beyond what the importer reads; `aed288a` Correct small points of the workspace check and its help; `5e46e51` Correct small points of the importer's documents and the independent reading; `84dedeb` Correct sentences of the changelog, the README and the reference | The importer refuses an element more than 64 deep in its module, a container more than 64 deep in its file, and a document of more than 8,388,608 nodes, and the independent reading refuses the same nesting; other points are of wording and of help. | "What it reads", "Limits" |
+| readers' smaller points | `21e1daf` Refuse a document nested or grown beyond what the importer reads; `aed288a` Correct small points of the workspace check and its help; `5e46e51` Correct small points of the importer's documents and the independent reading; `84dedeb` Correct sentences of the changelog, the README and the reference | The importer refuses an element more than 64 deep in its module, a container more than 64 deep in its file, and a document of more than 8,388,608 nodes, and the independent reading refuses the same nesting. `fidryn changes` holds each module file it reads again to the BLAKE3 its check accepted, and ends with `E730` naming a file that changed after the check read it. `conformance/uslm_text.py` and `usc_profile.py` refuse an archive member whose header declares fewer bytes than its compressed stream holds. The other points are of wording and of help. | "What it reads", "Change sets", "Limits"; `conformance/README.md` |
 | the tools | `6b5910d` Close the edges of the replay tool and test it against a repository; `9bf8fe6` Keep the replay's test out of the caller's git configuration and remove a leftover partial file; `6796ee3` Hold a sample of definitions to the ledger and the records it is drawn from; `8c98aba` Follow a redirect only to the same host and bound the size of a fetched archive; `1dda1ea` Keep no token in the law repository's checkout and say why the drift job failed | The replay tool holds its repository, `uscode.next/` and its temporary files to stated conditions and is tested against a real repository; the drawing tool holds the definitions to the ledger; the fetching tool follows a redirect only to the same host over `https` and takes at most 512 MiB in one response; the workflow keeps no token in its checkouts. | `conformance/README.md`; "Limits", "Fetching"; `docs/development.md` |
 
 What a user of the tools sees change:
@@ -1113,8 +1167,12 @@ What a user of the tools sees change:
   1 MiB);
 - that a module of edition 2 is read from a regular file only;
 - what a change set lists for like-named notes;
+- that `fidryn changes` ends with `E730` when a module file changed after
+  its check read it;
 - that a check refuses a manifest or a lock that is no regular file or is
   larger than 64 MiB;
+- that `conformance/uslm_text.py` and `usc_profile.py` refuse an archive
+  member whose header understates its size;
 - that the fetching tool refuses a redirect to another host and a response
   larger than its bound.
 
@@ -1150,6 +1208,25 @@ By the controller of the run, with the release build of `b6d8b49`,
   its commits stand.
 - **The text of the two readings on every release**, with the corrected
   code: 27 of 27 equal, as item 4 says.
+- **The profile of 119-142, counted again** with `conformance/usc_profile.py`
+  of `b6d8b49`: byte for byte the profile of the full run, as item 2 says.
+- **Every change set of the law repository, held to the corrected
+  independent comparison**, `conformance/usc_compare.py --against` of
+  `b6d8b49`: 26 of 26 exited 0, as item 5 says.
+- **Tables of contents inside another**, the one form on which the two
+  readings differ only in a count and no text (see "Known limits", 3): for
+  this record, a scratch script counted, in every member of each of the 27
+  archives, the tables of contents of the publisher's namespace that stand
+  inside another,
+
+  ```sh
+  lease run --cpus 8 --mem 16G --time 2h -- /usr/bin/time -v uv run --locked python -I SCRATCH/nested_toc.py /library/corpora/uscode --jobs 8
+  ```
+
+  It exited 0 in 50.97 s and found none in any release: 58 members each,
+  from 3,266 tables of contents in 119-73not60 to 3,303 in 119-142, 0 inside
+  another (`SCRATCH/closing-nested-toc.tsv`). For 119-142, 3,303 is the
+  count of the ledger and of the profile.
 - **The script on the law repository**, with the same build, inside one
   `lease` job, `--cache-dir /cache/fidryn/final/check-cache`: exit 0, two
   workspaces, each recording the toolchain 0.3.0; `uscode` with no error and
@@ -1169,8 +1246,9 @@ Each item says so under its verdict, in short:
   repository today, with the same outputs.
 - Items 2, 5 and 8 rest on the workspaces, the ledgers and the change sets
   the build of the run wrote. The corrected build writes the same bytes for
-  every release, so they stand. The profile of item 2 and the independent
-  comparison of item 5 were not run again with the corrected scripts.
+  every release, so they stand. The other side of items 2 and 5 was made
+  again with the corrected scripts: the profile of 119-142 is the same bytes,
+  and the independent comparison agrees with all 26 change sets.
 - Item 4 stands with wider evidence: the two readings were compared on every
   release of the year, before and after the corrections.
 - Item 7 is open, as it was. The corrected drawing tool draws the same
@@ -1181,13 +1259,12 @@ Each item says so under its verdict, in short:
 
 ## Known limits
 
-Each of these is true at `47c9205`. Most are also stated, without counts of
-the whole Code, in "Limits" of `docs/law-modules.md`. The notices that
+Each of these is true at `47c9205`, and so at the commit of this record,
+which changes no code. Most are also stated, without counts of the whole
+Code, in "Limits" of `docs/law-modules.md`. The notices that
 `fidryn changes` loses are stated under `changes` in `docs/cli.md`. Stated
-here only are: the forms of the XML that the readers of the whole branch
-found read differently, and the `class` attribute; a module that begins with
-a comment of certain lengths; a `HOME` or `XDG_CACHE_HOME` inside a
-workspace; and the body of a redirect.
+here only are: a module that begins with a comment of certain lengths; a
+`HOME` or `XDG_CACHE_HOME` inside a workspace; and the body of a redirect.
 
 1. **Change sets.**
    - The credit and the footnotes of a unit that is on one side only, or that
@@ -1239,29 +1316,64 @@ workspace; and the body of a redirect.
      region. About 25 of the 34,329 definitions of release 119-142 hold the
      words of such an exception in their first 300 characters, by the count
      of the review of Task 15; this record did not count them again.
-3. **The two readings of the publisher's XML** read some forms differently,
-   and no release of 2026 holds any of them. Each is loud when it appears: a
-   refusal by one side, or a difference that a comparison of the two shows,
-   never altered text that passes unseen. The forms:
-   - a `continuation` or a `proviso` inside a `content` that stands directly
-     in a note (read by the importer, refused by the independent reading);
-   - a note inside a paragraph or a text part of quoted content (refused by
-     the importer, read by the independent reading);
-   - forms that a reader of the whole branch found, which its corrections
-     left: a `num` or a `heading` in a quoted level, which ends the open
-     paragraph in one reading only; a footnote inside a footnote; white space
-     inside `br`, `img` and a column; an identifier with an empty member of
-     a list; a table of contents inside another; a footnote inside a
-     container's release note;
-   - the `class` attribute of a reference, which the importer splits at ASCII
-     white space and the independent reading at any white space.
+3. **The two readings of the publisher's XML** read nine forms differently.
+   The reference now lists them too ("Limits", "The ingester and the
+   independent reading"). Each was taken from the code of both readings at
+   `47c9205`. They fall in two groups, and only the first is loud.
+   - **One of the two refuses the document**, so a release that holds the
+     form is refused by that reading:
+     - a `continuation` or a `proviso` inside a `content` that stands
+       directly in a note: read by the importer, refused by the independent
+       reading;
+     - a note inside a paragraph or a text part of quoted content: refused by
+       the importer, read by the independent reading;
+     - white space inside a `br`, an `img` or a column: refused by the
+       importer as content, taken for none by the independent reading;
+     - an identifier of a unit or a container whose list has an empty
+       member, as two spaces or a space at either end make, and an
+       identifier of a provision that begins with a space: refused by the
+       importer as no address, read by the independent reading without the
+       empty member. (Of a provision's identifier the importer reads the
+       first member only, so an empty member after it is no difference.)
+     - a `class` attribute of a `ref` whose words are separated by
+       white space that is not ASCII: the importer splits it at ASCII white
+       space only and the independent reading at any, so one finds the class
+       `footnoteRef` where the other does not, and one of them refuses the
+       `ref`, as having neither an `href` nor that class or as having both.
+   - **Both read the document, and read it differently.** Neither refuses
+     it, and nothing warns:
+     - a `num` or a `heading` among the words of a level of quoted content:
+       the independent reading ends the open paragraph there, the importer
+       does not;
+     - a footnote inside a footnote: the importer counts it as a footnote of
+       its own, the independent reading leaves it out;
+     - a table of contents inside another: the importer counts it twice
+       among the tables of contents of the lock, the independent reading
+       once; no text differs;
+     - a footnote inside the release note of a title or an appendix: the
+       importer keeps it as a footnote of the container, the independent
+       reading leaves it out with the note.
 
-   The importer imported all 27 releases with no refusal, and the
-   independent reading read all 27 with none; the text of the two was the
-   same on all 27 (item 4). The independent reading refuses the nesting the
-   importer refuses, but has no bound on the number of nodes of a document,
-   so it can run out of memory on a document the importer refuses for its
-   size (about 3 GB for a member of 64 MiB of empty elements).
+   No release of 2026 holds any of the nine. The importer imported all 27
+   releases with no refusal, the independent reading read all 27 with none,
+   and the text of the two was the same on all 27 (item 4); and the scratch
+   count of the section on the corrections found no table of contents inside
+   another in any of them.
+
+   What follows for whoever keeps the law repository: a new release that
+   holds a form of the second group is imported, checked and replayed
+   without a word, and the two readings differ on it. The import and the
+   check of a new release do not show such a difference. A comparison of the
+   two readings on that release does: `conformance/uslm_text.py` on its
+   archives against `fidryn text DIR --json` of its workspace, and for a
+   table of contents the counts of `conformance/usc_profile.py` against the
+   ledger. This run made the comparison of the text for all 27 releases;
+   the replay tool does not make it.
+
+   The independent reading refuses the nesting the importer refuses, but has
+   no bound on the number of nodes of a document, so it can run out of
+   memory on a document the importer refuses for its size (about 3 GB for a
+   member of 64 MiB of empty elements).
 4. **Diagnostics.** `fidryn check` prints no line or column for a diagnostic
    of a module of edition 2. `E740` carries the title `PinMismatch` also when
    a dependency fails for another reason than its pin.
@@ -1271,12 +1383,12 @@ workspace; and the body of a redirect.
      directory of the user, outside every workspace, unless the user's own
      `HOME` or `XDG_CACHE_HOME` points into a workspace; then it lies inside
      that one.
-   - When the importer examines the head of an existing module file, a
-     module that begins with a comment of certain lengths is refused as no
-     module of edition 2, and so is one whose head lies past its first
-     64 KiB. It errs toward refusing: nothing is removed, no file is taken
-     for an earlier output that is not one, and no writer writes such a
-     file.
+   - An import judges an existing module file by its head alone. A module
+     that a person changed below its head is therefore an earlier output,
+     which a run writes again or removes. A module that begins with a
+     comment of certain lengths is refused as no module of edition 2, and so
+     is one whose head lies past its first 64 KiB; there it errs toward
+     refusing: nothing is removed, and no writer writes such a file.
    - A module file name such as `s1932~2.fr` has the shape of a Windows 8.3
      short name, and on a volume that gives files short names it could be
      the short name of another file. A check that is killed while it writes
@@ -1318,14 +1430,16 @@ the two differ".
 ## What only the owner can do
 
 1. **Read the two samples of definitions, or name someone who will**
-   (decision O-3). This closes item 7. Until then it is open, and no claim
-   about the correctness of the definitions is made beyond their agreement
-   with a second implementation of the same rules.
+   (decision O-3). The reading decides item 7: it is met only if the first
+   sample has no error, and otherwise the patterns are corrected and a new
+   sample is drawn. Until then it is open, and no claim about the
+   correctness of the definitions is made beyond their agreement with a
+   second implementation of the same rules.
 2. **Push the branch.** Nothing of it has run on GitHub. The first push runs
    the gate on Ubuntu, the Rust tests on macOS and Windows (the code that
    finds the user's cache directory on Windows has never been compiled), and
-   the lint of the new workflow, which could not be run here. This closes
-   the half of item 13 on GitHub.
+   the lint of the new workflow, which could not be run here. If those jobs
+   pass, the half of item 13 on GitHub is closed.
 3. **Decide whether the stage is merged into `dev`.**
 4. **Decide the name, the visibility and the license of the law repository**
    (decision O-6). Until then it stays local at `/work/projects/law-local`,
@@ -1348,3 +1462,14 @@ the two differ".
    of the stage before it, names in its header the tooling it was written
    for. It is no reader document; whether it should say so in a public
    repository is his to decide.
+8. **Decide how the branch's history enters the public repository.** A
+   sentence taken from the Code is gone from every file of the branch, but it
+   is still in the branch's history: the abridged sentence of 1 U.S.C. 1 in
+   the fixture before `e8660af` and in the plan before `47c9205`, and the
+   four quotations in the record of the run before `71377f7`. If the branch
+   is pushed with its history, those words stand in the history of the
+   public repository outside `samples/uscode/`. They are text of a work of
+   the United States Government, and no license is at stake; the rule they
+   break is the repository's own, that the text of the Code has one place.
+   Whether the branch is merged with its history or as one commit is his to
+   decide, and this is one thing that depends on it.
