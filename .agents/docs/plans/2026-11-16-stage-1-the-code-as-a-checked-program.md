@@ -904,7 +904,7 @@ Changed files:
 
 | Path | Change |
 | --- | --- |
-| `Cargo.toml`, `Cargo.lock`, `pyproject.toml`, `uv.lock`, `.gitattributes` | Two members, three Rust and two Python dependencies, `*.zip binary` (Task 1); the version (Task 23) |
+| `Cargo.toml`, `Cargo.lock`, `pyproject.toml`, `uv.lock`, `.gitattributes` | Two members, three Rust and two Python dependencies, `*.zip binary` (Task 1); the version (Task 20b) |
 | `crates/fidryn-core/src/diagnostics.rs` | Seven codes (Task 1) |
 | `crates/fidryn-syntax/src/lib.rs` | Exports `edition` and `e2` |
 | `crates/fidryn-check/src/lib.rs`, `Cargo.toml` | Exports `e2`; depends on `fidryn-provision` |
@@ -928,10 +928,10 @@ Each task ends with the gate green on the tree it commits. "Tests" lists the tes
 | 3 | 1 | 10 | 9, 11 | 18 | 14, 17 |
 | 4 | 3 | 11 | 4b, 6 | 19 | 18 |
 | 4b | 4 | 12 | 11 | 20 | 14, 19 |
-| 5 | 1 | 13 | 12 | 21 | 16, 20 |
+| 5 | 1 | 13 | 12 | 21 | 16, 20b |
 | 6 | 4, 5 | 14 | 10, 13 | 22 | 21 |
 | 7 | 2 | 15 | 14b | 23 | 22 |
-| 14b | 14 | | | | |
+| 14b | 14 | 20b | 20 | | |
 
 So after Task 1 three lanes run side by side: Task 2 and then 7; Tasks 3, 4 and 4b; Task 5. Tasks 8 and 9 run beside Tasks 6 and 11 to 13; Task 17 may run beside Tasks 14 to 16.
 
@@ -1710,6 +1710,28 @@ impl AddressIndex {
 - [ ] Tests and fixture pairs first; implement the Rust side, then the Python side.
 - [ ] Reference section, command reference, changelog. Gate. Commit: `Report what changed between two releases and which bindings went stale`
 
+### Task 20b: The version of the release
+
+The manifest of a generated workspace records the version of the toolchain that wrote it, and its lock the version of the ingester (S11). A check under another version warns (`W760`), and the script of Task 23 fails when the law repository records a version that is not the binary's. The law repository of Tasks 21 and 22 must therefore be written by a build that calls itself 0.3.0: the version is raised here, before the full run.
+
+**Files:**
+- Modify: `Cargo.toml` (the workspace version and the versions of the internal dependencies), `Cargo.lock`
+- Modify: `CHANGELOG.md` (the notes under `[Unreleased]` become `## [0.3.0] - <date>`)
+- Modify: `conformance/fixtures/workspace/demo/` and `samples/uscode/` (regenerated, because the manifest and the lock record the version and the curated sample pins the lock), and any other committed file that a test holds to the version
+- Modify: `docs/law-modules.md` (the examples that show the version), `docs/releases.md` (what a release regenerates), `site/` (regenerated)
+
+**Interfaces:**
+- Consumes: every earlier task.
+- Produces: a build whose `fidryn --version`, manifests and locks say `0.3.0`. No rule, no hash of a module and no byte of a module file changes: of the generated files, only the lines that carry the version differ, and the digests of files that hold such a line.
+
+**Tests:**
+- `cargo run -p xtask --offline -- release-check` prints `release 0.3.0`.
+- `cargo xtask uscode-sample` passes after the regeneration.
+- No module file (`*.fr`), no `coverage.json`, no `profile.json` and no text record changes: `git diff --stat` of the commit shows it.
+
+**Steps:**
+- [ ] Raise the version; regenerate what records it, each file by its own means; fold the changelog; `docs/releases.md` names every regeneration a release needs. Gate, package build, license check and release check, as at the end of Stage 0. Commit: `Raise the version to 0.3.0`
+
 ### Task 21: The full Code, measured
 
 This task is run on this machine, through `lease`, on release 119-142. It changes the repository only where the full release shows a defect; each such change has a test and a fixture that reproduces it with invented text.
@@ -1719,7 +1741,7 @@ This task is run on this machine, through `lease`, on release 119-142. It change
 - Modify: whatever the run shows to be wrong, with tests
 
 **Interfaces:**
-- Consumes: every earlier task; the archive of 119-142. The directory `/library/corpora/uscode/119-142/` holds it with a record written by the measurement of 2026-11-16, which is not in the format of S11 and which the fetch tool does not extend: rename that directory to `119-142.measured`, fetch the release again with `tools/fetch_uscode.py 119-142 --all` into a new `/library/corpora/uscode/119-142/`, and confirm that the two archives are the same bytes. The same for `119-138` in Task 22.
+- Consumes: every earlier task, Task 20b among them: the binary of this task says `0.3.0`, and so do the manifest and the lock it writes; the archive of 119-142. The directory `/library/corpora/uscode/119-142/` holds it with a record written by the measurement of 2026-11-16, which is not in the format of S11 and which the fetch tool does not extend: rename that directory to `119-142.measured`, fetch the release again with `tools/fetch_uscode.py 119-142 --all` into a new `/library/corpora/uscode/119-142/`, and confirm that the two archives are the same bytes. The same for `119-138` in Task 22.
 - Produces: the generated workspace `/work/projects/law-local/uscode/` in a new local git repository `/work/projects/law-local/` (no remote), and the record.
 
 **Steps, each recorded with its command line, its wall-clock time and its peak memory (`/usr/bin/time -v`):**
@@ -1771,7 +1793,7 @@ Run on this machine. Nothing of the full Code enters this repository.
 - Create: `.agents/docs/reviews/<date>-stage-1-acceptance.md`
 - Modify: `xtask/src/site/guides.rs` (the reference becomes a guide, "Law modules", in the group "Write"), `site/` (regenerated)
 - Modify: `docs/law-modules.md`, `docs/language.md`, `docs/cli.md`, `docs/implementation-status.md`, `docs/ARCHITECTURE.md`, `docs/README.md`, `docs/releases.md`, `README.md`
-- Modify: `Cargo.toml`, `Cargo.lock` (version 0.3.0), `CHANGELOG.md`, `samples/uscode/` (regenerated, because the lock and the manifest record the version)
+- Modify: `CHANGELOG.md` (the notes of this task, under `## [0.3.0]`; the version was raised by Task 20b)
 
 **Interfaces:**
 - Consumes: everything; the records of Tasks 21 and 22.
@@ -1785,22 +1807,22 @@ Run on this machine. Nothing of the full Code enters this repository.
 - `docs/language.md`: one short section that says there are two editions, what the marker is, and where the reference is.
 - `docs/cli.md`: every new command and flag (each task has added its own; this task reads the whole page against `fidryn --help`).
 - `docs/ARCHITECTURE.md`: the two new crates, the direction rule, the two phases of a workspace check.
-- `docs/releases.md`: after raising the version, run `cargo xtask uscode-sample --update`.
+- `docs/releases.md`: what a release regenerates after the version is raised (written by Task 20b; read here against what was done).
 - `README.md`: what works now, in one paragraph, with the two commands a reader can run on the sample.
 - None of them describes a stage, a plan or a destination.
 
 **Tests:**
 - The site check and the documentation check pass with the new guide; every command a document shows runs within the check's limit.
 - `cargo run -p xtask --offline -- release-check` prints `release 0.3.0`.
-- `cargo xtask uscode-sample` passes after the regeneration.
+- `cargo xtask uscode-sample` passes without `--update`.
 - The workflow file passes `actionlint` (the "Workflow lint" job of CI runs it; locally, run it if it is installed and say so if it is not).
 
 **Steps:**
 - [ ] Write the acceptance record from the records of Tasks 21 and 22; mark what is open.
 - [ ] Bring the documents to the state above; regenerate the site.
-- [ ] Raise the version to 0.3.0; fold the `[Unreleased]` notes into `## [0.3.0] - <date>`; regenerate the sample.
+- [ ] The version was raised by Task 20b. Check that the law repository records it (`tools/check-law-repository.sh`), that the notes of Tasks 21 to 23 stand under `## [0.3.0]`, and that the date of that heading is the day of this commit.
 - [ ] Gate, package build, license check and release check, as at the end of Stage 0.
-- [ ] Commit: `Document law modules and label the release 0.3.0`
+- [ ] Commit: `Document law modules for release 0.3.0`
 
 After this task the controller runs the whole-branch review once, applies one round of fixes for findings that meet the review bar, and reports to the owner. Merging into `dev` and everything after it are the owner's decisions.
 
