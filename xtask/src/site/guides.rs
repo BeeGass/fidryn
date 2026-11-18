@@ -97,10 +97,19 @@ pub const GUIDES: &[Guide] = &[
         description: "Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.",
     },
     Guide {
+        slug: "coverage",
+        file: "coverage.md",
+        title: "Coverage",
+        number: Some(8),
+        group: "Read results",
+        blurb: "What the sample of the Code holds",
+        description: "The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.",
+    },
+    Guide {
         slug: "contributing",
         file: "contributing.md",
         title: "Contributing",
-        number: Some(8),
+        number: Some(9),
         group: "Contribute",
         blurb: "Toolchain, tests, commits",
         description: "Toolchain, tests, and how to work on the Fidryn reference interpreter.",
@@ -160,9 +169,9 @@ mod tests {
     }
 
     #[test]
-    fn numbered_guides_run_one_to_eight_in_order() {
+    fn numbered_guides_run_one_to_nine_in_order() {
         let numbers: Vec<u32> = GUIDES.iter().filter_map(|g| g.number).collect();
-        assert_eq!(numbers, (1..=8).collect::<Vec<u32>>());
+        assert_eq!(numbers, (1..=9).collect::<Vec<u32>>());
     }
 
     #[test]

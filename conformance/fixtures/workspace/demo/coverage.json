@@ -1,0 +1,88 @@
+{
+  "schema": "fidryn.coverage/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "totals": {
+    "units": 3,
+    "containers": 2,
+    "provisions": 3,
+    "units_by_kind": {
+      "section": 3
+    },
+    "units_by_status": {
+      "in-force": 3
+    },
+    "containers_by_kind": {
+      "chapter": 1,
+      "title": 1
+    },
+    "addresses": {
+      "aliases": 0,
+      "disambiguated": 0,
+      "assigned": 0
+    },
+    "notes": {
+      "enacted": 0,
+      "editorial": 0
+    },
+    "notes_by_group": {},
+    "footnotes": 0,
+    "with_images": 0,
+    "references": {
+      "operative": {
+        "exact": 0,
+        "target-status": 0,
+        "ambiguous": 0,
+        "unit-only": 0,
+        "range-form": 0,
+        "no-unit": 0,
+        "outside": 0,
+        "malformed": 0
+      },
+      "enacted": {
+        "exact": 0,
+        "target-status": 0,
+        "ambiguous": 0,
+        "unit-only": 0,
+        "range-form": 0,
+        "no-unit": 0,
+        "outside": 0,
+        "malformed": 0
+      },
+      "editorial": {
+        "exact": 0,
+        "target-status": 0,
+        "ambiguous": 0,
+        "unit-only": 0,
+        "range-form": 0,
+        "no-unit": 0,
+        "outside": 0,
+        "malformed": 0
+      }
+    },
+    "outside_by_body": {},
+    "definitions": {
+      "enacted": 0,
+      "restated": 0,
+      "unresolved": 0
+    },
+    "definitions_by_kind": {},
+    "not_imported": {
+      "tables_of_contents": 0,
+      "footnotes_in_tables_of_contents": 0,
+      "links_in_tables_of_contents": 0,
+      "release_notes": 0,
+      "links_without_words": 0,
+      "note_group_headings": 0
+    }
+  },
+  "by_source": [
+    {
+      "source": "demo01.xml",
+      "positive_law": true,
+      "units": 3,
+      "provisions": 3,
+      "definitions": 0
+    }
+  ]
+}

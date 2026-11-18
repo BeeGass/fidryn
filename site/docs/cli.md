@@ -659,20 +659,27 @@ workers.
 
 A run writes `workspace.json` first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
-output that it does not write, and writes `law.lock.json` last, so a run
-that is stopped leaves a directory the next run accepts. With `--title`,
+output that it does not write, and writes `law.lock.json` and then, last,
+`coverage.json`, the [coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)
+of the workspace, which [`coverage`](#coverage) prints; so a run that is
+stopped leaves a directory the next run accepts. The lock does not list
+the ledger. With `--title`,
 only the modules of those titles are written, and the lock lists the
 archives and members whose modules the run wrote. The numbering of
 addresses still runs over every member the archive directory holds,
 whichever titles are chosen, so an address does not depend on the
 selection.
 
-`--verify` compares `workspace.json`, `law.lock.json` and every module
-file of `DIR` with what the run would write. Every other entry that a run
-would refuse is extra: a file other than a module and `coverage.json` at
-the top, and a symbolic link or any other entry that is neither a file
-nor a directory. Only `coverage.json` and the entries whose name begins
-with a dot are not looked at. It writes nothing, `DIR` included.
+`--verify` compares `workspace.json`, `law.lock.json`, `coverage.json`
+and every module file of `DIR` with what the run would write. Every other
+entry that a run would refuse is extra: a file other than a module and
+those three at the top, and a symbolic link or any other entry that is
+neither a file nor a directory. Only the entries whose name begins with a
+dot are not looked at. It writes nothing, `DIR` included. A run stopped
+after the lock and before the ledger leaves a workspace that `fidryn check`
+accepts, since no check reads the ledger, and `--verify` reports it as
+`missing coverage.json`, or `different coverage.json` when the ledger is
+that of an earlier run.
 
 **Example**
 
@@ -867,6 +874,70 @@ fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 --hashes
 
 `--hashes` without `ADDRESS`, and `--hashes` with `--json`, are usage
 errors, exit 2.
+
+## `coverage`
+
+`fidryn coverage DIR` prints the coverage ledger of the generated workspace
+in `DIR`, `fidryn.coverage/v0.1`: its units, containers and provisions,
+its notes, footnotes and images, its references of each layer by outcome,
+the definitions extracted from its provisions by basis and by kind, and
+what its importer counted and did not import
+([The coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)). It computes the
+ledger from the modules as their files stand, the manifest and the lock.
+It does not verify the module files against the lock, which is what
+`fidryn check DIR` is for. Of a workspace whose files are those its run
+wrote, it prints that run's `coverage.json`, byte for byte.
+
+**Arguments**
+
+| Name | Required | Type |
+| --- | --- | --- |
+| `DIR` | yes | path to the directory of a generated workspace |
+
+**Example**
+
+```sh
+fidryn coverage conformance/fixtures/workspace/demo
+fidryn coverage samples/uscode/workspace
+```
+
+**Success.** Exit 0. It prints the ledger as JSON with two spaces of
+indentation and a final line end, its keys in their order, the JSON Schema
+of which is [schemas/coverage-v0.1.json](https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json).
+Of the demo workspace it prints first:
+
+```text
+{
+  "schema": "fidryn.coverage/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "totals": {
+    "units": 3,
+    "containers": 2,
+    "provisions": 3,
+    "units_by_kind": {
+      "section": 3
+    },
+```
+
+The output depends on the files of the workspace alone: neither the host,
+the working directory nor the number of threads the system offers changes
+a byte. The figures of the sample of the Code are on the page
+[Coverage](https://fidryn.onlygass.dev/docs/coverage.md).
+
+**Failure.** Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a curated workspace, which has no ledger, as
+``DIR holds a curated workspace, and the coverage ledger belongs to a generated workspace, whose lock records what its importer counted``;
+a directory that holds no workspace (`E730`); a generated workspace
+without a lock, with one that cannot be read, or with one whose prefix or
+release is not the manifest's (`E730`); an entry that cannot be read or is
+neither a file nor a directory (`E730`); and a module file that is not a
+module of edition 2 that lowers, with its diagnostics. The curated sample
+of the repository is refused:
+
+```sh exit=1
+fidryn coverage samples/uscode/curated
+```
 
 ## See also
 

@@ -5,8 +5,9 @@
 use super::cache::Cache;
 use super::discover::walk;
 use super::{
-    CheckOptions, DependencyInterfaces, GeneratedWriter, Unresolved, UnresolvedCitation,
-    WorkspaceReport, WriteError, check_interfaces, check_workspace,
+    CheckOptions, CoverageError, DependencyInterfaces, GeneratedWriter, Unresolved,
+    UnresolvedCitation, WorkspaceReport, WriteError, check_interfaces, check_workspace,
+    read_coverage,
 };
 use fidryn_check::e2::lower;
 use fidryn_check::e2::names::{ResolvedBinding, resolve};
@@ -546,13 +547,14 @@ fn the_writer_removes_what_is_gone_and_refuses_a_foreign_directory() {
     );
     assert_eq!(check(scratch.path()).diagnostics, []);
 
-    // A run keeps `coverage.json` at the top and every directory whose name
-    // begins with a dot.
+    // A run writes `coverage.json` at the top again, the ledger of what it
+    // wrote, and keeps every directory whose name begins with a dot.
+    let ledger = read(scratch.path(), "coverage.json");
     put(scratch.path(), "coverage.json", "{}\n");
     put(scratch.path(), ".cache/v1/entry.json", "{}\n");
     put(scratch.path(), "zz/.drafts/s9.fr", "An invented draft.\n");
     write_workspace(scratch.path(), &models);
-    assert_eq!(read(scratch.path(), "coverage.json"), "{}\n");
+    assert_eq!(read(scratch.path(), "coverage.json"), ledger);
     assert_eq!(read(scratch.path(), ".cache/v1/entry.json"), "{}\n");
     assert_eq!(
         read(scratch.path(), "zz/.drafts/s9.fr"),
@@ -1895,6 +1897,96 @@ fn the_committed_check_report_is_what_the_check_writes() {
              workspace; what it writes is in {}",
             fresh.path().display()
         );
+    }
+}
+
+/// The ledger the writer writes of a workspace, `coverage.json`, is what
+/// [`read_coverage`] counts again from its files, on any number of workers;
+/// its references are counted as the check counts them; a run stopped
+/// before the ledger leaves a workspace that checks clean; and a curated
+/// workspace, a generated one without a lock and one with a module that
+/// does not lower have no ledger.
+#[test]
+fn the_ledger_the_writer_writes_is_what_is_counted_from_the_files() {
+    let scratch = Scratch::new("ledger");
+    let out = scratch.join("outcomes");
+    let lock = write_workspace(&out, &outcome_models());
+    let written = read(&out, "coverage.json");
+    for jobs in [1, 8] {
+        let counted = read_coverage(&out, jobs).unwrap_or_else(|error| panic!("{error:?}"));
+        assert_eq!(counted.to_json(), written, "on {jobs} workers");
+    }
+    let ledger: serde_json::Value = serde_json::from_str(&written).expect("the ledger is JSON");
+    let report: serde_json::Value =
+        serde_json::from_str(&check(&out).to_json()).expect("the report is JSON");
+    assert_eq!(ledger["totals"]["references"], report["references"]);
+    assert_eq!(
+        ledger["totals"]["outside_by_body"],
+        report["outside_by_body"]
+    );
+    let modules = ledger["totals"]["units"].as_u64().expect("a count")
+        + ledger["totals"]["containers"].as_u64().expect("a count");
+    assert_eq!(modules, lock.modules.len() as u64);
+    assert_eq!(ledger["release"], "42-7");
+
+    // A run stopped after the lock and before the ledger leaves a
+    // workspace whose check does not read the ledger.
+    fs::remove_file(out.join("coverage.json")).expect("remove the ledger");
+    assert_eq!(check(&out).diagnostics, []);
+    assert_eq!(
+        read_coverage(&out, 1)
+            .unwrap_or_else(|error| panic!("{error:?}"))
+            .to_json(),
+        written
+    );
+
+    let unread = |root: &Path| match read_coverage(root, 1) {
+        Err(CoverageError::Unread(diagnostics)) => diagnostics,
+        other => panic!("{other:?}"),
+    };
+    let curated = scratch.join("curated");
+    fs::create_dir_all(&curated).expect("create a directory");
+    curated_workspace(&curated, &[]);
+    assert!(matches!(
+        read_coverage(&curated, 1),
+        Err(CoverageError::Curated)
+    ));
+    put(
+        &out,
+        "zz/demo/t1/s9.fr",
+        "edition 2\nmodule \"/zz/demo/t1/s9\" {\n",
+    );
+    let found = unread(&out);
+    assert!(
+        !found.is_empty()
+            && found
+                .iter()
+                .all(|found| found.source_file.as_deref() == Some("zz/demo/t1/s9.fr")),
+        "{found:#?}"
+    );
+    fs::remove_file(out.join("law.lock.json")).expect("remove the lock");
+    assert_diagnostic(
+        only_of(&unread(&out)),
+        DiagnosticCode::E730,
+        "law.lock.json",
+        None,
+        "has a lock",
+    );
+    fs::remove_file(out.join("workspace.json")).expect("remove the manifest");
+    assert_diagnostic(
+        only_of(&unread(&out)),
+        DiagnosticCode::E730,
+        "workspace.json",
+        None,
+        "no workspace",
+    );
+}
+
+/// The one diagnostic of `diagnostics`.
+fn only_of(diagnostics: &[Diagnostic]) -> &Diagnostic {
+    match diagnostics {
+        [diagnostic] => diagnostic,
+        other => panic!("expected one diagnostic, found {other:#?}"),
     }
 }
 

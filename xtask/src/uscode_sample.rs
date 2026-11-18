@@ -1,20 +1,24 @@
-//! Checks the pinned sample of the Code under `samples/uscode/`, seven things
-//! in this order, and fails with a message that names the first difference
-//! when one of them does not hold:
+//! Checks the pinned sample of the Code under `samples/uscode/`, eight
+//! things in this order, and fails with a message that names the first
+//! difference when one of them does not hold:
 //!
 //! 1. every archive in `archives/` has the size, the SHA-256 and the BLAKE3
 //!    that the retrieval record beside it gives, and the record names every
 //!    archive and no other;
 //! 2. `fidryn ingest uscode samples/uscode/archives --out DIR` writes into a
 //!    temporary directory, byte for byte, every directory and file of the
-//!    workspace committed at `workspace/`, and nothing else; `--update`
-//!    writes the committed workspace with the same command first;
+//!    workspace committed at `workspace/`, its coverage ledger
+//!    `coverage.json` among them, and nothing else; `--update` writes the
+//!    committed workspace with the same command first;
 //! 3. an ingest on one worker writes the same bytes as one on eight;
 //! 4. `fidryn check samples/uscode/workspace --no-cache` exits 0 with no
-//!    error;
+//!    error, and `fidryn coverage samples/uscode/workspace` prints the
+//!    committed `coverage.json`, byte for byte;
 //! 5. `profile.json` is, byte for byte, what `conformance/usc_profile.py`
-//!    prints for the archives, and its counts of references by layer and
-//!    outcome are those of the check report of step 4;
+//!    prints for the archives; its counts of references by layer and
+//!    outcome are those of the check report of step 4; and every key that
+//!    the profile's `import` and the ledger's `totals` share has one value
+//!    in both, the keys that only one of them has being named here;
 //! 6. what `conformance/uslm_text.py` prints for the archives is, line for
 //!    line, what `fidryn text samples/uscode/workspace --json` prints;
 //! 7. the check of the curated sample, `samples/uscode/curated`, which
@@ -24,7 +28,10 @@
 //!    `exact`;
 //!    `--update` writes, after the workspace, the release and the lock
 //!    digest of that dependency and the toolchain of the curated manifest,
-//!    and nothing else of it.
+//!    and nothing else of it;
+//! 8. the table of `docs/coverage.md` between its two markers is the one
+//!    that the committed `coverage.json` gives; `--update` writes it, and
+//!    nothing else of the page.
 //!
 //! The `fidryn` commands run in this process, through `fidryn_cli`, as the
 //! binary runs them, and the check of the curated sample through the check
@@ -32,8 +39,8 @@
 //! named. Their temporary directories are made under the system's directory
 //! for temporary files and removed whether the step passes or fails, and the
 //! checks keep no cache, so the step leaves the repository as it found it;
-//! only `--update` writes, and only the committed workspace and those three
-//! values of the curated manifest.
+//! only `--update` writes, and only the committed workspace, those three
+//! values of the curated manifest and the table of the page.
 
 use crate::workspace::workspace_root;
 use anyhow::{Context, Result, anyhow, bail};
@@ -81,9 +88,24 @@ const TOOLCHAIN: &str = env!("CARGO_PKG_VERSION");
 /// The layers whose references the profile and the check report count.
 const LAYERS: [&str; 3] = ["operative", "enacted", "editorial"];
 
+/// The coverage ledger of a generated workspace, at its top.
+const LEDGER: &str = "coverage.json";
+/// The page of the site that shows the ledger of the sample.
+const PAGE: &str = "docs/coverage.md";
+/// The markers between which the page holds the table of the ledger.
+const TABLE_BEGIN: &str = "<!-- coverage-table:begin -->";
+const TABLE_END: &str = "<!-- coverage-table:end -->";
+
+/// The keys of the ledger's `totals` that the profile's `import` does not
+/// have: the independent reading extracts no definitions.
+const LEDGER_ONLY: [&str; 2] = ["definitions", "definitions_by_kind"];
+/// The keys of the profile's `import` that the ledger's `totals` does not
+/// have: the ledger has them at its top, where they are compared.
+const PROFILE_ONLY: [&str; 2] = ["prefix", "release"];
+
 #[derive(Debug, clap::Args)]
 pub struct UscodeSampleArgs {
-    /// Write samples/uscode/workspace with what the ingester writes from the archives, and the pin and the toolchain of samples/uscode/curated, then check them
+    /// Write samples/uscode/workspace with what the ingester writes from the archives, the pin and the toolchain of samples/uscode/curated, and the table of docs/coverage.md, then check them
     #[arg(long)]
     pub update: bool,
 }
@@ -92,9 +114,9 @@ pub fn run(args: UscodeSampleArgs) -> Result<()> {
     check(&workspace_root(), args.update)
 }
 
-/// Runs the seven steps on the sample under `root`; with `update`, step 2
+/// Runs the eight steps on the sample under `root`; with `update`, step 2
 /// first writes the committed workspace, and then the pin and the toolchain
-/// of the curated manifest.
+/// of the curated manifest and the table of the page.
 pub fn check(root: &Path, update: bool) -> Result<()> {
     let problems = archive_problems(&root.join(ARCHIVES))?;
     if !problems.is_empty() {
@@ -114,6 +136,8 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
         eprintln!("wrote {WORKSPACE}");
         update_curated(root)?;
         eprintln!("wrote the pin and the toolchain of {CURATED}/{MANIFEST}");
+        update_page(root)?;
+        eprintln!("wrote the table of {PAGE}");
     }
     if !committed.is_dir() {
         bail!("{WORKSPACE} does not exist; write it with `cargo xtask uscode-sample --update`");
@@ -146,6 +170,21 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     if !checked || report["errors"].as_u64() != Some(0) {
         bail!("`fidryn check {WORKSPACE} --no-cache` found errors, which it printed above");
     }
+    eprintln!("+ fidryn coverage {WORKSPACE}");
+    let mut counted = Vec::new();
+    fidryn_cli::law::write_coverage(&committed, &mut counted)
+        .map_err(|error| anyhow!("`fidryn coverage {WORKSPACE}` failed: {error}"))?;
+    let committed_ledger =
+        fs::read(committed.join(LEDGER)).with_context(|| format!("read {WORKSPACE}/{LEDGER}"))?;
+    if counted != committed_ledger {
+        bail!(
+            "{WORKSPACE}/{LEDGER} is not what `fidryn coverage {WORKSPACE}` prints: they differ \
+             first at line {}",
+            first_differing_line(&committed_ledger, &counted)
+        );
+    }
+    let ledger: Value = serde_json::from_slice(&committed_ledger)
+        .with_context(|| format!("{WORKSPACE}/{LEDGER} holds no JSON"))?;
 
     let printed = printed_output(root, PROFILE_SCRIPT, profile_command(root))?;
     let committed_profile =
@@ -160,6 +199,9 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     {
         bail!("{problem}");
     }
+    if let Some(problem) = ledger_problem(&profile["import"], &ledger) {
+        bail!("{problem}");
+    }
 
     let script = printed_output(root, TEXT_SCRIPT, text_command(root))?;
     let mut text = Vec::new();
@@ -171,14 +213,352 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     let records = text.iter().filter(|&&byte| byte == b'\n').count();
 
     let citations = check_curated(root)?;
+
+    let page = fs::read_to_string(root.join(PAGE)).with_context(|| format!("read {PAGE}"))?;
+    if page_region(&page)? != coverage_table(&ledger)? {
+        bail!(
+            "{PAGE}: the table between `{TABLE_BEGIN}` and `{TABLE_END}` is not what \
+             {WORKSPACE}/{LEDGER} gives; write it with `cargo xtask uscode-sample --update`"
+        );
+    }
     eprintln!(
         "{ARCHIVES} matches {RECORD}; {WORKSPACE} is what the ingester writes from it, on one \
-         worker and on eight, and checks with no error; {PROFILE} is current and counts the \
-         references the check counts; the text of its {records} records is what \
-         {TEXT_SCRIPT} prints; and {CURATED} checks against it with no error and no warning, \
-         each of its {citations} citations `exact`"
+         worker and on eight, checks with no error, and holds the ledger `fidryn coverage` \
+         prints; {PROFILE} is current and counts the references the check counts and what the \
+         ledger counts; the text of its {records} records is what {TEXT_SCRIPT} prints; \
+         {CURATED} checks against it with no error and no warning, each of its {citations} \
+         citations `exact`; and the table of {PAGE} is what the ledger gives"
     );
     Ok(())
+}
+
+/// The number, from 1, of the first line at which `a` and `b` differ, or
+/// the line after the shorter when one is the beginning of the other.
+fn first_differing_line(a: &[u8], b: &[u8]) -> usize {
+    let a_lines: Vec<&[u8]> = a.split_inclusive(|&byte| byte == b'\n').collect();
+    let b_lines: Vec<&[u8]> = b.split_inclusive(|&byte| byte == b'\n').collect();
+    a_lines
+        .iter()
+        .zip(&b_lines)
+        .position(|(a, b)| a != b)
+        .unwrap_or_else(|| a_lines.len().min(b_lines.len()))
+        + 1
+}
+
+/// Step 5, against the ledger: `None` when every key that `import`, the
+/// profile's object of that name, and the `totals` of `ledger` share has one
+/// value in both, and the keys only one of them has are those of
+/// [`PROFILE_ONLY`], which are compared with the keys of the ledger's top,
+/// and of [`LEDGER_ONLY`]. Otherwise what differs, naming the first key, in
+/// the byte order of their paths, with the value of each side.
+fn ledger_problem(import: &Value, ledger: &Value) -> Option<String> {
+    let shown = format!("{WORKSPACE}/{LEDGER}");
+    let (Some(import), Some(totals)) = (import.as_object(), ledger["totals"].as_object()) else {
+        return Some(format!(
+            "{PROFILE} has no object `import`, or {shown} no object `totals`"
+        ));
+    };
+    for key in import.keys() {
+        if PROFILE_ONLY.contains(&key.as_str()) {
+            if totals.contains_key(key) {
+                return Some(format!(
+                    "{shown} has `totals.{key}`, which the step takes to stand at its top"
+                ));
+            }
+        } else if !totals.contains_key(key) && !LEDGER_ONLY.contains(&key.as_str()) {
+            return Some(format!(
+                "{PROFILE} has `import.{key}`, and {shown} has no `totals.{key}`"
+            ));
+        }
+    }
+    for key in totals.keys() {
+        if !import.contains_key(key) && !LEDGER_ONLY.contains(&key.as_str()) {
+            return Some(format!(
+                "{shown} has `totals.{key}`, and {PROFILE} has no `import.{key}`"
+            ));
+        }
+    }
+    for key in PROFILE_ONLY {
+        if let Some(problem) = value_difference("", import.get(key), ledger.get(key)) {
+            return Some(problem.shown(&format!("import.{key}"), key, &shown));
+        }
+    }
+    let mut keys: Vec<&String> = import
+        .keys()
+        .filter(|key| totals.contains_key(*key))
+        .collect();
+    keys.sort();
+    for key in keys {
+        if let Some(problem) = value_difference("", import.get(key), totals.get(key)) {
+            return Some(problem.shown(&format!("import.{key}"), &format!("totals.{key}"), &shown));
+        }
+    }
+    None
+}
+
+/// Where two JSON values first differ: the path below the two compared,
+/// and the value of each there, `None` where it has none.
+struct ValueDifference {
+    below: String,
+    profiled: Option<Value>,
+    counted: Option<Value>,
+}
+
+impl ValueDifference {
+    /// The message of the difference of the profile's value at `profile_at`
+    /// and the ledger's, `shown`, at `ledger_at`.
+    fn shown(&self, profile_at: &str, ledger_at: &str, shown: &str) -> String {
+        let value = |value: &Option<Value>| {
+            value
+                .as_ref()
+                .map_or("nothing".to_owned(), |value| format!("`{value}`"))
+        };
+        format!(
+            "{shown} has {} at `{ledger_at}{below}`, and {PROFILE} has {} at \
+             `{profile_at}{below}`",
+            value(&self.counted),
+            value(&self.profiled),
+            below = self.below
+        )
+    }
+}
+
+/// The first place, in the byte order of the keys, at which `profiled` and
+/// `counted` differ; the keys of an object are compared whatever their
+/// order. `None` when the two are equal.
+fn value_difference(
+    below: &str,
+    profiled: Option<&Value>,
+    counted: Option<&Value>,
+) -> Option<ValueDifference> {
+    if let (Some(Value::Object(profiled)), Some(Value::Object(counted))) = (profiled, counted) {
+        let keys: BTreeSet<&String> = profiled.keys().chain(counted.keys()).collect();
+        return keys.into_iter().find_map(|key| {
+            value_difference(
+                &format!("{below}.{key}"),
+                profiled.get(key),
+                counted.get(key),
+            )
+        });
+    }
+    (profiled != counted).then(|| ValueDifference {
+        below: below.to_owned(),
+        profiled: profiled.cloned(),
+        counted: counted.cloned(),
+    })
+}
+
+/// What `--update` writes of the page under `root`: the table between its
+/// markers, what the committed ledger gives. Nothing else of the page
+/// changes.
+fn update_page(root: &Path) -> Result<()> {
+    let ledger = read_json(&root.join(WORKSPACE).join(LEDGER))?;
+    let path = root.join(PAGE);
+    let page = fs::read_to_string(&path).with_context(|| format!("read {PAGE}"))?;
+    let updated = with_region(&page, &coverage_table(&ledger)?)?;
+    fs::write(&path, updated).with_context(|| format!("write {PAGE}"))
+}
+
+/// The positions in `page` of the end of its one begin marker and of the
+/// start of its one end marker, which follows it.
+fn region_bounds(page: &str) -> Result<(usize, usize)> {
+    let begins: Vec<usize> = page.match_indices(TABLE_BEGIN).map(|(at, _)| at).collect();
+    let ends: Vec<usize> = page.match_indices(TABLE_END).map(|(at, _)| at).collect();
+    match (begins.as_slice(), ends.as_slice()) {
+        ([begin], [end]) if begin + TABLE_BEGIN.len() <= *end => {
+            Ok((begin + TABLE_BEGIN.len(), *end))
+        }
+        _ => bail!("{PAGE} must hold exactly one `{TABLE_BEGIN}` followed by one `{TABLE_END}`"),
+    }
+}
+
+/// What `page` holds between its markers.
+fn page_region(page: &str) -> Result<&str> {
+    let (start, end) = region_bounds(page)?;
+    Ok(&page[start..end])
+}
+
+/// `page` with `region` between its markers in place of what stood there.
+fn with_region(page: &str, region: &str) -> Result<String> {
+    let (start, end) = region_bounds(page)?;
+    Ok(format!("{}{region}{}", &page[..start], &page[end..]))
+}
+
+/// `count` with a comma between each group of three digits.
+fn grouped(count: u64) -> String {
+    let digits = count.to_string();
+    let mut shown = String::new();
+    for (at, digit) in digits.chars().enumerate() {
+        if at > 0 && (digits.len() - at).is_multiple_of(3) {
+            shown.push(',');
+        }
+        shown.push(digit);
+    }
+    shown
+}
+
+/// The count at `key` of the object `value`, which names `at`.
+fn count_at(value: &Value, key: &str, at: &str) -> Result<u64> {
+    value
+        .get(key)
+        .and_then(Value::as_u64)
+        .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no count at `{at}.{key}`"))
+}
+
+/// The counts of the object at `key` of `value`, each before its key:
+/// `229 `courtRule`, 1 `level``, in the order of the object, or `none`.
+fn counts_at(value: &Value, key: &str, at: &str) -> Result<String> {
+    let object = value
+        .get(key)
+        .and_then(Value::as_object)
+        .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no object at `{at}.{key}`"))?;
+    if object.is_empty() {
+        return Ok("none".to_owned());
+    }
+    object
+        .iter()
+        .map(|(word, count)| {
+            let count = count
+                .as_u64()
+                .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER}: `{at}.{key}.{word}` is no count"))?;
+            Ok(format!("{} `{word}`", grouped(count)))
+        })
+        .collect::<Result<Vec<String>>>()
+        .map(|counts| counts.join(", "))
+}
+
+/// The table of the page: one row for each key of the ledger `ledger`, in
+/// its order, and one for each source file, each with what it counts, the
+/// key it stands at and the figure or the figures.
+fn coverage_table(ledger: &Value) -> Result<String> {
+    let text = |key: &str| {
+        ledger
+            .get(key)
+            .and_then(Value::as_str)
+            .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no string at `{key}`"))
+    };
+    let totals = ledger
+        .get("totals")
+        .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no `totals`"))?;
+    let references = totals
+        .get("references")
+        .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no `totals.references`"))?;
+    let mut rows: Vec<(String, String, String)> = vec![
+        (
+            "The release".to_owned(),
+            "release".to_owned(),
+            format!("`{}`", text("release")?),
+        ),
+        (
+            "The prefix of every address".to_owned(),
+            "prefix".to_owned(),
+            format!("`{}`", text("prefix")?),
+        ),
+    ];
+    let mut row = |what: &str, key: &str, figure: String| {
+        rows.push((what.to_owned(), format!("totals.{key}"), figure));
+    };
+    let count = |key: &str| count_at(totals, key, "totals").map(grouped);
+    let counts = |key: &str| counts_at(totals, key, "totals");
+    row("Units imported", "units", count("units")?);
+    row("Units, by kind", "units_by_kind", counts("units_by_kind")?);
+    row(
+        "Units, by status (`in-force` for a unit with none)",
+        "units_by_status",
+        counts("units_by_status")?,
+    );
+    row("Containers imported", "containers", count("containers")?);
+    row(
+        "Containers, by kind",
+        "containers_by_kind",
+        counts("containers_by_kind")?,
+    );
+    row(
+        "Provisions imported and addressed, the top provision of each unit included",
+        "provisions",
+        count("provisions")?,
+    );
+    row(
+        "Addresses: aliases kept, and addresses disambiguated and assigned by the importer",
+        "addresses",
+        counts("addresses")?,
+    );
+    row("Notes imported, by layer", "notes", counts("notes")?);
+    row(
+        "Notes, by group",
+        "notes_by_group",
+        counts("notes_by_group")?,
+    );
+    row("Footnotes imported", "footnotes", count("footnotes")?);
+    row(
+        "Provisions and notes that hold an image, whose picture is not in the archive",
+        "with_images",
+        count("with_images")?,
+    );
+    for (layer, what) in [
+        ("operative", "References in operative text, by outcome"),
+        ("enacted", "References in enacted notes, by outcome"),
+        ("editorial", "References in editorial matter, by outcome"),
+    ] {
+        row(
+            what,
+            &format!("references.{layer}"),
+            counts_at(references, layer, "totals.references")?,
+        );
+    }
+    row(
+        "References of the outcome `outside`, by the body of law they name",
+        "outside_by_body",
+        counts("outside_by_body")?,
+    );
+    row(
+        "Definitions extracted, by basis",
+        "definitions",
+        counts("definitions")?,
+    );
+    row(
+        "Definitions extracted, by kind",
+        "definitions_by_kind",
+        counts("definitions_by_kind")?,
+    );
+    row(
+        "Counted and not imported",
+        "not_imported",
+        counts("not_imported")?,
+    );
+    let sources = ledger
+        .get("by_source")
+        .and_then(Value::as_array)
+        .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no array at `by_source`"))?;
+    for (place, source) in sources.iter().enumerate() {
+        let at = format!("by_source.{place}");
+        let name = source
+            .get("source")
+            .and_then(Value::as_str)
+            .ok_or_else(|| anyhow!("{WORKSPACE}/{LEDGER} has no string at `{at}.source`"))?;
+        let flag = match source.get("positive_law") {
+            Some(Value::Bool(true)) => "positive law",
+            Some(Value::Bool(false)) => "not positive law",
+            Some(Value::Null) => "no positive-law flag",
+            _ => bail!("{WORKSPACE}/{LEDGER} has no flag at `{at}.positive_law`"),
+        };
+        rows.push((
+            format!("The file `{name}` ({flag})"),
+            at.clone(),
+            format!(
+                "{} units, {} provisions, {} definitions",
+                grouped(count_at(source, "units", &at)?),
+                grouped(count_at(source, "provisions", &at)?),
+                grouped(count_at(source, "definitions", &at)?)
+            ),
+        ));
+    }
+    let mut table = String::from("\n\n| Counted | Key | Figure |\n| --- | --- | --- |\n");
+    for (what, key, figure) in rows {
+        table.push_str(&format!("| {what} | `{key}` | {figure} |\n"));
+    }
+    table.push('\n');
+    Ok(table)
 }
 
 /// A directory of its own under the system's directory for temporary
@@ -915,6 +1295,163 @@ mod tests {
         );
     }
 
+    /// A profile's `import` and a ledger that agree, in invented counts.
+    fn agreeing() -> (Value, Value) {
+        let import = serde_json::json!({
+            "notes": { "editorial": 1, "enacted": 2 },
+            "prefix": "/zz/demo",
+            "release": "42-7",
+            "units": 3,
+            "units_by_kind": { "section": 3 },
+        });
+        let ledger = serde_json::json!({
+            "schema": "fidryn.coverage/v0.1",
+            "prefix": "/zz/demo",
+            "release": "42-7",
+            "totals": {
+                "units": 3,
+                "units_by_kind": { "section": 3 },
+                "notes": { "enacted": 2, "editorial": 1 },
+                "definitions": { "enacted": 1, "restated": 0, "unresolved": 0 },
+                "definitions_by_kind": { "means": 1 },
+            },
+            "by_source": [],
+        });
+        (import, ledger)
+    }
+
+    #[test]
+    fn the_ledger_is_compared_with_the_profile_key_for_key() {
+        let (import, ledger) = agreeing();
+        assert_eq!(ledger_problem(&import, &ledger), None);
+        let problem = |change: &dyn Fn(&mut Value, &mut Value)| {
+            let (mut import, mut ledger) = agreeing();
+            change(&mut import, &mut ledger);
+            ledger_problem(&import, &ledger).expect("a difference")
+        };
+        assert_eq!(
+            problem(&|_, ledger| ledger["totals"]["notes"]["editorial"] = Value::from(2)),
+            "samples/uscode/workspace/coverage.json has `2` at `totals.notes.editorial`, and \
+             samples/uscode/profile.json has `1` at `import.notes.editorial`"
+        );
+        assert_eq!(
+            problem(&|_, ledger| ledger["totals"]["units_by_kind"]["rule"] = Value::from(1)),
+            "samples/uscode/workspace/coverage.json has `1` at `totals.units_by_kind.rule`, and \
+             samples/uscode/profile.json has nothing at `import.units_by_kind.rule`"
+        );
+        assert_eq!(
+            problem(&|import, _| import["release"] = Value::from("42-8")),
+            "samples/uscode/workspace/coverage.json has `\"42-7\"` at `release`, and \
+             samples/uscode/profile.json has `\"42-8\"` at `import.release`"
+        );
+        assert_eq!(
+            problem(&|import, _| import["footnotes"] = Value::from(0)),
+            "samples/uscode/profile.json has `import.footnotes`, and \
+             samples/uscode/workspace/coverage.json has no `totals.footnotes`"
+        );
+        assert_eq!(
+            problem(&|_, ledger| ledger["totals"]["footnotes"] = Value::from(0)),
+            "samples/uscode/workspace/coverage.json has `totals.footnotes`, and \
+             samples/uscode/profile.json has no `import.footnotes`"
+        );
+        // A key of the ledger alone that the profile comes to have is
+        // compared like any other.
+        assert!(
+            problem(&|import, _| import["definitions"] = Value::from(1))
+                .contains("`totals.definitions`")
+        );
+    }
+
+    #[test]
+    fn the_table_of_the_page_is_what_the_ledger_gives() {
+        let root = workspace_root();
+        let ledger = read_json(&root.join(WORKSPACE).join(LEDGER)).expect("the sample's ledger");
+        let page = read_text(&root.join(PAGE));
+        let table = coverage_table(&ledger).unwrap_or_else(|error| panic!("{error:#}"));
+        assert_eq!(page_region(&page).expect("the markers"), table);
+        assert!(
+            table.contains("| Units imported | `totals.units` | 563 |"),
+            "{table}"
+        );
+        assert!(
+            table.contains("| Provisions imported and addressed, the top provision of each unit included | `totals.provisions` | 4,857 |"),
+            "{table}"
+        );
+
+        // A figure of the ledger changes the table, and the update writes
+        // the table alone.
+        let mut changed = ledger.clone();
+        changed["totals"]["units"] = Value::from(1);
+        let other = coverage_table(&changed).expect("a table");
+        assert_ne!(other, table);
+        let updated = with_region(&page, &other).expect("the markers");
+        assert_eq!(page_region(&updated).expect("the markers"), other);
+        assert_eq!(with_region(&updated, &table).expect("the markers"), page);
+
+        let broken = [
+            "no markers\n".to_owned(),
+            format!("{TABLE_END}\n{TABLE_BEGIN}\n"),
+            format!("{TABLE_BEGIN}\n{TABLE_END}\n{TABLE_BEGIN}\n{TABLE_END}\n"),
+        ];
+        for page in broken {
+            let error = page_region(&page).expect_err("broken markers");
+            assert!(format!("{error:#}").contains(PAGE), "{error:#}");
+        }
+        let mut missing = ledger;
+        missing["totals"]
+            .as_object_mut()
+            .expect("an object")
+            .remove("footnotes");
+        let error = coverage_table(&missing).expect_err("a count is missing");
+        assert!(
+            format!("{error:#}").contains("`totals.footnotes`"),
+            "{error:#}"
+        );
+        assert_eq!(
+            [0, 7, 999, 1000, 4857, 1_000_000].map(grouped),
+            ["0", "7", "999", "1,000", "4,857", "1,000,000"]
+        );
+    }
+
+    /// Every key of `value`, at any depth.
+    fn keys_of(value: &Value, out: &mut Vec<String>) {
+        match value {
+            Value::Object(object) => {
+                for (key, inner) in object {
+                    out.push(key.clone());
+                    keys_of(inner, out);
+                }
+            }
+            Value::Array(items) => {
+                for item in items {
+                    keys_of(item, out);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn the_ledger_never_says_encoded() {
+        let root = workspace_root();
+        let ledger = read_json(&root.join(WORKSPACE).join(LEDGER)).expect("the sample's ledger");
+        let mut keys = Vec::new();
+        keys_of(&ledger, &mut keys);
+        assert!(keys.len() > 60, "{keys:?}");
+        for key in &keys {
+            assert!(!key.to_ascii_lowercase().contains("encod"), "{key}");
+        }
+        let page = read_text(&root.join(PAGE));
+        for sentence in page.split(['.', '\n']) {
+            assert!(
+                !sentence.to_lowercase().contains("encod"),
+                "{PAGE}: {sentence}"
+            );
+        }
+        assert!(page.contains("imported") && page.contains("addressed"));
+        assert!(page.contains("classified") && page.contains("extracted"));
+    }
+
     #[test]
     fn the_text_is_compared_line_for_line() {
         let script = b"{\"address\":\"/zz/demo/t1\",\"p\":\"A widget.\"}\n\
@@ -1149,6 +1686,20 @@ mod tests {
             "{message}"
         );
         fs::write(&module, &original).expect("restore the module");
+
+        // One figure of the ledger.
+        let ledger = copy.join(WORKSPACE).join(LEDGER);
+        let original = fs::read_to_string(&ledger).expect("read the ledger of the sample");
+        let changed = original.replacen("\"units\": 563", "\"units\": 564", 1);
+        assert_ne!(changed, original);
+        fs::write(&ledger, &changed).expect("change the ledger");
+        let error = check(&copy, false).expect_err("a ledger changed by hand");
+        let message = format!("{error:#}");
+        assert!(
+            message.contains("different coverage.json (1 path differs)"),
+            "{message}"
+        );
+        fs::write(&ledger, &original).expect("restore the ledger");
 
         // One byte of one archive.
         let archive = copy.join(ARCHIVES).join("xml_usc01@119-142.zip");

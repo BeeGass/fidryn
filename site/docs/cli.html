@@ -77,12 +77,13 @@
     <ol>
       <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
       <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage"><span class="n">&sect;8</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Contribute</p>
     <ol>
-      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+      <li><a href="/docs/contributing"><span class="n">&sect;9</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
     </ol>
   </div>
   <div class="group">
@@ -97,7 +98,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.18</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.19</span> See also</a></li></ol></details>
     <div class="prose">
 <p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
@@ -574,19 +575,26 @@ workers.</p>
 </div>
 <p>A run writes <code>workspace.json</code> first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
-output that it does not write, and writes <code>law.lock.json</code> last, so a run
-that is stopped leaves a directory the next run accepts. With <code>--title</code>,
+output that it does not write, and writes <code>law.lock.json</code> and then, last,
+<code>coverage.json</code>, the <a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger">coverage ledger</a>
+of the workspace, which <a href="#coverage"><code>coverage</code></a> prints; so a run that is
+stopped leaves a directory the next run accepts. The lock does not list
+the ledger. With <code>--title</code>,
 only the modules of those titles are written, and the lock lists the
 archives and members whose modules the run wrote. The numbering of
 addresses still runs over every member the archive directory holds,
 whichever titles are chosen, so an address does not depend on the
 selection.</p>
-<p><code>--verify</code> compares <code>workspace.json</code>, <code>law.lock.json</code> and every module
-file of <code>DIR</code> with what the run would write. Every other entry that a run
-would refuse is extra: a file other than a module and <code>coverage.json</code> at
-the top, and a symbolic link or any other entry that is neither a file
-nor a directory. Only <code>coverage.json</code> and the entries whose name begins
-with a dot are not looked at. It writes nothing, <code>DIR</code> included.</p>
+<p><code>--verify</code> compares <code>workspace.json</code>, <code>law.lock.json</code>, <code>coverage.json</code>
+and every module file of <code>DIR</code> with what the run would write. Every other
+entry that a run would refuse is extra: a file other than a module and
+those three at the top, and a symbolic link or any other entry that is
+neither a file nor a directory. Only the entries whose name begins with a
+dot are not looked at. It writes nothing, <code>DIR</code> included. A run stopped
+after the lock and before the ledger leaves a workspace that <code>fidryn check</code>
+accepts, since no check reads the ledger, and <code>--verify</code> reports it as
+<code>missing coverage.json</code>, or <code>different coverage.json</code> when the ledger is
+that of an earlier run.</p>
 <p><strong>Example</strong></p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn ingest uscode samples/uscode/archives --out DIR
 fidryn ingest uscode samples/uscode/archives --out DIR --title 1 --jobs 4
@@ -734,7 +742,55 @@ The chapter of the demo workspace is a container:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 <span class="tk-ty">--hashes</span></code></pre></figure>
 <p><code>--hashes</code> without <code>ADDRESS</code>, and <code>--hashes</code> with <code>--json</code>, are usage
 errors, exit 2.</p>
-<h2 id="see-also"><span class="hn">4.18</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="coverage"><span class="hn">4.18</span> <code>coverage</code> <a class="anchor" href="#coverage" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn coverage DIR</code> prints the coverage ledger of the generated workspace
+in <code>DIR</code>, <code>fidryn.coverage/v0.1</code>: its units, containers and provisions,
+its notes, footnotes and images, its references of each layer by outcome,
+the definitions extracted from its provisions by basis and by kind, and
+what its importer counted and did not import
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger">The coverage ledger</a>). It computes the
+ledger from the modules as their files stand, the manifest and the lock.
+It does not verify the module files against the lock, which is what
+<code>fidryn check DIR</code> is for. Of a workspace whose files are those its run
+wrote, it prints that run's <code>coverage.json</code>, byte for byte.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>DIR</code></td><td>yes</td><td>path to the directory of a generated workspace</td></tr>
+</tbody></table>
+</div>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage conformance/fixtures/workspace/demo
+<span class="tk-kw">fidryn</span> coverage samples/uscode/workspace</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. It prints the ledger as JSON with two spaces of
+indentation and a final line end, its keys in their order, the JSON Schema
+of which is <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json">schemas/coverage-v0.1.json</a>.
+Of the demo workspace it prints first:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>{
+  &quot;schema&quot;: &quot;fidryn.coverage/v0.1&quot;,
+  &quot;prefix&quot;: &quot;/zz/demo&quot;,
+  &quot;release&quot;: &quot;42-7&quot;,
+  &quot;totals&quot;: {
+    &quot;units&quot;: 3,
+    &quot;containers&quot;: 2,
+    &quot;provisions&quot;: 3,
+    &quot;units_by_kind&quot;: {
+      &quot;section&quot;: 3
+    },</code></pre></figure>
+<p>The output depends on the files of the workspace alone: neither the host,
+the working directory nor the number of threads the system offers changes
+a byte. The figures of the sample of the Code are on the page
+<a href="/docs/coverage">Coverage</a>.</p>
+<p><strong>Failure.</strong> Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a curated workspace, which has no ledger, as
+<code>DIR holds a curated workspace, and the coverage ledger belongs to a generated workspace, whose lock records what its importer counted</code>;
+a directory that holds no workspace (<code>E730</code>); a generated workspace
+without a lock, with one that cannot be read, or with one whose prefix or
+release is not the manifest's (<code>E730</code>); an entry that cannot be read or is
+neither a file nor a directory (<code>E730</code>); and a module file that is not a
+module of edition 2 that lowers, with its diagnostics. The curated sample
+of the repository is refused:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage samples/uscode/curated</code></pre></figure>
+<h2 id="see-also"><span class="hn">4.19</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
@@ -745,7 +801,7 @@ errors, exit 2.</p>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.18</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">4.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">4.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">4.18</span> coverage</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.19</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

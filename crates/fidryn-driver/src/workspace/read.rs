@@ -1,11 +1,15 @@
 //! Reading the modules of a workspace into the model, for what prints their
-//! text.
+//! text, and into their interfaces, for the coverage ledger of a generated
+//! workspace.
 
-use super::check::{lower_file, of_file, read_manifest, read_module};
+use super::check::{lower_file, of_file, read_lock, read_manifest, read_module};
 use super::discover::walk;
 use super::index::order;
+use super::report::ledger_of;
+use fidryn_check::e2::Lowered;
 use fidryn_core::{Diagnostic, DiagnosticCode};
-use fidryn_provision::Module;
+use fidryn_provision::workspace::WorkspaceKind;
+use fidryn_provision::{Coverage, Module, interface_of};
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -27,6 +31,64 @@ pub fn read_modules(root: &Path, jobs: usize) -> Result<Vec<Module>, Vec<Diagnos
     if read_manifest(root, &mut diagnostics).is_none() {
         return Err(diagnostics);
     }
+    read_each(root, jobs, |lowered| lowered.module)
+}
+
+/// Why [`read_coverage`] gives no ledger.
+#[derive(Debug)]
+pub enum CoverageError {
+    /// The workspace is curated: a coverage ledger is that of a generated
+    /// workspace, which an importer writes with its lock.
+    Curated,
+    /// The workspace cannot be read: every diagnostic, each naming its file
+    /// by its path relative to the workspace's directory.
+    Unread(Vec<Diagnostic>),
+}
+
+/// The coverage ledger of the generated workspace whose directory is
+/// `root`, counted from the interfaces of its modules as their files stand,
+/// its manifest and its lock: what the writer of the workspace wrote as
+/// `coverage.json`, when no file was changed since. The module files are
+/// read on `jobs` threads, and the ledger is the same for any number of
+/// them.
+///
+/// The modules are read as [`read_modules`] reads them, and nothing else is
+/// checked, the module files against the lock among them, which the check
+/// of the workspace does. A curated workspace has no ledger
+/// ([`CoverageError::Curated`]). The diagnostics of [`read_modules`], those
+/// of a generated workspace without a lock, with a lock that cannot be read
+/// or one whose prefix or release is not its manifest's (`E730`), are
+/// [`CoverageError::Unread`]; then no module is read.
+pub fn read_coverage(root: &Path, jobs: usize) -> Result<Coverage, CoverageError> {
+    let mut diagnostics = Vec::new();
+    let Some(manifest) = read_manifest(root, &mut diagnostics) else {
+        return Err(CoverageError::Unread(diagnostics));
+    };
+    if manifest.kind == WorkspaceKind::Curated {
+        return Err(CoverageError::Curated);
+    }
+    let lock = read_lock(root, &manifest, &mut diagnostics);
+    let lock = match lock {
+        Some(lock) if diagnostics.is_empty() => lock,
+        _ => return Err(CoverageError::Unread(diagnostics)),
+    };
+    let interfaces = read_each(root, jobs, |lowered| {
+        interface_of(&lowered.module, &lowered.decl_spans())
+    })
+    .map_err(CoverageError::Unread)?;
+    Ok(ledger_of(&interfaces, &manifest, &lock))
+}
+
+/// What `each` gives of every module of the workspace whose directory is
+/// `root`, whose manifest was read, lowered on `jobs` threads, in the byte
+/// order of the paths of their files; or every diagnostic, as
+/// [`read_modules`] gives them.
+fn read_each<T: Send>(
+    root: &Path,
+    jobs: usize,
+    each: impl Fn(Lowered) -> T + Sync,
+) -> Result<Vec<T>, Vec<Diagnostic>> {
+    let mut diagnostics = Vec::new();
     let found = walk(root);
     for (rel, why) in &found.unreadable {
         diagnostics.push(of_file(
@@ -52,7 +114,7 @@ pub fn read_modules(root: &Path, jobs: usize) -> Result<Vec<Module>, Vec<Diagnos
                 break;
             };
             let lowered = match read_module(&root.join(rel)) {
-                Ok((_, head)) => lower_file(head).map(|lowered| lowered.module),
+                Ok((_, head)) => lower_file(head).map(&each),
                 Err(error) => Err(vec![Diagnostic::new(
                     DiagnosticCode::E730,
                     format!("this file cannot be read: {error}"),
@@ -78,7 +140,7 @@ pub fn read_modules(root: &Path, jobs: usize) -> Result<Vec<Module>, Vec<Diagnos
     let mut modules = Vec::with_capacity(done.len());
     for ((_, lowered), rel) in done.into_iter().zip(&found.modules) {
         match lowered {
-            Ok(module) => modules.push(module),
+            Ok(read) => modules.push(read),
             Err(found) => diagnostics.extend(
                 found
                     .into_iter()

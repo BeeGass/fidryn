@@ -635,8 +635,12 @@ mod tests {
             "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/mill\"><span class=\"label\">Previous &middot; &sect;5</span><span class=\"t\">Mill</span></a><a class=\"next\" href=\"/docs/examples\"><span class=\"label\">Next &middot; &sect;7</span><span class=\"t\">Examples</span></a></nav>"
         );
         assert_eq!(
+            pager("coverage"),
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/examples\"><span class=\"label\">Previous &middot; &sect;7</span><span class=\"t\">Examples</span></a><a class=\"next\" href=\"/docs/contributing\"><span class=\"label\">Next &middot; &sect;9</span><span class=\"t\">Contributing</span></a></nav>"
+        );
+        assert_eq!(
             pager("contributing"),
-            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/examples\"><span class=\"label\">Previous &middot; &sect;7</span><span class=\"t\">Examples</span></a></nav>"
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/coverage\"><span class=\"label\">Previous &middot; &sect;8</span><span class=\"t\">Coverage</span></a></nav>"
         );
     }
 
@@ -766,6 +770,7 @@ mod tests {
                 "/docs/mill",
                 "/docs/outcomes",
                 "/docs/examples",
+                "/docs/coverage",
                 "/docs/contributing",
             ]
         );

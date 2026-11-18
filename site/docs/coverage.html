@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coverage — Fidryn</title>
+<meta name="description" content="The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="author" content="Bryan Gass">
+<link rel="canonical" href="https://fidryn.onlygass.dev/docs/coverage">
+<link rel="alternate" type="text/markdown" href="https://fidryn.onlygass.dev/docs/coverage.md" title="Markdown">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fidryn">
+<meta property="og:title" content="Coverage — Fidryn">
+<meta property="og:description" content="The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.">
+<meta property="og:url" content="https://fidryn.onlygass.dev/docs/coverage">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Coverage — Fidryn">
+<meta name="twitter:description" content="The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Coverage — Fidryn","description":"The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.","url":"https://fidryn.onlygass.dev/docs/coverage","isPartOf":{"@type":"WebSite","name":"Fidryn","url":"https://fidryn.onlygass.dev"},"author":{"@type":"Person","name":"Bryan Gass","alternateName":"BeeGass"},"significantLink":"https://fidryn.onlygass.dev/docs/coverage.md"}</script>
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fidryn.css?v=4c83b8bf">
+<script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("fidryn-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script src="/assets/fidryn.js?v=c1ba21c2" defer></script>
+</head>
+<body class="page-doc">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <a class="brand" href="/"><span class="mono" aria-hidden="true">F</span><span class="wordmark">Fidryn</span></a>
+<p class="crumb"><a href="/docs/">Docs</a> <span aria-hidden="true">/</span> Coverage</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/docs/" aria-current="page">Docs</a>
+    <a href="/docs/examples">Examples</a>
+    <a href="https://github.com/BeeGass/fidryn">GitHub</a>
+  </nav>
+  <form class="search" action="/docs/" method="get" role="search">
+    <label class="sr-only" for="site-search">Search the docs</label>
+    <input id="site-search" name="q" type="search" placeholder="Search docs" autocomplete="off" spellcheck="false" role="combobox" aria-controls="search-results" aria-expanded="false" aria-autocomplete="list">
+    <kbd aria-hidden="true">/</kbd>
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+  </form>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" hidden><span aria-hidden="true"></span></button>
+  <button class="menu-btn" type="button" data-drawer-open aria-controls="drawer" aria-expanded="false" hidden>Menu</button>
+</header>
+<main id="main">
+<div class="doc-layout">
+  <nav id="drawer" class="guides" aria-label="Guides">
+  <div class="guides-head"><p class="label">Contents</p><button type="button" class="btn sec sm" data-drawer-close>Close</button></div>
+  <div class="group">
+    <p class="label">Start</p>
+    <ol>
+      <li><a href="/docs/"><span class="n"></span><span class="t">Overview</span><span class="d">Where to begin</span></a></li>
+      <li><a href="/docs/getting-started"><span class="n">&sect;1</span><span class="t">Getting started</span><span class="d">Check and run a tiny module</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Write</p>
+    <ol>
+      <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
+      <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Run</p>
+    <ol>
+      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Read results</p>
+    <ol>
+      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage" aria-current="page"><span class="n">&sect;8</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Contribute</p>
+    <ol>
+      <li><a href="/docs/contributing"><span class="n">&sect;9</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Implementers</p>
+    <ol>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Internal ledgers</span><span class="d">Working ledgers, partly out of date</span></a></li>
+    </ol>
+  </div>
+</nav>
+  <article class="doc" aria-labelledby="doc-title">
+    <p class="kicker">&sect; 8 &middot; Read results</p>
+    <h1 id="doc-title">Coverage</h1>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#what-the-words-mean"><span class="n">8.1</span> What the words mean</a></li><li class="lvl-2"><a href="#the-basis-of-a-definition"><span class="n">8.2</span> The basis of a definition</a></li><li class="lvl-2"><a href="#counted-and-not-imported"><span class="n">8.3</span> Counted and not imported</a></li><li class="lvl-2"><a href="#the-figures"><span class="n">8.4</span> The figures</a></li></ol></details>
+    <div class="prose">
+<p>The figures on this page are those of the sample of the United States Code
+committed in this repository, under <code>samples/uscode/</code>, and of nothing else.
+The sample holds three whole titles of the release <code>119-142</code> of the
+official XML release point published by the Office of the Law Revision
+Counsel: Title 1, Title 11 Appendix and Title 45. The table below is
+generated from the coverage ledger of the sample's workspace,
+<a href="https://github.com/BeeGass/fidryn/blob/main/samples/uscode/workspace/coverage.json"><code>samples/uscode/workspace/coverage.json</code></a>,
+which <a href="/docs/cli#coverage"><code>fidryn coverage</code></a> prints and
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger">The coverage ledger</a> describes key by
+key.</p>
+<h2 id="what-the-words-mean"><span class="hn">8.1</span> What the words mean <a class="anchor" href="#what-the-words-mean" aria-label="Link to this section">#</a></h2>
+<p>The ledger says how far the provisions of the sample are taken in three
+words, and in no others.</p>
+<ul>
+<li><strong>Imported.</strong> The official text of the provision is in a module, read
+from a pinned file, the publisher's archive, whose size and digests the
+importer verifies against the retrieval record that says where and when
+it was fetched. The lock of the workspace records the digests of each
+archive and of each module file, and the check of the workspace verifies
+every module file against them.</li>
+<li><strong>Addressed.</strong> The provision has a typed address, and its place in the
+hierarchy, its status and the references in its text are resolved and
+checked. Every provision imported is addressed. Each reference has an
+outcome, and the table gives the references of each layer by outcome, so
+that a reader sees how many of them reach their target.</li>
+<li><strong>Classified.</strong> What kind of provision it is, is recorded. At this version
+the one kind that is recorded is a definition, and the ledger gives the
+number of definitions extracted, by basis and by kind. It gives no count
+of classified provisions, since one provision can hold more than one
+definition.</li>
+</ul>
+<h2 id="the-basis-of-a-definition"><span class="hn">8.2</span> The basis of a definition <a class="anchor" href="#the-basis-of-a-definition" aria-label="Link to this section">#</a></h2>
+<p>Each definition extracted has one of three bases:</p>
+<ul>
+<li><code>enacted</code>: its reach names a region of the Code, and the file of its unit
+declares its title positive law, so the words that state the reach are
+those the law enacted.</li>
+<li><code>restated</code>: its reach names a region of the Code, and the file of its
+unit does not declare its title positive law, so the words are those of
+the editors of the Code, and the reach the law enacted may differ from the
+one they state.</li>
+<li><code>unresolved</code>: the rules found no region of the Code for it, because it
+states no reach that they read, because its reach names a law outside the
+Code, or because its reach words name a part of the Code in a form the
+rules do not resolve, such as "this chapter and chapter 5".</li>
+</ul>
+<p>The rules read definitions written in a closed list of forms
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#definitions">Definitions</a>), and they do not find every
+definition that the text holds. The share of the definitions they miss has
+not been measured for the sample.</p>
+<h2 id="counted-and-not-imported"><span class="hn">8.3</span> Counted and not imported <a class="anchor" href="#counted-and-not-imported" aria-label="Link to this section">#</a></h2>
+<p>Some of what the publisher's files hold is by rule not imported. The
+importer counts it in the lock of the workspace under these six names, and
+the ledger copies the counts:</p>
+<ul>
+<li><code>tables_of_contents</code>: the tables of contents, whose entries repeat the
+headings of the units they list;</li>
+<li><code>footnotes_in_tables_of_contents</code>: the footnotes inside them;</li>
+<li><code>links_in_tables_of_contents</code>: the links inside them;</li>
+<li><code>release_notes</code>: the notes that say which release a file is current
+through;</li>
+<li><code>links_without_words</code>: the links that have no words, or white space
+alone;</li>
+<li><code>note_group_headings</code>: the cross headings that open the groups of notes,
+whose labels are not imported; what a cross heading holds after its label
+is imported, as a note of its group.</li>
+</ul>
+<h2 id="the-figures"><span class="hn">8.4</span> The figures <a class="anchor" href="#the-figures" aria-label="Link to this section">#</a></h2>
+<!-- coverage-table:begin -->
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Counted</th><th>Key</th><th>Figure</th></tr></thead><tbody>
+<tr><td>The release</td><td><code>release</code></td><td><code>119-142</code></td></tr>
+<tr><td>The prefix of every address</td><td><code>prefix</code></td><td><code>/us/usc</code></td></tr>
+<tr><td>Units imported</td><td><code>totals.units</code></td><td>563</td></tr>
+<tr><td>Units, by kind</td><td><code>totals.units_by_kind</code></td><td>229 <code>courtRule</code>, 1 <code>level</code>, 333 <code>section</code></td></tr>
+<tr><td>Units, by status (<code>in-force</code> for a unit with none)</td><td><code>totals.units_by_status</code></td><td>482 <code>in-force</code>, 9 <code>omitted</code>, 68 <code>repealed</code>, 4 <code>transferred</code></td></tr>
+<tr><td>Containers imported</td><td><code>totals.containers</code></td><td>72</td></tr>
+<tr><td>Containers, by kind</td><td><code>totals.containers_by_kind</code></td><td>1 <code>appendix</code>, 25 <code>chapter</code>, 1 <code>courtRules</code>, 1 <code>level</code>, 13 <code>part</code>, 29 <code>subchapter</code>, 2 <code>title</code></td></tr>
+<tr><td>Provisions imported and addressed, the top provision of each unit included</td><td><code>totals.provisions</code></td><td>4,857</td></tr>
+<tr><td>Addresses: aliases kept, and addresses disambiguated and assigned by the importer</td><td><code>totals.addresses</code></td><td>229 <code>aliases</code>, 0 <code>disambiguated</code>, 3 <code>assigned</code></td></tr>
+<tr><td>Notes imported, by layer</td><td><code>totals.notes</code></td><td>1,498 <code>enacted</code>, 593 <code>editorial</code></td></tr>
+<tr><td>Notes, by group</td><td><code>totals.notes_by_group</code></td><td>1 <code>courtRules</code>, 303 <code>editorialNotes</code>, 9 <code>execDoc</code>, 539 <code>statutoryNotes</code>, 1,239 <code>ungrouped</code></td></tr>
+<tr><td>Footnotes imported</td><td><code>totals.footnotes</code></td><td>107</td></tr>
+<tr><td>Provisions and notes that hold an image, whose picture is not in the archive</td><td><code>totals.with_images</code></td><td>1</td></tr>
+<tr><td>References in operative text, by outcome</td><td><code>totals.references.operative</code></td><td>644 <code>exact</code>, 14 <code>target-status</code>, 0 <code>ambiguous</code>, 11 <code>unit-only</code>, 1 <code>range-form</code>, 273 <code>no-unit</code>, 192 <code>outside</code>, 0 <code>malformed</code></td></tr>
+<tr><td>References in enacted notes, by outcome</td><td><code>totals.references.enacted</code></td><td>332 <code>exact</code>, 18 <code>target-status</code>, 0 <code>ambiguous</code>, 14 <code>unit-only</code>, 0 <code>range-form</code>, 364 <code>no-unit</code>, 1,454 <code>outside</code>, 0 <code>malformed</code></td></tr>
+<tr><td>References in editorial matter, by outcome</td><td><code>totals.references.editorial</code></td><td>275 <code>exact</code>, 47 <code>target-status</code>, 0 <code>ambiguous</code>, 14 <code>unit-only</code>, 1 <code>range-form</code>, 259 <code>no-unit</code>, 4,919 <code>outside</code>, 0 <code>malformed</code></td></tr>
+<tr><td>References of the outcome <code>outside</code>, by the body of law they name</td><td><code>totals.outside_by_body</code></td><td>739 <code>/us/act</code>, 3,310 <code>/us/pl</code>, 2,516 <code>/us/stat</code></td></tr>
+<tr><td>Definitions extracted, by basis</td><td><code>totals.definitions</code></td><td>7 <code>enacted</code>, 100 <code>restated</code>, 37 <code>unresolved</code></td></tr>
+<tr><td>Definitions extracted, by kind</td><td><code>totals.definitions_by_kind</code></td><td>7 <code>borrowed</code>, 1 <code>does_not_include</code>, 15 <code>includes</code>, 121 <code>means</code></td></tr>
+<tr><td>Counted and not imported</td><td><code>totals.not_imported</code></td><td>19 <code>tables_of_contents</code>, 4 <code>footnotes_in_tables_of_contents</code>, 341 <code>links_in_tables_of_contents</code>, 3 <code>release_notes</code>, 0 <code>links_without_words</code>, 358 <code>note_group_headings</code></td></tr>
+<tr><td>The file <code>usc01.xml</code> (positive law)</td><td><code>by_source.0</code></td><td>39 units, 129 provisions, 10 definitions</td></tr>
+<tr><td>The file <code>usc11a.xml</code> (not positive law)</td><td><code>by_source.1</code></td><td>230 units, 2,362 provisions, 4 definitions</td></tr>
+<tr><td>The file <code>usc45.xml</code> (not positive law)</td><td><code>by_source.2</code></td><td>294 units, 2,366 provisions, 130 definitions</td></tr>
+</tbody></table>
+</div>
+<!-- coverage-table:end -->
+<p><code>cargo xtask uscode-sample --update</code> writes this table from the ledger, and
+<code>cargo xtask uscode-sample</code>, which <code>cargo xtask ci</code> runs, fails when the
+table is not what the ledger gives.</p>
+
+    </div>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/examples"><span class="label">Previous &middot; &sect;7</span><span class="t">Examples</span></a><a class="next" href="/docs/contributing"><span class="label">Next &middot; &sect;9</span><span class="t">Contributing</span></a></nav>
+    <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/coverage.md">Edit this page on GitHub</a><a href="/docs/coverage.md">View as Markdown</a></p>
+    <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
+  </article>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#what-the-words-mean"><span class="n">8.1</span> What the words mean</a></li><li class="lvl-2"><a href="#the-basis-of-a-definition"><span class="n">8.2</span> The basis of a definition</a></li><li class="lvl-2"><a href="#counted-and-not-imported"><span class="n">8.3</span> Counted and not imported</a></li><li class="lvl-2"><a href="#the-figures"><span class="n">8.4</span> The figures</a></li></ol></aside>
+</div>
+</main>
+<div class="backdrop" data-drawer-close hidden></div>
+<footer class="site-foot">
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <nav aria-label="Footer">
+    <a href="/docs/">Docs</a>
+    <a href="/llms.txt">llms.txt</a>
+    <a href="https://github.com/BeeGass/fidryn">Source</a>
+    <a href="https://onlygass.dev">onlygass.dev</a>
+  </nav>
+</footer>
+</body>
+</html>

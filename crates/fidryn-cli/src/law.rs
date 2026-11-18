@@ -1,19 +1,23 @@
 //! The commands of law modules: `fidryn ingest`, a generated workspace
-//! written from the archives of one release of a corpus, and `fidryn text`,
-//! the text of the provisions and notes a workspace holds.
+//! written from the archives of one release of a corpus, `fidryn text`, the
+//! text of the provisions and notes a workspace holds, and `fidryn
+//! coverage`, the coverage ledger of a generated workspace.
 //!
 //! `ingest` is the one place of the command line that names the corpus it
 //! imports, the United States Code, read from the official XML release point
 //! published by the Office of the Law Revision Counsel by
-//! `fidryn-ingest-uscode`. What it writes, `fidryn-driver` writes: the
-//! command joins the two. `text` names no corpus: it prints the text records
-//! of `fidryn_provision::records` of the modules `fidryn-driver` reads, or
-//! the same text laid out for a person, or the two hashes a binding to one
-//! provision records.
+//! `fidryn-ingest-uscode`. What it writes, `fidryn-driver` writes, the
+//! coverage ledger last: the command joins the two. `text` names no corpus:
+//! it prints the text records of `fidryn_provision::records` of the modules
+//! `fidryn-driver` reads, or the same text laid out for a person, or the two
+//! hashes a binding to one provision records. Nor does `coverage`, which
+//! prints the ledger `fidryn-driver` counts from a workspace's files.
 
 use clap::Subcommand;
 use fidryn_core::Diagnostic;
-use fidryn_driver::workspace::{GeneratedWriter, WriteError, read_modules};
+use fidryn_driver::workspace::{
+    CoverageError, GeneratedWriter, WriteError, read_coverage, read_modules,
+};
 use fidryn_ingest_uscode::{IngestError, IngestOptions, generator, ingest, open};
 use fidryn_provision::records::text_records;
 use fidryn_provision::workspace::{Manifest, WorkspaceKind};
@@ -237,6 +241,44 @@ pub fn write_text(
         })
     };
     written.map_err(|error| format!("cannot write the text: {error}"))
+}
+
+/// `fidryn coverage DIR`: prints to stdout what [`write_coverage`] writes.
+/// Exit 1, with the reason on stderr and nothing on stdout, when the
+/// workspace is curated or cannot be read.
+pub(crate) fn coverage(dir: &Path) -> ExitCode {
+    let stdout = io::stdout();
+    let mut out = io::BufWriter::new(stdout.lock());
+    match write_coverage(dir, &mut out) {
+        Ok(()) => match out.flush() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => super::fail(format!("cannot write the ledger: {error}")),
+        },
+        Err(message) => super::fail(message),
+    }
+}
+
+/// Writes to `out` the coverage ledger of the generated workspace in `dir`,
+/// `fidryn.coverage/v0.1`, counted from its modules as their files stand,
+/// its manifest and its lock: what its writer wrote as `coverage.json`, when
+/// no file was changed since. The modules are read and nothing else of the
+/// workspace is checked; the module files are not held against the lock,
+/// which `fidryn check DIR` does. Nothing is written when the workspace is
+/// curated, since a ledger is that of a generated workspace, or when it
+/// cannot be read: no manifest, no lock or one that cannot be read or that
+/// disagrees with the manifest, or a module file that does not lower.
+pub fn write_coverage(dir: &Path, out: &mut dyn Write) -> Result<(), String> {
+    let jobs = std::thread::available_parallelism().map_or(1, std::num::NonZero::get);
+    let ledger = read_coverage(dir, jobs).map_err(|error| match error {
+        CoverageError::Curated => format!(
+            "{} holds a curated workspace, and the coverage ledger belongs to a generated \
+             workspace, whose lock records what its importer counted",
+            dir.display()
+        ),
+        CoverageError::Unread(diagnostics) => diagnostics_under(dir, &diagnostics),
+    })?;
+    out.write_all(ledger.to_json().as_bytes())
+        .map_err(|error| format!("cannot write the ledger: {error}"))
 }
 
 /// `fidryn text DIR ADDRESS --hashes`: prints to stdout what

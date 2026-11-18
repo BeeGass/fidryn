@@ -8,8 +8,8 @@ the checker verifies of one module, how modules form a workspace and what
 the checker verifies of one, how a workspace is checked, what outcome
 each reference has, when a binding is stale, how the ingester for the
 United States Code reads the publisher's XML, by which rules it extracts
-definitions, and what the sample of the Code in the repository holds and
-how it is checked. The crate `fidryn-provision` implements the model and
+definitions, what the coverage ledger of a generated workspace counts, and
+what the sample of the Code in the repository holds and how it is checked. The crate `fidryn-provision` implements the model and
 the rules over it, `fidryn-syntax` reads the text of a module,
 `fidryn-check` lowers it into the model and checks it, `fidryn-driver`
 checks a workspace and writes a generated one, and `fidryn-ingest-uscode`
@@ -722,7 +722,8 @@ An importer writes a generated workspace with
   holds nothing but entries whose name begins with a dot (the working
   directory of a new repository, with its `.git`, is such a one), or holds
   a generated workspace of the same prefix. Such a directory may also hold
-  `coverage.json` at its top, and anywhere any entry whose name begins with
+  its [coverage ledger](#the-coverage-ledger), `coverage.json`, at its top,
+  which the run writes again, and anywhere any entry whose name begins with
   a dot, which the run leaves as they are. Any other directory, a curated
   workspace, a generated workspace of another prefix and one that holds a
   symbolic link of another name among them, is refused, and nothing in it
@@ -734,21 +735,27 @@ An importer writes a generated workspace with
   which `create` clears and `finish` removes.
 - `write(module)` writes a unit or a container whose address is below the
   prefix, in the canonical form, to its path, through a temporary file
-  that is renamed. It may be called from several threads at once, and it
-  fails when the run has already written a module to that path, so that
-  no module replaces another.
+  that is renamed, and keeps the module's [interface](#interfaces), built
+  from the module as it was given. It may be called from several threads
+  at once, and it fails when the run has already written a module to that
+  path, so that no module replaces another.
 - `finish(generator, artifacts, addresses, not_imported)` removes every
   `.fr` file the run did not write, and each directory that leaves empty,
-  then writes `law.lock.json` last, and returns the lock.
+  then writes `law.lock.json`, then, last, `coverage.json`, the
+  [coverage ledger](#the-coverage-ledger) counted from the interfaces of
+  the modules it wrote, the manifest and the lock, and returns the lock.
+  Nothing is read again to count the ledger: neither the text of the
+  modules nor what the importer read.
 - `compare(out, manifest)` makes a writer that writes nothing. It compares
   the manifest with `workspace.json` at once, `write` compares each module
   with the file at its path, and `finish` compares the lock with
-  `law.lock.json`. `finish` counts as extra every `.fr` file of `out` that
-  the run did not write and every entry that `create` refuses: a file other
-  than a module and `coverage.json` at the top, and a symbolic link or any
-  other entry that is neither a file nor a directory. The two follow one
-  rule, so they cannot disagree. Only `coverage.json` and the entries whose
-  name begins with a dot are not looked at. `finish` returns the lock when
+  `law.lock.json` and the ledger with `coverage.json`. `finish` counts as
+  extra every `.fr` file of `out` that the run did not write and every
+  entry that `create` refuses: a file other than a module, the manifest,
+  the lock and the ledger at the top, and a symbolic link or any other
+  entry that is neither a file nor a directory. The two follow one rule, so
+  they cannot disagree. Only the entries whose name begins with a dot are
+  not looked at. `finish` returns the lock when
   nothing differs, and then `create` accepts the directory and a run of the
   same modules changes none of its bytes; otherwise it returns
   `WriteError::Differs`, which lists every path that is `missing`, `extra`
@@ -761,7 +768,11 @@ threads changes a byte. A run that is stopped before `finish`, by an error
 or because it was killed, leaves a generated workspace of the same prefix
 whose lock is missing or is that of the run before it. `fidryn check`
 reports it with `E730`, and the next run accepts the directory and, when it
-finishes, puts it right.
+finishes, puts it right. A run stopped after the lock and before the
+ledger leaves a workspace that checks clean, since no check reads the
+ledger, and whose ledger is missing or is that of the run before it;
+`compare` reports it as `missing coverage.json` or
+`different coverage.json`, and the next run puts it right.
 
 ### What the checker verifies in a workspace
 
@@ -888,7 +899,8 @@ anything is printed or written.
 
 The interface of a module, which `fidryn_provision::interface_of` builds
 from the lowered module and the byte ranges of its declarations, holds all
-that phase two reads of the module:
+that phase two and the [coverage ledger](#the-coverage-ledger) read of the
+module:
 
 - its address, its shape, its aliases, `within`, `source` and
   `positive_law`; for a container its kind, status and members;
@@ -1759,9 +1771,10 @@ group it opens.
 the manifest, of the name `uscode`, the kind `generated`, the prefix
 `/us/usc`, the release of the record and the running toolchain's version;
 a module for each unit and container of the titles chosen, every title by
-default; and the lock, whose generator is `fidryn-ingest-uscode` at the
+default; the lock, whose generator is `fidryn-ingest-uscode` at the
 same version, whose artifacts are the archives and members whose modules
-the run wrote, as the record gives them, and whose counts are those above.
+the run wrote, as the record gives them, and whose counts are those above;
+and last the [coverage ledger](#the-coverage-ledger) of the workspace.
 The numbering of addresses still runs over every member of the archive
 directory, as [How it gives addresses](#how-it-gives-addresses) says.
 
@@ -1953,15 +1966,19 @@ note as `see_note`.
   name a part of the Code in a form the rules do not resolve, such as "this
   chapter and chapter 5" or "subparagraph (A) of this paragraph", a reach
   that names a law outside the Code, such as "this Act" or a link to a
-  public law, and a reach whose kind word names no provision or container
-  above the definition.
+  public law, and a reach whose kind word names neither the provision that
+  states the reach nor any provision or container above it. For an
+  inherited reach, the provision that states it is the provision of the
+  chapeau.
 - `restated`: the file does not declare its title positive law (its flag is
   `no`, or it has none), so the words of the provision are those of the
   editors of the Code, and the reach the law enacted may differ from the
   one they state: a "this chapter" of the Code may stand for "this Act" or
-  "this title" of the law the editors classified there. `see_note` points
-  to the editorial note that says what the enacted words were, when there
-  is one.
+  "this title" of the law the editors classified there. `see_note`, when a
+  definition has one, is the address of the first editorial note headed
+  "References in Text" one of whose own paragraphs holds the words that
+  name the region followed by `, referred to in`. Such a note often says
+  what the enacted words were; the rules do not check that it does.
 
 An invented example: the chapeau of a section of an invented title that is
 positive law, and the definitions extracted from its paragraphs.
@@ -1986,6 +2003,68 @@ holds each to the rules of [What the checker verifies in one module](#what-the-c
 its provision is in the module, each term stands in its text, and the reach
 words stand in its text or in the chapeau of one of its ancestors.
 
+## The coverage ledger
+
+A generated workspace holds at its top its coverage ledger,
+`coverage.json`, `fidryn.coverage/v0.1`: what the workspace holds, in
+counts. The [writer](#writing-a-generated-workspace) writes it last, after
+the lock, through a temporary file like every file of a run, and the lock
+does not list it. [`fidryn coverage DIR`](cli.md#coverage) prints it,
+counted again from the files of the workspace as they stand; the two are
+the same, byte for byte, while no file is changed. No check reads it. Its
+JSON Schema is [`coverage-v0.1.json`](../schemas/coverage-v0.1.json).
+
+`fidryn_provision::records::coverage` counts it from the
+[interfaces](#interfaces) of the modules, the index of their addresses
+below the prefix, which gives each reference its [outcome](#references) as
+the check of the workspace does, the manifest and the lock, and from
+nothing else: it reads no module's source and nothing outside the
+workspace. A unit and a container are counted, with their notes,
+footnotes, references and definitions; a curated module is counted
+nowhere. The keys, in their order:
+
+| Key | Counts | From |
+| --- | --- | --- |
+| `schema` | `"fidryn.coverage/v0.1"` | |
+| `prefix` | the prefix of the workspace | the manifest |
+| `release` | the release of the workspace | the lock |
+| `totals.units` | the unit modules | the interfaces of the shape `unit` |
+| `totals.containers` | the container modules | the interfaces of the shape `container` |
+| `totals.provisions` | every provision of every unit, the unit's own top provision included | the provisions of the interfaces of units |
+| `totals.units_by_kind` | the units by the kind of their top provision | the kind of the first provision of a unit's interface |
+| `totals.units_by_status` | the units by the status of their top provision, `in-force` for one with none | its status |
+| `totals.containers_by_kind` | the containers by their kind | the kind of the container |
+| `totals.addresses` | `aliases`, `disambiguated` and `assigned`: the aliases the importer kept, and the elements whose address it disambiguated or whose segment it assigned | the lock's `addresses`, copied |
+| `totals.notes` | the notes of the units and the containers, `enacted` and `editorial`, by their layer | the layer of each note |
+| `totals.notes_by_group` | the same notes by their group | the group of each note |
+| `totals.footnotes` | the footnotes of the units and the containers | the number of footnotes of each interface |
+| `totals.with_images` | the provisions and the notes that hold an image, whose picture is not in the archive the text was read from | the `image` of each provision and note |
+| `totals.references` | the references of each layer, `operative`, `enacted` and `editorial`, by outcome, each of the eight outcomes for each layer, as the check report counts them | each reference, its outcome looked up in the index |
+| `totals.outside_by_body` | the references of the outcome `outside`, of every layer, by the body of law they name | the same |
+| `totals.definitions` | the definitions extracted, by [basis](#the-basis): `enacted`, `restated` and `unresolved` | the definitions of the interfaces of units |
+| `totals.definitions_by_kind` | the definitions extracted, by kind: `means`, `includes`, `does_not_include`, `borrowed` | the same |
+| `totals.not_imported` | what the importer counted and did not import, by the six names of the lock | the lock's `not_imported`, copied |
+| `by_source` | one row for each source file of a unit or a container, sorted by the bytes of `source`: `source`; `positive_law`, `true`, `false`, or `null` for a file with no flag; and the `units` of the file, their `provisions` and their `definitions` | the `source` and `positive_law` of each interface |
+
+The ledger is written with two spaces of indentation, one member to a
+line, an empty object written `{}`, and a final line end. The keys of a
+map whose keys are words of the workspace, a kind, a status, a group, a
+body of law or a kind of definition, are sorted by their bytes, and a word
+is listed only when something is counted under it; the outcomes stand in
+the order of [References](#references). A file of an appendix is a row of
+its own, as every other source is, and nothing merges its counts into
+those of the title it accompanies. The flag of a row is that of the first
+module of the file, by path; every module of a file the importer reads has
+the file's flag. Nothing of the host, the clock or the number of workers
+reaches the ledger, and an estimate of the definitions the rules miss is
+not in it: the ledger holds only what is counted from the workspace.
+
+The ledger of the invented demo workspace is
+[`conformance/fixtures/workspace/demo/coverage.json`](../conformance/fixtures/workspace/demo/coverage.json),
+and that of the sample of the Code
+[`samples/uscode/workspace/coverage.json`](../samples/uscode/workspace/coverage.json),
+whose figures [Coverage](coverage.md) shows.
+
 ## The sample
 
 The repository holds a sample of the Code under `samples/uscode/`
@@ -2001,9 +2080,11 @@ point published by the Office of the Law Revision Counsel, Title 1, Title
   [usc-counting-rules.md](../conformance/usc-counting-rules.md).
 - `workspace/` holds the generated workspace that
   `fidryn ingest uscode samples/uscode/archives --out DIR` writes: its
-  manifest, its lock, and a module for each of the 563 units and 72
-  containers of the three titles, 637 files in all. It is written by
-  `cargo xtask uscode-sample --update` and never by hand.
+  manifest, its lock, its [coverage ledger](#the-coverage-ledger), and a
+  module for each of the 563 units and 72 containers of the three titles,
+  638 files in all. It is written by `cargo xtask uscode-sample --update`
+  and never by hand. The page [Coverage](coverage.md) shows the figures of
+  its ledger.
 - `curated/` holds a curated workspace written by hand that
   [depends](#depending-on-another-workspace) on `workspace/`, at
   `../workspace`, pinned to its release and to the BLAKE3 of its lock. Its
@@ -2015,20 +2096,28 @@ point published by the Office of the Law Revision Counsel, Title 1, Title
   it with its dependency.
 
 `cargo xtask uscode-sample`, which `cargo xtask ci` runs, holds the sample
-to seven things, in this order, and fails with a message that names the
+to eight things, in this order, and fails with a message that names the
 first difference when one of them does not hold:
 
 1. every archive has the size, the SHA-256 and the BLAKE3 that its record
    gives, and the record names every archive and no other;
 2. an ingest of the archives into a temporary directory writes, byte for
-   byte, every directory and file of the committed workspace, and nothing
-   else;
+   byte, every directory and file of the committed workspace, its ledger
+   among them, and nothing else;
 3. an ingest on one worker writes the same bytes as an ingest on eight;
-4. `fidryn check samples/uscode/workspace --no-cache` finds no error;
+4. `fidryn check samples/uscode/workspace --no-cache` finds no error, and
+   `fidryn coverage samples/uscode/workspace` prints the committed
+   `coverage.json`, byte for byte;
 5. `profile.json` is, byte for byte, what the script prints for the
-   archives, and its counts of references by layer and outcome, which the
+   archives; its counts of references by layer and outcome, which the
    script works out by the rules of [References](#references) on its own,
-   are those of the check report;
+   are those of the check report; and every count that the profile's
+   `import` and the ledger's `totals` both hold is the same in both, from
+   the units and the provisions to the notes, the images and what was not
+   imported. Only the ledger counts definitions, `definitions` and
+   `definitions_by_kind`, since the script extracts none, and the profile's
+   `prefix` and `release` stand at the top of the ledger, where they are
+   compared;
 6. the text of every provision, container, note, source credit and
    footnote that `fidryn text samples/uscode/workspace --json` reads back
    from the modules equals, line for line, what `conformance/uslm_text.py`
@@ -2039,15 +2128,20 @@ first difference when one of them does not hold:
    and a stale binding (`W750`) among the warnings, counts at least one
    citation, and gives every citation of it the outcome `exact`; the step
    names the file and the first thing that is wrong, and the curated
-   sample when it counts no citation.
+   sample when it counts no citation;
+8. the table of [Coverage](coverage.md), between the markers
+   `<!-- coverage-table:begin -->` and `<!-- coverage-table:end -->`, is
+   the one the committed ledger gives.
 
 The `fidryn` commands run in the process of the step, as the binary runs
 them. The step makes its temporary directories under the system's
 directory for temporary files and removes them whether it passes or fails,
 and its checks keep no cache, so it leaves the repository as it found it:
-only `--update` writes, the workspace, and then, in the curated manifest,
+only `--update` writes, the workspace, then, in the curated manifest,
 the release and the lock digest of its dependency and its `toolchain`,
-and nothing else; it never touches the curated module.
+and then the table of `docs/coverage.md` between its markers, and nothing
+else; it never touches the curated module. The ledger is not listed in
+the lock, so writing it moves no pin.
 
 ```text
 cargo xtask uscode-sample

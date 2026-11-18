@@ -23,12 +23,13 @@ environment, and Node. It runs workspace tests, Clippy across targets/features,
 Rustdoc, schema assertions and controls, Python/JavaScript checks, the sample
 check (`cargo xtask uscode-sample`: the committed archives of the Code against
 their retrieval record, the committed workspace against what the importer
-writes from them on one worker and on eight, its check, the committed profile
-and its counts of references against the script that counts the archives and
-the check, the text of every provision and note against what an
-independent script reads from the publisher's XML, and the curated sample,
-checked with the generated one as its dependency, every citation of it
-`exact` and its binding not stale), generated-site
+writes from them on one worker and on eight, its check and its coverage
+ledger, the committed profile and its counts against the script that counts
+the archives, the check and the ledger, the text of every provision and note
+against what an independent script reads from the publisher's XML, the
+curated sample, checked with the generated one as its dependency, every
+citation of it `exact` and its binding not stale, and the table of the
+coverage page against the ledger), generated-site
 consistency, the example status check
 (`cargo xtask examples`), the documentation check (`cargo xtask docs`) and
 benchmark compilation. The example status and documentation checks are

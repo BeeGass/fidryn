@@ -1,7 +1,8 @@
 //! The model of law modules and the rules over it: addresses, the
 //! normalization of text, the file path of a module, the model of provisions,
 //! notes and modules ([`model`]), their hashes ([`hash`]), their text
-//! records ([`records`]), their canonical text ([`render`]), the interface
+//! records and the coverage ledger of a generated workspace ([`records`]),
+//! their canonical text ([`render`]), the interface
 //! of a module ([`interface`]), the index of addresses that gives each
 //! reference its outcome ([`mod@reference`]), the staleness of a binding
 //! ([`binding`]), and the files of a workspace as data: its manifest, its
@@ -32,7 +33,7 @@ pub use model::{
     DefinitionKind, Footnote, Import, Item, Layer, Module, Note, Num, PartRole, Provision, Quoted,
     QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
 };
-pub use records::TextRecord;
+pub use records::{Coverage, TextRecord};
 pub use reference::{AddressIndex, DeclaredTwice, Outcome};
 
 /// A seeded generator for the tests: the same sequence on every run and every

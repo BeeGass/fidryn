@@ -384,6 +384,90 @@ fn the_text_of_the_workspace_of_a_fixture_is_its_expected_records() {
     }
 }
 
+/// The keys of the ledger's `totals` that the profile of a fixture does not
+/// have: the independent reading extracts no definitions.
+const LEDGER_ONLY: [&str; 2] = ["definitions", "definitions_by_kind"];
+/// The keys of the profile that stand at the top of the ledger, not in its
+/// `totals`.
+const AT_THE_TOP: [&str; 2] = ["prefix", "release"];
+
+/// `fidryn coverage DIR` prints, byte for byte, the ledger that the ingest
+/// of each fixture wrote as `coverage.json`, and the ledger counts what the
+/// profile written by hand for the fixture counts, key for key: the units,
+/// containers and provisions, the notes, the footnotes and images, the
+/// references by layer and outcome and the lock's counts. A curated
+/// workspace and a directory with no workspace have no ledger.
+#[test]
+fn the_ledger_of_a_fixture_is_what_coverage_prints_and_counts_what_its_profile_counts() {
+    let coverage = |dir: &Path| {
+        fidryn()
+            .args([OsStr::new("coverage"), dir.as_os_str()])
+            .output()
+            .expect("run fidryn")
+    };
+    for (name, members) in fixture_releases() {
+        let scratch = Scratch::new(&format!("coverage-{name}"));
+        let archives = scratch.join("archives");
+        one_archive(&archives, members);
+        let out = scratch.join("out");
+        succeeded(&ingest(&archives, &out, &[]), &name);
+        let written = read(&out.join("coverage.json"));
+        let printed = coverage(&out);
+        succeeded(&printed, &format!("coverage of {name}"));
+        assert_eq!(stderr(&printed), "", "{name}");
+        assert_eq!(stdout(&printed), written, "{name}");
+
+        let ledger: Value = serde_json::from_str(&written).expect("the ledger is JSON");
+        assert_eq!(ledger["schema"], "fidryn.coverage/v0.1", "{name}");
+        let profile: Value =
+            serde_json::from_slice(&fixture(&format!("{name}.profile.json"))).expect("JSON");
+        let totals = ledger["totals"].as_object().expect("an object");
+        for (key, counted) in profile.as_object().expect("an object") {
+            let ours = if AT_THE_TOP.contains(&key.as_str()) {
+                &ledger[key]
+            } else {
+                totals
+                    .get(key)
+                    .unwrap_or_else(|| panic!("{name}: the ledger has no `{key}`"))
+            };
+            assert_eq!(ours, counted, "{name}: `{key}`");
+        }
+        for key in totals.keys() {
+            assert!(
+                profile.get(key).is_some() || LEDGER_ONLY.contains(&key.as_str()),
+                "{name}: the profile has no `{key}`"
+            );
+        }
+    }
+
+    // A curated workspace has no ledger, and neither has a directory with
+    // no workspace; nothing is printed to stdout.
+    let scratch = Scratch::new("coverage-refused");
+    let curated = scratch.join("curated");
+    fs::create_dir_all(&curated).expect("create a directory");
+    let manifest = fidryn_provision::workspace::Manifest {
+        name: "notes".to_owned(),
+        kind: fidryn_provision::workspace::WorkspaceKind::Curated,
+        prefix: fidryn_provision::Address::parse("/zz/notes").expect("an address"),
+        release: None,
+        toolchain: VERSION.to_owned(),
+        dependencies: Vec::new(),
+    };
+    fs::write(curated.join("workspace.json"), manifest.to_json()).expect("write");
+    for (dir, words) in [
+        (
+            &curated,
+            "holds a curated workspace, and the coverage ledger belongs to a generated workspace",
+        ),
+        (&scratch.join("archives"), "E730"),
+    ] {
+        let refused = coverage(dir);
+        assert_eq!(refused.status.code(), Some(1), "{}", stderr(&refused));
+        assert_eq!(stdout(&refused), "");
+        assert!(stderr(&refused).contains(words), "{}", stderr(&refused));
+    }
+}
+
 /// Every module the importer reads from a fixture, written in its canonical
 /// form, passes the one-module check with the definitions extracted from it
 /// and reads back to the same model; so does the fixture of a file that is
@@ -778,14 +862,35 @@ fn verify_reports_a_changed_a_missing_and_an_extra_file_and_writes_nothing() {
     one_archive(&archives, fixture_members("two-files"));
     let out = scratch.join("out");
     succeeded(&ingest(&archives, &out, &[]), "the run");
-    // What a run keeps beside its own files, and entries whose name begins
-    // with a dot, are not looked at.
-    fs::write(out.join("coverage.json"), "{}\n").expect("write");
+    // Entries whose name begins with a dot are not looked at.
     fs::write(out.join(".notes"), "not the workspace's\n").expect("write");
-
     let verified = ingest(&archives, &out, &["--verify"]);
     succeeded(&verified, "a directory that holds what the run writes");
     assert_eq!(stdout(&verified), "ok\n");
+
+    // The ledger a run writes after the lock is compared like any other
+    // file: missing when a run stopped before it, different when it is
+    // that of another run. The check of the workspace does not read it.
+    let ledger = read(&out.join("coverage.json"));
+    for (bytes, word) in [(None, "missing"), (Some("{}\n"), "different")] {
+        match bytes {
+            None => fs::remove_file(out.join("coverage.json")).expect("remove the ledger"),
+            Some(bytes) => fs::write(out.join("coverage.json"), bytes).expect("write"),
+        }
+        succeeded(
+            &check(&out),
+            "the check of a workspace whose ledger is not its own",
+        );
+        let verified = ingest(&archives, &out, &["--verify"]);
+        assert_eq!(verified.status.code(), Some(1), "{}", stderr(&verified));
+        assert_eq!(stdout(&verified), format!("{word} coverage.json\n"));
+    }
+    succeeded(
+        &ingest(&archives, &out, &[]),
+        "a run that writes the ledger again",
+    );
+    assert_eq!(read(&out.join("coverage.json")), ledger);
+    assert_eq!(stdout(&ingest(&archives, &out, &["--verify"])), "ok\n");
 
     let s1 = out.join("us/usc/t99/s1.fr");
     let changed = read(&s1).replace("The first holder", "The first keeper");
@@ -832,6 +937,7 @@ fn verify_reports_a_changed_a_missing_and_an_extra_file_and_writes_nothing() {
     assert_eq!(
         stdout(&verified),
         [
+            "coverage.json",
             "law.lock.json",
             "us/usc/t99.fr",
             "us/usc/t99/s1.fr",

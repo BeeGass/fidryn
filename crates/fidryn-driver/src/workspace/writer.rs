@@ -2,13 +2,14 @@
 //! with what a run would write into it.
 
 use super::discover::{Walk, is_dot_named, walk};
-use super::{LOCK_FILE, MANIFEST_FILE};
+use super::report::ledger_of;
+use super::{COVERAGE_FILE, LOCK_FILE, MANIFEST_FILE};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::render::render;
 use fidryn_provision::workspace::{
     AddressCounts, Artifact, Generator, Lock, Manifest, NotImported, WorkspaceKind,
 };
-use fidryn_provision::{Hash32, Module};
+use fidryn_provision::{DeclSpans, Hash32, Interface, Module, interface_of};
 use std::collections::BTreeMap;
 use std::fmt;
 use std::fs;
@@ -21,14 +22,12 @@ use std::sync::{Mutex, PoisonError};
 /// while they are written. Its name begins with a dot, so no check reads it.
 const SCRATCH: &str = ".fidryn-write";
 
-/// The file at the top of a generated workspace that the writer keeps
-/// besides its own two.
-const COVERAGE_FILE: &str = "coverage.json";
-
 /// Writes a generated workspace: its manifest, the modules of one run, then
-/// its lock. A run that stops before its end leaves a generated workspace of
-/// the same prefix whose lock is missing or outdated: the check reports it,
-/// and the next run accepts the directory and puts it right.
+/// its lock, and last its coverage ledger, `coverage.json`. A run that stops
+/// before its end leaves a generated workspace of the same prefix whose lock
+/// is missing or outdated, which the check reports, or, stopped between the
+/// two, whose ledger is missing or outdated; the next run accepts the
+/// directory and puts it right.
 ///
 /// [`GeneratedWriter::write`] may be called from several threads at once.
 /// What the run writes depends only on the modules, the manifest and what
@@ -45,6 +44,9 @@ pub struct GeneratedWriter {
     /// The BLAKE3 of the bytes of every module the run has written, by its
     /// path.
     written: Mutex<BTreeMap<String, Hash32>>,
+    /// The interface of every module the run has written, by its path, built
+    /// from the module as it was given, which the ledger is counted from.
+    interfaces: Mutex<BTreeMap<String, Interface>>,
     /// The number of the next temporary file.
     next: AtomicU64,
     /// What a writer made by [`GeneratedWriter::compare`] compares with;
@@ -120,13 +122,14 @@ impl GeneratedWriter {
     /// `out` is a directory that does not exist, which is created, one that
     /// holds nothing but entries whose name begins with a dot, or one whose
     /// `workspace.json` is the manifest of a generated workspace of the same
-    /// prefix. Such a directory may hold, besides `.fr` files and the
-    /// manifest and the lock, a file `coverage.json` at its top and, anywhere,
-    /// any file, directory or symbolic link whose name begins with a dot,
-    /// which the run leaves as they are. Any other directory is refused, and
-    /// nothing in it is changed. `manifest` is of kind `generated`, has a
-    /// release and has no dependencies; it is written at once, so that a run
-    /// that stops before its end leaves a directory the next run accepts.
+    /// prefix. Such a directory may hold, besides the `.fr` files and the
+    /// manifest, the lock and the ledger `coverage.json` at its top, which
+    /// the run writes again, and, anywhere, any file, directory or symbolic
+    /// link whose name begins with a dot, which the run leaves as they are.
+    /// Any other directory is refused, and nothing in it is changed.
+    /// `manifest` is of kind `generated`, has a release and has no
+    /// dependencies; it is written at once, so that a run that stops before
+    /// its end leaves a directory the next run accepts.
     pub fn create(out: &Path, manifest: Manifest) -> Result<GeneratedWriter, WriteError> {
         refuse_manifest(&manifest)?;
         match fs::metadata(out) {
@@ -151,6 +154,7 @@ impl GeneratedWriter {
             out: out.to_owned(),
             manifest,
             written: Mutex::new(BTreeMap::new()),
+            interfaces: Mutex::new(BTreeMap::new()),
             next: AtomicU64::new(0),
             compared: None,
         };
@@ -161,11 +165,10 @@ impl GeneratedWriter {
     /// A writer that writes nothing and compares what a run of the
     /// generated workspace `manifest` would write with what the directory
     /// `out` holds: the manifest, each module given to
-    /// [`write`](Self::write), and the lock [`finish`](Self::finish) is
-    /// given. Every other entry of `out` that [`create`](Self::create) would
-    /// refuse is extra; what a run keeps beside its own files,
-    /// `coverage.json` at the top, is not looked at, and nor is any entry
-    /// whose name begins with a dot.
+    /// [`write`](Self::write), and the lock and the ledger
+    /// [`finish`](Self::finish) writes. Every other entry of `out` that
+    /// [`create`](Self::create) would refuse is extra; an entry whose name
+    /// begins with a dot is not looked at.
     ///
     /// `manifest` is refused as by `create`. `out` is a directory, or does
     /// not exist, in which case every file the run writes is missing and
@@ -194,6 +197,7 @@ impl GeneratedWriter {
             out: out.to_owned(),
             manifest,
             written: Mutex::new(BTreeMap::new()),
+            interfaces: Mutex::new(BTreeMap::new()),
             next: AtomicU64::new(0),
             compared: Some(Compared {
                 found,
@@ -207,8 +211,9 @@ impl GeneratedWriter {
     /// Renders `module`, a unit or a container whose address is below the
     /// prefix, and writes it to its path through a temporary name, or, for
     /// a writer made by [`compare`](Self::compare), compares it with the
-    /// file at its path. Fails when the run has already written a module to
-    /// that path, so that no module replaces another.
+    /// file at its path; and keeps its interface, for the ledger. Fails when
+    /// the run has already written a module to that path, so that no module
+    /// replaces another.
     pub fn write(&self, module: &Module) -> Result<(), WriteError> {
         let address = match module {
             Module::Unit(unit) => &unit.address,
@@ -244,22 +249,32 @@ impl GeneratedWriter {
                 .lock()
                 .unwrap_or_else(PoisonError::into_inner)
                 .remove(&path);
-        })
+        })?;
+        let interface = interface_of(module, &DeclSpans::default());
+        self.interfaces
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(path, interface);
+        Ok(())
     }
 
     /// Ends the run: removes every `.fr` file the run did not write, and each
     /// directory that leaves empty, then writes `law.lock.json`, the lock of
     /// `generator`, `artifacts`, `addresses`, `not_imported` and every module
-    /// the run wrote, which it returns. An entry whose name begins with a dot
-    /// is not touched.
+    /// the run wrote, which it returns, and last `coverage.json`, the
+    /// coverage ledger of the workspace
+    /// ([`coverage`](fidryn_provision::records::coverage)), counted from the
+    /// interfaces of the modules as they were given, the manifest and the
+    /// lock: what `fidryn coverage` prints of the workspace. An entry whose
+    /// name begins with a dot is not touched.
     ///
     /// A writer made by [`compare`](Self::compare) removes and writes
-    /// nothing. It compares the lock, and counts as extra every module file
-    /// of the directory that the run did not write and every entry that
-    /// `create` would refuse. It returns the lock when nothing differs, in
-    /// which case `create` accepts the directory and a run of the same
-    /// modules changes none of its bytes, and [`WriteError::Differs`]
-    /// otherwise.
+    /// nothing. It compares the lock and the ledger, and counts as extra
+    /// every module file of the directory that the run did not write and
+    /// every entry that `create` would refuse. It returns the lock when
+    /// nothing differs, in which case `create` accepts the directory and a
+    /// run of the same modules changes none of its bytes, and
+    /// [`WriteError::Differs`] otherwise.
     pub fn finish(
         self,
         generator: Generator,
@@ -272,6 +287,7 @@ impl GeneratedWriter {
         if let Some(compared) = &self.compared {
             let lock = self.lock(generator, artifacts, addresses, not_imported, modules);
             self.put(LOCK_FILE, &lock.to_json())?;
+            self.put(COVERAGE_FILE, &self.ledger(&lock))?;
             let mut differences = std::mem::take(
                 &mut *compared
                     .differences
@@ -322,9 +338,24 @@ impl GeneratedWriter {
         }
         let lock = self.lock(generator, artifacts, addresses, not_imported, modules);
         self.put(LOCK_FILE, &lock.to_json())?;
+        self.put(COVERAGE_FILE, &self.ledger(&lock))?;
         let scratch = self.out.join(SCRATCH);
         fs::remove_dir_all(&scratch).map_err(|error| io_error(&scratch, error))?;
         Ok(lock)
+    }
+
+    /// The text of the ledger of the run, whose lock is `lock`, from the
+    /// interfaces of the modules it wrote, in the order of their paths.
+    fn ledger(&self, lock: &Lock) -> String {
+        let interfaces: Vec<Interface> = std::mem::take(
+            &mut *self
+                .interfaces
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner),
+        )
+        .into_values()
+        .collect();
+        ledger_of(&interfaces, &self.manifest, lock).to_json()
     }
 
     /// The lock of the run.
@@ -501,8 +532,8 @@ fn refuse_foreign(out: &Path, manifest: &Manifest) -> Result<(), WriteError> {
     }
 }
 
-/// The files a run keeps at the top of a generated workspace besides its
-/// modules: its manifest, its lock, and `coverage.json`.
+/// The files a run writes at the top of a generated workspace besides its
+/// modules: its manifest, its lock, and its ledger, `coverage.json`.
 const KEPT: [&str; 3] = [MANIFEST_FILE, LOCK_FILE, COVERAGE_FILE];
 
 /// What kind of entry a stray entry is.
@@ -814,10 +845,11 @@ mod tests {
             expected.push(("zz/demo/t1/s3.fr", Difference::Different));
             expected.sort_by(|a, b| a.0.cmp(b.0));
         }
-        // What a run keeps beside the workspace, and entries whose name
-        // begins with a dot, are not looked at, and a comparing writer does
-        // not touch the directory of a writer's temporary files.
-        fs::write(out.join("coverage.json"), "{}\n").expect("write");
+        // The ledger a run writes is compared like any other file. Entries
+        // whose name begins with a dot are not looked at, and a comparing
+        // writer does not touch the directory of a writer's temporary files.
+        fs::write(out.join(COVERAGE_FILE), "{}\n").expect("write");
+        expected.insert(0, (COVERAGE_FILE, Difference::Different));
         fs::write(out.join(".notes.fr"), "not a module\n").expect("write");
         fs::create_dir_all(out.join(SCRATCH)).expect("create");
         fs::write(out.join(SCRATCH).join("0.tmp"), "pending\n").expect("write");
@@ -837,7 +869,9 @@ mod tests {
         ));
         assert_eq!(tree(&out), before);
 
-        // The lock a run writes is compared like any other file.
+        // The lock and the ledger a run writes are compared like any other
+        // file: a run of fewer modules writes a lock and a ledger of other
+        // bytes.
         let other = scratch.join("other");
         run(create(&other), &models()).expect("the run is written");
         let error = run(compare(&other, manifest("0.0.0")), &models()[..3])
@@ -845,10 +879,17 @@ mod tests {
         assert_eq!(
             error.to_string(),
             format!(
-                "{} does not hold what the run writes: different law.lock.json, extra \
-                 zz/demo/t1/s3.fr",
+                "{} does not hold what the run writes: different coverage.json, different \
+                 law.lock.json, extra zz/demo/t1/s3.fr",
                 other.display()
             )
+        );
+        // A ledger that is missing, as after a run stopped between the lock
+        // and the ledger, is missing.
+        fs::remove_file(other.join(COVERAGE_FILE)).expect("remove the ledger");
+        assert_eq!(
+            differences(run(compare(&other, manifest("0.0.0")), &models())),
+            [(COVERAGE_FILE.to_owned(), Difference::Missing)]
         );
     }
 
@@ -857,7 +898,11 @@ mod tests {
         let scratch = Scratch::new("absent");
         let out = scratch.join("absent");
         let found = differences(run(compare(&out, manifest("0.0.0")), &models()));
-        let mut expected = vec![LOCK_FILE.to_owned(), MANIFEST_FILE.to_owned()];
+        let mut expected = vec![
+            COVERAGE_FILE.to_owned(),
+            LOCK_FILE.to_owned(),
+            MANIFEST_FILE.to_owned(),
+        ];
         expected.extend(["t1", "t1/s1", "t1/s2", "t1/s3"].map(|rel| format!("zz/demo/{rel}.fr")));
         expected.sort();
         assert_eq!(

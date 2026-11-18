@@ -23,6 +23,7 @@ statement of any jurisdiction's law.
 | [Cases and time](cases-and-time.md) | Case records, valid time, known-at |
 | [Outcomes](outcomes.md) | Determinate, Suspended, Contingent, and the rest |
 | [Examples](examples.md) | Trust, tax, federal slices, fifty states |
+| [Coverage](coverage.md) | What the sample of the United States Code in the repository holds, in counts |
 
 The closed grammar is [`grammar.ebnf`](../grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
@@ -32,7 +33,9 @@ are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),
 `outcomeDocument`). The files of a workspace of law modules follow
 [`schemas/workspace-v0.1.json`](../schemas/workspace-v0.1.json),
 [`schemas/law-lock-v0.1.json`](../schemas/law-lock-v0.1.json) and
-[`schemas/retrieval-v0.1.json`](../schemas/retrieval-v0.1.json), and the
+[`schemas/retrieval-v0.1.json`](../schemas/retrieval-v0.1.json), the
+coverage ledger of a generated workspace follows
+[`schemas/coverage-v0.1.json`](../schemas/coverage-v0.1.json), and the
 report of the check of a workspace follows
 [`schemas/check-report-v0.1.json`](../schemas/check-report-v0.1.json).
 
@@ -45,7 +48,7 @@ report of the check of a workspace follows
 | [Licensing](../LICENSING.md) | MIT terms and third-party notices |
 | [Releases](releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, and the sample of the Code the repository holds and its check |
+| [Law modules](law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, the coverage ledger of a generated workspace, and the sample of the Code the repository holds and its check |
 | [Implementation status](implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 

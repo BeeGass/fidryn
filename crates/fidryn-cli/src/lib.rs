@@ -98,6 +98,12 @@ pub enum Command {
         #[arg(long, requires = "address", conflicts_with = "json")]
         hashes: bool,
     },
+    /// Print the coverage ledger of a generated workspace (`fidryn.coverage/v0.1`), counted
+    /// from its modules as they stand, its manifest and its lock.
+    Coverage {
+        /// The directory of the generated workspace.
+        dir: PathBuf,
+    },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
         path: PathBuf,
@@ -243,6 +249,7 @@ pub fn run(cli: Cli) -> ExitCode {
             Some(address) if hashes => law::hashes(&dir, address),
             address => law::text(&dir, address, json),
         },
+        Command::Coverage { dir } => law::coverage(&dir),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -350,13 +357,14 @@ pub fn run(cli: Cli) -> ExitCode {
 
 /// The files a command reads as its input. `check` chooses its front end by
 /// what it is given, a workspace's directory or a file of either edition,
-/// `ingest` reads archives, `text` the modules of edition 2 of a workspace,
-/// and `ui` reads none.
+/// `ingest` reads archives, `text` and `coverage` the modules of edition 2
+/// of a workspace, and `ui` reads none.
 fn inputs_of(command: &Command) -> Vec<PathBuf> {
     match command {
         Command::Check { .. }
         | Command::Ingest { .. }
         | Command::Text { .. }
+        | Command::Coverage { .. }
         | Command::Ui { .. } => Vec::new(),
         Command::Fmt { path }
         | Command::Inputs { path, .. }

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Validate Fidryn case records, source manifests, the files of workspaces and text records.
 
-The files of a workspace are its manifest, its lock and the retrieval record of
-its archives; the demo workspace under conformance/fixtures/workspace and the
-workspace of the sample under samples/uscode are checked, and so is the check
-report under conformance/fixtures/check-report. Every line of every
-`*.records.jsonl` under conformance/fixtures is a text record.
+The files of a workspace are its manifest, its lock, its coverage ledger and the
+retrieval record of its archives; the demo workspace under
+conformance/fixtures/workspace and the workspace of the sample under
+samples/uscode are checked, and so is the check report under
+conformance/fixtures/check-report. Every line of every `*.records.jsonl` under
+conformance/fixtures is a text record.
 
 Requires: jsonschema, which uv run provides (preferred). Falls back to a
 built-in Draft 2020-12 subset checker if jsonschema is not installed.
@@ -30,6 +31,7 @@ SCHEMA_FILES = {
     "fidryn.retrieval/v0.1": "retrieval-v0.1.json",
     "fidryn.check-report/v0.1": "check-report-v0.1.json",
     "fidryn.text-record/v0.1": "text-record-v0.1.json",
+    "fidryn.coverage/v0.1": "coverage-v0.1.json",
 }
 
 # The directories, relative to the repository root, whose JSON documents are

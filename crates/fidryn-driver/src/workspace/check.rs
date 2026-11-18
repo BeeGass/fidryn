@@ -272,7 +272,11 @@ pub(super) fn read_manifest(root: &Path, diagnostics: &mut Vec<Diagnostic>) -> O
 /// The lock of a generated workspace, when it has one that can be read. A
 /// generated workspace without one, and a curated workspace with one, are
 /// reported in `diagnostics`.
-fn read_lock(root: &Path, manifest: &Manifest, diagnostics: &mut Vec<Diagnostic>) -> Option<Lock> {
+pub(super) fn read_lock(
+    root: &Path,
+    manifest: &Manifest,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> Option<Lock> {
     let text = match fs::read_to_string(root.join(LOCK_FILE)) {
         Ok(text) => Ok(Some(text)),
         Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),

@@ -20,6 +20,7 @@ Research fixture — not legal advice.
 | Mill | https://fidryn.onlygass.dev/docs/mill | https://fidryn.onlygass.dev/docs/mill.md |
 | Outcomes | https://fidryn.onlygass.dev/docs/outcomes | https://fidryn.onlygass.dev/docs/outcomes.md |
 | Examples | https://fidryn.onlygass.dev/docs/examples | https://fidryn.onlygass.dev/docs/examples.md |
+| Coverage | https://fidryn.onlygass.dev/docs/coverage | https://fidryn.onlygass.dev/docs/coverage.md |
 | Contributing | https://fidryn.onlygass.dev/docs/contributing | https://fidryn.onlygass.dev/docs/contributing.md |
 
 ========== https://fidryn.onlygass.dev/docs/index.md ==========
@@ -60,6 +61,7 @@ statement of any jurisdiction's law.
 | [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) | Case records, valid time, known-at |
 | [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md) | Determinate, Suspended, Contingent, and the rest |
 | [Examples](https://fidryn.onlygass.dev/docs/examples.md) | Trust, tax, federal slices, fifty states |
+| [Coverage](https://fidryn.onlygass.dev/docs/coverage.md) | What the sample of the United States Code in the repository holds, in counts |
 
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),
@@ -69,7 +71,9 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 `outcomeDocument`). The files of a workspace of law modules follow
 [`schemas/workspace-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/workspace-v0.1.json),
 [`schemas/law-lock-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/law-lock-v0.1.json) and
-[`schemas/retrieval-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/retrieval-v0.1.json), and the
+[`schemas/retrieval-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/retrieval-v0.1.json), the
+coverage ledger of a generated workspace follows
+[`schemas/coverage-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json), and the
 report of the check of a workspace follows
 [`schemas/check-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/check-report-v0.1.json).
 
@@ -82,7 +86,7 @@ report of the check of a workspace follows
 | [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
 | [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
-| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, and the sample of the Code the repository holds and its check |
+| [Law modules](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md) | Addresses of modules, provisions and notes, the file path of a module, the normalization of its text, the model of provisions, notes and modules, their hashes, the syntax of edition 2, what the checker verifies in one module, workspaces: their manifest, their lock and what the checker verifies in one, how a workspace is checked, references and their outcomes, the ingester for the United States Code, the definitions it extracts, the coverage ledger of a generated workspace, and the sample of the Code the repository holds and its check |
 | [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
 | [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
@@ -2293,20 +2297,27 @@ workers.
 
 A run writes `workspace.json` first, then each module, each file through
 a temporary file that is renamed; it removes the modules of an earlier
-output that it does not write, and writes `law.lock.json` last, so a run
-that is stopped leaves a directory the next run accepts. With `--title`,
+output that it does not write, and writes `law.lock.json` and then, last,
+`coverage.json`, the [coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)
+of the workspace, which [`coverage`](#coverage) prints; so a run that is
+stopped leaves a directory the next run accepts. The lock does not list
+the ledger. With `--title`,
 only the modules of those titles are written, and the lock lists the
 archives and members whose modules the run wrote. The numbering of
 addresses still runs over every member the archive directory holds,
 whichever titles are chosen, so an address does not depend on the
 selection.
 
-`--verify` compares `workspace.json`, `law.lock.json` and every module
-file of `DIR` with what the run would write. Every other entry that a run
-would refuse is extra: a file other than a module and `coverage.json` at
-the top, and a symbolic link or any other entry that is neither a file
-nor a directory. Only `coverage.json` and the entries whose name begins
-with a dot are not looked at. It writes nothing, `DIR` included.
+`--verify` compares `workspace.json`, `law.lock.json`, `coverage.json`
+and every module file of `DIR` with what the run would write. Every other
+entry that a run would refuse is extra: a file other than a module and
+those three at the top, and a symbolic link or any other entry that is
+neither a file nor a directory. Only the entries whose name begins with a
+dot are not looked at. It writes nothing, `DIR` included. A run stopped
+after the lock and before the ledger leaves a workspace that `fidryn check`
+accepts, since no check reads the ledger, and `--verify` reports it as
+`missing coverage.json`, or `different coverage.json` when the ledger is
+that of an earlier run.
 
 **Example**
 
@@ -2501,6 +2512,70 @@ fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 --hashes
 
 `--hashes` without `ADDRESS`, and `--hashes` with `--json`, are usage
 errors, exit 2.
+
+## `coverage`
+
+`fidryn coverage DIR` prints the coverage ledger of the generated workspace
+in `DIR`, `fidryn.coverage/v0.1`: its units, containers and provisions,
+its notes, footnotes and images, its references of each layer by outcome,
+the definitions extracted from its provisions by basis and by kind, and
+what its importer counted and did not import
+([The coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger)). It computes the
+ledger from the modules as their files stand, the manifest and the lock.
+It does not verify the module files against the lock, which is what
+`fidryn check DIR` is for. Of a workspace whose files are those its run
+wrote, it prints that run's `coverage.json`, byte for byte.
+
+**Arguments**
+
+| Name | Required | Type |
+| --- | --- | --- |
+| `DIR` | yes | path to the directory of a generated workspace |
+
+**Example**
+
+```sh
+fidryn coverage conformance/fixtures/workspace/demo
+fidryn coverage samples/uscode/workspace
+```
+
+**Success.** Exit 0. It prints the ledger as JSON with two spaces of
+indentation and a final line end, its keys in their order, the JSON Schema
+of which is [schemas/coverage-v0.1.json](https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json).
+Of the demo workspace it prints first:
+
+```text
+{
+  "schema": "fidryn.coverage/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "totals": {
+    "units": 3,
+    "containers": 2,
+    "provisions": 3,
+    "units_by_kind": {
+      "section": 3
+    },
+```
+
+The output depends on the files of the workspace alone: neither the host,
+the working directory nor the number of threads the system offers changes
+a byte. The figures of the sample of the Code are on the page
+[Coverage](https://fidryn.onlygass.dev/docs/coverage.md).
+
+**Failure.** Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a curated workspace, which has no ledger, as
+``DIR holds a curated workspace, and the coverage ledger belongs to a generated workspace, whose lock records what its importer counted``;
+a directory that holds no workspace (`E730`); a generated workspace
+without a lock, with one that cannot be read, or with one whose prefix or
+release is not the manifest's (`E730`); an entry that cannot be read or is
+neither a file nor a directory (`E730`); and a module file that is not a
+module of edition 2 that lowers, with its diagnostics. The curated sample
+of the repository is refused:
+
+```sh exit=1
+fidryn coverage samples/uscode/curated
+```
 
 ## See also
 
@@ -3810,6 +3885,129 @@ the interpreter cannot honestly claim completeness.
 `run` never chooses a completion. Open-textured queries must be allowed
 to `Suspend`. The kernel does not search.
 
+========== https://fidryn.onlygass.dev/docs/coverage.md ==========
+
+---
+title: "Coverage"
+description: "The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted."
+url: "https://fidryn.onlygass.dev/docs/coverage"
+markdown: "https://fidryn.onlygass.dev/docs/coverage.md"
+author: "Bryan Gass"
+---
+
+> Canonical HTML: https://fidryn.onlygass.dev/docs/coverage
+> This markdown mirror is for agents and plain-text readers.
+
+# Coverage
+
+The figures on this page are those of the sample of the United States Code
+committed in this repository, under `samples/uscode/`, and of nothing else.
+The sample holds three whole titles of the release `119-142` of the
+official XML release point published by the Office of the Law Revision
+Counsel: Title 1, Title 11 Appendix and Title 45. The table below is
+generated from the coverage ledger of the sample's workspace,
+[`samples/uscode/workspace/coverage.json`](https://github.com/BeeGass/fidryn/blob/main/samples/uscode/workspace/coverage.json),
+which [`fidryn coverage`](https://fidryn.onlygass.dev/docs/cli.md#coverage) prints and
+[The coverage ledger](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#the-coverage-ledger) describes key by
+key.
+
+## What the words mean
+
+The ledger says how far the provisions of the sample are taken in three
+words, and in no others.
+
+- **Imported.** The official text of the provision is in a module, read
+  from a pinned file, the publisher's archive, whose size and digests the
+  importer verifies against the retrieval record that says where and when
+  it was fetched. The lock of the workspace records the digests of each
+  archive and of each module file, and the check of the workspace verifies
+  every module file against them.
+- **Addressed.** The provision has a typed address, and its place in the
+  hierarchy, its status and the references in its text are resolved and
+  checked. Every provision imported is addressed. Each reference has an
+  outcome, and the table gives the references of each layer by outcome, so
+  that a reader sees how many of them reach their target.
+- **Classified.** What kind of provision it is, is recorded. At this version
+  the one kind that is recorded is a definition, and the ledger gives the
+  number of definitions extracted, by basis and by kind. It gives no count
+  of classified provisions, since one provision can hold more than one
+  definition.
+
+## The basis of a definition
+
+Each definition extracted has one of three bases:
+
+- `enacted`: its reach names a region of the Code, and the file of its unit
+  declares its title positive law, so the words that state the reach are
+  those the law enacted.
+- `restated`: its reach names a region of the Code, and the file of its
+  unit does not declare its title positive law, so the words are those of
+  the editors of the Code, and the reach the law enacted may differ from the
+  one they state.
+- `unresolved`: the rules found no region of the Code for it, because it
+  states no reach that they read, because its reach names a law outside the
+  Code, or because its reach words name a part of the Code in a form the
+  rules do not resolve, such as "this chapter and chapter 5".
+
+The rules read definitions written in a closed list of forms
+([Definitions](https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md#definitions)), and they do not find every
+definition that the text holds. The share of the definitions they miss has
+not been measured for the sample.
+
+## Counted and not imported
+
+Some of what the publisher's files hold is by rule not imported. The
+importer counts it in the lock of the workspace under these six names, and
+the ledger copies the counts:
+
+- `tables_of_contents`: the tables of contents, whose entries repeat the
+  headings of the units they list;
+- `footnotes_in_tables_of_contents`: the footnotes inside them;
+- `links_in_tables_of_contents`: the links inside them;
+- `release_notes`: the notes that say which release a file is current
+  through;
+- `links_without_words`: the links that have no words, or white space
+  alone;
+- `note_group_headings`: the cross headings that open the groups of notes,
+  whose labels are not imported; what a cross heading holds after its label
+  is imported, as a note of its group.
+
+## The figures
+
+<!-- coverage-table:begin -->
+
+| Counted | Key | Figure |
+| --- | --- | --- |
+| The release | `release` | `119-142` |
+| The prefix of every address | `prefix` | `/us/usc` |
+| Units imported | `totals.units` | 563 |
+| Units, by kind | `totals.units_by_kind` | 229 `courtRule`, 1 `level`, 333 `section` |
+| Units, by status (`in-force` for a unit with none) | `totals.units_by_status` | 482 `in-force`, 9 `omitted`, 68 `repealed`, 4 `transferred` |
+| Containers imported | `totals.containers` | 72 |
+| Containers, by kind | `totals.containers_by_kind` | 1 `appendix`, 25 `chapter`, 1 `courtRules`, 1 `level`, 13 `part`, 29 `subchapter`, 2 `title` |
+| Provisions imported and addressed, the top provision of each unit included | `totals.provisions` | 4,857 |
+| Addresses: aliases kept, and addresses disambiguated and assigned by the importer | `totals.addresses` | 229 `aliases`, 0 `disambiguated`, 3 `assigned` |
+| Notes imported, by layer | `totals.notes` | 1,498 `enacted`, 593 `editorial` |
+| Notes, by group | `totals.notes_by_group` | 1 `courtRules`, 303 `editorialNotes`, 9 `execDoc`, 539 `statutoryNotes`, 1,239 `ungrouped` |
+| Footnotes imported | `totals.footnotes` | 107 |
+| Provisions and notes that hold an image, whose picture is not in the archive | `totals.with_images` | 1 |
+| References in operative text, by outcome | `totals.references.operative` | 644 `exact`, 14 `target-status`, 0 `ambiguous`, 11 `unit-only`, 1 `range-form`, 273 `no-unit`, 192 `outside`, 0 `malformed` |
+| References in enacted notes, by outcome | `totals.references.enacted` | 332 `exact`, 18 `target-status`, 0 `ambiguous`, 14 `unit-only`, 0 `range-form`, 364 `no-unit`, 1,454 `outside`, 0 `malformed` |
+| References in editorial matter, by outcome | `totals.references.editorial` | 275 `exact`, 47 `target-status`, 0 `ambiguous`, 14 `unit-only`, 1 `range-form`, 259 `no-unit`, 4,919 `outside`, 0 `malformed` |
+| References of the outcome `outside`, by the body of law they name | `totals.outside_by_body` | 739 `/us/act`, 3,310 `/us/pl`, 2,516 `/us/stat` |
+| Definitions extracted, by basis | `totals.definitions` | 7 `enacted`, 100 `restated`, 37 `unresolved` |
+| Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 1 `does_not_include`, 15 `includes`, 121 `means` |
+| Counted and not imported | `totals.not_imported` | 19 `tables_of_contents`, 4 `footnotes_in_tables_of_contents`, 341 `links_in_tables_of_contents`, 3 `release_notes`, 0 `links_without_words`, 358 `note_group_headings` |
+| The file `usc01.xml` (positive law) | `by_source.0` | 39 units, 129 provisions, 10 definitions |
+| The file `usc11a.xml` (not positive law) | `by_source.1` | 230 units, 2,362 provisions, 4 definitions |
+| The file `usc45.xml` (not positive law) | `by_source.2` | 294 units, 2,366 provisions, 130 definitions |
+
+<!-- coverage-table:end -->
+
+`cargo xtask uscode-sample --update` writes this table from the ledger, and
+`cargo xtask uscode-sample`, which `cargo xtask ci` runs, fails when the
+table is not what the ledger gives.
+
 ========== https://fidryn.onlygass.dev/docs/contributing.md ==========
 
 ---
@@ -3864,11 +4062,12 @@ Rustdoc with warnings denied, executable schema probes, Python lint/format/types
 and probe controls, the sample check (`cargo xtask uscode-sample`: the
 committed archives of the Code against their retrieval record, the committed
 workspace against what the importer writes from them on one worker and on
-eight, its check, the committed profile and its counts of references against
-the script that counts the archives and the check, the text of every
-provision and note against what an independent script reads from the
-publisher's XML, and the curated sample, checked with the generated one as
-its dependency, every citation of it `exact` and its binding not stale), required
+eight, its check and its coverage ledger, the committed profile and its
+counts against the script that counts the archives, the check and the
+ledger, the text of every provision and note against what an independent
+script reads from the publisher's XML, the curated sample, checked with the
+generated one as its dependency, every citation of it `exact` and its
+binding not stale, and the table of the coverage page against the ledger), required
 JavaScript tests, generated-site consistency, the example status and
 documentation checks described below, and benchmark compilation. Node and
 [uv](https://docs.astral.sh/uv/) are required for qualification.
@@ -3986,7 +4185,7 @@ fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-provision       law-module model and the rules over it (no workspace crate)
 fidryn-ingest-uscode   official XML release point into law modules (provision)
-fidryn-cli             fidryn binary and localhost mill; ingest and text commands (driver + provision + ingest-uscode)
+fidryn-cli             fidryn binary and localhost mill; ingest, text and coverage commands (driver + provision + ingest-uscode)
 ```
 
 ## Tests

@@ -32,6 +32,8 @@ Source: https://github.com/BeeGass/fidryn
   - HTML: https://fidryn.onlygass.dev/docs/outcomes
 - [Examples](https://fidryn.onlygass.dev/docs/examples.md): Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.
   - HTML: https://fidryn.onlygass.dev/docs/examples
+- [Coverage](https://fidryn.onlygass.dev/docs/coverage.md): The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.
+  - HTML: https://fidryn.onlygass.dev/docs/coverage
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing.md): Toolchain, tests, and how to work on the Fidryn reference interpreter.
   - HTML: https://fidryn.onlygass.dev/docs/contributing
 

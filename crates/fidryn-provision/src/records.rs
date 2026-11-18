@@ -1,4 +1,7 @@
-//! The text records of a module: one line of compact JSON for each
+//! The records of a workspace: the text records of a module, and the
+//! coverage ledger of a generated workspace.
+//!
+//! The text records of a module are one line of compact JSON for each
 //! provision, container, note, credit and footnote, for comparison line by
 //! line with an independent reading of the source.
 //!
@@ -11,14 +14,25 @@
 //! The records are sorted by the bytes of their address; for one address the
 //! provision or container comes first, then the credit, then the footnotes by
 //! ordinal.
+//!
+//! The coverage ledger ([`coverage`]) counts what a generated workspace
+//! holds, from the interfaces of its modules, the index of their addresses,
+//! its manifest and its lock alone: its units, containers and provisions,
+//! its notes and footnotes, the outcomes of its references, the definitions
+//! extracted from its provisions, and what the importer counted and did not
+//! import.
 
 use crate::address::Address;
+use crate::interface::{Interface, Shape};
 use crate::model::{
-    Block, Footnote, Item, Layer, Module, Note, Num, PartRole, Provision, QuotedItem, RowGroup,
-    Run, Text, UnitModule,
+    Basis, Block, DefinitionKind, Footnote, Item, Layer, Module, Note, Num, PartRole, Provision,
+    QuotedItem, RowGroup, Run, Text, UnitModule,
 };
+use crate::reference::{AddressIndex, Outcome};
+use crate::workspace::{AddressCounts, Lock, Manifest, NotImported};
 use serde::{Serialize, Serializer};
 use serde_json::{Map, Value, json};
+use std::collections::BTreeMap;
 
 /// One text record. It serializes to one line of compact JSON, with its keys
 /// in the order of the record's kind: the order in which they are inserted,
@@ -356,6 +370,350 @@ fn quoted_items(items: &[QuotedItem]) -> Value {
             })
             .collect(),
     )
+}
+
+/// The `schema` of a coverage ledger.
+pub const COVERAGE_SCHEMA: &str = "fidryn.coverage/v0.1";
+
+/// The status under which a unit whose top provision has none is counted.
+pub const IN_FORCE: &str = "in-force";
+
+/// The layers of the model, in the order the ledger lists them.
+const LAYERS: [Layer; 3] = [Layer::Operative, Layer::Enacted, Layer::Editorial];
+
+/// The coverage ledger of a generated workspace, `fidryn.coverage/v0.1`,
+/// which [`coverage`] gives and [`Coverage::to_json`] writes. Every map is
+/// sorted by the bytes of its keys.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Coverage {
+    /// The prefix of the workspace, its manifest's.
+    pub prefix: Address,
+    /// The release of the workspace, its lock's.
+    pub release: String,
+    pub totals: Totals,
+    /// One row for each source file of a unit or a container, sorted by the
+    /// bytes of `source`.
+    pub by_source: Vec<SourceCounts>,
+}
+
+/// What a ledger counts of the whole workspace.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Totals {
+    /// The unit modules.
+    pub units: u64,
+    /// The container modules.
+    pub containers: u64,
+    /// Every provision of every unit, the unit's own top provision included.
+    pub provisions: u64,
+    /// The units by the kind of their top provision.
+    pub units_by_kind: BTreeMap<String, u64>,
+    /// The units by the status of their top provision, [`IN_FORCE`] for
+    /// none.
+    pub units_by_status: BTreeMap<String, u64>,
+    pub containers_by_kind: BTreeMap<String, u64>,
+    /// The lock's count of the addresses the importer gave.
+    pub addresses: AddressCounts,
+    /// The notes of the units and the containers of the enacted layer.
+    pub enacted_notes: u64,
+    /// The notes of the units and the containers of the editorial layer.
+    pub editorial_notes: u64,
+    /// The notes by their group.
+    pub notes_by_group: BTreeMap<String, u64>,
+    pub footnotes: u64,
+    /// The provisions and the notes that hold an image.
+    pub with_images: u64,
+    /// The references of each layer by the name of their outcome; every
+    /// layer and every outcome is present.
+    pub references: BTreeMap<Layer, BTreeMap<String, u64>>,
+    /// The references of outcome `outside`, of every layer, by the body of
+    /// law they name.
+    pub outside_by_body: BTreeMap<String, u64>,
+    /// The definitions whose basis is `enacted`.
+    pub enacted_definitions: u64,
+    /// The definitions whose basis is `restated`.
+    pub restated_definitions: u64,
+    /// The definitions whose basis is `unresolved`.
+    pub unresolved_definitions: u64,
+    /// The definitions by the name of their kind.
+    pub definitions_by_kind: BTreeMap<String, u64>,
+    /// The lock's count of what the importer did not import.
+    pub not_imported: NotImported,
+}
+
+/// What a ledger counts of the modules of one source file.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceCounts {
+    /// The source file, as the modules declare it.
+    pub source: String,
+    /// The file's positive-law flag, as the first of its modules in the
+    /// order of the interfaces declares it; `None` when it has none.
+    pub positive_law: Option<bool>,
+    /// The unit modules of the file.
+    pub units: u64,
+    /// Every provision of those units.
+    pub provisions: u64,
+    /// The definitions of those units.
+    pub definitions: u64,
+}
+
+/// The name of a definition's kind, as a module writes it.
+fn kind_name(kind: DefinitionKind) -> &'static str {
+    match kind {
+        DefinitionKind::Means => "means",
+        DefinitionKind::Includes => "includes",
+        DefinitionKind::DoesNotInclude => "does_not_include",
+        DefinitionKind::Borrowed => "borrowed",
+    }
+}
+
+/// The name of a layer, as the ledger writes it.
+fn layer_name(layer: Layer) -> &'static str {
+    match layer {
+        Layer::Operative => "operative",
+        Layer::Enacted => "enacted",
+        Layer::Editorial => "editorial",
+    }
+}
+
+/// Adds one to the count of `key` in `counts`.
+fn add(counts: &mut BTreeMap<String, u64>, key: &str) {
+    match counts.get_mut(key) {
+        Some(count) => *count += 1,
+        None => {
+            counts.insert(key.to_owned(), 1);
+        }
+    }
+}
+
+/// `count` as a `u64`.
+fn wide(count: usize) -> u64 {
+    u64::try_from(count).expect("a count fits in 64 bits")
+}
+
+/// The coverage ledger of the generated workspace whose manifest is
+/// `manifest` and whose lock is `lock`, from the interfaces of its modules,
+/// `interfaces`, and `index`, the index of their addresses below the
+/// manifest's prefix, which gives each reference its outcome. It reads no
+/// module's source, and nothing from outside the workspace.
+///
+/// A unit, a container and their notes, footnotes, references and
+/// definitions are counted; a curated module is not. `addresses` and
+/// `not_imported` are the lock's, copied. The ledger is the same for any
+/// order of `interfaces` in which no two declare one address or one alias,
+/// which no workspace that checks has: a reference to such an address
+/// reaches the interface that comes first.
+pub fn coverage(
+    interfaces: &[Interface],
+    index: &AddressIndex,
+    manifest: &Manifest,
+    lock: &Lock,
+) -> Coverage {
+    let mut totals = Totals {
+        addresses: lock.addresses,
+        not_imported: lock.not_imported,
+        references: LAYERS
+            .into_iter()
+            .map(|layer| {
+                let outcomes = Outcome::NAMES
+                    .into_iter()
+                    .map(|name| (name.to_owned(), 0))
+                    .collect();
+                (layer, outcomes)
+            })
+            .collect(),
+        ..Totals::default()
+    };
+    let mut sources: BTreeMap<&str, SourceCounts> = BTreeMap::new();
+    for interface in interfaces {
+        let (Some(source), Shape::Unit | Shape::Container) =
+            (interface.source.as_deref(), interface.shape)
+        else {
+            continue;
+        };
+        let row = sources.entry(source).or_insert_with(|| SourceCounts {
+            source: source.to_owned(),
+            positive_law: interface.positive_law,
+            units: 0,
+            provisions: 0,
+            definitions: 0,
+        });
+        if interface.shape == Shape::Unit {
+            let provisions = wide(interface.provisions.len());
+            totals.units += 1;
+            totals.provisions += provisions;
+            // The first provision of the interface of a unit is its top one.
+            if let Some(top) = interface.provisions.first() {
+                add(&mut totals.units_by_kind, interface.word(top.kind));
+                let status = top.status.map_or(IN_FORCE, |status| interface.word(status));
+                add(&mut totals.units_by_status, status);
+            }
+            totals.with_images += wide(
+                interface
+                    .provisions
+                    .iter()
+                    .filter(|provision| provision.image)
+                    .count(),
+            );
+            row.units += 1;
+            row.provisions += provisions;
+            row.definitions += wide(interface.definitions.len());
+        }
+        if let Some(container) = &interface.container {
+            totals.containers += 1;
+            add(&mut totals.containers_by_kind, &container.kind);
+        }
+        for note in &interface.notes {
+            match note.layer {
+                Layer::Enacted => totals.enacted_notes += 1,
+                Layer::Editorial => totals.editorial_notes += 1,
+                // A note of a module that lowers is of one of the other two
+                // layers.
+                Layer::Operative => continue,
+            }
+            add(&mut totals.notes_by_group, interface.word(note.group));
+            if note.image {
+                totals.with_images += 1;
+            }
+        }
+        totals.footnotes += u64::from(interface.footnotes);
+        for reference in &interface.references {
+            let outcome = index.outcome(&reference.target);
+            let counts = totals
+                .references
+                .get_mut(&reference.layer)
+                .expect("every layer is counted");
+            *counts
+                .get_mut(outcome.name())
+                .expect("every outcome is counted") += 1;
+            if let Outcome::Outside(body) = &outcome {
+                add(&mut totals.outside_by_body, body);
+            }
+        }
+        for definition in &interface.definitions {
+            match definition.basis {
+                Basis::Enacted => totals.enacted_definitions += 1,
+                Basis::Restated => totals.restated_definitions += 1,
+                Basis::Unresolved => totals.unresolved_definitions += 1,
+            }
+            add(&mut totals.definitions_by_kind, kind_name(definition.kind));
+        }
+    }
+    Coverage {
+        prefix: manifest.prefix.clone(),
+        release: lock.release.clone(),
+        totals,
+        by_source: sources.into_values().collect(),
+    }
+}
+
+/// `counts` as a JSON object, its keys in their order.
+fn counted(counts: &BTreeMap<String, u64>) -> Value {
+    Value::Object(
+        counts
+            .iter()
+            .map(|(key, count)| (key.clone(), Value::from(*count)))
+            .collect(),
+    )
+}
+
+/// An object of `entries`, in their order.
+fn object<const N: usize>(entries: [(&str, Value); N]) -> Value {
+    Value::Object(
+        entries
+            .into_iter()
+            .map(|(key, value)| (key.to_owned(), value))
+            .collect(),
+    )
+}
+
+impl Coverage {
+    /// The ledger as `coverage.json` holds it and `fidryn coverage` prints
+    /// it: JSON with two spaces of indentation and a final line end, the
+    /// keys of the ledger in their order, the outcomes in the order of
+    /// [`Outcome::NAMES`], and the keys of every other map, the kinds,
+    /// statuses, groups and bodies of law, sorted by their bytes.
+    pub fn to_json(&self) -> String {
+        let totals = &self.totals;
+        let references = Value::Object(
+            LAYERS
+                .into_iter()
+                .map(|layer| {
+                    let counts = totals.references.get(&layer);
+                    let outcomes = Outcome::NAMES
+                        .into_iter()
+                        .map(|name| {
+                            let count = counts.and_then(|counts| counts.get(name)).copied();
+                            (name.to_owned(), Value::from(count.unwrap_or(0)))
+                        })
+                        .collect();
+                    (layer_name(layer).to_owned(), Value::Object(outcomes))
+                })
+                .collect(),
+        );
+        let by_source = self
+            .by_source
+            .iter()
+            .map(|row| {
+                object([
+                    ("source", Value::from(row.source.as_str())),
+                    ("positive_law", Value::from(row.positive_law)),
+                    ("units", Value::from(row.units)),
+                    ("provisions", Value::from(row.provisions)),
+                    ("definitions", Value::from(row.definitions)),
+                ])
+            })
+            .collect();
+        let ledger = object([
+            ("schema", Value::from(COVERAGE_SCHEMA)),
+            ("prefix", Value::from(self.prefix.as_str())),
+            ("release", Value::from(self.release.as_str())),
+            (
+                "totals",
+                object([
+                    ("units", Value::from(totals.units)),
+                    ("containers", Value::from(totals.containers)),
+                    ("provisions", Value::from(totals.provisions)),
+                    ("units_by_kind", counted(&totals.units_by_kind)),
+                    ("units_by_status", counted(&totals.units_by_status)),
+                    ("containers_by_kind", counted(&totals.containers_by_kind)),
+                    (
+                        "addresses",
+                        serde_json::to_value(totals.addresses).expect("three counts"),
+                    ),
+                    (
+                        "notes",
+                        object([
+                            ("enacted", Value::from(totals.enacted_notes)),
+                            ("editorial", Value::from(totals.editorial_notes)),
+                        ]),
+                    ),
+                    ("notes_by_group", counted(&totals.notes_by_group)),
+                    ("footnotes", Value::from(totals.footnotes)),
+                    ("with_images", Value::from(totals.with_images)),
+                    ("references", references),
+                    ("outside_by_body", counted(&totals.outside_by_body)),
+                    (
+                        "definitions",
+                        object([
+                            ("enacted", Value::from(totals.enacted_definitions)),
+                            ("restated", Value::from(totals.restated_definitions)),
+                            ("unresolved", Value::from(totals.unresolved_definitions)),
+                        ]),
+                    ),
+                    ("definitions_by_kind", counted(&totals.definitions_by_kind)),
+                    (
+                        "not_imported",
+                        serde_json::to_value(totals.not_imported).expect("six counts"),
+                    ),
+                ]),
+            ),
+            ("by_source", Value::Array(by_source)),
+        ]);
+        let mut text =
+            serde_json::to_string_pretty(&ledger).expect("a ledger of strings and numbers");
+        text.push('\n');
+        text
+    }
 }
 
 #[cfg(test)]
@@ -742,5 +1100,566 @@ mod tests {
         unit.root.num = None;
         let line = lines(&Module::Unit(unit)).remove(0);
         assert!(line.contains(r#""num":null,"heading""#), "{line}");
+    }
+}
+
+#[cfg(test)]
+mod ledger_tests {
+    //! The coverage ledger. Every model here is invented, in the invented
+    //! corpus `/zz/demo`.
+
+    use super::{Coverage, coverage};
+    use crate::interface::{DeclSpans, Interface, interface_of};
+    use crate::model::build::*;
+    use crate::model::{
+        Basis, Block, Citation, ContainerModule, CuratedModule, Definition, DefinitionKind,
+        Footnote, Item, Layer, Module, Note, UnitModule,
+    };
+    use crate::reference::AddressIndex;
+    use crate::workspace::{AddressCounts, Generator, Lock, Manifest, NotImported, WorkspaceKind};
+    use serde_json::{Map, Value};
+    use std::collections::BTreeMap;
+
+    fn linked(targets: &[&str]) -> Block {
+        let mut runs = vec![words("An invented text that names")];
+        for target in targets {
+            runs.push(words(" "));
+            runs.push(link("this", target));
+        }
+        runs.push(words("."));
+        para(runs)
+    }
+
+    fn container(
+        at: &str,
+        kind: &str,
+        source: &str,
+        positive_law: Option<bool>,
+    ) -> ContainerModule {
+        ContainerModule {
+            address: address(at),
+            aliases: Vec::new(),
+            within: None,
+            source: source.to_owned(),
+            positive_law,
+            kind: kind.to_owned(),
+            num: num("1", "1"),
+            heading: Some(plain_text("Invented Things")),
+            status: None,
+            members: Vec::new(),
+            credit: None,
+            notes: Vec::new(),
+            footnotes: Vec::new(),
+        }
+    }
+
+    fn unit(at: &str, kind: &str, source: &str, positive_law: Option<bool>) -> UnitModule {
+        UnitModule {
+            address: address(at),
+            aliases: Vec::new(),
+            within: None,
+            source: source.to_owned(),
+            positive_law,
+            root: provision(
+                at,
+                kind,
+                num("1", "§ 1."),
+                None,
+                vec![content(vec![para(vec![words("An invented section.")])])],
+            ),
+            credit: None,
+            notes: Vec::new(),
+            footnotes: Vec::new(),
+            definitions: Vec::new(),
+        }
+    }
+
+    fn child(at: &str, blocks: Vec<Block>) -> Item {
+        Item::Child(provision(
+            at,
+            "subsection",
+            num("a", "(a)"),
+            None,
+            vec![content(blocks)],
+        ))
+    }
+
+    fn defined(at: &str, kind: DefinitionKind, basis: Basis) -> Definition {
+        Definition {
+            at: address(at),
+            terms: vec!["widget".to_owned()],
+            kind,
+            words: None,
+            region: None,
+            basis,
+            borrowed_from: None,
+            see_note: None,
+        }
+    }
+
+    fn grouped(at: &str, layer: Layer, group: &str, block: Block) -> Note {
+        let mut made = note(at, layer, "An Invented Note", "An invented note.");
+        made.group = group.to_owned();
+        made.blocks.push(block);
+        made
+    }
+
+    fn footnote(ordinal: u32, blocks: Vec<Block>) -> Footnote {
+        Footnote {
+            ordinal,
+            shown: ordinal.to_string(),
+            blocks,
+        }
+    }
+
+    /// The modules of an invented workspace whose counts are known: a
+    /// title and its chapter, three sections, the last repealed, an
+    /// appendix of another source with no positive-law flag and a rule in
+    /// it, and a curated module, which the ledger does not count.
+    fn modules() -> Vec<Module> {
+        let mut title = container("/zz/demo/t1", "title", "demo01.xml", Some(true));
+        title.credit = Some(text(vec![
+            words("Invented "),
+            link("credit", "/zz/demo/t1/s1"),
+        ]));
+        title.notes.push(grouped(
+            "/zz/demo/t1/note/editorialNotes/nolaw/codification",
+            Layer::Editorial,
+            "editorialNotes",
+            linked(&["/zz/other/act/1"]),
+        ));
+        title
+            .footnotes
+            .push(footnote(1, vec![linked(&["/zz/demo/t1/s9"])]));
+
+        let mut chapter = container("/zz/demo/t1/ch1", "chapter", "demo01.xml", Some(true));
+        chapter.heading = Some(text(vec![link("Widgets", "/zz/demo/t1/s2")]));
+        chapter.notes.push(grouped(
+            "/zz/demo/t1/ch1/note/statutoryNotes/nolaw/figure",
+            Layer::Enacted,
+            "statutoryNotes",
+            Block::Image {
+                source: "demo-figure.png".to_owned(),
+            },
+        ));
+
+        let mut s1 = unit("/zz/demo/t1/s1", "section", "demo01.xml", Some(true));
+        s1.root.items = vec![
+            content(vec![linked(&[
+                "/zz/demo/t1/s2",
+                "/zz/demo/t1/s1/z",
+                "/zz/demo/t1/s9",
+                "/yy/stat/116/926",
+                "not an address",
+            ])]),
+            child("/zz/demo/t1/s1/a", vec![para(vec![words("A widget.")])]),
+            child(
+                "/zz/demo/t1/s1/b",
+                vec![Block::Image {
+                    source: "demo-widget.png".to_owned(),
+                }],
+            ),
+        ];
+        s1.notes.push(grouped(
+            "/zz/demo/t1/s1/note/statutoryNotes/nolaw/amendments",
+            Layer::Enacted,
+            "statutoryNotes",
+            linked(&["/zz/demo/t1/s3"]),
+        ));
+        s1.footnotes = vec![
+            footnote(1, vec![para(vec![words("An invented footnote.")])]),
+            footnote(2, vec![para(vec![words("Another invented footnote.")])]),
+        ];
+        s1.definitions.push(defined(
+            "/zz/demo/t1/s1/a",
+            DefinitionKind::Means,
+            Basis::Enacted,
+        ));
+
+        // One provision that holds two definitions.
+        let mut s2 = unit("/zz/demo/t1/s2", "section", "demo01.xml", Some(true));
+        s2.definitions = vec![
+            defined(
+                "/zz/demo/t1/s2",
+                DefinitionKind::Includes,
+                Basis::Unresolved,
+            ),
+            defined("/zz/demo/t1/s2", DefinitionKind::Borrowed, Basis::Enacted),
+        ];
+
+        let mut s3 = unit("/zz/demo/t1/s3", "section", "demo01.xml", Some(true));
+        s3.root.status = Some("repealed".to_owned());
+
+        let appendix = container("/zz/demo/t1a", "appendix", "demo01a.xml", None);
+        let mut rule = unit("/zz/demo/t1a/rule1", "rule", "demo01a.xml", None);
+        rule.root.items.push(child(
+            "/zz/demo/t1a/rule1/a",
+            vec![linked(&["/zz/demo/t1/s1\u{2013}3", "/zz/demo/t1/s3"])],
+        ));
+        rule.definitions.push(defined(
+            "/zz/demo/t1a/rule1/a",
+            DefinitionKind::DoesNotInclude,
+            Basis::Restated,
+        ));
+
+        let curated = CuratedModule {
+            address: address("/zz/demo/c1"),
+            imports: Vec::new(),
+            citations: vec![Citation {
+                name: "widgets".to_owned(),
+                target: address("/zz/demo/t1/s9"),
+            }],
+            bindings: Vec::new(),
+        };
+        vec![
+            Module::Container(title),
+            Module::Container(chapter),
+            Module::Unit(s1),
+            Module::Unit(s2),
+            Module::Unit(s3),
+            Module::Container(appendix),
+            Module::Unit(rule),
+            Module::Curated(curated),
+        ]
+    }
+
+    fn manifest() -> Manifest {
+        Manifest {
+            name: "demo".to_owned(),
+            kind: WorkspaceKind::Generated,
+            prefix: address("/zz/demo"),
+            release: Some("42-7".to_owned()),
+            toolchain: "0.0.0".to_owned(),
+            dependencies: Vec::new(),
+        }
+    }
+
+    fn lock() -> Lock {
+        Lock {
+            prefix: address("/zz/demo"),
+            release: "42-7".to_owned(),
+            generator: Generator {
+                name: "demo-writer".to_owned(),
+                version: "0.0.0".to_owned(),
+            },
+            artifacts: Vec::new(),
+            addresses: AddressCounts {
+                aliases: 2,
+                disambiguated: 1,
+                assigned: 3,
+            },
+            not_imported: NotImported {
+                tables_of_contents: 1,
+                footnotes_in_tables_of_contents: 2,
+                links_in_tables_of_contents: 3,
+                release_notes: 4,
+                links_without_words: 5,
+                note_group_headings: 6,
+            },
+            modules: BTreeMap::new(),
+        }
+    }
+
+    fn interfaces(modules: &[Module]) -> Vec<Interface> {
+        modules
+            .iter()
+            .map(|module| interface_of(module, &DeclSpans::default()))
+            .collect()
+    }
+
+    fn ledger_of(interfaces: &[Interface]) -> Coverage {
+        let manifest = manifest();
+        let index = AddressIndex::build(interfaces, std::slice::from_ref(&manifest.prefix));
+        coverage(interfaces, &index, &manifest, &lock())
+    }
+
+    /// The ledger of the workspace of [`modules`], as `coverage.json`
+    /// holds it.
+    const LEDGER: &str = r#"{
+  "schema": "fidryn.coverage/v0.1",
+  "prefix": "/zz/demo",
+  "release": "42-7",
+  "totals": {
+    "units": 4,
+    "containers": 3,
+    "provisions": 7,
+    "units_by_kind": {
+      "rule": 1,
+      "section": 3
+    },
+    "units_by_status": {
+      "in-force": 3,
+      "repealed": 1
+    },
+    "containers_by_kind": {
+      "appendix": 1,
+      "chapter": 1,
+      "title": 1
+    },
+    "addresses": {
+      "aliases": 2,
+      "disambiguated": 1,
+      "assigned": 3
+    },
+    "notes": {
+      "enacted": 2,
+      "editorial": 1
+    },
+    "notes_by_group": {
+      "editorialNotes": 1,
+      "statutoryNotes": 2
+    },
+    "footnotes": 3,
+    "with_images": 2,
+    "references": {
+      "operative": {
+        "exact": 2,
+        "target-status": 1,
+        "ambiguous": 0,
+        "unit-only": 1,
+        "range-form": 1,
+        "no-unit": 1,
+        "outside": 1,
+        "malformed": 1
+      },
+      "enacted": {
+        "exact": 0,
+        "target-status": 1,
+        "ambiguous": 0,
+        "unit-only": 0,
+        "range-form": 0,
+        "no-unit": 0,
+        "outside": 0,
+        "malformed": 0
+      },
+      "editorial": {
+        "exact": 1,
+        "target-status": 0,
+        "ambiguous": 0,
+        "unit-only": 0,
+        "range-form": 0,
+        "no-unit": 1,
+        "outside": 1,
+        "malformed": 0
+      }
+    },
+    "outside_by_body": {
+      "/yy/stat": 1,
+      "/zz/other": 1
+    },
+    "definitions": {
+      "enacted": 2,
+      "restated": 1,
+      "unresolved": 1
+    },
+    "definitions_by_kind": {
+      "borrowed": 1,
+      "does_not_include": 1,
+      "includes": 1,
+      "means": 1
+    },
+    "not_imported": {
+      "tables_of_contents": 1,
+      "footnotes_in_tables_of_contents": 2,
+      "links_in_tables_of_contents": 3,
+      "release_notes": 4,
+      "links_without_words": 5,
+      "note_group_headings": 6
+    }
+  },
+  "by_source": [
+    {
+      "source": "demo01.xml",
+      "positive_law": true,
+      "units": 3,
+      "provisions": 5,
+      "definitions": 3
+    },
+    {
+      "source": "demo01a.xml",
+      "positive_law": null,
+      "units": 1,
+      "provisions": 2,
+      "definitions": 1
+    }
+  ]
+}
+"#;
+
+    #[test]
+    fn the_ledger_counts_a_demo_workspace() {
+        let ledger = ledger_of(&interfaces(&modules()));
+        // Units of two kinds and two statuses, provisions, notes by layer
+        // and group, footnotes, images, references by layer and outcome,
+        // definitions by basis and kind, each source with its flag, and the
+        // lock's counts, copied.
+        assert_eq!(ledger.totals.units, 4);
+        assert_eq!(ledger.totals.provisions, 7);
+        assert_eq!(ledger.totals.with_images, 2);
+        assert_eq!(
+            (
+                ledger.totals.enacted_definitions,
+                ledger.totals.restated_definitions,
+                ledger.totals.unresolved_definitions
+            ),
+            (2, 1, 1)
+        );
+        assert_eq!(ledger.totals.addresses, lock().addresses);
+        assert_eq!(ledger.totals.not_imported, lock().not_imported);
+        assert_eq!(ledger.to_json(), LEDGER);
+
+        // A workspace with nothing counted writes every closed key and
+        // every open map empty.
+        let empty = ledger_of(&[]);
+        let value: Value = serde_json::from_str(&empty.to_json()).expect("JSON");
+        assert_eq!(value["totals"]["units_by_kind"], Value::Object(Map::new()));
+        assert_eq!(value["totals"]["references"]["enacted"]["malformed"], 0);
+        assert_eq!(value["by_source"], Value::Array(Vec::new()));
+        assert!(
+            empty
+                .to_json()
+                .contains("\"units_by_kind\": {},\n    \"units_by_status\": {},")
+        );
+    }
+
+    /// `value` against `schema`, a JSON Schema of the subset the schemas of
+    /// this repository use: `$ref` into `$defs`, `type`, `const`, `enum`,
+    /// `required`, `properties`, `additionalProperties`, `items` and
+    /// `minimum`; `propertyNames` and `pattern` are left to the conformance
+    /// check, which runs a full validator. An object's keys are also held to
+    /// the order of `properties`.
+    fn conforms(schema: &Value, value: &Value, root: &Value, at: &str) -> Result<(), String> {
+        if let Some(target) = schema.get("$ref").and_then(Value::as_str) {
+            let name = target
+                .strip_prefix("#/$defs/")
+                .unwrap_or_else(|| panic!("a reference into $defs: {target}"));
+            return conforms(&root["$defs"][name], value, root, at);
+        }
+        if let Some(expected) = schema.get("const")
+            && expected != value
+        {
+            return Err(format!("{at} is {value}, not {expected}"));
+        }
+        if let Some(Value::Array(allowed)) = schema.get("enum")
+            && !allowed.contains(value)
+        {
+            return Err(format!("{at} is {value}, none of {allowed:?}"));
+        }
+        if let Some(types) = schema.get("type") {
+            let types: Vec<&str> = match types {
+                Value::String(one) => vec![one.as_str()],
+                Value::Array(many) => many.iter().filter_map(Value::as_str).collect(),
+                other => panic!("a type: {other}"),
+            };
+            let kind = match value {
+                Value::Null => "null",
+                Value::Bool(_) => "boolean",
+                Value::Number(number) if number.is_u64() || number.is_i64() => "integer",
+                Value::Number(_) => "number",
+                Value::String(_) => "string",
+                Value::Array(_) => "array",
+                Value::Object(_) => "object",
+            };
+            if !types.contains(&kind) {
+                return Err(format!("{at} is {kind}, not {types:?}"));
+            }
+        }
+        if let (Some(minimum), Some(number)) = (
+            schema.get("minimum").and_then(Value::as_i64),
+            value.as_i64(),
+        ) && number < minimum
+        {
+            return Err(format!("{at} is {number}, below {minimum}"));
+        }
+        if let Value::Object(object) = value {
+            let properties = schema.get("properties").and_then(Value::as_object);
+            if let Some(Value::Array(required)) = schema.get("required") {
+                for key in required.iter().filter_map(Value::as_str) {
+                    if !object.contains_key(key) {
+                        return Err(format!("{at} lacks `{key}`"));
+                    }
+                }
+            }
+            if let Some(properties) = properties {
+                let order: Vec<&String> = properties
+                    .keys()
+                    .filter(|key| object.contains_key(*key))
+                    .collect();
+                let keys: Vec<&String> = object
+                    .keys()
+                    .filter(|key| properties.contains_key(*key))
+                    .collect();
+                if order != keys {
+                    return Err(format!("the keys of {at} are {keys:?}, not {order:?}"));
+                }
+            }
+            for (key, item) in object {
+                let here = format!("{at}/{key}");
+                match properties.and_then(|properties| properties.get(key)) {
+                    Some(property) => conforms(property, item, root, &here)?,
+                    None => match schema.get("additionalProperties") {
+                        Some(Value::Bool(false)) => return Err(format!("{here} is not allowed")),
+                        Some(additional @ Value::Object(_)) => {
+                            conforms(additional, item, root, &here)?;
+                        }
+                        _ => {}
+                    },
+                }
+            }
+        }
+        if let (Value::Array(items), Some(each)) = (value, schema.get("items")) {
+            for (place, item) in items.iter().enumerate() {
+                conforms(each, item, root, &format!("{at}/{place}"))?;
+            }
+        }
+        Ok(())
+    }
+
+    fn schema() -> Value {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../schemas/coverage-v0.1.json");
+        let text = std::fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+        serde_json::from_str(&text).expect("the schema is JSON")
+    }
+
+    #[test]
+    fn the_ledger_is_deterministic_and_matches_its_schema() {
+        let modules = modules();
+        let written = ledger_of(&interfaces(&modules)).to_json();
+        // Any order of the modules, and the interfaces read back from their
+        // JSON, give the same bytes.
+        let mut reversed = interfaces(&modules);
+        reversed.reverse();
+        assert_eq!(ledger_of(&reversed).to_json(), written);
+        let mut rotated = interfaces(&modules);
+        rotated.rotate_left(3);
+        assert_eq!(ledger_of(&rotated).to_json(), written);
+        let read: Vec<Interface> = interfaces(&modules)
+            .iter()
+            .map(|interface| Interface::from_json(&interface.to_json()).expect("read back"))
+            .collect();
+        assert_eq!(ledger_of(&read).to_json(), written);
+
+        let schema = schema();
+        for text in [written, ledger_of(&[]).to_json()] {
+            let value: Value = serde_json::from_str(&text).expect("JSON");
+            conforms(&schema, &value, &schema, "").unwrap_or_else(|error| panic!("{error}"));
+        }
+        // What the schema refuses, the check above refuses too.
+        let mut value: Value = serde_json::from_str(LEDGER).expect("JSON");
+        value["totals"]["unknown"] = Value::from(1);
+        assert!(conforms(&schema, &value, &schema, "").is_err());
+        let mut value: Value = serde_json::from_str(LEDGER).expect("JSON");
+        value["by_source"][0]["units"] = Value::from(-1);
+        assert!(conforms(&schema, &value, &schema, "").is_err());
+
+        // A source whose flag the ledger takes from its first module.
+        let mut flagged = modules;
+        if let Module::Unit(rule) = &mut flagged[6] {
+            rule.positive_law = Some(false);
+        }
+        let ledger = ledger_of(&interfaces(&flagged));
+        assert_eq!(ledger.by_source[1].positive_law, None);
     }
 }

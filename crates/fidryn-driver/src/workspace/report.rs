@@ -1,12 +1,27 @@
-//! The files a check of a workspace writes on request: the check report,
-//! `fidryn.check-report/v0.1`, and the list of the references and the
-//! citations whose outcome is not `exact`.
+//! The files written about a workspace: those a check of a workspace writes
+//! on request, the check report, `fidryn.check-report/v0.1`, and the list of
+//! the references and the citations whose outcome is not `exact`; and the
+//! coverage ledger of a generated workspace, `fidryn.coverage/v0.1`, which
+//! its writer writes and [`read_coverage`](super::read_coverage) counts again
+//! from its files.
 
 use super::check::WorkspaceReport;
 use super::index::{LAYERS, Unresolved, UnresolvedCitation};
-use fidryn_provision::{Layer, Outcome};
+use fidryn_provision::records::coverage;
+use fidryn_provision::workspace::{Lock, Manifest};
+use fidryn_provision::{AddressIndex, Coverage, Interface, Layer, Outcome};
 use serde_json::{Map, Value};
 use std::collections::BTreeMap;
+
+/// The coverage ledger of the generated workspace whose manifest is
+/// `manifest` and whose lock is `lock`, from the interfaces of its modules,
+/// `interfaces`, in the order of their paths: each reference gets its
+/// outcome from the index of their addresses below the manifest's prefix,
+/// as in the check of the workspace.
+pub(super) fn ledger_of(interfaces: &[Interface], manifest: &Manifest, lock: &Lock) -> Coverage {
+    let index = AddressIndex::build(interfaces, std::slice::from_ref(&manifest.prefix));
+    coverage(interfaces, &index, manifest, lock)
+}
 
 /// The `schema` of a check report.
 pub const CHECK_REPORT_SCHEMA: &str = "fidryn.check-report/v0.1";

@@ -1,7 +1,7 @@
 # Conformance
 
 JSON Schema checks for case records and source manifests under `examples/`
-and `prelude/`, for the three files of a workspace of law modules
+and `prelude/`, for the four files of a workspace of law modules
 under `fixtures/workspace/` and under `samples/uscode/`, for the report of
 the check of a workspace under `fixtures/check-report/`, and for every text
 record of `fixtures/`. This is a document-shape check. It does not
@@ -15,8 +15,9 @@ uv run python conformance/check_json_contracts.py /path/to/fidryn --output valid
 
 The checker looks for `"schema": "fidryn.case-record/v0.1"`,
 `"fidryn.source-manifest/v0.1"`, `"fidryn.workspace/v0.1"`,
-`"fidryn.law-lock/v0.1"`, `"fidryn.retrieval/v0.1"` and
-`"fidryn.check-report/v0.1"`, and holds every line of every
+`"fidryn.law-lock/v0.1"`, `"fidryn.retrieval/v0.1"`,
+`"fidryn.check-report/v0.1"` and `"fidryn.coverage/v0.1"`, and holds every
+line of every
 `*.records.jsonl` under `fixtures/` to `schemas/text-record-v0.1.json`,
 the schema of `fidryn.text-record/v0.1`, whose records hold no `schema`
 key. Exit `0` if every checked document is valid, `1` on validation
@@ -36,9 +37,13 @@ archive. Every name, text, address, digest of an archive and count in them
 is invented. The Rust test
 `the_committed_demo_workspace_is_what_the_writer_writes` of `fidryn-driver`
 holds every file there, byte for byte, to what the writer of a generated
-workspace writes. `test_workspace_schemas.py` checks that the manifest,
-the lock and the retrieval record match their schemas, and that the
-schemas refuse what a workspace check refuses.
+workspace writes, its coverage ledger `demo/coverage.json` among them.
+`test_workspace_schemas.py` checks that the manifest, the lock and the
+retrieval record match their schemas, and that the schemas refuse what a
+workspace check refuses. `test_coverage_schema.py` checks that the ledger
+of the demo workspace and that of the sample of the Code match
+`schemas/coverage-v0.1.json`, in the layout the writer writes, and that the
+schema refuses what is no ledger.
 
 `fixtures/check-report/` holds `report.json`, the check report of an
 invented workspace in the corpus `/zz/demo` that has a reference of every

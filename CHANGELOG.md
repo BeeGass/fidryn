@@ -145,6 +145,21 @@ interchange schema versions are maintained independently of the interpreter.
   the generated sample, and the sample step fails when that binding is
   stale. `DependencyInterfaces::Loaded` records the name and the release
   of the dependency.
+- The coverage ledger of a generated workspace, `coverage.json`,
+  `fidryn.coverage/v0.1`, with the JSON Schema
+  `schemas/coverage-v0.1.json`: the units, containers and provisions
+  imported, the notes, footnotes and images, the references of each layer
+  by outcome, the definitions extracted by basis and by kind, the lock's
+  counts of addresses and of what was not imported, and a row for each
+  source file. `fidryn_provision::records::coverage` counts it from the
+  interfaces of the modules, the index of their addresses, the manifest
+  and the lock. `GeneratedWriter::finish` writes it after the lock, and
+  `--verify` compares it; `fidryn coverage DIR` prints it, counted from the
+  modules as they stand (`fidryn_driver::workspace::read_coverage`). The
+  sample's workspace holds its ledger, `cargo xtask uscode-sample` holds
+  the ledger to `fidryn coverage` and, key for key, to the independent
+  profile, and the site shows its figures in the guide Coverage,
+  `docs/coverage.md`, whose table the step generates and checks.
 
 ## [0.2.0] - 2026-11-16
 
