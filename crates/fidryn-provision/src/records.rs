@@ -445,8 +445,11 @@ pub struct Totals {
 pub struct SourceCounts {
     /// The source file, as the modules declare it.
     pub source: String,
-    /// The file's positive-law flag, as the first of its modules in the
-    /// order of the interfaces declares it; `None` when it has none.
+    /// The file's positive-law flag, as the module of the file whose address
+    /// comes first in the byte order of addresses declares it, whatever the
+    /// order of the interfaces; `None` when it declares none. An importer
+    /// gives every module of a file the file's flag, so they agree; when
+    /// they do not, that module's flag is the row's.
     pub positive_law: Option<bool>,
     /// The unit modules of the file.
     pub units: u64,
@@ -498,10 +501,13 @@ fn wide(count: usize) -> u64 {
 ///
 /// A unit, a container and their notes, footnotes, references and
 /// definitions are counted; a curated module is not. `addresses` and
-/// `not_imported` are the lock's, copied. The ledger is the same for any
-/// order of `interfaces` in which no two declare one address or one alias,
-/// which no workspace that checks has: a reference to such an address
-/// reaches the interface that comes first.
+/// `not_imported` are the lock's, copied. The flag of a source file is that
+/// of its module whose address comes first ([`SourceCounts::positive_law`]).
+/// The ledger is the same for any order of `interfaces` in which no two
+/// declare one address or one alias, which no workspace that checks has: a
+/// reference to such an address reaches the interface that comes first in
+/// `index`, and of two modules of one file at one address the first gives
+/// the file's flag.
 pub fn coverage(
     interfaces: &[Interface],
     index: &AddressIndex,
@@ -524,6 +530,8 @@ pub fn coverage(
         ..Totals::default()
     };
     let mut sources: BTreeMap<&str, SourceCounts> = BTreeMap::new();
+    // The address of the module whose flag each source's row holds.
+    let mut flagged_by: BTreeMap<&str, &Address> = BTreeMap::new();
     for interface in interfaces {
         let (Some(source), Shape::Unit | Shape::Container) =
             (interface.source.as_deref(), interface.shape)
@@ -537,6 +545,13 @@ pub fn coverage(
             provisions: 0,
             definitions: 0,
         });
+        match flagged_by.get(source) {
+            Some(first) if **first <= interface.address => {}
+            _ => {
+                flagged_by.insert(source, &interface.address);
+                row.positive_law = interface.positive_law;
+            }
+        }
         if interface.shape == Shape::Unit {
             let provisions = wide(interface.provisions.len());
             totals.units += 1;
@@ -1654,12 +1669,25 @@ mod ledger_tests {
         value["by_source"][0]["units"] = Value::from(-1);
         assert!(conforms(&schema, &value, &schema, "").is_err());
 
-        // A source whose flag the ledger takes from its first module.
+        // When the modules of one file disagree on its flag, the row takes
+        // the flag of the module whose address comes first, in any order of
+        // the interfaces: the appendix `/zz/demo/t1a` before its rule.
+        let flag_of = |modules: &[Module]| {
+            let mut reversed = interfaces(modules);
+            reversed.reverse();
+            let flags = [interfaces(modules), reversed]
+                .map(|order| ledger_of(&order).by_source[1].positive_law);
+            assert_eq!(flags[0], flags[1], "the flag depends on the order");
+            flags[0]
+        };
         let mut flagged = modules;
         if let Module::Unit(rule) = &mut flagged[6] {
             rule.positive_law = Some(false);
         }
-        let ledger = ledger_of(&interfaces(&flagged));
-        assert_eq!(ledger.by_source[1].positive_law, None);
+        assert_eq!(flag_of(&flagged), None);
+        if let Module::Container(appendix) = &mut flagged[5] {
+            appendix.positive_law = Some(true);
+        }
+        assert_eq!(flag_of(&flagged), Some(true));
     }
 }

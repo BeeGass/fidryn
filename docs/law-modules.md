@@ -9,11 +9,12 @@ the checker verifies of one, how a workspace is checked, what outcome
 each reference has, when a binding is stale, how the ingester for the
 United States Code reads the publisher's XML, by which rules it extracts
 definitions, what the coverage ledger of a generated workspace counts, and
-what the sample of the Code in the repository holds and how it is checked. The crate `fidryn-provision` implements the model and
-the rules over it, `fidryn-syntax` reads the text of a module,
-`fidryn-check` lowers it into the model and checks it, `fidryn-driver`
-checks a workspace and writes a generated one, and `fidryn-ingest-uscode`
-imports the Code. In the examples, `/zz/demo` is an invented corpus.
+what the sample of the Code in the repository holds and how it is
+checked. The crate `fidryn-provision` implements the model and the rules
+over it, `fidryn-syntax` reads the text of a module, `fidryn-check`
+lowers it into the model and checks it, `fidryn-driver` checks a
+workspace and writes a generated one, and `fidryn-ingest-uscode` imports
+the Code. In the examples, `/zz/demo` is an invented corpus.
 
 ## Addresses
 
@@ -1976,9 +1977,10 @@ note as `see_note`.
   one they state: a "this chapter" of the Code may stand for "this Act" or
   "this title" of the law the editors classified there. `see_note`, when a
   definition has one, is the address of the first editorial note headed
-  "References in Text" one of whose own paragraphs holds the words that
-  name the region followed by `, referred to in`. Such a note often says
-  what the enacted words were; the rules do not check that it does.
+  "References in Text" one of whose own paragraphs holds, in any case, the
+  words that name the region followed by `, referred to in`. Such a note
+  often says what the enacted words were; the rules do not check that it
+  does.
 
 An invented example: the chapeau of a section of an invented title that is
 positive law, and the definitions extracted from its paragraphs.
@@ -2053,11 +2055,14 @@ body of law or a kind of definition, are sorted by their bytes, and a word
 is listed only when something is counted under it; the outcomes stand in
 the order of [References](#references). A file of an appendix is a row of
 its own, as every other source is, and nothing merges its counts into
-those of the title it accompanies. The flag of a row is that of the first
-module of the file, by path; every module of a file the importer reads has
-the file's flag. Nothing of the host, the clock or the number of workers
-reaches the ledger, and an estimate of the definitions the rules miss is
-not in it: the ledger holds only what is counted from the workspace.
+those of the title it accompanies. The flag of a row is that of the module
+of the file whose address comes first in the byte order of addresses,
+whatever the order in which the modules are read; every module of a file
+the importer reads has the file's flag, so they agree, and when they do not
+that module's flag is the row's. Nothing of the host, the clock or the
+number of workers reaches the ledger, and an estimate of the definitions
+the rules miss is not in it: the ledger holds only what is counted from the
+workspace.
 
 The ledger of the invented demo workspace is
 [`conformance/fixtures/workspace/demo/coverage.json`](../conformance/fixtures/workspace/demo/coverage.json),
@@ -2141,7 +2146,10 @@ only `--update` writes, the workspace, then, in the curated manifest,
 the release and the lock digest of its dependency and its `toolchain`,
 and then the table of `docs/coverage.md` between its markers, and nothing
 else; it never touches the curated module. The ledger is not listed in
-the lock, so writing it moves no pin.
+the lock, so writing it moves no pin. When `--update` changes the table of
+`docs/coverage.md`, `cargo xtask site` is run after it to render the page
+again, since `cargo xtask ci` fails while the site is not what the
+documents give.
 
 ```text
 cargo xtask uscode-sample

@@ -249,8 +249,11 @@ fn first_differing_line(a: &[u8], b: &[u8]) -> usize {
 /// profile's object of that name, and the `totals` of `ledger` share has one
 /// value in both, and the keys only one of them has are those of
 /// [`PROFILE_ONLY`], which are compared with the keys of the ledger's top,
-/// and of [`LEDGER_ONLY`]. Otherwise what differs, naming the first key, in
-/// the byte order of their paths, with the value of each side.
+/// and of [`LEDGER_ONLY`]. Each key those two name must be on its side: a
+/// key named as the ledger's alone that the ledger lacks, or as the
+/// profile's alone that the profile lacks, is a difference too. Otherwise
+/// what differs, naming the first key, in the byte order of their paths,
+/// with the value of each side.
 fn ledger_problem(import: &Value, ledger: &Value) -> Option<String> {
     let shown = format!("{WORKSPACE}/{LEDGER}");
     let (Some(import), Some(totals)) = (import.as_object(), ledger["totals"].as_object()) else {
@@ -258,6 +261,22 @@ fn ledger_problem(import: &Value, ledger: &Value) -> Option<String> {
             "{PROFILE} has no object `import`, or {shown} no object `totals`"
         ));
     };
+    for key in LEDGER_ONLY {
+        if !totals.contains_key(key) {
+            return Some(format!(
+                "the step names `totals.{key}` as a key of the ledger alone, and {shown} has no \
+                 `totals.{key}`"
+            ));
+        }
+    }
+    for key in PROFILE_ONLY {
+        if !import.contains_key(key) {
+            return Some(format!(
+                "the step names `import.{key}` as a key of the profile alone, and {PROFILE} has \
+                 no `import.{key}`"
+            ));
+        }
+    }
     for key in import.keys() {
         if PROFILE_ONLY.contains(&key.as_str()) {
             if totals.contains_key(key) {
@@ -265,7 +284,7 @@ fn ledger_problem(import: &Value, ledger: &Value) -> Option<String> {
                     "{shown} has `totals.{key}`, which the step takes to stand at its top"
                 ));
             }
-        } else if !totals.contains_key(key) && !LEDGER_ONLY.contains(&key.as_str()) {
+        } else if !totals.contains_key(key) {
             return Some(format!(
                 "{PROFILE} has `import.{key}`, and {shown} has no `totals.{key}`"
             ));
@@ -1359,6 +1378,33 @@ mod tests {
         assert!(
             problem(&|import, _| import["definitions"] = Value::from(1))
                 .contains("`totals.definitions`")
+        );
+        // A key the step names as one side's alone must be on that side,
+        // whether or not the other side has it.
+        let remove = |value: &mut Value, key: &str| {
+            value
+                .as_object_mut()
+                .expect("an object")
+                .remove(key)
+                .expect("the key is there");
+        };
+        assert_eq!(
+            problem(&|_, ledger| remove(&mut ledger["totals"], "definitions_by_kind")),
+            "the step names `totals.definitions_by_kind` as a key of the ledger alone, and \
+             samples/uscode/workspace/coverage.json has no `totals.definitions_by_kind`"
+        );
+        assert_eq!(
+            problem(&|import, ledger| {
+                remove(&mut ledger["totals"], "definitions");
+                import["definitions"] = Value::from(1);
+            }),
+            "the step names `totals.definitions` as a key of the ledger alone, and \
+             samples/uscode/workspace/coverage.json has no `totals.definitions`"
+        );
+        assert_eq!(
+            problem(&|import, _| remove(import, "release")),
+            "the step names `import.release` as a key of the profile alone, and \
+             samples/uscode/profile.json has no `import.release`"
         );
     }
 

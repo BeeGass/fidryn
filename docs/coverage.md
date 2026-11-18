@@ -44,10 +44,15 @@ Each definition extracted has one of three bases:
   unit does not declare its title positive law, so the words are those of
   the editors of the Code, and the reach the law enacted may differ from the
   one they state.
-- `unresolved`: the rules found no region of the Code for it, because it
-  states no reach that they read, because its reach names a law outside the
-  Code, or because its reach words name a part of the Code in a form the
-  rules do not resolve, such as "this chapter and chapter 5".
+- `unresolved`: the rules found no region of the Code for it, for one of
+  four causes: it states no reach that they read; its reach is a link to a
+  law outside the Code, such as a public law; its reach words are in a form
+  the rules do not resolve, whether they name a part of the Code, as "this
+  chapter and chapter 5" does, or a law outside it, as "this Act" does; or
+  its reach is in a form they resolve, "this" and the name of a kind of
+  provision or container, but neither the provision that states the reach
+  nor any provision or container above it is of that kind, as with "As
+  used in this subtitle" in a section that stands in no subtitle.
 
 The rules read definitions written in a closed list of forms
 ([Definitions](law-modules.md#definitions)), and they do not find every

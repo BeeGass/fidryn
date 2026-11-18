@@ -71,6 +71,10 @@ runs every check of the sample:
 cargo xtask uscode-sample --update
 ```
 
+When that changes the table of `docs/coverage.md`, run `cargo xtask site`
+after it, which renders the page again: `cargo xtask ci` fails while the
+site is not what the documents give.
+
 Whether the committed workspace is what the ingester writes, that it
 checks, the text of a section and of the notes below it, and the ledger
 counted again from the modules:
