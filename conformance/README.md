@@ -260,3 +260,65 @@ They need `sh`, and are skipped, saying so, where there is none.
 its own, and holds the workflow and `law-repository.pin.json` to what
 [Checking a law repository](../docs/development.md#checking-a-law-repository)
 says.
+
+## Replaying releases
+
+`tools/replay_uscode.py` makes each of the 27 release points the publisher
+lists for 2026, in the publisher's order, one commit of a repository of
+the imported law. For each release it fetches the archive of every title
+with `fetch_uscode.py` when it is absent; imports it with
+`fidryn ingest uscode` into `uscode.next/` and checks it, which must find
+no error and no warning; for every release after the first writes the
+change set of `fidryn changes uscode uscode.next` as JSON to
+`changes/<release>.json`; replaces `uscode/` with `uscode.next/`; and
+commits, with the text form of the change set as the message given to git
+as it is (`/us/usc: release 119-73not60` for the first), then reads the
+message back from the commit and stops unless it is the text form byte
+for byte.
+
+```sh
+uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR --fidryn PATH --cache-dir DIR
+```
+
+The commits of the branch that is checked out, from its root, say where
+the replay stands, so a replay that is stopped goes on from the release it
+was in, and never commits a release twice or skips one. It removes only
+`uscode/`, and only when the repository holds `.git`, `uscode` is a
+directory and no link with the manifest of a generated workspace of
+`/us/usc`, and `uscode.next/` holds the complete import of the next
+release; anything else stops it with what it found. Each run of `fidryn`
+has a limit of its own on its address space and its time
+(`--memory-limit`, `--time-limit`). Exit `0` when every release is
+committed, `1` when the replay stops at what it found, `2` when a command
+or a file cannot be run, read or written. `test_replay_order.py` holds
+the list to the publisher's, the reading of a history to the commits it
+names, and the replacement to its conditions, with no network and no
+binary.
+
+## Drawing definition samples
+
+`tools/draw_definition_samples.py` draws the two samples of 500 that a
+person reads to judge the definitions of a generated workspace:
+`extracted.jsonl`, from every definition its module files hold, and
+`near-misses.jsonl`, from the paragraphs of operative text that hold a
+term in curly quotation marks within 60 characters before `mean`,
+`means`, `include`, `includes`, `shall mean` or `has the meaning`, and
+from which no definition was extracted. It reads the `definition` blocks
+in their canonical form and the text records that `fidryn text DIR --json`
+printed for the workspace, and starts no program. Each line holds the
+seed, the release, the size of the population, the place in the draw,
+what a reader needs to judge it without opening the Code (the paragraph's
+text and the nearest chapeau above it among them), and an empty
+`verdict`. The draw is a Fisher-Yates shuffle driven by SplitMix64, written
+out in the tool, so that one seed draws the same lines with any version of
+the language; a sample once drawn is not written over.
+
+```sh
+uv run --locked python -I tools/draw_definition_samples.py --workspace DIR --records FILE --seed N --out DIR
+```
+
+Exit `0` when both samples are drawn, `1` when an input is not in the form
+the tool reads or a sample is there already, `2` when an input cannot be
+read or the output written. `test_draw_definition_samples.py` holds the
+generator to the known answers of SplitMix64, and the draw, the two
+populations and the lines to an invented workspace.

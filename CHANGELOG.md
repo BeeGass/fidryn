@@ -202,6 +202,19 @@ interchange schema versions are maintained independently of the interpreter.
   the group Write, in reading order, with a section of its limits;
   `docs/implementation-status.md` has a section for edition 2, and
   `docs/language.md` a section on the two editions.
+- `tools/replay_uscode.py`, which makes the 27 release points the
+  publisher lists for 2026, in its order, the commits of a repository of
+  the imported law: each release fetched when it is absent, imported into
+  `uscode.next/` and checked, its change set written to
+  `changes/<release>.json`, `uscode/` replaced, and the text form of the
+  change set committed as the message, read back and held to it byte for
+  byte. A replay that is stopped goes on from the release it was in; it
+  removes only `uscode/`, under stated conditions, and gives each run of
+  `fidryn` a limit on its address space and its time.
+  `tools/draw_definition_samples.py` draws, with a seed and a generator
+  written out in the tool, the two samples of 500 that a person reads to
+  judge the extracted definitions and to estimate the ones the closed
+  patterns miss, each line with what a reader needs and an empty verdict.
 
 ## [0.2.0] - 2026-11-16
 
