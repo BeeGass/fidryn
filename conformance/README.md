@@ -237,21 +237,37 @@ their units by the rules of
 second time on the reading of `uslm_common.py`, sharing no code with the
 importer
 ([A second implementation of the rules](../docs/law-modules.md#a-second-implementation-of-the-rules)).
+It implements the second version of those rules, D1 to D14, each rule in
+the code naming its number. The text the rules read is the text of a
+paragraph as D1.1 makes it from the reading: a `ref` of the class
+`footnoteRef` is a footnote marker and gives nothing, and a superscript
+run (`sup` or `xhtml:sup`) made only of the digits `0` to `9` is left
+out, with one space beside it; every other superscript is read.
 `--records FILE` gets one JSON object for each definition, to a line,
 sorted by the bytes of the provision's address and then by the bytes of
-the line: `at`, `terms`, `kind`, `words` (`null` for `unstated`),
-`region`, `basis`, `borrowed_from` and `see_note`, the fields of a
-`definition` block, `null` where the block has none. The script prints
-their number and the release. With `--against DIR` it reads the
-`definition` blocks of the module files of the workspace `DIR` in their
-canonical form, refuses a line that begins with the word `definition` and
-does not begin a block in that form, and exits `1`, naming the first
-definition that differs and, when the other side has one of the same
-provision and terms, the field, unless the release gives the definitions
-that the workspace holds, as many times each.
+the line, with the fields of a definition in their order: `at`, `terms`,
+`kind`, `words` (`null` for `unstated`), `condition`, `region`, `basis`,
+`borrowed_from`, `borrowed_words` and `see_note`, the fields of a
+`definition` block, `null` where the definition has none. A definition of
+kind `borrowed` has exactly one of `borrowed_from` and `borrowed_words`.
+The script prints their number and the release. With `--against DIR` it
+reads the `definition` blocks of the module files of the workspace `DIR`
+in their canonical form, its fields in the order of the grammar of the
+block (`condition` after `words`, and one of `borrowed_from` and
+`borrowed_words` after `basis`), refuses a line that begins with the word
+`definition` and does not begin a block in that form, and exits `1`,
+naming the first definition that differs and, when the other side has one
+of the same provision and terms, the field, unless the release gives the
+definitions that the workspace holds, as many times each.
 `cargo xtask uscode-sample` runs it on the sample and holds the records it
 writes to the definitions of the committed workspace's modules, as the
 check reads them.
+
+`fixtures/definitions/vectors.jsonl` holds the test vectors of the rules,
+238 of them, one JSON object to a line, on invented text in the title 99:
+each names the rule it holds, gives the input (a unit, its containers and
+notes, and its provisions with their parts, blocks and runs) and the
+records it expects, or none and why.
 
 ```sh
 uv run --locked python -I conformance/usc_definitions.py /path/to/release --records definitions.jsonl
@@ -262,12 +278,18 @@ Exit `0` when the records are written and, with `--against`, the
 definitions are the same; `1` when the input is refused by a reading rule,
 a module file holds a definition block in another form, or the definitions
 differ; `2` when an input cannot be read or the records cannot be
-written. `test_usc_definitions.py` holds the script to the definitions
-that the importer's tests expect of the fixtures `definitions-*.xml` and
-of small invented documents of the title 99 that it writes, and holds
-`--against` to workspaces that it writes: the same definitions, one
-definition missing on each side, a field that differs, and a block in
-another form.
+written. `test_usc_definitions.py` holds the script to every vector: it
+builds the vector's unit in the model of the reading of `uslm_common.py`,
+hands it to the rules as the reading of the publisher's XML does, and
+compares the records with those expected, as many times each, naming the
+vector and the first field that differs. It holds the script to the
+definitions of the fixtures `definitions-*.xml` and of small invented
+documents of the title 99 that it writes, footnote markers and
+superscripts among them, and holds `--against` to workspaces that it
+writes: the same definitions, one definition missing on each side, a
+field that differs, `condition` and `borrowed_words` among them, a block
+in another form, a block with both `borrowed_from` and `borrowed_words`,
+and a `condition` out of its order.
 
 ## Fetching a release
 
@@ -435,18 +457,25 @@ person reads to judge the definitions of a generated workspace:
 term in curly quotation marks within 60 characters before `mean`,
 `means`, `include`, `includes`, `shall mean` or `has the meaning`, and
 from which no definition was extracted. It reads the `definition` blocks
-in their canonical form, stops at a block in another form, and holds the
-number it read, by basis, to the workspace's coverage ledger
-`coverage.json`. It reads the text records that `fidryn text DIR --json`
-printed for the workspace, and holds them to it: they count the units,
-containers, provisions, notes and footnotes the ledger counts, and every
-definition's provision has a record. It starts no program. Each line
-holds the seed, the release, the size of the population, the place in the draw,
-what a reader needs to judge it without opening the Code (the paragraph's
-text and the nearest chapeau above it among them), and an empty
-`verdict`. The draw is a Fisher-Yates shuffle driven by SplitMix64, written
-out in the tool, so that one seed draws the same lines with any version of
-Python; a sample once drawn is not written over.
+in their canonical form, `condition` and `borrowed_words` among their
+fields, stops at a block in another form, and holds the number it read,
+by basis, to the workspace's coverage ledger `coverage.json`. It reads
+the text records that `fidryn text DIR --json` printed for the workspace,
+and holds them to it: they count the units, containers, provisions, notes
+and footnotes the ledger counts, and every definition's provision has a
+record. It gives each definition the paragraph it was extracted from: of
+the blocks of its provision's text parts that are paragraphs, the one
+with a sentence whose first term in curly quotation marks is the
+definition's first term, the sentences and the term read with the rules
+of `usc_definitions.py`; a paragraph that no definition was given is one
+from which none was extracted. It starts no program. Each line holds the seed, the release,
+the size of the population, the place in the draw, what a reader needs to
+judge it without opening the Code (the paragraph's text and the nearest
+chapeau above it among them, and of a definition its condition and its
+borrowed words), and an empty `verdict`. The draw is a Fisher-Yates
+shuffle driven by SplitMix64, written out in the tool, so that one seed
+draws the same lines with any version of Python; a sample once drawn is
+not written over.
 
 ```sh
 uv run --locked python -I tools/draw_definition_samples.py --workspace DIR --records FILE --seed N --out DIR
@@ -456,7 +485,10 @@ Exit `0` when both samples are drawn, `1` when an input is not in the form
 the tool reads or a sample is there already, `2` when an input cannot be
 read or the output written. `test_draw_definition_samples.py` holds the
 generator to the known answers of SplitMix64, the draws of the two samples
-drawn from the release 119-142 to theirs, and the draw, the two
-populations, the lines and the refusals of a block in another form, of a
-ledger that counts other definitions and of records of other provisions to
+drawn from the release 119-142 to theirs, the first terms of the
+sentences of a paragraph, and the draw, the two populations (a definition
+of a later sentence and one of a proviso part among them), the lines and
+the refusals of a block in another form, of a block with both borrowed
+fields, of a ledger that counts other definitions, of records of other
+provisions and of a definition whose paragraph the records do not hold to
 an invented workspace.

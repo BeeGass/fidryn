@@ -16,22 +16,28 @@ file yet:
 
 - `extracted.jsonl`: 500 definitions drawn without replacement from every definition
   of the workspace. Each line holds the address of the provision, the terms, the kind,
-  the reach words (`unstated` when there are none), the region (`null` when there is
-  none), the basis, and the text of the paragraph it was extracted from: of the first
-  blocks of the provision's chapeau and content parts that are paragraphs, the one
-  whose first term in curly quotation marks is the definition's first term (the second
-  such for a second definition of that term, and so on).
+  the reach words (`unstated` when there are none), the condition, the region, the
+  basis and the borrowed words (each `null` when there is none), and the text of the
+  paragraph it was extracted from: of the paragraphs that the rules of Definitions read,
+  the blocks of the provision's text parts that are paragraphs (not those in a table),
+  the one with a sentence whose first term in curly quotation marks is the definition's
+  first term, the second such sentence for a second definition of that term, and so
+  on. The rules read a definition from any of those paragraphs, at the start of any of
+  its sentences, and the terms of a reading begin at its first quotation mark; the
+  sentences, the text and the terms are read as `conformance/usc_definitions.py` reads
+  them (a term without a final comma and without the stray marks of nested quotation).
 - `near-misses.jsonl`: 500 paragraphs of operative text drawn without replacement from
   those that hold a term in curly quotation marks, `“` and `”` around at least one
   character that is neither, followed within 60 characters, from the end of the term
   to the start of the verb, by one of the verb forms `mean`, `means`, `include`,
   `includes`, `shall mean` and `has the meaning`, standing as words (no letter `A` to
   `Z` or `a` to `z` just before or after them, and in the case written here), and from
-  which no definition was extracted. The paragraphs are those of every text part of
-  every provision, in its blocks and in the cells of its tables, and not in quoted
-  content. Each line holds the address of the provision, the role of the part, the
-  place of the paragraph among the paragraphs of the provision (from 1, in the order of
-  the text), its text, and the first term and its verb that put it into the population.
+  which no definition was extracted: no definition of the workspace was given that
+  paragraph as above. The paragraphs are those of every text part of every provision,
+  in its blocks and in the cells of its tables, and not in quoted content. Each line
+  holds the address of the provision, the role of the part, the place of the paragraph
+  among the paragraphs of the provision (from 1, in the order of the text), its text,
+  and the first term and its verb that put it into the population.
 
 Every line also holds the seed, the release of the workspace, the size of the
 population it was drawn from, the place of the line in the draw (from 1), the address
@@ -62,6 +68,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "conformance"))
+
+from usc_definitions import read_text, recorded_term, sentences
+from uslm_common import Text
+
 SIZE = 500
 MASK = (1 << 64) - 1
 WINDOW = 60
@@ -75,9 +86,11 @@ FIELDS = {
         ("term", STRING),
         ("kind", r"[a-z_]+"),
         ("words", rf"{STRING}|unstated"),
+        ("condition", STRING),
         ("region", STRING),
         ("basis", r"[a-z_]+"),
         ("borrowed_from", STRING),
+        ("borrowed_words", STRING),
         ("see_note", STRING),
     )
 }
@@ -146,17 +159,41 @@ def loose_match(words: str) -> tuple[str, str] | None:
     return None
 
 
+def first_terms(block: dict[str, Any]) -> list[str]:
+    """The terms that a definition read from the paragraph `block` of a text record can
+    have as its first term: for each sentence of the paragraph's text as the rules of
+    Definitions read it, its first term in curly quotation marks, as the rules record
+    a term. The rules read a paragraph at the start of each of its sentences, and the
+    terms of a reading begin at its first quotation mark."""
+    text = read_text(
+        Text(
+            str(block["p"]),
+            tuple((int(start), int(end), str(target)) for start, end, target in block["refs"]),
+            tuple((int(start), int(end)) for start, end in block["sup"]),
+        )
+    )
+    found = []
+    for start, end in sentences(text.plain):
+        term = TERM.search(text.plain, start, end)
+        if term is not None:
+            found.append(recorded_term(term[1]))
+    return found
+
+
 @dataclass
 class Definition:
     address: str
     terms: list[str]
     kind: str
     words: str
+    condition: str | None
     region: str | None
     basis: str
+    borrowed_words: str | None
     place: tuple[str, int]
     text: str = ""
-    item: int = -1
+    # The place of its paragraph among the paragraphs of the provision.
+    paragraph: int = -1
 
 
 @dataclass
@@ -165,9 +202,6 @@ class Paragraph:
     role: str
     ordinal: int
     text: str
-    # The place of its part among the items of the provision, when it is the part's
-    # first block; such a paragraph is the one a definition is extracted from.
-    first_of: int | None
     term: str
     verb: str
 
@@ -192,7 +226,8 @@ def read_block(lines: list[str], at: int, file: str, number: int) -> tuple[Defin
     values: dict[str, list[str]] = {}
     index = at + 1
 
-    def field(name: str, required: bool, many: bool = False) -> None:
+    def field(name: str, required: bool, many: bool = False) -> bool:
+        """Reads the lines of the field `name` at `index`; whether there was one."""
         nonlocal index
         while index < len(lines):
             found = FIELDS[name].fullmatch(lines[index])
@@ -208,13 +243,18 @@ def read_block(lines: list[str], at: int, file: str, number: int) -> tuple[Defin
                 f"{file}:{number + index - at}: `{line}` stands where the definition block "
                 f"of `{address}` has its `{name}`"
             )
+        return name in values
 
+    # The order of the grammar of a definition block; `borrowed_from` and
+    # `borrowed_words` share one place, so that a block holds at most one of the two.
     field("term", True, many=True)
     field("kind", True)
     field("words", True)
+    field("condition", False)
     field("region", False)
     field("basis", True)
-    field("borrowed_from", False)
+    if not field("borrowed_from", False):
+        field("borrowed_words", False)
     field("see_note", False)
     if index >= len(lines) or lines[index] != "  }":
         line = lines[index] if index < len(lines) else ""
@@ -227,15 +267,21 @@ def read_block(lines: list[str], at: int, file: str, number: int) -> tuple[Defin
     if kind not in KINDS or basis not in BASES:
         raise FormError(f"{where}: the kind `{kind}` or the basis `{basis}` is not of its list")
     words = values["words"][0]
-    region = values.get("region")
+
+    def optional(name: str) -> str | None:
+        found = values.get(name)
+        return decoded(found[0], where) if found else None
+
     return (
         Definition(
             address,
             [decoded(term, where) for term in values["term"]],
             kind,
             "unstated" if words == "unstated" else decoded(words, where),
-            decoded(region[0], where) if region else None,
+            optional("condition"),
+            optional("region"),
             basis,
+            optional("borrowed_words"),
             (file, number),
         ),
         index + 1,
@@ -324,26 +370,27 @@ def hold_definitions(definitions: list[Definition], totals: dict[str, Any], ledg
         )
 
 
-def paragraphs(blocks: list[Any]) -> Iterator[tuple[bool, str]]:
+def paragraphs(blocks: list[Any]) -> Iterator[tuple[bool, dict[str, Any]]]:
     """The paragraphs of `blocks`, and of the cells of their tables, in order, each with
-    whether it is the first of `blocks`; quoted content is not read."""
-    for index, block in enumerate(blocks):
+    whether it is one of `blocks` itself, not in a table; quoted content is not read."""
+    for block in blocks:
         if "p" in block:
-            yield index == 0, str(block["p"])
+            yield True, block
         elif "table" in block:
             for _, cells in block["table"]:
                 for _, _, _, inner in cells:
-                    for _, words in paragraphs(inner):
-                        yield False, words
+                    for _, paragraph in paragraphs(inner):
+                        yield False, paragraph
 
 
 @dataclass
 class Provisions:
     parent: dict[str, str]
     chapeau: dict[str, str]
-    # The first blocks of the chapeau and content parts of each provision that holds a
-    # definition, that are paragraphs: the place of the part and the text.
-    firsts: dict[str, list[tuple[int, str]]]
+    # The paragraphs that the rules read of each provision that holds a definition, the
+    # blocks of its text parts that are paragraphs: for each, its place among the
+    # paragraphs of the provision, its text, and the first terms of its sentences.
+    read: dict[str, list[tuple[int, str, list[str]]]]
     near: list[Paragraph]
     # What the records count, by the names of the coverage ledger.
     counted: dict[str, int]
@@ -386,32 +433,24 @@ def read_records(records: Path, defined: set[str]) -> Provisions:
                 found.counted["units"] += 1
             address = str(record["address"])
             if address in defined:
-                found.firsts[address] = []
+                found.read[address] = []
             chapeau: list[str] = []
             ordinal = 0
-            for place, item in enumerate(record["items"]):
+            for item in record["items"]:
                 if "child" in item:
                     found.parent[str(item["child"])] = address
                     continue
                 role, blocks = str(item["part"]), item["blocks"]
                 if role == "chapeau":
                     chapeau += [str(block["p"]) for block in blocks if "p" in block]
-                if (
-                    address in defined
-                    and role in ("chapeau", "content")
-                    and blocks
-                    and "p" in blocks[0]
-                ):
-                    found.firsts[address].append((place, str(blocks[0]["p"])))
-                for first, words in paragraphs(blocks):
+                for of_part, paragraph in paragraphs(blocks):
                     ordinal += 1
+                    words = str(paragraph["p"])
+                    if address in defined and of_part:
+                        found.read[address].append((ordinal, words, first_terms(paragraph)))
                     match = loose_match(words)
                     if match is not None:
-                        found.near.append(
-                            Paragraph(
-                                address, role, ordinal, words, place if first else None, *match
-                            )
-                        )
+                        found.near.append(Paragraph(address, role, ordinal, words, *match))
             if chapeau:
                 found.chapeau[address] = "\n".join(chapeau)
     return found
@@ -438,28 +477,32 @@ def hold_records(provisions: Provisions, totals: dict[str, Any], ledger: Path) -
 
 
 def place_definitions(definitions: list[Definition], provisions: Provisions) -> None:
-    """Gives each definition the paragraph it was extracted from."""
+    """Gives each definition the paragraph it was extracted from: the paragraphs that
+    the rules read of its provision, once for each of their sentences whose first term
+    is the definition's first term, in order, the second such for a second definition
+    of that term, and so on."""
     taken: dict[tuple[str, str], int] = {}
     for definition in definitions:
-        if definition.address not in provisions.firsts:
+        if definition.address not in provisions.read:
             raise FormError(
                 f"the records hold no provision at `{definition.address}`, which a definition "
                 "names; they are to be the records of the workspace"
             )
         term = definition.terms[0]
         candidates = [
-            (place, words)
-            for place, words in provisions.firsts[definition.address]
-            if (first := TERM.search(words)) is not None and first[1] == term
+            (ordinal, words)
+            for ordinal, words, firsts in provisions.read[definition.address]
+            for first in firsts
+            if first == term
         ]
         key = (definition.address, term)
         nth = taken.get(key, 0)
         if nth >= len(candidates):
             raise FormError(
-                f"the records hold no paragraph of `{definition.address}` whose first term is "
-                f"“{term}”, from which its definition is extracted"
+                f"the records hold no paragraph of `{definition.address}` with a sentence whose "
+                f"first term is “{term}”, from which its definition is extracted"
             )
-        definition.item, definition.text = candidates[nth]
+        definition.paragraph, definition.text = candidates[nth]
         taken[key] = nth + 1
 
 
@@ -486,12 +529,12 @@ def draw_samples(workspace: Path, records: Path, seed: int, out: Path, size: int
     provisions = read_records(records, {definition.address for definition in definitions})
     hold_records(provisions, totals, workspace / LEDGER)
     place_definitions(definitions, provisions)
-    extracted = {(definition.address, definition.item) for definition in definitions}
+    extracted = {(definition.address, definition.paragraph) for definition in definitions}
     near = sorted(
         (
             paragraph
             for paragraph in provisions.near
-            if (paragraph.address, paragraph.first_of) not in extracted
+            if (paragraph.address, paragraph.ordinal) not in extracted
         ),
         key=lambda paragraph: (paragraph.address.encode(), paragraph.ordinal),
     )
@@ -509,8 +552,10 @@ def draw_samples(workspace: Path, records: Path, seed: int, out: Path, size: int
                     "terms": definition.terms,
                     "kind": definition.kind,
                     "words": definition.words,
+                    "condition": definition.condition,
                     "region": definition.region,
                     "basis": definition.basis,
+                    "borrowed_words": definition.borrowed_words,
                     "text": definition.text,
                     "chapeau": provisions.nearest(definition.address),
                     "verdict": "",
