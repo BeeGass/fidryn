@@ -87,7 +87,12 @@ interchange schema versions are maintained independently of the interpreter.
   The rules do not find every definition. The one-module check accepts
   reach words that stand in the text of the provision or in the chapeau of
   any of its ancestors. The sample's modules hold the definitions
-  extracted from them.
+  extracted from them. `conformance/usc_definitions.py` implements the
+  rules a second time, on the independent reading of the publisher's XML
+  and sharing no code with the importer: it writes the definitions of a
+  release, one JSON object to a line, and with `--against DIR` compares
+  them with those of a workspace. `cargo xtask uscode-sample` holds the
+  definitions of the sample's modules to it.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,

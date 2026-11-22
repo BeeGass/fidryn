@@ -1510,6 +1510,26 @@ provision with one first term keep the order of their parts. The checker
 holds each to the rules of
 [What the checker verifies in one module](#what-the-checker-verifies-in-one-module).
 
+### A second implementation of the rules
+
+`conformance/usc_definitions.py` implements the rules of this section a
+second time. It is written from their text, on the independent reading of
+the publisher's XML that `conformance/uslm_text.py` prints
+([The official XML of the Code](https://github.com/BeeGass/fidryn/blob/main/conformance/README.md#the-official-xml-of-the-code)),
+and shares no code with the importer. It writes the definitions it finds in
+a release, one JSON object to a line, and with `--against DIR` compares
+them with those that the `definition` blocks of a workspace hold.
+
+The check of [the sample](#the-sample), which `cargo xtask ci` runs, holds
+the importer's definitions of the sample to it: the two must find the same
+definitions in the sample's archives, field for field. That shows that two
+implementations of the rules, written apart, read them alike on that text:
+a definition that one of them finds, misses or records otherwise by a
+mistake of its own fails the check. It does not show that the rules find
+every definition the text holds. Both follow the same closed list of
+forms, so a definition written in another form is missed by both, and the
+comparison cannot see it.
+
 ## Curated modules: imports, citations and names
 
 A curated module is written by a person. It gives names to addresses,
@@ -2466,7 +2486,7 @@ point published by the Office of the Law Revision Counsel, Title 1, Title
   it with its dependency.
 
 `cargo xtask uscode-sample`, which `cargo xtask ci` runs, holds the sample
-to eight things, in this order, and fails with a message that names the
+to nine things, in this order, and fails with a message that names the
 first difference when one of them does not hold:
 
 1. every archive has the size, the SHA-256 and the BLAKE3 that its record
@@ -2485,21 +2505,27 @@ first difference when one of them does not hold:
    `import` and the ledger's `totals` both hold is the same in both, from
    the units and the provisions to the notes, the images and what was not
    imported. Only the ledger counts definitions, `definitions` and
-   `definitions_by_kind`, since the script extracts none, and the profile's
-   `prefix` and `release` stand at the top of the ledger, where they are
-   compared;
+   `definitions_by_kind`, since that script extracts none, and the
+   profile's `prefix` and `release` stand at the top of the ledger, where
+   they are compared;
 6. the text of every provision, container, note, source credit and
    footnote that `fidryn text samples/uscode/workspace --json` reads back
    from the modules equals, line for line, what `conformance/uslm_text.py`
    reads from the publisher's XML by the [rules of the reading](#the-ingester-for-the-united-states-code),
    which it implements on its own, sharing no code with the ingester;
-7. the check of `curated/` with its dependency finds no error and no
+7. the definitions that `conformance/usc_definitions.py` finds in the
+   archives, by its own implementation of the [rules](#definitions), are
+   those that the `definition` blocks of the committed workspace hold,
+   field for field
+   ([A second implementation of the rules](#a-second-implementation-of-the-rules));
+   the script names the first definition that differs;
+8. the check of `curated/` with its dependency finds no error and no
    warning, a pin that is no longer the lock's (`E740`) among the errors
    and a stale binding (`W750`) among the warnings, counts at least one
    citation, and gives every citation of it the outcome `exact`; the step
    names the file and the first thing that is wrong, and the curated
    sample when it counts no citation;
-8. the table of [Coverage](https://fidryn.onlygass.dev/docs/coverage.md), between the markers
+9. the table of [Coverage](https://fidryn.onlygass.dev/docs/coverage.md), between the markers
    `<!-- coverage-table:begin -->` and `<!-- coverage-table:end -->`, is
    the one the committed ledger gives.
 
@@ -2608,6 +2634,22 @@ more.
 - An exception written inside the text of a definition, such as "means a
   widget, except in section 5", does not narrow its region: the region is
   that of the reach alone.
+- The importer and `conformance/usc_definitions.py`
+  ([A second implementation of the rules](#a-second-implementation-of-the-rules))
+  record two rare forms differently. A release that holds one shows the
+  difference only when the two are compared on it, as the check of the
+  sample compares them for the sample:
+  - a reach whose object begins with `this` and a space but names no kind
+    of [The region](#the-region), and is a single link to an address below
+    the prefix of the corpus, as a link whose words are `this Act` would
+    be: the script records the link's target as the region, as the rules
+    say, and the importer records no region;
+  - a restated definition whose unit has two notes that
+    [The note](#the-note) could point at, one at a provision and one at a
+    provision below it, where the higher provision's note stands first in
+    the document: the importer points at that note, and the script at the
+    lower provision's, since the independent reading gives the notes of a
+    provision after those of the provisions below it.
 
 ### Change sets
 
