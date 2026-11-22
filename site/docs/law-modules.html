@@ -1192,14 +1192,19 @@ else the one the environment variable <code>FIDRYN_CACHE_DIR</code> names, when 
 set and not empty; else <code>fidryn</code> in the cache directory of the user,
 outside every workspace: on Windows the directory <code>LOCALAPPDATA</code> names,
 and on other systems the one <code>XDG_CACHE_HOME</code> names, else <code>.cache</code> in
-<code>HOME</code>, each taken only when it is an absolute path. When none of them
-names a directory, the check keeps no cache, as with <code>--no-cache</code>, and
-<code>fidryn check</code> says so once on stderr. <code>--no-cache</code> keeps no cache: the
-check then reads and checks every module file and writes no entry. Unless
-the cache is named inside it, the check writes nothing into the workspace,
-and it reads nothing there but the workspace's own files: a
-<code>.fidryn-cache</code> or any other entry whose name begins with a dot is not
-read, and a symbolic link of any name is not followed.</p>
+<code>HOME</code>, each taken only when it is an absolute path. That directory is not
+used when it is the directory of the workspace under check or lies inside
+it, as it does when one of these variables names a directory inside the
+workspace; the two are compared with every link and every <code>..</code> resolved,
+as far as each exists. When none of them names a directory, or the one
+they name lies inside the workspace, the check keeps no cache, as with
+<code>--no-cache</code>, and <code>fidryn check</code> says so once on stderr, with the reason.
+<code>--no-cache</code> keeps no cache: the check then reads and checks every module
+file and writes no entry. Unless the cache is named inside it, the check
+writes nothing into the workspace, and it reads nothing there but the
+workspace's own files: a <code>.fidryn-cache</code> or any other entry whose name
+begins with a dot is not read, and a symbolic link of any name is not
+followed.</p>
 <p>One cache serves every workspace of a user. An entry is the result of the
 bytes of one file, whatever workspace holds the file, so the workspaces
 that hold a file of the same bytes share its entry, and the first check of

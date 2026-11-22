@@ -386,6 +386,18 @@ pub(super) fn cache_shared(root: &Path, manifest: &Manifest, cache: &Path) -> Op
     })
 }
 
+/// Whether the directory `dir` is the directory `outer` or lies inside it,
+/// the two compared as the check compares a cache's directory with that of
+/// a dependency: with every link and `..` resolved, as far as each exists,
+/// so that a directory that does not exist yet lies inside `outer` when the
+/// part of it that exists does. `false` when no part of either exists.
+pub fn lies_inside(dir: &Path, outer: &Path) -> bool {
+    let (Some((existing, at)), Some((_, outer))) = (resolved(dir), resolved(outer)) else {
+        return false;
+    };
+    at.starts_with(&outer) || existing.starts_with(&outer)
+}
+
 /// The longest part of `path` that exists, made canonical, and `path` with
 /// that part so resolved and the rest of it taken as written, a `..` there
 /// removing the segment before it; `None` when no part of it exists, which

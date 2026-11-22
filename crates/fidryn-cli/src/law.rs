@@ -357,13 +357,16 @@ pub fn write_hashes(dir: &Path, address: &str, out: &mut dyn Write) -> Result<()
 /// message. Every workspace is read as `fidryn check` reads it, on `--jobs`
 /// threads and through one cache, which `fidryn check` chooses
 /// ([`super::cache_dir`]) and every workspace shares, made absolute;
-/// `--no-cache` keeps none. When the cache could not be used or written, it
-/// says so once on stderr, as `fidryn check` does, and the change set is the
-/// same. Exit 1, with the diagnostics on stderr and nothing on stdout, when
-/// a directory is not what the command compares or a workspace has an
-/// error; then it says after them why there is no cache when it knew that
-/// before it read a workspace, no directory being named for the cache or
-/// the identity of the executable being unknown.
+/// `--no-cache` keeps none, and none is kept when the directory in the cache
+/// directory of the user lies inside one of the workspaces. When the cache
+/// could not be used or written, it says so once on stderr, as `fidryn
+/// check` does, and the change set is the same. Exit 1, with the
+/// diagnostics on stderr and nothing on stdout, when a directory is not
+/// what the command compares or a workspace has an error; then it says
+/// after them why there is no cache when it knew that before it read a
+/// workspace, no directory being named for the cache, the one of the user
+/// lying inside a workspace, or the identity of the executable being
+/// unknown.
 pub(crate) fn changes(
     old: &Path,
     new: &Path,
@@ -371,7 +374,9 @@ pub(crate) fn changes(
     json: bool,
     flags: &super::WorkspaceFlags,
 ) -> ExitCode {
-    let (mut options, unused) = super::check_options(flags);
+    let mut workspaces = vec![old, new];
+    workspaces.extend(bindings.iter().map(PathBuf::as_path));
+    let (mut options, unused) = super::check_options(flags, &workspaces);
     // One directory for every workspace: a relative one would be taken
     // inside each of them.
     options.cache_dir = options
