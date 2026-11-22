@@ -3,7 +3,7 @@
 Do not reimplement fabricated-witness, source-driven due, nested seq, or
 CLI `check_path` byte-auth. Those crate tests remain the evidence. This
 file lists the six finite public-API obligations and the named tests in
-[`tests/integration/integration_suite.rs`](../tests/integration/integration_suite.rs).
+[`tests/integration/integration_suite.rs`](../../tests/integration/integration_suite.rs).
 
 Command: `cargo test -p fidryn-integration-tests --offline integration_suite`.
 
@@ -20,7 +20,7 @@ not language closure. Remaining after this gate: independent kernel
 without `evaluate`, packages, Salsa, SMT, surface transaction syntax,
 mill must not gain filesystem from paste. The next gate beyond this
 six-obligation suite is
-[`tests/integration/boundary_review_20260917.rs`](../tests/integration/boundary_review_20260917.rs)
+[`tests/integration/boundary_review_20260917.rs`](../../tests/integration/boundary_review_20260917.rs)
 (2026-09-17 11:35 boundary review).
 
 ## 1. Verification strength
@@ -82,26 +82,28 @@ Named tests (same records, no authority grant):
 
 ## 4. Public report fidelity
 
-Schema `fidryn.evaluation-report/v0.1`:
+Checked CLI and mill reports use `fidryn.evaluation-report/v0.2`. The
+report-fidelity contract retains these fields and adds invocation identity:
 
 ```
 schema, executionMode, assumptions, sourceTrust, verificationMethod,
-coverage, outcomeDocument
+coverage, outcomeDocument, invocation, invocationId, engineVersion
 ```
 
 `outcomeDocument` is the existing `fidryn.outcome/v0.1` object (keep
 that schema unchanged as a projection). Qualifications that cannot fit
 the old outcome live on the envelope. A scenario report must not be
-reduced to an outcome-only export. This suite asserts JSON keys on
-`render_report` output and calls `fidryn_trace::reject_lossy_export`
-when that symbol is present.
+reduced to an outcome-only export. Current checked output comes from
+`fidryn_trace::render_checked_report`; the legacy `render_report` API remains
+a v0.1 compatibility projection. `fidryn_trace::reject_lossy_export` enforces
+the outcome-only export boundary.
 
 CLI `run`/`explore` and mill `/api/run` `/api/explore` print/return the
 report envelope. Mill pasted compile sets `sourceTrust: unauthenticated`.
 Path compile may be `fixture` or `byteVerified`. In-memory
 `compile_source` (the mill paste path) is unauthenticated.
 
-Named tests:
+Historical regression identifiers (their version suffixes are retained):
 
 - `render_report_schema_is_evaluation_report_v0_1`
 - `scenario_report_is_not_outcome_only_export`

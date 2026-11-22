@@ -34,6 +34,7 @@ module Examples.AvaNoahPrenup version "0.1.0" {
     entity Ava : NaturalPerson
     entity Noah : NaturalPerson
     entity ANP : PremaritalAgreement
+    entity DivorceCase : Proceeding
 
     record_type FinancialDisclosureSchedule {
         owner: NaturalPerson
@@ -44,6 +45,7 @@ module Examples.AvaNoahPrenup version "0.1.0" {
     }
 
     proposition Married(a: NaturalPerson, b: NaturalPerson)
+    proposition Effective(agreement: PremaritalAgreement)
     proposition ProspectiveSpouses(
         a: NaturalPerson,
         b: NaturalPerson,

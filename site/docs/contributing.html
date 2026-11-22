@@ -89,23 +89,25 @@
     <p class="label">Implementers</p>
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Internal ledgers</span><span class="d">Working ledgers, partly out of date</span></a></li>
     </ol>
   </div>
 </nav>
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 8 &middot; Contribute</p>
     <h1 id="doc-title">Contributing to Fidryn</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#example-status-and-documentation-checks"><span class="n">8.4</span> Example status and documentation checks</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.5</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.6</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.7</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.8</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.9</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.10</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.11</span> Not legal advice</a></li></ol></details>
     <div class="prose">
-<p>This file is for people building the v0.1 reference interpreter. It is
+<p>This file is for people building the 0.2 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the <a href="https://github.com/BeeGass/fidryn/blob/main/README.md">README</a> and the <a href="/docs/">documentation hub</a>.</p>
 <p>Fidryn (FID-rin) is a research fixture. Modules under <code>examples/</code> and
 records under <code>tests/</code> exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.</p>
+<p>Fidryn is released under the MIT License. Licensing and contribution
+rights are described in <a href="https://github.com/BeeGass/fidryn/blob/main/LICENSING.md">Licensing</a>. Contributions are
+accepted under the same license; no separate agreement is required.</p>
 <h2 id="toolchain"><span class="hn">8.1</span> Toolchain <a class="anchor" href="#toolchain" aria-label="Link to this section">#</a></h2>
 <p>Rust 1.98, edition 2024. Workspace <code>package.rust-version</code> is 1.98.
 <a href="https://github.com/BeeGass/fidryn/blob/main/rust-toolchain.toml"><code>rust-toolchain.toml</code></a> pins the 1.98.1
@@ -117,18 +119,20 @@ channel and the <code>rustfmt</code> and <code>clippy</code> components.</p>
 at Command Line Tools clang because the Xcode license is unsigned.</p>
 <h2 id="checks"><span class="hn">8.2</span> Checks <a class="anchor" href="#checks" aria-label="Link to this section">#</a></h2>
 <p>From the repository root:</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt
-<span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
-<span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--offline</span></code></pre></figure>
-<p><code>cargo xtask ci</code> runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-<code>cargo xtask ci --fmt</code> also checks Rust formatting first. The Python steps
-need <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run</code> provides the Python
-that <code>.python-version</code> names and the packages <code>uv.lock</code> pins. GitHub
-Actions runs <code>cargo xtask ci --fmt</code> on every push to <code>main</code> and every
-pull request (<code>.github/workflows/ci.yml</code>); the runner builds its own
-<code>.venv</code> from <code>uv.lock</code>, and nothing it builds is committed.</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> fmt <span class="tk-ty">--all</span>
+<span class="tk-kw">cargo</span> clippy <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-targets</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span> <span class="tk-ty">--</span> <span class="tk-ty">-D</span> warnings
+<span class="tk-kw">cargo</span> test <span class="tk-ty">--workspace</span> <span class="tk-ty">--all-features</span> <span class="tk-ty">--locked</span> <span class="tk-ty">--offline</span></code></pre></figure>
+<p><code>cargo xtask ci --fmt</code> runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, the
+example status and documentation checks described below, and benchmark
+compilation. Node and <a href="https://docs.astral.sh/uv/">uv</a> are required for
+qualification. <code>uv run --locked</code> uses <code>.python-version</code> and <code>uv.lock</code>.</p>
+<p>GitHub runs this gate for pushes and PRs to <code>dev</code> and <code>main</code>, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>. Generated environments and build
+outputs are not committed.</p>
 <p>Do not weaken no-false-determinacy to make a test pass.</p>
 <h2 id="website"><span class="hn">8.3</span> Website <a class="anchor" href="#website" aria-label="Link to this section">#</a></h2>
 <p>The public site in <a href="https://github.com/BeeGass/fidryn/tree/main/site/"><code>site/</code></a> is generated from these guides
@@ -141,10 +145,52 @@ specimen is evaluated by the real interpreter at build time, so a
 change in semantics also makes the site stale.</p>
 <p>The stylesheet and script in <code>site/assets/</code> are written by hand. The
 mill, whose page lives in <a href="https://github.com/BeeGass/fidryn/tree/main/web/"><code>web/</code></a>, embeds the stylesheet
-<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. When Node is
-installed, <code>cargo xtask ci</code> also runs the JavaScript unit tests in
-<code>web/tests/</code>; Node is never needed to build or serve anything.</p>
-<h2 id="pipeline"><span class="hn">8.4</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
+<code>fidryn.css</code> and has its own script, <code>web/mill.js</code>. <code>cargo xtask ci</code> requires Node to run the JavaScript unit tests in
+<code>web/tests/</code>; Node is not needed to build or serve the interpreter.</p>
+<h2 id="example-status-and-documentation-checks"><span class="hn">8.4</span> Example status and documentation checks <a class="anchor" href="#example-status-and-documentation-checks" aria-label="Link to this section">#</a></h2>
+<p><code>cargo xtask examples</code> runs <code>fidryn check</code> on every <code>.fr</code> file under
+<code>examples/</code>, <code>packages/</code>, <code>prelude/</code> and <code>tests/programs/</code>, and fails when
+the recorded result is out of date. The record is <code>examples/status.json</code>
+and <code>examples/STATUS.md</code>; the status sentence between the
+<code>examples-status</code> markers in <code>README.md</code>, <code>examples/README.md</code>,
+<code>examples/states/README.md</code> and <code>docs/examples.md</code>; and the <code> (draft)</code>
+mark after each path of a failing file that <code>README.md</code>,
+<code>examples/README.md</code>, <code>examples/states/README.md</code> or a Markdown file
+directly under <code>docs/</code> mentions outside a code block. Do not edit any of these by
+hand. <code>cargo xtask examples --update</code> rewrites the status files, the
+status sentences and the draft marks. Run <code>cargo xtask site</code> after it,
+because the site is generated from the guides it rewrites.</p>
+<p><code>cargo xtask docs</code> reads the Markdown in <code>README.md</code>, <code>LICENSING.md</code>,
+<code>CHANGELOG.md</code>, <code>SECURITY.md</code>, <code>docs/</code>, <code>examples/</code>, <code>packages/</code>,
+<code>conformance/</code> and <code>site/README.md</code>. It checks that every relative link
+resolves, that every untagged or <code>fidryn</code>-tagged code block that starts
+with <code>module</code> passes the checker, and that the <code>fidryn</code> commands in
+blocks tagged <code>sh</code> behave as the tag says. <code>--skip-commands</code> leaves out
+the commands.</p>
+<p>A code block that shows a <code>fidryn</code> command takes one of these tags:</p>
+<ul>
+<li><code>sh</code>: the check runs each <code>fidryn</code> command in the block from the
+repository root and expects exit status 0. A command is a line, with
+lines ending in <code>\</code> joined, that starts with <code>fidryn</code> or with
+<code>cargo run -p fidryn-cli --</code>; the check runs the built <code>fidryn</code> binary
+with the words after that prefix. A line in an <code>sh</code> block that is not a
+<code>fidryn</code> command, such as <code>cargo test --workspace --locked</code>, is not run.
+A command with <code>ui</code> as one of its words is taken to start the mill, so
+it is not run either. The check does not use a shell, so a command
+must not use <code>&gt;</code>, <code>&gt;&gt;</code>, <code>&lt;</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>||</code> or <code>;</code>. A command that has
+not exited after 60 seconds is stopped and reported.</li>
+<li><code>sh exit=N</code>: the same, but each command must exit with status <code>N</code>. A
+tag whose first word is <code>sh</code> and which is neither <code>sh</code> nor <code>sh exit=N</code>
+with <code>N</code> an integer, such as <code>sh exit 1</code>, is reported.</li>
+<li><code>text</code>: the block is shown and not run. Use it for placeholders such as
+<code>PATH</code>, for output redirection, and for commands that cannot run
+unattended.</li>
+</ul>
+<p>A block with any other tag, such as <code>shell</code>, or with none, must not show
+a <code>fidryn</code> command. Such a tag is not itself reported, but a block under
+it that shows a <code>fidryn</code> command is reported as an untagged block would
+be.</p>
+<h2 id="pipeline"><span class="hn">8.5</span> Pipeline <a class="anchor" href="#pipeline" aria-label="Link to this section">#</a></h2>
 <p>Land a change in the crate that owns that stage:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>syntax → hir → check → core → eval → handlers → verify → driver → cli</code></pre></figure>
 <p><code>fidryn-kernel</code> sits beside verify: it accepts or rejects covering
@@ -154,7 +200,7 @@ extra stages.</p>
 <p>Do not add reverse dependencies. Do not put evaluator logic in
 <code>syntax</code>. Do not put parser logic in <code>core</code>. <code>fidryn-driver</code> must not
 depend on <code>fidryn-cli</code>.</p>
-<h2 id="crates"><span class="hn">8.5</span> Crates <a class="anchor" href="#crates" aria-label="Link to this section">#</a></h2>
+<h2 id="crates"><span class="hn">8.6</span> Crates <a class="anchor" href="#crates" aria-label="Link to this section">#</a></h2>
 <p>Workspace members are listed in <a href="https://github.com/BeeGass/fidryn/blob/main/Cargo.toml"><code>Cargo.toml</code></a>.</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
@@ -170,7 +216,7 @@ fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
 fidryn-cli             fidryn binary and localhost mill</code></pre></figure>
-<h2 id="tests"><span class="hn">8.6</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
+<h2 id="tests"><span class="hn">8.7</span> Tests <a class="anchor" href="#tests" aria-label="Link to this section">#</a></h2>
 <p>Tests live next to the crates they exercise (<code>#[cfg(test)]</code> in <code>src</code>,
 and <code>crates/&lt;name&gt;/tests/</code> when a crate has an integration kit).</p>
 <p>The adversarial review kit is
@@ -181,27 +227,32 @@ Those tests are regressions, not closure of the language.</p>
 runs them as independently named modules. Do not rewrite compiled Core
 to green fingerprint tests. Patching a <code>CoreModule</code> so a digest, plan,
 or outcome matches is not a passing test.</p>
-<h2 id="commits"><span class="hn">8.7</span> Commits <a class="anchor" href="#commits" aria-label="Link to this section">#</a></h2>
-<p>Use Conventional Commits (<code>feat(syntax): ...</code>, <code>fix(eval): ...</code>,
-<code>test(cli): ...</code>, <code>docs: ...</code>). Prefer atomic commits in pipeline order,
-then tests and docs. Do not dump unrelated crates into one commit.</p>
-<h2 id="grammar"><span class="hn">8.8</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
-<p>The closed v0.1 grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the
-repository root. Unknown body fields are parse errors, not extension
-points.</p>
-<h2 id="implementer-documents"><span class="hn">8.9</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
+<h2 id="commits"><span class="hn">8.8</span> Commits <a class="anchor" href="#commits" aria-label="Link to this section">#</a></h2>
+<p>Write each commit subject as an imperative sentence with no type prefix,
+for example <code>Require code-scanning findings to pass before promotion</code>.
+Recent history follows this; older commits used Conventional Commits
+prefixes such as <code>feat(syntax):</code>, which are no longer used. Prefer atomic
+commits in pipeline order, then tests and docs. Do not dump unrelated
+crates into one commit.</p>
+<h2 id="grammar"><span class="hn">8.9</span> Grammar <a class="anchor" href="#grammar" aria-label="Link to this section">#</a></h2>
+<p>The grammar is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a> at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+<code>source</code> blocks, rule bodies and judgment request blocks. In most other
+declarations an unknown field is skipped without a diagnostic; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>.</p>
+<h2 id="implementer-documents"><span class="hn">8.10</span> Implementer documents <a class="anchor" href="#implementer-documents" aria-label="Link to this section">#</a></h2>
 <p>These files are crate contracts and evidence. They are not user
 tutorials.</p>
 <ul>
 <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a> — Frozen crate graph, public APIs, and the pipeline of total functions over trees.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status.md</a> — Evidence-backed capability matrix. A <code>.fr</code> file is not an executable specification.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md">OBLIGATIONS.md</a> — Review obligation matrix. Green workspace tests are regressions, not language closure.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md">WORKSTREAM-CONTRACT.md</a> — Shared types and acceptance for covering certificates, <code>seq</code>/<code>require</code>, tax, and trust profiles.</li>
-<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md">INTEGRATION-CONTRACT.md</a> — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.</li>
+<li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status.md</a> — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A <code>.fr</code> file is not an executable specification.</li>
 </ul>
+<p>The internal working ledgers are indexed in
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md">internal/README.md</a>. They are not reader
+documentation, and parts of them describe earlier states of the code.</p>
 <p>Mill HTTP routes are documented in <a href="/docs/mill">mill.md</a>, not in
 ARCHITECTURE.md.</p>
-<h2 id="not-legal-advice"><span class="hn">8.10</span> Not legal advice <a class="anchor" href="#not-legal-advice" aria-label="Link to this section">#</a></h2>
+<h2 id="not-legal-advice"><span class="hn">8.11</span> Not legal advice <a class="anchor" href="#not-legal-advice" aria-label="Link to this section">#</a></h2>
 <p>This interpreter, its tests, and its example modules are not legal
 advice.</p>
 
@@ -210,12 +261,12 @@ advice.</p>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/contributing.md">Edit this page on GitHub</a><a href="/docs/contributing.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.4</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.5</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.6</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.7</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.8</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.9</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.10</span> Not legal advice</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#toolchain"><span class="n">8.1</span> Toolchain</a></li><li class="lvl-2"><a href="#checks"><span class="n">8.2</span> Checks</a></li><li class="lvl-2"><a href="#website"><span class="n">8.3</span> Website</a></li><li class="lvl-2"><a href="#example-status-and-documentation-checks"><span class="n">8.4</span> Example status and documentation checks</a></li><li class="lvl-2"><a href="#pipeline"><span class="n">8.5</span> Pipeline</a></li><li class="lvl-2"><a href="#crates"><span class="n">8.6</span> Crates</a></li><li class="lvl-2"><a href="#tests"><span class="n">8.7</span> Tests</a></li><li class="lvl-2"><a href="#commits"><span class="n">8.8</span> Commits</a></li><li class="lvl-2"><a href="#grammar"><span class="n">8.9</span> Grammar</a></li><li class="lvl-2"><a href="#implementer-documents"><span class="n">8.10</span> Implementer documents</a></li><li class="lvl-2"><a href="#not-legal-advice"><span class="n">8.11</span> Not legal advice</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

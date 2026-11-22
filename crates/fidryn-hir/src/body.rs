@@ -5,6 +5,7 @@
 //! slices. Semantic decisions are made from tokens, not `str::contains`.
 
 use crate::HirQueryBody;
+use crate::text::{structure_of, without_comments};
 use fidryn_core::ir::{CompareOp, Guard};
 use fidryn_core::types::{PrimitiveType, Sort, Type};
 use fidryn_core::value::{BinOp, PropTerm, Term};
@@ -71,6 +72,12 @@ pub fn query_body_from_decl(d: &Decl) -> HirQueryBody {
         {
             *goal_expr = Some(concat_seq(expr_to_term(expr), goal_expr.take()));
         }
+        if goal.kind != "Evaluate"
+            && let Some(expr) = &d.expr
+            && let HirQueryBody::Goal { fields, .. } = &mut body
+        {
+            fields.insert("$prefix".into(), expr_to_term(expr));
+        }
         return body;
     }
     if let Some(expr) = &d.expr {
@@ -85,7 +92,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
         Expr::Int(value) => Term::Int(*value),
         Expr::Decimal(text) => decimal_term(text),
         Expr::String(text) => Term::String(text.clone()),
-        Expr::Ident(name) => Term::Ident(name.clone()),
+        Expr::Ident(name) => Term::Ident(name_text(name)),
         Expr::Apply { callee, args } => apply_expr_to_term(callee, args),
         Expr::Binary { op, left, right } => Term::Binary {
             op: map_binop(*op),
@@ -100,7 +107,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             transaction_term(flatten_transaction_expr_args(args))
         }
         Expr::Call { callee, args } => Term::Call {
-            callee: callee.clone(),
+            callee: name_text(callee),
             args: args.iter().map(expr_to_term).collect(),
         },
         Expr::If { cond, then, else_ } => Term::If {
@@ -109,7 +116,7 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             else_: Box::new(else_.as_deref().map(expr_to_term).unwrap_or(Term::Wildcard)),
         },
         Expr::Money { amount, currency } => Term::Apply {
-            ctor: currency.clone(),
+            ctor: name_text(currency),
             args: vec![decimal_term(amount)],
         },
         Expr::Duration { n, unit } => Term::Apply {
@@ -117,21 +124,47 @@ pub fn expr_to_term(expr: &Expr) -> Term {
             args: vec![Term::Int(*n)],
         },
         Expr::Require(inner) => require_term(expr_to_term(inner)),
+        Expr::NamedArg { name, value } => Term::Apply {
+            ctor: "$named".into(),
+            args: vec![Term::String(name.clone()), expr_to_term(value)],
+        },
+        Expr::Set(items) => Term::Set(items.iter().map(expr_to_term).collect()),
+        Expr::Record(fields) => Term::Record(
+            fields
+                .iter()
+                .map(|(name, value)| (name.clone(), expr_to_term(value)))
+                .collect(),
+        ),
+        Expr::Grouped(inner) => expr_to_term(inner),
         Expr::Block(items) => seq_term(items.iter().map(expr_to_term).collect()),
     }
+}
+
+/// A name as the parser hands it over. The type arguments of a call are
+/// part of its name, as the text from `<` to `>`, and a comment between two
+/// lines of them is in that text. It is read as white space.
+fn name_text(name: &str) -> String {
+    without_comments(name).into_owned()
 }
 
 pub fn expr_to_guard(expr: &Expr) -> Guard {
     term_to_guard(&expr_to_term(expr))
 }
 
-pub fn consequences_from_ast(items: &[ConsequenceAst]) -> Vec<(String, PropTerm)> {
-    items
-        .iter()
-        .filter_map(|item| {
-            term_as_prop(&expr_to_term(&item.expr)).map(|prop| (item.verb.clone(), prop))
-        })
-        .collect()
+/// The consequences of one list of a rule, `then` or `otherwise`: each one
+/// whose expression is a proposition, and the text of each one whose
+/// expression is not. The second list is for a diagnostic: such a
+/// consequence is not dropped without one.
+pub fn consequences_from_ast(items: &[ConsequenceAst]) -> (Vec<(String, PropTerm)>, Vec<String>) {
+    let mut propositions = Vec::new();
+    let mut not_propositions = Vec::new();
+    for item in items {
+        match term_as_prop(&expr_to_term(&item.expr)) {
+            Some(prop) => propositions.push((item.verb.clone(), prop)),
+            None => not_propositions.push(item.text.clone()),
+        }
+    }
+    (propositions, not_propositions)
 }
 
 fn goal_ast_to_body(goal: &GoalAst) -> HirQueryBody {
@@ -162,7 +195,10 @@ fn apply_expr_to_term(callee: &Expr, args: &[Expr]) -> Term {
         }
         Term::Ident(ctor) => Term::Apply {
             ctor,
-            args: args.iter().map(expr_to_term).collect(),
+            args: match args {
+                [Expr::Block(fields)] => fields.iter().map(expr_to_term).collect(),
+                _ => args.iter().map(expr_to_term).collect(),
+            },
         },
         Term::Call { callee, args: prev } if prev.is_empty() => {
             if callee.eq_ignore_ascii_case("transaction") {
@@ -203,7 +239,11 @@ fn map_binop(op: SynBinOp) -> BinOp {
 }
 
 pub fn parse_query_body(src: &str) -> HirQueryBody {
-    let inner = last_brace_inner(src).unwrap_or(src);
+    // A declaration with no block has no body. The tokens of its header
+    // are not read as one.
+    let Some(inner) = last_brace_inner(src) else {
+        return HirQueryBody::None;
+    };
     let mut p = SliceParser::new(inner);
     let mut items = Vec::new();
     let mut goal = None;
@@ -280,12 +320,57 @@ pub fn parse_function_parts(src: &str) -> (Vec<(String, String)>, Option<Term>) 
     (extract_params(src), parse_fn_body_from_source(src))
 }
 
+/// The expression after the first `returns` of a declaration's text.
+/// `Ok(None)` when the text has no `returns`. `Err` when no expression can
+/// be read there, and when the expression nests deeper than the reader
+/// goes: what the reader returns then lacks the part below its limit.
+pub fn parse_decl_result(src: &str) -> Result<Option<Term>, ()> {
+    let mut parser = SliceParser::new(src);
+    while !parser.is_eof() {
+        if parser.eat_ident("returns") {
+            let result = parser.parse_expr();
+            return result.filter(|_| !parser.exhausted).map(Some).ok_or(());
+        }
+        parser.bump();
+    }
+    Ok(None)
+}
+
+pub fn parse_record_requirements(src: &str) -> Vec<String> {
+    let mut parser = SliceParser::new(src);
+    let mut schemas = Vec::new();
+    while !parser.is_eof() {
+        if parser.eat_ident("record") && parser.eat_ident("requires") {
+            if parser.at_kind(TokenKind::Ident) {
+                let first = parser.parse_qname();
+                let schema =
+                    if parser.eat_kind(TokenKind::Colon) && parser.at_kind(TokenKind::Ident) {
+                        parser.parse_qname()
+                    } else {
+                        first
+                    };
+                if !schemas.contains(&schema) {
+                    schemas.push(schema);
+                }
+            }
+        } else {
+            parser.bump();
+        }
+    }
+    schemas
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RuleParts {
     pub guard: Option<Guard>,
     pub consequences: Vec<(String, PropTerm)>,
     pub fallback: Vec<(String, PropTerm)>,
     pub require: Option<Guard>,
+    /// The text of each `then` consequence whose expression is not a
+    /// proposition. Such a consequence is in neither list above.
+    pub consequences_not_propositions: Vec<String>,
+    /// The same for the `otherwise` consequences.
+    pub fallback_not_propositions: Vec<String>,
 }
 
 pub fn parse_rule_parts(src: &str) -> RuleParts {
@@ -295,6 +380,8 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
     let mut consequences = Vec::new();
     let mut fallback = Vec::new();
     let mut require = None;
+    let mut consequences_not_propositions = Vec::new();
+    let mut fallback_not_propositions = Vec::new();
     while !p.is_eof() {
         if p.eat_ident("when") {
             if let Some(term) = p.parse_expr() {
@@ -303,14 +390,18 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
             continue;
         }
         if p.eat_ident("then") {
-            if let Some(item) = parse_rule_consequence_pair(&mut p) {
-                consequences.push(item);
+            match parse_rule_consequence_pair(&mut p) {
+                Some(Ok(item)) => consequences.push(item),
+                Some(Err(text)) => consequences_not_propositions.push(text),
+                None => {}
             }
             continue;
         }
         if p.eat_ident("otherwise") {
-            if let Some(item) = parse_rule_consequence_pair(&mut p) {
-                fallback.push(item);
+            match parse_rule_consequence_pair(&mut p) {
+                Some(Ok(item)) => fallback.push(item),
+                Some(Err(text)) => fallback_not_propositions.push(text),
+                None => {}
             }
             continue;
         }
@@ -327,17 +418,29 @@ pub fn parse_rule_parts(src: &str) -> RuleParts {
         consequences,
         fallback,
         require,
+        consequences_not_propositions,
+        fallback_not_propositions,
     }
 }
 
-fn parse_rule_consequence_pair(p: &mut SliceParser<'_>) -> Option<(String, PropTerm)> {
+/// A consequence read from the text of a rule: its verb and proposition.
+/// When an expression stands there that is not a proposition, the text of
+/// the consequence, for a diagnostic. `None` when no expression stands
+/// there.
+fn parse_rule_consequence_pair(
+    p: &mut SliceParser<'_>,
+) -> Option<Result<(String, PropTerm), String>> {
+    let first = p.idx;
     let op = if p.at_kind(TokenKind::Ident) {
         p.bump_text()
     } else {
         "derive".into()
     };
     let term = p.parse_expr()?;
-    term_as_prop(&term).map(|prop| (op, prop))
+    Some(match term_as_prop(&term) {
+        Some(prop) => Ok((op, prop)),
+        None => Err(p.text_from(first)),
+    })
 }
 
 pub fn and_opt_guard(left: Option<Guard>, right: Guard) -> Guard {
@@ -353,58 +456,100 @@ pub fn and_opt_guard(left: Option<Guard>, right: Guard) -> Guard {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DutyParts {
     pub bearer: String,
+    pub bearer_term: Term,
     pub claimant: Option<String>,
+    pub claimant_term: Option<Term>,
     pub attaches: Option<Guard>,
+    pub attaches_term: Option<Term>,
     pub content: Vec<Term>,
     pub due: Option<Term>,
+    pub invalid: bool,
 }
 
 pub fn parse_duty_parts(src: &str) -> DutyParts {
     let inner = last_brace_inner(src).unwrap_or(src);
     let mut p = SliceParser::new(inner);
     let mut bearer = String::new();
+    let mut bearer_term = Term::Wildcard;
     let mut claimant = None;
+    let mut claimant_term = None;
     let mut attaches = None;
+    let mut attaches_term = None;
     let mut content = Vec::new();
     let mut due = None;
+    let mut invalid = false;
+    // How many parentheses, brackets and braces are open in the text the
+    // reader steps over: the text of a field it does not know. A word that
+    // begins a field begins one only where none is open; inside them it is
+    // part of that text.
+    let mut open = 0usize;
     while !p.is_eof() {
+        if open > 0 {
+            match p.bump().map(|token| token.kind) {
+                Some(TokenKind::LParen | TokenKind::LBracket | TokenKind::LBrace) => open += 1,
+                Some(TokenKind::RParen | TokenKind::RBracket | TokenKind::RBrace) => open -= 1,
+                _ => {}
+            }
+            continue;
+        }
         if p.eat_ident("bearer") {
-            if p.at_kind(TokenKind::Ident) {
-                bearer = p.bump_text();
+            if let Some(term) = p.parse_expr() {
+                bearer = term_as_name(&term).unwrap_or_default();
+                bearer_term = term;
+            } else {
+                invalid = true;
             }
             continue;
         }
         if p.eat_ident("claimant") {
-            if p.at_kind(TokenKind::Ident) {
-                claimant = Some(p.bump_text());
-            }
+            claimant_term = p.parse_expr();
+            claimant = claimant_term.as_ref().and_then(term_as_name);
+            invalid |= claimant_term.is_none();
             continue;
         }
         if p.eat_ident("attaches") {
             let _ = p.eat_ident("when");
             if let Some(term) = p.parse_expr() {
                 attaches = Some(term_to_guard(&term));
+                attaches_term = Some(term);
+            } else {
+                invalid = true;
             }
             continue;
         }
         if p.eat_ident("content") {
+            // A content that cannot be read makes the duty invalid, as the
+            // other fields do: dropped, it would leave the duty with less
+            // content than its text says.
             if let Some(term) = p.parse_expr() {
                 content.push(term);
+            } else {
+                invalid = true;
             }
             continue;
         }
         if p.eat_ident("due") {
             due = parse_due_expr(&mut p);
+            invalid |= due.is_none();
             continue;
         }
-        p.bump();
+        if matches!(
+            p.bump().map(|token| token.kind),
+            Some(TokenKind::LParen | TokenKind::LBracket | TokenKind::LBrace)
+        ) {
+            open = 1;
+        }
     }
     DutyParts {
         bearer,
+        bearer_term,
         claimant,
+        claimant_term,
         attaches,
+        attaches_term,
         content,
         due,
+        invalid: invalid || p.exhausted,
     }
 }
 
@@ -436,20 +581,94 @@ pub fn parse_rule_kind(src: &str) -> String {
     "prescriptive".into()
 }
 
+/// How many levels of `<` a type may have. The parser has the same limit
+/// for a type it reads.
+const MAX_TYPE_NESTING: usize = 128;
+
+/// The type that the text of a type names.
+///
+/// A comment in the text is read as white space, and a `|`, a `,` or a `<`
+/// inside a string literal is no part of the type's structure.
+///
+/// The reader goes down no more levels of `<` than the parser lets a type
+/// have. For a text it would have to go deeper into, it gives the whole
+/// text as the name of a sort, which is not the type the text names:
+/// `type_nests_too_deep` tells, and a caller that takes a type out of text
+/// the parser has not read asks it.
 pub fn parse_type_name(raw: &str) -> Type {
+    let code = without_comments(raw);
+    type_from_text(&code, 0).unwrap_or_else(|| Type::Sort(Sort::Nominal(code.trim().to_owned())))
+}
+
+/// True when the text of a type has more than 128 levels of `<`, which is
+/// more than the parser lets a type have, or when `parse_type_name` gives
+/// up on it for another reason.
+///
+/// The levels are counted in the text, as the parser counts them. So a
+/// text is refused for them also where the reader would not go down into
+/// it, as in the argument of `Money`, which it takes for a name.
+pub fn type_nests_too_deep(raw: &str) -> bool {
+    let code = without_comments(raw);
+    most_angles_open(&code) > MAX_TYPE_NESTING || type_from_text(&code, 0).is_none()
+}
+
+/// True when more than 128 `<` stand open at one place of `text`, outside
+/// its comments and its string literals: the levels of the types in it are
+/// more than the parser lets a type have.
+///
+/// This counts the levels of a text that holds types but is no type
+/// itself, such as a parameter list, without reading it.
+pub fn angles_nest_too_deep(text: &str) -> bool {
+    most_angles_open(text) > MAX_TYPE_NESTING
+}
+
+/// The most `<` that stand open at one place of `text`, outside its
+/// comments and its string literals.
+fn most_angles_open(text: &str) -> usize {
+    let mut open = 0usize;
+    let mut most = 0;
+    for byte in structure_of(text).bytes() {
+        match byte {
+            b'<' => {
+                open += 1;
+                most = most.max(open);
+            }
+            b'>' => open = open.saturating_sub(1),
+            _ => {}
+        }
+    }
+    most
+}
+
+/// The type that `raw` names, where `raw` holds no comment and stands
+/// inside `level` pairs of `<` and `>`. `None` when it nests its arguments
+/// deeper than the limit.
+fn type_from_text(raw: &str, level: usize) -> Option<Type> {
     let s = raw.trim();
     if s.is_empty() {
-        return Type::Sort(Sort::Nominal(String::new()));
+        return Some(Type::Sort(Sort::Nominal(String::new())));
     }
-    if let Some(open) = s.find('<')
+    let members = split_top_level(s, '|').collect::<Vec<_>>();
+    if members.len() > 1 {
+        // A member holds no `|` outside its brackets, so it is not split
+        // again before a `<` is passed.
+        return Some(Type::Applied {
+            ctor: "Union".into(),
+            args: members
+                .into_iter()
+                .map(|member| type_from_text(member, level))
+                .collect::<Option<_>>()?,
+        });
+    }
+    if let Some(open) = structure_of(s).find('<')
         && s.ends_with('>')
         && open > 0
     {
         let ctor = s[..open].trim();
         let inner = &s[open + 1..s.len() - 1];
-        return parse_applied_type(ctor, inner);
+        return parse_applied_type(ctor, inner, level + 1);
     }
-    match s {
+    Some(match s {
         "Bool" => Type::bool(),
         "Int" => Type::Primitive(PrimitiveType::Int),
         "Decimal" => Type::Primitive(PrimitiveType::Decimal),
@@ -477,11 +696,18 @@ pub fn parse_type_name(raw: &str) -> Type {
         "Interpretation" => Type::Sort(Sort::Interpretation),
         "ClauseRef" => Type::Sort(Sort::ClauseRef),
         other => Type::Sort(Sort::Nominal(other.to_owned())),
-    }
+    })
 }
 
+/// The parameters in the first parenthesized list of a declaration's text:
+/// each `name: type` of it.
+///
+/// A comment in the text is read as white space. A parenthesis, a comma or a
+/// colon inside a string literal neither begins or ends the list nor
+/// separates anything in it.
 pub fn extract_params(src: &str) -> Vec<(String, String)> {
-    let Some((start, end)) = first_paren_group(src) else {
+    let src = without_comments(src);
+    let Some((start, end)) = first_paren_group(&src) else {
         return Vec::new();
     };
     let inner = src[start + 1..end].trim();
@@ -490,9 +716,9 @@ pub fn extract_params(src: &str) -> Vec<(String, String)> {
     }
     split_top_level(inner, ',')
         .filter_map(|part| {
-            let (name, ty) = part.split_once(':')?;
-            let name = name.trim();
-            let ty = ty.trim();
+            let colon = structure_of(part).find(':')?;
+            let name = part[..colon].trim();
+            let ty = part[colon + 1..].trim();
             if name.is_empty() || ty.is_empty() {
                 None
             } else {
@@ -502,28 +728,43 @@ pub fn extract_params(src: &str) -> Vec<(String, String)> {
         .collect()
 }
 
+/// The text between the braces of the last block of a declaration that
+/// stands inside no other block.
+///
+/// Braces are counted as tokens, so a brace inside a comment or a string
+/// literal is not one. The braces of an effect row, which follow `!`, are
+/// part of the header and are not a block.
 pub fn last_brace_inner(src: &str) -> Option<&str> {
     let mut depth = 0i32;
     let mut start = None;
     let mut last = None;
-    for (i, c) in src.char_indices() {
-        match c {
-            '{' => {
+    let mut before = None;
+    let mut effect_row = false;
+    for token in lex(src) {
+        match token.kind {
+            TokenKind::Whitespace
+            | TokenKind::Comment
+            | TokenKind::DocComment
+            | TokenKind::Newline => continue,
+            TokenKind::LBrace => {
                 if depth == 0 {
-                    start = Some(i);
+                    start = Some(token.end as usize);
+                    effect_row = before == Some(TokenKind::Bang);
                 }
                 depth += 1;
             }
-            '}' => {
+            TokenKind::RBrace => {
                 depth -= 1;
                 if depth == 0
-                    && let Some(s) = start
+                    && !effect_row
+                    && let Some(inner_start) = start
                 {
-                    last = Some(&src[s + 1..i]);
+                    last = src.get(inner_start..token.start as usize);
                 }
             }
             _ => {}
         }
+        before = Some(token.kind);
     }
     last
 }
@@ -532,6 +773,20 @@ pub fn parse_expr_src(src: &str) -> Option<Term> {
     let mut p = SliceParser::new(src);
     let term = p.parse_expr()?;
     Some(term)
+}
+
+/// The whole of `src` read as one expression. `None` when it is not one: no
+/// expression stands there, the reader cannot read a part of it, or text
+/// follows the expression. `Err` when the text nests deeper than the reader
+/// goes: the reader then returns nothing, or an expression that lacks the
+/// part below its limit, and neither is what the text says.
+pub(crate) fn parse_whole_expr(src: &str) -> Result<Option<Term>, ()> {
+    let mut p = SliceParser::new(src);
+    let term = p.parse_expr();
+    if p.exhausted && !p.unreadable {
+        return Err(());
+    }
+    Ok(term.filter(|_| !p.exhausted && p.is_eof()))
 }
 
 pub fn term_as_name(term: &Term) -> Option<String> {
@@ -570,11 +825,6 @@ pub fn flatten_term_list(term: &Term) -> Vec<Term> {
 
 pub fn collect_term_callees(term: &Term, functions: &BTreeSet<&str>, out: &mut BTreeSet<String>) {
     match term {
-        Term::Ident(name) | Term::Binder(name) => {
-            if functions.contains(name.as_str()) {
-                out.insert(name.clone());
-            }
-        }
         Term::Call { callee, args } => {
             if functions.contains(callee.as_str()) {
                 out.insert(callee.clone());
@@ -689,12 +939,6 @@ pub fn source_has_bare_prop_if(src: &str, propositions: &BTreeSet<String>) -> bo
     false
 }
 
-pub fn query_is_automatic(src: &str) -> bool {
-    let mut p = SliceParser::new(src);
-    let _ = p.eat_ident("query");
-    p.at_ident("automatic")
-}
-
 pub fn import_requires_digest(src: &str) -> bool {
     ident_present(src, "digest")
 }
@@ -793,16 +1037,15 @@ fn parse_contents_until_end(p: &mut SliceParser<'_>) -> Option<Term> {
             continue;
         }
         if p.eat_ident("return") {
-            if let Some(term) = p.parse_expr() {
-                items.push(term);
+            match p.parse_expr() {
+                Some(term) => items.push(term),
+                None => p.give_up(),
             }
             continue;
         }
         match p.parse_expr() {
             Some(term) => items.push(term),
-            None => {
-                p.bump();
-            }
+            None => p.give_up(),
         }
     }
     if items.is_empty() {
@@ -880,8 +1123,15 @@ fn parse_goal_fields(p: &mut SliceParser<'_>) -> BTreeMap<String, Term> {
     fields
 }
 
-fn parse_applied_type(ctor: &str, inner: &str) -> Type {
-    match ctor {
+/// The type `ctor<inner>`, where `inner` stands inside `level` pairs of `<`
+/// and `>`. `None` when that is deeper than a type may nest, or when an
+/// argument nests deeper.
+fn parse_applied_type(ctor: &str, inner: &str, level: usize) -> Option<Type> {
+    if level > MAX_TYPE_NESTING {
+        return None;
+    }
+    let argument = |text: &str| type_from_text(text, level).map(Box::new);
+    Some(match ctor {
         "Money" => Type::Primitive(PrimitiveType::Money {
             currency: inner.trim().to_owned(),
         }),
@@ -889,40 +1139,45 @@ fn parse_applied_type(ctor: &str, inner: &str) -> Type {
             calendar: inner.trim().to_owned(),
         }),
         "Option" => Type::Primitive(PrimitiveType::Option {
-            inner: Box::new(parse_type_name(inner)),
+            inner: argument(inner)?,
         }),
         "Interval" => Type::Primitive(PrimitiveType::Interval {
-            inner: Box::new(parse_type_name(inner)),
+            inner: argument(inner)?,
         }),
         "FiniteSet" => Type::Primitive(PrimitiveType::FiniteSet {
-            inner: Box::new(parse_type_name(inner)),
+            inner: argument(inner)?,
         }),
         "NonEmptySet" => Type::Primitive(PrimitiveType::NonEmptySet {
-            inner: Box::new(parse_type_name(inner)),
+            inner: argument(inner)?,
         }),
         "Map" => {
             let mut args = split_top_level(inner, ',');
             let key = args.next().unwrap_or("");
             let value = args.next().unwrap_or("");
             Type::Primitive(PrimitiveType::Map {
-                key: Box::new(parse_type_name(key)),
-                value: Box::new(parse_type_name(value)),
+                key: argument(key)?,
+                value: argument(value)?,
             })
         }
         ctor => {
-            let args = split_top_level(inner, ',').map(parse_type_name).collect();
+            let args = split_top_level(inner, ',')
+                .map(|text| type_from_text(text, level))
+                .collect::<Option<_>>()?;
             Type::Applied {
                 ctor: ctor.to_owned(),
                 args,
             }
         }
-    }
+    })
 }
 
+/// Where the first parenthesized group of `src` opens and closes. A
+/// parenthesis inside a string literal is not counted.
 fn first_paren_group(src: &str) -> Option<(usize, usize)> {
-    let start = src.find('(')?;
+    let structure = structure_of(src);
+    let start = structure.find('(')?;
     let mut depth = 0i32;
-    for (i, c) in src[start..].char_indices() {
+    for (i, c) in structure[start..].char_indices() {
         match c {
             '(' => depth += 1,
             ')' => {
@@ -937,14 +1192,17 @@ fn first_paren_group(src: &str) -> Option<(usize, usize)> {
     None
 }
 
+/// The parts of `src` between the `sep` that stand inside no bracket. A
+/// bracket or a `sep` inside a string literal is not counted.
 fn split_top_level(src: &str, sep: char) -> impl Iterator<Item = &str> {
+    let structure = structure_of(src);
     let mut parts = Vec::new();
     let mut start = 0;
     let mut depth_paren = 0i32;
     let mut depth_angle = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in src.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -970,17 +1228,46 @@ fn split_top_level(src: &str, sep: char) -> impl Iterator<Item = &str> {
     parts.into_iter().filter(|s| !s.is_empty())
 }
 
-fn term_to_guard(term: &Term) -> Guard {
+pub fn term_to_guard(term: &Term) -> Guard {
     match term {
         Term::Bool(true) => Guard::Satisfied,
         Term::Bool(false) => Guard::Not(Box::new(Guard::Satisfied)),
         Term::Apply { ctor, args } if ctor == "operative" => operative_guard(args),
         Term::Call { callee, args } if callee == "operative" => operative_guard(args),
-        Term::Apply { ctor, args } if ctor == "determined" || ctor == "assumed" => args
-            .first()
-            .and_then(term_as_prop)
-            .map(Guard::Derived)
-            .unwrap_or(Guard::Satisfied),
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "effective" && args.len() == 1 =>
+        {
+            Guard::EffectiveActTerm(args[0].clone())
+        }
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "derived" && args.len() == 1 =>
+        {
+            args.first()
+                .and_then(term_as_prop)
+                .map(Guard::Derived)
+                .unwrap_or_else(|| Guard::Not(Box::new(Guard::Satisfied)))
+        }
+        // A Pratt `in` that escaped the modal prefix is still the context,
+        // not a proposition whose predicate is the word `in`.
+        Term::Apply { ctor, args }
+            if ctor == "in" && args.len() == 2 && modal_operative(&args[0]) =>
+        {
+            operative_guard_in_context(&args[0], &args[1])
+        }
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+            if ctor == "determined" || ctor == "assumed" =>
+        {
+            args.first()
+                .and_then(term_as_prop)
+                .map(|prop| {
+                    if ctor == "determined" {
+                        Guard::Determined(prop)
+                    } else {
+                        Guard::Assumed(prop)
+                    }
+                })
+                .unwrap_or_else(|| Guard::Not(Box::new(Guard::Satisfied)))
+        }
         Term::Apply { ctor, args } if ctor == "observed" => Guard::Observed {
             schema: args.first().and_then(term_as_name).unwrap_or_default(),
             binder: args.get(1).and_then(term_as_name).unwrap_or_default(),
@@ -1016,9 +1303,11 @@ fn term_to_guard(term: &Term) -> Guard {
                 right: args[1].clone(),
             }
         }
-        other => term_as_prop(other)
-            .map(|prop| Guard::Operative(prop, String::new()))
-            .unwrap_or(Guard::Satisfied),
+        other => Guard::Compare {
+            op: CompareOp::Eq,
+            left: other.clone(),
+            right: Term::Bool(true),
+        },
     }
 }
 
@@ -1027,8 +1316,42 @@ fn operative_guard(args: &[Term]) -> Guard {
         .first()
         .and_then(term_as_prop)
         .unwrap_or_else(|| PropTerm::new("", Vec::new()));
-    let ctx = args.get(1).and_then(term_as_name).unwrap_or_default();
+    let ctx = args.get(1).map(term_context_label).unwrap_or_default();
     Guard::Operative(prop, ctx)
+}
+
+fn modal_operative(term: &Term) -> bool {
+    match term {
+        Term::Apply { ctor, .. } | Term::Call { callee: ctor, .. } => ctor == "operative",
+        _ => false,
+    }
+}
+
+fn operative_guard_in_context(modal: &Term, context: &Term) -> Guard {
+    let mut args = match modal {
+        Term::Apply { args, .. } | Term::Call { args, .. } => args.clone(),
+        _ => Vec::new(),
+    };
+    if args.len() == 1 {
+        args.push(context.clone());
+    }
+    operative_guard(&args)
+}
+
+fn term_context_label(term: &Term) -> String {
+    match term {
+        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name.clone(),
+        Term::Call { callee, args } | Term::Apply { ctor: callee, args } => {
+            if args.is_empty() {
+                callee.clone()
+            } else {
+                let parts: Vec<String> = args.iter().map(term_context_label).collect();
+                format!("{callee}({})", parts.join(", "))
+            }
+        }
+        Term::Field { base, name } => format!("{}.{}", term_context_label(base), name),
+        _ => String::new(),
+    }
 }
 
 fn binop_compare(op: BinOp) -> Option<CompareOp> {
@@ -1120,6 +1443,15 @@ struct SliceParser<'a> {
     src: &'a str,
     tokens: Vec<Token>,
     idx: usize,
+    depth: usize,
+    /// How many links of `else if` the reader is inside of.
+    links: usize,
+    /// True when the reader gave up: it passed one of its limits, or
+    /// `unreadable` is set. The cursor is then at the end.
+    exhausted: bool,
+    /// True when the reader gave up because a token inside an argument
+    /// list, braces or a block begins no item it can read.
+    unreadable: bool,
 }
 
 impl<'a> SliceParser<'a> {
@@ -1141,6 +1473,10 @@ impl<'a> SliceParser<'a> {
             src,
             tokens,
             idx: 0,
+            depth: 0,
+            links: 0,
+            exhausted: false,
+            unreadable: false,
         }
     }
 
@@ -1180,6 +1516,21 @@ impl<'a> SliceParser<'a> {
             .unwrap_or_default()
     }
 
+    /// The source text from the token at index `first` to the end of the
+    /// last token consumed.
+    fn text_from(&self, first: usize) -> String {
+        let start = self
+            .tokens
+            .get(first)
+            .map_or(self.src.len(), |token| token.start as usize);
+        let end = self
+            .idx
+            .checked_sub(1)
+            .and_then(|last| self.tokens.get(last))
+            .map_or(start, |token| token.end as usize);
+        self.src.get(start..end.max(start)).unwrap_or("").to_owned()
+    }
+
     fn eat_kind(&mut self, kind: TokenKind) -> bool {
         if self.at_kind(kind) {
             self.idx += 1;
@@ -1215,14 +1566,54 @@ impl<'a> SliceParser<'a> {
     }
 
     fn parse_expr(&mut self) -> Option<Term> {
-        self.parse_or()
+        if self.depth >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.depth += 1;
+        let result = self.parse_or();
+        self.depth -= 1;
+        result.and_then(|term| self.bounded_term(term))
+    }
+
+    fn bounded_term(&mut self, term: Term) -> Option<Term> {
+        let mut pending = vec![(&term, 1usize)];
+        let mut count = 0;
+        while let Some((term, depth)) = pending.pop() {
+            count += 1;
+            if depth > 128 || count > 10_000 {
+                self.exhausted = true;
+                self.idx = self.tokens.len();
+                return None;
+            }
+            let child = depth + 1;
+            match term {
+                Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
+                    pending.extend(args.iter().map(|term| (term, child)))
+                }
+                Term::Field { base, .. } => pending.push((base, child)),
+                Term::Record(fields) => pending.extend(fields.values().map(|term| (term, child))),
+                Term::Binary { left, right, .. } => {
+                    pending.push((left, child));
+                    pending.push((right, child));
+                }
+                Term::If { cond, then, else_ } => {
+                    pending.push((cond, child));
+                    pending.push((then, child));
+                    pending.push((else_, child));
+                }
+                _ => {}
+            }
+        }
+        Some(term)
     }
 
     fn parse_or(&mut self) -> Option<Term> {
         let mut left = self.parse_and()?;
         while self.eat_ident("or") {
             let right = self.parse_and()?;
-            left = bin("or", left, right);
+            left = self.bounded_term(bin("or", left, right))?;
         }
         Some(left)
     }
@@ -1231,7 +1622,7 @@ impl<'a> SliceParser<'a> {
         let mut left = self.parse_compare()?;
         while self.eat_ident("and") {
             let right = self.parse_compare()?;
-            left = bin("and", left, right);
+            left = self.bounded_term(bin("and", left, right))?;
         }
         Some(left)
     }
@@ -1263,7 +1654,7 @@ impl<'a> SliceParser<'a> {
             };
             self.bump();
             let right = self.parse_mul()?;
-            left = bin(op, left, right);
+            left = self.bounded_term(bin(op, left, right))?;
         }
         Some(left)
     }
@@ -1278,12 +1669,24 @@ impl<'a> SliceParser<'a> {
             };
             self.bump();
             let right = self.parse_unary()?;
-            left = bin(op, left, right);
+            left = self.bounded_term(bin(op, left, right))?;
         }
         Some(left)
     }
 
     fn parse_unary(&mut self) -> Option<Term> {
+        if self.depth >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.depth += 1;
+        let result = self.parse_unary_inner();
+        self.depth -= 1;
+        result
+    }
+
+    fn parse_unary_inner(&mut self) -> Option<Term> {
         if self.eat_ident("not") {
             let inner = self.parse_unary()?;
             return Some(Term::Apply {
@@ -1292,9 +1695,21 @@ impl<'a> SliceParser<'a> {
             });
         }
         if self.eat_kind(TokenKind::Minus) {
+            if self.at_kind(TokenKind::Int) {
+                let raw = self.bump_text();
+                let value = format!("-{raw}").parse::<i64>().ok()?;
+                return if self.at_kind(TokenKind::DurationUnit) {
+                    Some(Term::Apply {
+                        ctor: self.bump_text(),
+                        args: vec![Term::Int(value)],
+                    })
+                } else {
+                    Some(Term::Int(value))
+                };
+            }
             let inner = self.parse_unary()?;
             return Some(match inner {
-                Term::Int(n) => Term::Int(-n),
+                Term::Int(n) => Term::Int(n.checked_neg()?),
                 other => Term::Apply {
                     ctor: "-".into(),
                     args: vec![Term::Int(0), other],
@@ -1348,16 +1763,15 @@ impl<'a> SliceParser<'a> {
                 continue;
             }
             if self.eat_ident("return") {
-                if let Some(term) = self.parse_expr() {
-                    items.push(term);
+                match self.parse_expr() {
+                    Some(term) => items.push(term),
+                    None => self.give_up(),
                 }
                 continue;
             }
             match self.parse_expr() {
                 Some(term) => items.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         let _ = self.eat_kind(TokenKind::RBrace);
@@ -1401,7 +1815,7 @@ impl<'a> SliceParser<'a> {
         let mut args = vec![cond, then_branch];
         if self.eat_ident("else") {
             let else_branch = if self.at_ident("if") {
-                self.parse_if()?
+                self.parse_else_if()?
             } else if self.at_kind(TokenKind::LBrace) {
                 self.parse_block()?
             } else {
@@ -1413,6 +1827,26 @@ impl<'a> SliceParser<'a> {
             ctor: "if".into(),
             args,
         })
+    }
+
+    /// The `if` that follows an `else`.
+    ///
+    /// `parse_if` reads it by calling itself, without passing `parse_expr`
+    /// or `parse_unary`, so the links of a chain are counted here, as
+    /// `parse_unary` counts a level. They have a count of their own. A link
+    /// is one level of the term and takes none of the levels its condition
+    /// and its branch are read with, so the reader refuses no chain whose
+    /// term `bounded_term` accepts: that is one of 126 links at most.
+    fn parse_else_if(&mut self) -> Option<Term> {
+        if self.links >= 128 {
+            self.exhausted = true;
+            self.idx = self.tokens.len();
+            return None;
+        }
+        self.links += 1;
+        let result = self.parse_if();
+        self.links -= 1;
+        result
     }
 
     fn parse_block(&mut self) -> Option<Term> {
@@ -1447,14 +1881,16 @@ impl<'a> SliceParser<'a> {
                         }
                     }
                 };
+                term = self.bounded_term(term)?;
                 continue;
             }
             if self.eat_kind(TokenKind::Dot) && self.at_kind(TokenKind::Ident) {
                 let name = self.bump_text();
-                term = Term::Apply {
-                    ctor: ".".into(),
-                    args: vec![term, Term::Ident(name)],
+                term = Term::Field {
+                    base: Box::new(term),
+                    name,
                 };
+                term = self.bounded_term(term)?;
                 continue;
             }
             break;
@@ -1474,7 +1910,7 @@ impl<'a> SliceParser<'a> {
                     self.bump();
                     return Some(Term::Bool(false));
                 }
-                Some(Term::Ident(self.parse_qname()))
+                Some(Term::Ident(self.bump_text()))
             }
             TokenKind::Int => {
                 let text = self.bump_text();
@@ -1492,7 +1928,9 @@ impl<'a> SliceParser<'a> {
             TokenKind::Date | TokenKind::DateTime => Some(Term::Ident(self.bump_text())),
             TokenKind::String => {
                 let raw = self.bump_text();
-                Some(Term::String(trim_quotes(&raw).to_owned()))
+                fidryn_syntax::decode_string_literal(&raw)
+                    .ok()
+                    .map(Term::String)
             }
             TokenKind::LParen => {
                 self.bump();
@@ -1545,13 +1983,16 @@ impl<'a> SliceParser<'a> {
                     continue;
                 }
                 if !self.at_kind(TokenKind::Ident) {
-                    self.bump();
+                    self.give_up();
                     continue;
                 }
                 let key = self.bump_text();
                 let _ = self.eat_kind(TokenKind::Colon) || self.eat_kind(TokenKind::Eq);
-                if let Some(value) = self.parse_expr() {
-                    fields.insert(key, value);
+                match self.parse_expr() {
+                    Some(value) => {
+                        fields.insert(key, value);
+                    }
+                    None => self.give_up(),
                 }
             }
             let _ = self.eat_kind(TokenKind::RBrace);
@@ -1564,9 +2005,7 @@ impl<'a> SliceParser<'a> {
             }
             match self.parse_expr() {
                 Some(term) => items.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         let _ = self.eat_kind(TokenKind::RBrace);
@@ -1587,12 +2026,23 @@ impl<'a> SliceParser<'a> {
             }
             match self.parse_expr() {
                 Some(term) => args.push(term),
-                None => {
-                    self.bump();
-                }
+                None => self.give_up(),
             }
         }
         args
+    }
+
+    /// Gives the read up: a token inside an argument list, braces or a
+    /// block begins no item the reader can read. Stepping over it would
+    /// read a term the text does not say. The cursor goes to the end, as
+    /// when the reader passes one of its limits, and a caller that rejects
+    /// a read that was given up rejects this one.
+    fn give_up(&mut self) {
+        if !self.exhausted {
+            self.unreadable = true;
+        }
+        self.exhausted = true;
+        self.idx = self.tokens.len();
     }
 
     fn try_skip_type_args(&mut self) -> bool {
@@ -1645,10 +2095,6 @@ fn bin(op: &str, left: Term, right: Term) -> Term {
         ctor: op.to_owned(),
         args: vec![left, right],
     }
-}
-
-fn trim_quotes(s: &str) -> &str {
-    s.trim().trim_matches('"')
 }
 
 #[cfg(test)]
@@ -2117,5 +2563,147 @@ duty PayInvoice {
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_is_not_a_brace() {
+        // The only braces stand in a comment or in a string, so there is no
+        // block.
+        assert_eq!(last_brace_inner("query Q()\n// { return 7 }\n-> Int"), None);
+        assert_eq!(
+            last_brace_inner("query Q() -> String \"{ return 7 }\""),
+            None
+        );
+        // The block is the one made of brace tokens, whatever the comments
+        // and strings beside it and inside it hold.
+        assert_eq!(
+            last_brace_inner("query Q() // { 1 }\n{ return 2 } // { 3 }"),
+            Some(" return 2 ")
+        );
+        assert_eq!(
+            last_brace_inner("rule R : derive {\nthen derive P()\n// } { when false\n}"),
+            Some("\nthen derive P()\n// } { when false\n")
+        );
+        assert_eq!(
+            last_brace_inner("duty D { content \"} {\" bearer A }"),
+            Some(" content \"} {\" bearer A ")
+        );
+        // Blocks inside the block belong to it, and of two blocks side by
+        // side the last one is taken.
+        assert_eq!(
+            last_brace_inner("{ a { b } c } { d { e } }"),
+            Some(" d { e } ")
+        );
+    }
+
+    #[test]
+    fn the_braces_of_an_effect_row_are_not_a_block() {
+        assert_eq!(last_brace_inner("query Q() -> Int ! {Observe}"), None);
+        assert_eq!(
+            last_brace_inner("query Q() -> Int\n! // why\n{Observe}"),
+            None
+        );
+        assert_eq!(
+            last_brace_inner("query Q() -> Int ! {Observe} { return 7 }"),
+            Some(" return 7 ")
+        );
+    }
+
+    #[test]
+    fn a_declaration_with_no_block_has_no_body() {
+        // Neither the tokens of the header nor a comment between its lines
+        // nor its effect row is read as a body.
+        for src in [
+            "query Q() -> Int",
+            "query Q() -> Int 5",
+            "query Q()\n// { return 7 }\n-> Int",
+            "query Q() -> LegalPerson ! {Acme}",
+        ] {
+            assert_eq!(parse_query_body(src), HirQueryBody::None, "{src:?}");
+        }
+        for header in [
+            "calc f(a: Int) -> Int",
+            "calc f(a: Int) -> Int fuel = 100",
+            "calc f(a: Int) -> Int a",
+            "fn f(a: Int)\n// { return 7 }\n-> Int",
+            "fn f(a: Int) -> LegalPerson ! {Acme}",
+        ] {
+            assert_eq!(parse_function_parts(header).1, None, "{header:?}");
+            let parsed = fidryn_syntax::parse_file(&format!(
+                "module M version \"0.1.0\" {{\n{header}\n}}\n"
+            ));
+            let function = parsed
+                .module()
+                .and_then(|module| module.items.first())
+                .and_then(|item| item.decl())
+                .expect("a function");
+            assert_eq!(function.name.as_deref(), Some("f"), "{header:?}");
+            assert_eq!(term_from_decl(function), None, "{header:?}");
+        }
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_rule() {
+        // Counted as braces, each of these would end the body and begin a
+        // second one that holds `when false`.
+        let commented =
+            parse_rule_parts("rule R : derive {\nthen derive P()\n// } { when false\n}");
+        assert_eq!(
+            commented,
+            parse_rule_parts("rule R : derive {\nthen derive P()\n}")
+        );
+        let quoted = parse_rule_parts(
+            "rule R : derive {\nthen derive T(\"} { when false\")\nthen derive P()\n}",
+        );
+        assert_eq!(quoted.guard, None, "{quoted:?}");
+        let derived: Vec<&str> = quoted
+            .consequences
+            .iter()
+            .map(|(_, prop)| prop.predicate.as_str())
+            .collect();
+        assert_eq!(derived, ["T", "P"]);
+    }
+
+    #[test]
+    fn a_brace_in_a_comment_or_a_string_does_not_end_the_body_of_a_duty() {
+        let plain =
+            parse_duty_parts("duty D {\nbearer Payer\nclaimant Payee\ncontent USD(100.00)\n}");
+        assert_eq!(plain.claimant.as_deref(), Some("Payee"));
+        assert_eq!(plain.content.len(), 1);
+        assert_eq!(
+            parse_duty_parts(
+                "duty D {\nbearer Payer // } not the end\nclaimant Payee\ncontent USD(100.00)\n}"
+            ),
+            plain
+        );
+        let quoted =
+            parse_duty_parts("duty D {\nbearer Payer\ncontent \"pay } now\"\nclaimant Payee\n}");
+        assert_eq!(quoted.claimant.as_deref(), Some("Payee"));
+        assert_eq!(quoted.content, [Term::String("pay } now".into())]);
+    }
+
+    #[test]
+    fn a_consequence_read_from_the_text_that_is_not_a_proposition_is_kept_as_its_text() {
+        // The path that reads the consequences of a rule from its text
+        // dropped an expression that is not a proposition, as the path that
+        // reads them from the tree did. Both now keep its text for a
+        // diagnostic.
+        let parts = parse_rule_parts(
+            "rule R : derive {\nthen derive 5\nthen derive P()\notherwise establish \"x\"\notherwise derive Q()\n}",
+        );
+        let predicates = |list: &[(String, PropTerm)]| -> Vec<String> {
+            list.iter()
+                .map(|(_, prop)| prop.predicate.clone())
+                .collect()
+        };
+        assert_eq!(predicates(&parts.consequences), ["P"]);
+        assert_eq!(parts.consequences_not_propositions, ["derive 5"]);
+        assert_eq!(predicates(&parts.fallback), ["Q"]);
+        assert_eq!(parts.fallback_not_propositions, ["establish \"x\""]);
+        // With no expression after the word there is no consequence, as
+        // before, and nothing to report.
+        let parts = parse_rule_parts("rule R : derive { when true then }");
+        assert!(parts.consequences.is_empty());
+        assert!(parts.consequences_not_propositions.is_empty());
     }
 }

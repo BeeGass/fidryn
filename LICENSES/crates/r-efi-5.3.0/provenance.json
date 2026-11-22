@@ -1,0 +1,14 @@
+{
+  "crate": "r-efi",
+  "version": "5.3.0",
+  "cargoSource": "registry+https://github.com/rust-lang/crates.io-index",
+  "sourceRepository": "https://github.com/r-efi/r-efi",
+  "sourceCommit": "97b55bed1c2c91dcbf787674849f05337ff80b33",
+  "files": [
+    {
+      "path": "AUTHORS",
+      "sourceUrl": "https://raw.githubusercontent.com/r-efi/r-efi/97b55bed1c2c91dcbf787674849f05337ff80b33/AUTHORS",
+      "sha256": "ff92bed461f50338dd703a9ba9aee496a425957873df1d91192776e4bdf5dda7"
+    }
+  ]
+}

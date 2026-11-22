@@ -1,0 +1,24 @@
+{
+  "crate": "anes",
+  "version": "0.1.6",
+  "cargoSource": "registry+https://github.com/rust-lang/crates.io-index",
+  "sourceRepository": "https://github.com/qwandor/anes-rs",
+  "sourceCommit": "378ac7461ecac29fde9e10df7b08359d1315a9ad",
+  "files": [
+    {
+      "path": "LICENSE-APACHE",
+      "sourceUrl": "https://raw.githubusercontent.com/qwandor/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+    },
+    {
+      "path": "LICENSE-MIT",
+      "sourceUrl": "https://raw.githubusercontent.com/qwandor/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/qwandor/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/anes/README.md",
+      "sha256": "b62c8554d456263c75b49d19bf668360789a1275d6bdd7cbe0364cb45427e711"
+    }
+  ]
+}

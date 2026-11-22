@@ -1,5 +1,6 @@
 //! Bounded constitutive/derive worklist. The case record is never mutated.
 
+use crate::trace::{DerivationStep, record_step};
 use fidryn_core::ir::{CompareOp, Consequence, CoreDecl, CoreEffect, CoreModule, CoreRule, Guard};
 use fidryn_core::value::{PropTerm, Term, Value};
 use fidryn_core::{CaseRecord, EngineError, FrozenCaseView, RunContext};
@@ -23,12 +24,21 @@ pub struct DerivedWorld {
     base: BTreeSet<GroundProp>,
     withdrawn: BTreeSet<GroundProp>,
     seeded_determinations: Vec<SeededDetermination>,
+    conflicts: BTreeSet<GroundProp>,
+    assumed: BTreeSet<GroundProp>,
+    assumed_denied: BTreeSet<GroundProp>,
+    scenario: bool,
+    trace: Vec<DerivationStep>,
+    provenance: BTreeMap<GroundProp, BTreeSet<String>>,
+    work_units: u64,
+    operation_limit: u64,
+    judgment_requests: BTreeMap<GroundProp, BTreeSet<fidryn_core::OpenRequest>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct GroundProp {
     predicate: String,
-    arguments: Vec<String>,
+    arguments: Vec<Term>,
 }
 
 /// A case determination as seeded, including protocol and decider.
@@ -55,7 +65,126 @@ impl DerivedWorld {
         ctx: &RunContext,
         args: &BTreeMap<String, Value>,
     ) -> Result<Self, EngineError> {
+        Self::compute_in_mode(
+            module,
+            case,
+            ctx,
+            args,
+            false,
+            crate::ExecutionBudget::default(),
+        )
+    }
+
+    pub(crate) fn compute_with_budget(
+        module: &CoreModule,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+        scenario: bool,
+        budget: crate::ExecutionBudget,
+    ) -> Result<Self, EngineError> {
+        Self::compute_in_mode(module, case, ctx, args, scenario, budget)
+    }
+
+    fn compute_in_mode(
+        module: &CoreModule,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+        scenario: bool,
+        budget: crate::ExecutionBudget,
+    ) -> Result<Self, EngineError> {
+        if budget.operations == 0 {
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        let input_units = input_cost(module, case, args, u64::from(budget.operations))?;
+        if fidryn_core::ValidatedCompletionModel::admit(case).is_err() {
+            return Ok(Self {
+                scenario,
+                work_units: input_units,
+                operation_limit: u64::from(budget.operations),
+                ..Self::default()
+            });
+        }
         let mut world = Self::seed(module, case, ctx, args);
+        world.work_units = input_units;
+        world.operation_limit = u64::from(budget.operations);
+        world.scenario = scenario;
+        if scenario {
+            for assumption in &case.assumptions {
+                record_step(
+                    &mut world.trace,
+                    "assumption",
+                    format!("{assumption:?}"),
+                    Vec::new(),
+                );
+                if let Value::Map(fields) = &assumption.payload {
+                    for (issue, value) in fields {
+                        let prop = GroundProp::from_prop(&parse_prop_issue(issue));
+                        match value {
+                            Value::Bool(true) => {
+                                world.assumed.insert(prop);
+                            }
+                            Value::Bool(false) => {
+                                world.assumed_denied.insert(prop);
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
+        }
+        if world.trace.len() >= 100_000 || crate::trace::exhausted(&world.trace) {
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        let observation_world = world.clone();
+        for proposition in crate::judgment::observations(
+            module,
+            case,
+            ctx,
+            &observation_world,
+            &mut world.work_units,
+            &mut world.trace,
+        )? {
+            world.insert_held(proposition);
+        }
+        let context_world = world.clone();
+        let findings = crate::judgment::evaluate(
+            module,
+            case,
+            ctx,
+            args,
+            &context_world,
+            &mut world.work_units,
+            &mut world.trace,
+        )?;
+        for finding in findings {
+            let ground = GroundProp::from_prop(&finding.proposition);
+            world
+                .provenance
+                .entry(ground.clone())
+                .or_default()
+                .insert(finding.trace);
+            if let Some(established) = finding.result {
+                world.seeded_determinations.push(SeededDetermination {
+                    prop: ground.clone(),
+                    protocol: finding.protocol,
+                    decider: "DeclaredEvidencePolicy".into(),
+                    established,
+                });
+                if established && finding.operative {
+                    world.insert_held(finding.proposition);
+                } else if !established {
+                    world.insert_denied(finding.proposition);
+                }
+            } else {
+                world
+                    .judgment_requests
+                    .entry(ground)
+                    .or_default()
+                    .extend(finding.requests);
+            }
+        }
         let rules: Vec<&CoreRule> = module
             .declarations
             .iter()
@@ -69,36 +198,130 @@ impl DerivedWorld {
         }
         let candidates = ground_candidates(module, case, args);
         for _ in 0..WORKLIST_FUEL {
-            let before_held = world.held.clone();
-            let before_denied = world.denied.clone();
+            let before = world.clone();
+            let mut pending = Vec::new();
+            let mut additions = BTreeSet::new();
+            let mut withdrawals = BTreeSet::new();
             for rule in &rules {
+                spend_work(&mut world.work_units, 1, world.operation_limit)?;
                 if !rule_in_force(rule, ctx) {
+                    continue;
+                }
+                if rule.selection.is_some() {
+                    record_step(
+                        &mut world.trace,
+                        "open_selection",
+                        format!(
+                            "rule={} requires declared selection {:?}",
+                            rule.name, rule.selection
+                        ),
+                        Vec::new(),
+                    );
                     continue;
                 }
                 let binders = rule_binders(rule, module);
                 for subst in substitutions(&binders, &candidates)? {
-                    match world.guard_holds(&rule.guard, &subst, case, ctx) {
-                        Hold::Yes => {
-                            let justifications =
-                                world.guard_justifications(&rule.guard, &subst, case, ctx);
-                            world.apply_effects(&rule.consequences, &subst, &justifications);
+                    spend_work(
+                        &mut world.work_units,
+                        guard_cost(&rule.guard),
+                        world.operation_limit,
+                    )?;
+                    let (effects, justifications) =
+                        match before.guard_holds(&rule.guard, &subst, case, ctx) {
+                            Hold::Yes => (
+                                &rule.consequences,
+                                before.guard_justifications(
+                                    &rule.guard,
+                                    &subst,
+                                    case,
+                                    ctx,
+                                    &mut world.work_units,
+                                )?,
+                            ),
+                            Hold::No => match &rule.fallback {
+                                Some(effects) => (effects, axiomatic_justification()),
+                                None => continue,
+                            },
+                            Hold::Unknown => continue,
+                        };
+                    for effect in effects {
+                        if !matches!(
+                            effect.consequence,
+                            Consequence::Derive(_)
+                                | Consequence::Establish(_)
+                                | Consequence::Terminate(_)
+                                | Consequence::Suspend(_)
+                        ) {
+                            return Err(EngineError::Unsupported(format!(
+                                "rule `{}` requires unsupported institutional effect {:?}",
+                                rule.name, effect.consequence
+                            )));
                         }
-                        Hold::No => {
-                            if let Some(fallback) = &rule.fallback {
-                                world.apply_effects(fallback, &subst, &axiomatic_justification());
+                        match &effect.consequence {
+                            Consequence::Derive(prop) | Consequence::Establish(prop) => {
+                                additions.insert(GroundProp::from_prop(&subst_prop(prop, &subst)));
                             }
+                            Consequence::Terminate(prop) | Consequence::Suspend(prop) => {
+                                withdrawals
+                                    .insert(GroundProp::from_prop(&subst_prop(prop, &subst)));
+                            }
+                            _ => {}
                         }
-                        Hold::Unknown => {}
                     }
+                    pending.push((effects, subst, justifications));
+                }
+            }
+            world
+                .conflicts
+                .extend(additions.intersection(&withdrawals).cloned());
+            if !world.conflicts.is_empty() {
+                record_step(
+                    &mut world.trace,
+                    "norm_conflict",
+                    format!(
+                        "conflicting staged effects: {:?}; candidate effects={pending:?}",
+                        world.conflicts
+                    ),
+                    Vec::new(),
+                );
+                return Ok(world);
+            }
+            for (effects, subst, justifications) in pending {
+                if world.trace.len().saturating_add(effects.len()) >= 100_000 {
+                    return Err(EngineError::FuelExhausted { remaining: 0 });
+                }
+                let support_cost = justifications.iter().fold(0_u64, |cost, support| {
+                    cost.saturating_add(1 + support.len() as u64)
+                });
+                spend_work(
+                    &mut world.work_units,
+                    (effects.len() as u64).saturating_mul(support_cost),
+                    world.operation_limit,
+                )?;
+                world.apply_effects(effects, &subst, &justifications);
+                if crate::trace::exhausted(&world.trace) {
+                    return Err(EngineError::FuelExhausted { remaining: 0 });
                 }
             }
             world.retract_unsupported();
             world.reseed_base();
-            if world.held == before_held && world.denied == before_denied {
+            if world.held == before.held
+                && world.denied == before.denied
+                && world.support == before.support
+                && world.withdrawn == before.withdrawn
+            {
                 return Ok(world);
             }
         }
         Err(EngineError::FuelExhausted { remaining: 0 })
+    }
+
+    /// Operations consumed while admitting evidence and reaching the fixed point.
+    pub fn work_units(&self) -> u64 {
+        self.work_units
+    }
+    pub(crate) fn operation_limit(&self) -> u64 {
+        self.operation_limit
     }
 
     pub fn holds(&self, prop: &PropTerm) -> bool {
@@ -108,8 +331,7 @@ impl DerivedWorld {
     pub fn denied(&self, prop: &PropTerm) -> bool {
         let want = GroundProp::from_prop(prop);
         self.denied.iter().any(|denied| {
-            names_eq(&denied.predicate, &want.predicate)
-                && (denied.arguments.is_empty() || denied.arguments == want.arguments)
+            names_eq(&denied.predicate, &want.predicate) && denied.arguments == want.arguments
         })
     }
 
@@ -145,18 +367,46 @@ impl DerivedWorld {
                 denied = true;
             }
         }
-        if denied {
-            return Some(false);
+        match (established, denied) {
+            (true, false) => Some(true),
+            (false, true) => Some(false),
+            _ => None,
         }
-        if established {
-            return Some(true);
-        }
-        if self.denied(prop) {
-            Some(false)
-        } else if self.holds(prop) {
-            Some(true)
-        } else {
-            None
+    }
+
+    pub(crate) fn is_scenario(&self) -> bool {
+        self.scenario
+    }
+
+    pub fn derivation(&self) -> &[DerivationStep] {
+        &self.trace
+    }
+
+    pub(crate) fn judgment_requests(
+        &self,
+        proposition: &PropTerm,
+    ) -> Option<&BTreeSet<fidryn_core::OpenRequest>> {
+        self.judgment_requests
+            .get(&GroundProp::from_prop(proposition))
+    }
+
+    pub fn has_conflict(&self) -> bool {
+        !self.conflicts.is_empty()
+    }
+
+    pub(crate) fn proposition_conflicted(&self, prop: &PropTerm) -> bool {
+        self.holds(prop) && self.denied(prop)
+    }
+
+    pub(crate) fn assumed_value(&self, prop: &PropTerm) -> Option<bool> {
+        let grounded = GroundProp::from_prop(prop);
+        match (
+            self.assumed.contains(&grounded),
+            self.assumed_denied.contains(&grounded),
+        ) {
+            (true, false) => Some(true),
+            (false, true) => Some(false),
+            _ => None,
         }
     }
 
@@ -169,13 +419,38 @@ impl DerivedWorld {
         let mut world = Self::default();
         let propositions = declared_propositions(module);
         let view = FrozenCaseView::from_context(case, ctx);
+        for item in &case.evidence {
+            if !FrozenCaseView::evidence_is_known(item.observed_at, Some(ctx.record_time)) {
+                record_step(
+                    &mut world.trace,
+                    "temporal_rejection",
+                    format!(
+                        "evidence observed at {} after known-at {}: {item:?}",
+                        item.observed_at, ctx.record_time
+                    ),
+                    Vec::new(),
+                );
+            }
+        }
+        for determination in &case.determinations {
+            if !FrozenCaseView::determination_is_known(
+                determination.recorded_at,
+                Some(ctx.record_time),
+            ) {
+                record_step(
+                    &mut world.trace,
+                    "temporal_rejection",
+                    format!("future determination: {determination:?}"),
+                    Vec::new(),
+                );
+            }
+        }
         seed_facts(&mut world, &case.facts, &propositions);
         seed_facts(&mut world, args, &propositions);
         seed_determinations(&mut world, &view);
         seed_evidence(&mut world, &view);
         seed_events(&mut world, &view, &propositions);
         seed_core_facts(&mut world, module);
-        seed_observations(&mut world, module, &view);
         world
     }
 
@@ -185,9 +460,16 @@ impl DerivedWorld {
         self.base.insert(ground.clone());
         self.withdrawn.remove(&ground);
         self.support
-            .entry(ground)
+            .entry(ground.clone())
             .or_default()
             .insert(SupportSet::new());
+        let id = record_step(
+            &mut self.trace,
+            "foundation",
+            format!("admitted {ground:?}"),
+            Vec::new(),
+        );
+        self.provenance.entry(ground).or_default().insert(id);
     }
 
     fn insert_derived(&mut self, prop: PropTerm, justifications: &Justifications) {
@@ -233,6 +515,22 @@ impl DerivedWorld {
             }
             Guard::Derived(prop) => {
                 let grounded = subst_prop(prop, subst);
+                if self.proposition_conflicted(&grounded) {
+                    Hold::Unknown
+                } else if self.holds(&grounded) {
+                    Hold::Yes
+                } else if self.denied(&grounded) {
+                    Hold::No
+                } else {
+                    Hold::Unknown
+                }
+            }
+            Guard::Assumed(prop) => match self.assumed_value(&subst_prop(prop, subst)) {
+                Some(value) => Hold::from_bool(value),
+                None => Hold::Unknown,
+            },
+            Guard::Determined(prop) => {
+                let grounded = subst_prop(prop, subst);
                 match self.modal_determined(&grounded) {
                     Some(true) => Hold::Yes,
                     Some(false) => Hold::No,
@@ -268,13 +566,43 @@ impl DerivedWorld {
                     _ => Hold::Unknown,
                 }
             }
+            Guard::EffectiveActTerm(term) => {
+                let term = subst_term(term, subst);
+                match &term {
+                    Term::Apply { ctor, args } | Term::Call { callee: ctor, args }
+                        if ctor == "AcceptOffice" && args.len() == 2 =>
+                    {
+                        let person = crate::judgment::term_label(&args[0]);
+                        let office = crate::judgment::term_label(&args[1]);
+                        if crate::is_accepted(case, &person, &office, ctx) {
+                            Hold::Yes
+                        } else {
+                            Hold::Unknown
+                        }
+                    }
+                    _ => {
+                        let key = format!("Effective({})", crate::judgment::term_label(&term));
+                        match case.facts.get(&key) {
+                            Some(Value::Bool(value)) => Hold::from_bool(*value),
+                            _ => Hold::Unknown,
+                        }
+                    }
+                }
+            }
             Guard::CompletedAct(name) | Guard::EffectiveAct(name) => {
-                if case.facts.contains_key(name)
+                if case.facts.get(name) == Some(&Value::Bool(true))
                     || FrozenCaseView::from_context(case, ctx)
                         .determinations()
-                        .any(|d| names_eq(&d.issue, name) && d.established)
+                        .any(|d| {
+                            names_eq(&d.issue, name)
+                                && d.established
+                                && !d.protocol.is_empty()
+                                && !d.decider.is_empty()
+                        })
                 {
                     Hold::Yes
+                } else if case.facts.get(name) == Some(&Value::Bool(false)) {
+                    Hold::No
                 } else {
                     Hold::Unknown
                 }
@@ -289,33 +617,50 @@ impl DerivedWorld {
         subst: &BTreeMap<String, Term>,
         case: &CaseRecord,
         ctx: &RunContext,
-    ) -> Justifications {
-        match guard {
+        work_units: &mut u64,
+    ) -> Result<Justifications, EngineError> {
+        spend_work(work_units, 1, self.operation_limit)?;
+        Ok(match guard {
             Guard::Satisfied => axiomatic_justification(),
-            Guard::Operative(prop, _) | Guard::Derived(prop) => {
+            Guard::Operative(prop, _)
+            | Guard::Derived(prop)
+            | Guard::Determined(prop)
+            | Guard::Assumed(prop) => {
                 let grounded = subst_prop(prop, subst);
                 let premise = self
                     .matching_held(&grounded)
                     .unwrap_or_else(|| GroundProp::from_prop(&grounded));
-                let mut justifications = Justifications::new();
-                justifications.insert(SupportSet::from([premise]));
-                justifications
+                Justifications::from([SupportSet::from([premise])])
             }
-            Guard::And(parts) => parts.iter().fold(axiomatic_justification(), |acc, part| {
-                cartesian_support(&acc, &self.guard_justifications(part, subst, case, ctx))
-            }),
-            Guard::Or(parts) => parts
-                .iter()
-                .filter(|part| self.guard_holds(part, subst, case, ctx) == Hold::Yes)
-                .flat_map(|part| self.guard_justifications(part, subst, case, ctx))
-                .collect(),
+            Guard::And(parts) => {
+                let mut out = axiomatic_justification();
+                for part in parts {
+                    out = cartesian_support(
+                        &out,
+                        &self.guard_justifications(part, subst, case, ctx, work_units)?,
+                        work_units,
+                        self.operation_limit,
+                    )?;
+                }
+                out
+            }
+            Guard::Or(parts) => {
+                let mut out = Justifications::new();
+                for part in parts {
+                    if self.guard_holds(part, subst, case, ctx) == Hold::Yes {
+                        out.extend(self.guard_justifications(part, subst, case, ctx, work_units)?);
+                    }
+                }
+                out
+            }
             Guard::Not(_)
             | Guard::Compare { .. }
             | Guard::Observed { .. }
             | Guard::CompletedAct(_)
             | Guard::EffectiveAct(_)
+            | Guard::EffectiveActTerm(_)
             | Guard::Request(_) => axiomatic_justification(),
-        }
+        })
     }
 
     fn matching_held(&self, want: &PropTerm) -> Option<GroundProp> {
@@ -342,9 +687,28 @@ impl DerivedWorld {
             .collect();
         let justifications = strip_cut(justifications, &cut);
         for effect in effects {
+            let parents: BTreeSet<_> = justifications
+                .iter()
+                .flatten()
+                .flat_map(|premise| self.provenance.get(premise).into_iter().flatten().cloned())
+                .collect();
+            let id = record_step(
+                &mut self.trace,
+                "rule_application",
+                format!(
+                    "effect={}; consequence={:?}; substitution={subst:?}",
+                    effect.id, effect.consequence
+                ),
+                parents,
+            );
             match &effect.consequence {
                 Consequence::Derive(prop) | Consequence::Establish(prop) => {
-                    self.insert_derived(subst_prop(prop, subst), &justifications);
+                    let prop = subst_prop(prop, subst);
+                    self.provenance
+                        .entry(GroundProp::from_prop(&prop))
+                        .or_default()
+                        .insert(id.clone());
+                    self.insert_derived(prop, &justifications);
                 }
                 Consequence::Terminate(prop) | Consequence::Suspend(prop) => {
                     self.withdraw(GroundProp::from_prop(&subst_prop(prop, subst)));
@@ -355,32 +719,28 @@ impl DerivedWorld {
     }
 
     fn retract_unsupported(&mut self) {
+        // Compute the least set with a live foundation. A mutually supporting
+        // component without a surviving premise is not its own foundation.
+        let mut grounded: BTreeSet<_> = self.base.difference(&self.withdrawn).cloned().collect();
         loop {
-            let drop: Vec<GroundProp> = self
-                .held
-                .iter()
-                .filter(|prop| !self.has_valid_support(prop))
-                .cloned()
-                .collect();
-            if drop.is_empty() {
-                return;
+            let before = grounded.len();
+            for (prop, justifications) in &self.support {
+                if self.withdrawn.contains(prop) || !self.held.contains(prop) {
+                    continue;
+                }
+                if justifications
+                    .iter()
+                    .any(|support| support.iter().all(|premise| grounded.contains(premise)))
+                {
+                    grounded.insert(prop.clone());
+                }
             }
-            for prop in drop {
-                self.held.remove(&prop);
-                self.support.remove(&prop);
+            if grounded.len() == before {
+                break;
             }
         }
-    }
-
-    fn has_valid_support(&self, prop: &GroundProp) -> bool {
-        let Some(justifications) = self.support.get(prop) else {
-            return self.base.contains(prop) && !self.withdrawn.contains(prop);
-        };
-        justifications.iter().any(|justification| {
-            justification
-                .iter()
-                .all(|premise| premise != prop && self.held.contains(premise))
-        })
+        self.held.retain(|prop| grounded.contains(prop));
+        self.support.retain(|prop, _| grounded.contains(prop));
     }
 
     fn reseed_base(&mut self) {
@@ -404,16 +764,137 @@ fn axiomatic_justification() -> Justifications {
     justifications
 }
 
-fn cartesian_support(left: &Justifications, right: &Justifications) -> Justifications {
+fn cartesian_support(
+    left: &Justifications,
+    right: &Justifications,
+    work_units: &mut u64,
+    limit: u64,
+) -> Result<Justifications, EngineError> {
     let mut out = Justifications::new();
     for a in left {
         for b in right {
+            spend_work(work_units, (a.len() + b.len() + 1) as u64, limit)?;
             let mut united = a.clone();
             united.extend(b.iter().cloned());
             out.insert(united);
         }
     }
-    out
+    Ok(out)
+}
+
+fn input_cost(
+    module: &CoreModule,
+    case: &CaseRecord,
+    args: &BTreeMap<String, Value>,
+    limit: u64,
+) -> Result<u64, EngineError> {
+    fn value(value: &Value, units: &mut u64, limit: u64, depth: usize) -> Result<(), EngineError> {
+        if depth >= 128 {
+            return Err(EngineError::FuelExhausted { remaining: 0 });
+        }
+        spend_work(units, 1, limit)?;
+        match value {
+            Value::String(text) | Value::Entity(text) => {
+                spend_work(units, (text.len() / 128) as u64, limit)?
+            }
+            Value::Map(fields) | Value::Ctor { fields, .. } => {
+                for child in fields.values() {
+                    value_cost(child, units, limit, depth + 1)?;
+                }
+            }
+            Value::Set(values)
+            | Value::ClauseRef {
+                arguments: values, ..
+            } => {
+                for child in values {
+                    value_cost(child, units, limit, depth + 1)?;
+                }
+            }
+            Value::Option(Some(child)) => value_cost(child, units, limit, depth + 1)?,
+            _ => {}
+        }
+        Ok(())
+    }
+    fn value_cost(
+        item: &Value,
+        units: &mut u64,
+        limit: u64,
+        depth: usize,
+    ) -> Result<(), EngineError> {
+        value(item, units, limit, depth)
+    }
+    let mut units = 0;
+    spend_work(
+        &mut units,
+        module
+            .declarations
+            .len()
+            .saturating_add(module.nominations.len())
+            .saturating_add(case.facts.len())
+            .saturating_add(case.evidence.len())
+            .saturating_add(case.events.len())
+            .saturating_add(case.determinations.len())
+            .saturating_add(case.assumptions.len()) as u64,
+        limit,
+    )?;
+    for domain in case
+        .admissible_completions
+        .interpretations
+        .values()
+        .chain(case.admissible_completions.choices.values())
+        .chain(
+            case.admissible_completions
+                .evidence
+                .values()
+                .map(|domain| &domain.responses),
+        )
+    {
+        spend_work(&mut units, 1, limit)?;
+        for value in domain {
+            spend_work(&mut units, 1 + (value.len() / 128) as u64, limit)?;
+        }
+    }
+    for item in case
+        .facts
+        .values()
+        .chain(args.values())
+        .chain(case.evidence.iter().map(|record| &record.value))
+        .chain(case.events.iter().map(|event| &event.payload))
+        .chain(
+            case.assumptions
+                .iter()
+                .map(|assumption| &assumption.payload),
+        )
+    {
+        value_cost(item, &mut units, limit, 0)?;
+    }
+    Ok(units)
+}
+
+fn spend_work(consumed: &mut u64, amount: u64, limit: u64) -> Result<(), EngineError> {
+    *consumed = consumed.saturating_add(amount);
+    if *consumed >= limit {
+        Err(EngineError::FuelExhausted { remaining: 0 })
+    } else {
+        Ok(())
+    }
+}
+
+fn guard_cost(guard: &Guard) -> u64 {
+    let mut pending = vec![guard];
+    let mut count = 0_u64;
+    while let Some(guard) = pending.pop() {
+        count += 1;
+        if count >= 100_000 {
+            return count;
+        }
+        match guard {
+            Guard::And(parts) | Guard::Or(parts) => pending.extend(parts),
+            Guard::Not(inner) => pending.push(inner),
+            _ => {}
+        }
+    }
+    count
 }
 
 fn strip_cut(justifications: &Justifications, cut: &BTreeSet<GroundProp>) -> Justifications {
@@ -425,13 +906,7 @@ fn strip_cut(justifications: &Justifications, cut: &BTreeSet<GroundProp>) -> Jus
 
 impl SeededDetermination {
     fn applies_to(&self, prop: &PropTerm) -> bool {
-        if self.prop.satisfies(prop, false) {
-            return true;
-        }
-        let want = GroundProp::from_prop(prop);
-        names_eq(&self.protocol, &want.predicate)
-            && (self.prop.arguments.is_empty() || self.prop.arguments == want.arguments)
-            && (!self.decider.is_empty() || !self.protocol.is_empty())
+        !self.protocol.is_empty() && !self.decider.is_empty() && self.prop.satisfies(prop, false)
     }
 }
 
@@ -439,7 +914,7 @@ impl GroundProp {
     fn from_prop(prop: &PropTerm) -> Self {
         Self {
             predicate: prop.predicate.clone(),
-            arguments: prop.arguments.iter().map(arg_label).collect(),
+            arguments: prop.arguments.iter().map(canonical_ground_term).collect(),
         }
     }
 
@@ -447,14 +922,12 @@ impl GroundProp {
         if !names_eq(&self.predicate, &want.predicate) {
             return false;
         }
-        let want_args: Vec<String> = want.arguments.iter().map(arg_label).collect();
+        let want_args: Vec<Term> = want.arguments.iter().map(canonical_ground_term).collect();
         if self.arguments == want_args {
             return true;
         }
-        if want_args.is_empty() {
-            return true;
-        }
-        allow_zero_ary && self.arguments.is_empty()
+        let _ = allow_zero_ary;
+        false
     }
 }
 
@@ -497,7 +970,7 @@ fn seed_facts(
         if value != &Value::Bool(true) {
             continue;
         }
-        world.insert_held(PropTerm::new(name.clone(), Vec::new()));
+        world.insert_held(parse_prop_issue(name));
         for prop in propositions {
             if fact_names_proposition(name, prop) {
                 world.insert_held(PropTerm::new(prop.clone(), Vec::new()));
@@ -508,7 +981,27 @@ fn seed_facts(
 
 fn seed_determinations(world: &mut DerivedWorld, view: &FrozenCaseView<'_>) {
     for det in view.determinations() {
+        if det.protocol.trim().is_empty() || det.decider.trim().is_empty() {
+            record_step(
+                &mut world.trace,
+                "admission_rejection",
+                format!("determination lacks protocol or decider: {det:?}"),
+                Vec::new(),
+            );
+            continue;
+        }
         let prop = parse_prop_issue(&det.issue);
+        let id = record_step(
+            &mut world.trace,
+            "determination",
+            format!("{det:?}"),
+            Vec::new(),
+        );
+        world
+            .provenance
+            .entry(GroundProp::from_prop(&prop))
+            .or_default()
+            .insert(id);
         world.seeded_determinations.push(SeededDetermination {
             prop: GroundProp::from_prop(&prop),
             protocol: det.protocol.clone(),
@@ -525,6 +1018,12 @@ fn seed_determinations(world: &mut DerivedWorld, view: &FrozenCaseView<'_>) {
 
 fn seed_evidence(world: &mut DerivedWorld, view: &FrozenCaseView<'_>) {
     for item in view.evidence() {
+        record_step(
+            &mut world.trace,
+            "evidence",
+            format!("{item:?}"),
+            Vec::new(),
+        );
         world.observed.insert(item.schema.clone());
     }
 }
@@ -574,24 +1073,6 @@ fn seed_core_facts(world: &mut DerivedWorld, module: &CoreModule) {
     }
 }
 
-fn seed_observations(world: &mut DerivedWorld, module: &CoreModule, view: &FrozenCaseView<'_>) {
-    for decl in &module.declarations {
-        let CoreDecl::Observation(obs) = decl else {
-            continue;
-        };
-        let seen =
-            world.observed(&obs.name) || view.evidence().any(|e| names_eq(&e.schema, &obs.name));
-        if !seen {
-            continue;
-        }
-        if obs.establishes.arguments.iter().all(term_is_ground) {
-            world.insert_held(obs.establishes.clone());
-        } else {
-            world.insert_held(PropTerm::new(obs.establishes.predicate.clone(), Vec::new()));
-        }
-    }
-}
-
 fn declared_propositions(module: &CoreModule) -> BTreeSet<String> {
     module
         .declarations
@@ -604,22 +1085,11 @@ fn declared_propositions(module: &CoreModule) -> BTreeSet<String> {
 }
 
 fn fact_names_proposition(fact: &str, prop: &str) -> bool {
-    names_eq(fact, prop) || names_eq(fact, camel_stem(prop))
-}
-
-fn camel_stem(name: &str) -> &str {
-    let mut end = name.len();
-    for (i, c) in name.char_indices().skip(1) {
-        if c.is_uppercase() {
-            end = i;
-            break;
-        }
-    }
-    &name[..end]
+    fact == prop
 }
 
 fn names_eq(a: &str, b: &str) -> bool {
-    a == b || a.eq_ignore_ascii_case(b)
+    a == b
 }
 
 fn rule_in_force(rule: &CoreRule, ctx: &RunContext) -> bool {
@@ -670,7 +1140,10 @@ fn collect_effect_idents(effects: &[CoreEffect], out: &mut BTreeSet<String>) {
 
 fn collect_guard_idents(guard: &Guard, out: &mut BTreeSet<String>) {
     match guard {
-        Guard::Operative(prop, _) | Guard::Derived(prop) => collect_prop_idents(prop, out),
+        Guard::Operative(prop, _)
+        | Guard::Derived(prop)
+        | Guard::Determined(prop)
+        | Guard::Assumed(prop) => collect_prop_idents(prop, out),
         Guard::And(parts) | Guard::Or(parts) => {
             for part in parts {
                 collect_guard_idents(part, out);
@@ -752,8 +1225,7 @@ fn substitutions(
         return Ok(Vec::new());
     }
     let mut acc = vec![BTreeMap::new()];
-    for (index, binder) in binders.iter().enumerate() {
-        let last_binder = index + 1 == binders.len();
+    for binder in binders {
         let mut next = Vec::new();
         let mut truncated = false;
         'expand: for env in &acc {
@@ -767,18 +1239,15 @@ fn substitutions(
                 next.push(env);
             }
         }
-        if truncated && !last_binder {
+        if truncated {
             return Err(EngineError::Unsupported(format!(
-                "substitution cap {MAX_SUBSTITUTIONS} reached with binders remaining"
+                "substitution cap {MAX_SUBSTITUTIONS} reached before complete enumeration"
             )));
         }
         if next.is_empty() {
             return Ok(Vec::new());
         }
         acc = next;
-        if truncated {
-            break;
-        }
     }
     let total = binders.len();
     acc.retain(|subst| subst.len() == total && binders.iter().all(|b| subst.contains_key(b)));
@@ -872,7 +1341,9 @@ fn compare_values(op: CompareOp, left: &Value, right: &Value) -> bool {
 }
 
 fn values_eq(left: &Value, right: &Value) -> bool {
-    left == right || arg_label_value(left) == arg_label_value(right)
+    left == right
+        || matches!((left, right), (Value::Int(a), Value::Decimal(b)) if rust_decimal::Decimal::from(*a) == *b)
+        || matches!((left, right), (Value::Decimal(a), Value::Int(b)) if *a == rust_decimal::Decimal::from(*b))
 }
 
 fn cmp_ord(left: &Value, right: &Value) -> Option<std::cmp::Ordering> {
@@ -895,43 +1366,24 @@ fn value_as_term(value: &Value) -> Option<Term> {
     }
 }
 
-fn arg_label(term: &Term) -> String {
+pub(crate) fn canonical_ground_term(term: &Term) -> Term {
     match term {
-        Term::Ident(s) | Term::String(s) | Term::Binder(s) => s.clone(),
-        Term::Bool(b) => b.to_string(),
-        Term::Int(i) => i.to_string(),
-        Term::Decimal(d) => d.to_string(),
-        Term::Apply { ctor, args } if args.is_empty() => ctor.clone(),
-        Term::Call { callee, args } if args.is_empty() => callee.clone(),
-        other => format!("{other:?}"),
-    }
-}
-
-fn arg_label_value(value: &Value) -> String {
-    match value {
-        Value::Entity(s) | Value::String(s) => s.clone(),
-        Value::Bool(b) => b.to_string(),
-        Value::Int(i) => i.to_string(),
-        Value::Decimal(d) => d.to_string(),
-        Value::Ctor { name, fields } if fields.is_empty() => name.clone(),
-        Value::Prop(p) => p.predicate.clone(),
-        other => other.display_label(),
-    }
-}
-
-fn term_is_ground(term: &Term) -> bool {
-    match term {
-        Term::Ident(name) | Term::Binder(name) => name.starts_with(|c: char| c.is_uppercase()),
-        Term::Bool(_)
-        | Term::Int(_)
-        | Term::Decimal(_)
-        | Term::String(_)
-        | Term::Instant(_)
-        | Term::Duration(_) => true,
-        Term::Apply { args, .. } | Term::Call { args, .. } | Term::Set(args) => {
-            args.iter().all(term_is_ground)
+        Term::Ident(name) | Term::Binder(name) if name.contains('(') => {
+            parse_arg_term_bounded(name, 0)
         }
-        _ => false,
+        Term::Binder(name) => Term::Ident(name.clone()),
+        Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => Term::Apply {
+            ctor: ctor.clone(),
+            args: args.iter().map(canonical_ground_term).collect(),
+        },
+        Term::Set(items) => Term::Set(items.iter().map(canonical_ground_term).collect()),
+        Term::Record(fields) => Term::Record(
+            fields
+                .iter()
+                .map(|(name, term)| (name.clone(), canonical_ground_term(term)))
+                .collect(),
+        ),
+        other => other.clone(),
     }
 }
 
@@ -963,19 +1415,56 @@ pub fn parse_prop_issue(issue: &str) -> PropTerm {
 }
 
 fn parse_arg_term(s: &str) -> Term {
-    if s.eq_ignore_ascii_case("true") {
+    parse_arg_term_bounded(s, 0)
+}
+
+fn parse_arg_term_bounded(s: &str, depth: usize) -> Term {
+    let s = s.trim();
+    if depth >= 64 || s.len() > 65_536 {
+        return Term::Apply {
+            ctor: "$invalid_issue".into(),
+            args: vec![Term::String(s.to_owned())],
+        };
+    }
+    if s == "true" {
         return Term::Bool(true);
     }
-    if s.eq_ignore_ascii_case("false") {
+    if s == "false" {
         return Term::Bool(false);
     }
     if let Ok(i) = s.parse::<i64>() {
         return Term::Int(i);
     }
+    if let Ok(value) = s.parse::<rust_decimal::Decimal>() {
+        return Term::Decimal(value);
+    }
     if s.len() >= 2
         && ((s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')))
     {
         return Term::String(s[1..s.len() - 1].to_owned());
+    }
+    if let Some(open) = s.find('(') {
+        let head = s[..open].trim();
+        if !head.is_empty()
+            && head
+                .chars()
+                .all(|c| c.is_alphanumeric() || c == '_' || c == '.')
+            && s.ends_with(')')
+        {
+            let inside = &s[open + 1..s.len() - 1];
+            let args = if inside.trim().is_empty() {
+                Vec::new()
+            } else {
+                split_commas(inside)
+                    .into_iter()
+                    .map(|part| parse_arg_term_bounded(part, depth + 1))
+                    .collect()
+            };
+            return Term::Apply {
+                ctor: head.into(),
+                args,
+            };
+        }
     }
     Term::Ident(s.to_owned())
 }
@@ -983,11 +1472,24 @@ fn parse_arg_term(s: &str) -> Term {
 fn split_commas(src: &str) -> Vec<&str> {
     let mut parts = Vec::new();
     let mut start = 0;
-    let mut depth = 0i32;
+    let mut depth = 0_i32;
+    let mut quoted = None;
+    let mut escaped = false;
     for (i, c) in src.char_indices() {
+        if let Some(quote) = quoted {
+            if escaped {
+                escaped = false;
+            } else if c == '\\' {
+                escaped = true;
+            } else if c == quote {
+                quoted = None;
+            }
+            continue;
+        }
         match c {
-            '(' => depth += 1,
-            ')' => depth -= 1,
+            '"' | '\'' => quoted = Some(c),
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => depth -= 1,
             ',' if depth == 0 => {
                 parts.push(&src[start..i]);
                 start = i + 1;

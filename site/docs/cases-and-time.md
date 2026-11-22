@@ -36,10 +36,10 @@ as an evidence gap in
 
 Pass a JSON file to `fidryn run` or `fidryn explore`:
 
-```
+```text
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME \
-    [--arg KEY=VALUE] [--scenario]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
+    [--arg KEY=VALUE] [--scenario] [--budget N]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] \
     --valid-at TIME --known-at TIME
 ```
 
@@ -49,7 +49,7 @@ canonicalize to UTC. `run` never chooses a missing completion. `--arg
 KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
 `case.assumptions` as an overlay. `explore --bounds` merges extra
 declared domains into `admissibleCompletions`. Successful `run` /
-`explore` stdout is `fidryn.evaluation-report/v0.1`.
+`explore` stdout is `fidryn.evaluation-report/v0.2`.
 
 See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf), and
 [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).

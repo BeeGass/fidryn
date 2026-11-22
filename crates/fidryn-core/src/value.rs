@@ -86,7 +86,7 @@ impl PropTerm {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "data", rename_all = "camelCase")]
 pub enum Value {
     Unit,
@@ -102,7 +102,7 @@ pub enum Value {
         name: String,
         fields: BTreeMap<String, Value>,
     },
-    Set(Vec<Value>),
+    Set(#[serde(with = "set_values")] Vec<Value>),
     Map(BTreeMap<String, Value>),
     Option(Option<Box<Value>>),
     ClauseRef {
@@ -113,7 +113,113 @@ pub enum Value {
     },
 }
 
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Unit, Self::Unit) => true,
+            (Self::Bool(a), Self::Bool(b)) => a == b,
+            (Self::Int(a), Self::Int(b)) => a == b,
+            (Self::Decimal(a), Self::Decimal(b)) => a == b,
+            (Self::String(a), Self::String(b)) | (Self::Entity(a), Self::Entity(b)) => a == b,
+            (Self::Instant(a), Self::Instant(b)) => a == b,
+            (Self::Duration(a), Self::Duration(b)) => a == b,
+            (Self::Prop(a), Self::Prop(b)) => a == b,
+            (
+                Self::Ctor {
+                    name: a,
+                    fields: af,
+                },
+                Self::Ctor {
+                    name: b,
+                    fields: bf,
+                },
+            ) => a == b && af == bf,
+            (Self::Set(a), Self::Set(b)) => {
+                a.iter().all(|value| b.contains(value)) && b.iter().all(|value| a.contains(value))
+            }
+            (Self::Map(a), Self::Map(b)) => a == b,
+            (Self::Option(a), Self::Option(b)) => a == b,
+            (
+                Self::ClauseRef {
+                    module: a,
+                    clause: ac,
+                    arguments: aa,
+                    digest: ad,
+                },
+                Self::ClauseRef {
+                    module: b,
+                    clause: bc,
+                    arguments: ba,
+                    digest: bd,
+                },
+            ) => a == b && ac == bc && aa == ba && ad == bd,
+            _ => false,
+        }
+    }
+}
+
+impl Eq for Value {}
+
+/// Set wire identity is independent of order and duplicate occurrences.
+/// Encode children once, then sort their canonical representations without
+/// re-entering Value serialization while ordering the raw JSON tree.
+mod set_values {
+    use super::*;
+    use serde::ser::Error as _;
+
+    pub fn serialize<S: Serializer>(values: &[Value], serializer: S) -> Result<S::Ok, S::Error> {
+        let mut elements = BTreeMap::new();
+        for value in values {
+            let mut json = serde_json::to_value(value).map_err(S::Error::custom)?;
+            normalize_decimals(&mut json);
+            let key = crate::canonical_json(&json).map_err(S::Error::custom)?;
+            elements.entry(key).or_insert(json);
+        }
+        elements
+            .into_values()
+            .collect::<Vec<_>>()
+            .serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<Value>, D::Error> {
+        Vec::<Value>::deserialize(deserializer)
+    }
+
+    pub(super) fn normalize_decimals(value: &mut serde_json::Value) {
+        match value {
+            serde_json::Value::Array(values) => values.iter_mut().for_each(normalize_decimals),
+            serde_json::Value::Object(fields) => {
+                for value in fields.values_mut() {
+                    normalize_decimals(value);
+                }
+                let key =
+                    if fields.get("kind").and_then(serde_json::Value::as_str) == Some("decimal") {
+                        Some("data")
+                    } else if fields.len() == 1 && fields.contains_key("Decimal") {
+                        Some("Decimal")
+                    } else {
+                        None
+                    };
+                if let Some(key) = key
+                    && let Some(text) = fields.get(key).and_then(serde_json::Value::as_str)
+                    && let Ok(decimal) = Decimal::from_str(text)
+                {
+                    fields.insert(
+                        key.into(),
+                        serde_json::Value::String(decimal.normalize().to_string()),
+                    );
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
 impl Value {
+    /// Decode the same friendly or tagged JSON accepted in case records.
+    pub fn from_case_json(value: serde_json::Value) -> Result<Self, String> {
+        value_from_case_json(value)
+    }
     pub fn display_label(&self) -> String {
         match self {
             Value::Entity(n) | Value::String(n) => n.clone(),
@@ -124,6 +230,18 @@ impl Value {
             other => format!("{other:?}"),
         }
     }
+}
+
+/// Content identity for typed values, including canonical sets and decimals.
+pub fn value_digest(value: &Value) -> Result<String, String> {
+    let mut json = serde_json::to_value(value).map_err(|error| error.to_string())?;
+    set_values::normalize_decimals(&mut json);
+    let canonical = crate::canonical_json(&json).map_err(|error| error.to_string())?;
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"fidryn-value");
+    hasher.update(&[0xff]);
+    hasher.update(canonical.as_bytes());
+    Ok(hasher.finalize().to_hex().to_string())
 }
 
 /// Serde tags for [`Value`] (`tag = "kind"`, `rename_all = "camelCase"`).

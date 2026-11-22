@@ -147,6 +147,7 @@ module Arkansas.Property.Homestead version "0.1.0" {
                 using Determine
             require determined EligibleClaimant(Owner)
                 using Determine
+            return true
         }
     }
 
@@ -157,6 +158,7 @@ module Arkansas.Property.Homestead version "0.1.0" {
         goal Evaluate {
             require determined ExceptedCreditor(Creditor)
                 using Determine
+            return true
         }
     }
 
@@ -167,6 +169,7 @@ module Arkansas.Property.Homestead version "0.1.0" {
         goal Evaluate {
             require determined AnnexedButRuralInNature(Home)
                 using Determine
+            return true
         }
     }
 

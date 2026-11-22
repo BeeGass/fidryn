@@ -43,6 +43,7 @@ module US.Federal.Military.SCRAInterest version "0.1.0" {
             require observed ServiceRecord
             require determined MilitaryServicePeriod(Servicemember)
                 using Determine
+            return true
         }
     }
 

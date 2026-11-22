@@ -1,18 +1,26 @@
 //! Name resolution, import authentication, and surface-to-HIR elaboration.
 
 mod body;
+mod text;
 
 use fidryn_core::ir::Guard;
 use fidryn_core::value::{PropTerm, Term};
 use fidryn_core::{Diagnostic, DiagnosticCode, SourceManifest};
-use fidryn_syntax::Parse;
+use fidryn_syntax::{Parse, TokenKind, lex};
+use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::ops::Range;
 
 pub use body::{
-    collect_source_callees, collect_term_callees, flatten_term_list, last_brace_inner,
-    parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name, term_as_prop,
-    term_from_decl, term_has_bare_prop_guard,
+    angles_nest_too_deep, collect_source_callees, collect_term_callees, flatten_term_list,
+    last_brace_inner, parse_expr_src, parse_type_name, source_has_bare_prop_if, term_as_name,
+    term_as_prop, term_from_decl, term_has_bare_prop_guard, term_to_guard, type_nests_too_deep,
 };
+pub use text::{structure_of, without_comments};
+
+pub type HirRecordTypes = BTreeMap<String, (bool, Vec<(String, String)>)>;
+pub type HirTypes = fidryn_core::types::TypeEnvironment;
+pub type HirCallableSignatures = BTreeMap<String, (Vec<(String, String)>, String)>;
 
 #[derive(Clone, Debug)]
 pub struct HirModule {
@@ -27,13 +35,18 @@ pub struct HirModule {
     pub outside_scope: Vec<String>,
     pub entities: BTreeMap<String, String>,
     pub propositions: BTreeMap<String, Vec<(String, String)>>,
+    pub record_types: HirRecordTypes,
+    pub types: HirTypes,
     pub offices: BTreeMap<String, String>,
+    pub callable_signatures: HirCallableSignatures,
     pub queries: BTreeMap<String, HirQuery>,
     pub rules: Vec<HirRule>,
     pub duties: Vec<HirDuty>,
     pub nominations: Vec<HirNomination>,
     pub interpretation_families: BTreeMap<String, InterpretationAlts>,
     pub decisions: Vec<HirDecision>,
+    pub judgments: Vec<HirJudgment>,
+    pub observations: Vec<HirObservation>,
     pub conflict_doctrines: Vec<HirDoctrine>,
     pub clauses: BTreeMap<String, String>,
     pub imports: Vec<HirImport>,
@@ -86,7 +99,10 @@ pub struct HirRule {
     pub kind: String,
     pub source: Option<String>,
     pub binders: Vec<String>,
+    pub typed_binders: Vec<(String, String)>,
+    pub guard_terms: Vec<Term>,
     pub guard: Option<Guard>,
+    pub selection: Option<HirSelection>,
     pub consequences: Vec<(String, PropTerm)>,
     pub fallback: Vec<(String, PropTerm)>,
 }
@@ -94,11 +110,25 @@ pub struct HirRule {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HirDuty {
     pub name: String,
+    pub params: Vec<(String, String)>,
     pub bearer: String,
+    pub bearer_term: Term,
     pub claimant: Option<String>,
+    pub claimant_term: Option<Term>,
     pub attaches: Option<Guard>,
+    pub attaches_term: Option<Term>,
     pub content: Vec<Term>,
     pub due: Option<Term>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HirSelection {
+    pub binder: String,
+    pub finite_domain: Term,
+    pub predicate: Term,
+    pub ordering: Vec<String>,
+    pub ascending: Vec<bool>,
+    pub require_unique_keys: bool,
 }
 
 pub type EligibilityDef = (PropTerm, bool);
@@ -116,6 +146,37 @@ pub struct HirDecision {
     pub name: String,
     pub requirements: Vec<String>,
     pub result: Option<Term>,
+    pub params: Vec<(String, String)>,
+    pub result_type: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct HirJudgment {
+    pub name: String,
+    pub params: Vec<(String, String)>,
+    pub decides: PropTerm,
+    pub source: Option<Term>,
+    pub authority: fidryn_core::ir::JudgmentAuthority,
+    pub records: Vec<(String, String)>,
+    pub record_patterns: Vec<Term>,
+    pub constraints: Vec<Term>,
+    pub establish_when: Option<Term>,
+    pub reject_when: Option<Term>,
+    pub otherwise: Option<fidryn_core::ir::JudgmentFallback>,
+    pub on_established: Vec<fidryn_core::ir::JudgmentAction>,
+    pub standard: Option<Term>,
+    pub review: Option<fidryn_core::ir::JudgmentReview>,
+    pub unsupported_clauses: Vec<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct HirObservation {
+    pub name: String,
+    pub params: Vec<(String, String)>,
+    pub establishes: PropTerm,
+    pub validators: Vec<Term>,
+    pub source: Option<Term>,
+    pub unsupported_clauses: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -138,6 +199,7 @@ pub struct HirFunction {
     pub fuel: Option<u32>,
     pub result_type: String,
     pub source: String,
+    pub effects: Vec<String>,
     pub params: Vec<(String, String)>,
     pub body: Option<Term>,
 }
@@ -186,6 +248,7 @@ pub struct HirQuantifier {
 pub struct HirVerification {
     pub name: String,
     pub formula: String,
+    pub assertions: Vec<Term>,
     pub bounds: Option<HirVerificationBounds>,
 }
 
@@ -213,13 +276,18 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         outside_scope: Vec::new(),
         entities: BTreeMap::new(),
         propositions: BTreeMap::new(),
+        record_types: standard_type_environment().1.clone(),
+        types: standard_type_environment().0.clone(),
         offices: BTreeMap::new(),
+        callable_signatures: BTreeMap::new(),
         queries: BTreeMap::new(),
         rules: Vec::new(),
         duties: Vec::new(),
         nominations: Vec::new(),
         interpretation_families: BTreeMap::new(),
         decisions: Vec::new(),
+        judgments: Vec::new(),
+        observations: Vec::new(),
         conflict_doctrines: Vec::new(),
         clauses: BTreeMap::new(),
         imports: Vec::new(),
@@ -231,6 +299,38 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
         retained: Vec::new(),
         diagnostics: parse.diagnostics.clone(),
     };
+    let mut declared = BTreeMap::new();
+    for item in &module.items {
+        let decl = match item {
+            fidryn_syntax::ast::Item::Header(_)
+            | fidryn_syntax::ast::Item::Import(_)
+            | fidryn_syntax::ast::Item::Nomination(_) => continue,
+            other => other.decl(),
+        };
+        let Some(decl) = decl else {
+            continue;
+        };
+        let Some(name) = decl.name.as_ref() else {
+            continue;
+        };
+        let namespace = if matches!(
+            item,
+            fidryn_syntax::ast::Item::Type(_) | fidryn_syntax::ast::Item::RecordType(_)
+        ) {
+            "type"
+        } else {
+            "value"
+        };
+        if let Some(first) = declared.insert((namespace, name.clone()), decl.span) {
+            let mut diagnostic = Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("duplicate {namespace} declaration `{name}`"),
+            )
+            .with_span(decl.span);
+            diagnostic.related_spans.push(first);
+            hir.diagnostics.push(diagnostic);
+        }
+    }
     for item in &module.items {
         match item {
             fidryn_syntax::ast::Item::Header(h) => match h.kind {
@@ -238,17 +338,26 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                     hir.jurisdiction = h.value.clone();
                 }
                 fidryn_syntax::ast::HeaderKind::SourceSnapshot => {
-                    hir.snapshot = trim_quotes(&h.value).to_owned();
+                    hir.snapshot =
+                        fidryn_syntax::decode_string_literal(&h.value).unwrap_or_default();
                 }
                 fidryn_syntax::ast::HeaderKind::SourceManifest => {
-                    hir.manifest_path = trim_quotes(&h.value).to_owned();
+                    hir.manifest_path =
+                        fidryn_syntax::decode_string_literal(&h.value).unwrap_or_default();
                 }
                 fidryn_syntax::ast::HeaderKind::OutsideScope => {
-                    hir.outside_scope = h
-                        .value
-                        .split(|c: char| c == '{' || c == '}' || c == ',' || c.is_whitespace())
-                        .filter(|s| !s.is_empty())
-                        .map(str::to_owned)
+                    hir.outside_scope = fidryn_syntax::lexer::lex(&h.value)
+                        .iter()
+                        .filter_map(|token| {
+                            let raw = &h.value[token.start as usize..token.end as usize];
+                            match token.kind {
+                                fidryn_syntax::lexer::TokenKind::Ident => Some(raw.to_owned()),
+                                fidryn_syntax::lexer::TokenKind::String => {
+                                    fidryn_syntax::decode_string_literal(raw).ok()
+                                }
+                                _ => None,
+                            }
+                        })
                         .collect();
                 }
                 fidryn_syntax::ast::HeaderKind::EffectiveAt => {
@@ -269,23 +378,17 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 });
             }
             fidryn_syntax::ast::Item::Source(d) => {
-                let artifact = d.source.split("artifact").nth(1).and_then(|s| {
-                    let t = s.trim().trim_start_matches('"');
-                    let end = t.find('"')?;
-                    Some(t[..end].to_owned())
-                });
                 hir.sources.push(HirSource {
                     name: d.name.clone().unwrap_or_default(),
-                    artifact,
+                    artifact: source_artifact(&d.source),
                 });
             }
             fidryn_syntax::ast::Item::Entity(d) => {
                 if let Some(name) = &d.name {
-                    let ty = d
-                        .signature
-                        .as_deref()
-                        .unwrap_or("")
+                    let ty = without_comments(d.signature.as_deref().unwrap_or(""))
                         .trim_start_matches(':')
+                        .trim()
+                        .trim_end_matches(';')
                         .trim()
                         .to_owned();
                     hir.entities.insert(name.clone(), ty);
@@ -298,6 +401,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Office(d) => {
                 if let Some(name) = &d.name {
+                    hir.callable_signatures
+                        .insert(name.clone(), (decl_params(d), "Office".into()));
                     hir.offices
                         .insert(name.clone(), d.signature.clone().unwrap_or_default());
                 }
@@ -308,12 +413,8 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 let body = body::query_body_from_decl(d);
                 let has_goal = !matches!(body, HirQueryBody::None)
                     || query_body_has_quantifier_or_require(src);
-                let automatic = d.automatic || body::query_is_automatic(src);
-                let effects = if d.effects.is_empty() {
-                    extract_effects(src)
-                } else {
-                    d.effects.clone()
-                };
+                let automatic = d.automatic;
+                let effects = d.effects.clone();
                 let result_type = d
                     .result_type
                     .clone()
@@ -351,12 +452,13 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         name.clone(),
                         HirFunction {
                             is_calc: d.keyword == "calc",
-                            fuel: d.fuel.or_else(|| extract_fuel(&d.source)),
+                            fuel: d.fuel,
                             result_type: d
                                 .result_type
                                 .clone()
                                 .unwrap_or_else(|| extract_return_type(&d.source)),
                             source: d.source.clone(),
+                            effects: d.effects.clone(),
                             params,
                             body: d
                                 .expr
@@ -396,16 +498,40 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 } else if let Some(req) = parsed.require {
                     guard = Some(body::and_opt_guard(guard, req));
                 }
-                let consequences = if d.consequences.is_empty() {
-                    parsed.consequences
+                let (consequences, consequences_not_propositions) = if d.consequences.is_empty() {
+                    (parsed.consequences, parsed.consequences_not_propositions)
                 } else {
                     body::consequences_from_ast(&d.consequences)
                 };
-                let fallback = if d.fallback.is_empty() {
-                    parsed.fallback
+                let (fallback, fallback_not_propositions) = if d.fallback.is_empty() {
+                    (parsed.fallback, parsed.fallback_not_propositions)
                 } else {
                     body::consequences_from_ast(&d.fallback)
                 };
+                // A consequence whose expression is not a proposition is in
+                // neither list. It is reported: a rule that lost it would
+                // establish less than its text says.
+                let rule_name = d.name.as_deref().unwrap_or_default();
+                for (word, texts) in [
+                    ("then", &consequences_not_propositions),
+                    ("otherwise", &fallback_not_propositions),
+                ] {
+                    for text in texts {
+                        let text = without_comments(text)
+                            .split_whitespace()
+                            .collect::<Vec<_>>()
+                            .join(" ");
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E210,
+                                format!(
+                                    "`{word} {text}` in rule `{rule_name}` requires a proposition"
+                                ),
+                            )
+                            .with_span(d.span),
+                        );
+                    }
+                }
                 hir.rules.push(HirRule {
                     name: d.name.clone().unwrap_or_default(),
                     kind: d
@@ -417,7 +543,22 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                         .unwrap_or_else(|| body::parse_rule_kind(&d.source)),
                     source: Some(d.source.clone()),
                     binders: d.params.iter().map(|(name, _)| name.clone()).collect(),
+                    typed_binders: d.params.clone(),
+                    guard_terms: d
+                        .guard
+                        .iter()
+                        .chain(d.require.iter())
+                        .map(body::expr_to_term)
+                        .collect(),
                     guard,
+                    selection: d.selection.as_ref().map(|selection| HirSelection {
+                        binder: selection.binder.clone(),
+                        finite_domain: body::expr_to_term(&selection.finite_domain),
+                        predicate: body::expr_to_term(&selection.predicate),
+                        ordering: selection.ordering.clone(),
+                        ascending: selection.ascending.clone(),
+                        require_unique_keys: selection.require_unique_keys,
+                    }),
                     consequences,
                     fallback,
                 });
@@ -426,11 +567,18 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
                 let name = d.name.clone().unwrap_or_default();
                 if !name.is_empty() {
                     let parts = body::parse_duty_parts(&d.source);
+                    if parts.invalid {
+                        hir.diagnostics.push(Diagnostic::new(DiagnosticCode::E100, format!("duty `{name}` contains an invalid or over-budget attachment/deadline expression")).with_span(d.span));
+                    }
                     hir.duties.push(HirDuty {
                         name,
+                        params: decl_params(d),
                         bearer: parts.bearer,
+                        bearer_term: parts.bearer_term,
                         claimant: parts.claimant,
+                        claimant_term: parts.claimant_term,
                         attaches: parts.attaches,
+                        attaches_term: parts.attaches_term,
                         content: parts.content,
                         due: parts.due,
                     });
@@ -446,14 +594,91 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Interpretation(d) => {
                 let name = d.name.clone().unwrap_or_default();
-                let alts = extract_alternative_defs(&d.source);
+                let alts = match extract_alternative_defs(&d.source) {
+                    Ok((alts, unread)) => {
+                        // A definition that is not read is reported: an
+                        // alternative that lost it would define less than
+                        // its text says.
+                        for definition in unread {
+                            let (code, message) = match definition {
+                                UnreadDefinition::NotAProposition(text) => (
+                                    DiagnosticCode::E210,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` requires a proposition"
+                                    ),
+                                ),
+                                UnreadDefinition::NoStatus(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
+                                    ),
+                                ),
+                                UnreadDefinition::MoreThanOneStatus(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` has more than one status"
+                                    ),
+                                ),
+                                UnreadDefinition::Outside(text) => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "`{text}` in interpretation family `{name}` stands outside the block of every alternative"
+                                    ),
+                                ),
+                                UnreadDefinition::NoName => (
+                                    DiagnosticCode::E100,
+                                    format!(
+                                        "an `alternative` in interpretation family `{name}` has no name"
+                                    ),
+                                ),
+                            };
+                            hir.diagnostics
+                                .push(Diagnostic::new(code, message).with_span(d.span));
+                        }
+                        alts
+                    }
+                    Err(()) => {
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E100,
+                                format!(
+                                    "interpretation family `{name}` contains a definition that exceeds resource limits"
+                                ),
+                            )
+                            .with_span(d.span),
+                        );
+                        Vec::new()
+                    }
+                };
                 hir.interpretation_families.insert(name, alts);
             }
             fidryn_syntax::ast::Item::Decision(d) => {
+                let result = extract_returns(&d.source).unwrap_or_else(|()| {
+                    hir.diagnostics.push(
+                        Diagnostic::new(
+                            DiagnosticCode::E100,
+                            "decision return expression is invalid or exceeds resource limits",
+                        )
+                        .with_span(d.span),
+                    );
+                    None
+                });
                 hir.decisions.push(HirDecision {
                     name: d.name.clone().unwrap_or_default(),
                     requirements: extract_record_requires(&d.source),
-                    result: extract_returns(&d.source),
+                    result,
+                    params: d.params.clone(),
+                    result_type: d.result_type.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Judgment(d) => {
+                if let Some(judgment) = judgment_from_decl(d, &mut hir.diagnostics) {
+                    hir.judgments.push(judgment);
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name: d.name.clone().unwrap_or_default(),
+                    source: d.source.clone(),
                 });
             }
             fidryn_syntax::ast::Item::ConflictDoctrine(d) => {
@@ -464,16 +689,101 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
             }
             fidryn_syntax::ast::Item::Clause(d) => {
                 if let Some(name) = &d.name {
+                    hir.callable_signatures
+                        .insert(name.clone(), (d.params.clone(), "ClauseRef".into()));
                     hir.clauses.insert(name.clone(), d.source.clone());
                 }
             }
-            fidryn_syntax::ast::Item::Type(d)
-            | fidryn_syntax::ast::Item::RecordType(d)
-            | fidryn_syntax::ast::Item::Observation(d)
-            | fidryn_syntax::ast::Item::Power(d)
-            | fidryn_syntax::ast::Item::Judgment(d)
-            | fidryn_syntax::ast::Item::LegalAct(d)
-            | fidryn_syntax::ast::Item::Scenario(d) => {
+            fidryn_syntax::ast::Item::RecordType(d) => {
+                hir.types.remove(d.name.as_deref().unwrap_or_default());
+                hir.record_types.insert(
+                    d.name.clone().unwrap_or_default(),
+                    (
+                        d.keyword == "evidence_type",
+                        d.fields
+                            .iter()
+                            .map(|(name, ty)| (name.clone(), ty.clone()))
+                            .collect(),
+                    ),
+                );
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name: d.name.clone().unwrap_or_default(),
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Type(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                hir.record_types.remove(&name);
+                if let Some(definition) = type_definition_from_decl(d) {
+                    let parameters = d
+                        .type_args
+                        .iter()
+                        .map(|parameter| without_comments(parameter).into_owned())
+                        .collect();
+                    hir.types.insert(name.clone(), (parameters, definition));
+                }
+                if let Some(fidryn_syntax::ast::TypeDefinitionAst::Sum(variants)) =
+                    &d.type_definition
+                {
+                    for variant in variants {
+                        if !variant.fields.is_empty() {
+                            hir.record_types
+                                .insert(variant.name.clone(), (false, variant.fields.clone()));
+                        }
+                    }
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::LegalAct(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                hir.callable_signatures
+                    .insert(name.clone(), (decl_params(d), "LegalAction".into()));
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Observation(d) => {
+                let name = d.name.clone().unwrap_or_default();
+                if let Some(observation) = &d.observation {
+                    if let Some(establishes) =
+                        body::term_as_prop(&body::expr_to_term(&observation.establishes))
+                    {
+                        hir.observations.push(HirObservation {
+                            name: name.clone(),
+                            params: d.params.clone(),
+                            establishes,
+                            validators: observation
+                                .validators
+                                .iter()
+                                .map(body::expr_to_term)
+                                .collect(),
+                            source: d.source_basis.as_ref().map(body::expr_to_term),
+                            unsupported_clauses: observation.unsupported_clauses.clone(),
+                        });
+                    } else {
+                        hir.diagnostics.push(
+                            Diagnostic::new(
+                                DiagnosticCode::E210,
+                                "observation must establish a proposition",
+                            )
+                            .with_span(d.span),
+                        );
+                    }
+                }
+                hir.retained.push(HirRetainedDecl {
+                    kind: d.keyword.clone(),
+                    name,
+                    source: d.source.clone(),
+                });
+            }
+            fidryn_syntax::ast::Item::Power(d) | fidryn_syntax::ast::Item::Scenario(d) => {
                 hir.retained.push(HirRetainedDecl {
                     kind: d.keyword.clone(),
                     name: d.name.clone().unwrap_or_default(),
@@ -496,8 +806,153 @@ pub fn elaborate(parse: &Parse, manifest: &SourceManifest) -> Result<HirModule, 
     Ok(hir)
 }
 
-fn trim_quotes(s: &str) -> &str {
-    s.trim().trim_matches('"').trim()
+fn type_definition_from_decl(
+    d: &fidryn_syntax::ast::Decl,
+) -> Option<fidryn_core::ir::TypeDefinition> {
+    use fidryn_core::ir::{CoreConstructor, TypeDefinition};
+    Some(match d.type_definition.as_ref()? {
+        fidryn_syntax::ast::TypeDefinitionAst::Alias(ty) => {
+            TypeDefinition::Alias(parse_type_name(ty))
+        }
+        fidryn_syntax::ast::TypeDefinitionAst::Sum(variants) => TypeDefinition::Sum(
+            variants
+                .iter()
+                .map(|variant| CoreConstructor {
+                    name: variant.name.clone(),
+                    arguments: variant
+                        .arguments
+                        .iter()
+                        .map(|ty| parse_type_name(ty))
+                        .collect(),
+                    fields: variant
+                        .fields
+                        .iter()
+                        .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+                        .collect(),
+                })
+                .collect(),
+        ),
+    })
+}
+
+fn standard_type_environment() -> &'static (HirTypes, HirRecordTypes) {
+    static STANDARD: std::sync::OnceLock<(HirTypes, HirRecordTypes)> = std::sync::OnceLock::new();
+    STANDARD.get_or_init(|| {
+        let parsed = fidryn_syntax::parse_file(include_str!("../../../prelude/prelude.fr"));
+        assert!(
+            !parsed.has_errors(),
+            "invalid standard type environment: {:?}",
+            parsed.diagnostics
+        );
+        let mut types = BTreeMap::new();
+        let mut records = BTreeMap::new();
+        for item in &parsed.module().expect("standard module").items {
+            match item {
+                fidryn_syntax::ast::Item::Type(d) => {
+                    if let Some(definition) = type_definition_from_decl(d) {
+                        types.insert(
+                            d.name.clone().unwrap_or_default(),
+                            (d.type_args.clone(), definition),
+                        );
+                    }
+                }
+                fidryn_syntax::ast::Item::RecordType(d) => {
+                    records.insert(
+                        d.name.clone().unwrap_or_default(),
+                        (
+                            d.keyword == "evidence_type",
+                            d.fields
+                                .iter()
+                                .map(|(name, ty)| (name.clone(), ty.clone()))
+                                .collect(),
+                        ),
+                    );
+                }
+                _ => {}
+            }
+        }
+        (types, records)
+    })
+}
+
+fn judgment_from_decl(
+    d: &fidryn_syntax::ast::Decl,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> Option<HirJudgment> {
+    use fidryn_core::ir::{JudgmentAction, JudgmentAuthority, JudgmentFallback, JudgmentReview};
+    use fidryn_syntax::ast::JudgmentAuthorityAst;
+    let parsed = d.judgment.as_ref()?;
+    let Some(decides) = term_as_prop(&body::expr_to_term(&parsed.decides)) else {
+        diagnostics.push(
+            Diagnostic::new(
+                DiagnosticCode::E210,
+                "judgment decides requires a proposition",
+            )
+            .with_span(d.span),
+        );
+        return None;
+    };
+    let authority = match parsed.authority.as_ref()? {
+        JudgmentAuthorityAst::Actor(actor) => JudgmentAuthority::Actor(body::expr_to_term(actor)),
+        JudgmentAuthorityAst::Concurrence {
+            minimum,
+            distinct,
+            issuer_type,
+        } => JudgmentAuthority::Concurrence {
+            minimum: *minimum,
+            distinct: *distinct,
+            issuer_type: parse_type_name(issuer_type),
+        },
+    };
+    let otherwise = if let Some((issue, protocol)) = &parsed.otherwise {
+        let Some(issue) = term_as_prop(&body::expr_to_term(issue)) else {
+            diagnostics.push(
+                Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "judgment suspension issue requires a proposition",
+                )
+                .with_span(d.span),
+            );
+            return None;
+        };
+        Some(JudgmentFallback::Suspend {
+            issue,
+            protocol: body::expr_to_term(protocol),
+        })
+    } else {
+        None
+    };
+    Some(HirJudgment {
+        name: d.name.clone().unwrap_or_default(),
+        params: d.params.clone(),
+        decides,
+        source: d.source_basis.as_ref().map(body::expr_to_term),
+        authority,
+        records: parsed.records.clone(),
+        record_patterns: parsed
+            .record_patterns
+            .iter()
+            .map(body::expr_to_term)
+            .collect(),
+        constraints: parsed.constraints.iter().map(body::expr_to_term).collect(),
+        establish_when: parsed.establish_when.as_ref().map(body::expr_to_term),
+        reject_when: parsed.reject_when.as_ref().map(body::expr_to_term),
+        otherwise,
+        on_established: parsed
+            .on_established
+            .iter()
+            .map(|(issue, context)| JudgmentAction::MakeOperative {
+                issue: body::expr_to_term(issue),
+                context: body::expr_to_term(context),
+            })
+            .collect(),
+        standard: parsed.standard.as_ref().map(body::expr_to_term),
+        review: parsed.review.as_ref().map(|(by, standard)| JudgmentReview {
+            by: body::expr_to_term(by),
+            standard: body::expr_to_term(standard),
+        }),
+        unsupported_clauses: parsed.unsupported_clauses.clone(),
+    })
 }
 
 fn decl_params(d: &fidryn_syntax::ast::Decl) -> Vec<(String, String)> {
@@ -508,39 +963,116 @@ fn decl_params(d: &fidryn_syntax::ast::Decl) -> Vec<(String, String)> {
     }
 }
 
-fn query_body_has_quantifier_or_require(src: &str) -> bool {
-    let inner = last_brace_inner(src).unwrap_or("");
-    !inner.is_empty()
-        && (contains_ident(inner, "require")
-            || contains_ident(inner, "for_all")
-            || contains_ident(inner, "exists")
-            || contains_ident(inner, "goal")
-            || contains_ident(inner, "return"))
+/// The text of a declaration as its readers take it: the text with its
+/// comments blank, which they cut what they read out of, and its structure,
+/// which they search for the place. A position in one is the same position
+/// in the other.
+fn views(src: &str) -> (Cow<'_, str>, Cow<'_, str>) {
+    (without_comments(src), structure_of(src))
 }
 
-fn extract_effects(src: &str) -> Vec<String> {
-    let Some(start) = src.find('!') else {
-        return Vec::new();
+/// The stretch of `structure` after the first `word` in it, up to the next
+/// `word` or the end. Splitting the text on the word gives this stretch as
+/// its second piece.
+fn after_first(structure: &str, word: &str) -> Option<Range<usize>> {
+    let start = structure.find(word)? + word.len();
+    let end = structure[start..]
+        .find(word)
+        .map_or(structure.len(), |next| start + next);
+    Some(start..end)
+}
+
+/// The stretch of `structure` after the first keyword `word` in it, up to
+/// the next one or the end. The keyword is found only as a word of its own
+/// (`find_word`).
+fn after_first_word(structure: &str, word: &str) -> Option<Range<usize>> {
+    let start = find_word(structure, word, 0, Spaced::No)? + word.len();
+    let end = find_word(structure, word, start, Spaced::No).unwrap_or(structure.len());
+    Some(start..end)
+}
+
+/// The sides of a keyword on which white space must stand, beyond the
+/// keyword being a word of its own. A reader asks for white space where
+/// the grammar puts it beside the keyword.
+#[derive(Clone, Copy)]
+enum Spaced {
+    No,
+    Before,
+    Around,
+}
+
+/// True for a character that can be part of a name: a letter, a digit, `_`,
+/// and the `.` between the parts of a dotted name.
+fn is_name_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '_' || c == '.'
+}
+
+/// White space as the lexer reads it: a space, a tab, a carriage return and
+/// a line end. A comment is white space in the views of a text.
+fn is_space(c: char) -> bool {
+    matches!(c, ' ' | '\t' | '\r' | '\n')
+}
+
+/// The position of the first `word` in `structure` at or after `from` that
+/// stands as a word of its own: no character of a name directly before it
+/// or after it, so that it is not a part of a longer name, and white space
+/// on the sides that `spaced` names.
+fn find_word(structure: &str, word: &str, from: usize, spaced: Spaced) -> Option<usize> {
+    let (space_before, space_after) = match spaced {
+        Spaced::No => (false, false),
+        Spaced::Before => (true, false),
+        Spaced::Around => (true, true),
     };
-    let rest = &src[start..];
-    let Some(open) = rest.find('{') else {
-        return Vec::new();
+    let fits = |beside: Option<char>, space: bool| {
+        if space {
+            beside.is_some_and(is_space)
+        } else {
+            beside.is_none_or(|c| !is_name_char(c))
+        }
     };
-    let Some(close) = rest.find('}') else {
-        return Vec::new();
-    };
-    rest[open + 1..close]
-        .split(',')
-        .map(|s| s.trim().to_owned())
-        .filter(|s| !s.is_empty())
-        .collect()
+    let mut start = from;
+    while let Some(found) = structure.get(start..)?.find(word) {
+        let at = start + found;
+        let before = structure[..at].chars().next_back();
+        let after = structure[at + word.len()..].chars().next();
+        if fits(before, space_before) && fits(after, space_after) {
+            return Some(at);
+        }
+        start = at + word.len();
+    }
+    None
+}
+
+/// The value of the `artifact` field of a `source`: what stands after the
+/// word, from the quote that follows it to the next quote. The word is not
+/// found in a comment, inside a string literal or as a part of a longer
+/// name, such as the name `artifact_registry` of the source.
+fn source_artifact(src: &str) -> Option<String> {
+    let (code, structure) = views(src);
+    let value = code[after_first_word(&structure, "artifact")?]
+        .trim()
+        .trim_start_matches('"');
+    let end = value.find('"')?;
+    Some(value[..end].to_owned())
+}
+
+fn query_body_has_quantifier_or_require(src: &str) -> bool {
+    let inner = last_brace_inner(src).unwrap_or("");
+    let structure = structure_of(inner);
+    !inner.is_empty()
+        && (contains_ident(&structure, "require")
+            || contains_ident(&structure, "for_all")
+            || contains_ident(&structure, "exists")
+            || contains_ident(&structure, "goal")
+            || contains_ident(&structure, "return"))
 }
 
 fn extract_return_type(src: &str) -> String {
-    let Some(after_arrow) = src.split("->").nth(1) else {
+    let (code, structure) = views(src);
+    let Some(after_arrow) = after_first(&structure, "->") else {
         return String::new();
     };
-    let mut ty = after_arrow;
+    let mut ty = &structure[after_arrow.clone()];
     if let Some(i) = ty.find('!') {
         ty = &ty[..i];
     }
@@ -550,138 +1082,301 @@ fn extract_return_type(src: &str) -> String {
     if let Some(i) = find_ident(ty, "fuel") {
         ty = &ty[..i];
     }
-    ty.trim().to_owned()
+    code[after_arrow.start..after_arrow.start + ty.len()]
+        .trim()
+        .to_owned()
 }
 
+/// The rank of a nomination: the integer after the word `rank`, or 0. The
+/// word is not found as a part of a longer name, such as `Frank`.
 fn extract_rank(src: &str) -> i64 {
-    src.split("rank")
-        .nth(1)
-        .and_then(|s| {
-            s.split_whitespace()
+    let (code, structure) = views(src);
+    after_first_word(&structure, "rank")
+        .and_then(|after_rank| {
+            code[after_rank]
+                .split_whitespace()
                 .next()
                 .and_then(|n| n.trim_matches(';').parse().ok())
         })
         .unwrap_or(0)
 }
 
+/// The office of a nomination: the text after the word `for`, up to the
+/// word `rank`, the next `for` or the end. The grammar puts white space
+/// around `for` and before `rank`, and a tab or a line end serves there as
+/// well as a space.
 fn extract_office(src: &str) -> String {
-    src.split(" for ")
-        .nth(1)
-        .map(|s| s.split(" rank").next().unwrap_or(s).trim().to_owned())
-        .unwrap_or_default()
+    let (code, structure) = views(src);
+    let Some(word) = find_word(&structure, "for", 0, Spaced::Around) else {
+        return String::new();
+    };
+    let start = word + "for".len();
+    let stretch_end =
+        find_word(&structure, "for", start, Spaced::Around).unwrap_or(structure.len());
+    let end =
+        find_word(&structure[..stretch_end], "rank", start, Spaced::Before).unwrap_or(stretch_end);
+    code[start..end].trim().to_owned()
 }
 
 #[allow(dead_code)]
 fn extract_alternatives(src: &str) -> Vec<String> {
     extract_alternative_defs(src)
+        .map(|(alternatives, _)| alternatives)
+        .unwrap_or_default()
         .into_iter()
         .map(|(name, _)| name)
         .collect()
 }
 
-fn extract_alternative_defs(src: &str) -> InterpretationAlts {
+/// A definition of an interpretation family that is not read, with its
+/// text as `definition_text` gives it, for a diagnostic, and an alternative
+/// that is not read.
+enum UnreadDefinition {
+    /// The text between `defines` and its `as` is not one proposition.
+    NotAProposition(String),
+    /// No `as established` or `as not_established` follows the expression.
+    NoStatus(String),
+    /// More than one status follows the expression.
+    MoreThanOneStatus(String),
+    /// The definition stands in the family outside the block of every
+    /// alternative.
+    Outside(String),
+    /// An `alternative` has no name. Its block is not read.
+    NoName,
+}
+
+/// The alternatives of an `interpretation_family`, each with what it
+/// defines, and each definition and alternative that is not read, in the
+/// order of the text.
+///
+/// The body of the family is its last block. An alternative is the word
+/// `alternative` in that body, outside every bracket, its name, the word
+/// after it, and its block: from the first `{` after the name to the `}`
+/// that closes it (`alternative_block`). Its definitions are the ones
+/// inside that block. A definition begins with the word `defines` and runs
+/// to the next one or the end of the block. Its expression is all the text
+/// between `defines` and its status, an `as` with white space around it
+/// and the word `established` or `not_established`. The words are found
+/// only as words of their own, not in a comment or a string literal. `Err`
+/// when the expression of a definition nests deeper than the reader of
+/// expressions goes: the definition would be lost, or cut short.
+fn extract_alternative_defs(src: &str) -> Result<(InterpretationAlts, Vec<UnreadDefinition>), ()> {
+    const ALTERNATIVE: &str = "alternative";
+    const DEFINES: &str = "defines";
+    let (code, structure) = views(src);
     let mut out = Vec::new();
-    for (i, part) in src.split("alternative ").enumerate() {
-        if i == 0 {
-            continue;
-        }
-        let name = part
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .trim_matches('{')
-            .to_owned();
-        if name.is_empty() {
-            continue;
-        }
-        let mut defs = Vec::new();
-        let mut rest = part;
-        while let Some(idx) = rest.find("defines ") {
-            rest = &rest[idx + "defines ".len()..];
-            let stmt_end = rest.find("defines ").unwrap_or(rest.len());
-            let stmt = &rest[..stmt_end];
-            if let Some(end) = stmt.find(" as not_established") {
-                let expr = stmt[..end].trim();
-                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
-                {
-                    defs.push((prop, false));
+    let mut unread = Vec::new();
+    let Some(body) = last_block(&structure) else {
+        return Ok((out, unread));
+    };
+    let mut at = body.start;
+    let mut depth = 0usize;
+    while let Some(c) = structure[at..body.end].chars().next() {
+        match c {
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => depth = depth.saturating_sub(1),
+            _ if depth == 0 && word_at(&structure, at, ALTERNATIVE) => {
+                let name_start = skip_space(&structure, at + ALTERNATIVE.len());
+                let name_end = structure[name_start..]
+                    .find(|c: char| !is_name_char(c))
+                    .map_or(structure.len(), |len| name_start + len);
+                let block = alternative_block(&structure, name_end..body.end);
+                if name_start == name_end {
+                    unread.push(UnreadDefinition::NoName);
+                } else {
+                    let mut defs = Vec::new();
+                    if let Some(block) = block.clone() {
+                        let mut found =
+                            find_word(&structure[..block.end], DEFINES, block.start, Spaced::No);
+                        while let Some(definition) = found {
+                            found = find_word(
+                                &structure[..block.end],
+                                DEFINES,
+                                definition + DEFINES.len(),
+                                Spaced::No,
+                            );
+                            let span = definition..found.unwrap_or(block.end);
+                            match read_definition(&code, &structure, span)? {
+                                Ok(def) => defs.push(def),
+                                Err(not_read) => unread.push(not_read),
+                            }
+                        }
+                    }
+                    out.push((code[name_start..name_end].to_owned(), defs));
                 }
-            } else if let Some(end) = stmt.find(" as established") {
-                let expr = stmt[..end].trim();
-                if let Some(prop) = body::parse_expr_src(expr).and_then(|t| body::term_as_prop(&t))
-                {
-                    defs.push((prop, true));
+                // What follows the alternative: past its block, or past its
+                // name when no block follows it.
+                at = block.map_or(name_end, |block| (block.end + 1).min(body.end));
+                continue;
+            }
+            _ if word_at(&structure, at, DEFINES) => {
+                // A definition outside every alternative: it runs to the next
+                // definition or alternative of the family, or the end.
+                let next = [DEFINES, ALTERNATIVE]
+                    .iter()
+                    .filter_map(|word| {
+                        find_word(&structure[..body.end], word, at + DEFINES.len(), Spaced::No)
+                    })
+                    .min()
+                    .unwrap_or(body.end);
+                unread.push(UnreadDefinition::Outside(definition_quote(
+                    &code,
+                    &structure,
+                    at..next,
+                )));
+                at += DEFINES.len();
+                continue;
+            }
+            _ => {}
+        }
+        at += c.len_utf8();
+    }
+    Ok((out, unread))
+}
+
+/// The definition whose text is `span` of `code`, where `structure` is the
+/// structure of `code`: its proposition and whether it is established, or
+/// why it is not read. `Err` when its expression nests deeper than the
+/// reader of expressions goes.
+fn read_definition(
+    code: &str,
+    structure: &str,
+    span: Range<usize>,
+) -> Result<Result<EligibilityDef, UnreadDefinition>, ()> {
+    let expr_start = span.start + "defines".len();
+    let statuses = definition_statuses(&structure[..span.end], expr_start);
+    let text = || definition_quote(code, structure, span.clone());
+    Ok(match statuses.as_slice() {
+        [] => Err(UnreadDefinition::NoStatus(text())),
+        [(word, established, _)] => {
+            match body::parse_whole_expr(&code[expr_start..*word])?
+                .as_ref()
+                .and_then(body::term_as_prop)
+            {
+                Some(prop) => Ok((prop, *established)),
+                None => Err(UnreadDefinition::NotAProposition(text())),
+            }
+        }
+        _ => Err(UnreadDefinition::MoreThanOneStatus(text())),
+    })
+}
+
+/// The text of the definition that is `span` of `code`, for a diagnostic:
+/// up to the end of its last status, or of the definition when it has none,
+/// as `definition_text` gives it.
+fn definition_quote(code: &str, structure: &str, span: Range<usize>) -> String {
+    let statuses = definition_statuses(&structure[..span.end], span.start + "defines".len());
+    let end = statuses.last().map_or(span.end, |status| status.2);
+    definition_text(&code[span.start..end], &structure[span.start..end])
+}
+
+/// The statuses in `structure` after `from`: each `as` with white space
+/// around it that the word `established` or `not_established` follows as a
+/// word of its own, with whether the word is `established` and where it
+/// ends.
+fn definition_statuses(structure: &str, from: usize) -> Vec<(usize, bool, usize)> {
+    let mut statuses = Vec::new();
+    let mut rest = from;
+    while let Some(word) = find_word(structure, "as", rest, Spaced::Around) {
+        let status = skip_space(structure, word + "as".len());
+        for (status_word, established) in [("not_established", false), ("established", true)] {
+            if word_at(structure, status, status_word) {
+                statuses.push((word, established, status + status_word.len()));
+            }
+        }
+        rest = word + "as".len();
+    }
+    statuses
+}
+
+/// The inside of the block of an alternative whose name ends where
+/// `after_name` begins: from the first `{` after the name to the `}` that
+/// closes it. `None` when a `}`, the word `defines` or the word
+/// `alternative` comes first, or the end of `after_name`.
+fn alternative_block(structure: &str, after_name: Range<usize>) -> Option<Range<usize>> {
+    let open = after_name.start + structure[after_name.clone()].find('{')?;
+    let between = &structure[after_name.start..open];
+    let other = between.contains('}')
+        || find_word(between, "defines", 0, Spaced::No).is_some()
+        || find_word(between, "alternative", 0, Spaced::No).is_some();
+    (!other).then(|| open + 1..matching_close(structure, open))
+}
+
+/// True when `word` stands at `at` in `structure` as a word of its own.
+fn word_at(structure: &str, at: usize, word: &str) -> bool {
+    structure[at..].starts_with(word) && is_ident_boundary(structure, at, word.len())
+}
+
+/// The position of the first character at or after `from` that is not
+/// white space, or the end.
+fn skip_space(structure: &str, from: usize) -> usize {
+    structure[from..]
+        .find(|c: char| !is_space(c))
+        .map_or(structure.len(), |len| from + len)
+}
+
+/// The position of the `}` that closes the `{` at `open`, or the end when
+/// none closes it. Braces are counted, as `brace_inner` counts them.
+fn matching_close(structure: &str, open: usize) -> usize {
+    let mut depth = 0usize;
+    for (i, c) in structure[open..].char_indices() {
+        match c {
+            '{' => depth += 1,
+            '}' => {
+                depth = depth.saturating_sub(1);
+                if depth == 0 {
+                    return open + i;
                 }
             }
-            rest = &rest[stmt_end..];
+            _ => {}
         }
-        out.push((name, defs));
     }
-    out
+    structure.len()
+}
+
+/// The inside of the last block of `structure` that stands inside no other
+/// block: from after its `{` to the `}` that closes it.
+fn last_block(structure: &str) -> Option<Range<usize>> {
+    let mut last = None;
+    let mut at = 0;
+    while let Some(open) = structure[at..].find('{').map(|i| at + i) {
+        let close = matching_close(structure, open);
+        last = Some(open + 1..close);
+        at = (close + 1).min(structure.len());
+    }
+    last
+}
+
+/// The text of a definition for a diagnostic: `code` from the word
+/// `defines` to the end of the definition, a `;` or a `}` that closes
+/// nothing, on one line, where `structure` is the structure of `code`.
+fn definition_text(code: &str, structure: &str) -> String {
+    take_clause_to_end(code, structure)
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 fn extract_record_requires(src: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut rest = src;
-    while let Some(idx) = rest.find("record requires ") {
-        rest = &rest[idx + "record requires ".len()..];
-        let name: String = rest
-            .chars()
-            .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
-            .collect();
-        if !name.is_empty() && !out.contains(&name) {
-            out.push(name);
-        }
-    }
-    out
+    body::parse_record_requirements(src)
 }
 
-fn extract_returns(src: &str) -> Option<Term> {
-    let rest = src.split("returns ").nth(1)?.trim();
-    let token: String = rest
-        .chars()
-        .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
-        .collect();
-    if token.is_empty() {
-        None
-    } else {
-        Some(Term::Ident(token))
-    }
-}
-
-fn extract_fuel(src: &str) -> Option<u32> {
-    let mut start = 0;
-    while let Some(rel) = src[start..].find("fuel") {
-        let i = start + rel;
-        if is_ident_boundary(src, i, 4) {
-            let rest = src[i + 4..].trim_start();
-            if let Some(rest) = rest.strip_prefix('=') {
-                let rest = rest.trim_start();
-                let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
-                if let Ok(n) = digits.parse() {
-                    return Some(n);
-                }
-            }
-        }
-        start = i + 1;
-    }
-    None
+fn extract_returns(src: &str) -> Result<Option<Term>, ()> {
+    body::parse_decl_result(src)
 }
 
 fn extract_effect_result(src: &str) -> String {
-    src.split("->")
-        .last()
-        .map(|s| {
-            s.trim()
-                .trim_end_matches('}')
-                .trim()
-                .lines()
-                .next()
-                .unwrap_or("")
-                .trim()
-                .to_owned()
-        })
-        .unwrap_or_default()
+    let (code, structure) = views(src);
+    let after_arrow = structure.rfind("->").map_or(0, |arrow| arrow + "->".len());
+    code[after_arrow..]
+        .trim()
+        .trim_end_matches('}')
+        .trim()
+        .lines()
+        .next()
+        .unwrap_or("")
+        .trim()
+        .to_owned()
 }
 
 fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerification> {
@@ -690,7 +1385,15 @@ fn verification_from_decl(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificatio
     }
     let name = d.name.as_ref().filter(|n| !n.is_empty())?.clone();
     Some(HirVerification {
-        formula: verify_formula(d),
+        // A block the parser read no assertion from gets no formula. Its
+        // text is not searched for one: the search would find the word
+        // `assert` in a comment and take the comment for the assertion.
+        formula: if d.assertions.is_empty() {
+            String::new()
+        } else {
+            verify_formula(d)
+        },
+        assertions: d.assertions.iter().map(body::expr_to_term).collect(),
         bounds: verify_bounds(d),
         name,
     })
@@ -713,44 +1416,70 @@ fn verify_formula(d: &fidryn_syntax::ast::Decl) -> String {
     }
 }
 
+/// The bounds of a verify block: the three numbers in the `bounds` field the
+/// parser recorded. That record is the text of the field's tokens, and it is
+/// read token by token, so no comment and no string sets a number.
 fn verify_bounds(d: &fidryn_syntax::ast::Decl) -> Option<HirVerificationBounds> {
-    let text = d
-        .fields
-        .get("bounds")
-        .cloned()
-        .or_else(|| extract_bounds_clause(&d.source))?;
+    let text = d.fields.get("bounds")?;
+    let tokens: Vec<(TokenKind, &str)> = lex(text)
+        .iter()
+        .filter(|token| {
+            !matches!(
+                token.kind,
+                TokenKind::Whitespace
+                    | TokenKind::Comment
+                    | TokenKind::DocComment
+                    | TokenKind::Newline
+                    | TokenKind::Eof
+            )
+        })
+        .map(|token| (token.kind, &text[token.start as usize..token.end as usize]))
+        .collect();
     Some(HirVerificationBounds {
-        persons: labeled_u32(&text, "persons").unwrap_or(0),
-        events: labeled_u32(&text, "events").unwrap_or(0),
-        time_points: labeled_u32(&text, "time_points").unwrap_or(0),
+        persons: bound_in(&tokens, "persons"),
+        events: bound_in(&tokens, "events"),
+        time_points: bound_in(&tokens, "time_points"),
     })
 }
 
+/// The number the tokens of a `bounds` field give for `word`. The first
+/// token that is the word decides: the number is the integer token that
+/// follows it, directly or after a `:`. It is zero when no integer token
+/// follows there, when the integer does not fit in 32 bits and when the word
+/// is not among the tokens.
+fn bound_in(tokens: &[(TokenKind, &str)], word: &str) -> u32 {
+    let mut after = tokens
+        .iter()
+        .skip_while(|(kind, text)| *kind != TokenKind::Ident || *text != word)
+        .skip(1);
+    let number = match after.next() {
+        Some((TokenKind::Colon, _)) => after.next(),
+        token => token,
+    };
+    match number {
+        Some((TokenKind::Int, digits)) => digits.parse().unwrap_or(0),
+        _ => 0,
+    }
+}
+
+/// The text of a declaration from the word `assert` to the end of that
+/// clause, as it is written. The word and the end of the clause are looked
+/// for in the structure of the text, so neither is found in a comment or
+/// inside a string literal.
 fn extract_assert_clause(src: &str) -> Option<String> {
-    let i = find_ident(src, "assert")?;
-    Some(take_clause_to_end(&src[i..]))
+    let structure = structure_of(src);
+    let i = find_ident(&structure, "assert")?;
+    Some(take_clause_to_end(&src[i..], &structure[i..]))
 }
 
-fn extract_bounds_clause(src: &str) -> Option<String> {
-    let i = find_ident(src, "bounds")?;
-    let rest = src[i..].trim_start();
-    if rest.len() < 6 {
-        return None;
-    }
-    let after = rest[6..].trim_start();
-    if after.starts_with('{') {
-        let inner = brace_inner(after)?;
-        Some(format!("bounds {{{inner}}}"))
-    } else {
-        Some(take_clause_to_end(&src[i..]))
-    }
-}
-
-fn take_clause_to_end(s: &str) -> String {
+/// `s` up to the end of its first clause: a `;` or a `}` that closes
+/// nothing, outside every bracket of `structure`, which is the structure of
+/// `s`.
+fn take_clause_to_end(s: &str, structure: &str) -> String {
     let mut depth_paren = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -772,27 +1501,25 @@ fn take_clause_to_end(s: &str) -> String {
     s.trim().trim_end_matches(';').trim().to_owned()
 }
 
-fn labeled_u32(src: &str, label: &str) -> Option<u32> {
-    let i = find_ident(src, label)?;
-    let rest = src[i + label.len()..]
-        .trim_start()
-        .trim_start_matches(':')
-        .trim_start();
-    let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
-    digits.parse().ok()
-}
-
+/// The quantifiers written in the text of a declaration. A quantifier in a
+/// comment or inside a string literal is none.
 fn extract_quantifiers(src: &str) -> Vec<HirQuantifier> {
+    let (code, structure) = views(src);
     let mut out = Vec::new();
     let mut i = 0;
-    while i < src.len() {
-        if let Some((kind, kw_len)) = quantifier_at(src, i) {
-            if let Some(q) = parse_quantifier_tail(kind, &src[i + kw_len..]) {
+    while i < structure.len() {
+        if let Some((kind, kw_len)) = quantifier_at(&structure, i) {
+            let after = i + kw_len;
+            if let Some(q) = parse_quantifier_tail(kind, &code[after..], &structure[after..]) {
                 out.push(q);
             }
             i += kw_len;
         } else {
-            i += src[i..].chars().next().map(char::len_utf8).unwrap_or(1);
+            i += structure[i..]
+                .chars()
+                .next()
+                .map(char::len_utf8)
+                .unwrap_or(1);
         }
     }
     out
@@ -810,8 +1537,16 @@ fn quantifier_at(src: &str, i: usize) -> Option<(QuantifierKind, usize)> {
     None
 }
 
-fn parse_quantifier_tail(kind: QuantifierKind, rest: &str) -> Option<HirQuantifier> {
-    let rest = rest.trim_start();
+/// The quantifier whose text after its keyword is `code`, with the
+/// structure of that text beside it. The variable and the word `in` hold no
+/// string, so they are read from the structure, where they stand as they
+/// are written.
+fn parse_quantifier_tail(
+    kind: QuantifierKind,
+    code: &str,
+    structure: &str,
+) -> Option<HirQuantifier> {
+    let rest = structure.trim_start();
     let binder_len = ident_len(rest)?;
     let binder = rest[..binder_len].to_owned();
     let after_binder = rest[binder_len..].trim_start();
@@ -819,7 +1554,8 @@ fn parse_quantifier_tail(kind: QuantifierKind, rest: &str) -> Option<HirQuantifi
         return None;
     }
     let after_in = after_binder[2..].trim_start();
-    let (domain, formula) = split_domain_formula(after_in)?;
+    let (domain, formula) =
+        split_domain_formula(&code[structure.len() - after_in.len()..], after_in)?;
     Some(HirQuantifier {
         kind,
         binder,
@@ -845,11 +1581,14 @@ fn ident_len(s: &str) -> Option<usize> {
     Some(end)
 }
 
-fn split_domain_formula(s: &str) -> Option<(String, String)> {
+/// The domain and the formula of a quantifier, cut out of `s`, the text
+/// after its word `in`. The `:` or the `{` between the two is looked for in
+/// `structure`, the structure of `s`.
+fn split_domain_formula(s: &str, structure: &str) -> Option<(String, String)> {
     let mut depth_paren = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -858,7 +1597,10 @@ fn split_domain_formula(s: &str) -> Option<(String, String)> {
             '{' => {
                 if depth_paren == 0 && depth_brack == 0 && depth_brace == 0 {
                     let domain = s[..i].trim().to_owned();
-                    let inner = brace_inner(&s[i..]).unwrap_or("").trim().to_owned();
+                    let inner = brace_inner(&s[i..], &structure[i..])
+                        .unwrap_or("")
+                        .trim()
+                        .to_owned();
                     return Some((domain, inner));
                 }
                 depth_brace += 1;
@@ -882,12 +1624,14 @@ fn split_domain_formula(s: &str) -> Option<(String, String)> {
     None
 }
 
-fn brace_inner(s: &str) -> Option<&str> {
-    if !s.starts_with('{') {
+/// What stands between the first `{` of `s` and the `}` that closes it,
+/// where `structure` is the structure of `s`.
+fn brace_inner<'a>(s: &'a str, structure: &str) -> Option<&'a str> {
+    if !structure.starts_with('{') {
         return None;
     }
     let mut depth = 0i32;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '{' => depth += 1,
             '}' => {
@@ -907,28 +1651,25 @@ fn contains_ident(src: &str, name: &str) -> bool {
 }
 
 fn find_ident(src: &str, name: &str) -> Option<usize> {
-    let mut start = 0;
-    while let Some(rel) = src[start..].find(name) {
-        let i = start + rel;
-        if is_ident_boundary(src, i, name.len()) {
-            return Some(i);
-        }
-        start = i + 1;
-    }
-    None
+    find_word(src, name, 0, Spaced::No)
 }
 
+/// True when no character of a name stands directly before the text of
+/// `len` bytes at `start` of `src`, or directly after it.
 fn is_ident_boundary(src: &str, start: usize, len: usize) -> bool {
     let before = src[..start].chars().next_back();
     let after = src[start + len..].chars().next();
-    let ident_char = |c: char| c.is_ascii_alphanumeric() || c == '_';
-    before.is_none_or(|c| !ident_char(c)) && after.is_none_or(|c| !ident_char(c))
+    before.is_none_or(|c| !is_name_char(c)) && after.is_none_or(|c| !is_name_char(c))
 }
 
 /// Split `QName` / `QName<A, B>` into the base name and angle-bracket arguments.
+///
+/// A comment in the text is read as white space, and a `<`, a `>` or a `,`
+/// inside a string literal is not counted.
 pub fn split_qname_type_args(s: &str) -> (String, Vec<String>) {
-    let s = s.trim();
-    let Some(open) = s.find('<') else {
+    let code = without_comments(s);
+    let s = code.trim();
+    let Some(open) = structure_of(s).find('<') else {
         return (s.to_owned(), Vec::new());
     };
     let name = s[..open].trim().to_owned();
@@ -936,11 +1677,15 @@ pub fn split_qname_type_args(s: &str) -> (String, Vec<String>) {
 }
 
 /// Parse the first `<...>` argument list in `s`, respecting nested angles.
+///
+/// A comment in the text is read as white space, and a `<`, a `>` or a `,`
+/// inside a string literal is not counted.
 pub fn parse_angle_args(s: &str) -> Vec<String> {
-    let Some(open) = s.find('<') else {
+    let code = without_comments(s);
+    let Some(open) = structure_of(&code).find('<') else {
         return Vec::new();
     };
-    parse_leading_angle_args(&s[open..])
+    parse_leading_angle_args(&code[open..])
 }
 
 /// Type parameters written on a `module Name<T>` header, used when the AST
@@ -1014,6 +1759,7 @@ fn parse_module_header(source: &str) -> (String, Vec<String>) {
 }
 
 fn type_args_from_import_text(source: &str) -> Vec<String> {
+    let source = without_comments(source);
     let s = source.trim();
     let rest = s.strip_prefix("import").unwrap_or(s);
     let mut i = 0usize;
@@ -1031,14 +1777,18 @@ fn type_args_from_import_text(source: &str) -> Vec<String> {
     parse_leading_angle_args(&rest[i..])
 }
 
+/// The arguments between the `<` that `s` begins with and the `>` that
+/// closes it. A comment in between is read as white space, and a `<`, a `>`
+/// or a `,` inside a string literal is not counted.
 fn parse_leading_angle_args(s: &str) -> Vec<String> {
     let s = s.trim_start();
     if !s.starts_with('<') {
         return Vec::new();
     }
+    let (code, structure) = views(s);
     let mut depth = 0i32;
     let mut end = None;
-    for (i, c) in s.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '<' => depth += 1,
             '>' => {
@@ -1054,17 +1804,20 @@ fn parse_leading_angle_args(s: &str) -> Vec<String> {
     let Some(end) = end else {
         return Vec::new();
     };
-    split_top_level_commas(&s[1..end])
+    split_top_level_commas(&code[1..end])
 }
 
+/// The parts of `inner` between the commas that stand inside no bracket. A
+/// bracket or a comma inside a string literal is not counted.
 fn split_top_level_commas(inner: &str) -> Vec<String> {
+    let structure = structure_of(inner);
     let mut parts = Vec::new();
     let mut start = 0;
     let mut depth_paren = 0i32;
     let mut depth_angle = 0i32;
     let mut depth_brack = 0i32;
     let mut depth_brace = 0i32;
-    for (i, c) in inner.char_indices() {
+    for (i, c) in structure.char_indices() {
         match c {
             '(' => depth_paren += 1,
             ')' => depth_paren -= 1,
@@ -1114,6 +1867,18 @@ fn skip_ws_and_comments(s: &str, i: &mut usize) {
         return;
     }
 }
+
+#[cfg(test)]
+mod comment_tests;
+
+#[cfg(test)]
+mod depth_tests;
+
+#[cfg(test)]
+mod word_tests;
+
+#[cfg(test)]
+mod unreadable_tests;
 
 #[cfg(test)]
 mod tests {
@@ -1609,6 +2374,178 @@ module Examples.Trivial version "0.1.0" {
     }
 
     #[test]
+    fn a_verify_block_with_no_assertion_has_no_formula() {
+        let src = r#"
+module Examples.Comment version "0.1.0" {
+    verify OnlyAComment {
+        bounds { persons: 2 }
+        assuming fair
+        // assert true
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        assert_eq!(hir.verifications.len(), 1, "{:?}", hir.verifications);
+        let v = &hir.verifications[0];
+        assert!(v.assertions.is_empty(), "{:?}", v.assertions);
+        // The text of the block is not searched for an assertion.
+        assert_eq!(v.formula, "");
+        assert_eq!(v.bounds.as_ref().map(|bounds| bounds.persons), Some(2));
+    }
+
+    #[test]
+    fn the_bounds_of_a_verify_block_come_only_from_a_bounds_field() {
+        let src = r#"
+module Examples.Bounds version "0.1.0" {
+    verify InAComment {
+        // bounds { persons: 2 }
+        assert true
+    }
+    verify InAnotherField {
+        assuming bounds persons 3
+        assert true
+    }
+    verify Braces {
+        bounds { persons: 2 }
+        assert true
+    }
+    verify Words {
+        bounds persons 2 events 1 time_points 1
+        assert true
+    }
+    verify BraceOnTheNextLine {
+        bounds
+        { persons: 3 }
+        assert true
+    }
+    verify TwoFields {
+        bounds { persons: 2 }
+        bounds { events: 1 }
+        assert true
+    }
+    verify CommentBelow {
+        bounds { events: 1 }
+        // bounds { persons: 2 }
+        assert true
+    }
+    verify CommentBelowTheLastField {
+        assert true
+        bounds { events: 1 }
+        // note: persons 2 is enough
+    }
+    verify CommentOnTheLine {
+        bounds events 1 // persons: 2
+        assert true
+    }
+    verify CommentOnTheNextLine {
+        bounds events 1
+        // persons: 2
+        assert true
+    }
+    verify CommentBelowABlankLine {
+        bounds { events: 1 }
+
+        // persons: 2
+
+        assert true
+    }
+    verify CommentAboveAnotherField {
+        bounds { events: 1 }
+        // persons: 2
+        assuming fair
+        assert true
+    }
+    verify CommentInsideTheBraces {
+        bounds {
+            // persons: 9
+            persons: 2
+        }
+        assert true
+    }
+    verify CommentAfterAComma {
+        bounds { events: 1, // persons: 5
+            persons: 2 }
+        assert true
+    }
+    verify InAString {
+        bounds { label: "persons: 2" }
+        assert true
+    }
+    verify Decimal {
+        bounds { persons: 2.5 }
+        assert true
+    }
+    verify SecondOccurrence {
+        bounds persons x persons 2
+        assert true
+    }
+    verify TooLarge {
+        bounds { persons: 99999999999 }
+        assert true
+    }
+    verify OneColon {
+        bounds persons : 2
+        assert true
+    }
+    verify TwoColons {
+        bounds persons :: 2
+        assert true
+    }
+}
+"#;
+        let parsed = parse_file(src);
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        let bounds: Vec<_> = hir
+            .verifications
+            .iter()
+            .map(|verification| {
+                (
+                    verification.name.as_str(),
+                    verification
+                        .bounds
+                        .as_ref()
+                        .map(|bounds| (bounds.persons, bounds.events, bounds.time_points)),
+                )
+            })
+            .collect();
+        assert_eq!(
+            bounds,
+            [
+                ("InAComment", None),
+                ("InAnotherField", None),
+                ("Braces", Some((2, 0, 0))),
+                ("Words", Some((2, 1, 1))),
+                ("BraceOnTheNextLine", Some((3, 0, 0))),
+                // The last `bounds` field counts, and a number it does not
+                // give is zero.
+                ("TwoFields", Some((0, 1, 0))),
+                // A comment sets nothing: not below the field, not on its
+                // line and not inside it.
+                ("CommentBelow", Some((0, 1, 0))),
+                ("CommentBelowTheLastField", Some((0, 1, 0))),
+                ("CommentOnTheLine", Some((0, 1, 0))),
+                ("CommentOnTheNextLine", Some((0, 1, 0))),
+                ("CommentBelowABlankLine", Some((0, 1, 0))),
+                ("CommentAboveAnotherField", Some((0, 1, 0))),
+                ("CommentInsideTheBraces", Some((2, 0, 0))),
+                ("CommentAfterAComma", Some((2, 1, 0))),
+                // The contents of a string are not read, and a number is an
+                // integer token.
+                ("InAString", Some((0, 0, 0))),
+                ("Decimal", Some((0, 0, 0))),
+                // The first place where a word stands decides, and an
+                // integer that does not fit in 32 bits gives zero.
+                ("SecondOccurrence", Some((0, 0, 0))),
+                ("TooLarge", Some((0, 0, 0))),
+                // The integer follows its word directly or after one `:`.
+                ("OneColon", Some((2, 0, 0))),
+                ("TwoColons", Some((0, 0, 0))),
+            ]
+        );
+    }
+
+    #[test]
     fn money_usd_and_eur_differ() {
         let src = r#"
 module Examples.Fx version "0.1.0" {
@@ -1704,9 +2641,9 @@ module Examples.Retain version "0.1.0" {
     recorded_at 2026-01-01T00:00:00Z
     type TaxYear = Int
     record_type TaxableIncome { amount: Money<USD> }
-    observation Filing(record: TaxableIncome)
+    observation Filing(record: TaxableIncome) establishes FilingReceived(record) { require true }
     power Amend { holder Settlor }
-    judgment Capacity(person: NaturalPerson)
+    judgment Capacity(person: NaturalPerson) decides Issued(person) { authority Court }
     legal_act Sign(doc: TaxableIncome)
     scenario HappyPath { assume true }
     proposition Issued(person: NaturalPerson)
@@ -1750,5 +2687,485 @@ module Examples.Retain version "0.1.0" {
             "{:?}",
             hir.retained
         );
+    }
+
+    /// The codes and messages the lowering rejects a module with. The
+    /// module has no parse error.
+    fn rejected(src: &str) -> Vec<(DiagnosticCode, String)> {
+        let parsed = parse_file(src);
+        assert!(!parsed.has_errors(), "{:?}", parsed.diagnostics);
+        elaborate(&parsed, &SourceManifest::default())
+            .expect_err("the module is rejected")
+            .into_iter()
+            .map(|diagnostic| (diagnostic.code, diagnostic.message))
+            .collect()
+    }
+
+    /// A module with one rule, `Exemption`, that has these statements.
+    fn rule_module(statements: &str) -> String {
+        format!(
+            "module Examples.Consequence version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    proposition Exempt(who: LegalPerson)\n    rule Exemption : constitutive {{\n        when true\n        {statements}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_consequence_that_is_not_a_proposition_is_e210_and_names_the_rule_and_the_consequence() {
+        // The expression of the consequence is a number, a string, a sum, a
+        // proposition under a modal word, a set, a field of a name, or a
+        // number in parentheses. None of these is a proposition. Such a
+        // consequence was dropped without a diagnostic, and the rule
+        // established less than its text says.
+        for written in [
+            "5",
+            "\"x\"",
+            "1 + 2",
+            "operative Exempt(Acme)",
+            "{Acme}",
+            "Acme.name",
+            "(5)",
+        ] {
+            // In the `then` list and in the `otherwise` list.
+            for (word, statements) in [
+                ("then", format!("then establish {written}")),
+                (
+                    "otherwise",
+                    format!("then establish Exempt(Acme)\n        otherwise establish {written}"),
+                ),
+            ] {
+                assert_eq!(
+                    rejected(&rule_module(&statements)),
+                    [(
+                        DiagnosticCode::E210,
+                        format!(
+                            "`{word} establish {written}` in rule `Exemption` requires a proposition"
+                        )
+                    )],
+                    "{word} establish {written}"
+                );
+            }
+        }
+        // Each such consequence of a rule is reported, in the order of the
+        // rule's text within its list.
+        assert_eq!(
+            rejected(&rule_module(
+                "then establish 5\n        then derive Exempt(Acme)\n        then derive \"x\"\n        otherwise derive 7"
+            )),
+            [
+                (
+                    DiagnosticCode::E210,
+                    "`then establish 5` in rule `Exemption` requires a proposition".to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`then derive \"x\"` in rule `Exemption` requires a proposition".to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`otherwise derive 7` in rule `Exemption` requires a proposition".to_owned()
+                ),
+            ]
+        );
+        // The consequence is quoted as it is written, on one line, with its
+        // `as_to` part and without the `;` that ends it.
+        assert_eq!(
+            rejected(&rule_module(
+                "then establish 1 +\n            2 as_to Acme;"
+            )),
+            [(
+                DiagnosticCode::E210,
+                "`then establish 1 + 2 as_to Acme` in rule `Exemption` requires a proposition"
+                    .to_owned()
+            )]
+        );
+    }
+
+    #[test]
+    fn a_consequence_that_is_a_proposition_is_kept_with_no_diagnostic() {
+        let parsed = parse_file(&rule_module(
+            "then establish Exempt(Acme)\n        then derive Flag\n        otherwise derive (Exempt(Acme))",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        let rule = &hir.rules[0];
+        let predicates = |list: &[(String, PropTerm)]| -> Vec<(String, String)> {
+            list.iter()
+                .map(|(verb, prop)| (verb.clone(), prop.predicate.clone()))
+                .collect()
+        };
+        assert_eq!(
+            predicates(&rule.consequences),
+            [
+                ("establish".to_owned(), "Exempt".to_owned()),
+                ("derive".to_owned(), "Flag".to_owned())
+            ]
+        );
+        assert_eq!(
+            predicates(&rule.fallback),
+            [("derive".to_owned(), "Exempt".to_owned())]
+        );
+    }
+
+    /// A module with one interpretation family, `Reading`, whose one
+    /// alternative, `Wide`, has these statements.
+    fn family_module(statements: &str) -> String {
+        format!(
+            "module Examples.Definition version \"0.1.0\" {{\n    entity Alice : NaturalPerson\n    proposition Eligible(person: NaturalPerson)\n    interpretation_family Reading {{\n        alternative Wide {{\n            {statements}\n        }}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_definition_that_is_no_proposition_is_e210_and_names_the_family_and_the_definition() {
+        // The expression of the definition is a number, a string, a sum, a
+        // set, a negation, a comparison, a proposition under a modal word, a
+        // field of a name, or a number in parentheses. None of these is a
+        // proposition. Such a definition was dropped without a diagnostic,
+        // and the alternative defined less than its text says.
+        for written in [
+            "5",
+            "\"x\"",
+            "1 + 2",
+            "{Eligible(Alice)}",
+            "not Eligible(Alice)",
+            "Alice == Alice",
+            "operative Eligible(Alice)",
+            "Alice.name",
+            "(5)",
+        ] {
+            for status in ["established", "not_established"] {
+                assert_eq!(
+                    rejected(&family_module(&format!("defines {written} as {status}"))),
+                    [(
+                        DiagnosticCode::E210,
+                        format!(
+                            "`defines {written} as {status}` in interpretation family `Reading` requires a proposition"
+                        )
+                    )],
+                    "defines {written} as {status}"
+                );
+            }
+        }
+        // A definition with no expression defines no proposition either.
+        assert_eq!(
+            rejected(&family_module("defines as established")),
+            [(
+                DiagnosticCode::E210,
+                "`defines as established` in interpretation family `Reading` requires a proposition"
+                    .to_owned()
+            )]
+        );
+        // Each such definition is reported, in the order of the text, and the
+        // definition is quoted on one line, without the `;` that ends it and
+        // without a comment.
+        assert_eq!(
+            rejected(&family_module(
+                "defines 5 as established\n            defines Eligible(Alice) as established\n            defines 1 + // one more\n                2 as not_established;\n            defines \"x\" as established"
+            )),
+            [
+                (
+                    DiagnosticCode::E210,
+                    "`defines 5 as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines 1 + 2 as not_established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines \"x\" as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_definition_with_no_status_after_its_expression_is_e100() {
+        // With no `as established` or `as not_established` after its
+        // expression, a definition was dropped without a diagnostic. A word
+        // that only begins with `established` or `not_established` is no
+        // status either.
+        for written in [
+            "defines Eligible(Alice)",
+            "defines Eligible(Alice) as suspended",
+            "defines Eligible(Alice) as established_later",
+            "defines Eligible(Alice) as not_established_yet",
+            "defines Eligible(Alice) has established",
+            "defines 5",
+            "defines",
+            // A status the reader does not take: no white space before `as`,
+            // and a `.` joined to the status word.
+            "defines Eligible(Alice)as established",
+            "defines Eligible(Alice) as established.",
+        ] {
+            assert_eq!(
+                rejected(&family_module(written)),
+                [(
+                    DiagnosticCode::E100,
+                    format!(
+                        "`{written}` in interpretation family `Reading` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
+                    )
+                )],
+                "{written}"
+            );
+        }
+        // Each definition is reported for itself, and one that is read is kept.
+        assert_eq!(
+            rejected(&family_module(
+                "defines Eligible(Alice)\n            defines Eligible(Alice) as established\n            defines 5 as established"
+            )),
+            [
+                (
+                    DiagnosticCode::E100,
+                    "`defines Eligible(Alice)` in interpretation family `Reading` has no status: `as established` or `as not_established`, with white space around `as` and nothing joined to the status word"
+                        .to_owned()
+                ),
+                (
+                    DiagnosticCode::E210,
+                    "`defines 5 as established` in interpretation family `Reading` requires a proposition"
+                        .to_owned()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_definition_that_is_a_proposition_is_kept_with_no_diagnostic() {
+        // A proposition with arguments, with an empty list of arguments, and
+        // with none, each established and not established.
+        let parsed = parse_file(&family_module(
+            "defines Eligible(Alice) as established\n            defines Eligible(Alice) as not_established\n            defines Flag() as established\n            defines Flag as not_established",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert!(hir.diagnostics.is_empty(), "{:?}", hir.diagnostics);
+        let definitions: Vec<(String, usize, bool)> = hir.interpretation_families["Reading"][0]
+            .1
+            .iter()
+            .map(|(prop, established)| (prop.predicate.clone(), prop.arguments.len(), *established))
+            .collect();
+        assert_eq!(
+            definitions,
+            [
+                ("Eligible".to_owned(), 1, true),
+                ("Eligible".to_owned(), 1, false),
+                ("Flag".to_owned(), 0, true),
+                ("Flag".to_owned(), 0, false),
+            ]
+        );
+    }
+
+    /// A module with one interpretation family, `Reading`, whose body holds
+    /// these statements.
+    fn family_body(body: &str) -> String {
+        format!(
+            "module Examples.Definition version \"0.1.0\" {{\n    entity Alice : NaturalPerson\n    proposition Eligible(person: NaturalPerson)\n    interpretation_family Reading {{\n        {body}\n    }}\n}}\n"
+        )
+    }
+
+    fn e210(text: &str) -> (DiagnosticCode, String) {
+        (
+            DiagnosticCode::E210,
+            format!("`{text}` in interpretation family `Reading` requires a proposition"),
+        )
+    }
+
+    #[test]
+    fn a_definition_outside_the_block_of_every_alternative_is_e100() {
+        // In a family with no alternative, before the first one, after the
+        // `}` of one and between two. The first two were dropped, and the
+        // others were taken into the alternative above them.
+        let outside = [(
+            DiagnosticCode::E100,
+            "`defines Eligible(Alice) as established` in interpretation family `Reading` stands outside the block of every alternative".to_owned(),
+        )];
+        let alternative = "alternative Wide {\n            defines Flag as established\n        }";
+        for body in [
+            "defines Eligible(Alice) as established".to_owned(),
+            format!("defines Eligible(Alice) as established\n        {alternative}"),
+            format!("{alternative}\n        defines Eligible(Alice) as established"),
+            format!(
+                "{alternative}\n        defines Eligible(Alice) as established\n        alternative Other {{ defines Flag as not_established }}"
+            ),
+            // In a block of the family that is no alternative's, and with
+            // another field after it, which the diagnostic does not quote.
+            "selector { defines Eligible(Alice) as established }".to_owned(),
+            format!(
+                "{alternative}\n        defines Eligible(Alice) as established\n        selector explicit"
+            ),
+        ] {
+            assert_eq!(rejected(&family_body(&body)), outside, "{body}");
+        }
+    }
+
+    #[test]
+    fn the_whole_text_between_defines_and_as_is_the_proposition() {
+        // `defines` is found with nothing after it, as before `(`.
+        let parsed = parse_file(&family_module("defines(Eligible(Alice)) as established"));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert_eq!(
+            hir.interpretation_families["Reading"][0].1[0].0.predicate,
+            "Eligible"
+        );
+        // A part of the text the reader does not take as the one
+        // proposition was dropped with no diagnostic, or the definition
+        // was not found.
+        for written in [
+            "defines(5) as established",
+            "defines Eligible(Alice) 5 as established",
+            "defines Eligible(Alice) Eligible(Alice) as established",
+            "defines Eligible(Alice)) as established",
+            "defines Eligible([a, b)) as established",
+        ] {
+            assert_eq!(
+                rejected(&family_module(written)),
+                [e210(written)],
+                "{written}"
+            );
+        }
+    }
+
+    #[test]
+    fn an_alternative_with_no_name_and_a_definition_with_two_statuses_are_e100() {
+        // Each was read without a diagnostic: the alternative was stepped
+        // over with its definitions, and the last status was taken. A string
+        // is no name either; the alternative was named with its quotes.
+        for alternative in ["alternative {", "alternative{", "alternative \"Wide\" {"] {
+            assert_eq!(
+                rejected(&family_body(&format!(
+                    "{alternative}\n            defines Eligible(Alice) as established\n        }}"
+                ))),
+                [(
+                    DiagnosticCode::E100,
+                    "an `alternative` in interpretation family `Reading` has no name".to_owned()
+                )],
+                "{alternative}"
+            );
+        }
+        assert_eq!(
+            rejected(&family_module(
+                "defines Eligible(Alice) as established as not_established"
+            )),
+            [(
+                DiagnosticCode::E100,
+                "`defines Eligible(Alice) as established as not_established` in interpretation family `Reading` has more than one status".to_owned()
+            )]
+        );
+    }
+
+    #[test]
+    fn each_alternative_has_the_definitions_of_its_own_block() {
+        // A comment, a string and the two words inside longer names stand
+        // between the blocks.
+        let parsed = parse_file(&family_body(
+            "alternative First {\n            defines Eligible(Alice) as established // alternative Ghost { defines Wrong() as established }\n        }\n        selector redefines_alternative\n            or \"alternative Ghost defines Wrong() as established\"\n        alternative Second {\n            defines Flag as not_established\n        }",
+        ));
+        let hir = elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+        assert!(hir.diagnostics.is_empty(), "{:?}", hir.diagnostics);
+        let alternatives: Vec<(String, Vec<(String, bool)>)> =
+            hir.interpretation_families["Reading"]
+                .iter()
+                .map(|(name, definitions)| {
+                    (
+                        name.clone(),
+                        definitions
+                            .iter()
+                            .map(|(prop, established)| (prop.predicate.clone(), *established))
+                            .collect(),
+                    )
+                })
+                .collect();
+        assert_eq!(
+            alternatives,
+            [
+                ("First".to_owned(), vec![("Eligible".to_owned(), true)]),
+                ("Second".to_owned(), vec![("Flag".to_owned(), false)]),
+            ]
+        );
+    }
+
+    /// A module with one duty, `Keep`, borne by `Acme`, with these
+    /// statements below its `bearer`.
+    fn duty_module(statements: &str) -> String {
+        format!(
+            "module Examples.Content version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    duty Keep {{\n        bearer Acme\n        {statements}\n    }}\n}}\n"
+        )
+    }
+
+    #[test]
+    fn a_duty_whose_content_cannot_be_read_is_e100() {
+        // The reader of the duty's text gives no expression for any of
+        // these. The content was dropped without a diagnostic, and the duty
+        // passed the checker with no content.
+        let deep = format!("{}a{}", "[".repeat(5_000), "]".repeat(5_000));
+        for written in [
+            "[a, b)",
+            "[a, b]",
+            deep.as_str(),
+            "days",
+            "days(3)",
+            "a +",
+            "a <",
+            "not",
+            "operative",
+            "if c",
+            "!a",
+            "= Pay(Acme)",
+            ": Pay(Acme)",
+            "",
+        ] {
+            assert_eq!(
+                rejected(&duty_module(&format!("content {written}"))),
+                [(
+                    DiagnosticCode::E100,
+                    "duty `Keep` contains an invalid or over-budget attachment/deadline expression"
+                        .to_owned()
+                )],
+                "content {}",
+                &written[..written.len().min(40)]
+            );
+        }
+    }
+
+    #[test]
+    fn a_duty_whose_content_is_read_keeps_it_as_before() {
+        let content = |statements: &str| -> String {
+            let parsed = parse_file(&duty_module(statements));
+            let hir =
+                elaborate(&parsed, &SourceManifest::default()).expect("the module is lowered");
+            format!("{:?}", hir.duties[0].content)
+        };
+        for (statements, read) in [
+            (
+                "content Pay(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }]"#,
+            ),
+            (
+                "content { Pay(Acme), File(Acme) }",
+                r#"[Set([Apply { ctor: "Pay", args: [Ident("Acme")] }, Apply { ctor: "File", args: [Ident("Acme")] }])]"#,
+            ),
+            ("content \"pay now\"", r#"[String("pay now")]"#),
+            (
+                "content if c { a } else { b }",
+                r#"[Apply { ctor: "if", args: [Ident("c"), Ident("a"), Ident("b")] }]"#,
+            ),
+            (
+                "content USD(100.00)",
+                r#"[Apply { ctor: "USD", args: [Decimal(100.00)] }]"#,
+            ),
+            (
+                "content 30 days",
+                r#"[Apply { ctor: "days", args: [Int(30)] }]"#,
+            ),
+            (
+                "content Pay(Acme)\n        content File(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }, Apply { ctor: "File", args: [Ident("Acme")] }]"#,
+            ),
+            (
+                "content\n            Pay(Acme)",
+                r#"[Apply { ctor: "Pay", args: [Ident("Acme")] }]"#,
+            ),
+        ] {
+            assert_eq!(content(statements), read, "{statements}");
+        }
     }
 }

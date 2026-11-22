@@ -89,45 +89,49 @@
     <p class="label">Implementers</p>
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">Evidence-backed capability matrix</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Obligations</span><span class="d">Review obligations</span></a></li>
-      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Integration contract</span><span class="d">How the machinery is wired</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Implementation status</span><span class="d">What the interpreter does today</span></a></li>
+      <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Internal ledgers</span><span class="d">Working ledgers, partly out of date</span></a></li>
     </ol>
   </div>
 </nav>
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 2 &middot; Write</p>
     <h1 id="doc-title">The Fidryn language</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></details>
     <div class="prose">
 <p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
 open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
 <p>Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
-<p>The grammar is closed: unknown body fields are parse errors. Copy from
-an existing <code>.fr</code> file when you are unsure a spelling parses. The
-reference is <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
+<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
+that only inside <code>source</code> blocks, the bodies of rules and the request
+block of a judgment's <code>otherwise suspend NeedJudgment</code>. In most other
+declarations an unknown field is skipped without a diagnostic; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>. Copy from an existing
+<code>.fr</code> file when you are unsure a spelling parses. The reference is
+<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
 <h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is <strong>parsed / checked / executed</strong> only where noted — see
+Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
-<tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed/checked; hex digests authenticate under CLI <code>check_path</code></td></tr>
+<tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
 <tr><td><code>record_type</code> / <code>evidence_type</code></td><td>FOIA / trust fixtures</td><td>Parsed/checked; used as named evidence schemas</td></tr>
 <tr><td><code>observation</code></td><td>LLC / state homestead modules</td><td>Parsed/checked; Observe matches schema + known-at</td></tr>
-<tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>In-module overlay fixtures; not JSON cases; not silent <code>run</code> defaults</td></tr>
+<tr><td><code>scenario</code></td><td>all 50 <code>examples/states/</code> modules</td><td>Name read; body not interpreted. Scenario runs use the case record's <code>assumptions</code>, not these blocks</td></tr>
 <tr><td><code>Evaluate</code> / <code>UniqueOccupant</code> / <code>RunDecision</code> / <code>StatusOf</code></td><td>trust, late-payment, LLC</td><td>Executed query plans</td></tr>
 <tr><td><code>EvaluateClause</code></td><td><code>examples/prenup/ava-noah.fr</code></td><td>Executed clause-plan queries</td></tr>
-<tr><td><code>power</code> / <code>legal_act</code> / <code>clause</code></td><td>trust, FOIA, prenup</td><td>Parsed/checked; specialized paths, not a general act engine</td></tr>
-<tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Parsed; conflict outcomes/requests when staged effects disagree</td></tr>
+<tr><td><code>power</code> / <code>legal_act</code></td><td>trust, FOIA, prenup</td><td>Name and parameters read; body not interpreted, so unknown fields pass. A <code>legal_act</code> name types as a <code>LegalAction</code> in calls. Neither reaches evaluation</td></tr>
+<tr><td><code>clause</code></td><td>prenup, minimum-wage</td><td>Name and parameters read; body kept as text. At run time only <code>EvaluateClause</code> uses it, and the evaluator knows two clause names</td></tr>
+<tr><td><code>conflict_doctrine</code></td><td>prenup, minimum-wage</td><td>Body not interpreted; the text must name a declared clause after <code>defeat</code> (E511). Never consulted when staged effects disagree</td></tr>
 <tr><td><code>transaction</code></td><td><code>tests/programs/transaction-atomic.fr</code></td><td>Partial; not a full commit engine</td></tr>
 <tr><td><code>for_all</code> / <code>exists</code></td><td>status + grammar</td><td>Finite declared domains only; open domains suspend; no open-world proofs</td></tr>
-<tr><td><code>fn</code></td><td>grammar / status</td><td>Limited/partial; no current example declaration</td></tr>
+<tr><td><code>fn</code></td><td><code>packages/logic/true.fr</code></td><td>Parsed, checked and executed; a query can call a function</td></tr>
 <tr><td>Module type parameters</td><td>status</td><td>Type-name substitution only; no cross-file value-parameter calculus</td></tr>
 </tbody></table>
 </div>
@@ -149,6 +153,45 @@ the dated slice this file encodes. <code>effective_at</code> is a date.
 <code>recorded_at</code> is a date-time (<code>Z</code> or a numeric offset).
 <code>outside_scope</code> is a set of named exclusions; those names reappear on
 the outcome's <code>modelBoundary</code>.</p>
+<p>A comment begins with <code>//</code> and runs to the end of its line. There is no
+block comment: <code>/* ... */</code> is read as ordinary tokens, not skipped.</p>
+<p>A comment is never read as code. Whatever it holds, nothing is taken
+from it: a <code>}</code> in a comment closes no block, a <code>-&gt;</code> begins no type, and
+<code>assert false</code>, <code>defeat Residual</code> or <code>for_all x in People: true</code> in a
+comment asserts nothing, defeats no clause and declares no property. A
+comment at the end of a line of code does not change what that code
+means. A line that holds only a comment is a blank line, and a blank
+line is not always nothing: it can end a statement that the line below
+would otherwise continue. See
+<a href="#where-a-statement-ends">Where a statement ends</a>.</p>
+<p>A bracket or a word inside a string literal is text of the string and
+nothing else. <code>artifact "files/a}1.txt"</code> closes no block, a citation
+such as <code>from "Stat. 12(a"</code> opens no parenthesis, and a string that holds
+<code>defeat Residual</code> defeats no clause.</p>
+<p>A comment can change text that is kept or shown as it is written, and
+how a report identifies the program (see <a href="/docs/outcomes">outcomes</a>), in
+places such as these. <code>sourceBundle</code> covers the text of the module byte
+for byte, so any comment changes it, and <code>fidryn review</code> shows the text
+of each declaration with the comments inside it, but not a comment at
+the end of its last line or one above it. <code>invocation.program.fingerprint</code>,
+and with it <code>invocationId</code> and the trace ids, is taken over the compiled
+program. That keeps some text as it is written: the body of a <code>clause</code>,
+the first <code>assert</code> of a <code>verify</code> block, a line of a <code>verify</code> block that
+is kept as an assertion that cannot be decided, and a clause of a
+<code>judgment</code> or an <code>observation</code> that is kept as text. A comment inside
+such text changes the fingerprint, as a change of the white space there
+does. So does a comment at the end of the last line of such a kept
+assertion or kept clause: the kept text then ends with the last token
+before the comment, and with as many spaces in the comment's place it
+ends with the spaces and the line end. The kept clauses of a judgment
+are also quoted in the payload of its <code>JudgmentPolicy</code> request, in the
+outcome of a run and in its trace. Those of an observation are quoted in
+the error a run ends with when a record of the observed schema is on the
+case, and in the output of <code>fidryn inputs</code>. A comment in such a clause,
+or at the end of its last line, changes what these show. A comment at
+the end of a line of a query, a rule or a duty, or at the end of the last
+line of the first <code>assert</code> of a <code>verify</code> block, changes neither the
+fingerprint nor the outcome of a run.</p>
 <p>The trust fixture also declares a source manifest, resolved relative
 to the module file:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source_manifest</span> <span class="tk-st">&quot;sources/ma-trust-fixture.manifest.json&quot;</span></code></pre></figure>
@@ -166,26 +209,40 @@ Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
     <span class="tk-kw">digest</span> fixture
     <span class="tk-kw">effective</span> <span class="tk-pu">[</span><span class="tk-nu">2026-09-17</span><span class="tk-pu">,</span> <span class="tk-nu">+inf</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>digest fixture</code> is a fixture profile, not a hash of the file. It is
-not byte-verified authentication. A 32- or 64-digit hex digest is
-blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
-first 16 bytes). <code>check</code> of a <code>.fr</code> path hashes the file at <code>artifact</code>
-relative to the module directory. A missing file or a mismatch is
-unauthenticated; digest-required imports fail with E200. Hex without
-readable bytes is not a fixture profile. The source-manifest JSON uses
-the same <code>"digest": "fixture"</code> versus hex distinction.</p>
+<p>In 0.2 a <code>source</code> block is a record for the reader. The parser rejects
+an unknown field in it, and the checker requires an <code>artifact</code> field
+(<code>E540</code>). The checker also types the source's name as a <code>String</code>, so a
+query that returns <code>FinalPayStatute</code> passes <code>check</code>, but <code>run</code> fails
+with <code>unbound identifier</code>. Nothing else reads the block: it does not
+reach evaluation, and the file named by <code>artifact</code> is never read,
+whatever <code>digest</code> says (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
+<p>Digests are checked in the source manifest instead. That is the JSON
+file the module names with <code>source_manifest</code>, or, when it names none,
+<code>sources/manifest.json</code> or the only <code>*.manifest.json</code> in <code>sources/</code> next
+to the module. Each manifest artifact has a <code>path</code> and a <code>digest</code>.
+<code>"digest": "fixture"</code> is a fixture trust profile, not a hash of the file
+and not byte verification. A 32- or 64-digit hex digest is blake3 of the
+artifact bytes (64 hex: the full digest; 32 hex: the first 16 bytes).
+<code>check</code> and <code>run</code> of a <code>.fr</code> path read the file at <code>path</code>, relative to
+the module directory or to <code>--source-root</code>, and compare. A missing file
+or a mismatch leaves the artifact unauthenticated, and an import that
+requires that digest fails with E200. Pasted source in the
+<a href="/docs/mill">Mill</a> reads no manifest and no files.</p>
 <h2 id="imports"><span class="hn">2.4</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
-<p>Modules may import another module by name and version. Digests and aliases
-match the source-trust story above.</p>
+<p>Modules may import another module by name and version. An import that
+carries a <code>digest</code> must find that digest on an authenticated artifact of
+the source manifest above, or the checker reports E200. An <code>alias</code> line
+in an import is accepted and ignored in 0.2.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture
-    <span class="tk-kw">alias</span> FOIARegs
 <span class="tk-pu">}</span></code></pre></figure>
-<p>CLI <code>check</code> / <code>run</code> of a path can byte-authenticate hex digests against
-artifacts under the module directory. <code>"digest": "fixture"</code> (or
-<code>digest fixture</code> in source) is a trust profile, not byte verification.
-Mill paste does not load manifests or artifact files.</p>
+<p>In an import, <code>digest fixture</code> asks for a manifest artifact whose digest
+is <code>fixture</code>. That is a trust profile, not byte verification. A hex
+digest in an import asks for a manifest artifact with that digest whose
+file <code>check</code> or <code>run</code> of a path has read and matched. With no matching
+manifest artifact the import is E200. Mill paste loads no manifest, so
+there an import with a digest is always E200.</p>
 <h2 id="entities-propositions-and-offices"><span class="hn">2.5</span> Entities, propositions, and offices <a class="anchor" href="#entities-propositions-and-offices" aria-label="Link to this section">#</a></h2>
 <p>Name the parties and the propositions you will later test. A
 proposition is not a Boolean.</p>
@@ -203,6 +260,13 @@ proposition is not a Boolean.</p>
     <span class="tk-kw">lost_by</span> <span class="tk-pu">{</span>Death<span class="tk-pu">,</span> EffectiveResignation<span class="tk-pu">,</span> EffectiveRemoval<span class="tk-pu">}</span>
     <span class="tk-kw">competence</span> <span class="tk-pu">{</span>AdministerTrust<span class="tk-pu">,</span> DecideTrustDistributions<span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>Fidryn 0.2 reads only an office's name and parameters. The rest of the
+declaration, <code>occupied_by</code> and every field in the body, is discarded:
+every office reaches the intermediate representation with occupant type
+<code>LegalPerson</code>, at most one occupant and no competence, and nothing reads
+the declaration at run time (test
+<code>an_office_keeps_none_of_its_declared_fields</code>; see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
 <p><code>Occupies(Bryan, TrusteeOf(BRT))</code> is a proposition about that office,
 not a <code>Bool</code>.</p>
 <h2 id="record-and-evidence-types"><span class="hn">2.6</span> Record and evidence types <a class="anchor" href="#record-and-evidence-types" aria-label="Link to this section">#</a></h2>
@@ -217,9 +281,19 @@ not a <code>Bool</code>.</p>
 <p>These declarations are part of the closed grammar. Copy field shapes from
 an existing fixture rather than inventing spellings.</p>
 <h2 id="observations"><span class="hn">2.7</span> Observations <a class="anchor" href="#observations" aria-label="Link to this section">#</a></h2>
-<p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.</p>
-<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">observation</span> OfficialFilingObservation<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">OfficialFilingRecord</span><span class="tk-pu">)</span>
-<span class="tk-kw">observation</span> EndOfTenancy<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">TenancyRecord</span><span class="tk-pu">)</span></code></pre></figure>
+<p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.
+Its header binds one record and, after <code>establishes</code>, gives the
+proposition that the record establishes. Its body holds the conditions
+the record must meet. This one is from
+<a href="https://github.com/BeeGass/fidryn/blob/main/examples/tax/federal-tax.fr"><code>examples/tax/federal-tax.fr</code></a>:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">observation</span> DomesticFormationRecord<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">:</span> <span class="tk-ty">BeneficialOwnershipReport</span><span class="tk-pu">)</span>
+<span class="tk-kw">establishes</span> DomesticCompany<span class="tk-pu">(</span><span class="tk-kw">record</span><span class="tk-pu">.</span>company<span class="tk-pu">)</span>
+    <span class="tk-kw">from</span> FinCENBOIFinalRule<span class="tk-pu">.</span>section<span class="tk-pu">(</span><span class="tk-st">&quot;domestic-entity&quot;</span><span class="tk-pu">)</span>
+<span class="tk-pu">{</span>
+    <span class="tk-kw">require</span> <span class="tk-kw">record</span><span class="tk-pu">.</span>company <span class="tk-pu">==</span> AcmeLLC
+<span class="tk-pu">}</span></code></pre></figure>
+<p>A header with no <code>establishes</code> or with no <code>{ ... }</code> body is rejected with
+<code>E100</code>.</p>
 <p>Observe still requires a matching case evidence row with <code>observedAt</code> at
 or before <code>--known-at</code>. Declaring an observation does not invent the
 record.</p>
@@ -254,7 +328,9 @@ form when the domain is closed
 <p><code>EvaluateClause</code> is an additional query plan used by some instruments
 (for example <a href="https://github.com/BeeGass/fidryn/blob/main/examples/prenup/ava-noah.fr"><code>examples/prenup/ava-noah.fr</code></a>):</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> provision_result<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">!</span> <span class="tk-pu">{</span>Observe<span class="tk-pu">,</span> Determine<span class="tk-pu">,</span> Interpret<span class="tk-pu">}</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">goal</span> EvaluateClause <span class="tk-pu">{</span> <span class="tk-pu">/</span><span class="tk-pu">*</span> <span class="tk-kw">clause</span> plan <span class="tk-pu">*</span><span class="tk-pu">/</span> <span class="tk-pu">}</span>
+    <span class="tk-kw">goal</span> EvaluateClause <span class="tk-pu">{</span>
+        <span class="tk-co">// clause plan</span>
+    <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>The effect row <code>! {Observe, Determine, Interpret}</code> is permission, not
 a promise that the engine will invent evidence. If the case does not
@@ -272,8 +348,15 @@ effect row is empty.</p>
     <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span>
         <span class="tk-kw">require</span> determined WillfulFailureToPay<span class="tk-pu">(</span>Employer<span class="tk-pu">)</span>
             <span class="tk-kw">using</span> Determine
+        <span class="tk-kw">return</span> <span class="tk-nu">true</span>
     <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>The waiting-time query answers <code>true</code> once the case records a
+determination that establishes <code>WillfulFailureToPay(Employer)</code>. It
+suspends otherwise, including when the determination is negative (tests
+<code>an_established_determination_makes_the_judgment_query_true</code> and
+<code>a_negative_determination_suspends_and_never_answers_false</code> in
+<code>tests/integration/repaired_examples.rs</code>).</p>
 <p>An automatic query that reaches <code>Determine</code>, <code>Observe</code>, or <code>Interpret</code>
 is E420. Willful failure is a judgment, not a Bool you compute in the
 module. The waiting-time query is allowed to suspend.</p>
@@ -293,9 +376,98 @@ continues, <code>false</code> suspends and does not return the later value.</p>
 runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</code> resumes by skipping
 the completed prefix, so a later term does not re-run an earlier
 attach.</p>
-<p><code>require determined P using Determine</code> requests a competent
-determination instead of treating <code>P</code> as a Bool.</p>
-<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.11</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
+<p><code>require determined P using Determine</code> asks for a determination of <code>P</code>
+instead of treating <code>P</code> as a Bool. In 0.2 the <code>using</code> clause is parsed
+and discarded. Any determination of <code>P</code> on the case that names a
+protocol and a decider answers the requirement. A negative determination
+fails it, and with none the query suspends with a request for a judgment
+on <code>P</code>. The protocol name stands in the statement of <code>using</code>: a <code>using</code>
+that ends its statement, with no name after it, is rejected with <code>E100</code>,
+and the line below it is not read as the name.</p>
+<p>A statement that a query body, a <code>goal Evaluate</code> block, the body of a
+<code>calc</code> or an <code>fn</code>, or a <code>transaction</code> block cannot read is rejected with
+<code>E100</code>, wherever it stands in the block. A <code>return</code> with no expression is
+one.</p>
+<h2 id="where-a-statement-ends"><span class="hn">2.11</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
+<p>A statement ends at a <code>;</code> or at the end of its line. It goes on into the
+next line in two cases.</p>
+<ul>
+<li>The line ends in a token that cannot end a statement. The tokens that
+can are a name or word, a literal, <code>)</code>, <code>]</code>, <code>}</code>, <code>*</code> and <code>&gt;</code>. A line
+that ends in one of the prefix words <code>not</code>, <code>operative</code>, <code>effective</code>,
+<code>established</code>, <code>determined</code>, <code>always</code>, <code>active</code>, <code>every</code>, <code>unique</code> and
+<code>closed</code> goes on as well.</li>
+<li>The next line begins with a continuation: one of the words <code>and</code>, <code>or</code>,
+<code>in</code>, <code>where</code>, <code>then</code>, <code>else</code>, <code>from</code>, <code>decides</code>, <code>occupied_by</code>,
+<code>establishes</code>, <code>using</code>, <code>for</code>, <code>rank</code>, <code>as</code>, <code>to</code>, <code>version</code> and <code>fuel</code>,
+or one of the tokens <code>.</code>, <code>,</code>, <code>-&gt;</code>, <code>=&gt;</code>, <code>:</code>, <code>=</code>, <code>|</code>, <code>&lt;</code>, <code>!</code>, <code>{</code>,
+<code>(</code> and <code>[</code>.</li>
+</ul>
+<p>A blank line has no token, and neither has a line that holds only a
+comment. The first case holds across such lines. The second holds across
+them only for a line that begins with <code>and</code>, <code>or</code>, <code>in</code>, <code>.</code>, <code>,</code>, <code>-&gt;</code>,
+<code>=&gt;</code>, <code>:</code>, <code>=</code>, <code>|</code> or <code>&lt;</code>. No statement begins with one of those, so a
+condition can carry a comment between its lines:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">rule</span> BothConditions <span class="tk-pu">:</span> <span class="tk-kw">derive</span> <span class="tk-kw">from</span> <span class="tk-st">&quot;cite&quot;</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">when</span> operative A
+        <span class="tk-co">// the second condition</span>
+        <span class="tk-kw">and</span> operative B
+    <span class="tk-kw">then</span> <span class="tk-kw">derive</span> C
+<span class="tk-pu">}</span></code></pre></figure>
+<p>The guard of that rule is <code>operative A and operative B</code>. Each of the
+other continuations, such as <code>then</code>, <code>for</code> or <code>(</code>, can begin a statement
+of its own, so below a blank line or a comment line it does not continue
+the statement above. That holds where the parser tests whether a
+statement has ended, as it does after the condition of an <code>if</code> and after
+the word <code>else</code>: the block of a branch does not stand below a blank line
+or a comment line. In some places where it expects the next part of a form
+it does not test, and reads on across blank and comment lines: an <code>else</code>
+after the block of an <code>if</code>, for example, and the <code>{ ... }</code> block that
+follows the domain of a quantifier or the word <code>transaction</code>.</p>
+<p>Parentheses, brackets and braces do not change the rule: a line break
+inside them ends the expression before it in the same cases. <code>(1</code>
+followed by the line <code>+ 2)</code> is rejected, because <code>+</code> is not a
+continuation. Write <code>(1 +</code> and then <code>2)</code>.</p>
+<p>Text the parser steps over without reading it, such as a <code>verify</code> field
+it does not read or a clause it keeps as text, ends by the same rule with
+three differences. A line break inside its parentheses, brackets or
+braces does not end it. A prefix word at the end of a line does not carry
+it into the next line. And it ends after the <code>}</code> that closes its
+outermost brace, unless a continuation follows.</p>
+<p>A declaration does not go on into the declaration below it. Outside the
+parentheses, brackets and braces that a declaration has opened and not
+closed, a line that begins with a declaration keyword is no part of that
+declaration, whatever the line above it ends in. Blank lines and comment
+lines between the two change nothing. There is one exception: below the
+header of a <code>for_all</code> or an <code>exists</code> that ends in <code>:</code>, a line that begins
+with <code>for_all</code> or <code>exists</code> is the body of the quantifier.</p>
+<p>So the first case above does not carry a header into such a line. A
+header that leaves no bracket open and whose line ends in <code>,</code>, <code>.</code>, <code>:</code>,
+<code>!</code>, <code>-&gt;</code>, <code>=&gt;</code>, <code>=</code>, <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>+</code>, <code>-</code>, <code>/</code>, <code>|</code> or
+<code>..</code> is not finished above such a line, and the module is rejected with
+<code>E100</code>: <code>rule R : derive from Basis +</code> above the line <code>clause C {</code> is
+rejected, and <code>clause C</code> is a declaration with its own block. That holds
+wherever in a header the token stands: after an operator that lacks its
+operand, after a name that ends in <code>.</code>, after the <code>!</code> of an effect row,
+among type arguments that <code>&lt;</code> opens and no <code>&gt;</code> closes, and after the <code>:</code>,
+<code>-&gt;</code> or <code>=</code> that a type follows. A prefix word at the end of the <code>from</code>
+basis of a rule, or of an expression in the header of a judgment or an
+observation, lacks its operand in the same way: the module is rejected
+with <code>E100</code>, and the declaration below is read. A type on the next line
+that is no declaration keyword is read: <code>entity Pat :</code> followed by the
+line <code>NaturalPerson</code> declares <code>Pat</code>. Inside a bracket that the
+declaration has left open, the lines below can still be read as what the
+bracket holds: below <code>proposition P(</code>, the line <code>clause C {</code> is read as a
+parameter, and the module is rejected with no clause declared.</p>
+<p>A keyword that takes a name, such as <code>entity</code>, <code>rule</code> or <code>query</code>, is
+rejected with <code>E100</code> when its statement ends with it: the name is not
+read from the next line. It is rejected as well when the token after it
+is not a name, as in <code>power { holder A }</code> or <code>entity : NaturalPerson</code>.
+The six header keywords, <code>jurisdiction</code>, <code>source_snapshot</code>,
+<code>source_manifest</code>, <code>effective_at</code>, <code>recorded_at</code> and <code>outside_scope</code>, are
+rejected with <code>E100</code> in the same way when the statement ends with the
+keyword: the value is not read from the next line.</p>
+<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> <span class="tk-nu">21</span> <span class="tk-nu">counted_days</span>
@@ -303,37 +475,46 @@ determination instead of treating <code>P</code> as a Bool.</p>
 
 <span class="tk-kw">calc</span> federal_hourly_floor<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Money</span><span class="tk-pu">&lt;</span><span class="tk-ty">USD</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> USD<span class="tk-pu">(</span><span class="tk-nu">7.25</span><span class="tk-pu">)</span>
-<span class="tk-pu">}</span>
-
-<span class="tk-kw">query</span> <span class="tk-kw">automatic</span> deadline_running<span class="tk-pu">(</span>end<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">,</span> as_of<span class="tk-pu">:</span> <span class="tk-ty">Time</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">return</span> as_of <span class="tk-pu">&lt;=</span> end <span class="tk-pu">+</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
+<p>A <code>calc</code> or an <code>fn</code> needs its <code>{ ... }</code> body. A header with none is
+rejected with <code>E100</code>.</p>
+<p>Fidryn 0.2 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
+only by a duty's <code>due</code> clause; see <a href="#duties">Duties</a>.</p>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
 calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
-<code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> is not
-<code>21 days</code>.</p>
+<code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>). <code>21 counted_days</code> and <code>21 days</code>
+have different types, but a duty's <code>due</code> clause counts each of them as
+21 days of 24 hours.</p>
 <p><code>if</code> / <code>else</code> is Boolean control flow. The condition must be a <code>Bool</code>,
 not a proposition. <a href="https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr"><code>prelude/tax.fr</code></a> uses it on
 amounts:</p>
-<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>if amount &lt;= 11925.00 {
-    amount * 0.10
-} else {
-    if amount &lt;= 48475.00 {
-        11925.00 * 0.10 + (amount - 11925.00) * 0.12
-    } else {
-        if amount &lt;= 103350.00 {
-            11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
-        } else {
-            17651.00 + (amount - 103350.00) * 0.24
-        }
-    }
-}</code></pre></figure>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">if</span> amount <span class="tk-pu">&lt;=</span> <span class="tk-nu">11925.00</span> <span class="tk-pu">{</span>
+    amount <span class="tk-pu">*</span> <span class="tk-nu">0.10</span>
+<span class="tk-pu">}</span> <span class="tk-kw">else</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">if</span> amount <span class="tk-pu">&lt;=</span> <span class="tk-nu">48475.00</span> <span class="tk-pu">{</span>
+        <span class="tk-nu">11925.00</span> <span class="tk-pu">*</span> <span class="tk-nu">0.10</span> <span class="tk-pu">+</span> <span class="tk-pu">(</span>amount <span class="tk-pu">-</span> <span class="tk-nu">11925.00</span><span class="tk-pu">)</span> <span class="tk-pu">*</span> <span class="tk-nu">0.12</span>
+    <span class="tk-pu">}</span> <span class="tk-kw">else</span> <span class="tk-pu">{</span>
+        <span class="tk-kw">if</span> amount <span class="tk-pu">&lt;=</span> <span class="tk-nu">103350.00</span> <span class="tk-pu">{</span>
+            <span class="tk-nu">11925.00</span> <span class="tk-pu">*</span> <span class="tk-nu">0.10</span> <span class="tk-pu">+</span> <span class="tk-pu">(</span><span class="tk-nu">48475.00</span> <span class="tk-pu">-</span> <span class="tk-nu">11925.00</span><span class="tk-pu">)</span> <span class="tk-pu">*</span> <span class="tk-nu">0.12</span> <span class="tk-pu">+</span> <span class="tk-pu">(</span>amount <span class="tk-pu">-</span> <span class="tk-nu">48475.00</span><span class="tk-pu">)</span> <span class="tk-pu">*</span> <span class="tk-nu">0.22</span>
+        <span class="tk-pu">}</span> <span class="tk-kw">else</span> <span class="tk-pu">{</span>
+            <span class="tk-nu">17651.00</span> <span class="tk-pu">+</span> <span class="tk-pu">(</span>amount <span class="tk-pu">-</span> <span class="tk-nu">103350.00</span><span class="tk-pu">)</span> <span class="tk-pu">*</span> <span class="tk-nu">0.24</span>
+        <span class="tk-pu">}</span>
+    <span class="tk-pu">}</span>
+<span class="tk-pu">}</span></code></pre></figure>
+<p>The <code>{</code> after the condition opens the branch. In the condition of an
+<code>if</code>, in the domain of a quantifier, and in the header of a rule, a
+judgment or an observation, a name followed by <code>{</code> is therefore the name
+alone and is not applied to the block: <code>if flag { 1 } else { 2 }</code> tests
+<code>flag</code>. A record constructor written with its name needs parentheses
+there, as in <code>if (R { x: 1 }) == r { 1 } else { 2 }</code>.</p>
+<p>An <code>if</code> or an <code>else</code> needs its branch in the same statement. With none,
+the module is rejected with <code>E100</code>.</p>
 <p>This is a rejected guard (E310):</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> bad<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">LegalPerson</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> if Incapacitated<span class="tk-pu">(</span>Bryan<span class="tk-pu">)</span> <span class="tk-pu">{</span> Bryan <span class="tk-pu">}</span> <span class="tk-pu">}</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> <span class="tk-kw">if</span> Incapacitated<span class="tk-pu">(</span>Bryan<span class="tk-pu">)</span> <span class="tk-pu">{</span> Bryan <span class="tk-pu">}</span> <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Use <code>when operative P</code> on a rule, or <code>require determined P using Determine</code> in a query. <code>Prop</code> has no conversion to <code>Bool</code>.</p>
-<h2 id="rules"><span class="hn">2.12</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
+<h2 id="rules"><span class="hn">2.13</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
 <p>A <code>rule</code> fires when a guard holds, then derives or establishes a
 proposition. The current staged worklist is <strong>bounded and specialized</strong>
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>); this is not a
@@ -345,14 +526,31 @@ are not that worklist. The kind is <code>derive</code>, <code>constitutive</code
     <span class="tk-kw">when</span> operative TrustInstrumentExecuted<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">in</span> TrustCreation<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span>
     <span class="tk-kw">then</span> <span class="tk-kw">establish</span> Occupies<span class="tk-pu">(</span>Bryan<span class="tk-pu">,</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>when operative P</code> tests legal status. <code>when determined P</code> tests a
-competent determination already on the case. <code>then derive</code> and
-<code>then establish</code> are the usual consequences. Guards must use
-<code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a bare
-proposition. The successor rule in the trust fixture also
+<p>The <code>from</code> basis can also be a bare name, as in <code>from Instrument</code>: the <code>{</code>
+after it opens the rule's body. A rule needs that body. A rule header
+with no <code>{ ... }</code> after it is rejected with <code>E100</code>.</p>
+<p>The body holds <code>when</code>, <code>then</code>, <code>otherwise</code>, <code>require</code>, <code>select</code> and
+<code>source</code> statements. Other text in it is rejected with <code>E100</code>, and so is
+a <code>then</code> or an <code>otherwise</code> that no consequence follows, and a <code>when</code>, a
+<code>require</code> or a <code>source</code> with no expression after it. A consequence names
+a proposition: <code>then establish 5</code> is rejected with <code>E210</code>, and so is a
+consequence that is the name of an entity whose type is neither <code>Prop</code>
+nor an alias of <code>Prop</code>. Two more lines are accepted:
+<code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
+its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
+not apply them: the consequences of the rule hold at every time, whatever
+the interval says (see
+<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests">implementation-status</a>).</p>
+<p><code>when operative P</code> tests legal status. <code>in TrustCreation(BRT)</code> names the
+legal context of that test. The guard still turns on the proposition
+<code>TrustInstrumentExecuted(BRT)</code>. It is not a proposition named <code>in</code>.
+<code>when determined P</code> tests for a determination of <code>P</code> already on the case.
+<code>then derive</code> and <code>then establish</code> are the usual consequences. Guards
+must use <code>operative</code>, <code>determined</code>, <code>assumed</code>, or <code>necessarily</code> — not a
+bare proposition. The successor rule in the trust fixture also
 <code>select unique candidate from nominations_for(...)</code> with
 <code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
-<h2 id="interpretation-families"><span class="hn">2.13</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
+<h2 id="interpretation-families"><span class="hn">2.14</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
 <p>When the instrument still admits more than one reading, declare the
 family and what each alternative establishes.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">interpretation_family</span> DeadlineMeaning <span class="tk-pu">{</span>
@@ -376,7 +574,7 @@ and the case has not selected one, the outcome is <code>suspended</code>
 <p>The trust fixture binds a family to a clause and names a selector
 (<code>explicit_instrument_definition or controlling_interpretation or request Interpret</code>). That is how a court selection on the case becomes
 operative. It is not a default vote.</p>
-<h2 id="nominations"><span class="hn">2.14</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
+<h2 id="nominations"><span class="hn">2.15</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
 <p>A nomination is a ranked candidate for an office.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">nomination</span> Alice <span class="tk-kw">for</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">rank</span> <span class="tk-nu">1</span>
     <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4.a&quot;</span><span class="tk-pu">)</span>
@@ -389,18 +587,20 @@ occupancy record, eligibility, and any required acceptance. Open
 eligibility stays <code>suspended</code>, or becomes <code>contingent</code> under
 <a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
 the first name on the list.</p>
-<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.15</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
-<p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
-They are <strong>status-qualified</strong>: parsed and checked, with specialized
-evaluation paths — not a general operational law engine. See
-<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
+<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.16</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
+<p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">conflict_doctrine</span> ChildSupportCannotBeAdverselyAffected <span class="tk-pu">..</span><span class="tk-pu">.</span></code></pre></figure>
-<p>When staged effects disagree and no unique doctrine applies, the outcome
-kind is <code>normConflict</code> (or a <code>needConflict</code> request). List order is never
-a silent tie-break.</p>
-<h2 id="duties"><span class="hn">2.16</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
+<p>Fidryn 0.2 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
+<code>conflict_doctrine</code> or <code>scenario</code> declarations, so an unknown field in
+one of them passes without a diagnostic. A <code>clause</code> body is kept as text.
+The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
+<code>ChildSupportWaiver</code>; see <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>.</p>
+<p>When the rules' staged effects both add and withdraw the same
+proposition, the outcome kind is <code>normConflict</code>. No <code>conflict_doctrine</code>
+is consulted, and list order is never a silent tie-break.</p>
+<h2 id="duties"><span class="hn">2.17</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
 <p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
 From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr"><code>tests/programs/late-payment.fr</code></a>:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">duty</span> PayInvoice <span class="tk-pu">{</span>
@@ -411,8 +611,10 @@ From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-pa
     <span class="tk-kw">due</span> <span class="tk-nu">0</span> <span class="tk-nu">counted_days</span> after invoice_date
 <span class="tk-pu">}</span>
 
-<span class="tk-kw">query</span> obligation_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">String</span> <span class="tk-pu">{</span>
-    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> duty_status<span class="tk-pu">(</span>PayInvoice<span class="tk-pu">)</span> <span class="tk-pu">}</span>
+<span class="tk-kw">query</span> obligation_status<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">DutyState</span> <span class="tk-pu">{</span>
+    <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span>
+        duty_status<span class="tk-pu">(</span>PayInvoice<span class="tk-pu">)</span>
+    <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p><code>duty_status(Name)</code> looks up that duty declaration plus the case on the
 <strong>implemented specialized duty path</strong> (see late-payment fixtures and
@@ -427,47 +629,164 @@ guard. A <code>kind: duty</code> event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit <code>assumption</code>. That gate is in
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2 id="transactions-and-quantifiers"><span class="hn">2.17</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
+<h2 id="transactions-and-quantifiers"><span class="hn">2.18</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
 <p><code>transaction { ... }</code> blocks exist in the grammar and are exercised by
 <code>tests/programs/transaction-atomic.fr</code>. Support is <strong>partial</strong> — not a
 full atomic commit engine for arbitrary legal acts.</p>
 <p><code>for_all</code> / <code>exists</code> quantify over <strong>finite declared domains</strong> (and
-closures where required). Open domains suspend. Nested / open-world
+closures where required). The body follows the domain after a <code>:</code> or as a
+block: <code>for_all x in Scores: x &gt; 0</code> and <code>for_all x in Scores { x &gt; 0 }</code>
+are the same quantifier. Open domains suspend. Nested / open-world
 theorem proving is not implemented. Prefer reading
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a> before treating a
 quantified <code>verify</code> as a proved theorem.</p>
-<h2 id="scenarios-in-module"><span class="hn">2.18</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
-<p>A <code>scenario</code> block names overlay hypotheses for fixtures that do not
-ship companion JSON case files (for example under <code>examples/states/</code>).
-It is not a silent default for <code>run</code>.</p>
+<h2 id="scenarios-in-module"><span class="hn">2.19</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
+<p>A <code>scenario</code> block writes down example hypotheses in fixtures that do
+not ship companion JSON case files (for example under
+<code>examples/states/</code>).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">scenario</span> InsideCityHalfAcre <span class="tk-pu">{</span>
     <span class="tk-kw">assume</span> OccupiesAsResidence<span class="tk-pu">(</span>Owner<span class="tk-pu">,</span> Home<span class="tk-pu">)</span>
     <span class="tk-kw">assume</span> InsideMunicipality<span class="tk-pu">(</span>Home<span class="tk-pu">)</span>
     <span class="tk-kw">assume</span> within_urban_acreage<span class="tk-pu">(</span><span class="tk-nu">0.5</span><span class="tk-pu">)</span>
     <span class="tk-kw">at</span> <span class="tk-nu">2026-09-17T12:00:00-04:00</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Case JSON
-can carry analogous overlay rows as <code>assumptions</code> (<code>id</code>, <code>payload</code>);
-CLI <code>run --scenario</code> applies them, and the mill treats a nonempty
-<code>assumptions</code> list as scenario mode. Default operative <code>run</code> does not.
-See <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
-<h2 id="verify"><span class="hn">2.19</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property. v0.1 discharges Boolean
-literals:</p>
-<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Trivial <span class="tk-pu">{</span>
+<p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Fidryn
+0.2 does not interpret a <code>scenario</code> block: the parser reads its name and
+skips its body, and nothing in it reaches evaluation
+(<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>). Neither <code>run</code> nor
+<code>run --scenario</code> reads these blocks.</p>
+<p>Scenario evaluation is driven by the case record. Its <code>assumptions</code>
+rows (<code>id</code>, <code>payload</code>) are applied when you pass <code>run --scenario</code>, and
+the report's <code>executionMode</code> is then <code>scenario</code>. The mill uses scenario
+mode when the pasted case has a nonempty <code>assumptions</code> list. A default
+<code>run</code> is operative and ignores <code>assumptions</code>. See
+<a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
+<h2 id="verify"><span class="hn">2.20</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
+<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.2
+decides closed formulas only: literals, arithmetic, comparisons, Boolean
+connectives, and quantifiers over a literal set or bounded synthetic
+entities.</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> Arithmetic <span class="tk-pu">{</span>
     <span class="tk-kw">assert</span> <span class="tk-nu">true</span>
+    <span class="tk-kw">assert</span> <span class="tk-nu">1</span> <span class="tk-pu">+</span> <span class="tk-nu">1</span> <span class="tk-pu">==</span> <span class="tk-nu">2</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p><code>assert true</code> proves. <code>assert false</code> is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:</p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> verify PATH <span class="tk-ty">--property</span> NAME</code></pre></figure>
+<p>Both assertions hold, so the property is proved. A false assertion, such
+as <code>assert false</code> or <code>assert 1 + 1 == 3</code>, is a counterexample. An
+assertion that cannot be decided without a query or a proposition is
+unresolved, and the property is then <code>unknown</code> unless another assertion
+is false. For those properties,</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- verify PATH --property NAME</code></pre></figure>
 <p>reports <code>unknown</code> rather than pretending they are theorems. Fixture
 modules often write honesty properties in English-shaped <code>assert</code>
 lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
-<h2 id="what-the-language-will-not-do"><span class="hn">2.20</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
+<h3 id="the-fields-of-a-verify-block"><span class="hn">2.20.1</span> The fields of a verify block <a class="anchor" href="#the-fields-of-a-verify-block" aria-label="Link to this section">#</a></h3>
+<p>A verify block is a list of fields. Nine words begin a field:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>First word</th><th>What <code>verify</code> does with the field</th></tr></thead><tbody>
+<tr><td><code>assert</code></td><td>The expression after it is an assertion.</td></tr>
+<tr><td><code>for_all</code>, <code>exists</code></td><td>The expression the word begins is an assertion, checked in the same way.</td></tr>
+<tr><td><code>bounds</code></td><td>It is read for three numbers, the synthetic persons, events and time points, and for nothing else.</td></tr>
+<tr><td><code>interpretations</code>, <code>judgments</code>, <code>choices</code>, <code>assuming</code></td><td>The field is recognized and not read.</td></tr>
+<tr><td><code>for</code></td><td>A <code>for every</code> line is not evaluated. It is kept as an assertion that cannot be decided.</td></tr>
+</tbody></table>
+</div>
+<p>An assertion that cannot be decided leaves the property <code>unknown</code> unless
+another assertion is false. A block with no assertion is <code>unknown</code> too,
+whatever its comments say: a comment is never read as an assertion.</p>
+<p>The bounds come from a <code>bounds</code> field and from nowhere else. Each of the
+three numbers is read at the first place where its word, <code>persons</code>,
+<code>events</code> or <code>time_points</code>, stands as a token in the field. When the next
+token is an integer, or a <code>:</code> followed by an integer, that integer is the
+number. Otherwise the number is zero, as it is when the word is not in the
+field. So <code>bounds persons x persons 2</code> gives zero persons, and so do
+<code>persons: 2.5</code>, which is not an integer, and an integer that does not fit
+in 32 bits.</p>
+<p>No comment sets a number, wherever it stands: inside the field, after it
+on its line, or on the lines below it. The contents of a string are not
+read either. Another field that holds the word <code>bounds</code> does not set the
+bounds, and a block with no <code>bounds</code> field has zero of each. When a block
+has several <code>bounds</code> fields, the last one counts. The test
+<code>the_bounds_come_only_from_a_bounds_field</code> in
+<code>tests/integration/verify_blocks.rs</code> pins each of these rules.</p>
+<p>A field ends where its statement ends; see
+<a href="#where-a-statement-ends">Where a statement ends</a>. An <code>assert</code>, <code>for_all</code>,
+<code>exists</code> or <code>bounds</code> field, and a field that is not read, ends earlier
+where the next field begins, as if a <code>;</code> stood there:</p>
+<ul>
+<li>
+<p>The word <code>assert</code> begins a field wherever it stands, in the middle of a
+line too.</p>
+</li>
+<li>
+<p>A line that begins with one of the other eight words begins a field. In
+the middle of a line those words do not cut a field short:
+<code>assuming fair for every x in {1, 2}: x == 3</code> is one <code>assuming</code> field,
+and none of it is read.</p>
+</li>
+<li>
+<p>There is one exception. Below an <code>assert</code>, <code>for_all</code> or <code>exists</code> field,
+a line that begins with <code>for_all</code> or <code>exists</code> does not end that field.
+It continues the line above when the statement goes on into it, and is
+a field of its own when the statement has ended. This is one assertion,
+and it is proved:</p>
+<figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">verify</span> EveryNumberHasAnEqual <span class="tk-pu">{</span>
+    <span class="tk-kw">for_all</span> x <span class="tk-kw">in</span> <span class="tk-pu">{</span><span class="tk-nu">1</span><span class="tk-pu">,</span> <span class="tk-nu">2</span><span class="tk-pu">}</span><span class="tk-pu">:</span>
+        <span class="tk-kw">exists</span> y <span class="tk-kw">in</span> <span class="tk-pu">{</span><span class="tk-nu">1</span><span class="tk-pu">,</span> <span class="tk-nu">2</span><span class="tk-pu">}</span><span class="tk-pu">:</span> x <span class="tk-pu">==</span> y
+<span class="tk-pu">}</span></code></pre></figure>
+</li>
+<li>
+<p>Nothing inside the parentheses, brackets or braces of a field begins a
+field.</p>
+</li>
+</ul>
+<p>A <code>for every</code> line, and a line the block does not recognize, have no
+early end. The parser steps over such a line as text it does not read,
+together with every line that text goes on into, an <code>assert</code> line
+included, and the whole is one assertion that cannot be decided.</p>
+<p>An expression that is complete where the next field begins is an
+assertion. One that is cut off there gets the diagnostic it would get
+before a <code>;</code>: <code>assert true or 1 +</code> followed by the line <code>assert false</code> is
+rejected with <code>E100</code>, "expected expression after operator", and
+<code>assert if true { true } else</code> followed by the line <code>assert true</code> is
+rejected with <code>E100</code>, "expected <code>{</code> after <code>else</code>". Where the parser has no
+diagnostic before a <code>;</code>, there is none here either: <code>not</code> with nothing
+after it gives no expression. An <code>assert</code> with no expression, <code>assert not</code>
+included, is an assertion that cannot be decided.</p>
+<p>Text that follows the expression of an <code>assert</code>, <code>for_all</code> or <code>exists</code>
+field is read as the next field when it begins with one of the nine
+words. That is rare on one line, because a word that directly follows an
+expression is normally taken into the expression as an operand:
+<code>assert true assuming fair</code> is one assertion, and it cannot be decided.
+Before a <code>:</code> or an <code>=</code> a word is not an operand, so
+<code>assert true assuming: x</code> is the assertion <code>true</code> followed by an
+<code>assuming</code> field.</p>
+<p>Text that begins with none of the nine words, such as a misspelled
+<code>assert</code>, is not dropped either. When the field above goes on into it, it
+is part of that field. Otherwise it is read as a line of its own and kept
+as an assertion that cannot be decided, with one difference after an
+<code>assert</code>: the <code>assert</code> and the text that follows its expression, on the
+same line or below it, are together one assertion that cannot be decided,
+and the module is rejected with <code>E100</code> when that text begins with
+something other than a word.</p>
+<p>Two limits remain.</p>
+<ul>
+<li>What stands inside the parentheses, brackets or braces of a <code>bounds</code>
+field, or of a field that is not read, belongs to that field, and so
+does a line that begins with none of the nine words when the field goes
+on into it. None of it is read as an assertion: an <code>assert false</code>
+between the braces of an <code>interpretations</code> field or of a <code>bounds</code> field
+is not read.</li>
+<li><code>verify</code> evaluates an assertion; it does not type-check it. A true
+operand of <code>or</code> and a false operand of <code>and</code> settle the result whatever
+the other operand is, and the branch an <code>if</code> does not take is not
+examined. So <code>assert true or no_such_name</code> is proved, and so is
+<code>assert true or 1 +</code> followed by the line
+<code>for_all x in {1, 2}: x == 3</code>, where the second line is the right
+operand of <code>+</code>.</li>
+</ul>
+<h2 id="what-the-language-will-not-do"><span class="hn">2.21</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
 <p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
 <code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,
 <code>assumed</code>, or <code>necessarily</code>, or request <code>Determine</code>.</p>
@@ -487,12 +806,12 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/language.md">Edit this page on GitHub</a><a href="/docs/language.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.11</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.12</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.13</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.14</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.15</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.16</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.17</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.18</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.19</span> Verify</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.20</span> What the language will not do</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn v0.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

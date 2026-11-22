@@ -129,6 +129,7 @@ module Kansas.Property.Homestead version "0.1.0" {
             require observed OccupancyRecord
             require determined HomesteadCharacter(Home, Owner)
                 using Determine
+            return true
         }
     }
 
@@ -139,6 +140,7 @@ module Kansas.Property.Homestead version "0.1.0" {
         goal Evaluate {
             require determined ExceptedCreditor(Creditor)
                 using Determine
+            return true
         }
     }
 
@@ -149,6 +151,7 @@ module Kansas.Property.Homestead version "0.1.0" {
         goal Evaluate {
             require determined AbandonedHomestead(Home, Owner)
                 using Determine
+            return true
         }
     }
 

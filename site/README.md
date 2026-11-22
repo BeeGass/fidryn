@@ -29,8 +29,9 @@ so a change in semantics also shows up as a stale site.
 | `llms.txt`, `llms-full.txt`, `sitemap.xml`, `robots.txt` | Generated |
 | `vercel.json` | Deploy config: clean URLs, headers, caching |
 
-Implementer docs (`ARCHITECTURE.md`, `OBLIGATIONS.md`, contracts, the
-status matrix) stay on GitHub; the docs overview links to them.
+Implementer docs (`ARCHITECTURE.md`, the implementation status page and
+the internal index, `internal/README.md`) stay on GitHub; the docs
+overview and the sidebar's Implementers group link to them.
 
 Never edit generated files by hand; the next run overwrites them.
 

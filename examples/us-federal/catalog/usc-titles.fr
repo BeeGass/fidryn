@@ -71,7 +71,7 @@ module US.Federal.Code.Catalog version "0.1.0" {
     proposition EncodedSlice(name: String)
     proposition TitleRemainsOutside(title: String)
 
-    rule CatalogHonesty : constitutive
+    rule CatalogHonesty(name: String) : constitutive
         from OLRC
     {
         when operative EncodedSlice(name)

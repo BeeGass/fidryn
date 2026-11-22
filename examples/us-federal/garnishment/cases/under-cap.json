@@ -2,8 +2,30 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "US.Federal.Garnishment.CCPA@0.1.0",
   "facts": {
-    "garnished": "USD(200.00)",
-    "cap": "USD(250.00)"
+    "garnished": {
+      "kind": "ctor",
+      "data": {
+        "name": "USD",
+        "fields": {
+          "_0": {
+            "kind": "decimal",
+            "data": "200.00"
+          }
+        }
+      }
+    },
+    "cap": {
+      "kind": "ctor",
+      "data": {
+        "name": "USD",
+        "fields": {
+          "_0": {
+            "kind": "decimal",
+            "data": "250.00"
+          }
+        }
+      }
+    }
   },
   "admissibleCompletions": {}
 }

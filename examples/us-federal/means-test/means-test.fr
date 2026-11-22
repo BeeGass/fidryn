@@ -39,6 +39,7 @@ module US.Federal.Bankruptcy.MeansTest version "0.1.0" {
         goal Evaluate {
             require determined SpecialCircumstances(Debtor)
                 using Determine
+            return true
         }
     }
 

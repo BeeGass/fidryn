@@ -17,7 +17,10 @@ use fidryn_core::{
     TrustProfile, Value, VerifiedSourceBundle, canonical_json, is_safe_package_name,
     package_name_from_import, packages_root,
 };
-use fidryn_eval::{evaluate, evaluate_scenario, report_from_scenario};
+use fidryn_eval::{
+    ExecutionBudget, evaluate_scenario_traced_with_budget, evaluate_traced_with_budget,
+    report_from_scenario,
+};
 use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_syntax::ast::{HeaderKind, Item};
@@ -25,7 +28,9 @@ use fidryn_syntax::parse_file;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs;
 use std::hash::{Hash, Hasher};
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Read, Write};
+#[cfg(unix)]
+use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -122,6 +127,8 @@ struct RunInput<'db> {
     #[returns(copy)]
     scenario: bool,
     #[returns(copy)]
+    budget: Option<u32>,
+    #[returns(copy)]
     fuel_attempt: u64,
 }
 
@@ -161,21 +168,42 @@ fn compile_checked<'db>(db: &'db dyn DriverJar, input: CheckInput<'db>) -> Check
         compile_with_sources(source, &manifest, None)
     } else {
         match materialize_pinned_root(&artifacts) {
-            Ok(pinned) => compile_with_sources(source, &manifest, Some(pinned.path())),
+            Ok(pinned) => compile_with_sources(source, &manifest, Some(pinned.path())).map_err(
+                |mut diagnostics| {
+                    if let Some(original) = input.source_root(db) {
+                        for diagnostic in &mut diagnostics {
+                            if let Some(file) = &diagnostic.source_file
+                                && let Ok(relative) = Path::new(file).strip_prefix(pinned.path())
+                            {
+                                diagnostic.source_file =
+                                    Some(Path::new(original).join(relative).display().to_string());
+                            }
+                        }
+                    }
+                    diagnostics
+                },
+            ),
             Err(diagnostics) => Err(diagnostics),
         }
     };
-    let bundle = result
-        .is_ok()
-        .then(|| pin_bundle_from_observations(&manifest, &artifacts, unread));
+    let bundle = result.is_ok().then(|| {
+        pin_bundle_from_observations(&manifest, &artifacts, unread)
+            .with_root_source(source.as_bytes())
+    });
     CheckMemo { result, bundle }
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct RunMemo {
+    outcome: Outcome<Value>,
+    derivation: Vec<fidryn_eval::DerivationStep>,
 }
 
 #[salsa::tracked(returns(clone))]
 fn evaluate_query<'db>(
     db: &'db dyn DriverJar,
     input: RunInput<'db>,
-) -> Result<Outcome<Value>, EngineError> {
+) -> Result<RunMemo, EngineError> {
     let module = input.module(db).0;
     let args = input.args(db).0;
     let case = input.case(db).0;
@@ -186,9 +214,23 @@ fn evaluate_query<'db>(
     let ctx = RunContext::new(valid_time, record_time);
     let _fuel_attempt = input.fuel_attempt(db);
     if input.scenario(db) {
-        evaluate_scenario_run(&module, input.query(db), &args, &case, &ctx)
+        evaluate_scenario_run(
+            &module,
+            input.query(db),
+            &args,
+            &case,
+            &ctx,
+            input.budget(db),
+        )
     } else {
-        evaluate_run(&module, input.query(db), &args, &case, &ctx)
+        evaluate_run(
+            &module,
+            input.query(db),
+            &args,
+            &case,
+            &ctx,
+            input.budget(db),
+        )
     }
 }
 
@@ -196,14 +238,45 @@ fn evaluate_query<'db>(
 pub struct Driver {
     db: DriverDb,
     executes: Arc<AtomicU64>,
-    source_bundles: HashMap<TrustKey, VerifiedSourceBundle>,
+    source_bundles: HashMap<TrustKey, Option<VerifiedSourceBundle>>,
     fuel_attempts: HashMap<[u8; 32], u64>,
+    derivations: HashMap<String, Vec<fidryn_eval::DerivationStep>>,
     hits: u64,
     misses: u64,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct TrustKey([u8; 32]);
+
+/// Checked executable and the source observations belonging to this compilation.
+/// A bare Core module cannot distinguish identical programs compiled under different trust.
+#[derive(Clone, Debug)]
+pub struct CompilationArtifact {
+    module: CoreModule,
+    sources: VerifiedSourceBundle,
+    source: String,
+    manifest: SourceManifest,
+    source_inputs: BTreeMap<String, Option<Vec<u8>>>,
+}
+
+impl CompilationArtifact {
+    pub fn module(&self) -> &CoreModule {
+        &self.module
+    }
+    pub fn sources(&self) -> &VerifiedSourceBundle {
+        &self.sources
+    }
+    pub fn source(&self) -> &str {
+        &self.source
+    }
+    pub fn manifest(&self) -> &SourceManifest {
+        &self.manifest
+    }
+    /// Exact dependency/lock observations used by compilation, with missing or unread inputs explicit.
+    pub fn source_inputs(&self) -> &BTreeMap<String, Option<Vec<u8>>> {
+        &self.source_inputs
+    }
+}
 
 impl Driver {
     /// Empty salsa database and memo counters.
@@ -221,6 +294,7 @@ impl Driver {
             executes,
             source_bundles: HashMap::new(),
             fuel_attempts: HashMap::new(),
+            derivations: HashMap::new(),
             hits: 0,
             misses: 0,
         }
@@ -235,6 +309,16 @@ impl Driver {
             self.hits += 1;
         }
         result
+    }
+
+    /// Actual evaluation records retained alongside the memoized outcome.
+    pub fn derivation_of(
+        &self,
+        request: &ExecutionRequest,
+    ) -> Option<&[fidryn_eval::DerivationStep]> {
+        self.derivations
+            .get(&request.identity().hex())
+            .map(Vec::as_slice)
     }
 
     /// Combined check and run cache hits.
@@ -262,6 +346,56 @@ impl Driver {
         self.check_cached(source, manifest, None)
     }
 
+    /// Compile pasted text without filesystem capabilities, retaining its own provenance.
+    pub fn check_source_artifact(
+        &mut self,
+        source: &str,
+        manifest: &SourceManifest,
+    ) -> Result<CompilationArtifact, Vec<Diagnostic>> {
+        self.check_artifact_cached(source, manifest, None)
+    }
+
+    /// Compile a path and retain the exact admitted source bundle.
+    pub fn check_path_artifact(
+        &mut self,
+        path: &Path,
+    ) -> Result<(CompilationArtifact, SourceManifest), Vec<Diagnostic>> {
+        let root = path
+            .parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+            .unwrap_or(Path::new("."));
+        self.check_path_artifact_with_root(path, root)
+    }
+
+    /// Compile within an explicit filesystem capability root. Source artifacts and
+    /// package inputs are relative to this root; manifests remain relative to the module.
+    pub fn check_path_artifact_with_root(
+        &mut self,
+        path: &Path,
+        source_root: &Path,
+    ) -> Result<(CompilationArtifact, SourceManifest), Vec<Diagnostic>> {
+        ensure_path_within(source_root, path)?;
+        let source = read_text_bounded(path, 8 * 1024 * 1024).map_err(|error| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E100,
+                format!("cannot read {}: {error}", path.display()),
+            )]
+        })?;
+        let mut manifest = load_manifest(path, &source, source_root)?;
+        extend_manifest_with_packages(&mut manifest, source_root, &source)?;
+        let artifact = self
+            .check_artifact_cached(&source, &manifest, Some(source_root))
+            .map_err(|mut diagnostics| {
+                for diagnostic in &mut diagnostics {
+                    if diagnostic.source_file.is_none() {
+                        diagnostic.source_file = Some(path.display().to_string());
+                    }
+                }
+                diagnostics
+            })?;
+        Ok((artifact, manifest))
+    }
+
     /// Compile a `.fr` path, loading the declared `source_manifest` or a
     /// `sources/` fallback. A declared path that is missing or malformed is a
     /// diagnostic. Modules that omit a manifest get an empty default.
@@ -278,17 +412,8 @@ impl Driver {
         &mut self,
         path: &Path,
     ) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
-        let src = fs::read_to_string(path).map_err(|e| {
-            vec![Diagnostic::new(
-                DiagnosticCode::E100,
-                format!("cannot read {}: {e}", path.display()),
-            )]
-        })?;
-        let mut manifest = load_manifest(path, &src)?;
-        let source_root = path.parent().unwrap_or(Path::new("."));
-        extend_manifest_with_packages(&mut manifest, source_root, &src)?;
-        let module = self.check_cached(&src, &manifest, Some(source_root))?;
-        Ok((module, manifest))
+        self.check_path_artifact(path)
+            .map(|(artifact, manifest)| (artifact.module, manifest))
     }
 
     fn check_cached(
@@ -297,6 +422,57 @@ impl Driver {
         manifest: &SourceManifest,
         source_root: Option<&Path>,
     ) -> Result<CoreModule, Vec<Diagnostic>> {
+        self.check_artifact_cached(source, manifest, source_root)
+            .map(|artifact| artifact.module)
+    }
+
+    fn check_artifact_cached(
+        &mut self,
+        source: &str,
+        manifest: &SourceManifest,
+        source_root: Option<&Path>,
+    ) -> Result<CompilationArtifact, Vec<Diagnostic>> {
+        if let Some(root) = source_root {
+            let canonical_root = root.canonicalize().map_err(|error| {
+                vec![Diagnostic::new(
+                    DiagnosticCode::E200,
+                    format!("cannot resolve source root: {error}"),
+                )]
+            })?;
+            let mut normalized_paths = BTreeSet::new();
+            let mut resolved_paths = BTreeSet::new();
+            for artifact in &manifest.artifacts {
+                let relative = safe_rel_artifact_path(&artifact.path).ok_or_else(|| {
+                    vec![Diagnostic::new(
+                        DiagnosticCode::E200,
+                        format!("artifact `{}` escapes the source root", artifact.path),
+                    )]
+                })?;
+                if !normalized_paths.insert(relative.clone()) {
+                    return Err(vec![Diagnostic::new(
+                        DiagnosticCode::E200,
+                        format!("duplicate normalized artifact path `{}`", artifact.path),
+                    )]);
+                }
+                if let Ok(resolved) = root.join(relative).canonicalize() {
+                    if !resolved.starts_with(&canonical_root) {
+                        return Err(vec![Diagnostic::new(
+                            DiagnosticCode::E200,
+                            format!(
+                                "artifact `{}` resolves outside the source root",
+                                artifact.path
+                            ),
+                        )]);
+                    }
+                    if !resolved_paths.insert(resolved) {
+                        return Err(vec![Diagnostic::new(
+                            DiagnosticCode::E200,
+                            format!("artifact `{}` aliases another observed file", artifact.path),
+                        )]);
+                    }
+                }
+            }
+        }
         let manifest_json = match serde_json::to_string(manifest) {
             Ok(json) => json,
             Err(err) => {
@@ -310,9 +486,9 @@ impl Driver {
         let snapshot = manifest.snapshot.clone();
         let source_owned = source.to_owned();
         let root_display = source_root.map(|path| path.display().to_string());
-        let mut artifacts = artifact_observations(manifest, source_root);
+        let mut artifacts = artifact_observations(manifest, source_root)?;
         if let Some(root) = source_root {
-            collect_nested_package_inputs(root, source, &mut artifacts);
+            collect_nested_package_inputs(root, source, &mut artifacts)?;
         }
         let memo = self.with_memo(|db| {
             let input = CheckInput::new(
@@ -325,12 +501,114 @@ impl Driver {
             );
             compile_checked(db, input)
         });
-        if let (Ok(module), Some(bundle)) = (&memo.result, memo.bundle) {
+        let module = memo.result?;
+        let bundle = memo.bundle.ok_or_else(|| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                "successful compilation did not retain its source observations",
+            )]
+        })?;
+        {
             self.source_bundles
-                .entry(trust_key(module))
-                .or_insert(bundle);
+                .entry(trust_key(&module))
+                .and_modify(|previous| {
+                    if previous.as_ref() != Some(&bundle) {
+                        *previous = None;
+                    }
+                })
+                .or_insert_with(|| Some(bundle.clone()));
         }
-        memo.result
+        let source_inputs = artifacts
+            .into_iter()
+            .map(|(path, _, observation)| {
+                (
+                    path,
+                    match observation {
+                        ArtifactObservation::Bytes(bytes) => Some(bytes),
+                        _ => None,
+                    },
+                )
+            })
+            .collect();
+        Ok(CompilationArtifact {
+            module,
+            sources: bundle,
+            source: source.to_owned(),
+            manifest: manifest.clone(),
+            source_inputs,
+        })
+    }
+
+    /// Evaluate using the provenance of a particular compilation, unaffected by cache history.
+    pub fn run_artifact_report(
+        &mut self,
+        artifact: &CompilationArtifact,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        scenario: bool,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.run_artifact_report_with_budget(artifact, query, case, ctx, scenario, None)
+    }
+
+    pub fn run_artifact_report_with_budget(
+        &mut self,
+        artifact: &CompilationArtifact,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        scenario: bool,
+        budget: Option<u32>,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        let mut report = self.finish_run_report_with_budget(
+            &artifact.module,
+            query,
+            case,
+            ctx,
+            &BTreeMap::new(),
+            scenario,
+            budget,
+        )?;
+        report.trust = artifact.sources.trust_summary();
+        report.source_bundle = Some(artifact.sources.identity().hex());
+        Ok(report)
+    }
+
+    /// Qualify a report using this compilation and its invocation, including covering replay.
+    pub fn run_artifact_checked(
+        &mut self,
+        artifact: &CompilationArtifact,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        scenario: bool,
+    ) -> Result<fidryn_kernel::CheckedEvaluation, EngineError> {
+        self.run_artifact_checked_with_budget(artifact, query, case, ctx, scenario, None)
+    }
+
+    pub fn run_artifact_checked_with_budget(
+        &mut self,
+        artifact: &CompilationArtifact,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        scenario: bool,
+        budget: Option<u32>,
+    ) -> Result<fidryn_kernel::CheckedEvaluation, EngineError> {
+        let report =
+            self.run_artifact_report_with_budget(artifact, query, case, ctx, scenario, budget)?;
+        let mode = report.execution_mode;
+        fidryn_kernel::CheckedEvaluation::validate(
+            &artifact.module,
+            &QueryName::from(query),
+            case,
+            ctx,
+            &BTreeMap::new(),
+            mode,
+            Some(&artifact.sources),
+            report,
+        )
+        .map_err(EngineError::InvalidInput)
     }
 
     /// Compile a `.fr` path, discarding the loaded manifest.
@@ -366,11 +644,9 @@ impl Driver {
     /// Evaluate `query` and wrap the outcome as [`EvaluationReport`].
     ///
     /// [`Self::run`] stays operative (assumptions ignored for committed
-    /// status; the run cache stores those outcomes). Nonempty
-    /// `case.assumptions` selects [`fidryn_eval::evaluate_scenario`] and
-    /// `ExecutionMode::Scenario` so a case file cannot silently render as
-    /// an unconditional operative result. The caller's `case.events` is
-    /// not mutated.
+    /// status; the run cache stores those outcomes). Scenario evaluation is
+    /// selected explicitly through [`Self::run_report_scenario`]. The caller's
+    /// `case.events` is not mutated.
     pub fn run_report(
         &mut self,
         module: &CoreModule,
@@ -392,10 +668,29 @@ impl Driver {
         self.finish_run_report(module, query, case, ctx, args, false)
     }
 
+    pub fn run_report_with_budget(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        scenario: bool,
+        budget: Option<u32>,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
+        self.finish_run_report_with_budget(
+            module,
+            query,
+            case,
+            ctx,
+            &BTreeMap::new(),
+            scenario,
+            budget,
+        )
+    }
+
     /// Like [`Self::run_report`], always as a scenario overlay.
     ///
-    /// Used by CLI `--scenario`. Nonempty `case.assumptions` already take
-    /// this path from [`Self::run_report`].
+    /// Used by CLI `--scenario`; hypotheses are disclosed on the report.
     pub fn run_report_scenario(
         &mut self,
         module: &CoreModule,
@@ -426,20 +721,37 @@ impl Driver {
         args: &BTreeMap<String, Value>,
         scenario: bool,
     ) -> Result<EvaluationReport<Value>, EngineError> {
-        let scenario = scenario || !case.assumptions.is_empty();
+        self.finish_run_report_with_budget(module, query, case, ctx, args, scenario, None)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn finish_run_report_with_budget(
+        &mut self,
+        module: &CoreModule,
+        query: &str,
+        case: &CaseRecord,
+        ctx: &RunContext,
+        args: &BTreeMap<String, Value>,
+        scenario: bool,
+        budget: Option<u32>,
+    ) -> Result<EvaluationReport<Value>, EngineError> {
         let mode = if scenario {
             ExecutionMode::Scenario
         } else {
             ExecutionMode::Operative
         };
-        let request = execution_request(module, query, args, case, ctx, mode)?;
+        let request = execution_request(module, query, args, case, ctx, mode)?.with_budget(budget);
         let outcome = self.cached_eval(module, query, args, case, ctx, &request)?;
         let mut report = if scenario {
-            report_from_scenario(outcome, case.assumptions.clone())
+            report_from_scenario(outcome, fidryn_eval::duty::scenario_hypotheses(case, ctx))
         } else {
             EvaluationReport::from_outcome(outcome)
         };
         report.trust = self.source_trust_of(module);
+        report.source_bundle = self
+            .source_bundle_of(module)
+            .map(|bundle| bundle.identity().hex());
+        report.request = Some(request);
         Ok(report)
     }
 
@@ -473,6 +785,7 @@ impl Driver {
                 record_time.clone(),
                 request_identity.clone(),
                 scenario,
+                request.budget,
                 fuel_attempt,
             );
             evaluate_query(db, input)
@@ -481,12 +794,17 @@ impl Driver {
             self.fuel_attempts
                 .insert(identity, fuel_attempt.saturating_add(1));
         }
-        result
+        let memo = result?;
+        self.derivations
+            .insert(request.identity().hex(), memo.derivation);
+        Ok(memo.outcome)
     }
 
     /// Bundle recorded when this driver compiled `module`.
     pub fn source_bundle_of(&self, module: &CoreModule) -> Option<&VerifiedSourceBundle> {
-        self.source_bundles.get(&trust_key(module))
+        self.source_bundles
+            .get(&trust_key(module))
+            .and_then(Option::as_ref)
     }
 
     /// Trust recorded when this driver compiled `module`.
@@ -518,7 +836,24 @@ fn pin_bundle_from_observations(
     if unread {
         return VerifiedSourceBundle::from_manifest(manifest);
     }
-    VerifiedSourceBundle::from_observed(manifest, |path| {
+    let mut closure = manifest.clone();
+    for (path, digest, _) in artifacts {
+        if !closure
+            .artifacts
+            .iter()
+            .any(|artifact| artifact.path == *path)
+        {
+            closure.artifacts.push(fidryn_core::ManifestArtifact {
+                path: path.clone(),
+                digest: digest.clone(),
+                kind: "dependency_input".into(),
+                effective: String::new(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            });
+        }
+    }
+    closure.artifacts.sort_by(|a, b| a.path.cmp(&b.path));
+    VerifiedSourceBundle::from_observed(&closure, |path| {
         artifacts.iter().find_map(|(observed_path, _, obs)| {
             if observed_path != path {
                 return None;
@@ -563,7 +898,11 @@ fn materialize_pinned_root(
         nanos,
         PINNED_ROOT_SEQ.fetch_add(1, Ordering::Relaxed)
     ));
-    fs::create_dir_all(&dir).map_err(|err| {
+    let mut directory = fs::DirBuilder::new();
+    directory.recursive(false);
+    #[cfg(unix)]
+    directory.mode(0o700);
+    directory.create(&dir).map_err(|err| {
         vec![Diagnostic::new(
             DiagnosticCode::E100,
             format!("cannot create pinned artifact snapshot: {err}"),
@@ -586,12 +925,19 @@ fn materialize_pinned_root(
                 )]
             })?;
         }
-        fs::write(&dest, bytes).map_err(|err| {
-            vec![Diagnostic::new(
-                DiagnosticCode::E100,
-                format!("cannot write pinned artifact `{path}`: {err}"),
-            )]
-        })?;
+        let mut options = fs::OpenOptions::new();
+        options.write(true).create_new(true);
+        #[cfg(unix)]
+        options.mode(0o600);
+        options
+            .open(&dest)
+            .and_then(|mut file| file.write_all(bytes))
+            .map_err(|err| {
+                vec![Diagnostic::new(
+                    DiagnosticCode::E100,
+                    format!("cannot write pinned artifact `{path}`: {err}"),
+                )]
+            })?;
     }
     Ok(pinned)
 }
@@ -666,13 +1012,14 @@ fn evaluate_run(
     args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
-) -> Result<Outcome<Value>, EngineError> {
+    budget: Option<u32>,
+) -> Result<RunMemo, EngineError> {
     let state = case.into_state();
     let mut handler = CaseFile {
         record: case.clone(),
         known_at: Some(ctx.record_time),
     };
-    evaluate(
+    let session = evaluate_traced_with_budget(
         module,
         &QueryName::from(query),
         args,
@@ -680,7 +1027,14 @@ fn evaluate_run(
         ctx,
         &mut handler,
         case,
-    )
+        budget
+            .map(|operations| ExecutionBudget { operations })
+            .unwrap_or_default(),
+    )?;
+    Ok(RunMemo {
+        outcome: session.outcome,
+        derivation: session.derivation,
+    })
 }
 
 fn evaluate_scenario_run(
@@ -689,13 +1043,14 @@ fn evaluate_scenario_run(
     args: &BTreeMap<String, Value>,
     case: &CaseRecord,
     ctx: &RunContext,
-) -> Result<Outcome<Value>, EngineError> {
+    budget: Option<u32>,
+) -> Result<RunMemo, EngineError> {
     let state = case.into_state();
     let mut handler = CaseFile {
         record: case.clone(),
         known_at: Some(ctx.record_time),
     };
-    evaluate_scenario(
+    let session = evaluate_scenario_traced_with_budget(
         module,
         &QueryName::from(query),
         args,
@@ -703,27 +1058,37 @@ fn evaluate_scenario_run(
         ctx,
         &mut handler,
         case,
-    )
+        budget
+            .map(|operations| ExecutionBudget { operations })
+            .unwrap_or_default(),
+    )?;
+    Ok(RunMemo {
+        outcome: session.outcome,
+        derivation: session.derivation,
+    })
 }
 
 fn artifact_observations(
     manifest: &SourceManifest,
     source_root: Option<&Path>,
-) -> Vec<(String, String, ArtifactObservation)> {
-    manifest
-        .artifacts
-        .iter()
-        .map(|artifact| {
-            let observation = match source_root {
-                None => ArtifactObservation::Unread,
-                Some(root) => match read_artifact_bytes(root, &artifact.path) {
-                    Some(bytes) => ArtifactObservation::Bytes(bytes),
-                    None => ArtifactObservation::Missing,
-                },
-            };
-            (artifact.path.clone(), artifact.digest.clone(), observation)
-        })
-        .collect()
+) -> Result<Vec<(String, String, ArtifactObservation)>, Vec<Diagnostic>> {
+    let mut artifacts = Vec::new();
+    for artifact in &manifest.artifacts {
+        let observation = match source_root {
+            None => ArtifactObservation::Unread,
+            Some(root) => match read_artifact_bytes(root, &artifact.path)? {
+                Some(bytes) => ArtifactObservation::Bytes(bytes),
+                None => ArtifactObservation::Missing,
+            },
+        };
+        push_artifact_observation(
+            &mut artifacts,
+            artifact.path.clone(),
+            artifact.digest.clone(),
+            observation,
+        )?;
+    }
+    Ok(artifacts)
 }
 
 /// Add nested `packages/<name>` module and lock bytes to the salsa check
@@ -733,7 +1098,7 @@ fn collect_nested_package_inputs(
     source_root: &Path,
     src: &str,
     artifacts: &mut Vec<(String, String, ArtifactObservation)>,
-) {
+) -> Result<(), Vec<Diagnostic>> {
     let mut pending: Vec<(String, usize)> = imported_package_names(src)
         .into_iter()
         .map(|name| (name, 1))
@@ -746,9 +1111,10 @@ fn collect_nested_package_inputs(
         if depth > NESTED_PACKAGE_INPUT_DEPTH {
             continue;
         }
-        observe_package_inputs(source_root, &name, depth, artifacts, &mut pending);
+        observe_package_inputs(source_root, &name, depth, artifacts, &mut pending)?;
     }
     artifacts.sort_by(|left, right| left.0.cmp(&right.0));
+    Ok(())
 }
 
 fn observe_package_inputs(
@@ -757,12 +1123,16 @@ fn observe_package_inputs(
     depth: usize,
     artifacts: &mut Vec<(String, String, ArtifactObservation)>,
     pending: &mut Vec<(String, usize)>,
-) {
+) -> Result<(), Vec<Diagnostic>> {
     let dir = packages_root(source_root).join(name);
+    ensure_path_within(source_root, &dir)?;
+    if !dir.is_dir() {
+        return Ok(());
+    }
     let lock_rel = format!("packages/{name}/manifest.json");
-    let lock_obs = match fs::read(dir.join("manifest.json")) {
-        Ok(bytes) => ArtifactObservation::Bytes(bytes),
-        Err(_) => ArtifactObservation::Missing,
+    let lock_obs = match read_artifact_bytes(source_root, &lock_rel)? {
+        Some(bytes) => ArtifactObservation::Bytes(bytes),
+        None => ArtifactObservation::Missing,
     };
     let lock = match &lock_obs {
         ArtifactObservation::Bytes(bytes) => serde_json::from_slice::<PackageLock>(bytes).ok(),
@@ -772,18 +1142,18 @@ fn observe_package_inputs(
         ArtifactObservation::Bytes(bytes) => blake3::hash(bytes).to_hex().to_string(),
         ArtifactObservation::Unread | ArtifactObservation::Missing => String::new(),
     };
-    push_artifact_observation(artifacts, lock_rel, lock_digest, lock_obs);
+    push_artifact_observation(artifacts, lock_rel, lock_digest, lock_obs)?;
 
     let Some(module_path) = unique_package_module(&dir) else {
-        return;
+        return Ok(());
     };
     let Some(file_name) = module_path.file_name().and_then(|n| n.to_str()) else {
-        return;
+        return Ok(());
     };
     let rel = format!("packages/{name}/{file_name}");
-    let module_obs = match fs::read(&module_path) {
-        Ok(bytes) => ArtifactObservation::Bytes(bytes),
-        Err(_) => ArtifactObservation::Missing,
+    let module_obs = match read_artifact_bytes(source_root, &rel)? {
+        Some(bytes) => ArtifactObservation::Bytes(bytes),
+        None => ArtifactObservation::Missing,
     };
     let module_digest = match &module_obs {
         ArtifactObservation::Bytes(bytes) => lock
@@ -801,7 +1171,7 @@ fn observe_package_inputs(
             pending.push((nested, depth + 1));
         }
     }
-    push_artifact_observation(artifacts, rel, module_digest, module_obs);
+    push_artifact_observation(artifacts, rel, module_digest, module_obs)
 }
 
 fn push_artifact_observation(
@@ -809,20 +1179,78 @@ fn push_artifact_observation(
     path: String,
     digest: String,
     observation: ArtifactObservation,
-) {
+) -> Result<(), Vec<Diagnostic>> {
     if artifacts.iter().any(|(existing, _, _)| existing == &path) {
-        return;
+        return Ok(());
+    }
+    let retained = artifacts
+        .iter()
+        .map(|(_, _, observation)| match observation {
+            ArtifactObservation::Bytes(bytes) => bytes.len(),
+            _ => 0,
+        })
+        .sum::<usize>();
+    let incoming = match &observation {
+        ArtifactObservation::Bytes(bytes) => bytes.len(),
+        _ => 0,
+    };
+    if artifacts.len() >= 4096 || retained.saturating_add(incoming) > 64 * 1024 * 1024 {
+        return Err(vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            "source dependency observations exceed 4096 files or 64 MiB",
+        )]);
     }
     artifacts.push((path, digest, observation));
+    Ok(())
 }
 
-fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
-    let path = Path::new(artifact_path);
-    if path.is_absolute() {
-        fs::read(path).ok()
-    } else {
-        fs::read(source_root.join(path)).ok()
+fn read_artifact_bytes(
+    source_root: &Path,
+    artifact_path: &str,
+) -> Result<Option<Vec<u8>>, Vec<Diagnostic>> {
+    let failure = |message: String| vec![Diagnostic::new(DiagnosticCode::E200, message)];
+    let relative = safe_rel_artifact_path(artifact_path)
+        .ok_or_else(|| failure(format!("invalid artifact path `{artifact_path}`")))?;
+    let root = source_root
+        .canonicalize()
+        .map_err(|error| failure(error.to_string()))?;
+    let path = match root.join(relative).canonicalize() {
+        Ok(path) => path,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(failure(error.to_string())),
+    };
+    if !path.starts_with(&root) {
+        return Err(failure(format!(
+            "artifact `{artifact_path}` escapes the source root"
+        )));
     }
+    read_bytes_bounded(&path, 32 * 1024 * 1024)
+        .map(Some)
+        .map_err(|error| failure(format!("cannot read artifact `{artifact_path}`: {error}")))
+}
+
+fn read_bytes_bounded(path: &Path, limit: usize) -> std::io::Result<Vec<u8>> {
+    let file = fs::File::open(path)?;
+    if file.metadata()?.len() > limit as u64 {
+        return Err(std::io::Error::new(
+            ErrorKind::InvalidData,
+            format!("input exceeds {limit} bytes"),
+        ));
+    }
+    let mut bytes = Vec::new();
+    file.take((limit + 1) as u64).read_to_end(&mut bytes)?;
+    if bytes.len() > limit {
+        return Err(std::io::Error::new(
+            ErrorKind::InvalidData,
+            format!("input exceeds {limit} bytes"),
+        ));
+    }
+    Ok(bytes)
+}
+
+fn read_text_bounded(path: &Path, limit: usize) -> std::io::Result<String> {
+    String::from_utf8(read_bytes_bounded(path, limit)?)
+        .map_err(|error| std::io::Error::new(ErrorKind::InvalidData, error))
 }
 
 fn run_identity(
@@ -870,6 +1298,7 @@ fn extend_manifest_with_packages(
     src: &str,
 ) -> Result<(), Vec<Diagnostic>> {
     let packages_dir = packages_root(source_root);
+    ensure_path_within(source_root, &packages_dir)?;
     if !packages_dir.is_dir() {
         return Ok(());
     }
@@ -926,11 +1355,13 @@ fn load_package_artifact(
         return Ok(None);
     }
     let dir = packages_root(source_root).join(name);
+    ensure_path_within(source_root, &dir)?;
     if !dir.is_dir() {
         return Ok(None);
     }
     let lock_path = dir.join("manifest.json");
-    let text = match fs::read_to_string(&lock_path) {
+    ensure_path_within(source_root, &lock_path)?;
+    let text = match read_text_bounded(&lock_path, 4 * 1024 * 1024) {
         Ok(text) => text,
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Err(vec![Diagnostic::new(
@@ -984,7 +1415,9 @@ fn unique_package_module(dir: &Path) -> Option<PathBuf> {
     let entries = fs::read_dir(dir).ok()?;
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.is_file() && path.extension().and_then(|e| e.to_str()) == Some("fr") {
+        if entry.file_type().ok()?.is_file()
+            && path.extension().and_then(|e| e.to_str()) == Some("fr")
+        {
             found.push(path);
         }
     }
@@ -1000,9 +1433,13 @@ fn unique_package_module(dir: &Path) -> Option<PathBuf> {
 ///
 /// A **declared** path that is missing or malformed is a diagnostic, not
 /// [`SourceManifest::default`].
-fn load_manifest(module_path: &Path, src: &str) -> Result<SourceManifest, Vec<Diagnostic>> {
+fn load_manifest(
+    module_path: &Path,
+    src: &str,
+    source_root: &Path,
+) -> Result<SourceManifest, Vec<Diagnostic>> {
     let dir = module_path.parent().unwrap_or(Path::new("."));
-    if let Some(declared) = declared_manifest_path(src) {
+    if let Some(declared) = declared_manifest_path(src)? {
         if declared.is_empty() {
             return Err(vec![Diagnostic::new(
                 DiagnosticCode::E540,
@@ -1010,20 +1447,52 @@ fn load_manifest(module_path: &Path, src: &str) -> Result<SourceManifest, Vec<Di
             )]);
         }
         let path = resolve_manifest_path(dir, &declared);
+        ensure_path_within(source_root, &path)?;
         return read_manifest(&path, true);
     }
 
     let default_path = dir.join("sources").join("manifest.json");
+    ensure_path_within(source_root, &default_path)?;
     if default_path.is_file() {
+        ensure_path_within(source_root, &default_path)?;
         return read_manifest(&default_path, false);
     }
 
     let sources_dir = dir.join("sources");
+    ensure_path_within(source_root, &sources_dir)?;
     if let Some(unique) = unique_glob_manifest(&sources_dir) {
+        ensure_path_within(source_root, &unique)?;
         return read_manifest(&unique, false);
     }
 
     Ok(SourceManifest::default())
+}
+
+fn ensure_path_within(root: &Path, path: &Path) -> Result<(), Vec<Diagnostic>> {
+    let root = root.canonicalize().map_err(|error| {
+        vec![Diagnostic::new(
+            DiagnosticCode::E200,
+            format!("cannot resolve source root: {error}"),
+        )]
+    })?;
+    if let Ok(resolved) = path.canonicalize() {
+        if !resolved.starts_with(&root) {
+            return Err(vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!(
+                    "{} resolves outside the source root {}",
+                    path.display(),
+                    root.display()
+                ),
+            )]);
+        }
+    } else if let Some(parent) = path.parent() {
+        // An absent leaf still cannot use a symlinked parent to escape.
+        if parent.exists() {
+            return ensure_path_within(&root, parent);
+        }
+    }
+    Ok(())
 }
 
 fn resolve_manifest_path(module_dir: &Path, declared: &str) -> PathBuf {
@@ -1035,59 +1504,45 @@ fn resolve_manifest_path(module_dir: &Path, declared: &str) -> PathBuf {
     }
 }
 
-fn declared_manifest_path(src: &str) -> Option<String> {
+fn declared_manifest_path(src: &str) -> Result<Option<String>, Vec<Diagnostic>> {
     let parsed = parse_file(src);
+    if parsed.has_errors() {
+        return Err(parsed.diagnostics);
+    }
     if let Some(module) = parsed.module() {
         for item in &module.items {
             if let Item::Header(header) = item
                 && header.kind == HeaderKind::SourceManifest
             {
-                let path = unquote_manifest_path(&header.value);
-                if !path.is_empty() {
-                    return Some(path);
-                }
+                let path = fidryn_syntax::decode_string_literal(
+                    header.value.trim().trim_end_matches(';').trim(),
+                )
+                .map_err(|error| {
+                    vec![Diagnostic::new(
+                        DiagnosticCode::E100,
+                        format!("invalid source_manifest path: {error}"),
+                    )]
+                })?;
+                return Ok(Some(path));
             }
         }
     }
-    scan_source_manifest_header(src)
+    Ok(None)
 }
 
-fn scan_source_manifest_header(src: &str) -> Option<String> {
-    for line in src.lines() {
-        let trimmed = line.trim();
-        if trimmed.starts_with("//") {
-            continue;
-        }
-        let Some(rest) = trimmed.strip_prefix("source_manifest") else {
-            continue;
-        };
-        let path = unquote_manifest_path(rest);
-        if !path.is_empty() {
-            return Some(path);
-        }
-    }
-    None
-}
-
-fn unquote_manifest_path(raw: &str) -> String {
-    let raw = raw.trim().trim_end_matches(';').trim();
-    if let Some(inner) = raw.strip_prefix('"') {
-        return inner
-            .split_once('"')
-            .map(|(s, _)| s)
-            .unwrap_or(inner)
-            .trim()
-            .to_owned();
-    }
-    if let Some(inner) = raw.strip_prefix('\'') {
-        return inner
-            .split_once('\'')
-            .map(|(s, _)| s)
-            .unwrap_or(inner)
-            .trim()
-            .to_owned();
-    }
-    raw.split_whitespace().next().unwrap_or("").to_owned()
+/// Load source metadata within the same capability boundary as path compilation.
+pub fn load_source_manifest(
+    module_path: &Path,
+    source: &str,
+    source_root: Option<&Path>,
+) -> Result<SourceManifest, Vec<Diagnostic>> {
+    let root = source_root.unwrap_or_else(|| {
+        module_path
+            .parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+            .unwrap_or(Path::new("."))
+    });
+    load_manifest(module_path, source, root)
 }
 
 fn unique_glob_manifest(sources_dir: &Path) -> Option<PathBuf> {
@@ -1110,7 +1565,7 @@ fn unique_glob_manifest(sources_dir: &Path) -> Option<PathBuf> {
 }
 
 fn read_manifest(path: &Path, declared: bool) -> Result<SourceManifest, Vec<Diagnostic>> {
-    match fs::read_to_string(path) {
+    match read_text_bounded(path, 4 * 1024 * 1024) {
         Ok(text) => parse_manifest_json(&text, path),
         Err(err) if err.kind() == ErrorKind::NotFound => {
             if declared {
@@ -1383,7 +1838,7 @@ module Regression version "0.1.0" {
     }
 
     #[test]
-    fn run_report_with_assumptions_is_scenario_and_preserves_events() {
+    fn explicit_scenario_report_preserves_events() {
         let src = bool_query("true");
         let mut driver = Driver::new();
         let module = driver
@@ -1396,7 +1851,7 @@ module Regression version "0.1.0" {
         });
         let events_before = case.events.clone();
         let report = driver
-            .run_report(&module, "q", &case, &ctx())
+            .run_report_scenario(&module, "q", &case, &ctx())
             .expect("report");
         assert_eq!(report.execution_mode, ExecutionMode::Scenario);
         assert_eq!(report.assumptions, case.assumptions);
@@ -1844,8 +2299,8 @@ module Examples.ImpBytes version "0.1.0" {{
             TrustProfile::Unauthenticated
         );
         let bundle = driver.source_bundle_of(&module).expect("bundle");
-        assert!(!bundle.artifacts[0].ok);
-        assert!(bundle.artifacts[0].observed_digest.is_none());
+        assert!(!bundle.artifacts()[0].ok);
+        assert!(bundle.artifacts()[0].observed_digest.is_none());
         assert_ne!(bundle.trust_summary(), TrustProfile::ByteVerified);
         let _ = fs::remove_dir_all(&dir);
     }
@@ -1888,9 +2343,9 @@ module Examples.ImpBytes version "0.1.0" {{
         let mut driver = Driver::new();
         let (module, _) = driver.check_path(&path).expect("check");
         let bundle = driver.source_bundle_of(&module).expect("bundle");
-        assert!(bundle.artifacts[0].ok);
+        assert!(bundle.artifacts()[0].ok);
         assert_eq!(
-            bundle.artifacts[0].observed_digest.as_deref(),
+            bundle.artifacts()[0].observed_digest.as_deref(),
             Some(digest.as_str())
         );
         assert_eq!(bundle.trust_summary(), TrustProfile::ByteVerified);
@@ -1916,9 +2371,257 @@ module Examples.ImpBytes version "0.1.0" {{
         let mut driver = Driver::new();
         let module = driver.check_source(&src, &manifest).expect("compile");
         let bundle = driver.source_bundle_of(&module).expect("bundle");
-        assert!(!bundle.artifacts[0].ok);
+        assert!(!bundle.artifacts()[0].ok);
         assert_eq!(bundle.trust_summary(), TrustProfile::Unauthenticated);
         assert_eq!(driver.source_trust_of(&module), bundle.trust_summary());
+    }
+
+    #[test]
+    fn compilation_artifact_provenance_is_independent_of_cache_order() {
+        let dir = temp_module_dir("artifact-order");
+        let bytes = b"authenticated fixture bytes";
+        fs::write(dir.join("law.txt"), bytes).unwrap();
+        let manifest = SourceManifest {
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "law.txt".into(),
+                digest: blake3::hash(bytes).to_hex().to_string(),
+                kind: "text".into(),
+                effective: "2026-01-01".into(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+            ..SourceManifest::default()
+        };
+        let source = bool_query("true");
+        let mut identities = Vec::new();
+        for filesystem_first in [true, false] {
+            let mut driver = Driver::new();
+            let (file, pasted) = if filesystem_first {
+                let file = driver
+                    .check_artifact_cached(&source, &manifest, Some(&dir))
+                    .unwrap();
+                let pasted = driver.check_source_artifact(&source, &manifest).unwrap();
+                (file, pasted)
+            } else {
+                let pasted = driver.check_source_artifact(&source, &manifest).unwrap();
+                let file = driver
+                    .check_artifact_cached(&source, &manifest, Some(&dir))
+                    .unwrap();
+                (file, pasted)
+            };
+            assert_eq!(file.module(), pasted.module());
+            assert_eq!(file.sources().trust_summary(), TrustProfile::ByteVerified);
+            assert_eq!(
+                pasted.sources().trust_summary(),
+                TrustProfile::Unauthenticated
+            );
+            assert_eq!(
+                driver.source_trust_of(file.module()),
+                TrustProfile::Unauthenticated
+            );
+            let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+            let report = driver
+                .run_artifact_report(
+                    &file,
+                    "q",
+                    &CaseRecord::default(),
+                    &RunContext::new(t, t),
+                    false,
+                )
+                .unwrap();
+            assert_eq!(report.trust, TrustProfile::ByteVerified);
+            assert_eq!(report.source_bundle, Some(file.sources().identity().hex()));
+            identities.push(file.sources().identity());
+        }
+        assert_eq!(identities[0], identities[1]);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn source_root_is_explicit_and_confines_manifest_resolution() {
+        let root = temp_module_dir("explicit-root");
+        let modules = root.join("modules");
+        fs::create_dir_all(&modules).unwrap();
+        fs::write(
+            root.join("manifest.json"),
+            serde_json::to_vec(&SourceManifest::default()).unwrap(),
+        )
+        .unwrap();
+        let path = modules.join("module.fr");
+        fs::write(
+            &path,
+            bool_query("true").replace(
+                "    query q",
+                "    source_manifest \"../manifest.json\"\n    query q",
+            ),
+        )
+        .unwrap();
+        let mut driver = Driver::new();
+        assert!(driver.check_path_artifact(&path).is_err());
+        driver
+            .check_path_artifact_with_root(&path, &root)
+            .expect("explicit enclosing capability root");
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn source_manifest_uses_decoded_headers_and_ignores_line_comments() {
+        let root = temp_module_dir("manifest-syntax");
+        let path = root.join("module.fr");
+        fs::create_dir_all(root.join("sources")).unwrap();
+        fs::write(
+            root.join("sources/manifest.json"),
+            serde_json::to_vec(&SourceManifest::default()).unwrap(),
+        )
+        .unwrap();
+        let source = bool_query("true").replace(
+            "    query q",
+            "    source_manifest \"sources/\\u006danifest.json\"\n    query q",
+        );
+        fs::write(&path, source).unwrap();
+        Driver::new()
+            .check_path_artifact(&path)
+            .expect("JSON escapes select the actual manifest");
+        fs::remove_dir_all(root.join("sources")).unwrap();
+        let decoy = format!(
+            "// source_manifest \"missing.json\"\n{}",
+            bool_query("true")
+        );
+        fs::write(&path, decoy).unwrap();
+        Driver::new()
+            .check_path_artifact(&path)
+            .expect("comment text is not a manifest header");
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn oversized_source_and_artifact_inputs_fail_before_compilation() {
+        let root = temp_module_dir("file-budgets");
+        let path = root.join("large.fr");
+        fs::File::create(&path)
+            .unwrap()
+            .set_len(8 * 1024 * 1024 + 1)
+            .unwrap();
+        let error = Driver::new().check_path_artifact(&path).unwrap_err();
+        assert!(
+            error
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("exceeds"))
+        );
+        let dependency = root.join("large.txt");
+        fs::File::create(dependency)
+            .unwrap()
+            .set_len(32 * 1024 * 1024 + 1)
+            .unwrap();
+        let manifest = SourceManifest {
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "large.txt".into(),
+                digest: "fixture".into(),
+                kind: "text".into(),
+                effective: String::new(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+            ..SourceManifest::default()
+        };
+        let error = Driver::new()
+            .check_artifact_cached(&bool_query("true"), &manifest, Some(&root))
+            .unwrap_err();
+        assert!(
+            error
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("exceeds"))
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn duplicate_normalized_artifacts_are_rejected_before_capture() {
+        let root = temp_module_dir("duplicate-inputs");
+        fs::write(root.join("law.txt"), b"law").unwrap();
+        let artifact = |path: &str| fidryn_core::ManifestArtifact {
+            path: path.into(),
+            digest: "fixture".into(),
+            kind: "text".into(),
+            effective: String::new(),
+            weight: fidryn_core::SourceWeight::Explanatory,
+        };
+        let manifest = SourceManifest {
+            artifacts: vec![artifact("law.txt"), artifact("./law.txt")],
+            ..SourceManifest::default()
+        };
+        let errors = Driver::new()
+            .check_artifact_cached(&bool_query("true"), &manifest, Some(&root))
+            .unwrap_err();
+        assert!(
+            errors
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("duplicate normalized"))
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn pinned_source_snapshot_is_private_and_exclusively_created() {
+        use std::os::unix::fs::PermissionsExt;
+        let pinned = materialize_pinned_root(&[(
+            "source.txt".into(),
+            String::new(),
+            ArtifactObservation::Bytes(b"private source".to_vec()),
+        )])
+        .unwrap();
+        assert_eq!(
+            fs::metadata(pinned.path()).unwrap().permissions().mode() & 0o777,
+            0o700
+        );
+        assert_eq!(
+            fs::metadata(pinned.path().join("source.txt"))
+                .unwrap()
+                .permissions()
+                .mode()
+                & 0o777,
+            0o600
+        );
+        assert!(
+            materialize_pinned_root(&[
+                (
+                    "source.txt".into(),
+                    String::new(),
+                    ArtifactObservation::Bytes(b"first".to_vec())
+                ),
+                (
+                    "./source.txt".into(),
+                    String::new(),
+                    ArtifactObservation::Bytes(b"second".to_vec())
+                ),
+            ])
+            .is_err()
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn source_root_rejects_symlinked_artifacts() {
+        let root = temp_module_dir("symlink-root");
+        let outside = temp_module_dir("symlink-outside");
+        fs::write(outside.join("law.txt"), b"outside").unwrap();
+        std::os::unix::fs::symlink(outside.join("law.txt"), root.join("law.txt")).unwrap();
+        let manifest = SourceManifest {
+            artifacts: vec![fidryn_core::ManifestArtifact {
+                path: "law.txt".into(),
+                digest: "fixture".into(),
+                kind: "text".into(),
+                effective: String::new(),
+                weight: fidryn_core::SourceWeight::Explanatory,
+            }],
+            ..SourceManifest::default()
+        };
+        assert!(
+            Driver::new()
+                .check_artifact_cached(&bool_query("true"), &manifest, Some(&root))
+                .is_err()
+        );
+        let _ = fs::remove_dir_all(root);
+        let _ = fs::remove_dir_all(outside);
     }
 
     #[test]

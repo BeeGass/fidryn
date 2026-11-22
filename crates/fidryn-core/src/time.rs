@@ -78,10 +78,34 @@ pub enum Bound {
     NegInf,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct Interval {
     pub start: Bound,
     pub end: Bound,
+}
+
+impl<'de> Deserialize<'de> for Interval {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Bounds {
+            start: Bound,
+            end: Bound,
+        }
+        let Bounds { start, end } = Bounds::deserialize(deserializer)?;
+        let invalid = match (start, end) {
+            (Bound::PosInf, _) | (_, Bound::NegInf) => true,
+            (
+                Bound::Inclusive(a) | Bound::Exclusive(a),
+                Bound::Inclusive(b) | Bound::Exclusive(b),
+            ) => a > b,
+            _ => false,
+        };
+        if invalid {
+            return Err(serde::de::Error::custom(TimeError::InvertedInterval));
+        }
+        Ok(Self { start, end })
+    }
 }
 
 impl Interval {
@@ -197,6 +221,42 @@ mod tests {
             kind: CalendarKind::WorkingDays,
         };
         assert_ne!(a, b);
+    }
+
+    #[test]
+    fn interval_admission_rejects_reversed_or_impossible_bounds() {
+        let earlier = Instant::parse("2033-01-01T00:00:00Z").unwrap();
+        let later = Instant::parse("2034-01-01T00:00:00Z").unwrap();
+        for interval in [
+            Interval {
+                start: Bound::Inclusive(later),
+                end: Bound::Exclusive(earlier),
+            },
+            Interval {
+                start: Bound::PosInf,
+                end: Bound::PosInf,
+            },
+            Interval {
+                start: Bound::NegInf,
+                end: Bound::NegInf,
+            },
+        ] {
+            assert!(
+                serde_json::from_value::<Interval>(serde_json::to_value(interval).unwrap())
+                    .is_err()
+            );
+        }
+        for interval in [
+            Interval::always(),
+            Interval::from_instants(earlier, Some(earlier)).unwrap(),
+            Interval::from_instants(earlier, Some(later)).unwrap(),
+        ] {
+            assert_eq!(
+                serde_json::from_value::<Interval>(serde_json::to_value(interval).unwrap())
+                    .unwrap(),
+                interval
+            );
+        }
     }
 
     #[test]

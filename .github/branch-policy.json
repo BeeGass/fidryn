@@ -1,0 +1,37 @@
+{
+  "repository": "BeeGass/fidryn",
+  "repositoryId": 1373924541,
+  "ownerUserId": 44324535,
+  "approvedContributorIds": [
+    44324535
+  ],
+  "requiredWorkflows": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "jobs": [
+        "cargo xtask ci",
+        "Rust tests (ubuntu-24.04)",
+        "Rust tests (macos-15)",
+        "Rust tests (windows-2025)",
+        "Security",
+        "Workflow lint",
+        "Release metadata"
+      ]
+    },
+    {
+      "path": ".github/workflows/codeql.yml",
+      "jobs": [
+        "CodeQL (rust)",
+        "CodeQL (python)",
+        "CodeQL (javascript-typescript)"
+      ]
+    }
+  ],
+  "mainSourceCheck": "Main source policy",
+  "requiredChecks": [
+    {
+      "context": "CodeQL",
+      "integrationId": 57789
+    }
+  ]
+}

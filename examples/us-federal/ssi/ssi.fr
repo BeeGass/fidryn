@@ -43,6 +43,7 @@ module US.Federal.Benefits.SSIResources version "0.1.0" {
         goal Evaluate {
             require determined HouseholdOfAnother(Applicant)
                 using Determine
+            return true
         }
     }
 

@@ -1,0 +1,641 @@
+{
+  "schema": "fidryn.examples-status/v0.1",
+  "files": [
+    {
+      "path": "examples/california/abc-test/abc-test.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/california/cpra/cpra.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/california/final-pay/final-pay.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/california/lemon/lemon.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/california/noncompete/noncompete.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/california/security-deposit/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/delaware/dgcl-220/dgcl-220.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/everyday/final-paycheck/final-paycheck.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/everyday/minimum-wage/minimum-wage.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/foia/foia-request.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/illinois/bipa/bipa.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 1
+      }
+    },
+    {
+      "path": "examples/massachusetts-llc/harbor-robotics.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/massachusetts/security-deposit/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/new-york/foil/foil.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/prenup/ava-noah.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/procedure/civil-complaint.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/alabama/final-wages.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/alaska/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E200": 1
+      }
+    },
+    {
+      "path": "examples/states/arizona/material-noncompliance.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 7
+      }
+    },
+    {
+      "path": "examples/states/arkansas/homestead.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/california/wage-statements.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/states/colorado/famli.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/connecticut/paid-sick-leave.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/states/delaware/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/florida/homestead.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/georgia/dispossessory.fr",
+      "check": "fails",
+      "codes": {
+        "E200": 1
+      }
+    },
+    {
+      "path": "examples/states/hawaii/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 8
+      }
+    },
+    {
+      "path": "examples/states/idaho/noncompete.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/illinois/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/states/indiana/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/iowa/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/kansas/homestead.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/kentucky/final-wages.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 6
+      }
+    },
+    {
+      "path": "examples/states/louisiana/community-property.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/maine/paid-family-leave.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/states/maryland/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/states/massachusetts/pfml.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/states/michigan/no-fault-pip.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/minnesota/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 6
+      }
+    },
+    {
+      "path": "examples/states/mississippi/eviction.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 8
+      }
+    },
+    {
+      "path": "examples/states/missouri/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 8
+      }
+    },
+    {
+      "path": "examples/states/montana/wrongful-discharge.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/nebraska/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 10
+      }
+    },
+    {
+      "path": "examples/states/nevada/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/new-hampshire/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 6
+      }
+    },
+    {
+      "path": "examples/states/new-jersey/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/states/new-mexico/owner-resident.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/new-york/security-deposit-trust.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 6
+      }
+    },
+    {
+      "path": "examples/states/north-carolina/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 8
+      }
+    },
+    {
+      "path": "examples/states/north-dakota/homestead.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/ohio/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/oklahoma/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/oregon/no-cause-notice.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/pennsylvania/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/rhode-island/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/south-carolina/residential-landlord.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 7
+      }
+    },
+    {
+      "path": "examples/states/south-dakota/wage-payment.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/states/tennessee/urlta.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/texas/payday.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 5
+      }
+    },
+    {
+      "path": "examples/states/utah/eviction.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 8
+      }
+    },
+    {
+      "path": "examples/states/vermont/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 4
+      }
+    },
+    {
+      "path": "examples/states/virginia/vrlta-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 9
+      }
+    },
+    {
+      "path": "examples/states/washington/paid-sick-leave.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/states/west-virginia/final-wages.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 6
+      }
+    },
+    {
+      "path": "examples/states/wisconsin/security-deposit.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 10
+      }
+    },
+    {
+      "path": "examples/states/wyoming/wage-payment.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/tax/federal-tax.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/texas/homestead/homestead.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/trust/bryan-revocable-trust.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/ucc/battle-of-forms/battle-of-forms.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/accredited-investor/accredited-investor.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/ada-service-animal/ada-service-animal.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/catalog/usc-titles.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/cobra/cobra.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/diversity/diversity.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/dmca/dmca.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/efta/efta.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/eighty-three-b/eighty-three-b.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/fair-housing/fair-housing.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/fcra/fcra.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/fdcpa/fdcpa.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/flsa/flsa.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/fmla/fmla.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/garnishment/garnishment.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/hearsay/hearsay.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/hipaa/hipaa.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/means-test/means-test.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/medicare/medicare.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 3
+      }
+    },
+    {
+      "path": "examples/us-federal/naturalization/naturalization.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/pslf/pslf.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/removal/removal.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/scra/scra.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/speedy-trial/speedy-trial.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/ssa-fra/ssa-fra.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/ssi/ssi.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/tcpa/tcpa.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/title-vii/title-vii.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/unlawful-presence/unlawful-presence.fr",
+      "check": "ok"
+    },
+    {
+      "path": "examples/us-federal/userra/userra.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "examples/us-federal/warn/warn.fr",
+      "check": "fails",
+      "codes": {
+        "E210": 2
+      }
+    },
+    {
+      "path": "packages/logic/true.fr",
+      "check": "ok"
+    },
+    {
+      "path": "packages/std/core.fr",
+      "check": "ok"
+    },
+    {
+      "path": "prelude/argument.fr",
+      "check": "ok"
+    },
+    {
+      "path": "prelude/prelude.fr",
+      "check": "ok"
+    },
+    {
+      "path": "prelude/procedure.fr",
+      "check": "ok"
+    },
+    {
+      "path": "prelude/tax.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/eligibility-succession.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/late-payment-extended.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/late-payment.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/named-decision.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/require-gate.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/transaction-atomic.fr",
+      "check": "ok"
+    },
+    {
+      "path": "tests/programs/two-offices.fr",
+      "check": "ok"
+    }
+  ]
+}

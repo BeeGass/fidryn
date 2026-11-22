@@ -50,6 +50,7 @@ module California.Consumer.LemonLaw version "0.1.0" {
         goal Evaluate {
             require determined SubstantialImpairment(Vehicle)
                 using Determine
+            return true
         }
     }
 

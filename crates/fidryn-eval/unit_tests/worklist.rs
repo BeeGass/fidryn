@@ -135,10 +135,7 @@ fn denied_and_held_determination_is_not_determined_true() {
         Some(true),
         "a qualified denial must not be treated as determined true"
     );
-    assert_eq!(
-        world.modal_determined(&parse_prop_issue("P(A)")),
-        Some(false)
-    );
+    assert_eq!(world.modal_determined(&parse_prop_issue("P(A)")), None);
 }
 
 #[test]

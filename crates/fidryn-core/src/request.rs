@@ -11,6 +11,10 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::BTreeMap;
 use std::fmt;
 
+/// The semantics version this engine implements. Every report and request
+/// that names it takes the value from here.
+pub const SEMANTICS_VERSION: &str = "0.2";
+
 /// Name-derived module id plus executable content fingerprint.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -114,11 +118,14 @@ impl fmt::Display for ExecutionRequestId {
 
 /// One evaluation invocation: program, query, case snapshot, clocks, mode.
 ///
-/// Optional `budget` is part of identity even when the evaluator does not
-/// yet consume it. Warm and cold execution of the same request must agree.
+/// Optional `budget` is part of identity and limits actual evaluator operations.
+/// `None` selects the bounded default defined by this semantics version. Warm
+/// and cold execution of the same request must agree.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecutionRequest {
+    pub semantics_version: String,
+    pub operation: ExecutionOperation,
     pub program: ProgramIdentity,
     pub query: QueryName,
     pub args: BTreeMap<String, Value>,
@@ -127,6 +134,14 @@ pub struct ExecutionRequest {
     pub known_at: Instant,
     pub mode: ExecutionMode,
     pub budget: Option<u32>,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ExecutionOperation {
+    #[default]
+    Run,
+    Explore,
 }
 
 impl ExecutionRequest {
@@ -140,6 +155,8 @@ impl ExecutionRequest {
         mode: ExecutionMode,
     ) -> Result<Self, String> {
         Ok(Self {
+            semantics_version: SEMANTICS_VERSION.into(),
+            operation: ExecutionOperation::Run,
             program: ProgramIdentity::of(module)?,
             query: QueryName::from(query),
             args: args.clone(),
@@ -161,6 +178,13 @@ impl ExecutionRequest {
     pub fn identity(&self) -> ExecutionRequestId {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"fidryn.execution-request/v0.1");
+        hasher.update(&[0xff]);
+        hasher.update(self.semantics_version.as_bytes());
+        hasher.update(&[0xff]);
+        hasher.update(match self.operation {
+            ExecutionOperation::Run => b"run",
+            ExecutionOperation::Explore => b"explore",
+        });
         hasher.update(&[0xff]);
         hasher.update(self.program.module_id.as_bytes());
         hasher.update(&[0xff]);
@@ -190,7 +214,7 @@ impl ExecutionRequest {
         hasher.update(&[0xff]);
         match self.budget {
             Some(n) => hasher.update(&n.to_le_bytes()),
-            None => hasher.update(b"unbounded"),
+            None => hasher.update(b"default"),
         };
         ExecutionRequestId(*hasher.finalize().as_bytes())
     }

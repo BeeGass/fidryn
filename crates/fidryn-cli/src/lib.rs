@@ -1,29 +1,34 @@
 //! Fidryn command-line toolchain.
 
+mod engine;
+pub mod inputs;
 pub mod opinion;
+pub mod review;
 pub mod ui;
 
 use clap::{Parser, Subcommand};
 use fidryn_adapt::{DryRun, FilingAdapter, MassachusettsCorporations};
 use fidryn_check::check;
+#[cfg(test)]
+use fidryn_core::DiagnosticCode;
 use fidryn_core::{
-    AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, DiagnosticCode,
-    EngineError, EvaluationReport, ExecutionMode, Instant, Outcome, QueryName, RunContext,
-    SourceManifest, TimeError, TraceId, Value, canonical_json,
+    AdmissibleCompletions, CaseRecord, CoreDecl, CoreModule, Diagnostic, EngineError,
+    EvaluationReport, ExecutionMode, Instant, QueryName, RunContext, SourceManifest, TimeError,
+    TraceId, Value, canonical_json,
 };
 use fidryn_hir::elaborate;
-use fidryn_render::{module_vars, render};
-use fidryn_syntax::ast::{HeaderKind, Item};
+use fidryn_render::{module_values, render_values};
 use fidryn_syntax::{format_module, parse_file};
-pub(crate) use fidryn_trace::render_report;
+#[cfg(test)]
+use fidryn_trace::render_report;
 use fidryn_trace::{REPORT_QUALIFICATION_FIELDS, explain, explain_value};
-use fidryn_verify::{explore_query, verify_property};
+use fidryn_verify::verify_property;
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::fmt;
 use std::fs;
-use std::io::ErrorKind;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -34,6 +39,9 @@ thread_local! {
 #[derive(Parser, Debug)]
 #[command(name = "fidryn", version, about = "Fidryn reference interpreter")]
 pub struct Cli {
+    /// Filesystem root for source artifacts and packages (defaults to the module directory).
+    #[arg(long, global = true)]
+    pub source_root: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
 }
@@ -45,6 +53,12 @@ pub enum Command {
     },
     Check {
         path: PathBuf,
+    },
+    /// Describe typed query arguments, evidence schemas and external review requests.
+    Inputs {
+        path: PathBuf,
+        #[arg(long)]
+        query: String,
     },
     /// Evaluate a query against a case record. Never chooses a completion.
     Run {
@@ -65,6 +79,9 @@ pub enum Command {
         /// Evaluate with case assumptions as a scenario overlay.
         #[arg(long)]
         scenario: bool,
+        /// Maximum evaluator operations, including rule and judgment work.
+        #[arg(long)]
+        budget: Option<u32>,
     },
     /// Explore a query under explicit finite bounds.
     Explore {
@@ -102,6 +119,27 @@ pub enum Command {
         path: PathBuf,
         #[arg(long)]
         template: PathBuf,
+        /// Typed JSON data available under `data` in the template.
+        #[arg(long)]
+        data: Option<PathBuf>,
+    },
+    /// Export portable inputs, source links and a freshly checked report for review.
+    Review {
+        path: PathBuf,
+        #[arg(long)]
+        query: String,
+        #[arg(long)]
+        case: PathBuf,
+        #[arg(long = "valid-at")]
+        valid_at: String,
+        #[arg(long = "known-at")]
+        known_at: String,
+        #[arg(long)]
+        scenario: bool,
+        #[arg(long)]
+        budget: Option<u32>,
+        #[arg(long)]
+        template: Option<PathBuf>,
     },
     /// Submit a filing packet. Live HTTP requires `--live` and
     /// `FIDRYN_ALLOW_LIVE_FILING=1`. Transmission is not a `Filed` fact.
@@ -127,9 +165,23 @@ pub enum Command {
 
 /// Dispatch a parsed CLI invocation.
 pub fn run(cli: Cli) -> ExitCode {
+    let source_root = cli.source_root.as_deref();
     match cli.command {
         Command::Fmt { path } => cmd_fmt(&path),
-        Command::Check { path } => cmd_check(&path),
+        Command::Check { path } => cmd_check(&path, source_root),
+        Command::Inputs { path, query } => {
+            match compile_module_with_root(&path, source_root)
+                .map_err(|diagnostics| diagnostics_text(&diagnostics))
+                .and_then(|(module, _)| inputs::query_input_schema(&module, &query))
+                .and_then(|schema| canonical_json(&schema).map_err(|error| error.to_string()))
+            {
+                Ok(schema) => {
+                    println!("{schema}");
+                    ExitCode::SUCCESS
+                }
+                Err(error) => fail(error),
+            }
+        }
         Command::Run {
             path,
             query,
@@ -138,7 +190,20 @@ pub fn run(cli: Cli) -> ExitCode {
             known_at,
             args,
             scenario,
-        } => cmd_run(&path, &query, &case, &valid_at, &known_at, &args, scenario),
+            budget,
+        } => cmd_run(
+            &RunRequest {
+                path: &path,
+                query: &query,
+                case: CaseInput::File(&case),
+                valid_at: &valid_at,
+                known_at: &known_at,
+                args: &args,
+                scenario,
+            },
+            source_root,
+            budget,
+        ),
         Command::Explore {
             path,
             query,
@@ -153,15 +218,52 @@ pub fn run(cli: Cli) -> ExitCode {
             bounds.as_deref(),
             &valid_at,
             &known_at,
+            source_root,
         ),
         Command::Explain { trace_id, format } => cmd_explain(&trace_id, &format),
-        Command::Verify { path, property } => cmd_verify(&path, &property),
+        Command::Verify { path, property } => cmd_verify(&path, &property, source_root),
         Command::Diff {
             old_snapshot,
             new_snapshot,
             query,
-        } => cmd_diff(&old_snapshot, &new_snapshot, &query),
-        Command::Render { path, template } => cmd_render(&path, &template),
+        } => cmd_diff(&old_snapshot, &new_snapshot, &query, source_root),
+        Command::Render {
+            path,
+            template,
+            data,
+        } => cmd_render(&path, &template, data.as_deref(), source_root),
+        Command::Review {
+            path,
+            query,
+            case,
+            valid_at,
+            known_at,
+            scenario,
+            budget,
+            template,
+        } => {
+            let context = instant_arg("--valid-at", &valid_at).and_then(|valid| {
+                instant_arg("--known-at", &known_at).map(|known| RunContext::new(valid, known))
+            });
+            match context.and_then(|context| {
+                review::build_review(&review::ReviewRequest {
+                    path: &path,
+                    query: &query,
+                    case_path: &case,
+                    context: &context,
+                    scenario,
+                    source_root,
+                    template: template.as_deref(),
+                    budget,
+                })
+            }) {
+                Ok(document) => {
+                    println!("{document}");
+                    ExitCode::SUCCESS
+                }
+                Err(error) => fail(error),
+            }
+        }
         Command::File {
             packet,
             adapter,
@@ -205,7 +307,16 @@ pub fn apply_run_args(case: &mut CaseRecord, args: &[String]) -> Result<(), Stri
         if k.is_empty() {
             return Err("--arg KEY=VALUE requires a nonempty KEY".into());
         }
-        case.facts.insert(k.to_owned(), Value::String(v.to_owned()));
+        let value = match serde_json::from_str(v) {
+            Ok(json) => {
+                Value::from_case_json(json).map_err(|error| format!("--arg `{k}`: {error}"))?
+            }
+            Err(error) if v.starts_with(['{', '[', '"']) => {
+                return Err(format!("--arg `{k}` has invalid JSON: {error}"));
+            }
+            Err(_) => Value::String(v.to_owned()),
+        };
+        case.facts.insert(k.to_owned(), value);
     }
     Ok(())
 }
@@ -224,7 +335,27 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
 /// `sources/` fallback. A declared path that is missing or malformed is a
 /// diagnostic. Modules that omit a manifest get an empty default.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
-    DRIVER.with(|driver| driver.borrow_mut().check_path(path))
+    compile_module_with_root(path, None)
+}
+
+fn compile_artifact(
+    path: &Path,
+    source_root: Option<&Path>,
+) -> Result<(fidryn_driver::CompilationArtifact, SourceManifest), Vec<Diagnostic>> {
+    DRIVER.with(|driver| match source_root {
+        Some(root) => driver
+            .borrow_mut()
+            .check_path_artifact_with_root(path, root),
+        None => driver.borrow_mut().check_path_artifact(path),
+    })
+}
+
+pub fn compile_module_with_root(
+    path: &Path,
+    source_root: Option<&Path>,
+) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
+    compile_artifact(path, source_root)
+        .map(|(artifact, manifest)| (artifact.module().clone(), manifest))
 }
 
 /// Where `fidryn run` reads its case record from.
@@ -262,7 +393,24 @@ pub struct RunRequest<'a> {
 /// `--known-at`, then evaluation. Compile and evaluation share this
 /// thread's driver, so `sourceTrust` is the one the CLI reports.
 pub fn run_report_text(req: &RunRequest<'_>) -> Result<String, String> {
-    let (module, _) = compile_module(req.path).map_err(|ds| diagnostics_text(&ds))?;
+    run_report_text_with_root(req, None)
+}
+
+pub fn run_report_text_with_root(
+    req: &RunRequest<'_>,
+    source_root: Option<&Path>,
+) -> Result<String, String> {
+    run_report_text_with_options(req, source_root, None)
+}
+
+pub fn run_report_text_with_options(
+    req: &RunRequest<'_>,
+    source_root: Option<&Path>,
+    budget: Option<u32>,
+) -> Result<String, String> {
+    let (artifact, _) =
+        compile_artifact(req.path, source_root).map_err(|ds| diagnostics_text(&ds))?;
+    let module = artifact.module();
     let mut case = read_case(req.case)?;
     apply_run_args(&mut case, req.args)?;
     let valid = instant_arg("--valid-at", req.valid_at)?;
@@ -271,21 +419,98 @@ pub fn run_report_text(req: &RunRequest<'_>) -> Result<String, String> {
     let report = DRIVER
         .with(|driver| {
             let mut driver = driver.borrow_mut();
-            if req.scenario {
-                driver.run_report_scenario(&module, req.query, &case, &ctx)
-            } else {
-                driver.run_report(&module, req.query, &case, &ctx)
-            }
+            driver.run_artifact_checked_with_budget(
+                &artifact,
+                req.query,
+                &case,
+                &ctx,
+                req.scenario,
+                budget,
+            )
         })
         .map_err(|err| EngineFailure::from_err(err).to_string())?;
-    Ok(render_report(
-        &module,
+    let text = fidryn_trace::render_checked_report(
+        module,
         &QueryName::from(req.query),
         valid,
         known,
         &case,
         &report,
-    ))
+    )?;
+    let steps = DRIVER
+        .with(|driver| {
+            driver
+                .borrow()
+                .derivation_of(
+                    report
+                        .report()
+                        .request
+                        .as_ref()
+                        .expect("checked invocation"),
+                )
+                .map(<[_]>::to_vec)
+        })
+        .ok_or("evaluation did not retain its derivation")?;
+    attach_derivation(&text, &steps)
+}
+
+pub(crate) fn attach_derivation(
+    text: &str,
+    steps: &[fidryn_eval::DerivationStep],
+) -> Result<String, String> {
+    use fidryn_trace::{TraceDocument, TraceKind, TraceNode};
+    let mut report: serde_json::Value =
+        serde_json::from_str(text).map_err(|error| error.to_string())?;
+    let trace = report["outcomeDocument"]["outcome"]["trace"]
+        .as_str()
+        .ok_or("missing outcome trace")?
+        .to_owned();
+    let nodes: Vec<_> = steps
+        .iter()
+        .map(|step| TraceNode {
+            id: step.id.clone(),
+            detail: step.detail.clone(),
+            parents: step.parents.clone(),
+            kind: match step.kind.as_str() {
+                "rule_application" => TraceKind::RuleApplication,
+                "authority" => TraceKind::AuthorityCheck,
+                "temporal_rejection" => TraceKind::TemporalFilter,
+                "institutional_transition" => TraceKind::InstitutionalTransition,
+                "transaction_begin" | "transaction_commit" | "transaction_rollback" => {
+                    TraceKind::Transaction
+                }
+                "invocation" => TraceKind::Invocation,
+                "foundation" => TraceKind::Foundation,
+                "assumption" => TraceKind::Assumption,
+                "determination" => TraceKind::Determination,
+                "evidence" => TraceKind::EvidenceSubmission,
+                _ => TraceKind::Evaluation,
+            },
+        })
+        .collect();
+    let ids: std::collections::BTreeSet<_> = nodes.iter().map(|node| node.id.as_str()).collect();
+    if !ids.contains(trace.as_str())
+        || nodes.iter().any(|node| {
+            node.parents
+                .iter()
+                .any(|parent| !ids.contains(parent.as_str()))
+        })
+    {
+        return Err("derivation is not rooted in the outcome or has missing supports".into());
+    }
+    report["traceDocument"] = serde_json::to_value(TraceDocument {
+        trace,
+        provenance_root: Some(
+            report["invocationId"]
+                .as_str()
+                .ok_or("missing invocation identity")?
+                .into(),
+        ),
+        nodes,
+    })
+    .map_err(|error| error.to_string())?;
+    report["engineArtifact"] = engine::executable_identity()?;
+    canonical_json(&report).map_err(|error| error.to_string())
 }
 
 /// Compile diagnostics as the CLI prints them, one per line.
@@ -303,8 +528,11 @@ fn emit_diagnostics(diagnostics: &[Diagnostic]) {
     }
 }
 
-fn compile_or_exit(path: &Path) -> Result<(CoreModule, SourceManifest), ExitCode> {
-    compile_module(path).map_err(|ds| {
+fn compile_or_exit(
+    path: &Path,
+    source_root: Option<&Path>,
+) -> Result<(CoreModule, SourceManifest), ExitCode> {
+    compile_module_with_root(path, source_root).map_err(|ds| {
         emit_diagnostics(&ds);
         ExitCode::from(1)
     })
@@ -355,23 +583,6 @@ impl From<EngineError> for EngineFailure {
     }
 }
 
-/// Accept both `Outcome` and `Result<Outcome, EngineError>` (core or eval).
-pub(crate) trait IntoEvalOutcome {
-    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure>;
-}
-
-impl IntoEvalOutcome for Outcome<Value> {
-    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure> {
-        Ok(self)
-    }
-}
-
-impl IntoEvalOutcome for Result<Outcome<Value>, EngineError> {
-    fn into_eval_outcome(self) -> Result<Outcome<Value>, EngineFailure> {
-        self.map_err(EngineFailure::from_err)
-    }
-}
-
 /// Load the source manifest for `module_path`.
 ///
 /// Resolution:
@@ -383,154 +594,33 @@ impl IntoEvalOutcome for Result<Outcome<Value>, EngineError> {
 /// [`SourceManifest::default`]. `"digest": "fixture"` is a fixture profile
 /// label, not an authenticated hash.
 pub fn load_manifest(module_path: &Path, src: &str) -> Result<SourceManifest, Vec<Diagnostic>> {
-    let dir = module_path.parent().unwrap_or(Path::new("."));
-    if let Some(declared) = declared_manifest_path(src) {
-        if declared.is_empty() {
-            return Err(vec![Diagnostic::new(
-                DiagnosticCode::E540,
-                "declared source_manifest path is empty",
-            )]);
-        }
-        let path = resolve_manifest_path(dir, &declared);
-        return read_manifest(&path, true);
-    }
-
-    let default_path = dir.join("sources").join("manifest.json");
-    if default_path.is_file() {
-        return read_manifest(&default_path, false);
-    }
-
-    let sources_dir = dir.join("sources");
-    if let Some(unique) = unique_glob_manifest(&sources_dir) {
-        return read_manifest(&unique, false);
-    }
-
-    Ok(SourceManifest::default())
-}
-
-fn resolve_manifest_path(module_dir: &Path, declared: &str) -> PathBuf {
-    let path = Path::new(declared);
-    if path.is_absolute() {
-        path.to_path_buf()
-    } else {
-        module_dir.join(path)
-    }
-}
-
-fn declared_manifest_path(src: &str) -> Option<String> {
-    let parsed = parse_file(src);
-    if let Some(module) = parsed.module() {
-        for item in &module.items {
-            if let Item::Header(header) = item
-                && header.kind == HeaderKind::SourceManifest
-            {
-                let path = unquote_manifest_path(&header.value);
-                if !path.is_empty() {
-                    return Some(path);
-                }
-            }
-        }
-    }
-    scan_source_manifest_header(src)
-}
-
-fn scan_source_manifest_header(src: &str) -> Option<String> {
-    for line in src.lines() {
-        let trimmed = line.trim();
-        if trimmed.starts_with("//") {
-            continue;
-        }
-        let Some(rest) = trimmed.strip_prefix("source_manifest") else {
-            continue;
-        };
-        let path = unquote_manifest_path(rest);
-        if !path.is_empty() {
-            return Some(path);
-        }
-    }
-    None
-}
-
-fn unquote_manifest_path(raw: &str) -> String {
-    let raw = raw.trim().trim_end_matches(';').trim();
-    if let Some(inner) = raw.strip_prefix('"') {
-        return inner
-            .split_once('"')
-            .map(|(s, _)| s)
-            .unwrap_or(inner)
-            .trim()
-            .to_owned();
-    }
-    if let Some(inner) = raw.strip_prefix('\'') {
-        return inner
-            .split_once('\'')
-            .map(|(s, _)| s)
-            .unwrap_or(inner)
-            .trim()
-            .to_owned();
-    }
-    raw.split_whitespace().next().unwrap_or("").to_owned()
-}
-
-fn unique_glob_manifest(sources_dir: &Path) -> Option<PathBuf> {
-    if !sources_dir.is_dir() {
-        return None;
-    }
-    let mut found = Vec::new();
-    let entries = fs::read_dir(sources_dir).ok()?;
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
-        let name = path.file_name()?.to_str()?;
-        if name.ends_with(".manifest.json") {
-            found.push(path);
-        }
-    }
-    if found.len() == 1 { found.pop() } else { None }
-}
-
-fn read_manifest(path: &Path, declared: bool) -> Result<SourceManifest, Vec<Diagnostic>> {
-    match fs::read_to_string(path) {
-        Ok(text) => parse_manifest_json(&text, path),
-        Err(err) if err.kind() == ErrorKind::NotFound => {
-            if declared {
-                Err(vec![Diagnostic::new(
-                    DiagnosticCode::E540,
-                    format!("declared source_manifest `{}` is missing", path.display()),
-                )])
-            } else {
-                Ok(SourceManifest::default())
-            }
-        }
-        Err(err) => Err(vec![Diagnostic::new(
-            DiagnosticCode::E540,
-            format!("cannot read source_manifest {}: {err}", path.display()),
-        )]),
-    }
-}
-
-fn parse_manifest_json(text: &str, path: &Path) -> Result<SourceManifest, Vec<Diagnostic>> {
-    serde_json::from_str::<SourceManifest>(text).map_err(|err| {
-        vec![Diagnostic::new(
-            DiagnosticCode::E100,
-            format!("malformed source_manifest {}: {err}", path.display()),
-        )]
-    })
+    fidryn_driver::load_source_manifest(module_path, src, None)
 }
 
 /// Read and parse a case record. Err is the CLI's stderr line.
 fn read_case(input: CaseInput<'_>) -> Result<CaseRecord, String> {
+    const LIMIT: usize = 8 * 1024 * 1024;
     let owned;
     let text = match input {
         CaseInput::File(path) => {
-            owned = fs::read_to_string(path)
-                .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+            let mut bytes = Vec::new();
+            fs::File::open(path)
+                .map_err(|error| format!("cannot read {}: {error}", path.display()))?
+                .take((LIMIT + 1) as u64)
+                .read_to_end(&mut bytes)
+                .map_err(|error| format!("cannot read {}: {error}", path.display()))?;
+            if bytes.len() > LIMIT {
+                return Err(format!("case record exceeds {LIMIT} bytes"));
+            }
+            owned = String::from_utf8(bytes)
+                .map_err(|error| format!("invalid case record: {error}"))?;
             owned.as_str()
         }
         CaseInput::Json(text) => text,
     };
+    if text.len() > LIMIT {
+        return Err(format!("case record exceeds {LIMIT} bytes"));
+    }
     serde_json::from_str(text).map_err(|e| format!("invalid case record: {e}"))
 }
 
@@ -577,8 +667,8 @@ fn cmd_fmt(path: &Path) -> ExitCode {
     }
 }
 
-fn cmd_check(path: &Path) -> ExitCode {
-    match compile_or_exit(path) {
+fn cmd_check(path: &Path, source_root: Option<&Path>) -> ExitCode {
+    match compile_or_exit(path, source_root) {
         Ok(_) => {
             println!("ok");
             ExitCode::SUCCESS
@@ -604,37 +694,49 @@ pub(crate) fn apply_scenario_envelope(report: &mut EvaluationReport, case: &Case
 /// Assignment evaluation uses `evaluate_scenario` when `case.assumptions`
 /// is nonempty, so the overlay can change the answer. The envelope is
 /// then labeled scenario.
+#[cfg(test)]
 pub(crate) fn explore_report(
     module: &CoreModule,
     query: &QueryName,
     case: &CaseRecord,
     ctx: &RunContext,
 ) -> Result<EvaluationReport, EngineFailure> {
-    let outcome = explore_query(module, query, case, ctx).into_eval_outcome()?;
-    let mut report = EvaluationReport::from_outcome(outcome);
-    apply_scenario_envelope(&mut report, case);
-    Ok(report)
+    explore_report_traced(module, query, case, ctx).map(|(report, _)| report)
 }
 
-fn cmd_run(
-    path: &Path,
-    query: &str,
-    case_path: &Path,
-    valid_at: &str,
-    known_at: &str,
-    args: &[String],
-    scenario: bool,
-) -> ExitCode {
-    let req = RunRequest {
-        path,
-        query,
-        case: CaseInput::File(case_path),
-        valid_at,
-        known_at,
-        args,
-        scenario,
-    };
-    match run_report_text(&req) {
+pub(crate) fn explore_report_traced(
+    module: &CoreModule,
+    query: &QueryName,
+    case: &CaseRecord,
+    ctx: &RunContext,
+) -> Result<(EvaluationReport, fidryn_verify::ExplorationSession), EngineFailure> {
+    let session = fidryn_verify::explore_query_traced(module, query, case, ctx)?;
+    let mut report = EvaluationReport::from_outcome(session.outcome.clone());
+    apply_scenario_envelope(&mut report, case);
+    if report.execution_mode == ExecutionMode::Scenario {
+        report.assumptions = fidryn_eval::duty::scenario_hypotheses(case, ctx);
+    }
+    report.request = Some(
+        fidryn_core::ExecutionRequest::from_eval(
+            module,
+            query.as_str(),
+            &BTreeMap::new(),
+            case,
+            ctx,
+            report.execution_mode,
+        )
+        .map_err(EngineError::InvalidInput)?,
+    );
+    report
+        .request
+        .as_mut()
+        .expect("exploration request")
+        .operation = fidryn_core::ExecutionOperation::Explore;
+    Ok((report, session))
+}
+
+fn cmd_run(req: &RunRequest<'_>, source_root: Option<&Path>, budget: Option<u32>) -> ExitCode {
+    match run_report_text_with_options(req, source_root, budget) {
         Ok(text) => {
             println!("{text}");
             ExitCode::SUCCESS
@@ -670,10 +772,16 @@ fn cmd_explore(
     bounds: Option<&Path>,
     valid_at: &str,
     known_at: &str,
+    source_root: Option<&Path>,
 ) -> ExitCode {
-    let Ok((module, _)) = compile_or_exit(path) else {
-        return ExitCode::from(1);
+    let (artifact, _) = match compile_artifact(path, source_root) {
+        Ok(result) => result,
+        Err(diagnostics) => {
+            emit_diagnostics(&diagnostics);
+            return ExitCode::from(1);
+        }
     };
+    let module = artifact.module();
     let Ok(mut case) = load_case(case_path) else {
         return ExitCode::from(1);
     };
@@ -704,30 +812,49 @@ fn cmd_explore(
         return ExitCode::from(1);
     };
     let ctx = RunContext::new(valid, known);
-    let mut report = match explore_report(&module, &QueryName::from(query), &case, &ctx) {
-        Ok(report) => report,
-        Err(err) => {
-            eprintln!("{err}");
-            return ExitCode::from(1);
-        }
-    };
-    report.trust = DRIVER.with(|driver| driver.borrow().source_trust_of(&module));
-    println!(
-        "{}",
-        render_report(
-            &module,
-            &QueryName::from(query),
-            valid,
-            known,
-            &case,
-            &report
-        )
+    let (mut report, session) =
+        match explore_report_traced(module, &QueryName::from(query), &case, &ctx) {
+            Ok(result) => result,
+            Err(err) => {
+                eprintln!("{err}");
+                return ExitCode::from(1);
+            }
+        };
+    let bundle = artifact.sources();
+    report.trust = bundle.trust_summary();
+    report.source_bundle = Some(bundle.identity().hex());
+    let checked = fidryn_kernel::CheckedEvaluation::validate_exploration(
+        module,
+        &QueryName::from(query),
+        &case,
+        &ctx,
+        &BTreeMap::new(),
+        report.execution_mode,
+        Some(bundle),
+        &session.evidence,
+        report,
     );
+    let text = checked
+        .and_then(|checked| {
+            fidryn_trace::render_checked_report(
+                module,
+                &QueryName::from(query),
+                valid,
+                known,
+                &case,
+                &checked,
+            )
+        })
+        .and_then(|text| attach_derivation(&text, &session.derivation));
+    match text {
+        Ok(text) => println!("{text}"),
+        Err(error) => return fail(error),
+    }
     ExitCode::SUCCESS
 }
 
-fn cmd_verify(path: &Path, property: &str) -> ExitCode {
-    let Ok((module, _)) = compile_or_exit(path) else {
+fn cmd_verify(path: &Path, property: &str, source_root: Option<&Path>) -> ExitCode {
+    let Ok((module, _)) = compile_or_exit(path, source_root) else {
         return ExitCode::from(1);
     };
     let verdict = verify_property(&module, property);
@@ -740,8 +867,13 @@ fn cmd_verify(path: &Path, property: &str) -> ExitCode {
     }
 }
 
-fn cmd_render(path: &Path, template: &Path) -> ExitCode {
-    let Ok((module, _)) = compile_or_exit(path) else {
+fn cmd_render(
+    path: &Path,
+    template: &Path,
+    data: Option<&Path>,
+    source_root: Option<&Path>,
+) -> ExitCode {
+    let Ok((module, _)) = compile_or_exit(path, source_root) else {
         return ExitCode::from(1);
     };
     let template_src = match fs::read_to_string(template) {
@@ -751,7 +883,11 @@ fn cmd_render(path: &Path, template: &Path) -> ExitCode {
             return ExitCode::from(1);
         }
     };
-    match render(&template_src, &module_vars(&module)) {
+    let data = match data.map(read_render_data).transpose() {
+        Ok(data) => data,
+        Err(error) => return fail(error),
+    };
+    match render_with_data(&template_src, &module, data.as_ref()) {
         Ok(text) => {
             print!("{text}");
             ExitCode::SUCCESS
@@ -761,6 +897,32 @@ fn cmd_render(path: &Path, template: &Path) -> ExitCode {
             ExitCode::from(1)
         }
     }
+}
+
+fn read_render_data(path: &Path) -> Result<serde_json::Value, String> {
+    const LIMIT: usize = 8 * 1024 * 1024;
+    let mut bytes = Vec::new();
+    fs::File::open(path)
+        .map_err(|error| format!("cannot read {}: {error}", path.display()))?
+        .take((LIMIT + 1) as u64)
+        .read_to_end(&mut bytes)
+        .map_err(|error| error.to_string())?;
+    if bytes.len() > LIMIT {
+        return Err(format!("template data exceeds {LIMIT} bytes"));
+    }
+    serde_json::from_slice(&bytes).map_err(|error| format!("invalid template data: {error}"))
+}
+
+pub(crate) fn render_with_data(
+    template: &str,
+    module: &CoreModule,
+    data: Option<&serde_json::Value>,
+) -> Result<String, fidryn_render::RenderError> {
+    let mut values = module_values(module);
+    if let Some(data) = data {
+        values["data"] = data.clone();
+    }
+    render_values(template, &values)
 }
 
 fn cmd_file(packet: &Path, adapter: &str, live: bool, endpoint: Option<&str>) -> ExitCode {
@@ -843,11 +1005,16 @@ fn load_explain_source(trace_id: &str) -> Result<ExplainSource, String> {
     }
 }
 
-fn cmd_diff(old_snapshot: &Path, new_snapshot: &Path, query: &str) -> ExitCode {
-    let Ok(old) = load_diff_input(old_snapshot, query) else {
+fn cmd_diff(
+    old_snapshot: &Path,
+    new_snapshot: &Path,
+    query: &str,
+    source_root: Option<&Path>,
+) -> ExitCode {
+    let Ok(old) = load_diff_input(old_snapshot, query, source_root) else {
         return ExitCode::from(1);
     };
-    let Ok(new) = load_diff_input(new_snapshot, query) else {
+    let Ok(new) = load_diff_input(new_snapshot, query, source_root) else {
         return ExitCode::from(1);
     };
     let diff = NamedSnapshotDiff {
@@ -954,16 +1121,7 @@ pub fn snapshot_names_from_module(module: &CoreModule) -> BTreeMap<String, Strin
             _ => {}
         }
     }
-    let module_fp = canonical_json(&serde_json::json!({
-        "name": module.name,
-        "version": module.version,
-        "outside_scope": module.outside_scope,
-        "rules": rules,
-        "functions": functions,
-        "duties": duties,
-        "nominations": module.nominations,
-    }))
-    .expect("canonical json");
+    let module_fp = canonical_json(module).expect("canonical json");
     names.insert(module.name.clone(), module_fp);
     for function in &functions {
         names
@@ -1132,10 +1290,7 @@ fn merge_json_snapshot(
         names.insert(module.to_owned(), module_fp);
     }
     if let Some(q) = obj.get("query").and_then(|q| q.as_str()) {
-        let fp = obj
-            .get("outcome")
-            .map(|o| canonical_json(o).unwrap_or_else(|_| o.to_string()))
-            .unwrap_or_else(|| canonical_json(value).unwrap_or_else(|_| value.to_string()));
+        let fp = canonical_json(value).unwrap_or_else(|_| value.to_string());
         names.insert(q.to_owned(), fp);
         return;
     }
@@ -1189,9 +1344,13 @@ fn is_fidryn_source(path: &Path) -> bool {
         .is_some_and(|e| e.eq_ignore_ascii_case("fr"))
 }
 
-fn load_diff_input(path: &Path, query: &str) -> Result<DiffInput, ExitCode> {
+fn load_diff_input(
+    path: &Path,
+    query: &str,
+    source_root: Option<&Path>,
+) -> Result<DiffInput, ExitCode> {
     if is_fidryn_source(path) {
-        let (module, _) = compile_or_exit(path)?;
+        let (module, _) = compile_or_exit(path, source_root)?;
         return Ok(DiffInput {
             result: snapshot_names_from_module(&module),
             assurance: BTreeMap::new(),
@@ -1214,6 +1373,7 @@ fn load_diff_input(path: &Path, query: &str) -> Result<DiffInput, ExitCode> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fidryn_core::Outcome;
     use fidryn_core::{
         Assumption, CoreNomination, CoreRule, ExecutionMode, Guard, NodeId, QueryPlan, RuleKind,
         Term,
@@ -1416,7 +1576,11 @@ module Examples.T version "0.1.0" {
         let t = Instant::parse("2033-01-01T00:00:00Z").unwrap();
         let ctx = RunContext::new(t, t);
         let report = DRIVER
-            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .with(|driver| {
+                driver
+                    .borrow_mut()
+                    .run_report_scenario(&module, "q", &case, &ctx)
+            })
             .expect("report");
         assert_eq!(report.execution_mode, ExecutionMode::Scenario);
         assert_eq!(report.assumptions, case.assumptions);
@@ -1469,7 +1633,7 @@ module Examples.T version "0.1.0" {
     fn run_report_assumption_overlay_changes_boolean_fact() {
         let src = r#"
 module Examples.T version "0.1.0" {
-    query q() -> Bool {
+    query q(flag: Bool) -> Bool {
         goal Evaluate { flag }
     }
 }
@@ -1490,7 +1654,11 @@ module Examples.T version "0.1.0" {
             "operative evaluate must ignore the flag overlay: {operative:?}"
         );
         let report = DRIVER
-            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .with(|driver| {
+                driver
+                    .borrow_mut()
+                    .run_report_scenario(&module, "q", &case, &ctx)
+            })
             .expect("run_report scenario");
         assert_eq!(report.execution_mode, ExecutionMode::Scenario);
         match &report.outcome {
@@ -1515,7 +1683,7 @@ module Examples.T version "0.1.0" {
         content USD(100.00)
         due 30 counted_days after invoice_date
     }
-    query q() -> String {
+    query q() -> DutyState {
         goal Evaluate { duty_status(PayInvoice) }
     }
 }
@@ -1536,7 +1704,7 @@ module Examples.T version "0.1.0" {
             id: "hyp-performed".into(),
             payload: Value::Ctor {
                 name: "Performed".into(),
-                fields: BTreeMap::new(),
+                fields: BTreeMap::from([("name".into(), Value::String("PayInvoice".into()))]),
             },
         });
         let ctx = RunContext::new(t, t);
@@ -1544,7 +1712,11 @@ module Examples.T version "0.1.0" {
             .with(|driver| driver.borrow_mut().run(&module, "q", &case, &ctx))
             .expect("operative");
         let scenario = DRIVER
-            .with(|driver| driver.borrow_mut().run_report(&module, "q", &case, &ctx))
+            .with(|driver| {
+                driver
+                    .borrow_mut()
+                    .run_report_scenario(&module, "q", &case, &ctx)
+            })
             .expect("run_report scenario");
         assert_eq!(scenario.execution_mode, ExecutionMode::Scenario);
         let operative_status = duty_status_label(&operative);
@@ -1803,6 +1975,19 @@ module Examples.T version "0.1.0" {
         assert!(err.contains("KEY=VALUE"), "{err}");
         let err = apply_run_args(&mut case, &["=value".into()]).expect_err("empty key");
         assert!(err.contains("nonempty KEY"), "{err}");
+        apply_run_args(
+            &mut case,
+            &[
+                "count=7".into(),
+                "ready=true".into(),
+                "people=[\"Ada\",\"Ben\"]".into(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(case.facts["count"], Value::Int(7));
+        assert_eq!(case.facts["ready"], Value::Bool(true));
+        assert!(matches!(&case.facts["people"], Value::Set(values) if values.len() == 2));
+        assert!(apply_run_args(&mut case, &["bad={broken".into()]).is_err());
     }
 
     #[test]

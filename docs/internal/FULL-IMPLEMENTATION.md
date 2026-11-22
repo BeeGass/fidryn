@@ -1,12 +1,13 @@
 # Fidryn: required subsystems
 
 The originating essay deferred several subsystems. They remain **language
-requirements** for v0.1. Nothing in this list is an accepted deferral.
+requirements** first specified for v0.1 and carried forward to 0.2.0.
+Nothing in this list is an accepted deferral.
 
 A `.fr` module is not an executable specification. A feature is
 implemented only when parse, resolution, checking, evaluation, uncertainty,
 provenance, and tests agree. Evidence is
-[`implementation-status.md`](implementation-status.md). This review-fix
+[`implementation-status.md`](../implementation-status.md). This review-fix
 pass closes the holes in [`REVIEW-FIX-CONTRACT.md`](REVIEW-FIX-CONTRACT.md)
 (term evaluation, real plans, matching, aggregation, certificates, manifests).
 It does **not** make general rule evaluation, fuel-SCC termination, or
@@ -128,7 +129,7 @@ determination that is operative in the relevant context.
 14. **Mill UI**
     - `fidryn ui [--port N] [--no-open]` on 127.0.0.1 only.
     - Check, run, explore, render. No live filing from the UI.
-    - Outcome JSON uses the mill/CLI evaluation-report envelope (`fidryn.evaluation-report/v0.1` with nested `fidryn.outcome/v0.1`
+    - Outcome JSON uses the mill/CLI evaluation-report envelope (`fidryn.evaluation-report/v0.2` with nested `fidryn.outcome/v0.1`
       fields, camelCase, hex ids, tagged `Value`).
 
 15. **General worklist evaluator**
@@ -145,8 +146,8 @@ determination that is operative in the relevant context.
 ## Crate ownership for parallel work
 
 See [`REVIEW-FIX-CONTRACT.md`](REVIEW-FIX-CONTRACT.md). Docs own only
-this file, [`implementation-status.md`](implementation-status.md), and
-[`ARCHITECTURE.md`](ARCHITECTURE.md).
+this file, [`implementation-status.md`](../implementation-status.md), and
+[`ARCHITECTURE.md`](../ARCHITECTURE.md).
 
 Do not weaken no-false-determinacy. Rust 1.98. `cargo fmt`,
 `clippy -D warnings`, `cargo test --workspace`.

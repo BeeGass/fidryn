@@ -14,9 +14,12 @@ pub const PACKAGES_DIR: &str = "packages";
 
 /// Locked package identity: name, version, and blake3 digest of the module bytes.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct PackageLock {
-    #[serde(default = "package_lock_schema")]
+    #[serde(
+        default = "package_lock_schema",
+        deserialize_with = "deserialize_lock_schema"
+    )]
     pub schema: String,
     pub name: String,
     pub version: String,
@@ -25,6 +28,18 @@ pub struct PackageLock {
 
 fn package_lock_schema() -> String {
     PACKAGE_LOCK_SCHEMA.to_owned()
+}
+
+fn deserialize_lock_schema<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<String, D::Error> {
+    let schema = String::deserialize(deserializer)?;
+    if schema != PACKAGE_LOCK_SCHEMA {
+        return Err(serde::de::Error::custom(format!(
+            "unsupported package lock schema `{schema}`"
+        )));
+    }
+    Ok(schema)
 }
 
 impl Default for PackageLock {

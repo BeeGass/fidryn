@@ -11,14 +11,15 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the v0.1 research interpreter. The modules under
+This repository is the 0.2 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
 
-From the repository root, every command below uses
-`cargo run -p fidryn-cli --` so it works before you install a `fidryn`
-binary. After you build, the same arguments follow `fidryn`.
+From the repository root, every `fidryn` command below is written as
+`cargo run -p fidryn-cli --` followed by its arguments, so it works
+before you install a `fidryn` binary. After you install one, the same
+arguments follow `fidryn`.
 
 ## Prerequisites
 
@@ -36,13 +37,13 @@ From the repository root, compile the workspace and run the tests.
 The first pass takes a bit: it builds every crate, then runs the
 suite.
 
-```
-cargo test --workspace --offline
+```sh
+cargo test --workspace --locked
 ```
 
 Confirm the CLI:
 
-```
+```sh
 cargo run -p fidryn-cli -- --help
 ```
 
@@ -72,7 +73,7 @@ module Programs.RequireGate version "0.1.0" {
 
 Check it:
 
-```
+```sh
 cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 ```
 
@@ -91,33 +92,37 @@ ISO 8601 / RFC 3339 (`Z` or a numeric offset). Use
 `2026-09-17T12:00:00Z` for this hour. Details of the case JSON and
 the two clocks are in [Cases and time](cases-and-time.md).
 
-`require-gate` does not need facts or an interpretation. Write a
-minimal empty case that satisfies the interchange schema
-(`schema` and `admissibleCompletions` are the required properties):
+`require-gate` does not need facts or an interpretation. The repository ships
+a minimal empty case record that satisfies the interchange schema
+(`schema` and `admissibleCompletions` are the required properties), at
+`tests/programs/cases/empty.json`:
 
-```
-cat > /tmp/fidryn-empty-case.json <<'EOF'
-{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}
-EOF
+```json
+{
+  "schema": "fidryn.case-record/v0.1",
+  "admissibleCompletions": {}
+}
 ```
 
 Run `q`. It should be determinate `7`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query q \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
 
 The CLI prints one line of canonical JSON
-(`fidryn.evaluation-report/v0.1`). Pretty-printed, the important fields
-look like this:
+(`fidryn.evaluation-report/v0.2`). Pretty-printed, the important fields
+look like this. This excerpt omits invocation hashes and derivation nodes; the
+actual document also includes `invocation`, `invocationId`, `engineVersion`,
+`sourceBundle` and `traceDocument`:
 
 ```json
 {
-  "schema": "fidryn.evaluation-report/v0.1",
+  "schema": "fidryn.evaluation-report/v0.2",
   "executionMode": "operative",
   "sourceTrust": "unauthenticated",
   "verificationMethod": "none",
@@ -152,14 +157,30 @@ The six-kind legal result is nested under `outcomeDocument`.
 `complete_instruments` as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
 Pass `--scenario` only when you intend `case.assumptions` as an overlay;
-operative `run` (the default) does not apply them.
+operative `run` (the default) does not apply them. `--budget N` sets the maximum
+number of evaluation operations; exhaustion is an engine error and cannot
+produce a qualified determinate answer. The selected budget is part of the
+invocation identity.
+
+Save the complete report to retain its actual trace:
+
+```text
+cargo run -p fidryn-cli -- run tests/programs/require-gate.fr --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
+cargo run -p fidryn-cli -- explain report.json --format text
+```
+
+`--source-root PATH` explicitly grants the filesystem root for artifacts and
+packages. It defaults to the module directory; absolute paths, parent traversal
+and symlinks cannot make an artifact escape that root.
 
 Now run `r`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query r \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
@@ -198,7 +219,7 @@ The Massachusetts trust fixture is a bounded slice of a private
 instrument, not Massachusetts trust law as a whole. Check it the same
 way:
 
-```
+```sh
 cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -209,7 +230,7 @@ later `run` a query against a case under
 [`examples/trust/cases/`](../examples/trust/cases/).
 
 The [examples](examples.md) catalog has more fixtures. They encode
-bounded high-impact slices. They do not contain the entire United
+bounded slices of the law. They do not contain the entire United
 States Code.
 
 ## Next reading

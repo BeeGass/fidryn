@@ -44,6 +44,7 @@ module US.Federal.Education.PSLF version "0.1.0" {
         goal Evaluate {
             require determined QualifyingEmployer(Employer)
                 using Determine
+            return true
         }
     }
 

@@ -2,204 +2,26 @@
 
 use fidryn_check::check;
 use fidryn_core::case::CaseDetermination;
-use fidryn_core::ir::{CoreDecl, CoreDuty, CoreFunction, QueryPlan};
-use fidryn_core::types::PrimitiveType;
+use fidryn_core::ir::{CoreDecl, CoreDuty, QueryPlan};
 use fidryn_core::{
-    CaseRecord, DiagnosticCode, EngineError, Interval, JurisdictionId, ManifestArtifact, NodeId,
-    NodeMeta, OpenRequest, OriginId, Outcome, QueryName, RunContext, SourceManifest, SourceWeight,
-    Term, Type, Value,
+    CaseRecord, DiagnosticCode, EngineError, OpenRequest, Outcome, QueryName, RunContext,
+    SourceManifest, Term, Value,
 };
 use fidryn_eval::evaluate;
 use fidryn_handlers::CaseFile;
 use fidryn_hir::elaborate;
 use fidryn_syntax::parse_file;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
 fn compile(rel: &str) -> fidryn_core::CoreModule {
-    let path = root().join(rel);
-    let src = fs::read_to_string(&path).unwrap();
-    let parsed = parse_file(&src);
-    assert!(!parsed.has_errors(), "{rel}: {:?}", parsed.diagnostics);
-    let mut manifest = load_manifest(&path, &src);
-    ensure_import_digests(&src, &mut manifest);
-    let hir = elaborate(&parsed, &manifest).unwrap();
-    let mut module = check(&hir, &manifest).unwrap();
-    rewrite_module_calls(&mut module);
-    ensure_tax_formula(&mut module);
-    module
-}
-
-fn ensure_import_digests(src: &str, manifest: &mut SourceManifest) {
-    for line in src.lines() {
-        let trimmed = line.trim();
-        let Some(rest) = trimmed.strip_prefix("import ") else {
-            continue;
-        };
-        let name = rest
-            .split_whitespace()
-            .next()
-            .unwrap_or("")
-            .trim_matches('{')
-            .trim();
-        if name.is_empty() {
-            continue;
-        }
-        let already = manifest.artifacts.iter().any(|artifact| {
-            artifact.path == name
-                || artifact.path.ends_with(name)
-                || artifact
-                    .path
-                    .split(['/', '\\'])
-                    .any(|segment| segment == name)
-        });
-        if already {
-            continue;
-        }
-        manifest.artifacts.push(ManifestArtifact {
-            path: name.to_owned(),
-            digest: "fixture".into(),
-            kind: "fixture".into(),
-            effective: String::new(),
-            weight: SourceWeight::Explanatory,
-        });
-    }
-}
-
-fn ensure_tax_formula(module: &mut fidryn_core::CoreModule) {
-    let has_formula = module.declarations.iter().any(|decl| {
-        matches!(
-            decl,
-            CoreDecl::Function(function) if function.name == "ordinary_income_tax_formula"
-        )
-    });
-    if has_formula {
-        return;
-    }
-    if !module.queries.iter().any(|query| query.name == "tax_on") {
-        return;
-    }
-    module.declarations.push(CoreDecl::Function(CoreFunction {
-        id: NodeId::of(b"ordinary_income_tax_formula"),
-        name: "ordinary_income_tax_formula".into(),
-        params: vec![(
-            "amount".into(),
-            Type::Primitive(PrimitiveType::Money {
-                currency: "USD".into(),
-            }),
-        )],
-        result: Type::Primitive(PrimitiveType::Money {
-            currency: "USD".into(),
-        }),
-        effects: Default::default(),
-        is_calc: true,
-        fuel: None,
-        body: None,
-        meta: NodeMeta {
-            span: None,
-            source: Some("ordinary_income_tax_formula".into()),
-            jurisdiction: JurisdictionId::of(b"test"),
-            valid_time: Interval::always(),
-            record_time: Interval::always(),
-            origin: OriginId::Direct(NodeId::of(b"ordinary_income_tax_formula")),
-        },
-    }));
-}
-
-fn load_manifest(module_path: &Path, src: &str) -> SourceManifest {
-    let dir = module_path.parent().unwrap_or(Path::new("."));
-    let declared = src.lines().find_map(|line| {
-        let trimmed = line.trim();
-        trimmed
-            .strip_prefix("source_manifest")
-            .map(|rest| rest.trim().trim_matches('"').to_owned())
-            .filter(|path| !path.is_empty())
-    });
-    let candidates = [
-        declared.as_ref().map(|rel| dir.join(rel)),
-        Some(dir.join("sources").join("manifest.json")),
-    ];
-    for candidate in candidates.into_iter().flatten() {
-        if let Ok(text) = fs::read_to_string(&candidate)
-            && let Ok(manifest) = serde_json::from_str::<SourceManifest>(&text)
-        {
-            return manifest;
-        }
-    }
-    if let Ok(entries) = fs::read_dir(dir.join("sources")) {
-        let manifests: Vec<_> = entries
-            .flatten()
-            .map(|entry| entry.path())
-            .filter(|path| {
-                path.extension().and_then(|ext| ext.to_str()) == Some("json")
-                    && path
-                        .file_name()
-                        .and_then(|name| name.to_str())
-                        .is_some_and(|name| name.contains("manifest"))
-            })
-            .collect();
-        if manifests.len() == 1
-            && let Ok(text) = fs::read_to_string(&manifests[0])
-            && let Ok(manifest) = serde_json::from_str::<SourceManifest>(&text)
-        {
-            return manifest;
-        }
-    }
-    SourceManifest::default()
-}
-
-fn rewrite_module_calls(module: &mut fidryn_core::CoreModule) {
-    for query in &mut module.queries {
-        if query.name == "judgment" {
-            query.plan = QueryPlan::Evaluate(Term::Apply {
-                ctor: "judgment".into(),
-                args: Vec::new(),
-            });
-            continue;
-        }
-        if let QueryPlan::Evaluate(term) = &mut query.plan {
-            rewrite_calls(term);
-        }
-    }
-}
-
-fn rewrite_calls(term: &mut Term) {
-    match term {
-        Term::Call { callee, args } => {
-            for arg in args.iter_mut() {
-                rewrite_calls(arg);
-            }
-            *term = Term::Apply {
-                ctor: callee.clone(),
-                args: std::mem::take(args),
-            };
-        }
-        Term::Apply { args, .. } | Term::Set(args) => {
-            for arg in args {
-                rewrite_calls(arg);
-            }
-        }
-        Term::Binary { left, right, .. } => {
-            rewrite_calls(left);
-            rewrite_calls(right);
-        }
-        Term::If { cond, then, else_ } => {
-            rewrite_calls(cond);
-            rewrite_calls(then);
-            rewrite_calls(else_);
-        }
-        Term::Record(fields) => {
-            for value in fields.values_mut() {
-                rewrite_calls(value);
-            }
-        }
-        Term::Field { base, .. } => rewrite_calls(base),
-        _ => {}
-    }
+    fidryn_driver::Driver::new()
+        .check(&root().join(rel))
+        .unwrap_or_else(|diagnostics| panic!("{rel}: {diagnostics:?}"))
 }
 
 fn load_case(rel: &str) -> CaseRecord {
@@ -247,7 +69,7 @@ fn try_run_at(
     evaluate(
         module,
         &QueryName::from(query),
-        &case.facts,
+        &Default::default(),
         &state,
         &RunContext::new(t, t),
         &mut handler,
@@ -359,7 +181,14 @@ fn with_invoice_issued(mut case: CaseRecord, at: fidryn_core::Instant) -> CaseRe
 fn with_payment(mut case: CaseRecord, paid_at: fidryn_core::Instant) -> CaseRecord {
     case.evidence.push(fidryn_core::EvidenceItem {
         schema: "PaymentRecord".into(),
-        value: Value::Entity("Payer".into()),
+        value: Value::Map(std::collections::BTreeMap::from([
+            ("duty".into(), Value::String("PayInvoice".into())),
+            ("payer".into(), Value::Entity("Payer".into())),
+            ("payee".into(), Value::Entity("Payee".into())),
+            ("currency".into(), Value::String("USD".into())),
+            ("amount".into(), Value::Int(100)),
+            ("paid_at".into(), Value::Instant(paid_at)),
+        ])),
         observed_at: paid_at,
     });
     case
@@ -542,9 +371,15 @@ fn tax_on_computes_closed_form() {
     let case = load_case("examples/tax/cases/ordinary-income.json");
     match run(&module, "tax_on", &case) {
         Outcome::Determinate {
-            value: Value::Decimal(d),
+            value: Value::Ctor { name, fields },
             ..
-        } => assert!(!d.is_zero(), "{d}"),
+        } => {
+            assert_eq!(name, "USD");
+            assert!(
+                matches!(fields.get("_0"), Some(Value::Decimal(amount)) if !amount.is_zero()),
+                "{fields:?}"
+            );
+        }
         other => panic!("{other:?}"),
     }
 }
@@ -579,31 +414,31 @@ fn judgment_with_entry_is_determinate() {
     }
 }
 
+fn succession_case(offices: &[&str]) -> CaseRecord {
+    let mut case = CaseRecord::default();
+    for office in offices {
+        case.evidence.push(fidryn_core::EvidenceItem {
+            schema: "OccupancyRecord".into(),
+            value: Value::Map(std::collections::BTreeMap::from([
+                ("person".into(), Value::String("Pat".into())),
+                ("office".into(), Value::String((*office).into())),
+            ])),
+            observed_at: now(),
+        });
+        case.facts
+            .insert(format!("Incapacitated(Pat,{office})"), Value::Bool(true));
+        for candidate in ["Alice", "Bob", "Carol", "Dana", "Eve"] {
+            case.facts
+                .insert(format!("Accepted({candidate},{office})"), Value::Bool(true));
+        }
+    }
+    case
+}
+
 #[test]
 fn independent_program_both_eligible_picks_rank_one() {
     let module = compile("tests/programs/eligibility-succession.fr");
-    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
-    let mut case = CaseRecord::default();
-    case.facts
-        .insert("alice_accepted".into(), Value::Bool(true));
-    case.facts.insert("bob_accepted".into(), Value::Bool(true));
-    case.facts
-        .insert("carol_accepted".into(), Value::Bool(true));
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "OccupancyRecord".into(),
-        value: Value::String("Pat".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c1".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c2".into()),
-        observed_at: t,
-    });
+    let mut case = succession_case(&["TrusteeOf(BRT)"]);
     case.admissible_completions.interpretations.insert(
         "SuccessorEligibility".into(),
         vec!["Both".into(), "BobAndCarol".into()],
@@ -619,28 +454,7 @@ fn independent_program_both_eligible_picks_rank_one() {
 #[test]
 fn independent_program_bob_and_carol_does_not_appoint_alice() {
     let module = compile("tests/programs/eligibility-succession.fr");
-    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
-    let mut case = CaseRecord::default();
-    case.facts
-        .insert("alice_accepted".into(), Value::Bool(true));
-    case.facts.insert("bob_accepted".into(), Value::Bool(true));
-    case.facts
-        .insert("carol_accepted".into(), Value::Bool(true));
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "OccupancyRecord".into(),
-        value: Value::String("Pat".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c1".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c2".into()),
-        observed_at: t,
-    });
+    let mut case = succession_case(&["TrusteeOf(BRT)"]);
     case.admissible_completions.interpretations.insert(
         "SuccessorEligibility".into(),
         vec!["Both".into(), "BobAndCarol".into()],
@@ -656,28 +470,7 @@ fn independent_program_bob_and_carol_does_not_appoint_alice() {
 #[test]
 fn independent_program_carol_only_selects_carol() {
     let module = compile("tests/programs/eligibility-succession.fr");
-    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
-    let mut case = CaseRecord::default();
-    case.facts
-        .insert("alice_accepted".into(), Value::Bool(true));
-    case.facts.insert("bob_accepted".into(), Value::Bool(true));
-    case.facts
-        .insert("carol_accepted".into(), Value::Bool(true));
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "OccupancyRecord".into(),
-        value: Value::String("Pat".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c1".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c2".into()),
-        observed_at: t,
-    });
+    let mut case = succession_case(&["TrusteeOf(BRT)"]);
     case.admissible_completions.interpretations.insert(
         "SuccessorEligibility".into(),
         vec!["Both".into(), "BobAndCarol".into(), "CarolOnly".into()],
@@ -693,28 +486,7 @@ fn independent_program_carol_only_selects_carol() {
 #[test]
 fn independent_program_two_offices_follow_their_own_protocols() {
     let module = compile("tests/programs/two-offices.fr");
-    let t = fidryn_core::Instant::parse("2026-09-17T12:00:00Z").unwrap();
-    let mut case = CaseRecord::default();
-    case.facts
-        .insert("alice_accepted".into(), Value::Bool(true));
-    case.facts.insert("bob_accepted".into(), Value::Bool(true));
-    case.facts.insert("dana_accepted".into(), Value::Bool(true));
-    case.facts.insert("eve_accepted".into(), Value::Bool(true));
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "OccupancyRecord".into(),
-        value: Value::String("Pat".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c1".into()),
-        observed_at: t,
-    });
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PhysicianCertificate".into(),
-        value: Value::String("c2".into()),
-        observed_at: t,
-    });
+    let mut case = succession_case(&["TrusteeOf(BRT)", "ExecutorOf(Est)"]);
     case.admissible_completions
         .interpretations
         .insert("TrusteeEligibility".into(), vec!["HighRank".into()]);
@@ -793,12 +565,7 @@ fn independent_program_late_payment_without_record_suspends() {
 fn independent_program_late_payment_with_record_is_determinate() {
     let module = compile("tests/programs/late-payment.fr");
     let t = now();
-    let mut case = CaseRecord::default();
-    case.evidence.push(fidryn_core::EvidenceItem {
-        schema: "PaymentRecord".into(),
-        value: Value::Entity("Payer".into()),
-        observed_at: t,
-    });
+    let case = with_payment(CaseRecord::default(), t);
     match run(&module, "paid_on_time", &case) {
         Outcome::Determinate { value, .. } => {
             assert_eq!(value.display_label(), "true", "{value:?}");

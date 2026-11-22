@@ -4,9 +4,8 @@
 
 use fidryn_cli::compile_source;
 use fidryn_core::{
-    CaseRecord, Consequence, CoreDecl, CoreEffect, CoreModule, CoreRule, EffectId, EngineError,
-    Guard, Handler, HandlerResult, Instant, NodeId, OpenRequest, Outcome, PropTerm, QueryName,
-    RuleKind, RunContext, SourceManifest, SuspensionReason, Term, Value, canonical_json,
+    CaseRecord, CoreModule, EngineError, Handler, HandlerResult, Instant, OpenRequest, Outcome,
+    PropTerm, QueryName, RunContext, SourceManifest, SuspensionReason, Term, Value, canonical_json,
 };
 use fidryn_driver::Driver;
 use fidryn_eval::{DerivedWorld, evaluate, evaluate_session, resume};
@@ -207,15 +206,21 @@ fn decimal_case_and_text_case_have_distinct_semantic_encodings() {
 
 #[test]
 fn cached_case_result_agrees_with_uncached_result() {
-    let module = compile(&source("query q() -> Decimal { return x }"));
+    let module = compile(&source("query q(x: Decimal) -> Decimal { return x }"));
     let mut driver = Driver::new();
     let number = case_with(decimal());
     let text = case_with(Value::String("1.25".into()));
-    let _ = driver.run(&module, "q", &number, &context());
     assert_eq!(
-        driver.run(&module, "q", &text, &context()),
-        execute(&module, &text)
+        answer(driver.run(&module, "q", &number, &context())),
+        decimal()
     );
+    let cached = driver.run(&module, "q", &text, &context());
+    assert!(
+        matches!(&cached, Err(EngineError::InvalidInput(_))),
+        "typed Decimal input must refuse a String: {cached:?}"
+    );
+    assert_eq!(cached, execute(&module, &text));
+    assert_eq!(cached, Driver::new().run(&module, "q", &text, &context()));
 }
 
 fn pending(request: &OpenRequest) -> HandlerResult {
@@ -363,56 +368,23 @@ fn snapshot_change_does_not_retain_unvalidated_old_answers() {
     );
 }
 
-fn rule(module: &CoreModule, name: &str, guard: Guard, effects: Vec<Consequence>) -> CoreDecl {
-    let meta = module.queries[0].meta.clone();
-    CoreDecl::Rule(CoreRule {
-        id: NodeId::of(name.as_bytes()),
-        name: name.into(),
-        kind: RuleKind::Constitutive,
-        binders: vec![],
-        selection: None,
-        guard,
-        consequences: effects
-            .into_iter()
-            .enumerate()
-            .map(|(i, consequence)| CoreEffect {
-                id: EffectId::of(format!("{name}:{i}").as_bytes()),
-                consequence,
-                meta: meta.clone(),
-            })
-            .collect(),
-        fallback: None,
-        meta,
-    })
-}
-fn prop(name: &str) -> PropTerm {
-    PropTerm::new(name, vec![])
-}
-
 #[test]
 fn worklist_replacement_with_equal_cardinality_is_not_quiescence() {
-    let mut module = compile(&source("query q() -> Bool { return true }"));
-    let first = rule(
-        &module,
-        "B_to_C",
-        Guard::Derived(prop("B")),
-        vec![Consequence::Derive(prop("C"))],
-    );
-    let second = rule(
-        &module,
-        "A_to_B",
-        Guard::Derived(prop("A")),
-        vec![
-            Consequence::Terminate(prop("A")),
-            Consequence::Establish(prop("B")),
-        ],
-    );
-    module.declarations.extend([first, second]);
+    let module = compile(&source(
+        r#"
+        proposition A()
+        proposition B()
+        proposition C()
+        rule B_to_C : derive { when operative B() then derive C() }
+        rule A_to_B : constitutive { when operative A() then terminate A() then establish B() }
+        query q() -> Bool { return true }
+    "#,
+    ));
     let mut case = CaseRecord::default();
     case.facts.insert("A".into(), Value::Bool(true));
     let world = DerivedWorld::compute(&module, &case, &context(), &BTreeMap::new()).unwrap();
     assert!(
-        world.holds(&prop("C")),
+        world.holds(&PropTerm::new("C", vec![])),
         "the next pass must propagate the replacement"
     );
 }

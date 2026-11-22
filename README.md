@@ -5,63 +5,70 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This repository is the v0.1 **reference interpreter**. It is a research
-fixture, not legal advice, not an operative instrument, and not a
-complete statement of any jurisdiction's law. Modules under `examples/`
-and programs under `tests/` exist to exercise the interpreter.
+Fidryn is released under the MIT License: see [LICENSE](LICENSE). [Licensing](LICENSING.md) covers third-party notices.
 
-Source files use the `.fr` extension.
+## Status
 
-**Documentation:** [docs/README.md](docs/README.md) — start with
-[Getting started](docs/getting-started.md).
+Fidryn 0.2 is a research interpreter. It checks and runs modules (`.fr`
+files) built from queries; functions; calculations; rules; observations;
+judgments that use a concurrence policy; decisions, which run through a
+query's `RunDecision` goal; duties, which run only through the built-in
+calls `duty_status` and `duty_step`; and `verify` properties, whose
+assertions `fidryn verify` decides from closed formulas only: literals,
+arithmetic, comparisons, Boolean connectives, and quantifiers over a
+literal set or bounded synthetic entities. Each run prints
+a JSON report that records the query, the valid and known times, and
+digests of the program and the case record. Several kinds of declaration,
+such as `power`, `office` and `legal_act`, are accepted but not run;
+expressions have no date arithmetic; and an `import` brings in
+declarations only from a package under `packages/`. A module that does
+not pass the checker cannot be run.
+[Implementation status](docs/implementation-status.md) lists what works
+and what does not, with the test or code that shows each one.
 
-## No false determinacy
-
-A computation may return one determinate result only when that result
-is invariant across every still-admissible resolution of the unresolved
-issues, or when a competent authority has already made a determination
-that is operative in the relevant context.
-
-`run` never chooses a completion. An empty completion set is not a
-vacuous determinate answer. Open branches without a covering certificate
-stay `Suspended`. Every outcome carries the declared `modelBoundary`.
+Nothing in this repository is legal advice. The modules under `examples/`
+and the programs under `tests/` exist to exercise the interpreter. None of
+them is a complete statement of any jurisdiction's law.
 
 ## Quick start
 
-Rust 1.98 (`rust-toolchain.toml` pins the patch). From the repository
-root:
+Rust 1.98 is required; `rust-toolchain.toml` selects it.
 
-```
-cargo test --workspace --offline
-cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
-```
-
-Install the binary:
-
-```
-cargo install --path crates/fidryn-cli
-fidryn check examples/trust/bryan-revocable-trust.fr
+```sh
+cargo install --path crates/fidryn-cli --locked
+fidryn check tests/programs/require-gate.fr
 ```
 
-Run a query against a case record (RFC 3339 times are required):
+`check` prints `ok`. Run a query against a case record:
 
-```
-fidryn run examples/tax/federal-tax.fr \
-  --query tax_on \
-  --case examples/tax/cases/ordinary-income.json \
-  --valid-at 2034-03-01T09:00:00Z \
-  --known-at 2034-03-01T09:00:00Z
-```
-
-Local mill (loopback only, default port 8751):
-
-```
-fidryn ui --no-open
+```sh
+fidryn run tests/programs/require-gate.fr \
+  --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
 ```
 
-Then open `http://127.0.0.1:8751`. See [the mill guide](docs/mill.md).
+The report's outcome is determinate `7`. Query `r` in the same file is
+suspended, because its requirement fails:
 
-## What to read next
+```sh
+fidryn run tests/programs/require-gate.fr \
+  --query r \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
+```
+
+Run the tests:
+
+```sh
+cargo test --workspace --locked
+```
+
+## Documentation
+
+The guides are indexed in [docs/README.md](docs/README.md).
 
 | If you want to… | Read |
 | --- | --- |
@@ -77,21 +84,25 @@ Then open `http://127.0.0.1:8751`. See [the mill guide](docs/mill.md).
 
 The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 
-```
+```text
 fidryn fmt PATH
 fidryn check PATH
-fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario]
+fidryn inputs PATH --query NAME
+fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario] [--budget N]
 fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] --valid-at TIME --known-at TIME
-fidryn explain TRACE_ID --format text|json|dot
+fidryn explain TRACE_ID [--format text|json|dot]
 fidryn verify PATH --property NAME
 fidryn diff OLD_SNAPSHOT NEW_SNAPSHOT --query NAME
-fidryn render PATH --template TEMPLATE
+fidryn render PATH --template TEMPLATE [--data DATA.json]
+fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--scenario] [--budget N] [--template TEMPLATE]
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
 ```
 
+Every subcommand also takes `--source-root PATH`, the root for source
+artifacts and packages, which defaults to the module's directory.
 `--arg provision=...` writes `case.facts["provision"]`. Times are ISO 8601
-/ RFC 3339. `run` / `explore` print `fidryn.evaluation-report/v0.1` (nested
+/ RFC 3339. `run` / `explore` print `fidryn.evaluation-report/v0.2` (nested
 `outcomeDocument` is `fidryn.outcome/v0.1`). `--scenario` applies
 `case.assumptions` as an overlay; default `run` is operative. `explore`
 searches only the declared finite completion space. `file` is dry-run
@@ -100,11 +111,19 @@ receipt is not a `Filed` fact.
 
 ## Examples
 
-Bounded high-impact slices, not the United States Code:
+<!-- examples-status:begin -->
+`fidryn check` passes for 54 of the 114 `.fr` modules under `examples/`, `packages/`, `prelude/` and `tests/programs/` with this version. The [per-file list](examples/STATUS.md) is generated by `cargo xtask examples --update`. A file marked (draft) does not pass and cannot be run; [implementation status](docs/implementation-status.md) lists what the language cannot yet express.
+<!-- examples-status:end -->
+
+The examples encode selected parts of particular laws and legal
+instruments, not whole codes such as the United States Code. Places to
+start:
 
 - Trust successor occupancy: `examples/trust/bryan-revocable-trust.fr`
 - Federal ordinary-income tax: `examples/tax/federal-tax.fr`
-- Fifty-state corpus: `examples/states/` (quality bar: Florida homestead)
+- Fifty-state corpus: `examples/states/`, one module per state. Its
+  [README](examples/states/README.md) says how many pass the checker and
+  marks each one that does not.
 - Independent programs: `tests/programs/` (require-gate, late-payment)
 
 Catalog: [docs/examples.md](docs/examples.md) and
@@ -135,3 +154,5 @@ actually implemented: [docs/implementation-status.md](docs/implementation-status
 ## Website
 
 Public landing: [fidryn.onlygass.dev](https://fidryn.onlygass.dev) (static files in `site/`).
+
+Release packages and the version/changelog gate are described in [Releases](docs/releases.md).

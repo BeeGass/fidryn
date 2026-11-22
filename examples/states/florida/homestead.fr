@@ -48,6 +48,11 @@ module Florida.Property.Homestead version "0.1.0" {
     proposition PurchaseMoneyMortgage(creditor: LegalPerson, property: RealProperty)
     proposition LaborOrMaterialsLien(creditor: LegalPerson, property: RealProperty)
 
+    record_type ResidenceRecord {
+        person: NaturalPerson
+        property: RealProperty
+    }
+
     observation OccupancyRecord(record: ResidenceRecord)
         establishes OccupiesAsResidence(record.person, record.property)
         from HomesteadConstitution
@@ -109,6 +114,7 @@ module Florida.Property.Homestead version "0.1.0" {
             require observed OccupancyRecord
             require determined HomesteadCharacter(Home, Owner)
                 using Determine
+            return true
         }
     }
 
@@ -119,6 +125,7 @@ module Florida.Property.Homestead version "0.1.0" {
         goal Evaluate {
             require determined ExceptedCreditor(Creditor)
                 using Determine
+            return true
         }
     }
 

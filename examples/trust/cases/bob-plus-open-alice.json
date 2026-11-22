@@ -6,7 +6,20 @@
   },
   "admissibleCompletions": {
     "interpretations": {
-      "SuccessorEligibility": ["I1", "I2"]
+      "SuccessorEligibility": [
+        "I1",
+        "I2"
+      ]
     }
-  }
+  },
+  "evidence": [
+    {
+      "schema": "OccupancyRecord",
+      "value": {
+        "person": "Bryan",
+        "office": "TrusteeOf(BRT)"
+      },
+      "observedAt": "2026-08-23T12:00:00Z"
+    }
+  ]
 }

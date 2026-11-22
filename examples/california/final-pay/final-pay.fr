@@ -44,6 +44,7 @@ module California.Employment.FinalPay version "0.1.0" {
         goal Evaluate {
             require determined WillfulFailureToPay(Employer)
                 using Determine
+            return true
         }
     }
 

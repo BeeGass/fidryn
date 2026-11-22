@@ -26,6 +26,8 @@ module Examples.BryanRevocableTrust version "0.1.0" {
     entity Alice : NaturalPerson
     entity Bob : NaturalPerson
     entity BRT : Trust
+    entity PhysicianOne : LicensedPhysician
+    entity PhysicianTwo : LicensedPhysician
 
     office TrusteeOf(trust: Trust) occupied_by LegalPerson {
         cardinality 0..1
@@ -43,6 +45,9 @@ module Examples.BryanRevocableTrust version "0.1.0" {
         purpose: CapacityPurpose
     )
     proposition Eligible(person: LegalPerson, office: Office)
+    proposition Occupies(person: LegalPerson, office: Office)
+    proposition Irrevocable(trust: Trust)
+    proposition CourtAppointmentProcedure(trust: Trust)
 
     interpretation_family SuccessorEligibility
         for Instrument.clause("4.4")

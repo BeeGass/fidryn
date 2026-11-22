@@ -9,7 +9,7 @@ use std::process::Command;
 
 const EMPTY_CASE: &str = r#"{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}"#;
 const GATE_TIME: &str = "2026-09-17T12:00:00Z";
-const TRUST_TIME: &str = "2034-03-01T09:00:00Z";
+const TRUST_TIME: &str = "2026-08-24T09:00:00Z";
 const TIME_HELP: &str =
     "Use ISO 8601 / RFC 3339, for example 2033-01-01T00:00:00Z or 2033-01-01T00:00:00+00:00.";
 
@@ -39,7 +39,7 @@ fn request<'a>(
 
 fn report(text: &str) -> Value {
     let report: Value = serde_json::from_str(text).expect("report JSON");
-    assert_eq!(report["schema"], "fidryn.evaluation-report/v0.1", "{text}");
+    assert_eq!(report["schema"], "fidryn.evaluation-report/v0.2", "{text}");
     report
 }
 
@@ -226,7 +226,7 @@ fn checks_run_in_the_cli_order() {
 }
 
 #[test]
-fn fidryn_run_prints_the_same_text() {
+fn fidryn_run_matches_library_result_and_discloses_each_executable() {
     let module = workspace_file("examples/trust/bryan-revocable-trust.fr");
     let case = workspace_file("examples/trust/cases/court-selects-i2.json");
     let fidryn_run = |valid_at: &str| {
@@ -249,7 +249,27 @@ fn fidryn_run_prints_the_same_text() {
     let text = run_report_text(&req).expect("library run");
     let out = fidryn_run(TRUST_TIME);
     assert!(out.status.success(), "{out:?}");
-    assert_eq!(String::from_utf8(out.stdout).unwrap(), format!("{text}\n"));
+    let mut library: Value = serde_json::from_str(&text).unwrap();
+    let mut command: Value = serde_json::from_slice(&out.stdout).unwrap();
+    let library_engine = library
+        .as_object_mut()
+        .unwrap()
+        .remove("engineArtifact")
+        .unwrap();
+    let command_engine = command
+        .as_object_mut()
+        .unwrap()
+        .remove("engineArtifact")
+        .unwrap();
+    assert_eq!(
+        library_engine["semanticsVersion"],
+        command_engine["semanticsVersion"]
+    );
+    assert_ne!(
+        library_engine["digest"], command_engine["digest"],
+        "the test host and CLI are distinct executable artifacts"
+    );
+    assert_eq!(library, command);
 
     let err = run_report_text(&RunRequest {
         valid_at: "yesterday",

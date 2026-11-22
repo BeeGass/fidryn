@@ -692,13 +692,14 @@ mod tests {
             "fn",
             "as",
             "in",
+            "if",
+            "else",
         ] {
             assert!(kw.contains(word), "{word} should be a keyword");
         }
         for word in [
             "true",
             "false",
-            "if",
             "_",
             "UniqueOccupant",
             "FiniteSet",
@@ -771,7 +772,8 @@ mod tests {
             ("interpretation_family DeadlineMeaning {", Lang::Fr),
             ("fidryn-syntax          lossless CST", Lang::Plain),
             ("syntax → hir → check", Lang::Plain),
-            ("if amount <= 11925.00 {", Lang::Plain),
+            ("if amount <= 11925.00 {", Lang::Fr),
+            ("amount <= 11925.00", Lang::Plain),
             ("$HOME/bin", Lang::Plain),
             ("", Lang::Plain),
         ] {

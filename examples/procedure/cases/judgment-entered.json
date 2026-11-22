@@ -2,10 +2,40 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "Examples.CivilComplaint@0.1.0",
   "facts": {
-    "case": "DistrictCase",
-    "complaint": "ComplaintPleading",
-    "answer": "AnswerPleading",
-    "judgment_entry": "judgment-1",
+    "case": {
+      "kind": "entity",
+      "data": "DistrictCase"
+    },
+    "complaint": {
+      "kind": "entity",
+      "data": "ComplaintPleading"
+    },
+    "answer": {
+      "kind": "entity",
+      "data": "AnswerPleading"
+    },
+    "judgment_entry": {
+      "proceeding": {
+        "kind": "entity",
+        "data": "DistrictCase"
+      },
+      "court": {
+        "kind": "entity",
+        "data": "Forum"
+      },
+      "entered_at": {
+        "kind": "instant",
+        "data": "2026-10-01T20:00:00Z"
+      },
+      "disposition": "Judgment entered for plaintiff",
+      "finality": {
+        "kind": "ctor",
+        "data": {
+          "name": "Final",
+          "fields": {}
+        }
+      }
+    },
     "commenced": true,
     "answered": true
   },
@@ -22,7 +52,28 @@
     },
     {
       "schema": "JudgmentEntry",
-      "value": "judgment-1",
+      "value": {
+        "proceeding": {
+          "kind": "entity",
+          "data": "DistrictCase"
+        },
+        "court": {
+          "kind": "entity",
+          "data": "Forum"
+        },
+        "entered_at": {
+          "kind": "instant",
+          "data": "2026-10-01T20:00:00Z"
+        },
+        "disposition": "Judgment entered for plaintiff",
+        "finality": {
+          "kind": "ctor",
+          "data": {
+            "name": "Final",
+            "fields": {}
+          }
+        }
+      },
       "observedAt": "2026-10-01T16:00:00-04:00"
     }
   ],
@@ -37,7 +88,10 @@
   "interpretations": {},
   "decisions": {},
   "closures": [
-    { "domain": "judgment_entries", "closed": true }
+    {
+      "domain": "judgment_entries",
+      "closed": true
+    }
   ],
   "outsideScope": [
     "discovery",

@@ -32,7 +32,7 @@ module Fidryn.Prelude version "0.1.0" {
     type OpenRequest = NeedEvidence | NeedJudgment | NeedChoice | NeedInterpretation
     type Digest = String
 
-    type CapacityPurpose = Administer | Execute
+    type CapacityPurpose = Administer(Trust) | Execute(LegalAction)
     type LicensedPhysician = NaturalPerson
     type CertificateConclusion = Supports | Opposes
     record_type Distribution {

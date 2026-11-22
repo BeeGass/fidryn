@@ -72,15 +72,35 @@ impl std::fmt::Display for SourceBundleId {
 /// [`TrustProfile::Fixture`]. Otherwise the bundle is unauthenticated.
 /// Identity is a hash of pinned observed digests, not of digest-looking
 /// strings alone.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VerifiedSourceBundle {
-    pub snapshot: String,
-    pub jurisdiction: String,
-    pub artifacts: Vec<BundleArtifact>,
+    snapshot: String,
+    jurisdiction: String,
+    artifacts: Vec<BundleArtifact>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    root_source: Option<String>,
 }
 
 impl VerifiedSourceBundle {
+    pub fn snapshot(&self) -> &str {
+        &self.snapshot
+    }
+
+    pub fn jurisdiction(&self) -> &str {
+        &self.jurisdiction
+    }
+
+    pub fn artifacts(&self) -> &[BundleArtifact] {
+        &self.artifacts
+    }
+
+    /// Bind the compiled root text, including comments, without changing legal-source trust.
+    pub fn with_root_source(mut self, source: &[u8]) -> Self {
+        self.root_source = Some(blake3::hash(source).to_hex().to_string());
+        self
+    }
+
     /// Bundle for `manifest` with no observed bytes. Never reads paths.
     pub fn from_manifest(manifest: &SourceManifest) -> Self {
         Self::from_observed(manifest, |_| None)
@@ -103,6 +123,7 @@ impl VerifiedSourceBundle {
             snapshot: manifest.snapshot.clone(),
             jurisdiction: manifest.jurisdiction.clone(),
             artifacts,
+            root_source: None,
         }
     }
 
@@ -115,6 +136,10 @@ impl VerifiedSourceBundle {
         hasher.update(self.snapshot.as_bytes());
         hasher.update(&[0xff]);
         hasher.update(self.jurisdiction.as_bytes());
+        hasher.update(&[0xff]);
+        if let Some(root) = &self.root_source {
+            hasher.update(root.as_bytes());
+        }
         hasher.update(&[0xff]);
         for artifact in &self.artifacts {
             hasher.update(artifact.path.as_bytes());
@@ -143,6 +168,7 @@ impl VerifiedSourceBundle {
         let mut any_fixture = false;
         let mut hex_count = 0usize;
         let mut hex_ok = 0usize;
+        let mut unverified = false;
         for artifact in &self.artifacts {
             match artifact.method {
                 ArtifactVerificationMethod::Fixture => any_fixture = true,
@@ -152,10 +178,12 @@ impl VerifiedSourceBundle {
                         hex_ok += 1;
                     }
                 }
-                ArtifactVerificationMethod::None => {}
+                ArtifactVerificationMethod::None => unverified = true,
             }
         }
-        if any_fixture {
+        if unverified || hex_ok != hex_count {
+            TrustProfile::Unauthenticated
+        } else if any_fixture {
             TrustProfile::Fixture
         } else if hex_count > 0 && hex_ok == hex_count {
             TrustProfile::ByteVerified

@@ -100,6 +100,8 @@ pub struct Diagnostic {
     pub primary_span: Option<Span>,
     pub related_spans: Vec<Span>,
     pub suggestion: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_file: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -116,6 +118,7 @@ impl Diagnostic {
             primary_span: None,
             related_spans: Vec::new(),
             suggestion: None,
+            source_file: None,
         }
     }
 
@@ -126,6 +129,11 @@ impl Diagnostic {
 
     pub fn with_suggestion(mut self, suggestion: impl Into<String>) -> Self {
         self.suggestion = Some(suggestion.into());
+        self
+    }
+
+    pub fn with_source(mut self, source: impl Into<String>) -> Self {
+        self.source_file = Some(source.into());
         self
     }
 
@@ -143,6 +151,9 @@ impl Diagnostic {
 
 impl fmt::Display for Diagnostic {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(source) = &self.source_file {
+            write!(f, "{source}: ")?;
+        }
         write!(f, "{} {}: {}", self.code, self.code.title(), self.message)
     }
 }

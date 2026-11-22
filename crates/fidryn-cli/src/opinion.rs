@@ -11,6 +11,29 @@ use serde_json::{Map, Value};
 /// The outcome's sentences come first; `Outside scope: …` is always last
 /// when the model boundary names anything.
 pub fn sentences(report: &Value) -> Vec<String> {
+    let mut out = vec![
+        format!("Evaluation mode: {}.", text(&report["executionMode"])),
+        format!("Source trust: {}.", text(&report["sourceTrust"])),
+    ];
+    let doc = &report["outcomeDocument"];
+    if let (Some(valid), Some(known)) = (
+        doc["asOf"]["validTime"].as_str(),
+        doc["asOf"]["recordTime"].as_str(),
+    ) {
+        out.push(format!("Legal time: {valid}; known at: {known}."));
+    }
+    if report["executionMode"] == "scenario" {
+        let hypotheses = report["assumptions"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default();
+        out.push(format!("Applied hypotheses: {}.", Value::Array(hypotheses)));
+    }
+    out.extend(content_sentences(report));
+    out
+}
+
+fn content_sentences(report: &Value) -> Vec<String> {
     let doc = &report["outcomeDocument"];
     let query = doc["query"].as_str().unwrap_or("The query");
     let mut out = if doc["outcome"].is_object() {
@@ -351,7 +374,10 @@ mod tests {
             "trace": "0".repeat(32),
             "ignoredOpenIssues": []
         });
-        assert_eq!(sentences(&report(outcome)), ["acting_trustee is Bob."]);
+        assert_eq!(
+            content_sentences(&report(outcome)),
+            ["acting_trustee is Bob."]
+        );
     }
 
     #[test]
@@ -363,7 +389,10 @@ mod tests {
             "convergenceCertificate": null,
             "ignoredOpenIssues": []
         });
-        assert_eq!(sentences(&report(outcome)), ["acting_trustee is 7."]);
+        assert_eq!(
+            content_sentences(&report(outcome)),
+            ["acting_trustee is 7."]
+        );
     }
 
     #[test]
@@ -378,7 +407,7 @@ mod tests {
             ]
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee is Bob.".to_owned(),
                 format!("Covered by convergence certificate {}.", "ab".repeat(16)),
@@ -400,7 +429,7 @@ mod tests {
             ]
         });
         assert_eq!(
-            sentences(&report(outcome))[2],
+            content_sentences(&report(outcome))[2],
             "2 open issues were set aside under that certificate."
         );
     }
@@ -416,7 +445,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report_with(outcome, &TRUST_SCOPE)),
+            content_sentences(&report_with(outcome, &TRUST_SCOPE)),
             [
                 "acting_trustee depends on SuccessorEligibility.",
                 "Under I1 it is Alice.",
@@ -439,7 +468,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee depends on SuccessorEligibility.",
                 "Under SuccessorEligibility = I1 it is Alice.",
@@ -460,7 +489,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "Under SuccessorEligibility = I1, SecondConcurringCertificate = absent it is Alice.",
                 "No single answer is determinate across the admissible completions.",
@@ -482,7 +511,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome))[0],
+            content_sentences(&report(outcome))[0],
             "acting_trustee depends on SuccessorEligibility and CourtCapacityDetermination and needEvidence."
         );
     }
@@ -496,7 +525,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "Under I1 it is Alice.",
                 "No single answer is determinate across the admissible completions.",
@@ -512,7 +541,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee is suspended.",
                 "Outstanding request: requirement failed (require).",
@@ -531,7 +560,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee is suspended.",
                 "Outstanding requests: evidence matching PhysicianCertificate; a determination under CourtCapacityDetermination.",
@@ -547,14 +576,14 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee ended in a norm conflict: no single applicable doctrine among LexSpecialis, LexPosterior."
             ]
         );
         let bare = json!({"kind": "normConflict", "doctrines": [], "trace": "0".repeat(32)});
         assert_eq!(
-            sentences(&report(bare)),
+            content_sentences(&report(bare)),
             ["acting_trustee ended in a norm conflict."]
         );
     }
@@ -568,7 +597,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee is outside the module's competence: the situs of the land is not modeled.",
                 "Request: applicable law among Massachusetts, New York.",
@@ -584,7 +613,7 @@ mod tests {
             "trace": "0".repeat(32)
         });
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             [
                 "acting_trustee has no consistent answer: the admitted model cannot be satisfied.",
                 "Unsatisfiable core: Alive(Bryan), Dead(Bryan).",
@@ -592,7 +621,7 @@ mod tests {
         );
         let bare = json!({"kind": "inconsistent", "core": [], "trace": "0".repeat(32)});
         assert_eq!(
-            sentences(&report(bare)),
+            content_sentences(&report(bare)),
             ["acting_trustee has no consistent answer: the admitted model cannot be satisfied."]
         );
     }
@@ -601,7 +630,7 @@ mod tests {
     fn unknown_kind_is_named_and_nothing_more() {
         let outcome = json!({"kind": "vacated", "order": "remand", "trace": "0".repeat(32)});
         assert_eq!(
-            sentences(&report(outcome)),
+            content_sentences(&report(outcome)),
             ["acting_trustee returned an outcome of kind vacated."]
         );
     }
@@ -609,12 +638,15 @@ mod tests {
     #[test]
     fn report_without_an_outcome() {
         assert_eq!(
-            sentences(&report(Value::Null)),
+            content_sentences(&report(Value::Null)),
             ["The report has no outcome."]
         );
-        assert_eq!(sentences(&json!({})), ["The report has no outcome."]);
         assert_eq!(
-            sentences(&report_with(Value::Null, &["tax"])),
+            content_sentences(&json!({})),
+            ["The report has no outcome."]
+        );
+        assert_eq!(
+            content_sentences(&report_with(Value::Null, &["tax"])),
             ["The report has no outcome.", "Outside scope: tax."]
         );
     }
@@ -628,13 +660,16 @@ mod tests {
             "ignoredOpenIssues": []
         });
         assert_eq!(
-            sentences(&report_with(outcome.clone(), &["complete_instruments"])),
+            content_sentences(&report_with(outcome.clone(), &["complete_instruments"])),
             [
                 "acting_trustee is 7.",
                 "Outside scope: complete_instruments.",
             ]
         );
-        assert_eq!(sentences(&report(outcome)), ["acting_trustee is 7."]);
+        assert_eq!(
+            content_sentences(&report(outcome)),
+            ["acting_trustee is 7."]
+        );
     }
 
     #[test]

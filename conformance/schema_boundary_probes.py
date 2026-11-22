@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
@@ -109,6 +110,11 @@ def builtin_iter_errors(
 
     for sub in schema.get("allOf", []):
         errors.extend(builtin_iter_errors(sub, instance, by_id, current_id, location))
+    if "anyOf" in schema and not any(
+        not builtin_iter_errors(sub, instance, by_id, current_id, location)
+        for sub in schema["anyOf"]
+    ):
+        errors.append("instance does not satisfy any allowed schema")
 
     if "if" in schema:
         if_errors = builtin_iter_errors(schema["if"], instance, by_id, current_id, location)
@@ -194,7 +200,7 @@ def validator_errors(
     return builtin_iter_errors(schema, document, by_id, schema.get("$id", ""))
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "root",
@@ -300,7 +306,14 @@ def main() -> None:
             indent=2,
         )
     )
+    positives = {"baseline_report", "mill_transport_wrapper"}
+    mismatches = [
+        str(row["name"]) for row in rows if row["accepted_by_schema"] != (row["name"] in positives)
+    ]
+    if mismatches:
+        print("schema boundary expectation mismatch: " + ", ".join(mismatches), file=sys.stderr)
+    return int(bool(mismatches))
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

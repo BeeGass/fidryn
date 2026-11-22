@@ -42,22 +42,23 @@ module US.Federal.Courts.Diversity version "0.1.0" {
         return amount > amount_threshold()
     }
 
-    query complete_diversity()
+    query complete_diversity(parties: FiniteSet<LegalPerson>)
         -> Bool
         ! {Observe, Determine}
     {
         goal Evaluate {
             require determined CompleteDiversity(parties)
                 using Determine
+            return true
         }
     }
 
-    query diversity_jurisdiction(amount: Money<USD>)
+    query diversity_jurisdiction(amount: Money<USD>, parties: FiniteSet<LegalPerson>)
         -> Bool
         ! {Observe, Determine}
     {
         goal Evaluate {
-            require amount_in_controversy_met(amount)
+            require amount > amount_threshold()
             require determined CompleteDiversity(parties)
                 using Determine
             return true

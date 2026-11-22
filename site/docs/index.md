@@ -16,7 +16,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the v0.1 reference
+This directory is the human documentation for the 0.2 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -38,7 +38,7 @@ statement of any jurisdiction's law.
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json), and
-[`schemas/evaluation-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json)
+[`schemas/evaluation-report-v0.2.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json)
 (CLI `run` / `explore` and mill eval responses nest the outcome as
 `outcomeDocument`).
 
@@ -47,12 +47,11 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | Document | What it is |
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
+| [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
+| [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
-| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
-| [Obligations](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) | Review obligations; green tests are regressions |
-| [Integration contract](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) | How existing machinery must be wired |
-| [Workstream contract](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) | Covering, require, tax, trust profiles |
-| [Review-fix contract](https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md) | Historical pass-3 repair brief |
-| [Full implementation](https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md) | Older deferred-work list; status is the matrix |
+| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
+| [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
 Mill HTTP routes live in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in Architecture.

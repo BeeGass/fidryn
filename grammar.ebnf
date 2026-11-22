@@ -1,4 +1,4 @@
-(* Fidryn v0.1 closed grammar. Unknown body fields are parse errors. *)
+(* Fidryn 0.2 grammar. The parser enforces closed field sets only for source blocks, rule bodies and judgment request blocks; see docs/implementation-status.md. *)
 
 File            ::= Module EOF
 
@@ -95,7 +95,7 @@ ObservationField::= "authenticate" Expr End
                   | "valid_time" IntervalExpr End
                   | "record_time" IntervalExpr End
 
-NominationDecl  ::= "nomination" Expr "for" Expr "rank" Int SourceRef? End
+NominationDecl  ::= "nomination" QName "for" Expr "rank" Int SourceRef? End
 
 FunctionDecl    ::= ("fn" | "calc") Signature "->" Type EffectRow? FuelClause? Block
 FuelClause      ::= "fuel" "=" Int
@@ -163,6 +163,15 @@ RuleStatement   ::= "when" Expr End
                   | "require" Expr End
                   | "select" Selection
                   | "source" Expr End
+                  | "valid_time" IntervalExpr End
+                  | "record_time" IntervalExpr End
+
+(* The parser rejects text in a rule that is none of these statements, and
+   a when, a require or a source with no Expr after it. It accepts the
+   valid_time and record_time statements, each with an interval that has
+   both of its bounds, and the interpreter does not apply them: the
+   consequences of a rule hold at every time. *)
+
 Selection       ::= "unique"? Ident "from" Expr
                     ("where" Expr)?
                     ("order_by" OrderKey ("," OrderKey)*)? End
@@ -172,6 +181,13 @@ ConsequenceStmt ::= ConsequenceOp Expr ("as_to" Expr)? End
 ConsequenceOp   ::= "establish" | "terminate" | "suspend"
                   | "constitute" | "create" | "derive" | "activate"
                   | "defeat" | "make"
+
+(* The Expr of a consequence names a proposition. A consequence whose
+   Expr is a number, a string, a sum or a date, for example, is rejected
+   with E210 after each ConsequenceOp, and so is one whose Expr is the
+   name of an entity whose type is neither Prop nor an alias of Prop.
+   After create, Duty with arguments is not checked as a proposition: it
+   needs the fields bearer, claimant and content. *)
 
 (* ----- judgments and decisions ----- *)
 
@@ -217,12 +233,19 @@ ReviewClause    ::= "by" Expr ("under" Expr)?
 
 (* ----- interpretation and conflict ----- *)
 
-InterpretationDecl ::= "interpretation_family" Ident "for" Expr
+InterpretationDecl ::= "interpretation_family" Ident ("for" Expr)?
                        "{" InterpretationField* "}"
-InterpretationField::= "alternative" Ident Block
+InterpretationField::= "alternative" Ident "{" Definition* "}"
                   | "admissibility" Expr End
                   | "selector" Expr End
-                  | "defines" Expr "as" Expr End
+Definition      ::= "defines" Expr "as" Status ";"?
+Status          ::= Ident   (* established or not_established, and only one *)
+
+(* The parser steps over the body of an interpretation family, and the
+   lowering reads its definitions from the text. A definition stands in
+   the block of an alternative and ends at the next "defines" or at the
+   "}" of the block. Its Expr is all the text between "defines" and "as",
+   and is one proposition. *)
 
 ConflictDoctrineDecl ::= "conflict_doctrine" Ident SourceRef?
                          "{" ConflictField* "}"
@@ -305,9 +328,28 @@ Primary         ::= literal
                   | MoneyLiteral
                   | QuantifierExpr
                   | TransactionExpr
+                  | IfExpr
 ArgList         ::= Arg ("," Arg)*
 Arg             ::= (Ident "=")? Expr
                   | "..." Expr
+
+IfExpr          ::= "if" Expr Block ("else" (IfExpr | Block))?
+
+(* In the condition of an if, in the domain of a quantifier and in the
+   header of a rule, a judgment or an observation, a name followed by "{"
+   is the name alone. It is not applied to the block: the "{" opens the
+   block of the if, the quantifier or the declaration. A record constructor
+   written with its name, as in R { x: 1 }, therefore needs parentheses in
+   such an expression. Between parentheses, brackets or braces a name
+   followed by "{" takes its block as it does elsewhere.
+
+   The parser also accepts a branch written without braces. After else it
+   is an expression in the same statement, as in if c { 1 } else 2. After
+   the condition of an if it is an expression that begins with a word the
+   condition does not take, such as not or operative, as in
+   if c not a else not b. In if c 1 else 2 the 1 is read as part of the
+   condition, and the if is rejected because no branch is left. An if or
+   an else with no branch is rejected. *)
 
 SetExpr         ::= "{" ExprList? "}"
 ExprList        ::= Expr ("," Expr)*
@@ -318,6 +360,17 @@ MoneyLiteral    ::= Ident "(" Decimal ")"   (* currency constructor, e.g. USD(50
 
 QName           ::= Ident ("." Ident)*
 Ident           ::= [A-Za-z_] [A-Za-z0-9_]*
+
+(* A word of DurationUnit is not always read as a name where a declaration
+   takes its name. After calc, evidence_type, fn, import, judgment,
+   observation, query, record_type, rule, source, type and verify it is
+   read as the name. After clause, conflict_doctrine, decision, duty,
+   effect, entity, exists, for_all, interpretation_family, legal_act,
+   nomination, office, power, proposition and scenario it is rejected with
+   E100, as the whole name and as the first part of a dotted name; as a
+   later part of a dotted name, as in nomination Org.days for B rank 1, it
+   is read. *)
+
 String          ::= JSON-string
 Int             ::= "-"? [0-9]+
 Decimal         ::= "-"? [0-9]+ "." [0-9]+
@@ -331,9 +384,82 @@ DurationUnit    ::= "days" | "working_days" | "counted_days"
 Infinity        ::= "+inf" | "-inf"
 End             ::= inserted-newline | ";"
 
-(* Automatic semicolon insertion: insert End at newline when delimiter
-   depth is zero, the previous token can end a statement, and the next
-   token is not a continuation: and, or, where, then, else, ".", ",". *)
+(* Automatic semicolon insertion: the parser inserts End at a newline when
+   the last token before the newline can end a statement and the first
+   token after it is not a continuation.
+
+   The tokens that can end a statement are a name or word, a literal, ")",
+   "]", "}", "*" and ">". The prefix words are the exception: after not,
+   operative, effective, established, determined, always, active, every,
+   unique or closed a newline does not end the statement.
+
+   The continuations are the words and, or, where, then, else, from,
+   decides, occupied_by, establishes, using, for, rank, as, to, version,
+   fuel and in, and the tokens ".", ",", "->", "=>", ":", "!", "=", "|",
+   "<", "{", "(" and "[".
+
+   A blank line and a line that holds only a comment have no token, so the
+   first token after the newline is then the first token of the next line
+   that has one. Across such lines it counts as a continuation only when
+   it is and, or or in, or one of ".", ",", "->", "=>", ":", "=", "|" and
+   "<": no statement begins with one of those. Each of the other
+   continuations can begin a line in its own right.
+
+   Delimiter depth is not tested. Inside parentheses, brackets and braces a
+   newline ends the expression before it by the same rule, and what follows
+   must be what the enclosing form allows next. In the arguments of a call
+   and in the elements of a braced collection that can be another argument
+   or element, so g(a <newline> b) has two arguments. In a parenthesized
+   expression it must be the closing parenthesis, so (1 <newline> + 2) is
+   rejected, and inside brackets it must be a comma or the closing
+   delimiter.
+
+   The parser does not test for End everywhere. In some places where it
+   expects the next part of a form it reads on across any newlines: for
+   example before else after the block of an if, before the block that
+   follows the domain of a quantifier, and before the block that follows the
+   word transaction. It does test after the condition of an if and after the
+   word else: a branch does not follow an End.
+
+   Text the parser steps over without reading it (the body of a
+   declaration it does not interpret, a verify field it does not read, a
+   clause it keeps as text) ends differently. Parentheses, brackets and
+   braces are counted there, and a newline inside them never ends the
+   text. Outside them a newline ends it by the rule above, except that a
+   prefix word ends a line as any other word does. The text also ends
+   after a ";" outside them, and after the "}" that closes its outermost
+   brace unless a continuation follows that brace.
+
+   A declaration does not go on into the declaration below it. Outside
+   the parentheses, brackets and braces that a declaration has opened and
+   not closed, a line whose first token is a declaration keyword is no
+   part of that declaration, whatever token the line above it ends in.
+   Blank lines and comment lines between the two change nothing. There is
+   one exception: below the header of a for_all or an exists that ends in
+   ":", a line that begins with for_all or exists is the body of the
+   quantifier.
+
+   So a header that leaves no bracket open and whose line ends in ",",
+   ".", ":", "!", "->", "=>", "=", "==", "!=", "<", "<=", ">=", "+", "-",
+   "/", "|" or ".." is not finished above such a line, although no End is
+   inserted there by the rule above, and the module is rejected with E100:
+   rule R : derive from Basis + above the line clause C { is rejected,
+   and clause C is a declaration with its own block. That holds wherever
+   in a header the token stands: after an operator that lacks its operand,
+   after a name that ends in ".", after the "!" of an effect row, among
+   type arguments that "<" opens and no ">" closes, and after the ":",
+   "->" or "=" that a type follows. A prefix word at the end of the from
+   basis of a rule, or of an expression in the header of a judgment or an
+   observation, lacks its operand in the same way. Inside a bracket that
+   the declaration has left open, the lines below can still be read as
+   what the bracket holds.
+
+   A keyword that takes a name is rejected when its statement ends with
+   it: the name is not read from the next line. It is rejected as well
+   when the token after it is not a name. The six header keywords,
+   jurisdiction, source_snapshot, source_manifest, effective_at,
+   recorded_at and outside_scope, are rejected when the statement ends
+   with the keyword: the value is not read from the next line. *)
 
 (* Reserved words: module, version, fn, calc, type, query, rule, when,
    then, otherwise, and, or, not, in, from, for, return, returns.

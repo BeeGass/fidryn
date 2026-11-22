@@ -43,6 +43,7 @@ module US.Federal.Benefits.SocialSecurityFRA version "0.1.0" {
         goal Evaluate {
             require determined DelayedRetirementCreditsApply(Claimant)
                 using Determine
+            return true
         }
     }
 

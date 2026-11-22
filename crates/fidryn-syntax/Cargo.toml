@@ -12,3 +12,5 @@ description = "Fidryn lexer, lossless CST, parser, and formatter"
 rowan.workspace = true
 thiserror.workspace = true
 fidryn-core.workspace = true
+serde_json.workspace = true
+rust_decimal.workspace = true

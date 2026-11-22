@@ -11,13 +11,17 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the v0.1 reference interpreter. It is
+This file is for people building the 0.2 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 
 Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
+
+Fidryn is released under the MIT License. Licensing and contribution
+rights are described in [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions are
+accepted under the same license; no separate agreement is required.
 
 ## Toolchain
 
@@ -36,20 +40,23 @@ at Command Line Tools clang because the Xcode license is unsigned.
 From the repository root:
 
 ```
-cargo fmt
-cargo clippy --workspace -- -D warnings
-cargo test --workspace --offline
+cargo fmt --all
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci` runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
-need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
-that `.python-version` names and the packages `uv.lock` pins. GitHub
-Actions runs `cargo xtask ci --fmt` on every push to `main` and every
-pull request (`.github/workflows/ci.yml`); the runner builds its own
-`.venv` from `uv.lock`, and nothing it builds is committed.
+`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, the
+example status and documentation checks described below, and benchmark
+compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
+qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+
+GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+[Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md). Generated environments and build
+outputs are not committed.
 
 Do not weaken no-false-determinacy to make a test pass.
 
@@ -70,9 +77,55 @@ change in semantics also makes the site stale.
 
 The stylesheet and script in `site/assets/` are written by hand. The
 mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
-`fidryn.css` and has its own script, `web/mill.js`. When Node is
-installed, `cargo xtask ci` also runs the JavaScript unit tests in
-`web/tests/`; Node is never needed to build or serve anything.
+`fidryn.css` and has its own script, `web/mill.js`. `cargo xtask ci` requires Node to run the JavaScript unit tests in
+`web/tests/`; Node is not needed to build or serve the interpreter.
+
+## Example status and documentation checks
+
+`cargo xtask examples` runs `fidryn check` on every `.fr` file under
+`examples/`, `packages/`, `prelude/` and `tests/programs/`, and fails when
+the recorded result is out of date. The record is `examples/status.json`
+and `examples/STATUS.md`; the status sentence between the
+`examples-status` markers in `README.md`, `examples/README.md`,
+`examples/states/README.md` and `docs/examples.md`; and the ` (draft)`
+mark after each path of a failing file that `README.md`,
+`examples/README.md`, `examples/states/README.md` or a Markdown file
+directly under `docs/` mentions outside a code block. Do not edit any of these by
+hand. `cargo xtask examples --update` rewrites the status files, the
+status sentences and the draft marks. Run `cargo xtask site` after it,
+because the site is generated from the guides it rewrites.
+
+`cargo xtask docs` reads the Markdown in `README.md`, `LICENSING.md`,
+`CHANGELOG.md`, `SECURITY.md`, `docs/`, `examples/`, `packages/`,
+`conformance/` and `site/README.md`. It checks that every relative link
+resolves, that every untagged or `fidryn`-tagged code block that starts
+with `module` passes the checker, and that the `fidryn` commands in
+blocks tagged `sh` behave as the tag says. `--skip-commands` leaves out
+the commands.
+
+A code block that shows a `fidryn` command takes one of these tags:
+
+- `sh`: the check runs each `fidryn` command in the block from the
+  repository root and expects exit status 0. A command is a line, with
+  lines ending in `\` joined, that starts with `fidryn` or with
+  `cargo run -p fidryn-cli --`; the check runs the built `fidryn` binary
+  with the words after that prefix. A line in an `sh` block that is not a
+  `fidryn` command, such as `cargo test --workspace --locked`, is not run.
+  A command with `ui` as one of its words is taken to start the mill, so
+  it is not run either. The check does not use a shell, so a command
+  must not use `>`, `>>`, `<`, `|`, `&&`, `||` or `;`. A command that has
+  not exited after 60 seconds is stopped and reported.
+- `sh exit=N`: the same, but each command must exit with status `N`. A
+  tag whose first word is `sh` and which is neither `sh` nor `sh exit=N`
+  with `N` an integer, such as `sh exit 1`, is reported.
+- `text`: the block is shown and not run. Use it for placeholders such as
+  `PATH`, for output redirection, and for commands that cannot run
+  unattended.
+
+A block with any other tag, such as `shell`, or with none, must not show
+a `fidryn` command. Such a tag is not itself reported, but a block under
+it that shows a `fidryn` command is reported as an untagged block would
+be.
 
 ## Pipeline
 
@@ -129,15 +182,20 @@ or outcome matches is not a passing test.
 
 ## Commits
 
-Use Conventional Commits (`feat(syntax): ...`, `fix(eval): ...`,
-`test(cli): ...`, `docs: ...`). Prefer atomic commits in pipeline order,
-then tests and docs. Do not dump unrelated crates into one commit.
+Write each commit subject as an imperative sentence with no type prefix,
+for example `Require code-scanning findings to pass before promotion`.
+Recent history follows this; older commits used Conventional Commits
+prefixes such as `feat(syntax):`, which are no longer used. Prefer atomic
+commits in pipeline order, then tests and docs. Do not dump unrelated
+crates into one commit.
 
 ## Grammar
 
-The closed v0.1 grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the
-repository root. Unknown body fields are parse errors, not extension
-points.
+The grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+`source` blocks, rule bodies and judgment request blocks. In most other
+declarations an unknown field is skipped without a diagnostic; see
+[implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 ## Implementer documents
 
@@ -145,10 +203,11 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
+
+The internal working ledgers are indexed in
+[internal/README.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md). They are not reader
+documentation, and parts of them describe earlier states of the code.
 
 Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
 ARCHITECTURE.md.

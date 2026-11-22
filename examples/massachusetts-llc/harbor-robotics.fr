@@ -33,6 +33,7 @@ module Examples.FormHarborRoboticsLLC version "0.1.0" {
     entity Bryan : NaturalPerson
     entity ResidentAgentCo : DomesticCorporation
     entity HarborRobotics : ProposedLLC
+    entity MassachusettsSecretaryOfCommonwealth.CorporationsDivision : Authority
 
     record_type CertificateOfOrganization {
         name: LLCName
@@ -60,6 +61,7 @@ module Examples.FormHarborRoboticsLLC version "0.1.0" {
         source_digest: Digest
     }
 
+    proposition FormedLLC(company: ProposedLLC)
     proposition NameConforms(name: LLCName)
     proposition Filed(
         certificate: CertificateOfOrganization,
@@ -106,30 +108,47 @@ module Examples.FormHarborRoboticsLLC version "0.1.0" {
         review by CourtWithEntityJurisdiction under ApplicableStandard
     }
 
+    effect NameDesignatorReview { request(name: LLCName) -> Bool }
+    effect CommonwealthOfficeReview { request(address: StreetAddress) -> Bool }
+    effect ResidentAgentReview { request(agent: LegalPerson) -> Bool }
+    effect ServiceAddressReview { request(address: StreetAddress) -> Bool }
+    effect AgentConsentReview { request(consent: SignedConsent) -> Bool }
+    effect ExecutionAuthorityReview { request(certificate: CertificateOfOrganization) -> Bool }
+    effect PersonAddressCompletenessReview {
+        request(managers: FiniteSet<NamedPersonAddress>, filers: FiniteSet<NamedPersonAddress>, signers: FiniteSet<NamedPersonAddress>) -> Bool
+    }
+    effect BusinessCharacterReview { request(description: String) -> Bool }
+    effect CurrentFilingFee {
+        request(certificate: CertificateOfOrganization, instructions: String) -> Money<USD>
+    }
+
     query filing_readiness(certificate: CertificateOfOrganization)
         -> FilingPacket
-        ! {Observe, Determine}
+        ! {Observe, Determine, NameDesignatorReview, CommonwealthOfficeReview,
+           ResidentAgentReview, ServiceAddressReview, AgentConsentReview,
+           ExecutionAuthorityReview, PersonAddressCompletenessReview,
+           BusinessCharacterReview, CurrentFilingFee}
     {
-        require certificate.name has_llc_designator
+        require NameDesignatorReview(certificate.name)
         require operative NameConforms(certificate.name)
             using Observe
-        require in_commonwealth(certificate.commonwealth_office)
-        require eligible_resident_agent(certificate.resident_agent)
-        require valid_service_address(certificate.resident_agent_address)
-        require valid(certificate.resident_agent_consent)
-        require every certificate.executed_by
-            is authorized_to_execute(certificate)
+        require CommonwealthOfficeReview(certificate.commonwealth_office)
+        require ResidentAgentReview(certificate.resident_agent)
+        require ServiceAddressReview(certificate.resident_agent_address)
+        require AgentConsentReview(certificate.resident_agent_consent)
+        require ExecutionAuthorityReview(certificate)
         require certificate.managers is nonempty
             or certificate.authorized_filers is nonempty
-        require every named_person_address is complete
-        require not_blank(certificate.business_character)
+        require PersonAddressCompletenessReview(
+            certificate.managers,
+            certificate.authorized_filers,
+            certificate.real_property_signers
+        )
+        require BusinessCharacterReview(certificate.business_character)
 
         return FilingPacket {
             certificate
-            fee: current_fee(
-                CertificateOfOrganization,
-                SecretaryInstructions
-            )
+            fee: CurrentFilingFee(certificate, "SecretaryInstructions")
             destination:
                 MassachusettsSecretaryOfCommonwealth.CorporationsDivision
         }

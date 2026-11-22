@@ -11,7 +11,7 @@ Do not copy human handbooks into `.agents/`. Human docs stay in [`README.md`](..
 | Path | What it is |
 | --- | --- |
 | [`README.md`](../README.md) | What Fidryn is, the quick start, and the crate table |
-| [`docs/README.md`](../docs/README.md) | Doc index. The README says to start with [`docs/getting-started.md`](../docs/getting-started.md) |
+| [`docs/README.md`](../docs/README.md) | Doc index. The README says the guides are indexed there, and points first-time readers at [`docs/getting-started.md`](../docs/getting-started.md) |
 | [`docs/contributing.md`](../docs/contributing.md) | Contributing notes linked from the README |
 | [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) | Pipeline and APIs, as the README labels that file |
 | [`docs/implementation-status.md`](../docs/implementation-status.md) | What the README says is actually implemented |
@@ -26,19 +26,17 @@ Do not copy human handbooks into `.agents/`. Human docs stay in [`README.md`](..
 
 Other top-level directories are present and are not given a role in the README sections used for this map: `benches/`, `conformance/`, `packages/`, `prelude/`, `schemas/`, `templates/`. Do not invent what they contain.
 
-The README says Fidryn is a programming language for legal instruments and that this repository is the v0.1 reference interpreter: a research fixture, not legal advice and not an operative instrument. Source files use `.fr`.
+The README says Fidryn is a programming language for legal instruments and that Fidryn 0.2 is a research interpreter that checks and runs modules (`.fr` files). It says nothing in the repository is legal advice, and that the modules under `examples/` and the programs under `tests/` exist to exercise the interpreter.
 
-Commands the README documents:
+Commands the README's quick start shows:
 
 ```bash
-cargo test --workspace --offline
-cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
-cargo install --path crates/fidryn-cli
-fidryn check examples/trust/bryan-revocable-trust.fr
-fidryn ui --no-open
+cargo install --path crates/fidryn-cli --locked
+fidryn check tests/programs/require-gate.fr
+cargo test --workspace --locked
 ```
 
-`fidryn run` is also shown, with `--query`, `--case`, `--valid-at`, and `--known-at`. Do not invent a separate lint command.
+`fidryn run` is also shown, on `tests/programs/require-gate.fr` with `--query`, `--case tests/programs/cases/empty.json`, `--valid-at`, and `--known-at`. The README's "CLI at a glance" block lists the synopsis of every subcommand, including `fidryn ui [--port N] [--no-open]`. Do not invent a separate lint command.
 
 ## Where agent material goes
 

@@ -1,0 +1,7 @@
+{
+  "kind": "map",
+  "data": {
+    "document": { "kind": "string", "data": "certificate of organization" },
+    "entity": { "kind": "string", "data": "Example LLC" }
+  }
+}

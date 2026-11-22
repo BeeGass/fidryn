@@ -42,7 +42,7 @@ instruments: precise where law is mechanical, explicit where judgment
 enters, and incapable of hiding authority, discretion, or ambiguity
 inside a Boolean.
 
-This directory is the human documentation for the v0.1 reference
+This directory is the human documentation for the 0.2 reference
 interpreter. Start at the [product README](https://github.com/BeeGass/fidryn/blob/main/README.md) to clone and
 build, then read [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md). The modules,
 records, and examples in this repository are research fixtures. They
@@ -64,7 +64,7 @@ statement of any jurisdiction's law.
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json), and
-[`schemas/evaluation-report-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json)
+[`schemas/evaluation-report-v0.2.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json)
 (CLI `run` / `explore` and mill eval responses nest the outcome as
 `outcomeDocument`).
 
@@ -73,13 +73,12 @@ are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/mai
 | Document | What it is |
 | --- | --- |
 | [Contributing](https://fidryn.onlygass.dev/docs/contributing.md) | Toolchain, tests, commits |
+| [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md) | Native GitHub protections, required checks, reproducible reports and review bundles |
+| [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md) | MIT terms and third-party notices |
+| [Releases](https://github.com/BeeGass/fidryn/blob/main/docs/releases.md) | Version/changelog checks, native packages and GitHub release publication |
 | [Architecture](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) | Pipeline and crate contract |
-| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | Evidence-backed capability matrix |
-| [Obligations](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) | Review obligations; green tests are regressions |
-| [Integration contract](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) | How existing machinery must be wired |
-| [Workstream contract](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) | Covering, require, tax, trust profiles |
-| [Review-fix contract](https://github.com/BeeGass/fidryn/blob/main/docs/REVIEW-FIX-CONTRACT.md) | Historical pass-3 repair brief |
-| [Full implementation](https://github.com/BeeGass/fidryn/blob/main/docs/FULL-IMPLEMENTATION.md) | Older deferred-work list; status is the matrix |
+| [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) | What the 0.2 interpreter does and does not do, each statement backed by a test or a code location |
+| [Internal ledgers](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md) | Working ledgers from reviewing and repairing the interpreter; parts describe earlier states of the code |
 
 Mill HTTP routes live in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in Architecture.
 
@@ -109,14 +108,15 @@ still-admissible resolution of the unresolved issues, or when a
 competent authority has already made a determination that is operative
 in the relevant context. The interpreter never invents a completion.
 
-This repository is the v0.1 research interpreter. The modules under
+This repository is the 0.2 research interpreter. The modules under
 `examples/` and the programs under `tests/` are fixtures. They are not
 legal advice, not operative instruments, and not a complete statement
 of any jurisdiction's law.
 
-From the repository root, every command below uses
-`cargo run -p fidryn-cli --` so it works before you install a `fidryn`
-binary. After you build, the same arguments follow `fidryn`.
+From the repository root, every `fidryn` command below is written as
+`cargo run -p fidryn-cli --` followed by its arguments, so it works
+before you install a `fidryn` binary. After you install one, the same
+arguments follow `fidryn`.
 
 ## Prerequisites
 
@@ -134,13 +134,13 @@ From the repository root, compile the workspace and run the tests.
 The first pass takes a bit: it builds every crate, then runs the
 suite.
 
-```
-cargo test --workspace --offline
+```sh
+cargo test --workspace --locked
 ```
 
 Confirm the CLI:
 
-```
+```sh
 cargo run -p fidryn-cli -- --help
 ```
 
@@ -170,7 +170,7 @@ module Programs.RequireGate version "0.1.0" {
 
 Check it:
 
-```
+```sh
 cargo run -p fidryn-cli -- check tests/programs/require-gate.fr
 ```
 
@@ -189,33 +189,37 @@ ISO 8601 / RFC 3339 (`Z` or a numeric offset). Use
 `2026-09-17T12:00:00Z` for this hour. Details of the case JSON and
 the two clocks are in [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md).
 
-`require-gate` does not need facts or an interpretation. Write a
-minimal empty case that satisfies the interchange schema
-(`schema` and `admissibleCompletions` are the required properties):
+`require-gate` does not need facts or an interpretation. The repository ships
+a minimal empty case record that satisfies the interchange schema
+(`schema` and `admissibleCompletions` are the required properties), at
+`tests/programs/cases/empty.json`:
 
-```
-cat > /tmp/fidryn-empty-case.json <<'EOF'
-{"schema":"fidryn.case-record/v0.1","admissibleCompletions":{}}
-EOF
+```json
+{
+  "schema": "fidryn.case-record/v0.1",
+  "admissibleCompletions": {}
+}
 ```
 
 Run `q`. It should be determinate `7`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query q \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
 
 The CLI prints one line of canonical JSON
-(`fidryn.evaluation-report/v0.1`). Pretty-printed, the important fields
-look like this:
+(`fidryn.evaluation-report/v0.2`). Pretty-printed, the important fields
+look like this. This excerpt omits invocation hashes and derivation nodes; the
+actual document also includes `invocation`, `invocationId`, `engineVersion`,
+`sourceBundle` and `traceDocument`:
 
 ```json
 {
-  "schema": "fidryn.evaluation-report/v0.1",
+  "schema": "fidryn.evaluation-report/v0.2",
   "executionMode": "operative",
   "sourceTrust": "unauthenticated",
   "verificationMethod": "none",
@@ -250,14 +254,30 @@ The six-kind legal result is nested under `outcomeDocument`.
 `complete_instruments` as outside scope, so the envelope repeats that
 exclusion. An omitted interpretation cannot silently shrink the model.
 Pass `--scenario` only when you intend `case.assumptions` as an overlay;
-operative `run` (the default) does not apply them.
+operative `run` (the default) does not apply them. `--budget N` sets the maximum
+number of evaluation operations; exhaustion is an engine error and cannot
+produce a qualified determinate answer. The selected budget is part of the
+invocation identity.
+
+Save the complete report to retain its actual trace:
+
+```text
+cargo run -p fidryn-cli -- run tests/programs/require-gate.fr --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z --known-at 2026-09-17T12:00:00Z > report.json
+cargo run -p fidryn-cli -- explain report.json --format text
+```
+
+`--source-root PATH` explicitly grants the filesystem root for artifacts and
+packages. It defaults to the module directory; absolute paths, parent traversal
+and symlinks cannot make an artifact escape that root.
 
 Now run `r`:
 
-```
+```sh
 cargo run -p fidryn-cli -- run tests/programs/require-gate.fr \
     --query r \
-    --case /tmp/fidryn-empty-case.json \
+    --case tests/programs/cases/empty.json \
     --valid-at 2026-09-17T12:00:00Z \
     --known-at 2026-09-17T12:00:00Z
 ```
@@ -296,7 +316,7 @@ The Massachusetts trust fixture is a bounded slice of a private
 instrument, not Massachusetts trust law as a whole. Check it the same
 way:
 
-```
+```sh
 cargo run -p fidryn-cli -- check examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -307,7 +327,7 @@ later `run` a query against a case under
 [`examples/trust/cases/`](https://github.com/BeeGass/fidryn/tree/main/examples/trust/cases/).
 
 The [examples](https://fidryn.onlygass.dev/docs/examples.md) catalog has more fixtures. They encode
-bounded high-impact slices. They do not contain the entire United
+bounded slices of the law. They do not contain the entire United
 States Code.
 
 ## Next reading
@@ -346,35 +366,40 @@ open the fixtures and check them. For build, `check`, and the first
 
 Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the v0.1 research interpreter. Example modules are fixtures. They are
+the 0.2 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.
 
-The grammar is closed: unknown body fields are parse errors. Copy from
-an existing `.fr` file when you are unsure a spelling parses. The
-reference is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf).
+The grammar in `grammar.ebnf` is closed, but the 0.2 parser enforces
+that only inside `source` blocks, the bodies of rules and the request
+block of a judgment's `otherwise suspend NeedJudgment`. In most other
+declarations an unknown field is skipped without a diagnostic; see
+[implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md). Copy from an existing
+`.fr` file when you are unsure a spelling parses. The reference is
+[`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf).
 
 
 ## Surface inventory (status-qualified)
 
 The grammar ([`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf)) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-v0.1 support is **parsed / checked / executed** only where noted — see
+Support in 0.2 is **parsed / checked / executed** only where noted — see
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 | Construct | Fixture example | Status note |
 | --- | --- | --- |
-| `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed/checked; hex digests authenticate under CLI `check_path` |
+| `import` (+ `digest` / `alias`) | `examples/trust/bryan-revocable-trust.fr` | Parsed. `alias` is accepted and ignored. An import with no digest and no matching package does nothing. |
 | `record_type` / `evidence_type` | FOIA / trust fixtures | Parsed/checked; used as named evidence schemas |
 | `observation` | LLC / state homestead modules | Parsed/checked; Observe matches schema + known-at |
-| `scenario` | all 50 `examples/states/` modules | In-module overlay fixtures; not JSON cases; not silent `run` defaults |
+| `scenario` | all 50 `examples/states/` modules | Name read; body not interpreted. Scenario runs use the case record's `assumptions`, not these blocks |
 | `Evaluate` / `UniqueOccupant` / `RunDecision` / `StatusOf` | trust, late-payment, LLC | Executed query plans |
 | `EvaluateClause` | `examples/prenup/ava-noah.fr` | Executed clause-plan queries |
-| `power` / `legal_act` / `clause` | trust, FOIA, prenup | Parsed/checked; specialized paths, not a general act engine |
-| `conflict_doctrine` | prenup, minimum-wage | Parsed; conflict outcomes/requests when staged effects disagree |
+| `power` / `legal_act` | trust, FOIA, prenup | Name and parameters read; body not interpreted, so unknown fields pass. A `legal_act` name types as a `LegalAction` in calls. Neither reaches evaluation |
+| `clause` | prenup, minimum-wage | Name and parameters read; body kept as text. At run time only `EvaluateClause` uses it, and the evaluator knows two clause names |
+| `conflict_doctrine` | prenup, minimum-wage | Body not interpreted; the text must name a declared clause after `defeat` (E511). Never consulted when staged effects disagree |
 | `transaction` | `tests/programs/transaction-atomic.fr` | Partial; not a full commit engine |
 | `for_all` / `exists` | status + grammar | Finite declared domains only; open domains suspend; no open-world proofs |
-| `fn` | grammar / status | Limited/partial; no current example declaration |
+| `fn` | `packages/logic/true.fr` | Parsed, checked and executed; a query can call a function |
 | Module type parameters | status | Type-name substitution only; no cross-file value-parameter calculus |
 
 ## Module header
@@ -400,6 +425,49 @@ the dated slice this file encodes. `effective_at` is a date.
 `recorded_at` is a date-time (`Z` or a numeric offset).
 `outside_scope` is a set of named exclusions; those names reappear on
 the outcome's `modelBoundary`.
+
+A comment begins with `//` and runs to the end of its line. There is no
+block comment: `/* ... */` is read as ordinary tokens, not skipped.
+
+A comment is never read as code. Whatever it holds, nothing is taken
+from it: a `}` in a comment closes no block, a `->` begins no type, and
+`assert false`, `defeat Residual` or `for_all x in People: true` in a
+comment asserts nothing, defeats no clause and declares no property. A
+comment at the end of a line of code does not change what that code
+means. A line that holds only a comment is a blank line, and a blank
+line is not always nothing: it can end a statement that the line below
+would otherwise continue. See
+[Where a statement ends](#where-a-statement-ends).
+
+A bracket or a word inside a string literal is text of the string and
+nothing else. `artifact "files/a}1.txt"` closes no block, a citation
+such as `from "Stat. 12(a"` opens no parenthesis, and a string that holds
+`defeat Residual` defeats no clause.
+
+A comment can change text that is kept or shown as it is written, and
+how a report identifies the program (see [outcomes](https://fidryn.onlygass.dev/docs/outcomes.md)), in
+places such as these. `sourceBundle` covers the text of the module byte
+for byte, so any comment changes it, and `fidryn review` shows the text
+of each declaration with the comments inside it, but not a comment at
+the end of its last line or one above it. `invocation.program.fingerprint`,
+and with it `invocationId` and the trace ids, is taken over the compiled
+program. That keeps some text as it is written: the body of a `clause`,
+the first `assert` of a `verify` block, a line of a `verify` block that
+is kept as an assertion that cannot be decided, and a clause of a
+`judgment` or an `observation` that is kept as text. A comment inside
+such text changes the fingerprint, as a change of the white space there
+does. So does a comment at the end of the last line of such a kept
+assertion or kept clause: the kept text then ends with the last token
+before the comment, and with as many spaces in the comment's place it
+ends with the spaces and the line end. The kept clauses of a judgment
+are also quoted in the payload of its `JudgmentPolicy` request, in the
+outcome of a run and in its trace. Those of an observation are quoted in
+the error a run ends with when a record of the observed schema is on the
+case, and in the output of `fidryn inputs`. A comment in such a clause,
+or at the end of its last line, changes what these show. A comment at
+the end of a line of a query, a rule or a duty, or at the end of the last
+line of the first `assert` of a `verify` block, changes neither the
+fingerprint nor the outcome of a run.
 
 The trust fixture also declares a source manifest, resolved relative
 to the module file:
@@ -428,33 +496,48 @@ source FinalPayStatute {
 }
 ```
 
-`digest fixture` is a fixture profile, not a hash of the file. It is
-not byte-verified authentication. A 32- or 64-digit hex digest is
-blake3 of the artifact bytes (64 hex: the full digest; 32 hex: the
-first 16 bytes). `check` of a `.fr` path hashes the file at `artifact`
-relative to the module directory. A missing file or a mismatch is
-unauthenticated; digest-required imports fail with E200. Hex without
-readable bytes is not a fixture profile. The source-manifest JSON uses
-the same `"digest": "fixture"` versus hex distinction.
+In 0.2 a `source` block is a record for the reader. The parser rejects
+an unknown field in it, and the checker requires an `artifact` field
+(`E540`). The checker also types the source's name as a `String`, so a
+query that returns `FinalPayStatute` passes `check`, but `run` fails
+with `unbound identifier`. Nothing else reads the block: it does not
+reach evaluation, and the file named by `artifact` is never read,
+whatever `digest` says ([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+
+Digests are checked in the source manifest instead. That is the JSON
+file the module names with `source_manifest`, or, when it names none,
+`sources/manifest.json` or the only `*.manifest.json` in `sources/` next
+to the module. Each manifest artifact has a `path` and a `digest`.
+`"digest": "fixture"` is a fixture trust profile, not a hash of the file
+and not byte verification. A 32- or 64-digit hex digest is blake3 of the
+artifact bytes (64 hex: the full digest; 32 hex: the first 16 bytes).
+`check` and `run` of a `.fr` path read the file at `path`, relative to
+the module directory or to `--source-root`, and compare. A missing file
+or a mismatch leaves the artifact unauthenticated, and an import that
+requires that digest fails with E200. Pasted source in the
+[Mill](https://fidryn.onlygass.dev/docs/mill.md) reads no manifest and no files.
 
 
 ## Imports
 
-Modules may import another module by name and version. Digests and aliases
-match the source-trust story above.
+Modules may import another module by name and version. An import that
+carries a `digest` must find that digest on an authenticated artifact of
+the source manifest above, or the checker reports E200. An `alias` line
+in an import is accepted and ignored in 0.2.
 
 ```
 import MA.TrustLaw.Fixture version "2026-08-23"
 import Agency.FOIARegulations version "fixture-2026-08-23" {
     digest fixture
-    alias FOIARegs
 }
 ```
 
-CLI `check` / `run` of a path can byte-authenticate hex digests against
-artifacts under the module directory. `"digest": "fixture"` (or
-`digest fixture` in source) is a trust profile, not byte verification.
-Mill paste does not load manifests or artifact files.
+In an import, `digest fixture` asks for a manifest artifact whose digest
+is `fixture`. That is a trust profile, not byte verification. A hex
+digest in an import asks for a manifest artifact with that digest whose
+file `check` or `run` of a path has read and matched. With no matching
+manifest artifact the import is E200. Mill paste loads no manifest, so
+there an import with a digest is always E200.
 
 ## Entities, propositions, and offices
 
@@ -482,6 +565,14 @@ office TrusteeOf(trust: Trust) occupied_by LegalPerson {
 }
 ```
 
+Fidryn 0.2 reads only an office's name and parameters. The rest of the
+declaration, `occupied_by` and every field in the body, is discarded:
+every office reaches the intermediate representation with occupant type
+`LegalPerson`, at most one occupant and no competence, and nothing reads
+the declaration at run time (test
+`an_office_keeps_none_of_its_declared_fields`; see
+[implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)).
+
 `Occupies(Bryan, TrusteeOf(BRT))` is a proposition about that office,
 not a `Bool`.
 
@@ -506,11 +597,22 @@ an existing fixture rather than inventing spellings.
 ## Observations
 
 An `observation` names an evidence-shaped fact the evaluator may Observe.
+Its header binds one record and, after `establishes`, gives the
+proposition that the record establishes. Its body holds the conditions
+the record must meet. This one is from
+[`examples/tax/federal-tax.fr`](https://github.com/BeeGass/fidryn/blob/main/examples/tax/federal-tax.fr):
 
 ```
-observation OfficialFilingObservation(record: OfficialFilingRecord)
-observation EndOfTenancy(record: TenancyRecord)
+observation DomesticFormationRecord(record: BeneficialOwnershipReport)
+establishes DomesticCompany(record.company)
+    from FinCENBOIFinalRule.section("domestic-entity")
+{
+    require record.company == AcmeLLC
+}
 ```
+
+A header with no `establishes` or with no `{ ... }` body is rejected with
+`E100`.
 
 Observe still requires a matching case evidence row with `observedAt` at
 or before `--known-at`. Declaring an observation does not invent the
@@ -555,7 +657,9 @@ form when the domain is closed
 
 ```
 query provision_result() -> ... ! {Observe, Determine, Interpret} {
-    goal EvaluateClause { /* clause plan */ }
+    goal EvaluateClause {
+        // clause plan
+    }
 }
 ```
 
@@ -579,9 +683,17 @@ query waiting_time_penalty() -> Bool ! {Determine} {
     goal Evaluate {
         require determined WillfulFailureToPay(Employer)
             using Determine
+        return true
     }
 }
 ```
+
+The waiting-time query answers `true` once the case records a
+determination that establishes `WillfulFailureToPay(Employer)`. It
+suspends otherwise, including when the determination is negative (tests
+`an_established_determination_makes_the_judgment_query_true` and
+`a_negative_determination_suspends_and_never_answers_false` in
+`tests/integration/repaired_examples.rs`).
 
 An automatic query that reaches `Determine`, `Observe`, or `Interpret`
 is E420. Willful failure is a judgment, not a Bool you compute in the
@@ -610,8 +722,109 @@ runs both. Nested `seq` under `+`, a call, or `if` resumes by skipping
 the completed prefix, so a later term does not re-run an earlier
 attach.
 
-`require determined P using Determine` requests a competent
-determination instead of treating `P` as a Bool.
+`require determined P using Determine` asks for a determination of `P`
+instead of treating `P` as a Bool. In 0.2 the `using` clause is parsed
+and discarded. Any determination of `P` on the case that names a
+protocol and a decider answers the requirement. A negative determination
+fails it, and with none the query suspends with a request for a judgment
+on `P`. The protocol name stands in the statement of `using`: a `using`
+that ends its statement, with no name after it, is rejected with `E100`,
+and the line below it is not read as the name.
+
+A statement that a query body, a `goal Evaluate` block, the body of a
+`calc` or an `fn`, or a `transaction` block cannot read is rejected with
+`E100`, wherever it stands in the block. A `return` with no expression is
+one.
+
+## Where a statement ends
+
+A statement ends at a `;` or at the end of its line. It goes on into the
+next line in two cases.
+
+- The line ends in a token that cannot end a statement. The tokens that
+  can are a name or word, a literal, `)`, `]`, `}`, `*` and `>`. A line
+  that ends in one of the prefix words `not`, `operative`, `effective`,
+  `established`, `determined`, `always`, `active`, `every`, `unique` and
+  `closed` goes on as well.
+- The next line begins with a continuation: one of the words `and`, `or`,
+  `in`, `where`, `then`, `else`, `from`, `decides`, `occupied_by`,
+  `establishes`, `using`, `for`, `rank`, `as`, `to`, `version` and `fuel`,
+  or one of the tokens `.`, `,`, `->`, `=>`, `:`, `=`, `|`, `<`, `!`, `{`,
+  `(` and `[`.
+
+A blank line has no token, and neither has a line that holds only a
+comment. The first case holds across such lines. The second holds across
+them only for a line that begins with `and`, `or`, `in`, `.`, `,`, `->`,
+`=>`, `:`, `=`, `|` or `<`. No statement begins with one of those, so a
+condition can carry a comment between its lines:
+
+```
+rule BothConditions : derive from "cite" {
+    when operative A
+        // the second condition
+        and operative B
+    then derive C
+}
+```
+
+The guard of that rule is `operative A and operative B`. Each of the
+other continuations, such as `then`, `for` or `(`, can begin a statement
+of its own, so below a blank line or a comment line it does not continue
+the statement above. That holds where the parser tests whether a
+statement has ended, as it does after the condition of an `if` and after
+the word `else`: the block of a branch does not stand below a blank line
+or a comment line. In some places where it expects the next part of a form
+it does not test, and reads on across blank and comment lines: an `else`
+after the block of an `if`, for example, and the `{ ... }` block that
+follows the domain of a quantifier or the word `transaction`.
+
+Parentheses, brackets and braces do not change the rule: a line break
+inside them ends the expression before it in the same cases. `(1`
+followed by the line `+ 2)` is rejected, because `+` is not a
+continuation. Write `(1 +` and then `2)`.
+
+Text the parser steps over without reading it, such as a `verify` field
+it does not read or a clause it keeps as text, ends by the same rule with
+three differences. A line break inside its parentheses, brackets or
+braces does not end it. A prefix word at the end of a line does not carry
+it into the next line. And it ends after the `}` that closes its
+outermost brace, unless a continuation follows.
+
+A declaration does not go on into the declaration below it. Outside the
+parentheses, brackets and braces that a declaration has opened and not
+closed, a line that begins with a declaration keyword is no part of that
+declaration, whatever the line above it ends in. Blank lines and comment
+lines between the two change nothing. There is one exception: below the
+header of a `for_all` or an `exists` that ends in `:`, a line that begins
+with `for_all` or `exists` is the body of the quantifier.
+
+So the first case above does not carry a header into such a line. A
+header that leaves no bracket open and whose line ends in `,`, `.`, `:`,
+`!`, `->`, `=>`, `=`, `==`, `!=`, `<`, `<=`, `>=`, `+`, `-`, `/`, `|` or
+`..` is not finished above such a line, and the module is rejected with
+`E100`: `rule R : derive from Basis +` above the line `clause C {` is
+rejected, and `clause C` is a declaration with its own block. That holds
+wherever in a header the token stands: after an operator that lacks its
+operand, after a name that ends in `.`, after the `!` of an effect row,
+among type arguments that `<` opens and no `>` closes, and after the `:`,
+`->` or `=` that a type follows. A prefix word at the end of the `from`
+basis of a rule, or of an expression in the header of a judgment or an
+observation, lacks its operand in the same way: the module is rejected
+with `E100`, and the declaration below is read. A type on the next line
+that is no declaration keyword is read: `entity Pat :` followed by the
+line `NaturalPerson` declares `Pat`. Inside a bracket that the
+declaration has left open, the lines below can still be read as what the
+bracket holds: below `proposition P(`, the line `clause C {` is read as a
+parameter, and the module is rejected with no clause declared.
+
+A keyword that takes a name, such as `entity`, `rule` or `query`, is
+rejected with `E100` when its statement ends with it: the name is not
+read from the next line. It is rejected as well when the token after it
+is not a name, as in `power { holder A }` or `entity : NaturalPerson`.
+The six header keywords, `jurisdiction`, `source_snapshot`,
+`source_manifest`, `effective_at`, `recorded_at` and `outside_scope`, are
+rejected with `E100` in the same way when the statement ends with the
+keyword: the value is not read from the next line.
 
 ## Calc, conditionals, money, and durations
 
@@ -625,16 +838,20 @@ calc return_deadline() -> Duration<counted_days> {
 calc federal_hourly_floor() -> Money<USD> {
     return USD(7.25)
 }
-
-query automatic deadline_running(end: Time, as_of: Time) -> Bool {
-    return as_of <= end + return_deadline()
-}
 ```
+
+A `calc` or an `fn` needs its `{ ... }` body. A header with none is
+rejected with `E100`.
+
+Fidryn 0.2 cannot add a duration to a time in an expression: `end +
+return_deadline()`, with `end: Time`, is `E210`. A deadline is computed
+only by a duty's `due` clause; see [Duties](#duties).
 
 Money is `USD(100.00)`, never an untyped decimal. Durations carry a
 calendar kind (`counted_days`, `calendar_days`, `working_days`,
-`days`, `hours`, `minutes`, `seconds`). `21 counted_days` is not
-`21 days`.
+`days`, `hours`, `minutes`, `seconds`). `21 counted_days` and `21 days`
+have different types, but a duty's `due` clause counts each of them as
+21 days of 24 hours.
 
 `if` / `else` is Boolean control flow. The condition must be a `Bool`,
 not a proposition. [`prelude/tax.fr`](https://github.com/BeeGass/fidryn/blob/main/prelude/tax.fr) uses it on
@@ -655,6 +872,16 @@ if amount <= 11925.00 {
     }
 }
 ```
+
+The `{` after the condition opens the branch. In the condition of an
+`if`, in the domain of a quantifier, and in the header of a rule, a
+judgment or an observation, a name followed by `{` is therefore the name
+alone and is not applied to the block: `if flag { 1 } else { 2 }` tests
+`flag`. A record constructor written with its name needs parentheses
+there, as in `if (R { x: 1 }) == r { 1 } else { 2 }`.
+
+An `if` or an `else` needs its branch in the same statement. With none,
+the module is rejected with `E100`.
 
 This is a rejected guard (E310):
 
@@ -684,11 +911,30 @@ rule InitialTrustee : constitutive
 }
 ```
 
-`when operative P` tests legal status. `when determined P` tests a
-competent determination already on the case. `then derive` and
-`then establish` are the usual consequences. Guards must use
-`operative`, `determined`, `assumed`, or `necessarily` — not a bare
-proposition. The successor rule in the trust fixture also
+The `from` basis can also be a bare name, as in `from Instrument`: the `{`
+after it opens the rule's body. A rule needs that body. A rule header
+with no `{ ... }` after it is rejected with `E100`.
+
+The body holds `when`, `then`, `otherwise`, `require`, `select` and
+`source` statements. Other text in it is rejected with `E100`, and so is
+a `then` or an `otherwise` that no consequence follows, and a `when`, a
+`require` or a `source` with no expression after it. A consequence names
+a proposition: `then establish 5` is rejected with `E210`, and so is a
+consequence that is the name of an entity whose type is neither `Prop`
+nor an alias of `Prop`. Two more lines are accepted:
+`valid_time` and `record_time`, each followed by an interval with both of
+its bounds, such as `[2026-08-14, +inf)`. Fidryn 0.2 reads them and does
+not apply them: the consequences of the rule hold at every time, whatever
+the interval says (see
+[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
+
+`when operative P` tests legal status. `in TrustCreation(BRT)` names the
+legal context of that test. The guard still turns on the proposition
+`TrustInstrumentExecuted(BRT)`. It is not a proposition named `in`.
+`when determined P` tests for a determination of `P` already on the case.
+`then derive` and `then establish` are the usual consequences. Guards
+must use `operative`, `determined`, `assumed`, or `necessarily` — not a
+bare proposition. The successor rule in the trust fixture also
 `select unique candidate from nominations_for(...)` with
 `require unique nomination_rank`. A tie is not a silent pick.
 
@@ -747,9 +993,6 @@ the first name on the list.
 ## Powers, legal acts, clauses, and conflict doctrines
 
 These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).
-They are **status-qualified**: parsed and checked, with specialized
-evaluation paths — not a general operational law engine. See
-[implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 ```
 power SettlorAmendmentPower { ... }
@@ -757,9 +1000,15 @@ legal_act AcceptOffice(candidate: LegalPerson, office: Office) { ... }
 conflict_doctrine ChildSupportCannotBeAdverselyAffected ...
 ```
 
-When staged effects disagree and no unique doctrine applies, the outcome
-kind is `normConflict` (or a `needConflict` request). List order is never
-a silent tie-break.
+Fidryn 0.2 does not interpret the bodies of `power`, `legal_act`,
+`conflict_doctrine` or `scenario` declarations, so an unknown field in
+one of them passes without a diagnostic. A `clause` body is kept as text.
+The evaluator knows two clause names, `SpousalSupportWaiver` and
+`ChildSupportWaiver`; see [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
+
+When the rules' staged effects both add and withdraw the same
+proposition, the outcome kind is `normConflict`. No `conflict_doctrine`
+is consulted, and list order is never a silent tie-break.
 
 ## Duties
 
@@ -775,8 +1024,10 @@ duty PayInvoice {
     due 0 counted_days after invoice_date
 }
 
-query obligation_status() -> String {
-    goal Evaluate { duty_status(PayInvoice) }
+query obligation_status() -> DutyState {
+    goal Evaluate {
+        duty_status(PayInvoice)
+    }
 }
 ```
 
@@ -803,16 +1054,18 @@ explicit `assumption`. That gate is in
 full atomic commit engine for arbitrary legal acts.
 
 `for_all` / `exists` quantify over **finite declared domains** (and
-closures where required). Open domains suspend. Nested / open-world
+closures where required). The body follows the domain after a `:` or as a
+block: `for_all x in Scores: x > 0` and `for_all x in Scores { x > 0 }`
+are the same quantifier. Open domains suspend. Nested / open-world
 theorem proving is not implemented. Prefer reading
 [implementation-status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) before treating a
 quantified `verify` as a proved theorem.
 
 ## Scenarios (in-module)
 
-A `scenario` block names overlay hypotheses for fixtures that do not
-ship companion JSON case files (for example under `examples/states/`).
-It is not a silent default for `run`.
+A `scenario` block writes down example hypotheses in fixtures that do
+not ship companion JSON case files (for example under
+`examples/states/`).
 
 ```
 scenario InsideCityHalfAcre {
@@ -823,28 +1076,40 @@ scenario InsideCityHalfAcre {
 }
 ```
 
-Grammar: `ScenarioDecl` in [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Case JSON
-can carry analogous overlay rows as `assumptions` (`id`, `payload`);
-CLI `run --scenario` applies them, and the mill treats a nonempty
-`assumptions` list as scenario mode. Default operative `run` does not.
-See [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) and [CLI](https://fidryn.onlygass.dev/docs/cli.md).
+Grammar: `ScenarioDecl` in [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Fidryn
+0.2 does not interpret a `scenario` block: the parser reads its name and
+skips its body, and nothing in it reaches evaluation
+([implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)). Neither `run` nor
+`run --scenario` reads these blocks.
+
+Scenario evaluation is driven by the case record. Its `assumptions`
+rows (`id`, `payload`) are applied when you pass `run --scenario`, and
+the report's `executionMode` is then `scenario`. The mill uses scenario
+mode when the pasted case has a nonempty `assumptions` list. A default
+`run` is operative and ignores `assumptions`. See
+[Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md) and [CLI](https://fidryn.onlygass.dev/docs/cli.md).
 
 ## Verify
 
-A `verify` block is a named property. v0.1 discharges Boolean
-literals:
+A `verify` block is a named property made of `assert` lines. Fidryn 0.2
+decides closed formulas only: literals, arithmetic, comparisons, Boolean
+connectives, and quantifiers over a literal set or bounded synthetic
+entities.
 
 ```
-verify Trivial {
+verify Arithmetic {
     assert true
+    assert 1 + 1 == 2
 }
 ```
 
-`assert true` proves. `assert false` is a counterexample. Other
-formulas parse, but the bounded verifier does not currently obtain a
-covering proof of them:
+Both assertions hold, so the property is proved. A false assertion, such
+as `assert false` or `assert 1 + 1 == 3`, is a counterexample. An
+assertion that cannot be decided without a query or a proposition is
+unresolved, and the property is then `unknown` unless another assertion
+is false. For those properties,
 
-```
+```text
 cargo run -p fidryn-cli -- verify PATH --property NAME
 ```
 
@@ -854,6 +1119,115 @@ lines (`assert automatic pay_due_immediately has empty effect row`).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for `automatic` is E420
 whether or not a `verify` block repeats it.
+
+### The fields of a verify block
+
+A verify block is a list of fields. Nine words begin a field:
+
+| First word | What `verify` does with the field |
+| --- | --- |
+| `assert` | The expression after it is an assertion. |
+| `for_all`, `exists` | The expression the word begins is an assertion, checked in the same way. |
+| `bounds` | It is read for three numbers, the synthetic persons, events and time points, and for nothing else. |
+| `interpretations`, `judgments`, `choices`, `assuming` | The field is recognized and not read. |
+| `for` | A `for every` line is not evaluated. It is kept as an assertion that cannot be decided. |
+
+An assertion that cannot be decided leaves the property `unknown` unless
+another assertion is false. A block with no assertion is `unknown` too,
+whatever its comments say: a comment is never read as an assertion.
+
+The bounds come from a `bounds` field and from nowhere else. Each of the
+three numbers is read at the first place where its word, `persons`,
+`events` or `time_points`, stands as a token in the field. When the next
+token is an integer, or a `:` followed by an integer, that integer is the
+number. Otherwise the number is zero, as it is when the word is not in the
+field. So `bounds persons x persons 2` gives zero persons, and so do
+`persons: 2.5`, which is not an integer, and an integer that does not fit
+in 32 bits.
+
+No comment sets a number, wherever it stands: inside the field, after it
+on its line, or on the lines below it. The contents of a string are not
+read either. Another field that holds the word `bounds` does not set the
+bounds, and a block with no `bounds` field has zero of each. When a block
+has several `bounds` fields, the last one counts. The test
+`the_bounds_come_only_from_a_bounds_field` in
+`tests/integration/verify_blocks.rs` pins each of these rules.
+
+A field ends where its statement ends; see
+[Where a statement ends](#where-a-statement-ends). An `assert`, `for_all`,
+`exists` or `bounds` field, and a field that is not read, ends earlier
+where the next field begins, as if a `;` stood there:
+
+- The word `assert` begins a field wherever it stands, in the middle of a
+  line too.
+- A line that begins with one of the other eight words begins a field. In
+  the middle of a line those words do not cut a field short:
+  `assuming fair for every x in {1, 2}: x == 3` is one `assuming` field,
+  and none of it is read.
+- There is one exception. Below an `assert`, `for_all` or `exists` field,
+  a line that begins with `for_all` or `exists` does not end that field.
+  It continues the line above when the statement goes on into it, and is
+  a field of its own when the statement has ended. This is one assertion,
+  and it is proved:
+
+  ```
+  verify EveryNumberHasAnEqual {
+      for_all x in {1, 2}:
+          exists y in {1, 2}: x == y
+  }
+  ```
+
+- Nothing inside the parentheses, brackets or braces of a field begins a
+  field.
+
+A `for every` line, and a line the block does not recognize, have no
+early end. The parser steps over such a line as text it does not read,
+together with every line that text goes on into, an `assert` line
+included, and the whole is one assertion that cannot be decided.
+
+An expression that is complete where the next field begins is an
+assertion. One that is cut off there gets the diagnostic it would get
+before a `;`: `assert true or 1 +` followed by the line `assert false` is
+rejected with `E100`, "expected expression after operator", and
+`assert if true { true } else` followed by the line `assert true` is
+rejected with `E100`, "expected `{` after `else`". Where the parser has no
+diagnostic before a `;`, there is none here either: `not` with nothing
+after it gives no expression. An `assert` with no expression, `assert not`
+included, is an assertion that cannot be decided.
+
+Text that follows the expression of an `assert`, `for_all` or `exists`
+field is read as the next field when it begins with one of the nine
+words. That is rare on one line, because a word that directly follows an
+expression is normally taken into the expression as an operand:
+`assert true assuming fair` is one assertion, and it cannot be decided.
+Before a `:` or an `=` a word is not an operand, so
+`assert true assuming: x` is the assertion `true` followed by an
+`assuming` field.
+
+Text that begins with none of the nine words, such as a misspelled
+`assert`, is not dropped either. When the field above goes on into it, it
+is part of that field. Otherwise it is read as a line of its own and kept
+as an assertion that cannot be decided, with one difference after an
+`assert`: the `assert` and the text that follows its expression, on the
+same line or below it, are together one assertion that cannot be decided,
+and the module is rejected with `E100` when that text begins with
+something other than a word.
+
+Two limits remain.
+
+- What stands inside the parentheses, brackets or braces of a `bounds`
+  field, or of a field that is not read, belongs to that field, and so
+  does a line that begins with none of the nine words when the field goes
+  on into it. None of it is read as an assertion: an `assert false`
+  between the braces of an `interpretations` field or of a `bounds` field
+  is not read.
+- `verify` evaluates an assertion; it does not type-check it. A true
+  operand of `or` and a false operand of `and` settle the result whatever
+  the other operand is, and the branch an `if` does not take is not
+  examined. So `assert true or no_such_name` is proved, and so is
+  `assert true or 1 +` followed by the line
+  `for_all x in {1, 2}: x == 3`, where the second line is the right
+  operand of `+`.
 
 ## What the language will not do
 
@@ -915,10 +1289,10 @@ as an evidence gap in
 
 Pass a JSON file to `fidryn run` or `fidryn explore`:
 
-```
+```text
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME \
-    [--arg KEY=VALUE] [--scenario]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json \
+    [--arg KEY=VALUE] [--scenario] [--budget N]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] \
     --valid-at TIME --known-at TIME
 ```
 
@@ -928,7 +1302,7 @@ canonicalize to UTC. `run` never chooses a missing completion. `--arg
 KEY=VALUE` writes `case.facts["KEY"]`. `--scenario` evaluates with
 `case.assumptions` as an overlay. `explore --bounds` merges extra
 declared domains into `admissibleCompletions`. Successful `run` /
-`explore` stdout is `fidryn.evaluation-report/v0.1`.
+`explore` stdout is `fidryn.evaluation-report/v0.2`.
 
 See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf), and
 [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
@@ -1265,14 +1639,14 @@ author: "Bryan Gass"
 
 # Fidryn CLI
 
-The binary name is `fidryn`. It is the v0.1 reference interpreter: parse a
+The binary name is `fidryn`. It is the 0.2 reference interpreter: parse a
 `.fr` module, check it, and evaluate a named query against a case record.
 It is not legal advice and does not file anything unless you opt into live
 HTTP as described under [`file`](#file).
 
 From a clone of this repository:
 
-```
+```text
 cargo run -p fidryn-cli -- <subcommand> ...
 ```
 
@@ -1292,13 +1666,16 @@ That places `fidryn` on your Cargo bin path. Workspace `rust-version` is
 
 ## Exit status
 
-Success is exit 0. Failures are exit 1. Compiler diagnostics, engine
+Success is exit 0. A command line the argument parser rejects, such as an
+unknown subcommand or flag, a missing required argument, or `--budget abc`,
+is a usage error: the usage message goes to stderr and the exit status is
+2. Every other failure is exit 1. Compiler diagnostics, engine
 errors, adapter errors, and usage problems go to stderr. Successful
 payloads (formatted source, the word `ok`, evaluation-report JSON, rendered text,
 diff JSON, filing receipts) go to stdout.
 
 A legal `Outcome` is not a process failure. `run` and `explore` print a
-`fidryn.evaluation-report/v0.1` document (with nested
+`fidryn.evaluation-report/v0.2` document (with nested
 `outcomeDocument` of schema `fidryn.outcome/v0.1`) and exit 0 even when
 the nested outcome kind is `suspended`, `contingent`, `normConflict`,
 `outsideCompetence`, or `inconsistent`. Unknown queries, invalid
@@ -1307,11 +1684,12 @@ failures and exit 1.
 
 ## Source checking and trust
 
-`check`, `run`, `explore`, `verify`, `diff` (when a snapshot is a `.fr`
+`check`, `inputs`, `run`, `explore`, `review`, `verify`, `diff` (when a snapshot is a `.fr`
 file), and `render` compile through `Driver::check_path`. That call loads
 the module’s `source_manifest` (or a `sources/` fallback) and then
 `check_with_sources` with `source_root` set to the directory that contains
-the `.fr` file. Hex import digests are authenticated against artifact
+the `.fr` file, or the explicit global `--source-root PATH`. Static paths and
+symlinks must remain inside that root. Hex import digests are authenticated against artifact
 bytes next to the module:
 
 - a 64-digit hex digest must equal the full blake3 of the file at
@@ -1341,7 +1719,7 @@ modified.
 
 **Example**
 
-```
+```sh
 fidryn fmt examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -1364,7 +1742,7 @@ authentication as described above.
 
 **Example**
 
-```
+```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -1374,7 +1752,7 @@ fidryn check examples/trust/bryan-revocable-trust.fr
 `CODE Title: message` (for example
 `E310 PropAsGuard: ...`). A module that cannot check:
 
-```
+```sh exit=1
 fidryn check tests/diagnostics/e310-prop-as-guard.fr
 ```
 
@@ -1383,7 +1761,8 @@ fidryn check tests/diagnostics/e310-prop-as-guard.fr
 Evaluate one query against one case record at a pair of bitemporal
 instants. `run` never chooses a completion. It does not search
 `admissibleCompletions`, pick an interpretation, or fill in missing
-evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]`).
+evidence. `--arg KEY=VALUE` writes a typed fact onto the case (`case.facts[KEY]`): JSON literals and tagged
+values are decoded, while unquoted names remain strings.
 
 **Arguments**
 
@@ -1394,7 +1773,8 @@ evidence. `--arg KEY=VALUE` writes a string fact onto the case (`case.facts[KEY]
 | `--case RECORD.json` | yes | path to a `fidryn.case-record/v0.1` JSON file |
 | `--valid-at TIME` | yes | ISO 8601 / RFC 3339 instant |
 | `--known-at TIME` | yes | ISO 8601 / RFC 3339 instant |
-| `--arg KEY=VALUE` | no, repeatable | sets `case.facts[KEY]` to the string `VALUE` |
+| `--arg KEY=VALUE` | no, repeatable | sets `case.facts[KEY]` to decoded JSON or an unquoted name string |
+| `--budget N` | no | maximum actual evaluator operations; exhaustion is an engine failure |
 | `--scenario` | no | flag; evaluate with `case.assumptions` as a scenario overlay (`executionMode: scenario`) |
 
 `--valid-at` is valid time. `--known-at` is record time. Both accept a
@@ -1408,7 +1788,7 @@ when the case has none).
 
 **Example**
 
-```
+```sh
 fidryn run examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -1418,7 +1798,7 @@ fidryn run examples/trust/bryan-revocable-trust.fr \
 
 Override a fact without editing the case file:
 
-```
+```sh
 fidryn run examples/prenup/ava-noah.fr \
   --query provision_result \
   --case examples/prenup/cases/divorce-record.json \
@@ -1427,10 +1807,12 @@ fidryn run examples/prenup/ava-noah.fr \
   --arg provision=ChildSupportWaiver
 ```
 
-**Success.** Canonical JSON for schema `fidryn.evaluation-report/v0.1`
+**Success.** Canonical JSON for schema `fidryn.evaluation-report/v0.2`
 on stdout: `schema`, `executionMode` (`operative` or `scenario`),
 `sourceTrust`, `verificationMethod`, `assumptions`, optional `coverage`,
-and `outcomeDocument`. Nested `outcomeDocument` is the
+`invocation`, `invocationId`, `engineVersion`, `engineArtifact`, source bundle
+identity, retained `traceDocument`, and `outcomeDocument`. Exploration also
+retains checked branch `searchEvidence`. Nested `outcomeDocument` is the
 `fidryn.outcome/v0.1` projection (`module`, `sourceSnapshot`, `query`,
 `asOf`, `modelBoundary`, `outcome`). Exit 0. See [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md).
 
@@ -1442,10 +1824,11 @@ as `outcome.kind = inconsistent`.
 
 ## `explore`
 
-Evaluate a query under an explicit finite completion space. The space
-must already be on the case as `admissibleCompletions`, or you must pass
-`--bounds` to merge more completions into the case. `explore` still does
-not invent interpretations; it only examines the declared finite bounds.
+Evaluate a query under an explicit finite completion space: the case's
+`admissibleCompletions`, with any completions from `--bounds` merged in.
+When neither supplies a completion, `explore` evaluates the case as it
+stands (see below). `explore` does not invent interpretations; it only
+examines the declared finite bounds.
 
 **Arguments**
 
@@ -1464,15 +1847,31 @@ not invent interpretations; it only examines the declared finite bounds.
 file that already carries that object is accepted. Entries are merged
 (extended), not replaced wholesale.
 
-If neither the case nor `--bounds` supplies a nonempty completion space,
-exploration yields an inconsistent outcome whose core includes
-`empty completion set`. That is still a successful CLI run (exit 0) with
-an outcome document on stdout.
+When neither the case nor `--bounds` supplies any completions, `explore`
+evaluates the case as it stands. A query that needs no completion is
+answered: with the empty case record `tests/programs/cases/empty.json`,
+query `q` of `tests/programs/require-gate.fr` is determinate `7`. A query
+that needs an interpretation, evidence or a choice that the case does not
+supply is `suspended`, with a request for it.
+
+```sh
+fidryn explore tests/programs/require-gate.fr \
+  --query q \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
+```
+
+The outcome is `inconsistent`, with `empty completion set` in its core,
+when the case or `--bounds` lists an interpretation family or a choice
+with no alternatives, such as `"SuccessorEligibility": []`. That happens
+whatever the query asks. Each of these is a successful CLI run (exit 0)
+with an outcome document on stdout.
 
 **Example** (case already declares `admissibleCompletions`; `--bounds`
 merges another copy of the same family from a second record in the repo):
 
-```
+```sh
 fidryn explore examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -1484,7 +1883,7 @@ fidryn explore examples/trust/bryan-revocable-trust.fr \
 Omit `--bounds` when the case record is already admissible, as
 `examples/trust/cases/one-certificate.json` is.
 
-**Success.** The same `fidryn.evaluation-report/v0.1` envelope as `run`,
+**Success.** The same `fidryn.evaluation-report/v0.2` envelope as `run`,
 on stdout. If `case.assumptions` is nonempty, explore labels the report
 `executionMode: scenario` (there is no separate `--scenario` flag on
 `explore`).
@@ -1506,29 +1905,32 @@ Render a trace as text, JSON, or Graphviz DOT.
 | `--format FORMAT` | no | `text` (default), `json`, or `dot` |
 
 If `TRACE_ID` is an existing file, or `TRACE_ID.json` exists, that JSON
-is loaded. An evaluation-report or outcome document from a prior `run` /
-`explore` is wrapped as a small DAG (nested `outcomeDocument` is used
-when present). If no such file exists, the argument is hashed as a
+is loaded. A saved v0.2 report from `run` / `explore` retains the actual
+parented derivation in `traceDocument`; `explain` uses those nodes. Legacy
+outcome-only documents have only the provenance their compatibility projection
+retained. If no such file exists, the argument is hashed as a
 `TraceId` and the node list is empty. JSON always includes a `nodes`
 array; emptiness means no persisted DAG was loaded, not an omitted field.
 Unknown `--format` values are treated as `text`.
 
 **Example**
 
-```
+```text
 fidryn run examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
   --valid-at 2026-08-23T12:00:00Z \
   --known-at 2026-08-23T12:00:00Z \
-  > /tmp/fidryn-outcome.json
+  > outcome.json
 
-fidryn explain /tmp/fidryn-outcome.json --format text
+fidryn explain outcome.json --format text
 ```
+
+The first command writes `outcome.json` in the working directory.
 
 Without a file, the id is hashed and the DAG is empty:
 
-```
+```sh
 fidryn explain 00000000000000000000000000000000 --format json
 ```
 
@@ -1539,27 +1941,36 @@ fidryn explain 00000000000000000000000000000000 --format json
 
 ## `verify`
 
-Check a declared `verify` property on a module. Query names are not
-properties. The name must appear in the module’s `verify` blocks.
+Check a property of a module. A `verify` block declares one under its
+name. A `for_all` or an `exists` written in a query, in a `verify` block
+or as a declaration of its own is a property as well. It is named after
+its kind, its variable and its number among the quantifiers written in
+those places, counted from 0 in the order of the text: `for_all:x:0`.
+Such a property has no bounds, and its verdict is `unknown`. Query names
+are not properties.
 
 **Arguments**
 
 | Name | Required | Type |
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file |
-| `--property NAME` | yes | declared verification name |
+| `--property NAME` | yes | property name |
 
 **Example**
 
-```
+```sh exit=1
 fidryn verify examples/trust/bryan-revocable-trust.fr --property TrusteeContinuity
 ```
 
 `TrusteeContinuity` is declared on that module. A bounded check that does
 not obtain a covering proof is not success: the CLI prints the verdict to
-stderr and exits 1. Only a proved verdict is exit 0 (today that is a
-declared `true` or `assert true` formula). Passing a query name such as
-`acting_trustee` is invalid.
+stderr and exits 1. Only a proved verdict is exit 0. The bounded supported
+fragment includes structured Boolean/arithmetic assertions and finite quantified
+formulas; every assertion in the named block must hold.
+[The fields of a verify block](https://fidryn.onlygass.dev/docs/language.md#the-fields-of-a-verify-block)
+says which parts of a block are its assertions. Unsupported formulas, a
+block with no assertion and resource exhaustion remain `unknown`. Passing a
+query name such as `acting_trustee` is invalid.
 
 **Success.** Stdout, for example
 `proved NAME (persons=..., events=..., time_points=...)`.
@@ -1574,7 +1985,8 @@ declared `true` or `assert true` formula). Passing a query name such as
 Compare two snapshots and print canonical JSON with two named
 operations: `result` (outcomeDocument / compiled query bodies) and
 `assurance` (executionMode, sourceTrust, assumptions,
-verificationMethod). Each is `{added, removed, changed}`. Changing only
+verificationMethod, coverage, invocation/source/executable identity and
+exploration evidence). Each is `{added, removed, changed}`. Changing only
 qualifications is an assurance diff, not a silent equal. A `.fr` path is
 compiled; any other path is read as JSON (an evaluation report, mill
 `{ok, report}` wrapper, outcome document, or serialized module).
@@ -1589,7 +2001,7 @@ compiled; any other path is read as JSON (an evaluation report, mill
 
 **Example**
 
-```
+```sh
 fidryn diff \
   examples/trust/bryan-revocable-trust.fr \
   examples/california/final-pay/final-pay.fr \
@@ -1615,7 +2027,10 @@ Each of `result` and `assurance` has keys `added`, `removed`, and
 ## `render`
 
 Interpolate Core fields into a template. Available keys from the compiled
-module are `module`, `version`, and `outside_scope`. Missing keys fail
+module are `module`, `version`, typed `outside_scope` and its text
+`outside_scope_label`. Optional `--data DATA.json` adds typed values under `data`.
+`{{#each data.people}}{{name}}{{/each}}` iterates records without splitting names
+on punctuation. Missing keys fail
 closed. A directory named `certified` does not approve legal content;
 `templates/certified/` files are interpolation fixtures only.
 
@@ -1625,10 +2040,11 @@ closed. A directory named `certified` does not approve legal content;
 | --- | --- | --- |
 | `PATH` | yes | path to a `.fr` file |
 | `--template TEMPLATE` | yes | path to a template file |
+| `--data DATA.json` | no | typed JSON under the `data` template key |
 
 **Example**
 
-```
+```sh
 fidryn render examples/trust/bryan-revocable-trust.fr \
   --template templates/certified/instrument-outline.txt
 ```
@@ -1650,7 +2066,7 @@ Live HTTP requires both `--live` and the environment variable
 
 | Name | Required | Type |
 | --- | --- | --- |
-| `PACKET.json` | yes | JSON file parsed as the packet body |
+| `PACKET.json` | yes | JSON file holding one Fidryn value in tagged form (see below) |
 | `--adapter NAME` | no | `dry-run` (default), `ma-corporations`, or `massachusetts` |
 | `--live` | no | flag; enable live HTTP when the adapter and env allow it |
 | `--endpoint URL` | no | live POST URL for the Massachusetts adapter |
@@ -1660,18 +2076,27 @@ adapter name uses dry-run. The dry-run adapter refuses `--live` even if
 the environment variable is set. The Massachusetts adapter’s default
 endpoint is `https://www.sec.state.ma.us/filing`.
 
-There is no dedicated packet fixture in-tree; any JSON value is accepted.
-The LLC case record is a realistic dry-run body:
+A packet is one Fidryn value in its tagged JSON form: an object whose
+`kind` names the kind of value, such as `string`, `int`, `bool` or `map`,
+and whose `data` holds it, as in `{"kind":"string","data":"x"}`. A `map`
+holds named values in the same form. Other JSON, a case record included,
+is refused with `invalid packet JSON` and exit 1.
+[`tests/programs/packets/dry-run.json`](https://github.com/BeeGass/fidryn/blob/main/tests/programs/packets/dry-run.json)
+is a small packet: a `map` of two strings.
 
-```
-fidryn file examples/massachusetts-llc/cases/transmitted-without-official-record.json
+Without `--live`, every adapter answers as the dry-run adapter does: it
+prints the packet back as `{"kind":"dryRun","packet":...}`, makes no
+network request and writes no file.
+
+```sh
+fidryn file tests/programs/packets/dry-run.json
 ```
 
 Live shape (does not establish `Filed`):
 
-```
+```text
 FIDRYN_ALLOW_LIVE_FILING=1 fidryn file \
-  examples/massachusetts-llc/cases/transmitted-without-official-record.json \
+  tests/programs/packets/dry-run.json \
   --adapter ma-corporations \
   --live \
   --endpoint https://www.sec.state.ma.us/filing
@@ -1705,7 +2130,7 @@ is omitted.
 
 **Example**
 
-```
+```sh
 fidryn ui --port 8751 --no-open
 ```
 
@@ -1716,6 +2141,24 @@ fidryn ui --port 8751 --no-open
 **Failure.** Exit 1.
 `127.0.0.1:PORT is already in use. Stop that process or pass --port.`
 Other bind or runtime errors are printed to stderr.
+
+## `inputs`
+
+`fidryn inputs MODULE --query QUERY` emits JSON Schema for the declared query
+argument object. Aliases, sum constructors, records, nominal entities and
+collections come from checked declarations. Observation schemas and external
+review requests appear as metadata. Unsupported representations refuse instead
+of producing an unconstrained input schema.
+
+## `review`
+
+`fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at
+TIME` emits a portable `fidryn.review-bundle/v0.1` JSON archive. It retains exact
+source/case/dependency/lock bytes, a labeled normalized manifest, checked report
+and actual trace, source spans, executable digest and rerun arguments. Optional
+`--scenario`, `--budget N` and `--template FILE` select the disclosed evaluation
+or retain reviewer material. Reviewer status is `not_assessed`; the archive does
+not constitute legal approval. See [Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md).
 
 ## See also
 
@@ -1740,7 +2183,7 @@ author: "Bryan Gass"
 The mill is a loopback-only web UI for checking, running, exploring, and
 rendering Fidryn source on this machine. Start it with the CLI:
 
-```
+```text
 fidryn ui [--port N] [--no-open]
 ```
 
@@ -1756,19 +2199,19 @@ See [getting started](https://fidryn.onlygass.dev/docs/getting-started.md) for a
 
 From a clone:
 
-```
+```sh
 cargo run -p fidryn-cli -- ui --no-open
 ```
 
 Or, after `cargo install --path crates/fidryn-cli`:
 
-```
+```sh
 fidryn ui --port 8751 --no-open
 ```
 
 On success, stderr prints:
 
-```
+```text
 fidryn mill on http://127.0.0.1:8751
 127.0.0.1 only. live filing is disabled.
 ```
@@ -1876,9 +2319,11 @@ as CLI `--valid-at` and `--known-at`.
 On evaluation success, HTTP 200, and the body is a transport wrapper
 `{ "ok": true, "report": ..., "opinion": [...] }`
 (`schemas/mill-evaluation-response-v0.1.json`). `report` is the
-`fidryn.evaluation-report/v0.1` envelope the CLI prints
+`fidryn.evaluation-report/v0.2` envelope the CLI prints
 (`schema`, `executionMode`, `assumptions`, `sourceTrust`,
-`verificationMethod`, `coverage`, `outcomeDocument`). `opinion` is the
+`verificationMethod`, `coverage`, checked invocation and source/executable
+identities, retained actual `traceDocument`, `outcomeDocument`, and exploration
+`searchEvidence` when applicable). `opinion` is the
 report read as plain sentences, for example
 `acting_trustee depends on SuccessorEligibility.` and
 `Under I1 it is Alice.` for a contingent trust run. Each sentence is a
@@ -1923,7 +2368,9 @@ It is not rewritten as `inconsistent`.
 HTTP status is 200 in both cases. Success is `{"ok": true, "text": "..."}`.
 Failure (check diagnostics joined by newlines, or a missing template key)
 is `{"ok": false, "error": "..."}`. Template variables are `module`,
-`version`, and `outside_scope`. Missing keys fail closed.
+`version`, typed `outside_scope`, and `outside_scope_label`. An optional JSON
+`data` field is available under the template key `data`; typed arrays and record
+fields are preserved. Missing keys and collection type mismatches fail closed.
 
 ## In-memory compile versus path compile
 
@@ -2011,6 +2458,15 @@ completions on the case JSON.
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [CLI](https://fidryn.onlygass.dev/docs/cli.md)
 
+### `POST /api/inputs`
+
+Accepts `source` and `query` and returns `{ok: true, schema: ...}` with the input
+schema derived from checked declarations, including evidence and effect request
+metadata. Unsupported input representations return an explicit error. `/api/check`
+diagnostic responses also include `locations` with source paths, byte spans and
+UTF-16 editor ranges when available. These ranges identify the exact submitted
+source; unavailable locations stay explicit.
+
 ========== https://fidryn.onlygass.dev/docs/outcomes.md ==========
 
 ---
@@ -2034,7 +2490,7 @@ The six-kind result is a `fidryn.outcome/v0.1` object, defined by
 [`schemas/outcome-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/outcome-v0.1.json). Field names
 are camelCase. Trust, coverage, execution mode, and assumptions that
 cannot fit that schema live on the evaluation-report envelope
-([`fidryn.evaluation-report/v0.1`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.1.json));
+([`fidryn.evaluation-report/v0.2`](https://github.com/BeeGass/fidryn/blob/main/schemas/evaluation-report-v0.2.json));
 they are not extra keys on the outcome object (`additionalProperties`
 is false).
 
@@ -2044,7 +2500,7 @@ See [CLI](https://fidryn.onlygass.dev/docs/cli.md), the [language grammar](https
 ## Envelope
 
 CLI `run` / `explore` and mill `/api/run` / `/api/explore` emit
-`fidryn.evaluation-report/v0.1`. The six-kind legal result is nested as
+`fidryn.evaluation-report/v0.2`. The six-kind legal result is nested as
 `outcomeDocument`. That nested object is:
 
 | Field | Meaning |
@@ -2070,19 +2526,26 @@ failures (exit 1). They are never rewritten as `inconsistent`.
 ## Evaluation report envelope
 
 Qualifications that the outcome schema cannot carry live on
-`fidryn.evaluation-report/v0.1`. `fidryn_trace::render_report` emits
-that object. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
+`fidryn.evaluation-report/v0.2`. `fidryn_trace::render_checked_report`
+requires an invocation-bound checked evaluation. The legacy `render_report`
+API remains a v0.1 compatibility projection and does not supply a checked v0.2
+invocation. `outcomeDocument` is the `fidryn.outcome/v0.1` projection
 above; that schema is unchanged.
 
 | Field | Meaning |
 | --- | --- |
-| `schema` | `fidryn.evaluation-report/v0.1`. |
+| `schema` | `fidryn.evaluation-report/v0.2`. |
 | `executionMode` | `operative` or `scenario`. Operative `evaluate` does not apply `case.assumptions`. |
 | `assumptions` | Overlay hypotheses copied onto a scenario report. Empty for operative runs. |
 | `sourceTrust` | How the compiled source was authenticated. In-memory / mill pasted compile is `unauthenticated`. A path compile may be `fixture` or `byteVerified`. `fixture` is not byte-verified. |
 | `verificationMethod` | `none` (no covering verification; a claims-digest binding is not covering), `structural` (shape only), or `finiteReplay` (each declared branch re-evaluated). Only `finiteReplay` is covering. |
 | `coverage` | Optional `CoverageWitness`. Shape completeness is not covering meaning. |
 | `outcomeDocument` | The `fidryn.outcome/v0.1` object from the previous section. |
+| `invocation`, `invocationId` | Program/case identity, query arguments, clocks, execution mode, operation and actual operation budget. |
+| `sourceBundle` | Identity of this compilation's immutable source observations. |
+| `engineVersion`, `engineArtifact` | Engine semantics and, for CLI/mill reports, executable digest/size/platform/capture method. |
+| `traceDocument` | Actual retained derivation nodes and parent links. |
+| `searchEvidence` | Checked executed branches and exact coverage for exploration. |
 
 Do not drop trust or coverage to keep an old outcome printer happy.
 If a qualification cannot fit `fidryn.outcome/v0.1`, it belongs here.
@@ -2095,7 +2558,9 @@ outcome-only `fidryn.outcome/v0.1` export.
 `outcome` is tagged by `kind`. Every kind includes `trace`, a 32-character
 hex `TraceId`. `fidryn explain TRACE_ID` loads `TRACE_ID.json` when that
 file exists; otherwise it prints the hashed id. JSON traces always
-include a `nodes` array.
+include a `nodes` array. Saving the complete evaluation report preserves its
+actual graph for a later `fidryn explain report.json`; a bare hash cannot
+reconstruct discarded execution records.
 
 Values inside an outcome are tagged runtime values
 (`{"kind":"bool","data":true}`, `{"kind":"entity","data":"Bob"}`,
@@ -2370,7 +2835,7 @@ user record must use `{ "kind": "record", "data": { ... } }`; see
 ## Reading a result
 
 1. Confirm the CLI/mill report `schema` is
-   `fidryn.evaluation-report/v0.1`, then open nested `outcomeDocument`
+   `fidryn.evaluation-report/v0.2`, then open nested `outcomeDocument`
    (`schema` `fidryn.outcome/v0.1`). Read `executionMode`,
    `sourceTrust`, and `assumptions` on the report before treating the
    answer as operative.
@@ -2419,7 +2884,11 @@ Every module is a `.fr` file. Start by checking it. `check` authenticates
 the declared source manifest (when the module has one), elaborates, and
 type-checks. A clean module prints `ok`.
 
-```
+<!-- examples-status:begin -->
+`fidryn check` passes for 54 of the 114 `.fr` modules under `examples/`, `packages/`, `prelude/` and `tests/programs/` with this version. The [per-file list](https://github.com/BeeGass/fidryn/blob/main/examples/STATUS.md) is generated by `cargo xtask examples --update`. A file marked (draft) does not pass and cannot be run; [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) lists what the language cannot yet express.
+<!-- examples-status:end -->
+
+```sh
 fidryn check examples/trust/bryan-revocable-trust.fr
 ```
 
@@ -2429,7 +2898,7 @@ against one record at a pair of ISO 8601 / RFC 3339 timestamps. `run`
 never chooses a completion. A `Suspended` outcome is an honest result,
 not a failed command.
 
-```
+```sh
 fidryn run examples/us-federal/flsa/flsa.fr \
   --query overtime_hours \
   --case examples/us-federal/flsa/cases/forty-one-hours.json \
@@ -2442,14 +2911,22 @@ Evidence whose `observedAt` is after `--known-at` does not discharge a
 query. `--arg KEY=VALUE` writes `case.facts["KEY"]` on top of the JSON
 (for example `--arg provision=ChildSupportWaiver`).
 
-State modules under `examples/states/` do not ship companion JSON. Case
-facts live in `scenario` blocks inside the `.fr` file. There is no JSON
-source manifest either: the `source { ... }` block already carries
-citation, artifact, and `digest fixture`. Check the module, and verify a
-declared property when you want the honesty assertions:
+State modules under `examples/states/` do not ship a companion JSON case
+record or a JSON source manifest. Their `scenario` blocks write down
+example facts, but the interpreter does not read them: a run takes its
+facts from a case record. The `source { ... }` block carries the
+citation, artifact, and `digest fixture`, and no file is read from it
+(see [implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md)). Check the
+module:
 
-```
+```sh
 fidryn check examples/states/florida/homestead.fr
+```
+
+`verify` cannot yet discharge the honesty assertions in these modules. It
+reports the property `unknown` and exits with status 1:
+
+```sh exit=1
 fidryn verify examples/states/florida/homestead.fr --property HomesteadHonesty
 ```
 
@@ -2464,7 +2941,7 @@ judgment in a Boolean.
 These eleven modules cover an instrument, a closed-form tax slice, an
 agency procedure, a formation filing, a family agreement, a civil-procedure
 spine, a consumer clock, a state constitutional cap, a federal wage rule,
-and two interpreter programs.
+and two interpreter programs. The rows not marked (draft) check clean.
 
 | Path | Purpose | Command |
 | --- | --- | --- |
@@ -2474,17 +2951,17 @@ and two interpreter programs.
 | `examples/massachusetts-llc/harbor-robotics.fr` | Massachusetts LLC formation; a transport receipt is not an official filing record. | `fidryn check examples/massachusetts-llc/harbor-robotics.fr` |
 | `examples/prenup/ava-noah.fr` | California UPAA provision enforcement for the Ava–Noah agreement. | `fidryn check examples/prenup/ava-noah.fr` |
 | `examples/procedure/civil-complaint.fr` | FRCP 3/4/12/58 complaint-to-judgment spine. | `fidryn check examples/procedure/civil-complaint.fr` |
-| `examples/california/security-deposit/security-deposit.fr` | California 21-day security-deposit return clock versus bad-faith doubling. | `fidryn check examples/california/security-deposit/security-deposit.fr` |
-| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character; scenarios live in the `.fr` file. | `fidryn check examples/states/florida/homestead.fr` |
+| `examples/california/security-deposit/security-deposit.fr` (draft) | California 21-day security-deposit return clock versus bad-faith doubling. | not runnable |
+| `examples/states/florida/homestead.fr` | Florida homestead acreage caps and forced-sale character. Its `scenario` blocks are not read by the interpreter. | `fidryn check examples/states/florida/homestead.fr` |
 | `examples/us-federal/flsa/flsa.fr` | FLSA 40-hour overtime versus the white-collar exemption. | `fidryn check examples/us-federal/flsa/flsa.fr` |
 | `tests/programs/require-gate.fr` | `require true` returns 7; `require false` does not run the return. | `fidryn check tests/programs/require-gate.fr` |
 | `tests/programs/late-payment.fr` | Invoice duty, timely-payment decision, and a strict-versus-extended deadline family. | `fidryn check tests/programs/late-payment.fr` |
 
-Run the modules that ship JSON case records. Timestamps match each
-module's `recorded_at` or, when evidence is later, that evidence's
-`observedAt`.
+Run the clean modules that ship JSON case records. Each command's
+timestamps are the latest `observedAt` among the record's evidence, or
+the module's `recorded_at` when the record has no evidence.
 
-```
+```sh
 fidryn run examples/trust/bryan-revocable-trust.fr \
   --query acting_trustee \
   --case examples/trust/cases/one-certificate.json \
@@ -2497,7 +2974,7 @@ Other trust records in the same folder are
 `court-selects-i2.json`. One physician certificate without a checked
 completion is expected to suspend.
 
-```
+```sh
 fidryn run examples/tax/federal-tax.fr \
   --query tax_on \
   --case examples/tax/cases/ordinary-income.json \
@@ -2505,7 +2982,7 @@ fidryn run examples/tax/federal-tax.fr \
   --known-at 2026-08-14T00:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/tax/federal-tax.fr \
   --query boi_required \
   --case examples/tax/cases/domestic-company-after-exemption.json \
@@ -2513,7 +2990,15 @@ fidryn run examples/tax/federal-tax.fr \
   --known-at 2026-09-01T00:00:00-04:00
 ```
 
-```
+Under its consequence, the exemption rule of `federal-tax.fr` writes
+`valid_time [2026-08-14, +inf)` and a `record_time` line. Fidryn 0.2 reads
+such lines and does not apply them (see
+`the_valid_time_and_record_time_lines_of_a_rule_are_not_applied` under
+[Known limits pinned by tests](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests)).
+So the answer, `false`, is the same for
+`--valid-at 2020-01-01T00:00:00Z`, long before the interval begins.
+
+```sh
 fidryn run examples/foia/foia-request.fr \
   --query disposition \
   --case examples/foia/cases/proposed-exemption-5-withholding.json \
@@ -2521,7 +3006,7 @@ fidryn run examples/foia/foia-request.fr \
   --known-at 2026-08-23T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/massachusetts-llc/harbor-robotics.fr \
   --query entity_status \
   --case examples/massachusetts-llc/cases/official-filing-record.json \
@@ -2533,7 +3018,15 @@ fidryn run examples/massachusetts-llc/harbor-robotics.fr \
 is the contrast case: transmission without an `OfficialFilingRecord`
 suspends.
 
-```
+Under its consequence, the formation rule of `harbor-robotics.fr` writes
+`valid_time [effective_at, +inf)` and a `record_time` line, and they are
+not applied either. The answer, `FormedLLC`, is the same for
+`--valid-at 2020-01-01T00:00:00Z`, long before the filing. It does depend
+on `--known-at`, through the filing record of the case: with a
+`--known-at` before 14:12 that day the record is not yet known, and the
+answer is `NotFormedLLC`.
+
+```sh
 fidryn run examples/prenup/ava-noah.fr \
   --query provision_result \
   --case examples/prenup/cases/divorce-record.json \
@@ -2546,7 +3039,7 @@ fidryn run examples/prenup/ava-noah.fr \
 `case.facts["provision"]` when you want a different clause without
 editing the JSON.
 
-```
+```sh
 fidryn run examples/procedure/civil-complaint.fr \
   --query judgment \
   --case examples/procedure/cases/judgment-entered.json \
@@ -2557,15 +3050,7 @@ fidryn run examples/procedure/civil-complaint.fr \
 `complaint-answered-without-judgment.json` suspends because there is no
 judgment entry.
 
-```
-fidryn run examples/california/security-deposit/security-deposit.fr \
-  --query deadline_running \
-  --case examples/california/security-deposit/cases/day-10.json \
-  --valid-at 2026-09-17T12:00:00-07:00 \
-  --known-at 2026-09-17T12:00:00-07:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/flsa/flsa.fr \
   --query overtime_hours \
   --case examples/us-federal/flsa/cases/forty-one-hours.json \
@@ -2573,11 +3058,12 @@ fidryn run examples/us-federal/flsa/flsa.fr \
   --known-at 2026-09-17T12:00:00-04:00
 ```
 
-Florida homestead has no JSON case file. The scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` are in
-`examples/states/florida/homestead.fr`. `require-gate.fr` and
-`late-payment.fr` also have no JSON; they are check-only programs. See
-[Independent programs](#independent-programs).
+Florida homestead has no JSON case file, and the interpreter does not read
+its `scenario` blocks (`InsideCityHalfAcre`, `RuralHundredSixty`,
+`TaxCreditor`), so this guide never passes it to `fidryn run`.
+`require-gate.fr` and `late-payment.fr` have no case records of their
+own; they run with the empty case record that `tests/programs/` ships.
+See [Independent programs](#independent-programs).
 
 ## Federal slices
 
@@ -2596,7 +3082,7 @@ and this timestamp pair:
 
 Check, then run:
 
-```
+```text
 fidryn check PATH
 fidryn run PATH --query QUERY --case CASE \
   --valid-at 2026-09-17T12:00:00-04:00 \
@@ -2611,24 +3097,16 @@ The original FOIA spine is `examples/foia/foia-request.fr`, not under
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
 | `examples/us-federal/diversity/diversity.fr` | 28 U.S.C. § 1332(a). The $75,000 amount-in-controversy floor is mechanical; complete diversity is not. | `amount_in_controversy_met` | `examples/us-federal/diversity/cases/amount-met-diversity-open.json` |
-| `examples/us-federal/removal/removal.fr` | 28 U.S.C. § 1446(b). Thirty-day removal clock versus later-served-defendant doctrine. | `thirty_day_window` | `examples/us-federal/removal/cases/inside-thirty-days.json` |
+| `examples/us-federal/removal/removal.fr` (draft) | 28 U.S.C. § 1446(b). Thirty-day removal clock versus later-served-defendant doctrine. | `thirty_day_window` | `examples/us-federal/removal/cases/inside-thirty-days.json` |
 | `examples/us-federal/hearsay/hearsay.fr` | Fed. R. Evid. 801–804. Out-of-court use versus the 803(6) business-records exception. | `out_of_court` | `examples/us-federal/hearsay/cases/out-of-court-statement.json` |
-| `examples/us-federal/speedy-trial/speedy-trial.fr` | 18 U.S.C. § 3161. Seventy-day clock versus ends-of-justice continuance. | `seventy_day_window` | `examples/us-federal/speedy-trial/cases/inside-seventy-days.json` |
+| `examples/us-federal/speedy-trial/speedy-trial.fr` (draft) | 18 U.S.C. § 3161. Seventy-day clock versus ends-of-justice continuance. | `seventy_day_window` | `examples/us-federal/speedy-trial/cases/inside-seventy-days.json` |
 
-```
+```sh
 fidryn run examples/us-federal/diversity/diversity.fr --query amount_in_controversy_met --case examples/us-federal/diversity/cases/amount-met-diversity-open.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
-fidryn run examples/us-federal/removal/removal.fr --query thirty_day_window --case examples/us-federal/removal/cases/inside-thirty-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/hearsay/hearsay.fr --query out_of_court --case examples/us-federal/hearsay/cases/out-of-court-statement.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/speedy-trial/speedy-trial.fr --query seventy_day_window --case examples/us-federal/speedy-trial/cases/inside-seventy-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
 ### Employment counsel and workers
@@ -2637,23 +3115,15 @@ fidryn run examples/us-federal/speedy-trial/speedy-trial.fr --query seventy_day_
 | --- | --- | --- | --- |
 | `examples/us-federal/flsa/flsa.fr` | 29 U.S.C. § 207. Hours over 40 are mechanical; the white-collar exemption is a determination. | `overtime_hours` | `examples/us-federal/flsa/cases/forty-one-hours.json` |
 | `examples/us-federal/fmla/fmla.fr` | 29 U.S.C. § 2611. 1,250 hours / 12 months / 50 employees versus serious health condition. | `eligibility_counts` | `examples/us-federal/fmla/cases/hours-and-headcount.json` |
-| `examples/us-federal/title-vii/title-vii.fr` | 42 U.S.C. § 2000e-5. 180/300-day EEOC charge clock versus equitable tolling. | `charge_clock` | `examples/us-federal/title-vii/cases/day-100-worksharing.json` |
-| `examples/us-federal/warn/warn.fr` | 29 U.S.C. § 2102. Sixty-day / 100-employee floor versus unforeseen circumstances. | `notice_timely` | `examples/us-federal/warn/cases/sixty-day-notice.json` |
+| `examples/us-federal/title-vii/title-vii.fr` (draft) | 42 U.S.C. § 2000e-5. 180/300-day EEOC charge clock versus equitable tolling. | `charge_clock` | `examples/us-federal/title-vii/cases/day-100-worksharing.json` |
+| `examples/us-federal/warn/warn.fr` (draft) | 29 U.S.C. § 2102. Sixty-day / 100-employee floor versus unforeseen circumstances. | `notice_timely` | `examples/us-federal/warn/cases/sixty-day-notice.json` |
 
-```
+```sh
 fidryn run examples/us-federal/flsa/flsa.fr --query overtime_hours --case examples/us-federal/flsa/cases/forty-one-hours.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/fmla/fmla.fr --query eligibility_counts --case examples/us-federal/fmla/cases/hours-and-headcount.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/title-vii/title-vii.fr --query charge_clock --case examples/us-federal/title-vii/cases/day-100-worksharing.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/warn/warn.fr --query notice_timely --case examples/us-federal/warn/cases/sixty-day-notice.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
 California noncompete, final pay, and the ABC test are not under
@@ -2663,44 +3133,32 @@ California noncompete, final pay, and the ABC test are not under
 
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
-| `examples/us-federal/fcra/fcra.fr` | 15 U.S.C. § 1681i. Thirty-day credit reinvestigation clock. | `reinvestigation_clock` | `examples/us-federal/fcra/cases/day-10.json` |
-| `examples/us-federal/fdcpa/fdcpa.fr` | 15 U.S.C. § 1692g. Thirty-day debt-validation clock. | `validation_clock` | `examples/us-federal/fdcpa/cases/day-10.json` |
-| `examples/us-federal/efta/efta.fr` | 15 U.S.C. § 1693f. Sixty-day bank-error clock. | `error_clock` | `examples/us-federal/efta/cases/day-30.json` |
+| `examples/us-federal/fcra/fcra.fr` (draft) | 15 U.S.C. § 1681i. Thirty-day credit reinvestigation clock. | `reinvestigation_clock` | `examples/us-federal/fcra/cases/day-10.json` |
+| `examples/us-federal/fdcpa/fdcpa.fr` (draft) | 15 U.S.C. § 1692g. Thirty-day debt-validation clock. | `validation_clock` | `examples/us-federal/fdcpa/cases/day-10.json` |
+| `examples/us-federal/efta/efta.fr` (draft) | 15 U.S.C. § 1693f. Sixty-day bank-error clock. | `error_clock` | `examples/us-federal/efta/cases/day-30.json` |
 | `examples/us-federal/tcpa/tcpa.fr` | 47 U.S.C. § 227. Statutory-damages floor; consent and autodialer stay open-textured. | `at_least_statutory_floor` | `examples/us-federal/tcpa/cases/statutory-floor.json` |
 | `examples/us-federal/dmca/dmca.fr` | 17 U.S.C. § 512. Six notice elements versus counter-notice good faith. | `notice_elements_met` | `examples/us-federal/dmca/cases/six-elements.json` |
 | `examples/us-federal/ada-service-animal/ada-service-animal.fr` | 28 C.F.R. § 36.302. Two permitted questions versus task-training. | `two_questions_only` | `examples/us-federal/ada-service-animal/cases/two-questions.json` |
 | `examples/us-federal/fair-housing/fair-housing.fr` | HUD FHEO-2020-01. Extra deposit is mechanical; disability-and-nexus is not. | `extra_deposit_not_required` | `examples/us-federal/fair-housing/cases/no-extra-deposit.json` |
 | `examples/us-federal/garnishment/garnishment.fr` | 15 U.S.C. § 1673. Twenty-five percent disposable-earnings cap. | `within_twenty_five_percent` | `examples/us-federal/garnishment/cases/under-cap.json` |
 
-```
-fidryn run examples/us-federal/fcra/fcra.fr --query reinvestigation_clock --case examples/us-federal/fcra/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/fdcpa/fdcpa.fr --query validation_clock --case examples/us-federal/fdcpa/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/efta/efta.fr --query error_clock --case examples/us-federal/efta/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/tcpa/tcpa.fr --query at_least_statutory_floor --case examples/us-federal/tcpa/cases/statutory-floor.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/dmca/dmca.fr --query notice_elements_met --case examples/us-federal/dmca/cases/six-elements.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/ada-service-animal/ada-service-animal.fr --query two_questions_only --case examples/us-federal/ada-service-animal/cases/two-questions.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/fair-housing/fair-housing.fr --query extra_deposit_not_required --case examples/us-federal/fair-housing/cases/no-extra-deposit.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/garnishment/garnishment.fr --query within_twenty_five_percent --case examples/us-federal/garnishment/cases/under-cap.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
@@ -2708,44 +3166,28 @@ fidryn run examples/us-federal/garnishment/garnishment.fr --query within_twenty_
 
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
-| `examples/us-federal/medicare/medicare.fr` | 42 U.S.C. § 1395p. Age-65 attainment versus initial-enrollment and late-enrollment penalty. | `age_65_attained` | `examples/us-federal/medicare/cases/turning-65.json` |
+| `examples/us-federal/medicare/medicare.fr` (draft) | 42 U.S.C. § 1395p. Age-65 attainment versus initial-enrollment and late-enrollment penalty. | `age_65_attained` | `examples/us-federal/medicare/cases/turning-65.json` |
 | `examples/us-federal/ssa-fra/ssa-fra.fr` | 42 U.S.C. § 416(l). Full retirement age 67 for birth year 1960 versus delayed credits. | `fra_is_sixty_seven` | `examples/us-federal/ssa-fra/cases/born-1960.json` |
 | `examples/us-federal/ssi/ssi.fr` | 42 U.S.C. § 1382. $2,000 resource cap versus household-of-another. | `resources_within_cap` | `examples/us-federal/ssi/cases/under-cap.json` |
-| `examples/us-federal/cobra/cobra.fr` | 29 U.S.C. § 1165. Sixty-day election window versus qualifying event. | `election_open` | `examples/us-federal/cobra/cases/day-30.json` |
-| `examples/us-federal/hipaa/hipaa.fr` | 45 C.F.R. § 164.524. Thirty-day records clock versus psychotherapy notes. | `access_clock_running` | `examples/us-federal/hipaa/cases/day-10.json` |
+| `examples/us-federal/cobra/cobra.fr` (draft) | 29 U.S.C. § 1165. Sixty-day election window versus qualifying event. | `election_open` | `examples/us-federal/cobra/cases/day-30.json` |
+| `examples/us-federal/hipaa/hipaa.fr` (draft) | 45 C.F.R. § 164.524. Thirty-day records clock versus psychotherapy notes. | `access_clock_running` | `examples/us-federal/hipaa/cases/day-10.json` |
 | `examples/us-federal/scra/scra.fr` | 50 U.S.C. § 3937. Six-percent interest cap during military service. | `within_six_percent` | `examples/us-federal/scra/cases/six-percent.json` |
-| `examples/us-federal/userra/userra.fr` | 38 U.S.C. § 4312. Reemployment window versus escalator position. | `within_outer_window` | `examples/us-federal/userra/cases/day-30.json` |
+| `examples/us-federal/userra/userra.fr` (draft) | 38 U.S.C. § 4312. Reemployment window versus escalator position. | `within_outer_window` | `examples/us-federal/userra/cases/day-30.json` |
 | `examples/us-federal/pslf/pslf.fr` | 20 U.S.C. § 1087e. 120 qualifying payments versus qualifying employer. | `payment_count_met` | `examples/us-federal/pslf/cases/one-hundred-twenty.json` |
 
-```
-fidryn run examples/us-federal/medicare/medicare.fr --query age_65_attained --case examples/us-federal/medicare/cases/turning-65.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/ssa-fra/ssa-fra.fr --query fra_is_sixty_seven --case examples/us-federal/ssa-fra/cases/born-1960.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/ssi/ssi.fr --query resources_within_cap --case examples/us-federal/ssi/cases/under-cap.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
-fidryn run examples/us-federal/cobra/cobra.fr --query election_open --case examples/us-federal/cobra/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/us-federal/hipaa/hipaa.fr --query access_clock_running --case examples/us-federal/hipaa/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/scra/scra.fr --query within_six_percent --case examples/us-federal/scra/cases/six-percent.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
-fidryn run examples/us-federal/userra/userra.fr --query within_outer_window --case examples/us-federal/userra/cases/day-30.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/pslf/pslf.fr --query payment_count_met --case examples/us-federal/pslf/cases/one-hundred-twenty.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
@@ -2753,34 +3195,26 @@ fidryn run examples/us-federal/pslf/pslf.fr --query payment_count_met --case exa
 
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
-| `examples/us-federal/naturalization/naturalization.fr` | 8 U.S.C. § 1427. Five-year / three-year residency versus good moral character. | `residency_met` | `examples/us-federal/naturalization/cases/five-years.json` |
+| `examples/us-federal/naturalization/naturalization.fr` (draft) | 8 U.S.C. § 1427. Five-year / three-year residency versus good moral character. | `residency_met` | `examples/us-federal/naturalization/cases/five-years.json` |
 | `examples/us-federal/unlawful-presence/unlawful-presence.fr` | 8 U.S.C. § 1182(a)(9)(B). 180-day / 1-year triggers versus waiver. | `three_year_bar_triggered` | `examples/us-federal/unlawful-presence/cases/one-hundred-eighty-days.json` |
 | `examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr` | 11 U.S.C. § 362. Stay on filing versus stay relief. | `stay_in_force` | `examples/us-federal/bankruptcy-stay/cases/day-after-filing.json` |
 | `examples/us-federal/means-test/means-test.fr` | 11 U.S.C. § 707(b). Median-income comparison versus special circumstances. | `above_median` | `examples/us-federal/means-test/cases/above-median.json` |
-| `examples/us-federal/eighty-three-b/eighty-three-b.fr` | 26 U.S.C. § 83(b). Thirty-day election window versus substantial risk of forfeiture. | `election_window_open` | `examples/us-federal/eighty-three-b/cases/day-10.json` |
+| `examples/us-federal/eighty-three-b/eighty-three-b.fr` (draft) | 26 U.S.C. § 83(b). Thirty-day election window versus substantial risk of forfeiture. | `election_window_open` | `examples/us-federal/eighty-three-b/cases/day-10.json` |
 | `examples/us-federal/accredited-investor/accredited-investor.fr` | 17 C.F.R. § 230.501. Income and net-worth tests versus sophistication. | `individual_income_met` | `examples/us-federal/accredited-investor/cases/income-met.json` |
 
-```
-fidryn run examples/us-federal/naturalization/naturalization.fr --query residency_met --case examples/us-federal/naturalization/cases/five-years.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/unlawful-presence/unlawful-presence.fr --query three_year_bar_triggered --case examples/us-federal/unlawful-presence/cases/one-hundred-eighty-days.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/bankruptcy-stay/bankruptcy-stay.fr --query stay_in_force --case examples/us-federal/bankruptcy-stay/cases/day-after-filing.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/us-federal/means-test/means-test.fr --query above_median --case examples/us-federal/means-test/cases/above-median.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
-fidryn run examples/us-federal/eighty-three-b/eighty-three-b.fr --query election_window_open --case examples/us-federal/eighty-three-b/cases/day-10.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/us-federal/accredited-investor/accredited-investor.fr --query individual_income_met --case examples/us-federal/accredited-investor/cases/income-met.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
@@ -2794,10 +3228,9 @@ does not encode titles. It records that the United States Code, the CFR,
 uncodified statutes, case law, and internal guidance remain outside this
 corpus except for the slices listed above.
 
-```
+```sh
 fidryn check examples/us-federal/catalog/usc-titles.fr
-fidryn run examples/us-federal/catalog/usc-titles.fr --query encoding_is_bounded --case examples/us-federal/catalog/cases/catalog-query.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-fidryn verify examples/us-federal/catalog/usc-titles.fr --property CatalogDoesNotClaimCompleteness
+fidryn run examples/us-federal/catalog/usc-titles.fr --query complete_code_is_outside_scope --case examples/us-federal/catalog/cases/catalog-query.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
 ## Other practice slices
@@ -2811,82 +3244,62 @@ Central offset from the module header, use
 
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
-| `examples/california/security-deposit/security-deposit.fr` | Cal. Civ. Code § 1950.5. Twenty-one-day return versus bad-faith doubling. | `deadline_running` | `examples/california/security-deposit/cases/day-10.json` |
+| `examples/california/security-deposit/security-deposit.fr` (draft) | Cal. Civ. Code § 1950.5. Twenty-one-day return versus bad-faith doubling. | `deadline_running` | `examples/california/security-deposit/cases/day-10.json` |
 | `examples/california/final-pay/final-pay.fr` | Cal. Lab. Code §§ 201–203. Immediate pay on discharge versus waiting-time penalty. | `pay_due_immediately` | `examples/california/final-pay/cases/discharged.json` |
 | `examples/california/noncompete/noncompete.fr` | Cal. Bus. & Prof. Code § 16600 versus the sale-of-business exception. | `void_as_to_noncompete` | `examples/california/noncompete/cases/restraint-present.json` |
 | `examples/california/abc-test/abc-test.fr` | Cal. Lab. Code § 2775. Prong A can be Boolean; prongs B and C cannot. | `prong_a_free_from_control` | `examples/california/abc-test/cases/prong-a-free.json` |
 | `examples/california/lemon/lemon.fr` | Cal. Civ. Code § 1793.22. Repair attempts versus substantial impairment. | `reasonable_repair_attempts` | `examples/california/lemon/cases/four-attempts.json` |
-| `examples/california/cpra/cpra.fr` | Cal. Civ. Code § 1798.130. Forty-five-day access clock. | `response_clock_running` | `examples/california/cpra/cases/day-20.json` |
+| `examples/california/cpra/cpra.fr` (draft) | Cal. Civ. Code § 1798.130. Forty-five-day access clock. | `response_clock_running` | `examples/california/cpra/cases/day-20.json` |
 
-```
-fidryn run examples/california/security-deposit/security-deposit.fr --query deadline_running --case examples/california/security-deposit/cases/day-10.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
-```
-
-```
+```sh
 fidryn run examples/california/final-pay/final-pay.fr --query pay_due_immediately --case examples/california/final-pay/cases/discharged.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
 ```
 
-```
+```sh
 fidryn run examples/california/noncompete/noncompete.fr --query void_as_to_noncompete --case examples/california/noncompete/cases/restraint-present.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
 ```
 
-```
+```sh
 fidryn run examples/california/abc-test/abc-test.fr --query prong_a_free_from_control --case examples/california/abc-test/cases/prong-a-free.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
 ```
 
-```
+```sh
 fidryn run examples/california/lemon/lemon.fr --query reasonable_repair_attempts --case examples/california/lemon/cases/four-attempts.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
 ```
 
-```
-fidryn run examples/california/cpra/cpra.fr --query response_clock_running --case examples/california/cpra/cases/day-20.json --valid-at 2026-09-17T12:00:00-07:00 --known-at 2026-09-17T12:00:00-07:00
-```
-
 Wage statements for California are the fifty-state module
-`examples/states/california/wage-statements.fr`, not this directory.
+`examples/states/california/wage-statements.fr` (draft), not this directory.
 
 ### Delaware, Illinois, Massachusetts, New York, Texas, UCC, everyday
 
 | Path | Purpose | Query | Case |
 | --- | --- | --- | --- |
 | `examples/delaware/dgcl-220/dgcl-220.fr` | 8 Del. C. § 220. Record stockholder is mechanical; proper purpose is not. | `stockholder_of_record` | `examples/delaware/dgcl-220/cases/record-stockholder.json` |
-| `examples/illinois/bipa/bipa.fr` | 740 ILCS 14. Consent before biometrics versus willful damages. | `consent_before_biometric` | `examples/illinois/bipa/cases/no-consent.json` |
-| `examples/massachusetts/security-deposit/security-deposit.fr` | M.G.L. c. 186 § 15B. Thirty-day itemization versus treble damages. | `itemization_deadline_running` | `examples/massachusetts/security-deposit/cases/day-15.json` |
-| `examples/new-york/foil/foil.fr` | N.Y. Pub. Off. Law § 87. Five-day acknowledgment versus law-enforcement exemption. | `acknowledge_window_running` | `examples/new-york/foil/cases/day-3.json` |
+| `examples/illinois/bipa/bipa.fr` (draft) | 740 ILCS 14. Consent before biometrics versus willful damages. | `consent_before_biometric` | `examples/illinois/bipa/cases/no-consent.json` |
+| `examples/massachusetts/security-deposit/security-deposit.fr` (draft) | M.G.L. c. 186 § 15B. Thirty-day itemization versus treble damages. | `itemization_deadline_running` | `examples/massachusetts/security-deposit/cases/day-15.json` |
+| `examples/new-york/foil/foil.fr` (draft) | N.Y. Pub. Off. Law § 87. Five-day acknowledgment versus law-enforcement exemption. | `acknowledge_window_running` | `examples/new-york/foil/cases/day-3.json` |
 | `examples/texas/homestead/homestead.fr` | Tex. Const. art. XVI § 50 and Tex. Prop. Code § 41.002. Urban acreage versus homestead character. | `urban_acreage_10_acres` | `examples/texas/homestead/cases/urban-eight-acres.json` |
 | `examples/ucc/battle-of-forms/battle-of-forms.fr` | U.C.C. § 2-207. Additional terms between merchants versus material alteration. | `additional_term_between_merchants` | `examples/ucc/battle-of-forms/cases/both-merchants.json` |
 | `examples/everyday/minimum-wage/minimum-wage.fr` | 29 U.S.C. § 206. Federal $7.25 floor; which local ordinance applies is not a Boolean. | `federal_floor` | `examples/everyday/minimum-wage/cases/federal-floor.json` |
 | `examples/everyday/final-paycheck/final-paycheck.fr` | Default next payday versus California immediate pay. | `default_next_payday` | `examples/everyday/final-paycheck/cases/next-payday.json` |
 
-```
+```sh
 fidryn run examples/delaware/dgcl-220/dgcl-220.fr --query stockholder_of_record --case examples/delaware/dgcl-220/cases/record-stockholder.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
-fidryn run examples/illinois/bipa/bipa.fr --query consent_before_biometric --case examples/illinois/bipa/cases/no-consent.json --valid-at 2026-09-17T12:00:00-05:00 --known-at 2026-09-17T12:00:00-05:00
-```
-
-```
-fidryn run examples/massachusetts/security-deposit/security-deposit.fr --query itemization_deadline_running --case examples/massachusetts/security-deposit/cases/day-15.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
-fidryn run examples/new-york/foil/foil.fr --query acknowledge_window_running --case examples/new-york/foil/cases/day-3.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
-```
-
-```
+```sh
 fidryn run examples/texas/homestead/homestead.fr --query urban_acreage_10_acres --case examples/texas/homestead/cases/urban-eight-acres.json --valid-at 2026-09-17T12:00:00-05:00 --known-at 2026-09-17T12:00:00-05:00
 ```
 
-```
+```sh
 fidryn run examples/ucc/battle-of-forms/battle-of-forms.fr --query additional_term_between_merchants --case examples/ucc/battle-of-forms/cases/both-merchants.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/everyday/minimum-wage/minimum-wage.fr --query federal_floor --case examples/everyday/minimum-wage/cases/federal-floor.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
-```
+```sh
 fidryn run examples/everyday/final-paycheck/final-paycheck.fr --query default_next_payday --case examples/everyday/final-paycheck/cases/next-payday.json --valid-at 2026-09-17T12:00:00-04:00 --known-at 2026-09-17T12:00:00-04:00
 ```
 
@@ -2896,108 +3309,111 @@ and `examples/tax/` are in [Start here](#start-here).
 
 ## Fifty-state corpus
 
-`examples/states/` has one full high-impact module per U.S. state:
-homestead, final pay, security deposit, paid leave, no-fault, community
-property, and similar rules people and lawyers actually hit. Each file
-is a complete instrument (sources, entities, propositions, observations,
-rules, duties, queries, scenarios, verification). These are research
-fixtures, not legal advice, and not a complete statement of any state's
-code.
+`examples/states/` has one module per U.S. state. Each encodes part of
+the state law named in its principal citation in the table below, on
+topics such as homestead, final pay, security deposits, paid leave,
+no-fault insurance and community property. These are research fixtures,
+not legal advice, and not a complete statement of any state's code.
 
-Case facts are `scenario` blocks in the `.fr` file. There is no companion
-JSON case file and no JSON source manifest. `source_manifest` is omitted
-when the module's `source { ... }` block already carries citation,
-artifact, and `digest fixture`; the compiler loads an empty manifest in
-that case.
+There is no companion JSON case file and no JSON source manifest. The
+`scenario` blocks in each `.fr` file write down example facts, but the
+interpreter does not read them; a run takes its facts from a case
+record. `source_manifest` is omitted, so the compiler uses an empty
+manifest. The `source { ... }` block, which carries the citation,
+artifact, and `digest fixture`, does not take the manifest's place: no
+file is read from it.
 
-The quality bar is `examples/states/florida/homestead.fr`
-(`Florida.Property.Homestead`, Fla. Const. art. X, § 4). Urban acreage
-0.5, rural acreage 160, and the $1,000 personal-property cap are
-`automatic`. Homestead character and excepted-creditor status stay in
-`Determine` / `Observe`. Scenarios `InsideCityHalfAcre`,
-`RuralHundredSixty`, and `TaxCreditor` sit in the same file. Fixture
-excerpts live next to each module under `sources/` and are not official
-editions.
+The quality bar for writing a state module is
+`examples/states/florida/homestead.fr` (`Florida.Property.Homestead`,
+Fla. Const. art. X, § 4). It passes the checker. Urban acreage 0.5, rural
+acreage 160, and the $1,000 personal-property cap are `automatic`.
+Homestead character and excepted-creditor status stay in `Determine` /
+`Observe`. Scenarios `InsideCityHalfAcre`, `RuralHundredSixty`, and
+`TaxCreditor` sit in the same file. Fixture excerpts live next to each
+module under `sources/` and are not official editions.
 
-```
+```sh
 fidryn check examples/states/florida/homestead.fr
-fidryn verify examples/states/florida/homestead.fr --property HomesteadHonesty
 ```
 
 District of Columbia and the territories are outside this corpus.
 
 | State | File | Module | Principal citation |
 | --- | --- | --- | --- |
-| Alabama | `examples/states/alabama/final-wages.fr` | `Alabama.Employment.FinalWages` | Ala. Code §§ 8-24-2 to 8-24-3 |
-| Alaska | `examples/states/alaska/security-deposit.fr` | `Alaska.Housing.SecurityDeposit` | AS 34.03.070 |
-| Arizona | `examples/states/arizona/material-noncompliance.fr` | `Arizona.Housing.MaterialNoncomplianceNotice` | A.R.S. § 33-1368 |
+| Alabama | `examples/states/alabama/final-wages.fr` (draft) | `Alabama.Employment.FinalWages` | Ala. Code §§ 8-24-2 to 8-24-3 |
+| Alaska | `examples/states/alaska/security-deposit.fr` (draft) | `Alaska.Housing.SecurityDeposit` | AS 34.03.070 |
+| Arizona | `examples/states/arizona/material-noncompliance.fr` (draft) | `Arizona.Housing.MaterialNoncomplianceNotice` | A.R.S. § 33-1368 |
 | Arkansas | `examples/states/arkansas/homestead.fr` | `Arkansas.Property.Homestead` | Ark. Const. art. IX, §§ 3–5 |
-| California | `examples/states/california/wage-statements.fr` | `California.Employment.WageStatements` | Cal. Lab. Code § 226 |
+| California | `examples/states/california/wage-statements.fr` (draft) | `California.Employment.WageStatements` | Cal. Lab. Code § 226 |
 | Colorado | `examples/states/colorado/famli.fr` | `Colorado.Employment.FAMLI` | Colo. Rev. Stat. §§ 8-13.3-503 to 8-13.3-505 |
-| Connecticut | `examples/states/connecticut/paid-sick-leave.fr` | `Connecticut.Employment.PaidSickLeave` | Conn. Gen. Stat. §§ 31-57r, 31-57s |
-| Delaware | `examples/states/delaware/wage-payment.fr` | `Delaware.Employment.WagePayment` | 19 Del. C. §§ 1102, 1103 |
+| Connecticut | `examples/states/connecticut/paid-sick-leave.fr` (draft) | `Connecticut.Employment.PaidSickLeave` | Conn. Gen. Stat. §§ 31-57r, 31-57s |
+| Delaware | `examples/states/delaware/wage-payment.fr` (draft) | `Delaware.Employment.WagePayment` | 19 Del. C. §§ 1102, 1103 |
 | Florida | `examples/states/florida/homestead.fr` | `Florida.Property.Homestead` | Fla. Const. art. X, § 4 |
-| Georgia | `examples/states/georgia/dispossessory.fr` | `Georgia.Housing.Dispossessory` | O.C.G.A. § 44-7-50 et seq. |
-| Hawaii | `examples/states/hawaii/security-deposit.fr` | `Hawaii.Housing.SecurityDeposit` | Haw. Rev. Stat. § 521-44 |
+| Georgia | `examples/states/georgia/dispossessory.fr` (draft) | `Georgia.Housing.Dispossessory` | O.C.G.A. § 44-7-50 et seq. |
+| Hawaii | `examples/states/hawaii/security-deposit.fr` (draft) | `Hawaii.Housing.SecurityDeposit` | Haw. Rev. Stat. § 521-44 |
 | Idaho | `examples/states/idaho/noncompete.fr` | `Idaho.Employment.Noncompete` | Idaho Code §§ 44-2701, 44-2704 |
-| Illinois | `examples/states/illinois/wage-payment.fr` | `Illinois.Employment.WagePayment` | 820 ILCS 115/3 to 115/14 |
-| Indiana | `examples/states/indiana/security-deposit.fr` | `Indiana.Housing.SecurityDeposit` | Ind. Code § 32-31-3 |
-| Iowa | `examples/states/iowa/security-deposit.fr` | `Iowa.Housing.SecurityDeposit` | Iowa Code § 562A.12 |
+| Illinois | `examples/states/illinois/wage-payment.fr` (draft) | `Illinois.Employment.WagePayment` | 820 ILCS 115/3 to 115/14 |
+| Indiana | `examples/states/indiana/security-deposit.fr` (draft) | `Indiana.Housing.SecurityDeposit` | Ind. Code § 32-31-3 |
+| Iowa | `examples/states/iowa/security-deposit.fr` (draft) | `Iowa.Housing.SecurityDeposit` | Iowa Code § 562A.12 |
 | Kansas | `examples/states/kansas/homestead.fr` | `Kansas.Property.Homestead` | Kan. Const. art. 15, § 9 |
-| Kentucky | `examples/states/kentucky/final-wages.fr` | `Kentucky.Employment.FinalWages` | KRS 337.055 |
+| Kentucky | `examples/states/kentucky/final-wages.fr` (draft) | `Kentucky.Employment.FinalWages` | KRS 337.055 |
 | Louisiana | `examples/states/louisiana/community-property.fr` | `Louisiana.Family.CommunityProperty` | La. Civ. Code arts. 2338–2341 |
-| Maine | `examples/states/maine/paid-family-leave.fr` | `Maine.Employment.PaidFamilyLeave` | 26 M.R.S. §§ 850-A to 850-J |
-| Maryland | `examples/states/maryland/wage-payment.fr` | `Maryland.Employment.WagePayment` | Md. Code, Lab. & Empl. §§ 3-502, 3-505, 3-507.2 |
-| Massachusetts | `examples/states/massachusetts/pfml.fr` | `Massachusetts.Employment.PFML` | M.G.L. c. 175M §§ 2–6 |
+| Maine | `examples/states/maine/paid-family-leave.fr` (draft) | `Maine.Employment.PaidFamilyLeave` | 26 M.R.S. §§ 850-A to 850-J |
+| Maryland | `examples/states/maryland/wage-payment.fr` (draft) | `Maryland.Employment.WagePayment` | Md. Code, Lab. & Empl. §§ 3-502, 3-505, 3-507.2 |
+| Massachusetts | `examples/states/massachusetts/pfml.fr` (draft) | `Massachusetts.Employment.PFML` | M.G.L. c. 175M §§ 2–6 |
 | Michigan | `examples/states/michigan/no-fault-pip.fr` | `Michigan.Insurance.NoFaultPIP` | MCL 500.3105, 500.3107 |
-| Minnesota | `examples/states/minnesota/security-deposit.fr` | `Minnesota.Housing.SecurityDeposit` | Minn. Stat. § 504B.178 |
-| Mississippi | `examples/states/mississippi/eviction.fr` | `Mississippi.Housing.Eviction` | Miss. Code Ann. §§ 89-8-13, 89-8-19, 89-8-39 |
-| Missouri | `examples/states/missouri/security-deposit.fr` | `Missouri.Housing.SecurityDeposit` | Mo. Rev. Stat. § 535.300 |
-| Montana | `examples/states/montana/wrongful-discharge.fr` | `Montana.Employment.WrongfulDischarge` | Mont. Code Ann. §§ 39-2-903 to 39-2-912 |
-| Nebraska | `examples/states/nebraska/wage-payment.fr` | `Nebraska.Employment.WagePayment` | Neb. Rev. Stat. §§ 48-1229 to 48-1234 |
-| Nevada | `examples/states/nevada/security-deposit.fr` | `Nevada.Housing.SecurityDeposit` | NRS 118A.240, 118A.242 |
-| New Hampshire | `examples/states/new-hampshire/wage-payment.fr` | `NewHampshire.Employment.WagePayment` | N.H. Rev. Stat. Ann. §§ 275:43, 275:44 |
-| New Jersey | `examples/states/new-jersey/security-deposit.fr` | `NewJersey.Housing.SecurityDeposit` | N.J.S.A. 46:8-21.1, 46:8-21.2 |
-| New Mexico | `examples/states/new-mexico/owner-resident.fr` | `NewMexico.Housing.OwnerResident` | NMSA 1978 §§ 47-8-18, 47-8-20, 47-8-37 |
-| New York | `examples/states/new-york/security-deposit-trust.fr` | `NewYork.Housing.SecurityDepositTrust` | N.Y. Gen. Oblig. Law §§ 7-103, 7-105 |
-| North Carolina | `examples/states/north-carolina/security-deposit.fr` | `NorthCarolina.Housing.SecurityDeposit` | N.C.G.S. §§ 42-50 to 42-55 |
-| North Dakota | `examples/states/north-dakota/homestead.fr` | `NorthDakota.Property.Homestead` | N.D. Const. art. XI, § 22 |
-| Ohio | `examples/states/ohio/security-deposit.fr` | `Ohio.Housing.SecurityDeposit` | Ohio Rev. Code § 5321.16 |
-| Oklahoma | `examples/states/oklahoma/wage-payment.fr` | `Oklahoma.Employment.WagePayment` | 40 O.S. §§ 165.2, 165.3 |
-| Oregon | `examples/states/oregon/no-cause-notice.fr` | `Oregon.Housing.NoCauseNotice` | ORS 90.427 |
-| Pennsylvania | `examples/states/pennsylvania/security-deposit.fr` | `Pennsylvania.Housing.SecurityDeposit` | 68 P.S. §§ 250.511a–250.512 |
-| Rhode Island | `examples/states/rhode-island/security-deposit.fr` | `RhodeIsland.Housing.SecurityDeposit` | R.I. Gen. Laws §§ 34-18-19, 34-18-24 |
-| South Carolina | `examples/states/south-carolina/residential-landlord.fr` | `SouthCarolina.Housing.ResidentialLandlord` | S.C. Code Ann. §§ 27-40-410, 27-40-710 |
+| Minnesota | `examples/states/minnesota/security-deposit.fr` (draft) | `Minnesota.Housing.SecurityDeposit` | Minn. Stat. § 504B.178 |
+| Mississippi | `examples/states/mississippi/eviction.fr` (draft) | `Mississippi.Housing.Eviction` | Miss. Code Ann. §§ 89-8-13, 89-8-19, 89-8-39 |
+| Missouri | `examples/states/missouri/security-deposit.fr` (draft) | `Missouri.Housing.SecurityDeposit` | Mo. Rev. Stat. § 535.300 |
+| Montana | `examples/states/montana/wrongful-discharge.fr` (draft) | `Montana.Employment.WrongfulDischarge` | Mont. Code Ann. §§ 39-2-903 to 39-2-912 |
+| Nebraska | `examples/states/nebraska/wage-payment.fr` (draft) | `Nebraska.Employment.WagePayment` | Neb. Rev. Stat. §§ 48-1229 to 48-1234 |
+| Nevada | `examples/states/nevada/security-deposit.fr` (draft) | `Nevada.Housing.SecurityDeposit` | NRS 118A.240, 118A.242 |
+| New Hampshire | `examples/states/new-hampshire/wage-payment.fr` (draft) | `NewHampshire.Employment.WagePayment` | N.H. Rev. Stat. Ann. §§ 275:43, 275:44 |
+| New Jersey | `examples/states/new-jersey/security-deposit.fr` (draft) | `NewJersey.Housing.SecurityDeposit` | N.J.S.A. 46:8-21.1, 46:8-21.2 |
+| New Mexico | `examples/states/new-mexico/owner-resident.fr` (draft) | `NewMexico.Housing.OwnerResident` | NMSA 1978 §§ 47-8-18, 47-8-20, 47-8-37 |
+| New York | `examples/states/new-york/security-deposit-trust.fr` (draft) | `NewYork.Housing.SecurityDepositTrust` | N.Y. Gen. Oblig. Law §§ 7-103, 7-105 |
+| North Carolina | `examples/states/north-carolina/security-deposit.fr` (draft) | `NorthCarolina.Housing.SecurityDeposit` | N.C.G.S. §§ 42-50 to 42-55 |
+| North Dakota | `examples/states/north-dakota/homestead.fr` (draft) | `NorthDakota.Property.Homestead` | N.D. Const. art. XI, § 22 |
+| Ohio | `examples/states/ohio/security-deposit.fr` (draft) | `Ohio.Housing.SecurityDeposit` | Ohio Rev. Code § 5321.16 |
+| Oklahoma | `examples/states/oklahoma/wage-payment.fr` (draft) | `Oklahoma.Employment.WagePayment` | 40 O.S. §§ 165.2, 165.3 |
+| Oregon | `examples/states/oregon/no-cause-notice.fr` (draft) | `Oregon.Housing.NoCauseNotice` | ORS 90.427 |
+| Pennsylvania | `examples/states/pennsylvania/security-deposit.fr` (draft) | `Pennsylvania.Housing.SecurityDeposit` | 68 P.S. §§ 250.511a–250.512 |
+| Rhode Island | `examples/states/rhode-island/security-deposit.fr` (draft) | `RhodeIsland.Housing.SecurityDeposit` | R.I. Gen. Laws §§ 34-18-19, 34-18-24 |
+| South Carolina | `examples/states/south-carolina/residential-landlord.fr` (draft) | `SouthCarolina.Housing.ResidentialLandlord` | S.C. Code Ann. §§ 27-40-410, 27-40-710 |
 | South Dakota | `examples/states/south-dakota/wage-payment.fr` | `SouthDakota.Employment.WagePayment` | S.D. Codified Laws §§ 60-11-9, 60-11-10 |
-| Tennessee | `examples/states/tennessee/urlta.fr` | `Tennessee.Housing.URLTA` | Tenn. Code Ann. § 66-28-301 et seq. |
-| Texas | `examples/states/texas/payday.fr` | `Texas.Employment.Payday` | Tex. Lab. Code ch. 61 |
-| Utah | `examples/states/utah/eviction.fr` | `Utah.Housing.Eviction` | Utah Code §§ 78B-6-802, 78B-6-811 |
-| Vermont | `examples/states/vermont/security-deposit.fr` | `Vermont.Housing.SecurityDeposit` | 9 V.S.A. §§ 4451, 4461 |
-| Virginia | `examples/states/virginia/vrlta-deposit.fr` | `Virginia.Housing.VRLTADeposit` | Va. Code § 55.1-1226 |
-| Washington | `examples/states/washington/paid-sick-leave.fr` | `Washington.Employment.PaidSickLeave` | RCW 49.46.210 |
-| West Virginia | `examples/states/west-virginia/final-wages.fr` | `WestVirginia.Employment.FinalWages` | W. Va. Code § 21-5-4 |
-| Wisconsin | `examples/states/wisconsin/security-deposit.fr` | `Wisconsin.Housing.SecurityDeposit` | Wis. Stat. § 704.28; ATCP 134.06 |
-| Wyoming | `examples/states/wyoming/wage-payment.fr` | `Wyoming.Employment.WagePayment` | Wyo. Stat. § 27-4-104 |
+| Tennessee | `examples/states/tennessee/urlta.fr` (draft) | `Tennessee.Housing.URLTA` | Tenn. Code Ann. § 66-28-301 et seq. |
+| Texas | `examples/states/texas/payday.fr` (draft) | `Texas.Employment.Payday` | Tex. Lab. Code ch. 61 |
+| Utah | `examples/states/utah/eviction.fr` (draft) | `Utah.Housing.Eviction` | Utah Code §§ 78B-6-802, 78B-6-811 |
+| Vermont | `examples/states/vermont/security-deposit.fr` (draft) | `Vermont.Housing.SecurityDeposit` | 9 V.S.A. §§ 4451, 4461 |
+| Virginia | `examples/states/virginia/vrlta-deposit.fr` (draft) | `Virginia.Housing.VRLTADeposit` | Va. Code § 55.1-1226 |
+| Washington | `examples/states/washington/paid-sick-leave.fr` (draft) | `Washington.Employment.PaidSickLeave` | RCW 49.46.210 |
+| West Virginia | `examples/states/west-virginia/final-wages.fr` (draft) | `WestVirginia.Employment.FinalWages` | W. Va. Code § 21-5-4 |
+| Wisconsin | `examples/states/wisconsin/security-deposit.fr` (draft) | `Wisconsin.Housing.SecurityDeposit` | Wis. Stat. § 704.28; ATCP 134.06 |
+| Wyoming | `examples/states/wyoming/wage-payment.fr` (draft) | `Wyoming.Employment.WagePayment` | Wyo. Stat. § 27-4-104 |
 
-Check any row the same way:
+The rows not marked (draft) check clean:
 
-```
-fidryn check examples/states/georgia/dispossessory.fr
+```sh
+fidryn check examples/states/arkansas/homestead.fr
+fidryn check examples/states/colorado/famli.fr
+fidryn check examples/states/florida/homestead.fr
+fidryn check examples/states/idaho/noncompete.fr
+fidryn check examples/states/kansas/homestead.fr
 fidryn check examples/states/louisiana/community-property.fr
 fidryn check examples/states/michigan/no-fault-pip.fr
-fidryn check examples/states/montana/wrongful-discharge.fr
-fidryn check examples/states/oregon/no-cause-notice.fr
-fidryn check examples/states/texas/payday.fr
+fidryn check examples/states/south-dakota/wage-payment.fr
 ```
 
 ## Independent programs
 
 `tests/programs/` holds small modules that exercise the interpreter.
-They are not jurisdiction slices. They declare `outside_scope`, they
-have no `cases/` directory, and `fidryn run` cannot be aimed at them
-without a case JSON you write yourself. Check them:
+They are not jurisdiction slices. They declare `outside_scope`. The
+directory ships an empty case record, `tests/programs/cases/empty.json`,
+with no facts, evidence or completions. Every query in these programs
+runs against it and exits 0; a query that needs something the record
+does not hold is suspended. Check them:
 
-```
+```sh
 fidryn check tests/programs/eligibility-succession.fr
 fidryn check tests/programs/named-decision.fr
 fidryn check tests/programs/two-offices.fr
@@ -3005,6 +3421,16 @@ fidryn check tests/programs/require-gate.fr
 fidryn check tests/programs/late-payment.fr
 fidryn check tests/programs/late-payment-extended.fr
 fidryn check tests/programs/transaction-atomic.fr
+```
+
+Run one against the empty case record:
+
+```sh
+fidryn run tests/programs/late-payment.fr \
+  --query obligation_status \
+  --case tests/programs/cases/empty.json \
+  --valid-at 2026-09-17T12:00:00Z \
+  --known-at 2026-09-17T12:00:00Z
 ```
 
 | Path | Purpose |
@@ -3015,7 +3441,7 @@ fidryn check tests/programs/transaction-atomic.fr
 | `tests/programs/require-gate.fr` | Query `q` is `require true; return 7`. Query `r` is `require false; return 7`. False require does not run the return. |
 | `tests/programs/late-payment.fr` | `PayInvoice` duty, `TimelyPayment` decision, and `DeadlineMeaning` (strict versus 15 counted days). Queries `due`, `paid_on_time`, `obligation_status`. |
 | `tests/programs/late-payment-extended.fr` | Same duty shape with `due 15 counted_days after invoice_date` and no competing deadline family. |
-| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` returns `Bool`. Partial surface — not a general transaction engine. |
+| `tests/programs/transaction-atomic.fr` | `transaction` block that attaches then discharges a `pay` duty; query `q` is declared `-> DutyStatus`. Partial surface — not a general transaction engine. |
 
 ## Honesty
 
@@ -3036,7 +3462,7 @@ official editions.
 **Not the United States Code.** The United States Code is a codification
 of statutes, not the whole of federal law. Regulations, case law,
 internal guidance, and uncodified provisions sit elsewhere. This corpus
-encodes bounded high-impact slices. `US.Federal.Code.Catalog` exists so
+encodes bounded slices of the law. `US.Federal.Code.Catalog` exists so
 the interpreter cannot honestly claim completeness.
 
 `run` never chooses a completion. Open-textured queries must be allowed
@@ -3057,13 +3483,17 @@ author: "Bryan Gass"
 
 # Contributing to Fidryn
 
-This file is for people building the v0.1 reference interpreter. It is
+This file is for people building the 0.2 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](https://github.com/BeeGass/fidryn/blob/main/README.md) and the [documentation hub](https://fidryn.onlygass.dev/docs/index.md).
 
 Fidryn (FID-rin) is a research fixture. Modules under `examples/` and
 records under `tests/` exercise the interpreter. They are not operative
 instruments and not a complete statement of any jurisdiction's law.
+
+Fidryn is released under the MIT License. Licensing and contribution
+rights are described in [Licensing](https://github.com/BeeGass/fidryn/blob/main/LICENSING.md). Contributions are
+accepted under the same license; no separate agreement is required.
 
 ## Toolchain
 
@@ -3082,20 +3512,23 @@ at Command Line Tools clang because the Xcode license is unsigned.
 From the repository root:
 
 ```
-cargo fmt
-cargo clippy --workspace -- -D warnings
-cargo test --workspace --offline
+cargo fmt --all
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci` runs the tests and clippy, then the conformance
-probes and the Python checks (ruff and mypy), the site check, the
-JavaScript tests when Node is installed, and a bench build;
-`cargo xtask ci --fmt` also checks Rust formatting first. The Python steps
-need [uv](https://docs.astral.sh/uv/): `uv run` provides the Python
-that `.python-version` names and the packages `uv.lock` pins. GitHub
-Actions runs `cargo xtask ci --fmt` on every push to `main` and every
-pull request (`.github/workflows/ci.yml`); the runner builds its own
-`.venv` from `uv.lock`, and nothing it builds is committed.
+`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
+Rustdoc with warnings denied, executable schema probes, Python lint/format/types
+and probe controls, required JavaScript tests, generated-site consistency, the
+example status and documentation checks described below, and benchmark
+compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
+qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+
+GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
+Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
+and CodeQL. Development and native branch protections are described in
+[Development and promotion](https://github.com/BeeGass/fidryn/blob/main/docs/development.md). Generated environments and build
+outputs are not committed.
 
 Do not weaken no-false-determinacy to make a test pass.
 
@@ -3116,9 +3549,55 @@ change in semantics also makes the site stale.
 
 The stylesheet and script in `site/assets/` are written by hand. The
 mill, whose page lives in [`web/`](https://github.com/BeeGass/fidryn/tree/main/web/), embeds the stylesheet
-`fidryn.css` and has its own script, `web/mill.js`. When Node is
-installed, `cargo xtask ci` also runs the JavaScript unit tests in
-`web/tests/`; Node is never needed to build or serve anything.
+`fidryn.css` and has its own script, `web/mill.js`. `cargo xtask ci` requires Node to run the JavaScript unit tests in
+`web/tests/`; Node is not needed to build or serve the interpreter.
+
+## Example status and documentation checks
+
+`cargo xtask examples` runs `fidryn check` on every `.fr` file under
+`examples/`, `packages/`, `prelude/` and `tests/programs/`, and fails when
+the recorded result is out of date. The record is `examples/status.json`
+and `examples/STATUS.md`; the status sentence between the
+`examples-status` markers in `README.md`, `examples/README.md`,
+`examples/states/README.md` and `docs/examples.md`; and the ` (draft)`
+mark after each path of a failing file that `README.md`,
+`examples/README.md`, `examples/states/README.md` or a Markdown file
+directly under `docs/` mentions outside a code block. Do not edit any of these by
+hand. `cargo xtask examples --update` rewrites the status files, the
+status sentences and the draft marks. Run `cargo xtask site` after it,
+because the site is generated from the guides it rewrites.
+
+`cargo xtask docs` reads the Markdown in `README.md`, `LICENSING.md`,
+`CHANGELOG.md`, `SECURITY.md`, `docs/`, `examples/`, `packages/`,
+`conformance/` and `site/README.md`. It checks that every relative link
+resolves, that every untagged or `fidryn`-tagged code block that starts
+with `module` passes the checker, and that the `fidryn` commands in
+blocks tagged `sh` behave as the tag says. `--skip-commands` leaves out
+the commands.
+
+A code block that shows a `fidryn` command takes one of these tags:
+
+- `sh`: the check runs each `fidryn` command in the block from the
+  repository root and expects exit status 0. A command is a line, with
+  lines ending in `\` joined, that starts with `fidryn` or with
+  `cargo run -p fidryn-cli --`; the check runs the built `fidryn` binary
+  with the words after that prefix. A line in an `sh` block that is not a
+  `fidryn` command, such as `cargo test --workspace --locked`, is not run.
+  A command with `ui` as one of its words is taken to start the mill, so
+  it is not run either. The check does not use a shell, so a command
+  must not use `>`, `>>`, `<`, `|`, `&&`, `||` or `;`. A command that has
+  not exited after 60 seconds is stopped and reported.
+- `sh exit=N`: the same, but each command must exit with status `N`. A
+  tag whose first word is `sh` and which is neither `sh` nor `sh exit=N`
+  with `N` an integer, such as `sh exit 1`, is reported.
+- `text`: the block is shown and not run. Use it for placeholders such as
+  `PATH`, for output redirection, and for commands that cannot run
+  unattended.
+
+A block with any other tag, such as `shell`, or with none, must not show
+a `fidryn` command. Such a tag is not itself reported, but a block under
+it that shows a `fidryn` command is reported as an untagged block would
+be.
 
 ## Pipeline
 
@@ -3175,15 +3654,20 @@ or outcome matches is not a passing test.
 
 ## Commits
 
-Use Conventional Commits (`feat(syntax): ...`, `fix(eval): ...`,
-`test(cli): ...`, `docs: ...`). Prefer atomic commits in pipeline order,
-then tests and docs. Do not dump unrelated crates into one commit.
+Write each commit subject as an imperative sentence with no type prefix,
+for example `Require code-scanning findings to pass before promotion`.
+Recent history follows this; older commits used Conventional Commits
+prefixes such as `feat(syntax):`, which are no longer used. Prefer atomic
+commits in pipeline order, then tests and docs. Do not dump unrelated
+crates into one commit.
 
 ## Grammar
 
-The closed v0.1 grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the
-repository root. Unknown body fields are parse errors, not extension
-points.
+The grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf) at the repository root.
+It is closed, but the 0.2 parser enforces closed field sets only in
+`source` blocks, rule bodies and judgment request blocks. In most other
+declarations an unknown field is skipped without a diagnostic; see
+[implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md).
 
 ## Implementer documents
 
@@ -3191,10 +3675,11 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — Evidence-backed capability matrix. A `.fr` file is not an executable specification.
-- [OBLIGATIONS.md](https://github.com/BeeGass/fidryn/blob/main/docs/OBLIGATIONS.md) — Review obligation matrix. Green workspace tests are regressions, not language closure.
-- [WORKSTREAM-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/WORKSTREAM-CONTRACT.md) — Shared types and acceptance for covering certificates, `seq`/`require`, tax, and trust profiles.
-- [INTEGRATION-CONTRACT.md](https://github.com/BeeGass/fidryn/blob/main/docs/INTEGRATION-CONTRACT.md) — Wire existing machinery into ordinary compile, eval, and CLI paths. Do not reimplement helpers.
+- [implementation-status.md](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
+
+The internal working ledgers are indexed in
+[internal/README.md](https://github.com/BeeGass/fidryn/blob/main/docs/internal/README.md). They are not reader
+documentation, and parts of them describe earlier states of the code.
 
 Mill HTTP routes are documented in [mill.md](https://fidryn.onlygass.dev/docs/mill.md), not in
 ARCHITECTURE.md.

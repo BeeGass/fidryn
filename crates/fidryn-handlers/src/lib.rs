@@ -1,5 +1,8 @@
 //! CaseFile, Scenario, Explore, and Skeptical handlers.
 
+mod exploration;
+pub use exploration::aggregate_completions;
+
 use fidryn_core::case::CaseDetermination;
 use fidryn_core::ir::CoreConflictDoctrine;
 use fidryn_core::outcome::OpenRequest;
@@ -53,6 +56,19 @@ impl Handler for CaseFile {
     fn handle_determine(&mut self, request: &OpenRequest) -> HandlerResult {
         match request {
             OpenRequest::NeedJudgment { protocol, issue } => {
+                if determination_conflicts(&self.record, protocol, issue, self.known_at) {
+                    return HandlerResult::Suspend {
+                        requests: BTreeSet::from([OpenRequest::NeedConflict {
+                            graph: vec![format!(
+                                "conflicting determinations for {} under {protocol}",
+                                format_prop_term(issue)
+                            )],
+                            doctrines: Vec::new(),
+                        }]),
+                        reason: SuspensionReason::OpenBranch,
+                        trace_fragment: format!("conflicting-judgments:{protocol}"),
+                    };
+                }
                 match self.visible_determination(protocol, issue) {
                     Some(d) if d.established => HandlerResult::Resume {
                         value: Value::Bool(true),
@@ -457,6 +473,28 @@ fn term_mentions_subject(term: &Term, subject: &str) -> bool {
     }
 }
 
+fn determination_conflicts(
+    record: &CaseRecord,
+    protocol: &str,
+    issue: &PropTerm,
+    known_at: Option<Instant>,
+) -> bool {
+    let mut established = false;
+    let mut denied = false;
+    for determination in &record.determinations {
+        if determination.protocol == protocol
+            && !determination.protocol.trim().is_empty()
+            && !determination.decider.trim().is_empty()
+            && judgment_issue_matches(&determination.issue, issue)
+            && FrozenCaseView::determination_is_known(determination.recorded_at, known_at)
+        {
+            established |= determination.established;
+            denied |= !determination.established;
+        }
+    }
+    established && denied
+}
+
 fn matching_determination<'a>(
     record: &'a CaseRecord,
     protocol: &str,
@@ -465,6 +503,8 @@ fn matching_determination<'a>(
 ) -> Option<&'a CaseDetermination> {
     record.determinations.iter().find(|determination| {
         determination.protocol == protocol
+            && !determination.protocol.trim().is_empty()
+            && !determination.decider.trim().is_empty()
             && judgment_issue_matches(&determination.issue, issue)
             && FrozenCaseView::determination_is_known(determination.recorded_at, known_at)
     })
@@ -489,7 +529,8 @@ fn format_prop_term(issue: &PropTerm) -> String {
 
 fn format_term(term: &Term) -> String {
     match term {
-        Term::Ident(name) | Term::String(name) | Term::Binder(name) => name.clone(),
+        Term::Ident(name) | Term::Binder(name) => name.clone(),
+        Term::String(name) => format!("{name:?}"),
         Term::Bool(value) => value.to_string(),
         Term::Int(value) => value.to_string(),
         Term::Decimal(value) => value.to_string(),
@@ -504,7 +545,27 @@ fn format_term(term: &Term) -> String {
 }
 
 fn compact_issue(label: &str) -> String {
-    label.chars().filter(|c| !c.is_whitespace()).collect()
+    let mut quoted = None;
+    let mut escaped = false;
+    label
+        .chars()
+        .filter(|c| {
+            if let Some(quote) = quoted {
+                if escaped {
+                    escaped = false;
+                } else if *c == '\\' {
+                    escaped = true;
+                } else if *c == quote {
+                    quoted = None;
+                }
+                return true;
+            }
+            if *c == '"' || *c == '\'' {
+                quoted = Some(*c);
+            }
+            !c.is_whitespace()
+        })
+        .collect()
 }
 
 fn recorded_conflict(
@@ -1243,6 +1304,35 @@ mod tests {
         match h.handle_determine(&need_eligible("Alice")) {
             HandlerResult::Resume { value, .. } => assert_eq!(value, Value::Bool(true)),
             other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn opposing_determinations_suspend_in_both_record_orders() {
+        let positive = CaseDetermination {
+            issue: "Eligible(Alice)".into(),
+            protocol: "Eligibility".into(),
+            established: true,
+            decider: "CourtA".into(),
+            recorded_at: None,
+        };
+        let negative = CaseDetermination {
+            established: false,
+            decider: "CourtB".into(),
+            ..positive.clone()
+        };
+        for determinations in [
+            vec![positive.clone(), negative.clone()],
+            vec![negative, positive],
+        ] {
+            let record = CaseRecord {
+                determinations,
+                ..CaseRecord::default()
+            };
+            let mut handler = CaseFile::new(record);
+            assert!(
+                matches!(handler.handle_determine(&need_eligible("Alice")), HandlerResult::Suspend { requests, .. } if requests.iter().any(|request| matches!(request, OpenRequest::NeedConflict { .. })))
+            );
         }
     }
 

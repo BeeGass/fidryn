@@ -1,8 +1,7 @@
 //! Local mill: localhost-only web UI. Never live-files.
 
 use crate::{
-    EngineFailure, compile_source, explore_report, merge_bounds_json, opinion, parse_instant,
-    render_report,
+    EngineFailure, compile_source, explore_report_traced, merge_bounds_json, opinion, parse_instant,
 };
 use axum::Router;
 use axum::extract::{Json, Path, State};
@@ -10,11 +9,10 @@ use axum::http::{StatusCode, header};
 use axum::response::{Html, IntoResponse, Response};
 use axum::routing::{get, post};
 use fidryn_core::{
-    CaseRecord, CoreModule, Diagnostic, EvaluationReport, Instant, QueryName, RunContext,
-    SourceManifest, TrustProfile,
+    CaseRecord, CoreModule, Diagnostic, EvaluationReport, QueryName, RunContext, SourceManifest,
+    TrustProfile,
 };
 use fidryn_driver::Driver;
-use fidryn_render::{module_vars, render};
 use serde::{Deserialize, Serialize};
 use std::io::ErrorKind;
 use std::net::{Ipv4Addr, SocketAddr};
@@ -99,6 +97,7 @@ pub fn router() -> Router {
         .route("/api/health", get(health))
         .route("/api/samples", get(samples))
         .route("/api/check", post(check))
+        .route("/api/inputs", post(inputs_api))
         .route("/api/run", post(run))
         .route("/api/explore", post(explore))
         .route("/api/render", post(render_api))
@@ -261,8 +260,8 @@ const SAMPLES: &[Sample] = &[
         source: TRUST_SOURCE,
         case: include_str!("../../../examples/trust/cases/two-certificates-open-eligibility.json"),
         query: "acting_trustee",
-        valid_at: "2034-03-01T09:00:00Z",
-        known_at: "2034-03-01T09:00:00Z",
+        valid_at: "2026-08-24T09:00:00Z",
+        known_at: "2026-08-24T09:00:00Z",
         action: "run",
         expect: "contingent",
     },
@@ -273,8 +272,8 @@ const SAMPLES: &[Sample] = &[
         source: TRUST_SOURCE,
         case: include_str!("../../../examples/trust/cases/court-selects-i2.json"),
         query: "acting_trustee",
-        valid_at: "2034-03-01T09:00:00Z",
-        known_at: "2034-03-01T09:00:00Z",
+        valid_at: "2026-08-24T09:00:00Z",
+        known_at: "2026-08-24T09:00:00Z",
         action: "run",
         expect: "determinate",
     },
@@ -285,8 +284,8 @@ const SAMPLES: &[Sample] = &[
         source: TRUST_SOURCE,
         case: include_str!("../../../examples/trust/cases/one-certificate.json"),
         query: "acting_trustee",
-        valid_at: "2034-03-01T09:00:00Z",
-        known_at: "2034-03-01T09:00:00Z",
+        valid_at: "2026-08-24T09:00:00Z",
+        known_at: "2026-08-24T09:00:00Z",
         action: "run",
         expect: "suspended",
     },
@@ -305,6 +304,8 @@ struct CheckRequest {
 struct CheckResponse {
     ok: bool,
     diagnostics: Vec<Diagnostic>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    locations: Option<serde_json::Value>,
 }
 
 /// Compile pasted mill source in memory only.
@@ -323,11 +324,22 @@ fn mill_check(source: String) -> CheckResponse {
         Ok(_) => CheckResponse {
             ok: true,
             diagnostics: Vec::new(),
+            locations: None,
         },
-        Err(diagnostics) => CheckResponse {
-            ok: false,
-            diagnostics,
-        },
+        Err(mut diagnostics) => {
+            for diagnostic in &mut diagnostics {
+                if diagnostic.source_file.is_none() {
+                    diagnostic.source_file = Some("<memory>".into());
+                }
+            }
+            let sources = std::collections::BTreeMap::from([("<memory>".into(), source)]);
+            let locations = Some(crate::inputs::diagnostics_data(&diagnostics, &sources));
+            CheckResponse {
+                ok: false,
+                diagnostics,
+                locations,
+            }
+        }
     }
 }
 
@@ -342,8 +354,36 @@ async fn check(
             Json(CheckResponse {
                 ok: false,
                 diagnostics: Vec::new(),
+                locations: None,
             }),
         ),
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct InputsRequest {
+    source: String,
+    query: String,
+}
+
+async fn inputs_api(
+    State(state): State<MillState>,
+    Json(req): Json<InputsRequest>,
+) -> JsonResponse {
+    match mill_cpu(&state, move || match mill_compile(&req.source) {
+        Ok(module) => match crate::inputs::query_input_schema(&module, &req.query) {
+            Ok(schema) => (
+                StatusCode::OK,
+                Json(serde_json::json!({"ok":true,"schema":schema})),
+            ),
+            Err(error) => mill_err(StatusCode::BAD_REQUEST, error, Vec::new()),
+        },
+        Err(diagnostics) => mill_err(StatusCode::BAD_REQUEST, "check failed", diagnostics),
+    })
+    .await
+    {
+        Ok(response) => response,
+        Err(error) => mill_err(StatusCode::INTERNAL_SERVER_ERROR, error, Vec::new()),
     }
 }
 
@@ -356,6 +396,8 @@ struct EvalRequest {
     case: serde_json::Value,
     #[serde(default)]
     bounds: Option<serde_json::Value>,
+    #[serde(default)]
+    budget: Option<u32>,
     valid_at: String,
     known_at: String,
 }
@@ -366,6 +408,8 @@ type JsonResponse = (StatusCode, Json<serde_json::Value>);
 struct RenderRequest {
     source: String,
     template: String,
+    #[serde(default)]
+    data: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize)]
@@ -437,12 +481,53 @@ fn mill_engine_err(err: &EngineFailure) -> JsonResponse {
 fn mill_report_doc(
     module: &CoreModule,
     query: &QueryName,
-    valid: Instant,
-    known: Instant,
+    ctx: &RunContext,
     case: &CaseRecord,
     report: &EvaluationReport,
+    derivation: Option<&[fidryn_eval::DerivationStep]>,
+    exploration: Option<&fidryn_core::CompletionSearchEvidence>,
 ) -> JsonResponse {
-    let text = render_report(module, query, valid, known, case, report);
+    let checked = match exploration {
+        Some(evidence) => fidryn_kernel::CheckedEvaluation::validate_exploration(
+            module,
+            query,
+            case,
+            ctx,
+            &std::collections::BTreeMap::new(),
+            report.execution_mode,
+            None,
+            evidence,
+            report.clone(),
+        ),
+        None => fidryn_kernel::CheckedEvaluation::validate(
+            module,
+            query,
+            case,
+            ctx,
+            &std::collections::BTreeMap::new(),
+            report.execution_mode,
+            None,
+            report.clone(),
+        ),
+    };
+    let text = match checked
+        .and_then(|checked| {
+            fidryn_trace::render_checked_report(
+                module,
+                query,
+                ctx.valid_time,
+                ctx.record_time,
+                case,
+                &checked,
+            )
+        })
+        .and_then(|text| match derivation {
+            Some(steps) => crate::attach_derivation(&text, steps),
+            None => Ok(text),
+        }) {
+        Ok(text) => text,
+        Err(error) => return mill_err(StatusCode::INTERNAL_SERVER_ERROR, error, Vec::new()),
+    };
     match serde_json::from_str::<serde_json::Value>(&text) {
         Ok(report_json) => (
             StatusCode::OK,
@@ -500,19 +585,50 @@ fn eval_request(req: EvalRequest, explore_mode: bool) -> JsonResponse {
     };
     let ctx = RunContext::new(valid, known);
     let query = QueryName::from(req.query.as_str());
-    let mut report = if explore_mode {
-        match explore_report(&module, &query, &case, &ctx) {
-            Ok(report) => report,
+    if explore_mode && req.budget.is_some() {
+        return mill_err(
+            StatusCode::BAD_REQUEST,
+            "custom operation budgets are currently supported by run; exploration has its declared finite search bounds",
+            Vec::new(),
+        );
+    }
+    let (mut report, derivation, exploration) = if explore_mode {
+        match explore_report_traced(&module, &query, &case, &ctx) {
+            Ok((report, session)) => (report, Some(session.derivation), Some(session.evidence)),
             Err(err) => return mill_engine_err(&err),
         }
     } else {
-        match Driver::new().run_report(&module, query.as_str(), &case, &ctx) {
-            Ok(report) => report,
+        let mut driver = Driver::new();
+        let result = driver.run_report_with_budget(
+            &module,
+            query.as_str(),
+            &case,
+            &ctx,
+            !case.assumptions.is_empty(),
+            req.budget,
+        );
+        match result {
+            Ok(report) => {
+                let derivation = report
+                    .request
+                    .as_ref()
+                    .and_then(|request| driver.derivation_of(request))
+                    .map(<[_]>::to_vec);
+                (report, derivation, None)
+            }
             Err(err) => return mill_engine_err(&EngineFailure::from_err(err)),
         }
     };
     report.trust = TrustProfile::Unauthenticated;
-    mill_report_doc(&module, &query, valid, known, &case, &report)
+    mill_report_doc(
+        &module,
+        &query,
+        &ctx,
+        &case,
+        &report,
+        derivation.as_deref(),
+        exploration.as_ref(),
+    )
 }
 
 async fn run(State(state): State<MillState>, Json(req): Json<EvalRequest>) -> JsonResponse {
@@ -548,7 +664,7 @@ fn mill_render(req: RenderRequest) -> (StatusCode, Json<RenderResponse>) {
             );
         }
     };
-    match render(&req.template, &module_vars(&module)) {
+    match crate::render_with_data(&req.template, &module, req.data.as_ref()) {
         Ok(text) => (
             StatusCode::OK,
             Json(RenderResponse {
@@ -779,7 +895,7 @@ mod tests {
         let samples: serde_json::Value =
             serde_json::from_str(&body_text(response).await).expect("samples JSON");
         let gate = "2026-09-17T12:00:00Z";
-        let trust = "2034-03-01T09:00:00Z";
+        let trust = "2026-08-24T09:00:00Z";
         let trust_source = repo_text("examples/trust/bryan-revocable-trust.fr");
         let expected = serde_json::json!([
             {
@@ -957,7 +1073,7 @@ module Examples.T version "0.1.0" {
             report.get("ok").is_none(),
             "report schema forbids mill ok: {report}"
         );
-        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.2", "{json}");
         assert_eq!(report["executionMode"], mode, "{json}");
         assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
         assert_ne!(report["sourceTrust"], "byteVerified", "{json}");
@@ -993,6 +1109,34 @@ module Examples.T version "0.1.0" {
     }
 
     #[tokio::test]
+    async fn input_descriptions_and_editor_locations_follow_the_compiled_source() {
+        let source =
+            "module InputPanel version \"0.1.0\" { query q(count: Int) -> Int { return count } }";
+        let (status, response) = post_json(
+            "/api/inputs",
+            serde_json::json!({"source":source,"query":"q"}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::OK, "{response}");
+        assert_eq!(response["schema"]["x-fidryn-query"], "q");
+        assert_eq!(response["schema"]["required"], serde_json::json!(["count"]));
+        let (status,response)=post_json("/api/check",serde_json::json!({"source":"module Broken version \"0.1.0\" { query q() -> Bool { return (true } }"})).await;
+        assert_eq!(status, StatusCode::OK, "{response}");
+        assert_eq!(response["ok"], false);
+        assert_eq!(
+            response["locations"]["schema"],
+            "fidryn.editor-diagnostics/v0.1"
+        );
+        assert!(
+            response["locations"]["diagnostics"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|diagnostic| diagnostic["primary"]["location_available"] == true)
+        );
+    }
+
+    #[tokio::test]
     async fn pasted_run_with_assumptions_is_scenario() {
         let mut body = eval_body();
         body["case"] = serde_json::json!({
@@ -1006,7 +1150,7 @@ module Examples.T version "0.1.0" {
         assert_eq!(report["assumptions"][0]["payload"], true, "{json}");
         assert_eq!(report["sourceTrust"], "unauthenticated", "{json}");
         assert_ne!(report["sourceTrust"], "byteVerified", "{json}");
-        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.1", "{json}");
+        assert_eq!(report["schema"], "fidryn.evaluation-report/v0.2", "{json}");
         assert_eq!(
             report["outcomeDocument"]["schema"], "fidryn.outcome/v0.1",
             "{json}"
@@ -1030,7 +1174,7 @@ module Examples.T version "0.1.0" {
     fn flag_src() -> &'static str {
         r#"
 module Examples.T version "0.1.0" {
-    query q() -> Bool {
+    query q(flag: Bool) -> Bool {
         goal Evaluate { flag }
     }
 }
@@ -1050,7 +1194,7 @@ module Examples.T version "0.1.0" {
         content USD(100.00)
         due 30 counted_days after invoice_date
     }
-    query q() -> String {
+    query q() -> DutyState {
         goal Evaluate { duty_status(PayInvoice) }
     }
 }
@@ -1142,7 +1286,7 @@ module Examples.T version "0.1.0" {
         scenario_body["source"] = serde_json::json!(duty_src());
         scenario_body["case"] = attached_duty_case(serde_json::json!([{
             "id": "hyp-performed",
-            "payload": {"kind": "ctor", "data": {"name": "Performed", "fields": {}}}
+            "payload": {"name": "PayInvoice", "status": "Performed"}
         }]));
         let (status, json) = post_json("/api/run", scenario_body).await;
         assert_eq!(status, StatusCode::OK, "{json}");
@@ -1329,8 +1473,8 @@ module Examples.T version "0.1.0" {
             "source": TRUST_MODULE,
             "query": "acting_trustee",
             "case": case,
-            "validAt": "2034-03-01T09:00:00Z",
-            "knownAt": "2034-03-01T09:00:00Z"
+            "validAt": "2026-08-24T09:00:00Z",
+            "knownAt": "2026-08-24T09:00:00Z"
         });
         let (status, json) = post_json("/api/run", body).await;
         assert_eq!(status, StatusCode::OK, "{json}");
@@ -1342,6 +1486,9 @@ module Examples.T version "0.1.0" {
         assert_eq!(
             opinion_of(&json),
             [
+                "Evaluation mode: operative.",
+                "Source trust: unauthenticated.",
+                "Legal time: 2026-08-24T09:00:00Z; known at: 2026-08-24T09:00:00Z.",
                 "acting_trustee depends on SuccessorEligibility.",
                 "Under I1 it is Alice.",
                 "Under I2 it is Bob.",
@@ -1468,6 +1615,6 @@ module Examples.T version "0.1.0" {
             .unwrap();
         let mut buf = String::new();
         stream.read_to_string(&mut buf).unwrap();
-        assert!(buf.contains("ok"), "{buf}");
+        assert!(buf.contains("ok"), "mock health response must contain ok");
     }
 }

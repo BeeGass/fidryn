@@ -3,25 +3,207 @@
   "$id": "https://fidryn.dev/schemas/case-record-v0.1.json",
   "title": "fidryn.case-record/v0.1",
   "type": "object",
-  "required": ["schema", "admissibleCompletions"],
+  "required": [
+    "schema",
+    "admissibleCompletions"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema": { "const": "fidryn.case-record/v0.1" },
-    "module": { "type": "string" },
-    "facts": { "type": "object" },
-    "evidence": { "type": "array" },
-    "determinations": { "type": "array" },
-    "interpretations": { "type": "object" },
-    "decisions": { "type": "object" },
-    "closures": { "type": "array" },
-    "outsideScope": { "type": "array", "items": { "type": "string" } },
+    "schema": {
+      "const": "fidryn.case-record/v0.1"
+    },
+    "module": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "facts": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schema",
+          "value",
+          "observedAt"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "schema": {
+            "type": "string"
+          },
+          "value": true,
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "determinations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "issue",
+          "protocol",
+          "established",
+          "decider"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "issue": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "established": {
+            "type": "boolean"
+          },
+          "decider": {
+            "type": "string"
+          },
+          "recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "recordedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "interpretations": {
+      "type": "object"
+    },
+    "decisions": {
+      "type": "object"
+    },
+    "closures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "domain",
+          "closed"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "closed": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "outsideScope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "admissibleCompletions": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "interpretations": { "type": "object" },
-        "evidence": { "type": "object" },
-        "choices": { "type": "object" }
+        "interpretations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "responses"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "responses": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "effectOnValidTime": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "choices": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "validTime",
+          "recordTime",
+          "payload"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "validTime": {
+            "type": "object"
+          },
+          "recordTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payload": true
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "payload"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "payload": true
+        }
       }
     }
   }

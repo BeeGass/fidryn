@@ -24,11 +24,11 @@ runs them):
 uv run python conformance/probe_outcome_schema.py
 ```
 
-The probe checks `schemas/outcome-v0.1.json` against three malformed
-`fidryn.outcome/v0.1` documents (determinate without value / non-hex
-trace, ignored open issues without a certificate, tagged bool with a
-non-boolean). After the schema strengthening, all three should report
-`accepted_by_current_schema: false`.
+The probe checks `schemas/outcome-v0.1.json` against four malformed
+`fidryn.outcome/v0.1` documents: `determinate_without_value`,
+`invalid_trace`, `ignored_issue_without_certificate` and
+`ill_typed_tagged_value`. After the schema strengthening, all four should
+report `accepted_by_current_schema: false`.
 
 Evaluation-report and mill-transport probes (not invoked from cargo
 tests; `cargo xtask ci` runs them):

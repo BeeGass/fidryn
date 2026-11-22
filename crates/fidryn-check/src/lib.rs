@@ -16,20 +16,24 @@ use fidryn_core::{
     package_name_from_import, package_path_matches_import, packages_root,
 };
 use fidryn_hir::{
-    HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, collect_source_callees,
-    collect_term_callees, flatten_term_list, last_brace_inner, parse_type_name,
-    source_has_bare_prop_if, split_qname_type_args, term_as_name, term_has_bare_prop_guard,
+    HirEffect, HirFunction, HirImport, HirModule, HirQuery, HirQueryBody, HirRecordTypes,
+    angles_nest_too_deep, collect_term_callees, flatten_term_list, last_brace_inner,
+    parse_type_name, source_has_bare_prop_if, split_qname_type_args, structure_of, term_as_name,
+    term_has_bare_prop_guard, type_nests_too_deep, without_comments,
 };
 use fidryn_syntax::ast::Item;
 use fidryn_syntax::parse_file;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::io::ErrorKind;
-use std::path::{Path, PathBuf};
+use std::io::Read;
+use std::path::{Component, Path, PathBuf};
 
 /// Nested package linking on path compile. Mill / `check_source` never
 /// increment this: `source_root = None` does not walk `packages/`.
 const PACKAGE_LINK_DEPTH_CAP: usize = 8;
+const ARTIFACT_BYTE_LIMIT: u64 = 32 * 1024 * 1024;
+const MANIFEST_ARTIFACT_BYTE_LIMIT: u64 = 64 * 1024 * 1024;
 
 pub use fidryn_core::TrustProfile;
 
@@ -64,6 +68,9 @@ pub fn check(hir: &HirModule, manifest: &SourceManifest) -> Result<CoreModule, V
 /// unread hex artifact is [`TrustProfile::Unauthenticated`]. This profile
 /// is source-integrity only, not legal applicability or issuer authenticity.
 pub fn source_integrity(manifest: &SourceManifest, source_root: Option<&Path>) -> TrustProfile {
+    if validate_manifest_paths(manifest, source_root).is_err() {
+        return TrustProfile::Unauthenticated;
+    }
     let mut any_fixture = false;
     let mut hex_count = 0usize;
     let mut hex_verified = 0usize;
@@ -104,6 +111,8 @@ pub fn source_integrity(manifest: &SourceManifest, source_root: Option<&Path>) -
 /// a cycle or missing nested digest is E200) and unique declarations are
 /// merged into the importer. `source_root = None` never walks `packages/`.
 /// Unique names are kept as-is; collisions are E200.
+/// Artifact paths are relative, confined to the canonical root, and bounded.
+/// The filesystem is trusted against concurrent hostile symlink replacement.
 pub fn check_with_sources(
     hir: &HirModule,
     manifest: &SourceManifest,
@@ -121,7 +130,16 @@ fn check_module(
     seen: &mut BTreeSet<String>,
     depth: usize,
 ) -> Result<(CoreModule, LinkedImports), Vec<Diagnostic>> {
+    validate_manifest_paths(manifest, source_root)?;
     let mut diagnostics = hir.diagnostics.clone();
+    if types_nest_too_deep(hir) {
+        // The checks below read these types, so they are not run.
+        diagnostics.push(Diagnostic::new(
+            DiagnosticCode::E100,
+            "type nesting exceeds the limit of 128",
+        ));
+        return Err(diagnostics);
+    }
     check_nominations(hir, &mut diagnostics);
     check_imports(hir, manifest, source_root, &mut diagnostics);
     let linked = if link_imports {
@@ -133,6 +151,7 @@ fn check_module(
     check_doctrines(hir, &mut diagnostics);
     check_recursion(hir, &mut diagnostics);
     check_sources(hir, &mut diagnostics);
+    check_type_environment(&hir.types, &mut diagnostics);
     check_instantiation_arity(hir, &mut diagnostics);
     if has_errors(&diagnostics) {
         return Err(diagnostics);
@@ -147,6 +166,82 @@ fn check_module(
         None => core,
     };
     Ok((core, linked))
+}
+
+/// The types of a list of parameters or fields, as their text.
+fn types_of(params: &[(String, String)]) -> impl Iterator<Item = &str> {
+    params.iter().map(|(_, ty)| ty.as_str())
+}
+
+/// True when a type of the module nests its arguments deeper than the
+/// parser lets a type nest.
+///
+/// The parser refuses such a type where it reads one. The lowering takes
+/// other types out of text the parser has stepped over, the operation of an
+/// `effect` among them, and hands every type on as its text. All of them
+/// are looked at here, before the checker reads any. The levels of the
+/// types of an effect are also counted over the whole texts its readers
+/// take them out of, because the readers cut some types short.
+fn types_nest_too_deep(hir: &HirModule) -> bool {
+    if hir
+        .effects
+        .values()
+        .flat_map(|effect| effect_operation_texts(&effect.source))
+        .any(angles_nest_too_deep)
+    {
+        return true;
+    }
+    let effect_params: Vec<(String, String)> = hir
+        .effects
+        .values()
+        .flat_map(|effect| source_param_texts(&effect.source))
+        .collect();
+    let queries = hir
+        .queries
+        .values()
+        .flat_map(|query| types_of(&query.params).chain([query.result_type.as_str()]));
+    let functions = hir
+        .functions
+        .values()
+        .flat_map(|function| types_of(&function.params).chain([function.result_type.as_str()]));
+    let decisions = hir
+        .decisions
+        .iter()
+        .flat_map(|decision| types_of(&decision.params).chain(decision.result_type.as_deref()));
+    let judgments = hir
+        .judgments
+        .iter()
+        .flat_map(|judgment| types_of(&judgment.params).chain(types_of(&judgment.records)));
+    let effects = hir
+        .effects
+        .values()
+        .map(|effect| effect.result_type.as_str())
+        .chain(types_of(&effect_params));
+    let lists = hir
+        .propositions
+        .values()
+        .chain(hir.record_types.values().map(|(_, fields)| fields))
+        .chain(hir.callable_signatures.values().map(|(params, _)| params))
+        .chain(hir.rules.iter().map(|rule| &rule.typed_binders))
+        .chain(hir.duties.iter().map(|duty| &duty.params))
+        .chain(
+            hir.observations
+                .iter()
+                .map(|observation| &observation.params),
+        )
+        .flat_map(|list| types_of(list));
+    let imports = hir.imports.iter().flat_map(|import| &import.type_args);
+    hir.entities
+        .values()
+        .chain(imports)
+        .map(String::as_str)
+        .chain(lists)
+        .chain(queries)
+        .chain(functions)
+        .chain(decisions)
+        .chain(judgments)
+        .chain(effects)
+        .any(type_nests_too_deep)
 }
 
 fn has_errors(diagnostics: &[Diagnostic]) -> bool {
@@ -185,7 +280,7 @@ fn instantiated_module_name(base: &str, args: &[Type]) -> String {
         format!(
             "{base}<{}>",
             args.iter()
-                .map(ToString::to_string)
+                .map(source_type_name)
                 .collect::<Vec<_>>()
                 .join(", ")
         )
@@ -223,6 +318,39 @@ pub fn substitute_type(ty: Type, params: &[String], args: &[Type]) -> Type {
     substitute_nominal(ty, params, args)
 }
 
+fn check_type_environment(
+    environment: &fidryn_core::types::TypeEnvironment,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
+    for (name, (parameters, definition)) in environment {
+        let ty = if parameters.is_empty() {
+            Type::Sort(Sort::Nominal(name.clone()))
+        } else {
+            Type::Applied {
+                ctor: name.clone(),
+                args: parameters
+                    .iter()
+                    .map(|parameter| Type::Sort(Sort::Nominal(parameter.clone())))
+                    .collect(),
+            }
+        };
+        if let Err(error) = fidryn_core::types::resolve_aliases(&ty, environment) {
+            diagnostics.push(Diagnostic::new(DiagnosticCode::E210, error));
+        }
+        if let fidryn_core::ir::TypeDefinition::Sum(variants) = definition {
+            let mut declared = BTreeSet::new();
+            for variant in variants {
+                if !declared.insert(&variant.name) {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E200,
+                        format!("duplicate constructor `{}` in `{name}`", variant.name),
+                    ));
+                }
+            }
+        }
+    }
+}
+
 fn check_nominations(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
     let mut ranks: BTreeMap<(String, i64), Vec<String>> = BTreeMap::new();
     for n in &hir.nominations {
@@ -255,11 +383,17 @@ fn check_queries(
     for (name, function) in imported_functions {
         functions.entry(name.clone()).or_insert(function.clone());
     }
-    let entities: BTreeMap<String, Type> = hir
+    let mut entities: BTreeMap<String, Type> = hir
         .entities
         .iter()
         .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
         .collect();
+    for source in &hir.sources {
+        entities.insert(source.name.clone(), Type::Primitive(PrimitiveType::String));
+    }
+    for clause in hir.clauses.keys() {
+        entities.insert(clause.clone(), Type::Sort(Sort::ClauseRef));
+    }
     for q in hir.queries.values() {
         if !query_declares_goal(q) {
             diagnostics.push(Diagnostic::new(
@@ -284,6 +418,10 @@ fn check_queries(
             let cx = TypeCheck {
                 functions: &functions,
                 propositions: &propositions,
+                proposition_params: &hir.propositions,
+                record_types: &hir.record_types,
+                type_declarations: &hir.types,
+                callable_signatures: &hir.callable_signatures,
                 entities: &entities,
                 effects: &hir.effects,
                 locals: &locals,
@@ -293,9 +431,27 @@ fn check_queries(
                 term,
                 &parse_type_name(&q.result_type),
                 "query",
-                true,
+                false,
                 diagnostics,
             );
+        }
+        if let HirQueryBody::Goal { fields, .. } = &q.body
+            && let Some(prefix) = fields.get("$prefix")
+        {
+            let locals = locals_from_params(&q.params);
+            let cx = TypeCheck {
+                functions: &functions,
+                propositions: &propositions,
+                proposition_params: &hir.propositions,
+                record_types: &hir.record_types,
+                type_declarations: &hir.types,
+                callable_signatures: &hir.callable_signatures,
+                entities: &entities,
+                effects: &hir.effects,
+                locals: &locals,
+                owner: &q.name,
+            };
+            let _ = cx.infer(prefix, diagnostics);
         }
     }
     for f in hir.functions.values() {
@@ -312,6 +468,10 @@ fn check_queries(
         let cx = TypeCheck {
             functions: &functions,
             propositions: &propositions,
+            proposition_params: &hir.propositions,
+            record_types: &hir.record_types,
+            type_declarations: &hir.types,
+            callable_signatures: &hir.callable_signatures,
             entities: &entities,
             effects: &hir.effects,
             locals: &locals,
@@ -324,6 +484,202 @@ fn check_queries(
             false,
             diagnostics,
         );
+        if f.is_calc && !inferred.function(&f.name).is_empty() {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E420,
+                format!("calc `{}` must be effect-free", f.name),
+            ));
+        }
+    }
+    for rule in &hir.rules {
+        let mut locals = locals_from_params(&rule.typed_binders);
+        if let Some(selection) = &rule.selection {
+            let cx = TypeCheck {
+                functions: &functions,
+                propositions: &propositions,
+                proposition_params: &hir.propositions,
+                record_types: &hir.record_types,
+                type_declarations: &hir.types,
+                callable_signatures: &hir.callable_signatures,
+                entities: &entities,
+                effects: &hir.effects,
+                locals: &locals,
+                owner: &rule.name,
+            };
+            if let Some(Type::Primitive(
+                PrimitiveType::FiniteSet { inner } | PrimitiveType::NonEmptySet { inner },
+            )) = cx.infer(&selection.finite_domain, diagnostics)
+            {
+                locals.insert(selection.binder.clone(), *inner);
+            } else {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "selection requires a typed finite domain",
+                ));
+            }
+        }
+        let cx = TypeCheck {
+            functions: &functions,
+            propositions: &propositions,
+            proposition_params: &hir.propositions,
+            record_types: &hir.record_types,
+            type_declarations: &hir.types,
+            callable_signatures: &hir.callable_signatures,
+            entities: &entities,
+            effects: &hir.effects,
+            locals: &locals,
+            owner: &rule.name,
+        };
+        for term in &rule.guard_terms {
+            cx.check_bool_condition("rule guard", term, diagnostics);
+        }
+        if let Some(selection) = &rule.selection {
+            cx.check_bool_condition("selection predicate", &selection.predicate, diagnostics);
+        }
+        for (operation, prop) in rule.consequences.iter().chain(&rule.fallback) {
+            // A consequence with no arguments is a bare name, and any
+            // capitalized name with no arguments is read as a proposition.
+            // One that is declared as something else, an entity for
+            // example, is not a proposition. That holds for each of the
+            // verbs, so the test stands before the one for `create Duty`.
+            if prop.arguments.is_empty()
+                && let Some(ty) = cx.infer_ident(&prop.predicate)
+                && !ty.is_prop()
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "`{operation} {}` in rule `{}` requires a proposition, not {ty}",
+                        prop.predicate, rule.name
+                    ),
+                ));
+                continue;
+            }
+            // `create Duty` is the one consequence that is checked as
+            // something else than a proposition: it needs the three fields
+            // of a duty. Every other consequence of `create` is checked as
+            // the consequences of the other eight verbs are.
+            if operation == "create" && prop.predicate == "Duty" {
+                let fields = prop
+                    .arguments
+                    .iter()
+                    .filter_map(|argument| match argument {
+                        Term::Apply { ctor, args } if ctor == "$named" => match args.as_slice() {
+                            [Term::String(name), value] => Some((name.as_str(), value)),
+                            _ => None,
+                        },
+                        _ => None,
+                    })
+                    .collect::<BTreeMap<_, _>>();
+                for name in ["bearer", "claimant"] {
+                    if let Some(value) = fields.get(name) {
+                        cx.check_result(
+                            value,
+                            &Type::Sort(Sort::LegalPerson),
+                            "position role",
+                            false,
+                            diagnostics,
+                        );
+                    } else {
+                        diagnostics.push(Diagnostic::new(
+                            DiagnosticCode::E210,
+                            format!("Duty creation requires `{name}`"),
+                        ));
+                    }
+                }
+                if !fields.contains_key("content") {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "Duty creation requires content",
+                    ));
+                }
+                continue;
+            }
+            cx.check_modal_proposition(
+                "operative",
+                &[Term::Apply {
+                    ctor: prop.predicate.clone(),
+                    args: prop.arguments.clone(),
+                }],
+                diagnostics,
+            );
+        }
+    }
+    for duty in &hir.duties {
+        let locals = locals_from_params(&duty.params);
+        let cx = TypeCheck {
+            functions: &functions,
+            propositions: &propositions,
+            proposition_params: &hir.propositions,
+            record_types: &hir.record_types,
+            type_declarations: &hir.types,
+            callable_signatures: &hir.callable_signatures,
+            entities: &entities,
+            effects: &hir.effects,
+            locals: &locals,
+            owner: &duty.name,
+        };
+        if let Some(term) = &duty.attaches_term {
+            cx.check_bool_condition("duty attachment", term, diagnostics);
+        }
+    }
+    for observation in &hir.observations {
+        let locals = locals_from_params(&observation.params);
+        let cx = TypeCheck {
+            functions: &functions,
+            propositions: &propositions,
+            proposition_params: &hir.propositions,
+            record_types: &hir.record_types,
+            type_declarations: &hir.types,
+            callable_signatures: &hir.callable_signatures,
+            entities: &entities,
+            effects: &hir.effects,
+            locals: &locals,
+            owner: &observation.name,
+        };
+        for validator in &observation.validators {
+            cx.check_bool_condition("observation validator", validator, diagnostics);
+        }
+        cx.check_modal_proposition(
+            "observation establishes",
+            &[Term::Apply {
+                ctor: observation.establishes.predicate.clone(),
+                args: observation.establishes.arguments.clone(),
+            }],
+            diagnostics,
+        );
+    }
+    for judgment in &hir.judgments {
+        let mut locals = locals_from_params(&judgment.params);
+        locals.extend(locals_from_params(&judgment.records));
+        let cx = TypeCheck {
+            functions: &functions,
+            propositions: &propositions,
+            proposition_params: &hir.propositions,
+            record_types: &hir.record_types,
+            type_declarations: &hir.types,
+            callable_signatures: &hir.callable_signatures,
+            entities: &entities,
+            effects: &hir.effects,
+            locals: &locals,
+            owner: &judgment.name,
+        };
+        cx.check_modal_proposition(
+            "judgment decides",
+            &[Term::Apply {
+                ctor: judgment.decides.predicate.clone(),
+                args: judgment.decides.arguments.clone(),
+            }],
+            diagnostics,
+        );
+        for condition in judgment
+            .constraints
+            .iter()
+            .chain(judgment.establish_when.iter())
+            .chain(judgment.reject_when.iter())
+        {
+            cx.check_bool_condition("judgment condition", condition, diagnostics);
+        }
     }
 }
 
@@ -381,6 +737,10 @@ fn query_result_term(q: &HirQuery) -> Option<&Term> {
 struct TypeCheck<'a> {
     functions: &'a BTreeMap<String, HirFunction>,
     propositions: &'a BTreeSet<String>,
+    proposition_params: &'a BTreeMap<String, Vec<(String, String)>>,
+    record_types: &'a HirRecordTypes,
+    type_declarations: &'a fidryn_core::types::TypeEnvironment,
+    callable_signatures: &'a fidryn_hir::HirCallableSignatures,
     entities: &'a BTreeMap<String, Type>,
     effects: &'a BTreeMap<String, HirEffect>,
     locals: &'a BTreeMap<String, Type>,
@@ -388,6 +748,64 @@ struct TypeCheck<'a> {
 }
 
 impl TypeCheck<'_> {
+    fn resolve_type(&self, ty: Type) -> Type {
+        fidryn_core::types::resolve_aliases(&ty, self.type_declarations).unwrap_or(ty)
+    }
+
+    fn compatible(&self, expected: &Type, actual: &Type) -> bool {
+        let expected = self.resolve_type(expected.clone());
+        let actual = self.resolve_type(actual.clone());
+        if types_compatible(&expected, &actual) {
+            return true;
+        }
+        if let Type::Applied { ctor, args } = &expected
+            && ctor == "Union"
+        {
+            return args.iter().any(|member| self.compatible(member, &actual));
+        }
+        if let (Type::Sort(Sort::Nominal(expected)), Type::Sort(Sort::Nominal(actual))) =
+            (&expected, &actual)
+            && let Some((_, fidryn_core::ir::TypeDefinition::Sum(variants))) =
+                self.type_declarations.get(expected)
+        {
+            return variants
+                .iter()
+                .any(|variant| variant.name == *actual && variant.arguments.is_empty());
+        }
+        false
+    }
+    fn check_record(
+        &self,
+        name: &str,
+        signature: &[(String, String)],
+        fields: &BTreeMap<String, Term>,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        for (field, ty) in signature {
+            match fields.get(field) {
+                Some(value) => self.check_result(
+                    value,
+                    &parse_type_name(ty),
+                    "record field",
+                    false,
+                    diagnostics,
+                ),
+                None => diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!("record `{name}` is missing field `{field}`"),
+                )),
+            }
+        }
+        for field in fields.keys() {
+            if !signature.iter().any(|(declared, _)| declared == field) {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!("unknown field `{field}` in record `{name}`"),
+                ));
+            }
+        }
+    }
+
     fn check_result(
         &self,
         term: &Term,
@@ -396,10 +814,36 @@ impl TypeCheck<'_> {
         allow_case_bindings: bool,
         diagnostics: &mut Vec<Diagnostic>,
     ) {
+        let expected = &self.resolve_type(expected.clone());
         let before = diagnostics.len();
+        if let Term::Set(items) = term
+            && let Type::Primitive(
+                PrimitiveType::FiniteSet { inner } | PrimitiveType::NonEmptySet { inner },
+            ) = expected
+        {
+            if items.is_empty()
+                && matches!(expected, Type::Primitive(PrimitiveType::NonEmptySet { .. }))
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "NonEmptySet cannot be empty",
+                ));
+            }
+            for item in items {
+                self.check_result(item, inner, "set element", false, diagnostics);
+            }
+            return;
+        }
+        if let Term::Record(fields) = term
+            && let Type::Sort(Sort::Nominal(name)) = expected
+            && let Some((_, signature)) = self.record_types.get(name)
+        {
+            self.check_record(name, signature, fields, diagnostics);
+            return;
+        }
         match self.infer(term, diagnostics) {
             Some(actual) => {
-                if !types_compatible_in(self.owner, expected, &actual) {
+                if !self.compatible(expected, &actual) {
                     diagnostics.push(Diagnostic::new(
                         DiagnosticCode::E210,
                         format!(
@@ -442,8 +886,29 @@ impl TypeCheck<'_> {
             Term::Apply { ctor, args } | Term::Call { callee: ctor, args } => {
                 self.infer_apply(ctor, args, diagnostics)
             }
-            Term::Field { base, .. } => {
-                let _ = self.infer(base, diagnostics);
+            Term::Field { base, name } => {
+                if let Some(qualified) = qualified_term_name(term)
+                    && !self
+                        .locals
+                        .contains_key(qualified.split('.').next().unwrap_or_default())
+                    && let Some(ty) = self.entities.get(&qualified)
+                {
+                    return Some(self.resolve_type(ty.clone()));
+                }
+                let base_type = self
+                    .infer(base, diagnostics)
+                    .map(|ty| self.resolve_type(ty));
+                if let Some(Type::Sort(Sort::Nominal(record))) = &base_type
+                    && let Some((_, fields)) = self.record_types.get(record)
+                {
+                    if let Some((_, ty)) = fields.iter().find(|(field, _)| field == name) {
+                        return Some(self.resolve_type(parse_type_name(ty)));
+                    }
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!("record `{record}` has no field `{name}`"),
+                    ));
+                }
                 None
             }
             Term::Set(xs) => self.infer_set(xs, diagnostics),
@@ -459,16 +924,31 @@ impl TypeCheck<'_> {
 
     fn infer_ident(&self, name: &str) -> Option<Type> {
         if let Some(ty) = self.locals.get(name) {
-            return Some(ty.clone());
+            return Some(self.resolve_type(ty.clone()));
         }
         if let Some(ty) = self.entities.get(name) {
-            return Some(ty.clone());
+            return Some(self.resolve_type(ty.clone()));
         }
         if self.propositions.contains(name) {
             return Some(Type::prop());
         }
         if let Some(effect) = self.effects.get(name) {
-            return Some(parse_type_name(&effect.result_type));
+            return Some(self.resolve_type(parse_type_name(&effect.result_type)));
+        }
+        if let Some((params, result)) = self.callable_signatures.get(name)
+            && params.is_empty()
+        {
+            return Some(self.resolve_type(parse_type_name(result)));
+        }
+        for (parameters, definition) in self.type_declarations.values() {
+            if let fidryn_core::ir::TypeDefinition::Sum(variants) = definition
+                && parameters.is_empty()
+                && variants
+                    .iter()
+                    .any(|variant| variant.name == name && variant.arguments.is_empty())
+            {
+                return Some(Type::Sort(Sort::Nominal(name.into())));
+            }
         }
         None
     }
@@ -479,10 +959,184 @@ impl TypeCheck<'_> {
         args: &[Term],
         diagnostics: &mut Vec<Diagnostic>,
     ) -> Option<Type> {
+        if self.locals.contains_key(ctor) {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!("local binding `{ctor}` is not a callable function"),
+            ));
+            return None;
+        }
+        let (generic_base, type_arguments) = split_qname_type_args(ctor);
+        if generic_base == "case_input" {
+            if type_arguments.len() != 1 {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "case_input requires exactly one result type argument",
+                ));
+                return None;
+            }
+            self.check_named_args(
+                ctor,
+                &[("key".into(), Type::Primitive(PrimitiveType::String))],
+                args,
+                diagnostics,
+            );
+            let ty = parse_type_name(&type_arguments[0]);
+            if let Err(error) = fidryn_core::types::resolve_aliases(&ty, self.type_declarations) {
+                diagnostics.push(Diagnostic::new(DiagnosticCode::E210, error));
+                return None;
+            }
+            return Some(self.resolve_type(ty));
+        }
         if ctor.eq_ignore_ascii_case("seq") || ctor.eq_ignore_ascii_case("transaction") {
             return self.infer_seq(args, diagnostics);
         }
+        if matches!(ctor, "nominations_for" | "vacancy_or_suspension") {
+            self.check_named_args(
+                ctor,
+                &[("office".into(), Type::Sort(Sort::Office))],
+                args,
+                diagnostics,
+            );
+            return Some(if ctor == "nominations_for" {
+                Type::Primitive(PrimitiveType::FiniteSet {
+                    inner: Box::new(Type::Sort(Sort::LegalPerson)),
+                })
+            } else {
+                Type::bool()
+            });
+        }
+        if ctor == "closed" {
+            if !matches!(args, [Term::Apply {ctor, ..} | Term::Call {callee:ctor, ..}] if ctor == "nominations_for")
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "closed requires a declared nominations_for domain",
+                ));
+            }
+            for argument in args {
+                let _ = self.infer(argument, diagnostics);
+            }
+            return Some(Type::bool());
+        }
+        if ctor == "unique" {
+            if !matches!(args, [Term::Ident(key)] if key == "nomination_rank") {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "unique requires a declared selection ordering key",
+                ));
+            }
+            return Some(Type::bool());
+        }
+        if ctor == "is"
+            && matches!(args.get(1), Some(Term::Ident(predicate)) if predicate == "nonempty")
+        {
+            self.check_arity(ctor, args, 2, 2, diagnostics);
+            if !matches!(
+                args.first()
+                    .and_then(|argument| self.infer(argument, diagnostics)),
+                Some(Type::Primitive(
+                    PrimitiveType::FiniteSet { .. } | PrimitiveType::NonEmptySet { .. }
+                ))
+            ) {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "nonempty requires a finite collection",
+                ));
+            }
+            return Some(Type::bool());
+        }
+        if ctor == "later_effective_time_or" {
+            let time = Type::Primitive(PrimitiveType::Time);
+            self.check_named_args(
+                ctor,
+                &[
+                    (
+                        "requested".into(),
+                        Type::Primitive(PrimitiveType::Option {
+                            inner: Box::new(time.clone()),
+                        }),
+                    ),
+                    ("filed_at".into(), time.clone()),
+                ],
+                args,
+                diagnostics,
+            );
+            return Some(time);
+        }
+        if ctor == "digest" {
+            self.check_arity(ctor, args, 1, 1, diagnostics);
+            if args
+                .first()
+                .and_then(|argument| self.infer(argument, diagnostics))
+                .is_none()
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "digest requires a typed value",
+                ));
+            }
+            return Some(Type::Primitive(PrimitiveType::String));
+        }
+        if ctor == "same_subject_and_purpose" {
+            self.check_arity(ctor, args, 2, 2, diagnostics);
+            for argument in args {
+                let Some(Type::Sort(Sort::Nominal(record))) = self.infer(argument, diagnostics)
+                else {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "same_subject_and_purpose requires typed records",
+                    ));
+                    continue;
+                };
+                if !self.record_types.get(&record).is_some_and(|(_, fields)| {
+                    ["subject", "purpose"]
+                        .iter()
+                        .all(|required| fields.iter().any(|(name, _)| name == required))
+                }) {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "record must declare subject and purpose fields",
+                    ));
+                }
+            }
+            return Some(Type::bool());
+        }
+        if ctor == "fresh" {
+            self.check_arity(ctor, args, 2, 2, diagnostics);
+            if let Some(argument) = args.first() {
+                let record = self.infer(argument, diagnostics);
+                if !matches!(record, Some(Type::Sort(Sort::Nominal(ref name))) if self.record_types.get(name).is_some_and(|(_, fields)| fields.iter().any(|(field, ty)| field == "signed_at" && parse_type_name(ty) == Type::Primitive(PrimitiveType::Time))))
+                {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "fresh requires a record declaring signed_at: Time",
+                    ));
+                }
+            }
+            if !matches!(
+                args.get(1)
+                    .and_then(|argument| self.infer(argument, diagnostics)),
+                Some(Type::Primitive(PrimitiveType::Duration { .. }))
+            ) {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "fresh requires a duration bound",
+                ));
+            }
+            return Some(Type::bool());
+        }
+        if ctor.eq_ignore_ascii_case("duty_status") {
+            return Some(Type::Sort(Sort::Nominal("DutyState".into())));
+        }
+        if ctor.eq_ignore_ascii_case("duty_step") {
+            return Some(Type::Sort(Sort::Nominal("DutyStatus".into())));
+        }
+        if ctor.eq_ignore_ascii_case("require_authority") {
+            return Some(Type::Sort(Sort::Nominal("Unit".into())));
+        }
         if ctor.eq_ignore_ascii_case("require") {
+            self.check_arity(ctor, args, 1, 1, diagnostics);
             if let Some(cond) = args.first() {
                 self.check_bool_condition("require", cond, diagnostics);
             }
@@ -499,6 +1153,7 @@ impl TypeCheck<'_> {
             };
         }
         if ctor.eq_ignore_ascii_case("not") {
+            self.check_arity(ctor, args, 1, 1, diagnostics);
             if let Some(inner) = args.first() {
                 self.check_bool_condition("not", inner, diagnostics);
             }
@@ -515,8 +1170,25 @@ impl TypeCheck<'_> {
             return Some(Type::bool());
         }
         if ctor.eq_ignore_ascii_case("for_all") || ctor.eq_ignore_ascii_case("exists") {
-            for arg in args {
-                let _ = self.infer(arg, diagnostics);
+            if let [Term::Ident(binder) | Term::Binder(binder), domain, body] = args {
+                let domain_ty = self.infer(domain, diagnostics);
+                let mut locals = self.locals.clone();
+                if let Some(Type::Primitive(
+                    PrimitiveType::FiniteSet { inner } | PrimitiveType::NonEmptySet { inner },
+                )) = domain_ty
+                {
+                    locals.insert(binder.clone(), *inner);
+                }
+                let cx = TypeCheck {
+                    locals: &locals,
+                    ..*self
+                };
+                cx.check_bool_condition("quantifier", body, diagnostics);
+            } else {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    "quantifier requires a binder, domain, and Boolean body",
+                ));
             }
             return Some(Type::bool());
         }
@@ -528,20 +1200,45 @@ impl TypeCheck<'_> {
         }
         if let Some(function) = self.functions.get(ctor) {
             self.check_call_args(function, args, diagnostics);
-            return Some(parse_type_name(&function.result_type));
+            return Some(self.resolve_type(parse_type_name(&function.result_type)));
+        }
+        if let Some((params, result)) = self.callable_signatures.get(ctor) {
+            self.check_named_args(ctor, &params_as_types(params), args, diagnostics);
+            return Some(self.resolve_type(parse_type_name(result)));
+        }
+        if ctor == "effective" {
+            self.check_named_args(
+                ctor,
+                &[("action".into(), Type::Sort(Sort::LegalAction))],
+                args,
+                diagnostics,
+            );
+            return Some(Type::bool());
         }
         if is_currency_ctor(ctor) {
+            self.check_arity(ctor, args, 1, 1, diagnostics);
             for arg in args {
-                let _ = self.infer(arg, diagnostics);
+                if !matches!(
+                    self.infer(arg, diagnostics),
+                    Some(Type::Primitive(PrimitiveType::Int | PrimitiveType::Decimal))
+                ) {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!("currency constructor `{ctor}` requires a numeric amount"),
+                    ));
+                }
             }
             return Some(Type::Primitive(PrimitiveType::Money {
                 currency: ctor.to_owned(),
             }));
         }
         if is_duration_unit(ctor) {
-            for arg in args {
-                let _ = self.infer(arg, diagnostics);
-            }
+            self.check_named_args(
+                ctor,
+                &[("count".into(), Type::Primitive(PrimitiveType::Int))],
+                args,
+                diagnostics,
+            );
             return Some(Type::Primitive(PrimitiveType::Duration {
                 calendar: ctor.to_owned(),
             }));
@@ -556,10 +1253,70 @@ impl TypeCheck<'_> {
             return Some(parse_type_name(&effect.result_type));
         }
         if self.propositions.contains(ctor) {
-            for arg in args {
-                let _ = self.infer(arg, diagnostics);
-            }
+            let params = self
+                .proposition_params
+                .get(ctor)
+                .map(|params| params_as_types(params))
+                .unwrap_or_default();
+            self.check_named_args(ctor, &params, args, diagnostics);
             return Some(Type::prop());
+        }
+        if let Some((_, fields)) = self.record_types.get(ctor) {
+            self.check_named_args(ctor, &params_as_types(fields), args, diagnostics);
+            return Some(Type::Sort(Sort::Nominal(ctor.to_owned())));
+        }
+        for (owner, (parameters, definition)) in self.type_declarations {
+            if let fidryn_core::ir::TypeDefinition::Sum(variants) = definition
+                && let Some(variant) = variants.iter().find(|variant| variant.name == generic_base)
+            {
+                if parameters.len() != type_arguments.len() {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!(
+                            "constructor `{ctor}` requires {} type arguments",
+                            parameters.len()
+                        ),
+                    ));
+                    return None;
+                }
+                let arguments = type_arguments
+                    .iter()
+                    .map(|argument| parse_type_name(argument))
+                    .collect::<Vec<_>>();
+                let signature = if variant.fields.is_empty() {
+                    variant
+                        .arguments
+                        .iter()
+                        .enumerate()
+                        .map(|(index, ty)| {
+                            (
+                                format!("arg{index}"),
+                                substitute_nominal(ty.clone(), parameters, &arguments),
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                } else {
+                    variant
+                        .fields
+                        .iter()
+                        .map(|(name, ty)| {
+                            (
+                                name.clone(),
+                                substitute_nominal(ty.clone(), parameters, &arguments),
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                };
+                self.check_named_args(ctor, &signature, args, diagnostics);
+                return Some(if arguments.is_empty() {
+                    Type::Sort(Sort::Nominal(owner.clone()))
+                } else {
+                    Type::Applied {
+                        ctor: owner.clone(),
+                        args: arguments,
+                    }
+                });
+            }
         }
         if looks_like_proposition(ctor) && args.is_empty() {
             return Some(Type::prop());
@@ -601,9 +1358,25 @@ impl TypeCheck<'_> {
         let mut inner = None;
         for x in xs {
             match (inner.clone(), self.infer(x, diagnostics)) {
-                (current, None) => inner = current,
+                (current, None) => {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        "set elements must have declared types",
+                    ));
+                    inner = current;
+                }
                 (None, Some(ty)) => inner = Some(ty),
-                (Some(left), Some(right)) => inner = self.join_types(&left, &right),
+                (Some(left), Some(right)) => {
+                    if let Some(joined) = self.join_types(&left, &right) {
+                        inner = Some(joined);
+                    } else {
+                        diagnostics.push(Diagnostic::new(
+                            DiagnosticCode::E210,
+                            format!("set has incompatible element types {left} and {right}"),
+                        ));
+                        inner = Some(left);
+                    }
+                }
             }
         }
         inner.map(|inner| {
@@ -620,31 +1393,102 @@ impl TypeCheck<'_> {
         right: &Term,
         diagnostics: &mut Vec<Diagnostic>,
     ) -> Option<Type> {
-        match op {
-            BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge => {
-                let _ = self.infer(left, diagnostics);
-                let _ = self.infer(right, diagnostics);
-                Some(Type::bool())
-            }
-            BinOp::And | BinOp::Or => {
-                if let Some(ty) = self.infer(left, diagnostics) {
-                    self.report_bool_operand("logical", &ty, diagnostics);
-                }
-                if let Some(ty) = self.infer(right, diagnostics) {
-                    self.report_bool_operand("logical", &ty, diagnostics);
-                }
-                Some(Type::bool())
-            }
-            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div => {
-                match (
-                    self.infer(left, diagnostics),
-                    self.infer(right, diagnostics),
-                ) {
-                    (Some(left_ty), Some(right_ty)) => self.join_types(&left_ty, &right_ty),
-                    _ => None,
-                }
-            }
+        let left_ty = self.infer(left, diagnostics)?;
+        let right_ty = self.infer(right, diagnostics)?;
+        let numeric = |ty: &Type| {
+            matches!(
+                ty,
+                Type::Primitive(PrimitiveType::Int | PrimitiveType::Decimal)
+            )
+        };
+        let comparison = matches!(
+            op,
+            BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge
+        );
+        if matches!(op, BinOp::And | BinOp::Or) {
+            self.report_bool_operand("logical", &left_ty, diagnostics);
+            self.report_bool_operand("logical", &right_ty, diagnostics);
+            return Some(Type::bool());
         }
+        if comparison {
+            let equal = matches!(op, BinOp::Eq | BinOp::Ne);
+            let ordered = numeric(&left_ty) && numeric(&right_ty)
+                || matches!(
+                    (&left_ty, &right_ty),
+                    (
+                        Type::Primitive(PrimitiveType::String),
+                        Type::Primitive(PrimitiveType::String)
+                    ) | (
+                        Type::Primitive(PrimitiveType::Time),
+                        Type::Primitive(PrimitiveType::Time)
+                    ) | (
+                        Type::Primitive(PrimitiveType::Date),
+                        Type::Primitive(PrimitiveType::Date)
+                    )
+                )
+                || matches!(
+                    (&left_ty, &right_ty),
+                    (
+                        Type::Primitive(PrimitiveType::Money { .. }),
+                        Type::Primitive(PrimitiveType::Money { .. })
+                    ) | (
+                        Type::Primitive(PrimitiveType::Duration { .. }),
+                        Type::Primitive(PrimitiveType::Duration { .. })
+                    )
+                ) && left_ty == right_ty;
+            if !(ordered
+                || equal
+                    && (self.compatible(&left_ty, &right_ty)
+                        || self.compatible(&right_ty, &left_ty)))
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "comparison in `{}` has incompatible operands {left_ty} and {right_ty}",
+                        self.owner
+                    ),
+                ));
+            }
+            return Some(Type::bool());
+        }
+        if numeric(&left_ty) && numeric(&right_ty) {
+            return Some(if left_ty == right_ty {
+                left_ty
+            } else {
+                Type::Primitive(PrimitiveType::Decimal)
+            });
+        }
+        match (&left_ty, &right_ty, op) {
+            (
+                Type::Primitive(PrimitiveType::Money { currency: a }),
+                Type::Primitive(PrimitiveType::Money { currency: b }),
+                BinOp::Add | BinOp::Sub,
+            ) if a == b => return Some(left_ty),
+            (Type::Primitive(PrimitiveType::Money { .. }), scalar, BinOp::Mul | BinOp::Div)
+                if numeric(scalar) =>
+            {
+                return Some(left_ty);
+            }
+            (scalar, Type::Primitive(PrimitiveType::Money { .. }), BinOp::Mul)
+                if numeric(scalar) =>
+            {
+                return Some(right_ty);
+            }
+            (
+                Type::Primitive(PrimitiveType::Duration { calendar: a }),
+                Type::Primitive(PrimitiveType::Duration { calendar: b }),
+                BinOp::Add | BinOp::Sub,
+            ) if a == b => return Some(left_ty),
+            _ => {}
+        }
+        diagnostics.push(Diagnostic::new(
+            DiagnosticCode::E210,
+            format!(
+                "operator {op:?} in `{}` is not defined for {left_ty} and {right_ty}",
+                self.owner
+            ),
+        ));
+        None
     }
 
     fn join_inferred(
@@ -672,7 +1516,16 @@ impl TypeCheck<'_> {
                     None
                 }
             },
-            (Some(ty), None) | (None, Some(ty)) => Some(ty),
+            (Some(_), None) | (None, Some(_)) => {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!(
+                        "both branches in `{}` must have a declared, compatible type",
+                        self.owner
+                    ),
+                ));
+                None
+            }
             (None, None) => None,
         }
     }
@@ -681,9 +1534,7 @@ impl TypeCheck<'_> {
         if left == right {
             return Some(left.clone());
         }
-        if types_compatible_in(self.owner, left, right)
-            || types_compatible_in(self.owner, right, left)
-        {
+        if self.compatible(left, right) || self.compatible(right, left) {
             return Some(prefer_join(left, right));
         }
         None
@@ -720,10 +1571,52 @@ impl TypeCheck<'_> {
                 ),
             ));
         }
-        for (arg, (name, expected)) in args.iter().zip(params.iter()) {
+        let mut bound = vec![None; params.len()];
+        let mut positional = 0;
+        for arg in args {
+            let (index, value) = if let Term::Apply { ctor, args } = arg
+                && ctor == "$named"
+                && let [Term::String(label), value] = args.as_slice()
+            {
+                let Some(index) = params.iter().position(|(name, _)| name == label) else {
+                    diagnostics.push(Diagnostic::new(
+                        DiagnosticCode::E210,
+                        format!("unknown argument `{label}` for `{callee}`"),
+                    ));
+                    continue;
+                };
+                (index, value)
+            } else {
+                while positional < bound.len() && bound[positional].is_some() {
+                    positional += 1;
+                }
+                let index = positional;
+                positional += 1;
+                (index, arg)
+            };
+            if let Some(slot) = bound.get_mut(index)
+                && slot.replace(value).is_some()
+            {
+                diagnostics.push(Diagnostic::new(
+                    DiagnosticCode::E210,
+                    format!("duplicate argument `{}` for `{callee}`", params[index].0),
+                ));
+            }
+        }
+        for (arg, (name, expected)) in bound.into_iter().zip(params.iter()) {
+            let Some(arg) = arg else {
+                continue;
+            };
+            if let Term::Record(fields) = arg
+                && let Type::Sort(Sort::Nominal(record)) = expected
+                && let Some((_, signature)) = self.record_types.get(record)
+            {
+                self.check_record(record, signature, fields, diagnostics);
+                continue;
+            }
             let before = diagnostics.len();
             match self.infer(arg, diagnostics) {
-                Some(actual) if !types_compatible(expected, &actual) => {
+                Some(actual) if !self.compatible(expected, &actual) => {
                     diagnostics.push(Diagnostic::new(
                         DiagnosticCode::E210,
                         format!(
@@ -731,7 +1624,7 @@ impl TypeCheck<'_> {
                         ),
                     ));
                 }
-                None if diagnostics.len() == before && !is_case_binding(arg) => {
+                None if diagnostics.len() == before => {
                     diagnostics.push(Diagnostic::new(
                         DiagnosticCode::E210,
                         format!("argument `{name}` of `{callee}` could not be typed as {expected}"),
@@ -748,6 +1641,7 @@ impl TypeCheck<'_> {
         args: &[Term],
         diagnostics: &mut Vec<Diagnostic>,
     ) {
+        self.check_arity(ctor, args, 1, 2, diagnostics);
         let Some(arg) = args.first() else {
             diagnostics.push(Diagnostic::new(
                 DiagnosticCode::E210,
@@ -777,6 +1671,25 @@ impl TypeCheck<'_> {
         }
     }
 
+    fn check_arity(
+        &self,
+        callee: &str,
+        args: &[Term],
+        minimum: usize,
+        maximum: usize,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) {
+        if args.len() < minimum || args.len() > maximum {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!(
+                    "`{callee}` expects {minimum}..={maximum} arguments, but {} were supplied",
+                    args.len()
+                ),
+            ));
+        }
+    }
+
     fn check_bool_condition(
         &self,
         construct: &str,
@@ -784,6 +1697,13 @@ impl TypeCheck<'_> {
         diagnostics: &mut Vec<Diagnostic>,
     ) {
         let Some(ty) = self.infer(cond, diagnostics) else {
+            diagnostics.push(Diagnostic::new(
+                DiagnosticCode::E210,
+                format!(
+                    "{construct} in `{}` requires an explicitly typed Boolean input",
+                    self.owner
+                ),
+            ));
             return;
         };
         self.report_bool_operand(construct, &ty, diagnostics);
@@ -810,6 +1730,14 @@ impl TypeCheck<'_> {
     }
 }
 
+fn qualified_term_name(term: &Term) -> Option<String> {
+    match term {
+        Term::Ident(name) => Some(name.clone()),
+        Term::Field { base, name } => Some(format!("{}.{name}", qualified_term_name(base)?)),
+        _ => None,
+    }
+}
+
 fn locals_from_params(params: &[(String, String)]) -> BTreeMap<String, Type> {
     params
         .iter()
@@ -829,12 +1757,15 @@ fn is_require_term(term: &Term) -> bool {
 fn is_modal_ctor(name: &str) -> bool {
     matches!(
         name,
-        "operative" | "determined" | "assumed" | "observed" | "necessarily"
+        "operative" | "determined" | "assumed" | "observed" | "necessarily" | "derived"
     )
 }
 
 fn is_proposition_modal(name: &str) -> bool {
-    matches!(name, "operative" | "determined" | "assumed" | "necessarily")
+    matches!(
+        name,
+        "operative" | "determined" | "assumed" | "necessarily" | "derived"
+    )
 }
 
 fn is_currency_ctor(name: &str) -> bool {
@@ -935,49 +1866,120 @@ fn params_as_types(params: &[(String, String)]) -> Vec<(String, Type)> {
         .collect()
 }
 
+/// The parameters in the first parenthesized list of the text of an
+/// `effect`, each with its type.
 fn source_typed_params(src: &str) -> Vec<(String, Type)> {
-    let Some(start) = src.find('(') else {
+    source_param_texts(src)
+        .into_iter()
+        .map(|(name, ty)| (name, parse_type_name(&ty)))
+        .collect()
+}
+
+/// The parameters in the first parenthesized list of the text of an
+/// `effect`: each `name: type` between two of its commas, the type as its
+/// text.
+///
+/// The text is read with its comments blank. The parentheses, the commas
+/// and the colons are looked for in its structure, so none of them is found
+/// inside a string literal.
+fn source_param_texts(src: &str) -> Vec<(String, String)> {
+    let code = without_comments(src);
+    let structure = structure_of(src);
+    let Some((start, end)) = effect_parameter_list(&structure) else {
         return Vec::new();
     };
+    let mut params = Vec::new();
+    let mut part_start = start + 1;
+    let commas = structure[start + 1..end]
+        .match_indices(',')
+        .map(|(comma, _)| start + 1 + comma);
+    for part_end in commas.chain([end]) {
+        let part = part_start..part_end;
+        part_start = part_end + 1;
+        let Some(colon) = structure[part.clone()].find(':') else {
+            continue;
+        };
+        let name = code[part.start..part.start + colon].trim();
+        let ty = code[part.start + colon + 1..part.end].trim();
+        if !name.is_empty() && !ty.is_empty() {
+            params.push((name.to_owned(), ty.to_owned()));
+        }
+    }
+    params
+}
+
+/// Where the parameter list of the operation of an `effect` opens and
+/// closes: the first `(` of `structure`, the structure of the text of the
+/// effect, and the `)` that closes it.
+fn effect_parameter_list(structure: &str) -> Option<(usize, usize)> {
+    let start = structure.find('(')?;
     let mut depth = 0i32;
-    let mut end = None;
-    for (i, b) in src.as_bytes()[start..].iter().enumerate() {
+    for (i, b) in structure.as_bytes()[start..].iter().enumerate() {
         match b {
             b'(' => depth += 1,
             b')' => {
                 depth -= 1;
                 if depth == 0 {
-                    end = Some(start + i);
-                    break;
+                    return Some((start, start + i));
                 }
             }
             _ => {}
         }
     }
-    let Some(end) = end else {
-        return Vec::new();
-    };
-    let inner = src[start + 1..end].trim();
-    if inner.is_empty() {
-        return Vec::new();
-    }
-    inner
-        .split(',')
-        .filter_map(|part| {
-            let (name, ty) = part.split_once(':')?;
-            let name = name.trim();
-            let ty = ty.trim();
-            if name.is_empty() || ty.is_empty() {
-                None
-            } else {
-                Some((name.to_owned(), parse_type_name(ty)))
-            }
-        })
-        .collect()
+    None
 }
 
+/// The texts of an `effect` that its readers take types out of, whole:
+/// the parameter list of its operation, and all that follows each `->` to
+/// the end of that operation. The readers keep less of them: the list is
+/// split at every comma, also inside `<...>`, a part with no `:` is left
+/// out, and the result is taken after the last `->` alone and cut at the
+/// end of its first line. The levels of the types are counted over these
+/// texts, so that a type is counted before a reader cuts it.
+fn effect_operation_texts(src: &str) -> Vec<&str> {
+    let structure = structure_of(src);
+    let mut texts = Vec::new();
+    if let Some((start, end)) = effect_parameter_list(&structure) {
+        texts.push(&src[start..=end]);
+    }
+    // A type holds no `->`, so the text after one arrow is looked at up to
+    // the next at most, and each part of the text once.
+    let arrows: Vec<usize> = structure.match_indices("->").map(|(at, _)| at).collect();
+    for (index, &arrow) in arrows.iter().enumerate() {
+        let start = arrow + "->".len();
+        let limit = arrows.get(index + 1).copied().unwrap_or(structure.len());
+        texts.push(&src[start..start + operation_end(&structure[start..limit])]);
+    }
+    texts
+}
+
+/// The length of the rest of an operation, where `structure` is the
+/// structure of the text after its `->`: up to a `;` or a line end that no
+/// `<` and no bracket stands open across, or up to the `}` that ends the
+/// block of the effect.
+fn operation_end(structure: &str) -> usize {
+    let mut angles = 0usize;
+    let mut brackets = 0usize;
+    for (i, b) in structure.bytes().enumerate() {
+        match b {
+            b'<' => angles += 1,
+            b'>' => angles = angles.saturating_sub(1),
+            b'(' | b'[' | b'{' => brackets += 1,
+            b')' | b']' => brackets = brackets.saturating_sub(1),
+            b'}' if brackets == 0 => return i,
+            b'}' => brackets -= 1,
+            b';' | b'\n' if angles == 0 && brackets == 0 => return i,
+            _ => {}
+        }
+    }
+    structure.len()
+}
+
+/// The name of the operation of an `effect`: the first word in its block.
+/// A comment there is read as white space.
 fn effect_op_name(src: &str) -> String {
-    let inner = last_brace_inner(src).unwrap_or(src).trim();
+    let src = without_comments(src);
+    let inner = last_brace_inner(&src).unwrap_or(&src).trim();
     let ident: String = inner
         .chars()
         .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
@@ -1005,30 +2007,6 @@ fn prefer_join(left: &Type, right: &Type) -> Type {
 
 fn types_compatible(expected: &Type, actual: &Type) -> bool {
     expected == actual || is_subtype(actual, expected)
-}
-
-fn types_compatible_in(owner: &str, expected: &Type, actual: &Type) -> bool {
-    if types_compatible(expected, actual) {
-        return true;
-    }
-    is_tax_calc(owner) && money_decimal_pair(expected, actual)
-}
-
-fn is_tax_calc(name: &str) -> bool {
-    name == "ordinary_income_tax" || name == "ordinary_income_tax_formula"
-}
-
-fn money_decimal_pair(left: &Type, right: &Type) -> bool {
-    matches!(
-        (left, right),
-        (
-            Type::Primitive(PrimitiveType::Money { .. }),
-            Type::Primitive(PrimitiveType::Decimal)
-        ) | (
-            Type::Primitive(PrimitiveType::Decimal),
-            Type::Primitive(PrimitiveType::Money { .. })
-        )
-    )
 }
 
 fn function_has_bare_prop_guard(f: &HirFunction, propositions: &BTreeSet<String>) -> bool {
@@ -1062,7 +2040,6 @@ fn collect_query_callees(q: &HirQuery, names: &BTreeSet<&str>) -> BTreeSet<Strin
         }
         HirQueryBody::None => {}
     }
-    callees.extend(collect_source_callees(&q.plan, names));
     callees
 }
 
@@ -1108,7 +2085,6 @@ fn infer_module_effects(
         if let Some(body) = &function.body {
             collect_term_callees(body, &function_names, &mut callees);
         }
-        callees.extend(collect_source_callees(&function.source, &function_names));
         function_local.insert(function.name.clone(), effects);
         function_callees.insert(function.name.clone(), callees);
     }
@@ -1266,27 +2242,8 @@ where
         .collect()
 }
 
-fn extract_effect_names(src: &str) -> Vec<String> {
-    let mut search = src;
-    while let Some(bang) = search.find('!') {
-        let after = search[bang + 1..].trim_start();
-        if let Some(inner) = after.strip_prefix('{')
-            && let Some(close) = inner.find('}')
-        {
-            return inner[..close]
-                .split(',')
-                .map(str::trim)
-                .filter(|s| !s.is_empty())
-                .map(str::to_owned)
-                .collect();
-        }
-        search = &search[bang + 1..];
-    }
-    Vec::new()
-}
-
 fn function_effect_names(function: &HirFunction) -> Vec<String> {
-    extract_effect_names(&function.source)
+    function.effects.clone()
 }
 
 fn check_recursion(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
@@ -1297,7 +2254,6 @@ fn check_recursion(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
         if let Some(body) = &f.body {
             collect_term_callees(body, &functions, &mut callees);
         }
-        callees.extend(collect_source_callees(&f.source, &functions));
         graph.insert(name.clone(), callees);
     }
     for name in &functions {
@@ -1421,19 +2377,24 @@ fn check_doctrines(hir: &HirModule, diagnostics: &mut Vec<Diagnostic>) {
 }
 
 /// Resolve `defeat <Clause>` targets against known clauses.
+///
+/// The word `defeat` is looked for in the structure of the text, so it is
+/// not found in a comment or inside a string literal. It is found only as a
+/// word of its own: no letter, digit, `_` or `.` of a dotted name stands
+/// beside it. The name is the first word after it in the text with its
+/// comments blank.
 fn expand_conflict_clause_ids(source: &str, clauses: &BTreeMap<String, String>) -> Vec<String> {
+    let structure = structure_of(source);
+    let source = without_comments(source);
+    let name_char = |c: char| c.is_ascii_alphanumeric() || c == '_' || c == '.';
     let mut found = Vec::new();
-    for (i, _) in source.match_indices("defeat") {
+    for (i, _) in structure.match_indices("defeat") {
         let before = source[..i].chars().next_back();
-        if before.is_some_and(|c| c.is_ascii_alphanumeric() || c == '_') {
+        if before.is_some_and(name_char) {
             continue;
         }
         let rest = &source[i + "defeat".len()..];
-        if rest
-            .chars()
-            .next()
-            .is_some_and(|c| c.is_ascii_alphanumeric() || c == '_')
-        {
+        if rest.chars().next().is_some_and(name_char) {
             continue;
         }
         let name: String = rest
@@ -1531,9 +2492,8 @@ fn artifact_matches_import(artifact: &ManifestArtifact, import: &HirImport) -> b
         .as_deref()
         .map(str::trim)
         .filter(|s| !s.is_empty())
-        && artifact.digest.trim().eq_ignore_ascii_case(digest)
     {
-        return true;
+        return artifact.digest.trim().eq_ignore_ascii_case(digest);
     }
     path_matches_import(&artifact.path, &import.name)
 }
@@ -1596,11 +2556,176 @@ fn authenticate_digest(digest: &str, bytes: Option<&[u8]>) -> TrustProfile {
 }
 
 fn read_artifact_bytes(source_root: &Path, artifact_path: &str) -> Option<Vec<u8>> {
-    let path = Path::new(artifact_path);
-    if path.is_absolute() {
-        std::fs::read(path).ok()
+    read_confined_bytes(source_root, artifact_path, ARTIFACT_BYTE_LIMIT)
+        .ok()
+        .flatten()
+}
+
+fn relative_artifact_path(path: &str) -> Result<PathBuf, String> {
+    let mut relative = PathBuf::new();
+    for component in Path::new(path).components() {
+        match component {
+            Component::Normal(part) => relative.push(part),
+            Component::CurDir => {}
+            Component::Prefix(_) | Component::RootDir | Component::ParentDir => {
+                return Err(format!("artifact `{path}` escapes the source root"));
+            }
+        }
+    }
+    if relative.as_os_str().is_empty() {
+        return Err("artifact path cannot be empty".into());
+    }
+    Ok(relative)
+}
+
+fn confined_artifact_path(root: &Path, path: &str) -> Result<PathBuf, String> {
+    let relative = relative_artifact_path(path)?;
+    let root = root
+        .canonicalize()
+        .map_err(|error| format!("cannot resolve source root: {error}"))?;
+    let candidate = root.join(relative);
+    let mut ancestor = candidate.clone();
+    loop {
+        match ancestor.canonicalize() {
+            Ok(resolved) => {
+                if !resolved.starts_with(&root) {
+                    return Err(format!(
+                        "artifact `{path}` resolves outside the source root"
+                    ));
+                }
+                return Ok(if ancestor == candidate {
+                    resolved
+                } else {
+                    candidate
+                });
+            }
+            Err(error) if error.kind() == ErrorKind::NotFound => {
+                if !ancestor.pop() {
+                    return Err(format!("cannot resolve artifact `{path}`"));
+                }
+            }
+            Err(error) => return Err(format!("cannot resolve artifact `{path}`: {error}")),
+        }
+    }
+}
+
+fn read_confined_bytes(root: &Path, path: &str, maximum: u64) -> Result<Option<Vec<u8>>, String> {
+    let confined = confined_artifact_path(root, path)?;
+    match fs::metadata(&confined) {
+        Ok(metadata) if !metadata.is_file() => {
+            return Err(format!("artifact `{path}` is not a regular file"));
+        }
+        Ok(metadata) if metadata.len() > maximum => {
+            return Err(format!(
+                "artifact `{path}` exceeds the byte limit of {maximum}"
+            ));
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(format!("cannot inspect artifact `{path}`: {error}")),
+    }
+    let file = match fs::File::open(&confined) {
+        Ok(file) => file,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(format!("cannot read artifact `{path}`: {error}")),
+    };
+    let metadata = file
+        .metadata()
+        .map_err(|error| format!("cannot inspect artifact `{path}`: {error}"))?;
+    if !metadata.is_file() {
+        return Err(format!("artifact `{path}` is not a regular file"));
+    }
+    if metadata.len() > maximum {
+        return Err(format!(
+            "artifact `{path}` exceeds the byte limit of {maximum}"
+        ));
+    }
+    let mut bytes = Vec::new();
+    file.take(maximum + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|error| format!("cannot read artifact `{path}`: {error}"))?;
+    if bytes.len() as u64 > maximum {
+        return Err(format!(
+            "artifact `{path}` exceeds the byte limit of {maximum}"
+        ));
+    }
+    Ok(Some(bytes))
+}
+
+fn validate_manifest_paths(
+    manifest: &SourceManifest,
+    root: Option<&Path>,
+) -> Result<(), Vec<Diagnostic>> {
+    let mut normalized = BTreeSet::new();
+    let mut physical = BTreeSet::new();
+    let mut total_bytes = 0u64;
+    let mut diagnostics = Vec::new();
+    for artifact in &manifest.artifacts {
+        let admission = (|| {
+            let relative = if root.is_some() {
+                relative_artifact_path(&artifact.path)?
+            } else {
+                Path::new(&artifact.path)
+                    .components()
+                    .filter(|component| !matches!(component, Component::CurDir))
+                    .collect()
+            };
+            if !normalized.insert(relative) {
+                return Err(format!(
+                    "duplicate normalized artifact path `{}`",
+                    artifact.path
+                ));
+            }
+            if let Some(root) = root {
+                let path = confined_artifact_path(root, &artifact.path)?;
+                match fs::metadata(&path) {
+                    Ok(metadata) => {
+                        if !metadata.is_file() {
+                            return Err(format!(
+                                "artifact `{}` is not a regular file",
+                                artifact.path
+                            ));
+                        }
+                        if !physical.insert(path) {
+                            return Err(format!(
+                                "duplicate physical artifact path `{}`",
+                                artifact.path
+                            ));
+                        }
+                        if metadata.len() > ARTIFACT_BYTE_LIMIT {
+                            return Err(format!(
+                                "artifact `{}` exceeds the byte limit of {ARTIFACT_BYTE_LIMIT}",
+                                artifact.path
+                            ));
+                        }
+                        total_bytes = total_bytes
+                            .checked_add(metadata.len())
+                            .ok_or("artifact byte total overflow")?;
+                        if total_bytes > MANIFEST_ARTIFACT_BYTE_LIMIT {
+                            return Err(format!(
+                                "manifest artifacts exceed the byte limit of {MANIFEST_ARTIFACT_BYTE_LIMIT}"
+                            ));
+                        }
+                    }
+                    Err(error) if error.kind() == ErrorKind::NotFound => {}
+                    Err(error) => {
+                        return Err(format!(
+                            "cannot inspect artifact `{}`: {error}",
+                            artifact.path
+                        ));
+                    }
+                }
+            }
+            Ok(())
+        })();
+        if let Err(error) = admission {
+            diagnostics.push(Diagnostic::new(DiagnosticCode::E200, error));
+        }
+    }
+    if diagnostics.is_empty() {
+        Ok(())
     } else {
-        std::fs::read(source_root.join(path)).ok()
+        Err(diagnostics)
     }
 }
 
@@ -1682,7 +2807,16 @@ fn link_authenticated_packages(
                 linked.modules.push(pkg_core);
             }
             Ok(None) => {}
-            Err(err) => diagnostics.extend(err),
+            Err(err) => {
+                let source_path = root.join(&artifact.path).display().to_string();
+                diagnostics.extend(err.into_iter().map(|diagnostic| {
+                    if diagnostic.source_file.is_none() {
+                        diagnostic.with_source(source_path.clone())
+                    } else {
+                        diagnostic
+                    }
+                }));
+            }
         }
     }
     linked
@@ -1826,23 +2960,29 @@ fn load_nested_package_artifact(
     if !is_safe_package_name(name) {
         return Ok(None);
     }
-    let dir = packages_root(source_root).join(name);
+    let dir = confined_artifact_path(source_root, &format!("packages/{name}"))
+        .map_err(|error| vec![Diagnostic::new(DiagnosticCode::E200, error)])?;
     if !dir.is_dir() {
         return Ok(None);
     }
     let lock_path = dir.join("manifest.json");
-    let text = match fs::read_to_string(&lock_path) {
-        Ok(text) => text,
-        Err(err) if err.kind() == ErrorKind::NotFound => {
+    let lock_bytes = read_confined_bytes(
+        source_root,
+        &format!("packages/{name}/manifest.json"),
+        4 * 1024 * 1024,
+    )
+    .map_err(|error| vec![Diagnostic::new(DiagnosticCode::E200, error)])?;
+    let text = match lock_bytes {
+        Some(bytes) => String::from_utf8(bytes).map_err(|error| {
+            vec![Diagnostic::new(
+                DiagnosticCode::E200,
+                format!("nested package lock is not UTF-8: {error}"),
+            )]
+        })?,
+        None => {
             return Err(vec![Diagnostic::new(
                 DiagnosticCode::E200,
                 format!("imported package `{name}` is missing a nested digest"),
-            )]);
-        }
-        Err(err) => {
-            return Err(vec![Diagnostic::new(
-                DiagnosticCode::E200,
-                format!("cannot read nested package `{name}` lock: {err}"),
             )]);
         }
     };
@@ -1938,6 +3078,7 @@ fn hir_function_from_query(query: &HirQuery) -> HirFunction {
         fuel: None,
         result_type: query.result_type.clone(),
         source: query.plan.clone(),
+        effects: query.effects.clone(),
         params: query.params.clone(),
         body: query_result_term(query).cloned(),
     }
@@ -1948,11 +3089,12 @@ fn merge_linked_modules(
     packages: &[CoreModule],
     diagnostics: &mut Vec<Diagnostic>,
 ) {
-    let mut decl_names: BTreeSet<String> = into
+    let mut decl_names: BTreeSet<(String, String)> = into
         .declarations
         .iter()
-        .filter_map(core_decl_name)
-        .map(str::to_owned)
+        .filter_map(|decl| {
+            core_decl_name(decl).map(|name| (core_decl_namespace(decl).into(), name.into()))
+        })
         .collect();
     let mut query_names: BTreeSet<String> = into.queries.iter().map(|q| q.name.clone()).collect();
     for package in packages {
@@ -1961,7 +3103,14 @@ fn merge_linked_modules(
                 into.declarations.push(decl.clone());
                 continue;
             };
-            if !decl_names.insert(name.to_owned()) {
+            if into
+                .declarations
+                .iter()
+                .any(|existing| same_builtin_type(existing, decl))
+            {
+                continue;
+            }
+            if !decl_names.insert((core_decl_namespace(decl).into(), name.to_owned())) {
                 diagnostics.push(imported_name_collision(name, &package.name));
                 continue;
             }
@@ -1977,8 +3126,38 @@ fn merge_linked_modules(
     }
 }
 
+fn core_decl_namespace(decl: &CoreDecl) -> &'static str {
+    if matches!(decl, CoreDecl::Type(_) | CoreDecl::RecordType(_)) {
+        "type"
+    } else {
+        "value"
+    }
+}
+
+fn same_builtin_type(left: &CoreDecl, right: &CoreDecl) -> bool {
+    let builtin = |meta: &NodeMeta| meta.source.as_deref() == Some("builtin:prelude");
+    match (left, right) {
+        (CoreDecl::Type(left), CoreDecl::Type(right)) => {
+            builtin(&left.meta)
+                && builtin(&right.meta)
+                && left.name == right.name
+                && left.parameters == right.parameters
+                && left.definition == right.definition
+        }
+        (CoreDecl::RecordType(left), CoreDecl::RecordType(right)) => {
+            builtin(&left.meta)
+                && builtin(&right.meta)
+                && left.name == right.name
+                && left.fields == right.fields
+                && left.is_evidence == right.is_evidence
+        }
+        _ => false,
+    }
+}
+
 fn core_decl_name(decl: &CoreDecl) -> Option<&str> {
     match decl {
+        CoreDecl::Type(d) => Some(d.name.as_str()),
         CoreDecl::Source(d) => Some(d.name.as_str()),
         CoreDecl::Entity(d) => Some(d.name.as_str()),
         CoreDecl::RecordType(d) => Some(d.name.as_str()),
@@ -2049,7 +3228,7 @@ fn import_targets_module(import_name: &str, module_name: &str) -> bool {
     if imp.is_empty() || module.is_empty() {
         return false;
     }
-    imp == module || module.ends_with(&format!(".{imp}")) || imp.ends_with(&format!(".{module}"))
+    imp == module
 }
 
 fn arity_mismatch(module: &str, expected: usize, actual: usize) -> Diagnostic {
@@ -2081,6 +3260,12 @@ fn encode_module_name(name: &str, params: &[String]) -> String {
 
 fn subst_primitive(prim: PrimitiveType, params: &[String], args: &[Type]) -> PrimitiveType {
     match prim {
+        PrimitiveType::Money { currency } => PrimitiveType::Money {
+            currency: subst_parameter_name(currency, params, args),
+        },
+        PrimitiveType::Duration { calendar } => PrimitiveType::Duration {
+            calendar: subst_parameter_name(calendar, params, args),
+        },
         PrimitiveType::Interval { inner } => PrimitiveType::Interval {
             inner: Box::new(substitute_nominal(*inner, params, args)),
         },
@@ -2101,12 +3286,73 @@ fn subst_primitive(prim: PrimitiveType, params: &[String], args: &[Type]) -> Pri
     }
 }
 
+fn subst_parameter_name(name: String, params: &[String], args: &[Type]) -> String {
+    params
+        .iter()
+        .position(|param| param == &name)
+        .and_then(|index| args.get(index))
+        .map(source_type_name)
+        .unwrap_or(name)
+}
+
+fn source_type_name(ty: &Type) -> String {
+    match ty {
+        Type::Sort(Sort::Nominal(name)) => name.clone(),
+        Type::Primitive(PrimitiveType::Money { currency }) => format!("Money<{currency}>"),
+        Type::Primitive(PrimitiveType::Duration { calendar }) => format!("Duration<{calendar}>"),
+        Type::Primitive(PrimitiveType::Option { inner }) => {
+            format!("Option<{}>", source_type_name(inner))
+        }
+        Type::Primitive(PrimitiveType::FiniteSet { inner }) => {
+            format!("FiniteSet<{}>", source_type_name(inner))
+        }
+        Type::Primitive(PrimitiveType::NonEmptySet { inner }) => {
+            format!("NonEmptySet<{}>", source_type_name(inner))
+        }
+        Type::Primitive(PrimitiveType::Interval { inner }) => {
+            format!("Interval<{}>", source_type_name(inner))
+        }
+        Type::Primitive(PrimitiveType::Map { key, value }) => format!(
+            "Map<{}, {}>",
+            source_type_name(key),
+            source_type_name(value)
+        ),
+        Type::Applied { ctor, args } => format!(
+            "{ctor}<{}>",
+            args.iter()
+                .map(source_type_name)
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        _ => ty.to_string(),
+    }
+}
+
 fn subst_ty(ty: &mut Type, params: &[String], args: &[Type]) {
     *ty = substitute_nominal(ty.clone(), params, args);
 }
 
 fn subst_decl(decl: &mut CoreDecl, params: &[String], args: &[Type]) {
     match decl {
+        CoreDecl::Type(declaration) => {
+            let substitutions = params
+                .iter()
+                .zip(args)
+                .filter(|(parameter, _)| !declaration.parameters.contains(parameter))
+                .map(|(parameter, argument)| (parameter.clone(), argument.clone()))
+                .collect::<Vec<_>>();
+            let (parameters, arguments): (Vec<_>, Vec<_>) = substitutions.into_iter().unzip();
+            match &mut declaration.definition {
+                fidryn_core::ir::TypeDefinition::Alias(ty) => subst_ty(ty, &parameters, &arguments),
+                fidryn_core::ir::TypeDefinition::Sum(variants) => {
+                    for variant in variants {
+                        for ty in &mut variant.arguments {
+                            subst_ty(ty, &parameters, &arguments);
+                        }
+                    }
+                }
+            }
+        }
         CoreDecl::Entity(entity) => subst_ty(&mut entity.ty, params, args),
         CoreDecl::RecordType(record) => {
             for (_, ty) in &mut record.fields {
@@ -2198,7 +3444,9 @@ fn lower(
     imported_functions: &BTreeMap<String, HirFunction>,
 ) -> CoreModule {
     let inferred = infer_module_effects(hir, imported_functions);
-    let jid = JurisdictionId::of(hir.jurisdiction.as_bytes());
+    // The value of the header is kept as it is written. A comment between
+    // two lines of it is read as white space.
+    let jid = JurisdictionId::of(without_comments(&hir.jurisdiction).as_bytes());
     let meta = |node: &str| NodeMeta {
         span: None,
         source: Some(node.to_owned()),
@@ -2224,6 +3472,52 @@ fn lower(
                 .iter()
                 .map(|(param, ty)| (param.clone(), parse_type_name(ty)))
                 .collect(),
+            meta: meta(name),
+        }));
+    }
+    for (name, (is_evidence, fields)) in &hir.record_types {
+        let mut record_meta = meta(name);
+        if !hir.retained.iter().any(|decl| {
+            decl.name == *name && matches!(decl.kind.as_str(), "record_type" | "evidence_type")
+        }) {
+            record_meta.source = Some("builtin:prelude".into());
+        }
+        declarations.push(CoreDecl::RecordType(fidryn_core::ir::CoreRecordType {
+            id: NodeId::of(name.as_bytes()),
+            name: name.clone(),
+            is_evidence: *is_evidence,
+            fields: params_as_types(fields),
+            meta: record_meta,
+        }));
+    }
+    for (name, (parameters, definition)) in &hir.types {
+        let mut type_meta = meta(name);
+        if !hir
+            .retained
+            .iter()
+            .any(|decl| decl.name == *name && decl.kind == "type")
+        {
+            type_meta.source = Some("builtin:prelude".into());
+        }
+        declarations.push(CoreDecl::Type(fidryn_core::ir::CoreTypeDecl {
+            id: NodeId::of(name.as_bytes()),
+            name: name.clone(),
+            parameters: parameters.clone(),
+            definition: definition.clone(),
+            meta: type_meta,
+        }));
+    }
+    for (name, source) in &hir.clauses {
+        declarations.push(CoreDecl::Clause(fidryn_core::ir::CoreClause {
+            id: ClauseId::of(name.as_bytes()),
+            name: name.clone(),
+            source: source.clone(),
+            binders: hir
+                .callable_signatures
+                .get(name)
+                .map(|(params, _)| params_as_types(params))
+                .unwrap_or_default(),
+            rules: Vec::new(),
             meta: meta(name),
         }));
     }
@@ -2279,7 +3573,17 @@ fn lower(
                 _ => RuleKind::Prescriptive,
             },
             binders: rule.binders.clone(),
-            selection: None,
+            selection: rule
+                .selection
+                .as_ref()
+                .map(|selection| fidryn_core::ir::CoreSelection {
+                    binder: selection.binder.clone(),
+                    finite_domain: selection.finite_domain.clone(),
+                    predicate: fidryn_hir::term_to_guard(&selection.predicate),
+                    ordering: selection.ordering.clone(),
+                    ascending: selection.ascending.clone(),
+                    require_unique_keys: selection.require_unique_keys,
+                }),
             guard: rule.guard.clone().unwrap_or(Guard::Satisfied),
             consequences: lower_rule_effects(&rule.name, "then", &rule.consequences, &rule_meta),
             fallback: (!fallback.is_empty()).then_some(fallback),
@@ -2297,8 +3601,9 @@ fn lower(
         declarations.push(CoreDecl::Duty(CoreDuty {
             id: NodeId::of(duty.name.as_bytes()),
             name: duty.name.clone(),
-            bearer: Term::Ident(duty.bearer.clone()),
-            claimant: duty.claimant.clone().map(Term::Ident),
+            binders: params_as_types(&duty.params),
+            bearer: duty.bearer_term.clone(),
+            claimant: duty.claimant_term.clone(),
             attaches: duty.attaches.clone().unwrap_or(Guard::Satisfied),
             content,
             meta: meta(&duty.name),
@@ -2319,7 +3624,7 @@ fn lower(
         declarations.push(CoreDecl::Decision(fidryn_core::ir::CoreDecision {
             id: NodeId::of(decision.name.as_bytes()),
             name: decision.name.clone(),
-            binders: Vec::new(),
+            binders: params_as_types(&decision.params),
             requirements: decision
                 .requirements
                 .iter()
@@ -2331,12 +3636,81 @@ fn lower(
             option_space: Term::Wildcard,
             declared_result: decision.result.as_ref().map(|expression| {
                 fidryn_core::ir::DecisionReturn {
-                    result_type: Type::Sort(Sort::Nominal("Decision".into())),
+                    result_type: decision
+                        .result_type
+                        .as_deref()
+                        .map(parse_type_name)
+                        .unwrap_or_else(|| Type::Sort(Sort::Nominal("Decision".into()))),
                     expression: expression.clone(),
                 }
             }),
             meta: meta(&decision.name),
         }));
+    }
+    for observation in &hir.observations {
+        declarations.push(CoreDecl::Observation(fidryn_core::ir::CoreObservation {
+            id: NodeId::of(observation.name.as_bytes()),
+            name: observation.name.clone(),
+            record_binder: observation
+                .params
+                .first()
+                .map(|(name, _)| name.clone())
+                .unwrap_or_default(),
+            record_type: observation
+                .params
+                .first()
+                .map(|(_, ty)| parse_type_name(ty)),
+            validators: Vec::new(),
+            validator_terms: observation.validators.clone(),
+            establishes: observation.establishes.clone(),
+            source: observation.source.clone(),
+            unsupported_clauses: observation.unsupported_clauses.clone(),
+            meta: meta(&observation.name),
+        }));
+    }
+    for judgment in &hir.judgments {
+        use fidryn_core::ir::JudgmentAuthority;
+        let authority = match &judgment.authority {
+            JudgmentAuthority::Actor(actor) => actor.clone(),
+            JudgmentAuthority::Concurrence {
+                minimum,
+                distinct,
+                issuer_type,
+            } => Term::Apply {
+                ctor: "concurrence".into(),
+                args: vec![
+                    Term::Int(i64::from(*minimum)),
+                    Term::Bool(*distinct),
+                    Term::String(source_type_name(issuer_type)),
+                ],
+            },
+        };
+        declarations.push(CoreDecl::Judgment(Box::new(
+            fidryn_core::ir::CoreJudgment {
+                id: NodeId::of(judgment.name.as_bytes()),
+                name: judgment.name.clone(),
+                decides: judgment.decides.clone(),
+                authority,
+                binders: params_as_types(&judgment.params),
+                source: judgment.source.clone(),
+                authority_policy: Some(judgment.authority.clone()),
+                record_requires: judgment
+                    .records
+                    .iter()
+                    .map(|(name, ty)| (name.clone(), parse_type_name(ty)))
+                    .collect(),
+                record_patterns: judgment.record_patterns.clone(),
+                standard: judgment.standard.clone(),
+                constraints: judgment.constraints.clone(),
+                establish_when: judgment.establish_when.clone(),
+                reject_when: judgment.reject_when.clone(),
+                otherwise: judgment.otherwise.clone(),
+                on_established: judgment.on_established.clone(),
+                review: judgment.review.clone(),
+                unsupported_clauses: judgment.unsupported_clauses.clone(),
+                meta: meta(&judgment.name),
+            },
+        )));
     }
     let queries = hir
         .queries
@@ -2387,6 +3761,7 @@ fn lower_verifications(hir: &HirModule, meta: impl Fn(&str) -> NodeMeta) -> Vec<
                 },
             ),
             formula: item.formula.clone(),
+            assertions: item.assertions.clone(),
             meta: meta(&item.name),
         });
     }
@@ -2407,6 +3782,7 @@ fn lower_verifications(hir: &HirModule, meta: impl Fn(&str) -> NodeMeta) -> Vec<
                 q.domain,
                 q.formula
             ),
+            assertions: Vec::new(),
             meta: meta(&q.binder),
         });
     }
@@ -2442,6 +3818,10 @@ fn consequence_from_op(op: &str, prop: &PropTerm) -> Consequence {
         "establish" | "constitute" => Consequence::Establish(prop.clone()),
         "terminate" => Consequence::Terminate(prop.clone()),
         "suspend" => Consequence::Suspend(prop.clone()),
+        "create" => Consequence::CreatePositionExpr(Term::Apply {
+            ctor: prop.predicate.clone(),
+            args: prop.arguments.clone(),
+        }),
         _ => Consequence::Derive(prop.clone()),
     }
 }
@@ -2476,7 +3856,7 @@ fn lower_query(
 }
 
 fn lower_query_plan(q: &HirQuery, hir: &HirModule) -> QueryPlan {
-    match &q.body {
+    let plan = match &q.body {
         HirQueryBody::Return(term) => QueryPlan::Evaluate(term.clone()),
         HirQueryBody::Goal {
             kind,
@@ -2505,6 +3885,20 @@ fn lower_query_plan(q: &HirQuery, hir: &HirModule) -> QueryPlan {
                 .unwrap_or(QueryPlan::Evaluate(Term::Wildcard)),
         },
         HirQueryBody::None => QueryPlan::Evaluate(Term::Wildcard),
+    };
+    if let HirQueryBody::Goal { fields, .. } = &q.body
+        && let Some(prefix) = fields.get("$prefix")
+    {
+        let prefix = match prefix {
+            Term::Apply { ctor, args } if ctor == "seq" => args.clone(),
+            other => vec![other.clone()],
+        };
+        QueryPlan::Guarded {
+            prefix,
+            plan: Box::new(plan),
+        }
+    } else {
+        plan
     }
 }
 
@@ -2592,6 +3986,12 @@ fn lower_status_of(fields: &BTreeMap<String, Term>) -> QueryPlan {
         when_closed_absent,
     }
 }
+
+#[cfg(test)]
+mod comment_tests;
+
+#[cfg(test)]
+mod depth_tests;
 
 #[cfg(test)]
 mod tests {
@@ -2760,8 +4160,8 @@ module Examples.Fuel version "0.1.0" {
         countdown(n - 1)
     }
     query all_ok() -> Bool {
-        for_all x in People: Eligible(x)
-        exists y in People: Trustee(y)
+        for_all x in People: true
+        exists y in People: true
     }
 }
 "#;
@@ -2878,6 +4278,32 @@ module Examples.Rule version "0.1.0" {
             "{:?}",
             rule.consequences
         );
+    }
+
+    #[test]
+    fn operative_in_context_lowers_to_the_proposition() {
+        let src = r#"
+module Examples.Context version "0.1.0" {
+    rule R : derive { when operative P() in Context(X) then derive Q() }
+    query ok() -> Bool {
+        goal Evaluate { true }
+    }
+}
+"#;
+        let module = check_src(src).expect("operative in context should check");
+        let rule = module.declarations.iter().find_map(|d| match d {
+            CoreDecl::Rule(r) if r.name == "R" => Some(r),
+            _ => None,
+        });
+        let rule = rule.expect("rule R");
+        match &rule.guard {
+            Guard::Operative(prop, ctx) => {
+                assert_eq!(prop.predicate, "P", "{prop:?}");
+                assert!(prop.arguments.is_empty(), "{prop:?}");
+                assert_eq!(ctx, "Context(X)");
+            }
+            other => panic!("context must not become the proposition `in`: {other:?}"),
+        }
     }
 
     #[test]
@@ -3331,7 +4757,15 @@ module Examples.ImpBytes version "0.1.0" {
         manifest: &SourceManifest,
         source_root: Option<&Path>,
     ) -> Result<CoreModule, Vec<Diagnostic>> {
-        let parsed = parse_file(digest_import_src());
+        let source = digest_import_src().replace(
+            "abc",
+            manifest
+                .artifacts
+                .first()
+                .map(|a| a.digest.as_str())
+                .unwrap_or("abc"),
+        );
+        let parsed = parse_file(&source);
         let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
         check_with_sources(&hir, manifest, source_root)
     }
@@ -3357,6 +4791,123 @@ module Examples.ImpBytes version "0.1.0" {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    fn check_boundary_manifest(
+        manifest: &SourceManifest,
+        root: Option<&Path>,
+    ) -> Result<CoreModule, Vec<Diagnostic>> {
+        let parsed =
+            parse_file("module Boundary version \"1\" { query q() -> Bool {return true} }");
+        let hir = elaborate(&parsed, &SourceManifest::default()).unwrap();
+        check_with_sources(&hir, manifest, root)
+    }
+
+    #[test]
+    fn public_checker_refuses_absolute_and_parent_artifact_paths() {
+        let root = TempRoot::new();
+        let outside = TempRoot::new();
+        outside.write("law.txt", b"outside");
+        let digest = encode_hex(blake3::hash(b"outside").as_bytes());
+        for path in [
+            outside.0.join("law.txt").display().to_string(),
+            format!(
+                "../{}/law.txt",
+                outside.0.file_name().unwrap().to_str().unwrap()
+            ),
+        ] {
+            let manifest = artifact_manifest(&path, &digest);
+            let diagnostics = check_boundary_manifest(&manifest, Some(&root.0)).unwrap_err();
+            assert!(
+                diagnostics
+                    .iter()
+                    .any(|diagnostic| diagnostic.code == DiagnosticCode::E200
+                        && diagnostic.message.contains("source root")),
+                "{diagnostics:?}"
+            );
+            assert_eq!(
+                source_integrity(&manifest, Some(&root.0)),
+                TrustProfile::Unauthenticated
+            );
+        }
+    }
+
+    #[test]
+    fn public_checker_refuses_duplicate_normalized_artifact_paths() {
+        let root = TempRoot::new();
+        root.write("law.txt", b"law");
+        let mut manifest = artifact_manifest("law.txt", "fixture");
+        let mut duplicate = manifest.artifacts[0].clone();
+        duplicate.path = "./law.txt".into();
+        manifest.artifacts.push(duplicate);
+        let diagnostics = check_boundary_manifest(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("duplicate normalized"))
+        );
+        assert!(check_boundary_manifest(&manifest, None).is_err());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn public_checker_refuses_symlink_escape_and_duplicate_physical_paths() {
+        let root = TempRoot::new();
+        let outside = TempRoot::new();
+        outside.write("law.txt", b"outside");
+        std::os::unix::fs::symlink(outside.0.join("law.txt"), root.0.join("escape.txt")).unwrap();
+        let manifest = artifact_manifest("escape.txt", "fixture");
+        let diagnostics = check_boundary_manifest(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("outside the source root"))
+        );
+        root.write("law.txt", b"law");
+        std::os::unix::fs::symlink(root.0.join("law.txt"), root.0.join("alias.txt")).unwrap();
+        let mut manifest = artifact_manifest("law.txt", "fixture");
+        let mut alias = manifest.artifacts[0].clone();
+        alias.path = "alias.txt".into();
+        manifest.artifacts.push(alias);
+        let diagnostics = check_boundary_manifest(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("duplicate physical"))
+        );
+    }
+
+    #[test]
+    fn public_checker_bounds_artifact_and_nested_lock_bytes() {
+        let root = TempRoot::new();
+        fs::File::create(root.0.join("large.txt"))
+            .unwrap()
+            .set_len(ARTIFACT_BYTE_LIMIT + 1)
+            .unwrap();
+        let manifest = artifact_manifest("large.txt", "fixture");
+        let diagnostics = check_boundary_manifest(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("byte limit of 33554432"))
+        );
+        fs::create_dir_all(root.0.join("packages/std")).unwrap();
+        fs::create_dir_all(root.0.join("packages/logic")).unwrap();
+        let bytes = std_core_reexport_src();
+        root.write("packages/std/core.fr", bytes);
+        fs::File::create(root.0.join("packages/logic/manifest.json"))
+            .unwrap()
+            .set_len(4 * 1024 * 1024 + 1)
+            .unwrap();
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let diagnostics = check_std_core_import(&manifest, Some(&root.0)).unwrap_err();
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.message.contains("byte limit of 4194304")),
+            "{diagnostics:?}"
+        );
     }
 
     #[test]
@@ -3683,16 +5234,16 @@ module Examples.ReqInt version "0.1.0" {
         let src = r#"
 module Examples.Tax version "0.1.0" {
     calc ordinary_income_tax_formula(amount: Money<USD>) -> Money<USD> {
-        if amount <= 11925.00 {
+        if amount <= USD(11925.00) {
             amount * 0.10
         } else {
-            if amount <= 48475.00 {
-                11925.00 * 0.10 + (amount - 11925.00) * 0.12
+            if amount <= USD(48475.00) {
+                USD(11925.00) * 0.10 + (amount - USD(11925.00)) * 0.12
             } else {
-                if amount <= 103350.00 {
-                    11925.00 * 0.10 + (48475.00 - 11925.00) * 0.12 + (amount - 48475.00) * 0.22
+                if amount <= USD(103350.00) {
+                    USD(11925.00) * 0.10 + (USD(48475.00) - USD(11925.00)) * 0.12 + (amount - USD(48475.00)) * 0.22
                 } else {
-                    17651.00 + (amount - 103350.00) * 0.24
+                    USD(17651.00) + (amount - USD(103350.00)) * 0.24
                 }
             }
         }
@@ -3964,6 +5515,7 @@ module Examples.UseStd version "0.1.0" {
     query always_true() -> Bool {
         goal Evaluate { true }
     }
+
 }
 "#;
         let digest = encode_hex(blake3::hash(bytes).as_bytes());
@@ -3981,6 +5533,23 @@ module Examples.UseStd version "0.1.0" {
             authenticate_artifact(&manifest.artifacts[0], Some(&root.0)),
             TrustProfile::ByteVerified
         );
+    }
+
+    #[test]
+    fn package_parse_diagnostics_keep_the_package_source_path() {
+        let bytes = b"module Std.Core version \"0.1.0\" { query broken() -> Int { return 9223372036854775808 } }";
+        let digest = encode_hex(blake3::hash(bytes).as_bytes());
+        let root = TempRoot::new();
+        fs::create_dir_all(root.0.join("packages/std")).unwrap();
+        root.write("packages/std/core.fr", bytes);
+        let manifest = package_artifact_manifest("packages/std/core.fr", &digest, "0.1.0");
+        let diagnostics = check_std_core_import(&manifest, Some(&root.0)).unwrap_err();
+        assert!(diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == DiagnosticCode::E100
+                && diagnostic.source_file.as_deref()
+                    == Some(root.0.join("packages/std/core.fr").to_str().unwrap())
+                && diagnostic.primary_span.is_some()
+        }));
     }
 
     #[test]
@@ -4259,5 +5828,316 @@ module Examples.UseEff version "0.1.0" {
             err.iter().any(|d| d.code == DiagnosticCode::E420),
             "{err:?}"
         );
+    }
+
+    #[test]
+    fn a_consequence_that_names_an_entity_is_e210() {
+        // `Acme` is an entity. A name with no arguments has the shape of a
+        // proposition, so the rule established a proposition called `Acme`
+        // that nothing declares, and the module passed.
+        let module = |consequences: &str| {
+            format!(
+                "module Review version \"0.1.0\" {{\n    entity Acme : LegalPerson\n    proposition Exempt(who: LegalPerson)\n    proposition Flag()\n    rule Exemption : constitutive {{\n        when true\n        {consequences}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+            )
+        };
+        let rejected = |consequences: &str| -> Vec<(DiagnosticCode, String)> {
+            check_src(&module(consequences))
+                .expect_err(consequences)
+                .into_iter()
+                .map(|diagnostic| (diagnostic.code, diagnostic.message))
+                .collect()
+        };
+        // Each of the nine verbs, `create` among them, in the `then` list
+        // and in the `otherwise` list.
+        for verb in [
+            "establish",
+            "constitute",
+            "terminate",
+            "suspend",
+            "create",
+            "derive",
+            "activate",
+            "defeat",
+            "make",
+        ] {
+            for written in ["Acme", "(Acme)", "Acme()"] {
+                for consequences in [
+                    format!("then {verb} {written}"),
+                    format!("then establish Exempt(Acme)\n        otherwise {verb} {written}"),
+                ] {
+                    assert_eq!(
+                        rejected(&consequences),
+                        [(
+                            DiagnosticCode::E210,
+                            format!(
+                                "`{verb} Acme` in rule `Exemption` requires a proposition, not LegalPerson"
+                            )
+                        )],
+                        "{consequences}"
+                    );
+                }
+            }
+        }
+        // A declared proposition with no arguments is a consequence as
+        // before, with and without its parentheses.
+        check_src(&module("then establish Flag\n        then derive Flag()"))
+            .expect("a proposition with no arguments");
+        // `create` takes what the other verbs take: a proposition with its
+        // arguments, and a name with no arguments that is a proposition or
+        // that nothing declares. Beside those it takes a duty with its
+        // three fields.
+        check_src(&module(
+            "then create Exempt(Acme)\n        then create Flag\n        then create Position\n        then create Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))",
+        ))
+        .expect("the consequences `create` takes");
+        // And a duty with no fields is told what it lacks, as before.
+        let lacking = [
+            "Duty creation requires `bearer`",
+            "Duty creation requires `claimant`",
+            "Duty creation requires content",
+        ]
+        .map(|message| (DiagnosticCode::E210, message.to_owned()));
+        assert_eq!(rejected("then create Duty()"), lacking);
+        assert_eq!(rejected("then create Duty"), lacking);
+    }
+
+    #[test]
+    fn create_is_checked_as_the_other_eight_verbs_are() {
+        // After `create` the checker looked at nothing but the fields of a
+        // `Duty`. So a name with arguments, whatever it names, a date, a
+        // duration, an interval and a quantifier passed after `create`
+        // alone, and each is `E210` after the other eight verbs.
+        let module = |consequences: &str| {
+            format!(
+                "module Review version \"0.1.0\" {{\n    type Color = Red | Green\n    type Truth = Prop\n    entity Acme : LegalPerson\n    entity Pr : Prop\n    entity Al : Truth\n    office Chair\n    office Seat(n: Int)\n    record_type Paper {{\n        a: Int\n    }}\n    effect reads {{ request(a: Int) -> Bool }}\n    calc seven() -> Int {{ return 7 }}\n    fn eight() -> Int {{ return 8 }}\n    query nine() -> Int {{ return 9 }}\n    proposition Exempt(who: LegalPerson)\n    proposition Flag()\n    rule Exemption(who: LegalPerson) : constitutive {{\n        when true\n        {consequences}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+            )
+        };
+        // The diagnostics of a module, from the lowering or from the
+        // checker, with `verb` written as VERB. None when it passes.
+        let diagnostics = |verb: &str, consequences: &str| -> Vec<(DiagnosticCode, String)> {
+            let parsed = parse_file(&module(consequences));
+            assert!(!parsed.has_errors(), "{consequences}");
+            elaborate(&parsed, &SourceManifest::default())
+                .and_then(|hir| check(&hir, &SourceManifest::default()).map(|_| ()))
+                .err()
+                .unwrap_or_default()
+                .into_iter()
+                .map(|diagnostic| (diagnostic.code, diagnostic.message.replace(verb, "VERB")))
+                .collect()
+        };
+        let both_lists = |verb: &str, form: &str| {
+            [
+                diagnostics(verb, &format!("then {verb} {form}")),
+                diagnostics(
+                    verb,
+                    &format!("then establish Exempt(Acme)\n        otherwise {verb} {form}"),
+                ),
+            ]
+        };
+        // Expressions that are no name, each also in parentheses, and names
+        // alone, with `()` and with arguments.
+        let mut forms: Vec<String> = Vec::new();
+        for expression in [
+            "5",
+            "2.5",
+            "\"none\"",
+            "true",
+            "1 + 2",
+            "1 < 2",
+            "{1, 2}",
+            "{ a: 1 }",
+            "2026-01-01",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T09:30:00-05:00",
+            "5 days",
+            "USD(500.00)",
+            "[1, 2]",
+            "[1, 2)",
+            "[2026-08-14, +inf)",
+            "for_all x in {1, 2} : x > 0",
+            "exists x in {1, 2} : x > 0",
+            "_",
+            "+inf",
+            "-inf",
+            "if true { Flag() } else { Flag() }",
+            "who.name",
+            "\"a\"(1)",
+            "operative Exempt(Acme)",
+        ] {
+            forms.push(expression.to_owned());
+            forms.push(format!("({expression})"));
+        }
+        for (name, arguments) in [
+            ("Exempt", "Acme"),
+            ("Exempt", "5"),
+            ("Exempt", "Acme, Acme"),
+            ("Flag", "1"),
+            ("Acme", "1"),
+            ("Pr", "1"),
+            ("Al", "1"),
+            ("Chair", "1"),
+            ("Seat", "1"),
+            ("reads", "1"),
+            ("Red", "1"),
+            ("who", "1"),
+            ("Paper", "1"),
+            ("seven", "1"),
+            ("eight", "1"),
+            ("nine", "1"),
+            ("Unknown", "Acme"),
+            ("unknown", "1"),
+        ] {
+            forms.push(name.to_owned());
+            forms.push(format!("{name}()"));
+            forms.push(format!("{name}({arguments})"));
+        }
+        let other_verbs = [
+            "constitute",
+            "terminate",
+            "suspend",
+            "create",
+            "derive",
+            "activate",
+            "defeat",
+            "make",
+        ];
+        let mut accepted = Vec::new();
+        for form in &forms {
+            let after_establish = both_lists("establish", form);
+            for verb in other_verbs {
+                assert_eq!(both_lists(verb, form), after_establish, "{verb} {form}");
+            }
+            if after_establish.iter().all(Vec::is_empty) {
+                accepted.push(form.as_str());
+            }
+        }
+        // What a consequence can be: a proposition with its arguments, a
+        // name of type `Prop`, which an entity can have, and a capitalized
+        // name with no arguments that nothing declares.
+        assert_eq!(
+            accepted,
+            [
+                "Exempt(Acme)",
+                "Flag",
+                "Flag()",
+                "Pr",
+                "Pr()",
+                "Al",
+                "Al()",
+                "Unknown",
+                "Unknown()"
+            ]
+        );
+        // `Duty` is the exception, and only after `create`: its three
+        // fields are checked, and nothing declares it as a proposition.
+        let duty = "Duty(bearer = Acme, claimant = Acme, content = Exempt(Acme))";
+        for verb in other_verbs.into_iter().chain(["establish"]) {
+            if verb == "create" {
+                assert_eq!(both_lists(verb, duty), [Vec::new(), Vec::new()]);
+                continue;
+            }
+            assert_eq!(
+                both_lists(verb, duty),
+                [(); 2].map(|()| vec![(
+                    DiagnosticCode::E210,
+                    "`operative` in `Exemption` requires a proposition, not Nominal(\"Duty\")"
+                        .to_owned()
+                )]),
+                "{verb}"
+            );
+        }
+        // Without its fields `Duty` is told after `create` which of them it
+        // lacks. After the other eight verbs it is a name that this module
+        // does not declare: alone and with `()` it passes, and with an
+        // argument it is no proposition.
+        let lacking: Vec<(DiagnosticCode, String)> = [
+            "Duty creation requires `bearer`",
+            "Duty creation requires `claimant`",
+            "Duty creation requires content",
+        ]
+        .map(|message| (DiagnosticCode::E210, message.to_owned()))
+        .to_vec();
+        let no_proposition = vec![(
+            DiagnosticCode::E210,
+            "`operative` in `Exemption` requires a proposition, not Nominal(\"Duty\")".to_owned(),
+        )];
+        for verb in other_verbs.into_iter().chain(["establish"]) {
+            for (form, after_the_other_verbs) in [
+                ("Duty", Vec::new()),
+                ("Duty()", Vec::new()),
+                ("Duty(1)", no_proposition.clone()),
+            ] {
+                let expected = if verb == "create" {
+                    lacking.clone()
+                } else {
+                    after_the_other_verbs
+                };
+                assert_eq!(
+                    both_lists(verb, form),
+                    [expected.clone(), expected],
+                    "{verb} {form}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_capitalized_name_the_checker_reads_otherwise_is_no_proposition() {
+        // A capitalized name with no arguments that nothing declares is a
+        // proposition to the checker: as a consequence, after `create` too,
+        // and as the operand of `operative`.
+        let uses = |name: &str| {
+            [
+                format!("when true\n        then establish {name}"),
+                format!("when true\n        then create {name}"),
+                format!("when operative {name}()\n        then establish Flag()"),
+            ]
+            .map(|statements| {
+                format!(
+                    "module Review version \"0.1.0\" {{\n    proposition Flag()\n    rule R : constitutive {{\n        {statements}\n    }}\n    query q() -> Bool {{ return true }}\n}}\n"
+                )
+            })
+        };
+        for name in ["Unknown", "Abc", "A1", "AB", "FLAGS"] {
+            for module in uses(name) {
+                check_src(&module).expect(name);
+            }
+        }
+        // Some names are read otherwise and are no propositions. `Final`
+        // is a variant and `Distribution` a record type of the standard
+        // types, which every module has. Three or four capital letters are
+        // a currency. And some words are read as the same word in
+        // lowercase, whatever their capitals.
+        for name in [
+            "Final",
+            "Distribution",
+            "ABC",
+            "FLAG",
+            "IF",
+            "APPLY",
+            "For_All",
+            "Seq",
+            "Transaction",
+            "If",
+            "Not",
+            "Call",
+            "Apply",
+            "Require",
+            "Exists",
+            "For_all",
+            "Duty_status",
+            "Duty_step",
+            "Require_authority",
+        ] {
+            for module in uses(name) {
+                let diagnostics = check_src(&module).expect_err(name);
+                assert!(
+                    diagnostics
+                        .iter()
+                        .all(|diagnostic| diagnostic.code == DiagnosticCode::E210),
+                    "{name}: {diagnostics:?}"
+                );
+            }
+        }
     }
 }

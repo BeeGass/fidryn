@@ -1,4 +1,4 @@
-# Fidryn v0.1 architecture
+# Fidryn 0.2 architecture
 
 Fidryn is a reference interpreter for legal instruments. It is a compiler
 plus a partial evaluator: parse a `.fr` module, authenticate a source
@@ -33,18 +33,21 @@ bytes
   -> Outcome<T> + proof-relevant trace
 ```
 
-v0.1 is a reference interpreter, not a native-code compiler. There is no
+Fidryn 0.2 is a reference interpreter, not a native-code compiler. There is no
 LLVM backend. `calc` functions are total, effect-free, and terminating;
 they run in the evaluator, not as machine code.
 
 ## Improvements over the essay's gaps
 
 The essay left a grammar sketch, deferred conflict oracles, and noted that
-no-false-determinacy is only as honest as the admitted model. v0.1 closes
-those as follows:
+no-false-determinacy is only as honest as the admitted model. Fidryn 0.2
+retains the following contracts:
 
-1. `grammar.ebnf` is closed. Unknown body fields are parse errors, not
-   extension points. There is no catch-all `Ident Expr` statement.
+1. `grammar.ebnf` is closed. It has no catch-all `Ident Expr` statement.
+   The 0.2 parser enforces closed field sets only in `source` blocks,
+   rule bodies and judgment request blocks; in most other declarations an
+   unknown field is skipped without a diagnostic (see
+   [implementation status](implementation-status.md)).
 2. Keywords that introduce declarations are contextual. `source`, `entity`,
    `office`, `rule`, and similar words are identifiers except in declaration
    position. Reserved words are the small set in the grammar.
@@ -84,8 +87,8 @@ those as follows:
 16. Filing adapters, tax calc modules, guarded recursion, user-defined
     effects, quantification, court procedure, case-law graphs, constrained
     render, a bounded solver, and a localhost mill UI are in-tree. In-tree
-    is not executed. See the capability matrix. Live filing still requires
-    `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
+    is not executed. See [implementation status](implementation-status.md).
+    Live filing still requires `--live` and `FIDRYN_ALLOW_LIVE_FILING=1`.
 
 ## Crate graph
 
@@ -146,7 +149,7 @@ See the crate itself. The important types are `CoreModule`, `Outcome<T>`,
 covering proof. Ignoring open issues requires a covering certificate
 (`verified_covering` + complete `CoverageWitness`). A hash of the open
 issues is not covering. `CompletionProofId::of(b"P11")` is never a
-certificate. See [`OBLIGATIONS.md`](OBLIGATIONS.md).
+certificate. See [`OBLIGATIONS.md`](internal/OBLIGATIONS.md).
 
 ### fidryn-hir
 
@@ -218,23 +221,29 @@ Conservative precedence (first match wins):
 
 ### fidryn-cli
 
-```
+```text
 fidryn fmt PATH
 fidryn check PATH
+fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
-    [--arg KEY=VALUE]
-fidryn explore PATH --query NAME --case RECORD.json --bounds BOUNDS.json
+    [--arg KEY=VALUE] [--scenario] [--budget N]
+fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json]
     --valid-at TIME --known-at TIME
-fidryn explain TRACE_ID --format text|json|dot
+fidryn explain TRACE_ID [--format text|json|dot]
 fidryn verify PATH --property NAME
 fidryn diff OLD_SNAPSHOT NEW_SNAPSHOT --query NAME
-fidryn render PATH --template TEMPLATE
+fidryn render PATH --template TEMPLATE [--data DATA.json]
+fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
+    [--scenario] [--budget N] [--template TEMPLATE]
+fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
+fidryn ui [--port N] [--no-open]
 ```
 
-`run` never chooses a completion. `--arg provision=...` sets
-`case.facts["provision"]`. `TIME` is ISO 8601 / RFC 3339 (`Z` or a numeric
-offset). Compiler diagnostics print `Diagnostic`'s `Display` and exit 1.
-`explore` requires explicit bounds.
+Every subcommand also takes `--source-root PATH`. `run` never chooses a
+completion. `--arg provision=...` sets `case.facts["provision"]`. `TIME` is
+ISO 8601 / RFC 3339 (`Z` or a numeric offset). Compiler diagnostics print
+`Diagnostic`'s `Display` and exit 1. `explore` examines only the finite
+completion space on the case and in `--bounds`.
 
 ## Pipeline
 

@@ -61,7 +61,7 @@ module US.Federal.Securities.AccreditedInvestor version "0.1.0" {
     {
         goal Evaluate {
             require observed TaxReturn
-            require individual_income_met(year1, year2)
+            require year1 > income_threshold() and year2 > income_threshold()
             return true
         }
     }
@@ -73,6 +73,7 @@ module US.Federal.Securities.AccreditedInvestor version "0.1.0" {
         goal Evaluate {
             require determined InvestorSophistication(Investor)
                 using Determine
+            return true
         }
     }
 

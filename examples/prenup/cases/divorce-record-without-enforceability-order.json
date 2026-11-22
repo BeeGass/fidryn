@@ -2,9 +2,15 @@
   "schema": "fidryn.case-record/v0.1",
   "module": "Examples.AvaNoahPrenup@0.1.0",
   "facts": {
-    "provision": "Examples.AvaNoahPrenup@0.1.0::SpousalSupportWaiver()",
-    "against": "Ava",
-    "case": "DivorceCase",
+    "provision": "SpousalSupportWaiver",
+    "against": {
+      "kind": "entity",
+      "data": "Ava"
+    },
+    "case": {
+      "kind": "entity",
+      "data": "DivorceCase"
+    },
     "married": true,
     "agreement_executed": true
   },
@@ -31,7 +37,11 @@
     "interpretations": {},
     "evidence": {
       "PrenupEnforceability": {
-        "responses": ["absent", "established", "not_established"],
+        "responses": [
+          "absent",
+          "established",
+          "not_established"
+        ],
         "effectOnValidTime": "unchanged_if_after_query_valid_time"
       }
     },

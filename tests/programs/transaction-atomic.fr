@@ -15,7 +15,7 @@ module Programs.TransactionAtomic version "0.1.0" {
         content USD(100.00)
     }
 
-    query q() -> Bool {
+    query q() -> DutyStatus {
         transaction {
             duty_step(pay, attach);
             duty_step(pay, discharge)
