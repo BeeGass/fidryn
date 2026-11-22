@@ -239,14 +239,14 @@ module "/us/usc/t45/s231f" {
     p "1979—Subsec. (b)(7). " ["Pub. L. 96–101" -> "/us/pl/96/101"] " substituted “Notwithstanding any other provision of law, the Secretary” for “The Secretary” and inserted “and the Milwaukee Railroad Restructuring Act” after “administration of this subchapter”."
     hash "4e1a4390925df29e0ec81ec16ad21f012b3dbf689067ccd7e9a1391dcc27fb43"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.88/change-of-name" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.88/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
     p "“Secretary of Health and Human Services” substituted for “Secretary of Health, Education, and Welfare” in subsecs. (b)(7), (c)(2), and (d)(4) and (5) pursuant to " ["section 509(b) of Pub. L. 96–88" -> "/us/pl/96/88/s509/b"] ", which is classified to " ["section 3508(b) of Title 20" -> "/us/usc/t20/s3508/b"] ", Education."
     hash "3b6414860809996994aa0a2a6c4e54f739678c43ee4245a66b49c143606874ca"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
@@ -255,7 +255,7 @@ module "/us/usc/t45/s231f" {
     p "Amendment by " ["section 106(a) of Pub. L. 107–90" -> "/us/pl/107/90/s106/a"] " effective Jan. 1, 2002, see " ["section 106(e)(1) of Pub. L. 107–90" -> "/us/pl/107/90/s106/e/1"] ", set out as a note under " ["section 231n of this title" -> "/us/usc/t45/s231n"] "."
     hash "d2c09ab3ab64928cb60701944ebd57fdd50948935b9578c18b5ad821966d6386"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.98.369/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.98.369/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -272,21 +272,21 @@ module "/us/usc/t45/s231f" {
     }
     hash "3e44797b61008cce99d166a2c82583d30fd4691e0ec1c1ed113f65239f7324da"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.97.248/effective-date-of-1982-amendment" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.97.248/effective-date-of-1982-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1982 Amendment"
     p "Amendment by " ["Pub. L. 97–248" -> "/us/pl/97/248"] " applicable to hospice care provided on or after Nov. 1, 1983, see " ["section 122(h)(1)(A) of Pub. L. 97–248" -> "/us/pl/97/248/s122/h/1/A"] ", as amended, set out as a note under " ["section 1395c of Title 42" -> "/us/usc/t42/s1395c"] ", The Public Health and Welfare."
     hash "041b6525c86ea8d246a4e6bda8d05ef13b794e4e33f8685489804119bec5715d"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by section 1122(a)(2), (b)(1), (c) of " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Oct. 1, 1981, and amendment by other provisions of " ["section 1122 of Pub. L. 97–35" -> "/us/pl/97/35/s1122"] " effective Oct. 1, 1981, and applicable only with respect to annuities awarded on or after Oct. 1, 1981, see " ["section 1129 of Pub. L. 97–35" -> "/us/pl/97/35/s1129"] ", set out as a note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
     hash "ef3b2cc1f577bb8d68063d5a50e4b19c625caacf1acfb96838cb837d91187470"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.499/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.499/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
@@ -305,7 +305,7 @@ module "/us/usc/t45/s231f" {
     }
     hash "77bbcecb9b3bb5e69eb95d5d3d6509da784307d598a3f2ff3f67452f9341ac26"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.254/repeals" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.96.254/repeals" editorial {
     group statutoryNotes
     topic "repeals"
     heading "Repeals"
@@ -329,21 +329,21 @@ module "/us/usc/t45/s231f" {
     p ["Pub. L. 104–208, div. A, title I, § 101(e) [title IV]" -> "/us/pl/104/208/dA/tI/s101/e/tIV"] ", Sept. 30, 1996, " ["110 Stat. 3009–233" -> "/us/stat/110/3009-233"] ", 3009–268."
     hash "f89767c3d41d1c0e0472c1a55158c1b4db644a4baa3bfcf53598d8e7ac081fa2"
   }
-  note "/us/usc/t45/s231f/note/statutoryNotes/pl.101.509/references-in-other-laws-to-gs-16-17-or-18-pay-rates" enacted {
+  note "/us/usc/t45/s231f/note/statutoryNotes/pl.101.509/references-in-other-laws-to-gs-16-17-or-18-pay-rates" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "References in Other Laws to GS–16, 17, or 18 Pay Rates"
     p "References in laws to the rates of pay for GS–16, 17, or 18, or to maximum rates of pay under the General Schedule, to be considered references to rates payable under specified sections of Title 5, Government Organization and Employees, see section 529 [title I, § 101(c)(1)] of " ["Pub. L. 101–509" -> "/us/pl/101/509"] ", set out in a note under " ["section 5376 of Title 5" -> "/us/usc/t5/s5376"] "."
     hash "ea44723d8911858fb791ac200684d76bee281e646461766b462a95dcafcc3423"
   }
-  note "/us/usc/t45/s231f/note/execDoc/nolaw/transfer-of-functions" enacted {
+  note "/us/usc/t45/s231f/note/execDoc/nolaw/transfer-of-functions" editorial {
     group execDoc
     topic "transferOfFunctions"
     heading "Transfer of Functions"
     p "“Fiscal Service” substituted for “Division of Disbursements” in subsec. (b)(4) on authority of section 1(a)(1) of 1940 Reorg. Plan No. III, eff. June 30, 1940, 5 F.R. 2107, " ["54 Stat. 1231" -> "/us/stat/54/1231"] ", set out in the Appendix to Title 5, Government Organization and Employees, which consolidated such division into Fiscal Service of Treasury Department. See " ["section 306 of Title 31" -> "/us/usc/t31/s306"] ", Money and Finance."
     hash "f6caf95d1aed22e2acd584c8eafcee37b513857bc8e34eeb38b5cae14b6f23c0"
   }
-  note "/us/usc/t45/s231f/note/execDoc/nolaw/delegation-of-reporting-authority" enacted {
+  note "/us/usc/t45/s231f/note/execDoc/nolaw/delegation-of-reporting-authority" editorial {
     group execDoc
     topic "miscellaneous"
     heading "Delegation of Reporting Authority"
@@ -362,7 +362,7 @@ module "/us/usc/t45/s231f" {
   }
   layers {
     operative "ffe947582fdccfcb66ca93cc3daf1eabc0ef184148da98e0b7da0288ea2ad22b"
-    enacted "c203c90f9f2c440e60461283020d8bc00f8e98812237b178bfa8e78208652f27"
-    editorial "d119fe827e3b50f720dcc5473716c63c6e2704b9f8fdce266a10926a6922b131"
+    enacted "f0bfeb3185990a31bee6516a10ed23cdd31aa0360e5f2b3235fac3dc0f4bf51b"
+    editorial "374beefe1e93b7f2e4800af134a223b0a8949e44cdfa145f5009a4adb158c829"
   }
 }

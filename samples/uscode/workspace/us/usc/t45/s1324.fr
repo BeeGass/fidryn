@@ -28,7 +28,7 @@ module "/us/usc/t45/s1324" {
     p ["Section 1321(a)(2) of this title" -> "/us/usc/t45/s1321/a/2"] ", referred to in subsec. (a), was repealed by " ["Pub. L. 101–213, § 2(b)(3)" -> "/us/pl/101/213/s2/b/3"] ", Dec. 11, 1989, " ["103 Stat. 1843" -> "/us/stat/103/1843"] "."
     hash "97492827bfa9e1f693480f114827be0b92544b8b63f5c2987112005097a0b78a"
   }
-  note "/us/usc/t45/s1324/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s1324/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
@@ -40,7 +40,7 @@ module "/us/usc/t45/s1324" {
   }
   layers {
     operative "2ff8b8cee5d5023863fa9cb908658807318315ec7d98bfadafe88663e22133e8"
-    enacted "d6b3f8494e27656c40777c0ff29ed0d5280f754dae1804112c31a19a882cf552"
-    editorial "13031b868a2d5c8c9d3297725a062c58c418b1b7fe4e1f9890aacff6d7669cfc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b5bee1ec31660f3d0288fddde3f05ae53f43353f70de8ae1d8b256bbd418f280"
   }
 }

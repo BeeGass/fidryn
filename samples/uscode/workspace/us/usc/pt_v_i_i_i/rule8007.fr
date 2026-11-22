@@ -129,14 +129,14 @@ module "/us/usc/ptVIII/rule8007" {
     hash "918d9e7b44b5529ea0f02ba513a20dd20843726e3a11d7d765a32405b8d8c1c6"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8007, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to completion and transmission of the record and docketing of the appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "8129d1a623612918cd3146515b51274d132f7ec45e73dd6a5c3fbcd0d8a6105c"
   }
-  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -148,14 +148,14 @@ module "/us/usc/ptVIII/rule8007" {
     p "Changes Made After Publication and Comment. The clause “or where it will be taken” was deleted in subdivision (b)(1). Stylistic changes were made to the titles of subdivisions (b) and (e) and in subdivision (e)(1). A discussion of subdivision (e) was added to the Committee Note."
     hash "0f954f6ce1fcfd0f0fa29b252ca9aa3a3f947093338a79e9b203f86a8f05ab7b"
   }
-  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "The amendments to subdivisions (a)(1)(B), (c), and (d) conform this rule with the amendment of Rule 62 F.R.Civ.P., which is made applicable to adversary proceedings by Rule 7062. Rule 62 formerly required a party to provide a “supersedeas bond” to obtain a stay of the judgment and proceedings to enforce the judgment. As amended, Rule 62(b) allows a party to obtain a stay by providing a “bond or other security.”"
     hash "07b3786a10ca3a07dfee4d21b2bb8c16535968d9cb5c52699ec06bbfe441759e"
   }
-  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -167,7 +167,7 @@ module "/us/usc/ptVIII/rule8007" {
   }
   layers {
     operative "918d9e7b44b5529ea0f02ba513a20dd20843726e3a11d7d765a32405b8d8c1c6"
-    enacted "17e9169d41b1cac5a75616676c1224d94018ad820eff3fed54c6fe4142fe8756"
-    editorial "ce66e2271e5b94b4874e8efc46a3862f9f95a5f70519ab6a5937287412302ba4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2b3e12c458196f0311af80ed83ff428afd4159f7098c21d970c96295f55707ac"
   }
 }

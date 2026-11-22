@@ -17,7 +17,7 @@ module "/us/usc/t1/s105" {
     p "1974—" ["Pub. L. 93–344" -> "/us/pl/93/344"] " substituted “September 30” for “June 30”."
     hash "15871b2a6121cd935f94e3430472a8d258277e206e8c99bf9a268beb9ea76eb2"
   }
-  note "/us/usc/t1/s105/note/statutoryNotes/pl.93.344/effective-date-of-1974-amendment" enacted {
+  note "/us/usc/t1/s105/note/statutoryNotes/pl.93.344/effective-date-of-1974-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1974 Amendment"
@@ -26,7 +26,7 @@ module "/us/usc/t1/s105" {
   }
   layers {
     operative "df4f26cce642f040b5a784e7df4e6c5a5cbe69d4bbf60fb61b69b10178590e94"
-    enacted "8b5e9ef4591ed69e691264c6fde4dd5e45f38487efccb3ec374c8e56af797a41"
-    editorial "f8e2253faac9ede99d36942c374d0076f77817a9073d5d09b3b232121fe35575"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fb9351445f10a83d93ec399e8538bcc398c98270a5014c1f40f5131fa9669254"
   }
 }

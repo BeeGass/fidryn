@@ -19,7 +19,7 @@ module "/us/usc/t1/s112" {
     p "1950—Act Sept. 23, 1950, amended section generally to implement 1950 Reorg. Plan No. 20, § 1, eff. May 24, 1950, 15 F.R. 3178, " ["64 Stat. 1272" -> "/us/stat/64/1272"] ", which transferred to the Administrator of General Services certain duties formerly performed by the Secretary of State."
     hash "458cfd4ad678e0e7afce7eec910100a5b4f3610b739294bf63f97747f096c66d"
   }
-  note "/us/usc/t1/s112/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t1/s112/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -98,7 +98,7 @@ module "/us/usc/t1/s112" {
     }
     hash "136b45892f3b960f2e558ca07736f09958c45b0553a97f58d16c636bfde4be98"
   }
-  note "/us/usc/t1/s112/note/statutoryNotes/act.1895-01-12.ch23/effect-of-repeal-of-section-73-of-act-jan-12-1895" enacted {
+  note "/us/usc/t1/s112/note/statutoryNotes/act.1895-01-12.ch23/effect-of-repeal-of-section-73-of-act-jan-12-1895" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Effect of Repeal of Section 73 of Act Jan. 12, 1895"
@@ -107,7 +107,7 @@ module "/us/usc/t1/s112" {
   }
   layers {
     operative "e07c934aff55be97cec580bc8c2bfe49e339c1eae0fd3eae7006dbd7f2efc43b"
-    enacted "0e46bfe279ed0bc25df5575c358b7b28f6934764cd4c02e463d32bca7a487a82"
-    editorial "0c3718962d87f961e402d3773644a8af350d15b77c6cc3055df14e1ad70e3354"
+    enacted "1f798440e5b05db8a7147081f0d54c5e0aad1451960b86f1ecc656080e00348d"
+    editorial "be2c71fb88dd9a7ec7722620338b7f49929e804bce863750284abf5cab2fb0d5"
   }
 }

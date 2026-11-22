@@ -20,7 +20,7 @@ module "/us/usc/t1/s211" {
     }
     hash "fc20cff4ad830c95ffca7d6354893e1db781f67961116b10520a0b43aece3a9c"
   }
-  note "/us/usc/t1/s211/note/statutoryNotes/pl.94.59/written-requests-for-documents" enacted {
+  note "/us/usc/t1/s211/note/statutoryNotes/pl.94.59/written-requests-for-documents" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Written Requests for Documents"
@@ -29,7 +29,7 @@ module "/us/usc/t1/s211" {
   }
   layers {
     operative "b2393f849024e45a73ae5e3e0a102f5973524dff02f5ef81ae3e0aacc32bdbea"
-    enacted "c532f28627b5d0ff3cffdaace827f0ba0c8133a45130d4c3bec67c1178cd6feb"
-    editorial "e1585c608dc3e65eaa50b07b345ca87d98fd4bee399ed00e9e511e20f35c44ed"
+    enacted "ed229edddd34e530658cc088144f1495349266ca84e6c016f10470be932e9658"
+    editorial "7f640fbdb83a47c33777c3ec6b36f0d3270585cc78a5d0c708f6eaf103b671dc"
   }
 }

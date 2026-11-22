@@ -10,21 +10,21 @@ module "/us/usc/ptIX/rule9031" {
     hash "991a37d8b0f736dc83595d4750acbb6f830f2095853b85f54dc8a2e6a94b1f06"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule precludes the appointment of masters in cases and proceedings under the Code."
     hash "7f03baf474417c1f6d8b5115453408098dbbb4dd6bf1c1f1b20a93ba923d6452"
   }
-  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9031 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "43f60df2b96addacf49f92ad6dc2cd79040e73c0a309d13b19aa8deadfe4d7df"
   }
-  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9031/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -33,7 +33,7 @@ module "/us/usc/ptIX/rule9031" {
   }
   layers {
     operative "991a37d8b0f736dc83595d4750acbb6f830f2095853b85f54dc8a2e6a94b1f06"
-    enacted "b0f23431b0edae1be31d89debd9cc0cc3df72741b3caeb8fe7f33001e57cc541"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7173ee5c631bee2c09356a79df94938039dcb9745016a36a2c72f4bce171d1fd"
   }
 }

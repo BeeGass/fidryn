@@ -78,7 +78,7 @@ module "/us/usc/t45/s1321" {
     p "1989—Subsec. (a)(2). " ["Pub. L. 101–213" -> "/us/pl/101/213"] " struck out par. (2) which set forth circumstances under which Corporation could declare or pay a common or preferred stock dividend and defined terms “common stock dividend” and “preferred stock dividend”."
     hash "82ee991a8166e3181250555b89ff1c2e4223d08fd9d6c6ab2083e32d15ac7cc3"
   }
-  note "/us/usc/t45/s1321/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1321/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -87,7 +87,7 @@ module "/us/usc/t45/s1321" {
   }
   layers {
     operative "f8c9c1260cfdf710d0ca4a6a176b2c0ab9b5029b9395857606d8d68e6a6ed296"
-    enacted "033110ac738c000d7be93b74a931a9d655372b543b61129250274b0601890954"
-    editorial "b6ffde268533da726c08b42e21fd60bcc3b026e8969eec5d23d0a5934478690a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fd5f04d466eff3d4bcceefd2d806387fee5e218695f55538f7307bbcf41c9c4d"
   }
 }

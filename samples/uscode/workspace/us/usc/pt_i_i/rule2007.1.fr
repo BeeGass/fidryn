@@ -84,7 +84,7 @@ module "/us/usc/ptII/rule2007.1" {
     hash "f106591d587b90a01fa179f3cd03083b31d0ebc6bd1351c2719e47ced2c57b0a"
   }
   credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
@@ -92,7 +92,7 @@ module "/us/usc/ptII/rule2007.1" {
     p "The requirement that connections with the United States trustee or persons employed in the United States trustee’s office be revealed is not intended to enlarge the definition of “disinterested person” in § 101(13) [now 101(14)] of the Code, to supersede executive regulations or other laws relating to appointments by United States trustees, or to otherwise restrict the United States trustee’s discretion in making appointments. This information is required, however, in the interest of full disclosure and confidence in the appointment process and to give the court all information that may be relevant to the exercise of judicial discretion in approving the appointment of a trustee or examiner in a chapter 11 case."
     hash "c162d2a479b8b328a1ca1765b1c51aabfc15e7e4d4c9d3f658388c4abf7b810b"
   }
-  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -104,7 +104,7 @@ module "/us/usc/ptII/rule2007.1" {
     p "GAP Report on Rule 2017.1. The published draft of proposed new subdivision (b)(3) of Rule 2017.1 [2007.1], and the Committee Note, was substantially revised to implement Mr. Patchan’s recommendations (described above), to clarify how a disputed election will be reported, and to make stylistic improvements."
     hash "fc7ef3b8d14f14c5d0d2f46627f9a96e1c7e57777873fa1c4068a29319c549e1"
   }
-  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -113,7 +113,7 @@ module "/us/usc/ptII/rule2007.1" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "be49339e095460747679895c573d5ca370d27dd3a60249219ad08a689fa30ee9"
   }
-  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -125,7 +125,7 @@ module "/us/usc/ptII/rule2007.1" {
   }
   layers {
     operative "f106591d587b90a01fa179f3cd03083b31d0ebc6bd1351c2719e47ced2c57b0a"
-    enacted "daa04d841fad1e6e37314e8d2f5a00fbce10180f830e3b576514b941ea0dc448"
-    editorial "bdd2606e702c16436d472c0e139abb1f5a7b39598539aace7c93fcf55786a6dc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "25ca2b04cb75e2a1fbbcbcd7bf2312b3b99f35111f1f934a20b9ba27c080d77e"
   }
 }

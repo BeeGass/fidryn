@@ -63,7 +63,7 @@ module "/us/usc/t45/s152" {
     p "1934—Act June 21, 1934, substituted “by the carrier or carriers” for “by the carriers” in par. Second, generally amended pars. Third, Fourth, and Fifth, and added pars. Sixth to Tenth."
     hash "33516224dda2f324caec82c697e44ed56c024cf984f931592e9ceaf808dbdfa8"
   }
-  note "/us/usc/t45/s152/note/statutoryNotes/nolaw/change-of-name" enacted {
+  note "/us/usc/t45/s152/note/statutoryNotes/nolaw/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -72,7 +72,7 @@ module "/us/usc/t45/s152" {
   }
   layers {
     operative "87c849d4601ba65e29b973ea98e4f1b8c774d240beb2ab522158644f5d24dd35"
-    enacted "ddb23d97c769ab698d5a8ea9cfaac520a491d1c21868133155e05c60fdfb8a6f"
-    editorial "7e17768b4780ff113aeeaf303531067c8693b5e8fbb5a0c69a9acef9b9e36584"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f57cc06d6a9a5e9c5a6dd2c4f13983cb30015166166aee31f3a7917642068c7e"
   }
 }

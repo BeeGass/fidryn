@@ -21,7 +21,7 @@ module "/us/usc/t45/s797h" {
     hash "cf7da284a03394a463d67db38997d1c009d2a4f57a6336a6486b90cbac1aeaa0"
   }
   credit "(" ["Pub. L. 93–236, title VII, § 709" -> "/us/pl/93/236/tVII/s709"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 666" -> "/us/stat/95/666"] ".)"
-  note "/us/usc/t45/s797h/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s797h/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -30,7 +30,7 @@ module "/us/usc/t45/s797h" {
   }
   layers {
     operative "cf7da284a03394a463d67db38997d1c009d2a4f57a6336a6486b90cbac1aeaa0"
-    enacted "9edff6fbbe9f2b18d20e6cbf90a4665f21a0de2e161e6cea0d199a1aa81b9e89"
-    editorial "14095894a9bd7894a1a7880357ab53346e633a7d014004274aa2f6e414e8943d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "560b5a25b8140c8ca2b7331c431d9a199b6a7c06679142569ad1186cfa59c7c0"
   }
 }

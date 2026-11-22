@@ -15,7 +15,7 @@ module "/us/usc/t45/s916" {
     p "Section, " ["Pub. L. 96–101, § 18" -> "/us/pl/96/101/s18"] ", Nov. 4, 1979, " ["93 Stat. 746" -> "/us/stat/93/746"] "; " ["Pub. L. 96–254, title I, § 116" -> "/us/pl/96/254/tI/s116"] ", May 30, 1980, " ["94 Stat. 405" -> "/us/stat/94/405"] ", provided that this chapter be in lieu of directed service on any line of the Milwaukee Railroad with certain exceptions."
     hash "786c4fc77b5f6a39656a7c0bb455c82133dbe6948a8a0eb0da9381ca7c427363"
   }
-  note "/us/usc/t45/s916/note/statutoryNotes/pl.104.88/effective-date-of-repeal" enacted {
+  note "/us/usc/t45/s916/note/statutoryNotes/pl.104.88/effective-date-of-repeal" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date of Repeal"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s916" {
   }
   layers {
     operative "3f97255749ea23f3110f7123f25484ce644af11a41eb568c2e4aeeb9293cc33c"
-    enacted "75b4e6c58bf7f61e4d7786ffb1f131118dfe319fdf5282fc4296206ed3ad210f"
-    editorial "79c3be03d6ea214216ed091da36b0af8f7f9c430b738be80fb6d8b3e7447b3e0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "526cae03e9b1e6b7bece40afbdfee6c72056958f421cf72d1d02f6095fe5e44b"
   }
 }

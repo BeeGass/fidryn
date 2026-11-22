@@ -21,7 +21,7 @@ module "/us/usc/ptI/rule1002" {
     hash "d553ee180cdd2714caba52765bd888350fa13f5c249302d1f0f0f5c2c58576dc"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -31,7 +31,7 @@ module "/us/usc/ptI/rule1002" {
     p "Official Form No. 1 may be used to seek relief voluntarily under any of the chapters. Only the original need be signed and verified, but the copies must be conformed to the original. See Rules 1008 and 9011(c). As provided in § 362(a) of the Code, the filing of a petition acts as a stay of certain acts and proceedings against the debtor, property of the debtor, and property of the estate."
     hash "3e8e3ffe9254da30c075e6c94d2d94e4cdcf4a4cdb8a1f32f775861b38fe6f57"
   }
-  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -41,7 +41,7 @@ module "/us/usc/ptI/rule1002" {
     p "The number of copies of a petition that must be filed is a matter for local rule."
     hash "dc1e3f67326036ee47fc4d44b685a3c8c88750bf0ee118ee604811eb24dbee92"
   }
-  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -49,7 +49,7 @@ module "/us/usc/ptI/rule1002" {
     p "Notwithstanding subdivision (b), pursuant to Rule 5005(b)(3), the clerk is not required to transmit a copy of the petition to the United States trustee if the United States trustee requests that it not be transmitted. Many rules require the clerk to transmit a certain document to the United States trustee, but Rule 5005(b)(3) relieves the clerk of that duty under this or any other rule if the United States trustee requests that such document not be transmitted."
     hash "385cd1eaa4bee944c7ebfbbdc95acf967d3b6273975d8d5b94a1f783fb0c14bb"
   }
-  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -58,7 +58,7 @@ module "/us/usc/ptI/rule1002" {
   }
   layers {
     operative "d553ee180cdd2714caba52765bd888350fa13f5c249302d1f0f0f5c2c58576dc"
-    enacted "a26821b7971a95cd70778fb00cfe2b1207b070bf5d725ef36a3c0aec11bcb2ea"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d0d3f0025c3053b3e169a2898e89776684786c5deaf3f4a6ea057ef3c3cdf213"
   }
 }

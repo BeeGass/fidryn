@@ -150,28 +150,28 @@ module "/us/usc/t45/s355" {
     }
     hash "ccb2329664dd41a969c033d69e3855405cc3e2e0e7ef602d694859d9a98b2d7e"
   }
-  note "/us/usc/t45/s355/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t45/s355/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
     p "Amendment by " ["Pub. L. 98–620" -> "/us/pl/98/620"] " not applicable to cases pending on Nov. 8, 1984, see " ["section 403 of Pub. L. 98–620" -> "/us/pl/98/620/s403"] ", set out as a note under " ["section 1657 of Title 28" -> "/us/usc/t28/s1657"] ", Judiciary and Judicial Procedure."
     hash "b3d0854af378192f7a53e70489f9fc3f7946aec91d2ce245380969a27892e6fd"
   }
-  note "/us/usc/t45/s355/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s355/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Oct. 1, 1981, and applicable only with respect to annuities awarded on or after that date, see " ["section 1129 of Pub. L. 97–35" -> "/us/pl/97/35/s1129"] ", set out as a note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
     hash "f34eedda9e0a73372e03d4a62b8df5d0ec73b66dc4aad6dab3e7c1e5b987c19c"
   }
-  note "/us/usc/t45/s355/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s355/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
     p "Amendment by act July 31, 1946, effective July 31, 1946, see section 401 of act July 31, 1946."
     hash "66fc5e6c2e6464b1794a09ea4c0dc8a6ad6bcc7f54c53e757a595cdf51acfef5"
   }
-  note "/us/usc/t45/s355/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s355/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
@@ -180,7 +180,7 @@ module "/us/usc/t45/s355" {
   }
   layers {
     operative "b68fe6577b3a54b2b315021478585ec91380abc2d32cd2ea20a2db9aec7d7c87"
-    enacted "a38292b651c1473afed29279ca30c768d787df857b44a7042256221e97ec90ec"
-    editorial "1fb259debb2735dbbc01d9e4718a26b6f38c53f4e16179b6c4452c56974c0024"
+    enacted "4409cdb631c83077c92ea1ee50e077bb432ddbd34560f052693da91d7d3410b7"
+    editorial "671c847b8614ee8f06f6701bdd1295e1b88de7801088816a838e3b2c45195b1c"
   }
 }

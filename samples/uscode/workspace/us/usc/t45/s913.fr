@@ -53,7 +53,7 @@ module "/us/usc/t45/s913" {
     p "Subsecs. (d), (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " added subsec. (d) and redesignated former subsec. (d) as (e)."
     hash "5ed633ca0d767c0ae4fb1cde5cfe81cccd8dbac9aae8db633fc41ef1d41d904e"
   }
-  note "/us/usc/t45/s913/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s913/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
@@ -62,7 +62,7 @@ module "/us/usc/t45/s913" {
   }
   layers {
     operative "b651af19fe8fd4a53c2a5a98c098ef6e26b6f9c1c7a4f68a0ad088cc5bb58ffa"
-    enacted "49c9cebde76b9a1ead32da48a9e65d5820ab4f84124a765190a4df3918ca065c"
-    editorial "4e79b8abaedc7cfb857267d35bd3e4f68e72d8ad607cef6b771e20cdf0a37a6f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c5bf8568f065f931b4c8d1264866e69ef25f3d071dbd42aa4d44bfbed7e64a4a"
   }
 }

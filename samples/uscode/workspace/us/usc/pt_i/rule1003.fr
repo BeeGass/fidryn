@@ -57,7 +57,7 @@ module "/us/usc/ptI/rule1003" {
     hash "2de77a34a80bed129c7e9b9f14da9bd218af796bc10d31727247107907b36b8c"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -75,14 +75,14 @@ module "/us/usc/ptI/rule1003" {
     p "The venue for a case ancillary to a foreign proceeding is provided in [former] 28 U.S.C. § 1474."
     hash "6da319c7cc64503a305e4d6a6859ad6c1a0cf4f607451a60e2b4720aa4b81e05"
   }
-  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The subject matter of subdivisions (a), (b), and (e) has been incorporated in Rules 1002, 1010, 1011, and 1018."
     hash "4136509752514b0209999ef3fdd2bcb7b0907bedc9a88a16d29d86db3cbfb186"
   }
-  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -91,7 +91,7 @@ module "/us/usc/ptI/rule1003" {
   }
   layers {
     operative "2de77a34a80bed129c7e9b9f14da9bd218af796bc10d31727247107907b36b8c"
-    enacted "84c7db8003fd4e8755746e71b09df0e9de882602f83cbe3cc41d381a72f27f7d"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "42b7ced31f0922213904b2235c5aea19f315c0e4e9dba5283c0e7437b7bac2f6"
   }
 }

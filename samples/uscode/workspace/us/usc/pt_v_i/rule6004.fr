@@ -143,7 +143,7 @@ module "/us/usc/ptVI/rule6004" {
     hash "89964c4f25b5ceb3af8bbe3b78b1401ee56c0faf68df46feed735c3c210d0f61"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -155,7 +155,7 @@ module "/us/usc/ptVI/rule6004" {
     p "The duty imposed by paragraph (2) does not affect the power of the bankruptcy court to order third persons to execute instruments transferring property purchased at a sale under this subdivision. See, e.g., In re Rosenberg, 138 F.2d 409 (7th Cir. 1943)."
     hash "c7b548203f300be86a2e2e983ae8c6366c4a8f973b8fb4d39cc84b755014c3a6"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -164,7 +164,7 @@ module "/us/usc/ptVI/rule6004" {
     p "Subdivision (c) is new. Section 363(f) provides that sales free and clear of liens or other interests are only permitted if one of the five statutory requirements is satisfied. Rule 9013 requires that a motion state with particularity the grounds relied upon by the movant. A motion for approval of a sale free and clear of liens or other interests is subject to Rule 9014, service must be made on the parties holding liens or other interests in the property, and notice of the hearing on the motion and the time for filing objections must be included in the notice given under subdivision (a)."
     hash "5b541a37df9e48341ce4c0721dd41764e4ead65f243aa52d2aacd6ee14924c51"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -172,7 +172,7 @@ module "/us/usc/ptVI/rule6004" {
     p "The words “with the clerk” in subdivision (f)(1) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "89acd3e9ddfa55f625eb1b41402f03d81e8acfe912c5604989604694c7c38e97"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -182,7 +182,7 @@ module "/us/usc/ptVI/rule6004" {
     p "GAP Report on Rule 6004. No changes since publication."
     hash "93ad7f36cb374159ce81b7538f7e55be7734c3d0277292722350ab961faffeb3"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -192,7 +192,7 @@ module "/us/usc/ptVI/rule6004" {
     p "Changes Made After Publication. The Committee Note was amended to highlight the connection between this rule and Rule 2002 with regard to the obligation to provide notice of proposed transactions. It was also amended to recognize the ability of the consumer privacy ombudsman to seek a continuance of a hearing on the proposed sale of personally identifiable information."
     hash "50eaf9ebb5862835424c24f62923f0ef6ea28a87a6bee0b395ef6c803ea3c12d"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -204,7 +204,7 @@ module "/us/usc/ptVI/rule6004" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -213,7 +213,7 @@ module "/us/usc/ptVI/rule6004" {
   }
   layers {
     operative "89964c4f25b5ceb3af8bbe3b78b1401ee56c0faf68df46feed735c3c210d0f61"
-    enacted "2e821c804f3c44024ef50ab4add23b227860ac42e93f25201f4a0a86ecf97d80"
-    editorial "0a5414b832d92914b5b4dc6c3cbafaa43cf60927ea321f56e7827be3bee84648"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d5641cc6f836fcb17745218bca38fe97e5a8a3642bd9bd1654186598835b97ad"
   }
 }

@@ -57,7 +57,7 @@ module "/us/usc/ptVI/rule6007" {
     hash "2d3e3e1b46313b65d0d0b5698baa179df5b8d7734d5965023134d75fa3811667"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -67,21 +67,21 @@ module "/us/usc/ptVI/rule6007" {
     p "Subdivision (c) requires a hearing when an objection under subdivision (a) is filed or a motion under subdivision (b) is made. Filing of an objection is sufficient to require a hearing; a separate or joined request for a hearing is unnecessary since the objection itself is tantamount to such a request."
     hash "66a9a7de040b6792444b86b97d82c75077cce52eabb8fb674a34f04f8f18a00b"
   }
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to the 1986 amendments to 28 U.S.C. § 586(a) and to the Code. The United States trustee monitors the progress of the case and has standing to raise, appear and be heard on the issues relating to the abandonment or other disposition of property. See §§ 307 and 554 of the Code. Committees of retired employees appointed under § 1114 are not entitled to notice under subdivision (a) of this rule."
     hash "5fed3092672f045d918e844a47d7eeed314cbb28513bd1daa365b2c45080fade"
   }
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to clarify that when a motion is made pursuant to subdivision (b), a hearing is not required if a hearing is not requested or if there is no opposition to the motion. See Rule 9014. Other amendments are stylistic and make no substantive change."
     hash "8320567b47482ff3a295b927bf45cdb3a2b087f7042993f7202b6f0cffa0118f"
   }
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -93,14 +93,14 @@ module "/us/usc/ptVI/rule6007" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2019 Amendment"
     p "Subdivision (b) of the rule is amended to specify the parties to be served with the motion and any notice of the motion. The rule also establishes an objection deadline. Both of these changes align subdivision (b) more closely with the procedures set forth in subdivision (a). In addition, the rule clarifies that no further action is necessary to notice or effect the abandonment of property ordered by the court in connection with a motion filed under subdivision (b), unless the court directs otherwise."
     hash "e51892268d024da7acafbb0a49d3f805f05eb42f88208f04dbb1d1ac5882b917"
   }
-  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -109,7 +109,7 @@ module "/us/usc/ptVI/rule6007" {
   }
   layers {
     operative "2d3e3e1b46313b65d0d0b5698baa179df5b8d7734d5965023134d75fa3811667"
-    enacted "ce9b5b666423664320b05a066e824ad8c2ff6a23b5a78a41650426fcafb6a023"
-    editorial "949e037b95351734e9c3648a180d74e4a28c357b30e639966c623805d0387aa5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fdc9899ff5752447bde239b36d607b06cdcbcfd861802ee083c4457eaa87c541"
   }
 }

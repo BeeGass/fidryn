@@ -30,7 +30,7 @@ module "/us/usc/ptIII/rule3014" {
     hash "52038042d9db9c22396a407fc37a58606301442558d9d3c60bbc7c82fe3f81c2"
   }
   credit "(As amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -40,7 +40,7 @@ module "/us/usc/ptIII/rule3014" {
     p "While this rule and the Code refer to a class of secured creditors it should be noted that ordinarily each secured creditor is in a separate and distinct class. In that event, the secured creditor has the sole power to determine application of § 1111(b) with respect to that claim."
     hash "5a10f9c1596f4d0ec1cfe6e1af3aaf4c7095c18c69f624e5f0b7f85e0948f14f"
   }
-  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -48,14 +48,14 @@ module "/us/usc/ptIII/rule3014" {
     p "GAP Report on Rule 3014. No changes to the published draft."
     hash "39a145d92fe14ecf06f30a22acde14e42323e1e14d4fc5865bc22eea7252fcf0"
   }
-  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Because there generally will not be a disclosure statement in a subchapter V case, see § 1181(b) of the Code, the rule is amended to provide a deadline for making an election under § 1111(b) in such cases that is set by the court."
     hash "187a74883ba7d5abb5b4e27609a12b1fafb02f6ccdc2202edb3e9a10ed2fbd0b"
   }
-  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -64,7 +64,7 @@ module "/us/usc/ptIII/rule3014" {
   }
   layers {
     operative "52038042d9db9c22396a407fc37a58606301442558d9d3c60bbc7c82fe3f81c2"
-    enacted "841b7309edf1c37893c1a0b364d99f7b102d349d37d23e07479ae3da9baf87ac"
-    editorial "898a2123d81cc7d5b2eae685178a49e69d1b9fd50c76d6479e71b3a5fc6f2da7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "20972623a8bb26ed09ac266731e0a71f10e45dbb650af719a5db7c13a3e87bea"
   }
 }

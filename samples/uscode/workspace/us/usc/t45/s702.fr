@@ -159,21 +159,21 @@ module "/us/usc/t45/s702" {
     p "Pars. (18), (19). " ["Pub. L. 94–210, § 610(a)(3)" -> "/us/pl/94/210/s610/a/3"] ", added pars. (18) and (19)."
     hash "5f9eb4436163b99fa5a5b6cef3938c0daf5949f2c07f409f21a3b7e09f8eb296"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
@@ -190,21 +190,21 @@ module "/us/usc/t45/s702" {
     }
     hash "c0db68622d622174a65e2ac57520b8664f210d01001e9522d3bb6818afdea20b"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s702/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s702/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -359,7 +359,7 @@ module "/us/usc/t45/s702" {
   }
   layers {
     operative "408111882a1196d1bb7510dfe203d35819ac4b6909b974c4e9f38ed166cd99c2"
-    enacted "4f4c3fbe8a64c21467213d38fa86f076e758bf245adc7fce061f6c49d3cdd7da"
-    editorial "c2c873826bb040fc290d97c562d02bd68cb34c1594c6a0849eec5cb4633078f8"
+    enacted "81dce6ecae2561dceb028b90bee0c8cebf9f7f86df1927aa82189181507f086c"
+    editorial "97b793f8879e4d3ffc45e2af2d5bcac5a1d1b9c4caf7c800e306be0133912b65"
   }
 }

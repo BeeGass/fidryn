@@ -18,21 +18,21 @@ module "/us/usc/t45/s713" {
     p "1976—Subsec. (a). " ["Pub. L. 94–210" -> "/us/pl/94/210"] " struck out provisions prohibiting requests for information under this subsection after effective date of the final system plan."
     hash "aa2bc6229b2d9c81d3b517ca6451e3e5b387e6ff713f363638336ef4264a1166"
   }
-  note "/us/usc/t45/s713/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s713/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
   }
-  note "/us/usc/t45/s713/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s713/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s713/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s713/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -41,7 +41,7 @@ module "/us/usc/t45/s713" {
   }
   layers {
     operative "777609c83fcd9088248b31440d59b2f39dc70366e28dd1bfb4535c1c6523a09d"
-    enacted "ab91fcde725a8d7c9af0800b56fac86efc4fb1d7ba08342cfb6068ea49a6ca5c"
-    editorial "9f51c14effa11648d2bcce8040b73482aa7dcd0e37e6eae214e7254cb1f4e6a1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0f1fefc4ec60ee4bea67d97c0a35832586730656d9408ad594d5e1790c6f6491"
   }
 }

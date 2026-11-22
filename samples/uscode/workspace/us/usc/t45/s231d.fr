@@ -166,7 +166,7 @@ module "/us/usc/t45/s231d" {
     }
     hash "270579acc3546ef032a6a4784b3cee23bf035675ff14d6c4023038bbe90f5fd0"
   }
-  note "/us/usc/t45/s231d/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231d/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
@@ -185,7 +185,7 @@ module "/us/usc/t45/s231d" {
     p "Amendment by section 106(i), (j) of " ["Pub. L. 98–76" -> "/us/pl/98/76"] " effective Aug. 12, 1983, except such amendment inapplicable to certain annuity amounts, see " ["section 106(k) of Pub. L. 98–76" -> "/us/pl/98/76/s106/k"] ", set out as a note under " ["section 231a of this title" -> "/us/usc/t45/s231a"] "."
     hash "5ab659d9e62de57b9271121cbc08d580a2d7ba913afd6cbcee6ce845883ba2c8"
   }
-  note "/us/usc/t45/s231d/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231d/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -200,7 +200,7 @@ module "/us/usc/t45/s231d" {
   }
   layers {
     operative "4be1c7f7f4a9b4f4308439d52e775c2caebfab76a6dc0e881d40cd610cebb466"
-    enacted "806f27167b57c0b7ad8989d3138f389923f65d69d295a07181573d55932335d5"
-    editorial "60159c2ca1b3f1fa4e06c2b510f12a965446e33f662efa26953fa71063309fba"
+    enacted "48c72366e0c9bd3e5d27e6d309d2f0481ed3a260f2640fc0c5bf2bff25f74859"
+    editorial "2457d9226408735dca55f11f0079bbb095f8468a9b2f5e11d0dcde2a02a5ffc1"
   }
 }

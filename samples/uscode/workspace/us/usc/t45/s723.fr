@@ -29,7 +29,7 @@ module "/us/usc/t45/s723" {
     p "Subsec. (b). " ["Pub. L. 94–5, § 6(b)" -> "/us/pl/94/5/s6/b"] ", substituted “$282,000,000” for “$85,000,000” and inserted provision that, of amounts authorized to be appropriated under this subsection $50,000,000 be available solely to pay to trustees of railroads in reorganization sums necessary to provide railroads with amounts equal to revenues attributable to tariff increases proposed by railroads and suspended by Interstate Commerce Commission during calendar year 1975, if Secretary determines that payments are necessary to carry out this section."
     hash "4be3c3d568e56cdf227f5a552e8b8b89cb5bfd72528f0dd20c53397eb7b76453"
   }
-  note "/us/usc/t45/s723/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s723/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -38,7 +38,7 @@ module "/us/usc/t45/s723" {
   }
   layers {
     operative "4379b3b7def34d277dbe5e6d4c677750276d2c693b60835644000f82ef53ca32"
-    enacted "6bc62b9cd939710a357a1f4eb1c360815e13b4cde4b0f79207dbd31298b74a62"
-    editorial "b221d86b97cb96b8311d53392ad1c0c05ed64a158917f62316470ff3adb33c7c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b4ab13db331411897060f82c074de1ec38383440c9584109523eefc6de733e12"
   }
 }

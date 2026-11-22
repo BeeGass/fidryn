@@ -49,7 +49,7 @@ module "/us/usc/ptII/rule2018" {
     hash "5a672646be51ee24648675e195d20b18fbfb86a8dd24e0585326d9bbfc1677d0"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -65,21 +65,21 @@ module "/us/usc/ptII/rule2018" {
     p "Subdivision (e) is derived from former Chapter VIII Rule 8–210(d). It gives the court flexibility in directing the type of future notices to be given intervenors."
     hash "7979d3ca35e2592f3a2dd56685d756a6d92a65e14812f5d133689918001cd765"
   }
-  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (d) is amended to make it clear that the prohibition against appeals by labor unions is limited only to their participation in connection with the hearings on the plan as provided in subdivision (d). If a labor union would otherwise have the right to file an appeal or to be a party to an appeal, this rule does not preclude the labor union from exercising that right."
     hash "66063540de5e22009ba3e81dfc7ed9dc9bc963f0cec8c4941367b8b1af5927db"
   }
-  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivisions (b) and (d) are amended to include chapter 12."
     hash "360495b91c9e5691d49ed1a6071da5b90721aa4daa17bb7d4fa69a602f72f0b8"
   }
-  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -88,7 +88,7 @@ module "/us/usc/ptII/rule2018" {
   }
   layers {
     operative "5a672646be51ee24648675e195d20b18fbfb86a8dd24e0585326d9bbfc1677d0"
-    enacted "daf56bda98637faa634ae388c7c078a8840f28bdfb9852d7fedaae701036e21c"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ade69b553fa219ff55c1c82cfd59550719ea4c207ee0bebb7efd689858de0a98"
   }
 }

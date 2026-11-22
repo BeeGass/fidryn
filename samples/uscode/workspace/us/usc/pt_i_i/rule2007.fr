@@ -67,7 +67,7 @@ module "/us/usc/ptII/rule2007" {
     hash "07ba3a0abe1538d5069eb36dcbb171dce0e7e6cc8e64dd067ab439aa25c698cd"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -76,14 +76,14 @@ module "/us/usc/ptII/rule2007" {
     p "Subdivision (b) implements § 1102(b)(1). The Code provision allows the court to appoint, as the official § 1102(a) committee, a “prepetition” committee if its members were fairly chosen and the committee is representative of the different kinds of claims. This subdivision of the rule indicates some of the factors the court may consider in determining whether the requirements of § 1102(b)(1) have been satisfied. In effect, the subdivision provides various factors which are similar to those set forth in Rule 2006 with respect to the solicitation and voting of proxies in a chapter 7 liquidation case."
     hash "36b7509504a31971ef53fdd9dd986905282a3ca2999acfba744e87c87b2504dc"
   }
-  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule is amended to conform to the 1984 amendments to § 1102(b)(1) of the Code."
     hash "2ea04edc8b5dd053e37c18a0bb7c5742aa7cecb9daf098969ff9d5fe981df606"
   }
-  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -91,7 +91,7 @@ module "/us/usc/ptII/rule2007" {
     p "Although § 1102(b)(1) of the Code permits the United States trustee to appoint a prepetition committee as the statutory committee if its members were fairly chosen and it is representative of the different kinds of claims to be represented, the amendment to this rule provides a procedure for judicial review of the appointment. The factors that may be considered by the court in determining whether the committee was fairly chosen are not new. A finding that a prepetition committee has not been fairly chosen does not prohibit the appointment of some or all of its members to the creditors’ committee. Although this rule deals only with judicial review of the appointment of prepetition committees, it does not preclude judicial review under Rule 2020 regarding the appointment of other committees."
     hash "3ad29c9bc62937c7133a96c137475c528f00d1dbc966fc8fd2c1477156a65967"
   }
-  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -103,7 +103,7 @@ module "/us/usc/ptII/rule2007" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -112,7 +112,7 @@ module "/us/usc/ptII/rule2007" {
   }
   layers {
     operative "07ba3a0abe1538d5069eb36dcbb171dce0e7e6cc8e64dd067ab439aa25c698cd"
-    enacted "37f36565790fe6919d9142547403d199c51dcc049b8aba2e0fd01d56e72bba88"
-    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fd1d807b9601eebcf2bada4c564cc56c42f8cb0f89676f1bfd51dfd73530bcb2"
   }
 }

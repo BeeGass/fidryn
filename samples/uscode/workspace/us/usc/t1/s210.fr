@@ -10,7 +10,7 @@ module "/us/usc/t1/s210" {
     hash "25761c605b48c2d40c73461507cef7d2ad6585e99e80edd46f2ce05ee197acdc"
   }
   credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 640" -> "/us/stat/61/640"] ".)"
-  note "/us/usc/t1/s210/note/statutoryNotes/nolaw/cross-references" enacted {
+  note "/us/usc/t1/s210/note/statutoryNotes/nolaw/cross-references" editorial {
     group statutoryNotes
     topic "crossReferences"
     heading "Cross References"
@@ -19,7 +19,7 @@ module "/us/usc/t1/s210" {
   }
   layers {
     operative "25761c605b48c2d40c73461507cef7d2ad6585e99e80edd46f2ce05ee197acdc"
-    enacted "eda070fdc5bfc01212ac47f5e400077beb6c83eb51ce26e421c6ebc9d4d46bbe"
-    editorial "e1585c608dc3e65eaa50b07b345ca87d98fd4bee399ed00e9e511e20f35c44ed"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f4bf431b7d80cac5ae849f324d3fc2b31d2231d9e4dad935711b10ba5e3dc566"
   }
 }

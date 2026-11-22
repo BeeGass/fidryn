@@ -49,14 +49,14 @@ module "/us/usc/t45/s151" {
     p "1934—Act June 21, 1934, added par. Sixth and redesignated provisions formerly set out as par. Sixth as Seventh."
     hash "b433006b3cf37779b6e7e0a08f06fde03ffa82b3a4cd02b8d8cb1bb77431e509"
   }
-  note "/us/usc/t45/s151/note/statutoryNotes/pl.104.264/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s151/note/statutoryNotes/pl.104.264/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p "Except as otherwise specifically provided, amendment by " ["Pub. L. 104–264" -> "/us/pl/104/264"] " applicable only to fiscal years beginning after Sept. 30, 1996, and not to be construed as affecting funds made available for a fiscal year ending before Oct. 1, 1996, see " ["section 3 of Pub. L. 104–264" -> "/us/pl/104/264/s3"] ", set out as a note under " ["section 106 of Title 49" -> "/us/usc/t49/s106"] ", Transportation."
     hash "a13ec0b937374de0a3c7ba6d2d1e2a1235ff31e818074aad44c54131f5930373"
   }
-  note "/us/usc/t45/s151/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s151/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -73,7 +73,7 @@ module "/us/usc/t45/s151" {
     }
     hash "2491a97523f0be1047d5b74eccb252a18c13643ad2c0800fb2bbea20e9828de8"
   }
-  note "/us/usc/t45/s151/note/statutoryNotes/act.1940-08-13.ch664/social-insurance-and-labor-relations-of-railroad-coal-mining" enacted {
+  note "/us/usc/t45/s151/note/statutoryNotes/act.1940-08-13.ch664/social-insurance-and-labor-relations-of-railroad-coal-mining" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Social Insurance and Labor Relations of Railroad Coal-Mining Employees; Retroactive Operation of Act August 13, 1940; Effect on Payments, Rights, etc."
@@ -93,7 +93,7 @@ module "/us/usc/t45/s151" {
   }
   layers {
     operative "180a7eb8dde5870f26e8ef67c1c2808fa942036ee549a94fb84e3dca5c83e924"
-    enacted "31a067f1770263653690bbb4d488684076d29965f7997b31d2db56bac12d354c"
-    editorial "2d832cbeeab279a71cb542fabfa7b9453ddf3b9cccea9c742a04e1577dc63664"
+    enacted "3b23ae2ee49ffa7a3aec50524d7100f88b1ff459dbd436f79b0a230c065af3bc"
+    editorial "38da23b555f420906ca3281f9e7f62525f7d897e8b9a020291e4ae01887b48b0"
   }
 }

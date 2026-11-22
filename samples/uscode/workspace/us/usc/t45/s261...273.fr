@@ -115,7 +115,7 @@ module "/us/usc/t45/s261...273" {
     }
     hash "89b6c3987f75363ac630873b2259e3bc2b11f70a6a9808e48998c6daa78ecf76"
   }
-  note "/us/usc/t45/s261...273/note/statutoryNotes/act.1940-10-10.ch842/compensation-from-local-division-of-railway-labor-organizati" enacted {
+  note "/us/usc/t45/s261...273/note/statutoryNotes/act.1940-10-10.ch842/compensation-from-local-division-of-railway-labor-organizati" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Compensation From Local Division of Railway-Labor-Organization Employer Tax—Unpaid Before July 1, 1940"
@@ -124,7 +124,7 @@ module "/us/usc/t45/s261...273" {
   }
   layers {
     operative "d3616f37a16e9711a6eb281c05eab1ea95deb829a14668e93e86712648311442"
-    enacted "adbab5b210bc4791f17971a3af01c308d78465d381cca36ff4cdd55f84d66d1b"
-    editorial "4fee36fc328402586ed94895e0d5dd38c30b2c9dd18e4f29ee1a098e8d4860bb"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2b2d40bd47db10a6cce8c4fc3567f52b6063bc37a17379f30ba7c50c6980718f"
   }
 }

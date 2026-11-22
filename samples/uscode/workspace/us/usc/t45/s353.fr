@@ -37,21 +37,21 @@ module "/us/usc/t45/s353" {
     }
     hash "a1b9dcf01d8f6eccb67e1a2d64d803afc1e8b5d449776edc63f40c2483405d38"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1983 Amendment"
     p "Amendment by " ["Pub. L. 98–76" -> "/us/pl/98/76"] " applicable to compensation paid for services rendered after Dec. 31, 1983, see " ["section 411(b) of Pub. L. 98–76" -> "/us/pl/98/76/s411/b"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "1a8d8e5fb536ff3c1dc14958d87f4ffa4df300155b4a95fc75b69e724ba8aeab"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1975 Amendment"
     p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective for services rendered after Dec. 31, 1973, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "4073ef7cffc83ef3f1e43aef77734c40bf7f614ca5dda494050a55a66a487bc8"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1968 Amendment"
@@ -68,35 +68,35 @@ module "/us/usc/t45/s353" {
     }
     hash "3e39d4162e8e6c0960873d13bc2b5ffb27db9b2fb1156584585c34b9a62c5411"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1959 Amendment"
     p "Amendment by " ["Pub. L. 86–28" -> "/us/pl/86/28"] " effective with respect to base years after the base year ending Dec. 31, 1957, see " ["section 309 of Pub. L. 86–28" -> "/us/pl/86/28/s309"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "44840851d1381677ff774296b41d99a261aae9133c715ec66c82737cd15e5633"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1954 Amendment"
     p "Amendment by act Aug. 31, 1954, effective July 1, 1954, see section 401 of act Aug. 31, 1954, set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "e9786b4be163d0a8ffd8af6eb98fd468d5469dea7119ccfa9a11be8a637ba011"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1952-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1952-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1952 Amendment"
     p "Amendment by act May 15, 1952, effective with respect to benefit years beginning on and after July 1, 1952, see section 3 of act May 15, 1952, set out as a note under " ["section 352 of this title" -> "/us/usc/t45/s352"] "."
     hash "871176f0f86add5d04770143aa27802de2c69bbac6eff983d957c5509e337631"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
     p "Amendment by act July 31, 1946, effective July 1, 1947, see section 403 of act July 31, 1946, set out as a note under " ["section 352 of this title" -> "/us/usc/t45/s352"] "."
     hash "10130a7d9fd00435cc0f2dc4060674ac90ed6fc81dba612a2bb8a600b800d48f"
   }
-  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s353/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
@@ -105,7 +105,7 @@ module "/us/usc/t45/s353" {
   }
   layers {
     operative "806ee8385a76019f50b7a69c215db2b9865866ef4952520c620aabf9ae3ca769"
-    enacted "def3dd2a2daa94ad9cf1c1258649def9a7544403578979f11cdc0964bbd9fcc8"
-    editorial "9269bae4d4d1cc0997610e22bb1abca7f669c32b550b36e0addd83fbb31fb502"
+    enacted "12ee8e22dff50a454cc05c583676a77b732ef0c0161d904bbf0b84dee4f1fdf7"
+    editorial "5ce60250d54bf20ef21cb463fe3c7a79bc728636caee1747bf208cc509db4040"
   }
 }

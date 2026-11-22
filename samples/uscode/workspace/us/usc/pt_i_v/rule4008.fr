@@ -21,7 +21,7 @@ module "/us/usc/ptIV/rule4008" {
     hash "10b2585cdd0cac788bfc89b403c5118a09199fb621907fe03fb09818765ec3ea"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -30,14 +30,14 @@ module "/us/usc/ptIV/rule4008" {
     p "The expression “not more than” contained in the first sentence of the rule is for the explicit purpose of requiring the hearing to occur within that time period and cannot be extended."
     hash "946a3ddb793669e32bbd53060b8954cbfa05d82c2f8fb6c6deae4c6d355d0990"
   }
-  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is changed to conform to § 524(d) of the Code as amended in 1986. A hearing under § 524(d) is not mandatory unless the debtor desires to enter into a reaffirmation agreement."
     hash "0e0478ec5f95cc61c759f87f6310d241073d520c0ecf286e86c78febb2178ab4"
   }
-  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -47,7 +47,7 @@ module "/us/usc/ptIV/rule4008" {
     p "Changes Made After Publication. The only change was stylistic. The phrase “of the Code” was added to subdivision (b)."
     hash "ef640ecd5f9844320d2dc8c8a0d9b4c7efe19717664ced43aa6b354cadbd25ea"
   }
-  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -55,7 +55,7 @@ module "/us/usc/ptIV/rule4008" {
     p "Changes Made After Publication. No changes since publication."
     hash "50c420497de70420e6b1e26d98e7c36844e7e57340ac6fd167574508d6211356"
   }
-  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -64,7 +64,7 @@ module "/us/usc/ptIV/rule4008" {
   }
   layers {
     operative "10b2585cdd0cac788bfc89b403c5118a09199fb621907fe03fb09818765ec3ea"
-    enacted "8c6ae402e136c5d759d1df018aedb410600a0840f81b92eaab957829fc2eb179"
-    editorial "635ae2a7c7ea6f5973d29b79a81a0c42648f47762359e7aa384dff00b6c608bf"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "072588ecc235e55b1f627bf2f1f5ad7a4f3c9bf8e0a36419ffd5e8b8196857e0"
   }
 }

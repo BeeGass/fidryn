@@ -37,7 +37,7 @@ module "/us/usc/t45/s1017" {
     p "1981—Subsec. (a). " ["Pub. L. 97–130" -> "/us/pl/97/130"] " gave the Commission authority to authorize continued rail service under this section over the lines of the Rock Island Railroad until the disposition of the properties of the estate of the Rock Island Railroad."
     hash "b7b8ea5f67b4c3a6b5ba2398eedccfd4ece27cd5e4b3ba33296f05d44972779b"
   }
-  note "/us/usc/t45/s1017/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1017/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -56,7 +56,7 @@ module "/us/usc/t45/s1017" {
   }
   layers {
     operative "470ae948cd9de8b277abd48d84b8002114234c8849b314ecf3215182e71082f0"
-    enacted "3ac7121cb5d2424a7087850dab9bb3582fb187690e32004f79858b1e3f712659"
-    editorial "07f70a012083108c5fc664116298e1cd25f949fb79a6af8446bdaf7b3e61bf73"
+    enacted "fc8bcdc5cd17e292fd8ecd6dff3eef1f6cd901a95b01bc3caa5678f5c1733658"
+    editorial "54537064f6fedc00b2a0e870546eb5af8fff85d3ab1090db376374307f11c57d"
   }
 }

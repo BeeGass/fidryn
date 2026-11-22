@@ -18,7 +18,7 @@ module "/us/usc/t45/s797m" {
     p "Section 1144 of the Northeast Rail Service Act of 1981, referred to in text, is " ["section 1144 of Pub. L. 97–35" -> "/us/pl/97/35/s1144"] ", title XI, Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] ", which repealed subchapter V (§ 771 et seq.) of this chapter and sections 910 and 1006 of this title and enacted provisions set out as a note under " ["section 771 of this title" -> "/us/usc/t45/s771"] "."
     hash "55478c754a222453e1bdaf616ad15f96d6861d75419de2e980bbba971f26e3d7"
   }
-  note "/us/usc/t45/s797m/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s797m/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -30,7 +30,7 @@ module "/us/usc/t45/s797m" {
   }
   layers {
     operative "2705d771cfcaa1914623a6c30bf9628735c0fc0cdf9b6472d6fadb08061ec352"
-    enacted "81a120284a8f00479bf055c3927a34052b67b3f6864a011df48847e304b0c589"
-    editorial "5fefe3af4885db82b6d2f62512fee4caade15ebca4978a15592c8deee3eb26d5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8afc3a3297fa6214317f72e97f52caa0751e071b031f096ad4657c6e24b20968"
   }
 }

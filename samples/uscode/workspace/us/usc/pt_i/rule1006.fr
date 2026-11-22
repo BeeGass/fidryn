@@ -51,7 +51,7 @@ module "/us/usc/ptI/rule1006" {
     hash "889193464847fc930da04f4703de9140f899b11ac0f8fb6524fb74c6eee70ea2"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -59,14 +59,14 @@ module "/us/usc/ptI/rule1006" {
     p "Subdivision (b) is adapted from former Bankruptcy Rule 107. The administrative cost of installments in excess of four is disproportionate to the benefits conferred. Prolonging the period beyond 180 days after the commencement of the case causes undesirable delays in administration. Paragraph (2) accordingly continues the imposition of a maximum of four on the number of installments and retains the maximum period of installment payments allowable on an original application at 120 days. Only in extraordinary cases should it be necessary to give an applicant an extension beyond the four months. The requirement of paragraph (3) that filing fees be paid in full before the debtor may pay an attorney for services in connection with the case codifies the rule declared in In re Latham, 271 Fed. 538 (N.D.N.Y. 1921), and In re Darr, 232 Fed. 415 (N.D. Cal. 1916)."
     hash "ef6f550fba07d785f96734ca3f459faa75ab4084ae79b67c3b49848ed2068bf2"
   }
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (b)(3) is expanded to prohibit payments by the debtor or the chapter 13 trustee not only to attorneys but to any person who renders services to the debtor in connection with the case."
     hash "506d328b8a1ad1c51149db9561af48d5dc2ae90c1db9ff64a58e9f925d446a4c"
   }
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -75,7 +75,7 @@ module "/us/usc/ptI/rule1006" {
     p "GAP Report on Rule 1006. No changes since publication, except for a stylistic change in subdivision (a)."
     hash "478482a7a38bdca0cf9bc81f5e8deb0ed4556ec7776896d22c3593a3aac35a10"
   }
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -85,14 +85,14 @@ module "/us/usc/ptI/rule1006" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "59437f5b1753f36bd34eb7e2c72ba6c94fabc28f4b8af908fea256e5669a6a8e"
   }
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
     p "Subdivision (b)(1) is amended to clarify that an individual debtor’s voluntary petition, accompanied by an application to pay the filing fee in installments, must be accepted for filing, even if the court requires the initial installment to be paid at the time the petition is filed and the debtor fails to make that payment. Because the debtor’s bankruptcy case is commenced upon the filing of the petition, dismissal of the case due to the debtor’s failure to make the initial or a subsequent installment payment is governed by Rule 1017(b)(1)."
     hash "7ac8875f18c32ca3d5a15880c6654a9129d5b107070d91030c544e3a58d01e28"
   }
-  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -104,7 +104,7 @@ module "/us/usc/ptI/rule1006" {
   }
   layers {
     operative "889193464847fc930da04f4703de9140f899b11ac0f8fb6524fb74c6eee70ea2"
-    enacted "5811a6ed7265799e2cc255c27c7f046f7ddcd2555544b49962458bbc15e94c6f"
-    editorial "95ee73d6c0a0e98f3be6fd7cc7b759234053634d419ff2ed4d046b7216beb81b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7d9d92118e641f668f3c235662e0e0b6717d6cec59cdc9c333c76e464e21e97d"
   }
 }

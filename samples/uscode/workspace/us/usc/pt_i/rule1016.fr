@@ -21,21 +21,21 @@ module "/us/usc/ptI/rule1016" {
     hash "8f04442b2a4e165c117c910b32123756ff04c7b6cc11500c57f5bd9ba197246d"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Rules 118 and 11–16. In a chapter 11 reorganization case or chapter 13 individual’s debt adjustment case, the likelihood is that the case will be dismissed."
     hash "e5f5f66b45ab5349a849603e416f6b54c68cf95e55c8cc17c0447f65c952443c"
   }
-  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to 25 F.R.Civ.P. and to include chapter 12 cases."
     hash "63c37daf0774dad69eebcf56b385f8ad4065461a20a964d30761b7382723990b"
   }
-  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -44,7 +44,7 @@ module "/us/usc/ptI/rule1016" {
   }
   layers {
     operative "8f04442b2a4e165c117c910b32123756ff04c7b6cc11500c57f5bd9ba197246d"
-    enacted "728b098cae2d2846654fc405a156762b165f38e6e33df85641db30f26c75f341"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e68bd7d639bcd8326f6b9657eef7754f1f449f05a92c43d8078913ad18d2170c"
   }
 }

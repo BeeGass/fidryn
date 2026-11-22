@@ -108,21 +108,21 @@ module "/us/usc/t45/s748" {
     p "1983—Subsec. (c)(1). " ["Pub. L. 98–181" -> "/us/pl/98/181"] " substituted “1985” for “1983”."
     hash "c370a11abf7bce8e5f092ca649c984e2a91798b0ba51da36a995697f13748bdb"
   }
-  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s748/note/statutoryNotes/pl.97.35/effective-date" enacted {
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.97.35/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
     p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
   }
-  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -137,7 +137,7 @@ module "/us/usc/t45/s748" {
   }
   layers {
     operative "5e5bf4ac468ffd499203db18851d56c2baf486146e16876f1338f3e5ceb60a82"
-    enacted "5c5e00f33de728f4f85e18dbb8abe168fa9b8bf5edce85ea3fce4af9e14e144e"
-    editorial "5350984874a68fce9d4519428896eb04b68f090d1241215d24093a692dd4f524"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "27f68a1c05b42fda40dd0b5f52c895e14f8240dfb386cd1c2dffc428cee29228"
   }
 }

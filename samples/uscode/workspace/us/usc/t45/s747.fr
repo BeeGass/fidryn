@@ -92,28 +92,28 @@ module "/us/usc/t45/s747" {
     p "1978—Subsec. (c). " ["Pub. L. 95–565" -> "/us/pl/95/565"] " added subsec. (c)."
     hash "2eb6817285fbbfe5863cee4a73e6c8215d53cc0c1e980535641c18509e735096"
   }
-  note "/us/usc/t45/s747/note/statutoryNotes/pl.96.448/conrail-funding-studies-reports-to-congress-recommendations" enacted {
+  note "/us/usc/t45/s747/note/statutoryNotes/pl.96.448/conrail-funding-studies-reports-to-congress-recommendations" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Conrail Funding Studies; Reports to Congress; Recommendations for Financially Self-Sustaining Rail System; Availability of Recommendations; Publication in Federal Register; Comments on Reports; Recommendations by Secretary on Future Structure and Operations by Corporation; Immunity From Antitrust Laws; Analysis of Effects on Corporation and Employees of Alternative Changes in Labor Agreements and Related Operational Changes; Projections on Benefits, Changes, Savings, and Increased Revenues"
     p ["Pub. L. 96–448, title VII, § 703(a)" -> "/us/pl/96/448/tVII/s703/a"] "–(d), Oct. 14, 1980, " ["94 Stat. 1962" -> "/us/stat/94/1962"] ", directed the United States Railway Association and the Consolidated Rail Corporation, not later than Apr. 1, 1980 (which probably should have been Apr. 1, 1981) to each submit a report to Congress analyzing the impact, upon the Corporation, rail service in the region, railroad employees, the economy of the region, other rail carriers in the region and elsewhere, and the Federal budget, of no further Federal funding for the Corporation, continued Federal funding of the rail system of the Corporation as then structured, and future Federal funding of the Corporation to the extent necessary to preserve rail service in the region which could be self-supporting, without undue interim disruption of operations, required publication of these reports in the Federal Register, directed the Interstate Commerce Commission, not later than May 1, 1981, to submit to Congress its comments on the report of the Association, the Secretary of Transportation, and the Corporation, directed the Secretary of Transportation, not later than Apr. 1, 1981, to submit to Congress his recommendations with respect to the future structure and operations of the Corporation, and not later than May 1, 1981, to submit to Congress his comments and recommendations with respect to the reports of the Association and Corporation, provided that the antitrust laws as defined in " ["section 791(a)(3) of this title" -> "/us/usc/t45/s791/a/3"] " not apply to any action of the Association or Secretary of Transportation prior to May 1, 1981, directed the Corporation, not later than Mar. 15, 1981 to submit to Congress an analysis of the effects upon the Corporation and its employees of alternative changes in labor agreements and related operational changes, including an analysis of any Federal funding that would be required, and directed the Corporation, not later than Jan. 15, 1981, to submit to the Association its projections of the benefits to the Corporation of the Staggers Rail Act of 1980, " ["Pub. L. 96–448" -> "/us/pl/96/448"] ", Oct. 14, 1980, " ["94 Stat. 1895" -> "/us/stat/94/1895"] ", its projections of changes needed in the structure of the rail system of the Corporation, including properties which might be abandoned or transferred, and other projections of potential savings or increased revenues to the Corporation."
     hash "db97c56af396bd8286358e48355043364fc08e4e0e7ba4149395fe939f81ce5a"
   }
-  note "/us/usc/t45/s747/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+  note "/us/usc/t45/s747/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Reporting Requirements"
     p "For termination, effective May 15, 2000, of provisions in subsecs. (b) and (c)(4)(B) of this section relating to the requirement that the Association submit annual reports to Congress, see " ["section 3003 of Pub. L. 104–66" -> "/us/pl/104/66/s3003"] ", as amended, set out as a note under " ["section 1113 of Title 31" -> "/us/usc/t31/s1113"] ", Money and Finance, and the 11th and 12th items on page 195 of House Document No. 103–7."
     hash "756841f4c5c2a68ad883de3a67dfeac43fdb5841fdfa8aa1636234dc11ba28f5"
   }
-  note "/us/usc/t45/s747/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s747/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s747/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s747/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -122,7 +122,7 @@ module "/us/usc/t45/s747" {
   }
   layers {
     operative "ac88ceab3d5193811e9629012e793402245f967b237c7b0d4aee70eb460303f5"
-    enacted "615fac73abd739184a6e74559e9816392691f60635b294d7c312714adff31ba0"
-    editorial "36338c68a16ebf4a1a54e27f4130fd9b929f6af1e28af82ecbfaff74947d6fad"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f4acc2128266c2f75d3561cd41b9b44fd8f116f16b7d9e1290510a54d6b7b781"
   }
 }

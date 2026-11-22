@@ -31,7 +31,7 @@ module "/us/usc/ptIII/rule3005" {
     hash "ddc740efe04109a12c89bb60307b679a7ce137ad756416a65f65fbd3451dd5fd"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -40,14 +40,14 @@ module "/us/usc/ptIII/rule3005" {
     p "Subdivision (b). This subdivision applies in chapter 9 and 11 cases as distinguished from chapter 7 cases. It permits voting for or against a plan by an obligor who files a claim in place of the creditor."
     hash "f1bf2f505bd52fbc68960e686146bb36bfc4ce8b84c58fe268e714b92825350a"
   }
-  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The words “with the court” in subdivision (b) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "0b0be67f86629a4e5d80b571bf7af5e18cff97f879c4b891034fe14bf4d5d427"
   }
-  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -59,7 +59,7 @@ module "/us/usc/ptIII/rule3005" {
     p "(b) The phrase “file a proof of the claim” from line 7 of the proposed rule was moved up to line 4 of the proposed amendment immediately after the word “may”. This makes the structure of Rules 3004 and 3005 more consistent."
     hash "670c33bc764653801aaca24cc3606a6aad58f59817c842de75abb43d5a295de2"
   }
-  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -68,7 +68,7 @@ module "/us/usc/ptIII/rule3005" {
   }
   layers {
     operative "ddc740efe04109a12c89bb60307b679a7ce137ad756416a65f65fbd3451dd5fd"
-    enacted "33f39b25d0ff114e28886524f2f3575cfbddcc2d03e1f4a0b3708f3823b36a0c"
-    editorial "b33e4704e90c2e89903581052e264905ab9c58475d4c7a6bfea2d3782fb9d3a3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b726aaee1115e69619854b1074ffd3c07aeb95eeb7a675c00cdf6e13bda8a0c9"
   }
 }

@@ -36,21 +36,21 @@ module "/us/usc/ptVII/rule7016" {
     hash "46ba275bfbda9c82885dea2c41d4311ea19d5a1721735d9184b185dae88c4ad2"
   }
   credit "(As amended Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "This rule is amended to create a new subdivision (b) that provides for the bankruptcy court to enter final orders and judgment, issue proposed findings and conclusions, or take some other action in a proceeding. The rule leaves the decision as to the appropriate course of proceedings to the bankruptcy court. The court’s decision will be informed by the parties’ statements, required under Rules 7008(a), 7012(b), and 9027(a) and (e), regarding consent to the entry of final orders and judgment. If the bankruptcy court chooses to issue proposed findings of fact and conclusions of law, Rule 9033 applies."
     hash "aed29d9722324290361cd28da457f44b4501a7b92fbec436b8f4f3f618b424d3"
   }
-  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "7ef882bacf23426c96a71459a37495ba9adab9e96c03c15f78105d64f664d7f5"
   }
-  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7016/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -59,7 +59,7 @@ module "/us/usc/ptVII/rule7016" {
   }
   layers {
     operative "46ba275bfbda9c82885dea2c41d4311ea19d5a1721735d9184b185dae88c4ad2"
-    enacted "4debf542adab47a0312fd4a450b1eec276280c3351c04ec41be0a75ac73347bd"
-    editorial "3f28957698fc193c9199b1b9f7d704229a16f062083008ac2b17eccd53d9db61"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "738dee4b01530cc54a0c0aa1a2cfc04b202416cc09763fb00d33d1157a723df8"
   }
 }

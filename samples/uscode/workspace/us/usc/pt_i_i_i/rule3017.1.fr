@@ -68,7 +68,7 @@ module "/us/usc/ptIII/rule3017.1" {
     hash "30a2fd66d45b52d5fa9c08160fe5fff6a44f78dabd100db0d12e80a0da0736f1"
   }
   credit "(Added Apr. 11, 1997, eff. Dec. 1, 1997; amended Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" enacted {
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997"
@@ -77,7 +77,7 @@ module "/us/usc/ptIII/rule3017.1" {
     p "GAP Report on Rule 3017.1. No change to the published draft."
     hash "2170a7039f0f6349fa5b8628472e98d5351cccf498942f9f9ece1a141c2fa80b"
   }
-  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -86,14 +86,14 @@ module "/us/usc/ptIII/rule3017.1" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "947317c806cfaf00f41e23d992d577193f5399a46a2474b0d1a8a26a7c318da5"
   }
-  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. The title and subdivision (a) of the rule are amended to cover such cases when the court orders that § 1125 of the Code applies."
     hash "01f83af4058fbcdf435ddefe08e5e9877bdd50ee6465e21a7bd7c4cea22fee24"
   }
-  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -105,7 +105,7 @@ module "/us/usc/ptIII/rule3017.1" {
   }
   layers {
     operative "30a2fd66d45b52d5fa9c08160fe5fff6a44f78dabd100db0d12e80a0da0736f1"
-    enacted "c51f55a931083ee6e129d87f7a9c143348f49eb0170986c80419f2de90c0bbb9"
-    editorial "a56b425e9936a1bbe43ea3265864725ef4672c1b5be3cf1e4633f0aa161a9bf5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b026190a365ae3ffba94c1eea4f1077267db3f8a2bb3af6bc56ecac4cd0a483e"
   }
 }

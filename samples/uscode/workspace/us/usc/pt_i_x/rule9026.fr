@@ -10,14 +10,14 @@ module "/us/usc/ptIX/rule9026" {
     hash "3ea4ddc8d59b0c39cc996e34a26626b31452ec9e5ce5ac3a810e3c0b63100673"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9026/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9026/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9026 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "96ee44a2482f92075542c74f76e4fa61f9be95432b80ed5a604b6c016c200861"
   }
-  note "/us/usc/ptIX/rule9026/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9026/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptIX/rule9026" {
   }
   layers {
     operative "3ea4ddc8d59b0c39cc996e34a26626b31452ec9e5ce5ac3a810e3c0b63100673"
-    enacted "c998ad449758a648ebf179bd808f806aad7e6ceb8ef4f80a9f49f1c5ba38e491"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "676fc750c20405ff94b959f13095503a80427b2de540e366df4497a86c738bda"
   }
 }

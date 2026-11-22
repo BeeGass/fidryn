@@ -76,14 +76,14 @@ module "/us/usc/ptV/rule5009" {
     hash "f2462b01329e75c0bf498a18761b046437eb6622b0747a2404d71f5ced625991"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is the same as § 350(a) of the Code. An estate may be closed even though the period allowed by Rule 3002(c) for filing claims has not expired. The closing of a case may be expedited when a notice of no dividends is given under Rule 2002(e). Dismissal of a case for want of prosecution or failure to pay filing fees is governed by Rule 1017."
     hash "e73749c0105f40b8c76d81fad52b047000906852b3b89122f07378cd577f1f08"
   }
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -91,7 +91,7 @@ module "/us/usc/ptV/rule5009" {
     p "Rule 3022 governs the closing of chapter 11 cases."
     hash "2beccbc4d98b792c556412bf424c642584eec22c7b42f09b4a7fa3b0b8b38215"
   }
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -100,7 +100,7 @@ module "/us/usc/ptV/rule5009" {
     p "Changes Made After Publication. No changes since publication."
     hash "30bc5c442ced8229861f15c20f744441d74f300d2a16b1ede1d73307f27f46e4"
   }
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -108,7 +108,7 @@ module "/us/usc/ptV/rule5009" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "361ac4be452d56f97450a51f81769cb453e2fc4b8ab8e817d3eab2825a37b2b9"
   }
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
@@ -116,7 +116,7 @@ module "/us/usc/ptV/rule5009" {
     p "Other changes to this rule are stylistic."
     hash "36a48e1c01d8b2e0285fd62d180560e68df3f8df1d24b338f3cdfc6b8fae5052"
   }
-  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -130,7 +130,7 @@ module "/us/usc/ptV/rule5009" {
   }
   layers {
     operative "f2462b01329e75c0bf498a18761b046437eb6622b0747a2404d71f5ced625991"
-    enacted "7c4e7c08aa113ee0c2168ca2d956c01b522349e3264627173ae4c131844ab390"
-    editorial "dc41a44be431e89eb16ae68ffa8ac3addd93cb1b1633c1e06b5333f16bbc985e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6576f3cad5c9985f40a4af2f5e4eca457f5f8f34ee3b15609afc3181b9b822fe"
   }
 }

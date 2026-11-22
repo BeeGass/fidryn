@@ -72,14 +72,14 @@ module "/us/usc/ptVIII/rule8019" {
     hash "df43ad6f8e682011ad35d0f7a5b9d7726e803185d4b460a5329a95258a20c697"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8019, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to suspension of rules in Part VIII, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "73bdbb7e243a58f38bcca28f3cd8af5754a642bc86f3a5e3695deea91ec6a763"
   }
-  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -90,7 +90,7 @@ module "/us/usc/ptVIII/rule8019" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "cc0b8f668550375923020135181102f317d3450819380339c51d95e87b79e6bd"
   }
-  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -99,7 +99,7 @@ module "/us/usc/ptVIII/rule8019" {
   }
   layers {
     operative "df43ad6f8e682011ad35d0f7a5b9d7726e803185d4b460a5329a95258a20c697"
-    enacted "e9ae0f18652c5a21f749ed54370d5ef194b6da933c1adc1f7b5d388d37fb56d2"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "48cf0dc9f8dc52e31fee8c9832c86ddb83860fd912b0c76779e23227455564e0"
   }
 }

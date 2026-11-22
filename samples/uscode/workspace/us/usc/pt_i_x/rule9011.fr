@@ -139,7 +139,7 @@ module "/us/usc/ptIX/rule9011" {
     hash "bd3a01038043fec59a10fdf9668158d45fe18ba32e6a6ce5ed5926b5a4e6b750"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -149,21 +149,21 @@ module "/us/usc/ptIX/rule9011" {
     p "Subdivision (b) extends to all papers filed in cases under the Code the policy of minimizing reliance on the formalities of verification which is reflected in the third sentence of Rule 11 F.R.Civ.P. The second sentence of subdivision (b) permits the substitution of an unsworn declaration for the verification. See 28 U.S.C. § 1746. Rules requiring verification or an affidavit are as follows: Rule 1008, petitions, schedules, statements of financial affairs, Chapter 13 Statements and amendments; Rule 2006(e), list of multiple proxies and statement of facts and circumstances regarding their acquisition; Rule 4001(c), motion for ex parte relief from stay; Rule 7065, incorporating Rule 65(b) F.R.Civ.P. governing issuance of temporary restraining order; Rule 8011(d), affidavit in support of emergency motion on appeal."
     hash "0fe2cbfbdec99c8f93617f8c503d643d60e44f628e7158c2a40b5b2fb37c128a"
   }
-  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The statement of intention of the debtor under § 521(2) [now 521(a)(2)] of the Code is added to the documents which counsel is not required to sign."
     hash "db3e1ee2a168762c0c8f565c8d4dbb54d8bca9c75968185319db2d3f6d58f31d"
   }
-  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (a) is amended to conform to Rule 11 F.R.Civ.P. where appropriate, but also to clarify that it applies to the unnecessary delay or needless increase in the cost of the administration of the case. Deletion of the references to specific statements that are excluded from the scope of this subdivision is stylistic. As used in subdivision (a) of this rule, “statement” is limited to the statement of financial affairs and the statement of intention required to be filed under Rule 1007. Deletion of the reference to the Chapter 13 Statement is consistent with the amendment to Rule 1007(b)."
     hash "7f018433e86a173329e761cda630aa0f3da4bac14d3241b383a2a7f0d32df946"
   }
-  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -172,7 +172,7 @@ module "/us/usc/ptIX/rule9011" {
     p "GAP Report on Rule 9011. The proposed amendments to subdivision (a) were revised to clarify that a party not represented by an attorney must sign lists, schedules, and statements, as well as other papers that are filed."
     hash "73d6c96cfc9876642c7b8c0d47561b953a0ade167b8dec371825923e7a01e33b"
   }
-  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -181,7 +181,7 @@ module "/us/usc/ptIX/rule9011" {
   }
   layers {
     operative "bd3a01038043fec59a10fdf9668158d45fe18ba32e6a6ce5ed5926b5a4e6b750"
-    enacted "46f98809c972ad5b032ee01a17338ca4683f3a85a0571c023eae3847d2a74182"
-    editorial "097a2e6b61ed76c740f27ace07dd7834d858bfed9bb1f018ef8f99655c21173a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2fc21ae86382c2c55335c23a86410a45da68758edcb797f2d16f04f90c1a6010"
   }
 }

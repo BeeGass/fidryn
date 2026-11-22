@@ -199,7 +199,7 @@ module "/us/usc/ptIX/rule9027" {
     hash "340af82ecdbfd685c538efa2692b2720e6ffc2b31639277a09ef65e4b0bd2597"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 2002, eff. Dec. 1, 2002; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -221,7 +221,7 @@ module "/us/usc/ptIX/rule9027" {
     p "This rule does not deal with the question whether a single plaintiff or defendant may remove a claim or cause of action if there are two or more plaintiffs or defendants. See [former] 28 U.S.C. § 1478."
     hash "53ba0c5023aa22bcadd49fb822f42380f5d8c9936f92c54f2711af703e81c1f7"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -230,7 +230,7 @@ module "/us/usc/ptIX/rule9027" {
     p "Subdivision (i) has been abrogated consistent with the abrogation of Rule 9015."
     hash "a936625c25d8e03fb19f8a9e1fea78d3f3a5d700bcb7898e52c673237c996728"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -239,7 +239,7 @@ module "/us/usc/ptIX/rule9027" {
     p "Subdivision (e), redesignated as subdivision (d), is amended to delete the restriction that limits the role of the bankruptcy court to the filing of a report and recommendation for disposition of a motion for remand under 28 U.S.C. § 1452(b). This amendment is consistent with § 309(c) of the Judicial Improvements Act of 1990, which amended § 1452(b) so that it allows an appeal to the district court of a bankruptcy court’s order determining a motion for remand. This subdivision is also amended to clarify that the motion is a contested matter governed by Rule 9014. The words “filed with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "346a979ba3bdeb4f94e0c6d3150a34f2025e06a1265fba074f0d68b257f6e816"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -247,7 +247,7 @@ module "/us/usc/ptIX/rule9027" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "ca2ec5e374e2084f78448e51a2b1b01f135dbd8235eae656d997cfc70c4dec7f"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -259,7 +259,7 @@ module "/us/usc/ptIX/rule9027" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
@@ -267,7 +267,7 @@ module "/us/usc/ptIX/rule9027" {
     p "The party filing the notice of removal must include a statement regarding consent in the notice, and the other parties who have filed pleadings must respond in a separate statement filed within 14 days after removal. If a party to the removed claim or cause of action has not filed a pleading prior to removal, however, there is no need to file a separate statement under subdivision (e)(3), because a statement regarding consent must be included in a responsive pleading filed pursuant to Rule 7012(b). Rule 7016 governs the bankruptcy court’s decision whether to hear and determine the proceeding, issue proposed findings of fact and conclusions of law, or take some other action in the proceeding."
     hash "74b6688607b66e6272dcd12c41895ad827421623795bbc7e438a30f02ba32e62"
   }
-  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9027/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -276,7 +276,7 @@ module "/us/usc/ptIX/rule9027" {
   }
   layers {
     operative "340af82ecdbfd685c538efa2692b2720e6ffc2b31639277a09ef65e4b0bd2597"
-    enacted "160bde1733979e62d65a81a2b8625ab36e33efd975acf71d4e2bd11984e5b344"
-    editorial "1871f3054712934b9f6f63f898fa6965876aad098763bd12ef6653d6600536d4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cefaf5b33add0c59e3ef8b63770d1341be2c201360e8b17d14aef73babde4594"
   }
 }

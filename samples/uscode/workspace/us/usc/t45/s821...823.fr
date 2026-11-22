@@ -58,7 +58,7 @@ module "/us/usc/t45/s821...823" {
     }
     hash "deb69abf7a33d82cb340347dab01a564aad64e906e451a0eccac7daf2c4273b6"
   }
-  note "/us/usc/t45/s821...823/note/statutoryNotes/pl.109.59/substantive-criteria-and-standards" enacted {
+  note "/us/usc/t45/s821...823/note/statutoryNotes/pl.109.59/substantive-criteria-and-standards" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Substantive Criteria and Standards"
@@ -67,7 +67,7 @@ module "/us/usc/t45/s821...823" {
   }
   layers {
     operative "80438f116337c4cada7c721af134bc67cff073de2fd2061dffe408fe73ae4ce8"
-    enacted "19932718a4c5e699266c04a99e3fd5a0d70e5ff8a08d147d74975f1d2aee79cd"
-    editorial "a7023b485422d606cb54f79c7f29c091e01af86e1b3c7351561e043e65934f5d"
+    enacted "508ec76f9ebe02d13834cf9f119f1037d70282d4828fd230e38a1d480775bf1d"
+    editorial "4d62afe82d4634a6e28e764cde064cedb114bed83899c76befc82862944eb491"
   }
 }

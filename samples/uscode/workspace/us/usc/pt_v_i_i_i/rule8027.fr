@@ -20,7 +20,7 @@ module "/us/usc/ptVIII/rule8027" {
     hash "83415b83d299cbb6603bfe45531fbacadba858830675f4943709816508e02692"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -28,7 +28,7 @@ module "/us/usc/ptVIII/rule8027" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "c4099529171240a588b044e2aaed5307797f901899dbc87b8e2c0309c3f9d84c"
   }
-  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8027/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -37,7 +37,7 @@ module "/us/usc/ptVIII/rule8027" {
   }
   layers {
     operative "83415b83d299cbb6603bfe45531fbacadba858830675f4943709816508e02692"
-    enacted "70af5c46b7f3b93f34c2c9217edf246648b879e512ce6457fbd760ddc29cb5a8"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "15e30cb4994afd498ced4da8a9c64f3873813663d21a4d198e3214d6f3ea07ee"
   }
 }

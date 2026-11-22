@@ -34,14 +34,14 @@ module "/us/usc/t45/s231q" {
     p "1981—Par. (2). " ["Pub. L. 97–35" -> "/us/pl/97/35"] " inserted “and section 216(i)” after “203”."
     hash "a575eed8c99e8e192f0a6fa38830c3558727821336949e7fe81e801f1b2681dc"
   }
-  note "/us/usc/t45/s231q/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231q/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
     p "Amendment by " ["Pub. L. 107–90" -> "/us/pl/107/90"] " effective Jan. 1, 2002, see " ["section 103(j) of Pub. L. 107–90" -> "/us/pl/107/90/s103/j"] ", set out as a note under " ["section 405 of Title 42" -> "/us/usc/t42/s405"] ", The Public Health and Welfare."
     hash "0130bc1cbea49fe3f27ee02f0e294b2913a7bccef7be11ea8b35d37121b4e20a"
   }
-  note "/us/usc/t45/s231q/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231q/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -50,7 +50,7 @@ module "/us/usc/t45/s231q" {
   }
   layers {
     operative "02579cfcaf5b91136809c21f0721ca922fab6af96198d8e8938b747e8dc78279"
-    enacted "15705507033bab6b857a44e1534bc1224bf41e355a44daa626b2f1c0d5e894fa"
-    editorial "c91f677f8ee6f879b8b216eb1fee685e4afcb2b25e5bd62a729d81bc7b95384f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1f76a33c787fe9a4f4a759d8a352456278170e2b481af442082105e1e1a8b56e"
   }
 }

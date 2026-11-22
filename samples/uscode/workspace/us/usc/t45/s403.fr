@@ -17,7 +17,7 @@ module "/us/usc/t45/s403" {
     p "1963—" ["Pub. L. 88–133" -> "/us/pl/88/133"] " repealed provision for repayment of advances by transfers from account to general fund of Treasury when funds of account derived from increase in employers’ contribution rate are adequate for such purpose, which is now covered by " ["section 303(b) of Pub. L. 88–133" -> "/us/pl/88/133/s303/b"] ", set out as a note below."
     hash "866c2200f4eff51f92f8211e17aa071526b9b8f826642658651078bcee56569c"
   }
-  note "/us/usc/t45/s403/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+  note "/us/usc/t45/s403/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1963 Amendment"
@@ -36,7 +36,7 @@ module "/us/usc/t45/s403" {
   }
   layers {
     operative "a1715c4e2d714e78647cd3fd9636be844a7fcb1e8cdbe55ffe261dcaddec31e5"
-    enacted "b66d4ba630d0b650719de6a8e43426f74ae6094718eb49ab429d830fdf34fe4f"
-    editorial "28afedfd507b4e8bea163a3e65220da0d705f2605f1bd2da8dfc91ffd3b0056c"
+    enacted "650c10fab13646a17ae4321b9d84f26b760a5449b7baf6e19b7de58f522c98b2"
+    editorial "ffaa9e41d0643c5e39d7715c8b99b5e0c0e12f743e47c7a66d5b4ffd323599c0"
   }
 }

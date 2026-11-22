@@ -32,8 +32,8 @@
       "assigned": 3
     },
     "notes": {
-      "enacted": 1498,
-      "editorial": 593
+      "enacted": 196,
+      "editorial": 1895
     },
     "notes_by_group": {
       "courtRules": 1,
@@ -56,23 +56,23 @@
         "malformed": 0
       },
       "enacted": {
-        "exact": 332,
-        "target-status": 18,
+        "exact": 176,
+        "target-status": 15,
         "ambiguous": 0,
-        "unit-only": 14,
+        "unit-only": 12,
         "range-form": 0,
-        "no-unit": 364,
-        "outside": 1454,
+        "no-unit": 117,
+        "outside": 692,
         "malformed": 0
       },
       "editorial": {
-        "exact": 275,
-        "target-status": 47,
+        "exact": 431,
+        "target-status": 50,
         "ambiguous": 0,
-        "unit-only": 14,
+        "unit-only": 16,
         "range-form": 1,
-        "no-unit": 259,
-        "outside": 4919,
+        "no-unit": 506,
+        "outside": 5681,
         "malformed": 0
       }
     },

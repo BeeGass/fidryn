@@ -97,7 +97,7 @@ module "/us/usc/ptIII/rule3020" {
     hash "132fbb97716323ffd1a75c19a7c947708c54d33374b221796ad906b736b952e6"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -106,7 +106,7 @@ module "/us/usc/ptIII/rule3020" {
     p "Subdivision (d) clarifies the authority of the court to conclude matters pending before it prior to confirmation and to continue to administer the estate as necessary, e.g., resolving objections to claims."
     hash "a6a2d1e94eb9232758e32eb6ae3593d00803e4c2549509b05a66b96504ca83a6"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -115,14 +115,14 @@ module "/us/usc/ptIII/rule3020" {
     p "Subdivision (c) is also amended to require that the confirmation order be mailed to the trustee. Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
     hash "4b9ab60c876af49abf015a01711a2df7c9647c865d0e92c59a34ac233e4f34bb"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to limit its application to chapter 9 and chapter 11 cases. The procedures relating to confirmation of plans in chapter 12 and chapter 13 cases are provided in Rule 3015. Other amendments are stylistic and make no substantive change."
     hash "d1ae73df24f214b1892969ff3feda942dd734d9ccd8ed4f19fa4f073ff83b356"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -131,7 +131,7 @@ module "/us/usc/ptIII/rule3020" {
     p "GAP Report on Rule 3020. No changes since publication."
     hash "0d787ce47479b99fc195b1675004e0ce3b8d8ca58fcff321216a3a191346c32e"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -140,7 +140,7 @@ module "/us/usc/ptIII/rule3020" {
     p "Changes Made After Publication and Comments. No changes were made in the text of the proposed amendments. The Committee Note was revised to put in a more prominent position the statement that the validity and effect of injunctions provided for in plans is beyond the scope of the rules."
     hash "e4d62411675036d587007b2ddc9a5e8b396efe5bdb9ea2fdcfbdd72c44d3a7ce"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -152,7 +152,7 @@ module "/us/usc/ptIII/rule3020" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -161,7 +161,7 @@ module "/us/usc/ptIII/rule3020" {
   }
   layers {
     operative "132fbb97716323ffd1a75c19a7c947708c54d33374b221796ad906b736b952e6"
-    enacted "170850b8cc12466b92167b37ae0a6a9ef047d78d9fcbd1fea06cd553c1218492"
-    editorial "f2038d28ba770b7f743a978c3c500b3ad880364ab76e3f48e9fc15cff7113b4b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a912768a5e6970e9b3228262c20f0bc07de54f47f1c6d0b6b8c239ea83f128ee"
   }
 }

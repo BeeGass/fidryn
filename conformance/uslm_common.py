@@ -113,7 +113,13 @@ DROPPED_TAGS = frozenset(
 )
 INLINE_TAGS = DROPPED_TAGS | SUP_TAGS | SUB_TAGS | {"ref", "br"}
 ROW_GROUPS = {"xhtml:thead": "head", "xhtml:tbody": "body", "xhtml:tfoot": "foot"}
-EDITORIAL_TOPICS = frozenset({"removalDescription", "historicalAndRevision"})
+# The topics that make a note editorial whatever it holds: a historical and revision note,
+# the description of what was removed, and an amendment yet to take effect.
+EDITORIAL_TOPICS = frozenset(
+    {"historicalAndRevision", "removalDescription", "prospectiveAmendment"}
+)
+# The group of the statutory notes, the one group whose notes may be enacted.
+STATUTORY_GROUP = "statutoryNotes"
 LAW_ORIGINS = ("/us/pl/", "/us/act/", "/us/stat/")
 LAW_LINKS = ("/us/pl/", "/us/act/")
 RELEASE_NOTE_START = "Current through "
@@ -133,6 +139,21 @@ ASCII_WHITE_RUN = re.compile("[\t\n\f\r ]+")
 SEGMENT = re.compile("[A-Za-z0-9.~\u2013-]+")
 GROUP_WORD = re.compile("[A-Za-z][A-Za-z0-9]*")
 ASCII_NUMBER = re.compile("[0-9]+")
+# The headings of the notes of advisory committees, of extracts of reports and statements,
+# and of revision notes, each searched in the heading of an ungrouped note once its letters
+# A to Z are put in lower case and each run of white space is made one space. With
+# `re.ASCII` a word character of `\b` is an ASCII letter, an ASCII digit or `_`, and `\d`
+# an ASCII digit; the heading then holds no line feed, so that `$` is its end.
+EDITORS_HEADINGS = tuple(
+    re.compile(pattern, re.ASCII)
+    for pattern in (
+        r"^(notes? (of|on) (the )?advisory committee|advisory committee notes?$|committee notes? on rules)",
+        r"\breport no\b|\b(senate|house|conference) reports?\b|legislative statements?|explanatory statement|statement of (the )?managers|notes of (the )?committee on the judiciary|notes of conference committee|revision amendment|reviser|\bfloor statements?\b",
+        r"historical and revision|^\d{4} acts?$",
+    )
+)
+# The letters A to Z, each to its lower case, and no other character.
+ASCII_LOWER = {code: code + 32 for code in range(ord("A"), ord("Z") + 1)}
 LABEL_NAMES = {"num": "num", "heading": "heading", "sourceCredit": "source credit"}
 
 
@@ -204,6 +225,39 @@ def tag_of(element: Element) -> str:
 
 def is_footnote(element: Element) -> bool:
     return tag_of(element) == "note" and element.get("type") == "footnote"
+
+
+def holds_quoted(element: Element, skip: Element | None = None) -> bool:
+    """Whether the element holds a `quotedContent` element at any depth, outside its
+    footnotes and outside `skip`."""
+    for child in element:
+        if child is skip or is_footnote(child):
+            continue
+        if tag_of(child) == "quotedContent" or holds_quoted(child):
+            return True
+    return False
+
+
+def is_editors_heading(heading: str) -> bool:
+    """Whether a heading, with A to Z put in lower case and each run of white space made one
+    space, matches one of the patterns of `EDITORS_HEADINGS`."""
+    folded = WHITE_RUN.sub(" ", heading).translate(ASCII_LOWER)
+    return any(pattern.search(folded) for pattern in EDITORS_HEADINGS)
+
+
+def note_layer(group: str, topics: list[str], heading: Text | None, quoted: bool) -> str:
+    """The layer of a note: enacted when it holds quoted content outside its footnotes
+    (`quoted`), its group is the statutory group or it is ungrouped, none of its topics is
+    one of `EDITORIAL_TOPICS`, and, ungrouped, its heading is not one of the editors'; and
+    editorial otherwise."""
+    ungrouped = group == "ungrouped"
+    enacted = (
+        quoted
+        and (ungrouped or group == STATUTORY_GROUP)
+        and not any(topic in EDITORIAL_TOPICS for topic in topics)
+        and not (ungrouped and heading is not None and is_editors_heading(heading.plain))
+    )
+    return "enacted" if enacted else "editorial"
 
 
 def is_marker(element: Element) -> bool:
@@ -1527,6 +1581,8 @@ class MemberReader:
                 blocks = self.after_label(element, scope)
                 if not blocks:
                     continue
+                label = next((c for c in element if tag_of(c) == "heading"), None)
+                quoted = holds_quoted(element, skip=label)
             else:
                 topics = self.topics_of(element)
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
@@ -1534,6 +1590,7 @@ class MemberReader:
                     heading = self.read_optional_text(heading_element, scope)
                 context = Context(True, note_flow=True)
                 blocks = self.read_flow(element, context, scope, skip=heading_element)
+                quoted = holds_quoted(element)
             law = self.law_of(heading, blocks, element, anchor)
             segment = heading_segment(heading.plain) if heading is not None else ""
             if not segment:
@@ -1543,10 +1600,7 @@ class MemberReader:
             base = f"{anchor}/note/{group}/{law or 'nolaw'}/{segment}"
             named[base] += 1
             address = base if named[base] == 1 else f"{base}/{named[base]}"
-            editorial = group == "editorialNotes" or (
-                group == "ungrouped" and any(topic in EDITORIAL_TOPICS for topic in topics)
-            )
-            layer = "editorial" if editorial else "enacted"
+            layer = note_layer(group, topics, heading, quoted)
             read.append((index, Note(address, layer, group, topics, heading, blocks)))
         return read
 

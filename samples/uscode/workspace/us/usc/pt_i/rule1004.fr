@@ -10,7 +10,7 @@ module "/us/usc/ptI/rule1004" {
     hash "539b29f182a8f4666ebf279669dd6082809b9276ce182a1a250f26da033b745e"
   }
   credit "(As amended Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -19,7 +19,7 @@ module "/us/usc/ptI/rule1004" {
     p "Subdivision (b) implements § 303(b)(3) of the Code which provides that an involuntary petition may be filed by fewer than all the general partners or, when all the general partners are debtors, by a general partner, trustee of the partner or creditors of the partnership. Rule 1010, which governs service of a petition and summons in an involuntary case, specifies the time and mode of service on the partnership. When a petition is filed against a partnership under § 303(b)(3), this rule requires an additional service on the nonfiling general partners. It is the purpose of this subdivision to protect the interests of the nonpetitioning partners and the partnership."
     hash "2646858c6ef77fe360f3cbde9e44be17cc7f5e9e05daab42d3dc914b37b2da6a"
   }
-  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -28,7 +28,7 @@ module "/us/usc/ptI/rule1004" {
     p "Changes Made After Publication and Comments. No changes since publication."
     hash "2026e1a9ffa6bf794e642a856aa71427f96db87b7d083620d8a3c77b45dc89cd"
   }
-  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -37,7 +37,7 @@ module "/us/usc/ptI/rule1004" {
   }
   layers {
     operative "539b29f182a8f4666ebf279669dd6082809b9276ce182a1a250f26da033b745e"
-    enacted "4d969fca55ad2795e07e9f0b8d5cd8933a3b04244d7f1cf92854a9a21990f352"
-    editorial "a55c299eebb5e4a7669deab82590186f34316cf7af7594ac6084d8efa0cb7029"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5ea455d1e1afa08e1a2e75f76e807f1d12f272119cea2ffc7a97ac277945c0f8"
   }
 }

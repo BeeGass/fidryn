@@ -72,14 +72,14 @@ module "/us/usc/t45/s1204" {
     p "Section is comprised of subsecs. (a) to (d) of " ["section 605 of Pub. L. 97–468" -> "/us/pl/97/468/s605"] ". Subsec. (e) of " ["section 605 of Pub. L. 97–468" -> "/us/pl/97/468/s605"] " amended " ["section 712 of this title" -> "/us/usc/t45/s712"] "."
     hash "b2f3c89d842e30b0eb7542a6bf0ecf9d55ba2643448a3d83e614221fdc403cde"
   }
-  note "/us/usc/t45/s1204/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1204/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s1204/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s1204/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -94,7 +94,7 @@ module "/us/usc/t45/s1204" {
   }
   layers {
     operative "10a254037a862d356dc66cc69849eceaee004cc3ff40ed5c28728b485b496199"
-    enacted "ce041e4c8aae902ae095387eee6c7d346fdb5fbefd95add5bada5a0b4d2cd298"
-    editorial "5093ae6c09ded309fa87241deebb0377bb6f55eb552559808915498e142fedfc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c89547448815c95eadf8418f01f99721758c23d1f044d24554f459261b94dc85"
   }
 }

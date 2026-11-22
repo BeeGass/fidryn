@@ -80,7 +80,7 @@ module "/us/usc/ptIII/rule3015.1" {
     hash "b1650bbe387853031e90f6102c713c391248a7eaecafb8a5bd3108868291e0ca"
   }
   credit "(Added Apr. 27, 2017, eff. Dec. 1, 2017; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2017" enacted {
+  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2017" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017"
@@ -91,7 +91,7 @@ module "/us/usc/ptIII/rule3015.1" {
     p "The last paragraph of a Local Form must be for the inclusion of any nonstandard provisions, as defined by Rule 3015(c), and must include a statement that nonstandard provisions placed elsewhere in the plan are void. This part gives the debtor the opportunity to propose provisions that are not otherwise in, or that deviate from, the Local Form. The form must also require a certification by the debtor’s attorney or unrepresented debtor that there are no nonstandard provisions other than those placed in the final paragraph."
     hash "b09526f2b71192c29c449595a02a0dada1a3d4779dc44db2c5ec15d684c4834a"
   }
-  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -103,7 +103,7 @@ module "/us/usc/ptIII/rule3015.1" {
   }
   layers {
     operative "b1650bbe387853031e90f6102c713c391248a7eaecafb8a5bd3108868291e0ca"
-    enacted "03433f97df90f5d22d883790d06ffd5575bb332d77970b71f6b239132fc1e41b"
-    editorial "1b4ce7a07bb3db3ab513040488d10219f715e2bccae3f7056c1004f27d4cec8c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4fd7a26fdf4a67288d05b5ac86a2f03b867c64ea96502971eeaf94eff516ca92"
   }
 }

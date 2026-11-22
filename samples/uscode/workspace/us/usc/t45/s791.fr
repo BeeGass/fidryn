@@ -121,21 +121,21 @@ module "/us/usc/t45/s791" {
     p "Subsec. (d)(1). " ["Pub. L. 94–210, § 705(b)" -> "/us/pl/94/210/s705/b"] ", substituted mandatory for discretionary authority for purchase of properties by the Corporation and provisions relating to negotiations for properties for transfer pursuant to " ["section 716(c)(1)(C) of this title" -> "/us/usc/t45/s716/c/1/C"] ", for provisions relating to negotiations as provided in the final system plan."
     hash "0a24059bf3deecafbc721d27e6fafaeefddeac122973a02e30f2c244bb4461db"
   }
-  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s791/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s791/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -157,7 +157,7 @@ module "/us/usc/t45/s791" {
   }
   layers {
     operative "9036014a1e000d43e1821dbf630dd09f4326ef56faf517076cdcb6a22a7c219c"
-    enacted "5fb507082ad15e804db6962d4859007ae176d79953b52ff21c2225329ee85693"
-    editorial "9dede9c4ebb454ef8c692da28f6548ad4a3fb1fbf60c7c184107cf9556f69ca8"
+    enacted "bc7455d2ca1b6ff4bed3f663299f37c1f326a99a1002c4d0714b96b27cf99ead"
+    editorial "7fb5e86b7baa7b821f4802a5131641030ba1eca6b7ebf89b21a849a0fd40f287"
   }
 }

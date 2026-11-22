@@ -291,14 +291,14 @@ module "/us/usc/ptVIII/rule8013" {
     hash "d977f61e1c80a0bcf9e975907f32b9d5968f33cc3ab3582d015554d10d8f115e"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8013, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to disposition of appeal and weight accorded bankruptcy judge’s findings of fact, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "9276f7e7368f8a3e394040f8ac3a525f0eeeb2be93a6d3946e20d285a0dd299e"
   }
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -314,28 +314,28 @@ module "/us/usc/ptVIII/rule8013" {
     p "Changes Made After Publication and Comment. Subdivision (a)(2)(D) was changed to allow the court to require a notice of motion or proposed order. A stylistic change was made to subdivision (d)(2)(B)."
     hash "6ff91c9b91b3031163e1a045900ebedbcbfa8c837a45f2ed34a3868150eac3c5"
   }
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "Subdivision (f)(3) is amended to conform to F.R.App.P. 27(d)(2), which was recently amended to replace page limits with word limits for motions and responses produced using a computer. The word limits were derived from the current page limits, using the assumption that one page is equivalent to 260 words. Documents produced using a computer must include the certificate of compliance required by Rule 8015(h); Official Form 417C suffices to meet that requirement. Page limits are retained for papers prepared without the aid of a computer (i.e., handwritten or typewritten papers). For both the word limit and the page limit, the calculation excludes the accompanying documents required by Rule 8013(a)(2)(C) and any items listed in Rule 8015(h)."
     hash "adb134e0a49909fdcd0836eeee290d6f8639d354b6333ccfb90a2b6574f152aa"
   }
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2020 Amendment"
     p "Subdivision (a)(1) is amended to delete the reference to proof of service. This change reflects the recent amendment to Rule 8011(d) that eliminated the requirement of proof of service when filing and service are completed using a court’s electronic-filing system."
     hash "8944abf7bb5e2e26fbcb622907a6fc81f6d77380496794eee40446dc006e85c4"
   }
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 8013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "97d9db28ef94911ece70b527bf1887c36053fd8b48d8d88b2d7d564d004c5005"
   }
-  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVIII/rule8013/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -344,7 +344,7 @@ module "/us/usc/ptVIII/rule8013" {
   }
   layers {
     operative "d977f61e1c80a0bcf9e975907f32b9d5968f33cc3ab3582d015554d10d8f115e"
-    enacted "a00164c5bd10389aa134338271712aeb570867070026262a449448934d2db36c"
-    editorial "9bd3e91f90a7aba65330077820eaec12523711029e53abd6638d77c2dfe5e86a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "779134ce25a4f25455f62bcd2f47522f26aa79241d4b0def226e47305a006656"
   }
 }

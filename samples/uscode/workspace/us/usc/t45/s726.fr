@@ -388,21 +388,21 @@ module "/us/usc/t45/s726" {
     p "Subsecs. (f), (g). " ["Pub. L. 95–565" -> "/us/pl/95/565"] ", §§ 2(c), 3, added subsec. (f), redesignated former subsec. (f) as (g), and substituted “$3,300,000,000” for “$2,100,000,000”."
     hash "9f795b9965017a56e4f008127da128526aca220f9b7acb103a6e83cb83b249d7"
   }
-  note "/us/usc/t45/s726/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s726/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
   }
-  note "/us/usc/t45/s726/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s726/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s726/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s726/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -429,7 +429,7 @@ module "/us/usc/t45/s726" {
   }
   layers {
     operative "92c2c824a5a9f764c58fb3f78a8ec9facca9cfe76c8ab30345f7bd78493899f0"
-    enacted "bb7da539d5355bdcb8cb0943781c6326854f8d42b8b3b33bc9a2574f2f607cd3"
-    editorial "1507e8e65d362f7a546e0c22a452c385c39245113a2d6a6f811599763eccb47b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "528ecb7448ce9e35ecf6a516350eeb7c14443b17778db57583393271ca82eeaa"
   }
 }

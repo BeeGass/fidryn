@@ -207,7 +207,7 @@ module "/us/usc/t45/s362" {
     p "1939—Subsec. (g). Act June 20, 1939, inserted “, with respect to unemployment after June 30, 1939” after “employee is eligible” and struck out “June 30, 1939” after “therefor) after”."
     hash "f58ba20da8de22aec6c2406091c5aa0efefd56154096c57d614167ae0fa92bce"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/change-of-name" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -215,63 +215,63 @@ module "/us/usc/t45/s362" {
     p "“United States District Court for the Northern District of Illinois” substituted for “District Court of the United States for the Northern District of Illinois” in view of act June 25, 1948, which states that “There shall be in each judicial district a district court which shall be a court of record known as the United States District Court for the district”, and that “Illinois is divided into three judicial districts to be known as the Northern, Southern, and Eastern Districts of Illinois.” See sections 88 and 132 of Title 28, Judiciary and Judicial Procedure."
     hash "4a0ee7f16beea64bd1dd34d5d5f0e1f46bfa6252316db004e773d782f38c7bc2"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by section 7104(d), (e) of " ["Pub. L. 100–647" -> "/us/pl/100/647"] ", effective Jan. 1, 1990, see " ["section 7104(f) of Pub. L. 100–647" -> "/us/pl/100/647/s7104/f"] ", set out as a note under " ["section 355 of this title" -> "/us/usc/t45/s355"] "."
     hash "9455f03b2c1daba8b735fc381595af9d48112737b158fa2620818245633f6276"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1974 Amendment"
     p "Amendment by " ["Pub. L. 93–445" -> "/us/pl/93/445"] " effective Jan. 1, 1975, see " ["section 603 of Pub. L. 93–445" -> "/us/pl/93/445/s603"] ", set out as a note under " ["section 402 of Title 42" -> "/us/usc/t42/s402"] ", The Public Health and Welfare."
     hash "5fa55b4cf8ad1c4e9c627a6cb7ce22c58124f616c18c46e9c5b5749b769ab526"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/pl.91.452/effective-date-of-1970-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/pl.91.452/effective-date-of-1970-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1970 Amendment"
     p "Amendment by " ["Pub. L. 91–452" -> "/us/pl/91/452"] " effective on sixtieth day following Oct. 15, 1970, and not to affect any immunity to which any individual is entitled under this section by reason of any testimony given before sixtieth day following Oct. 15, 1970, see " ["section 260 of Pub. L. 91–452" -> "/us/pl/91/452/s260"] ", set out as an Effective Date; Savings Provisions note under " ["section 6001 of Title 18" -> "/us/usc/t18/s6001"] ", Crimes and Criminal Procedure."
     hash "8e4a0e7cbdada3dfb783a1e7998d756e7283144c7007927c626a1fc3e3243eed"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1968 Amendment"
     p "Amendment by " ["Pub. L. 90–257" -> "/us/pl/90/257"] " effective July 1, 1968, see " ["section 208 of Pub. L. 90–257" -> "/us/pl/90/257/s208"] ", set out as a note under " ["section 352 of this title" -> "/us/usc/t45/s352"] "."
     hash "55c1b138c97dc5b72ed73142262eb9a097c54437c427da2cdf27c9e638a9027a"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1958 Amendment"
     p "Amendment by " ["Pub. L. 85–927" -> "/us/pl/85/927"] " effective Sept. 6, 1958, except as otherwise indicated, see " ["section 207(c) of Pub. L. 85–927" -> "/us/pl/85/927/s207/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "e5491c4ad18c46a3258951b0ea60b804fb41eaea802bcca74a247d6a7c4a35a8"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
     p "Amendment by act July 31, 1946, effective July 31, 1946, see section 401 of act July 31, 1946."
     hash "66fc5e6c2e6464b1794a09ea4c0dc8a6ad6bcc7f54c53e757a595cdf51acfef5"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
     p "For effective date of amendment by act Oct. 10, 1940, see section 1 of act Oct. 10, 1940, set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "7f8443fd78fc0618e180bf8d25f9cab066022deda7a2215cef1adc814712f585"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/act.1949-10-28.ch782/repeals" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/act.1949-10-28.ch782/repeals" editorial {
     group statutoryNotes
     topic "repeals"
     heading "Repeals"
     p ["Act Oct. 28, 1949, ch. 782" -> "/us/act/1949-10-28/ch782"] ", cited as a credit to this section, was repealed (subject to a savings clause) by " ["Pub. L. 89–554" -> "/us/pl/89/554"] ", Sept. 6, 1966, § 8, " ["80 Stat. 632" -> "/us/stat/80/632"] ", 655."
     hash "bec09d440c79f2a2cd3d381b27eeda06c3e6b5573e7861caa156bd2ab880bceb"
   }
-  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/termination-of-advisory-councils" enacted {
+  note "/us/usc/t45/s362/note/statutoryNotes/nolaw/termination-of-advisory-councils" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Advisory Councils"
@@ -348,14 +348,14 @@ module "/us/usc/t45/s362" {
     }
     hash "acd4add39cce0280c5b96ba61c32020fc29b94a2906c6015464f2928f14cfc81"
   }
-  note "/us/usc/t45/s362/note/execDoc/nolaw/transfer-of-functions" enacted {
+  note "/us/usc/t45/s362/note/execDoc/nolaw/transfer-of-functions" editorial {
     group execDoc
     topic "transferOfFunctions"
     heading "Transfer of Functions"
     p "“Director of the Office of Personnel Management” substituted for “Civil Service Commission” in subsec. (l), pursuant to Reorg. Plan No. 2 of 1978, § 102, 43 F.R. 36037, " ["92 Stat. 3783" -> "/us/stat/92/3783"] ", set out under " ["section 1101 of Title 5" -> "/us/usc/t5/s1101"] ", Government Organization and Employees, which transferred functions vested by statute in United States Civil Service Commission to Director of Office of Personnel Management (except as otherwise specified), effective Jan. 1, 1979, as provided by section 1–102 of Ex. Ord. No. 12107, Dec. 28, 1978, 44 F.R. 1055, set out under " ["section 1101 of Title 5" -> "/us/usc/t5/s1101"] "."
     hash "fc10205fc83765a90fb4c22a4c1fdf2f37e175a20ad611a187cf2b83d0f23f18"
   }
-  note "/us/usc/t45/s362/note/execDoc/nolaw/delegation-of-functions" enacted {
+  note "/us/usc/t45/s362/note/execDoc/nolaw/delegation-of-functions" editorial {
     group execDoc
     topic "delegationOfFunctions"
     heading "Delegation of Functions"
@@ -364,7 +364,7 @@ module "/us/usc/t45/s362" {
   }
   layers {
     operative "1fe67fee172ad99ec75c13df8dfd135c453dc35b5bd701465c62d990fa6b482c"
-    enacted "ae42ab36c50570822450507af89b3daf51ef7de3b43227c6672fd0b708dbdfac"
-    editorial "e9dbabb8dda0fb241c85fa14523e90f347c8d80840b42643c1dfddb8641af1ac"
+    enacted "c3ba6a8de0e11af62745c0cb7ab0ce407d68b9b53cb2d0af130c62e328af103a"
+    editorial "2aa36940c1317caf9bd8819d6449b2a6e2f9d5c9b8a40719efcd49e547dd0b04"
   }
 }

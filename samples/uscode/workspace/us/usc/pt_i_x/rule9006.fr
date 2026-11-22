@@ -198,7 +198,7 @@ module "/us/usc/ptIX/rule9006" {
     hash "6cc42b54e8fa8308fd63d41e10ac4b25dbdba8e30fd35a7d3de83788e3992620"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 1989, eff. Aug. 1, 1989; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -212,7 +212,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Subdivision (f) is new and is the same as Rule 6(e) F.R.Civ.P."
     hash "a06bd8ff7d7fd0d73f0830f3cc006417bbc904d521d4015dce4c4a3e8c5966eb"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -223,7 +223,7 @@ module "/us/usc/ptIX/rule9006" {
     p "The original Advisory Committee Note to this rule included the 25 day notice period of Rule 2002(b) as a time period which may not be reduced under Rule 9006(c)(2). This was an error."
     hash "4983c0642423542c5ee8f3e65821356d64aa761824a8c9a9c598cb0682d0521d"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1989-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1989-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1989 Amendment"
@@ -231,7 +231,7 @@ module "/us/usc/ptIX/rule9006" {
     p "As a result of the present amendment, 10-day time periods prescribed or allowed will no longer be extended to at least 14 calendar days because of intermediate weekends and legal holidays."
     hash "c9e6690b71d252a04a1a1db0e62448ac09807d29786ca08ab624ccdb19857d4b"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -240,7 +240,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Subdivision (b)(3) is amended to limit the enlargement of time regarding dismissal of a chapter 7 case for substantial abuse in accordance with Rule 1017(e)."
     hash "bff5c5862afaf5914d573da753c0c4bf4f9c159e9e1f433a4cf67a5a2452ddb5"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -248,7 +248,7 @@ module "/us/usc/ptIX/rule9006" {
     p "GAP Report on Rule 9006. No changes since publication, except for a stylistic change."
     hash "6f0da55ed62064e515299c2fc064da6d35efe54f2b244e0d784a2afef8f0dcb8"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -256,7 +256,7 @@ module "/us/usc/ptIX/rule9006" {
     p "GAP Report on Rule 9006. The proposed amendment to Rule 9006(b)(2) has been added as a technical change to conform to the abrogation of Rule 1017(b)(3). The proposed amendment to Rule 9006(c)(2), providing that the time under Rule 1019(6) to file a request for payment of an administrative expense after a case is converted to chapter 7 could not be reduced by the court, was deleted. The proposed amendments to Rule 1019(6) have been changed so that the court will fix the time for filing the request for payment. Since the court will fix the time limit, the court should have the power to reduce it. See GAP Report to Rule 1019(6)."
     hash "e88f0eeffd14ed3402587276f19c57cd63d3900e07b191722daa5a2601b53002"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -264,7 +264,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "69dceddf3167b1fd1bbdb1bf3c6399f9dbaf356ff00f0b1c067cc2a057492009"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -275,7 +275,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Changes Made After Publication and Comment. The phrase “would otherwise expire under Rule 9006(a)” was added to the end of the rule to clarify further that the three day extension is to be added to the end of the period that is established under the counting provisions of Rule 9006(a). This also maintains a parallel construction with Civil Rule 6(e) in which the same addition to the rule was made after the public comment period."
     hash "90e133e9b867617a50ed790c0e18bfc05332bf929e9706abf6ca3042b54fba6e"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -285,7 +285,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Changes Made After Publication. Subdivision (b)(3) was amended to provide that Rule 9006 does not govern the enlargement of time to file a reaffirmation agreement, the statement required under Rule 1007(b)(7), or the time to file schedules and statements of financial affairs in small business cases. The title of subdivision (b)(3) was also amended to more accurately describe the operation of the provision. Subdivision (c)(2) was amended to recognize that the court may not reduce the time under Rule 1007(c) to file the statement required by Rule 1007(b)(7)."
     hash "d40b00255db8fca4a4517d524d7979aadb120d20ee2b75fa8051b1986e124fed"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -322,7 +322,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Subdivision (f) is amended to conform to the changes made to Rule 5(b)(2) of the Federal Rules of Civil Procedure as a part of the Civil Rules Restyling Project. As a part of that project, subparagraphs (b)(2)(C) and (D) of that rule were rewritten as subparagraphs (b)(2)(D), (E), and (F). The cross reference to those rules contained in subdivision (f) of this rule is corrected by this amendment."
     hash "3ac12d2e62c2001c2e5cb9179d98fd41dab7e3b58d95a02d346ca2011ac9fd6a"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -330,7 +330,7 @@ module "/us/usc/ptIX/rule9006" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "9a019d367165e6704ae05656014cccd7a24380d0a624afd16d5e372dc421ac33"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
@@ -344,14 +344,14 @@ module "/us/usc/ptIX/rule9006" {
     p "Subdivision (f) is also amended to conform to a corresponding amendment of Civil Rule 6(d). The amendment clarifies that only the party that is served by mail or under the specified provisions of Civil Rule 5—and not the party making service—is permitted to add three days to any prescribed period for taking action after service is made."
     hash "f843a4d6157666986250d2af8943feae74e8712a05c93d613463d7b7a49a1c0f"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/pl.117.17/committee-notes-on-rules-2023-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/pl.117.17/committee-notes-on-rules-2023-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2023 Amendment"
     p "The amendment adds “Juneteenth National Independence Day” to the list of legal holidays. See Juneteenth National Independence Day Act, " ["P.L. 117–17" -> "/us/pl/117/17"] " (2021) (amending 5 U.S.C. § 6103(a))."
     hash "531da9eed429d05914a4793fce95e37dc2f6bccf01a6f16e1c81e0d406eccaee"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -360,7 +360,7 @@ module "/us/usc/ptIX/rule9006" {
     p "The amendments to Rule 9006(b)(3)(B) and (c)(2) reflect the amendment to Rule 1007(b)(7) that replaces the requirement for submission of a statement showing that the debtor has completed a course on personal financial management with the requirement that the debtor provide the certificate of course completion issued by the approved provider of that course."
     hash "c63ed1dfe09b7f78f0f3d7a6f214d4e88581213d783dfec85edc9499e5588173"
   }
-  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -369,7 +369,7 @@ module "/us/usc/ptIX/rule9006" {
   }
   layers {
     operative "6cc42b54e8fa8308fd63d41e10ac4b25dbdba8e30fd35a7d3de83788e3992620"
-    enacted "6a60440fafa8a9a3e3afb4d664a1135cfa4ebae9e727e68b63efa214dbb29a56"
-    editorial "60f61c260fc5b869bb9591687922ac2e5311460acc51347c000864ce7d01da83"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c315ed9798bc96fb98bd7e7c7516ad272758865e882f8db4be255a11301d2287"
   }
 }

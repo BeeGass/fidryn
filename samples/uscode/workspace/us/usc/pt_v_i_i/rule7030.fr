@@ -10,21 +10,21 @@ module "/us/usc/ptVII/rule7030" {
     hash "84cd4526ec6f21dcf4907ac067bafbda72661b27a3b9f5a145052e41218bba4e"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Rule 30 F.R.Civ.P. refers to Rule 4 F.R.Civ.P. Pursuant to Rule 7002 that reference is a reference to Rule 4 F.R.Civ.P. as incorporated and modified by Rule 7004."
     hash "fa97b5cff5fb82a294c730ef7063f1b52e1b63b34b96f56e1af78acad66392a4"
   }
-  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7030 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "4ebc5b77df1ff722e99c84543b9b8c826e223012c4c97abe38dc4d89c44f989b"
   }
-  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7030/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -33,7 +33,7 @@ module "/us/usc/ptVII/rule7030" {
   }
   layers {
     operative "84cd4526ec6f21dcf4907ac067bafbda72661b27a3b9f5a145052e41218bba4e"
-    enacted "25d9866174ab702f3b5362c60931fdd2e9284840c8016ff73e25426a287f807b"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "371618fa3c24826c106836b0d5536b81d3e3ebde1f41146f0a32b0a1752ceca0"
   }
 }

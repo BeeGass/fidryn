@@ -141,7 +141,7 @@ module "/us/usc/t45/s1205" {
     p "1984—Subsec. (c)(1). " ["Pub. L. 98–620" -> "/us/pl/98/620"] " struck out provision that required review of agency action pursuant to this chapter to be expedited to same extent as expedited review provided by section 1108 of the Alaska National Interest Lands Conservation Act (" ["16 U.S.C. 3168" -> "/us/usc/t16/s3168"] ")."
     hash "8b3a5a3ca0257e94c8f101b81a3ae05a53ff2e7e22a120d1cb9fee2e9bf2266d"
   }
-  note "/us/usc/t45/s1205/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t45/s1205/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -150,7 +150,7 @@ module "/us/usc/t45/s1205" {
   }
   layers {
     operative "f3cdbf3d589bfff346e86b14c1ccdba1e494a9865fe6d03ef34552552f57f242"
-    enacted "39e2e2a096a295c78b5d89237e151baf8ebab8603dec2c4c17bd8f52487cb34b"
-    editorial "d62642a0212e9eb822be542cda964964d808f57c484f79ae8577004791d30aac"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7e837a3719fc315e4cc56b6f006e6b3ce1248c3a1655b14ee38777e69c5523c8"
   }
 }

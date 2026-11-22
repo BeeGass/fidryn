@@ -89,7 +89,7 @@ module "/us/usc/ptI/rule1017" {
     hash "373ee8dda34d955ed14104529cc39f321404ff0d3c92aa360473c2107f3bf0f2"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -99,7 +99,7 @@ module "/us/usc/ptI/rule1017" {
     p "Subdivision (d). Any proceeding, whether by a debtor or other party, to dismiss or convert a case under §§ 706, 707, 1112, or 1307 is commenced by a motion pursuant to Rule 9014."
     hash "fd23a952996be8c7cab7a6f8a099565385a5516601b2706472b001ffa81fa81b"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -108,7 +108,7 @@ module "/us/usc/ptI/rule1017" {
     p "Subdivision (e) is new and provides the procedure to be followed when a court on its own motion has made a preliminary determination that an individual debtor’s chapter 7 case may be dismissed pursuant to § 707(b) of the Code, which was added by the 1984 amendments. A debtor’s failure to attend the hearing is not a ground for dismissal pursuant to § 707(b)."
     hash "e7e40f8ec5b0892e0af0b997baa7527f65bd579b5beea00ff695a14c15aede0e"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -119,14 +119,14 @@ module "/us/usc/ptI/rule1017" {
     p "Subdivision (e) is amended to conform to the 1986 amendment to § 707(b) of the Code which permits the United States trustee to make a motion to dismiss a case for substantial abuse. The time limit for such a motion is added by this subdivision. In general, the facts that are the basis for a motion to dismiss under § 707(b) exist at the time the case is commenced and usually can be discovered early in the case by reviewing the debtor’s schedules and examining the debtor at the meeting of creditors. Since dismissal for substantial abuse has the effect of denying the debtor a discharge in the chapter 7 case based on matters which may be discovered early, a motion to dismiss under § 707(b) is analogous to an objection to discharge pursuant to Rule 4004 and, therefore, should be required to be made within a specified time period. If matters relating to substantial abuse are not discovered within the time period specified in subdivision (e) because of the debtor’s false testimony, refusal to obey a court order, fraudulent schedules or other fraud, and the debtor receives a discharge, the debtor’s conduct may constitute the basis for revocation of the discharge under § 727(d) and (e) of the Code."
     hash "01af164c54a3ed632bcb7b7199b49fe5530618435bdb1b6408bfcdee2b7d033f"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (d) is amended to clarify that the date of the filing of a notice of conversion in a chapter 12 or chapter 13 case is treated as the date of the conversion order for the purpose of applying Rule 1019. Other amendments are stylistic and make no substantive change."
     hash "ead046dc7cd6e225a2cf2b3efdda51a5c374e97377d502dce961ce8dbfc0772f"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -137,7 +137,7 @@ module "/us/usc/ptI/rule1017" {
     p "GAP Report on Rule 1017. No changes since publication, except for stylistic changes in Rule 1017(e) and (f)."
     hash "3d6817357499b0003be899915e456f49ef98afb11f8ec5ec49e3b83fd2197744"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2000 Amendment"
@@ -146,7 +146,7 @@ module "/us/usc/ptI/rule1017" {
     p "GAP Report on Rule 1017(e). No changes since publication."
     hash "8e3d9b6e491aa6ff5a6dcb6c7e1e924a7db69c9ccdc2493e70514bd35917201b"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -154,7 +154,7 @@ module "/us/usc/ptI/rule1017" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "3bee5347adee013cf066d43ada41865c7e6ad63b68553315e2995c70b02b451b"
   }
-  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -163,7 +163,7 @@ module "/us/usc/ptI/rule1017" {
   }
   layers {
     operative "373ee8dda34d955ed14104529cc39f321404ff0d3c92aa360473c2107f3bf0f2"
-    enacted "c27082e2936ad5bdcbbd584dab1ec08679274d3871f9103c2deb94831fe4ec02"
-    editorial "cc2a419823c8b69c306e48aff4340516e67749cda3b6f55b1b64b1aec8f6d19c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5be8691c63ff1c546aa194186c9303af527acb04ece1a6e054769f6148f5315d"
   }
 }

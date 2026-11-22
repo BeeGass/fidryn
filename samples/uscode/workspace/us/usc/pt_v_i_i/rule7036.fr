@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7036" {
     hash "cbeefd36e18c72577c37639e84cfc5af27e6e0e8c5018b0a689d47ede79257ca"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7036/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7036/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7036 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "5ea5114e95904e65f624ba8c5bec48c58cd9cbffe8a7e235996df62948022b1c"
   }
-  note "/us/usc/ptVII/rule7036/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7036/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7036" {
   }
   layers {
     operative "cbeefd36e18c72577c37639e84cfc5af27e6e0e8c5018b0a689d47ede79257ca"
-    enacted "c88aa2a200f7a785af33c4073fcd172149ec97d548321ce4f9c8873818c3456c"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8b251e41f6ba01d7a59c106415c87fe7836248783ffc623cf74c863c592305b4"
   }
 }

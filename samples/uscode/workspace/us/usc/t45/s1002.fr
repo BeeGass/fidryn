@@ -54,14 +54,14 @@ module "/us/usc/t45/s1002" {
     p "1980—Par. (5). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted “, the estate of such Company in its reorganization proceeding, or the trustee appointed in such proceeding” after “Railroad Company”. The amendment was executed by inserting amendatory text preceding the semicolon instead of the period at end of par. (5) as directed to reflect the probable intent of Congress, in view of par. (5) being enacted without a closing period."
     hash "5ab0a08b2d91100b6f2d96e623e9138321bf47b41049df71e47f56f3b6509b38"
   }
-  note "/us/usc/t45/s1002/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s1002/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
   }
-  note "/us/usc/t45/s1002/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1002/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -118,7 +118,7 @@ module "/us/usc/t45/s1002" {
   }
   layers {
     operative "7b8a7573e1fbfe5147a1c0c712c47b4638e0ef27013a457a1e5e34c46edd2a40"
-    enacted "2a870661cc302b22023d2563501f670cb3a3aed9d635085f1a061f0e0eb638ba"
-    editorial "bcf6324600dae135065631915e82d4be7cc914cd5fa09f0c1845c67bd5946162"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "61b03e7985c8b439c1645e1716810939c0d5d29e3faa9e871befd95c72bce26f"
   }
 }

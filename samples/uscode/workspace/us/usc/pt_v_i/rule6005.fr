@@ -10,7 +10,7 @@ module "/us/usc/ptVI/rule6005" {
     hash "73336bfba89fccb8d1ae7b86f061c6dae33f6b773a759518e1a3381f606399d1"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -18,7 +18,7 @@ module "/us/usc/ptVI/rule6005" {
     p "Reference should also be made to Rule 2013(a) regarding the limitation on employment of appraisers and auctioneers, and Rule 2014(a) regarding the application for appointment of an appraiser or auctioneer."
     hash "bcdea3939116e1dc9ada2e4da23248627907ddee6ca9efb4af5efecdbd90864c"
   }
-  note "/us/usc/ptVI/rule6005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -27,7 +27,7 @@ module "/us/usc/ptVI/rule6005" {
   }
   layers {
     operative "73336bfba89fccb8d1ae7b86f061c6dae33f6b773a759518e1a3381f606399d1"
-    enacted "6a4a6da5b494a52c5ca1b55ae48ab846244c5e1c3fe22c0e23c6bf686f969694"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5b9245e3a1486eb8c44077afc68ff42a7592ceb6f7e4536dafee1db776b8b895"
   }
 }

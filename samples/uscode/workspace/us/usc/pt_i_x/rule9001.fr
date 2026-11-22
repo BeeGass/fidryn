@@ -100,7 +100,7 @@ module "/us/usc/ptIX/rule9001" {
     hash "213f56167dbefa90f45282ddc2e03652f597e6f694861bb0a00354cd8bdf26bf"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -108,14 +108,14 @@ module "/us/usc/ptIX/rule9001" {
     p "The rule is also amended to include a definition of “court or judge”. Since a case or proceeding may be before a bankruptcy judge or a judge of the district court, “court or judge” is defined to mean the judicial officer before whom the case or proceeding is pending."
     hash "3cfac66d6ec6ec92f924f4c339cb2ba01264d4e3bc077775a7f48de8206e55be"
   }
-  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p ["Section 582 of title 28" -> "/us/usc/t28/s582"] " provides that the Attorney General may appoint one or more assistant United States trustees in any region when the public interest so requires. This rule is amended to clarify that an assistant United States trustee, as well as any designee of the United States trustee, is included within the meaning of “United States trustee” in the rules."
     hash "c22b118298b539d253e96ab8f0466ea3cfe2af0f05eae2e863d110622da9750c"
   }
-  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -124,7 +124,7 @@ module "/us/usc/ptIX/rule9001" {
     p "Changes Made After Publication and Comment. No changes since publication."
     hash "8186502fdba23b24287916a738e591fb6338b9e3e455b4092775ed5728bc3ddc"
   }
-  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -132,7 +132,7 @@ module "/us/usc/ptIX/rule9001" {
     p "Changes Made After Publication. No changes since publication."
     hash "607f2119f37bea1fee331a0622328a878cfdabd3e7563b7eb618f80d56d46261"
   }
-  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -141,7 +141,7 @@ module "/us/usc/ptIX/rule9001" {
   }
   layers {
     operative "213f56167dbefa90f45282ddc2e03652f597e6f694861bb0a00354cd8bdf26bf"
-    enacted "f73014d09c06e877b54da0172876b936c2562de06c772dbdda6d3412be63700a"
-    editorial "5d12c0e5225324fa567b610b5453f1657d24a97ca4ee31d8ba2031d34b3ef1f5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "002f5504aeecc7678b09606cdc59f5ca6d70dd87ba302620dbe16a300f25cf1a"
   }
 }

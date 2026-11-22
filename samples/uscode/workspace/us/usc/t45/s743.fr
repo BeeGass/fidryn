@@ -281,21 +281,21 @@ module "/us/usc/t45/s743" {
     p "1975—Subsec. (c)(1)(C). " ["Pub. L. 94–5" -> "/us/pl/94/5"] " added subpar. (C)."
     hash "eb2343b0a75b590f90622101ffc0092cf2a3abdc4343ae02ab5c73a9b240c613"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable to proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
     hash "5738327b8d935a396acd7128541b68a5aca7d2af8e8abb78fb66fd0602156b40"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by " ["Pub. L. 100–352" -> "/us/pl/100/352"] " effective ninety days after June 27, 1988, except that such amendment not to apply to cases pending in Supreme Court on such effective date or affect right to review or manner of reviewing judgment or decree of court which was entered before such effective date, see " ["section 7 of Pub. L. 100–352" -> "/us/pl/100/352/s7"] ", set out as a note under " ["section 1254 of Title 28" -> "/us/usc/t28/s1254"] ", Judiciary and Judicial Procedure."
     hash "feff9722fe583140dc628b7a0fa8adfc8defc8e4756e12aae08abbfdb687d079"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -312,35 +312,35 @@ module "/us/usc/t45/s743" {
     }
     hash "536809650898c214b53911e3e910c93c92b78b652e8e44f3e5a7da94777d47fa"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1976 Amendment"
     p "Amendment by " ["Pub. L. 94–555" -> "/us/pl/94/555"] " effective Oct. 1, 1976, see " ["section 303 of Pub. L. 94–555" -> "/us/pl/94/555/s303"] ", set out as a note under " ["section 702 of this title" -> "/us/usc/t45/s702"] "."
     hash "bbcf4d13b2bad24ed28d87ac343046c23afd6c40f613f4c216556bcc67fdfb78"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.317/cases-pending-in-special-court" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.104.317/cases-pending-in-special-court" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Cases Pending in Special Court"
@@ -375,7 +375,7 @@ module "/us/usc/t45/s743" {
     }
     hash "7badf0352f3d9bd27895a147c385afa82605b548539544f62520ef9af5a9d1e2"
   }
-  note "/us/usc/t45/s743/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s743/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -393,7 +393,7 @@ module "/us/usc/t45/s743" {
   }
   layers {
     operative "7546e214452c40cf4a71d4890fcef82e43d4cc429e7fc1a771ff438f8dddd122"
-    enacted "7d8f32e865e48e97471ef3b5e7872d6ea8d9a7996df442d3a4874081ade822d7"
-    editorial "17840f09652e2c979956064461a3dcbc8b5d686a73de9ab98efe50efc07b200d"
+    enacted "e2ea5fef89113f249d7e1aa9ad607651073f7402fe52ac70b132b91f40f1c6de"
+    editorial "9720501f82aa4f275754c831a8fcd536d90804bf9de16854ef2dd0a58db65a7d"
   }
 }

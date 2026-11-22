@@ -105,13 +105,13 @@ the ledger copies the counts:
 | Containers, by kind | `totals.containers_by_kind` | 1 `appendix`, 25 `chapter`, 1 `courtRules`, 1 `level`, 13 `part`, 29 `subchapter`, 2 `title` |
 | Provisions imported and addressed, the top provision of each unit included | `totals.provisions` | 4,857 |
 | Addresses: aliases kept, and addresses disambiguated and assigned by the importer | `totals.addresses` | 229 `aliases`, 0 `disambiguated`, 3 `assigned` |
-| Notes imported, by layer | `totals.notes` | 1,498 `enacted`, 593 `editorial` |
+| Notes imported, by layer | `totals.notes` | 196 `enacted`, 1,895 `editorial` |
 | Notes, by group | `totals.notes_by_group` | 1 `courtRules`, 303 `editorialNotes`, 9 `execDoc`, 539 `statutoryNotes`, 1,239 `ungrouped` |
 | Footnotes imported | `totals.footnotes` | 107 |
 | Provisions and notes that hold an image, whose picture is not in the archive | `totals.with_images` | 1 |
 | References in operative text, by outcome | `totals.references.operative` | 644 `exact`, 14 `target-status`, 0 `ambiguous`, 11 `unit-only`, 1 `range-form`, 273 `no-unit`, 192 `outside`, 0 `malformed` |
-| References in enacted notes, by outcome | `totals.references.enacted` | 332 `exact`, 18 `target-status`, 0 `ambiguous`, 14 `unit-only`, 0 `range-form`, 364 `no-unit`, 1,454 `outside`, 0 `malformed` |
-| References in editorial matter, by outcome | `totals.references.editorial` | 275 `exact`, 47 `target-status`, 0 `ambiguous`, 14 `unit-only`, 1 `range-form`, 259 `no-unit`, 4,919 `outside`, 0 `malformed` |
+| References in enacted notes, by outcome | `totals.references.enacted` | 176 `exact`, 15 `target-status`, 0 `ambiguous`, 12 `unit-only`, 0 `range-form`, 117 `no-unit`, 692 `outside`, 0 `malformed` |
+| References in editorial matter, by outcome | `totals.references.editorial` | 431 `exact`, 50 `target-status`, 0 `ambiguous`, 16 `unit-only`, 1 `range-form`, 506 `no-unit`, 5,681 `outside`, 0 `malformed` |
 | References of the outcome `outside`, by the body of law they name | `totals.outside_by_body` | 739 `/us/act`, 3,310 `/us/pl`, 2,516 `/us/stat` |
 | Definitions extracted, by basis | `totals.definitions` | 7 `enacted`, 100 `restated`, 37 `unresolved` |
 | Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 1 `does_not_include`, 15 `includes`, 121 `means` |

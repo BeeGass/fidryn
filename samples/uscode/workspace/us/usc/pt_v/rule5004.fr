@@ -21,7 +21,7 @@ module "/us/usc/ptV/rule5004" {
     hash "cc59b6a5f6e767a5e03a80e0ecc14280a3860ad885712c2976675a7e3a7881c1"
   }
   credit "(As amended Apr. 29, 1985, eff. Aug. 1, 1985; Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -30,7 +30,7 @@ module "/us/usc/ptV/rule5004" {
     p "Subdivision (b) precludes a bankruptcy judge from allowing compensation from the estate to a relative or other person closely associated with the judge. The subdivision applies where the judge has not appointed or approved the employment of the person requesting compensation. Perhaps the most frequent application of the subdivision will be in the allowance of administrative expenses under § 503(b)(3)–(5) of the Code. For example, if an attorney or accountant is retained by an indenture trustee who thereafter makes a substantial contribution in a chapter 11 case, the attorney or accountant may seek compensation under § 503(b)(4). If the attorney or accountant is a relative of or associated with the bankruptcy judge, the judge may not allow compensation to the attorney or accountant. Section 101(34) [now 101(45)] defines relative and Rule 9001 incorporates the definitions of the Code. See the Advisory Committee’s Note to Rule 5002."
     hash "2d24c5f247f65e36479de2279f7fe360b4bbf9f72959f681d7d970e996f29396"
   }
-  note "/us/usc/ptV/rule5004/note/ungrouped/pl.98.353/notes-of-advisory-committee-on-rules-1985-amendment" enacted {
+  note "/us/usc/ptV/rule5004/note/ungrouped/pl.98.353/notes-of-advisory-committee-on-rules-1985-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1985 Amendment"
@@ -38,14 +38,14 @@ module "/us/usc/ptV/rule5004" {
     p "The word “associated” in subdivision (b) has been changed to “connected” in order to conform with Rule 5002(b)."
     hash "407c9b03c7e01e0cc2d3314cc960925240ae8bcb2d3b5d5be9cfbadb63fbd267"
   }
-  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule is amended to be gender neutral. The bankruptcy judge before whom the matter is pending determines whether disqualification is required."
     hash "ed2a3cc377fbd0e8e927193957f513c537c42626df18e9cec4a6bde5f54293ea"
   }
-  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -54,7 +54,7 @@ module "/us/usc/ptV/rule5004" {
   }
   layers {
     operative "cc59b6a5f6e767a5e03a80e0ecc14280a3860ad885712c2976675a7e3a7881c1"
-    enacted "797497a674988deaadfcc04794d9f2bf3328a911d21cc29e227a05cbbc891523"
-    editorial "7aec77214ef586b05385f44c7060097ad40eeb7f1c651a1e419f6b4997d7ae17"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2d45be65c12412e6257b1cf878797837889f3fa2b657092155c5e33f0b6a016d"
   }
 }

@@ -20,13 +20,13 @@ module "/us/usc/t11a/~courtRules.1" {
     member "/us/usc/t11a/~courtRules.1/~level.2"
     hash "68b260bbd886a57e1478ade961692655a3cc6afef75f95d385d443cd718896c0"
   }
-  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/h.79dfad868bbef259" enacted {
+  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/h.79dfad868bbef259" editorial {
     group ungrouped
     topic "effectiveDate"
     p "(Effective August 1, 1983, as amended to January 23, 2026)"
     hash "79dfad868bbef259fd427aeb5e562c680085069e62574fd0d397bfc2407b4770"
   }
-  note "/us/usc/t11a/~courtRules.1/note/ungrouped/pl.98.91/historical-note" enacted {
+  note "/us/usc/t11a/~courtRules.1/note/ungrouped/pl.98.91/historical-note" editorial {
     group ungrouped
     topic "historical"
     heading "Historical Note"
@@ -34,13 +34,13 @@ module "/us/usc/t11a/~courtRules.1" {
     p "The Rules have been amended Aug. 30, 1983, " ["Pub. L. 98–91, § 2(a)" -> "/us/pl/98/91/s2/a"] ", " ["97 Stat. 607" -> "/us/stat/97/607"] ", eff. Aug. 1, 1983; July 10, 1984, " ["Pub. L. 98–353, title III, § 321" -> "/us/pl/98/353/tIII/s321"] ", " ["98 Stat. 357" -> "/us/stat/98/357"] "; Apr. 29, 1985, eff. Aug. 1, 1985; Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 1989, eff. Aug. 1, 1989; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 29, 1994, eff. Aug. 1, 1994; Oct. 22, 1994, " ["Pub. L. 103–394, title I, § 114" -> "/us/pl/103/394/tI/s114"] ", " ["108 Stat. 4118" -> "/us/stat/108/4118"] "; Apr. 27, 1995, eff. Dec. 1, 1995; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 29, 2002, eff. Dec. 1, 2002; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 12, 2006, eff. Dec. 1, 2006; Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 29, 2015, eff. Dec. 1, 2015; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024; Apr. 23, 2025, eff. Dec. 1, 2025."
     hash "6e09017757c7fda1f0dc1a8eca71a313017ea5c0b7148fed6abdb6a7aacb005a"
   }
-  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/part-x-abrogated-official-forms-see-united-states-courts-web" enacted {
+  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/part-x-abrogated-official-forms-see-united-states-courts-web" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "PART X. [ABROGATED] OFFICIAL FORMS [see United States Courts website] APPENDIX: LENGTH LIMITS STATED IN PART VIII OF THE FEDERAL RULES OF BANKRUPTCY PROCEDURE"
     hash "269136da06e5a24e7ef3e0d3e8c5d05c6efe86644557023e729d0d1410842d1c"
   }
-  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/effective-date-application-supersedure-of-prior-rules-transm" enacted {
+  note "/us/usc/t11a/~courtRules.1/note/ungrouped/nolaw/effective-date-application-supersedure-of-prior-rules-transm" editorial {
     group ungrouped
     topic "effectiveDate"
     heading "Effective Date; Application; Supersedure of Prior Rules; Transmission to Congress"
@@ -52,7 +52,7 @@ module "/us/usc/t11a/~courtRules.1" {
   }
   layers {
     operative "68b260bbd886a57e1478ade961692655a3cc6afef75f95d385d443cd718896c0"
-    enacted "91bcda205040f257befa71cdddf092f40600d632d8dff294e5c256e1ce9d5f59"
-    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "68e74deefbca88e9b56756e33ec6ee7760841f62e430bc662a0ff94281b0f770"
   }
 }

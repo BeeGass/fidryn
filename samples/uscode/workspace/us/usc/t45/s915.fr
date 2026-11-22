@@ -165,7 +165,7 @@ module "/us/usc/t45/s915" {
     p "1983—Subsec. (b)(3), (4). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " added par. (3) and redesignated former par. (3) as (4)."
     hash "63bfc693f868f1b80e07e50382959c1fe701ec7d8412fc2f4ccadb287bc0431a"
   }
-  note "/us/usc/t45/s915/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s915/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -198,7 +198,7 @@ module "/us/usc/t45/s915" {
   }
   layers {
     operative "b3bbaf3bb6cb5c8554b80e9182b3f8def25ff3e8e8181ef97899e8c83fe1196f"
-    enacted "e175611b7d6b52a4386c25ad66c38f39b79771e7f0b3fad08eedd7198f534e63"
-    editorial "e51b05e1204c103e5252ff3cb4d533ea1c3ce5f6cbb69917d8b9fc8db4e3338b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0efe8df8e2d9244f1e119a3aee8358252bb97437cd812c225c0f9b7ae4f7fef8"
   }
 }

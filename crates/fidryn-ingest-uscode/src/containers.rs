@@ -1298,7 +1298,7 @@ mod tests {
                 expected.with_images
             )
         );
-        assert!(counts.footnotes > 100 && counts.notes["enacted"] > 1000);
+        assert!(counts.footnotes > 100 && counts.notes["enacted"] > 100);
         assert_eq!(counts, expected);
         assert_eq!(
             (summary.units, summary.containers),

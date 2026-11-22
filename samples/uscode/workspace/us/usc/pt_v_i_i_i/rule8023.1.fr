@@ -50,7 +50,7 @@ module "/us/usc/ptVIII/rule8023.1" {
     hash "81e5c897ee038b522127809f036511518ba110b79b3d1a346722246b77ac45ca"
   }
   credit "(Added Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8023.1/note/ungrouped/nolaw/committee-notes-on-rules-2024" enacted {
+  note "/us/usc/ptVIII/rule8023.1/note/ungrouped/nolaw/committee-notes-on-rules-2024" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024"
@@ -59,7 +59,7 @@ module "/us/usc/ptVIII/rule8023.1" {
   }
   layers {
     operative "81e5c897ee038b522127809f036511518ba110b79b3d1a346722246b77ac45ca"
-    enacted "e2eacff9b9cded086928d2af0b78c24f1adedce76579e87cf98067d5a72cb45f"
-    editorial "899abdf668904b99cf5cbc7968c7d24b16a5789dd7142af6348f35f22a779347"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9a8fee98af514f32c9fdf9e06d2131aae30e7ae5c83c1da6318384ffa27ceff8"
   }
 }

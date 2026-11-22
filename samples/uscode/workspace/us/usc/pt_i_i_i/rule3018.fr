@@ -135,7 +135,7 @@ module "/us/usc/ptIII/rule3018" {
     hash "19cd928c0ee6e0f7b58b40fdbcad25f2f125a843c56495dbd9545eff5d33f5ab"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -148,7 +148,7 @@ module "/us/usc/ptIII/rule3018" {
     p "It should be noted that while the singular “plan” is used throughout, by construction the plural is included; see § 102(7)."
     hash "5148a4362eea38e32c97d41d0031ffd1711069b78c4e2547d54f37f9cab50ebb"
   }
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -158,14 +158,14 @@ module "/us/usc/ptIII/rule3018" {
     p "Subdivision (c) is amended to delete the Official Form number in anticipation of future revision and renumbering of the Official Forms."
     hash "00bb57179bb74ec0fadcbd32e8bdf62b98997f0bdea5a68c5d0b0f16f4b3c2e2"
   }
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "The title of this rule is amended to indicate that it applies only in a chapter 9 or a chapter 11 case. The amendment of the word “Plans” to “Plan” is stylistic."
     hash "361805e03d1595333215196eebf382a3b9bb8904148e1cc603e0de050b3c1478"
   }
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -175,14 +175,14 @@ module "/us/usc/ptIII/rule3018" {
     p "GAP Report on Rule 3018. No changes to the published draft."
     hash "f60da918152229cba8ac8bbc63006288197a31d240a8f99bd326a3c63988a314"
   }
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "Subdivision (a) of the rule is amended to take account of the court’s authority to set times under Rules 3017.1 and 3017.2 in small business cases and cases under subchapter V of chapter 11."
     hash "361b2d7dbeff6ce84fb316acce33d1f4b3da221122e3e87d7399f5834fdb58a2"
   }
-  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -191,7 +191,7 @@ module "/us/usc/ptIII/rule3018" {
   }
   layers {
     operative "19cd928c0ee6e0f7b58b40fdbcad25f2f125a843c56495dbd9545eff5d33f5ab"
-    enacted "3ff9b7ed1dbb57747ad1142694af0757169c51b23344c02ed98cda5709db00e7"
-    editorial "540a5d6fb52625a6c4fb06fb0a2a01dee7323f84da73fb7db89fe70f9fdd66ea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "575c65ff00118d0a2939e40d8c1569be23e23b7ec125c191891b6f10187ccb8e"
   }
 }

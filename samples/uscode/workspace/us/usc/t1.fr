@@ -10,7 +10,7 @@ module "/us/usc/t1" {
     member "/us/usc/t1/ch3"
     hash "c7b73423818b8cc8e42ee0f2f7206a66d575c244817a5d787a99960c3d4c22ba"
   }
-  note "/us/usc/t1/note/ungrouped/act.1947-07-30.ch388/noheading" enacted {
+  note "/us/usc/t1/note/ungrouped/act.1947-07-30.ch388/noheading" editorial {
     group ungrouped
     topic "enacting"
     p "This title was enacted by " ["act July 30, 1947, ch. 388, § 1" -> "/us/act/1947-07-30/ch388/s1"] ", " ["61 Stat. 633" -> "/us/stat/61/633"]
@@ -26,7 +26,7 @@ module "/us/usc/t1" {
     }
     hash "3b99f40cf45341fc6ecf21b72ee445db974b081c3b2c4ce6afe8d1c00b0e75fe"
   }
-  note "/us/usc/t1/note/statutoryNotes/act.1947-07-30.ch388/repeals" enacted {
+  note "/us/usc/t1/note/statutoryNotes/act.1947-07-30.ch388/repeals" editorial {
     group statutoryNotes
     topic "repeals"
     heading "Repeals"
@@ -43,7 +43,7 @@ module "/us/usc/t1" {
     }
     hash "33ea15c5d867a3d0a16eeacc89704e923702837932ba12a7b8b23ea60c8b25d8"
   }
-  note "/us/usc/t1/note/statutoryNotes/nolaw/h.887148d39153779d" enacted {
+  note "/us/usc/t1/note/statutoryNotes/nolaw/h.887148d39153779d" editorial {
     group statutoryNotes
     topic "dispositionOfSections"
     table {
@@ -283,7 +283,7 @@ module "/us/usc/t1" {
   }
   layers {
     operative "c7b73423818b8cc8e42ee0f2f7206a66d575c244817a5d787a99960c3d4c22ba"
-    enacted "97d6bb046e507da0d1306ccd5218ea7b1f376379a4ac956823ff700ea61f8267"
-    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+    enacted "6f86756008b0ee6cff83b1e8519422f3d8764250975c7ba554ce6254634a3e12"
+    editorial "f987877032cd9ac174b7459fabf3b33706d992367cba7996db6d99dc08853957"
   }
 }

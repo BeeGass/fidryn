@@ -56,7 +56,7 @@ module "/us/usc/t45/s911" {
     p "1980—Subsec. (e)(2). " ["Pub. L. 96–254" -> "/us/pl/96/254"] " inserted reference to State-accredited institutions which have been in existence for not less than two years."
     hash "c62524a6071b8b6e350dbbb8dc2af2b80b0ac04727923e0a6ad2addc08da071d"
   }
-  note "/us/usc/t45/s911/note/statutoryNotes/pl.100.527/change-of-name" enacted {
+  note "/us/usc/t45/s911/note/statutoryNotes/pl.100.527/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -79,7 +79,7 @@ module "/us/usc/t45/s911" {
   }
   layers {
     operative "489651fb76d6e101bb153cf9a74fe55bd68c98830a327375187d0ae76bb8e98c"
-    enacted "601d6757465e1854d93dc1de2c724a5bdba026722ba65d9f57315fdebebd4c6a"
-    editorial "d79e262ea6aa123011a49f36037a2007baab599eaef18160f73805ffb0fad5bf"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9d48f5e79336bcaeb2cf8da57408413d1ed68be2ed2df4626b556381c89ea43e"
   }
 }

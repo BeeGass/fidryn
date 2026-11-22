@@ -22,7 +22,7 @@ module "/us/usc/t45/s65" {
     p "Section 66, act Sept. 3, 5, 1916, ch. 436, § 4, " ["39 Stat. 722" -> "/us/stat/39/722"] ", provided penalty for violation of " ["section 65 of this title" -> "/us/usc/t45/s65"] ". See " ["section 28302 of Title 49" -> "/us/usc/t49/s28302"] ", Transportation."
     hash "17f5da6073b415dcc06baf7a27c1964089f71ce25cab1685319987b3732be430"
   }
-  note "/us/usc/t45/s65/note/statutoryNotes/nolaw/short-title" enacted {
+  note "/us/usc/t45/s65/note/statutoryNotes/nolaw/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -31,7 +31,7 @@ module "/us/usc/t45/s65" {
   }
   layers {
     operative "87e3880be56a0f5810783bc27bd8ba6fe38deff5dd7c70d83c6b95949f3e253e"
-    enacted "f1c1203cdbf2f4727382692f3186debc5868bad8b8bedf847cb50f4aaf860b5c"
-    editorial "c3bb8b2f44c11c093c902f44c5be80e91d9ffc6ab1187364ecc4cba5742b7543"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a98cb9f8fa56b05bd02ed9ba5e6b499348a139b0b5b7a48979177f5862de11e8"
   }
 }

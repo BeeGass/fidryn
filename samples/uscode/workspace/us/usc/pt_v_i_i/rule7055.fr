@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7055" {
     hash "eff35a9029929f2873626ae73ccbcf1d9d095d10a551597a198eb1ac20f97bb1"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7055/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7055/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7055 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "0d719e5026cd1ee45d9e10cc3ddebefd91a0f3d4601943f0c2848005ad47860b"
   }
-  note "/us/usc/ptVII/rule7055/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7055/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7055" {
   }
   layers {
     operative "eff35a9029929f2873626ae73ccbcf1d9d095d10a551597a198eb1ac20f97bb1"
-    enacted "d481e4f9b0af89d9a9e2507227d5647b0b1d7380d7e2331f939ade7816812ffd"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b6bc3f77b7f6576abb6ddcbbaf2b3d4311bded54902d22ebd35ced28b3645de9"
   }
 }

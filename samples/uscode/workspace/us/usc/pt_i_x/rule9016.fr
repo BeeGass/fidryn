@@ -10,21 +10,21 @@ module "/us/usc/ptIX/rule9016" {
     hash "c01dae613bac55bb64177bbc6669a9b1d5ae525d6de7835f1ae23bcccb963b08"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Although Rule 7004(d) authorizes nationwide service of process, Rule 45 F.R.Civ.P. limits the subpoena power to the judicial district and places outside the district which are within 100 miles of the place of trial or hearing."
     hash "a372ef35529b9f96d13fc12065d9420464d222fa5668f6b4fb608688b94fa8b8"
   }
-  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "5846cd4b8d13d9c8100dfee2aa09a5d5f4d803fe4684fa93ec6eb920e1a1badf"
   }
-  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9016/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -33,7 +33,7 @@ module "/us/usc/ptIX/rule9016" {
   }
   layers {
     operative "c01dae613bac55bb64177bbc6669a9b1d5ae525d6de7835f1ae23bcccb963b08"
-    enacted "1f8d19d3e7146495c2f4c1cdcb73562748557be2a227ece70885cd0f76886633"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f206c0514457ccdd9b61550550dee2e7100c6dc24b370e293c6e73ab8cb9ce33"
   }
 }

@@ -183,7 +183,7 @@ module "/us/usc/t45/s231e" {
     p ["Pub. L. 97–35, § 1121(c)(2)" -> "/us/pl/97/35/s1121/c/2"] ", substituted “any supplemental annuity payments made to the employee under " ["section 231a(b) of this title" -> "/us/usc/t45/s231a/b"] " or section 3(j) of the Railroad Retirement Act of 1937, any amounts” for “any amounts”."
     hash "fb58888c876c97fac2af3f6bbcefea2277ec75ea2dbd05872c7308f3137082e3"
   }
-  note "/us/usc/t45/s231e/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231e/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
@@ -200,7 +200,7 @@ module "/us/usc/t45/s231e" {
     }
     hash "998f897bf9df8b8647fe7fb5774e72c7b50c2dd3429952237dd44f11a118f99f"
   }
-  note "/us/usc/t45/s231e/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231e/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -212,7 +212,7 @@ module "/us/usc/t45/s231e" {
   }
   layers {
     operative "1e9c41fc8fbc68e24076374d5770afb801f76aa04ea1105b688be91294b31c2e"
-    enacted "274c9dab8a7a004ad5407dea354d943262ba83893ee84c24654d9d5fae8072f9"
-    editorial "27fcdc1a85597bdac22ef1e4b1c93da976c7d10e6c7d2d71e8bffc42ac693f73"
+    enacted "eb18634f33708adda5287ae490aba0bd6353ff84cf934c3824f6120453a0d037"
+    editorial "9ebb97efbf2a6c1b0fb68c1b65a34f390ebe1f813acb7974cc038f8ba89cb963"
   }
 }

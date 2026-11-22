@@ -44,28 +44,28 @@ module "/us/usc/ptIX/rule9019" {
     hash "5ff10848d2d1e329b94464052e5008cd2a472ec148fcc531cdfae5021d6608c0"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Subdivisions (a) and (c) of this rule are essentially the same as the provisions of former Bankruptcy Rule 919 and subdivision (b) is the same as former Rule 8–514(b), which was applicable to railroad reorganizations. Subdivision (b) permits the court to deal efficiently with a case in which there may be a large number of settlements."
     hash "bb4eee4cbb26d00017bccb4a8b9544882440759b93f4da45e45c32e31fc01109"
   }
-  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to enable the United States trustee to object or otherwise be heard in connection with a proposed compromise or settlement and otherwise to monitor the progress of the case."
     hash "53f9ae0125a32ea4ed73f15bb1c46ca176b5b4ddf9999f78195ce76fb4cf7e4d"
   }
-  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (a) is amended to conform to the language of § 102(1) of the Code. Other amendments are stylistic and make no substantive change."
     hash "6eb5c04456f9846ef765f37fb144283ee9c9ca77b20f5cd521f2a18a372b6b9d"
   }
-  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -74,7 +74,7 @@ module "/us/usc/ptIX/rule9019" {
   }
   layers {
     operative "5ff10848d2d1e329b94464052e5008cd2a472ec148fcc531cdfae5021d6608c0"
-    enacted "c105a98ead129f51a032bb6400a3e111c5c750680f39fdf3bcf0de1ea63875f3"
-    editorial "10271f83e68212ef9e2dfade67957e8baaa7d60061cb0d952dbd3ccb94e7d028"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "341b84fc4e437c9ad952d426d757225ac5c406900eb44564f2b25e5ebcbecd2c"
   }
 }

@@ -252,14 +252,14 @@ module "/us/usc/ptVIII/rule8009" {
     hash "0d5d5768cf4933c3f231574625db97a802ffb23fd4472ffa8cc6b12aba2077ad"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8009, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009, related to briefs and appendix and filing and service, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "16e7c65000b32c8af43741238889c8779c716204e733e1d76fcc3e3cb924f225"
   }
-  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -274,14 +274,14 @@ module "/us/usc/ptVIII/rule8009" {
     p "Changes Made After Publication and Comment. In subdivision (a)(2) and (3), the place of filing was clarified. “Docket entries kept by the bankruptcy clerk” was added to the list in subdivision (a)(4)."
     hash "b2850843d6fc6515b09a18925a40c6622944e17aeb8463e593143b282a2fbb1d"
   }
-  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 8009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "2fd276f60d60053d5c3be07892e94d0640cd673ad6cc1b3c9dadb02ff97653a0"
   }
-  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -290,7 +290,7 @@ module "/us/usc/ptVIII/rule8009" {
   }
   layers {
     operative "0d5d5768cf4933c3f231574625db97a802ffb23fd4472ffa8cc6b12aba2077ad"
-    enacted "1c78d0f865a582c67bd782ce79796dc4a55ff0c2f9bf267773bc4212e252ea98"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "56c5c52274a0fa350bc7a98769bbf61647d9eab6e3e3ec86700e4f0b4785015d"
   }
 }

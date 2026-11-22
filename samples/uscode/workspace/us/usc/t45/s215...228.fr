@@ -44,14 +44,14 @@ module "/us/usc/t45/s215...228" {
     p "Section 228, " ["act Aug. 29, 1935, ch. 812, § 14" -> "/us/act/1935-08-29/ch812/s14"] ", " ["49 Stat. 973" -> "/us/stat/49/973"] ", related to short title of this subchapter."
     hash "335e49cd564961f08371a2754176d00adce484025d6e4e8c09aafd91785e4969"
   }
-  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1940-06-11.ch307/effect-of-amendments-to-section-215-of-this-title" enacted {
+  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1940-06-11.ch307/effect-of-amendments-to-section-215-of-this-title" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Effect of Amendments to Section 215 of This Title"
     p ["Act June 11, 1940, ch. 307, § 2" -> "/us/act/1940-06-11/ch307/s2"] ", " ["54 Stat. 264" -> "/us/stat/54/264"] ", provided that the amendment of " ["section 215 of this title" -> "/us/usc/t45/s215"] " by act June 11, 1940, was to have the same effect as if it had been part of the Railroad Retirement Act of 1935 from its enactment on Aug. 29, 1935."
     hash "a8c463784a8595d4dd526570adb012e542959e039d19655586bd3dfd9b3d10ac"
   }
-  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1937-06-24.ch382/short-title-continuation-and-effect-of-railroad-retirement-a" enacted {
+  note "/us/usc/t45/s215...228/note/statutoryNotes/act.1937-06-24.ch382/short-title-continuation-and-effect-of-railroad-retirement-a" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Short Title; Continuation and Effect of Railroad Retirement Act of 1935"
@@ -60,7 +60,7 @@ module "/us/usc/t45/s215...228" {
   }
   layers {
     operative "04a4bcd48dbf841278d2849de392286a5ab64c00c8bbc412aae600909e4feb3c"
-    enacted "fce951fe179bca3d1d8f6e08d0e6155ea890b6e23dc04f0fd0cee808d3ea1e53"
-    editorial "a998561e6621db2cb2adc23fb942076e53168abbeb19c5dfa46d09725579ee27"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2dddfdc2d139850864eda7a736890ed4378f85d59e2f039325245a9f1f2d8024"
   }
 }

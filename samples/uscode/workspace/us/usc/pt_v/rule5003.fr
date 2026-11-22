@@ -137,7 +137,7 @@ module "/us/usc/ptV/rule5003" {
     hash "736e04484b9098fda42e5fb6b6d78fd63d470d016b16aefa6c76ff57fc8d389a"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -147,7 +147,7 @@ module "/us/usc/ptV/rule5003" {
     p "Former Bankruptcy Rules 507(d) and 508, which made materials in the clerk’s office and files available to the public, are not necessary because § 107 of the Code guarantees public access to files and dockets of cases under the Code."
     hash "7291cc2755b0dd227ef421370dce586211354ec38bf754a976c60c28fad5fc40"
   }
-  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -155,7 +155,7 @@ module "/us/usc/ptV/rule5003" {
     p "Subdivision (c) is amended to require that on the request of the prevailing party the clerk of the district court shall keep and index bankruptcy judgments and orders affecting title to or lien upon real or personal property or for the recovery of money or property with the civil judgments of the district court. This requirement is derived from former Rule 9021(b). The Director of the Administrative Office will provide guidance to the bankruptcy and district court clerks regarding appropriate paperwork and retention procedures."
     hash "2361f7981a1f184deb2235343abea3b5d12019256ef2ed8a89f78973ef3e4add"
   }
-  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2000 Amendment"
@@ -166,7 +166,7 @@ module "/us/usc/ptV/rule5003" {
     p "GAP Report on Rule 5003. No changes since publication."
     hash "0cea558bccc9ae77478ecb4bb1bf765def4a03537a4cedd12a009ecf0758c9ee"
   }
-  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -174,7 +174,7 @@ module "/us/usc/ptV/rule5003" {
     p "Changes Made After Publication. Subdivision (e) was amended to clarify that the clerk must maintain a separate mailing address register that contains the addresses to which notices pertaining to actions under § 505 of the Code are to be sent."
     hash "ff57002af38e83a7845e504469d31ab6477c48a79d2b09aae451aa23cc7e42d6"
   }
-  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -183,7 +183,7 @@ module "/us/usc/ptV/rule5003" {
   }
   layers {
     operative "736e04484b9098fda42e5fb6b6d78fd63d470d016b16aefa6c76ff57fc8d389a"
-    enacted "cce43c371f0db481fce479b4585887eb1245e43bbf1a67a2bdbe3c6f3bee0f7a"
-    editorial "df252d4000d02f5baa4ab44222fb42235ecefef4fdc920e1a3776b34e5e26e53"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b0cf83870e92bc9a82b8396c543992583972b00140971fcd9add126e27e5fe7f"
   }
 }

@@ -31,7 +31,7 @@ module "/us/usc/ptI/rule1004.1" {
     hash "5d084475ca00ef207ede5dd9bcab5b856b2d572eb399bc9c0e780cc4b77befc1"
   }
   credit "(Added Apr. 29, 2002, eff. Dec. 1, 2002; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2002" enacted {
+  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2002" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002"
@@ -39,7 +39,7 @@ module "/us/usc/ptI/rule1004.1" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "28664cf8601c311e063b87d5d301f81a8578cb9e63a9f0dbe308a57645661b8d"
   }
-  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -48,7 +48,7 @@ module "/us/usc/ptI/rule1004.1" {
   }
   layers {
     operative "5d084475ca00ef207ede5dd9bcab5b856b2d572eb399bc9c0e780cc4b77befc1"
-    enacted "2458f0ef50c86f9c5d49e23651c96f33fde2e6dee916555c908684768708ae03"
-    editorial "d369302448354ea2db6c53db3a1bc21992708ea8183d664e36f0113960502bd6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8d627538d9a8f73f64776084d18717c68662149b808d1b3b58144d03989a3398"
   }
 }

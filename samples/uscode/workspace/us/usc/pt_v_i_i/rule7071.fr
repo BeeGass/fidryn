@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7071" {
     hash "8af5abd73cf8bd2368fde4ec3644e202ae8d53fc93774f28220654ac50b635af"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7071 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "5d535d6452d712e8585a6b811f7c808ccdc144dd49f255de70daa5366cd302ff"
   }
-  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7071" {
   }
   layers {
     operative "8af5abd73cf8bd2368fde4ec3644e202ae8d53fc93774f28220654ac50b635af"
-    enacted "2a896700f19de817c670efc04d7eff7bea56f531db77a8d35e264d04bfa627fe"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e54fc4c8ee34c4549f002060c487841c5a02060d266a3541c65b121847cde450"
   }
 }

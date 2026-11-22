@@ -30,14 +30,14 @@ module "/us/usc/ptIII/rule3017.2" {
     hash "223bd62a5d2a42b983341032f6e7f9f1a519b6b3c9bbd4346e5f02a7253971db"
   }
   credit "(Added Apr. 11, 2022, eff. Dec. 1, 2022; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2022" enacted {
+  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2022" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022"
     p "The rule is added in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Because there generally will not be a disclosure statement in a subchapter V case, see § 1181(b) of the Code, the rule is added to authorize the court in such a case to act at a time other than when a disclosure statement is approved to set certain times and dates."
     hash "2d90a5f3525bf12c662c26ca01dcf784720b9ddeb350f6d9ac9eb4c867ac9210"
   }
-  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -46,7 +46,7 @@ module "/us/usc/ptIII/rule3017.2" {
   }
   layers {
     operative "223bd62a5d2a42b983341032f6e7f9f1a519b6b3c9bbd4346e5f02a7253971db"
-    enacted "9a2bc28a77543b7e61cb73e7b0ed2a4f7557a0bbd0a574f666e4adb992518852"
-    editorial "c6948dcaf956cfab37021cb1d64a4bd107514f885bcaa4bd4f6327b8943b8e28"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0e48caf0c85119e2c1a063252d728cc334858e028d39001a0fc1c2b3b52086a0"
   }
 }

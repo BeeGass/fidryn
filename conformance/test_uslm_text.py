@@ -93,6 +93,18 @@ CASES = {
     "release-note-footnote": "a footnote inside the release note of a title, and one in its credit",
     "ref-classes": "a link whose class holds footnoteRef after a no-break space, and a marker "
     "whose class holds it after a tab",
+    "notes-layer-quoted": "statutory notes that set out quoted content, that point to a law, that "
+    "paraphrase one, that quote only in a footnote, that quote in a table cell, and that hold "
+    "an empty quotation",
+    "notes-layer-groups": "notes with quoted content under a chapter, directly in a section, "
+    "before any group, in each of the four groups, in what a cross heading holds after its "
+    "label, and in a group the rules do not know",
+    "notes-layer-topics": "ungrouped notes with quoted content and each of the three topics of "
+    "the editors, one of them second, a topic near one of them, none, and a statutory note "
+    "with one",
+    "notes-layer-headings": "ungrouped notes with quoted content headed by each of the three "
+    "patterns, in other case and white space, with a non-ASCII letter after a word and "
+    "full-width digits, near misses, no heading, and a statutory note headed as a report",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -331,6 +343,66 @@ class TextFixtures(unittest.TestCase):
 
     def test_ref_classes(self) -> None:
         self.check("ref-classes")
+
+    def test_notes_layer_quoted(self) -> None:
+        self.check("notes-layer-quoted")
+
+    def test_notes_layer_groups(self) -> None:
+        self.check("notes-layer-groups")
+
+    def test_notes_layer_topics(self) -> None:
+        self.check("notes-layer-topics")
+
+    def test_notes_layer_headings(self) -> None:
+        self.check("notes-layer-headings")
+
+    def test_the_patterns_of_headings_read_letters_digits_and_word_ends_in_ascii(self) -> None:
+        for heading, matched in (
+            ("Notes of Advisory Committee on Rules", True),
+            ("Note on the Advisory Committee", True),
+            ("NOTES  ON\N{NO-BREAK SPACE}THE\tADVISORY COMMITTEE", True),
+            ("Advisory Committee Notes", True),
+            ("Advisory Committee Note", True),
+            ("Advisory Committee Notes on Rules", False),
+            ("Prior Notes of Advisory Committee", False),
+            ("Committee Notes on Rules—2099", True),
+            ("Report No. 1", True),
+            ("Report Nos. 1 and 2", False),
+            ("Report Noël", True),
+            ("Report No_1", False),
+            ("Areport No. 1", False),
+            ("Senate Report", True),
+            ("Senate Reports", True),
+            ("Senate Reportsx", False),
+            ("Xsenate Report", False),
+            ("Ésenate Report", True),
+            ("House Report 99-1", True),
+            ("Conference Reports.", True),
+            ("Legislative Statements", True),
+            ("Explanatory Statement", True),
+            ("Statement of Managers", True),
+            ("Statement of the Managers", True),
+            ("Notes of Committee on the Judiciary", True),
+            ("Notes of the Committee on the Judiciary", True),
+            ("Notes of Conference Committee", True),
+            ("Revision Amendment", True),
+            ("Revisers' Notes", True),
+            ("Floor Statement", True),
+            ("Floor Statements", True),
+            ("Floor Statementsx", False),
+            ("Afloor Statement", False),
+            ("Historical and Revision Notes", True),
+            ("2099 Act", True),
+            ("2099 Acts", True),
+            ("2099 Acts Amended", False),
+            ("12099 Act", False),
+            # The year in full-width digits, U+FF10 and the digit above it.
+            ("".join(chr(0xFF10 + int(digit)) for digit in "2099") + " Act", False),
+            ("Invented Short Title", False),
+            ("", False),
+        ):
+            with self.subTest(heading=heading):
+                self.assertEqual(uslm_common.is_editors_heading(heading), matched)
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)

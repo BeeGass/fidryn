@@ -43,14 +43,14 @@ module "/us/usc/ptVIII/rule8005" {
     hash "e73f7e55a828f0351b984c82aa18e7f9bd07c5017b6428b210d3648dd57afdd2"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8005, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to stay pending appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "ffd3b11024d57835fde42b2c0b91a0d0c251d7feb19e2b36318b2da2d9b4183d"
   }
-  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -62,7 +62,7 @@ module "/us/usc/ptVIII/rule8005" {
     p "Changes Made After Publication and Comment. In subdivision (b), a requirement was added that the BAP clerk notify the bankruptcy clerk if an appeal is transferred from the BAP to the district court upon the election of an appellee. Conforming and clarifying changes were made to the Committee Note."
     hash "70471683f0a9c9f8fb671176a16bab73ca95dbfe6686c5cde2d951e899333fd9"
   }
-  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -71,7 +71,7 @@ module "/us/usc/ptVIII/rule8005" {
   }
   layers {
     operative "e73f7e55a828f0351b984c82aa18e7f9bd07c5017b6428b210d3648dd57afdd2"
-    enacted "6ce75ad6cbe374c396c32cd4aa4fe7f54af9f0c2c8cc34431a106a406312bc53"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cc67349e6fa17869b99526084c73759c2a77883bbbc9b149a2b189a0a213e212"
   }
 }

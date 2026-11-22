@@ -10,7 +10,7 @@ module "/us/usc/ptIX/rule9008" {
     hash "600dec1885e13eb1bf11784e2c2720fcab4779b8cce0e75d234db4f6e0eff9e1"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -19,7 +19,7 @@ module "/us/usc/ptIX/rule9008" {
   }
   layers {
     operative "600dec1885e13eb1bf11784e2c2720fcab4779b8cce0e75d234db4f6e0eff9e1"
-    enacted "3e0a50307f5733c848155be883338b8bfd02eb5a4c464b988990d992fd1af862"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "56a80388cd4ac895f54aa0af9903f4d9fb3ba1a507c68f0922eee459d0d38e95"
   }
 }

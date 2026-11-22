@@ -17,7 +17,7 @@ module "/us/usc/t45/s1344" {
     p "1995—" ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “section 10102” for “section 10102(19)”."
     hash "77f610e52ff8c605240ec44bd8e0b4ef4c47009d1cfd59a15677d717c9a619a8"
   }
-  note "/us/usc/t45/s1344/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s1344/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -26,7 +26,7 @@ module "/us/usc/t45/s1344" {
   }
   layers {
     operative "fd0b7466caf1e7549ba92cd60e3d511f4da2d5e985caa57d1ec887cfeac68fa4"
-    enacted "e130011aa74b9629a59ef7af4499fae9de95f0766b93568493c2f4969f1e58b6"
-    editorial "f5001f303eeafc3a0bc752158827ff7c4d2429b6cde84bca442012758116d1a8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d05fc6e1e5bcc38ad8af17a77c4a13269b7edd1329820bdc4d7b6836b9a0386f"
   }
 }

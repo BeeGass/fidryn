@@ -200,7 +200,7 @@ module "/us/usc/ptIII/rule3017" {
     hash "6cc55190a60ab63482bd01b530e95b428d7a2e4424b0b0f840ed963cf8472f4e"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -212,14 +212,14 @@ module "/us/usc/ptIII/rule3017" {
     p "Subdivision (d) permits the court to require a party other than the clerk of the bankruptcy court to bear the responsibility for transmitting the notices and documents specified in the rule when votes on the plan are solicited. Ordinarily the person responsible for such mailing will be the proponent of the plan. In rare cases the clerk may be directed to mail these documents, particularly when the trustee would have the responsibility but there is insufficient money in the estate to enable the trustee to perform this task."
     hash "f02b6247376fa6a53c94331b7c4ece017ad8013fc3ca3d07456f0c2fed7a1098"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (d). Section 1125(c) of the Code requires that the entire approved disclosure statement be provided in connection with voting on a plan. The court is authorized by § 1125(c) to approve different disclosure statements for different classes. Although the rule does not permit the mailing of a summary of the disclosure statement in place of the approved disclosure statement, the court may approve a summary of the disclosure statement to be mailed with the complete disclosure statement to those voting on the plan."
     hash "0f3c2a4d20c51dac79228614b986bb498044e07bb002be5dcc4989be824617ef"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -229,7 +229,7 @@ module "/us/usc/ptIII/rule3017" {
     p "Subdivision (e) is designed to ensure that appropriate measures are taken for the plan, disclosure statement, ballot and other materials which are required to be transmitted to creditors and equity security holders under this rule to reach the beneficial holders of securities held in nominee name. Such measures may include orders directing the trustee or debtor in possession to reimburse the nominees out of the funds of the estate for the expenses incurred by them in distributing materials to beneficial holders. In most cases, the plan proponent will not know the identities of the beneficial holders and therefore it will be necessary to rely on the nominal holders of the securities to distribute the plan materials to the beneficial owners."
     hash "12defadba62adfd87bf0d0a413a265e53628c8c1f5a6add155d5ea09d650d74f"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -241,7 +241,7 @@ module "/us/usc/ptIII/rule3017" {
     p "GAP Report on Rule 3017. No changes to the published draft."
     hash "7128a8ff304d750ca6e44ba90e622ed7c015b43a95f1764c5639c1b72c08ea46"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -250,7 +250,7 @@ module "/us/usc/ptIII/rule3017" {
     p "Changes Made After Publication and Comments. No changes were made in the text of the proposed amendments since publication. The Committee Note was revised to put in a more prominent position the statement that the rule does not address related substantive law issues which are beyond the scope of the rules."
     hash "bdb769291ef401256c5cb6df2520673bf9d5d4e6d1f4c3a1a0c418a6b12ac87d"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -262,7 +262,7 @@ module "/us/usc/ptIII/rule3017" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -271,7 +271,7 @@ module "/us/usc/ptIII/rule3017" {
   }
   layers {
     operative "6cc55190a60ab63482bd01b530e95b428d7a2e4424b0b0f840ed963cf8472f4e"
-    enacted "b64db36be29ffa781f5d22a568f7db5745179a01ea1fdd81f428fe26ff7be280"
-    editorial "32272c7d0fb45838a6140544546b51dadd6cb6063e02b133cc92d892c6129b1b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4366d16ff00a1caf4ac2163ede6d7c5cee94d0934f944e5d59946a19aabd98e4"
   }
 }

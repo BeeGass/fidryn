@@ -78,7 +78,7 @@ module "/us/usc/ptIX/rule9014" {
     hash "0bc6451ba6540a6ca2d8b4169ba7971c740954cc05b155d5caef3c50c9658fe4"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -87,7 +87,7 @@ module "/us/usc/ptIX/rule9014" {
     p "When the rules of Part VII are applicable to a contested matter, reference in the Part VII rules to adversary proceedings is to be read as a reference to a contested matter. See Rule 9002(1)."
     hash "8e5cafc0b8ba995708f10015f2febc740695842619461a90554a6af053e64336"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -97,7 +97,7 @@ module "/us/usc/ptIX/rule9014" {
     p "GAP Report on Rule 9014. No changes since publication."
     hash "ee375e04daf128951240cbde71791dc194851472208f4f41bdb4900c0174244e"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -111,7 +111,7 @@ module "/us/usc/ptIX/rule9014" {
     p "The Committee Note was amended to reflect the changes made in the text of the rule."
     hash "c2c5f0ca5fe76c107b65d66fd3092d59a2ab0a2d16700377338e93949a2f414f"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2004 Amendment"
@@ -119,7 +119,7 @@ module "/us/usc/ptIX/rule9014" {
     p "Changes Made After Publication. No changes since publication."
     hash "28f7eb75cc7f1ea638334117ee0c0a77d2e65deb9ffae855c66a3d25e35f3340"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -127,14 +127,14 @@ module "/us/usc/ptIX/rule9014" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "e664adcf9b25306459614c2328ac1cf204e835bfbac4724a608f35f771de9f9f"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "cb7f7417f7d1d1a41cd67a8479a681f0921fe97db22ad23a90aa907769f57bc2"
   }
-  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -143,7 +143,7 @@ module "/us/usc/ptIX/rule9014" {
   }
   layers {
     operative "0bc6451ba6540a6ca2d8b4169ba7971c740954cc05b155d5caef3c50c9658fe4"
-    enacted "1a9cc75ede09267f2a9b907255190bf90a9ef8883da83215ae955ed33b1bc176"
-    editorial "01b441006c12eb17004323f265ccc2c5c09b46c8868c790767a223c78d5884bc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3763a605c5fdd4451384a02b88c4f0fd5455bc43f831d7d023d49568eeeff671"
   }
 }
