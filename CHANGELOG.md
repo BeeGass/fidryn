@@ -292,6 +292,9 @@ interchange schema versions are maintained independently of the interpreter.
   deflated member to the end of its compressed stream as well as to its
   header, and refuse a member whose header declares fewer bytes than it
   holds.
+- A roadmap page, `docs/roadmap.md`, shown on the site as the guide
+  "Roadmap": the destination, what exists today at each depth, and what
+  comes next.
 
 ## [0.2.0] - 2026-11-22
 

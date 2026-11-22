@@ -25,6 +25,7 @@ statement of any jurisdiction's law.
 | [Outcomes](outcomes.md) | Determinate, Suspended, Contingent, and the rest |
 | [Examples](examples.md) | Trust, tax, federal slices, fifty states |
 | [Coverage](coverage.md) | What the sample of the United States Code in the repository holds, in counts |
+| [Roadmap](roadmap.md) | Where the project is going, what exists today and what comes next |
 
 The closed grammar is [`grammar.ebnf`](../grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](../schemas/case-record-v0.1.json),

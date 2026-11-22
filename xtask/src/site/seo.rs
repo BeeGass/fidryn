@@ -311,6 +311,7 @@ mod tests {
                 "https://fidryn.onlygass.dev/docs/examples",
                 "https://fidryn.onlygass.dev/docs/coverage",
                 "https://fidryn.onlygass.dev/docs/contributing",
+                "https://fidryn.onlygass.dev/docs/roadmap",
             ]
         );
     }
@@ -322,7 +323,7 @@ mod tests {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url>\n    <loc>https://fidryn.onlygass.dev/</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n"
         ));
         assert!(xml.ends_with("  </url>\n</urlset>\n"));
-        assert_eq!(xml.matches("<url>").count(), 12);
+        assert_eq!(xml.matches("<url>").count(), 13);
         assert!(!xml.contains("lastmod"));
     }
 }
@@ -565,6 +566,6 @@ mod corpus_tests {
                 g.slug
             );
         }
-        assert!(full.ends_with("Body of contributing.\n"));
+        assert!(full.ends_with("Body of roadmap.\n"));
     }
 }

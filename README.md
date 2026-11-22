@@ -103,6 +103,7 @@ The guides are indexed in [docs/README.md](docs/README.md).
 | Browse fixtures | [Examples](docs/examples.md) |
 | See what the sample of the Code holds | [Coverage](docs/coverage.md) |
 | Change the interpreter | [Contributing](docs/contributing.md) |
+| See where the project is going | [Roadmap](docs/roadmap.md) |
 
 ## CLI at a glance
 
