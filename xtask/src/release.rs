@@ -611,7 +611,7 @@ mod tests {
         }
 
         fn git(&self, args: &[&str]) -> String {
-            let output = Command::new("git")
+            let output = crate::test_git::git()
                 .current_dir(&self.0)
                 .args([
                     "-c",

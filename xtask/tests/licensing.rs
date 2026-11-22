@@ -2,7 +2,11 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+
+// The git of the tests of the crate, which finds the repository it is run
+// in and nothing that the caller's environment names.
+#[path = "../src/test_git.rs"]
+mod test_git;
 
 const MIT: &str = "MIT License
 
@@ -108,7 +112,7 @@ fn contributions_are_accepted_under_the_project_license() {
 
 #[test]
 fn every_source_fixture_labels_itself() {
-    let output = Command::new("git")
+    let output = test_git::git()
         .current_dir(root())
         .args(["ls-files", "-z", "--", ":(glob)examples/**/sources/**"])
         .output()

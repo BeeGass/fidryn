@@ -1026,7 +1026,7 @@ mod tests {
     #[test]
     fn assets_exclude_ignored_local_files_but_include_visible_development_files() {
         let fixture = Fixture::new();
-        let mut init = Command::new("git");
+        let mut init = crate::test_git::git();
         init.current_dir(&fixture.0).args(["init", "--quiet"]);
         checked_status(&mut init).unwrap();
         fs::write(fixture.0.join(".gitignore"), ".DS_Store\n__pycache__/\n").unwrap();
@@ -1091,7 +1091,7 @@ mod tests {
     ];
 
     fn licensing_source(root: &Path) {
-        let mut init = Command::new("git");
+        let mut init = crate::test_git::git();
         init.current_dir(root).args(["init", "--quiet"]);
         checked_status(&mut init).unwrap();
         for name in LICENSING_FILES {
