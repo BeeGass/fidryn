@@ -21,7 +21,7 @@ module "/us/usc/ptI/rule1010" {
     hash "f05adc206dade84d7120595220ec65a7c7a195ab81258c9d8a58894a641b9c9a"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -34,14 +34,14 @@ module "/us/usc/ptI/rule1010" {
     p "Rule 1004 provides for transmission to nonpetitioning partners of a petition filed against the partnership by fewer than all the general partners."
     hash "bd9274081d035c0cd4a0f2fa6a3bf705eb1e32ae928dc465e0b5e0fdbea34202"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule has been broadened to include service of a petition commencing a case ancillary to a foreign proceeding, previously included in Rule 1003(e)(2)."
     hash "c4a71df06c8780315aa07e6446d27b183ad21211b6fea5e4be860cfd98f43845"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -49,14 +49,14 @@ module "/us/usc/ptI/rule1010" {
     p "Rule 4(g) and (h) F.R.Civ.P. made applicable by this rule refers to Rule 4(g) and (h) F.R.Civ.P. in effect on January 1, 1990, notwithstanding any subsequent amendment thereto. See Rule 7004(g)."
     hash "728e1b57f6b32a27cfeb184c16b0ac4706bfb02cc5d14958f761cbdc221a066b"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to delete the reference to the Official Form. The Official Form for the summons was abrogated in 1991. Other amendments are stylistic and make no substantive change."
     hash "a0fca1e4a51d83910a5975f769420c581a0c120478f54ecc22a47f09ecbdbcdb"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -66,7 +66,7 @@ module "/us/usc/ptI/rule1010" {
     p "GAP Report on Rule 1010. These amendments, which are technical and conforming, were not published for comment."
     hash "ef7a149ed54d5848aab4e6c2522b6e4d9bf613f19f08ba51035893fad85c303e"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -76,21 +76,21 @@ module "/us/usc/ptI/rule1010" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "d6cebbc7d3375df5d8864d458f9b2122829594968468ba1e09cacce28edcf0b2"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "Subdivision (a) of this rule is amended to remove provisions regarding the issuance of a summons for service in certain chapter 15 proceedings. The requirements for notice and service in chapter 15 proceedings are found in Rule 2002(q)."
     hash "4f51209bffbc458022a2a48002bcd4e9e74a80b739f825aad0436e3e74184f34"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 1010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "651daacb26f34e020fe82048422b8a11607638baff5d88458ae01bcd188a04d4"
   }
-  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptI/rule1010/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -99,7 +99,7 @@ module "/us/usc/ptI/rule1010" {
   }
   layers {
     operative "f05adc206dade84d7120595220ec65a7c7a195ab81258c9d8a58894a641b9c9a"
-    enacted "c58c9d9b937ca03472059f2b03c6c1e6cdf60102d95cc929164e53c556a6eb87"
-    editorial "2b876b6a425f1bf305bad85d5fdf0cef2c7bbae94d5131db8da79ddaddf109fe"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "19e328ab9d8b80d9367084e3d6a531ea7d9f497bcd80ab3bdba0234af5eed32e"
   }
 }

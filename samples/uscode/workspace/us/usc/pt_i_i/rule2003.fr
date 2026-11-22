@@ -178,7 +178,7 @@ module "/us/usc/ptII/rule2003" {
     hash "6e297cefe7a740e2182d2295c386e807fc2d16df453e156b29ffb77e8a403fe6"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -199,14 +199,14 @@ module "/us/usc/ptII/rule2003" {
     p "While a final meeting is not required, Rule 2002(f)(10) provides for the trustee’s final account to be sent to creditors."
     hash "dac2937263aa8eaae91a538c34ed951e88e248f2f35324184d6202165511a83f"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (a). Many courts schedule meetings of creditors at various locations in the district. Because the clerk must schedule meetings at those locations, an additional 20 days for scheduling the meetings is provided under the amended rule."
     hash "c98d0e0afcd587e10f1f82438b8e1da2088674306d1c7d8cdd7f185311f92049"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -216,14 +216,14 @@ module "/us/usc/ptII/rule2003" {
     p "Subdivisions (f) and (g) are derived from Rule X–1006(d) and (e), except that the amount is increased to $1,500 to conform to the amendment to Rule 2002(f)."
     hash "9f8281765966bb79ce8ffbd68a4e3ee06bdfd0e12c7b00dbff50f7645686a781"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (a) is amended to extend by ten days the time for holding the meeting of creditors in a chapter 13 case. This extension will provide more flexibility for scheduling the meeting of creditors. Other amendments are stylistic and make no substantive change."
     hash "81c209c0110081812af963bb43ceb04c8f4db0a984f93865b1b7026421b7d777"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -232,7 +232,7 @@ module "/us/usc/ptII/rule2003" {
     p "GAP Report on Rule 2003. No changes since publication."
     hash "7021584ba7bd97a373e21320c298d99f4e2ae2ec9878f386da5e6123fe88ea9f"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003 Amendment"
@@ -240,7 +240,7 @@ module "/us/usc/ptII/rule2003" {
     p "Changes Made After Publication and Comments. No changes since publication."
     hash "d74be233ffb95eb3f3a52d199bc8d148df20b8401df6b738b0b78a2c59b68fc6"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -248,7 +248,7 @@ module "/us/usc/ptII/rule2003" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "166b97a5fecba5e044717bd30cb836b3b99f98376e0a7d0a8cedf3b1f71f763f"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -260,7 +260,7 @@ module "/us/usc/ptII/rule2003" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011 Amendment"
@@ -268,7 +268,7 @@ module "/us/usc/ptII/rule2003" {
     p "Changes Made After Publication. No changes were made to the language of the rule following publication. The Committee Note was revised to state more explicitly that adjournment of a meeting of creditors to a specific date constitutes holding it open for purposes of § 1308(b) of the Bankruptcy Code."
     hash "bc87c0105ab23e88e99e61fdf962c0504b8b837e3240015e1f6136f2ea173ea3"
   }
-  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -277,7 +277,7 @@ module "/us/usc/ptII/rule2003" {
   }
   layers {
     operative "6e297cefe7a740e2182d2295c386e807fc2d16df453e156b29ffb77e8a403fe6"
-    enacted "5e3515c69cc78b330cba1f9c87cf72f28eb2108d2965ea3c4769b9385ef8a46f"
-    editorial "06277b7d9d99aa5ea13c1b2752009d106d8034c7ebcf99e0c5a5ae6611af101d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8fb6ea8ebd156db3de881376893881d729d9688af0126c3d38539ae4452e327a"
   }
 }

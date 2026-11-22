@@ -29,7 +29,7 @@ module "/us/usc/ptIX/rule9012" {
     hash "b1e4801b0876d0084303a7b82ebcccb1de761f16c2ad83cb49c80e6c8149255c"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -37,21 +37,21 @@ module "/us/usc/ptIX/rule9012" {
     p "The provisions of former Bankruptcy Rule 912(a) relating to who may administer oaths have been deleted as unnecessary. Bankruptcy judges and the clerks and deputy clerks of bankruptcy courts are authorized by statute to administer oaths and affirmations and to take acknowledgments. 28 U.S.C. §§ 459, 953. A person designated to preside at the meeting of creditors has authority under Rule 2003(b)(1) to administer the oath. Administration of the oath at a deposition is governed by Rule 7028."
     hash "29e910725d928a2cc3f0b90f7a3aa1330eb975dbe62b5d5e1927f4688c8e4d4d"
   }
-  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (a) has been added to the rule to authorize bankruptcy judges and clerks to administer oaths."
     hash "645f71a436007e55d50da9be020937ab12ac5f8072a1d9aafd8570992b60fe13"
   }
-  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to the 1986 amendment to § 343 which provides that the United States trustee may administer the oath to the debtor at the § 341 meeting. This rule also allows the United States trustee to administer oaths and affirmations and to take acknowledgments in other situations. This amendment also affects Rule 9010(c) relating to the acknowledgment of a power of attorney. The words “United States trustee” include a designee of the United States trustee pursuant to Rule 9001 and § 102(9) of the Code."
     hash "4bedb3a42e2dcb3d88052dbfd1df28ae38b34d55b4888a41113af06ee50f29a6"
   }
-  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -60,7 +60,7 @@ module "/us/usc/ptIX/rule9012" {
   }
   layers {
     operative "b1e4801b0876d0084303a7b82ebcccb1de761f16c2ad83cb49c80e6c8149255c"
-    enacted "2d9533fd353b766bd3318ba4da3ef057505d0e1df7b2e0b072eb6b4309c38403"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5ac4a6c499af838ff28d964edace8915733c7618d71fb8e372123b8678478b5f"
   }
 }

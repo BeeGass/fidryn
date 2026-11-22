@@ -70,7 +70,7 @@ module "/us/usc/ptVIII/rule8022" {
     hash "915b5195dd5fd94a999a6f0d9e767f7b8611fd6e0a92981ca8866df8680a8dd0"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -78,7 +78,7 @@ module "/us/usc/ptVIII/rule8022" {
     p "Changes Made After Publication and Comment. In subdivision (b), the reference to local rule was deleted as unnecessary."
     hash "e0dd96c31f58e23242c62cc39f660135a7e02709be3cf86a6fcf9892dec0d6a8"
   }
-  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -86,7 +86,7 @@ module "/us/usc/ptVIII/rule8022" {
     p "Page limits are retained for papers prepared without the aid of a computer (i.e., handwritten or typewritten papers). For both the word limit and the page limit, the calculation excludes any items listed in Rule 8015(g)."
     hash "d96c076c8a3398eeb4b8b5890e5f23d3ace6f63c10b876b3dcdfce342ec0817f"
   }
-  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -95,7 +95,7 @@ module "/us/usc/ptVIII/rule8022" {
   }
   layers {
     operative "915b5195dd5fd94a999a6f0d9e767f7b8611fd6e0a92981ca8866df8680a8dd0"
-    enacted "9dcdf6ca2120246d64949aa538111b5a871c8ac96967d40db43296300fdeb0aa"
-    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "887dbe672442e78ed94caf35faa96fed12aebd3397e951f03b7ceb85c7fc6de2"
   }
 }

@@ -47,7 +47,7 @@ module "/us/usc/ptIX/rule9015" {
     hash "e01830ff6f1b868544e674b0ee962ed694ce9a67cdb0db1884cabad004da8111"
   }
   credit "(Added Apr. 11, 1997, eff. Dec. 1, 1997; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" enacted {
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997"
@@ -55,7 +55,7 @@ module "/us/usc/ptIX/rule9015" {
     p "GAP Report on Rule 9015. No changes to the published draft."
     hash "425cce22a33e6d6ee8e30bf3f6d5a2afd4448898707fec95594efc898a079ff4"
   }
-  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -63,14 +63,14 @@ module "/us/usc/ptIX/rule9015" {
     p "Other amendments are stylistic."
     hash "0fbf8e1a1222ec147b49deb437d9806efc8c8a4d2a9e5400d040feaa402ca838"
   }
-  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "68dccfc355415dafab36754abbfe08aa9d96f0e4b444f140ab6601b7873194a8"
   }
-  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -79,7 +79,7 @@ module "/us/usc/ptIX/rule9015" {
   }
   layers {
     operative "e01830ff6f1b868544e674b0ee962ed694ce9a67cdb0db1884cabad004da8111"
-    enacted "3b09276a53e8d6ab6af32c5880ad824b27043291aef171ec903e3afa1127028c"
-    editorial "895a105e353f7369ffcdf81921c29728f2c65778ef5b9353d6c800bcb5568965"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b8d179358e9a72b7b1b30b62fea4d82fe695f92ed813e7f82d209855e26f16e7"
   }
 }

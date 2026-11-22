@@ -73,7 +73,7 @@ module "/us/usc/ptII/rule2014" {
     hash "04aaba07e6f77de069e31ba68655e7fe6276fa66ac9240ff44551199b7928147"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -81,7 +81,7 @@ module "/us/usc/ptII/rule2014" {
     p "Subdivision (b) is derived from former Bankruptcy Rule 215(f). The compensation provisions are set forth in § 504 of the Code."
     hash "370c822e2aa180465ff051070fca76719cce500c56af685c2c3068479a5fc3ce"
   }
-  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -91,7 +91,7 @@ module "/us/usc/ptII/rule2014" {
     p "The United States trustee appoints committees pursuant to § 1102 of the Code which is applicable in chapter 9 cases under § 901. In the interest of full disclosure and confidence in the bankruptcy system, a connection between the United States trustee and a professional employed by the committee should be revealed in every case, including a chapter 9 case. However, since the United States trustee does not have any role in the employment of professionals in chapter 9 cases, it is not necessary in such cases to transmit to the United States trustee a copy of the application under subdivision (a) of this rule. See 28 U.S.C. § 586(a)(3)(H) [now 586(a)(3)(I)]."
     hash "884fc43459e29ae402a0ceefdab1d8f8f1be4c2770955fc7fb5397703c81a911"
   }
-  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -100,7 +100,7 @@ module "/us/usc/ptII/rule2014" {
   }
   layers {
     operative "04aaba07e6f77de069e31ba68655e7fe6276fa66ac9240ff44551199b7928147"
-    enacted "177b10a0c915957bbc963f7f7d82ead104687aef0c108f0272636dc31b630efe"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c1295d37b8c88699e7cb7c7aca50512d53afd0c8d78c91096c40c8f5ab9f6264"
   }
 }

@@ -37,7 +37,7 @@ module "/us/usc/t45/s71...74" {
     p "Section 74, acts " ["June 29, 1906, ch. 3594, § 4" -> "/us/act/1906-06-29/ch3594/s4"] ", " ["34 Stat. 608" -> "/us/stat/34/608"] "; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] ", provided that penalty created by " ["section 73 of this title" -> "/us/usc/t45/s73"] " was recoverable by civil action and that United States attorneys had duty to prosecute violations of this chapter. See " ["section 80502 of Title 49" -> "/us/usc/t49/s80502"] "."
     hash "f11e9fb79b83fabfc068b324d08af79238d88cb52d052763a3f96ee970ef72f4"
   }
-  note "/us/usc/t45/s71...74/note/statutoryNotes/act.1906-06-29.ch3594/short-title" enacted {
+  note "/us/usc/t45/s71...74/note/statutoryNotes/act.1906-06-29.ch3594/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -46,7 +46,7 @@ module "/us/usc/t45/s71...74" {
   }
   layers {
     operative "bdd7f2d17094af82dbe4a16fcb57b522b991e8c50d8d75745b5b5c6e9d9a6c02"
-    enacted "ddec1c7d8aa9d38df6561bba060f1db0a61d67ac204bb3dfed6af975f087d4d2"
-    editorial "becc0a979b1f29466211bcf0f44bc6b6f91bed8fc49f1d54b4362d19ba173fea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "47b7ab6abe33f98e4b85f763b93c6265063c2c38cd194df42cbbc8e425510964"
   }
 }

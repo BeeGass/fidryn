@@ -27,21 +27,21 @@ module "/us/usc/ptI/rule1012" {
     hash "be13ab17bd09ea3054a35679be5cccc1340b9be04811f7bba650c765464a5eaa"
   }
   credit "(Added Apr. 28, 2016, eff. Dec. 1, 2016; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987"
     p "This rule [former Rule 1012—Examination of Debtor, Including Discovery, on Issue of Nonpayment of Debts in Involuntary Cases] is abrogated [abrogated Mar. 30, 1987, eff. Aug. 1, 1987]. The discovery rules apply whenever an involuntary petition is contested. Rule 1018."
     hash "d5cab8a05375dd7a0ba2a3b1e917d8274f8ccca73bd13cc6433749e0e8fdecb6"
   }
-  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "This rule is added to govern responses to petitions for recognition in cross-border cases. It incorporates provisions formerly found in Rule 1011. Subdivision (a) provides that the debtor or a party in interest may contest the petition. Subdivision (b) provides for presentation of responses no later than 7 days before the hearing on the petition, unless the court directs otherwise. Subdivision (c) governs the filing of corporate ownership statements by entities responding to the petition."
     hash "bac63a52e6d0415002148735abea007941c6570e9ea03a0234d8b3b7483c714b"
   }
-  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -50,7 +50,7 @@ module "/us/usc/ptI/rule1012" {
   }
   layers {
     operative "be13ab17bd09ea3054a35679be5cccc1340b9be04811f7bba650c765464a5eaa"
-    enacted "568433355643770b370045f57d441463ca252f861389a9928e00c5471564c32f"
-    editorial "c12d46c4f8a1497f7297457bc0bc0f26702c41b16f0966a7f1effaf7e5fd1fe3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "621673adc11de49a13e9deae4ca5b366371cc7e2f1c47ef4136efad10c6dafa8"
   }
 }

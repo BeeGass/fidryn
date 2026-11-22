@@ -78,10 +78,16 @@ What is counted is what the reading imports, element by element:
   it holds after that label is a note of the group it opens, with no heading and
   no topics. Topics are the `topic` attribute split at U+0020, with no empty
   member, so that an empty attribute gives none; a topic that holds any other
-  white-space character is refused. A note is editorial
-  when its group is `editorialNotes`, or when it is ungrouped and one of its
-  topics is `removalDescription` or `historicalAndRevision`; every other note is
-  enacted. A note's text may hold a text part that stands directly in it, read as
+  white-space character is refused. A note is enacted
+  when it holds a `quotedContent` element at any depth outside its footnotes
+  (of a group heading, after its label), its group is `statutoryNotes` or it is
+  ungrouped, none of its topics is `historicalAndRevision`, `removalDescription`
+  or `prospectiveAmendment`, and, when it is ungrouped, its heading, with `A` to
+  `Z` in lower case and each run of white space one space, matches none of the
+  three patterns of
+  [Notes and their layers](../docs/law-modules.md#notes-and-their-layers),
+  searched with ASCII word characters and digits; every other note is
+  editorial. A note's text may hold a text part that stands directly in it, read as
   the blocks of its parts, those of a `continuation` or a `proviso` inside a
   `content` among them, and a `signature`, also inside quoted content. A
   note's own heading is the first `heading` that is a child of the note. Any
@@ -193,8 +199,8 @@ lease run --cpus 8 --mem 16G --time 2h -- uv run --locked python -I conformance/
 ```
 
 The run read 58 members, 61,171 units, 9,623 containers and 774,018 provisions
-in 16.5 seconds of wall-clock time. Its largest process peaked at 685,756 KiB of
-resident memory, and the whole run at 1,238,089,728 bytes, page cache included.
+in 24.9 seconds of wall-clock time. Its largest process peaked at 686,132 KiB of
+resident memory, and the whole run at 1,426,231,296 bytes, page cache included.
 It printed:
 
 ```json
@@ -252,8 +258,8 @@ It printed:
       "tables_of_contents": 3303
     },
     "notes": {
-      "editorial": 83116,
-      "enacted": 87335
+      "editorial": 139115,
+      "enacted": 31336
     },
     "notes_by_group": {
       "courtRules": 20,
@@ -271,24 +277,24 @@ It printed:
     "provisions": 774018,
     "references": {
       "editorial": {
-        "ambiguous": 70,
-        "exact": 52559,
+        "ambiguous": 73,
+        "exact": 104469,
         "malformed": 0,
-        "no-unit": 6736,
-        "outside": 728990,
-        "range-form": 291,
-        "target-status": 8248,
-        "unit-only": 2344
+        "no-unit": 7141,
+        "outside": 838100,
+        "range-form": 426,
+        "target-status": 9455,
+        "unit-only": 2728
       },
       "enacted": {
-        "ambiguous": 50,
-        "exact": 94822,
+        "ambiguous": 47,
+        "exact": 42912,
         "malformed": 0,
-        "no-unit": 1259,
-        "outside": 229559,
-        "range-form": 253,
-        "target-status": 3598,
-        "unit-only": 1180
+        "no-unit": 854,
+        "outside": 120449,
+        "range-form": 118,
+        "target-status": 2391,
+        "unit-only": 796
       },
       "operative": {
         "ambiguous": 70,

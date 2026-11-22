@@ -74,7 +74,7 @@ module "/us/usc/ptII/rule2005" {
     hash "0db90827c6abfee582c151b40006fb0f1ecdae869c780faa9a9bfc2d1b6759f1"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -82,21 +82,21 @@ module "/us/usc/ptII/rule2005" {
     p "The affidavit required to be submitted in support of the motion may be subscribed by the unsworn declaration provided for in 28 U.S.C. § 1746."
     hash "7f07b36b40a295c0ea0ee88f76ccbeda84a89164462e8d8fda3612169dc293bb"
   }
-  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (b)(2) is amended to conform to § 321 of the Judicial Improvements Act of 1990, Pub. L. No. 101–650, which changed the title of “United States magistrate” to “United States magistrate judge.” Other amendments are stylistic and make no substantive change."
     hash "efbde1a72642a8cedbe7631a95581f476a6257daf1208a83689db16a8a2cbcb3"
   }
-  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2021 Amendment"
     p "The rule is amended to replace the reference to 18 U.S.C. § 3146(a) and (b) with a reference to 18 U.S.C. § 3142. Sections 3141 through 3151 of Title 18 were repealed by the Bail Reform Act of 1984, Pub. L. No. 98–473, Title II, § 203(a), " ["98 Stat. 1976" -> "/us/stat/98/1976"] " (1984), and replaced by new provisions dealing with bail. The current version of 18 U.S.C. § 3146 deals not with conditions to assure attendance or appearance, but with penalties for failure to appear. The topic of conditions is in 18 U.S.C. § 3142. Because 18 U.S.C. § 3142 contains provisions bearing on topics not included in former 18 U.S.C. § 3146(a) and (b), the rule is also amended to limit the reference to the “relevant” provisions and policies of § 3142."
     hash "4482115af058b55f135d47b5cde603dfb280484fe5a1ed56e75d7cae3f8269ed"
   }
-  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -105,7 +105,7 @@ module "/us/usc/ptII/rule2005" {
   }
   layers {
     operative "0db90827c6abfee582c151b40006fb0f1ecdae869c780faa9a9bfc2d1b6759f1"
-    enacted "8983d16e1605758ec870adce99921678469e4f921097d9b3384c4cefb719ffa7"
-    editorial "581c6700113c108d9c0421352908ca13f56995018ea0de2035b66dd52e8e41d0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8a6f04adf1f2905e3bdda54bc54b2dfdfb2064d3ac7c29925c00dee2ea5bae8a"
   }
 }

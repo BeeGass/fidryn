@@ -46,21 +46,21 @@ module "/us/usc/t45/s728" {
     p "Subchapter IV of this chapter, including " ["section 767 of this title" -> "/us/usc/t45/s767"] ", referred to in subsecs. (a)(1) and (b)(1), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(1)" -> "/us/pl/99/509/tIV/s4033/a/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "."
     hash "14fbcab3c78308b753114243f2c8f46c3cd74e2af13becb55953b3ac5379dbf4"
   }
-  note "/us/usc/t45/s728/note/statutoryNotes/pl.97.35/effective-date" enacted {
+  note "/us/usc/t45/s728/note/statutoryNotes/pl.97.35/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
     p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
   }
-  note "/us/usc/t45/s728/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+  note "/us/usc/t45/s728/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Reporting Requirements"
     p "For termination, effective May 15, 2000, of provisions of law requiring submittal to Congress of any annual, semiannual, or other regular periodic report listed in House Document No. 103–7 (in which a report required under subsec. (a) of this section is listed as the 9th item on page 195), see " ["section 3003 of Pub. L. 104–66" -> "/us/pl/104/66/s3003"] ", as amended, set out as a note under " ["section 1113 of Title 31" -> "/us/usc/t31/s1113"] ", Money and Finance."
     hash "057e6046c25071d43ce3200cb67ea96678afed5e0a50e2fd6c109fb9ab9a6610"
   }
-  note "/us/usc/t45/s728/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s728/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -72,7 +72,7 @@ module "/us/usc/t45/s728" {
   }
   layers {
     operative "52ad8662c5c1d80fac9bfe5b516696f4f2888a90930f8b37da29b083022c3ce2"
-    enacted "0d62674676a371104dbb6e98d26040771595807c838cf9797c1a15d025841e4f"
-    editorial "dcfe7bb3a7f7212ee4adcd0fa24d0725a943e97f447a51582875d314529c018e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1520bce3b312dd4f7d0772feb6593c2fae905c1a7caf990726ab3a5e4d1d633b"
   }
 }

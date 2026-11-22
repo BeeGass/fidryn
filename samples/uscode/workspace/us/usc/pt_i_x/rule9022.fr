@@ -50,7 +50,7 @@ module "/us/usc/ptIX/rule9022" {
     hash "127d151a74119a23665679e6d3d4151634a46e47d2356bad84b6749082f8ed36"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -58,14 +58,14 @@ module "/us/usc/ptIX/rule9022" {
     p "Subdivision (b) complements Rule 9021(b). When a district court acts as an appellate court, Rule 8016(b) requires the clerk to give notice of the judgment on appeal."
     hash "d6bd4ae11da62f7760666744e154e08f0e74ab943cbb55e589394a0ac3b07c3d"
   }
-  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to enable the United States trustee to be informed of all developments in the case so that administrative and supervisory functions provided in 28 U.S.C. § 586(a) may be performed."
     hash "8d0d1752902c246a13a0f3186b8eb452ab352ef433c914009134388c498fdbae"
   }
-  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -73,14 +73,14 @@ module "/us/usc/ptIX/rule9022" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "c5da93baa235b48cc18bfa0c7b636f3a0259101ec355b495631f8db26d8b45e7"
   }
-  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9022 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "ddcb3b843c5bfc16e42d08dce1514b85ae92db42e3d22ca4f5fc6ca81f3875d6"
   }
-  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -89,7 +89,7 @@ module "/us/usc/ptIX/rule9022" {
   }
   layers {
     operative "127d151a74119a23665679e6d3d4151634a46e47d2356bad84b6749082f8ed36"
-    enacted "d73d9ea1bd454f0d882efbeaedb5ab8f458adb044c6f860d01c949e332a04a5a"
-    editorial "63158ef09b3f632f2ff7765f2c4c25acf20417424c15464e16ba73220b840533"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2dbfd1ed4656b8bc511fde06d487d9fd7e30c2b954d8db564dcd644d4977c06d"
   }
 }

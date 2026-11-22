@@ -17,14 +17,14 @@ module "/us/usc/t1/s106b" {
     p "1984—" ["Pub. L. 98–497" -> "/us/pl/98/497"] " substituted “National Archives and Records Administration” and “Archivist of the United States” for “General Services Administration” and “Administrator of General Services”, respectively."
     hash "6ff208b74e5868b898feb23bae8bf41c2fa5fe8537f7b9bfebdeb756dcbde38d"
   }
-  note "/us/usc/t1/s106b/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t1/s106b/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
     p "Amendment by " ["Pub. L. 98–497" -> "/us/pl/98/497"] " effective Apr. 1, 1985, see " ["section 301 of Pub. L. 98–497" -> "/us/pl/98/497/s301"] ", set out as a note under " ["section 2102 of Title 44" -> "/us/usc/t44/s2102"] ", Public Printing and Documents."
     hash "89065e2a47007e935df4515dd4ad84b0d8f25811ae6e917d553a89432b5b40a5"
   }
-  note "/us/usc/t1/s106b/note/statutoryNotes/nolaw/similar-provisions-repeal-saving-clause-delegation-of-functi" enacted {
+  note "/us/usc/t1/s106b/note/statutoryNotes/nolaw/similar-provisions-repeal-saving-clause-delegation-of-functi" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Similar Provisions; Repeal; Saving Clause; Delegation of Functions; Transfer of Property and Personnel"
@@ -33,7 +33,7 @@ module "/us/usc/t1/s106b" {
   }
   layers {
     operative "d7f381698d98f78c32e270a3fdcd14f7d20df6b249dc57ce402854c4acc72800"
-    enacted "7f8aca90421ac917d573d4670cb101cd73f6d94fbc3d19c0c32c7db8df06b7ef"
-    editorial "39533e4914592ea0829b34883b63f47773a9e0d8b4abea546bee167fe5c4b5ce"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6cf640477290cd84ec474c23056d27e5a67e177d4899296468621a50df433bd0"
   }
 }

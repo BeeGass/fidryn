@@ -213,14 +213,14 @@ module "/us/usc/ptVIII/rule8002" {
     hash "2193a51897a25374cf19d20671cde6c4162a3b6f82bd1954672de074912a6821"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8002, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 1994, eff. Aug. 1, 1994; Apr. 11, 1997, eff. Dec. 1, 1997; Mar. 26, 2009, eff. Dec. 1, 2009, related to time for filing notice of appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "eabe9c77249cf89e378938210a596c8abe31082e9e14ce3c352b4a7708e17c05"
   }
-  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -233,7 +233,7 @@ module "/us/usc/ptVIII/rule8002" {
     p "Changes Made After Publication and Comment. Stylistic changes were made to the title of subdivision (b)(3) and to subdivision (c)(1)."
     hash "19bbe27e437d597768f6f75b3bea22c82a71a25d616991636af9a3898ac00266"
   }
-  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -246,14 +246,14 @@ module "/us/usc/ptVIII/rule8002" {
     p "The amended rule also provides that a notice is timely without a declaration or notarized statement if other evidence accompanying the notice shows that the notice was deposited on or before the due date and that postage was prepaid. If the notice is not accompanied by evidence that establishes timely deposit and prepayment of postage, then the appellate court—district court, BAP, or court of appeals in the case of a direct appeal—has discretion to accept a declaration or notarized statement at a later date. The rule uses the phrase “exercises its discretion to permit”—rather than simply “permits”—to help ensure that pro se inmates are aware that a court will not necessarily forgive a failure to provide the declaration initially."
     hash "f2662caa39854e1af31684910d8d87b9edd40acc0c5fb4f1ce7460fdc179477a"
   }
-  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 8002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "3974c48741d87432d9adef9519bda5a8e4b3cc35715b6df1cf2394b7aff09d2d"
   }
-  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -262,7 +262,7 @@ module "/us/usc/ptVIII/rule8002" {
   }
   layers {
     operative "2193a51897a25374cf19d20671cde6c4162a3b6f82bd1954672de074912a6821"
-    enacted "d2990766f7620c8c14eae8bdfab2362843e3d9e61924e634a3ec08204ef33aac"
-    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3db076f460d0f8f8ee59396313995d1bb835f0380236ebc84544dda907ba870f"
   }
 }

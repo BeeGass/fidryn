@@ -38,7 +38,7 @@ module "/us/usc/ptVIII" {
     member "/us/usc/ptVIII/rule8028"
     hash "6108e31ee6b22d6fae13c49e582fe2ceba3bc77b51159166529722183a6b9f69"
   }
-  note "/us/usc/ptVIII/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" enacted {
+  note "/us/usc/ptVIII/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Length Limits Stated in Part VIII of the Federal Rules of Bankruptcy Procedure"
@@ -47,7 +47,7 @@ module "/us/usc/ptVIII" {
   }
   layers {
     operative "6108e31ee6b22d6fae13c49e582fe2ceba3bc77b51159166529722183a6b9f69"
-    enacted "ba329f6ff7b6330d218b8d68b48a2b1f47fef2fc9fee21556b5e9d1a44b8be41"
-    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cf7b405d726a8a733951f3a21acb6abe5ac727b528d94fd7d83d0a3b8b08f060"
   }
 }

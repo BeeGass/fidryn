@@ -19,7 +19,7 @@ module "/us/usc/t45/s1009" {
     hash "fd2dae2d9ec1df8d7215268095ca647c495832ca1571cf49a0162e1c03f13011"
   }
   credit "(" ["Pub. L. 96–254, title I, § 111" -> "/us/pl/96/254/tI/s111"] ", May 30, 1980, " ["94 Stat. 404" -> "/us/stat/94/404"] ".)"
-  note "/us/usc/t45/s1009/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1009/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -28,7 +28,7 @@ module "/us/usc/t45/s1009" {
   }
   layers {
     operative "fd2dae2d9ec1df8d7215268095ca647c495832ca1571cf49a0162e1c03f13011"
-    enacted "b47c0b3129bb290249c01cdfb3c514e78ad258de45c2fdadc11a25578941b79b"
-    editorial "a268892ebee9f22cef1c9d92ce71705505d55212ec973c0aaff3dcae383d2e6a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1d5c5ac0eced73397ee8208b734ae018f881ee59275b90d4df562d9f26f3ced0"
   }
 }

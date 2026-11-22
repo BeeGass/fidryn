@@ -52,14 +52,14 @@ module "/us/usc/t45/s157" {
     p "1934—Act June 21, 1934, substituted “Mediation Board” for “Board of Mediation” wherever appearing."
     hash "c99bcda76d0ce0254a427f2ceef4d93a345e13c8e3dddd63ad63b3486479f3b2"
   }
-  note "/us/usc/t45/s157/note/statutoryNotes/pl.91.452/effective-date-of-1970-amendment" enacted {
+  note "/us/usc/t45/s157/note/statutoryNotes/pl.91.452/effective-date-of-1970-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1970 Amendment"
     p "Amendment by " ["Pub. L. 91–452" -> "/us/pl/91/452"] " effective on sixtieth day following Oct. 15, 1970, and not to affect any immunity to which any individual is entitled under this section by reason of any testimony given before sixtieth day following Oct. 15, 1970, see " ["section 260 of Pub. L. 91–452" -> "/us/pl/91/452/s260"] ", set out as an Effective Date; Savings Provision note under " ["section 6001 of Title 18" -> "/us/usc/t18/s6001"] ", Crimes and Criminal Procedure."
     hash "8487a36de61a73e6b2d474c34a72ae2981feafc0fe391f38305ebc3726e4d767"
   }
-  note "/us/usc/t45/s157/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s157/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -121,7 +121,7 @@ module "/us/usc/t45/s157" {
   }
   layers {
     operative "e3adeac9d63225232a0a3958bad70c06c8482654226ae1c4cb38d071411cd51e"
-    enacted "a60e527fac1cc7d5010e2c65562b13399b3c9ea10501ce25cc7eaf36a9e8f787"
-    editorial "72960e3bc22eed5933b7d8c1e5a34ba69d0dc5e2f84321df2136fdfcf59bbd64"
+    enacted "2c0dcccbf7e4c684ff8eded8b6947bdfa0acc6d7e9435925c2eee13987ba9e07"
+    editorial "9c6f4b817cbb856783ee4e5fc07da3e71fdcfd010bdcc7a21e8d52cf41ceb4e2"
   }
 }

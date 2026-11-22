@@ -76,7 +76,7 @@ module "/us/usc/t45/s1322" {
     p ["Section 11344 of title 49" -> "/us/usc/t49/s11344"] ", referred to in subsec. (b)(1), (2), was omitted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] ". Provisions similar to those in section 11344 are contained in sections 11324 and 14303 of Title 49."
     hash "2c99057451e7921fc5fcd626c4486f9b85c204a589a5e85a1a2ffa0a5fd246b5"
   }
-  note "/us/usc/t45/s1322/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1322/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -95,7 +95,7 @@ module "/us/usc/t45/s1322" {
   }
   layers {
     operative "d60cb2d57bbe175de988e6f013dfb0f34c8ed36d7e6a9a5e0abbf5e68583f5be"
-    enacted "a717bee657abc14b91d3c694c5ec79464bba284d1a16b1c938b0942dbd84631c"
-    editorial "bd20c5277e13f7a39928ace75e1b3be3e77fd09483488167845323688f1e99ce"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a4e2ca0716bdb3dec78753abb04be1c343d27b0b2de89a197e8fabef4f8071f5"
   }
 }

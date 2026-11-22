@@ -143,14 +143,14 @@ module "/us/usc/ptVIII/rule8016" {
     hash "151fe1520d64f5c5a07db4db06d836c30f76da40c98e709c93a188efdba80a4d"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8016, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to duties of clerk of district court and bankruptcy appellate panel, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "b0750a889b21ca7c824cf3790461e6d504f528eb51b5e2b3178061d18b9e4119"
   }
-  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -162,7 +162,7 @@ module "/us/usc/ptVIII/rule8016" {
     p "Changes Made After Publication and Comment. Subdivision (d)(2)(D) was added, and subdivision (f) was deleted. In subdivision (a), the statement that Rule 8018(a) does not apply was changed to refer to Rule 8018(a)(1)–(3). In subdivision (b), Rule 8018(a)(4) was added to the list of rules. Conforming changes were made to the Committee Note."
     hash "fb08e700a1cda162cb25329f730827d7b66db28a44a8b0f4b60508ff58d64cdf"
   }
-  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -171,7 +171,7 @@ module "/us/usc/ptVIII/rule8016" {
     p "Subdivision (d) is amended to refer to new Rule 8015(h) (which now contains the certificate-of-compliance provision formerly in Rule 8015(a)(7)(C))."
     hash "e4327ffb0eb690eb68039f6b55147a108d3b1e364004b66c6eb4c8a64aab5780"
   }
-  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -180,7 +180,7 @@ module "/us/usc/ptVIII/rule8016" {
   }
   layers {
     operative "151fe1520d64f5c5a07db4db06d836c30f76da40c98e709c93a188efdba80a4d"
-    enacted "f3d8c6a15ba405ba19eb7ab53a6bfbcf83b23cbade6cba93f4390c8a45ea2e4e"
-    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "821a85fd45355522d6fb1f4762e49dc7498957937e62d8cc0215044aef0b4565"
   }
 }

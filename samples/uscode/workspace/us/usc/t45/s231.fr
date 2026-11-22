@@ -384,7 +384,7 @@ module "/us/usc/t45/s231" {
     p "1976—Subsec. (h)(6)(vi), (vii). " ["Pub. L. 94–547" -> "/us/pl/94/547"] " added pars. (vi) and (vii)."
     hash "3e669b7da301358ee853f30b0637b9939dbb35c5c96b0e2d3aee159e9de2730d"
   }
-  note "/us/usc/t45/s231/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s231/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -518,7 +518,7 @@ module "/us/usc/t45/s231" {
     }
     hash "3d6b532d5c3b15d19f06cd6c101e8d35cadb86dee6cada06e65ed5ccf57feed8"
   }
-  note "/us/usc/t45/s231/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s231/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -664,6 +664,20 @@ module "/us/usc/t45/s231" {
     region "/us/usc/t45/ch9/schIV"
     basis restated
   }
+  definition "/us/usc/t45/s231/a/2" {
+    term "employer"
+    kind does_not_include
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/b/1" {
+    term "employee"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
   definition "/us/usc/t45/s231/b/2" {
     term "employee"
     kind does_not_include
@@ -685,9 +699,23 @@ module "/us/usc/t45/s231" {
     region "/us/usc/t45/ch9/schIV"
     basis restated
   }
+  definition "/us/usc/t45/s231/g/2" {
+    term "war service period"
+    kind means
+    words "For purposes of section 231b(i)(2) of this title"
+    region "/us/usc/t45/s231b/i/2"
+    basis restated
+  }
   definition "/us/usc/t45/s231/h/1" {
     term "compensation"
     kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/h/6" {
+    term "compensation"
+    kind does_not_include
     words "For the purposes of this subchapter"
     region "/us/usc/t45/ch9/schIV"
     basis restated
@@ -698,6 +726,12 @@ module "/us/usc/t45/s231" {
     words "For the purposes of this subchapter"
     region "/us/usc/t45/ch9/schIV"
     basis restated
+  }
+  definition "/us/usc/t45/s231/h/8" {
+    term "compensation"
+    kind includes
+    words "for the purposes of sections 231b(a)(1), 231c(a)(1), and 231c(f)(1) of this title"
+    basis unresolved
   }
   definition "/us/usc/t45/s231/i" {
     term "Board"
@@ -751,7 +785,7 @@ module "/us/usc/t45/s231" {
   }
   layers {
     operative "082f63deaa959fadb94cac92fb9287faaa1b6a5789eb098e38994a84c67e06ef"
-    enacted "6d7896d28f0ead1c3d15d876e86ba9a73c1e890b46edbb6f61315882534d9414"
-    editorial "9f14bd5642f1e3e39d9b908cd45dda05e63ee0e10295b89158426921d8061445"
+    enacted "67d6d4e23224f08780f9f7d46ed6b2cdc5320b48b1d06a15acadc63f0a8da988"
+    editorial "738e4e8734e25abbcab7586a6e12510254e7a504dc9043a009d9ab74d83dbb16"
   }
 }

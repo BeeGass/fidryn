@@ -27,7 +27,7 @@ module "/us/usc/ptIX/rule9003" {
     hash "4d31de01ca8545d92654f107979caab89bb83a61f8728dd081a06bc13cab6e85"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -35,14 +35,14 @@ module "/us/usc/ptIX/rule9003" {
     p "This rule is not a substitute for or limitation of any applicable canon of professional responsibility or judicial conduct. See, e.g., Canon 7, EC7–35, Disciplinary Rule 7–110(B) of the Code of Professional Responsibility: “Generally, in adversary proceedings a lawyer should not communicate with a judge relative to a matter pending before, or which is to be brought before, a tribunal over which he presides in circumstances which might have the effect or give the appearance of granting undue advantage to one party;” and Canon 3A(4) of the Code of Judicial Conduct: “A judge should . . . neither initiate nor consider ex parte or other communications concerning a pending or impending proceeding.”"
     hash "46215711ebfe753590aeb39fe27e2ce1e6c10fcd5c23748d03d11c2f85dd1f6c"
   }
-  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "This rule is amended to apply to both the bankruptcy judges and the district judges of the district."
     hash "0392629cdd75921aa8d29539756721ed05a861c21982337328a74261d7ffdf3b"
   }
-  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -50,7 +50,7 @@ module "/us/usc/ptIX/rule9003" {
     p "Subdivision (b) is derived from Rule X–1010."
     hash "3bd1cea8932bc141c2cdf41855435658eb2704aaaa1c2037c25b7bb3d9351027"
   }
-  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -59,7 +59,7 @@ module "/us/usc/ptIX/rule9003" {
   }
   layers {
     operative "4d31de01ca8545d92654f107979caab89bb83a61f8728dd081a06bc13cab6e85"
-    enacted "77baf2dd6e2fd72bcac62b96baa308ff4ee705d3c702c74c82318ff92f19e48b"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d7d7044f55a5294ae1b4092d9f21babe1635d26253a8998c73bb8c4023d9f2f9"
   }
 }

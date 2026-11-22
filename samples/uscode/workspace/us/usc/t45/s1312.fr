@@ -117,7 +117,7 @@ module "/us/usc/t45/s1312" {
     p "2004—Subsec. (h). " ["Pub. L. 108–271" -> "/us/pl/108/271"] " substituted “Government Accountability Office” for “General Accounting Office” in heading and wherever appearing in text."
     hash "1b7b35d00f8b23f32f4423b8c49f9312b30da31c5e3849d5bf38b8a2c0052153"
   }
-  note "/us/usc/t45/s1312/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1312/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -126,7 +126,7 @@ module "/us/usc/t45/s1312" {
   }
   layers {
     operative "4268ad354fb16486d1f6ece029743592ea44a196afe84b3ecf7c04c21649df71"
-    enacted "a57eaffb6da0a15ebc9eefd3fc83fbd0dd6201dd556cc2a6b0e06eaefb8fc33a"
-    editorial "fa5c893afdff4cda3aa5aba32f3e316510f81ed788b4b2e80464a150cc9f9648"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "032241668bca1b3843e124dc92a1e7c6fc12615c9e4f1055d1846b4d402f2de3"
   }
 }

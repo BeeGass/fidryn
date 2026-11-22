@@ -10,21 +10,21 @@ module "/us/usc/t45/s729" {
     hash "61b389c524e22856e6bd28673a995d3d96e9166ecd78b79f1539ddfec468148a"
   }
   credit "(" ["Pub. L. 93–236, title II, § 219" -> "/us/pl/93/236/tII/s219"] ", as added " ["Pub. L. 97–35, title XI, § 1150(a)" -> "/us/pl/97/35/tXI/s1150/a"] ", Aug. 13, 1981, " ["95 Stat. 675" -> "/us/stat/95/675"] ".)"
-  note "/us/usc/t45/s729/note/statutoryNotes/pl.97.35/effective-date" enacted {
+  note "/us/usc/t45/s729/note/statutoryNotes/pl.97.35/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
     p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
   }
-  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/termination-of-advisory-boards" enacted {
+  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/termination-of-advisory-boards" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Advisory Boards"
@@ -33,7 +33,7 @@ module "/us/usc/t45/s729" {
   }
   layers {
     operative "61b389c524e22856e6bd28673a995d3d96e9166ecd78b79f1539ddfec468148a"
-    enacted "9b49d1dd22ae15fa1883791cfd18ca43d41464c2a1a264234fcc9a8ebc2af50b"
-    editorial "1991ac03bc2df4ceb1d0a9eec693c91f6b7c4666b3fa3f9ac69c8e99ee64956f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "504884ceb831c6700b11fd7dc224ddfc236ffaea9b1ee3d35a0df18ff927c6b5"
   }
 }

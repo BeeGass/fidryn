@@ -50,7 +50,7 @@ module "/us/usc/ptVIII/rule8026" {
     hash "9f0fdf4a6464397ded4b92b71b67edf66f355e459f25ae5f848999c73ccc5708"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -58,14 +58,14 @@ module "/us/usc/ptVIII/rule8026" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "ccc34daa02e0f9976c6b35e02bb7666b95a20ff8f6df86826c2e2432fbf6b53b"
   }
-  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 8026 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "ffc7375dbf324e6cb437652bab01a39c7f19702ef6b3912783566d6c117a33a7"
   }
-  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVIII/rule8026/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -74,7 +74,7 @@ module "/us/usc/ptVIII/rule8026" {
   }
   layers {
     operative "9f0fdf4a6464397ded4b92b71b67edf66f355e459f25ae5f848999c73ccc5708"
-    enacted "27735ec93847c73ea46ffd5c7dcbf45629fd4b9aec520b40db0aa5eeeb764dfb"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9969ca3164251c5acf19a3eb74ad607c64b81f2c930bc190dba4ffedc738723c"
   }
 }

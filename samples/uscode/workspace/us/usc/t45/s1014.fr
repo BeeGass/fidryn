@@ -73,7 +73,7 @@ module "/us/usc/t45/s1014" {
     p "1983—Subsec. (a). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted “under an employee protection agreement entered into or a benefit schedule prescribed under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " may, if so provided under such agreement or benefit schedule,” for “from the Rock Island Railroad under an employee protection agreement or arrangement entered into under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " may”."
     hash "96f2ae59ccc50c692b5326b18adf9ce526606d4ad03b3b05cb501329fd4ddcf7"
   }
-  note "/us/usc/t45/s1014/note/statutoryNotes/pl.100.527/change-of-name" enacted {
+  note "/us/usc/t45/s1014/note/statutoryNotes/pl.100.527/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -96,7 +96,7 @@ module "/us/usc/t45/s1014" {
   }
   layers {
     operative "d31dcb404060d2ebac739a6d3f84adba9d9498fd0d850b26676bebad0ba2a6c5"
-    enacted "e81f3b7479b5f34051df1d481587687e5985b4b567c48ee48a0a80f3df1d8750"
-    editorial "c854aec88d0f8d9d5ec76e83d13d204c6ff039527001f08df919247c9dbe5bd4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a45c7d9abe489685785b65bce15749a7dbb0a250076eea968b3044ffb541124f"
   }
 }

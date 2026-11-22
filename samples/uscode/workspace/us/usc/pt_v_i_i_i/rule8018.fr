@@ -147,14 +147,14 @@ module "/us/usc/ptVIII/rule8018" {
     hash "e067441d80a4295cf1e355d79fa046c0a11a25c91fdea64a9402d05306b70269"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8018, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 27, 1995, eff. Dec. 1, 1995, related to rules by circuit councils and district courts and procedure when there is no controlling law, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "62bac71cc96c01225a20257f091768543b637563690775c047c0fe48a1ffd453"
   }
-  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -170,7 +170,7 @@ module "/us/usc/ptVIII/rule8018" {
     p "Changes Made After Publication and Comment. Subdivision (a)(4) was revised to provide more detail about the procedure for dismissing an appeal due to appellant’s failure to timely file a brief."
     hash "557c9e9839a0aacb0f48e56a34812831484740bd7b8bf53a3c044dcf218d5200"
   }
-  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -179,7 +179,7 @@ module "/us/usc/ptVIII/rule8018" {
   }
   layers {
     operative "e067441d80a4295cf1e355d79fa046c0a11a25c91fdea64a9402d05306b70269"
-    enacted "d80d38e51fcd62717475723ff560c74857f6afa8666c7c82b210740958758c6b"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "565c5583a444d4e23cdccb562dcd6a458f997b82d3d7297b5c03565f4ff7926a"
   }
 }

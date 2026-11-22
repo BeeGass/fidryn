@@ -10,21 +10,21 @@ module "/us/usc/ptVII/rule7070" {
     hash "fa96aed35aa057c61f3828de019b3c23e60aa3f5b4f5235560e4b0f152b06446"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The reference to court is used in the amendment because the district court may preside over an adversary proceeding."
     hash "9874ea68558fea3fdb27600b6eac11179c8979eea9bb45833c9611b51e998ff7"
   }
-  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7070 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "f032231096a1f5675c9dfc33d1e4692844af41194219263fdb31004c3de51d12"
   }
-  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7070/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -33,7 +33,7 @@ module "/us/usc/ptVII/rule7070" {
   }
   layers {
     operative "fa96aed35aa057c61f3828de019b3c23e60aa3f5b4f5235560e4b0f152b06446"
-    enacted "13eae5e7483968eda85e748669903336c4537184de362b030610daffd46b1885"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "50b141785a18559ec41b7d4ff38d50de14f707e5a50b1b4379e0fd5742f2daa8"
   }
 }

@@ -196,14 +196,14 @@ module "/us/usc/ptVIII/rule8011" {
     hash "d0bb3824ab012522c41107cc4e4c35fcd79dc06250be248cbe61de9258c65c76"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8011, Apr. 25, 1983, eff. Aug. 1, 1983, related to motions, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "f2264ed6bd753777b039c6585edc18644b23998644fa576a8f61d42985023fec"
   }
-  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -216,7 +216,7 @@ module "/us/usc/ptVIII/rule8011" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "2ebff1efa03494884686afb176410ce34a356484a26a9f7b0c7ccdb08d1c8ae6"
   }
-  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -230,7 +230,7 @@ module "/us/usc/ptVIII/rule8011" {
     p "Subdivision (e) requires the signature of counsel or an unrepresented party on every document that is filed. A filing made through a person’s electronic-filing account and authorized by that person, together with that person’s name on a signature block, constitutes the person’s signature. A person’s electronic-filing account means an account established by the court for use of the court’s electronic-filing system, which account the person accesses with the user name and password (or other credentials) issued to that person by the court."
     hash "13ee4b35c9b74092bdf74be5b42b7949bd30b5fc7c245eb604f8f77b2c2b1c6f"
   }
-  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -242,7 +242,7 @@ module "/us/usc/ptVIII/rule8011" {
   }
   layers {
     operative "d0bb3824ab012522c41107cc4e4c35fcd79dc06250be248cbe61de9258c65c76"
-    enacted "bf88b1bde0d8cd0278520e6dba089e052322e8662cd2650edb54d1f089f3c045"
-    editorial "572854136cdad978f31c78f3b3ac51eec7acabc0d305094c0b158422cddb12ef"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fade0263488a309f00d37f83ddf2baa3615219023fcd26e04500a84752272ffa"
   }
 }

@@ -45,7 +45,7 @@ module "/us/usc/t45/s661" {
     p "Par. (3). " ["Pub. L. 104–88, § 325(1)(B)" -> "/us/pl/104/88/s325/1/B"] ", substituted “rail carrier subject to part A of subtitle IV of title 49” for “common carrier by railroad subject to part I of the Interstate Commerce Act (" ["49 U.S.C. 1–27" -> "/us/usc/t49/s1–27"] ")”."
     hash "f38e5de7fe393af1751cbed75336f8da8144b6121600d2e042048ae04b668bf6"
   }
-  note "/us/usc/t45/s661/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s661/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -92,7 +92,7 @@ module "/us/usc/t45/s661" {
   }
   layers {
     operative "d1b01c56e31dbd0564a8b8e0f37e22b101a61e9e043b58b5a86507ca75654b08"
-    enacted "9c5907d18c28c58c66fa6a4f45695c9733986886118a8e3184649f77c6233830"
-    editorial "2b1e48482acd480d0fefcfc3bce41e253a33e777df59f0f734825c68193db8eb"
+    enacted "7588fdaca15d9c12634d963c8296b101c83f2a6fee1ec41d867150ad14ea05b6"
+    editorial "353a5a07ce07079c1a2609a374368beb05790cfd2463bbfb69907e2254a5ff34"
   }
 }

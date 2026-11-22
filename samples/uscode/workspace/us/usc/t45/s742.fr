@@ -31,7 +31,7 @@ module "/us/usc/t45/s742" {
     hash "f177eddacc14a3229edc50a03ded7bfc2d80d36e001506d7258dec2798a169e8"
   }
   credit "(" ["Pub. L. 93–236, title III, § 302" -> "/us/pl/93/236/tIII/s302"] ", Jan. 2, 1974, " ["87 Stat. 1005" -> "/us/stat/87/1005"] ".)"
-  note "/us/usc/t45/s742/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s742/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -40,7 +40,7 @@ module "/us/usc/t45/s742" {
   }
   layers {
     operative "f177eddacc14a3229edc50a03ded7bfc2d80d36e001506d7258dec2798a169e8"
-    enacted "e9603a5d8b787b60caba22f9a752b0ab1bb6bd9c4f92ba7d18ae5882eb0bec74"
-    editorial "2fee14c9e0ef0c228b89549ba962188460e7c989045eb3d34480bbde64f0f51c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4a2486f04bc0517ab328cc2182b4c91603e6a7a5eafd55deb53a8ff82ca79e34"
   }
 }

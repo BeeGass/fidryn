@@ -65,7 +65,7 @@ module "/us/usc/ptIX/rule9034" {
     hash "768ff134e22671a678bc3ffe4af2ec964d8bd4e9c0fe37250447354206d2c5d5"
   }
   credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
@@ -73,7 +73,7 @@ module "/us/usc/ptIX/rule9034" {
     p "Although other rules require that certain notices be transmitted to the United States trustee, this rule goes further in that it requires the transmittal to the United States trustee of other papers filed in connection with these matters. This rule is not an exhaustive list of the matters of which the United States trustee may be entitled to receive notice."
     hash "27b183a4e6fece7b41e6cef63930607229d5d11ad6a18a9375a0c2e80cd14d05"
   }
-  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -82,7 +82,7 @@ module "/us/usc/ptIX/rule9034" {
   }
   layers {
     operative "768ff134e22671a678bc3ffe4af2ec964d8bd4e9c0fe37250447354206d2c5d5"
-    enacted "df8e481cf3ba5a8b34da3aee036a59bd36eda0068fde765d7dfe9d2d2075a3ff"
-    editorial "6e221db452d28524b07181ff93d05672627360650a5762869a1fa53bda8724d3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0f05d86808ba200568cb09ebed0718798e55216f4633df28db814acffd3807aa"
   }
 }

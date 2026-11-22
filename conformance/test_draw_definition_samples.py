@@ -49,16 +49,30 @@ def part(role: str, *paragraphs: str) -> dict[str, Any]:
     return {"part": role, "blocks": [text(words) for words in paragraphs]}
 
 
-def definition(address: str, term: str, words: str, region: str | None) -> str:
+def definition(
+    address: str,
+    term: str,
+    words: str,
+    region: str | None,
+    *,
+    kind: str = "means",
+    condition: str | None = None,
+    borrowed_words: str | None = None,
+) -> str:
     lines = [
         f'  definition "{address}" {{',
         f'    term "{term}"',
-        "    kind means",
+        f"    kind {kind}",
         f'    words "{words}"',
     ]
+    if condition is not None:
+        lines.append(f'    condition "{condition}"')
     if region is not None:
         lines.append(f'    region "{region}"')
-    lines += ["    basis enacted", "  }"]
+    lines.append("    basis enacted")
+    if borrowed_words is not None:
+        lines.append(f'    borrowed_words "{borrowed_words}"')
+    lines.append("  }")
     return "\n".join(lines) + "\n"
 
 
@@ -68,16 +82,43 @@ def module(address: str, definitions: str) -> str:
 
 # Section 1: a chapeau that states a reach, and twelve paragraphs that define a term
 # under it. Section 2: a paragraph that defines two terms, and is not extracted.
-# Section 3: a subsection that states its own reach, and a continuation after it that
-# defines a term and is not read. Section 4: a table whose cell defines a term.
+# Section 3: a subsection that states its own reach in two sentences, each of which
+# defines a term, and a reach in its proviso part that defines a third; and a
+# continuation after the subsection that defines a term and is not read. Section 4: a
+# table whose cell defines a term.
 TERMS = [f"term{number:02d}" for number in range(1, 13)]
 S1_CHILDREN = [
     provision(f"{T1}/s1/{number}", "paragraph", [part("content", f"“{term}” means thing {term}.")])
     for number, term in enumerate(TERMS, start=1)
 ]
 S2 = "The term “gadget” means an invented device, and “gizmo” includes a gadget."
-S3A = "In this subsection, the term “sprocket” means an invented gear."
+S3A = (
+    "In this subsection, the term “sprocket” means an invented gear. For purposes of this "
+    "subsection, the term “spoke” has the meaning given that term in the Invented Act."
+)
+S3A_PROVISO = (
+    "For purposes of this subsection, the term “gear”, with respect to a wheel, includes a cog."
+)
 S3_CONTINUATION = "The term “cog” includes a sprocket."
+S3_DEFINITIONS = (
+    definition(
+        f"{T1}/s3/a",
+        "gear",
+        "For purposes of this subsection",
+        f"{T1}/s3/a",
+        kind="includes",
+        condition="with respect to a wheel",
+    )
+    + definition(
+        f"{T1}/s3/a",
+        "spoke",
+        "For purposes of this subsection",
+        f"{T1}/s3/a",
+        kind="borrowed",
+        borrowed_words="the Invented Act",
+    )
+    + definition(f"{T1}/s3/a", "sprocket", "In this subsection", f"{T1}/s3/a")
+)
 S4_CELL = "“bolt” means an invented fastener."
 TABLE = {
     "table": [
@@ -120,7 +161,7 @@ RECORDS: list[dict[str, Any]] = [
         [{"child": f"{T1}/s3/a"}, part("continuation", S3_CONTINUATION)],
         unit=True,
     ),
-    provision(f"{T1}/s3/a", "subsection", [part("content", S3A)]),
+    provision(f"{T1}/s3/a", "subsection", [part("content", S3A), part("proviso", S3A_PROVISO)]),
     provision(
         f"{T1}/s4", "section", [{"part": "content", "blocks": [text("A table."), TABLE]}], unit=True
     ),
@@ -152,7 +193,7 @@ def ledger(release: str = "42-7", **totals: object) -> str:
         "provisions": 17,
         "notes": {"enacted": 0, "editorial": 1},
         "footnotes": 0,
-        "definitions": {"enacted": 13, "restated": 0, "unresolved": 0},
+        "definitions": {"enacted": 15, "restated": 0, "unresolved": 0},
     }
     counted.update(totals)
     return json.dumps(
@@ -209,6 +250,151 @@ class Generator(unittest.TestCase):
         self.assertNotEqual(first, draw.draw(1000, 500, 20261118))
         self.assertEqual(sorted(draw.draw(7, 500, 3)), list(range(7)))
         self.assertEqual(draw.draw(0, 500, 3), [])
+
+
+class Extracted(unittest.TestCase):
+    """What the rules extract from one invented unit, section 1, whose items are given:
+    the first term of each definition and the place of its paragraph."""
+
+    def extracted(self, items: list[dict[str, Any]]) -> list[tuple[str, int]]:
+        root = provision(f"{T1}/s1", "section", items, unit=True)
+        records = {f"{T1}/s1": root}
+        return draw.extracted_from([root], records).get(f"{T1}/s1", [])
+
+    def test_each_definition_is_placed_on_the_paragraph_the_rules_extract_it_from(
+        self,
+    ) -> None:
+        def content(*blocks: dict[str, Any]) -> list[dict[str, Any]]:
+            return [{"part": "content", "blocks": list(blocks)}]
+
+        two = "In this section, the term “a” means b.1 In this section, the term “c” means d."
+        cases = [
+            # Each sentence is read, and a term is recorded as the rules record it.
+            (
+                content(
+                    text(
+                        "In this section, the term “a” means b. In this section, the term “c,” means d."
+                    )
+                ),
+                [("a", 1), ("c", 1)],
+            ),
+            # A later sentence with no reach of its own after `in this ` gives nothing
+            # (D10.2).
+            (
+                content(text("In this section, the term “a” means b. The term “c” means d.")),
+                [("a", 1)],
+            ),
+            (content(text("A rule. Another rule, with no term.")), []),
+            # The text the rules read: a superscript of digits only is no text, so the
+            # period before it ends a sentence; read as text, the number joins the two
+            # sentences, and the second term refuses the reading (D11.1).
+            (content({"p": two, "refs": [], "sup": [[38, 39]], "sub": []}), [("a", 1), ("c", 1)]),
+            (content(text(two)), []),
+            # A term that holds an end of a sentence ("R.M.S" is no abbreviation).
+            (
+                content(
+                    text("For purposes of this section, the term “R.M.S. Widget” means a ship.")
+                ),
+                [("R.M.S. Widget", 1)],
+            ),
+            # A sentence that reads no pattern gives nothing, and nor does one that reads a
+            # pattern that a later rule refuses: here a second term in the sentence (D11.1).
+            (
+                content(
+                    text("“x” is used below."),
+                    text("In this section, the term “x” means y, and “z” means w."),
+                    text("In this section, the term “x” means q."),
+                ),
+                [("x", 3)],
+            ),
+            # A table's cells are counted among the paragraphs, and are not read.
+            (
+                content(
+                    {"table": [["body", [[False, 1, 1, [text("“x” means a cell.")]]]]]},
+                    text("In this section, the term “x” means q."),
+                ),
+                [("x", 2)],
+            ),
+        ]
+        for items, expected in cases:
+            with self.subTest(json.dumps(items, ensure_ascii=False)):
+                self.assertEqual(self.extracted(items), expected)
+
+
+class Placement(unittest.TestCase):
+    """A definition is given the paragraph it was extracted from, on a workspace of one
+    invented unit, section 1, whose items are given."""
+
+    def drawn(self, items: list[dict[str, Any]], definitions: str) -> tuple[list[Any], list[Any]]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workspace = root / "workspace"
+            (workspace / "zz" / "demo" / "t1").mkdir(parents=True)
+            (workspace / "workspace.json").write_text(manifest(), encoding="utf-8")
+            count = definitions.count("  definition ")
+            (workspace / "coverage.json").write_text(
+                ledger(
+                    units=1,
+                    provisions=1,
+                    notes={"enacted": 0, "editorial": 0},
+                    definitions={"enacted": count, "restated": 0, "unresolved": 0},
+                ),
+                encoding="utf-8",
+            )
+            (workspace / "zz" / "demo" / "t1" / "s1.fr").write_text(
+                module(f"{T1}/s1", definitions), encoding="utf-8"
+            )
+            (workspace / "zz" / "demo" / "t1.fr").write_text(module(T1, ""), encoding="utf-8")
+            records = [
+                {**RECORDS[0], "members": [f"{T1}/s1"]},
+                provision(f"{T1}/s1", "section", items, unit=True),
+            ]
+            assert RECORDS[0]["address"] == T1
+            (root / "records.jsonl").write_text(
+                "".join(
+                    json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+                    for record in records
+                ),
+                encoding="utf-8",
+            )
+            out = root / "out"
+            draw.draw_samples(workspace, root / "records.jsonl", 1, out)
+            return tuple(  # type: ignore[return-value]
+                [json.loads(line) for line in (out / file).read_text(encoding="utf-8").splitlines()]
+                for file in ("extracted.jsonl", "near-misses.jsonl")
+            )
+
+    def test_an_earlier_sentence_that_defines_nothing_is_not_taken(self) -> None:
+        defining = "In this section, the term “x” means y."
+        extracted, near = self.drawn(
+            [{"part": "content", "blocks": [text("“x” is used below."), text(defining)]}],
+            definition(f"{T1}/s1", "x", "In this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        # The block extracted from is no near miss; the other holds no verb form.
+        self.assertEqual(near, [])
+
+    def test_an_earlier_sentence_that_a_later_rule_refuses_is_not_taken(self) -> None:
+        # The first block reads a pattern with the term “x”, and the rules refuse it for
+        # its second term (D11.1); the definition is extracted from the second block.
+        refused = "In this section, the term “x” means y, and “z” means w."
+        defining = "In this section, the term “x” means q."
+        extracted, near = self.drawn(
+            [{"part": "content", "blocks": [text(refused), text(defining)]}],
+            definition(f"{T1}/s1", "x", "In this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        # The block refused is a near miss, and the block extracted from is none.
+        self.assertEqual([line["text"] for line in near], [refused])
+
+    def test_a_term_that_holds_an_end_of_a_sentence_is_placed(self) -> None:
+        defining = "For purposes of this section, the term “R.M.S. Widget” means an invented ship."
+        extracted, near = self.drawn(
+            [part("content", defining)],
+            definition(f"{T1}/s1", "R.M.S. Widget", "For purposes of this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        self.assertEqual(near, [])
 
 
 class LooseMatch(unittest.TestCase):
@@ -269,9 +455,7 @@ class Samples(unittest.TestCase):
         units = {
             "s1": s1,
             "s2": "",
-            "s3": s3
-            if s3 is not None
-            else definition(f"{T1}/s3/a", "sprocket", "In this subsection", f"{T1}/s3/a"),
+            "s3": s3 if s3 is not None else S3_DEFINITIONS,
             "s4": "",
         }
         for name, definitions in units.items():
@@ -297,32 +481,44 @@ class Samples(unittest.TestCase):
 
     def test_each_line_holds_what_a_reader_needs(self) -> None:
         extracted, near = self.drawn(20261117, "sample")
-        self.assertEqual(len(extracted), 13)
-        self.assertEqual(sorted(line["draw"] for line in extracted), list(range(1, 14)))
-        by_address = {line["address"]: line for line in extracted}
+        self.assertEqual(len(extracted), 15)
+        self.assertEqual(sorted(line["draw"] for line in extracted), list(range(1, 16)))
+        by_term = {line["terms"][0]: line for line in extracted}
         self.assertEqual(
-            by_address[f"{T1}/s1/2"],
+            by_term["term02"],
             {
                 "seed": 20261117,
                 "release": "42-7",
-                "population": 13,
-                "draw": by_address[f"{T1}/s1/2"]["draw"],
+                "population": 15,
+                "draw": by_term["term02"]["draw"],
                 "address": f"{T1}/s1/2",
                 "terms": ["term02"],
                 "kind": "means",
                 "words": "In this section",
+                "condition": None,
                 "region": f"{T1}/s1",
                 "basis": "enacted",
+                "borrowed_words": None,
                 "text": "“term02” means thing term02.",
                 "chapeau": {"address": f"{T1}/s1", "text": "In this section:"},
                 "verdict": "",
             },
         )
-        self.assertEqual(by_address[f"{T1}/s3/a"]["text"], S3A)
-        self.assertIsNone(by_address[f"{T1}/s3/a"]["chapeau"])
-        # The twelve paragraphs of section 1 and the subsection of section 3 hold a
-        # term before a verb, and were extracted; the note and the credit are not
-        # operative text.
+        # The two sentences of the content of subsection 3(a) each give a definition,
+        # and its proviso part a third.
+        self.assertEqual(by_term["sprocket"]["text"], S3A)
+        self.assertIsNone(by_term["sprocket"]["chapeau"])
+        self.assertEqual(
+            [by_term["spoke"][name] for name in ("kind", "text", "condition", "borrowed_words")],
+            ["borrowed", S3A, None, "the Invented Act"],
+        )
+        self.assertEqual(
+            [by_term["gear"][name] for name in ("kind", "text", "condition", "borrowed_words")],
+            ["includes", S3A_PROVISO, "with respect to a wheel", None],
+        )
+        # The twelve paragraphs of section 1 and the two paragraphs of subsection 3(a)
+        # hold a term before a verb, and were extracted, the proviso among them; the note
+        # and the credit are not operative text.
         self.assertEqual(
             sorted((line["address"], line["part"], line["paragraph"]) for line in near),
             [
@@ -356,9 +552,9 @@ class Samples(unittest.TestCase):
     def test_one_seed_draws_the_same_lines_and_another_seed_others(self) -> None:
         first = self.drawn(7, "first", 5)
         self.assertEqual(len(first[0]), 5)
-        self.assertEqual(len({line["address"] for line in first[0]}), 5)
+        self.assertEqual(len({(line["address"], line["terms"][0]) for line in first[0]}), 5)
         for line in first[0]:
-            self.assertEqual(line["population"], 13)
+            self.assertEqual(line["population"], 15)
         self.assertEqual(first, self.drawn(7, "again", 5))
         self.assertEqual(
             (self.root / "first" / "extracted.jsonl").read_bytes(),
@@ -377,6 +573,21 @@ class Samples(unittest.TestCase):
             self.drawn(1, "refused")
         self.assertIn("zz/demo/t1/s3.fr:4", str(caught.exception))
         self.assertFalse((self.root / "refused").exists())
+        # A block holds `borrowed_from` or `borrowed_words`, not both.
+        both = definition(
+            f"{T1}/s3/a",
+            "spoke",
+            "For purposes of this subsection",
+            None,
+            kind="borrowed",
+            borrowed_words="the Invented Act",
+        ).replace("    borrowed_words", '    borrowed_from "/zz/demo/t1/s9"\n    borrowed_words')
+        self.write_workspace(both)
+        with self.assertRaises(draw.FormError) as caught:
+            self.drawn(1, "refused both")
+        self.assertIn("zz/demo/t1/s3.fr:9: `    borrowed_words", str(caught.exception))
+        self.assertIn("ends", str(caught.exception))
+        self.assertFalse((self.root / "refused both").exists())
 
     def test_a_definition_block_in_another_form_stops_the_reading(self) -> None:
         canonical = definition(f"{T1}/s3/a", "sprocket", "In this subsection", f"{T1}/s3/a")
@@ -398,8 +609,8 @@ class Samples(unittest.TestCase):
 
     def test_the_definitions_read_are_held_to_the_ledger_of_the_workspace(self) -> None:
         cases = {
-            "one more": ledger(definitions={"enacted": 14, "restated": 0, "unresolved": 0}),
-            "another basis": ledger(definitions={"enacted": 12, "restated": 1, "unresolved": 0}),
+            "one more": ledger(definitions={"enacted": 16, "restated": 0, "unresolved": 0}),
+            "another basis": ledger(definitions={"enacted": 14, "restated": 1, "unresolved": 0}),
             "another release": ledger("42-6"),
         }
         for name, coverage in cases.items():
@@ -413,7 +624,7 @@ class Samples(unittest.TestCase):
         with self.assertRaises(draw.FormError) as caught:
             self.drawn(1, "refused by the count")
         self.assertIn(
-            "the module files hold the definitions enacted: 13, restated: 0, unresolved: 0",
+            "the module files hold the definitions enacted: 15, restated: 0, unresolved: 0",
             str(caught.exception),
         )
         (self.workspace / "coverage.json").unlink()
@@ -450,11 +661,28 @@ class Samples(unittest.TestCase):
                 self.assertFalse((self.root / f"refused {name}").exists())
 
     def test_a_definition_whose_paragraph_the_records_do_not_hold_stops_the_drawing(self) -> None:
-        self.write_workspace(definition(f"{T1}/s3/a", "spanner", "In this subsection", None))
-        with self.assertRaises(draw.FormError) as caught:
-            self.drawn(1, "refused")
-        self.assertIn(f"{T1}/s3/a", str(caught.exception))
-        self.assertIn("spanner", str(caught.exception))
+        cases = {
+            # No paragraph of the provision holds the term.
+            "spanner": S3_DEFINITIONS,
+            # One sentence begins with the term, and the provision holds two definitions of it.
+            "sprocket": S3_DEFINITIONS,
+        }
+        for term, others in cases.items():
+            with self.subTest(term):
+                self.write_workspace(
+                    others + definition(f"{T1}/s3/a", term, "In this subsection", None),
+                    coverage=ledger(
+                        definitions={
+                            "enacted": 13 + others.count("definition"),
+                            "restated": 0,
+                            "unresolved": 0,
+                        }
+                    ),
+                )
+                with self.assertRaises(draw.FormError) as caught:
+                    self.drawn(1, f"refused {term}")
+                self.assertIn(f"{T1}/s3/a", str(caught.exception))
+                self.assertIn(f"whose first term is “{term}”", str(caught.exception))
 
     def test_a_sample_once_drawn_is_not_written_over(self) -> None:
         self.drawn(1, "kept")
@@ -476,7 +704,7 @@ class Samples(unittest.TestCase):
             run("11", out),
             (
                 0,
-                "drew 13 of 13 definitions and 3 of 3 near misses of the release 42-7 "
+                "drew 15 of 15 definitions and 3 of 3 near misses of the release 42-7 "
                 "with the seed 11\n",
                 "",
             ),

@@ -35,14 +35,14 @@ module "/us/usc/ptIX/rule9013" {
     hash "ee6020ab793e2bb99af8ae0a49416be61963b909e4fca9ce0560410842d034db"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from Rule 5(a) and Rule 7(b)(1) F.R.Civ.P. Except when an application is specifically authorized by these rules, for example an application under Rule 2014 for approval of the employment of a professional, all requests for court action must be made by motion."
     hash "9cbc0e7895d24f0e0d190beb3ed05bc06ffc3cabbeff697ba0d86360d0cafc54"
   }
-  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -50,7 +50,7 @@ module "/us/usc/ptIX/rule9013" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "d0e942c0ecb3419fa2994843112d8294e1ea9698962f0251f2c9c1bba0614a10"
   }
-  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -59,7 +59,7 @@ module "/us/usc/ptIX/rule9013" {
   }
   layers {
     operative "ee6020ab793e2bb99af8ae0a49416be61963b909e4fca9ce0560410842d034db"
-    enacted "347b4048131e6326ff1d6f659950eb3282c92f7c2a54d5b3d9432a8db7aa5fd0"
-    editorial "501f50f82e56647b8e06c556c337ed2d6ab71821dba6a62d7ce946d5ce5e1182"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "276b8e9f71dcd4b07a21d717dacfd0900e2209d82a51df239344face297e8179"
   }
 }

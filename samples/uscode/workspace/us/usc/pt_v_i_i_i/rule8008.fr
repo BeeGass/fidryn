@@ -44,14 +44,14 @@ module "/us/usc/ptVIII/rule8008" {
     hash "fee2d6ea2c375e58569a9b8c13578169b5373ab0f3c9f83c79d2b88ac5fdd123"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8008, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 1996, eff. Dec. 1, 1996, related to filing and service, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "969ee54163058e037fba6bae8181a3c8a67afa9fda9b936f41eb5a0eaf070a59"
   }
-  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -62,7 +62,7 @@ module "/us/usc/ptVIII/rule8008" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "313dd5e6f99703eea26c3ed686c6b3703a5525232f7bbee6722d0169c0053832"
   }
-  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -74,7 +74,7 @@ module "/us/usc/ptVIII/rule8008" {
   }
   layers {
     operative "fee2d6ea2c375e58569a9b8c13578169b5373ab0f3c9f83c79d2b88ac5fdd123"
-    enacted "895c29ace11ab6519f5b16dbea77f8cafea82cd88920d648acfebe67fa253dac"
-    editorial "fec81caed15aa1098bd0ccb0f3952ef4fb9ebe1fbf97de2d26ddf107a8cf7d08"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f503f43a996642a5ccc3ca7ae3ea04840bdfdfb312d688ce67272824611f96b8"
   }
 }

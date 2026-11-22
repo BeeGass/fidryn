@@ -10,14 +10,14 @@ module "/us/usc/ptIV/rule4005" {
     hash "396758b08c6654773820fe78791c320f55c68f49df850cf92918e4cff783ada3"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule does not address the burden of going forward with the evidence. Subject to the allocation by the rule of the initial burden of producing evidence and the ultimate burden of persuasion, the rule leaves to the courts the formulation of rules governing the shift of the burden of going forward with the evidence in the light of considerations such as the difficulty of proving the nonexistence of a fact and of establishing a fact as to which the evidence is likely to be more accessible to the debtor than to the objector. See, e.g., In re Haggerty, 165 F.2d 977, 979–80 (2d Cir. 1948); Federal Provision Co. v. Ershowsky, 94 F.2d 574, 575 (2d Cir. 1938); In re Riceputo, 41 F. Supp. 926, 927–28 (E.D.N.Y. 1941)."
     hash "413ea58969112c546b6ced4161bdebd633630ef35b2609604c14803089071617"
   }
-  note "/us/usc/ptIV/rule4005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -26,7 +26,7 @@ module "/us/usc/ptIV/rule4005" {
   }
   layers {
     operative "396758b08c6654773820fe78791c320f55c68f49df850cf92918e4cff783ada3"
-    enacted "50a27d82c0ad1c079492b7de42a4b4fd9021066ae2d9e0ad82ad0b02dc671f92"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7ea0759881ef8e4d03fbac9277477b2a26a7d093f7bd774c102d82ae1cde1ea5"
   }
 }

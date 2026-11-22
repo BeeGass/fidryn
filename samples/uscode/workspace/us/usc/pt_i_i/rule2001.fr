@@ -49,7 +49,7 @@ module "/us/usc/ptII/rule2001" {
     hash "6f4a54d4ea297eabb8b0fcd21d25fb997440b30d4cafd23e00d033737880d787"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -60,14 +60,14 @@ module "/us/usc/ptII/rule2001" {
     p "Subdivision (d) requires turnover of records and property to the trustee selected under § 702 of the Code, after qualification. That trustee may be the interim trustee who becomes the trustee because of the failure of creditors to elect one under § 702(d) or the trustee elected by creditors under § 702(b), (c)."
     hash "3765bbe1f12572ca51d3be30c1effe1cc372e8e490940ad3d6bf443627acaaa7"
   }
-  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to § 303(g) of the Code which provides that the United States trustee appoints the interim trustee. See Rule X–1003. This rule does not apply to the exercise by the court of the power to act sua sponte pursuant to § 105(a) of the Code."
     hash "33ca7f4a5c91fb4a9a2b9af721112c15846ee666214485ad9440f66801f6f2f5"
   }
-  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -76,7 +76,7 @@ module "/us/usc/ptII/rule2001" {
   }
   layers {
     operative "6f4a54d4ea297eabb8b0fcd21d25fb997440b30d4cafd23e00d033737880d787"
-    enacted "c2f1f5af5786f6f0897ebd2f5131ca30d8351d254a25e1a74753406ad27cf952"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "deff558505abfe4217f90c1874dfb82fe40f40d60400b5ea248abdfdd9b6551f"
   }
 }

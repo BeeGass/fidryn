@@ -33,7 +33,7 @@ module "/us/usc/rule1001" {
     hash "817e0e3085258e0f7c1e58760c82884508d68f60b60180f023bc816b02bb3b93"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/rule1001/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/rule1001/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -45,7 +45,7 @@ module "/us/usc/rule1001" {
     p "The final sentence of the rule is derived from former Bankruptcy Rule 903. The objective of “expeditious and economical administration” of cases under the Code has frequently been recognized by the courts to be “a chief purpose of the bankruptcy laws.” See Katchen v. Landy, 382 U.S. 323, 328 (1966): Bailey v. Glover, 88 U.S. (21 Wall.) 342, 346–47 (1874): Ex parte Christy, 44 U.S. (3 How.) 292, 312–14, 320–22 (1845). The rule also incorporates the wholesome mandate of the last sentence of Rule 1 of the Federal Rules of Civil Procedure. 2 Moore, Federal Practice ¶ 1.13 (2d ed. 1980); 4 Wright & Miller, Federal Practice and Procedure-Civil § 1029 (1969)."
     hash "7bfdf781217814357df68d2524a395cdb6c72ae44bdb9a1c20e5d20b941dc261"
   }
-  note "/us/usc/rule1001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/rule1001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -54,14 +54,14 @@ module "/us/usc/rule1001" {
     p "Rule 81(a)(1) F.R.Civ.P. provides that the civil rules do not apply to proceedings in bankruptcy, except as they may be made applicable by rules promulgated by the Supreme Court, e.g., Part VII of these rules. This amended Bankruptcy Rule 1001 makes the Bankruptcy Rules applicable to cases and proceedings under title 11, whether before the district judges or the bankruptcy judges of the district."
     hash "d2c84f5d9d59f614faf0fd552ed0b6a1bfd8ec76afc5b16de6d2630b18121d1c"
   }
-  note "/us/usc/rule1001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/rule1001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The citation to these rules is amended to conform to the citation form of the Federal Rules of Civil Procedure, Federal Rules of Appellate Procedure, and Federal Rules of Criminal Procedure."
     hash "b59296c965176cb7c0f0a428043f9e67227e493573a515317ffffe9dbc9f4fe6"
   }
-  note "/us/usc/rule1001/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/rule1001/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
@@ -71,7 +71,7 @@ module "/us/usc/rule1001" {
     p "This amendment does not create a new or independent source of sanctions. Nor does it abridge the scope of any other of these rules."
     hash "9e6515baab079a3228272268a68e5c33715924d3912074f49149cbd4a54692b9"
   }
-  note "/us/usc/rule1001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/rule1001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -86,7 +86,7 @@ module "/us/usc/rule1001" {
   }
   layers {
     operative "817e0e3085258e0f7c1e58760c82884508d68f60b60180f023bc816b02bb3b93"
-    enacted "4a1c913477a7c639e0e4a0d392d15c5985fd2d934b3e5b9a39794910cd9a994b"
-    editorial "f83f708c9cef01d7448538f48d217d1b3c31cd190e30004b2ba4850e72f1d79d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ce21ff0bf8dcb92febc151154b69d316c923234ab0cf2f2e9ae978ab2ac1cd6b"
   }
 }

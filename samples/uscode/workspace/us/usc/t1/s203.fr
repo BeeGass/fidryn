@@ -10,14 +10,14 @@ module "/us/usc/t1/s203" {
     hash "ede6813dd86dc05c0de55eac21978122bf8b10712651057cc0a299efc3cd540f"
   }
   credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 638" -> "/us/stat/61/638"] ".)"
-  note "/us/usc/t1/s203/note/statutoryNotes/pl.90.226/commission-on-revision-of-the-criminal-laws-of-the-district" enacted {
+  note "/us/usc/t1/s203/note/statutoryNotes/pl.90.226/commission-on-revision-of-the-criminal-laws-of-the-district" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Commission on Revision of the Criminal Laws of the District of Columbia"
     p ["Pub. L. 90–226, title X" -> "/us/pl/90/226/tX"] ", Dec. 27, 1967, " ["81 Stat. 742" -> "/us/stat/81/742"] ", provided for creation and operation of a commission to study and make recommendations with reference to a revised code of criminal law and procedure for the District of Columbia, prior to repeal by " ["Pub. L. 91–358, title VI, § 601" -> "/us/pl/91/358/tVI/s601"] ", July 29, 1970, " ["84 Stat. 667" -> "/us/stat/84/667"] ", as amended by " ["Pub. L. 91–530, § 2(b)(1)" -> "/us/pl/91/530/s2/b/1"] ", Dec. 7, 1970, " ["84 Stat. 1390" -> "/us/stat/84/1390"] "."
     hash "5d73bed645970a423b06ef91f4b12e14da0e420ad24700b6c097c2bf19d957b8"
   }
-  note "/us/usc/t1/s203/note/statutoryNotes/pl.94.386/cross-references" enacted {
+  note "/us/usc/t1/s203/note/statutoryNotes/pl.94.386/cross-references" editorial {
     group statutoryNotes
     topic "crossReferences"
     heading "Cross References"
@@ -27,7 +27,7 @@ module "/us/usc/t1/s203" {
   }
   layers {
     operative "ede6813dd86dc05c0de55eac21978122bf8b10712651057cc0a299efc3cd540f"
-    enacted "13c8d1965e0792d76922f94f7fa35b3d297d231f29aaaf148a73e53468d03da3"
-    editorial "dd1d349813048b1607e9eb7750c056973d6c9be9c650763824af8c60603cefe9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5ab7a23eb976e490c9c4156f7a590282f138c7be249b11e6c5c02864f2b480d5"
   }
 }

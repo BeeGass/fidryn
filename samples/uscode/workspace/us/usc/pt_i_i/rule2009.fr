@@ -53,7 +53,7 @@ module "/us/usc/ptII/rule2009" {
     hash "92384a40321384d5f4e21a3f35f37698fcb9b9c50fd5ecfb2f18042fd0695b0f"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -62,7 +62,7 @@ module "/us/usc/ptII/rule2009" {
     p "Subdivision (f) is derived from § 5e of the Act and former Bankruptcy Rule 210(f) and requires that the common trustee keep a separate account for each estate in all cases that are jointly administered."
     hash "5ea6fa6c075780e3542f520d3e033d89e315f44f733fa3302f751a292718d2f7"
   }
-  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -72,7 +72,7 @@ module "/us/usc/ptII/rule2009" {
     p "Subdivision (e) is abrogated because the exercise of discretion by the United States trustee, who is in the Executive Branch, is not subject to advance restriction by rule of court. United States v. Cox, 342 F.2d 167 (5th Cir. 1965), cert. denied, 365 U.S. 863 (1965); United States v. Frumento, 409 F.Supp. 136, 141 (E.D.Pa.), aff’d, 563 F.2d 1083 (3d Cir. 1977), cert. denied, 434 U.S. 1072 (1977); see, Smith v. United States, 375 F.2d 243 (5th Cir. 1967); House Report No. 95–595, 95th Cong., 1st Sess. 110 (1977). However, a trustee appointed by the United States trustee may be removed by the court for cause. See § 324 of the Code. Subdivision (d) of this rule, as amended, is consistent with § 324. Subdivision (f) is redesignated as subdivision (e)."
     hash "cc4b52776c6b36782f1f606bb24bfc5d7ec1de850a1db7112fb510c725afd812"
   }
-  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003 Amendment"
@@ -81,14 +81,14 @@ module "/us/usc/ptII/rule2009" {
     p "Changes Made After Publication and Comments. No changes since publication."
     hash "c992c89f47c28c73dc1435831b9ce4677126c01b2d4081165af38e6f2c652ce3"
   }
-  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. In a case under that subchapter, § 1183 of the Code requires the United States trustee to appoint a trustee, so there will be no election. Accordingly, subdivisions (a) and (b) of the rule are amended to except cases under subchapter V from their coverage. Subdivision (c)(2), which addresses the appointment of trustees in jointly administered chapter 11 cases, is amended to make it applicable to cases under subchapter V."
     hash "4097860bb27256b178abae184f6b72bab95440e6bed32fbf073797402d144e57"
   }
-  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -97,7 +97,7 @@ module "/us/usc/ptII/rule2009" {
   }
   layers {
     operative "92384a40321384d5f4e21a3f35f37698fcb9b9c50fd5ecfb2f18042fd0695b0f"
-    enacted "d5bdcb4a83b3b8bc219714d9130f6145afdffe1bd1ff142b3c8c02375e9b5b74"
-    editorial "e0baf21d3c251b380cc2d15685b6be4a30a096dc1a88a3a88a76fedb2adef4a8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b93d80ce972926cf0db2fa4c9ac7643ad2db37a0b39f8facffd8771063043e9d"
   }
 }

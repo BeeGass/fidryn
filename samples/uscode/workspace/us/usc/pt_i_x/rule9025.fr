@@ -10,21 +10,21 @@ module "/us/usc/ptIX/rule9025" {
     hash "43aaab2b52ca036263df4b3857c43dfc09f455b852125d128109a77abed9f1eb"
   }
   credit "(As amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is an adaptation of Rule 65.1 F.R.Civ.P. and applies to any surety on a bond given pursuant to § 303(e) of the Code, Rules 2001, 2010, 5008, 7062, 7065, 8005, or any other rule authorizing the giving of such security."
     hash "84256c6a258eb8032b40216f3cf2a3d63a059ba4c5112b6674e208472044da74"
   }
-  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "This rule is amended to reflect the amendment of Rule 62 F.R.Civ.P., which is made applicable to adversary proceedings by Rule 7062. Rule 62 allows a party to obtain a stay of a judgment “by providing a bond or other security.” Limiting this rule’s enforcement procedures to sureties might exclude use of those procedures against a security provider that is not a surety. All security providers are brought into the rule by these amendments."
     hash "3c2f90bad8687c9e3cecc8a82db245d92615075e3fbac976fa82ed48ec3da113"
   }
-  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9025/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -33,7 +33,7 @@ module "/us/usc/ptIX/rule9025" {
   }
   layers {
     operative "43aaab2b52ca036263df4b3857c43dfc09f455b852125d128109a77abed9f1eb"
-    enacted "a0737e516078da63ac3ae02836660a4186b9138ac0f75dc75adcc1d54af4bf11"
-    editorial "910dce97925995f9f2d91cd339a6e5659770e075eba7fcc01a57a06b630b19d9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fdc4732eff0e6965f63318c11c6b4237f436a8129a9435830511e4a0bd26049d"
   }
 }

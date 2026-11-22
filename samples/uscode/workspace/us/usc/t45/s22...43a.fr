@@ -149,7 +149,7 @@ module "/us/usc/t45/s22...43a" {
     p "Section 43a, " ["Pub. L. 100–342, § 24" -> "/us/pl/100/342/s24"] ", June 22, 1988, " ["102 Stat. 639" -> "/us/stat/102/639"] ", related to accident reports in which railroads assign human error as cause of accident or incident and provision that such reports contain an explanatory statement by employees involved. See " ["section 20901 of Title 49" -> "/us/usc/t49/s20901"] "."
     hash "12d1f63c9e83c0ede6d63228f88cf86895d93de87664882c05c92f5e68c3ce0b"
   }
-  note "/us/usc/t45/s22...43a/note/statutoryNotes/act.1910-05-06.ch208/short-title" enacted {
+  note "/us/usc/t45/s22...43a/note/statutoryNotes/act.1910-05-06.ch208/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -158,7 +158,7 @@ module "/us/usc/t45/s22...43a" {
   }
   layers {
     operative "ca67c5434d93e3bd484e2e243cde45b0a2d0bf040dbfabe6d38b7d467bb1816a"
-    enacted "68ca4b6986b266aa0d760bf7ab26a4b719d69f22afe74db70e68900ad8cb811c"
-    editorial "9130bfe80ef4df09fe6f203aa6dbdcaf401e577d45c394d99b106c8be8a8f6fd"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3fbf3948853dd10adf5cf08ee4526270558317f84b3b7acd459e53e4fce5e199"
   }
 }

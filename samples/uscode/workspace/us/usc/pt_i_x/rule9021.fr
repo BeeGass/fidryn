@@ -10,7 +10,7 @@ module "/us/usc/ptIX/rule9021" {
     hash "d78002e4a91d0a9c66ffabf79b8748864169500ae8e37c1e8ee7129780651f1e"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -19,14 +19,14 @@ module "/us/usc/ptIX/rule9021" {
     p "Subdivision (c) makes it clear that when a district court hears a matter reserved to it by [former] 28 U.S.C. §§ 1471, 1481, its judgments are entered in the district court’s civil docket and in the docket of the bankruptcy court. When the district court acts as an appellate court, Rule 8016(a) governs the entry of judgments on appeal."
     hash "f19646b6692aa50eb38fa85045e940a5faf6373d33df9faec842e47b154bf56c"
   }
-  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Former subdivision (a) was derived from Rule 58 F.R.Civ.P. As amended, Rule 9021 adopts Rule 58. The reference in Rule 58 to Rule 79(a) F.R.Civ.P. is to be read as a reference to Rule 5003."
     hash "bbae16a16a2acf10a09e15c17ac39b9bc9fdbbc45bcd2f44b482ca4307b08608"
   }
-  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -34,7 +34,7 @@ module "/us/usc/ptIX/rule9021" {
     p "Changes Made After Publication. No changes since publication."
     hash "873430a5582af3c914bb9764488714db72f9f1be9f09b9b6194f4b4cfbda4d6c"
   }
-  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -43,7 +43,7 @@ module "/us/usc/ptIX/rule9021" {
   }
   layers {
     operative "d78002e4a91d0a9c66ffabf79b8748864169500ae8e37c1e8ee7129780651f1e"
-    enacted "773e3895658ce7edd139b741f42d10d8ff2b880b3388c4181f756bed06286f04"
-    editorial "b0e754d2c123764d57a60fea19ed12116935d6735945cf2d6d1f29d5273c3663"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e98ea1993330fdeba2cfd0223d16543820714ac0a11ceebb0bf3e61f93ce65a0"
   }
 }

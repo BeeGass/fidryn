@@ -16,7 +16,7 @@ module "/us/usc/t45/s714" {
     p "Section, " ["Pub. L. 93–236, title II, § 204" -> "/us/pl/93/236/tII/s204"] ", Jan. 2, 1974, " ["87 Stat. 993" -> "/us/stat/87/993"] ", directed the Secretary, within 30 days after Jan. 2, 1974, to prepare a report, with recommendations, with respect to the geographic zones within the region in which said service should be provided, to submit the report to the Office, the Association, the Governor, and the public utilities commission of each State studied in the report and to local governments, consumer organizations, environmental groups, the public, and to Congress, and to publish the report in the Federal Register."
     hash "cf0e4ad170032ec0965a7b2658740fedb57751b89008a9d6623777d2a0f41677"
   }
-  note "/us/usc/t45/s714/note/statutoryNotes/pl.94.555/delaware-maryland-virginia-peninsula-rail-study-report-to-co" enacted {
+  note "/us/usc/t45/s714/note/statutoryNotes/pl.94.555/delaware-maryland-virginia-peninsula-rail-study-report-to-co" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Delaware-Maryland-Virginia Peninsula Rail Study; Report to Congress"
@@ -25,7 +25,7 @@ module "/us/usc/t45/s714" {
   }
   layers {
     operative "d4444bc6f0b9d23028761771738fc916ea222bf2ed8f2649686d961b1873c4fb"
-    enacted "eb1e1faccb032cfa78b4682455be1f46bf9c04af65ec1d5aba22564989ea2859"
-    editorial "1d86a06f72515f03c06eb5e3f86e28b83bcddc6899a34aff0448c1fa3d779c60"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "24048a2b453d4a362cd1b6ee334c0b79cd7c10c649501076dd7b0e3eff89d781"
   }
 }

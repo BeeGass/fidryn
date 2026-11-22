@@ -376,7 +376,7 @@ module "/us/usc/ptI/rule1007" {
     hash "8105ee9b18f698ca0c84f940b7f89a287954ef3a303b7262dacfadda574b4f27"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 29, 2015, eff. Dec. 1, 2015; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -392,7 +392,7 @@ module "/us/usc/ptI/rule1007" {
     p "Subdivision (k) is derived from former Rules 108(d) and 10–108(a)."
     hash "aa76c7e3a9b64c08a1d7976f6043a206b974d3c031725239c2babcee1df88055"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -403,7 +403,7 @@ module "/us/usc/ptI/rule1007" {
     p "Subdivision (k) provides that the court may not order an entity other than the debtor to prepare and file the statement of intention."
     hash "b766ca8766e2f888ba74da359baafba6d37154aac4fe58c14c3f483d762b6e27"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -414,7 +414,7 @@ module "/us/usc/ptI/rule1007" {
     p "Subdivision (l), which is derived from Rule X–1002(a), provides the United States trustee with the information required to perform certain administrative duties such as the appointment of a committee of unsecured creditors. In a chapter 7 case, the United States trustee should be aware of the debtor’s intention with respect to collateral that secures a consumer debt so that the United States trustee may monitor the progress of the case. Pursuant to § 307 of the Code, the United States trustee has standing to raise, appear and be heard on issues and the lists, schedules and statements contain information that, when provided to the United States trustee, enable that office to participate effectively in the case. The United States trustee has standing to move to dismiss a chapter 7 or 13 case for failure to file timely the list, schedules or statement required by § 521(1) of the Code. See §§ 707(a)(3) and 1307(c)(9). It is therefore necessary for the United States trustee to receive notice of any extension of time to file such documents. Upon request, the United States trustee also may receive from the trustee or debtor in possession a list of equity security holders."
     hash "4dd050533462d6ddc1a0671a9ded8c7048ef999b9f853328ac066b47bc235ffd"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -423,7 +423,7 @@ module "/us/usc/ptI/rule1007" {
     p "GAP Report on Rule 1007(c). No changes since publication, except for stylistic changes."
     hash "7358a7c2f756b0cd6b9b423b05c7641d9b07c1a3700a718f243835924e023059"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -432,7 +432,7 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "fc6d25e10d50b003f5af64563c146302435036749318863d538c6d510761322c"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003 Amendment"
@@ -442,7 +442,7 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication and Comments. The rule amendment is made in response to the extensive commentary that urged the Advisory Committee to continue the obligation contained in current Rule 1005 that a debtor must include his or her social security number on the caption of the bankruptcy petition. Rule 1005 is amended to limit that disclosure to the final four digits of the social security number, and Rule 1007 is amended to reinstate the obligation in a manner that will provide more protection of the debtor’s privacy while continuing access to the information to those persons with legitimate need for that data. The debtor must disclose the information, but the method of disclosure is by a verified statement that is submitted to the clerk. The statement is not filed in the case and does not become a part of the court record. Therefore, it enables the clerk to deliver that information to the creditors and the trustee in the case, but it does not become a part of the court record governed by § 107 of the Bankruptcy Code and is not available to the public."
     hash "5cf575be5fed57dec2dda5083c91cc37291ca4175dc90cbbd37f4da2d9acfba0"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -455,7 +455,7 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication and Comment. No changes since publication."
     hash "41814a57e48d81d9ce0385e81f463267c335b2d66fc7a48a77368df56432a152"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -475,7 +475,7 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication. Subdivision (a)(4) was amended to insert the requirement that the foreign representative who files the chapter 15 petition must file the corporate ownership statement. Subdivision (b)(4) was amended to provide that all individual debtors rather than just those whose debts are primarily consumer debts must file the statement of current monthly income. Subdivisions (b)(7) and (c) were amended to make the obligation to file a statement of the completion of a personal financial management course applicable to certain individual chapter 11 debtors as well as to individual debtors in chapters 7 and 13. Subdivision (c) is also amended to provide the court with broad discretion to enlarge the time to file the statement of completion of a personal financial management course. The Committee Note was amended to explain these changes."
     hash "d8e2d9167c036a48e0d7bd4e746b6dd13c24f624e30087d1a0251f76013a4840"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -487,7 +487,7 @@ module "/us/usc/ptI/rule1007" {
     p "• 25-day periods become 28-day periods"
     hash "ed56754d9fed287ba489e19948bed42ae70789755787e26bb3ca8be44aed7079"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -496,14 +496,14 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication. No changes since publication."
     hash "465aebd349ded049fb57fe5ccc6b3c0cf97809a7749fb5703c2cd2fbd2e073ce"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2012 Amendment"
     p "Subdivision (c). In subdivision (c), the time limit for a debtor in an involuntary case to file the list required by subdivision (a)(2) is deleted as unnecessary. Subdivision (a)(2) provides that the list must be filed within seven days after the entry of the order for relief. The other change to subdivision (c) is stylistic."
     hash "d4e186202f8b4417e259c083d77c19775eae5947a0980214855e69557faf8cf6"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -511,14 +511,14 @@ module "/us/usc/ptI/rule1007" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "7ef0350a2e2ce81cbd63cfd4e13dd5512788b1db58a9f5c0c133415f803672f0"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2015-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2015-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2015 Amendment"
     p "In subdivisions (a)(1) and (a)(2), the references to Schedules are amended to reflect the new designations adopted as part of the Forms Modernization Project."
     hash "c20531edaaba2593364fad61919e5ba058a08bf6b46057d2cf32310c8fe05c97"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
@@ -526,7 +526,7 @@ module "/us/usc/ptI/rule1007" {
     p "Subdivision (h) is amended to provide that the duty to file a supplemental schedule under the rule terminates upon confirmation of the plan in a subchapter V case, unless the plan is confirmed under § 1191(b), in which case it terminates upon discharge as provided in § 1192."
     hash "32f4f3cec3b1c20c9ef1a5f90c5f6e33d081a4a1c601f6b3438ba275c763b2dd"
   }
-  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -538,7 +538,7 @@ module "/us/usc/ptI/rule1007" {
   }
   layers {
     operative "8105ee9b18f698ca0c84f940b7f89a287954ef3a303b7262dacfadda574b4f27"
-    enacted "42577c47b2611bb69c79cd9b23d8233e3de0b9b52fe19e3affc445962278a988"
-    editorial "010971225e0d46e4bd14c9216cd23777ea2f10fba7e007dc4633ef3b282e901c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "be9365f66e5ee511cc44b5a006b3b38d17ca10ae2b89bfa04ae219cb7c55058a"
   }
 }

@@ -108,14 +108,14 @@ module "/us/usc/t45/s771...780" {
     }
     hash "35a91f5cd5680307be8a48cf8e975d76ed490da34c76f8628c4b29e94dac10cd"
   }
-  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.448/employee-protection-payments-under-former-provisions-reimbur" enacted {
+  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.448/employee-protection-payments-under-former-provisions-reimbur" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Employee Protection Payments Under Former Provisions; Reimbursement"
     p ["Pub. L. 96–448, title V, § 507" -> "/us/pl/96/448/tV/s507"] ", Oct. 14, 1980, " ["94 Stat. 1956" -> "/us/stat/94/1956"] ", provided that notwithstanding any other provision of law, the Consolidated Rail Corporation and other employers with employees protected under this subchapter, until the effective date of " ["Pub. L. 96–448" -> "/us/pl/96/448"] " [probably means Oct. 1, 1980, see " ["section 710 of Pub. L. 96–448" -> "/us/pl/96/448/s710"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy], continue to make payments for employee protection under such Act, [probably means this subchapter] in accordance with the provisions of such Act [probably means this subchapter], which were in effect on Jan. 1, 1979, and that notwithstanding any other provision of law, such Corporation and employers be reimbursed for such payments in accordance with former " ["section 779(a) of this title" -> "/us/usc/t45/s779/a"] "."
     hash "d96a9cfcb0344a6ad29771597ae799cc72f727001fa4c94b4f92925155c0d6ee"
   }
-  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.254/conrail-employee-protection" enacted {
+  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.254/conrail-employee-protection" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Conrail Employee Protection"
@@ -124,7 +124,7 @@ module "/us/usc/t45/s771...780" {
   }
   layers {
     operative "b1d882a44779da0a38b398ec607e62998b0db63e36b01e22262740d66fc66933"
-    enacted "a1025af231b327cd5a90dea145634e7db249f42abae726437b9cfdac258b29e5"
-    editorial "eeee1287512461cecbf61acf104536395b7a1c12a1491764231af4d61ae54185"
+    enacted "809cb7c7d666edb83a37dcd654e7712d118b000c21089415fe3a8fa00559046d"
+    editorial "8736cc9e7564795684c0e95ae74c873877ea5ad86bbf82c1c4331213cda8f813"
   }
 }

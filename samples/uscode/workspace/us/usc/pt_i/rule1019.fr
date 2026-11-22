@@ -186,7 +186,7 @@ module "/us/usc/ptI/rule1019" {
     hash "69c5f10c460e43a5e09aef9be1b16504d741707c5b86245aac1ff3446c76775a"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -200,7 +200,7 @@ module "/us/usc/ptI/rule1019" {
     p "Paragraph (8) permits the extension of the time for filing claims when claims are not timely filed but only with respect to any surplus that may remain in the estate. See also § 726(a)(2)(C) and (3) of the Code."
     hash "75d5330de61e844647ba9f5d59d14aa8826d866a47dbfc1a97077f00c4fd675d"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -211,7 +211,7 @@ module "/us/usc/ptI/rule1019" {
     p "Paragraph (6) is amended to place the obligation on the chapter 13 debtor to file a schedule of unpaid debts incurred during the superseded chapter 13 case."
     hash "1d425826378425c3dcb3ee0d14f2848ed900a36c61ab4e7f92f06b4b7740dd81"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -224,7 +224,7 @@ module "/us/usc/ptI/rule1019" {
     p "The additions of references to unexpired leases in paragraph (1)(A) and in paragraphs (6) and (7) (renumbered as paragraphs (5) and (6)) are technical amendments to clarify that unexpired leases are included as well as other executory contracts."
     hash "35abb62c63c77721eec07df812264ba0be2a7a180239b7b39c314771ed71c73c"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -232,7 +232,7 @@ module "/us/usc/ptI/rule1019" {
     p "GAP Report on Rule 1019. No changes were made to the text of the rule. The Committee Note was changed to conform to the proposed changes to Rule 3002 (see GAP Report on Rule 3002 below)."
     hash "5a1042ba5bc86d24142bb23280ca01f25033a940648c15548817b822d126c0f4"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -240,7 +240,7 @@ module "/us/usc/ptI/rule1019" {
     p "GAP Report on Rule 1019. No changes to the published draft."
     hash "abdb65ac1536eee861c8003699b6a87a87043fe61af31559dee1809ea21c58bc"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -251,7 +251,7 @@ module "/us/usc/ptI/rule1019" {
     p "GAP Report on Rule 1019. The proposed amendments to Rule 1019(6) were changed to delete the deadline for filing requests for payment of preconversion administrative expenses that would be applicable in all cases, and to provide instead that the court may fix such a deadline. The committee note was revised to clarify that it is not necessary for the court to fix a deadline where there are insufficient assets to pay preconversion administrative expenses."
     hash "6a9bd08da63fd6b3bf1a716fd0f6bc742475c8506415d7fe45f32d91f47d9ba5"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -259,7 +259,7 @@ module "/us/usc/ptI/rule1019" {
     p "Changes Made After Publication. The Committee Note was amended by adding the second sentence to the Note stating explicitly that the rule was not intended to take a position on whether motions to dismiss a case under § 707(b) and (c) are proper in a case that is converted from another chapter."
     hash "3571d184f49cd6c6d78fcd22899aec8453df0368951365a95c0221e46672cd9e"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -271,7 +271,7 @@ module "/us/usc/ptI/rule1019" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -279,7 +279,7 @@ module "/us/usc/ptI/rule1019" {
     p "Changes Made After Publication. No changes since publication."
     hash "45c989e44e263e75c0695694a932187029f686ccdc8ba0537a959fb051b50737"
   }
-  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -288,7 +288,7 @@ module "/us/usc/ptI/rule1019" {
   }
   layers {
     operative "69c5f10c460e43a5e09aef9be1b16504d741707c5b86245aac1ff3446c76775a"
-    enacted "5ab5a41d63372cf7949b1c903ddc4831600ba65cb7fd1420c6af5824f319e209"
-    editorial "43f1530fd67be00d4adb93476062c19cdd7b4e13182eed0451272cb52607e22e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5de17461172c5e00190eb5adec695e85fb2df6efccea3db99fe800a385988929"
   }
 }

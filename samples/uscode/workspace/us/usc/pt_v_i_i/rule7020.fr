@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7020" {
     hash "2bc6081a60dfeaccd279ad9807227f0119e4d4fc026e77b4207db460b2d6c521"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7020 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "baa0f68c5fa5c31a323b74652c19cbc85900b62e012919d9bdba5d0686b04f84"
   }
-  note "/us/usc/ptVII/rule7020/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7020/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7020" {
   }
   layers {
     operative "2bc6081a60dfeaccd279ad9807227f0119e4d4fc026e77b4207db460b2d6c521"
-    enacted "533e218ff0a85ecdad9d3780b916e322da7c0e60e248754d39dcc52d5989af51"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cdffe47b15f015eed0000d01720f93a033fd75d99dd2a513d22303470a5a0f72"
   }
 }

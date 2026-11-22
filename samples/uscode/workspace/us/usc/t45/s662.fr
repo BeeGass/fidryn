@@ -117,23 +117,30 @@ module "/us/usc/t45/s662" {
     p "Subsec. (c). " ["Pub. L. 95–598" -> "/us/pl/95/598"] " struck out subsec. (c) which related to treatment of a certificate as an administrative expense and priority of the certificate."
     hash "3e5b4e0d0c7c3e74f2d3286cdba08ae787068f3e8cd38dfc25c8f5b3d61901d1"
   }
-  note "/us/usc/t45/s662/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s662/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s662/note/statutoryNotes/pl.95.598/effective-date-of-1978-amendment" enacted {
+  note "/us/usc/t45/s662/note/statutoryNotes/pl.95.598/effective-date-of-1978-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1978 Amendment"
     p "Amendment by " ["Pub. L. 95–598" -> "/us/pl/95/598"] " effective Oct. 1, 1979, see " ["section 402(a) of Pub. L. 95–598" -> "/us/pl/95/598/s402/a"] ", set out as an Effective Date note preceding " ["section 101 of Title 11" -> "/us/usc/t11/s101"] ", Bankruptcy."
     hash "1cd3cd5227a5d4bc7ba6b777bb609ca70159ae48a42afcafdfe6384011fb8737"
   }
+  definition "/us/usc/t45/s662/c" {
+    term "restructuring"
+    kind includes
+    words "For purposes of this subsection"
+    region "/us/usc/t45/s662/c"
+    basis restated
+  }
   layers {
     operative "3ccb7b767cc4c0f20e0ee9d5a132f2a29fff7861134f45ab9408343831a7265a"
-    enacted "6c16909df1e562b63335cc5f3f66191dae1c6bb8b13bd3debdcc264cc6a50472"
-    editorial "4545eb0edf57bc7342b13bbc006eeef4fda07162848e9229cb1570b11a994b91"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "be2677719130f4806e85edfa739356ba0e0c44b1889aff74cfe6ce7aa060a274"
   }
 }

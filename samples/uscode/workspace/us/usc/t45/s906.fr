@@ -85,14 +85,14 @@ module "/us/usc/t45/s906" {
     p "1980—Subsec. (h). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " added subsec. (h)."
     hash "7dd1a59f14391a6131f35c486ed2994c535e666802ed2831ee68533a8cc79b35"
   }
-  note "/us/usc/t45/s906/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s906/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
   }
-  note "/us/usc/t45/s906/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s906/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -101,7 +101,7 @@ module "/us/usc/t45/s906" {
   }
   layers {
     operative "8da5aadb4e52703f49ca3ad8962f0fa146b2d85a18451fc8c8d152ed05ad7dc0"
-    enacted "5e193d966dffef3af96ae3dff6b65cc653d17b83e06ddb828294496a3c4f170b"
-    editorial "cc947327f153f7c04ead9f9521592852e37e55b4654017d6c362841192f4c068"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1756dd480ab4d7464178449c5ff787234580a1fdbc27206c82d4625ca59dac39"
   }
 }

@@ -266,7 +266,7 @@ module "/us/usc/ptVII/rule7004" {
     hash "da71d95fcc99c79cd9963dade179b16470c91576bdc06e9c14b592e1e056c864"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; " ["Pub. L. 103–394, title I, § 114" -> "/us/pl/103/394/tI/s114"] ", Oct. 22, 1994, " ["108 Stat. 4118" -> "/us/stat/108/4118"] "; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 12, 2006, eff. Dec. 1, 2006; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -278,7 +278,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Subdivision (f). The requirement of former Bankruptcy Rule 704 that the summons be served within 10 days is carried over into these rules by subdivision (f)."
     hash "59c681000589ce96956b6808e3c72faf46afb2cf4e656fc87305960517603198"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -286,7 +286,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Technical amendments are made to subdivisions (a), (b), (e), and (f) to conform to recent amendments to Rule 4 F.R.Civ.P."
     hash "da85ff44daec5e5d7d9310a0207f6ebce2f50b20fd9920a3ef21b64d54693326"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -296,13 +296,13 @@ module "/us/usc/ptVII/rule7004" {
     p "Subdivision (g) is added in anticipation of substantial amendment to, and restructuring of subdivisions of, Rule 4 F.R.Civ.P. Any amendment to Rule 4 will not affect service in bankruptcy cases and proceedings until further amendment to the Bankruptcy Rules. On January 1, 1990, Rule 4 F.R.Civ.P. read as follows:"
     hash "7a45a143189c531fc377320aa013b0a87574f7a03f46370046e7ada3cf6db4e0"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/rule-4-f-r-civ-p" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/rule-4-f-r-civ-p" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Rule 4 F.R.Civ.P."
     hash "f32200629ce80c9d3a56b6bfeebd0bc22f33df0fce5de6038b2202eacd229208"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/process" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/process" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Process"
@@ -335,7 +335,7 @@ module "/us/usc/ptVII/rule7004" {
     p "(j) Summons: Time Limit for Service. If a service of the summons and complaint is not made upon a defendant within 120 days after the filing of the complaint and the party on whose behalf such service was required cannot show good cause why such service was not made within that period, the action shall be dismissed as to that defendant without prejudice upon the court’s own initiative with notice to such party or upon motion. This subdivision shall not apply to service in a foreign country pursuant to subdivision (i) of this rule."
     hash "07148a77aad6cefa5b46c1640a1fe8e3ae713c26ccd49ec5fe5034a2d938c294"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -349,7 +349,7 @@ module "/us/usc/ptVII/rule7004" {
     p "GAP Report on Rule 7004. After publication of the proposed amendments, Rule 7004(b) was amended and Rule 7004(h) was added by the Bankruptcy Reform Act of 1994 to provide for service by certified mail on an insured depository institution. The above draft includes those statutory amendments (without underlining new language or striking former language). No other changes have been made since publication, except for stylistic changes."
     hash "b93f0650d9a1eadf45681a3d0f329303b8755e9faf0b9c987c6430796e1784bb"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -357,7 +357,7 @@ module "/us/usc/ptVII/rule7004" {
     p "GAP Report on Rule 7004. No changes since publication."
     hash "878b88f15368b16659b5c16cf6e25f11bf52792474a70a3b612113013397123c"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -365,7 +365,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Changes Made After Publication and Comment. No changes were made after publication."
     hash "2b0a9d185adc2ca38e2b5bfd721038101a842189d1d5c4ad53ccbc325b1aa8d0"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2006 Amendment"
@@ -375,7 +375,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Changes Made After Publication. The Committee Note was amended to add the final [second] paragraph of the Note. The new paragraph describes the reason for the deletion of the reference in the rule to the statement of affairs as a source for the debtor’s address. This was a secondary reason for amending the rule, and even in the absence of public comment on the proposed amendment, the Advisory Committee believes that the additional explanation in the Committee Note is appropriate."
     hash "6ba37145c9b9e20273abada6b4f2bdd55fd75dff40beeb88dff65f55bd1b72df"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -387,7 +387,7 @@ module "/us/usc/ptVII/rule7004" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014 Amendment"
@@ -395,28 +395,28 @@ module "/us/usc/ptVII/rule7004" {
     p "Changes Made After Publication and Comment. A new sentence referring to the availability of an enlargement of time under Rule 9006(b) was added to the Committee Note. The only other change made after publication and comment was stylistic."
     hash "b7a80eca76b191e42fc64e3c8f9c8921edf5aea1f40547759b932e83d8fc97bd"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "In 1996, Rule 7004(a) was amended to incorporate by reference F.R.Civ.P. 4(d)(1). Civil Rule 4(d)(1) addresses the effect of a defendant’s waiver of service. In 2007, Civil Rule 4 was amended, and the language of old Civil Rule 4(d)(1) was modified and renumbered as Civil Rule 4(d)(5). Accordingly, Rule 7004(a) is amended to update the cross-reference to Civil Rule 4."
     hash "05ccb30c976c45cfab1681084829c69d563df88db76b328e3ceffd640972f549"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "New Rule 7004(i) is intended to reject those cases interpreting Rule 7004(b)(3) and Rule 7004(h) to require service on a named officer, managing or general agent or other agent, rather than use of their titles. Service to a corporation or partnership, unincorporated association or insured depository institution at its proper address directed to the attention of the “Chief Executive Officer,” “President,” “Officer for Receiving Service of Process,” “Managing Agent,” “General Agent,” “Officer,” or “Agent for Receiving Service of Process” (or other similar titles) is sufficient."
     hash "d81717a3babff66eff4c15c5b06002911a0d42ec0016466b405b513b7168453c"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only. The beginning of Rule 7004(b) (through the words “in addition”) and all of Rule 7004(h) have not been restyled because they were enacted by Congress, " ["P.L. 103–394" -> "/us/pl/103/394"] ", Sec. 114, " ["108 Stat. 4106" -> "/us/stat/108/4106"] ", 4118 (1994). The Bankruptcy Rules Enabling Act, 28 U.S.C. § 2075, provides no authority to modify statutory language."
     hash "2abc6b6c1cbd6f60233f5e4cc8519fc4b7b30cd08bdc7c319d3c2c5f0b0d9a47"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -424,7 +424,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Section 3 of the Federal Deposit Insurance Act, referred to in subd. (h), is classified to " ["section 1813 of Title 12" -> "/us/usc/t12/s1813"] ", Banks and Banking."
     hash "8e762424730e993d6f78282fedcbf0b10c9016e223264e3501c158ea3c29565f"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/amendment-by-public-law" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/amendment-by-public-law" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Amendment by Public Law"
@@ -432,7 +432,7 @@ module "/us/usc/ptVII/rule7004" {
     p "Subd. (h). " ["Pub. L. 103–394, § 114(2)" -> "/us/pl/103/394/s114/2"] ", added subd. (h)."
     hash "bea9c2edb5564187fb2c3ba2a61924d418fba5f5ea7186de9f187ed58af6a063"
   }
-  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/effective-date-of-1994-amendment" enacted {
+  note "/us/usc/ptVII/rule7004/note/ungrouped/pl.103.394/effective-date-of-1994-amendment" editorial {
     group ungrouped
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1994 Amendment"
@@ -441,7 +441,7 @@ module "/us/usc/ptVII/rule7004" {
   }
   layers {
     operative "da71d95fcc99c79cd9963dade179b16470c91576bdc06e9c14b592e1e056c864"
-    enacted "3900b0ba69795535ad88defc05c6ca9830bf86c4d0ef014b81e50c7673d06d63"
-    editorial "74328b358f13bd22012d0806378261fa3d36e0b17e6cfd180b4015cbc3c575da"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "72f033763c888931f2f77139c15d8275fe4503d1ee2ef569ef326f2087d13875"
   }
 }

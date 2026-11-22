@@ -139,14 +139,14 @@ module "/us/usc/ptVIII/rule8003" {
     hash "da623e2dccd8906f81499b11f4f27f4c1c15a0985ce3e7d55866d6c13d9591e5"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8003, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009, related to leave to appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "1287a63a4cdde1ba70beacdf921267d733eef7beea3acd2a4903ca25184141f4"
   }
-  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -158,7 +158,7 @@ module "/us/usc/ptVIII/rule8003" {
     p "Changes Made After Publication and Comment. In subdivision (d)(2), the direction for docketing a bankruptcy appeal was changed to reflect the fact that many bankruptcy appeals have dual titles—the bankruptcy case itself and the adversary proceeding that is the subject of the appeal. Stylistic changes were made to subdivision (c)(1). Conforming changes were made to the Committee Note."
     hash "31b38c303f9a08d8268045a9be7c2ed144a772238956d55cb93fa9589afccd76"
   }
-  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2023-amendment" enacted {
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2023-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2023 Amendment"
@@ -170,7 +170,7 @@ module "/us/usc/ptVIII/rule8003" {
     p "On occasion, a party may file a notice of appeal after a judgment or appealable order or decree but identify only a previously nonappealable order that merged into that judgment or appealable order or decree. To deal with this situation, subdivision (a)(7) is added to provide that an appeal must not be dismissed for failure to properly identify the judgment or appealable order or decree if the notice of appeal was filed after entry of the judgment or appealable order or decree and identifies an order that merged into the judgment, order, or decree from which the appeal is taken. In this situation, a court should act as if the notice had properly identified the judgment or appealable order or decree. In determining whether a notice of appeal was filed after the entry of judgment, Rules 8002(a)(2) and (b)(2) apply."
     hash "9e69f576e0298a22c4a639a092a155a707d04e5c260df9f653f19a2f4ee0bfb7"
   }
-  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -179,7 +179,7 @@ module "/us/usc/ptVIII/rule8003" {
   }
   layers {
     operative "da623e2dccd8906f81499b11f4f27f4c1c15a0985ce3e7d55866d6c13d9591e5"
-    enacted "9e47fce134f3a2d8f05ed00d355ad556ea5d2dc8c5092a45da00f62b7d1d9244"
-    editorial "66f6d9de0700c4ea6c79236c3cd37bd9847c40f38dfb1b612589a431caaddcf8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1ae58ad4cd8ccdfad70640fe87d7e0f7bf87b570892b096a77cacbd4f1554c00"
   }
 }

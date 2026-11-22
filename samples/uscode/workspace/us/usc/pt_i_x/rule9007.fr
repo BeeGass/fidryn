@@ -36,7 +36,7 @@ module "/us/usc/ptIX/rule9007" {
     hash "30ff75dab038835a2345cc863001a5c892f664084dacf219081af5f249ac3517"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -45,7 +45,7 @@ module "/us/usc/ptIX/rule9007" {
   }
   layers {
     operative "30ff75dab038835a2345cc863001a5c892f664084dacf219081af5f249ac3517"
-    enacted "de07bc795b893ab108be564c1ace411df97ac55d2eb063056a019e41e2aa3575"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f83fc49a166712d0aadd611e38f0a24f708ffb3478c2b23b87a10ffc7fd14808"
   }
 }

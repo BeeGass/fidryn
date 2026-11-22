@@ -198,6 +198,9 @@ class ProfileFixtures(unittest.TestCase):
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
 
+    def test_definitions_second(self) -> None:
+        self.check("definitions-second")
+
     def test_notes_empty_topic(self) -> None:
         self.check("notes-empty-topic")
 
@@ -212,6 +215,18 @@ class ProfileFixtures(unittest.TestCase):
 
     def test_quoted_level_labels(self) -> None:
         self.check("quoted-level-labels")
+
+    def test_notes_layer_quoted(self) -> None:
+        self.check("notes-layer-quoted")
+
+    def test_notes_layer_groups(self) -> None:
+        self.check("notes-layer-groups")
+
+    def test_notes_layer_topics(self) -> None:
+        self.check("notes-layer-topics")
+
+    def test_notes_layer_headings(self) -> None:
+        self.check("notes-layer-headings")
 
     def test_toc_nested(self) -> None:
         # Each table of contents counts once, the one inside the other included.

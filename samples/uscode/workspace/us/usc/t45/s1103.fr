@@ -70,7 +70,7 @@ module "/us/usc/t45/s1103" {
     p "The Staggers Rail Act of 1980, referred to in par. (3), is " ["Pub. L. 96–448" -> "/us/pl/96/448"] ", Oct. 14, 1980, " ["94 Stat. 1895" -> "/us/stat/94/1895"] ". For complete classification of this Act to the Code, see Short Title of 1980 Amendment note set out under " ["section 10101 of Title 49" -> "/us/usc/t49/s10101"] ", Transportation, and Tables."
     hash "7d78f8cd83ab09766e39aaff5d8505443520dc77f5276382278461cf71b731a5"
   }
-  note "/us/usc/t45/s1103/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s1103/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -79,7 +79,7 @@ module "/us/usc/t45/s1103" {
   }
   layers {
     operative "c0c7fdfedc34afca559d6a61216aa26c319c22ad91c65af126c883e78badcbe0"
-    enacted "39199a48e5965f00b06f15dac68189f50ab7567171166a584d4e5ef49d0d94a4"
-    editorial "893b2acae8023182201268291d0e62295c3672ff95207e818826dd5f78fadb73"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "29fd193cc783c94df03ea6e87b382e8420b62b09b0c70c93237d7083532fdc2e"
   }
 }

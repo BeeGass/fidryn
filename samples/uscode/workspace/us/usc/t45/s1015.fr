@@ -15,7 +15,7 @@ module "/us/usc/t45/s1015" {
     p "Section, " ["Pub. L. 96–254, title I, § 120" -> "/us/pl/96/254/tI/s120"] ", May 30, 1980, " ["94 Stat. 408" -> "/us/stat/94/408"] "; " ["Pub. L. 97–216, title I, § 101" -> "/us/pl/97/216/tI/s101"] ", July 18, 1982, " ["96 Stat. 188" -> "/us/stat/96/188"] ", related to Interstate Commerce Commission ordering directed service over passenger commuter railroad lines that were in operation on Mar. 1, 1980, and had ceased to be in operation."
     hash "b1496ce30b7fccd9dc6a1cfeb97019f2fb9773fe827ed92fb2c1f46d1e745b9e"
   }
-  note "/us/usc/t45/s1015/note/statutoryNotes/pl.104.88/effective-date-of-repeal" enacted {
+  note "/us/usc/t45/s1015/note/statutoryNotes/pl.104.88/effective-date-of-repeal" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date of Repeal"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s1015" {
   }
   layers {
     operative "784786907230908b12d4dff6642d201f823e7998c662e1ed568e9ccbbc202b0a"
-    enacted "e4ccc7bdf04d2c5054be263586e50b1baaaf4a57ae19073750d953c0b4decbbb"
-    editorial "f24e458b19f5cddfca2423e188e23da69055d25bb47116ab5cb2426d7dfea279"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "eb73e8266a03a0401484ef51e9fb92fa51b2f6f967cfba0758c2984c4e269574"
   }
 }

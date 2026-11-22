@@ -509,10 +509,11 @@ fn every_extracted_definition_passes_the_checker() {
         }
     }
     for (name, expected) in [
-        ("definitions-chapeau", 14),
+        ("definitions-chapeau", 16),
         ("definitions-restated", 5),
         ("definitions-restated, flag on", 5),
-        ("definitions-sentence", 10),
+        ("definitions-second", 16),
+        ("definitions-sentence", 17),
     ] {
         assert_eq!(counts.get(name), Some(&expected), "{name}");
     }

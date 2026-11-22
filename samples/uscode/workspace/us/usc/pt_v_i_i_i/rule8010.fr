@@ -114,14 +114,14 @@ module "/us/usc/ptVIII/rule8010" {
     hash "77ad126d6e81de01487c2429eda360ee7178d54a41df95af6e0c349401cd567b"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8010, Apr. 25, 1983, eff. Aug. 1, 1983, related to form and length of briefs, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "634a0b1e1232c5028f5e4899036d5e0f4623c52df78f63515bc648ba67aeb22b"
   }
-  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -133,14 +133,14 @@ module "/us/usc/ptVIII/rule8010" {
     p "Changes Made After Publication and Comment. Subdivision (a)(1) was revised to more accurately reflect the way in which transcription services are selected. A cross-reference to Rule 8009(b) was added to subdivision (a)(2)(A)."
     hash "b1ebb06c0977277bc24f3ac1d476431b338fd084dd1b7d42faaf5af1870856c2"
   }
-  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "The amendment of subdivision (c) conforms this rule with the amendment of Rule 62 F.R.Civ.P., which is made applicable in adversary proceedings by Rule 7062. Rule 62 formerly required a party to provide a “supersedeas bond” to obtain a stay of the judgment and proceedings to enforce the judgment. As amended, Rule 62(b) allows a party to obtain a stay by providing a “bond or other security.”"
     hash "f5fb4a8d2c2a251e77f61c71de143e2443134dfe0282baef47d297eb9c22127e"
   }
-  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -149,7 +149,7 @@ module "/us/usc/ptVIII/rule8010" {
   }
   layers {
     operative "77ad126d6e81de01487c2429eda360ee7178d54a41df95af6e0c349401cd567b"
-    enacted "eae8fa5cdd80053a4cdc48273f1c907cc2826cd8d043e712b1b43767888fe01c"
-    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "dfae91ccb6e4c84337b916255adfbade6652a2b728a80a8b44ec5af4d9159d16"
   }
 }

@@ -30,7 +30,7 @@ module "/us/usc/ptII/rule2008" {
     hash "df231dac7f6c33313037304625c4a8419728db968bd9ebece6dc8ccafe74dc5e"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -39,21 +39,21 @@ module "/us/usc/ptII/rule2008" {
     p "In districts having a standing trustee for chapter 13 cases, a blanket acceptance of the appointment would be sufficient for compliance by the standing trustee with this rule."
     hash "da772e491e44b3467d4b89d5e6db069ef24cc4e1003109c47071948fc180c02a"
   }
-  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule is amended to eliminate the need for a standing chapter 13 trustee or member of the panel of chapter 7 trustees to accept or reject an appointment."
     hash "1b0bf4e5b4f38b737059c8f7859d91a8c8e2dab8802f257ad49ddf27e0b69eb7"
   }
-  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The amendments to this rule relating to the United States trustee are derived from Rule X–1004(a) and conform to the 1986 amendments to the Code and 28 U.S.C. § 586 which provide that the United States trustee appoints and supervises trustees, and in a chapter 7 case presides over any election of a trustee. This rule applies when a trustee is either appointed or elected. This rule is also amended to provide for chapter 12 cases."
     hash "c58655575453c65eabac73c0ce4fda0deec890b611ed6c049b3f4826aaeaed67"
   }
-  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -65,7 +65,7 @@ module "/us/usc/ptII/rule2008" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -74,7 +74,7 @@ module "/us/usc/ptII/rule2008" {
   }
   layers {
     operative "df231dac7f6c33313037304625c4a8419728db968bd9ebece6dc8ccafe74dc5e"
-    enacted "aacc05de3690002d9b49be2434fa63e525eebf9ae68d52b423b55868ab91036b"
-    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7248de5f826949f5057a4e02f373b22c99a735c048292a6683e36a22e5d8cded"
   }
 }

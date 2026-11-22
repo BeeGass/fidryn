@@ -776,9 +776,11 @@ mod tests {
                 terms: vec!["widget".to_owned()],
                 kind: DefinitionKind::Means,
                 words: Some("As used in section 2 of this title".to_owned()),
+                condition: None,
                 region: Some(address("/zz/demo/t1/s2")),
                 basis: Basis::Enacted,
                 borrowed_from: None,
+                borrowed_words: None,
                 see_note: None,
             }],
         }
@@ -1205,9 +1207,11 @@ mod ledger_tests {
             terms: vec!["widget".to_owned()],
             kind,
             words: None,
+            condition: None,
             region: None,
             basis,
             borrowed_from: None,
+            borrowed_words: None,
             see_note: None,
         }
     }

@@ -112,14 +112,14 @@ module "/us/usc/ptVIII/rule8004" {
     hash "8445d9193929bd1821673bbb752c5485ca16c64dc4a056b9fc9861f8813264af"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8004, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to service of the notice of appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "1c42968c0c7b3eb3f9907c616aee5f151e3aa06220231771f0c13082e83714b5"
   }
-  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -132,7 +132,7 @@ module "/us/usc/ptVIII/rule8004" {
     p "Changes Made After Publication and Comment. In subdivision (c)(2), the direction for docketing a bankruptcy appeal was changed to reflect the fact that many bankruptcy appeals have dual titles—the bankruptcy case itself and the adversary proceeding that is the subject of the appeal. As published, subdivision (c)(3) stated that the court must dismiss the appeal if the motion for leave to appeal is denied. That sentence was deleted."
     hash "2c975c454bc11e7f7d62ae2c9a378fd3205b27993d4daa901a60132dcbbfbf85"
   }
-  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -141,7 +141,7 @@ module "/us/usc/ptVIII/rule8004" {
   }
   layers {
     operative "8445d9193929bd1821673bbb752c5485ca16c64dc4a056b9fc9861f8813264af"
-    enacted "28069c3fe03e5ff724ec0e98bceae0c547df6808c9ce35596c74519a939c0b8a"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "669de996e0fe5f983b4720da58b2ab9be08c86fcb3fd96d0c3103c79e7f93cc0"
   }
 }

@@ -111,7 +111,7 @@ module "/us/usc/t45/s801" {
     }
     hash "8931416e81dc6e9422ae055b9ea0a2356cf4e33757524743c39549bf78920bc3"
   }
-  note "/us/usc/t45/s801/note/statutoryNotes/pl.94.210/short-title" enacted {
+  note "/us/usc/t45/s801/note/statutoryNotes/pl.94.210/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -120,7 +120,7 @@ module "/us/usc/t45/s801" {
   }
   layers {
     operative "ae03515f155ceb7de0617f11c5eb9e3aa3ae384edf02aaffc53f2571b9cf5b30"
-    enacted "bb8ad63a552b9c441edee4e1829a940a3e6e8142552c36c3dcc785afc6faf435"
-    editorial "c83f9182d91160747c2cd2b68aafc0300e29923ed2a84a8c19ab77d03c4d94f3"
+    enacted "01b809dd843abf0147556ff9816941847e456acf84665e6d436b28bdfce6eb54"
+    editorial "61c296777bedc41ff8eea29fb7dafaff22b7a45e2a28fb3d3e20f05980d190fd"
   }
 }

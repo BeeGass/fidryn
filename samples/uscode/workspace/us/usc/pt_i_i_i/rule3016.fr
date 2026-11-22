@@ -52,7 +52,7 @@ module "/us/usc/ptIII/rule3016" {
     hash "431dc7a0ee9f7e4bf6955174d5c7e25a76eb409faf372929b8bed66d412ef679"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -65,14 +65,14 @@ module "/us/usc/ptIII/rule3016" {
     p "Subdivision (c). This provision is new. In chapter 9 and 11 cases (including railroad reorganization cases) postpetition solicitation of votes on a plan requires transmittal of a disclosure statement, the contents of which have been approved by the court. See § 1125 of the Code. A prepetition solicitation must either have been in conformity with applicable nonbankruptcy law or, if none, the disclosure must have been of adequate information as set forth in § 1125 of the Code. See § 1126(b). Subdivision (c) of this rule provides the time for filing the disclosure statement or evidence of compliance with § 1126(b) which ordinarily will be with the plan but the court may allow a later time or the court may, pursuant to the last sentence, fix a time certain. Rule 3017 deals with the hearing on the disclosure statement. The disclosure statement, pursuant to § 1125 is to contain adequate information. “Adequate information” is defined in § 1125(a) as information that would permit a reasonable creditor or equity security holder to make an informed judgment on the plan."
     hash "cc65b6c0c3b340e16b6bb9edce48e045d4f4a1d840c1f0ddf84127377e23e1f5"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (a) is amended to enlarge the time for filing competing plans. A party in interest may not file a plan without leave of court only if an order approving a disclosure statement relating to another plan has been entered and a decision on confirmation of the plan has not been entered. This subdivision does not fix a deadline beyond which a debtor may not file a plan."
     hash "cdccc5df4decc46db0c3ed8808ffdd71ccf54945e7c5108ec0a9c08e1cf9bcb9"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -81,7 +81,7 @@ module "/us/usc/ptIII/rule3016" {
     p "GAP Report on Rule 3016. No changes since publication, except for a stylistic change."
     hash "882184219159af424a40518a10bb7129c2716d1c6720878939b1b702709324b4"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -91,7 +91,7 @@ module "/us/usc/ptIII/rule3016" {
     p "Changes Made After Publication and Comments. The word “highlighted” in the parenthesis was replaced with “underlined” because highlighted documents are difficult to scan electronically for inclusion in the clerks’ files. The Committee Note was revised to put in a more prominent position the statement that the validity and effect of any injunction provided for in a plan are substantive matters beyond the scope of the rules. Other stylistic changes were made to the Committee Note."
     hash "412d82edfc4ab6f231742db0586b41b93b419f36baf6884a7056856b47ac35e8"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -101,14 +101,14 @@ module "/us/usc/ptIII/rule3016" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "70b554da9b05049fff82423f4744ba2407bf898b311a3e2c150487e29cdd8127"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (b) of the rule is amended to reflect that under § 1181(b) of the Code, § 1125 does not apply to subchapter V cases (and thus a disclosure statement is not required) unless the court for cause orders otherwise. Subdivision (d) is amended to include subchapter V cases as ones in which Official Forms are available for a reorganization plan and, when required, a disclosure statement."
     hash "6acf7bc48d76607ed83f9ebf161f78c212efa217b6ec2b353050358ad9cd0833"
   }
-  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -117,7 +117,7 @@ module "/us/usc/ptIII/rule3016" {
   }
   layers {
     operative "431dc7a0ee9f7e4bf6955174d5c7e25a76eb409faf372929b8bed66d412ef679"
-    enacted "bcdc4829ce7cf9e3aba9573e9a48b76f33a64a4c627329abfbc7c395f687aee2"
-    editorial "56654b0320c01d35068c45387dd908a1110c989f8bee51987babc6af2f53326a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a5f7b8828e3b85ddcb988cc485a4c5bed71b293ba7ed614d5bf4550edbcdae7a"
   }
 }

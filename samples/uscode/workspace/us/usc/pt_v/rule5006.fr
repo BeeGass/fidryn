@@ -10,7 +10,7 @@ module "/us/usc/ptV/rule5006" {
     hash "a7579468d512ea07496111e31d5377af2e9920d578ffef4ba302fce83afe9aca"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -18,7 +18,7 @@ module "/us/usc/ptV/rule5006" {
     p "Rule 1101 F. R. Evid. makes the Federal Rules of Evidence applicable to cases under the Code. Rule 1005 F. R. Evid. allows the contents of an official record or of a paper filed with the court to be proved by a duly certified copy. A copy certified and issued in accordance with Rule 5006 is accorded authenticity by Rule 902(4) F. R. Evid."
     hash "4cc5c16d51d02e892a6de20d173a2ca9c7f21d640aeac4dd625a08fa27ee7ab0"
   }
-  note "/us/usc/ptV/rule5006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -27,7 +27,7 @@ module "/us/usc/ptV/rule5006" {
   }
   layers {
     operative "a7579468d512ea07496111e31d5377af2e9920d578ffef4ba302fce83afe9aca"
-    enacted "d0ba8300a3fde2bafc22568fb8befe27bce03cd72d1f22d644a81fc8607ac10b"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0a8a2cced52c465138bc7aea3fd50252c87e761156b99d38ddbba5cbb972971f"
   }
 }

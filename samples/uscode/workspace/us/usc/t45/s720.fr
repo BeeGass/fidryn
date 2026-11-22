@@ -78,28 +78,28 @@ module "/us/usc/t45/s720" {
     p "Subsec. (c). " ["Pub. L. 94–210, § 607(k)" -> "/us/pl/94/210/s607/k"] ", inserted provisions relating to guarantees as general obligations of the United States and pledge of full faith and credit for payment."
     hash "187601c13652d3f72f4aca4b544d71cc50b77bc58559ca856f32b56a1bc08c0e"
   }
-  note "/us/usc/t45/s720/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
   }
-  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1976 Amendment"
     p "Amendment by " ["Pub. L. 94–555" -> "/us/pl/94/555"] " effective Oct. 1, 1976, see " ["section 303 of Pub. L. 94–555" -> "/us/pl/94/555/s303"] ", set out as a note under " ["section 702 of this title" -> "/us/usc/t45/s702"] "."
     hash "bbcf4d13b2bad24ed28d87ac343046c23afd6c40f613f4c216556bcc67fdfb78"
   }
-  note "/us/usc/t45/s720/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s720/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -108,7 +108,7 @@ module "/us/usc/t45/s720" {
   }
   layers {
     operative "1b3aec80f00cff6f967493b593fe7ef2b092ccc4e363211f290e77a963d6bec7"
-    enacted "487b390c10da207cba4d8350676b17978eb2138be59f55cf9bc51b7c44b2e894"
-    editorial "c23571327abf2e4739333a3ce4abd5431a01a5fecae5e62857bfa28c04d40466"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "389cdda0c442344e9bb30ed7b0e84f1c4a858cb9c82e2b993555e3dc95123b43"
   }
 }

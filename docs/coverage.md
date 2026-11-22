@@ -29,9 +29,10 @@ words, and in no others.
   that a reader sees how many of them reach their target.
 - **Classified.** What kind of provision it is, is recorded. At this version
   the one kind that is recorded is a definition, and the ledger gives the
-  number of definitions extracted, by basis and by kind. It gives no count
-  of classified provisions, since one provision can hold more than one
-  definition.
+  number of definitions extracted, by basis and by kind; a definition with
+  a condition, or with source words in the place of a link, is counted as
+  any other. It gives no count of classified provisions, since one
+  provision can hold more than one definition.
 
 ## The basis of a definition
 
@@ -58,8 +59,10 @@ Each definition extracted has one of three bases:
 
 The rules read definitions written in a closed list of forms
 ([Definitions](law-modules.md#definitions)), and they do not find every
-definition that the text holds. The share of the definitions they miss has
-not been measured for the sample.
+definition that the text holds. The forms they leave out are listed, with
+their counts measured on the whole of release point 119-142, in
+[What stays out](law-modules.md#d16-what-stays-out); the share they miss
+has not been measured for the sample.
 
 ## Counted and not imported
 
@@ -94,20 +97,20 @@ the ledger copies the counts:
 | Containers, by kind | `totals.containers_by_kind` | 1 `appendix`, 25 `chapter`, 1 `courtRules`, 1 `level`, 13 `part`, 29 `subchapter`, 2 `title` |
 | Provisions imported and addressed, the top provision of each unit included | `totals.provisions` | 4,857 |
 | Addresses: aliases kept, and addresses disambiguated and assigned by the importer | `totals.addresses` | 229 `aliases`, 0 `disambiguated`, 3 `assigned` |
-| Notes imported, by layer | `totals.notes` | 1,498 `enacted`, 593 `editorial` |
+| Notes imported, by layer | `totals.notes` | 196 `enacted`, 1,895 `editorial` |
 | Notes, by group | `totals.notes_by_group` | 1 `courtRules`, 303 `editorialNotes`, 9 `execDoc`, 539 `statutoryNotes`, 1,239 `ungrouped` |
 | Footnotes imported | `totals.footnotes` | 107 |
 | Provisions and notes that hold an image, whose picture is not in the archive | `totals.with_images` | 1 |
 | References in operative text, by outcome | `totals.references.operative` | 644 `exact`, 14 `target-status`, 0 `ambiguous`, 11 `unit-only`, 1 `range-form`, 273 `no-unit`, 192 `outside`, 0 `malformed` |
-| References in enacted notes, by outcome | `totals.references.enacted` | 332 `exact`, 18 `target-status`, 0 `ambiguous`, 14 `unit-only`, 0 `range-form`, 364 `no-unit`, 1,454 `outside`, 0 `malformed` |
-| References in editorial matter, by outcome | `totals.references.editorial` | 275 `exact`, 47 `target-status`, 0 `ambiguous`, 14 `unit-only`, 1 `range-form`, 259 `no-unit`, 4,919 `outside`, 0 `malformed` |
+| References in enacted notes, by outcome | `totals.references.enacted` | 176 `exact`, 15 `target-status`, 0 `ambiguous`, 12 `unit-only`, 0 `range-form`, 117 `no-unit`, 692 `outside`, 0 `malformed` |
+| References in editorial matter, by outcome | `totals.references.editorial` | 431 `exact`, 50 `target-status`, 0 `ambiguous`, 16 `unit-only`, 1 `range-form`, 506 `no-unit`, 5,681 `outside`, 0 `malformed` |
 | References of the outcome `outside`, by the body of law they name | `totals.outside_by_body` | 739 `/us/act`, 3,310 `/us/pl`, 2,516 `/us/stat` |
-| Definitions extracted, by basis | `totals.definitions` | 7 `enacted`, 100 `restated`, 37 `unresolved` |
-| Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 1 `does_not_include`, 15 `includes`, 121 `means` |
+| Definitions extracted, by basis | `totals.definitions` | 8 `enacted`, 116 `restated`, 66 `unresolved` |
+| Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 8 `does_not_include`, 31 `includes`, 144 `means` |
 | Counted and not imported | `totals.not_imported` | 19 `tables_of_contents`, 4 `footnotes_in_tables_of_contents`, 341 `links_in_tables_of_contents`, 3 `release_notes`, 0 `links_without_words`, 358 `note_group_headings` |
-| The file `usc01.xml` (positive law) | `by_source.0` | 39 units, 129 provisions, 10 definitions |
-| The file `usc11a.xml` (not positive law) | `by_source.1` | 230 units, 2,362 provisions, 4 definitions |
-| The file `usc45.xml` (not positive law) | `by_source.2` | 294 units, 2,366 provisions, 130 definitions |
+| The file `usc01.xml` (positive law) | `by_source.0` | 39 units, 129 provisions, 11 definitions |
+| The file `usc11a.xml` (not positive law) | `by_source.1` | 230 units, 2,362 provisions, 17 definitions |
+| The file `usc45.xml` (not positive law) | `by_source.2` | 294 units, 2,366 provisions, 162 definitions |
 
 <!-- coverage-table:end -->
 

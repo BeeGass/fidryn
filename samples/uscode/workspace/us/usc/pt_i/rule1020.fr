@@ -35,7 +35,7 @@ module "/us/usc/ptI/rule1020" {
     hash "71003da85ee7dd5212c9e0778b280a484ed65a45a5d43db4a11101fc8e54aa5b"
   }
   credit "(Added Apr. 11, 1997, eff. Dec. 1, 1997; amended Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" enacted {
+  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997"
@@ -43,7 +43,7 @@ module "/us/usc/ptI/rule1020" {
     p "GAP Report on Rule 1020. The phrase “or by a later date as the court, for cause, may fix” at the end of the published draft was deleted. The general provisions on reducing or extending time periods under Rule 9006 will be applicable."
     hash "d8cf7b608c322c112d6bc0cf9843cb00f06e6fe7f0e44a64064342b595b7c6e0"
   }
-  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -53,7 +53,7 @@ module "/us/usc/ptI/rule1020" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "788da5ad2725287419e5ef54e10c80189381b08616191bbb3bbd187517610c0b"
   }
-  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -65,7 +65,7 @@ module "/us/usc/ptI/rule1020" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
@@ -74,7 +74,7 @@ module "/us/usc/ptI/rule1020" {
     p "Former subdivision (d) is redesignated as subdivision (c), and the list of entities to be served is revised to reflect that in most small business and subchapter V cases there will not be a committee of creditors."
     hash "f890768c72b99296761cb8708e425a9a8c25168365177a9f5068034fa33440fd"
   }
-  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -83,7 +83,7 @@ module "/us/usc/ptI/rule1020" {
   }
   layers {
     operative "71003da85ee7dd5212c9e0778b280a484ed65a45a5d43db4a11101fc8e54aa5b"
-    enacted "d7930e2ff1616c41f4ad70e94b2e08f09cc411a45fb2126ec903aef8ed39d3ec"
-    editorial "8a7dc6be33645f667e59ad19e585a7216b0d455b4a9090a6217f662a849640f6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "73032820e518f71bdfdc7c5ffc6506189332ec07ce184db629d99891edc92c51"
   }
 }

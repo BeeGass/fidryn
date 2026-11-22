@@ -215,7 +215,7 @@ module "/us/usc/ptIII/rule3002.1" {
     hash "741fab22f9dcf9e6e198bc87b8d899306374b0e7f8594dc0645955ea4ceb60cf"
   }
   credit "(Added Apr. 26, 2011, eff. Dec. 1, 2011; amended Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024; Apr. 23, 2025, eff. Dec. 1, 2025.)"
-  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2011" enacted {
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2011" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011"
@@ -243,7 +243,7 @@ module "/us/usc/ptIII/rule3002.1" {
     p "Other changes. Stylistic changes were made throughout the rule and Committee Note."
     hash "683958d956034101dca53fc55949b7f4af1f74098a609fc13bc7a9a4d8cbc733"
   }
-  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
@@ -251,7 +251,7 @@ module "/us/usc/ptIII/rule3002.1" {
     p "Subdivision (a) is further amended to provide that, unless the court orders otherwise, the notice obligations imposed by this rule cease on the effective date of an order granting relief from the automatic stay with regard to the debtor’s principal residence. Debtors and trustees typically do not make payments on mortgages after the stay relief is granted, so there is generally no need for the holder of the claim to continue providing the notices required by this rule. Sometimes, however, there may be reasons for the debtor to continue receiving mortgage information after stay relief. For example, the debtor may intend to seek a mortgage modification or to cure the default. When the court determines that the debtor has a need for the information required by this rule, the court is authorized to order that the notice obligations remain in effect or be reinstated after the relief from the stay is granted."
     hash "252609e37204e21c419efea855bb604a2ef578c737b0a02beaf119338825cd7c"
   }
-  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -260,14 +260,14 @@ module "/us/usc/ptIII/rule3002.1" {
     p "Subdivision (e) is amended to allow parties in interest in addition to the debtor or trustee, such as the United States trustee, to seek a determination regarding the validity of any claimed fee, expense, or charge."
     hash "2c93acefdcea47ba9497debfa31c01f5c82ed4bd98036ff26a6b452ae4ca975b"
   }
-  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 3002.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "57e0461fb9a3cf4d38017627bba95e331a44d586faa057cadba5c7cbd69459f4"
   }
-  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" enacted {
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2025 Amendment"
@@ -284,7 +284,7 @@ module "/us/usc/ptIII/rule3002.1" {
   }
   layers {
     operative "741fab22f9dcf9e6e198bc87b8d899306374b0e7f8594dc0645955ea4ceb60cf"
-    enacted "d1f939bc2354deb182f28f05bf9423aa9267bdb658fe219fcdc555f5b41d2d4b"
-    editorial "2ad3e0635db9de9c9dc57a054072d999517be0851ee656b946922ceb11cf20ca"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9775f701dddb5410114aa9b2ce3710dedca3a8374f76eedc2195d7d9ea9e09da"
   }
 }

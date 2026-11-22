@@ -10,21 +10,21 @@ module "/us/usc/ptIII/rule3013" {
     hash "9c6ca117cac0bfb968e9c847dc3c588c85994f7676e4f72729a5361bfdcf6708"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Sections 1122 and 1322(b)(1) set the standards for classifying claims and interests but provide that such classification is accomplished in the plan. This rule does not change the standards; rather it recognizes that it may be desirable or necessary to establish proper classification before a plan can be formulated. It provides for a court hearing on such notice as the court may direct."
     hash "eab9d36f0794dab886fc51b261b568164d0e9d1b7dbc19eb249f94df807e24cf"
   }
-  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to include chapter 12 cases."
     hash "17321bc9f0ad00ebcaf61e0b76f142892c3c0e0af3c9eab69d2e7fb74bebad30"
   }
-  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -33,7 +33,7 @@ module "/us/usc/ptIII/rule3013" {
   }
   layers {
     operative "9c6ca117cac0bfb968e9c847dc3c588c85994f7676e4f72729a5361bfdcf6708"
-    enacted "4211102b3191e15d85d868c7ced0ab6b764c7102299a035838c613d17a178e67"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6441e112200a629aa2f3808723cf5c5566691968ae86b7cbccfb2e042be4ae4a"
   }
 }

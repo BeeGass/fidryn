@@ -10,14 +10,14 @@ module "/us/usc/ptIX/rule9005" {
     hash "e8825f42bce5db5beb1a12a1913dad76171033a4e4706d10f53868dbf71f2a18"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "c25fc2026e7e72c57bb661750661d9d6a40a89aaa24e7cc0df3ccd222a4ffd06"
   }
-  note "/us/usc/ptIX/rule9005/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9005/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptIX/rule9005" {
   }
   layers {
     operative "e8825f42bce5db5beb1a12a1913dad76171033a4e4706d10f53868dbf71f2a18"
-    enacted "1f4de4c17f6459039ae7db53ed88d258342b93087946973b2d3e67167a842ca7"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "424dc4f7bab8c967637b361fc06bb5fbae36df742765bec1aaa302b67519049c"
   }
 }

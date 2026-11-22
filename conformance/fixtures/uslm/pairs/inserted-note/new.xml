@@ -10,9 +10,9 @@
 <content>A widget is a small device.</content>
 <notes type="uscNote">
 <note role="crossHeading" topic="statutoryNotes"><heading><b>Statutory Notes</b></heading></note>
-<note topic="effectiveDate"><heading>Effective Date</heading><p>Invented note N takes effect on a later invented day.</p></note>
-<note topic="effectiveDate"><heading>Effective Date</heading><p>Invented note A took effect on an invented day.</p></note>
-<note topic="effectiveDate"><heading>Effective Date</heading><p>Invented note B took effect on another invented day.</p></note>
+<note topic="effectiveDate"><heading>Effective Date</heading><p>An invented act provided that: <quotedContent>“Invented note N takes effect on a later invented day.”</quotedContent></p></note>
+<note topic="effectiveDate"><heading>Effective Date</heading><p>An invented act provided that: <quotedContent>“Invented note A took effect on an invented day.”</quotedContent></p></note>
+<note topic="effectiveDate"><heading>Effective Date</heading><p>An invented act provided that: <quotedContent>“Invented note B took effect on another invented day.”</quotedContent></p></note>
 </notes>
 </section>
 </title>

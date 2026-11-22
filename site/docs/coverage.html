@@ -134,9 +134,10 @@ outcome, and the table gives the references of each layer by outcome, so
 that a reader sees how many of them reach their target.</li>
 <li><strong>Classified.</strong> What kind of provision it is, is recorded. At this version
 the one kind that is recorded is a definition, and the ledger gives the
-number of definitions extracted, by basis and by kind. It gives no count
-of classified provisions, since one provision can hold more than one
-definition.</li>
+number of definitions extracted, by basis and by kind; a definition with
+a condition, or with source words in the place of a link, is counted as
+any other. It gives no count of classified provisions, since one
+provision can hold more than one definition.</li>
 </ul>
 <h2 id="the-basis-of-a-definition"><span class="hn">9.2</span> The basis of a definition <a class="anchor" href="#the-basis-of-a-definition" aria-label="Link to this section">#</a></h2>
 <p>Each definition extracted has one of three bases:</p>
@@ -162,8 +163,10 @@ used in this subtitle" in a section that stands in no subtitle.</li>
 </ul>
 <p>The rules read definitions written in a closed list of forms
 (<a href="/docs/law-modules#definitions">Definitions</a>), and they do not find every
-definition that the text holds. The share of the definitions they miss has
-not been measured for the sample.</p>
+definition that the text holds. The forms they leave out are listed, with
+their counts measured on the whole of release point 119-142, in
+<a href="/docs/law-modules#d16-what-stays-out">What stays out</a>; the share they miss
+has not been measured for the sample.</p>
 <h2 id="counted-and-not-imported"><span class="hn">9.3</span> Counted and not imported <a class="anchor" href="#counted-and-not-imported" aria-label="Link to this section">#</a></h2>
 <p>Some of what the publisher's files hold is by rule not imported. The
 importer counts it in the lock of the workspace under these six names, and
@@ -193,20 +196,20 @@ is imported, as a note of its group.</li>
 <tr><td>Containers, by kind</td><td><code>totals.containers_by_kind</code></td><td>1 <code>appendix</code>, 25 <code>chapter</code>, 1 <code>courtRules</code>, 1 <code>level</code>, 13 <code>part</code>, 29 <code>subchapter</code>, 2 <code>title</code></td></tr>
 <tr><td>Provisions imported and addressed, the top provision of each unit included</td><td><code>totals.provisions</code></td><td>4,857</td></tr>
 <tr><td>Addresses: aliases kept, and addresses disambiguated and assigned by the importer</td><td><code>totals.addresses</code></td><td>229 <code>aliases</code>, 0 <code>disambiguated</code>, 3 <code>assigned</code></td></tr>
-<tr><td>Notes imported, by layer</td><td><code>totals.notes</code></td><td>1,498 <code>enacted</code>, 593 <code>editorial</code></td></tr>
+<tr><td>Notes imported, by layer</td><td><code>totals.notes</code></td><td>196 <code>enacted</code>, 1,895 <code>editorial</code></td></tr>
 <tr><td>Notes, by group</td><td><code>totals.notes_by_group</code></td><td>1 <code>courtRules</code>, 303 <code>editorialNotes</code>, 9 <code>execDoc</code>, 539 <code>statutoryNotes</code>, 1,239 <code>ungrouped</code></td></tr>
 <tr><td>Footnotes imported</td><td><code>totals.footnotes</code></td><td>107</td></tr>
 <tr><td>Provisions and notes that hold an image, whose picture is not in the archive</td><td><code>totals.with_images</code></td><td>1</td></tr>
 <tr><td>References in operative text, by outcome</td><td><code>totals.references.operative</code></td><td>644 <code>exact</code>, 14 <code>target-status</code>, 0 <code>ambiguous</code>, 11 <code>unit-only</code>, 1 <code>range-form</code>, 273 <code>no-unit</code>, 192 <code>outside</code>, 0 <code>malformed</code></td></tr>
-<tr><td>References in enacted notes, by outcome</td><td><code>totals.references.enacted</code></td><td>332 <code>exact</code>, 18 <code>target-status</code>, 0 <code>ambiguous</code>, 14 <code>unit-only</code>, 0 <code>range-form</code>, 364 <code>no-unit</code>, 1,454 <code>outside</code>, 0 <code>malformed</code></td></tr>
-<tr><td>References in editorial matter, by outcome</td><td><code>totals.references.editorial</code></td><td>275 <code>exact</code>, 47 <code>target-status</code>, 0 <code>ambiguous</code>, 14 <code>unit-only</code>, 1 <code>range-form</code>, 259 <code>no-unit</code>, 4,919 <code>outside</code>, 0 <code>malformed</code></td></tr>
+<tr><td>References in enacted notes, by outcome</td><td><code>totals.references.enacted</code></td><td>176 <code>exact</code>, 15 <code>target-status</code>, 0 <code>ambiguous</code>, 12 <code>unit-only</code>, 0 <code>range-form</code>, 117 <code>no-unit</code>, 692 <code>outside</code>, 0 <code>malformed</code></td></tr>
+<tr><td>References in editorial matter, by outcome</td><td><code>totals.references.editorial</code></td><td>431 <code>exact</code>, 50 <code>target-status</code>, 0 <code>ambiguous</code>, 16 <code>unit-only</code>, 1 <code>range-form</code>, 506 <code>no-unit</code>, 5,681 <code>outside</code>, 0 <code>malformed</code></td></tr>
 <tr><td>References of the outcome <code>outside</code>, by the body of law they name</td><td><code>totals.outside_by_body</code></td><td>739 <code>/us/act</code>, 3,310 <code>/us/pl</code>, 2,516 <code>/us/stat</code></td></tr>
-<tr><td>Definitions extracted, by basis</td><td><code>totals.definitions</code></td><td>7 <code>enacted</code>, 100 <code>restated</code>, 37 <code>unresolved</code></td></tr>
-<tr><td>Definitions extracted, by kind</td><td><code>totals.definitions_by_kind</code></td><td>7 <code>borrowed</code>, 1 <code>does_not_include</code>, 15 <code>includes</code>, 121 <code>means</code></td></tr>
+<tr><td>Definitions extracted, by basis</td><td><code>totals.definitions</code></td><td>8 <code>enacted</code>, 116 <code>restated</code>, 66 <code>unresolved</code></td></tr>
+<tr><td>Definitions extracted, by kind</td><td><code>totals.definitions_by_kind</code></td><td>7 <code>borrowed</code>, 8 <code>does_not_include</code>, 31 <code>includes</code>, 144 <code>means</code></td></tr>
 <tr><td>Counted and not imported</td><td><code>totals.not_imported</code></td><td>19 <code>tables_of_contents</code>, 4 <code>footnotes_in_tables_of_contents</code>, 341 <code>links_in_tables_of_contents</code>, 3 <code>release_notes</code>, 0 <code>links_without_words</code>, 358 <code>note_group_headings</code></td></tr>
-<tr><td>The file <code>usc01.xml</code> (positive law)</td><td><code>by_source.0</code></td><td>39 units, 129 provisions, 10 definitions</td></tr>
-<tr><td>The file <code>usc11a.xml</code> (not positive law)</td><td><code>by_source.1</code></td><td>230 units, 2,362 provisions, 4 definitions</td></tr>
-<tr><td>The file <code>usc45.xml</code> (not positive law)</td><td><code>by_source.2</code></td><td>294 units, 2,366 provisions, 130 definitions</td></tr>
+<tr><td>The file <code>usc01.xml</code> (positive law)</td><td><code>by_source.0</code></td><td>39 units, 129 provisions, 11 definitions</td></tr>
+<tr><td>The file <code>usc11a.xml</code> (not positive law)</td><td><code>by_source.1</code></td><td>230 units, 2,362 provisions, 17 definitions</td></tr>
+<tr><td>The file <code>usc45.xml</code> (not positive law)</td><td><code>by_source.2</code></td><td>294 units, 2,366 provisions, 162 definitions</td></tr>
 </tbody></table>
 </div>
 <!-- coverage-table:end -->
@@ -224,7 +227,7 @@ table is not what the ledger gives.</p>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.1 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

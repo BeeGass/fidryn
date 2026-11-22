@@ -150,9 +150,10 @@ const DEFINITION: &[Slot] = &[
     some(&["term"]),
     required(&["kind"]),
     required(&["words"]),
+    optional(&["condition"]),
     optional(&["region"]),
     required(&["basis"]),
-    optional(&["borrowed_from"]),
+    optional(&["borrowed_from", "borrowed_words"]),
     optional(&["see_note"]),
 ];
 const LAYERS: &[Slot] = &[
@@ -183,7 +184,8 @@ struct Order<'a> {
     slots: &'static [Slot],
     /// The first place a field may still fill.
     next: usize,
-    seen: Vec<bool>,
+    /// The word that first filled each place.
+    seen: Vec<Option<&'static str>>,
 }
 
 impl<'a> Order<'a> {
@@ -192,7 +194,7 @@ impl<'a> Order<'a> {
             block,
             slots,
             next: 0,
-            seen: vec![false; slots.len()],
+            seen: vec![None; slots.len()],
         }
     }
 
@@ -201,30 +203,38 @@ impl<'a> Order<'a> {
         error(at, format!("missing field `{name}` in `{}`", self.block))
     }
 
-    /// Accept the field that begins with `word`, written at `at`.
+    /// Accept the field that begins with `word`, written at `at`. A place
+    /// that takes one of several words takes one of them once.
     fn accept(&mut self, word: &str, at: Span) -> Result<()> {
         let block = self.block;
-        let Some(index) = self
-            .slots
-            .iter()
-            .position(|slot| slot.words.contains(&word))
-        else {
+        let Some((index, known)) = self.slots.iter().enumerate().find_map(|(index, slot)| {
+            slot.words
+                .iter()
+                .find(|known| **known == word)
+                .map(|known| (index, *known))
+        }) else {
             return Err(error(at, format!("unknown field `{word}` in `{block}`")));
         };
         if index < self.next {
-            let message = if self.seen[index] && !self.slots[index].repeated {
-                format!("field `{word}` is given twice in `{block}`")
-            } else {
-                format!("field `{word}` is out of order in `{block}`")
+            let message = match self.seen[index] {
+                Some(first) if !self.slots[index].repeated && first != word => format!(
+                    "field `{word}` is given with `{first}` in `{block}`, which takes one of them"
+                ),
+                Some(_) if !self.slots[index].repeated => {
+                    format!("field `{word}` is given twice in `{block}`")
+                }
+                _ => format!("field `{word}` is out of order in `{block}`"),
             };
             return Err(error(at, message));
         }
-        if let Some(skipped) =
-            (self.next..index).find(|&skipped| self.slots[skipped].required && !self.seen[skipped])
+        if let Some(skipped) = (self.next..index)
+            .find(|&skipped| self.slots[skipped].required && self.seen[skipped].is_none())
         {
             return Err(self.missing(skipped, at));
         }
-        self.seen[index] = true;
+        if self.seen[index].is_none() {
+            self.seen[index] = Some(known);
+        }
         self.next = if self.slots[index].repeated {
             index
         } else {
@@ -236,7 +246,7 @@ impl<'a> Order<'a> {
     /// The block closes at `at`.
     fn close(&self, at: Span) -> Result<()> {
         match (self.next..self.slots.len())
-            .find(|&index| self.slots[index].required && !self.seen[index])
+            .find(|&index| self.slots[index].required && self.seen[index].is_none())
         {
             Some(index) => Err(self.missing(index, at)),
             None => Ok(()),
@@ -944,8 +954,9 @@ impl<'s> Parser<'s> {
         let at = self.string()?;
         self.open_block()?;
         let mut terms = Vec::new();
-        let (mut kind, mut words, mut region, mut basis) = (None, None, None, None);
-        let (mut borrowed_from, mut see_note) = (None, None);
+        let (mut kind, mut words, mut condition, mut region, mut basis) =
+            (None, None, None, None, None);
+        let (mut borrowed_from, mut borrowed_words, mut see_note) = (None, None, None);
         let close = self.fields("definition", DEFINITION, |p, token, word| {
             match word {
                 "term" => terms.push(p.field_string()?),
@@ -962,9 +973,11 @@ impl<'s> Parser<'s> {
                         return Err(p.expected(value, "a string or `unstated`"));
                     });
                 }
+                "condition" => condition = Some(p.field_string()?),
                 "region" => region = Some(p.field_string()?),
                 "basis" => basis = Some(p.field_ident()?),
                 "borrowed_from" => borrowed_from = Some(p.field_string()?),
+                "borrowed_words" => borrowed_words = Some(p.field_string()?),
                 "see_note" => see_note = Some(p.field_string()?),
                 _ => return Err(p.unhandled(token, "definition")),
             }
@@ -975,9 +988,11 @@ impl<'s> Parser<'s> {
             terms,
             kind: self.present(kind, close, "definition", "kind")?,
             words: self.present(words, close, "definition", "words")?,
+            condition,
             region,
             basis: self.present(basis, close, "definition", "basis")?,
             borrowed_from,
+            borrowed_words,
             see_note,
             span: join(start, span(close)),
         })

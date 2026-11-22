@@ -27,28 +27,28 @@ module "/us/usc/ptV/rule5001" {
     hash "89d672e98e3837ab51769650aa9d052d72f466d79b7173b8c13685eed34da631"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is adapted from subdivisions (a), (b) and (c) of Rule 77 F.R.Civ.P."
     hash "5646d4188d6637b913cb92e165938e495793569069cfa723a2593af4d7b3dfea"
   }
-  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Rule 9001, as amended, defines court to mean the bankruptcy judge or district judge before whom a case or proceeding is pending. Clerk means the bankruptcy clerk, if one has been appointed for the district; if a bankruptcy clerk has not been appointed, clerk means clerk of the district court."
     hash "ea8170f99db51809debd2baa2974488c8f839bf50d4ad164cdb42fc5c7d6906d"
   }
-  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (c) is amended to refer to Rule 9006(a) for a list of legal holidays. Reference to F.R.Civ.P. is not necessary for this purpose."
     hash "7af508bbccab4b9bf9e42c8b127b9e1773df3d3bd880c975d10f1010d2a69522"
   }
-  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -56,7 +56,7 @@ module "/us/usc/ptV/rule5001" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "bf8cfae6e07d55a2a2c0b1d0f3628b19c2dceeb5f19f3124347d8d29aa8582b8"
   }
-  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -65,7 +65,7 @@ module "/us/usc/ptV/rule5001" {
   }
   layers {
     operative "89d672e98e3837ab51769650aa9d052d72f466d79b7173b8c13685eed34da631"
-    enacted "20826b9bb2731d257f8e347597d0742415f8257df07d2db5a65ce3f8c1ccf318"
-    editorial "bca4e64bfe5e2de0ae5940691907691d6f1d9028b168e3e52a6429af2c6cd4e2"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0dfdbbe3550733bc8db8cf3a3ea38b24c9a42ce59d6085682a1f0c3558c731df"
   }
 }

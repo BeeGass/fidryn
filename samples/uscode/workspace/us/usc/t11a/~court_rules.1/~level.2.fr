@@ -15,7 +15,7 @@ module "/us/usc/t11a/~courtRules.1/~level.2" {
     hash "11fcb89878b52759a0ad66e60a3f3478346d164fa8f2badc267bc805fac2cb92"
   }
   credit "(As added Apr. 26, 2018, eff. Dec. 1, 2018.)"
-  note "/us/usc/t11a/~courtRules.1/~level.2/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" enacted {
+  note "/us/usc/t11a/~courtRules.1/~level.2/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Length Limits Stated in Part VIII of the Federal Rules of Bankruptcy Procedure"
@@ -24,7 +24,7 @@ module "/us/usc/t11a/~courtRules.1/~level.2" {
   }
   layers {
     operative "11fcb89878b52759a0ad66e60a3f3478346d164fa8f2badc267bc805fac2cb92"
-    enacted "c50dd9f2b9e3a3fe63565c246a41d2aa80ccc2d9a74798c3e1836ad53f32b953"
-    editorial "1250af8d0208bd619c27010df608a931f0bc22af65701a768ad45f7f809ce560"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1ce436891ffdf69f33d5b3b1cfb9a63ddc89bdb1562aef14e9e2a9d79dcd52da"
   }
 }

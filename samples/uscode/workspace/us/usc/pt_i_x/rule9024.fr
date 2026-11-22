@@ -36,7 +36,7 @@ module "/us/usc/ptIX/rule9024" {
     hash "bc076951a13345241b70a61d9d8ba2e23351fa3981217737155ca93ff51b44e7"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -44,21 +44,21 @@ module "/us/usc/ptIX/rule9024" {
     p "Pursuant to § 727(e) of the Code a complaint to revoke a discharge must be filed within one year of the entry of the discharge or, when certain grounds of revocation are asserted, the later of one year after the entry of the discharge or the date the case is closed. Under § 1144 and § 1330 of the Code a party must file a complaint to revoke an order confirming a chapter 11 or 13 plan within 180 days of its entry. Clauses (2) and (3) of this rule make it clear that the time periods established by §§ 727(e), 1144 and 1330 of the Code may not be circumvented by the invocation of F.R.Civ.P. 60(b)."
     hash "110a3b6949b8de8cdb9b8b9a291cb04a3a20dc8c9b58cff55c8ee61fe654d4a3"
   }
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Clause (3) is amended to include a reference to § 1230 of the Code which contains time limitations relating to revocation of confirmation of a chapter 12 plan. The time periods prescribed by § 1230 may not be circumvented by the invocation of F.R.Civ.P. 60(b)."
     hash "2a584286c7b21bedad6bbf03d8b4e7c59e8d062c055f89065b7d57f5caa488b6"
   }
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
     p "The rule is amended to conform to the changes made to the Federal Rules of Civil Procedure through the restyling of those rules effective on December 1, 2007."
     hash "76923e497c4b9c61312745ce5d68065b9395b228da2fec808e60203abfbd5cf5"
   }
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014 Amendment"
@@ -66,14 +66,14 @@ module "/us/usc/ptIX/rule9024" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "ffdbc3bd94aeed87628ac76d3749f5187c991535c08283dcf815b20e8e57a63f"
   }
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9024 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "d9d5f087f44814d5984f3b6b9d9868401e8ed1078d9e9a9b6d90e13c89c92aaa"
   }
-  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9024/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -82,7 +82,7 @@ module "/us/usc/ptIX/rule9024" {
   }
   layers {
     operative "bc076951a13345241b70a61d9d8ba2e23351fa3981217737155ca93ff51b44e7"
-    enacted "0879e5e3b1a412a7c34858eb151cf20be449f19064bb3034d8893545f4308f2c"
-    editorial "cfbbfc3b0a0831538c8fc4967a0184166469912f5fe232a983e8a39c9a2e4267"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "eeea81c0ebc506ed035ef70ca189677be72447d17a9b8be2521a614aca7ce47e"
   }
 }

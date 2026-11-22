@@ -15,7 +15,7 @@ module "/us/usc/t45/s793" {
     p "Section, " ["Pub. L. 93–236, title VI, § 603" -> "/us/pl/93/236/tVI/s603"] ", Jan. 2, 1974, " ["87 Stat. 1023" -> "/us/stat/87/1023"] ", related to freight rates for recyclables."
     hash "d8c2b3d0b7e8cb8978ede1c57056b581a6d7cc76fc3a8b761f29176205786838"
   }
-  note "/us/usc/t45/s793/note/statutoryNotes/pl.94.210/investigation-of-discriminatory-freight-rates-for-transporta" enacted {
+  note "/us/usc/t45/s793/note/statutoryNotes/pl.94.210/investigation-of-discriminatory-freight-rates-for-transporta" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Investigation of Discriminatory Freight Rates for Transportation of Recyclable or Recycled Materials"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s793" {
   }
   layers {
     operative "91de7c09dc7dc3a19cc9c60bac6e29d21e6ee4b99c60adedbdd272c3180b0faa"
-    enacted "d7d8404ad55bc7720185ea36f9399ae7233e2276721cf536c3e088d5bb18fda6"
-    editorial "07c181522c53f9c3c1ff3a160e100dbc7ea9c5517f64f9395e06750a51e75b3e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "baf39ce65a133de8acfa25a7b78ebd25b11f9cf64ae8416e257f3ac075ed5a55"
   }
 }

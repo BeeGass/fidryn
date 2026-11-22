@@ -372,7 +372,7 @@ module "/us/usc/t45/s231a" {
     p "Subsec. (h). " ["Pub. L. 97–35, § 1117(g)" -> "/us/pl/97/35/s1117/g"] ", substituted “the spouse or divorced wife of such individual” for “the spouse of such individual” in subdiv. (1), and “If a spouse or divorced wife entitled” for “If a spouse entitled” in subdiv. (3)."
     hash "e4713ff2394cb10175bd5b7b860a853d01186233e2e0c81dd40ccf1b2e099b1c"
   }
-  note "/us/usc/t45/s231a/note/statutoryNotes/pl.96.88/change-of-name" enacted {
+  note "/us/usc/t45/s231a/note/statutoryNotes/pl.96.88/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -399,7 +399,7 @@ module "/us/usc/t45/s231a" {
     }
     hash "e12439a94ac2a9b0e1d2d72cc599a33c26c062a9ad215de87996b5fd9a5c4dbf"
   }
-  note "/us/usc/t45/s231a/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231a/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
@@ -446,14 +446,14 @@ module "/us/usc/t45/s231a" {
     }
     hash "7d895fed861609eff7d9ff8dc02cea0ad287a789056ea6c5bbe5e1bb0620de0b"
   }
-  note "/us/usc/t45/s231a/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231a/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["section 1117(a) of Pub. L. 97–35" -> "/us/pl/97/35/s1117/a"] " effective Oct. 1, 1981, and applicable with respect to individuals whose supplemental annuity closing date under subsec. (b) of this section did not occur before Oct. 1, 1981, amendment by section 1117(e)(2), (f) of " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Jan. 1, 1982, and amendment by other provisions of " ["section 1117 of Pub. L. 97–35" -> "/us/pl/97/35/s1117"] " effective Oct. 1, 1981, and applicable with respect to annuities awarded on or after Oct. 1, 1981, see " ["section 1129 of Pub. L. 97–35" -> "/us/pl/97/35/s1129"] ", set out as a note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
     hash "abf8d8d18709cac8c38f8db2dc3f3816346011781fa0dfc020219866ec804820"
   }
-  note "/us/usc/t45/s231a/note/statutoryNotes/pl.94.12/special-50-payment-under-tax-reduction-act-of-1975" enacted {
+  note "/us/usc/t45/s231a/note/statutoryNotes/pl.94.12/special-50-payment-under-tax-reduction-act-of-1975" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Special $50 Payment Under Tax Reduction Act of 1975"
@@ -487,7 +487,7 @@ module "/us/usc/t45/s231a" {
   }
   layers {
     operative "e7afbea469fd5b1608859e676d494d559df9a275c7894d28cac8a3f26510f93b"
-    enacted "8d4b0dac16eaf94f9241b1fe9e5a4220aab10e7115586c590ee113da10067b4d"
-    editorial "421202378f4bd0a6ebd739f56dc1697834504841c0f7d4db13a86ef119c251cb"
+    enacted "19cc1e031bdaf019c73d5ec9bfcbad70b0ba82d27026a12116a492c95ce98323"
+    editorial "836be0e393ccacafe28bb90f74eac9af67cff7a2c40dca0a998f85464f8e32a0"
   }
 }

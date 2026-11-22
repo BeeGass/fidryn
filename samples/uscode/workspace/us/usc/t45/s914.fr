@@ -60,7 +60,7 @@ module "/us/usc/t45/s914" {
     p "1980—Subsec. (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted “to employees” after “no liability”."
     hash "952a23f8b98df6bec76dd0ee66b033682e8307d51f9a3822106252d6642c6dab"
   }
-  note "/us/usc/t45/s914/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s914/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
@@ -69,7 +69,7 @@ module "/us/usc/t45/s914" {
   }
   layers {
     operative "197b4dc3488a070cf6f9e0164110c6b8e1b373180144c36a8933341eb2e15162"
-    enacted "36dd9becc6748e25853af8213e205980ab38d86368942ac1f87be119524edcae"
-    editorial "e07b00a5f526d2cbc0642fd008ca771ae9f72e1b7e346c374dc44c1e3e747e18"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fa2da1864f1ca417532480fb0235114bf86eb8881040ad2d0120fc224dc0bb8e"
   }
 }

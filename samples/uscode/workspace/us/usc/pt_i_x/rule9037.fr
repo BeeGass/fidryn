@@ -154,7 +154,7 @@ module "/us/usc/ptIX/rule9037" {
     hash "32d7fa3a79f77c98685dc0565518a56d3a72c0b0da067b76ec8edd69a728edad"
   }
   credit "(Added Apr. 30, 2007, eff. Dec. 1, 2007; amended Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2007" enacted {
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2007" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007"
@@ -172,7 +172,7 @@ module "/us/usc/ptIX/rule9037" {
     p "Changes After Publication. Rule 9037 is intended to parallel as closely as possible Civil Rule 5.2 and Criminal Rule 49.1. The Advisory Committees have worked together to maintain as much consistency as possible in the three versions of the rule. The rule has been revised to implement the several style revisions suggested by the Style Subcommittee of the Standing Committee. Subdivision (b) was reorganized and renumbered. Subdivisions (b)(1) and (b)(3) were added in response to suggestions by the Department of Justice. Subdivision (b)(4), formerly subdivision (b)(2), was amended in response to the suggestion of the Committee on Court Administration and Case Management so that the subdivision now refers to court records that become a part of the record in the pending matter. The term “entity” has been substituted for “person” in subdivision (c) and for “party” in subdivisions (e) and (f) to conform the rule to the definitions provided in the Bankruptcy Code."
     hash "f42395f5dc9e7d4f80f43ceddb73ed45a691e7e0ffc996cb7cb0757d21800464"
   }
-  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2019 Amendment"
@@ -185,7 +185,7 @@ module "/us/usc/ptIX/rule9037" {
     p "This procedure does not affect the availability of any remedies that an individual whose personal identifiers are exposed may have against the entity that filed the unredacted document."
     hash "2f7d9b3db187833f783248fff262cd6522221c564ddfd66f6cbbea9e69e54b2e"
   }
-  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9037/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -197,7 +197,7 @@ module "/us/usc/ptIX/rule9037" {
   }
   layers {
     operative "32d7fa3a79f77c98685dc0565518a56d3a72c0b0da067b76ec8edd69a728edad"
-    enacted "a468ad99fbc9b086e96b2fb4c87b3fdc40f019d709d48854ffda1100ec811b4f"
-    editorial "7931136bda3d65b2abaefe184e64d03cfa91aa8bed29c9fec653362eef8b8fb3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e61eb90c14dd60033f48f2dab88a5dbfe312ba8d8b8d98b5a7e45b722bd90f4f"
   }
 }

@@ -60,7 +60,7 @@ module "/us/usc/ptVII/rule7001" {
     hash "2a2915ae04a31ae307a7bb56c8dbc61edc1cecdac5088b5d217bf199903cef40"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -158,21 +158,21 @@ module "/us/usc/ptVII/rule7001" {
     p "Exemptions and objections thereto are governed by Rule 4003. Filing of proofs of claim and the allowances thereof are governed by Rules 3001–3005, and objections to claims are governed by Rule 3007. When an objection to a claim is joined with a demand for relief of the kind specified in this Rule 7001, the matter becomes an adversary proceeding. See Rule 3007."
     hash "8f33b99f21ec74bb31f271e80e5b0e64781f4042a4c06f96ee85637b6f87650e"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Another exception is added to clause (1). A trustee may proceed by motion to recover property from the debtor."
     hash "965a5cdcb341037d6aad4937fcd09db5085274c852ae8158872114102568a25e"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Clauses (5) and (8) are amended to include chapter 12 plans."
     hash "f05306c84b12984fc04e456b7da584de7c0da18caa65b39bc889550a33b396b5"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -180,7 +180,7 @@ module "/us/usc/ptVII/rule7001" {
     p "GAP Report on Rule 7001. No changes since publication, except for stylistic changes."
     hash "c9bf6882617af052ea5380f23586fa9af370270b49afdc3bc1ea537a2bedd683"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -188,14 +188,14 @@ module "/us/usc/ptVII/rule7001" {
     p "Changes Made After Publication. The proposed addition of subsection (b) was deleted, and the content of that provision was moved to Rule 4004(d). The exception in paragraph (4) of the rule was revised to refer to objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) of the Code. The redesignation of the existing rule as subdivision (a) was also deleted. The Committee Note was revised to reflect these changes."
     hash "c37fc951dea84b6037237716bdff19c8e04858b49619c1e82b6d7864fb684693"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
     p "Subdivision (2) is amended to provide that the determination of the amount of a secured claim under Rule 3012, like a proceeding by the debtor to avoid a lien on or other transfer of exempt property under Rule 4003(d), does not require an adversary proceeding. The determination of the amount of a secured claim may be sought by motion or through a chapter 12 or chapter 13 plan in accordance with Rule 3012. An adversary proceeding continues to be required for lien avoidance not governed by Rule 4003(d)."
     hash "071aac12a7288be685bb50c2271d2d4a68a0f257e522f6727df74e6a00c9060c"
   }
-  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -206,7 +206,7 @@ module "/us/usc/ptVII/rule7001" {
   }
   layers {
     operative "2a2915ae04a31ae307a7bb56c8dbc61edc1cecdac5088b5d217bf199903cef40"
-    enacted "c5d9f63d895ad97aa6668618aff6d4ddf0d37951d65169eda9cf15b8df4f166d"
-    editorial "c3152dd321ac608edae9646abc59a87ada446bb14421eacf2990b33f1c51eab3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a867f26260ad2b833440de746ceb024fe86d1c8015b98c9a2b9cf954a502c85a"
   }
 }

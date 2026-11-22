@@ -74,14 +74,14 @@ module "/us/usc/t45/s363" {
     p "1939—Subsec. (d). Act June 20, 1939, substituted references to unemployment insurance account for references to unemployment compensation account wherever appearing."
     hash "008696cbc41187858c5f09535e180958fadf93701087009aefe848174cce22ce"
   }
-  note "/us/usc/t45/s363/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" enacted {
+  note "/us/usc/t45/s363/note/statutoryNotes/pl.90.257/effective-date-of-1968-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1968 Amendment"
     p "Amendment by " ["Pub. L. 90–257" -> "/us/pl/90/257"] " effective as of July 1, 1968, see " ["section 208 of Pub. L. 90–257" -> "/us/pl/90/257/s208"] ", set out as a note under " ["section 352 of this title" -> "/us/usc/t45/s352"] "."
     hash "811ceb55183946e6ff369ce82899ea60d37094888ed8c11e694e31038dee1b02"
   }
-  note "/us/usc/t45/s363/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s363/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
@@ -102,14 +102,14 @@ module "/us/usc/t45/s363" {
     }
     hash "b37e37b556310821a2cf896a5d946eef1ab82f88f8a6466eb2f0c6ce23992b16"
   }
-  note "/us/usc/t45/s363/note/statutoryNotes/act.1945-10-26.ch434/kentucky" enacted {
+  note "/us/usc/t45/s363/note/statutoryNotes/act.1945-10-26.ch434/kentucky" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Kentucky"
     p ["Act Oct. 26, 1945, ch. 434" -> "/us/act/1945-10-26/ch434"] ", " ["59 Stat. 550" -> "/us/stat/59/550"] ", as amended by Reorg. Plan No. 2 of 1946, § 4, eff. July 16, 1946, 11 F.R. 7873, " ["60 Stat. 1095" -> "/us/stat/60/1095"] ", provided that $1,260,000 should constitute the total amount withheld by the Federal Security Administrator under subsec. (d) of this section for payment for the administration of Kentucky’s Unemployment Compensation Law, KRS 341.010–341.990."
     hash "b84d6091f927d10532106c710c40fe8c75246606808bb8dbbf7e4ab8b4088ab8"
   }
-  note "/us/usc/t45/s363/note/execDoc/nolaw/transfer-of-functions" enacted {
+  note "/us/usc/t45/s363/note/execDoc/nolaw/transfer-of-functions" editorial {
     group execDoc
     topic "transferOfFunctions"
     heading "Transfer of Functions"
@@ -120,7 +120,7 @@ module "/us/usc/t45/s363" {
   }
   layers {
     operative "bc0bf60d35043c6bc4f0def0a7ce15d65abb02d3ac5927b3f995d137b1e48a96"
-    enacted "5a2a1194ca5a16b4c046bd9fca661c795bb20f8900123e575ac37a588df23d58"
-    editorial "580a058e187731cc9691caa5352276ece15975597e0225ea160dc5855ed46cb4"
+    enacted "8862561ffa692cc6711fc4883db8cd7fde82cb45e5c0aa0c4116e84017e45017"
+    editorial "55169594d313198ffb1eb54c3e520d11f58e4ad76bbc5ffd04e436d4fa5a4fe0"
   }
 }
