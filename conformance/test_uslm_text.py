@@ -519,6 +519,11 @@ def understated_archive(directory: Path, crc_of_prefix: bool) -> None:
 
 
 COMPOSED = "composes across the boundary"
+# The refusal of a column that holds anything, white space included: the reason, and the
+# column named as the element, whether it stands in a column group or in the table.
+COLUMN_WITH_CONTENT = (
+    "a column that holds text, white space included, or an element (element xhtml:col,"
+)
 # The combining acute accent, which composes with the `e` before it into U+00E9.
 ACUTE = chr(0x0301)
 # A white-space character other than U+0020.
@@ -756,7 +761,14 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
             "<col>A</col></colgroup><tr><td>A</td></tr></table></content>"
         ),
-        "column",
+        COLUMN_WITH_CONTENT,
+    ),
+    "column group that holds what is no column": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
+            "<p>A</p></colgroup><tr><td>A</td></tr></table></content>"
+        ),
+        "a column group that holds more than columns (element xhtml:p,",
     ),
     "signature that holds something other than name and role": (
         document(
@@ -840,14 +852,14 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
             "<col> </col></colgroup><tr><td>A</td></tr></table></content>"
         ),
-        "column",
+        COLUMN_WITH_CONTENT,
     ),
     "column of a table with white space": (
         document(
             inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><col>\n</col>'
             "<tr><td>A</td></tr></table></content>"
         ),
-        "column",
+        COLUMN_WITH_CONTENT,
     ),
     # The members of the identifier of a unit or a container are split at U+0020, and
     # none of them may be empty; a provision reads its first member.

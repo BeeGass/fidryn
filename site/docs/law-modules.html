@@ -2515,12 +2515,17 @@ independent reading reads it as a note of its own, <code>ungrouped</code>.</li>
 read by both and read differently, and shows only when the two readings
 are compared on that release: what <code>conformance/uslm_text.py</code> prints for
 its archives against what <code>fidryn text DIR --json</code> prints for its
-workspace. That comparison, with the counts of tables of contents of
-<code>conformance/usc_profile.py</code> against the ledger, is what would show any
-other form the two read differently. The check of <a href="#the-sample">the sample</a>
-makes both comparisons for the sample, and <code>tools/replay_uscode.py</code> makes
-them for each release it replays, before it commits the release, unless
-it is given <code>--no-readings</code>; an import makes neither.</p>
+workspace. <code>tools/replay_uscode.py</code> makes that comparison for each
+release it replays, before it commits the release, unless it is given
+<code>--no-readings</code>, and compares the count of tables of contents of
+<code>conformance/usc_profile.py</code> with the ledger's; an import makes neither.
+Another form that the two read differently shows there when it changes
+a text record or that count. One that changes only another count of
+what is not imported, the footnotes or the links in tables of contents,
+the release notes, the links without words or the labels of note
+groups, shows in neither: the check of <a href="#the-sample">the sample</a>
+compares every count that the profile and the ledger both hold, and
+does so for the sample alone.</p>
 </li>
 <li>
 <p>The independent reading refuses the nesting the ingester refuses, by the
