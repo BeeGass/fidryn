@@ -2058,8 +2058,24 @@ later step refuses is not tried again in another way.
 Measured on release point 119-142, the whole Code. The *near misses* are
 the 5,940 paragraphs that hold a quoted term near a defining verb and from
 which the first version extracts nothing (the population of the drawing
-tool). "In the population" counts those near misses; "remain" counts those
-these rules still do not extract a record for.
+tool for the first version's definitions). "In the population" counts
+those near misses; "remain" counts those these rules still do not extract
+a record for: those from whose paragraph they extract no definition of the
+term that made the paragraph a near miss. So matched, 4,319 of the 5,940
+are now read and 1,621 remain.
+
+Counted by the paragraph alone, a near miss being read when a definition
+is extracted from that same paragraph, as the drawing tool places each
+definition, these rules read 4,341 of the 5,940. The 22 more are read
+under another term: in 11 of them the same term, which the near miss
+holds with a final comma or period or in another case, and in 11 another
+term of the paragraph. Matched more loosely, 4,339 near
+misses have a definition of their term in their provision, and 4,400 a
+definition of any term in their provision. For these rules' definitions
+the drawing tool finds 1,600 near misses: the 1,599 paragraphs of the
+5,940 from which nothing is extracted, and one from which the first
+version extracted a definition and these rules extract none (49 U.S.C.
+40117(c)(2)(F), whose reach ran across an end of a sentence).
 
 1. **Kept out by a rule of these rules.**
 

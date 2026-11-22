@@ -18,14 +18,12 @@ file yet:
   of the workspace. Each line holds the address of the provision, the terms, the kind,
   the reach words (`unstated` when there are none), the condition, the region, the
   basis and the borrowed words (each `null` when there is none), and the text of the
-  paragraph it was extracted from: of the paragraphs that the rules of Definitions read,
-  the blocks of the provision's text parts that are paragraphs (not those in a table),
-  the one with a sentence at whose start the rules read a pattern and whose first term
-  in curly quotation marks, which begins in it, is the definition's first term, the
-  second such sentence for a second definition of that term, and so on. The rules read
-  a definition from any of those paragraphs, at the start of any of its sentences, and
-  the terms of a reading begin at its first quotation mark; the sentences, the text,
-  the pattern and the terms are read as `conformance/usc_definitions.py` reads them.
+  paragraph it was extracted from. That paragraph is found by the rules themselves: the
+  rules of Definitions of `conformance/usc_definitions.py`, every step of their order
+  of application, are applied to the unit of the provision as the text records give
+  it, and the definition is given the paragraph from which they extract a definition of
+  its provision with its first term, the second such for a second definition of that
+  term, and so on.
 - `near-misses.jsonl`: 500 paragraphs of operative text drawn without replacement from
   those that hold a term in curly quotation marks, `“` and `”` around at least one
   character that is neither, followed within 60 characters, from the end of the term
@@ -70,8 +68,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "conformance"))
 
-from usc_definitions import read_pattern, read_text, sentences
-from uslm_common import Text
+from usc_definitions import Place, Read, Reading, UnitDefinitions
+from uslm_common import Para, Part, Provision, Table, Text, Unit
 
 SIZE = 500
 MASK = (1 << 64) - 1
@@ -159,31 +157,108 @@ def loose_match(words: str) -> tuple[str, str] | None:
     return None
 
 
-def first_terms(block: dict[str, Any]) -> list[str]:
-    """The terms that a definition read from the paragraph `block` of a text record can
-    have as its first term: for each sentence of the paragraph's text as the rules of
-    Definitions read it, its first term in curly quotation marks, as the rules record a
-    term, when that term begins before the end of the sentence (it may run past it, as
-    the invented “R.M.S. Widget” does) and the rules read a pattern at the start of the
-    sentence.
-    The rules read a paragraph at the start of each of its sentences, and the terms of a
-    reading begin at its first quotation mark."""
-    text = read_text(
-        Text(
-            str(block["p"]),
-            tuple((int(start), int(end), str(target)) for start, end, target in block["refs"]),
-            tuple((int(start), int(end)) for start, end in block["sup"]),
-        )
+def text_of(block: dict[str, Any]) -> Text:
+    """The text of the paragraph `block` of a text record, in the model of the reading."""
+    return Text(
+        str(block["p"]),
+        tuple((int(start), int(end), str(target)) for start, end, target in block["refs"]),
+        tuple((int(start), int(end)) for start, end in block["sup"]),
+        tuple((int(start), int(end)) for start, end in block.get("sub", [])),
     )
-    found = []
-    for start, end in sentences(text.plain):
-        term = TERM.search(text.plain, start)
-        if term is None or term.start() >= end:
+
+
+# A block that is not a paragraph, which the rules of Definitions do not read.
+NOT_A_PARAGRAPH = Table([])
+
+
+class Placing(UnitDefinitions):
+    """The rules of Definitions of `conformance/usc_definitions.py`, every step of their
+    order of application, applied to one unit as its text records give it, noting for
+    each definition they extract its provision, its first term and the place of the
+    paragraph it is extracted from among the paragraphs of the provision."""
+
+    def __init__(self, unit: Unit, places: dict[int, int]) -> None:
+        # The place of each paragraph, by the identity of its text and of what the rules
+        # read of it.
+        self.places = places
+        self.of_read: dict[int, int] = {}
+        self.placed: list[tuple[str, str, int]] = []
+        super().__init__(unit)
+
+    def read_of(self, text: Text) -> Read:
+        read = super().read_of(text)
+        self.of_read[id(read)] = self.places[id(text)]
+        return read
+
+    def extract(
+        self,
+        path: list[Provision],
+        place: Place,
+        text: Read,
+        reading: Reading,
+        spans: list[tuple[int, int]],
+        the_end: int,
+    ) -> None:
+        count = len(self.found)
+        super().extract(path, place, text, reading, spans, the_end)
+        if len(self.found) > count:
+            self.placed.append((path[-1].address, reading.terms[0], self.of_read[id(text)]))
+
+
+def provision_of(
+    address: str, records: dict[str, dict[str, Any]], places: dict[int, int]
+) -> Provision:
+    """The provision at `address` and every provision below it, in the model of the
+    reading, from the text records `records` of the operative provisions; the place of
+    each of their paragraphs goes into `places`, counted as `read_records` counts it."""
+    record = records.get(address)
+    if record is None:
+        raise FormError(f"the records hold no provision at `{address}`, which another names")
+    items: list[Part | Provision] = []
+    ordinal = 0
+    for item in record["items"]:
+        if "child" in item:
+            items.append(provision_of(str(item["child"]), records, places))
             continue
-        reading = read_pattern(text, start)
-        if reading is not None:
-            found.append(reading.terms[0])
-    return found
+        blocks: list[Any] = []
+        for block in item["blocks"]:
+            if "p" in block:
+                ordinal += 1
+                text = text_of(block)
+                places[id(text)] = ordinal
+                blocks.append(Para(text))
+            else:
+                ordinal += sum(1 for _ in paragraphs([block]))
+                blocks.append(NOT_A_PARAGRAPH)
+        items.append(Part(str(item["part"]), blocks))
+    return Provision(address, str(record["kind"]), None, None, None, items)
+
+
+def extracted_from(
+    roots: list[dict[str, Any]], records: dict[str, dict[str, Any]]
+) -> dict[str, list[tuple[str, int]]]:
+    """For each provision of the units whose records are `roots`, the definitions the
+    rules extract from it, in the order they extract them: the first term of each and
+    the place of its paragraph among the paragraphs of the provision."""
+    extracted: dict[str, list[tuple[str, int]]] = {}
+    for root in roots:
+        places: dict[int, int] = {}
+        address = str(root["address"])
+        positive_law = root.get("positive_law")
+        unit = Unit(
+            address,
+            [],
+            None,
+            str(root["source"]),
+            positive_law if isinstance(positive_law, bool) else None,
+            provision_of(address, records, places),
+            None,
+            [],
+            [],
+        )
+        for at, term, ordinal in Placing(unit, places).placed:
+            extracted.setdefault(at, []).append((term, ordinal))
+    return extracted
 
 
 @dataclass
@@ -393,10 +468,12 @@ def paragraphs(blocks: list[Any]) -> Iterator[tuple[bool, dict[str, Any]]]:
 class Provisions:
     parent: dict[str, str]
     chapeau: dict[str, str]
-    # The paragraphs that the rules read of each provision that holds a definition, the
-    # blocks of its text parts that are paragraphs: for each, its place among the
-    # paragraphs of the provision, its text, and the first terms of its sentences.
-    read: dict[str, list[tuple[int, str, list[str]]]]
+    # The paragraphs of each provision that holds a definition, the blocks of its text
+    # parts that are paragraphs, by their place among the paragraphs of the provision.
+    read: dict[str, dict[int, str]]
+    # For each provision, the definitions the rules extract from the records: the first
+    # term of each, and the place of the paragraph it is extracted from.
+    extracted: dict[str, list[tuple[str, int]]]
     near: list[Paragraph]
     # What the records count, by the names of the coverage ledger.
     counted: dict[str, int]
@@ -414,7 +491,12 @@ COUNTED = ("units", "containers", "provisions", "enacted notes", "editorial note
 
 
 def read_records(records: Path, defined: set[str]) -> Provisions:
-    found = Provisions({}, {}, {}, [], dict.fromkeys(COUNTED, 0))
+    found = Provisions({}, {}, {}, {}, [], dict.fromkeys(COUNTED, 0))
+    # The records of the operative provisions, kept until all are read: they stand in
+    # the order of the bytes of their addresses, so the provisions of a unit need not
+    # follow its record directly (`s1.1` comes before `s1/a`).
+    operative: dict[str, dict[str, Any]] = {}
+    roots: list[dict[str, Any]] = []
     with records.open(encoding="utf-8") as stream:
         for number, line in enumerate(stream, start=1):
             try:
@@ -435,11 +517,13 @@ def read_records(records: Path, defined: set[str]) -> Provisions:
             if record.get("layer") != "operative" or "items" not in record:
                 raise FormError(f"{records}:{number}: no record of a provision")
             found.counted["provisions"] += 1
+            address = str(record["address"])
+            operative[address] = {"kind": record.get("kind"), "items": record["items"]}
             if "source" in record:
                 found.counted["units"] += 1
-            address = str(record["address"])
+                roots.append(record)
             if address in defined:
-                found.read[address] = []
+                found.read[address] = {}
             chapeau: list[str] = []
             ordinal = 0
             for item in record["items"]:
@@ -453,12 +537,24 @@ def read_records(records: Path, defined: set[str]) -> Provisions:
                     ordinal += 1
                     words = str(paragraph["p"])
                     if address in defined and of_part:
-                        found.read[address].append((ordinal, words, first_terms(paragraph)))
+                        found.read[address][ordinal] = words
                     match = loose_match(words)
                     if match is not None:
                         found.near.append(Paragraph(address, role, ordinal, words, *match))
             if chapeau:
                 found.chapeau[address] = "\n".join(chapeau)
+    # The rules are applied to each unit that holds a provision with a definition.
+    units = {str(root["address"]) for root in roots}
+    holding: set[str] = set()
+    for address in defined:
+        above: str | None = address
+        while above is not None and above not in units:
+            above = found.parent.get(above)
+        if above is not None:
+            holding.add(above)
+    found.extracted = extracted_from(
+        [root for root in roots if str(root["address"]) in holding], operative
+    )
     return found
 
 
@@ -483,10 +579,11 @@ def hold_records(provisions: Provisions, totals: dict[str, Any], ledger: Path) -
 
 
 def place_definitions(definitions: list[Definition], provisions: Provisions) -> None:
-    """Gives each definition the paragraph it was extracted from: the paragraphs that
-    the rules read of its provision, once for each of their sentences that `first_terms`
-    offers with the definition's first term, in order, the second such for a second
-    definition of that term, and so on."""
+    """Gives each definition the paragraph it was extracted from: of the definitions
+    that the rules extract from its provision with the definition's first term, in the
+    order they extract them, the paragraph of the first, the second for a second
+    definition of that term, and so on. A module writes two definitions of one provision
+    with one first term in the order they were extracted."""
     taken: dict[tuple[str, str], int] = {}
     for definition in definitions:
         if definition.address not in provisions.read:
@@ -496,19 +593,19 @@ def place_definitions(definitions: list[Definition], provisions: Provisions) -> 
             )
         term = definition.terms[0]
         candidates = [
-            (ordinal, words)
-            for ordinal, words, firsts in provisions.read[definition.address]
-            for first in firsts
+            ordinal
+            for first, ordinal in provisions.extracted.get(definition.address, [])
             if first == term
         ]
         key = (definition.address, term)
         nth = taken.get(key, 0)
         if nth >= len(candidates):
             raise FormError(
-                f"the records hold no paragraph of `{definition.address}` with a sentence whose "
-                f"first term is “{term}”, from which its definition is extracted"
+                f"the records hold no paragraph of `{definition.address}` from which the rules "
+                f"extract a definition whose first term is “{term}”, as they do this one"
             )
-        definition.paragraph, definition.text = candidates[nth]
+        definition.paragraph = candidates[nth]
+        definition.text = provisions.read[definition.address][candidates[nth]]
         taken[key] = nth + 1
 
 

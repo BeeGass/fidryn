@@ -252,35 +252,73 @@ class Generator(unittest.TestCase):
         self.assertEqual(draw.draw(0, 500, 3), [])
 
 
-class FirstTerms(unittest.TestCase):
-    def test_each_sentence_offers_its_first_term_as_the_rules_record_it(self) -> None:
+class Extracted(unittest.TestCase):
+    """What the rules extract from one invented unit, section 1, whose items are given:
+    the first term of each definition and the place of its paragraph."""
+
+    def extracted(self, items: list[dict[str, Any]]) -> list[tuple[str, int]]:
+        root = provision(f"{T1}/s1", "section", items, unit=True)
+        records = {f"{T1}/s1": root}
+        return draw.extracted_from([root], records).get(f"{T1}/s1", [])
+
+    def test_each_definition_is_placed_on_the_paragraph_the_rules_extract_it_from(
+        self,
+    ) -> None:
+        def content(*blocks: dict[str, Any]) -> list[dict[str, Any]]:
+            return [{"part": "content", "blocks": list(blocks)}]
+
+        two = "In this section, the term “a” means b.1 In this section, the term “c” means d."
         cases = [
-            (text("The term “a” means b. The term “c,” means d."), ["a", "c"]),
-            (text("A rule. Another rule, with no term."), []),
+            # Each sentence is read, and a term is recorded as the rules record it.
+            (
+                content(
+                    text(
+                        "In this section, the term “a” means b. In this section, the term “c,” means d."
+                    )
+                ),
+                [("a", 1), ("c", 1)],
+            ),
+            # A later sentence with no reach of its own after `in this ` gives nothing
+            # (D10.2).
+            (
+                content(text("In this section, the term “a” means b. The term “c” means d.")),
+                [("a", 1)],
+            ),
+            (content(text("A rule. Another rule, with no term.")), []),
             # The text the rules read: a superscript of digits only is no text, so the
-            # period before it ends a sentence.
+            # period before it ends a sentence; read as text, the number joins the two
+            # sentences, and the second term refuses the reading (D11.1).
+            (content({"p": two, "refs": [], "sup": [[38, 39]], "sub": []}), [("a", 1), ("c", 1)]),
+            (content(text(two)), []),
+            # A term that holds an end of a sentence ("R.M.S" is no abbreviation).
             (
-                {
-                    "p": "The term “a” means b.1 The term “c” means d.",
-                    "refs": [],
-                    "sup": [[21, 22]],
-                },
-                ["a", "c"],
+                content(
+                    text("For purposes of this section, the term “R.M.S. Widget” means a ship.")
+                ),
+                [("R.M.S. Widget", 1)],
             ),
-            (text("The term “a” means b.1 The term “c” means d."), ["a"]),
-            # A term that holds an end of a sentence ("R.M.S" is no abbreviation) is the
-            # first term of the sentence it begins in.
+            # A sentence that reads no pattern gives nothing, and nor does one that reads a
+            # pattern that a later rule refuses: here a second term in the sentence (D11.1).
             (
-                text("For purposes of this section, the term “R.M.S. Widget” means a ship."),
-                ["R.M.S. Widget"],
+                content(
+                    text("“x” is used below."),
+                    text("In this section, the term “x” means y, and “z” means w."),
+                    text("In this section, the term “x” means q."),
+                ),
+                [("x", 3)],
             ),
-            # A sentence offers its first term only when the rules read a pattern there.
-            (text("“x” is used below."), []),
-            (text("The term “x” is used below. In this section, the term “x” means y."), ["x"]),
+            # A table's cells are counted among the paragraphs, and are not read.
+            (
+                content(
+                    {"table": [["body", [[False, 1, 1, [text("“x” means a cell.")]]]]]},
+                    text("In this section, the term “x” means q."),
+                ),
+                [("x", 2)],
+            ),
         ]
-        for block, expected in cases:
-            with self.subTest(block["p"]):
-                self.assertEqual(draw.first_terms(block), expected)
+        for items, expected in cases:
+            with self.subTest(json.dumps(items, ensure_ascii=False)):
+                self.assertEqual(self.extracted(items), expected)
 
 
 class Placement(unittest.TestCase):
@@ -335,6 +373,19 @@ class Placement(unittest.TestCase):
         self.assertEqual([line["text"] for line in extracted], [defining])
         # The block extracted from is no near miss; the other holds no verb form.
         self.assertEqual(near, [])
+
+    def test_an_earlier_sentence_that_a_later_rule_refuses_is_not_taken(self) -> None:
+        # The first block reads a pattern with the term “x”, and the rules refuse it for
+        # its second term (D11.1); the definition is extracted from the second block.
+        refused = "In this section, the term “x” means y, and “z” means w."
+        defining = "In this section, the term “x” means q."
+        extracted, near = self.drawn(
+            [{"part": "content", "blocks": [text(refused), text(defining)]}],
+            definition(f"{T1}/s1", "x", "In this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        # The block refused is a near miss, and the block extracted from is none.
+        self.assertEqual([line["text"] for line in near], [refused])
 
     def test_a_term_that_holds_an_end_of_a_sentence_is_placed(self) -> None:
         defining = "For purposes of this section, the term “R.M.S. Widget” means an invented ship."

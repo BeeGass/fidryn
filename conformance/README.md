@@ -468,13 +468,14 @@ by basis, to the workspace's coverage ledger `coverage.json`. It reads
 the text records that `fidryn text DIR --json` printed for the workspace,
 and holds them to it: they count the units, containers, provisions, notes
 and footnotes the ledger counts, and every definition's provision has a
-record. It gives each definition the paragraph it was extracted from: of
-the blocks of its provision's text parts that are paragraphs, the one
-with a sentence at whose start the rules read a pattern and whose first
-term in curly quotation marks, which begins in it, is the definition's
-first term, the sentences, the pattern and the term read with the rules
-of `usc_definitions.py`; a paragraph that no definition was given is one
-from which none was extracted. It starts no program. Each line holds the seed, the release,
+record. It gives each definition the paragraph it was extracted from, as
+the rules themselves find it: it applies the rules of
+`usc_definitions.py`, every step of their order of application, to the
+unit of the definition's provision as the text records give it, and gives
+the definition the paragraph from which they extract a definition of that
+provision with its first term, the second such for a second definition of
+that term; a paragraph that no definition was given is one from which
+none was extracted. It starts no program. Each line holds the seed, the release,
 the size of the population, the place in the draw, what a reader needs to
 judge it without opening the Code (the paragraph's text and the nearest
 chapeau above it among them, and of a definition its condition and its
@@ -491,11 +492,13 @@ Exit `0` when both samples are drawn, `1` when an input is not in the form
 the tool reads or a sample is there already, `2` when an input cannot be
 read or the output written. `test_draw_definition_samples.py` holds the
 generator to the known answers of SplitMix64, the draws of the two samples
-drawn from the release 119-142 to theirs, the first terms of the
-sentences of a paragraph (a term that holds an end of a sentence, and a
-sentence that reads no pattern, among them), the placing of a definition
+drawn from the release 119-142 to theirs, what the rules extract from the
+paragraphs of a unit and where (later sentences, a term that holds an end
+of a sentence, a superscript number that ends a sentence, a sentence that
+reads no pattern and one whose pattern a later rule refuses, and the cells
+of a table, which are counted and not read), the placing of a definition
 on the block it was extracted from when an earlier block begins with the
-same term, and the draw, the two populations (a definition
+same term or reads a pattern that a later rule refuses, and the draw, the two populations (a definition
 of a later sentence and one of a proviso part among them), the lines and
 the refusals of a block in another form, of a block with both borrowed
 fields, of a ledger that counts other definitions, of records of other
